@@ -5,12 +5,14 @@ export const style = (colors: Attributes) => StyleSheet.create({
     title: {
         color: colors.textStrong,
         fontSize: Fonts.size.h5,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        textAlign: "center"
     },
 
     subtitle: {
         color: colors.text,
         fontSize: Fonts.size.h8,
+        textAlign: "center"
     },
 
     bottomDescription: {
@@ -29,10 +31,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
         flex: 1
     },
 
-    feedSection: {
-        marginBottom: Metrics.size.xl
-    },
-
     inlineSec: {
         flexDirection: "row",
         gap: Metrics.size.xl
@@ -40,5 +38,16 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     section: {
         gap: Metrics.size.m
+    },
+
+    feedSection: {
+        flexBasis: 10,
+        flexGrow: 1,
+        justifyContent: "center"
+    },
+
+    btnWrapper: {
+        paddingVertical: Metrics.size.xl,
+        backgroundColor: colors.primary
     }
 })

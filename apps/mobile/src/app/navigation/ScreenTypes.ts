@@ -128,11 +128,14 @@ type MenuClanStackParamList = {
   [APP_SCREEN.MENU_CLAN.CREATE_CHANNEL]: {
     categoryId: string;
   };
-  [APP_SCREEN.MENU_CLAN.CREATE_EVENT]: undefined
+  [APP_SCREEN.MENU_CLAN.CREATE_EVENT]: {
+    onGoBack?: () => void;
+  }
   [APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS]: {
     type: OptionEvent;
     channelId: string;
-    location: string
+    location: string;
+    onGoBack?: () => void;
   }
   [APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW]: {
     type: OptionEvent;
@@ -143,6 +146,7 @@ type MenuClanStackParamList = {
     title: string;
     description: string;
     frequency: number;
+    onGoBack?: () => void;
   }
   [APP_SCREEN.MENU_CLAN.SETTINGS]: undefined;
   [APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING]: undefined;

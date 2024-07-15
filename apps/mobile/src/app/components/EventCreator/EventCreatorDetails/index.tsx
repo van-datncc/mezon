@@ -1,11 +1,11 @@
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { style } from "./styles";
 import { useTranslation } from "react-i18next";
 import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes";
 import { MezonDateTimePicker, MezonInput, MezonSelect } from "../../../temp-ui";
 import MezonButton from "../../../temp-ui/MezonButton2";
 import { useState } from "react";
-import { getNearTime } from "@mezon/mobile-components";
+import { getNearTime, Icons } from "@mezon/mobile-components";
 import { OptionEvent } from "@mezon/utils";
 import Toast from "react-native-toast-message";
 import { Fonts, useTheme } from "@mezon/mobile-ui";
@@ -16,12 +16,30 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
     const styles = style(themeValue);
     const { t } = useTranslation(['eventCreator']);
 
-    // @ts-ignore
-    const { type, channelId, location } = route.params;
+    const { type, channelId, location, onGoBack } = route.params || {};
 
     navigation.setOptions({
-        headerTitle: t('screens.eventDetails.headerTitle')
+        headerTitle: t('screens.eventDetails.headerTitle'),
+        headerTitleStyle: {
+            fontSize: Fonts.size.h7,
+            color: themeValue.textDisabled
+        },
+        headerLeft: () => (
+            <TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
+                <Icons.ArrowLargeLeftIcon height={18} width={18} color={themeValue.textStrong} />
+            </TouchableOpacity>
+        ),
+        headerRight: () => (
+            <TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
+                <Icons.CloseLargeIcon height={18} width={18} color={themeValue.textStrong} />
+            </TouchableOpacity>
+        )
     })
+
+    function handleClose() {
+        onGoBack?.();
+        navigation.navigate(APP_SCREEN.HOME);
+    }
 
     const options = [
         {
@@ -82,83 +100,92 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
     }
 
     return (
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
             <View style={styles.feedSection}>
-                <View style={styles.headerSection}>
-                    <Text style={styles.title}>{t('screens.eventDetails.title')}</Text>
-                    <Text style={styles.subtitle}>{t('screens.eventDetails.subtitle')}</Text>
-                </View>
-
-                <View style={styles.section}>
-                    <MezonInput
-                        label={t("fields.eventName.title")}
-                        value={eventTitle}
-                        onTextChange={setEventTitle}
-                        placeHolder={t('fields.eventName.placeholder')}
-                    />
-
-                    <View style={styles.inlineSec}>
-                        <View style={{ flex: 2 }}>
-                            <MezonDateTimePicker
-                                title={t('fields.startDate.title')}
-                                onChange={(value) => setStartTime(value)}
-                                value={startTime}
-                                keepTime
-                            />
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <MezonDateTimePicker
-                                title={t('fields.startTime.title')}
-                                mode="time"
-                                onChange={(value) => setStartTime(value)}
-                                value={startTime}
-                            />
-                        </View>
+                <ScrollView>
+                    <View style={styles.headerSection}>
+                        <Text style={styles.title}>{t('screens.eventDetails.title')}</Text>
+                        <Text style={styles.subtitle}>{t('screens.eventDetails.subtitle')}</Text>
                     </View>
 
-                    {type === OptionEvent.OPTION_LOCATION &&
+                    <View style={styles.section}>
+                        <MezonInput
+                            label={t("fields.eventName.title")}
+                            titleUppercase
+                            value={eventTitle}
+                            onTextChange={setEventTitle}
+                            placeHolder={t('fields.eventName.placeholder')}
+                        />
+
                         <View style={styles.inlineSec}>
                             <View style={{ flex: 2 }}>
                                 <MezonDateTimePicker
-                                    title={t('fields.endDate.title')}
-                                    onChange={(value) => setEndTime(value)}
-                                    value={endTime}
+                                    title={t('fields.startDate.title')}
+                                    titleUppercase
+                                    onChange={(value) => setStartTime(value)}
+                                    value={startTime}
                                     keepTime
                                 />
                             </View>
                             <View style={{ flex: 1 }}>
                                 <MezonDateTimePicker
-                                    title={t('fields.endTime.title')}
+                                    title={t('fields.startTime.title')}
+                                    titleUppercase
                                     mode="time"
-                                    onChange={(value) => setEndTime(value)}
-                                    value={endTime}
+                                    onChange={(value) => setStartTime(value)}
+                                    value={startTime}
                                 />
                             </View>
                         </View>
-                    }
 
-                    <MezonInput
-                        label={t("fields.description.title")}
-                        value={eventDescription}
-                        onTextChange={setEventDescription}
-                        textarea
-                        placeHolder={t('fields.description.description')}
-                    />
+                        {type === OptionEvent.OPTION_LOCATION &&
+                            <View style={styles.inlineSec}>
+                                <View style={{ flex: 2 }}>
+                                    <MezonDateTimePicker
+                                        title={t('fields.endDate.title')}
+                                        onChange={(value) => setEndTime(value)}
+                                        value={endTime}
+                                        keepTime
+                                    />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <MezonDateTimePicker
+                                        title={t('fields.endTime.title')}
+                                        mode="time"
+                                        onChange={(value) => setEndTime(value)}
+                                        value={endTime}
+                                    />
+                                </View>
+                            </View>
+                        }
 
-                    <MezonSelect
-                        title={t('fields.eventFrequency.title')}
-                        data={options}
-                        onChange={handleFrequencyChange}
-                    />
-                </View>
+                        <MezonInput
+                            label={t("fields.description.title")}
+                            value={eventDescription}
+                            titleUppercase
+                            onTextChange={setEventDescription}
+                            textarea
+                            placeHolder={t('fields.description.description')}
+                        />
+
+                        <MezonSelect
+                            title={t('fields.eventFrequency.title')}
+                            titleUppercase
+                            data={options}
+                            onChange={handleFrequencyChange}
+                        />
+                    </View>
+                </ScrollView>
             </View>
 
-            <MezonButton
-                title={t('actions.next')}
-                titleStyle={{fontSize: Fonts.size.h7}}
-                type="success"
-                onPress={handlePressNext}
-            />
-        </ScrollView>
+            <View style={styles.btnWrapper}>
+                <MezonButton
+                    title={t('actions.next')}
+                    titleStyle={{ fontSize: Fonts.size.h7 }}
+                    type="success"
+                    onPress={handlePressNext}
+                />
+            </View>
+        </View>
     )
 }

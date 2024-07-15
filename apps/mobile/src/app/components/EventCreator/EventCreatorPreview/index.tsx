@@ -7,8 +7,10 @@ import MezonButton from "../../../temp-ui/MezonButton2";
 import { OptionEvent } from "@mezon/utils";
 import { Fonts, useTheme } from "@mezon/mobile-ui";
 import { style } from "./styles";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Icons } from "@mezon/mobile-components";
 
-type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT;
+type CreateEventScreenType = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW;
 export default function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<CreateEventScreenType>) {
     const { themeValue } = useTheme();
     const styles = style(themeValue);
@@ -16,13 +18,33 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
     const myUser = useAuth();
     const { createEventManagement } = useEventManagement();
     const { currentClanId } = useClans();
-    // @ts-ignore
-    const { type, channelId, location, startTime, endTime, title, description, frequency } = route.params;
-    console.log(startTime, endTime);
+    const {
+        type, channelId, location, startTime, endTime,
+        title, description, frequency, onGoBack
+    } = route.params || {};
 
     navigation.setOptions({
-        headerTitle: t('screens.eventPreview.headerTitle')
+        headerTitle: t('screens.eventPreview.headerTitle'),
+        headerTitleStyle: {
+            fontSize: Fonts.size.h7,
+            color: themeValue.textDisabled
+        },
+        headerLeft: () => (
+            <TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
+                <Icons.ArrowLargeLeftIcon height={18} width={18} color={themeValue.textStrong} />
+            </TouchableOpacity>
+        ),
+        headerRight: () => (
+            <TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
+                <Icons.CloseLargeIcon height={18} width={18} color={themeValue.textStrong} />
+            </TouchableOpacity>
+        )
     })
+
+    function handleClose() {
+        onGoBack?.();
+        navigation.navigate(APP_SCREEN.HOME);
+    }
 
     async function handleCreate() {
         const timeValueStart = (startTime as Date).toISOString();
@@ -71,12 +93,14 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
                 </View>
             </View>
 
-            <MezonButton
-                title={t('actions.create')}
-                titleStyle={{fontSize: Fonts.size.h7}}
-                type="success"
-                onPress={handleCreate}
-            />
+            <View style={styles.btnWrapper}>
+                <MezonButton
+                    title={t('actions.create')}
+                    titleStyle={{ fontSize: Fonts.size.h7 }}
+                    type="success"
+                    onPress={handleCreate}
+                />
+            </View>
         </View>
     )
 }

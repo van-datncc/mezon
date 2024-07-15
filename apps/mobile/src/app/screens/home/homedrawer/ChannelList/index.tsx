@@ -148,8 +148,16 @@ const ChannelList = React.memo((props: any) => {
 
 	function handlePressEventCreate() {
 		bottomSheetEventRef?.current?.dismiss();
-		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT });
+		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
+			screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT,
+			params: {
+				onGoBack: () => {
+					bottomSheetEventRef?.current?.present();
+				}
+			}
+		});
 	}
+
 	if (isEmpty(currentClan)) {
 		return <Block height={20} />;
 	}

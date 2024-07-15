@@ -37,7 +37,7 @@ export default function MezonSelect({ data, onChange, ...props }: IMezonSelectPr
         <View>
             <MezonFakeInputBox
                 {...props}
-                postfixIcon={<Icons.ChevronSmallRightIcon height={20} width={20} color={themeValue.text} />}
+                postfixIcon={<Icons.ChevronSmallDownIcon height={20} width={20} color={themeValue.text} />}
                 value={currentContent}
                 onPress={handlePress}
             />
