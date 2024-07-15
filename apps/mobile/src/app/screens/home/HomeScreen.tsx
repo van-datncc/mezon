@@ -1,4 +1,4 @@
-import { load, save, STORAGE_CLAN_ID, STORAGE_IS_FROM_FCM } from '@mezon/mobile-components';
+import { load, save, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
 import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -83,7 +83,7 @@ const HomeScreen = React.memo((props: any) => {
 	}, [currentClan, currentChannelId]);
 
 	const handleAppStateChange = async (state: string) => {
-		const isFromFCM = await load(STORAGE_IS_FROM_FCM);
+		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		if (isFromFCM?.toString() === 'true') {
 			dispatch(appActions.setLoadingMainMobile(false));
 		}

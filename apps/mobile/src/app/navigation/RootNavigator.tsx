@@ -19,7 +19,7 @@ import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useMemo } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
@@ -34,10 +34,12 @@ import NetInfoComp from '../components/NetworkInfo';
 import {
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_CLAN_ID,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
+	load,
 	remove,
 	save,
 	setCurrentClanLoader,
-	setDefaultChannelLoader, load, STORAGE_IS_FROM_FCM,
+	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
 import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
@@ -54,12 +56,12 @@ const NavigationMain = () => {
 	const { reconnect } = useMezon();
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useDispatch();
-	
+
 	useEffect(() => {
 		if (isLoggedIn) {
 			dispatch(appActions.setLoadingMainMobile(true));
 			delay(initAppLoading, 800);
-	}
+		}
 	}, [isLoggedIn]);
 
 	useEffect(() => {
@@ -81,10 +83,10 @@ const NavigationMain = () => {
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
-	
+
 	const initAppLoading = async () => {
 		dispatch(appActions.setLoadingMainMobile(false));
-		const isFromFCM = await load(STORAGE_IS_FROM_FCM);
+		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		await mainLoader({ isFromFCM: isFromFCM?.toString() === 'true' });
 	};
 
@@ -92,6 +94,9 @@ const NavigationMain = () => {
 		if (state === 'active') {
 			delay(reconnect, 1200);
 			await notifee.cancelAllNotifications();
+		}
+		if (state === 'background') {
+			await remove(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		}
 	};
 
@@ -124,7 +129,7 @@ const NavigationMain = () => {
 		await store.dispatch(gifsActions.fetchGifCategories());
 		await store.dispatch(gifsActions.fetchGifCategoryFeatured());
 		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
-		
+
 		// If is from FCM don't join current clan
 		if (!isFromFCM) {
 			if (currentClan && currentClan?.clan_id) {
@@ -140,7 +145,7 @@ const NavigationMain = () => {
 		} else {
 			await store.dispatch(directActions.fetchDirectMessage({}));
 		}
-		
+
 		return null;
 	};
 

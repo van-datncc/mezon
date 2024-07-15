@@ -1,9 +1,10 @@
 import { useReference } from '@mezon/core';
-import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
+import { CameraIcon, CheckIcon, PlayIcon, save, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
+import { delay } from 'lodash';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, Image, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
@@ -41,20 +42,20 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		if (hasPermission) {
 			loadPhotos();
 		} else {
-			Alert.alert('Permission Denied', 'App needs access to your came podra roll to function properly.');
+			await requestPermission();
 		}
 	};
 
 	const requestPermission = async () => {
 		if (Platform.OS === 'android') {
-			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE, {
-				title: 'Permission to access camera roll',
-				message: 'App needs access to your camera roll',
-				buttonPositive: 'OK',
-			});
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+			delay(() => save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false), 2000);
 			return granted === PermissionsAndroid.RESULTS.GRANTED;
 		} else if (Platform.OS === 'ios') {
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 			const result = await iosReadGalleryPermission('addOnly');
+			delay(() => save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false), 2000);
 			if (result === 'not-determined') {
 				const requestResult = await iosRequestReadWriteGalleryPermission();
 				return requestResult === 'granted' || requestResult === 'limited';
