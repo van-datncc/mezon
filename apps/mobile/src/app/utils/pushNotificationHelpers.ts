@@ -152,9 +152,6 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 };
 
 const jumpChannelOnNotification = async (store: any, channelId: string, clanId: string) => {
-	const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-	save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-	// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	store.dispatch(appActions.setLoadingMainMobile(false));
 };
@@ -170,9 +167,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				navigation.navigate(APP_SCREEN.HOME as never);
 				navigation.dispatch(DrawerActions.closeDrawer());
 			}
-			const clanIdCache = load(STORAGE_CLAN_ID);
 			const clanId = linkMatch[1];
-			const isDifferentClan = clanIdCache !== clanId;
 			const channelId = linkMatch[2];
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
@@ -181,7 +176,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
 			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
 			await setDefaultChannelLoader(respChannel, clanId);
-			delay(jumpChannelOnNotification, isDifferentClan ? 2000 : 500, store, channelId, clanId);
+			delay(jumpChannelOnNotification, 500, store, channelId, clanId);
 			delay(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_FROM_FCM, false);
