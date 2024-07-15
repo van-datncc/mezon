@@ -27,38 +27,31 @@ export default memo(function MezonDateTimePicker({ mode = "date", onChange, valu
     const [date, setDate] = useState(value || getNearTime(120))
     const [currentDate, setCurrentDate] = useState(value || getNearTime(120));
 
-    useEffect(() => {
-        setDate(value || getNearTime(120));
-        setCurrentDate(value || getNearTime(120));
-    }, [value])
+	useEffect(() => {
+		setDate(value || getNearTime(120));
+		setCurrentDate(value || getNearTime(120));
+	}, [value]);
 
-    const handleChange = useCallback(() => {
-        if (keepTime && mode !== "time" && value) {
-            const new_date = new Date(
-                date.getFullYear(),
-                date.getMonth(),
-                date.getDate(),
-                value.getHours(),
-                value.getMinutes(),
-                value.getSeconds()
-            );
+	const handleChange = useCallback(() => {
+		if (keepTime && mode !== 'time' && value) {
+			const new_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), value.getHours(), value.getMinutes(), value.getSeconds());
 
-            setCurrentDate(new_date);
-            onChange && onChange(new_date);
-        } else {
-            setCurrentDate(date);
-            onChange && onChange(date);
-        }
-        bottomSheetRef?.current?.dismiss();
-    }, [keepTime, mode, value, date]);
+			setCurrentDate(new_date);
+			onChange && onChange(new_date);
+		} else {
+			setCurrentDate(date);
+			onChange && onChange(date);
+		}
+		bottomSheetRef?.current?.dismiss();
+	}, [keepTime, mode, value, date]);
 
-    function handleClose() {
-        bottomSheetRef?.current?.dismiss();
-    }
+	function handleClose() {
+		bottomSheetRef?.current?.dismiss();
+	}
 
-    function handlePress() {
-        bottomSheetRef?.current?.present();
-    }
+	function handlePress() {
+		bottomSheetRef?.current?.present();
+	}
 
     return (
         <View>

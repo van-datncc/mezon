@@ -1,10 +1,10 @@
 import { useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { selectReactionPlaceActive } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 import { Icons } from '../../components';
-import { useSelector } from 'react-redux';
-import { selectReactionPlaceActive } from '@mezon/store';
 
 export const InputSearch: React.FC = () => {
 	const { subPanelActive } = useGifsStickersEmoji();

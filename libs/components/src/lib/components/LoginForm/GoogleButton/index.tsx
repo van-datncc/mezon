@@ -17,7 +17,7 @@ const GoogleButtonLogin: React.FC<GoogleButtonLoginProps> = ({ mode }) => {
 		onSuccess: async ({ code }) => {
 			await loginByGoogle(code);
 			if (mode !== 'dev') {
-				navigate("/mezon");
+				navigate('/mezon');
 			}
 		},
 		onError: (errorResponse) => console.log(errorResponse),

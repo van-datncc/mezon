@@ -1,21 +1,20 @@
 import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
+import { getSelectedMessage, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IMessageWithUser, removeDuplicatesById } from '@mezon/utils';
-import { getSelectedMessage } from '@mezon/store-mobile';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { default as CheckBox } from 'react-native-bouncy-checkbox';
 import { TextInput } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import UseMentionList from '../../../../../../app/hooks/useUserMentionList';
 import MessageItem from '../../MessageItem';
 import { styles } from './styles';
-import Toast from 'react-native-toast-message';
-import { useTranslation } from 'react-i18next';
-import { selectDirectsOpenlist } from '@mezon/store-mobile';
-import UseMentionList from "../../../../../../app/hooks/useUserMentionList";
 
 type OpjectSend = {
 	id: string;
@@ -42,30 +41,30 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const accountId = userProfile?.user?.id ?? '';
 	const { t } = useTranslation('message');
-  const listMentions = UseMentionList(message?.channel_id || '');
+	const listMentions = UseMentionList(message?.channel_id || '');
 
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM?.length
 			? listDM.map((itemDM: any) => {
-				return {
-					id: itemDM?.user_id?.[0] ?? '',
-					name: itemDM?.channel_label ?? '',
-					avatarUser: itemDM?.channel_avatar?.[0] ?? '',
-					idDM: itemDM?.id ?? '',
-					typeChat: 3,
-				};
-			})
+					return {
+						id: itemDM?.user_id?.[0] ?? '',
+						name: itemDM?.channel_label ?? '',
+						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
+						idDM: itemDM?.id ?? '',
+						typeChat: 3,
+					};
+				})
 			: [];
 		const listGroupSearch = listGroup?.length
 			? listGroup.map((itemGr: any) => {
-				return {
-					id: itemGr?.channel_id ?? '',
-					name: itemGr?.channel_label ?? '',
-					avatarUser: 'assets/images/avatar-group.png' ?? '',
-					idDM: itemGr?.id ?? '',
-					typeChat: 2,
-				};
-			})
+					return {
+						id: itemGr?.channel_id ?? '',
+						name: itemGr?.channel_label ?? '',
+						avatarUser: 'assets/images/avatar-group.png' ?? '',
+						idDM: itemGr?.id ?? '',
+						typeChat: 2,
+					};
+				})
 			: [];
 
 		const listSearch = [...listDMSearch, ...listGroupSearch];
@@ -106,19 +105,9 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 		try {
 			for (const selectedObjectIdSend of selectedObjectIdSends) {
 				if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-					sendForwardMessage(
-						'',
-						selectedObjectIdSend.id,
-						ChannelStreamMode.STREAM_MODE_DM,
-						selectedMessage,
-					);
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
 				} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-					sendForwardMessage(
-						'',
-						selectedObjectIdSend.id,
-						ChannelStreamMode.STREAM_MODE_GROUP,
-						selectedMessage,
-					);
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
 				} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 					sendForwardMessage(
 						selectedObjectIdSend.clanId || '',
@@ -132,8 +121,8 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 				type: 'success',
 				props: {
 					text2: t('forwardMessagesSuccessfully'),
-					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />
-				}
+					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />,
+				},
 			});
 		} catch (error) {
 			console.log('Tom log  => error', error);
@@ -154,10 +143,12 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 								<View style={styles.groupAvatar}>
 									<UserGroupIcon />
 								</View>
-							): (
+							) : (
 								<Image source={{ uri: item.avatarUser }} style={styles.memberAvatar} />
 							)}
-							<Text style={styles.memberName} numberOfLines={1}>{item.name}</Text>
+							<Text style={styles.memberName} numberOfLines={1}>
+								{item.name}
+							</Text>
 						</View>
 
 						<View>
@@ -229,12 +220,7 @@ const ForwardMessageModal = ({ show, onClose, message }: ForwardMessageModalProp
 
 				<View style={styles.searchWrapper}>
 					<View style={styles.inputWrapper}>
-						<TextInput
-							style={styles.input}
-							onChangeText={setSearchText}
-							placeholderTextColor={'white'}
-							placeholder="Search"
-						/>
+						<TextInput style={styles.input} onChangeText={setSearchText} placeholderTextColor={'white'} placeholder="Search" />
 					</View>
 				</View>
 

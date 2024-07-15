@@ -76,30 +76,30 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
         },
     ], [startTime]);
 
-    function handleFrequencyChange(value: number) {
-        setEventFrequency(value);
-    }
+	function handleFrequencyChange(value: number) {
+		setEventFrequency(value);
+	}
 
-    function handlePressNext() {
-        if (eventTitle?.trim()?.length === 0) {
-            Toast.show({
-                type: "error",
-                text1: t("notify.titleBlank")
-            })
-            return;
-        }
+	function handlePressNext() {
+		if (eventTitle?.trim()?.length === 0) {
+			Toast.show({
+				type: 'error',
+				text1: t('notify.titleBlank'),
+			});
+			return;
+		}
 
-        navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW, {
-            type,
-            channelId,
-            location,
-            title: eventTitle,
-            description: eventDescription,
-            startTime,
-            endTime,
-            frequency: eventFrequency,
-        });
-    }
+		navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW, {
+			type,
+			channelId,
+			location,
+			title: eventTitle,
+			description: eventDescription,
+			startTime,
+			endTime,
+			frequency: eventFrequency,
+		});
+	}
 
     return (
         <View style={styles.container}>

@@ -229,7 +229,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			setEnableOpenLinkItem(true);
 			setEnableCopyImageItem(true);
 			setEnableSaveImageItem(true);
-			return
+			return;
 		} else {
 			setEnableCopyLinkItem(false);
 			setEnableOpenLinkItem(false);

@@ -1,17 +1,13 @@
+import { CardStyleInterpolators, createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
 import React from 'react';
-import {
-	CardStyleInterpolators,
-	createStackNavigator,
-	TransitionSpecs,
-} from '@react-navigation/stack';
 
-import {APP_SCREEN} from "../../ScreenTypes";
-import UpdateGateScreen from "../../../screens/updateGate/UpdateGateScreen";
+import UpdateGateScreen from '../../../screens/updateGate/UpdateGateScreen';
+import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const ServersStacks = ({} : any) => {
+export const ServersStacks = ({}: any) => {
 	const Stack = createStackNavigator();
-	
+
 	return (
 		<Stack.Navigator
 			screenOptions={{

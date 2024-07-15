@@ -1,7 +1,7 @@
+import { onMessageListener, requestForToken, ToastController } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import { fcmActions, useAppDispatch } from '@mezon/store';
 import { MezonUiProvider } from '@mezon/ui';
-import { onMessageListener, requestForToken, ToastController } from '@mezon/components';
 import { useEffect } from 'react';
 import { Outlet, useLoaderData, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -25,7 +25,7 @@ const AppLayout = () => {
 			const message = payload.notification.body;
 			const image = payload.notification.image;
 			const title = payload.notification.title;
-			
+
 			toast(
 				<div>
 					<div className="flex items-center">
@@ -39,13 +39,14 @@ const AppLayout = () => {
 					</div>
 				</div>,
 				{
-				onClick: () => {
-					const fullLink = payload.data.link;
-					const baseUrl = 'https://mezon.vn';
-					const relativeLink = fullLink.replace(baseUrl, '');
-					navigate(relativeLink);
+					onClick: () => {
+						const fullLink = payload.data.link;
+						const baseUrl = 'https://mezon.vn';
+						const relativeLink = fullLink.replace(baseUrl, '');
+						navigate(relativeLink);
+					},
 				},
-			});
+			);
 		}
 		onMessageListener()
 			.then(handleNewMessage)
@@ -63,12 +64,18 @@ const AppLayout = () => {
 			});
 
 		if (fcmTokenObject?.token) {
-			dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmTokenObject.token ?? '', deviceId: fcmTokenObject.deviceId ?? '', platform: "website" }));
+			dispatch(
+				fcmActions.registFcmDeviceToken({
+					tokenId: fcmTokenObject.token ?? '',
+					deviceId: fcmTokenObject.deviceId ?? '',
+					platform: 'website',
+				}),
+			);
 		} else {
 			requestForToken()
 				.then((token) => {
 					if (token) {
-						dispatch(fcmActions.registFcmDeviceToken({ tokenId: token, deviceId: userProfile?.user?.id || '', platform: "website" }));
+						dispatch(fcmActions.registFcmDeviceToken({ tokenId: token, deviceId: userProfile?.user?.id || '', platform: 'website' }));
 					}
 				})
 				.catch((error: Error) => {

@@ -1,21 +1,21 @@
 import { ValidateSpecialCharacters } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import * as Icons from '../../../../../../ui/src/lib/Icons';
 import { ChannelLableModal } from '../ChannelLabel';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 interface ChannelNameModalProps {
 	type: number;
 	channelNameProps: string;
 	onChange: (value: string) => void;
 	onCheckValidate: (check: boolean) => void;
-	onHandleChangeValue: () => void
+	onHandleChangeValue: () => void;
 	error: string;
 }
 
 export type ChannelNameModalRef = {
 	checkInput: () => boolean;
-}
+};
 
 export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameModalProps>((props, ref) => {
 	const { channelNameProps, type, onChange, onCheckValidate, onHandleChangeValue, error } = props;

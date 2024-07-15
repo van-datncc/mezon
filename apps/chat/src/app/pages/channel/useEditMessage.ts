@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { useChatSending } from '@mezon/core';
 import { referencesActions, selectIdMessageRefEdit, selectOpenEditMessageState } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
+import { useCallback, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const useEditMessage = (channelId: string, channelLabel: string, mode: number, message: IMessageWithUser) => {
   const dispatch = useDispatch();

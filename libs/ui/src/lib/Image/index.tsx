@@ -10,9 +10,7 @@ export type ImageProps = ImgProps & {
 };
 
 function Image(params: ImageProps) {
-	return (
-		<Img {...params} />		
-	);
+	return <Img {...params} />;
 }
 
 export default Image;

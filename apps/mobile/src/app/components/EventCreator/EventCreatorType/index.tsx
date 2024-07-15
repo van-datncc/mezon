@@ -22,8 +22,8 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
     const styles = style(themeValue);
     const { onGoBack } = route.params || {};
 
-    const { t } = useTranslation(['eventCreator']);
-    const voicesChannel = useSelector(selectVoiceChannelAll);
+	const { t } = useTranslation(['eventCreator']);
+	const voicesChannel = useSelector(selectVoiceChannelAll);
 
     navigation.setOptions({
         headerTitle: t('screens.eventType.headerTitle'),
@@ -48,49 +48,53 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
         return onGoBack?.();
     }, [])
 
-    const options = useMemo(() => ([
-        {
-            title: t('fields.channelType.voiceChannel.title'),
-            description: t('fields.channelType.voiceChannel.description'),
-            value: OptionEvent.OPTION_SPEAKER,
-            textStyle: {
-                fontWeight: "bold"
-            }
-        },
-        {
-            title: t('fields.channelType.somewhere.title'),
-            description: t('fields.channelType.somewhere.description'),
-            value: OptionEvent.OPTION_LOCATION,
-            textStyle: {
-                fontWeight: "bold"
-            }
-        }
-    ]) satisfies IMezonOptionData, []);
+	const options = useMemo(
+		() =>
+			[
+				{
+					title: t('fields.channelType.voiceChannel.title'),
+					description: t('fields.channelType.voiceChannel.description'),
+					value: OptionEvent.OPTION_SPEAKER,
+					textStyle: {
+						fontWeight: 'bold',
+					},
+				},
+				{
+					title: t('fields.channelType.somewhere.title'),
+					description: t('fields.channelType.somewhere.description'),
+					value: OptionEvent.OPTION_LOCATION,
+					textStyle: {
+						fontWeight: 'bold',
+					},
+				},
+			] satisfies IMezonOptionData,
+		[],
+	);
 
-    const channels = voicesChannel.map(item => ({
-        title: item.channel_label,
-        value: item.channel_id,
-        icon: <SpeakerIcon height={20} width={20} color={themeValue.text} />
-    }))
+	const channels = voicesChannel.map((item) => ({
+		title: item.channel_label,
+		value: item.channel_id,
+		icon: <SpeakerIcon height={20} width={20} color={themeValue.text} />,
+	}));
 
-    const [eventType, setEventType] = useState<OptionEvent>(OptionEvent.OPTION_SPEAKER);
-    const [channelID, setChannelID] = useState<string>(channels?.[0]?.value || "")
-    const [location, setLocation] = useState<string>("");
+	const [eventType, setEventType] = useState<OptionEvent>(OptionEvent.OPTION_SPEAKER);
+	const [channelID, setChannelID] = useState<string>(channels?.[0]?.value || '');
+	const [location, setLocation] = useState<string>('');
 
-    function handleEventTypeChange(value: OptionEvent) {
-        setEventType(value);
-    }
+	function handleEventTypeChange(value: OptionEvent) {
+		setEventType(value);
+	}
 
-    function handlePressNext() {
-        if (eventType === OptionEvent.OPTION_LOCATION) {
-            if (location?.trim()?.length === 0) {
-                Toast.show({
-                    type: "error",
-                    text1: t("notify.locationBlank")
-                })
-                return;
-            }
-        }
+	function handlePressNext() {
+		if (eventType === OptionEvent.OPTION_LOCATION) {
+			if (location?.trim()?.length === 0) {
+				Toast.show({
+					type: 'error',
+					text1: t('notify.locationBlank'),
+				});
+				return;
+			}
+		}
 
         navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS, {
             type: eventType,
@@ -100,9 +104,9 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
         });
     }
 
-    function handleChannelIDChange(value: string | number) {
-        setChannelID(value as string);
-    }
+	function handleChannelIDChange(value: string | number) {
+		setChannelID(value as string);
+	}
 
     return (
         <View style={styles.container}>

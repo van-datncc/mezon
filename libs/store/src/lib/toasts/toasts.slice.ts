@@ -1,6 +1,6 @@
-import { createSlice, createEntityAdapter, PayloadAction, createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { Toast, ToastPayload } from './types';
+import { createAsyncThunk, createEntityAdapter, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { sleep } from '../helpers';
+import { Toast, ToastPayload } from './types';
 
 
 

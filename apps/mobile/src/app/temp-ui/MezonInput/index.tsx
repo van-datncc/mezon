@@ -31,32 +31,32 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
     const [isFocus, setFocus] = useState<boolean>(false);
     const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 
-    useEffect(() => {
-        setIsCheckValid(validInput(value))
-    }, [value])
+	useEffect(() => {
+		setIsCheckValid(validInput(value));
+	}, [value]);
 
-    function handleClearBtn() {
-        ref && ref.current && ref.current.clear();
-        onTextChange && onTextChange("");
-    }
+	function handleClearBtn() {
+		ref && ref.current && ref.current.clear();
+		onTextChange && onTextChange('');
+	}
 
-    function handleFocus() {
-        setShowCount(true);
-        setFocus(true);
-    }
+	function handleFocus() {
+		setShowCount(true);
+		setFocus(true);
+	}
 
-    function handleBlur() {
-        setShowCount(false);
-        setFocus(false);
-    }
+	function handleBlur() {
+		setShowCount(false);
+		setFocus(false);
+	}
 
-    const renderBorder = (): StyleProp<ViewStyle> => {
-        if (showBorderOnFocus) {
-            return isFocus ? styles.fakeInputFocus : styles.fakeInputBlur;
-        } else {
-            return {}
-        }
-    }
+	const renderBorder = (): StyleProp<ViewStyle> => {
+		if (showBorderOnFocus) {
+			return isFocus ? styles.fakeInputFocus : styles.fakeInputBlur;
+		} else {
+			return {};
+		}
+	};
 
     return (
         <View style={styles.container}>
@@ -78,23 +78,20 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
                         onBlur={handleBlur}
                     />
 
-                    {!textarea && value?.length > 0 &&
-                        <TouchableOpacity
-                            onPress={handleClearBtn}
-                            style={styles.clearBtn}>
-                            <CircleXIcon height={18} width={18} />
-                        </TouchableOpacity>
-                    }
-                </View>
+					{!textarea && value?.length > 0 && (
+						<TouchableOpacity onPress={handleClearBtn} style={styles.clearBtn}>
+							<CircleXIcon height={18} width={18} />
+						</TouchableOpacity>
+					)}
+				</View>
 
-                {showCount && textarea &&
-                    <View style={styles.lineCountWrapper}>
-                        <Text style={styles.count}>{`${value?.length || '0'}/${maxCharacter}`}</Text>
-                    </View>
-                }
-            </View>
-            {!isCheckValid && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
-        </View>
-
-    )
+				{showCount && textarea && (
+					<View style={styles.lineCountWrapper}>
+						<Text style={styles.count}>{`${value?.length || '0'}/${maxCharacter}`}</Text>
+					</View>
+				)}
+			</View>
+			{!isCheckValid && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
+		</View>
+	);
 }

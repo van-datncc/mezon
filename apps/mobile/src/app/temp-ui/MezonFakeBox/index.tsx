@@ -1,7 +1,7 @@
-import { useTheme } from "@mezon/mobile-ui";
-import { ReactNode } from "react";
-import { StyleProp, Text, TextStyle, TouchableOpacity, View } from "react-native";
-import { style } from "./styles";
+import { useTheme } from '@mezon/mobile-ui';
+import { ReactNode } from 'react';
+import { StyleProp, Text, TextStyle, TouchableOpacity, View } from 'react-native';
+import { style } from './styles';
 
 export interface IMezonFakeBoxProps {
     title?: string;
@@ -24,13 +24,13 @@ export default function MezonFakeInputBox({ title, titleStyle, titleUppercase, p
                     {title}
                 </Text>}
 
-            <TouchableOpacity onPress={onPress}>
-                <View style={styles.box}>
-                    {prefixIcon}
-                    <Text style={styles.textBox}>{value}</Text>
-                    {postfixIcon}
-                </View>
-            </TouchableOpacity>
-        </View>
-    )
-};
+			<TouchableOpacity onPress={onPress}>
+				<View style={styles.box}>
+					{prefixIcon}
+					<Text style={styles.textBox}>{value}</Text>
+					{postfixIcon}
+				</View>
+			</TouchableOpacity>
+		</View>
+	);
+}

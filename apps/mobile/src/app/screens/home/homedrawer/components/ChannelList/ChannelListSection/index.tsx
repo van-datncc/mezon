@@ -19,13 +19,12 @@ interface IChannelListSectionProps {
 }
 
 export const ChannelListSection = memo((props: IChannelListSectionProps) => {
-	
 	const styles = style(useTheme().themeValue);
 	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
 	const currentChanel = useSelector(selectCurrentChannel);
-  if (!props?.data?.category_name?.trim()) {
-    return;
-  }
+	if (!props?.data?.category_name?.trim()) {
+		return;
+	}
 	return (
 		<View key={Math.floor(Math.random() * 9999999).toString()} style={styles.channelListSection}>
 			<ChannelListSectionHeader

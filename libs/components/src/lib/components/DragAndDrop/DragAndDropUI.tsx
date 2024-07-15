@@ -1,6 +1,6 @@
 import { useDragAndDrop } from '@mezon/core';
 import { selectCurrentChannel } from '@mezon/store';
-import { DragEvent, useState } from 'react';
+import { DragEvent } from 'react';
 import { useSelector } from 'react-redux';
 import DocumentThumbnail from './DocumentThumbnail';
 
@@ -67,4 +67,3 @@ function DragAndDropUI({ onDrop }: DragAndDropUIProps) {
 }
 
 export default DragAndDropUI;
-
