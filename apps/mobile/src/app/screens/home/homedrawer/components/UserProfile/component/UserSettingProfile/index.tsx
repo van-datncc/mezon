@@ -1,6 +1,6 @@
 import { useChannelMembers } from '@mezon/core';
 import { ActionEmitEvent, ClockWarning, HammerIcon, SettingIcon, UserMinus } from '@mezon/mobile-components';
-import { Block, Colors, Text, size } from '@mezon/mobile-ui';
+import { Block, Colors, Text } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity, ClansEntity, selectCurrentClanId } from '@mezon/store-mobile';
 import { ApiAccount } from 'mezon-js/api.gen';
 import React, { useMemo, useState } from 'react';
@@ -9,12 +9,29 @@ import { useSelector } from 'react-redux';
 import { MezonModal } from '../../../../../../../../app/temp-ui/MezonModal';
 import KickUserClanModal from '../KickUserClanModal';
 import { styles } from './UserSettingProfile.style';
+import { ManageUserModal } from '../ManageUserModal';
 
-enum EActionSettingUserProfile {
+export enum EActionSettingUserProfile {
 	Manage = 'Manage',
 	TimeOut = 'Timeout',
 	Kick = 'Kick',
 	Ban = 'Ban',
+}
+
+interface IUserSettingProfileProps {
+	user: ChannelMembersEntity;
+	clan: ClansEntity;
+	currentChannel: ChannelsEntity;
+	userProfile: ApiAccount;
+	isClanOwner?: boolean;
+}
+
+export interface IProfileSetting {
+    label: string;
+    value: EActionSettingUserProfile;
+    icon: React.JSX.Element;
+    action: (action?: EActionSettingUserProfile) => void;
+    isShow: boolean;
 }
 
 const UserSettingProfile = ({
@@ -22,26 +39,23 @@ const UserSettingProfile = ({
 	clan,
 	currentChannel,
 	userProfile,
-}: {
-	user: ChannelMembersEntity;
-	clan: ClansEntity;
-	currentChannel: ChannelsEntity;
-	userProfile: ApiAccount;
-}) => {
-	const [visibleModal, setVisibleModal] = useState<boolean>(false);
+	isClanOwner
+}: IUserSettingProfileProps) => {
+	const [visibleKickUserModal, setVisibleKickUserModal] = useState<boolean>(false);
+	const [visibleManageUserModal, setVisibleManageUserModal] = useState<boolean>(false);
 	const { removeMemberClan } = useChannelMembers();
 	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
 	const checkUser = useMemo(() => userProfile?.user?.id === user?.user?.id, [user?.user?.id, userProfile?.user?.id]);
-
 	const currentClanId = useSelector(selectCurrentClanId);
 	const handleSettingUserProfile = (action?: EActionSettingUserProfile) => {
 		switch (action) {
 			case EActionSettingUserProfile.Manage:
+				setVisibleManageUserModal(true);
 				break;
 			case EActionSettingUserProfile.TimeOut:
 				break;
 			case EActionSettingUserProfile.Kick:
-				setVisibleModal(true);
+				setVisibleKickUserModal(true);
 				break;
 			case EActionSettingUserProfile.Ban:
 				break;
@@ -49,40 +63,43 @@ const UserSettingProfile = ({
 				break;
 		}
 	};
-	const profileSetting = [
-		{
-			label: EActionSettingUserProfile.Manage,
-			value: EActionSettingUserProfile.Manage,
-			icon: <SettingIcon color={Colors.textGray} width={20} height={20} />,
-			action: handleSettingUserProfile,
-			isShow: true,
-		},
-		{
-			label: `${EActionSettingUserProfile.TimeOut}`,
-			value: EActionSettingUserProfile.TimeOut,
-			icon: <ClockWarning width={20} height={20} />,
-			action: handleSettingUserProfile,
-			isShow: checkCreateUser && !checkUser,
-		},
-		{
-			label: `${EActionSettingUserProfile.Kick}`,
-			value: EActionSettingUserProfile.Kick,
-			icon: <UserMinus width={20} height={20} />,
-			action: handleSettingUserProfile,
-			isShow: checkCreateUser && !checkUser,
-		},
-		{
-			label: `${EActionSettingUserProfile.Ban}`,
-			value: EActionSettingUserProfile.Ban,
-			icon: <HammerIcon width={20} height={20} />,
-			action: handleSettingUserProfile,
-			isShow: checkCreateUser && !checkUser,
-		},
-	];
+	const profileSetting: IProfileSetting[] = useMemo(() => {
+		const settingList = [
+			{
+				label: `${EActionSettingUserProfile.Manage}`,
+				value: EActionSettingUserProfile.Manage,
+				icon: <SettingIcon color={Colors.textGray} width={20} height={20} />,
+				action: handleSettingUserProfile,
+				isShow: isClanOwner,
+			},
+			{
+				label: `${EActionSettingUserProfile.TimeOut}`,
+				value: EActionSettingUserProfile.TimeOut,
+				icon: <ClockWarning width={20} height={20} />,
+				action: handleSettingUserProfile,
+				isShow: checkCreateUser && !checkUser,
+			},
+			{
+				label: `${EActionSettingUserProfile.Kick}`,
+				value: EActionSettingUserProfile.Kick,
+				icon: <UserMinus width={20} height={20} />,
+				action: handleSettingUserProfile,
+				isShow: checkCreateUser && !checkUser,
+			},
+			{
+				label: `${EActionSettingUserProfile.Ban}`,
+				value: EActionSettingUserProfile.Ban,
+				icon: <HammerIcon width={20} height={20} />,
+				action: handleSettingUserProfile,
+				isShow: checkCreateUser && !checkUser,
+			},
+		]
+		return settingList
+	}, [checkCreateUser, checkUser, isClanOwner]);
 
 	const handleRemoveUserClans = async (value: string) => {
 		if (user) {
-			setVisibleModal(false);
+			setVisibleKickUserModal(false);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, { isHiddenBottomSheet: true });
 			const userIds = [user.user?.id ?? ''];
 			await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
@@ -90,29 +107,40 @@ const UserSettingProfile = ({
 	};
 
 	return (
-		<Block style={styles.wrapper}>
-			{profileSetting?.map((item, index) => (
-				<TouchableOpacity onPress={() => item.action(item.value)}>
-					{item?.isShow ? (
-						<Block key={index} style={styles.option}>
-							{item?.icon}
-							<Text
-								style={styles.textOption}
-							>
-								{item?.label}
-							</Text>
-						</Block>
-					) : null}
-				</TouchableOpacity>
-			))}
+		<Block>
+			{profileSetting.some(action => action.isShow) && (
+				<Block style={styles.wrapper}>
+					{profileSetting?.map((item, index) => (
+						<TouchableOpacity onPress={() => item.action(item.value)} key={index}>
+							{item?.isShow ? (
+								<Block style={styles.option}>
+									{item?.icon}
+									<Text
+										style={styles.textOption}
+									>
+										{item?.label}
+									</Text>
+								</Block>
+							) : null}
+						</TouchableOpacity>
+					))}
+				</Block>
+			)}
+
 			<MezonModal
-				visible={visibleModal}
+				visible={visibleKickUserModal}
 				visibleChange={(visible) => {
-					setVisibleModal(visible);
+					setVisibleKickUserModal(visible);
 				}}
 			>
 				<KickUserClanModal onRemoveUserClan={(value) => handleRemoveUserClans(value)} user={user} clan={clan} />
 			</MezonModal>
+
+			<ManageUserModal
+				visible={visibleManageUserModal}
+				user={user} onclose={() => setVisibleManageUserModal(false)}
+				profileSetting={profileSetting}
+			/>
 		</Block>
 	);
 };

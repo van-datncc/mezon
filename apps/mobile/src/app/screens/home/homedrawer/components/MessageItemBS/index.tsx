@@ -22,7 +22,7 @@ import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
 import { style } from './styles';
 import { MezonBottomSheet } from '../../../../../../app/temp-ui';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import RNFetchBlob from 'rn-fetch-blob';
 import { useAppDispatch } from '@mezon/store';
@@ -517,7 +517,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				)
 			}}
 		>
-			<View style={styles.bottomSheetWrapper}>{content}</View>
+			<BottomSheetScrollView style={styles.bottomSheetWrapper}>{content}</BottomSheetScrollView>
 		</MezonBottomSheet>
 	);
 });
