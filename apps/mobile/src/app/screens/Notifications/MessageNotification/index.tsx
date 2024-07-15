@@ -30,7 +30,7 @@ const MessageNotification = React.memo(({ message, channelId }: IMessageNotifica
 			return updateDate > createDate;
 		}
 		return false;
-	}, [message]);
+	}, [message?.update_time, message?.create_time]);
 	return (
 		<Block>
 			{attachments?.length ? (
