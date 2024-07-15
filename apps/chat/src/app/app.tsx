@@ -21,6 +21,11 @@ const mezon: CreateMezonClientOptions = {
 export function App() {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
+
+		if(!mezon) {
+			return { store: null, persistor: null };
+		}
+
 		return initStore(mezon, preloadedState);
 	}, [mezon]);
 
