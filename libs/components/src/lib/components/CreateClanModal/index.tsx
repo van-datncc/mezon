@@ -1,12 +1,12 @@
+import { ModalErrorTypeUpload, ModalOverData } from '@mezon/components';
 import { useAppNavigation, useClans } from '@mezon/core';
 import { selectAllAccount, selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
-import { fileTypeImage, ValidateSpecialCharacters } from '@mezon/utils';
+import { ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
-import { ModalErrorTypeUpload, ModalOverData } from '@mezon/components';
 
 export type ModalCreateClansProps = {
 	open: boolean;
@@ -14,9 +14,9 @@ export type ModalCreateClansProps = {
 };
 
 type openModalErrorProps = {
-	errorType: boolean,
-	errorSize: boolean,
-}
+	errorType: boolean;
+	errorSize: boolean;
+};
 
 const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { open, onClose } = props;
@@ -40,12 +40,10 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			setCheckValidate(true);
 		}
 	};
-	const [openModalError, seOpenModalError] = useState<openModalErrorProps>(
-		{
-			errorType: false,
-			errorSize: false,
-		}
-	);
+	const [openModalError, seOpenModalError] = useState<openModalErrorProps>({
+		errorType: false,
+		errorSize: false,
+	});
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
 		const session = sessionRef.current;
@@ -139,7 +137,10 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					</span>
 				</div>
 			</div>
-			<ModalErrorTypeUpload openModal={openModalError.errorType} handleClose={() => seOpenModalError((prev) => ({ ...prev, errorType: false }))} />
+			<ModalErrorTypeUpload
+				openModal={openModalError.errorType}
+				handleClose={() => seOpenModalError((prev) => ({ ...prev, errorType: false }))}
+			/>
 			<ModalOverData openModal={openModalError.errorSize} handleClose={() => seOpenModalError((prev) => ({ ...prev, errorSize: false }))} />
 		</Modal>
 	);

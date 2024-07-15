@@ -19,7 +19,10 @@ const WebhookItemModal = () => {
 							<div className="dark:text-[#b5bac1] text-textLightTheme text-[13px]">Created on 24 Jun 2024 by tung.nguyenquyson</div>
 						</div>
 					</div>
-					<div onClick={() => setIsExpand(!isExpand)} className={`cursor-pointer transition duration-100 ease-in-out ${isExpand ? "" : "-rotate-90"}`}>
+					<div
+						onClick={() => setIsExpand(!isExpand)}
+						className={`cursor-pointer transition duration-100 ease-in-out ${isExpand ? '' : '-rotate-90'}`}
+					>
 						<Icons.ArrowDown defaultSize="h-[30px] w-[30px] dark:text-[#b5bac1] text-black" />
 					</div>
 				</div>
@@ -62,7 +65,9 @@ const WebhookItemModal = () => {
 							</div>
 							<div className="border-t dark:border-[#3b3d44] my-[24px]"></div>
 							<div className="flex items-center gap-[20px]">
-								<div className="px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer">Copy Webhook URL</div>
+								<div className="px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer">
+									Copy Webhook URL
+								</div>
 								<div className="text-red-400 hover:underline cursor-pointer">Delete Webhook</div>
 							</div>
 						</div>

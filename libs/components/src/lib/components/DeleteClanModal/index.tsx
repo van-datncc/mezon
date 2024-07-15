@@ -1,6 +1,6 @@
 import { useClans } from '@mezon/core';
 import { selectCurrentClan, selectCurrentClanId } from '@mezon/store';
-import React, { FormEvent, MouseEvent, useEffect, useState } from 'react';
+import React, { FormEvent, MouseEvent, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,21 +9,21 @@ interface DeleteClanModalProps {
 }
 
 const DeleteClanModal: React.FC<DeleteClanModalProps> = ({ onClose }) => {
-	const {deleteClan} = useClans();
+	const { deleteClan } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
 	const [inputValue, setInputValue] = useState('');
 	const [inputValueIsMatchClanName, setInputValueIsMatchClanName] = useState(true);
 	const navigate = useNavigate();
-	const handleDeleteCurrentClan = async(e: FormEvent<HTMLFormElement> | MouseEvent<HTMLDivElement>) => {
+	const handleDeleteCurrentClan = async (e: FormEvent<HTMLFormElement> | MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
-		if(inputValue === currentClan?.clan_name){
-			await deleteClan({clanId: currentClanId || ""});
-			navigate("/mezon");
-		}else{
+		if (inputValue === currentClan?.clan_name) {
+			await deleteClan({ clanId: currentClanId || '' });
+			navigate('/mezon');
+		} else {
 			setInputValueIsMatchClanName(false);
 		}
-	}
+	};
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50 ">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
@@ -39,14 +39,20 @@ const DeleteClanModal: React.FC<DeleteClanModalProps> = ({ onClose }) => {
 							value={inputValue}
 							onChange={(e) => setInputValue(e.target.value)}
 						/>
-						{!inputValueIsMatchClanName ? <div className='text-[#fa777c] text-xs font-semibold'>You didn't enter the clan name correctly</div> : ""}
+						{!inputValueIsMatchClanName ? (
+							<div className="text-[#fa777c] text-xs font-semibold">You didn't enter the clan name correctly</div>
+						) : (
+							''
+						)}
 					</div>
 				</div>
 				<div className="bottom-block flex justify-end p-[16px] dark:bg-[#2b2d31] bg-[#e1dfdf] items-center gap-[20px] font-semibold rounded-[5px]">
 					<div onClick={onClose} className="dark:text-textDarkTheme text-textLightTheme cursor-pointer hover:underline">
 						Cancel
 					</div>
-					<div onClick={handleDeleteCurrentClan} className="bg-[#da373c] hover:bg-[#a12828] rounded-md px-4 py-2 cursor-pointer">Delete clan</div>
+					<div onClick={handleDeleteCurrentClan} className="bg-[#da373c] hover:bg-[#a12828] rounded-md px-4 py-2 cursor-pointer">
+						Delete clan
+					</div>
 				</div>
 			</form>
 		</div>

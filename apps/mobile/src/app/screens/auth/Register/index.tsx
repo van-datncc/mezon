@@ -2,7 +2,7 @@ import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import React from 'react';
-import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 import Button from '../../../components/auth/Button';
@@ -26,7 +26,7 @@ const RegisterSchema = Yup.object().shape({
 		.required('Please enter your mobile number'),
 });
 const RegisterScreen = () => {
-	const styles = style(useTheme().themeValue)
+	const styles = style(useTheme().themeValue);
 	const navigation = useNavigation();
 
 	return (

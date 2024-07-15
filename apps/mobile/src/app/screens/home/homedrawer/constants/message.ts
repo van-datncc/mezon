@@ -1,6 +1,6 @@
 import { TFunction } from "i18next";
-import { IMessageAction } from "../types";
 import { EMessageActionType } from "../enums";
+import { IMessageAction } from "../types";
 
 export const getMessageActions = (t: TFunction): IMessageAction[] => {
     return [

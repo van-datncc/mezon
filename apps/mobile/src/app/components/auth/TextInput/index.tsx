@@ -1,9 +1,8 @@
+import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import React, { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
-import Entypo from 'react-native-vector-icons/Entypo';
 import { style } from './styles';
-import { Icons } from '@mezon/mobile-components';
 
 interface UserTextInputProps {
 	placeholder: string;
@@ -16,7 +15,7 @@ interface UserTextInputProps {
 	touched: boolean;
 }
 const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, placeholder, isPass, value, onChangeText, onBlur }) => {
-	const { themeValue } = useTheme()
+	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [showPass, setShowPass] = useState<boolean>(true);
 
@@ -39,10 +38,7 @@ const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, pl
 				/>
 				{isPass && (
 					<Pressable onPress={() => setShowPass(!showPass)}>
-						{showPass
-							? <Icons.EyeIcon color={themeValue.text} />
-							: <Icons.EyeSlashIcon color={themeValue.text} />
-						}
+						{showPass ? <Icons.EyeIcon color={themeValue.text} /> : <Icons.EyeSlashIcon color={themeValue.text} />}
 					</Pressable>
 				)}
 			</View>
@@ -53,4 +49,3 @@ const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, pl
 };
 
 export default TextInputUser;
-

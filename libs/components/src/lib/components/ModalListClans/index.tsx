@@ -61,11 +61,18 @@ const ModalListClans = (props: ModalListClansProps) => {
 						<button
 							className={`w-full  flex py-1 px-2 items-center cursor-pointer justify-between rounded-md ${idSelectedClan === option.id ? 'dark:bg-[#151C2B] bg-bgLightModeButton duration-100 dark:text-contentPrimary text-black font-bold' : 'dark:text-contentSecondary text-[#323232]'}`}
 							key={option.id}
-							onClick={() => { onChangeClan(option.id); setTurnOffThreadMessage(); }}
+							onClick={() => {
+								onChangeClan(option.id);
+								setTurnOffThreadMessage();
+							}}
 						>
 							<div className="flex items-center gap-4 w-10/12">
 								{option.logo ? (
-									<img src={option.logo} alt={option.logo} className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10" />
+									<img
+										src={option.logo}
+										alt={option.logo}
+										className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10"
+									/>
 								) : (
 									<div>
 										{option?.clan_name && (

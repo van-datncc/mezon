@@ -1,10 +1,10 @@
+import { ArrowLeftIcon } from '@mezon/mobile-components';
 import React, { ReactNode } from 'react';
 import { Modal, ModalBaseProps, Pressable, Text, View, ViewStyle } from 'react-native';
 import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
 import { toastConfig } from '../../configs/toastConfig';
 import { styles } from './style';
-import { ArrowLeftIcon } from '@mezon/mobile-components';
 
 interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 	visible: boolean;
@@ -62,12 +62,14 @@ export const MezonModal = (props: IMezonModalProps) => {
 							<Pressable onPress={() => onBack && onBack()}>
 								<ArrowLeftIcon />
 							</Pressable>
-						): <View />}
+						) : (
+							<View />
+						)}
 						<Pressable onPress={() => setVisible(false)}>
 							<Feather size={27} name="x" style={styles.closeIcon} />
 						</Pressable>
 					</View>
-				): (
+				) : (
 					<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 						<View style={styles.headerContent}>
 							<Pressable onPress={() => setVisible(false)}>

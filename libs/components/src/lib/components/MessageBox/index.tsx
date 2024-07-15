@@ -121,7 +121,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							files.length = 0;
 							navigator.clipboard
 								.writeText('')
-								.then(() => { })
+								.then(() => {})
 								.catch((error) => {
 									console.error('Failed to clear clipboard:', error);
 								});
@@ -132,7 +132,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 							files.length = 0;
 							navigator.clipboard
 								.writeText('')
-								.then(() => { })
+								.then(() => {})
 								.catch((error) => {
 									console.error('Failed to clear clipboard:', error);
 								});

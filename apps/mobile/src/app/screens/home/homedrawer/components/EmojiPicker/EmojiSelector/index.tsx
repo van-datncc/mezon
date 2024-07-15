@@ -16,12 +16,12 @@ import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import { debounce } from 'lodash';
 import React, { useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import styles from './styles';
-import { useTranslation } from 'react-i18next';
 
 type EmojiSelectorProps = {
 	onSelected: (url: string) => void;
@@ -97,7 +97,7 @@ export default function EmojiSelector({
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const refScrollView = useRef<ScrollView>(null);
-	const { t } = useTranslation('message')
+	const { t } = useTranslation('message');
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: cateIcon[index] }));
 	const categoryRefs = useRef(
 		categoriesEmoji.reduce((refs, item) => {
@@ -140,7 +140,13 @@ export default function EmojiSelector({
 			<View style={{ backgroundColor: isReactMessage ? Colors.primary : Colors.secondary }}>
 				<View style={styles.textInputWrapper}>
 					<SearchIcon height={18} width={18} />
-					<TextInput onFocus={handleBottomSheetExpand} placeholder={t('findThePerfectReaction')} style={styles.textInput} placeholderTextColor={Colors.textGray} onChangeText={debouncedSetSearchText} />
+					<TextInput
+						onFocus={handleBottomSheetExpand}
+						placeholder={t('findThePerfectReaction')}
+						style={styles.textInput}
+						placeholderTextColor={Colors.textGray}
+						onChangeText={debouncedSetSearchText}
+					/>
 				</View>
 				<ScrollView
 					horizontal

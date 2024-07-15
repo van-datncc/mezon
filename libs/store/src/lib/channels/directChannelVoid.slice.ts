@@ -1,9 +1,9 @@
-import { IChannelCategorySetting, IDefaultNotificationCategory, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
-import { ApiDirectChannelVoice, ApiNotificationChannelCategoySetting, ApiNotificationSetting } from 'mezon-js/api.gen';
+import { IChannelCategorySetting, LoadingStatus } from '@mezon/utils';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
+import { ApiDirectChannelVoice } from 'mezon-js/api.gen';
 import { IDirectChannelVoid } from '../../../../utils/src';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 
 export interface DirectChannelVoidEntity extends IDirectChannelVoid {
 	id: string; // Primary ID

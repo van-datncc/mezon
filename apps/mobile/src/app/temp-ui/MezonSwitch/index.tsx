@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { SwitchProps } from 'react-native';
-import { View, TouchableOpacity } from 'react-native';
 import { useTheme } from '@mezon/mobile-ui';
+import React, { useEffect, useState } from 'react';
+import { SwitchProps, TouchableOpacity, View } from 'react-native';
 import { style } from './styles';
-import { useEffect } from 'react';
 
 export const MezonSwitch = ({ value, onValueChange }: SwitchProps) => {
 	const [isEnabled, setIsEnabled] = useState(value);
@@ -16,14 +14,11 @@ export const MezonSwitch = ({ value, onValueChange }: SwitchProps) => {
 
 	const toggleSwitch = () => {
 		onValueChange && onValueChange(!isEnabled);
-		setIsEnabled(previousState => !previousState);
-	}
+		setIsEnabled((previousState) => !previousState);
+	};
 
 	return (
-		<TouchableOpacity
-			style={[styles.switchContainer, isEnabled ? styles.switchContainerEnabled : {}]}
-			onPress={toggleSwitch}
-		>
+		<TouchableOpacity style={[styles.switchContainer, isEnabled ? styles.switchContainerEnabled : {}]} onPress={toggleSwitch}>
 			<View style={[styles.circle, isEnabled ? styles.circleEnabled : {}]} />
 		</TouchableOpacity>
 	);

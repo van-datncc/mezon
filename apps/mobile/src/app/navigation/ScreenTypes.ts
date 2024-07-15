@@ -1,5 +1,5 @@
 import { OptionEvent } from "@mezon/utils";
-import { CompositeScreenProps, NavigatorScreenParams, ParamListBase } from "@react-navigation/native";
+import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackScreenProps } from "@react-navigation/stack";
 

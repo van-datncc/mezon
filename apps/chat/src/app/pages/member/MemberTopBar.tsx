@@ -7,7 +7,9 @@ const MemberTopBar = () => {
 			<h2 className="text-base font-semibold">Recent Members</h2>
 			<div className="flex flex-row items-center gap-2">
 				<div className="relative">
-					<div className={`transition-all duration-300 w-[250px] h-8 pl-4 pr-2 py-3 dark:bg-bgTertiary bg-bgModifierHoverLight rounded items-center inline-flex`}>
+					<div
+						className={`transition-all duration-300 w-[250px] h-8 pl-4 pr-2 py-3 dark:bg-bgTertiary bg-bgModifierHoverLight rounded items-center inline-flex`}
+					>
 						<input
 							type="text"
 							placeholder="Search by user name or id"

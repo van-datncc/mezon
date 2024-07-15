@@ -2,19 +2,19 @@ import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../screens/settings';
+import { AccountSetting } from '../../../screens/settings/AccountSetting';
+import { BlockedUsers } from '../../../screens/settings/AccountSetting/BlockedUsers';
+import AppearanceSetting from '../../../screens/settings/AppearanceSetting';
+import AppThemeSetting from '../../../screens/settings/AppearanceSetting/AppTheme';
 import { LanguageSetting } from '../../../screens/settings/LanguageSetting';
 import { ProfileSetting } from '../../../screens/settings/ProfileSetting';
 import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
-import AppearanceSetting from '../../../screens/settings/AppearanceSetting';
-import AppThemeSetting from '../../../screens/settings/AppearanceSetting/AppTheme';
-import { AccountSetting } from '../../../screens/settings/AccountSetting';
-import { BlockedUsers } from '../../../screens/settings/AccountSetting/BlockedUsers';
 
-export const SettingStacks = ({ }: any) => {
+export const SettingStacks = ({}: any) => {
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['screenStack']);
-	const {themeValue} = useTheme();
+	const { themeValue } = useTheme();
 
 	return (
 		<Stack.Navigator
@@ -30,16 +30,16 @@ export const SettingStacks = ({ }: any) => {
 					backgroundColor: themeValue.primary,
 				},
 				headerTitleStyle: {
-					fontWeight: "bold",
-					fontSize: Fonts.size.h7
-				}
+					fontWeight: 'bold',
+					fontSize: Fonts.size.h7,
+				},
 			}}
 		>
 			<Stack.Screen
 				name={APP_SCREEN.SETTINGS.HOME}
 				component={Settings}
 				options={{
-					headerTitle: t('settingStack.settings')
+					headerTitle: t('settingStack.settings'),
 				}}
 			/>
 
@@ -88,7 +88,7 @@ export const SettingStacks = ({ }: any) => {
 				component={AppThemeSetting}
 				options={{
 					headerTitle: t('settingStack.appTheme'),
-					gestureEnabled: false
+					gestureEnabled: false,
 				}}
 			/>
 

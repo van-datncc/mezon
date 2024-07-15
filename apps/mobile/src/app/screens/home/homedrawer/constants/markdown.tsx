@@ -537,34 +537,39 @@ export const renderTextContent = ({
 };
 
 const getUserMention = (nameMention: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[]) => {
-  if (mode === 4 || mode === 3) {
-    return usersInChannel?.find(channelUser => channelUser?.user?.username === nameMention);
-  } else {
-    return usersClan?.find(userClan => userClan?.user?.username === nameMention);
-  }
+	if (mode === 4 || mode === 3) {
+		return usersInChannel?.find((channelUser) => channelUser?.user?.username === nameMention);
+	} else {
+		return usersClan?.find((userClan) => userClan?.user?.username === nameMention);
+	}
 };
 
-const renderMention = (part: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[], clansProfile: UserClanProfileEntity[], currentClan: ClansEntity) => {
-  const nameMention = part?.slice(1);
+const renderMention = (
+	part: string,
+	mode: number,
+	usersInChannel: ChannelMembersEntity[],
+	usersClan: UsersClanEntity[],
+	clansProfile: UserClanProfileEntity[],
+	currentClan: ClansEntity,
+) => {
+	const nameMention = part?.slice(1);
 
-  if (nameMention === "here") {
-    return `[@here](@here)`;
-  }
+	if (nameMention === 'here') {
+		return `[@here](@here)`;
+	}
 
-  const userMention = getUserMention(nameMention, mode, usersInChannel, usersClan);
-  const { user } = userMention || {};
+	const userMention = getUserMention(nameMention, mode, usersInChannel, usersClan);
+	const { user } = userMention || {};
 
-  const clanProfileByIdUser = clansProfile?.find(
-    clanProfile => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id,
-  );
+	const clanProfileByIdUser = clansProfile?.find(
+		(clanProfile) => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id,
+	);
 
-  if (clanProfileByIdUser) {
-    return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;
-  }
+	if (clanProfileByIdUser) {
+		return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;
+	}
 
-  if (userMention) {
-    return user?.display_name
-      ? `[@${user?.display_name}](@${user?.username})`
-      : `@[${user?.username}](@${user?.username})`;
-  }
+	if (userMention) {
+		return user?.display_name ? `[@${user?.display_name}](@${user?.username})` : `@[${user?.username}](@${user?.username})`;
+	}
 };

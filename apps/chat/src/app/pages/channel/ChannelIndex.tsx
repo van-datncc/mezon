@@ -8,7 +8,7 @@ export default function ChannelIndex() {
 	const { clanId } = useAppParams();
 	const categories = useSelector(selectCategoriesIds);
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || '', categories));
-	
+
 	const { navigate } = useAppNavigation();
 	useEffect(() => {
 		if (defaultChannelId) {
@@ -36,4 +36,3 @@ export default function ChannelIndex() {
 		</div>
 	);
 }
-

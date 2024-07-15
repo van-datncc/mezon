@@ -1,4 +1,3 @@
-import { Appearance } from 'react-native';
 
 // const isDarkTheme = Appearance.getColorScheme() === 'dark';
 // TODO: hardcode to check only dark theme
@@ -168,4 +167,5 @@ const colors = {
   darkGray: '#333333',
 };
 
-export { colors, lightThemeColor, darkThemeColor };
+export { colors, darkThemeColor, lightThemeColor };
+

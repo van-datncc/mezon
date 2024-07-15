@@ -3,8 +3,8 @@ import {
 	AppDispatch,
 	PinMessageEntity,
 	pinMessageActions,
-	selectChannelsEntities,
 	selectAllEmojiSuggestion,
+	selectChannelsEntities,
 	selectPinMessageByChannelId,
 } from '@mezon/store-mobile';
 import { Platform, View } from 'react-native';
@@ -14,16 +14,16 @@ import EmptyPinMessage from './EmptyPinMessage';
 import { styles } from './PinMessage';
 import PinMessageItem from './PinMessageItem';
 
-const PinMessage = ({ currentChannelId}: {currentChannelId: string}) => {
-  const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannelId));
+const PinMessage = ({ currentChannelId }: { currentChannelId: string }) => {
+	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannelId));
 
 	const dispatch = useDispatch<AppDispatch>();
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 
 	const handleUnpinMessage = (message: PinMessageEntity) => {
-    const channelId = currentChannelId;
-		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: channelId , message_id: message.id }));
+		const channelId = currentChannelId;
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: channelId, message_id: message.id }));
 	};
 
 	return (
