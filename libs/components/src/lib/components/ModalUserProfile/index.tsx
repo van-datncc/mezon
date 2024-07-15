@@ -12,6 +12,7 @@ import StatusProfile from './StatusProfile';
 import GroupIconBanner from './StatusProfile/groupIconBanner';
 import PendingFriend from './pendingFriend';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -46,7 +47,7 @@ const ModalUserProfile = ({
 	const { sendInviteMessage } = useSendInviteMessage();
 
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-	// console.log("userById: ", userById);
+
 	const [content, setContent] = useState<string>('');
 
 	const initOpenModal = {
@@ -86,17 +87,17 @@ const ModalUserProfile = ({
 	};
 	const [color, setColor] = useState<string>('#323232');
 
-	const getColor = async () => {
-		if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
-			const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
-			const colorImg = await getColorAverageFromURL(url || '');
-			if (colorImg) setColor(colorImg);
-		}
-	};
-
 	useEffect(() => {
+		const getColor = async () => {
+			if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
+				const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
+				const colorImg = await getColorAverageFromURL(url || '');
+				if (colorImg) setColor(colorImg);
+			}
+		};
+	
 		getColor();
-	}, [userID, []]);
+	}, [userProfile?.user?.avatar_url, userById?.user?.avatar_url, isFooterProfile, userID]);
 
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
