@@ -1,10 +1,11 @@
 import {
 	STORAGE_CLAN_ID,
-	STORAGE_IS_FROM_FCM,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_IS_FROM_FCM,
 	getUpdateOrAddClanChannelCache,
 	load,
 	save,
+	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
@@ -173,13 +174,13 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const clanId = linkMatch[1];
 			const isDifferentClan = clanIdCache !== clanId;
 			const channelId = linkMatch[2];
-			if (isDifferentClan) {
-				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				save(STORAGE_CLAN_ID, clanId);
-				store.dispatch(clansActions.joinClan({ clanId: clanId }));
-				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
-			}
+			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			save(STORAGE_CLAN_ID, clanId);
+			store.dispatch(clansActions.joinClan({ clanId: clanId }));
+			store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
+			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
+			await setDefaultChannelLoader(respChannel, clanId);
 			delay(jumpChannelOnNotification, isDifferentClan ? 2000 : 500, store, channelId, clanId);
 			delay(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
