@@ -4,7 +4,8 @@
         "channelCreator": "Tạo Channel",
         "clanSetting": "Cài đặt Clan",
         "clanOverviewSetting": "Tổng quan",
-        "eventCreator": "Tạo Sự Kiện"
+        "eventCreator": "Tạo Sự Kiện",
+        "serverRoles": "Vai Trò Máy Chủ"
     },
     "menuChannelStack": {
         "channelSetting": "Cài đặt Channel"

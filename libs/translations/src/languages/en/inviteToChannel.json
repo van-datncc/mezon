@@ -1,11 +1,11 @@
 {
     "title": "Invite a friend",
     "iconTitle": {
-        "twitter": "Twitter",
-        "faceBook": "Facebook",
-        "youtube": "Youtube",
+        "shareInvite": "Share Invite",
         "copyLink": "Copy Link",
-        "email": "Email"
+        "facebook": "Facebook",
+        "youtube": "Youtube",
+        "twitter": "Twitter"
     },
     "copyLink": "Link Copied!",
     "unknownChannel": "UNKNOWN CHANNEL",

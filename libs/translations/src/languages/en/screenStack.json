@@ -4,7 +4,8 @@
         "clanSetting": "Clan Settings",
         "channelCreator": "Create Channel",
         "clanOverviewSetting": "Overview Settings",
-        "eventCreator": "Create Event"
+        "eventCreator": "Create Event",
+        "serverRoles": "Server Roles"
     },
     "menuChannelStack": {
         "channelSetting": "Channel Settings"

@@ -12,8 +12,9 @@ export function useRoles(channelID?: string) {
 
 	const createRole = React.useCallback(
 		async (clan_id: string, clanId: string, title: string, add_user_ids: string[], active_permission_ids: string[]) => {
-			await dispatch(rolesClanActions.fetchCreateRole({ clan_id, title, add_user_ids, active_permission_ids }));
+			const response = await dispatch(rolesClanActions.fetchCreateRole({ clan_id, title, add_user_ids, active_permission_ids }));
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
+			return response?.payload;
 		},
 		[dispatch],
 	);
@@ -28,7 +29,7 @@ export function useRoles(channelID?: string) {
 			remove_user_ids: string[],
 			remove_permission_ids: string[],
 		) => {
-			await dispatch(
+			const response = await dispatch(
 				rolesClanActions.fetchUpdateRole({ role_id, title, add_user_ids, active_permission_ids, remove_user_ids, remove_permission_ids }),
 			);
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
@@ -41,6 +42,7 @@ export function useRoles(channelID?: string) {
 					repace: true,
 				}),
 			);
+			return response?.payload;
 		},
 		[dispatch],
 	);

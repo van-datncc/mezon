@@ -5,7 +5,7 @@ import {
 	FileIcon,
 	ReplyIcon,
 	ReplyMessageDeleted,
-	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
@@ -24,10 +24,10 @@ import {
 	selectMessageEntityById,
 	selectIdMessageToJump,
 	referencesActions,
-	selectLastSeenMessage,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
-	selectAllAccount,
+  selectAllAccount,
+  selectAllUsesClan,
 } from '@mezon/store-mobile';
 import { IMessageWithUser, MentionDataProps, convertTimeString, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
@@ -51,7 +51,6 @@ import { openUrl } from 'react-native-markdown-display';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { Swipeable } from 'react-native-gesture-handler';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
-import UseMentionList from "../../../hooks/useUserMentionList";
 
 const widthMedia = Metrics.screenWidth - 140;
 
@@ -101,20 +100,18 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous, [message?.sender_id]);
-	const { usersClan } = useClans();
 	const { t } = useTranslation('message');
 	const userProfile = useSelector(selectAllAccount);
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
 	}, [message, userProfile]);
 	const isCombine = !message?.isStartedMessageGroup;
-	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message?.references?.length, user]);
+	const isShowInfoUser = !isCombine || (message?.references?.length && !!user);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
 	const swipeableRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const listMentions = UseMentionList(props.channelId || '');
-
+  const usersClan = useSelector(selectAllUsesClan);
 	const checkMessageTargetToMoved = useMemo(() => {
 		return idMessageToJump === message?.id;
 	}, [idMessageToJump, message?.id]);
@@ -301,6 +298,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
+		alert('jumpToChannel Message item')
 		const store = await getStoreAsync();
 
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
@@ -324,7 +322,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				await Linking.openURL(urlVoice);
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
 			}
 		} catch (error) {
@@ -430,7 +428,18 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									</>
 								) : (
 									<>
-										{renderTextContent(messageRefFetchFromServe?.content?.t?.trim(), false, t, channelsEntities, emojiListPNG, null, null, true, clansProfile, currentClan, listMentions, true)}
+										{renderTextContent({
+                      lines: messageRefFetchFromServe?.content?.t?.trim(),
+                      isEdited: false,
+                      translate: t,
+                      channelsEntities,
+                      emojiListPNG,
+                      isNumberOfLine: true,
+                      clansProfile,
+                      currentClan,
+                      isMessageReply: true,
+                      mode
+                    })}
 									</>
 								)}
 							</View>
@@ -523,7 +532,20 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 						{documents?.length > 0 && renderDocuments()}
 						<Block opacity={(message?.isSending || message.isError) ? 0.6 : 1}>
-							{renderTextContent(lines, isEdited, t, channelsEntities, emojiListPNG, onMention, onChannelMention, isNumberOfLine, clansProfile, currentClan, listMentions)}
+							{renderTextContent({
+                lines,
+                isEdited,
+                translate: t,
+                channelsEntities,
+                emojiListPNG,
+                onMention,
+                onChannelMention,
+                isNumberOfLine,
+                clansProfile,
+                currentClan,
+                isMessageReply: false,
+                mode
+              })}
 						</Block>
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 						{!preventAction ? (

@@ -1,14 +1,19 @@
-import { Fonts, useTheme } from '@mezon/mobile-ui';
-import { createStackNavigator } from '@react-navigation/stack';
-import { useTranslation } from 'react-i18next';
-import CategoryCreator from '../../../components/Category';
-import ChannelCreator from '../../../components/ChannelCreator';
-import ClanSetting from '../../../components/ClanSettings';
-import ClanOverviewSetting from '../../../components/ClanSettings/Overview';
-import EventCreatorDetails from '../../../components/EventCreator/EventCreatorDetails';
-import EventCreatorPreview from '../../../components/EventCreator/EventCreatorPreview';
-import EventCreatorType from '../../../components/EventCreator/EventCreatorType';
-import { APP_SCREEN } from '../../ScreenTypes';
+import { createStackNavigator } from "@react-navigation/stack";
+import { APP_SCREEN } from "../../ScreenTypes";
+import { Fonts, useTheme } from "@mezon/mobile-ui";
+import { useTranslation } from "react-i18next";
+import CategoryCreator from "../../../components/Category";
+import ClanSetting from "../../../components/ClanSettings";
+import ClanOverviewSetting from "../../../components/ClanSettings/Overview";
+import ChannelCreator from "../../../components/ChannelCreator";
+import EventCreatorType from "../../../components/EventCreator/EventCreatorType";
+import EventCreatorDetails from "../../../components/EventCreator/EventCreatorDetails";
+import EventCreatorPreview from "../../../components/EventCreator/EventCreatorPreview";
+import { ServerRoles } from "../../../screens/serverRoles/ServerRoles";
+import { CreateNewRole } from "../../../screens/serverRoles/CreateNewRole";
+import { SetupPermissions } from "../../../screens/serverRoles/SetupPermissions";
+import { SetupMembers } from "../../../screens/serverRoles/SetupMembers";
+import { RoleDetail } from "../../../screens/serverRoles/RoleDetail";
 
 export const MenuClanStacks = ({}: any) => {
 	const { themeValue } = useTheme();
@@ -86,13 +91,53 @@ export const MenuClanStacks = ({}: any) => {
 				}}
 			/>
 
-			<Stack.Screen
-				name={APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING}
-				component={ClanOverviewSetting}
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING}
+                component={ClanOverviewSetting}
+                options={{
+                    headerTitle: t('menuClanStack.clanOverviewSetting'),
+                }}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.ROLE_SETTING}
+                component={ServerRoles}
+                options={{
+                    headerTitle: t('menuClanStack.serverRoles'),
+                }}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.CREATE_NEW_ROLE}
+                component={CreateNewRole}
 				options={{
-					headerTitle: t('menuClanStack.clanOverviewSetting'),
+					headerLeftLabelVisible: false
 				}}
-			/>
-		</Stack.Navigator>
-	);
-};
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS}
+                component={SetupPermissions}
+				options={{
+					headerLeftLabelVisible: false
+				}}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS}
+                component={SetupMembers}
+				options={{
+					headerLeftLabelVisible: false
+				}}
+            />
+
+            <Stack.Screen
+                name={APP_SCREEN.MENU_CLAN.ROLE_DETAIL}
+                component={RoleDetail}
+				options={{
+					headerLeftLabelVisible: false
+				}}
+            />
+        </Stack.Navigator>
+    );
+}
