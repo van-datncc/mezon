@@ -45,7 +45,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			currentChannel?.clan_id ?? '',
 			currentChannel?.id ?? '',
 			messageId ?? '',
-			emoji ?? '',
+			emoji?.trim() ?? '',
 			1,
 			message_sender_id ?? '',
 			false,

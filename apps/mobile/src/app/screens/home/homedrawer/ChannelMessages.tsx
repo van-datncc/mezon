@@ -328,6 +328,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 
 			<MessageItemBS
 				mode={mode}
+				clanId={currentClan.clan_id}
 				message={messageSelected}
 				onConfirmAction={onConfirmAction}
 				type={openBottomSheet}

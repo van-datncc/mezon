@@ -1,31 +1,32 @@
-import { useClans, useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
+import { useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
 import { Icons, LinkIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
+import { DirectEntity, selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useReducedMotion } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
+import { useSelector } from 'react-redux';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
+import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
 import { normalizeString } from '../../../../../utils/helpers';
 import { FriendListItem } from '../../Reusables';
 import { ExpireLinkValue, LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../constants';
 import { EMaxUserCanInvite } from '../../enums';
 import { style } from './styles';
 import { BottomSheetModal, BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
-import { DirectEntity, selectCurrentChannelId } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import {useSelector} from "react-redux";
 import { SeparatorWithLine } from '../../../../../components/Common';
 import { useCallback } from 'react';
 
 interface IInviteToChannelProp {
-   isUnknownChannel: boolean
-	 onClose?: () => void;
+	isUnknownChannel: boolean;
+	onClose?: () => void;
 }
 
 interface IInviteToChannelIconProp {
@@ -38,12 +39,14 @@ export const InviteToChannel = React.memo(
 	React.forwardRef(({ isUnknownChannel, onClose }: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 		const currentChannelId = useSelector(selectCurrentChannelId);
-		// const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+		const reducedMotion = useReducedMotion();
+
 		const [currentInviteLink, setCurrentInviteLink] = useState('');
 		const [searchUserText, setSearchUserText] = useState('');
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
-		const { currentClanId, currentClan } = useClans();
+		const currentClanId = useSelector(selectCurrentClanId);
+		const currentClan = useSelector(selectCurrentClan);
 		const { createLinkInviteUser } = useInvite();
 		const { t } = useTranslation(['inviteToChannel']);
 		const timeoutRef = useRef(null);
@@ -60,10 +63,10 @@ export const InviteToChannel = React.memo(
 
 		const userInviteList = useMemo(() => {
 			if (listDMInvite?.length) {
-				return listDMInvite?.filter(dm => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)))
+				return listDMInvite?.filter((dm) => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)));
 			}
-			return listUserInvite?.filter(UserInvite => normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)))
-		}, [searchUserText, listDMInvite, listUserInvite])
+			return listUserInvite?.filter((UserInvite) => normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)));
+		}, [searchUserText, listDMInvite, listUserInvite]);
 
 		const openEditLinkModal = () => {
 			//@ts-ignore
@@ -123,12 +126,12 @@ export const InviteToChannel = React.memo(
 		const directMessageWithUser = async (userId: string) => {
 			const response = await createDirectMessageWithUser(userId);
 			if (response?.channel_id) {
-				let channelMode = 0
+				let channelMode = 0;
 				if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
-					channelMode = ChannelStreamMode.STREAM_MODE_DM
+					channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				}
 				if (Number(response.type) === ChannelType.CHANNEL_TYPE_GROUP) {
-					channelMode = ChannelStreamMode.STREAM_MODE_GROUP
+					channelMode = ChannelStreamMode.STREAM_MODE_GROUP;
 				}
 				sendInviteMessage(currentInviteLink, response.channel_id, channelMode);
 			}
@@ -154,7 +157,7 @@ export const InviteToChannel = React.memo(
 				return;
 			}
 			setCurrentInviteLink(`https://mezon.vn/invite/${response.invite_link}`);
-		}
+		};
 
 		useEffect(() => {
 			if (currentClanId && currentChannelId) {
@@ -245,8 +248,9 @@ export const InviteToChannel = React.memo(
 					ref={refRBSheet}
 					enableDynamicSizing={false}
 					snapPoints={snapPoints}
+					animateOnMount={!reducedMotion}
 					index={0}
-            		animateOnMount
+					enablePanDownToClose
 					backdropComponent={Backdrop}
 					onDismiss={() => {
 						onClose?.();
@@ -278,17 +282,19 @@ export const InviteToChannel = React.memo(
 							<View style={styles.searchInviteFriendWrapper}>
 								<View style={styles.searchFriendToInviteWrapper}>
 									<TextInput
-									placeholder={'Invite friend to channel'}
-									placeholderTextColor={themeValue.text}
-									style={styles.searchFriendToInviteInput}
-									onChangeText={setSearchUserText}
+										placeholder={'Invite friend to channel'}
+										placeholderTextColor={themeValue.text}
+										style={styles.searchFriendToInviteInput}
+										onChangeText={setSearchUserText}
 									/>
 									<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
 								</View>
 								<View style={styles.editInviteLinkWrapper}>
-									<Text style={styles.defaultText}>{t('yourLinkInvite')} {expiredTimeSelected} </Text>
+									<Text style={styles.defaultText}>
+										{t('yourLinkInvite')} {expiredTimeSelected}{' '}
+									</Text>
 									<Pressable onPress={() => openEditLinkModal()}>
-									<Text style={styles.linkText}>{t('editInviteLink')}</Text>
+										<Text style={styles.linkText}>{t('editInviteLink')}</Text>
 									</Pressable>
 								</View>
 							</View>
@@ -346,7 +352,10 @@ export const InviteToChannel = React.memo(
 										>
 											<Text
 												style={[
-													{ color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray, textAlign: 'center' },
+													{
+														color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray,
+														textAlign: 'center',
+													},
 												]}
 											>
 												{option.label}
@@ -369,7 +378,10 @@ export const InviteToChannel = React.memo(
 										>
 											<Text
 												style={[
-													{ color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray, textAlign: 'center' },
+													{
+														color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray,
+														textAlign: 'center',
+													},
 												]}
 											>
 												{option}
@@ -383,13 +395,11 @@ export const InviteToChannel = React.memo(
 								<MezonSwitch value={isTemporaryMembership} onValueChange={setIsTemporaryMembership} />
 							</View>
 							<View style={{ flexDirection: 'row' }}>
-								<Text style={{ color: Colors.textGray }}>
-									{t('memberAutoKick')}
-								</Text>
+								<Text style={{ color: Colors.textGray }}>{t('memberAutoKick')}</Text>
 							</View>
 						</View>
 					</MezonModal>
-				): null}
+				) : null}
 			</View>
 		);
 	}),
