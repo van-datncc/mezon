@@ -31,7 +31,6 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const messageReactions = useMessageReaction(message.id);
 	const checkHasEmoji = useSelector(selectIsMessageHasReaction(message.id));
 
-
 	const isMessageMatched = message.id === idMessageRefReaction;
 
 	return (

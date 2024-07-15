@@ -1,13 +1,13 @@
 import { useAuth } from '@mezon/core';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import SettingRightClan from '../SettingRightClanProfile';
 import SettingRightUser from '../SettingRightUserProfile';
 
-interface SettingRightProfileProps{
+interface SettingRightProfileProps {
 	menuIsOpen: boolean;
 }
 
-const SettingRightProfile = ({menuIsOpen} : SettingRightProfileProps) => {
+const SettingRightProfile = ({ menuIsOpen }: SettingRightProfileProps) => {
 	const { userProfile } = useAuth();
 	const [isUserSettings, setIsUserSettings] = useState(true);
 
@@ -28,7 +28,7 @@ const SettingRightProfile = ({menuIsOpen} : SettingRightProfileProps) => {
 					name={userProfile?.user?.username || ''}
 					avatar={userProfile?.user?.avatar_url || ''}
 					nameDisplay={userProfile?.user?.display_name || ''}
-					aboutMe = {userProfile?.user?.about_me || ''}
+					aboutMe={userProfile?.user?.about_me || ''}
 					menuIsOpen={menuIsOpen}
 				/>
 			) : (

@@ -6,9 +6,7 @@ import {
 	selectCurrentClan,
 	selectCurrentVoiceChannelId,
 	selectShowScreen,
-	selectStatusCall,
 	useAppDispatch,
-	voiceActions,
 } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect } from 'react';
@@ -29,20 +27,20 @@ function VoiceControlPanel({ channelCurrent }: VoiceControlPanelProps) {
 	const { setStatusCall } = useVoice();
 
 	const startScreenShare = useCallback(() => {
-		console.log("not implemented");
+		console.log('not implemented');
 	}, []);
 
 	const stopScreenShare = useCallback(() => {
-		console.log("not implemented");
+		console.log('not implemented');
 	}, []);
 
 	const leaveVoiceChannel = useCallback(() => {
 		setStatusCall(false);
-		console.log("not implemented");
+		console.log('not implemented');
 	}, []);
 
 	const openCamera = useCallback(() => {
-		console.log("not implemented");
+		console.log('not implemented');
 	}, []);
 
 	const { toChannelPage } = useAppNavigation();

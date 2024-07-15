@@ -1,13 +1,13 @@
 import {
-	ClansEntity,
-	clansActions,
-	selectAllClans,
-	selectAllUsesClan,
-	selectCurrentClan,
-	selectCurrentClanId,
-	selectShowNumEvent,
-	useAppDispatch,
-	userClanProfileActions,
+    ClansEntity,
+    clansActions,
+    selectAllClans,
+    selectAllUsesClan,
+    selectCurrentClan,
+    selectCurrentClanId,
+    selectShowNumEvent,
+    useAppDispatch,
+    userClanProfileActions,
 } from '@mezon/store';
 import { UserSearchDataProps } from '@mezon/utils';
 import { ApiUpdateClanDescRequest } from 'mezon-js';

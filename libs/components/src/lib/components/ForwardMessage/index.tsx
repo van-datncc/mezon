@@ -101,7 +101,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 	}, [accountId, listDM, listGroup]);
 
 	const listChannelSearch = useMemo(() => {
-		const listChannelForward = listChannels.filter((channel)=> channel.type !== ChannelType.CHANNEL_TYPE_VOICE)
+		const listChannelForward = listChannels.filter((channel) => channel.type !== ChannelType.CHANNEL_TYPE_VOICE);
 		const list = listChannelForward.map((item) => {
 			return {
 				id: item?.id ?? '',
@@ -190,7 +190,9 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 														<Checkbox
 															className="w-4 h-4 focus:ring-transparent"
 															id={`checkbox-item-${channel.id}`}
-															checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === channel.id)}
+															checked={selectedObjectIdSends.some(
+																(selectedItem: any) => selectedItem.id === channel.id,
+															)}
 															onChange={() =>
 																handleToggle(
 																	channel.id,

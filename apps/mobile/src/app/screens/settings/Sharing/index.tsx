@@ -1,13 +1,5 @@
 import { useCategory, useReference } from '@mezon/core';
-import {
-	CloseIcon,
-	PenIcon,
-	SearchIcon,
-	SendIcon,
-	getAttachmentUnique,
-	save,
-	STORAGE_CLAN_ID
-} from '@mezon/mobile-components';
+import { CloseIcon, PenIcon, STORAGE_CLAN_ID, SearchIcon, SendIcon, getAttachmentUnique, save } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, directActions, getStoreAsync, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';

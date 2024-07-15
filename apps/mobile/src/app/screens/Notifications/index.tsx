@@ -2,21 +2,20 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChannels, useNotification } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { INotification, NotificationEntity, channelsActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
+import { INotification, NotificationEntity, channelsActions, getStoreAsync } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { MezonBottomSheet } from '../../temp-ui';
 import NotificationIndividualItem from './NotificationIndividualItem';
 import NotificationItem from './NotificationItem';
-import NotificationOption from './NotificationOption';
-import { EActionDataNotify, ENotifyBsToShow } from './types';
-import { style } from './Notifications.styles';
-import { MezonBottomSheet } from '../../temp-ui';
 import NotificationItemOption from './NotificationItemOption';
+import NotificationOption from './NotificationOption';
+import { style } from './Notifications.styles';
+import { EActionDataNotify, ENotifyBsToShow } from './types';
 
 const Notifications = () => {
 	const { themeValue } = useTheme();
@@ -66,7 +65,7 @@ const Notifications = () => {
 				break;
 			case ENotifyBsToShow.removeNotification:
 				bottomSheetOptionsRef.current?.present();
-				setNotify(notify)
+				setNotify(notify);
 				break;
 			default:
 				bottomSheetRef.current?.present();
@@ -123,10 +122,12 @@ const Notifications = () => {
 				/>
 			</View>
 
-			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={t('headerTitle')} titleSize='md'>
+			<MezonBottomSheet ref={bottomSheetRef} heightFitContent title={t('headerTitle')} titleSize="md">
 				<NotificationOption
 					channels={channels}
-					onChange={(value) => { handleFilterNotify(value) }}
+					onChange={(value) => {
+						handleFilterNotify(value);
+					}}
 				/>
 			</MezonBottomSheet>
 

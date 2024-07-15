@@ -1,7 +1,7 @@
+import { selectIsLogin } from '@mezon/store';
+import { useSelector } from 'react-redux';
 import { Navigate, Outlet, useLoaderData } from 'react-router-dom';
 import { IAuthLoaderData } from '../loaders/authLoader';
-import { useSelector } from 'react-redux';
-import { selectIsLogin } from '@mezon/store';
 
 const ProtectedRoutes = () => {
 	const { isLogin: isLoginLoader, redirect } = useLoaderData() as IAuthLoaderData;

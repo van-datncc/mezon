@@ -1,7 +1,6 @@
 import { useOnClickOutside } from '@mezon/core';
 import { selectAllChannelMembers, selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
-import { checkLastChar, MouseButton } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { MouseButton, checkLastChar } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -90,7 +89,7 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 					}}
 					onMouseDown={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={foundUser.user.id} mode={mode}/>
+					<ShortUserProfile userID={foundUser.user.id} mode={mode} />
 				</div>
 			)}
 			{foundUser !== null || tagName === '@here' ? (

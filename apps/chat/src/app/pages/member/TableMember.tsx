@@ -1,7 +1,7 @@
+import { selectAllUsesClan } from '@mezon/store';
+import { useSelector } from 'react-redux';
 import TableMemberHeader from './TableMemberHeader';
 import TableMemberItem from './TableMemberItem';
-import { useSelector } from 'react-redux';
-import { selectAllUsesClan } from '@mezon/store';
 const TableMember = () => {
 	const usersClan = useSelector(selectAllUsesClan);
 	return (

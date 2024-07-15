@@ -1,4 +1,12 @@
-import { RolesClanEntity, getNewNameRole, getNewSelectedPermissions, getSelectedRoleId, setNameRoleNew, toggleIsShowFalse, toggleIsShowTrue } from '@mezon/store';
+import {
+	RolesClanEntity,
+	getNewNameRole,
+	getNewSelectedPermissions,
+	getSelectedRoleId,
+	setNameRoleNew,
+	toggleIsShowFalse,
+	toggleIsShowTrue,
+} from '@mezon/store';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -9,7 +17,7 @@ export type ModalSettingSave = {
 	handleUpdateUser: () => void;
 };
 
-const SettingDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
+const SettingDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
 	const nameRole = useSelector(getNewNameRole);
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const clickRole = useSelector(getSelectedRoleId);
@@ -38,7 +46,9 @@ const SettingDisplayRole = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
 
 	return (
 		<div className="w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800">
-			<div className="text-xs font-bold uppercase mb-2">Role name<b className='text-red-600'>*</b></div>
+			<div className="text-xs font-bold uppercase mb-2">
+				Role name<b className="text-red-600">*</b>
+			</div>
 			<input
 				className="dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded outline-none"
 				type="text"
