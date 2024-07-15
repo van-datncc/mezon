@@ -1,5 +1,5 @@
 import { useMembersVoiceChannel } from '@mezon/core';
-import { selectMemberByDisplayName } from '@mezon/store';
+import { selectMemberByGoogleId } from '@mezon/store';
 import { AvatarComponent, NameComponent } from '@mezon/ui';
 import { IChannelMember } from '@mezon/utils';
 import { useEffect } from 'react';
@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { Icons } from '../../components';
 
 function UserListItem({ user, channelID }: { user: IChannelMember; channelID: string }) {
-	const member = useSelector(selectMemberByDisplayName(user.participant || ''));
+	const member = useSelector(selectMemberByGoogleId(user.id ?? ''));
 	const { setMembersVoiceChannel } = useMembersVoiceChannel();
 
 	useEffect(() => {
