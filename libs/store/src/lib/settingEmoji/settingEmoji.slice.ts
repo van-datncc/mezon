@@ -10,7 +10,6 @@ import {
 import {
   ApiClanEmojiCreateRequest, ApiClanEmojiList,
   ApiClanEmojiListResponse,
-  
   MezonUpdateClanEmojiByIdBody
 } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
