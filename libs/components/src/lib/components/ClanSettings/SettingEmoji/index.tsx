@@ -24,7 +24,9 @@ const SettingEmoji = () => {
     if (e.target.files) {
       const file = e.target.files[0];
       const imageSize = file?.size;
-      const fileName = file?.name.slice(0.62);
+      const fileNameParts = file?.name.split('.');
+      const fileName = fileNameParts.slice(0, -1).join('.').slice(0, 62);
+      console.log (fileNameParts, fileName);
       const session = sessionRef.current;
       const client = clientRef.current;
       const category = 'Custom';
