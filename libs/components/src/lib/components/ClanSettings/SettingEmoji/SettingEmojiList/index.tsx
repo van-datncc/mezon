@@ -1,4 +1,3 @@
-import { useSelector } from "react-redux";
 import SettingEmojiItem from "../SettingEmojiItem";
 import { ApiClanEmojiListResponse } from "mezon-js/api.gen";
 
