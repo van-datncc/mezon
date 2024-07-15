@@ -61,7 +61,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						isHideStatus={true}
 						isHideIconStatus={false}
 						key={currentDmGroup?.channel_id}
-						isHiddenPanel={true}
+						isHiddenAvatarPanel={true}
 					/>
 					<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup}/>
 				</div>

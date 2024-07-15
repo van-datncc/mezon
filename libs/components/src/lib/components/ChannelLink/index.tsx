@@ -1,6 +1,6 @@
 import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
 import { channelsActions, referencesActions, selectAllAccount, selectCloseMenu, selectCurrentClan, useAppDispatch, voiceActions } from '@mezon/store';
-import { ChannelStatusEnum, IChannel, getVoiceChannelName } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel, MouseButton, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -77,7 +77,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		const mouseY = event.clientY + window.screenY;
 		const windowHeight = window.innerHeight;
 
-		if (event.button === 2) {
+		if (event.button === MouseButton.RIGHT) {
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);

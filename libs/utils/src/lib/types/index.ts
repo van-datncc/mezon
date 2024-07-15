@@ -538,3 +538,9 @@ export enum Direction_Mode {
 	AFTER_TIMESTAMP = 2,
 	BEFORE_TIMESTAMP = 3,
 }
+
+export enum MouseButton {
+	LEFT = 0,
+	MIDDLE = 1,
+	RIGHT = 2,
+}

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Coords } from "../../ChannelLink";
 import PanelMember from "../../PanelMember";
 import { useOnClickOutside } from "@mezon/core";
+import { MouseButton } from "@mezon/utils";
 
 type LabelDmProps = {
     dmGroupId: string;
@@ -33,7 +34,7 @@ const LabelDm = (props: LabelDmProps) => {
 
 		const distanceToBottom = windowHeight - mouseY;
 
-		if (event.button === 2) {
+		if (event.button === MouseButton.RIGHT) {
 			setCoords({ mouseX, mouseY, distanceToBottom });
             setIsShowPanel(true);
 		}
