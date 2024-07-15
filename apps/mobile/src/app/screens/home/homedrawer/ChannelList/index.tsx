@@ -32,7 +32,7 @@ import { isEmpty, isEqual } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { gifsActions } from '../../../../../../../../libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
+import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
