@@ -1,6 +1,7 @@
 import { useAppNavigation, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
-import { clansActions, selectAllAccount, selectFriendStatus, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import { selectAllAccount, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -11,7 +12,6 @@ import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
 import GroupIconBanner from './StatusProfile/groupIconBanner';
 import PendingFriend from './pendingFriend';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
 
 type ModalUserProfileProps = {
 	userID?: string;
@@ -26,9 +26,9 @@ type ModalUserProfileProps = {
 };
 
 export type OpenModalProps = {
-	openFriend: boolean,
-	openOption: boolean,
-}
+	openFriend: boolean;
+	openOption: boolean;
+};
 
 const ModalUserProfile = ({
 	userID,
@@ -41,7 +41,6 @@ const ModalUserProfile = ({
 	showPopupLeft,
 	mode,
 }: ModalUserProfileProps) => {
-	const dispatch = useAppDispatch();
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
@@ -63,15 +62,15 @@ const ModalUserProfile = ({
 		if (response.channel_id) {
 			let channelMode = 0;
 			if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
-				channelMode = ChannelStreamMode.STREAM_MODE_DM
+				channelMode = ChannelStreamMode.STREAM_MODE_DM;
 			}
 			if (Number(response.type) === ChannelType.CHANNEL_TYPE_GROUP) {
-				channelMode = ChannelStreamMode.STREAM_MODE_GROUP
+				channelMode = ChannelStreamMode.STREAM_MODE_GROUP;
 			}
 			sendInviteMessage(content, response.channel_id, channelMode);
 			setContent('');
 			const directChat = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
-			navigate('/'+directChat);
+			navigate('/' + directChat);
 		}
 	};
 	const handleContent = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,7 +94,7 @@ const ModalUserProfile = ({
 				if (colorImg) setColor(colorImg);
 			}
 		};
-	
+
 		getColor();
 	}, [userProfile?.user?.avatar_url, userById?.user?.avatar_url, isFooterProfile, userID]);
 
@@ -115,7 +114,7 @@ const ModalUserProfile = ({
 				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2`}
 				style={{ backgroundColor: color }}
 			>
-				{(!checkUser && !checkAnonymous) && (
+				{!checkUser && !checkAnonymous && (
 					<GroupIconBanner
 						checkAddFriend={checkAddFriend}
 						openModal={openModal}
@@ -153,12 +152,16 @@ const ModalUserProfile = ({
 						</p>
 					</div>
 
-					{(checkAddFriend.myPendingFriend && !showPopupLeft) && <PendingFriend user={userById}/>}
+					{checkAddFriend.myPendingFriend && !showPopupLeft && <PendingFriend user={userById} />}
 
 					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
-					{isFooterProfile ? <StatusProfile userById={userById} /> : (mode !== 4) && (mode !== 3) && !hiddenRole && userById && <RoleUserProfile userID={userID} />}
+					{isFooterProfile ? (
+						<StatusProfile userById={userById} />
+					) : (
+						mode !== 4 && mode !== 3 && !hiddenRole && userById && <RoleUserProfile userID={userID} />
+					)}
 
-					{((!checkOwner(userById?.user?.google_id || '') && !hiddenRole) && !checkAnonymous)? (
+					{!checkOwner(userById?.user?.google_id || '') && !hiddenRole && !checkAnonymous ? (
 						<div className="w-full items-center mt-2">
 							<input
 								type="text"
