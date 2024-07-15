@@ -52,7 +52,7 @@ const HomeDefault = React.memo((props: any) => {
 		setIsShowSettingNotifyBottomSheet(!isShowSettingNotifyBottomSheet);
 		timeoutRef.current = setTimeout(() => {
 			bottomSheetRef.current?.snapToIndex(1);
-		}, 200)
+		}, 200);
 	};
 
 	const closeBottomSheet = () => {
@@ -162,21 +162,19 @@ const HomeDefault = React.memo((props: any) => {
 					)}
 				</View>
 			)}
-			{
-				isShowSettingNotifyBottomSheet && (
-					<BottomSheet
-						ref={bottomSheetRef}
-						animateOnMount
-						enablePanDownToClose={true}
-						backdropComponent={renderBackdrop}
-						index={-1}
-						snapPoints={snapPoints}
-						backgroundStyle={{ backgroundColor: themeValue.secondary }}
-					>
-						<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
-					</BottomSheet>
-				)
-			}
+			{isShowSettingNotifyBottomSheet && (
+				<BottomSheet
+					ref={bottomSheetRef}
+					animateOnMount
+					enablePanDownToClose={true}
+					backdropComponent={renderBackdrop}
+					index={-1}
+					snapPoints={snapPoints}
+					backgroundStyle={{ backgroundColor: themeValue.secondary }}
+				>
+					<BottomSheetView>{isShowSettingNotifyBottomSheet && <NotificationSetting />}</BottomSheetView>
+				</BottomSheet>
+			)}
 		</View>
 	);
 });

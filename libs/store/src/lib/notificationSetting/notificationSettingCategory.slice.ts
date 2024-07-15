@@ -1,8 +1,8 @@
 import { IChannelCategorySetting, IDefaultNotificationCategory, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
-import { ApiNotificationChannelCategoySetting, ApiNotificationSetting } from 'mezon-js/api.gen';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
+import { ApiNotificationChannelCategoySetting, ApiNotificationSetting } from 'mezon-js/api.gen';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 export const DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY = 'defaultnotificationcategory';
 
 export interface DefaultNotificationCategoryState {

@@ -1,9 +1,9 @@
 import { authActions, selectCurrentClan, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { ItemObjProps, listItemSetting } from '../ItemObj';
 import SettingItem from '../SettingItem';
-import { useSelector } from 'react-redux';
 
 type SettingSidebarProps = {
 	onClickItem?: (settingItem: ItemObjProps) => void;
@@ -50,9 +50,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 				>
 					Delete clan
 				</button>
-				{openModal &&
-					<LogoutModal handleLogOut={handleLogOut} onClose={handleCloseModal} />
-				}
+				{openModal && <LogoutModal handleLogOut={handleLogOut} onClose={handleCloseModal} />}
 			</div>
 		</div>
 	);

@@ -26,7 +26,10 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 				<form className="flex w-full flex-col gap-5 pt-4">
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label value={`What's cookin', ${name}?`} className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
+							<Label
+								value={`What's cookin', ${name}?`}
+								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
+							/>
 						</div>
 						<input
 							type="text"
@@ -36,7 +39,11 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 					</div>
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label htmlFor="clearAfter" value="Clear after" className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
+							<Label
+								htmlFor="clearAfter"
+								value="Clear after"
+								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
+							/>
 						</div>
 						<Dropdown
 							trigger="click"
@@ -60,7 +67,11 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 					</div>
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label htmlFor="status" value="Status" className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
+							<Label
+								htmlFor="status"
+								value="Status"
+								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
+							/>
 						</div>
 						<Dropdown
 							trigger="click"

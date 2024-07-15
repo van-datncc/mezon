@@ -33,7 +33,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 			references?: Array<ApiMessageRef>,
 			value?: ThreadValue,
 			anonymous?: boolean,
-			mentionEveryone?: boolean
+			mentionEveryone?: boolean,
 		) => {
 			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
 		},
@@ -89,7 +89,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 			)}
 			<ReplyMessageBox />
 			<MessageBox
-				listMentions={UserMentionList({channelID: channelId})}
+				listMentions={UserMentionList({ channelID: channelId })}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}

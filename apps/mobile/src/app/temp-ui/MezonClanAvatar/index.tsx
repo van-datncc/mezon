@@ -1,7 +1,7 @@
-import { StyleProp, Text, TextStyle, View } from "react-native";
-import { style } from "./styles";
 import { baseColor, useTheme } from "@mezon/mobile-ui";
+import { StyleProp, Text, TextStyle, View } from "react-native";
 import FastImage from "react-native-fast-image";
+import { style } from "./styles";
 
 interface IMezonClanAvatarProps {
     image?: string;

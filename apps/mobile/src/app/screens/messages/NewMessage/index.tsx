@@ -2,19 +2,19 @@ import { useDirect, useFriends } from '@mezon/core';
 import { ChevronIcon, UserGroupIcon, UserIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { FriendsEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { User } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { SeparatorWithLine } from '../../../components/Common';
 import { EFriendItemAction } from '../../../components/FriendItem';
 import { FriendListByAlphabet } from '../../../components/FriendListByAlphabet';
+import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { normalizeString } from '../../../utils/helpers';
 import { styles } from './styles';
-import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
-import { User } from 'mezon-js';
-import { useSelector } from 'react-redux';
 
 export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
@@ -90,7 +90,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 					directMessageWithUser(friend?.user?.id);
 					break;
 				case EFriendItemAction.ShowInformation:
-					setSelectedUser(friend?.user)
+					setSelectedUser(friend?.user);
 					break;
 				default:
 					break;

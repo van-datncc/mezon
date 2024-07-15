@@ -2,8 +2,8 @@ import { referencesActions, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import * as Icons from '../../../../../../ui/src/lib/Icons/index';
+import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import { useMessageLine } from '../useMessageLine';
 import MarkUpOnReply from './MarkUpOnReply';
 type MessageReplyProps = {

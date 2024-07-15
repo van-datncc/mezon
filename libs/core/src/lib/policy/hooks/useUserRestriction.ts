@@ -1,8 +1,8 @@
+import { selectCurrentClanId } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
-import { useUserPolicy } from './useUserPolicy';
 import { useSelector } from 'react-redux';
-import { selectCurrentClanId } from '@mezon/store';
+import { useUserPolicy } from './useUserPolicy';
 
 export function useUserRestriction(restrictions: EPermission[]) {
 	const currentClanId = useSelector(selectCurrentClanId);

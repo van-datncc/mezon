@@ -35,13 +35,16 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove }) => {
 						<Icons.PenEdit defaultSize="w-7 h-7" />
 					</button>
 					<div className="w-7 h-7 p-2 flex flex-row justify-center items-center dark:hover:bg-[#393C41] hover:bg-bgLightModeButton">
-						<button onClick={handleRemove} className=" flex flex-row justify-center items-center dark:hover:bg-[#393C41] hover:bg-bgLightModeButton scale-75">
+						<button
+							onClick={handleRemove}
+							className=" flex flex-row justify-center items-center dark:hover:bg-[#393C41] hover:bg-bgLightModeButton scale-75"
+						>
 							<Icons.TrashIcon defaultFill="#F93C48" defaultSize="w-4 w-4" />
 						</button>
 					</div>
 				</div>
 				<div className=" absolute bottom-0 mt-2 left-1 text-sm ">
-					<p className=''>{displayedFilename}</p>
+					<p className="">{displayedFilename}</p>
 				</div>
 			</div>
 		</div>

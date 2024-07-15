@@ -21,8 +21,7 @@ const mezon: CreateMezonClientOptions = {
 export function App() {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
-
-		if(!mezon) {
+		if (!mezon) {
 			return { store: null, persistor: null };
 		}
 
@@ -32,7 +31,7 @@ export function App() {
 	if (!store) {
 		return <>loading...</>;
 	}
-	
+
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 			<Routes />

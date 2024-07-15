@@ -67,19 +67,30 @@ export type MessageItemProps = {
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
 	showUserInformation?: boolean;
-	preventAction?: boolean
+	preventAction?: boolean;
 };
 
 const arePropsEqual = (prevProps, nextProps) => {
 	return prevProps.message === nextProps.message;
 };
 
-const idUserAnonymous = "1767478432163172999";
+const idUserAnonymous = '1767478432163172999';
 
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { mode, onOpenImage, isNumberOfLine, currentClan, clansProfile, jumpToRepliedMessage, onMessageAction, setIsOnlyEmojiPicker, showUserInformation = false, preventAction = false } = props;
+	const {
+		mode,
+		onOpenImage,
+		isNumberOfLine,
+		currentClan,
+		clansProfile,
+		jumpToRepliedMessage,
+		onMessageAction,
+		setIsOnlyEmojiPicker,
+		showUserInformation = false,
+		preventAction = false,
+	} = props;
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message = useMemo(() => {
 		return props?.message ? props?.message : selectedMessage;
@@ -107,7 +118,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const isCombine = !message?.isStartedMessageGroup;
 	const isShowInfoUser = !isCombine || (message?.references?.length && !!user);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
-	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
+	const clanProfileSender = useSelector(
+		selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string),
+	);
 	const swipeableRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
@@ -161,67 +174,73 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = useCallback((videoItem?: any) => {
-		return (
-			<View
-				style={{
-					height: 170,
-					width: widthMedia + size.s_50,
-					marginTop: size.s_10,
-				}}
-			>
-				{videoItem ? (
-					<RenderVideoChat key={`${videoItem?.url}_${new Date().getTime()}`} videoURI={videoItem?.url} />
-				) : (
-					videos.map((video, index) => {
-						return <RenderVideoChat key={video?.url} videoURI={video?.url} />;
-					})
-				)}
-			</View>
-		);
-	}, [videos]);
-
-	const imageItem = useCallback(({ image, index, checkImage }) => {
-		return (
-			<TouchableOpacity
-				disabled={checkImage}
-				activeOpacity={0.8}
-				key={index}
-				onPress={() => {
-					onOpenImage?.({
-						...image,
-						uploader: message.sender_id,
-						create_time: message.create_time,
-					});
-				}}
-				onLongPress={() => {
-					if (preventAction) return;
-					setIsOnlyEmojiPicker(false);
-					onMessageAction({
-						type: EMessageBSToShow.MessageAction,
-						senderDisplayName,
-						message
-					})
-					dispatch(setSelectedMessage(message));
-				}}
-			>
-				<FastImage
-					style={[
-						styles.imageMessageRender,
-						{
-							width: widthMedia,
-							height: calcImgHeight,
-						},
-					]}
-					source={{ uri: image?.url }}
-					resizeMode="contain"
-					onLoad={(evt) => {
-						setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
+	const renderVideos = useCallback(
+		(videoItem?: any) => {
+			return (
+				<View
+					style={{
+						height: 170,
+						width: widthMedia + size.s_50,
+						marginTop: size.s_10,
 					}}
-				/>
-			</TouchableOpacity>
-		);
-	}, [images, calcImgHeight]);
+				>
+					{videoItem ? (
+						<RenderVideoChat key={`${videoItem?.url}_${new Date().getTime()}`} videoURI={videoItem?.url} />
+					) : (
+						videos.map((video, index) => {
+							return <RenderVideoChat key={video?.url} videoURI={video?.url} />;
+						})
+					)}
+				</View>
+			);
+		},
+		[videos],
+	);
+
+	const imageItem = useCallback(
+		({ image, index, checkImage }) => {
+			return (
+				<TouchableOpacity
+					disabled={checkImage}
+					activeOpacity={0.8}
+					key={index}
+					onPress={() => {
+						onOpenImage?.({
+							...image,
+							uploader: message.sender_id,
+							create_time: message.create_time,
+						});
+					}}
+					onLongPress={() => {
+						if (preventAction) return;
+						setIsOnlyEmojiPicker(false);
+						onMessageAction({
+							type: EMessageBSToShow.MessageAction,
+							senderDisplayName,
+							message,
+						});
+						dispatch(setSelectedMessage(message));
+					}}
+				>
+					<FastImage
+						style={[
+							styles.imageMessageRender,
+							{
+								width: widthMedia,
+								height: calcImgHeight,
+							},
+						]}
+						source={{ uri: image?.url }}
+						resizeMode="contain"
+						onLoad={(evt) => {
+							setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
+						}}
+					/>
+				</TouchableOpacity>
+			);
+		},
+		[images, calcImgHeight],
+	);
 
 	const renderImages = useCallback(() => {
 		return (
@@ -260,8 +279,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onMessageAction({
 							type: EMessageBSToShow.MessageAction,
 							senderDisplayName,
-							message
-						})
+							message,
+						});
 						dispatch(setSelectedMessage(message));
 					}}
 				>
@@ -284,11 +303,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				const tagName = mentionedUser?.slice(1);
 				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username);
 
-				if (!mentionedUser || tagName === "here") return;
+				if (!mentionedUser || tagName === 'here') return;
 				onMessageAction({
 					type: EMessageBSToShow.UserInformation,
-					user: clanUser?.user
-				})
+					user: clanUser?.user,
+				});
 			} catch (error) {
 				console.log('error', error);
 			}
@@ -297,7 +316,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
-		alert('jumpToChannel Message item')
+		alert('jumpToChannel Message item');
 		const store = await getStoreAsync();
 
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
@@ -332,7 +351,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const handleJumpToMessage = (messageId: string) => {
 		dispatch(referencesActions.setIdMessageToJump(messageId));
 		jumpToRepliedMessage(messageRefFetchFromServe?.id);
-	}
+	};
 
 	const isEdited = useMemo(() => {
 		if (message?.update_time) {
@@ -344,8 +363,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	const senderDisplayName = useMemo(() => {
-		return clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username)
-	}, [checkAnonymous, clanProfile?.nick_name, message?.username, user?.user?.display_name, user?.user?.username])
+		return clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
+	}, [checkAnonymous, clanProfile?.nick_name, message?.username, user?.user?.display_name, user?.user?.username]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
@@ -360,7 +379,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		);
 	};
 
-	const handleSwipeableOpen = (direction: "left" | "right") => {
+	const handleSwipeableOpen = (direction: 'left' | 'right') => {
 		if (preventAction && swipeableRef.current) {
 			swipeableRef.current.close();
 		}
@@ -370,7 +389,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				type: EMessageActionType.Reply,
 				targetMessage: message,
 				isStillShowKeyboard: true,
-				replyTo: senderDisplayName
+				replyTo: senderDisplayName,
 			};
 			//Note: trigger to ChatBox.tsx
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);

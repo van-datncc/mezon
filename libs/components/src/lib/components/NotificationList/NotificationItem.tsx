@@ -1,5 +1,5 @@
 import { useJumpToMessage, useNotification } from '@mezon/core';
-import { selectCurrentClanId, selectMemberClanByUserId } from '@mezon/store';
+import { selectMemberClanByUserId } from '@mezon/store';
 import { convertTimeString } from '@mezon/utils';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useMemo } from 'react';

@@ -1,7 +1,6 @@
 import { useChannelMembers } from '@mezon/core';
-import { ChannelMembersEntity, selectCloseMenu, selectCurrentChannelId } from '@mezon/store';
+import { selectCloseMenu, selectCurrentChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';
-import MemberItem from './MemberItem';
 import ListMember from './listMember';
 
 export type MemberListProps = { className?: string };
@@ -18,7 +17,7 @@ function MemberList() {
 					MEMBER - {onlineMembers.length}
 				</p>
 				<div className="flex flex-col gap-4 ">
-					<ListMember lisMembers={onlineMembers} isOffline={false}/>
+					<ListMember lisMembers={onlineMembers} isOffline={false} />
 				</div>
 				{offlineMembers.length > 0 && (
 					<>
@@ -26,7 +25,7 @@ function MemberList() {
 							Offline - {offlineMembers.length}
 						</p>
 						<div className="flex flex-col gap-4 mb-3">
-							<ListMember lisMembers={offlineMembers} isOffline={true}/>
+							<ListMember lisMembers={offlineMembers} isOffline={true} />
 						</div>
 					</>
 				)}

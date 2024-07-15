@@ -1,5 +1,5 @@
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice, isRejectedWithValue } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc } from 'mezon-js/api.gen';
 import { getUserProfile } from '../account/account.slice';
@@ -9,16 +9,14 @@ import { usersClanActions } from '../clanMembers/clan.members';
 import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
 import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
+import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
-import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
-import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
 
 import { directActions } from '../direct/direct.slice';
 
-import { boolean } from 'yup';
-import { ThunkConfigWithToast, withToast } from '../toasts';
 
 export const CLANS_FEATURE_KEY = 'clans';
 

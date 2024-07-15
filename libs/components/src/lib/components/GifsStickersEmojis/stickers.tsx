@@ -86,7 +86,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 							alt={`Img`}
 							className="w-full h-auto cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton hover:rounded-lg border border-bgHoverMember rounded-lg"
 							onClick={() => handleClickImage(image.url)}
-							role='button'
+							role="button"
 						/>
 					))}
 				</div>
