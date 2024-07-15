@@ -173,73 +173,47 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		setDocuments(documents);
 	}, [attachments]);
 
-	const renderVideos = useCallback(
-		(videoItem?: any) => {
-			return (
-				<View
-					style={{
-						height: 170,
-						width: widthMedia + size.s_50,
-						marginTop: size.s_10,
+	const imageItem = useCallback(({ image, index, checkImage }) => {
+		return (
+			<TouchableOpacity
+				disabled={checkImage}
+				activeOpacity={0.8}
+				key={index}
+				onPress={() => {
+					onOpenImage?.({
+						...image,
+						uploader: message.sender_id,
+						create_time: message.create_time,
+					});
+				}}
+				onLongPress={() => {
+					if (preventAction) return;
+					setIsOnlyEmojiPicker(false);
+					onMessageAction({
+						type: EMessageBSToShow.MessageAction,
+						senderDisplayName,
+						message
+					})
+					dispatch(setSelectedMessage(message));
+				}}
+			>
+				<FastImage
+					style={[
+						styles.imageMessageRender,
+						{
+							width: widthMedia,
+							height: calcImgHeight,
+						},
+					]}
+					source={{ uri: image?.url }}
+					resizeMode="contain"
+					onLoad={(evt) => {
+						setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
 					}}
-				>
-					{videoItem ? (
-						<RenderVideoChat key={`${videoItem?.url}_${new Date().getTime()}`} videoURI={videoItem?.url} />
-					) : (
-						videos.map((video, index) => {
-							return <RenderVideoChat key={video?.url} videoURI={video?.url} />;
-						})
-					)}
-				</View>
-			);
-		},
-		[videos],
-	);
-
-	const imageItem = useCallback(
-		({ image, index, checkImage }) => {
-			return (
-				<TouchableOpacity
-					disabled={checkImage}
-					activeOpacity={0.8}
-					key={index}
-					onPress={() => {
-						onOpenImage?.({
-							...image,
-							uploader: message.sender_id,
-							create_time: message.create_time,
-						});
-					}}
-					onLongPress={() => {
-						if (preventAction) return;
-						setIsOnlyEmojiPicker(false);
-						onMessageAction({
-							type: EMessageBSToShow.MessageAction,
-							senderDisplayName,
-							message,
-						});
-						dispatch(setSelectedMessage(message));
-					}}
-				>
-					<FastImage
-						style={[
-							styles.imageMessageRender,
-							{
-								width: widthMedia,
-								height: calcImgHeight,
-							},
-						]}
-						source={{ uri: image?.url }}
-						resizeMode="contain"
-						onLoad={(evt) => {
-							setCalcImgHeight((evt.nativeEvent.height / evt.nativeEvent.width) * widthMedia);
-						}}
-					/>
-				</TouchableOpacity>
-			);
-		},
-		[images, calcImgHeight],
-	);
+				/>
+			</TouchableOpacity>
+		);
+	}, [images, calcImgHeight]);
 
 	const renderImages = useCallback(() => {
 		return (
@@ -264,7 +238,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			const checkIsVideo = isVideo(document?.url?.toLowerCase());
 
 			if (checkIsVideo) {
-				return renderVideos(document);
+				return <RenderVideoChat videoURL={document.url} />;
 			}
 
 			return (
@@ -536,19 +510,19 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 												id: message?.user?.id,
 											};
 
-								onMessageAction({
-									type: EMessageBSToShow.UserInformation,
-									user: userForDisplay,
-								});
-							}}
-							style={styles.messageBoxTop}
-						>
-							<Text style={styles.userNameMessageBox}>{senderDisplayName}</Text>
-							<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
-						</TouchableOpacity>
-					) : null}
-					{videos?.length > 0 && renderVideos()}
-					{images?.length > 0 && renderImages()}
+									onMessageAction({
+										type: EMessageBSToShow.UserInformation,
+										user: userForDisplay
+									})
+								}}
+								style={styles.messageBoxTop}
+							>
+								<Text style={styles.userNameMessageBox}>{senderDisplayName}</Text>
+								<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
+							</TouchableOpacity>
+						) : null}
+						{videos?.length > 0 && videos.map((video, index) => <RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} />)}
+						{images?.length > 0 && renderImages()}
 
 					{documents?.length > 0 && renderDocuments()}
 					<Block opacity={message?.isSending || message.isError ? 0.6 : 1}>

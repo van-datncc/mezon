@@ -13,30 +13,30 @@ export const UnreadDMBadgeList = React.memo(() => {
 	const unReadDirectMessageList = useSelector(selectDirectsUnreadlist);
 	const navigation = useNavigation<any>();
 
-	const getBadge = (dm: DirectEntity) => {
-		switch (dm.type) {
-			case ChannelType.CHANNEL_TYPE_DM:
-				return (
-					<View>
-						<Image source={{ uri: dm?.channel_avatar[0] }} resizeMode="cover" style={styles.groupAvatar} />
-						<View style={styles.badge}>
-							<Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
-						</View>
-					</View>
-				);
-			case ChannelType.CHANNEL_TYPE_GROUP:
-				return (
-					<View style={styles.groupAvatar}>
-						<UserGroupIcon />
-						<View style={styles.badge}>
-							<Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
-						</View>
-					</View>
-				);
-			default:
-				return <View />;
-		}
-	};
+    const getBadge = (dm: DirectEntity) => {
+        switch (dm.type) {
+            case ChannelType.CHANNEL_TYPE_DM:
+                return (
+                    <View>
+                        <Image source={{uri: dm?.channel_avatar?.[0]}} resizeMode='cover' style={styles.groupAvatar} />
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
+                        </View>
+                    </View>
+                )
+            case ChannelType.CHANNEL_TYPE_GROUP:
+                return (
+                    <View style={styles.groupAvatar}>
+                        <UserGroupIcon />
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
+                        </View>
+                    </View>
+                )
+            default:
+                return <View />
+        }
+    }
 
 	const navigateToDirectMessageMDetail = (channel_id) => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {

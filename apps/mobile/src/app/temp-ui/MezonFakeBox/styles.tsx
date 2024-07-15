@@ -28,4 +28,8 @@ export const style = (colors: Attributes) =>
 			fontWeight: '600',
 			marginBottom: Fonts.size.s_10,
 		},
+		titleUppercase: {
+			fontSize: Fonts.size.h7,
+			textTransform: "uppercase"
+		}
 	});
