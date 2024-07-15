@@ -55,11 +55,11 @@
         "eventFrequency": {
             "title": "Event Frequency",
             "noRepeat": "Does not repeat",
-            "weeklyOn": "Weekly on",
-            "everyOther": "Every other",
-            "monthlyOn": "Monthly on",
-            "annuallyOn": "Annually On",
-            "everyWeekday": "Every weekday (Monday to Friday"
+            "weeklyOn": "Weekly on {{name}}",
+            "everyOther": "Every other {{name}}",
+            "monthlyOn": "Monthly on {{name}}",
+            "annuallyOn": "Annually on {{name}}",
+            "everyWeekday": "Every weekday (Monday to Friday)"
         },
         "description": {
             "title": "Description",

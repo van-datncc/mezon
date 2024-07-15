@@ -5,18 +5,20 @@ import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes
 import { MezonDateTimePicker, MezonInput, MezonSelect } from "../../../temp-ui";
 import MezonButton from "../../../temp-ui/MezonButton2";
 import { useState } from "react";
-import { getNearTime, Icons } from "@mezon/mobile-components";
+import { getDayName, getDayWeekName, getDayYearName, getNearTime, Icons } from "@mezon/mobile-components";
 import { OptionEvent } from "@mezon/utils";
 import Toast from "react-native-toast-message";
 import { Fonts, useTheme } from "@mezon/mobile-ui";
+import { useMemo } from "react";
 
 type CreateEventScreenDetails = typeof APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS;
 export default function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<CreateEventScreenDetails>) {
     const { themeValue } = useTheme();
     const styles = style(themeValue);
-    const { t } = useTranslation(['eventCreator']);
-
+    const { t, i18n } = useTranslation(['eventCreator']);
     const { type, channelId, location, onGoBack } = route.params || {};
+
+    const language = useMemo(() => i18n.language === "vi" ? "vi" : "en", [i18n])
 
     navigation.setOptions({
         headerTitle: t('screens.eventDetails.headerTitle'),
@@ -41,38 +43,38 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
         navigation.navigate(APP_SCREEN.HOME);
     }
 
-    const options = [
+    const [eventTitle, setEventTitle] = useState<string>("");
+    const [eventDescription, setEventDescription] = useState<string>("");
+    const [startTime, setStartTime] = useState<Date>(getNearTime(120));
+    const [endTime, setEndTime] = useState<Date>(getNearTime(240));
+    const [eventFrequency, setEventFrequency] = useState<number>(0);
+
+    const options = useMemo(() => [
         {
             title: t('fields.eventFrequency.noRepeat'),
             value: 0
         },
         {
-            title: t('fields.eventFrequency.weeklyOn'),
+            title: t('fields.eventFrequency.weeklyOn', { name: getDayName(startTime, language) }),
             value: 1
         },
         {
-            title: t('fields.eventFrequency.everyOther'),
+            title: t('fields.eventFrequency.everyOther', { name: getDayName(startTime, language) }),
             value: 2
         },
         {
-            title: t('fields.eventFrequency.monthlyOn'),
+            title: t('fields.eventFrequency.monthlyOn', { name: getDayWeekName(startTime, language) }),
             value: 3
         },
         {
-            title: t('fields.eventFrequency.annuallyOn'),
+            title: t('fields.eventFrequency.annuallyOn', { name: getDayYearName(startTime, language) }),
             value: 4
         },
         {
             title: t('fields.eventFrequency.everyWeekday'),
             value: 5
         },
-    ]
-
-    const [eventTitle, setEventTitle] = useState<string>("");
-    const [eventDescription, setEventDescription] = useState<string>("");
-    const [startTime, setStartTime] = useState<Date>(getNearTime(120));
-    const [endTime, setEndTime] = useState<Date>(getNearTime(240));
-    const [eventFrequency, setEventFrequency] = useState<number>(0);
+    ], [startTime]);
 
     function handleFrequencyChange(value: number) {
         setEventFrequency(value);

@@ -10,7 +10,7 @@ import MezonFakeInputBox, { IMezonFakeBoxProps } from "../MezonFakeBox";
 import { useEffect } from "react";
 import { memo } from "react";
 import { useCallback } from "react";
-import { useTheme } from "@mezon/mobile-ui";
+import { ThemeModeBase, useTheme } from "@mezon/mobile-ui";
 import { style } from "./styles";
 
 type IMezonDateTimePicker = Omit<IMezonFakeBoxProps, "onPress" | "postfixIcon" | "value"> & {
@@ -21,7 +21,7 @@ type IMezonDateTimePicker = Omit<IMezonFakeBoxProps, "onPress" | "postfixIcon" |
 }
 
 export default memo(function MezonDateTimePicker({ mode = "date", onChange, value, keepTime, ...props }: IMezonDateTimePicker) {
-    const { themeValue } = useTheme();
+    const { themeValue, themeBasic } = useTheme();
     const styles = style(themeValue);
     const bottomSheetRef = useRef<BottomSheetModalMethods>();
     const [date, setDate] = useState(value || getNearTime(120))
@@ -93,7 +93,12 @@ export default memo(function MezonDateTimePicker({ mode = "date", onChange, valu
                 }
             >
                 <View style={styles.bsContainer}>
-                    <DatePicker date={date} onDateChange={setDate} mode={mode} />
+                    <DatePicker
+                        date={date}
+                        onDateChange={setDate}
+                        mode={mode}
+                        theme={themeBasic === ThemeModeBase.DARK ? "dark" : "light"}
+                    />
                 </View>
             </MezonBottomSheet>
         </View>
