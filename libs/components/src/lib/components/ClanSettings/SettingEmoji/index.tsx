@@ -1,15 +1,10 @@
 import SettingEmojiList from "./SettingEmojiList";
-import { IUserAccount } from "@mezon/utils";
-import { ensureSession, getMezonCtx } from "libs/store/src/lib/helpers";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { AppDispatch, createEmoji, selectAllEmoji, selectCurrentChannelId, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import { createEmoji, selectAllEmoji, selectCurrentChannelId, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
 import { handleUploadFile, useMezon } from "@mezon/transport";
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from "mezon-js/api.gen";
 import { ModalErrorTypeUpload, ModalOverData } from "../../ModalError";
-import { useTranslation } from 'react-i18next';
-
-
 
 const SettingEmoji = () => {
   const [openModal, setOpenModal] = useState(false);

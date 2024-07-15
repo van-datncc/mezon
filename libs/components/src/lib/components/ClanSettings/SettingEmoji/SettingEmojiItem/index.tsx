@@ -1,8 +1,8 @@
 
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
-import {selectCurrentClanId, selectMemberClanByUserId, settingClanEmojiActions, useAppDispatch} from "@mezon/store";
-import {ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody} from "mezon-js/api.gen";
+import { selectMemberClanByUserId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from "mezon-js/api.gen";
 
 type SettingEmojiItemProp = {
   emoji: ApiClanEmojiListResponse,
@@ -13,26 +13,24 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const dispatch = useAppDispatch()
 
-  const dataAuthor = useSelector(selectMemberClanByUserId("1809069169707061248"));
-  const currentClanId = useSelector(selectCurrentClanId) || '';
+  const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
 
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value);
-    console.log (e.target.value);
   }
 
   const handleUpdateEmoji = async () => {
-    console.log ('update')
+    console.log('update')
     const request: MezonUpdateClanEmojiByIdBody = {
       source: emoji.src,
       shortname: nameEmoji,
       category: emoji.category,
     }
-    await dispatch(settingClanEmojiActions.updateEmoji({request: request, emojiId: emoji.id || ''}))
+    await dispatch(settingClanEmojiActions.updateEmoji({ request: request, emojiId: emoji.id || '' }))
   }
 
   const handleDelete = () => {
-    console.log ('delete')
+    console.log('delete')
     dispatch(settingClanEmojiActions.deleteEmoji(emoji.id || ''));
   }
 
@@ -63,7 +61,7 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
               className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`}
               value={nameEmoji}
               onChange={(e) => handleChangeEmojiName(e)}
-              onKeyDown={(e) => {e.key === 'Enter' && handleUpdateEmoji()}}
+              onKeyDown={(e) => { e.key === 'Enter' && handleUpdateEmoji() }}
             />
           }
         </div>
