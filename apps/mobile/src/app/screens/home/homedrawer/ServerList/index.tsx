@@ -1,7 +1,14 @@
 import { useFriends } from '@mezon/core';
-import { Icons, remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
+import {
+	Icons,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_CLAN_ID,
+	remove,
+	save,
+	setDefaultChannelLoader
+} from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
+import { channelsActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
@@ -32,6 +39,8 @@ const ServerList = React.memo((props: any) => {
 		store.dispatch(clansActions.joinClan({ clanId: clanId }));
 		save(STORAGE_CLAN_ID, clanId);
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+		const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
+		await setDefaultChannelLoader(respChannel.payload, clanId);
 	};
 
 	useEffect(() => {
