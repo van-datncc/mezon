@@ -127,6 +127,10 @@ const CustomStatusBar = () => {
 const RootNavigation = () => {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
+		
+		if(!mezon) {
+			return { store: null, persistor: null };
+		}
 		return initStore(mezon, undefined);
 	}, [mezon]);
 
