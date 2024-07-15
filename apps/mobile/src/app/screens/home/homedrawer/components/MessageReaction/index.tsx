@@ -42,9 +42,10 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			currentChannel.id,
+			currentChannel?.clan_id ?? '',
+			currentChannel?.id ?? '',
 			messageId ?? '',
-			emoji ?? '',
+			emoji?.trim() ?? '',
 			1,
 			message_sender_id ?? '',
 			false,
@@ -57,7 +58,8 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			currentChannel.id,
+			currentChannel?.clan_id ?? '',
+			currentChannel?.id ?? '',
 			message.id ?? '',
 			emoji,
 			countToRemove,

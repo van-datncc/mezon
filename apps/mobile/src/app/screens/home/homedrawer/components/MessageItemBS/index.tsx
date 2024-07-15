@@ -360,11 +360,21 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	}, [t, userProfile, message, listPinMessages, isDM]);
 
 	const renderUserInformation = () => {
-		return <UserProfile userId={user?.id} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
+		return <UserProfile userId={user?.id} user={user} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
 	};
 
 	const handleReact = async (mode, messageId, emoji: string, senderId) => {
-		await reactionMessageDispatch('', mode, message.channel_id ?? '', messageId ?? '', emoji?.trim(), 1, senderId ?? '', false);
+		await reactionMessageDispatch(
+			'',
+			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			message?.clan_id ?? props?.clanId ?? '',
+			message.channel_id ?? '',
+			messageId ?? '',
+			emoji?.trim(),
+			1,
+			senderId ?? '',
+			false
+		);
 		onClose();
 	};
 

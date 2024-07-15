@@ -1,29 +1,29 @@
-import { useClans, useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
+import { BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
 import { LinkIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
+import { DirectEntity, selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
+import { useSelector } from 'react-redux';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
+import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
 import { normalizeString } from '../../../../../utils/helpers';
-import { FriendListItem } from '../../Reusables';
 import { ExpireLinkValue, LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../constants';
 import { EMaxUserCanInvite } from '../../enums';
+import { FriendListItem } from '../../Reusables';
 import { style } from './styles';
-import { BottomSheetModal, BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
-import { DirectEntity, selectCurrentChannelId } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import {useSelector} from "react-redux";
 
 interface IInviteToChannelProp {
-   isUnknownChannel: boolean
-	 onClose?: () => void;
+	isUnknownChannel: boolean;
+	onClose?: () => void;
 }
 
 export const InviteToChannel = React.memo(
@@ -35,7 +35,8 @@ export const InviteToChannel = React.memo(
 		const [searchUserText, setSearchUserText] = useState('');
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
-		const { currentClanId, currentClan } = useClans();
+		const currentClanId = useSelector(selectCurrentClanId);
+		const currentClan = useSelector(selectCurrentClan);
 		const { createLinkInviteUser } = useInvite();
 		const { t } = useTranslation(['inviteToChannel']);
 		const timeoutRef = useRef(null);
@@ -51,10 +52,10 @@ export const InviteToChannel = React.memo(
 
 		const userInviteList = useMemo(() => {
 			if (listDMInvite?.length) {
-				return listDMInvite?.filter(dm => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)))
+				return listDMInvite?.filter((dm) => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)));
 			}
-			return listUserInvite?.filter(UserInvite => normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)))
-		}, [searchUserText, listDMInvite, listUserInvite])
+			return listUserInvite?.filter((UserInvite) => normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)));
+		}, [searchUserText, listDMInvite, listUserInvite]);
 
 		const openEditLinkModal = () => {
 			//@ts-ignore
@@ -114,12 +115,12 @@ export const InviteToChannel = React.memo(
 		const directMessageWithUser = async (userId: string) => {
 			const response = await createDirectMessageWithUser(userId);
 			if (response?.channel_id) {
-				let channelMode = 0
+				let channelMode = 0;
 				if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
-					channelMode = ChannelStreamMode.STREAM_MODE_DM
+					channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				}
 				if (Number(response.type) === ChannelType.CHANNEL_TYPE_GROUP) {
-					channelMode = ChannelStreamMode.STREAM_MODE_GROUP
+					channelMode = ChannelStreamMode.STREAM_MODE_GROUP;
 				}
 				sendInviteMessage(currentInviteLink, response.channel_id, channelMode);
 			}
@@ -145,7 +146,7 @@ export const InviteToChannel = React.memo(
 				return;
 			}
 			setCurrentInviteLink(`https://mezon.vn/invite/${response.invite_link}`);
-		}
+		};
 
 		useEffect(() => {
 			if (currentClanId && currentChannelId) {
@@ -160,7 +161,7 @@ export const InviteToChannel = React.memo(
 					enableDynamicSizing={false}
 					snapPoints={['80%']}
 					index={0}
-            		animateOnMount
+					animateOnMount
 					backdropComponent={Backdrop}
 					onDismiss={() => {
 						onClose?.();
@@ -172,75 +173,85 @@ export const InviteToChannel = React.memo(
 						<View style={styles.inviteHeader}>
 							<Text style={styles.inviteHeaderText}>{t('title')}</Text>
 						</View>
-					{
-						isUnknownChannel ? <Text style={styles.textUnknown}>{t('unknownChannel')}</Text> : (
-						<>
-							<View style={styles.iconAreaWrapper}>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="link" style={styles.shareToInviteIcon} onPress={() => addInviteLinkToClipboard()} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
-								</Pressable>
-								<Pressable style={styles.inviteIconWrapper}>
-									<View style={styles.shareToInviteIconWrapper}>
-										<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
-									</View>
-									<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
-								</Pressable>
-							</View>
-
-							<View style={styles.searchInviteFriendWrapper}>
-								<View style={styles.searchFriendToInviteWrapper}>
-									<TextInput
-									placeholder={'Invite friend to channel'}
-									placeholderTextColor={themeValue.text}
-									style={styles.searchFriendToInviteInput}
-									onChangeText={setSearchUserText}
-									/>
-									<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
-								</View>
-								<View style={styles.editInviteLinkWrapper}>
-									<Text style={styles.defaultText}>{t('yourLinkInvite')} {expiredTimeSelected} </Text>
-									<Pressable onPress={() => openEditLinkModal()}>
-									<Text style={styles.linkText}>{t('editInviteLink')}</Text>
+						{isUnknownChannel ? (
+							<Text style={styles.textUnknown}>{t('unknownChannel')}</Text>
+						) : (
+							<>
+								<View style={styles.iconAreaWrapper}>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="twitter" style={styles.shareToInviteIcon} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.twitter')}</Text>
+									</Pressable>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="facebook" style={styles.shareToInviteIcon} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.faceBook')}</Text>
+									</Pressable>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="youtube" style={styles.shareToInviteIcon} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.youtube')}</Text>
+									</Pressable>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather
+												size={25}
+												name="link"
+												style={styles.shareToInviteIcon}
+												onPress={() => addInviteLinkToClipboard()}
+											/>
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.copyLink')}</Text>
+									</Pressable>
+									<Pressable style={styles.inviteIconWrapper}>
+										<View style={styles.shareToInviteIconWrapper}>
+											<Feather size={25} name="mail" style={styles.shareToInviteIcon} />
+										</View>
+										<Text style={styles.inviteIconText}>{t('iconTitle.email')}</Text>
 									</Pressable>
 								</View>
-							</View>
 
-							<BottomSheetFlatList
-								data={userInviteList}
-								keyExtractor={(item) => item?.id}
-								renderItem={({ item }) => {
-									return <FriendListItem
-										key={item?.id}
-										dmGroup={item}
-										user={item}
-										onPress={handleSendInVite}
-										isSent={sentIdList.includes(item?.id)}
-									/>
-								}}
-							/>
-						</>
-					)}
+								<View style={styles.searchInviteFriendWrapper}>
+									<View style={styles.searchFriendToInviteWrapper}>
+										<TextInput
+											placeholder={'Invite friend to channel'}
+											placeholderTextColor={themeValue.text}
+											style={styles.searchFriendToInviteInput}
+											onChangeText={setSearchUserText}
+										/>
+										<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
+									</View>
+									<View style={styles.editInviteLinkWrapper}>
+										<Text style={styles.defaultText}>
+											{t('yourLinkInvite')} {expiredTimeSelected}{' '}
+										</Text>
+										<Pressable onPress={() => openEditLinkModal()}>
+											<Text style={styles.linkText}>{t('editInviteLink')}</Text>
+										</Pressable>
+									</View>
+								</View>
+
+								<BottomSheetFlatList
+									data={userInviteList}
+									keyExtractor={(item) => item?.id}
+									renderItem={({ item }) => {
+										return (
+											<FriendListItem
+												key={item?.id}
+												dmGroup={item}
+												user={item}
+												onPress={handleSendInVite}
+												isSent={sentIdList.includes(item?.id)}
+											/>
+										);
+									}}
+								/>
+							</>
+						)}
 					</View>
 				</BottomSheetModal>
 
@@ -275,7 +286,10 @@ export const InviteToChannel = React.memo(
 										>
 											<Text
 												style={[
-													{ color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray, textAlign: 'center' },
+													{
+														color: option.value === expiredTimeSelected ? Colors.white : Colors.textGray,
+														textAlign: 'center',
+													},
 												]}
 											>
 												{option.label}
@@ -298,7 +312,10 @@ export const InviteToChannel = React.memo(
 										>
 											<Text
 												style={[
-													{ color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray, textAlign: 'center' },
+													{
+														color: option === maxUserCanInviteSelected ? Colors.white : Colors.textGray,
+														textAlign: 'center',
+													},
 												]}
 											>
 												{option}
@@ -312,13 +329,11 @@ export const InviteToChannel = React.memo(
 								<MezonSwitch value={isTemporaryMembership} onValueChange={setIsTemporaryMembership} />
 							</View>
 							<View style={{ flexDirection: 'row' }}>
-								<Text style={{ color: Colors.textGray }}>
-									{t('memberAutoKick')}
-								</Text>
+								<Text style={{ color: Colors.textGray }}>{t('memberAutoKick')}</Text>
 							</View>
 						</View>
 					</MezonModal>
-				): null}
+				) : null}
 			</View>
 		);
 	}),

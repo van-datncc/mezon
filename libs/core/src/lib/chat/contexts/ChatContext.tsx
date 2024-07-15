@@ -10,6 +10,7 @@ import {
 	mapReactionToEntity,
 	messagesActions,
 	notificationActions,
+	pinMessageActions,
 	reactionActions,
 	selectCurrentChannel,
 	toastActions,
@@ -23,6 +24,7 @@ import {
 	ChannelMessageEvent,
 	ChannelPresenceEvent,
 	ChannelUpdatedEvent,
+	LastPinMessageEvent,
 	MessageReactionEvent,
 	MessageTypingEvent,
 	Notification,
@@ -118,9 +120,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		(notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id) {
+			if (currentChannel?.channel_id !== (notification as any).channel_id ) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			}
+
+			if (currentChannel?.channel_id !== (notification as any).channel_id && notification.code === -9) {
+				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
+				dispatch(notificationActions.setStatusNoti())
+			}
+
 			if (notification.code === -2 || notification.code === -3) {
 				toast.info(notification.subject);
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
@@ -128,6 +137,19 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[currentChannel?.channel_id, dispatch],
 	);
+
+	const onpinmessage = useCallback(
+		(pin: LastPinMessageEvent) => {
+			if (pin.operation === 1) {
+				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannel?.channel_id ?? '', noCache: true }));
+			}
+			if (pin.operation === 0) {
+				dispatch(channelsActions.fetchChannels({ clanId: currentChannel?.clan_id ?? '', noCache: true }));
+			}
+		},
+		[currentChannel?.channel_id, dispatch],
+	);
+
 	const ondisconnect = useCallback(() => {
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect();
@@ -229,6 +251,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		socket.onnotification = onnotification;
 
+		socket.onpinmessage = onpinmessage;
+
 		socket.onstatuspresence = onstatuspresence;
 
 		socket.onchannelcreated = onchannelcreated;
@@ -241,15 +265,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -258,6 +283,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onmessagetyping,
 		onmessagereaction,
 		onnotification,
+		onpinmessage,
 		onstatuspresence,
 		socketRef,
 		onvoicejoined,

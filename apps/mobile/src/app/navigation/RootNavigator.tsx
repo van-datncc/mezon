@@ -1,6 +1,7 @@
 import {
 	MezonStoreProvider,
 	accountActions,
+	appActions,
 	authActions,
 	emojiSuggestionActions,
 	getStoreAsync,
@@ -27,6 +28,7 @@ import NetInfoComp from '../components/NetworkInfo';
 import { STORAGE_CHANNEL_CURRENT_CACHE, remove } from '@mezon/mobile-components';
 import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
+import { delay } from 'lodash';
 
 const RootStack = createStackNavigator();
 
@@ -57,34 +59,16 @@ const NavigationMain = () => {
 		}
 	}, [isLoggedIn, hasInternet]);
 
-	const withTimeout = async (promise: Promise<any>, duration: number) => {
-		let timeoutId: NodeJS.Timeout;
-		const timeoutPromise = new Promise((_, reject) => {
-			timeoutId = setTimeout(() => {
-				reject(new Error('Operation timed out'));
-			}, duration);
-		});
-
-		const result = await Promise.race([promise, timeoutPromise]);
-		clearTimeout(timeoutId);
-		return result;
-	};
-
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			withTimeout(reconnect(), 1500)
-				.then(() => {
-					console.log('Reconnected successfully');
-				})
-				.catch((e) => {
-					console.log('Failed to reconnect or operation timed out', e);
-				});
+			delay(reconnect, 1200);
 			await notifee.cancelAllNotifications();
 		}
 	};
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
+		store.dispatch(appActions.setLoadingMainMobile(false));
 		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: '0', noCache: false }));
 		try {
 			const response = await store.dispatch(authActions.refreshSession());

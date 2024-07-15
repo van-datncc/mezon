@@ -523,6 +523,8 @@ export type ContenSubmitEventProps = {
 export enum SHOW_POSITION {
 	IN_VIEWER = 'IN_VIEWER',
 	IN_LINK = 'IN_LINK',
+	IN_EMOJI = 'IN_EMOJI',
+	IN_STICKER = 'IN_STICKER',
 	NONE = 'NONE',
 }
 
