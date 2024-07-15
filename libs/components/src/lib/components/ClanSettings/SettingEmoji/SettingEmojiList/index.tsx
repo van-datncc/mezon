@@ -27,7 +27,7 @@ const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
       </div>
       <div className={'flex flex-col w-full'}>
         {emojiList.map(emoji => (
-          <SettingEmojiItem key={emoji.src} src={emoji.src ?? ''} emojiName={emoji.shortname ?? ''} authorId={'1809069169707061248'} />
+          <SettingEmojiItem key={emoji.id} emoji={emoji} />
         ))}
       </div>
     </div>

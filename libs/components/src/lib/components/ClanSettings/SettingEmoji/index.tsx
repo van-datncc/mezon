@@ -19,8 +19,7 @@ const SettingEmoji = () => {
   const currentClanId = useSelector(selectCurrentClanId) || '';
   const { sessionRef, clientRef } = useMezon()
   const emojiList = useSelector(selectAllEmoji);
-  // const { t } = useTranslation(["clanEmojiSetting"]);
-  const { t, i18n } = useTranslation('en');
+
   const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const file = e.target.files[0];
@@ -74,10 +73,10 @@ const SettingEmoji = () => {
 
       <div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
         <div className={'dark:text-textSecondary flex flex-col gap-2 text-textSecondary800'}>
-          <p className={''}>{t('description')}</p>
-          <p className={'uppercase text-xs'}>{t('header.description')}</p>
+          <p className={''}>Add up to 250 custom emoji that anyone can use in this server. Animated GIF emoji may be used by members with Mezon Nitro</p>
+          <p className={'uppercase text-xs'}>UPLOAD REQUIREMENTS</p>
           <ul className={"list-disc ml-[16px]"}>
-            <li>{t('title')}</li>
+            <li>File type: JPEG, PNG, GIF</li>
             <li>Recommended file size: 256 KB (We'll compress for you)</li>
             <li>Recommended dimensions: 128x128</li>
             <li>Naming: Emoji names must be at least 2 characters long and can only contain alphanumeric characters and underscores</li>

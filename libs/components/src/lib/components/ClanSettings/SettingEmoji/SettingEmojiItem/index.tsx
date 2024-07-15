@@ -2,20 +2,20 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectMemberClanByUserId } from "@mezon/store";
+import { ApiClanEmoji } from "mezon-js/api.gen";
 
 type SettingEmojiItemProp = {
-  src: string,
-  emojiName: string,
-  authorId: string,
+  emoji: ApiClanEmoji
 }
 
-const SettingEmojiItem = ({ src, authorId, emojiName }: SettingEmojiItemProp) => {
-  const [nameEmoji, setNameEmoji] = useState<string>(emojiName);
+const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
+  const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname ?? '');
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value);
   }
-  const dataAuthor = useSelector(selectMemberClanByUserId(authorId));
+  const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
+
 
   return (
     <div className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'} onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)}>
@@ -23,7 +23,7 @@ const SettingEmojiItem = ({ src, authorId, emojiName }: SettingEmojiItemProp) =>
 
         <div className={'w-14 h-8'}>
           <div className={'w-8 h-8 overflow-hidden flex items-center justify-center '}>
-            <img className={'w-full h-auto object-cover'} src={src} />
+            <img className={'w-full h-auto object-cover'} src={emoji.src} />
           </div>
         </div>
 
