@@ -55,7 +55,7 @@
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.3",
     "memoizee": "^0.4.15",
-    "mezon-js": "2.7.71",
+    "mezon-js": "^2.7.73",
     "mezon-js-protobuf": "1.4.58",
     "minio": "^7.1.3",
     "node-machine-id": "^1.1.12",

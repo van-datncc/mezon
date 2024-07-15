@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
 import SettingEmojiItem from "../SettingEmojiItem";
-import { ApiClanEmoji } from "mezon-js/api.gen";
+import { ApiClanEmojiListResponse } from "mezon-js/api.gen";
 
 type SettingEmojiListProps = {
   title: string;
-  emojiList: ApiClanEmoji[]
+  emojiList: ApiClanEmojiListResponse[]
 };
 
 const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
@@ -27,7 +27,7 @@ const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
       </div>
       <div className={'flex flex-col w-full'}>
         {emojiList.map((emoji, index) => (
-          <SettingEmojiItem src={emoji.src ?? ''} emojiName={emoji.shortname ?? ''} author={''} category={emoji.category ?? ''} key={index}/>
+          <SettingEmojiItem emoji={emoji} key={index}/>
         ))}
       </div>
     </div>

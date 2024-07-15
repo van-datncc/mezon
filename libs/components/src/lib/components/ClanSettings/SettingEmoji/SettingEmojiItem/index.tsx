@@ -2,17 +2,14 @@
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
 import {selectCurrentClanId, selectMemberClanByUserId, settingClanEmojiActions, useAppDispatch} from "@mezon/store";
-import {MezonUpdateClanEmojiByIdBody} from "mezon-js/api.gen";
+import {ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody} from "mezon-js/api.gen";
 
 type SettingEmojiItemProp = {
-  src: string,
-  emojiName: string,
-  author: string,
-  category: string,
+  emoji: ApiClanEmojiListResponse,
 }
 
-const SettingEmojiItem = ({ src, author, emojiName, category }: SettingEmojiItemProp) => {
-  const [nameEmoji, setNameEmoji] = useState<string>(emojiName);
+const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
+  const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const dispatch = useAppDispatch()
   
@@ -24,14 +21,19 @@ const SettingEmojiItem = ({ src, author, emojiName, category }: SettingEmojiItem
     console.log (e.target.value);
   }
   
-  const handleUpdateEmoji = () => {
+  const handleUpdateEmoji = async () => {
     console.log ('update')
     const request: MezonUpdateClanEmojiByIdBody = {
-      source: src,
+      source: emoji.src,
       shortname: nameEmoji,
-      category: category,
+      category: emoji.category,
     }
-    dispatch(settingClanEmojiActions.updateEmoji({request, currentClanId}))
+    await dispatch(settingClanEmojiActions.updateEmoji({request: request, emojiId: emoji.id || ''}))
+  }
+  
+  const handleDelete = () => {
+    console.log ('delete')
+    dispatch(settingClanEmojiActions.deleteEmoji(emoji.id || ''));
   }
 
   return (
@@ -44,14 +46,14 @@ const SettingEmojiItem = ({ src, author, emojiName, category }: SettingEmojiItem
 
         <div className={'w-14 h-8'}>
           <div className={'w-8 h-8 overflow-hidden flex items-center justify-center '}>
-            <img className={'w-full h-auto object-cover'} src={src} />
+            <img className={'w-full h-auto object-cover'} src={emoji.src} />
           </div>
         </div>
 
         <div className={'flex-1 relative'}>
           <div className={'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'}>
             <p className={`max-w-[172px] truncate overflow-hidden inline-block`}>
-              {emojiName}
+              {emoji.shortname}
             </p>
           </div>
 
@@ -77,7 +79,10 @@ const SettingEmojiItem = ({ src, author, emojiName, category }: SettingEmojiItem
 
         {
           showEdit &&
-          <button className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete absolute text-xs font-bold w-6 h-6 top-[-12px] right-[-12px] flex items-center justify-center rounded-[50%]">
+          <button
+            onClick={handleDelete}
+            className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete absolute text-xs font-bold w-6 h-6 top-[-12px] right-[-12px] flex items-center justify-center rounded-[50%]"
+          >
             X
           </button>
         }
