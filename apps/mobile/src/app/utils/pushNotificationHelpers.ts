@@ -1,7 +1,7 @@
 import {
 	STORAGE_CLAN_ID,
 	STORAGE_IS_FROM_FCM,
-	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	load,
 	save,
@@ -152,7 +152,7 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 
 const jumpChannelOnNotification = async (store: any, channelId: string, clanId: string) => {
 	const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-	save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+	save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 	// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	store.dispatch(appActions.setLoadingMainMobile(false));
@@ -175,7 +175,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const channelId = linkMatch[2];
 			if (isDifferentClan) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				save(STORAGE_CLAN_ID, clanId);
 				store.dispatch(clansActions.joinClan({ clanId: clanId }));
 				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));

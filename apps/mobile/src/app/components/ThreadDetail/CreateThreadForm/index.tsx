@@ -1,7 +1,7 @@
 import { useReference, useThreadMessage, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
-	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	ThreadIcon,
 	getUpdateOrAddClanChannelCache,
 	save,
@@ -141,7 +141,7 @@ export default function CreateThreadForm() {
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 

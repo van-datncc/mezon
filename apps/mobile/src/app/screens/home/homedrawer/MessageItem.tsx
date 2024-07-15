@@ -5,7 +5,7 @@ import {
 	FileIcon,
 	ReplyIcon,
 	ReplyMessageDeleted,
-	STORAGE_KEY_CLAN_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
@@ -106,7 +106,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
 	}, [message, userProfile]);
 	const isCombine = !message?.isStartedMessageGroup;
-	const isShowInfoUser = useMemo(() => !isCombine || (message?.references?.length && !!user), [isCombine, message?.references?.length, user]);
+	const isShowInfoUser = !isCombine || (message?.references?.length && !!user);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string));
 	const swipeableRef = React.useRef(null);
@@ -298,6 +298,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	);
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
+		alert('jumpToChannel Message item')
 		const store = await getStoreAsync();
 
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
@@ -321,7 +322,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				await Linking.openURL(urlVoice);
 			} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_KEY_CLAN_CURRENT_CACHE, dataSave);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				await jumpToChannel(channelId, clanId);
 			}
 		} catch (error) {

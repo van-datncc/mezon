@@ -1,5 +1,5 @@
 import { BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useDirect, useDMInvite, useInvite, useSendInviteMessage } from '@mezon/core';
+import { useDMInvite, useDirect, useInvite, useSendInviteMessage } from '@mezon/core';
 import { LinkIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
@@ -10,15 +10,16 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useReducedMotion } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
 import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
 import { normalizeString } from '../../../../../utils/helpers';
+import { FriendListItem } from '../../Reusables';
 import { ExpireLinkValue, LINK_EXPIRE_OPTION, MAX_USER_OPTION } from '../../constants';
 import { EMaxUserCanInvite } from '../../enums';
-import { FriendListItem } from '../../Reusables';
 import { style } from './styles';
 
 interface IInviteToChannelProp {
@@ -30,6 +31,8 @@ export const InviteToChannel = React.memo(
 	React.forwardRef(({ isUnknownChannel, onClose }: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 		const currentChannelId = useSelector(selectCurrentChannelId);
+		const reducedMotion = useReducedMotion();
+
 		// const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 		const [currentInviteLink, setCurrentInviteLink] = useState('');
 		const [searchUserText, setSearchUserText] = useState('');
@@ -160,8 +163,9 @@ export const InviteToChannel = React.memo(
 					ref={refRBSheet}
 					enableDynamicSizing={false}
 					snapPoints={['80%']}
+					animateOnMount={!reducedMotion}
 					index={0}
-					animateOnMount
+					enablePanDownToClose
 					backdropComponent={Backdrop}
 					onDismiss={() => {
 						onClose?.();
