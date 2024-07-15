@@ -167,21 +167,26 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	const reconnect = React.useCallback(async () => {
+		console.log('start-reconnect');
 		if (!clientRef.current) {
 			return;
 		}
-
+		console.log('reconnect-!clientRef.current', !clientRef.current);
 		const session = sessionRef.current;
 
 		if (!session) {
 			return;
 		}
+		console.log('reconnect-!session', !session);
 
 		if (!socketRef.current) {
 			return;
 		}
+		console.log('reconnect-!socketRef.current', !socketRef.current);
 
 		const session2 = await socketRef.current.connect(session, true);
+
+		console.log('session2', session2);
 
 		sessionRef.current = session2;
 	}, [clientRef, sessionRef, socketRef]);
