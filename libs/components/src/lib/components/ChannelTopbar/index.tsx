@@ -219,6 +219,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	const newNotificationStatus = useSelector(selectNewNotificationStatus);
 
 	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
+
 	const notiUnreadList = useMemo(() => {
 		return localStorage.getItem('notiUnread');
 	}, [newNotificationStatus]);
@@ -227,7 +228,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 		const updateNotiUnread = () => {
 			setNotiIdsUnread(notiUnreadList ? JSON.parse(notiUnreadList) : []);
 		};
-		updateNotiUnread(); 
+		updateNotiUnread();
 		const handleStorageChange = (event: StorageEvent) => {
 			if (event.key === 'notiUnread') {
 				updateNotiUnread();
@@ -250,12 +251,12 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content="Inboxs" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
-				<button className="focus-visible:outline-none relative" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
+				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox />
 					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList />}
+			{isShowInbox && <NotificationList unReadList={notiIdsUnread} />}
 		</div>
 	);
 }
@@ -265,7 +266,7 @@ function RedDot() {
 		<div
 			className="absolute border-[1px] dark:border-bgPrimary border-[#ffffff]
 		 w-[12px] h-[12px] rounded-full bg-colorDanger 
-		  font-bold text-[11px] flex items-center justify-center -bottom-0.5 -right-0.5"
+		  font-bold text-[11px] flex items-center justify-center -bottom-1.5 -right-1"
 		></div>
 	);
 }
