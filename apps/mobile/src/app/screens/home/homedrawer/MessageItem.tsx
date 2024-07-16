@@ -198,6 +198,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		onMessageAction({
 			type: EMessageBSToShow.UserInformation,
 			user: user?.user,
+      message
 		});
 	}, [preventAction, user?.user]);
 
@@ -205,23 +206,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		if (preventAction) return;
 		setIsOnlyEmojiPicker(false);
 
-		const userForDisplay: ApiUser = user
-			? user?.user
-			: checkAnonymous
-				? {
-						username: message?.username,
-						display_name: message?.name,
-						id: '',
-					}
-				: {
-						username: message?.user?.username,
-						display_name: message?.user?.name,
-						id: message?.user?.id,
-					};
 
 		onMessageAction({
 			type: EMessageBSToShow.UserInformation,
-			user: userForDisplay,
+			user: user?.user,
+      message
 		});
 	}, [checkAnonymous, message?.name, message?.user?.id, message?.user?.name, message?.user?.username, message?.username, preventAction, user]);
 
