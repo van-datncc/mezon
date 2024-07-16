@@ -171,6 +171,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			if (!clientRef.current) {
 				return;
 			}
+
 			const session = sessionRef.current;
 
 			if (!session) {
@@ -181,13 +182,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return;
 			}
 
-			const socket = clientRef.current.createSocket(clientRef.current.useSSL, true, new WebSocketAdapterPb());
-
-			socketRef.current = socket;
-
-			console.log('socket', socket);
 			const session2 = await socketRef.current.connect(session, true);
-			console.log(session2);
 			socketRef.current.joinClanChat(clanId);
 
 			sessionRef.current = session2;
