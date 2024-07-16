@@ -1,16 +1,16 @@
 import { IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessageEvent, ChannelType } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser, ChannelUserListChannelUser } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
+import { fetchChannelsCached } from '../channels/channels.slice';
+import { directChannelVoidActions } from '../channels/directChannelVoid.slice';
 import { clansActions } from '../clans/clans.slice';
 import { friendsActions } from '../friends/friend.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { MessagesEntity, messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
-import { directChannelVoidActions } from '../channels/directChannelVoid.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -163,10 +163,9 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType((type)?.toString() || ''));
-			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache }));
-			
+			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId }));
 			const fetchChannelMembersResult = await thunkAPI.dispatch(
-				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT, noCache }),
 			);
 			const members = fetchChannelMembersResult.payload as members[];
 			const userIds = members.map((member: any) => member.user.id);

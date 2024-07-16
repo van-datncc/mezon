@@ -1,19 +1,18 @@
 import { Dropdown } from 'flowbite-react';
 import ItemPanelMember from './ItemPanelMember';
 
-interface PanelGroupDMPProps{
-	isDmGroupOwner: boolean,
+interface PanelGroupDMPProps {
+	isDmGroupOwner: boolean;
 }
 
-const PanelGroupDM = ({isDmGroupOwner} : PanelGroupDMPProps) => {
-	
+const PanelGroupDM = ({ isDmGroupOwner }: PanelGroupDMPProps) => {
 	return (
 		<>
 			<div className="border-b dark:border-[#2e2f34]">
 				<ItemPanelMember children="Mark as read" />
 			</div>
 			<div className="border-b dark:border-[#2e2f34]">
-				{isDmGroupOwner && (<ItemPanelMember children="Invites" />)}
+				{isDmGroupOwner && <ItemPanelMember children="Invites" />}
 				<ItemPanelMember children="Change icon" />
 			</div>
 			<div className="border-b dark:border-[#2e2f34]">
@@ -33,11 +32,11 @@ const PanelGroupDM = ({isDmGroupOwner} : PanelGroupDMPProps) => {
 					<ItemPanelMember children="For 1 Hour" />
 					<ItemPanelMember children="For 3 Hours" />
 					<ItemPanelMember children="For 8 Hours" />
-                    <ItemPanelMember children="For 24 Hours" />
-                    <ItemPanelMember children="Until I turn it back on" />
+					<ItemPanelMember children="For 24 Hours" />
+					<ItemPanelMember children="Until I turn it back on" />
 				</Dropdown>
 			</div>
-			<ItemPanelMember children="Leave Group" danger/>
+			<ItemPanelMember children="Leave Group" danger />
 		</>
 	);
 };

@@ -1,15 +1,15 @@
 import { useEscapeKey } from '@mezon/core';
 import { selectDirectsOpenlist, selectTheme, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
+import { Tooltip } from 'flowbite-react';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ForwardMessageModal from '../ForwardMessage';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import { IconFriends } from '../../../../../ui/src/lib/Icons';
+import ForwardMessageModal from '../ForwardMessage';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
-import { Tooltip } from 'flowbite-react';
 import ListDMChannel from './listDMChannel';
 
 export type ChannelListProps = { className?: string };
@@ -84,7 +84,7 @@ function DirectMessageList() {
 						onClick={onClickOpenModal}
 						className="cursor-pointer flex flex-row justify-end  ml-0 hover:bg-bgSecondary rounded-full iconHover"
 					>
-						<Tooltip content='Create DM' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+						<Tooltip content="Create DM" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 							<Icons.Plus />
 						</Tooltip>
 					</button>

@@ -84,11 +84,8 @@ const propsToStyle = <T = Record<string, number | string>>(
 };
 
 export {
-  horizontalScale,
-  verticalScale,
-  moderateScale,
-  propsToStyle,
-  CONTAINER_FLUID_SPACING,
-  CONTAINER_SPACING,
-  Metrics
+    CONTAINER_FLUID_SPACING,
+    CONTAINER_SPACING, horizontalScale, Metrics, moderateScale,
+    propsToStyle, verticalScale
 };
+

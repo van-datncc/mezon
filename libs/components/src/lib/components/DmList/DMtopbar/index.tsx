@@ -1,15 +1,25 @@
 import { useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
-import { appActions, channelsActions, selectCloseMenu, selectDmGroupCurrent, selectIsShowMemberListDM, selectIsUseProfileDM, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
+import {
+	appActions,
+	selectCloseMenu,
+	selectDmGroupCurrent,
+	selectIsShowMemberListDM,
+	selectIsUseProfileDM,
+	selectStatusMenu,
+	selectTheme,
+	useAppDispatch,
+} from '@mezon/store';
+import { Tooltip } from 'flowbite-react';
+import { ChannelType } from 'mezon-js';
+import { useCallback, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
-import { HelpButton, InboxButton } from '../../ChannelTopbar';
 import * as Icons from '../../../../../../ui/src/lib/Icons/index';
+import { HelpButton, InboxButton } from '../../ChannelTopbar';
+import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
-import { Tooltip } from 'flowbite-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
-import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
+import LabelDm from './labelDm';
 
 export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -39,46 +49,6 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		[dispatch],
 	);
 
-	const inputRef = useRef<HTMLInputElement | null>(null);
-	const [openEditName, setOpenEditName] = useState(false);
-	const [label, setLabel] = useState(currentDmGroup?.channel_label);
-	const handleOpenEditName = () => {
-		if (currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP) {
-			setOpenEditName(true);
-		}
-	}
-
-	const handleChange = (event: any) => {
-		setLabel(event.target.value);
-	};
-
-	const handleKeyDown = (event: any) => {
-		if (event.key === 'Enter') {
-			setOpenEditName(false);
-			handleSave()
-		}
-	};
-
-	const handleSave = async () => {
-		const updateChannel: ApiUpdateChannelDescRequest = {
-			channel_id: dmGroupId || '',
-			channel_label: label,
-			category_id: '',
-		};
-		await dispatch(channelsActions.updateChannel(updateChannel));
-	};
-
-	useEffect(() => {
-		if (openEditName && inputRef.current) {
-			inputRef.current.focus();
-		}
-	}, [openEditName]);
-
-	useEffect(() => {
-		setOpenEditName(false);
-		setLabel(currentDmGroup?.channel_label);
-	}, [currentDmGroup?.channel_label, dmGroupId])
-
 	return (
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
@@ -100,23 +70,31 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						isHideStatus={true}
 						isHideIconStatus={false}
 						key={currentDmGroup?.channel_id}
+						isHiddenAvatarPanel={true}
 					/>
-					{!openEditName && <h2 className="shrink-1 dark:text-white text-black text-ellipsis" onClick={handleOpenEditName}>{label}</h2>}
-					{openEditName &&
-						<input ref={inputRef} defaultValue={label} onChange={handleChange} onKeyDown={handleKeyDown} className='w-full dark:text-white text-black outline-none border dark:border-white border-slate-200 bg-bgLightModeButton dark:bg-bgSecondary rounded' />
-					}
+					<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup} />
 				</div>
 
 				<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
 					<div className=" items-center gap-2 flex">
 						<div className="justify-start items-center gap-[15px] flex">
 							<button>
-								<Tooltip content='Start voice call' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+								<Tooltip
+									content="Start voice call"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								>
 									<Icons.IconPhoneDM />
 								</Tooltip>
 							</button>
 							<button>
-								<Tooltip content='Start Video Call' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+								<Tooltip
+									content="Start Video Call"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								>
 									<Icons.IconMeetDM />
 								</Tooltip>
 							</button>
@@ -124,24 +102,39 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								<PinButton isLightMode={appearanceTheme === 'light'} />
 							</div>
 							<button>
-								<Tooltip content='Add friends to DM' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+								<Tooltip
+									content="Add friends to DM"
+									trigger="hover"
+									animation="duration-500"
+									style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								>
 									<Icons.IconAddFriendDM />
 								</Tooltip>
 							</button>
-							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP &&
-								<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} >
-									<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
+								<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
+									<Tooltip
+										content="Show Member List"
+										trigger="hover"
+										animation="duration-500"
+										style={appearanceTheme === 'light' ? 'light' : 'dark'}
+									>
 										<Icons.MemberList isWhite={isShowMemberListDM} />
 									</Tooltip>
 								</button>
-							}
-							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM &&
+							)}
+							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
 								<button onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
-									<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+									<Tooltip
+										content="Show User Profile"
+										trigger="hover"
+										animation="duration-500"
+										style={appearanceTheme === 'light' ? 'light' : 'dark'}
+									>
 										<Icons.IconUserProfileDM />
 									</Tooltip>
 								</button>
-							}
+							)}
 						</div>
 						<SearchMessageChannel />
 						<div
@@ -153,20 +146,30 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 						</div>
 					</div>
 				</div>
-				{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP &&
-					<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className='sbm:hidden'>
-						<Tooltip content='Show Member List' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+				{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
+					<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className="sbm:hidden">
+						<Tooltip
+							content="Show Member List"
+							trigger="hover"
+							animation="duration-500"
+							style={appearanceTheme === 'light' ? 'light' : 'dark'}
+						>
 							<Icons.MemberList isWhite={isShowMemberListDM} />
 						</Tooltip>
 					</button>
-				}
-				{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM &&
-					<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className='sbm:hidden'>
-						<Tooltip content='Show User Profile' trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+				)}
+				{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
+					<button onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
+						<Tooltip
+							content="Show User Profile"
+							trigger="hover"
+							animation="duration-500"
+							style={appearanceTheme === 'light' ? 'light' : 'dark'}
+						>
 							<Icons.IconUserProfileDM />
 						</Tooltip>
 					</button>
-				}
+				)}
 			</div>
 		</div>
 	);

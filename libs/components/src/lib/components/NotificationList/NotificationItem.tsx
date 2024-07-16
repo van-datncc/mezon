@@ -1,5 +1,5 @@
 import { useJumpToMessage, useNotification } from '@mezon/core';
-import { selectCurrentClanId, selectMemberClanByUserId } from '@mezon/store';
+import { selectMemberClanByUserId } from '@mezon/store';
 import { convertTimeString } from '@mezon/utils';
 import { INotification } from 'libs/store/src/lib/notification/notify.slice';
 import { useMemo } from 'react';
@@ -14,7 +14,6 @@ function NotificationItem({ notify }: NotifyProps) {
 	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
 	const userName = notify?.content?.username;
 	let notice = notify?.subject;
-	const currentClanId = useSelector(selectCurrentClanId);
 	if (userName) {
 		const userNameLenght = userName.length;
 		notice = notify?.subject?.slice(userNameLenght);

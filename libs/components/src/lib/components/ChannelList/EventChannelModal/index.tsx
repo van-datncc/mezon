@@ -35,7 +35,6 @@ const EventModal = (props: EventModalProps) => {
 							<ModalCreate onClose={() => setOpenModal(false)} onCloseEventModal={onClose} />
 						</div>
 					)}
-					
 				</div>
 			) : (
 				<DetailItemEvent setOpenModalDetail={handleModalDetail} />

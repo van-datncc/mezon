@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ImageColors from "react-native-image-colors";
 
 export function useMixImageColor (imageUrl: string) {

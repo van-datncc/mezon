@@ -1,7 +1,6 @@
 import { useOnClickOutside } from '@mezon/core';
 import { selectAllChannelMembers, selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
-import { checkLastChar } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { MouseButton, checkLastChar } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -51,7 +50,7 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 	const [positionLeft, setPositionLeft] = useState(0);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-		if (event.button === 0 && tagName !== '@here') {
+		if (event.button === MouseButton.LEFT && tagName !== '@here') {
 			setIsShowPanelChannel(true);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
@@ -90,7 +89,7 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 					}}
 					onMouseDown={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={foundUser.user.id} mode={mode}/>
+					<ShortUserProfile userID={foundUser.user.id} mode={mode} />
 				</div>
 			)}
 			{foundUser !== null || tagName === '@here' ? (

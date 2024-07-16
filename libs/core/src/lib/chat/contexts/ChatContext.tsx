@@ -92,7 +92,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (directId === undefined) {
 				mess.isCurrentChannel = message.channel_id === channelId;
 			}
-
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -120,14 +119,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		(notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id ) {
+			if (currentChannel?.channel_id !== (notification as any).channel_id) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 			}
 
 			if (currentChannel?.channel_id !== (notification as any).channel_id && notification.code === -9) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
-				dispatch(notificationActions.setStatusNoti())
+				dispatch(notificationActions.setStatusNoti());
 			}
 
 			if (notification.code === -2 || notification.code === -3) {
@@ -222,7 +221,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onHeartbeatTimeout = useCallback(() => {
-		console.log('Heartbeat timeout');
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect();
 	}, [dispatch, reconnect]);
@@ -265,16 +263,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
-			socket.onpinmessage = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.onstatuspresence = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.ondisconnect = () => {};
 		};
 	}, [
 		onchannelmessage,

@@ -61,5 +61,10 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     errorInput: {
         paddingHorizontal: Metrics.size.m
+    },
+
+    titleUppercase: {
+        fontSize: Fonts.size.h7,
+        textTransform: "uppercase"
     }
 })

@@ -1,4 +1,5 @@
 import { AVATAR_DEFAULT_URL } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectMemberClanByUserId } from '@mezon/store-mobile';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
@@ -6,12 +7,9 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from '../../../hooks/useMessageParser';
 import { useMessageSender } from '../../../hooks/useMessageSender';
+import MessageNotification from '../MessageNotification';
 import { ENotifyBsToShow, NotifyProps } from '../types';
-import MessageItem from '../../home/homedrawer/MessageItem';
-import { ChannelStreamMode } from 'mezon-js';
-import { useTheme } from '@mezon/mobile-ui';
 import { style } from './NotificationItem.styles';
-import UseMentionList from '../../../hooks/useUserMentionList';
 
 function parseObject(obj: any) {
 	let attachments;
@@ -51,7 +49,7 @@ function parseObject(obj: any) {
 		mentions,
 		reactions,
 		references,
-		content
+		content,
 	};
 	return parsedObj;
 }
@@ -64,7 +62,6 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 	const channelInfo = useSelector(selectChannelById(notify?.content?.channel_id));
 	const data = parseObject(notify?.content);
 	const { messageTimeDifference } = useMessageParser(data);
-	const listMentions = UseMentionList(notify?.content?.channel_id || '');
 
 	return (
 		<TouchableOpacity
@@ -85,13 +82,7 @@ const NotificationItem = React.memo(({ notify, onLongPressNotify, onPressNotify 
 							{notify?.subject} - {channelInfo?.channel_label}:
 						</Text>
 						<View style={styles.contentMessage}>
-							<MessageItem
-                listMentions={listMentions}
-								message={data}
-								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-								channelId={data?.channel_id}
-								preventAction
-							/>
+							<MessageNotification message={data} channelId={data?.channel_id} />
 						</View>
 					</View>
 					<Text style={styles.notifyDuration}>{messageTimeDifference}</Text>

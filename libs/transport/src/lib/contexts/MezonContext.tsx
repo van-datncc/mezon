@@ -1,6 +1,6 @@
-import { Channel, Client, Session, Socket, Status } from 'mezon-js';
-import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import { DeviceUUID } from 'device-uuid';
+import { Client, Session, Socket, Status } from 'mezon-js';
+import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
 
@@ -98,7 +98,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		},
 		[createSocket],
 	);
-	
+
 	const authenticateApple = useCallback(
 		async (token: string) => {
 			if (!clientRef.current) {
@@ -172,6 +172,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		}
 
 		const session = sessionRef.current;
+
 		if (!session) {
 			return;
 		}
@@ -181,6 +182,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		}
 
 		const session2 = await socketRef.current.connect(session, true);
+
 		sessionRef.current = session2;
 	}, [clientRef, sessionRef, socketRef]);
 

@@ -36,10 +36,15 @@ window.electron?.on(NOTIFICATION_RECEIVED, (_, serverNotificationPayload) => {
         link: serverNotificationPayload.data.link
       }
     })
+
     notification.onclick = () => {
-      const link = serverNotificationPayload.data.link
-      if (link) {
-        window.electron?.send('navigate-to-url', link);
+      const notificationUrl = new URL(serverNotificationPayload.data.link);
+      const currentPath = window.location.pathname;
+      const path = notificationUrl.pathname;
+      const isSubPath = currentPath.endsWith(path)
+
+      if (path) {
+        window.electron?.send('navigate-to-url', path, isSubPath);
       }
     }
   } else {

@@ -1,4 +1,4 @@
-import { accountActions, authActions, clansActions } from '@mezon/store';
+import { accountActions, authActions } from '@mezon/store';
 import { IWithError } from '@mezon/utils';
 import { CustomLoaderFunction } from './appLoader';
 

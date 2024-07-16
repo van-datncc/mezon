@@ -1,14 +1,14 @@
 import { Icons, TickIcon } from '@mezon/mobile-components';
-import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
-import { ClansEntity, clansActions, getStoreAsync, selectCurrentClan } from '@mezon/store-mobile';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { ClansEntity, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
+import { ClanIcon } from '../ClanIcon';
 import CreateClanModal from '../CreateClanModal';
 import { style } from './styles';
-import { ClanIcon } from '../ClanIcon';
 
 interface ListClanPopupProps {
 	clans: ClansEntity[];
@@ -60,28 +60,27 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 							handleChangeClan(clan?.clan_id);
 						}}
 						key={clan.id}
-						style={[styles.serverItem, {
-							backgroundColor: currentClan?.clan_id === clan?.clan_id
-								? themeValue.secondaryLight
-								: themeValue.secondaryWeight,
-						}]}
+						style={[
+							styles.serverItem,
+							{
+								backgroundColor: currentClan?.clan_id === clan?.clan_id ? themeValue.secondaryLight : themeValue.secondaryWeight,
+							},
+						]}
 					>
 						<View style={styles.serverName}>
 							<ClanIcon
 								data={clan}
 								clanIconStyle={{
 									...styles.clanIcon,
-									...(currentClan?.clan_id === clan?.clan_id
-										? { backgroundColor: themeValue.tertiary }
-										: {}
-									)
-								}} />
-							<Text style={styles.clanName} numberOfLines={1} ellipsizeMode='tail'>{clan?.clan_name}</Text>
+									...(currentClan?.clan_id === clan?.clan_id ? { backgroundColor: themeValue.tertiary } : {}),
+								}}
+							/>
+							<Text style={styles.clanName} numberOfLines={1} ellipsizeMode="tail">
+								{clan?.clan_name}
+							</Text>
 						</View>
 
-						{currentClan?.clan_id === clan?.clan_id &&
-							<TickIcon width={10} height={10} color={baseColor.blurple} />
-						}
+						{currentClan?.clan_id === clan?.clan_id && <TickIcon width={10} height={10} color={baseColor.blurple} />}
 					</Pressable>
 				))}
 			</ScrollView>

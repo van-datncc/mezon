@@ -8,6 +8,11 @@ import ClanOverviewSetting from '../../../components/ClanSettings/Overview';
 import EventCreatorDetails from '../../../components/EventCreator/EventCreatorDetails';
 import EventCreatorPreview from '../../../components/EventCreator/EventCreatorPreview';
 import EventCreatorType from '../../../components/EventCreator/EventCreatorType';
+import { CreateNewRole } from '../../../screens/serverRoles/CreateNewRole';
+import { RoleDetail } from '../../../screens/serverRoles/RoleDetail';
+import { ServerRoles } from '../../../screens/serverRoles/ServerRoles';
+import { SetupMembers } from '../../../screens/serverRoles/SetupMembers';
+import { SetupPermissions } from '../../../screens/serverRoles/SetupPermissions';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 export const MenuClanStacks = ({}: any) => {
@@ -91,6 +96,46 @@ export const MenuClanStacks = ({}: any) => {
 				component={ClanOverviewSetting}
 				options={{
 					headerTitle: t('menuClanStack.clanOverviewSetting'),
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.ROLE_SETTING}
+				component={ServerRoles}
+				options={{
+					headerTitle: t('menuClanStack.serverRoles'),
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.CREATE_NEW_ROLE}
+				component={CreateNewRole}
+				options={{
+					headerLeftLabelVisible: false,
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS}
+				component={SetupPermissions}
+				options={{
+					headerLeftLabelVisible: false,
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS}
+				component={SetupMembers}
+				options={{
+					headerLeftLabelVisible: false,
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.ROLE_DETAIL}
+				component={RoleDetail}
+				options={{
+					headerLeftLabelVisible: false,
 				}}
 			/>
 		</Stack.Navigator>

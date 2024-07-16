@@ -15,7 +15,7 @@ type ChannelMessageBoxProps = {
 };
 
 function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
+	const { sendMessage } = useChatSending({ channelId, mode });
 	const {
 		dataGifCategories,
 		dataGifsSearch,
