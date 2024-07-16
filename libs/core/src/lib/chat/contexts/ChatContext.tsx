@@ -13,6 +13,7 @@ import {
 	pinMessageActions,
 	reactionActions,
 	selectCurrentChannel,
+	selectCurrentClanId,
 	toastActions,
 	useAppDispatch,
 	voiceActions,
@@ -32,7 +33,7 @@ import {
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
 } from 'mezon-js';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -57,9 +58,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const { directId, channelId } = useAppParams();
+	const { directId, channelId, clanId } = useAppParams();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
+	const currentClanId = useSelector(selectCurrentClanId);
+
+	const clanIdActive = useMemo(() => {
+		if (clanId !== undefined) {
+			return currentClanId;
+		} else {
+			return '0';
+		}
+	}, [clanId]);
 
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
@@ -150,9 +160,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const ondisconnect = useCallback(() => {
-		console.log('disconnect');
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect();
+		reconnect(clanIdActive ?? '');
 	}, [reconnect, dispatch]);
 
 	const onerror = useCallback(
@@ -223,7 +232,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onHeartbeatTimeout = useCallback(() => {
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect();
+		reconnect(clanIdActive ?? '');
 	}, [dispatch, reconnect]);
 
 	useEffect(() => {

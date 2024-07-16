@@ -28,7 +28,7 @@ export type MezonContextValue = {
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
 	addStatusFollow: (ids: string[]) => Promise<Status>;
-	reconnect: () => Promise<void>;
+	reconnect: (clanId: string) => Promise<void>;
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -166,30 +166,27 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[clientRef, socketRef],
 	);
 
-	const reconnect = React.useCallback(async () => {
-		console.log('start-reconnect');
-		if (!clientRef.current) {
-			return;
-		}
-		console.log('reconnect-!clientRef.current', !clientRef.current);
-		const session = sessionRef.current;
+	const reconnect = React.useCallback(
+		async (clanId: string) => {
+			if (!clientRef.current) {
+				return;
+			}
+			const session = sessionRef.current;
 
-		if (!session) {
-			return;
-		}
-		console.log('reconnect-!session', !session);
+			if (!session) {
+				return;
+			}
 
-		if (!socketRef.current) {
-			return;
-		}
-		console.log('reconnect-!socketRef.current', !socketRef.current);
+			if (!socketRef.current) {
+				return;
+			}
 
-		const session2 = await socketRef.current.connect(session, true);
-
-		console.log('session2', session2);
-
-		sessionRef.current = session2;
-	}, [clientRef, sessionRef, socketRef]);
+			const session2 = await socketRef.current.connect(session, true);
+			socketRef.current.joinClanChat(clanId);
+			sessionRef.current = session2;
+		},
+		[clientRef, sessionRef, socketRef],
+	);
 
 	const addStatusFollow = React.useCallback(
 		async (userIds: string[]) => {
