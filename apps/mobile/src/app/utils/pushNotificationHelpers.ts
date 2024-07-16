@@ -1,7 +1,7 @@
 import {
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	STORAGE_IS_FROM_FCM,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	getUpdateOrAddClanChannelCache,
 	load,
 	save,
@@ -179,7 +179,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			delay(jumpChannelOnNotification, 500, store, channelId, clanId);
 			delay(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
-				save(STORAGE_IS_FROM_FCM, false);
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 			}, 4000);
 		} else {
 			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
@@ -192,7 +192,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				delay(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
-					save(STORAGE_IS_FROM_FCM, false);
+					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
@@ -204,7 +204,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				delay(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
-					save(STORAGE_IS_FROM_FCM, false);
+					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
 			}
 		}
@@ -215,14 +215,14 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		store.dispatch(appActions.setLoadingMainMobile(false));
 		delay(() => {
 			store.dispatch(appActions.setIsFromFCMMobile(false));
-			save(STORAGE_IS_FROM_FCM, false);
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 		}, 4000);
 	}
 };
 
 const processNotification = async ({ notification, navigation, time = 0 }) => {
 	const store = await getStoreAsync();
-	save(STORAGE_IS_FROM_FCM, true);
+	save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {

@@ -28,6 +28,8 @@ export { default as UnreadMessageBreak } from './components/Message/UnreadMessag
 export { default as AttachmentLoading } from './components/MessageBox/AttachmentLoading';
 export { default as AttachmentPreviewThumbnail } from './components/MessageBox/AttachmentPreviewThumbnail';
 export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput';
+export { default as CustomModalMentions } from './components/MessageBox/ReactionMentionInput/CustomModalMentions';
+export { default as SuggestItem } from './components/MessageBox/ReactionMentionInput/SuggestItem';
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
 export { default as MessageImage } from './components/MessageWithUser/MessageImage';
@@ -39,9 +41,9 @@ export { default as SearchModal } from './components/SearchModal/index';
 export { default as ToastController } from './components/ToastController/ToastController';
 export { default as ModalNotificationSetting } from './components/notificationSetting/index';
 
+export { Icons } from '@mezon/ui';
 export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileByDnd';
 export { default as ForwardMessageModal } from './components/ForwardMessage';
-export { Icons } from '@mezon/ui';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
 export { default as MessageVideo } from './components/MessageWithUser/MessageVideo';
@@ -49,6 +51,9 @@ export { default as ModalListClans } from './components/ModalListClans';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
 
+export * from './components/AvatarImage/AvatarImage';
+export { ModalErrorTypeUpload, ModalOverData } from './components/ModalError';
+export { default as ModalUserProfile } from './components/ModalUserProfile';
 export { default as SearchMessageChannelRender } from './components/SearchMessageChannel/SearchMessageChannelRender';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as SettingAppearance } from './components/SettingAppearance';
@@ -56,8 +61,9 @@ export * from './components/SettingProfile';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
-export { default as ModalUserProfile } from './components/ModalUserProfile';
-export { ModalOverData, ModalErrorTypeUpload } from './components/ModalError';
-export * from './components/AvatarImage/AvatarImage';
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
+export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
+
+export * from './components/ThumnailAttachmentRender';
+

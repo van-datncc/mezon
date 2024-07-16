@@ -1,13 +1,13 @@
 import { useEmojiSuggestion, useInvite } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
 import { ILineMention, MentionTypeEnum, SHOW_POSITION, convertMarkdown, getSrcEmoji } from '@mezon/utils';
-import { useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 import clx from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import remarkGFM from 'remark-gfm';
+import { useMessageContextMenu } from '../ContextMenu';
 import ExpiryTimeModal from '../ExpiryTime';
 import ChannelHashtag from './HashTag';
 import MentionUser from './MentionUser';
@@ -167,7 +167,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 	}, [mentions, getLinkinvites, isOnlyEmoji]);
 
 	return (
-		<article style={{ letterSpacing: '-0.02rem' }} className={classes}>
+		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
 			{memoizedMentions}
 		</article>
 	);

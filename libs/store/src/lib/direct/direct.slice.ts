@@ -58,7 +58,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
-			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
 			return response;

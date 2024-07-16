@@ -1,4 +1,4 @@
-import { useChannelMembers } from '@mezon/core';
+import { useChannelMembersOnlineStatus } from '@mezon/core';
 import { selectCloseMenu, selectCurrentChannelId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import ListMember from './listMember';
@@ -7,7 +7,7 @@ export type MemberListProps = { className?: string };
 
 function MemberList() {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannelId });
+	const { onlineMembers, offlineMembers } = useChannelMembersOnlineStatus({ channelId: currentChannelId });
 	const closeMenu = useSelector(selectCloseMenu);
 
 	return (

@@ -1,0 +1,25 @@
+import { Attributes, Colors, size, verticalScale } from '@mezon/mobile-ui';
+import { StyleSheet } from 'react-native';
+export const style = (colors: Attributes) =>
+	StyleSheet.create({
+		fileViewer: {
+			gap: size.s_6,
+			marginTop: size.s_6,
+			paddingHorizontal: size.s_10,
+			width: '80%',
+			minHeight: verticalScale(50),
+			alignItems: 'center',
+			borderRadius: size.s_6,
+			flexDirection: 'row',
+			backgroundColor: Colors.bgPrimary,
+		},
+		fileName: {
+			fontSize: size.small,
+			color: Colors.white,
+		},
+		typeFile: {
+			fontSize: size.small,
+			color: Colors.textGray,
+			textTransform: 'uppercase',
+		},
+	});

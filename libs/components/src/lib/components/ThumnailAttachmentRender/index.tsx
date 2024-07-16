@@ -1,8 +1,9 @@
-import { Icons, MessageVideo } from '@mezon/components';
+import { Icons } from '@mezon/ui';
 import { SHOW_POSITION, fileTypeImage, fileTypeVideo } from '@mezon/utils';
-import { useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
+import { useMessageContextMenu } from '../ContextMenu';
+import MessageVideo from '../MessageWithUser/MessageVideo';
 import { typeFormats } from './TypeFormats';
 
 export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size?: string, pos?: string) => {
