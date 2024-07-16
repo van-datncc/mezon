@@ -1,11 +1,16 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+/* eslint-disable no-undef */
+/* eslint-disable no-restricted-globals */
 
-self.addEventListener('notificationclick', function(event) {
+
+self.addEventListener('notificationclick', function (event) {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({
       type: 'window',
       includeUncontrolled: true
-    }).then(function(clientList) {
+    }).then(function (clientList) {
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
         if (client.url === event.notification.data.FCM_MSG.data.link && 'focus' in client) {

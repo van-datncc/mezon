@@ -139,7 +139,7 @@ export function getDayYearName(date: Date, lang: "vi" | "en"): string {
 }
 
 export function getDayWeekName(date: Date, lang: "vi" | "en") {
-    var day = getDayName(date, lang);
+    const day = getDayName(date, lang);
     let weekOfMonth = -1;
     let d = date.getDate();
 

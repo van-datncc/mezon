@@ -28,6 +28,8 @@ export { default as UnreadMessageBreak } from './components/Message/UnreadMessag
 export { default as AttachmentLoading } from './components/MessageBox/AttachmentLoading';
 export { default as AttachmentPreviewThumbnail } from './components/MessageBox/AttachmentPreviewThumbnail';
 export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput';
+export { default as CustomModalMentions } from './components/MessageBox/ReactionMentionInput/CustomModalMentions';
+export { default as SuggestItem } from './components/MessageBox/ReactionMentionInput/SuggestItem';
 export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
 export { default as MessageImage } from './components/MessageWithUser/MessageImage';
