@@ -1,26 +1,27 @@
 import { useClans } from '@mezon/core';
 import { AddIcon, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
-import { ErrorInput } from '../../../../../components/ErrorInput';
-import { MezonButton, MezonModal } from '../../../../../temp-ui';
+import { MezonButton, MezonInput, MezonModal } from '../../../../../temp-ui';
 import { validInput } from '../../../../../utils/validate';
 import { IFile } from '../AttachmentPicker/Gallery';
-import { styles as s } from './CreateClanModal.styles';
+import { style } from './CreateClanModal.styles';
 
 interface ICreateClanProps {
 	visible: boolean;
 	setVisible: (value: boolean) => void;
 }
 const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const userProfile = useSelector(selectAllAccount);
 	const [nameClan, setNameClan] = useState<string>('');
 	const [urlImage, setUrlImage] = useState('');
@@ -100,46 +101,42 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 				visibleChange={(visible) => {
 					setVisible(visible);
 				}}
-				headerStyles={s.headerModal}
+				headerStyles={styles.headerModal}
 			>
 				<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-					<View style={s.wrapperCreateClanModal}>
-						<Text style={s.headerTitle}>{t('title')}</Text>
-						<Text style={s.headerSubTitle}>{t('subTitle')}</Text>
-						<View style={s.boxImage}>
-							<TouchableOpacity style={s.uploadImage} onPress={onOpen}>
+					<View style={styles.wrapperCreateClanModal}>
+						<Text style={styles.headerTitle}>{t('title')}</Text>
+						<Text style={styles.headerSubTitle}>{t('subTitle')}</Text>
+						<View style={styles.boxImage}>
+							<TouchableOpacity style={styles.uploadImage} onPress={onOpen}>
 								{!urlImage ? (
-									<View style={[s.uploadCreateClan]}>
-										<AddIcon style={s.addIcon} height={30} width={30} color={Colors.bgButton} />
+									<View style={[styles.uploadCreateClan]}>
+										<AddIcon style={styles.addIcon} height={30} width={30} color={Colors.bgButton} />
 										<UploadImage height={20} width={20} color={Colors.bgGrayLight} />
-										<Text style={s.uploadText}>{t('upload')}</Text>
+										<Text style={styles.uploadText}>{t('upload')}</Text>
 									</View>
 								) : (
-									<View style={[s.uploadCreateClan, s.overflowImage]}>
-										<Image source={{ uri: urlImage }} style={s.image} />
+									<View style={[styles.uploadCreateClan, styles.overflowImage]}>
+										<Image source={{ uri: urlImage }} style={styles.image} />
 									</View>
 								)}
 							</TouchableOpacity>
 						</View>
 
-						<Text style={s.serverName}>{t('clanName')}</Text>
-						<TextInput
-							style={s.input}
-							onChangeText={(text) => {
-								setNameClan(text);
-							}}
-							placeholder={`${userProfile?.user?.username}'s clan`}
-							placeholderTextColor={Colors.textGray}
+						<MezonInput
+							label={t('clanName')}
+							onTextChange={setNameClan}
+							placeHolder={`${userProfile?.user?.username}'s clan`}
 							value={nameClan}
-							clearButtonMode={'always'}
-							maxLength={64}
+							maxCharacter={64}
+							errorMessage={t('errorMessage')}
 						/>
-						{!isCheckValid && <ErrorInput style={s.errorMessage} errorMessage={t('errorMessage')} />}
-						<Text style={s.community}>
-							{t('byCreatingClan')} <Text style={s.communityGuideLines}>Community Guidelines.</Text>
+
+						<Text style={styles.community}>
+							{t('byCreatingClan')} <Text style={styles.communityGuideLines}>Community Guidelines.</Text>
 						</Text>
-						<MezonButton disabled={!isCheckValid} viewContainerStyle={s.button} onPress={handleCreateClan}>
-							<Text style={s.buttonText}>{t('createServer')}</Text>
+						<MezonButton disabled={!isCheckValid} viewContainerStyle={styles.button} onPress={handleCreateClan}>
+							<Text style={styles.buttonText}>{t('createServer')}</Text>
 						</MezonButton>
 					</View>
 				</TouchableWithoutFeedback>

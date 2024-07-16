@@ -5,12 +5,13 @@ import { Pressable, ScrollView } from 'react-native';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../temp-ui';
 import LogoClanSelector from './LogoClanSelector';
-import styles from './styles';
+import { style } from './styles';
 
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.SETTINGS;
 
 export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSettingsScreen>) {
 	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { t } = useTranslation(['clanSetting']);
 
 	navigation.setOptions({
