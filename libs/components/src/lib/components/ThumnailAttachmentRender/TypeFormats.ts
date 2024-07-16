@@ -1,4 +1,4 @@
-import * as Icons from '../Icons';
+import * as Icons from '../../../../../ui/src/lib/Icons';
 
 export const typeFormats = [
 	{

@@ -1,4 +1,4 @@
-import { RenderAttachmentThumbnail } from '@mezon/ui';
+import { RenderAttachmentThumbnail } from '@mezon/components';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useState } from 'react';
 import { Icons } from '../../components';

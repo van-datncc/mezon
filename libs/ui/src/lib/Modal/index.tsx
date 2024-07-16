@@ -1,7 +1,7 @@
-import { Icons } from '@mezon/components';
-import { ChannelsEntity } from '@mezon/store';
-import { ChannelStatusEnum } from '@mezon/utils';
+
+import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
+import { Hashtag, HashtagLocked, Speaker, SpeakerLocked } from '../Icons';
 
 export type ModalProps = {
 	children: React.ReactNode;
@@ -16,7 +16,7 @@ export type ModalProps = {
 	classSubTitleBox?: string;
 	borderBottomTitle?: string;
 	classNameWrapperChild?: string;
-	hasChannel?: ChannelsEntity;
+	hasChannel?: IChannel;
 };
 
 const Modal = (props: ModalProps) => {
@@ -46,14 +46,14 @@ const Modal = (props: ModalProps) => {
 									{hasChannel && (
 										<div className="inline-flex gap-x-2">
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
-												hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.SpeakerLocked defaultSize="w-5 h-5" />}
+												hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && <SpeakerLocked defaultSize="w-5 h-5" />}
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
-												hasChannel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.HashtagLocked defaultSize="w-5 h-5 " />}
+												hasChannel.type === ChannelType.CHANNEL_TYPE_TEXT && <HashtagLocked defaultSize="w-5 h-5 " />}
 											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-												<Icons.Speaker defaultSize="w-5 5-5" />
+												<Speaker defaultSize="w-5 5-5" />
 											)}
 											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_TEXT && (
-												<Icons.Hashtag defaultSize="w-5 h-5" />
+												<Hashtag defaultSize="w-5 h-5" />
 											)}
 											<p>{hasChannel.channel_label}</p>
 										</div>
