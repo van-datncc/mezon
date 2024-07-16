@@ -1,7 +1,7 @@
 import { useClans } from '@mezon/core';
-import { AddIcon, save, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
+import { AddIcon, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
+import { channelsActions, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,11 +31,13 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 	const { createClans } = useClans();
 	const handleCreateClan = async () => {
 		const store = await getStoreAsync();
-		createClans(nameClan?.trim?.(), urlImage).then((res) => {
+		createClans(nameClan?.trim?.(), urlImage).then(async (res) => {
 			if (res && res?.clan_id) {
 				store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
 				save(STORAGE_CLAN_ID, res?.clan_id);
 				store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
+				const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
+				await setDefaultChannelLoader(respChannel.payload, res?.clan_id);
 				setVisible(false);
 			}
 		});

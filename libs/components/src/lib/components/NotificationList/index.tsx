@@ -58,7 +58,7 @@ function NotificationList({ unReadList }: NotificationProps) {
 	}, []);
 
 	return (
-		<div className="absolute top-8 right-0 shadow-lg z-[99999999] border">
+		<div className="absolute top-8 right-0 shadow-lg z-[99999999]">
 			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black pt-1 text-[14px] rounded-lg mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
 				<div className="py-2 px-3 dark:bg-bgTertiary bg-white">
 					<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
