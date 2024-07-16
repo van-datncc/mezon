@@ -14,13 +14,13 @@ type ChannelMessageOptProps = {
 const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
   const currentChannel = useSelector(selectCurrentChannel);
   const refOpt = useRef<HTMLDivElement>(null);
-  console.log(!currentChannel);
-  const isThread = (currentChannel?.parrent_id !== undefined && Number(currentChannel?.parrent_id) !== 0) || !currentChannel;
+
+  const checkHiddenIconThread = (currentChannel?.parrent_id !== undefined && Number(currentChannel?.parrent_id) !== 0) || !currentChannel;
 
   const replyMenu = useMenuReplyMenuBuilder(message);
   const editMenu = useEditMenuBuilder(message);
   const reactMenu = useReactMenuBuilder(message);
-  const threadMenu = useThreadMenuBuilder(message, isThread);
+  const threadMenu = useThreadMenuBuilder(message, checkHiddenIconThread);
   const optionMenu = useOptionMenuBuilder(handleContextMenu);
 
   const items = useMenuBuilder([reactMenu, replyMenu, editMenu, threadMenu, optionMenu]);
