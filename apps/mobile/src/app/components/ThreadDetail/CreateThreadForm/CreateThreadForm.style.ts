@@ -1,8 +1,9 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
-export const styles = StyleSheet.create({
+
+export const style = (colors: Attributes) => StyleSheet.create({
 	createChannelContainer: {
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.primary,
 		height: '100%',
 		width: '100%',
 		position: 'relative',
@@ -11,7 +12,6 @@ export const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: 0,
 		width: '100%',
-		paddingHorizontal: size.s_10,
 	},
 	createChannelIcon: {
 		height: 60,
@@ -28,8 +28,7 @@ export const styles = StyleSheet.create({
 		marginBottom: 5,
 	},
 	threadPolicy: {
-		backgroundColor: '#383a40',
-		borderRadius: 8,
+		backgroundColor: colors.secondary,
 		flexDirection: 'row',
 		padding: 10,
 		gap: 20,
@@ -38,13 +37,13 @@ export const styles = StyleSheet.create({
 		fontSize: 16,
 		lineHeight: 1.25 * 16,
 		fontWeight: '600',
-		color: '#f1f2f4',
+		color: colors.textStrong,
 	},
 	threadPolicyContent: {
 		fontSize: 16,
 		lineHeight: 1.25 * 16,
 		fontWeight: '400',
-		color: '#dedce1',
+		color: colors.text,
 	},
 	inputThreadName: {
 		borderRadius: 6,
@@ -58,9 +57,9 @@ export const styles = StyleSheet.create({
 		height: size.s_40,
 		paddingVertical: 0,
 	},
-  inputContainer: {
+	inputContainer: {
 		marginBottom: size.s_20,
-  },
+	},
 	threadPolicyInfo: {
 		flex: 1,
 	},
@@ -68,7 +67,7 @@ export const styles = StyleSheet.create({
 		width: 50,
 		height: 50,
 		borderRadius: 50,
-		backgroundColor: '#313338',
+		backgroundColor: colors.secondary,
 		marginBottom: 16,
 		display: 'flex',
 		justifyContent: 'center',
@@ -82,5 +81,5 @@ export const styles = StyleSheet.create({
 		paddingTop: 10,
 		paddingBottom: 0,
 	},
-  errorMessage: {paddingRight: size.s_20}
+	errorMessage: { paddingRight: size.s_20 }
 });

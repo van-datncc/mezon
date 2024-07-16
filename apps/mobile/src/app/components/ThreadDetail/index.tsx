@@ -1,17 +1,19 @@
 import { useThreads } from '@mezon/core';
-import { size } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import EmptyThread from './EmptyThread';
 import GroupThread from './GroupThread';
 import ThreadItem from './ThreadItem';
-import { styles } from './styles';
-
+import { style } from './styles';
 export default function CreateThreadModal() {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
 	const { t } = useTranslation(['createThread']);
 	return (
+		// TODO: MezonMenu??
 		<View style={styles.createChannelContainer}>
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: size.s_50, paddingTop: size.s_10 }}>
 				{threadChannelOnline?.length ? (
