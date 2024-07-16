@@ -7,7 +7,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
-import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
+import { Block, Colors, Metrics, Text, baseColor, useAnimatedState, useTheme, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -48,6 +48,8 @@ import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { RenderDocumentsChat } from './components/RenderDocumentsChat';
 import { RenderImageChat } from './components/RenderImageChat';
+import { openUrl } from 'react-native-markdown-display';
+import { MezonClanAvatar } from '../../../temp-ui';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 
@@ -367,7 +369,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				styles.messageWrapper,
 				(isCombine || preventAction) && { marginTop: 0 },
 				hasIncludeMention && styles.highlightMessageMention,
-				checkMessageTargetToMoved && styles.highlightMessageReply,
+				checkMessageTargetToMoved && styles.highlightMessageReply
 			]}
 		>
 			{/* NEW LINE MESSAGE - TO BE UPDATE CORRECT LOGIC*/}
@@ -382,10 +384,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />
 					</View>
-					<Pressable
-						onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)}
-						style={styles.repliedMessageWrapper}
-					>
+					<Pressable onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
 						{repliedSender?.user?.avatar_url ? (
 							<View style={styles.replyAvatar}>
 								<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
@@ -418,7 +417,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 										clansProfile,
 										currentClan,
 										isMessageReply: true,
-										mode,
+										mode
 									})}
 								</>
 							)}
@@ -447,8 +446,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onMessageAction({
 							type: EMessageBSToShow.MessageAction,
 							senderDisplayName,
-							message,
-						});
+							message
+						})
 						dispatch(setSelectedMessage(message));
 					}}
 				>
@@ -473,7 +472,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							);
 						})}
 					{documents?.length > 0 && renderDocuments()}
-					<Block opacity={message?.isSending || message.isError ? 0.6 : 1}>
+					<Block opacity={(message?.isSending || message.isError) ? 0.6 : 1}>
 						{renderTextContent({
 							lines,
 							isEdited,
@@ -486,7 +485,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							clansProfile,
 							currentClan,
 							isMessageReply: false,
-							mode,
+							mode
 						})}
 					</Block>
 					{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
@@ -501,8 +500,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								onMessageAction({
 									type: EMessageBSToShow.MessageAction,
 									senderDisplayName,
-									message,
-								});
+									message
+								})
 							}}
 						/>
 					) : null}
