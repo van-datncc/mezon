@@ -3,11 +3,9 @@ import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaul
 import { channelsActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { Text, TouchableOpacity, View } from 'react-native';
-import Modal from 'react-native-modal';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { styles } from './DeleteClanModal.styles';
+import { MezonConfirm } from '../../temp-ui';
 
 const DeleteClanModal = ({ isVisibleModal, visibleChange }: { isVisibleModal: boolean; visibleChange: (isVisible: boolean) => void }) => {
 	const { dismiss } = useBottomSheetModal();
@@ -31,31 +29,15 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange }: { isVisibleModal: bo
 		await setDefaultChannelLoader(respChannel.payload, clans[0]?.clan_id);
 	};
 
-	const onCancel = () => {
-		visibleChange(false);
-	};
 	return (
-		<Modal
-			isVisible={isVisibleModal}
-			animationIn={'fadeIn'}
-			hasBackdrop={true}
-			coverScreen={true}
-			avoidKeyboard={false}
-			backdropColor={'rgba(0, 0, 0, 0.5)'}
-		>
-			<View style={styles.modalContainer}>
-				<Text style={styles.title}>{t('deleteClanModal.title')}</Text>
-				<Text style={styles.description}>{t('deleteClanModal.description', { currentClan: currentClan?.clan_name })}</Text>
-				<View>
-					<TouchableOpacity onPress={onConfirm} style={styles.yesButton}>
-						<Text style={styles.textButton}>{t('deleteClanModal.confirm')}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={onCancel} style={styles.noButton}>
-						<Text style={styles.textButton}>{t('deleteClanModal.cancel')}</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
-		</Modal>
+		<MezonConfirm
+			visible={isVisibleModal}
+			onVisibleChange={visibleChange}
+			confirmText={t('deleteClanModal.confirm')}
+			title={t('deleteClanModal.title')}
+			content={t('deleteClanModal.description', { currentClan: currentClan?.clan_name })}
+			onConfirm={onConfirm}
+		/>
 	);
 };
 
