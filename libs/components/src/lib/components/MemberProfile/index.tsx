@@ -129,7 +129,7 @@ function MemberProfile({
 
 	useOnClickOutside(panelRef, handleClickOutSide);
 
-	const checkFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE,[]);
+	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 
 	return (
 		<div className="relative group">
@@ -144,7 +144,7 @@ function MemberProfile({
 						<img src={avatar} className="w-[32px] h-[32px] min-w-[32px] rounded-full object-cover" />
 					) : (
 						<div className="w-[32px] h-[32px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-							{(checkFooter ? userProfile?.user?.username || '' : name || '').charAt(0).toUpperCase()}
+							{(isFooter ? userProfile?.user?.username || '' : name || '').charAt(0).toUpperCase()}
 						</div>
 					)}
 					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
@@ -176,7 +176,7 @@ function MemberProfile({
 						<div className="flex flex-row items-center w-full overflow-x-hidden">
 							<p
 								className={`text-base font-medium nameMemberProfile
-                  ${checkFooter ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+                  ${isFooter ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.MEMBER_LIST ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'}

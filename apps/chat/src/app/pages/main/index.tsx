@@ -141,9 +141,8 @@ function MyApp() {
 			return `/chat/clans/${currentClan?.id}`;
 		} else if (clans?.length > 0) {
 			return `/chat/clans/${clans[0].id}`;
-		} else {
-			return ``;
-		}
+		} 
+		return ``;
 	},[clans, currentChannel?.id, currentClan?.id]);
 
 	return (
@@ -179,7 +178,7 @@ function MyApp() {
 					<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 				))}
 				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
-				{initClan && (
+				{Boolean(initClan) && (
 					<NavLink
 						to={initClan}
 					>
@@ -194,14 +193,11 @@ function MyApp() {
 									className="min-w-12 min-h-12 object-cover clan"
 								/>
 							) : (
-								// eslint-disable-next-line react/jsx-no-useless-fragment
-								<>
-									{(currentClan?.clan_name || clans[0]?.clan_name) && (
-										<div className="w-[48px] h-[48px] dark:bg-bgTertiary bg-bgLightMode rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
-											{(currentClan?.clan_name || clans[0]?.clan_name || '').charAt(0).toUpperCase()}
-										</div>
-									)}
-								</>
+								(currentClan?.clan_name || clans[0]?.clan_name) && (
+									<div className="w-[48px] h-[48px] dark:bg-bgTertiary bg-bgLightMode rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
+										{(currentClan?.clan_name || clans[0]?.clan_name || '').charAt(0).toUpperCase()}
+									</div>
+								)
 							)}
 						</NavLinkComponent>
 					</NavLink>
