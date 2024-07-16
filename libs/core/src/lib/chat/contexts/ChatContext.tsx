@@ -150,6 +150,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const ondisconnect = useCallback(() => {
+		console.log('disconnect');
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect();
 	}, [reconnect, dispatch]);
