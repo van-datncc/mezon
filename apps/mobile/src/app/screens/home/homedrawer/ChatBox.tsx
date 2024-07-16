@@ -146,7 +146,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	const setMessageFromCache = async () => {
 		const allCachedMessage = await getAllCachedMessage();
-		setText(allCachedMessage?.[props?.channelId] || '');
+		setText(convertMentionsToText(allCachedMessage?.[props?.channelId] || ''));
 	};
 
 	const resetCachedText = async () => {
