@@ -1,5 +1,5 @@
 import { Icons, ShortUserProfile } from '@mezon/components';
-import { useChannelMembers, useOnClickOutside } from '@mezon/core';
+import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -67,7 +67,7 @@ function MemberProfile({
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
 
-	const { removeMemberClan } = useChannelMembers();
+	const { removeMemberClan } = useChannelMembersActions();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
 	const userProfile = useSelector(selectAllAccount);

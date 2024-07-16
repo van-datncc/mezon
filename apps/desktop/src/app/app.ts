@@ -73,7 +73,6 @@ export default class App {
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
-
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {

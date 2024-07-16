@@ -1,4 +1,4 @@
-import { useAppParams } from '@mezon/core';
+import { useAppParams } from '../../app/hooks/useAppParams';
 import {
 	channelMembersActions,
 	channelsActions,
@@ -92,7 +92,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (directId === undefined) {
 				mess.isCurrentChannel = message.channel_id === channelId;
 			}
-
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -222,7 +221,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onHeartbeatTimeout = useCallback(() => {
-		console.log('Heartbeat timeout');
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect();
 	}, [dispatch, reconnect]);

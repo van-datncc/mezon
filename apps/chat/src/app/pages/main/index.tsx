@@ -1,6 +1,7 @@
 import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -9,10 +10,10 @@ import {
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectStatusMenu,
-	selectTheme
+	selectTheme,
+	toggleIsShowPopupForwardFalse,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';

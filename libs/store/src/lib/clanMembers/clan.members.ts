@@ -25,20 +25,16 @@ export interface UsersClanState extends EntityState<UsersClanEntity, string> {
 export const UsersClanAdapter = createEntityAdapter<UsersClanEntity>();
 
 type UsersClanPayload = {
-	clanId: string,
+	clanId: string;
 };
-export const fetchUsersClan = createAsyncThunk(
-	'UsersClan/fetchUsersClan',
-	async ({ clanId }: UsersClanPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listClanUsers(mezon.session, clanId);
-		if (!response.clan_users) {
-			return [];
-		}
-		return response.clan_users.map(mapUsersClanToEntity);
-	},
-);
-
+export const fetchUsersClan = createAsyncThunk('UsersClan/fetchUsersClan', async ({ clanId }: UsersClanPayload, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	const response = await mezon.client.listClanUsers(mezon.session, clanId);
+	if (!response.clan_users) {
+		return [];
+	}
+	return response.clan_users.map(mapUsersClanToEntity);
+});
 
 export const initialUsersClanState: UsersClanState = UsersClanAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -69,24 +65,16 @@ export const UsersClanSlice = createSlice({
 	},
 });
 
-
 /*
  * Export reducer for store configuration.
  */
 export const usersClanReducer = UsersClanSlice.reducer;
-export const usersClanActions = { ...UsersClanSlice.actions, fetchUsersClan};
+export const usersClanActions = { ...UsersClanSlice.actions, fetchUsersClan };
 
+const { selectAll, selectById } = UsersClanAdapter.getSelectors();
 
-const { selectAll } = UsersClanAdapter.getSelectors();
-
-export const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState =>
-	rootState[USERS_CLANS_FEATURE_KEY];
+export const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 
 export const selectAllUsesClan = createSelector(getUsersClanState, selectAll);
 
-export const selectMemberClanByUserId = (userId: string) => 
-	createSelector(selectAllUsesClan,	
-	(entities) => {
-		return entities.find(ent => ent?.user?.id === userId) || null;
-	}
-)
+export const selectMemberClanByUserId = (userId: string) => createSelector(getUsersClanState, (state) => selectById(state, userId));

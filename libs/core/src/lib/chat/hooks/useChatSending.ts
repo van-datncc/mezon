@@ -21,7 +21,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const dispatch = useAppDispatch();
 	// TODO: if direct is the same as channel use one slice
 	// If not, using 2 hooks for direct and channel
-	const direct = useSelector(selectDirectById(directMessageId || directId || ""));
+	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectChannelById(channelId));
 	let channelID = channelId;
@@ -39,18 +39,20 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			anonymous?: boolean,
 			mentionEveryone?: boolean,
 		) => {
-			return dispatch(messagesActions.sendMessage({
-				channelId: channelID,
-				clanId: clanID || '',
-				mode,
-				content,
-				mentions,
-				attachments,
-				references,
-				anonymous,
-				mentionEveryone,
-				senderId: currentUserId,
-			}))
+			return dispatch(
+				messagesActions.sendMessage({
+					channelId: channelID,
+					clanId: clanID || '',
+					mode,
+					content,
+					mentions,
+					attachments,
+					references,
+					anonymous,
+					mentionEveryone,
+					senderId: currentUserId,
+				}),
+			);
 		},
 		[dispatch, channelID, clanID, mode, currentUserId],
 	);
@@ -73,7 +75,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
-			
+
 			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, editMessage);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],

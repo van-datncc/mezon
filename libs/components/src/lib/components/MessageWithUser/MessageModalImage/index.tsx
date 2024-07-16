@@ -2,9 +2,9 @@ import { Icons } from '@mezon/components';
 import { useAttachments } from '@mezon/core';
 import { selectAttachment, selectAttachmentPhoto, selectMessageIdAttachment, selectModeAttachment, selectOpenModalAttachment } from '@mezon/store';
 import { SHOW_POSITION } from '@mezon/utils';
-import { MessageContextMenuProps, useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { MessageContextMenuProps, useMessageContextMenu } from '../../ContextMenu';
 import ListAttachment from './listAttachment';
 
 const MessageModalImage = () => {
