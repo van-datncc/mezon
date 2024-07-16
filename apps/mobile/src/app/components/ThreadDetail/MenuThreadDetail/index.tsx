@@ -2,9 +2,9 @@ import { DirectEntity, selectCurrentChannel } from '@mezon/store-mobile';
 import React, { createContext, useMemo } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { styles } from './style';
+import { style } from './style';
 
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import { IChannel } from '@mezon/utils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionRow } from '../ActionRow';
@@ -14,6 +14,8 @@ import { ThreadHeader } from '../ThreadHeader';
 export const threadDetailContext = createContext<IChannel | DirectEntity>(null);
 
 export default function MenuThreadDetail(props: { route: any }) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	//NOTE: from DirectMessageDetail component
 	const directMessage = props.route?.params?.directMessage as DirectEntity;
 	const currentChannel = useSelector(selectCurrentChannel);

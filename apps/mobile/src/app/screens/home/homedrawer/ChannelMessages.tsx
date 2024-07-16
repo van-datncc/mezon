@@ -216,6 +216,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				break;
 			case EMessageBSToShow.UserInformation:
 				setUserSelected(user);
+				setMessageSelected(message);
 				break;
 			default:
 				break;

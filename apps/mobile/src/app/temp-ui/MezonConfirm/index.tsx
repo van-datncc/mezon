@@ -1,7 +1,8 @@
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { ReactNode } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
-import styles from './styles';
+import { style } from './styles';
 
 interface IMezonConfirmProps {
 	visible?: boolean;
@@ -13,6 +14,9 @@ interface IMezonConfirmProps {
 	onConfirm?: () => void;
 }
 export default function MezonConfirm({ children, visible, onVisibleChange, title, confirmText, content, onConfirm }: IMezonConfirmProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+
 	function handleClose() {
 		onVisibleChange && onVisibleChange(false);
 	}
@@ -43,7 +47,7 @@ export default function MezonConfirm({ children, visible, onVisibleChange, title
 
 				<View style={styles.btnWrapper}>
 					<TouchableOpacity style={[styles.btn, styles.btnDanger]} onPress={() => handleConfirm()}>
-						<Text style={styles.btnText}>{confirmText}</Text>
+						<Text style={[styles.btnText, { color: baseColor.white }]}>{confirmText}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity style={styles.btn} onPress={() => handleClose()}>
 						<Text style={styles.btnText}>Cancel</Text>

@@ -6,9 +6,8 @@ import { ClansEntity } from '@mezon/store-mobile';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { APP_SCREEN, AppStackScreenProps } from 'apps/mobile/src/app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, reserve } from 'apps/mobile/src/app/temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, MezonSwitch, reserve } from 'apps/mobile/src/app/temp-ui';
 import MezonButtonIcon from 'apps/mobile/src/app/temp-ui/MezonButtonIcon';
-import MezonToggleButton from 'apps/mobile/src/app/temp-ui/MezonToggleButton';
 import { MutableRefObject, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -43,8 +42,6 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS });
 		dismiss();
 	};
-
-	const ToggleBtn = () => <MezonToggleButton onChange={() => {}} height={25} width={45} />;
 
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
@@ -88,20 +85,20 @@ export default function ClanMenu({ clan, inviteRef }: IServerMenuProps) {
 		},
 		{
 			title: t('menu.optionsMenu.showAllChannels'),
-			component: <ToggleBtn />,
+			component: <MezonSwitch />,
 		},
 		{
 			title: t('menu.optionsMenu.hideMutedChannels'),
-			component: <ToggleBtn />,
+			component: <MezonSwitch />,
 		},
 		{
 			title: t('menu.optionsMenu.allowDirectMessage'),
-			component: <ToggleBtn />,
+			component: <MezonSwitch />,
 		},
 		{
 			title: t('menu.optionsMenu.allowMessageRequest'),
 
-			component: <ToggleBtn />,
+			component: <MezonSwitch />,
 		},
 		{
 			onPress: () => reserve(),

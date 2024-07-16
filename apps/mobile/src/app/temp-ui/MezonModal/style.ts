@@ -1,13 +1,13 @@
-import { Colors } from '@mezon/mobile-ui';
+import { Attributes, Colors } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	closeIcon: {
 		color: Colors.white,
 	},
 	container: {
 		flex: 1,
-		backgroundColor: Colors.bgCharcoal,
+		backgroundColor: colors.primary,
 	},
 	bgDefault: {
 		backgroundColor: Colors.bgCharcoal,
@@ -28,12 +28,12 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	textTitle: {
-		color: Colors.white,
+		color: colors.textStrong,
 		fontSize: 20,
 		marginLeft: 10,
 	},
 	confirm: {
-		color: Colors.white,
+		color: colors.textStrong,
 		fontSize: 18,
 		marginLeft: 10,
 	},

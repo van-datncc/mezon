@@ -1,4 +1,4 @@
-import { useAuth } from '@mezon/core';
+import { useAuth } from './useAuth';
 import { selectMemberOnlineStatusById } from '@mezon/store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';

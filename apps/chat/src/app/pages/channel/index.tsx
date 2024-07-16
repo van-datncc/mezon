@@ -25,7 +25,7 @@ function useChannelSeen(channelId: string) {
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
-		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp }));
+		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + 3 }));
 		if (isMessageRead && channelId === currentChannel?.channel_id) {
 			dispatch(notificationActions.setIsMessageRead(false));
 		}

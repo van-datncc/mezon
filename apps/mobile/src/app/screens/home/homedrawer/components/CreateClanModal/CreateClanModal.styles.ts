@@ -1,8 +1,8 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 import { transparent } from 'tailwindcss/colors';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	headerModal: { backgroundColor: transparent },
 	input: {
 		height: 40,
@@ -20,35 +20,36 @@ export const styles = StyleSheet.create({
 	headerTitle: {
 		fontSize: size.h5,
 		fontWeight: '700',
-		color: Colors.white,
+		color: colors.textStrong,
 		textAlign: 'center',
 		marginBottom: size.s_8,
 	},
 	headerSubTitle: {
 		fontSize: size.label,
 		fontWeight: '400',
-		color: Colors.textGray,
+		color: colors.text,
 		textAlign: 'center',
 		marginBottom: size.s_6,
 	},
+
 	uploadImage: {
 		width: 100,
 		height: 100,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-    borderRadius: 50,
+		borderRadius: 50,
 		borderStyle: 'dashed',
-		borderColor: Colors.white,
+		borderColor: colors.borderRadio,
 		borderWidth: 1,
 	},
-  boxImage: {
-    width: '100%',
+	boxImage: {
+		width: '100%',
 		height: 150,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-  },
+	},
 	uploadCreateClan: {
 		width: '100%',
 		height: '100%',
@@ -71,7 +72,7 @@ export const styles = StyleSheet.create({
 	community: {
 		fontSize: size.label,
 		fontWeight: '500',
-		color: Colors.textGray,
+		color: colors.text,
 		marginBottom: size.s_6,
 	},
 	communityGuideLines: {
@@ -94,7 +95,7 @@ export const styles = StyleSheet.create({
 	uploadText: {
 		fontSize: size.regular,
 		fontWeight: '500',
-		color: Colors.textGray,
+		color: colors.textDisabled,
 	},
 	overflowImage: {
 		overflow: 'hidden',
@@ -104,5 +105,5 @@ export const styles = StyleSheet.create({
 		height: '100%',
 		borderRadius: 50,
 	},
-  errorMessage: {paddingRight: size.s_20}
+	errorMessage: { paddingRight: size.s_20 }
 });
