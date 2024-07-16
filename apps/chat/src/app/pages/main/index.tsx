@@ -165,7 +165,7 @@ function MyApp() {
 				{dmGroupChatUnreadList.map((dmGroupChatUnread) => (
 					<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 				))}
-				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
+        <div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-[#ccced3] duration-100 w-2/3 mx-auto my-2"></div>
 				{currentClan?.id && (
 					<NavLink
 						to={`${currentChannel?.id ? `/chat/clans/${currentClan.id}/channels/${currentChannel?.id}` : `/chat/clans/${currentClan.id}`}`}
@@ -193,7 +193,6 @@ function MyApp() {
 						</NavLinkComponent>
 					</NavLink>
 				)}
-
 				<div
 					className="relative py-2"
 					onClick={() => {
