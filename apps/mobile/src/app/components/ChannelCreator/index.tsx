@@ -1,20 +1,23 @@
-import { CrossIcon, NittroIcon } from '@mezon/mobile-components';
+import { CrossIcon, Icons } from '@mezon/mobile-components';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch } from '@mezon/store';
 import { createNewChannel, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
 import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch } from '../../temp-ui';
 import { validInput } from '../../utils/validate';
-import styles from './styles';
+import { style } from './styles';
 
 type CreateChannelScreen = typeof APP_SCREEN.MENU_CLAN.CREATE_CHANNEL;
 export default function ChannelCreator({ navigation, route }: MenuClanScreenProps<CreateChannelScreen>) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [isChannelPrivate, setChannelPrivate] = useState<boolean>(false);
 	const [channelName, setChannelName] = useState<string>('');
 	const [channelType, setChannelType] = useState<ChannelType>(ChannelType.CHANNEL_TYPE_TEXT);
@@ -31,7 +34,8 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 			<Pressable onPress={handleCreateChannel}>
 				<Text
 					style={{
-						color: 'white',
+						color: baseColor.blurple,
+						fontWeight: "bold",
 						paddingHorizontal: 20,
 						opacity: channelName?.trim()?.length > 0 ? 1 : 0.5,
 					}}
@@ -43,7 +47,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 
 		headerLeft: () => (
 			<Pressable style={{ padding: 20 }} onPress={handleClose}>
-				<CrossIcon height={16} width={16} />
+				<CrossIcon height={16} width={16} color={themeValue.text} />
 			</Pressable>
 		),
 	});
@@ -90,7 +94,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 						{
 							title: t('fields.channelPrivate.title'),
 							component: <MezonSwitch />,
-							icon: <NittroIcon />,
+							icon: <Icons.LockIcon color={themeValue.text} height={20} width={20} />,
 						},
 					],
 				},
@@ -124,11 +128,10 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 				errorMessage={t('fields.channelName.errorMessage')}
 				placeHolder={t('fields.channelName.placeholder')}
 			/>
-			<View>
-				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} />
 
-				<MezonMenu menu={menuPrivate} />
-			</View>
+			<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} />
+
+			<MezonMenu menu={menuPrivate} />
 		</ScrollView>
 	);
 }

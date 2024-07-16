@@ -1,15 +1,18 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
-import { MuteIcon, SearchIcon, SettingIcon, ThreadIcon, UnMuteIcon } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { threadDetailContext } from '../MenuThreadDetail';
-import styles from './style';
+import { style } from './style';
 
 export const ActionRow = React.memo(() => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
 	const { statusMute } = useStatusMuteChannel();
@@ -20,8 +23,8 @@ export const ActionRow = React.memo(() => {
 	const actionList = [
 		{
 			title: 'Search',
-			action: () => {},
-			icon: <SearchIcon width={22} height={22} />,
+			action: () => { },
+			icon: <Icons.MagnifyingIcon width={22} height={22} color={themeValue.text} />,
 			hidden: true,
 		},
 		{
@@ -29,7 +32,7 @@ export const ActionRow = React.memo(() => {
 			action: () => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD });
 			},
-			icon: <ThreadIcon width={22} height={22} />,
+			icon: <Icons.ThreadIcon width={22} height={22} color={themeValue.text} />,
 			hidden: isChannel,
 		},
 		{
@@ -37,7 +40,9 @@ export const ActionRow = React.memo(() => {
 			action: () => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL });
 			},
-			icon: statusMute === EActionMute.Mute ? <MuteIcon width={22} height={22} /> : <UnMuteIcon width={22} height={22} />,
+			icon: statusMute === EActionMute.Mute
+				? <Icons.BellSlashIcon width={22} height={22} color={themeValue.text} />
+				: <Icons.BellIcon width={22} height={22} color={themeValue.text} />,
 			hidden: true,
 		},
 		{
@@ -50,7 +55,7 @@ export const ActionRow = React.memo(() => {
 					},
 				});
 			},
-			icon: <SettingIcon width={22} height={22} />,
+			icon: <Icons.SettingsIcon width={22} height={22} color={themeValue.text} />,
 			hidden: true,
 		},
 	];

@@ -1,7 +1,7 @@
-import { Colors } from '@mezon/mobile-ui';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { useCallback, useEffect, useState } from 'react';
 import { GestureResponderEvent, LayoutChangeEvent, Pressable, Text, View } from 'react-native';
-import styles from './style';
+import { style } from './style';
 
 interface IPos {
 	x: number;
@@ -32,6 +32,8 @@ const usePos = (): [IPos[], (event: LayoutChangeEvent, index: number) => void] =
 };
 
 export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [pos, onLayout] = usePos();
 	const [selected, setSelected] = useState<number>(pageID);
 
@@ -48,7 +50,7 @@ export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IPro
 			<View style={styles.headerTab}>
 				{titles.map((title, index) => (
 					<Pressable key={index.toString()} onLayout={(e) => onLayout(e, index)} onPress={(e) => handlePress(e, index)}>
-						<Text style={{ color: index === selected ? Colors.textViolet : Colors.white }}>{title}</Text>
+						<Text style={{ color: index === selected ? baseColor.blurple : themeValue.text }}>{title}</Text>
 					</Pressable>
 				))}
 			</View>

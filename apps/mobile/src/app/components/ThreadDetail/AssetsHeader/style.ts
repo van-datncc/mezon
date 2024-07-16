@@ -1,7 +1,7 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes, Colors } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     headerTab: {
         marginTop: 20,
         padding: 20,
@@ -31,5 +31,3 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     }
 })
-
-export default styles;
