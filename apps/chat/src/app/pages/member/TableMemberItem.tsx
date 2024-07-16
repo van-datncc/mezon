@@ -6,13 +6,14 @@ import RoleNameCard from "./RoleNameCard";
 
 type TableMemberItemProps = {
   userId: string;
-  name: string;
+  username: string;
   avatar: string;
   clanJoinTime?: string;
   discordJoinTime?: string;
+  displayName: string;
 };
 
-const TableMemberItem = ({ userId, name, avatar, clanJoinTime, discordJoinTime }: TableMemberItemProps) => {
+const TableMemberItem = ({ userId, username, avatar, clanJoinTime, discordJoinTime, displayName }: TableMemberItemProps) => {
   const userById = useSelector (selectMemberByUserId (userId ?? ''));
   const RolesClan = useSelector (selectAllRolesClan);
   const appearanceTheme = useSelector (selectTheme);
@@ -27,13 +28,13 @@ const TableMemberItem = ({ userId, name, avatar, clanJoinTime, discordJoinTime }
   }, [userById?.role_id, RolesClan]);
   
   return (
-    <div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] border-borderDivider last:border-b-0">
+    <div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-[#ccced3] last:border-b-0">
       <div className="flex-3 p-1">
         <div className="flex flex-row gap-2 items-center">
-          <img src={avatar} alt={name} className="w-[36px] h-[36px] min-w-[36px] rounded-full object-cover"/>
+          <img src={avatar} alt={username} className="w-[36px] h-[36px] min-w-[36px] rounded-full object-cover"/>
           <div className="flex flex-col">
-            <p className="text-base font-medium">{name}</p>
-            <p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{name}</p>
+            <p className="text-base font-medium">{displayName}</p>
+            <p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{username}</p>
           </div>
         </div>
       </div>

@@ -1,9 +1,9 @@
-import { Icons } from '@mezon/components';
-import { Button } from 'flowbite-react';
+import {Icons} from '@mezon/components';
+import {Button} from 'flowbite-react';
 
 const MemberTopBar = () => {
 	return (
-		<div className="flex flex-row justify-between items-center py-2 px-4 border-b-[1px] border-borderDivider">
+		<div className="flex flex-row justify-between items-center py-2 px-4 border-b-[1px] dark:border-borderDivider border-[#ccced3]">
 			<h2 className="text-base font-semibold">Recent Members</h2>
 			<div className="flex flex-row items-center gap-2">
 				<div className="relative">
