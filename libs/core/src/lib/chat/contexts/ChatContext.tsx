@@ -159,7 +159,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(event: unknown) => {
 			dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		},
-		[dispatch, reconnect],
+		[dispatch],
 	);
 
 	const onmessagetyping = useCallback(

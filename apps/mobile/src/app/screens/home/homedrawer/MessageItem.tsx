@@ -8,7 +8,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
-import { Block, Colors, Metrics, Text, size, useAnimatedState, useTheme, verticalScale } from '@mezon/mobile-ui';
+import { Block, Colors, Metrics, Text, baseColor, useAnimatedState, useTheme, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -47,6 +47,7 @@ import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMes
 import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { openUrl } from 'react-native-markdown-display';
+import { MezonClanAvatar } from '../../../temp-ui';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 
@@ -382,7 +383,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				styles.messageWrapper,
 				(isCombine || preventAction) && { marginTop: 0 },
 				hasIncludeMention && styles.highlightMessageMention,
-				checkMessageTargetToMoved && styles.highlightMessageReply,
+				checkMessageTargetToMoved && styles.highlightMessageReply
 			]}
 		>
 			{/*{lastSeen &&*/}
@@ -396,10 +397,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<View style={styles.iconReply}>
 						<ReplyIcon width={34} height={30} />
 					</View>
-					<Pressable
-						onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)}
-						style={styles.repliedMessageWrapper}
-					>
+					<Pressable onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
 						{repliedSender?.user?.avatar_url ? (
 							<View style={styles.replyAvatar}>
 								<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
@@ -432,7 +430,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 										clansProfile,
 										currentClan,
 										isMessageReply: true,
-										mode,
+										mode
 									})}
 								</>
 							)}
@@ -457,20 +455,33 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onPress={() => {
 							if (preventAction) return;
 							setIsOnlyEmojiPicker(false);
+							const userForDisplay: ApiUser = user
+								? user?.user
+								: checkAnonymous
+									? {
+										username: message?.username,
+										display_name: message?.name,
+										id: ""
+									}
+									: {
+										username: message?.user?.username,
+										display_name: message?.user?.name,
+										id: message?.user?.id
+									}
+
 							onMessageAction({
 								type: EMessageBSToShow.UserInformation,
-								user: user?.user,
-							});
+								user: userForDisplay
+							})
 						}}
 						style={styles.wrapperAvatar}
 					>
-						{user?.user?.avatar_url ? (
-							<Image source={{ uri: user?.user?.avatar_url }} style={styles.logoUser} />
-						) : (
-							<View style={styles.avatarMessageBoxDefault}>
-								<Text style={styles.textAvatarMessageBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
-							</View>
-						)}
+						<MezonClanAvatar
+							alt={user?.user?.username || message?.username}
+							image={user?.user?.avatar_url}
+							defaultColor={baseColor.gray}
+							textStyle={{ fontWeight: "normal", fontSize: 22 }}
+						/>
 					</Pressable>
 				) : (
 					<View style={styles.wrapperAvatarCombine} />
@@ -484,8 +495,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						onMessageAction({
 							type: EMessageBSToShow.MessageAction,
 							senderDisplayName,
-							message,
-						});
+							message
+						})
 						dispatch(setSelectedMessage(message));
 					}}
 				>
@@ -500,32 +511,32 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									? user?.user
 									: checkAnonymous
 										? {
-												username: message?.username,
-												display_name: message?.name,
-												id: '',
-											}
+											username: message?.username,
+											display_name: message?.name,
+											id: ""
+										}
 										: {
-												username: message?.user?.username,
-												display_name: message?.user?.name,
-												id: message?.user?.id,
-											};
+											username: message?.user?.username,
+											display_name: message?.user?.name,
+											id: message?.user?.id
+										}
 
-									onMessageAction({
-										type: EMessageBSToShow.UserInformation,
-										user: userForDisplay
-									})
-								}}
-								style={styles.messageBoxTop}
-							>
-								<Text style={styles.userNameMessageBox}>{senderDisplayName}</Text>
-								<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
-							</TouchableOpacity>
-						) : null}
-						{videos?.length > 0 && videos.map((video, index) => <RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} />)}
-						{images?.length > 0 && renderImages()}
+								onMessageAction({
+									type: EMessageBSToShow.UserInformation,
+									user: userForDisplay
+								})
+							}}
+							style={styles.messageBoxTop}
+						>
+							<Text style={styles.userNameMessageBox}>{senderDisplayName}</Text>
+							<Text style={styles.dateMessageBox}>{message?.create_time ? convertTimeString(message?.create_time) : ''}</Text>
+						</TouchableOpacity>
+					) : null}
+					{videos?.length > 0 && videos.map((video, index) => <RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} />)}
+					{images?.length > 0 && renderImages()}
 
 					{documents?.length > 0 && renderDocuments()}
-					<Block opacity={message?.isSending || message.isError ? 0.6 : 1}>
+					<Block opacity={(message?.isSending || message.isError) ? 0.6 : 1}>
 						{renderTextContent({
 							lines,
 							isEdited,
@@ -538,7 +549,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							clansProfile,
 							currentClan,
 							isMessageReply: false,
-							mode,
+							mode
 						})}
 					</Block>
 					{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
@@ -553,8 +564,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								onMessageAction({
 									type: EMessageBSToShow.MessageAction,
 									senderDisplayName,
-									message,
-								});
+									message
+								})
 							}}
 						/>
 					) : null}
