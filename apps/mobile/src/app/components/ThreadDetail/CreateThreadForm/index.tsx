@@ -45,12 +45,12 @@ export default function CreateThreadForm() {
 	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const currentChannelId = useSelector(selectCurrentChannelId);
+
 	const navigation = useNavigation();
 	const formikRef = useRef(null);
 	const { openThreadMessageState } = useReference();
 	const { valueThread, threadCurrentChannel } = useThreads();
-	const listMentions = UseMentionList(currentChannelId || '');
+	const listMentions = UseMentionList((currentChannel?.parrent_id === '0' ?  currentChannel?.channel_id : currentChannel?.parrent_id) || '');
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		channelLabel: threadCurrentChannel?.channel_label as string,
@@ -77,7 +77,7 @@ export default function CreateThreadForm() {
 				clan_id: currentClanId?.toString(),
 				channel_label: value.nameValueThread,
 				channel_private: value.isPrivate,
-				parrent_id: currentChannelId as string,
+				parrent_id: (currentChannel?.parrent_id === '0' ?  currentChannel?.channel_id : currentChannel?.parrent_id) || '',
 				category_id: currentChannel?.category_id,
 				type: ChannelType.CHANNEL_TYPE_TEXT,
 			};
@@ -93,7 +93,7 @@ export default function CreateThreadForm() {
 				Alert.alert('Created Thread Failed', "Thread not found or you're not allowed to update");
 			}
 		},
-		[currentChannel, currentChannelId, currentClanId, dispatch],
+		[currentChannel, currentChannel?.parrent_id, currentClanId, dispatch],
 	);
 
 	const handleSendMessageThread = useCallback(
@@ -137,7 +137,7 @@ export default function CreateThreadForm() {
 
 	const handleRouteData = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
-		navigation.navigate(APP_SCREEN.HOME as never);
+		navigation.navigate('HomeDefault' as never);
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);

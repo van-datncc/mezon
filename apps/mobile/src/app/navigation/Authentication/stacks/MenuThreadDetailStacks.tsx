@@ -1,12 +1,12 @@
 import { useReference } from '@mezon/core';
 import { AngleRight, ArrowLeftIcon, HashSignIcon, HashSignLockIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@react-navigation/stack';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native';
@@ -25,6 +25,11 @@ export const MenuThreadDetailStacks = ({}: any) => {
 	const navigation = useNavigation();
 	const [isChannel, setIsChannel] = useState<boolean>();
 	const currentChannel = useSelector(selectCurrentChannel);
+	const channelsEntities = useSelector(selectChannelsEntities);
+  const currentChannelById =  useMemo(() =>{
+    return channelsEntities?.[(currentChannel?.parrent_id === '0' ?  currentChannel?.channel_id : currentChannel?.parrent_id) || '']
+  },[currentChannel?.parrent_id, currentChannel?.channel_id, channelsEntities])
+
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
 	}, [currentChannel]);
@@ -91,7 +96,7 @@ export const MenuThreadDetailStacks = ({}: any) => {
 										</View>
 									)}
 									<Text style={{ color: Colors.white, fontSize: size.h6 , fontWeight: '700'}}>
-										{openThreadMessageState ? 'New Thread' : currentChannel?.channel_label}
+										{openThreadMessageState ? 'New Thread' : currentChannelById?.channel_label}
 									</Text>
 									<AngleRight width={14} height={14} style={{ marginLeft: size.s_10 }}></AngleRight>
 								</View>

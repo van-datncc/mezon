@@ -3,7 +3,7 @@ import React, { MutableRefObject } from "react";
 import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import { style } from "./styles";
-import { useClans } from "@mezon/core";
+import { useClans, useReference } from "@mezon/core";
 import { reserve, IMezonMenuSectionProps, MezonMenu, IMezonMenuItemProps } from "../../../../../../app/temp-ui";
 import { useTranslation } from "react-i18next";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -24,6 +24,8 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
     const { t } = useTranslation(['channelMenu']);
     const { themeValue } = useTheme()
     const styles = style(themeValue);
+	const { setOpenThreadMessageState } = useReference();
+
 
     const { currentClan } = useClans();
     const { dismiss } = useBottomSheetModal();
@@ -78,6 +80,18 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         }
     ]
 
+    const threadMenu: IMezonMenuItemProps[] = [
+      {
+          title: t('menu.thread.threads'),
+          onPress: () => {
+            dismiss();
+            setOpenThreadMessageState(false);
+            navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD});
+          },
+          icon: <Icons.ThreadIcon color={themeValue.textStrong}/>
+      }
+  ]
+
     const organizationMenu: IMezonMenuItemProps[] = [
         {
             title: t('menu.organizationMenu.edit'),
@@ -122,6 +136,9 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
         },
         {
             items: notificationMenu,
+        },
+        {
+            items: threadMenu,
         },
         {
             items: organizationMenu,
