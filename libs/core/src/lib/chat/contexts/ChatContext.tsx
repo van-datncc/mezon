@@ -1,4 +1,3 @@
-import { useAppParams } from '../../app/hooks/useAppParams';
 import {
 	channelMembersActions,
 	channelsActions,
@@ -36,6 +35,7 @@ import {
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 
@@ -128,15 +128,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onnotification = useCallback(
-		(notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id) {
-				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
-			}
-
+		async (notification: Notification) => {
 			if (currentChannel?.channel_id !== (notification as any).channel_id && notification.code === -9) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setStatusNoti());
+			}
+
+			if (currentChannel?.channel_id === (notification as any).channel_id) {
+				const timestamp = Date.now() / 1000;
+				dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
 			}
 
 			if (notification.code === -2 || notification.code === -3) {

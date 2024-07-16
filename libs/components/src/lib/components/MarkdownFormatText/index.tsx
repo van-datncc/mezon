@@ -1,7 +1,8 @@
-import { useEmojiSuggestion, useInvite } from '@mezon/core';
+import { useAppNavigation, useEmojiSuggestion, useInvite } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
 import { ILineMention, MentionTypeEnum, SHOW_POSITION, convertMarkdown, getSrcEmoji } from '@mezon/utils';
 import clx from 'classnames';
+import isElectron from 'is-electron';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Markdown from 'react-markdown';
 import { useModal } from 'react-modal-hook';
@@ -23,6 +24,7 @@ type MarkdownFormatTextProps = {
 const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnlyEmoji, mode, lengthLine }) => {
 	// TODO: move the invitation logic to upper level
 	const { getLinkInvite } = useInvite();
+	const { navigate } = useAppNavigation();
 
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => <ExpiryTimeModal onClose={closeInviteChannelModal} open={true} />);
 
@@ -40,7 +42,11 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 						if (new Date(res.expiry_time) < new Date()) {
 							openInviteChannelModal();
 						} else {
-							window.location.href = children;
+							if (isElectron()) {
+								navigate('/invite/' + inviteId);
+							} else {
+								window.location.href = children;
+							}
 						}
 					}
 				});
