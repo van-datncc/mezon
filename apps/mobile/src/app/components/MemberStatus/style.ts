@@ -1,19 +1,19 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, baseColor, size } from "@mezon/mobile-ui";
 import { Dimensions, StyleSheet } from "react-native";
 
-const style = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     container: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.primary,
         padding: 20,
         width: Dimensions.get("screen").width,
     },
 
     text: {
-        color: Colors.white
+        color: colors.text
     },
 
     box: {
-        backgroundColor: Colors.bgDarkCharcoal,
+        backgroundColor: colors.secondary,
         marginTop: 10,
         borderRadius: 15,
         width: "100%"
@@ -24,16 +24,17 @@ const style = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         padding: 10,
-        backgroundColor: Colors.primary,
+        backgroundColor: colors.secondary,
         borderRadius: 15,
         marginBottom: 10
     },
 
     iconWrapper: {
         padding: 10,
-        backgroundColor: Colors.green,
+        backgroundColor: baseColor.blurple,
         borderRadius: 50
     },
+
     iconNameWrapper: {
         display: "flex",
         justifyContent: "center",
@@ -41,28 +42,28 @@ const style = StyleSheet.create({
         flexDirection: "row",
         gap: 10
     },
-	actionItem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: size.s_12,
-		backgroundColor: Colors.bgDarkCharcoal,
-		padding: size.s_10,
+    actionItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: size.s_12,
+        backgroundColor: colors.secondary,
+        padding: size.s_10,
         borderRadius: size.s_12,
         marginBottom: size.s_10
-	},
-	actionTitle: {
-		flex: 1,
-		color: Colors.white,
-	},
+    },
+    actionTitle: {
+        flex: 1,
+        color: colors.text,
+    },
     newGroupContent: {
-        color: Colors.textGray,
+        color: colors.textDisabled,
         fontSize: size.small
     },
     actionIconWrapper: {
-		padding: size.s_8,
-		borderRadius: 50,
-        backgroundColor: Colors.bgViolet
-	},
+        padding: size.s_8,
+        borderRadius: 50,
+        backgroundColor: baseColor.blurple
+    },
 })
 
 export default style;

@@ -1,6 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChannelMembersOnlineStatus } from '@mezon/core';
-import { AddMemberIcon, AngleRightIcon, ChevronIcon, UserGroupIcon } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -22,6 +23,8 @@ enum EActionButton {
 }
 
 export const MemberListStatus = React.memo(() => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
 	const { onlineMembers, offlineMembers } = useChannelMembersOnlineStatus({ channelId: currentChannel?.id });
@@ -44,19 +47,19 @@ export const MemberListStatus = React.memo(() => {
 	};
 
 	return (
-		<ScrollView contentContainerStyle={style.container}>
+		<ScrollView contentContainerStyle={styles.container}>
 			{currentChannel?.type === ChannelType.CHANNEL_TYPE_DM ? (
-				<TouchableOpacity onPress={() => navigateToNewGroupScreen()} style={style.actionItem}>
-					<View style={[style.actionIconWrapper]}>
-						<UserGroupIcon />
+				<TouchableOpacity onPress={() => navigateToNewGroupScreen()} style={styles.actionItem}>
+					<View style={[styles.actionIconWrapper]}>
+						<Icons.GroupIcon height={20} width={20} color={baseColor.white} />
 					</View>
 					<View style={{ flex: 1 }}>
-						<Text style={style.actionTitle}>{t('message:newMessage.newGroup')}</Text>
-						<Text style={style.newGroupContent} numberOfLines={1}>
+						<Text style={styles.actionTitle}>{t('message:newMessage.newGroup')}</Text>
+						<Text style={styles.newGroupContent} numberOfLines={1}>
 							{t('message:newMessage.createGroupWith')} {currentChannel?.channel_label}
 						</Text>
 					</View>
-					<ChevronIcon height={15} width={15} />
+					<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
 				</TouchableOpacity>
 			) : null}
 
@@ -66,15 +69,15 @@ export const MemberListStatus = React.memo(() => {
 						handleAddOrInviteMembers(isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers);
 					}}
 				>
-					<View style={style.inviteBtn}>
-						<View style={style.iconNameWrapper}>
-							<View style={style.iconWrapper}>
-								<AddMemberIcon height={16} width={16} />
+					<View style={styles.inviteBtn}>
+						<View style={styles.iconNameWrapper}>
+							<View style={styles.iconWrapper}>
+								<Icons.UserPlusIcon height={20} width={20} color={baseColor.white} />
 							</View>
-							<Text style={style.text}>{isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers}</Text>
+							<Text style={styles.text}>{isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers}</Text>
 						</View>
 						<View>
-							<AngleRightIcon height={22} width={22} />
+							<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
 						</View>
 					</View>
 				</Pressable>
@@ -83,8 +86,8 @@ export const MemberListStatus = React.memo(() => {
 			<View>
 				{onlineMembers?.length > 0 && (
 					<View>
-						<Text style={style.text}>Member - {onlineMembers?.length || '0'}</Text>
-						<View style={style.box}>
+						<Text style={styles.text}>Member - {onlineMembers?.length || '0'}</Text>
+						<View style={styles.box}>
 							{onlineMembers.map((user) => (
 								<MemberItem
 									onPress={(user) => {
@@ -101,8 +104,8 @@ export const MemberListStatus = React.memo(() => {
 				)}
 				{offlineMembers?.length > 0 && (
 					<View style={{ marginTop: 20 }}>
-						<Text style={style.text}>Offline - {offlineMembers?.length}</Text>
-						<View style={style.box}>
+						<Text style={styles.text}>Offline - {offlineMembers?.length}</Text>
+						<View style={styles.box}>
 							{offlineMembers.map((user) => (
 								<MemberItem
 									key={user.id}
