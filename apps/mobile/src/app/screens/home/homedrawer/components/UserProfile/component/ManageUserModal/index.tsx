@@ -1,15 +1,13 @@
+import { useRoles } from "@mezon/core";
 import { Icons } from "@mezon/mobile-components";
 import { baseColor, Block, Colors, size, Text, useTheme } from "@mezon/mobile-ui";
 import { ChannelMembersEntity, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan } from "@mezon/store-mobile";
-import { useMemo, useState } from "react";
-import { memo } from "react";
-import { Modal, TouchableOpacity, Image, ScrollView } from "react-native";
-import { useSelector } from "react-redux";
-import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { useEffect } from "react";
-import { EActionSettingUserProfile, IProfileSetting } from "../UserSettingProfile";
-import { useRoles } from "@mezon/core";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Image, Modal, ScrollView, TouchableOpacity } from "react-native";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { useSelector } from "react-redux";
+import { EActionSettingUserProfile, IProfileSetting } from "../UserSettingProfile";
 
 interface IManageUserModalProp {
     user: ChannelMembersEntity;
@@ -18,7 +16,7 @@ interface IManageUserModalProp {
     profileSetting: IProfileSetting[];
 }
 
-export const ManageUserModal = memo(({user, visible, onclose, profileSetting}: IManageUserModalProp) => {
+export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }: IManageUserModalProp) => {
     const { themeValue } = useTheme();
     const [editMode, setEditMode] = useState(false);
     const RolesClan = useSelector(selectAllRolesClan);
@@ -33,18 +31,18 @@ export const ManageUserModal = memo(({user, visible, onclose, profileSetting}: I
     }, [RolesClan, user?.role_id])
 
     const isClanOwner = useMemo(() => {
-		return currentClan?.creator_id === user?.user?.id
-	}, [currentClan?.creator_id, user?.user?.id])
+        return currentClan?.creator_id === user?.user?.id
+    }, [currentClan?.creator_id, user?.user?.id])
 
     const addRole = async (roleId: string) => {
-		const activeRole = RolesClan.find((role) => role.id === roleId);
-		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [user?.user?.id] || [], [], [], []);
-	};
+        const activeRole = RolesClan.find((role) => role.id === roleId);
+        await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [user?.user?.id] || [], [], [], []);
+    };
 
-	const deleteRole = async (roleId: string) => {
-		const activeRole = RolesClan.find((role) => role.id === roleId);
-		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], [user?.user?.id] || [], []);
-	};
+    const deleteRole = async (roleId: string) => {
+        const activeRole = RolesClan.find((role) => role.id === roleId);
+        await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], [user?.user?.id] || [], []);
+    };
 
     const onSelectedRoleChange = async (value: boolean, roleId) => {
         setIsLoading(true);
@@ -61,7 +59,7 @@ export const ManageUserModal = memo(({user, visible, onclose, profileSetting}: I
     }
 
     useEffect(() => {
-        if ( user?.role_id) {
+        if (user?.role_id) {
             setIsLoading(false);
             setSelectedRole(user?.role_id);
         }
@@ -74,10 +72,16 @@ export const ManageUserModal = memo(({user, visible, onclose, profileSetting}: I
     return (
         <Modal visible={visible} animationType={'slide'} statusBarTranslucent={true}>
             <Block flex={1} backgroundColor={themeValue?.charcoal} paddingTop={size.s_40}>
-                <Block flexDirection="row" alignItems="center" justifyContent="space-between" height={size.s_40}>
-                    <Block paddingLeft={size.s_14} width={size.s_30}>
+                <Block flexDirection="row" alignItems="center" justifyContent="space-between" height={size.s_40} paddingHorizontal={size.s_14}>
+                    <Block>
                         {!isLoading && (
-                            <TouchableOpacity onPress={() => onclose()} disabled={isLoading}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    onclose();
+                                    setEditMode(false);
+                                }}
+                                disabled={isLoading}
+                            >
                                 <Icons.CloseIcon height={size.s_30} width={size.s_30} color={themeValue.white} />
                             </TouchableOpacity>
                         )}
@@ -109,7 +113,7 @@ export const ManageUserModal = memo(({user, visible, onclose, profileSetting}: I
                                         borderRadius: 50
                                     }}
                                 />
-                            ): (
+                            ) : (
                                 <Text
                                     style={{
                                         backgroundColor: Colors.vividScarlet,
@@ -123,12 +127,12 @@ export const ManageUserModal = memo(({user, visible, onclose, profileSetting}: I
                                     }}
                                 >{user?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
                             )}
-                                <Block>
-                                    {user?.user?.display_name ? (
-                                        <Text color={themeValue.white}>{user?.user?.display_name}</Text>
-                                    ): null}
-                                    <Text color={themeValue.text}>{user?.user?.username}</Text>
-                                </Block>
+                            <Block>
+                                {user?.user?.display_name ? (
+                                    <Text color={themeValue.white}>{user?.user?.display_name}</Text>
+                                ) : null}
+                                <Text color={themeValue.text}>{user?.user?.username}</Text>
+                            </Block>
                         </Block>
                     </Block>
 
@@ -163,7 +167,7 @@ export const ManageUserModal = memo(({user, visible, onclose, profileSetting}: I
                                                         textStyle={{ fontFamily: "JosefinSans-Regular" }}
                                                     />
                                                 </Block>
-                                                <Text color={isLoading ? themeValue.textDisabled :themeValue.white} h4>{role?.title}</Text>
+                                                <Text color={isLoading ? themeValue.textDisabled : themeValue.white} h4>{role?.title}</Text>
                                             </Block>
                                         </TouchableOpacity>
                                     )
@@ -178,13 +182,13 @@ export const ManageUserModal = memo(({user, visible, onclose, profileSetting}: I
                             {!editMode ? (
                                 <TouchableOpacity onPress={() => setEditMode(true)} disabled={isLoading}>
                                     <Block backgroundColor={themeValue.secondary} padding={size.s_14}>
-                                        <Text color={isLoading? Colors.textGray : baseColor.blurple} h4>{t('manage.editRoles')}</Text>
+                                        <Text color={isLoading ? Colors.textGray : baseColor.blurple} h4>{t('manage.editRoles')}</Text>
                                     </Block>
                                 </TouchableOpacity>
                             ) : (
                                 <TouchableOpacity onPress={() => setEditMode(false)} disabled={isLoading}>
                                     <Block backgroundColor={themeValue.secondary} padding={size.s_14}>
-                                        <Text color={isLoading? Colors.textGray : baseColor.blurple} h4>{t('manage.cancel')}</Text>
+                                        <Text color={isLoading ? Colors.textGray : baseColor.blurple} h4>{t('manage.cancel')}</Text>
                                     </Block>
                                 </TouchableOpacity>
                             )}
