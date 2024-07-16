@@ -8,13 +8,12 @@ import {
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
-	selectOpenModalAttachment,
 	selectStatusMenu,
-	selectTheme,
+	selectTheme
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -126,7 +125,6 @@ function MyApp() {
 
 	const { setMode } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
-	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const handleClick = useCallback(() => {
 		setOpenOptionMessageState(false);
@@ -134,6 +132,18 @@ function MyApp() {
 
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
+
+	const initClan = useMemo(() => {
+		if(currentChannel?.id && currentClan?.id) {
+			return `/chat/clans/${currentClan?.id}/channels/${currentChannel?.id}`;
+		} else if (currentClan?.id) {
+			return `/chat/clans/${currentClan?.id}`;
+		} else if (clans?.length > 0) {
+			return `/chat/clans/${clans[0].id}`;
+		} else {
+			return ``;
+		}
+	},[clans, currentChannel?.id, currentClan?.id]);
 
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
@@ -168,26 +178,26 @@ function MyApp() {
 					<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 				))}
 				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
-				{currentClan?.id && (
+				{initClan && (
 					<NavLink
-						to={`${currentChannel?.id ? `/chat/clans/${currentClan.id}/channels/${currentChannel?.id}` : `/chat/clans/${currentClan.id}`}`}
+						to={initClan}
 					>
-						<NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || ''}>
-							{currentClan?.logo ? (
+						<NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || clans[0]?.clan_name || ''}>
+							{(currentClan?.logo ||  clans[0]?.logo) ? (
 								<Image
-									src={currentClan?.logo || ''}
-									alt={currentClan?.clan_name || ''}
+									src={currentClan?.logo || clans[0]?.logo || ''}
+									alt={currentClan?.clan_name || clans[0]?.clan_name || ''}
 									placeholder="blur"
 									width={48}
-									blurdataurl={currentClan?.logo}
+									blurdataurl={currentClan?.logo || clans[0]?.logo}
 									className="min-w-12 min-h-12 object-cover clan"
 								/>
 							) : (
 								// eslint-disable-next-line react/jsx-no-useless-fragment
 								<>
-									{currentClan?.clan_name && (
+									{(currentClan?.clan_name || clans[0]?.clan_name) && (
 										<div className="w-[48px] h-[48px] dark:bg-bgTertiary bg-bgLightMode rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
-											{currentClan.clan_name.charAt(0).toUpperCase()}
+											{(currentClan?.clan_name || clans[0]?.clan_name || '').charAt(0).toUpperCase()}
 										</div>
 									)}
 								</>

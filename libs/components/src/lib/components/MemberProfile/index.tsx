@@ -141,7 +141,7 @@ function MemberProfile({
 						<img src={avatar} className="w-[32px] h-[32px] min-w-[32px] rounded-full object-cover" />
 					) : (
 						<div className="w-[32px] h-[32px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-							{(userProfile?.user?.username || name).charAt(0).toUpperCase()}
+							{(!isHiddenAvatarPanel ? userProfile?.user?.username || name : name || '').charAt(0).toUpperCase()}
 						</div>
 					)}
 					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
@@ -181,7 +181,7 @@ function MemberProfile({
 							`}
 								title={name}
 							>
-								{name}
+								{!isHiddenAvatarPanel && name}
 							</p>
 							{(dataMemberCreate?.createId || currentClan?.creator_id) &&
 								(dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id && (

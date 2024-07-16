@@ -3,7 +3,7 @@ import { selectDirectsOpenlist, selectTheme, useAppDispatch } from '@mezon/store
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as Icons from '../../../../../ui/src/lib/Icons';
@@ -14,6 +14,14 @@ import ListDMChannel from './listDMChannel';
 
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
+
+const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
+	return notSortedArr.slice().sort((a, b) => {
+		const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
+		const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
+		return timestampB - timestampA;
+	});
+};
 
 function DirectMessageList() {
 	const dispatch = useAppDispatch();
@@ -27,25 +35,17 @@ function DirectMessageList() {
 			return isUnique;
 		});
 	};
-	const [sortedFilteredDataDM, setSortedFilteredDataDM] = useState<IChannel[]>([]);
-
-	const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
-		return notSortedArr.slice().sort((a, b) => {
-			const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
-			const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
-			return timestampB - timestampA;
-		});
-	};
 	const navigate = useNavigate();
 
+	const sortedFilteredDataDM = useMemo(() => {
+		return sortDMItem(filterDmGroupsByChannelLabel(dmGroupChatList));
+	},[dmGroupChatList])
+
 	useEffect(() => {
-		const filteredDataDM = filterDmGroupsByChannelLabel(dmGroupChatList);
-		const sortedData = sortDMItem(filteredDataDM);
-		setSortedFilteredDataDM(sortedData);
-		if (sortedData.length === 0) {
+		if (sortedFilteredDataDM.length === 0) {
 			navigate('/chat/direct/friends');
 		}
-	}, [dmGroupChatList]);
+	}, [sortedFilteredDataDM, navigate]);
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const onClickOpenModal = () => {

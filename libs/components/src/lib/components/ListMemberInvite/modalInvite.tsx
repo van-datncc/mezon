@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import ListMemberInvite from '.';
 import Modal from '../../../../../ui/src/lib/Modal';
 
-const expireAfter = ['30 minutes', '1 hour', '6 hours', '12 hours', '1 day', '7 day', 'Never'];
+const expireAfter = ['30 minutes', '1 hour', '6 hours', '12 hours', '1 day', '7 days', 'Never'];
 
 const maxNumberofUses = ['No limit', '1 use', '5 uses', '10 uses', '25 uses', '50 uses', '100 uses'];
 
