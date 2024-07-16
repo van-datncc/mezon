@@ -18,16 +18,16 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 		onSettingProfile('Profiles');
 	};
 
-	const getColor = async () => {
-		if (!checkUrl) {
-			const colorImg = await getColorAverageFromURL(urlImg);
-			if (colorImg) setColor(colorImg);
-		}
-	};
-
 	useEffect(() => {
+		const getColor = async () => {
+			if (!checkUrl) {
+				const colorImg = await getColorAverageFromURL(urlImg);
+				if (colorImg) setColor(colorImg);
+			}
+		};
+
 		getColor();
-	}, [urlImg]);
+	}, [checkUrl, urlImg]);
 
 	return (
 		<div

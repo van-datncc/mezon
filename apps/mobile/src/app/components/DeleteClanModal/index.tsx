@@ -1,6 +1,6 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
-import { clansActions, getStoreAsync, selectAllClans, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
+import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaultChannelLoader } from '@mezon/mobile-components';
+import { channelsActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -27,6 +27,8 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange }: { isVisibleModal: bo
 		store.dispatch(clansActions.joinClan({ clanId: clans?.[0]?.clan_id }));
 		save(STORAGE_CLAN_ID, clans?.[0]?.clan_id);
 		store.dispatch(clansActions.changeCurrentClan({ clanId: clans[0]?.clan_id }));
+		const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clans[0]?.clan_id, noCache: true }));
+		await setDefaultChannelLoader(respChannel.payload, clans[0]?.clan_id);
 	};
 
 	const onCancel = () => {
