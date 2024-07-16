@@ -27,8 +27,8 @@ const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
         </p>
       </div>
       <div className={'flex flex-col w-full'}>
-        {emojiList.map((emoji, index) => (
-          <SettingEmojiItem emoji={emoji} key={index} />
+        {emojiList.map((emoji) => (
+          <SettingEmojiItem emoji={emoji} key={emoji.id} />
         ))}
       </div>
     </div>
