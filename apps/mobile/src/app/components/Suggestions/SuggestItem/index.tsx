@@ -1,7 +1,6 @@
 import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
-import { Image, View } from 'react-native';
-import { Text } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { styles as s } from './SuggestItem.styles';
 

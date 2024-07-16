@@ -1,4 +1,4 @@
-import { ForwardMessageModal, MessageModalImage, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
+import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
 	selectAllClans,
@@ -18,7 +18,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
-import { MessageContextMenuProvider } from '../channel/ContextMenu/MessageContextMenuContext';
 import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
 function MyApp() {
@@ -144,7 +143,10 @@ function MyApp() {
 				onClick={handleMenu}
 				id="menu"
 			>
-				<NavLink to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : "/chat/direct/friends"} onClick={() => setMode('dm')}>
+				<NavLink
+					to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
+					onClick={() => setMode('dm')}
+				>
 					<NavLinkComponent active={pathName.includes('direct')} clanName="Direct Messages">
 						<div>
 							<Image

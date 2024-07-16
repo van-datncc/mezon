@@ -1,16 +1,15 @@
 import {
-	directActions,
-	messagesActions,
-	selectCurrentClanId,
-	selectDirectById,
-	useAppDispatch,
+    directActions,
+    messagesActions,
+    selectDirectById,
+    useAppDispatch
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
+import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
-import { ApiMessageMention, ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import { useChatMessages } from './useChatMessages';
 import { useSelector } from 'react-redux';
+import { useChatMessages } from './useChatMessages';
 
 export type UseDirectMessagesOptions = {
 	channelId: string;

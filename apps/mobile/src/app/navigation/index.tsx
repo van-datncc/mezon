@@ -1,17 +1,16 @@
+import { CreateMezonClientOptions, MezonContextProvider } from '@mezon/transport';
 import React from 'react';
-import { CreateMezonClientOptions, MezonContextProvider } from "@mezon/transport";
-import RootNavigation from "./RootNavigator";
+import RootNavigation from './RootNavigator';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-import { NX_CHAT_APP_API_HOST } from '@env';
 import { I18nextProvider } from 'react-i18next';
 // @ts-ignore
 import i18n from '@mezon/translations';
+import * as Sentry from '@sentry/react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import 'react-native-svg';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import * as Sentry from '@sentry/react-native';
-import 'react-native-svg'
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
@@ -43,7 +42,6 @@ const App = () => {
 				</MezonContextProvider>
 			</I18nextProvider>
 		</SafeAreaProvider>
-
 	);
 };
 

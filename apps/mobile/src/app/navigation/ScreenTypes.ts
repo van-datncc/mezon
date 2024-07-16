@@ -1,5 +1,5 @@
 import { OptionEvent } from "@mezon/utils";
-import { CompositeNavigationProp, CompositeScreenProps, NavigatorScreenParams, ParamListBase } from "@react-navigation/native";
+import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackScreenProps } from "@react-navigation/stack";
 
@@ -62,7 +62,12 @@ export const APP_SCREEN = {
     CREATE_EVENT_DETAILS: 'ROUTES.MENU_CLAN.CREATE_EVENT_DETAILS',
     CREATE_EVENT_PREVIEW: 'ROUTES.MENU_CLAN.CREATE_EVENT_PREVIEW',
     SETTINGS: 'ROUTES.MENU_CLAN.SETTINGS',
-    OVERVIEW_SETTING: 'ROUTES.MENU_CLAN.OVERVIEW_SETTING'
+    OVERVIEW_SETTING: 'ROUTES.MENU_CLAN.OVERVIEW_SETTING',
+    ROLE_SETTING: 'ROUTES.MENU_CLAN.ROLE_SETTING',
+    CREATE_NEW_ROLE: 'ROUTES.MENU_CLAN.CREATE_NEW_ROLE',
+    SETUP_ROLE_MEMBERS: 'ROUTES.MENU_CLAN.SETUP_ROLE_MEMBERS',
+    SETUP_PERMISSIONS: 'ROUTES.MENU_CLAN.SETUP_PERMISSIONS',
+    ROLE_DETAIL: 'ROUTES.MENU_CLAN.ROLE_DETAIL',
   },
 
   MENU_CHANNEL: {
@@ -128,11 +133,14 @@ type MenuClanStackParamList = {
   [APP_SCREEN.MENU_CLAN.CREATE_CHANNEL]: {
     categoryId: string;
   };
-  [APP_SCREEN.MENU_CLAN.CREATE_EVENT]: undefined
+  [APP_SCREEN.MENU_CLAN.CREATE_EVENT]: {
+    onGoBack?: () => void;
+  }
   [APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS]: {
     type: OptionEvent;
     channelId: string;
-    location: string
+    location: string;
+    onGoBack?: () => void;
   }
   [APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW]: {
     type: OptionEvent;
@@ -143,9 +151,21 @@ type MenuClanStackParamList = {
     title: string;
     description: string;
     frequency: number;
+    onGoBack?: () => void;
   }
   [APP_SCREEN.MENU_CLAN.SETTINGS]: undefined;
   [APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING]: undefined;
+  [APP_SCREEN.MENU_CLAN.ROLE_SETTING]: undefined;
+  [APP_SCREEN.MENU_CLAN.CREATE_NEW_ROLE]: undefined;
+  [APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS]: {
+    roleId: string
+  };
+  [APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS]: {
+    roleId: string
+  };
+  [APP_SCREEN.MENU_CLAN.ROLE_DETAIL]: {
+    roleId: string
+  };
 };
 
 type SettingStackParamList = {

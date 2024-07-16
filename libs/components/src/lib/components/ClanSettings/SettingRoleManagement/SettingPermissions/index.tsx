@@ -21,7 +21,7 @@ export type ModalSettingSave = {
 	handleSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
-const SettingPermissions = ({RolesClan}:{RolesClan: RolesClanEntity[]}) => {
+const SettingPermissions = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
 	const dispatch = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const { permissionsDefault } = useUserPolicy(currentClan?.id || '');

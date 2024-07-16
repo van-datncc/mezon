@@ -1,6 +1,16 @@
 import { Icons } from '@mezon/components';
 import { useFriends, useMenu } from '@mezon/core';
-import { FriendsEntity, RootState, channelsActions, friendsActions, requestAddFriendParam, selectCloseMenu, selectMemberStatus, selectStatusMenu, useAppDispatch } from '@mezon/store';
+import {
+	FriendsEntity,
+	RootState,
+	channelsActions,
+	friendsActions,
+	requestAddFriendParam,
+	selectCloseMenu,
+	selectMemberStatus,
+	selectStatusMenu,
+	useAppDispatch,
+} from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';

@@ -19,7 +19,7 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
 	const checkImage = notImplementForGifOrStickerSendFromPanel(attachmentData);
-	const { setImageURL,setPositionShow } = useMessageContextMenu();
+	const { setImageURL, setPositionShow } = useMessageContextMenu();
 
 	const handleClick = (url: string) => {
 		if (!isDimensionsValid && !checkImage) {
@@ -43,7 +43,7 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 	const handleContextMenu = useCallback(() => {
 		setImageURL(attachmentData?.url ?? '');
 		onContextMenu;
-		setPositionShow(SHOW_POSITION.NONE)
+		setPositionShow(SHOW_POSITION.NONE);
 	}, [attachmentData?.url]);
 
 	if (imageError || !attachmentData.url) {

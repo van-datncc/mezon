@@ -1,6 +1,14 @@
 import { Icons } from '@mezon/components';
 import { useRoles } from '@mezon/core';
-import { RolesClanEntity, UsersClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import {
+	RolesClanEntity,
+	UsersClanEntity,
+	getNewAddMembers,
+	getSelectedRoleId,
+	selectAllUsesClan,
+	selectCurrentClan,
+	setAddMemberRoles,
+} from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -93,12 +101,16 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 						<div className="overflow-y-auto">
 							<ul className="flex flex-col gap-y-[5px] max-h-[200px] font-light text-sm ">
 								{searchResults.map((permission) => (
-									<li key={permission.id} >
-										<label htmlFor={permission.id} className='w-full inline-flex justify-between items-center'>
-											<div className='inline-flex gap-x-2'>
-												<img src={permission?.user?.avatar_url} alt={permission?.user?.display_name} className='size-6 object-cover rounded-full'/>
+									<li key={permission.id}>
+										<label htmlFor={permission.id} className="w-full inline-flex justify-between items-center">
+											<div className="inline-flex gap-x-2">
+												<img
+													src={permission?.user?.avatar_url}
+													alt={permission?.user?.display_name}
+													className="size-6 object-cover rounded-full"
+												/>
 												<p>{permission?.user?.display_name}</p>
-												<p className='text-contentTertiary'>{permission?.user?.username}</p>
+												<p className="text-contentTertiary">{permission?.user?.username}</p>
 											</div>
 											<input
 												id={permission.id}

@@ -1,7 +1,7 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
-import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { IChannelMember, IMessageWithUser, MouseButton } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from './useMessageParser';
@@ -29,7 +29,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 	const [positionBottom, setPositionBottom] = useState(false);
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		if (event.button === 0) {
+		if (event.button === MouseButton.LEFT) {
 			setIsShowPanelChannel(true);
 			const clickY = event.clientY;
 			const windowHeight = window.innerHeight;
@@ -73,7 +73,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 		};
 	}, [positionLeft]);
 
-	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999',[message?.sender_id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999', [message?.sender_id]);
 
 	if (isCombine && message.references?.length === 0 && !isShowFull) {
 		return <></>;
@@ -87,7 +87,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 					ref={panelRef}
 					onMouseDown={(event) => handleMouseClick(event)}
 					role="button"
-					style={{letterSpacing: "-0.02rem"}}
+					style={{ letterSpacing: '-0.02rem' }}
 				>
 					{clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 				</div>
@@ -105,7 +105,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode}/>
+					<ShortUserProfile userID={user?.user?.id || ''} message={message} mode={mode} />
 				</div>
 			)}
 		</div>

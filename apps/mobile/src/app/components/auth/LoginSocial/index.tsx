@@ -28,4 +28,3 @@ const LoginSocial = ({ onGoogleButtonPress, onAppleButtonPress }: any) => {
 };
 
 export default LoginSocial;
-

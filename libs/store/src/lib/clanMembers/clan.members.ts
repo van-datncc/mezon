@@ -1,6 +1,6 @@
-import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { IUsersClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ClanUserListClanUser } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const USERS_CLANS_FEATURE_KEY = 'usersClan';
 

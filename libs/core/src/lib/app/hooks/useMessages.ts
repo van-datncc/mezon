@@ -1,8 +1,6 @@
-import { selectQuantitiesMessageRemain } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { reactionActions } from '@mezon/store';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 type MessageProps = {
 	chatRef: React.RefObject<HTMLDivElement>;
