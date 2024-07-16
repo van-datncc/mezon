@@ -18,7 +18,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
@@ -56,12 +56,19 @@ const NavigationMain = () => {
 	const { reconnect } = useMezon();
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useDispatch();
+	const timerRef = useRef<any>();
 
 	useEffect(() => {
+		let timer;
 		if (isLoggedIn) {
 			dispatch(appActions.setLoadingMainMobile(true));
-			delay(initAppLoading, 800);
+			timer = delay(initAppLoading, 800);
 		}
+
+		return () => {
+			timer && clearTimeout(timer);
+			timerRef?.current && clearTimeout(timerRef.current);
+		};
 	}, [isLoggedIn]);
 
 	useEffect(() => {
@@ -92,7 +99,7 @@ const NavigationMain = () => {
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			delay(reconnect, 1200);
+			timerRef.current = delay(reconnect, 1200);
 			await notifee.cancelAllNotifications();
 		}
 		if (state === 'background') {

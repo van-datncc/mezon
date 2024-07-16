@@ -9,11 +9,12 @@ import {
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectIsFromFCMMobile,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { delay } from 'lodash';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
@@ -64,8 +65,10 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 const HomeScreen = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const dispatch = useDispatch();
 	const { sessionRef } = useMezon();
+	const timerRef = useRef<any>();
 
 	useCheckUpdatedVersion();
 
@@ -74,20 +77,22 @@ const HomeScreen = React.memo((props: any) => {
 			if (state === 'active') {
 				dispatch(appActions.setLoadingMainMobile(true));
 			}
-			delay(handleAppStateChange, 800, state);
+			timerRef.current = delay(handleAppStateChange, 800, state);
 		});
 
 		return () => {
 			appStateSubscription.remove();
+			timerRef?.current && clearTimeout(timerRef.current);
 		};
-	}, [currentClan, currentChannelId]);
+	}, [currentClan, currentChannelId, isFromFcmMobile]);
 
 	const handleAppStateChange = async (state: string) => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-		if (isFromFCM?.toString() === 'true') {
+		if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 			dispatch(appActions.setLoadingMainMobile(false));
+			return;
 		}
-		if (state === 'active' && isFromFCM?.toString() !== 'true') {
+		if (state === 'active' && isFromFCM?.toString() !== 'true' && !isFromFcmMobile) {
 			await messageLoader();
 		}
 	};
