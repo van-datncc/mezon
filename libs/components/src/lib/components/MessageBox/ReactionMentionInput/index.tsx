@@ -141,7 +141,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { mentions } = useMessageLine(content);
 	const usersClan = useSelector(selectAllUsesClan);
-	const { rawMembers } = useChannelMembers({ channelId: currentChannel?.channel_id as string });
 	const { emojis } = useEmojiSuggestion();
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 	const reactionRightState = useSelector(selectReactionRightState);
@@ -202,6 +201,31 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
+	const addMemberToChannel = useCallback(async (
+		currentChannel: ChannelsEntity | null,
+		mentions: ILineMention[],
+		userClans: UsersClanEntity[],
+		members: ChannelMembersEntity[],
+	) => {
+		const userIds = uniqueUsers(mentions, userClans, members);
+		const body = {
+			channelId: currentChannel?.channel_id as string,
+			channelType: currentChannel?.type,
+			userIds: userIds,
+		};
+		if (userIds.length > 0) {
+			await dispatch(channelUsersActions.addChannelUsers(body));
+		}
+	}, [dispatch]);
+
+
+	const editorRef = useRef<HTMLInputElement | null>(null);
+	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
+	const openEditMessageState = useSelector(selectOpenEditMessageState);
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
+
+
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
@@ -240,7 +264,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					anonymousMessage,
 					mentionEveryone,
 				);
-				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
+				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setValueTextInput('', props.isThread);
 				setAttachmentData([]);
 				dispatch(referencesActions.setIdReferenceMessageReply(''));
@@ -274,7 +298,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						mentionEveryone,
 					);
 				}
-				addMemberToChannel(currentChannel, mentions, usersClan, rawMembers);
+				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setValueTextInput('', props.isThread);
 				setMentionEveryone(false);
 				setAttachmentData([]);
@@ -287,38 +311,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
 		},
-		[
-			valueTextInput,
-			attachmentDataRef,
-			mentionData,
-			nameValueThread,
-			currentChannel,
-			threadCurrentChannel,
-			mentions,
-			isPrivate,
-			content,
-			getRefMessageReply,
-			dataReferences,
-			openThreadMessageState,
-		],
+		[valueTextInput, attachmentDataRef, mentionData, nameValueThread, props, threadCurrentChannel, openThreadMessageState, getRefMessageReply, dataReferences, openReplyMessageState, dispatch, setSubPanelActive, content, isPrivate, mentionEveryone, addMemberToChannel, currentChannel, mentions, usersClan, members, setValueTextInput, setAttachmentData, setDataReferences, currentChannelId, valueThread?.content.t, valueThread?.mentions, valueThread?.attachments, valueThread?.references, setOpenThreadMessageState],
 	);
-
-	const addMemberToChannel = async (
-		currentChannel: ChannelsEntity | null,
-		mentions: ILineMention[],
-		userClans: UsersClanEntity[],
-		members: ChannelMembersEntity[],
-	) => {
-		const userIds = uniqueUsers(mentions, userClans, members);
-		const body = {
-			channelId: currentChannel?.channel_id as string,
-			channelType: currentChannel?.type,
-			userIds: userIds,
-		};
-		if (userIds.length > 0) {
-			await dispatch(channelUsersActions.addChannelUsers(body));
-		}
-	};
 
 	const mentionedUsers: UserMentionsOpt[] = [];
 
@@ -349,18 +343,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [props.mode, commonChannelVoids]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		const mentionList =
-			members[0].users?.map((item: ChannelMembersEntity) => ({
-				id: item?.user?.id ?? '',
-				display: item?.user?.username ?? '',
-				avatarUrl: item?.user?.avatar_url ?? '',
-			})) ?? [];
-		const convertedMentions: UserMentionsOpt[] = mentionList
-			? mentionList.map((mention) => ({
-					user_id: mention.id.toString() ?? '',
-					username: mention.display ?? '',
-				}))
-			: [];
 
 		dispatch(threadsActions.setMessageThreadError(''));
 		setValueTextInput(newValue, props.isThread);
@@ -401,11 +383,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
-	const editorRef = useRef<HTMLInputElement | null>(null);
-	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
-	const openEditMessageState = useSelector(selectOpenEditMessageState);
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
+
 
 	const handleChangeNameThread = (nameThread: string) => {
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));

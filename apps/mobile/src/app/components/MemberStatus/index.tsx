@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useChannelMembers } from '@mezon/core';
+import { useChannelMembersOnlineStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity } from '@mezon/store-mobile';
@@ -27,7 +27,7 @@ export const MemberListStatus = React.memo(() => {
 	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
-	const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannel?.id });
+	const { onlineMembers, offlineMembers } = useChannelMembersOnlineStatus({ channelId: currentChannel?.id });
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
 	const { t } = useTranslation();
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
