@@ -104,6 +104,7 @@ const NavigationMain = () => {
 		}
 		if (state === 'background') {
 			await remove(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 
