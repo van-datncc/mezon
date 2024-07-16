@@ -16,7 +16,7 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 			return [];
 		}
 
-		const userMentionRaw = members[0].users;
+		const userMentionRaw = members;
 		const mentionList =
 			userMentionRaw?.map((item: ChannelMembersEntity) => ({
 				id: item?.user?.id ?? '',
@@ -39,7 +39,7 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 		} else {
 			return [...sortedMentionList, hardcodedUser];
 		}
-	}, [members]);
+	}, [channelMode, members]);
 
 	return newUserMentionList;
 }

@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useChannelMembers } from '@mezon/core';
+import { useChannelMembersOnlineStatus } from '@mezon/core';
 import { AddMemberIcon, AngleRightIcon, ChevronIcon, UserGroupIcon } from '@mezon/mobile-components';
 import { DirectEntity } from '@mezon/store-mobile';
 import { ChannelMembersEntity } from '@mezon/utils';
@@ -24,7 +24,7 @@ enum EActionButton {
 export const MemberListStatus = React.memo(() => {
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
-	const { onlineMembers, offlineMembers } = useChannelMembers({ channelId: currentChannel?.id });
+	const { onlineMembers, offlineMembers } = useChannelMembersOnlineStatus({ channelId: currentChannel?.id });
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
 	const { t } = useTranslation();
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
