@@ -1,21 +1,22 @@
-import { Colors, Fonts, Metrics } from "@mezon/mobile-ui";
+import { Attributes, baseColor, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
+
     container: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.secondary,
         padding: Metrics.size.l,
         borderRadius: 10,
         marginBottom: Metrics.size.xl
     },
     title: {
-        color: Colors.white,
+        color: colors.textStrong,
         fontSize: Fonts.size.h8,
         fontWeight: "bold",
 
     },
     value: {
-        color: Colors.gray72,
+        color: colors.textDisabled,
         fontSize: Fonts.size.h8,
     },
     header: {
@@ -25,18 +26,16 @@ const styles = StyleSheet.create({
         paddingBottom: Metrics.size.l
     },
     thumb: {
-        backgroundColor: Colors.white,
+        backgroundColor: baseColor.blurple,
         height: 25,
         width: 25,
         borderRadius: 15,
     },
     track: {
-        backgroundColor: Colors.gray72,
+        backgroundColor: baseColor.gray,
         height: 4
     },
     miniTrack: {
-        backgroundColor: Colors.green
+        backgroundColor: baseColor.blurple
     }
 })
-
-export default styles;
