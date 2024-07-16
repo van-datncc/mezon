@@ -8,7 +8,7 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { debounce } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
+import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
 import { Keyboard, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EmojiSelector from './EmojiSelector';
@@ -57,7 +57,6 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 
 	const { sendMessage } = useChatSending({
 		channelId: currentDirectMessage?.channel_id || currentChannel?.id || '',
-		channelLabel: currentDirectMessage?.channel_label || currentChannel?.channel_label || '',
 		mode: dmMode || channelMode,
 	});
 

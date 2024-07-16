@@ -1,6 +1,6 @@
-import { Client, Session } from 'mezon-js';
 import { MezonContextValue } from '@mezon/transport';
 import { AsyncThunkConfig, GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
+import { Client, Session } from 'mezon-js';
 import { GetThunkAPIWithMezon } from './typings';
 
 export const getMezonCtx = (thunkAPI: GetThunkAPI<AsyncThunkConfig>) => {

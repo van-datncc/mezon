@@ -21,26 +21,6 @@ const TableMember = () => {
             userId={user.id}
           />
         ))}
-        {usersClan.map ((user) => (
-          <TableMemberItem
-            key={user.id}
-            name={user.user?.username ?? ''}
-            avatar={user.user?.avatar_url ?? ''}
-            discordJoinTime={getTimeDifferenceDate (user.user?.create_time || '')}
-            clanJoinTime={user.user?.join_time}
-            userId={user.id}
-          />
-        ))}
-        {usersClan.map ((user) => (
-          <TableMemberItem
-            key={user.id}
-            name={user.user?.username ?? ''}
-            avatar={user.user?.avatar_url ?? ''}
-            discordJoinTime={getTimeDifferenceDate (user.user?.create_time || '')}
-            clanJoinTime={user.user?.join_time}
-            userId={user.id}
-          />
-        ))}
       </div>
     </div>
   );

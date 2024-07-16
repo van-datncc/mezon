@@ -8,8 +8,7 @@ import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@
 import { ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Text } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MuteThreadDetailModal from '../../../components/MuteThreadDetailModal';
 import CreateThreadModal from '../../../components/ThreadDetail';
@@ -90,14 +89,17 @@ export const MenuThreadDetailStacks = ({}: any) => {
 											)}
 										</View>
 									)}
-									<Text style={{ color: Colors.white, fontSize: size.h6 , fontWeight: '700'}}>
+									<Text style={{ color: Colors.white, fontSize: size.h6, fontWeight: '700' }}>
 										{openThreadMessageState ? 'New Thread' : currentChannel?.channel_label}
 									</Text>
 									<AngleRight width={14} height={14} style={{ marginLeft: size.s_10 }}></AngleRight>
 								</View>
 								{openThreadMessageState && (
-									<Text  numberOfLines={1} style={{ color: Colors.textGray, fontSize: size.medium, fontWeight: '400', maxWidth: '90%'}}>
-									{currentChannel?.channel_label}
+									<Text
+										numberOfLines={1}
+										style={{ color: Colors.textGray, fontSize: size.medium, fontWeight: '400', maxWidth: '90%' }}
+									>
+										{currentChannel?.channel_label}
 									</Text>
 								)}
 							</View>

@@ -2,6 +2,7 @@ import { UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
 import { IMessageWithUser, MentionDataProps } from '@mezon/utils';
+import CustomModalMentions from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/CustomModalMentions';
 import SuggestItem from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/SuggestItem';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -11,7 +12,6 @@ import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import { useEditMessage } from './useEditMessage';
-import CustomModalMentions from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/CustomModalMentions';
 
 type MessageInputProps = {
 	messageId: string;
@@ -198,7 +198,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 								<SuggestItem
 									name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
 									avatarUrl={suggestion.avatarUrl ?? ''}
-									subText={suggestion.display === 'here' ? 'Notify everyone who has permission to see this channel' : suggestion.display  ?? ''}
+									subText={
+										suggestion.display === 'here'
+											? 'Notify everyone who has permission to see this channel'
+											: suggestion.display ?? ''
+									}
 									subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== 'here'}
 								/>

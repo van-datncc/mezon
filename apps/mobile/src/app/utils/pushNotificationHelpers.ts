@@ -1,10 +1,11 @@
 import {
 	STORAGE_CLAN_ID,
-	STORAGE_IS_FROM_FCM,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	getUpdateOrAddClanChannelCache,
 	load,
 	save,
+	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
@@ -151,9 +152,6 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 };
 
 const jumpChannelOnNotification = async (store: any, channelId: string, clanId: string) => {
-	const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-	save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-	// store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: channelId }));
 	store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	store.dispatch(appActions.setLoadingMainMobile(false));
 };
@@ -169,21 +167,19 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				navigation.navigate(APP_SCREEN.HOME as never);
 				navigation.dispatch(DrawerActions.closeDrawer());
 			}
-			const clanIdCache = load(STORAGE_CLAN_ID);
 			const clanId = linkMatch[1];
-			const isDifferentClan = clanIdCache !== clanId;
 			const channelId = linkMatch[2];
-			if (isDifferentClan) {
-				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				save(STORAGE_CLAN_ID, clanId);
-				store.dispatch(clansActions.joinClan({ clanId: clanId }));
-				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
-			}
-			delay(jumpChannelOnNotification, isDifferentClan ? 2000 : 500, store, channelId, clanId);
+			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			save(STORAGE_CLAN_ID, clanId);
+			store.dispatch(clansActions.joinClan({ clanId: clanId }));
+			store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
+			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
+			await setDefaultChannelLoader(respChannel, clanId);
+			delay(jumpChannelOnNotification, 500, store, channelId, clanId);
 			delay(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
-				save(STORAGE_IS_FROM_FCM, false);
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 			}, 4000);
 		} else {
 			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
@@ -196,7 +192,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				delay(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
-					save(STORAGE_IS_FROM_FCM, false);
+					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
@@ -208,7 +204,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				delay(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
-					save(STORAGE_IS_FROM_FCM, false);
+					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
 			}
 		}
@@ -219,14 +215,14 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		store.dispatch(appActions.setLoadingMainMobile(false));
 		delay(() => {
 			store.dispatch(appActions.setIsFromFCMMobile(false));
-			save(STORAGE_IS_FROM_FCM, false);
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 		}, 4000);
 	}
 };
 
 const processNotification = async ({ notification, navigation, time = 0 }) => {
 	const store = await getStoreAsync();
-	save(STORAGE_IS_FROM_FCM, true);
+	save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {

@@ -1,13 +1,26 @@
 import { useReference } from '@mezon/core';
-import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
+import { CameraIcon, CheckIcon, PlayIcon, save, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, Image, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { delay } from 'lodash';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {
+	Alert,
+	FlatList,
+	Image,
+	Linking,
+	PermissionsAndroid,
+	Platform,
+	Text,
+	TouchableOpacity,
+	View
+} from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
 import { styles } from './styles';
+import {appActions} from "@mezon/store";
+import {useDispatch} from "react-redux";
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
 }
@@ -23,9 +36,10 @@ const Gallery = ({ onPickGallery }: IProps) => {
 	const [photos, setPhotos] = useState([]);
 	const [pageInfo, setPageInfo] = useState(null);
 	const [loading, setLoading] = useState(false);
-	const [permissionGranted, setPermissionGranted] = useState(false);
 	const { attachmentDataRef, setAttachmentData } = useReference();
-
+	const dispatch = useDispatch();
+	const timerRef = useRef<any>();
+	
 	const attachmentsFileName = useMemo(() => {
 		if (!attachmentDataRef?.length) return [];
 		return attachmentDataRef.map((attachment) => attachment.filename);
@@ -33,28 +47,46 @@ const Gallery = ({ onPickGallery }: IProps) => {
 
 	useEffect(() => {
 		checkAndRequestPermissions();
+		
+		return () => {
+			timerRef?.current && clearTimeout(timerRef.current);
+		}
 	}, []);
 
 	const checkAndRequestPermissions = async () => {
 		const hasPermission = await requestPermission();
-		setPermissionGranted(hasPermission);
 		if (hasPermission) {
 			loadPhotos();
 		} else {
-			Alert.alert('Permission Denied', 'App needs access to your came podra roll to function properly.');
+			await requestPermission();
 		}
 	};
 
 	const requestPermission = async () => {
 		if (Platform.OS === 'android') {
-			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE, {
-				title: 'Permission to access camera roll',
-				message: 'App needs access to your camera roll',
-				buttonPositive: 'OK',
-			});
+			dispatch(appActions.setIsFromFCMMobile(true));
+			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+			timerRef.current = delay(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
+			if (granted === 'never_ask_again') {
+				Alert.alert('Photo Permission', 'App needs access to your photo library', [
+					{
+						text: 'Cancel',
+						style: 'cancel',
+					},
+					{
+						text: 'OK',
+						onPress: () => {
+							openAppSettings();
+						},
+					},
+				])
+			}
+			
 			return granted === PermissionsAndroid.RESULTS.GRANTED;
 		} else if (Platform.OS === 'ios') {
+			dispatch(appActions.setIsFromFCMMobile(true));
 			const result = await iosReadGalleryPermission('addOnly');
+			timerRef.current = delay(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
 			if (result === 'not-determined') {
 				const requestResult = await iosRequestReadWriteGalleryPermission();
 				return requestResult === 'granted' || requestResult === 'limited';
@@ -62,6 +94,14 @@ const Gallery = ({ onPickGallery }: IProps) => {
 			return result === 'granted' || result === 'limited';
 		}
 		return false;
+	};
+	
+	const openAppSettings = () => {
+		if (Platform.OS === 'ios') {
+			Linking.openURL('app-settings:');
+		} else {
+			Linking.openSettings();
+		}
 	};
 
 	const loadPhotos = async (after = null) => {
@@ -214,21 +254,15 @@ const Gallery = ({ onPickGallery }: IProps) => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			{permissionGranted ? (
-				<FlatList
-					data={[{ isUseCamera: true }, ...photos]}
-					renderItem={renderItem}
-					keyExtractor={(item, index) => `${index.toString()}_gallery`}
-					numColumns={3}
-					onEndReached={handleLoadMore}
-					onEndReachedThreshold={0.5}
-					ListFooterComponent={() => loading && <Text>Loading...</Text>}
-				/>
-			) : (
-				<View style={styles.wrapperRequesting}>
-					<Text style={styles.titleRequesting}>Requesting permission to access photos...</Text>
-				</View>
-			)}
+			<FlatList
+				data={[{ isUseCamera: true }, ...photos]}
+				renderItem={renderItem}
+				keyExtractor={(item, index) => `${index.toString()}_gallery`}
+				numColumns={3}
+				onEndReached={handleLoadMore}
+				onEndReachedThreshold={0.5}
+				ListFooterComponent={() => loading && <Text>Loading...</Text>}
+			/>
 		</View>
 	);
 };

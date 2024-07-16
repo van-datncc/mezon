@@ -52,7 +52,7 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 			<div className="ChannelChat w-6 h-6 relative">{iconMap[type as ChannelType]}</div>
 			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex ">
 				<div className="Text self-stretch text-stone-300 text-sm font-bold leading-normal text-[10px]">
-					<p className='dark:text-white text-black'>{labelMap[type as ChannelType]}</p>
+					<p className="dark:text-white text-black">{labelMap[type as ChannelType]}</p>
 				</div>
 				<div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-zinc-400 text-sm font-normal leading-[18.20px] text-[10px] w-widthChannelTypeText">
 					<p className="one-line dark:text-white text-black">{descriptionMap[type as ChannelType]}</p>

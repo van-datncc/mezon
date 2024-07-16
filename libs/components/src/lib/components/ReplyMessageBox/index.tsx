@@ -1,4 +1,10 @@
-import { referencesActions, selectIdMessageRefReply, selectMemberByUserId, selectMessageByMessageId, selectOpenReplyMessageState } from '@mezon/store';
+import {
+	referencesActions,
+	selectIdMessageRefReply,
+	selectMemberByUserId,
+	selectMessageByMessageId,
+	selectOpenReplyMessageState,
+} from '@mezon/store';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons/index';
 

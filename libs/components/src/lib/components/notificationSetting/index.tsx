@@ -232,7 +232,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 					<div className="text-sm font-normal dark:text-textSecondary text-textSecondary800 mb-2">
 						Add a channel to override its default notification settings
 					</div>
-					<div className={appearanceTheme === 'dark' ? "" : "lightModeScrollBarMention"}>
+					<div className={appearanceTheme === 'dark' ? '' : 'lightModeScrollBarMention'}>
 						<Creatable
 							isClearable
 							onChange={handleChange}

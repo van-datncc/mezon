@@ -1,4 +1,4 @@
-import { Attributes, Colors, Fonts, Metrics } from "@mezon/mobile-ui";
+import { Attributes, Fonts, Metrics } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -31,7 +31,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     feedSection: {
-        marginBottom: Metrics.size.xl
+        flexBasis: 10,
+        flexGrow: 1
     },
 
     inlineSec: {
@@ -41,5 +42,10 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     section: {
         gap: Metrics.size.m
+    },
+
+    btnWrapper: {
+        paddingVertical: Metrics.size.xl,
+        backgroundColor: colors.primary
     }
 })

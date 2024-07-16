@@ -2,12 +2,12 @@ import { useAccount } from '@mezon/core';
 import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, selectTheme, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
+import { fileTypeImage, resizeFileImage } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
-import { fileTypeImage, resizeFileImage } from '@mezon/utils';
+import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
 
 const SettingRightUser = ({
 	onClanProfileClick,
@@ -58,7 +58,7 @@ const SettingRightUser = ({
 		const sizeImage = file?.size;
 		const session = sessionRef.current;
 		const client = clientRef.current;
-		const imageAvatarResize = await resizeFileImage(file, 120, 120, 'file', 80, 80) as File;
+		const imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
 		if (!file) return;
 		if (!client || !session) {
 			throw new Error('Client or file is not initialized');
@@ -164,7 +164,7 @@ const SettingRightUser = ({
 						</div>
 						<div className="mt-[30px] w-full">
 							<textarea
-								className={`dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full outline-none ${appearanceTheme === "light" ? "customScrollLightMode" : ""}`}
+								className={`dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full outline-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 								onChange={(e) => {
 									onchangeAboutUser(e);
 								}}
@@ -186,9 +186,9 @@ const SettingRightUser = ({
 				</div>
 			</div>
 			{(urlImage !== avatar && flags) ||
-				(displayName !== nameDisplay && flags) ||
-				(flagsRemoveAvartar !== false && flags) ||
-				(editAboutUser !== aboutMe && flags) ? (
+			(displayName !== nameDisplay && flags) ||
+			(flagsRemoveAvartar !== false && flags) ||
+			(editAboutUser !== aboutMe && flags) ? (
 				<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
 					<div className="flex-1 flex items-center text-nowrap">
 						<p className="text-[15px]">Carefull - you have unsaved changes!</p>

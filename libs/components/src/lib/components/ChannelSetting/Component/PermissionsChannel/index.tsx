@@ -1,12 +1,12 @@
+import { useAuth } from '@mezon/core';
+import { channelsActions, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
-import ListRolePermission from './listRolePermission';
 import ListMemberPermission from './listMemberPermission';
-import { channelsActions, useAppDispatch } from '@mezon/store';
-import { useAuth } from '@mezon/core';
+import ListRolePermission from './listRolePermission';
 export type PermissionsChannelProps = {
 	channel: IChannel;
 };
@@ -25,15 +25,22 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	};
 
 	const handleReset = () => {
-		setSelectedRoleIds([])
-		setSelectedUserIds([])
+		setSelectedRoleIds([]);
+		setSelectedUserIds([]);
 		setValueToggle(valueToggleInit);
 	};
 
 	const handleSave = async () => {
 		setValueToggleInit(valueToggle);
 		const updatedUserIds = userProfile?.user?.id ? [...selectedUserIds, userProfile.user.id] : selectedUserIds;
-		await dispatch(channelsActions.updateChannelPrivate({ channel_id: channel.id, channel_private: channel.channel_private || 0, user_ids: updatedUserIds, role_ids: selectedRoleIds }));
+		await dispatch(
+			channelsActions.updateChannelPrivate({
+				channel_id: channel.id,
+				channel_private: channel.channel_private || 0,
+				user_ids: updatedUserIds,
+				role_ids: selectedRoleIds,
+			}),
+		);
 	};
 
 	const openAddMemRoleModal = () => {
@@ -116,7 +123,16 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 					<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 				)}
 			</div>
-			{showAddMemRole && <AddMemRole onClose={closeAddMemRoleModal} channel={channel} onSelectedUsersChange={handleSelectedUsersChange} onSelectedRolesChange={handleSelectedRolesChange} selectRoleIds={selectedRoleIds} selectUserIds={selectedUserIds} />}
+			{showAddMemRole && (
+				<AddMemRole
+					onClose={closeAddMemRoleModal}
+					channel={channel}
+					onSelectedUsersChange={handleSelectedUsersChange}
+					onSelectedRolesChange={handleSelectedRolesChange}
+					selectRoleIds={selectedRoleIds}
+					selectUserIds={selectedUserIds}
+				/>
+			)}
 		</>
 	);
 };

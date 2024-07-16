@@ -3,17 +3,23 @@ import {
 	accountActions,
 	appActions,
 	authActions,
+	channelsActions,
+	clansActions,
+	directActions,
 	emojiSuggestionActions,
+	friendsActions,
 	getStoreAsync,
 	initStore,
+	notificationActions,
+	selectCurrentClan,
 	selectHasInternetMobile,
 	selectIsLogin,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
@@ -25,9 +31,19 @@ import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { AppState, StatusBar } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
 // import SplashScreen from '../components/SplashScreen';
-import { STORAGE_CHANNEL_CURRENT_CACHE, remove } from '@mezon/mobile-components';
+import {
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_CLAN_ID,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
+	load,
+	remove,
+	save,
+	setCurrentClanLoader,
+	setDefaultChannelLoader,
+} from '@mezon/mobile-components';
 import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
+import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { delay } from 'lodash';
 
 const RootStack = createStackNavigator();
@@ -38,6 +54,22 @@ const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
 	const { reconnect } = useMezon();
+	const currentClan = useSelector(selectCurrentClan);
+	const dispatch = useDispatch();
+	const timerRef = useRef<any>();
+
+	useEffect(() => {
+		let timer;
+		if (isLoggedIn) {
+			dispatch(appActions.setLoadingMainMobile(true));
+			timer = delay(initAppLoading, 800);
+		}
+
+		return () => {
+			timer && clearTimeout(timer);
+			timerRef?.current && clearTimeout(timerRef.current);
+		};
+	}, [isLoggedIn]);
 
 	useEffect(() => {
 		const timer = setTimeout(async () => {
@@ -59,16 +91,24 @@ const NavigationMain = () => {
 		}
 	}, [isLoggedIn, hasInternet]);
 
+	const initAppLoading = async () => {
+		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+		await mainLoader({ isFromFCM: isFromFCM?.toString() === 'true' });
+	};
+
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			delay(reconnect, 1200);
+			timerRef.current = delay(reconnect, 1200);
 			await notifee.cancelAllNotifications();
+		}
+		if (state === 'background') {
+			await remove(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 
 	const authLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(appActions.setLoadingMainMobile(false));
 		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: '0', noCache: false }));
 		try {
 			const response = await store.dispatch(authActions.refreshSession());
@@ -85,6 +125,39 @@ const NavigationMain = () => {
 			}
 		} catch (error) {
 			console.log('Tom log  => error authLoader', error);
+		}
+	};
+
+	const mainLoader = async ({ isFromFCM = false }) => {
+		try {
+			const store = await getStoreAsync();
+			await store.dispatch(notificationActions.fetchListNotification());
+			await store.dispatch(friendsActions.fetchListFriends({}));
+			const clanResp = await store.dispatch(clansActions.fetchClans());
+			await store.dispatch(gifsActions.fetchGifCategories());
+			await store.dispatch(gifsActions.fetchGifCategoryFeatured());
+			await store.dispatch(clansActions.joinClan({ clanId: '0' }));
+
+			// If is from FCM don't join current clan
+			if (!isFromFCM) {
+				if (currentClan && currentClan?.clan_id) {
+					save(STORAGE_CLAN_ID, currentClan?.clan_id);
+					await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
+					await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
+					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: currentClan?.clan_id, noCache: true }));
+					await setDefaultChannelLoader(respChannel.payload, currentClan?.clan_id);
+				} else {
+					await store.dispatch(directActions.fetchDirectMessage({}));
+					await setCurrentClanLoader(clanResp.payload);
+				}
+			} else {
+				await store.dispatch(directActions.fetchDirectMessage({}));
+			}
+			dispatch(appActions.setLoadingMainMobile(false));
+			return null;
+		} catch (error) {
+			console.log('error mainLoader', error);
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 
@@ -127,6 +200,9 @@ const CustomStatusBar = () => {
 const RootNavigation = () => {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
+		if (!mezon) {
+			return { store: null, persistor: null };
+		}
 		return initStore(mezon, undefined);
 	}, [mezon]);
 

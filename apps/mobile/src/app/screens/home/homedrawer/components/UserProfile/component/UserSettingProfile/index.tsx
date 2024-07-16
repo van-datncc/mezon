@@ -1,6 +1,6 @@
 import { useChannelMembers } from '@mezon/core';
 import { ActionEmitEvent, ClockWarning, HammerIcon, SettingIcon, UserMinus } from '@mezon/mobile-components';
-import { Block, Colors, Text, size } from '@mezon/mobile-ui';
+import { Block, Colors, Text } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity, ClansEntity, selectCurrentClanId } from '@mezon/store-mobile';
 import { ApiAccount } from 'mezon-js/api.gen';
 import React, { useMemo, useState } from 'react';
@@ -96,11 +96,7 @@ const UserSettingProfile = ({
 					{item?.isShow ? (
 						<Block key={index} style={styles.option}>
 							{item?.icon}
-							<Text
-								style={styles.textOption}
-							>
-								{item?.label}
-							</Text>
+							<Text style={styles.textOption}>{item?.label}</Text>
 						</Block>
 					) : null}
 				</TouchableOpacity>

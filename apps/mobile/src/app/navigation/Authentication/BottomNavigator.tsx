@@ -1,5 +1,5 @@
 import { HomeTab, MessageTab, NotiTab, ProfileTab } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
@@ -17,7 +17,7 @@ const TabStack = createBottomTabNavigator();
 
 const BottomNavigator = () => {
 	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
-	const {themeValue} = useTheme();
+	const { themeValue } = useTheme();
 
 	return (
 		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
@@ -33,7 +33,7 @@ const BottomNavigator = () => {
 						borderTopColor: themeValue.border,
 					},
 					tabBarActiveTintColor: themeValue.textStrong,
-					tabBarInactiveTintColor: themeValue.textDisabled
+					tabBarInactiveTintColor: themeValue.textDisabled,
 				}}
 				initialRouteName={APP_SCREEN.DRAWER_BAR}
 			>

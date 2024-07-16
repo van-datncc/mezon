@@ -1,4 +1,4 @@
-import { Icons, MemberProfile } from '@mezon/components';
+import { MemberProfile } from '@mezon/components';
 import { useAppParams } from '@mezon/core';
 import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
@@ -12,12 +12,12 @@ export type MemberListProps = {
 
 export type DataMemberCreate = {
 	createId: string;
-}
+};
 
 function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	const { directId } = useAppParams();
 	const rawMembers = useSelector(selectMembersByChannelId(directId));
-	const dataMemberCreate: DataMemberCreate = {createId: createId || ''};
+	const dataMemberCreate: DataMemberCreate = { createId: createId || '' };
 	return (
 		<div className="self-stretch h-[268px] flex-col justify-start items-start flex p-[24px] pt-[16px] pr-[24px] pb-[16px] pl-[16px] gap-[24px]">
 			<div>

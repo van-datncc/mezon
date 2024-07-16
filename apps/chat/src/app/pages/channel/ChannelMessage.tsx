@@ -1,4 +1,4 @@
-import { ChannelMessageOpt, MessageModalImage, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
 	selectIdMessageRefEdit,
@@ -6,7 +6,6 @@ import {
 	selectMemberByUserId,
 	selectMessageEntityById,
 	selectOpenEditMessageState,
-	selectOpenModalAttachment,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -32,7 +31,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu, preloadMessageContextMenu } = useMessageContextMenu();
-	
+
 	const isEditing = useMemo(() => {
 		return openEditMessageState && idMessageRefEdit === messageId;
 	}, [openEditMessageState, idMessageRefEdit, messageId]);
@@ -73,8 +72,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 
 	return (
 		<>
-			<div  className="fullBoxText relative group ">
-				
+			<div className="fullBoxText relative group ">
 				<MessageWithUser
 					message={mess as IMessageWithUser}
 					user={user}

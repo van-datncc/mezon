@@ -1,123 +1,123 @@
-import { Text, TouchableOpacity, View, Image, ScrollView } from 'react-native'
-import React from 'react'
-import Feather from 'react-native-vector-icons/Feather'
-import { style } from './styles'
-import { useMemo } from 'react'
-import { useAuth, useFriends } from '@mezon/core'
-import { APP_SCREEN } from '../../navigation/ScreenTypes'
-import Toast from "react-native-toast-message";
-import { useMixImageColor } from '../../hooks/useMixImageColor'
-import { ChevronIcon, Icons, MessageIcon, PenIcon } from '@mezon/mobile-components'
-import { FriendsEntity } from '@mezon/store-mobile'
-import moment from 'moment'
-import { MezonButton } from '../../temp-ui'
-import { Block, size, useTheme } from '@mezon/mobile-ui'
-import { useTranslation } from 'react-i18next'
+import { useAuth, useFriends } from '@mezon/core';
+import { Icons } from '@mezon/mobile-components';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { FriendsEntity } from '@mezon/store-mobile';
+import moment from 'moment';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { useMixImageColor } from '../../hooks/useMixImageColor';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { MezonButton } from '../../temp-ui';
+import { style } from './styles';
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
-    const user = useAuth();
-    const { themeValue } = useTheme();
-    const styles = style(themeValue);
-    const { friends: allUser } = useFriends();
-    const { color } = useMixImageColor(user?.userProfile?.user?.avatar_url);
-    const { t } = useTranslation('profile');
+	const user = useAuth();
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const { friends: allUser } = useFriends();
+	const { color } = useMixImageColor(user?.userProfile?.user?.avatar_url);
+	const { t } = useTranslation('profile');
 
-    const friendList: FriendsEntity[] = useMemo(() => {
-        return allUser.filter((user) => user.state === 0)
-    }, [allUser]);
+	const friendList: FriendsEntity[] = useMemo(() => {
+		return allUser.filter((user) => user.state === 0);
+	}, [allUser]);
 
-    const navigateToFriendScreen = () => {
-        navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.HOME });
-    };
-    const navigateToSettingScreen = () => {
-        navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HOME });
-    };
+	const navigateToFriendScreen = () => {
+		navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.HOME });
+	};
+	const navigateToSettingScreen = () => {
+		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HOME });
+	};
 
-    const navigateToProfileSetting = () => {
-        navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.PROFILE });
-    }
+	const navigateToProfileSetting = () => {
+		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.PROFILE });
+	};
 
-    const firstFriendImageList = useMemo(() => {
-        return friendList?.slice?.(0, 5)?.map(friend => friend?.user?.avatar_url)
-    }, [friendList])
+	const firstFriendImageList = useMemo(() => {
+		return friendList?.slice?.(0, 5)?.map((friend) => friend?.user?.avatar_url);
+	}, [friendList]);
 
-    const memberSince = useMemo(() => {
-        return moment(user?.userProfile?.user?.create_time).format('MMM DD, YYYY');
-    }, [user])
+	const memberSince = useMemo(() => {
+		return moment(user?.userProfile?.user?.create_time).format('MMM DD, YYYY');
+	}, [user]);
 
-    return (
-        <View style={styles.container}>
-            <View style={[styles.containerBackground, { backgroundColor: color }]}>
-                <View style={styles.backgroundListIcon}>
-                    <TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
-                        <Icons.SettingsIcon height={20} width={20} color={themeValue.textStrong} />
-                    </TouchableOpacity>
-                </View>
+	return (
+		<View style={styles.container}>
+			<View style={[styles.containerBackground, { backgroundColor: color }]}>
+				<View style={styles.backgroundListIcon}>
+					<TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
+						<Icons.SettingsIcon height={20} width={20} color={themeValue.textStrong} />
+					</TouchableOpacity>
+				</View>
 
-                <View style={styles.viewImageProfile}>
-                    {user?.userProfile?.user?.avatar_url ? (
-                        <Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
-                    ) : <Block overflow={'hidden'} width={'100%'} height={'100%'} borderRadius={50}>
-                        <Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>
-                    </Block>}
-                    <View style={styles.dotOnline} />
-                </View>
-            </View>
+				<View style={styles.viewImageProfile}>
+					{user?.userProfile?.user?.avatar_url ? (
+						<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
+					) : (
+						<Block overflow={'hidden'} width={'100%'} height={'100%'} borderRadius={50}>
+							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>
+						</Block>
+					)}
+					<View style={styles.dotOnline} />
+				</View>
+			</View>
 
-            <ScrollView style={styles.contentWrapper}>
-                <View style={styles.contentContainer}>
-                    <TouchableOpacity style={styles.viewInfo} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
-                        <Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
-                        <Icons.ChevronSmallDownIcon height={18} width={18} color={themeValue.text} />
-                    </TouchableOpacity>
+			<ScrollView style={styles.contentWrapper}>
+				<View style={styles.contentContainer}>
+					<TouchableOpacity style={styles.viewInfo} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
+						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
+						<Icons.ChevronSmallDownIcon height={18} width={18} color={themeValue.text} />
+					</TouchableOpacity>
 
-                    <Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
+					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
 
-                    <View style={styles.buttonList}>
-                        <MezonButton viewContainerStyle={styles.button} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
-                            <Icons.ChatIcon height={20} width={20} color={"white"} />
-                            <Text style={styles.whiteText}>{t('addStatus')}</Text>
-                        </MezonButton>
+					<View style={styles.buttonList}>
+						<MezonButton viewContainerStyle={styles.button} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
+							<Icons.ChatIcon height={20} width={20} color={'white'} />
+							<Text style={styles.whiteText}>{t('addStatus')}</Text>
+						</MezonButton>
 
-                        <MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
-                            <Icons.PencilIcon height={18} width={18} color={"white"} />
-                            <Text style={styles.whiteText}>{t('editStatus')}</Text>
-                        </MezonButton>
-                    </View>
-                </View>
+						<MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
+							<Icons.PencilIcon height={18} width={18} color={'white'} />
+							<Text style={styles.whiteText}>{t('editStatus')}</Text>
+						</MezonButton>
+					</View>
+				</View>
 
-                <View style={styles.contentContainer}>
-                    <View style={{ gap: size.s_20 }}>
-                        {user?.userProfile?.user?.about_me ? (
-                            <View>
-                                <Text style={styles.textTitle}>{t('aboutMe')}</Text>
-                                <Text style={styles.text}>{user?.userProfile?.user?.about_me}</Text>
-                            </View>
-                        ) : null}
+				<View style={styles.contentContainer}>
+					<View style={{ gap: size.s_20 }}>
+						{user?.userProfile?.user?.about_me ? (
+							<View>
+								<Text style={styles.textTitle}>{t('aboutMe')}</Text>
+								<Text style={styles.text}>{user?.userProfile?.user?.about_me}</Text>
+							</View>
+						) : null}
 
-                        <View>
-                            <Text style={styles.textTitle}>{t('mezonMemberSince')}</Text>
-                            <Text style={styles.text}>{memberSince}</Text>
-                        </View>
-                    </View>
-                </View>
+						<View>
+							<Text style={styles.textTitle}>{t('mezonMemberSince')}</Text>
+							<Text style={styles.text}>{memberSince}</Text>
+						</View>
+					</View>
+				</View>
 
-                <TouchableOpacity style={[styles.contentContainer, styles.imgList]} onPress={() => navigateToFriendScreen()}>
-                    <Text style={styles.textTitle}>{t('yourFriend')}</Text>
-                    <View style={styles.listImageFriend}>
-                        {firstFriendImageList.map((imgUrl, idx) => {
-                            return (
-                                <View key={idx} style={[styles.imageContainer, { right: idx * 20 }]}>
-                                    <Image source={{ uri: imgUrl }} style={styles.imageFriend} />
-                                </View>
-                            )
-                        })}
-                    </View>
-                    <Icons.ChevronSmallRightIcon width={18} height={18} style={{ marginLeft: size.s_4 }} color={themeValue.textStrong}/>
-                </TouchableOpacity>
-            </ScrollView>
-        </View>
-    )
-}
+				<TouchableOpacity style={[styles.contentContainer, styles.imgList]} onPress={() => navigateToFriendScreen()}>
+					<Text style={styles.textTitle}>{t('yourFriend')}</Text>
+					<View style={styles.listImageFriend}>
+						{firstFriendImageList.map((imgUrl, idx) => {
+							return (
+								<View key={idx} style={[styles.imageContainer, { right: idx * 20 }]}>
+									<Image source={{ uri: imgUrl }} style={styles.imageFriend} />
+								</View>
+							);
+						})}
+					</View>
+					<Icons.ChevronSmallRightIcon width={18} height={18} style={{ marginLeft: size.s_4 }} color={themeValue.textStrong} />
+				</TouchableOpacity>
+			</ScrollView>
+		</View>
+	);
+};
 
-export default ProfileScreen
+export default ProfileScreen;

@@ -9,12 +9,7 @@ import {
 	save,
 } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import {
-	RootState,
-	selectChannelsEntities,
-	selectCurrentChannel,
-	selectAllEmojiSuggestion,
-} from '@mezon/store-mobile';
+import { RootState, selectAllEmojiSuggestion, selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import {
 	ChannelMembersEntity,
@@ -78,8 +73,8 @@ interface IChatBoxProps {
 	messageAction?: EMessageActionType;
 	onShowKeyboardBottomSheet: (isShow: boolean, height: number, type?: string) => void;
 	hiddenIcon?: {
-		threadIcon: boolean
-	},
+		threadIcon: boolean;
+	};
 	directMessageId?: string;
 }
 const ChatBox = memo((props: IChatBoxProps) => {
@@ -106,9 +101,8 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [listChannelsMention, setListChannelsMention] = useState<ChannelsMention[]>([]);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({
 		channelId: props.channelId,
-		channelLabel: props.channelLabel,
 		mode: props.mode,
-		directMessageId: props?.channelId
+		directMessageId: props?.channelId,
 	});
 	const [messageActionListNeedToResolve, setMessageActionListNeedToResolve] = useState<IMessageActionNeedToResolve[]>([]);
 	const [text, setText] = useState<string>('');
@@ -140,7 +134,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const getAllCachedMessage = async () => {
 		const allCachedMessage = await load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
 		return allCachedMessage;
-	}
+	};
 
 	const saveMessageToCache = async (text: string) => {
 		const allCachedMessage = await getAllCachedMessage();
@@ -148,32 +142,29 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			...allCachedMessage,
 			[props?.channelId]: text,
 		});
-	}
+	};
 
 	const setMessageFromCache = async () => {
 		const allCachedMessage = await getAllCachedMessage();
 		setText(allCachedMessage?.[props?.channelId] || '');
-	}
+	};
 
 	const resetCachedText = async () => {
 		const allCachedMessage = await getAllCachedMessage();
 		delete allCachedMessage[props?.channelId];
 		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
-			...allCachedMessage
+			...allCachedMessage,
 		});
-	}
+	};
 
 	useEffect(() => {
 		if (props?.channelId) {
 			setMessageFromCache();
 		}
-	}, [props?.channelId])
+	}, [props?.channelId]);
 
 	//start: DM stuff
-	const {
-		sendDirectMessage,
-		sendMessageTyping: directMessageTyping,
-	} = useDirectMessages({
+	const { sendDirectMessage, sendMessageTyping: directMessageTyping } = useDirectMessages({
 		channelId: props.channelId ?? '',
 		mode: props.mode,
 	});
@@ -283,15 +274,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		} else {
 			const reference = currentSelectedReplyMessage
 				? [
-					{
-						message_id: '',
-						message_ref_id: currentSelectedReplyMessage.id,
-						ref_type: 0,
-						message_sender_id: currentSelectedReplyMessage?.user?.id,
-						content: JSON.stringify(currentSelectedReplyMessage.content),
-						has_attachment: Boolean(currentSelectedReplyMessage?.attachments?.length),
-					},
-				]
+						{
+							message_id: '',
+							message_ref_id: currentSelectedReplyMessage.id,
+							ref_type: 0,
+							message_sender_id: currentSelectedReplyMessage?.user?.id,
+							content: JSON.stringify(currentSelectedReplyMessage.content),
+							has_attachment: Boolean(currentSelectedReplyMessage?.attachments?.length),
+						},
+					]
 				: undefined;
 			setEmojiSuggestion('');
 			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
@@ -516,9 +507,9 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			})) ?? [];
 		const convertedMentions: UserMentionsOpt[] = mentionList
 			? mentionList.map((mention) => ({
-				user_id: mention.id.toString() ?? '',
-				username: mention.display ?? '',
-			}))
+					user_id: mention.id.toString() ?? '',
+					username: mention.display ?? '',
+				}))
 			: [];
 		if (mentions?.length > 0) {
 			if (mentions.some((mention) => mention.display === '@here')) {
@@ -684,10 +675,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 			)}
 			<View style={styles.containerInput}>
 				{text?.length > 0 && !isShowAttachControl ? (
-					<TouchableOpacity
-						style={[styles.btnIcon]}
-						onPress={() => setIsShowAttachControl(!isShowAttachControl)}
-					>
+					<TouchableOpacity style={[styles.btnIcon]} onPress={() => setIsShowAttachControl(!isShowAttachControl)}>
 						<Icons.ChevronSmallLeftIcon width={22} height={22} color={themeValue.textStrong} />
 					</TouchableOpacity>
 				) : (
@@ -741,9 +729,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 							<Icons.SendMessageIcon width={18} height={18} color={baseColor.white} />
 						</View>
 					) : (
-						<TouchableOpacity
-							onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}
-							style={styles.btnIcon}>
+						<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })} style={styles.btnIcon}>
 							<Icons.MicrophoneIcon width={22} height={22} color={themeValue.textStrong} />
 						</TouchableOpacity>
 					)}

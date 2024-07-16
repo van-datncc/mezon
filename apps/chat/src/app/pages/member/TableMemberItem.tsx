@@ -65,7 +65,6 @@ const TableMemberItem = ({ userId, name, avatar, clanJoinTime, discordJoinTime }
                 >
                   <span className='text-xs font-medium px-1 cursor-pointer' style={{lineHeight: '15px'}}>+{userRolesClan.length - 1}</span>
                 </Tooltip>
-                
               </span>
             }
           </span>

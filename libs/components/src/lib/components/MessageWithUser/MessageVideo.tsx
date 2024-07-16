@@ -5,10 +5,7 @@ export type MessageImage = {
 };
 
 function MessageVideo({ attachmentData }: MessageImage) {
-	return (
-		<video src={attachmentData.url} controls={true} autoPlay={false} className="h-[200px]"></video>
-
-	);
+	return <video src={attachmentData.url} controls={true} autoPlay={false} className="h-[200px]"></video>;
 }
 
 export default MessageVideo;
