@@ -27,7 +27,7 @@ export type ModalSettingSave = {
 	handleUpdateUser: () => Promise<void>;
 };
 const ServerSettingRoleManagement = (props: EditNewRole) => {
-	const {rolesClan, flagOption} = props;
+	const { rolesClan, flagOption } = props;
 	const { createRole, updateRole } = useRoles();
 	const clickRole = useSelector(getSelectedRoleId);
 	const nameRole = useSelector(getNewNameRole);
@@ -70,7 +70,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	return flagOption ? (
 		<>
 			<div className="absolute top-0 left-0 w-full h-full pl-2 overflow-y-auto flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary overflow-hidden sbm:pt-[-60px] pt-[10px]">
-				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan}/>
+				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} />
 				<div className="w-2/3">
 					<div className="font-semibold pl-3 dark:text-white text-black">
 						{clickRole === 'New Role' ? (
@@ -78,7 +78,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 						) : (
 							<div className="tracking-wide mb-4 text-base">EDIT ROLE</div>
 						)}
-						<SettingValueDisplayRole RolesClan={rolesClan}/>
+						<SettingValueDisplayRole RolesClan={rolesClan} />
 					</div>
 				</div>
 				<SettingUserClanProfileSave PropsSave={saveProfile} />

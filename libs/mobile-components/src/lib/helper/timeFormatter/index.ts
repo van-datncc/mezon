@@ -123,3 +123,35 @@ export function getNearTime(minutes: number): Date {
     const next = new Date((new Date()).getTime() + minutes * 60000);
     return new Date(next.getFullYear(), next.getMonth(), next.getDate(), next.getHours())
 }
+
+export function getDayName(date: Date, lang: "vi" | "en") {
+    return date.toLocaleDateString(lang, {
+        weekday: "long"
+    })
+}
+
+export function getDayYearName(date: Date, lang: "vi" | "en"): string {
+    return date.toLocaleDateString(lang, {
+        month: "short",
+        day: "2-digit"
+
+    })
+}
+
+export function getDayWeekName(date: Date, lang: "vi" | "en") {
+    var day = getDayName(date, lang);
+    let weekOfMonth = -1;
+    let d = date.getDate();
+
+    while (d > 0) {
+        d -= 7;
+        weekOfMonth += 1;
+    }
+
+    const name_en = ["first", "second", "third", "last"];
+    const name_vi = ["đầu tiên", "thứ hai", "thứ ba", "cuối cùng"]
+
+    return lang === "vi"
+        ? day + " " + name_vi[weekOfMonth] + " của tháng"
+        : name_en[weekOfMonth] + " " + day;
+}

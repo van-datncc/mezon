@@ -1,18 +1,18 @@
-import Resizer from "react-image-file-resizer";
 import {
-	differenceInDays,
-	differenceInHours,
-	differenceInMonths,
-	differenceInSeconds,
-	format,
-	formatDistanceToNowStrict,
-	fromUnixTime,
-	isSameDay,
-	startOfDay,
-	subDays,
+    differenceInDays,
+    differenceInHours,
+    differenceInMonths,
+    differenceInSeconds,
+    format,
+    formatDistanceToNowStrict,
+    fromUnixTime,
+    isSameDay,
+    startOfDay,
+    subDays,
 } from 'date-fns';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
+import Resizer from "react-image-file-resizer";
 import { TIME_COMBINE } from '../constant';
 import { ChannelMembersEntity, EmojiDataOptionals, ILineMention, IMessageWithUser, SenderInfoOptionals, UsersClanEntity } from '../types/index';
 

@@ -1,4 +1,4 @@
-import { createEmoji, selectAllEmoji, selectCurrentChannelId, selectCurrentClanId, selectEmojiLoading, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import { createEmoji, selectAllEmoji, selectCurrentChannelId, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
 import { handleUploadFile, useMezon } from "@mezon/transport";
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from "mezon-js/api.gen";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";

@@ -55,10 +55,10 @@
         "eventFrequency": {
             "title": "Chu kỳ sự kiện",
             "noRepeat": "Không lặp lại",
-            "weeklyOn": "Hàng tuần vào",
-            "everyOther": "Hàng tuần bắt đầu từ",
-            "monthlyOn": "Hàng tháng vào",
-            "annuallyOn": "Hàng năm vào",
+            "weeklyOn": "Hàng tuần vào {{name}}",
+            "everyOther": "Hàng tuần bắt đầu từ {{name}}",
+            "monthlyOn": "Hàng tháng vào {{name}}",
+            "annuallyOn": "Hàng năm vào {{name}}",
             "everyWeekday": "Mọi ngày trong tuần (T2 - T6)"
         },
         "description": {
@@ -72,6 +72,6 @@
     },
     "notify": {
         "locationBlank": "Cần nhập vị trí",
-         "titleBlank": "Cần một chủ đề cho sự kiện"
+        "titleBlank": "Cần một chủ đề cho sự kiện"
     }
 }

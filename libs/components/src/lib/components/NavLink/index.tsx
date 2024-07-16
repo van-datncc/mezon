@@ -1,7 +1,7 @@
-import { useThreads } from "@mezon/core";
-import { Tooltip } from "flowbite-react";
-import { useSelector } from "react-redux";
+import { useThreads } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
+import { Tooltip } from 'flowbite-react';
+import { useSelector } from 'react-redux';
 
 export type NavLinkProps = {
 	readonly active?: boolean;
@@ -9,7 +9,7 @@ export type NavLinkProps = {
 	clanName: string;
 };
 
-function NavLinkComponent({ active, children, clanName}: NavLinkProps) {
+function NavLinkComponent({ active, children, clanName }: NavLinkProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const { setTurnOffThreadMessage } = useThreads();
 
@@ -24,7 +24,13 @@ function NavLinkComponent({ active, children, clanName}: NavLinkProps) {
 			</div>
 
 			<div className="group-active:translate-y-px" onClick={() => setTurnOffThreadMessage()}>
-				<Tooltip content={<span style={{whiteSpace: 'nowrap'}}>{clanName}</span>} trigger="hover" animation="duration-500" style = { appearanceTheme === "light" ? "light" : "dark"} placement="right">
+				<Tooltip
+					content={<span style={{ whiteSpace: 'nowrap' }}>{clanName}</span>}
+					trigger="hover"
+					animation="duration-500"
+					style={appearanceTheme === 'light' ? 'light' : 'dark'}
+					placement="right"
+				>
 					<div
 						className={`${
 							active
@@ -41,5 +47,3 @@ function NavLinkComponent({ active, children, clanName}: NavLinkProps) {
 }
 
 export default NavLinkComponent;
-
-

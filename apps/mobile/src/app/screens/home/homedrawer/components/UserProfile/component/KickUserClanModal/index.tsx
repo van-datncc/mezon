@@ -18,7 +18,7 @@ const KickUserClanModal = ({
 }) => {
 	const { t } = useTranslation(['userProfile']);
 	const [reason, setReason] = useState<string>('');
-  const [ isFocusInput, setIsFocusInput ] = useState<boolean>(false);
+	const [isFocusInput, setIsFocusInput] = useState<boolean>(false);
 
 	return (
 		<Block height={'100%'} overflow="hidden">
@@ -43,9 +43,9 @@ const KickUserClanModal = ({
 							numberOfLines={5}
 							onChangeText={(text) => setReason(text)}
 							value={reason}
-              onFocus={() => setIsFocusInput(true)}
-              onBlur={() => setIsFocusInput(false)}
-							style={[styles.input, !isFocusInput && { borderBottomColor: Colors.textGray, borderBottomWidth: 1.5}]}
+							onFocus={() => setIsFocusInput(true)}
+							onBlur={() => setIsFocusInput(false)}
+							style={[styles.input, !isFocusInput && { borderBottomColor: Colors.textGray, borderBottomWidth: 1.5 }]}
 						></TextInput>
 					</Block>
 				</Block>

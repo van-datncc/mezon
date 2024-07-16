@@ -22,9 +22,9 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 				<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
 					<ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
 				</div>
+			) : avatarDM ? (
+				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />
 			) : (
-				avatarDM ?
-				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />:
 				<div className="h-[75px] w-[75px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-4xl">
 					{name?.charAt(0).toUpperCase()}
 				</div>
@@ -36,21 +36,20 @@ function ChatWelCome({ type, name, avatarDM }: ChatWelComeProp) {
 				</p>
 			</div>
 			<div>
-				{(currentChannel?.parrent_id !== "0" && !avatarDM) ?
+				{currentChannel?.parrent_id !== '0' && !avatarDM ? (
 					<div className="mb-1 dark:text-textDarkTheme text-textLightTheme">
 						<span className="text-base">Started by &nbsp;</span>
 						<span className="text-base font-semibold">{user?.user?.username}</span>
-					</div> :
+					</div>
+				) : (
 					<p className="dark:text-zinc-400 text-colorTextLightMode text-sm">
-						{avatarDM ?
-							(type === "DM" ?
-								`This is the beginning of your direct message history with ${name}` :
-								`Welcome to the beginning of the #${name} group`
-							) :
-							`This is the start of the #${name} ${currentChannel?.channel_private ? 'private' : ''} channel`
-						}
+						{avatarDM
+							? type === 'DM'
+								? `This is the beginning of your direct message history with ${name}`
+								: `Welcome to the beginning of the #${name} group`
+							: `This is the start of the #${name} ${currentChannel?.channel_private ? 'private' : ''} channel`}
 					</p>
-				}
+				)}
 			</div>
 		</div>
 	);

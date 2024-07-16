@@ -1,75 +1,65 @@
-import { Text, View } from "react-native";
-import styles from "./styles";
-import EventTime from "../EventTime";
-import { EventManagementEntity, selectClanById, selectClanId, selectMemberByUserId } from "@mezon/store-mobile";
-import MezonButton from "../../../temp-ui/MezonButton2";
-import { BellIcon, CheckIcon, ShareIcon, ThreeDotIcon } from "@mezon/mobile-components";
-import MezonAvatar from "../../../temp-ui/MezonAvatar";
-import { useSelector } from "react-redux";
-import EventLocation from "../EventLocation";
-import EventMenu from "../EventMenu";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useRef } from "react";
-import { MezonBottomSheet } from "../../../temp-ui";
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BellIcon, CheckIcon, ShareIcon, ThreeDotIcon } from '@mezon/mobile-components';
+import { EventManagementEntity, selectClanById, selectMemberByUserId } from '@mezon/store-mobile';
+import { useRef } from 'react';
+import { Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import { MezonBottomSheet } from '../../../temp-ui';
+import MezonAvatar from '../../../temp-ui/MezonAvatar';
+import MezonButton from '../../../temp-ui/MezonButton2';
+import EventLocation from '../EventLocation';
+import EventMenu from '../EventMenu';
+import EventTime from '../EventTime';
+import styles from './styles';
 
 interface IEventDetailProps {
-    event: EventManagementEntity
+	event: EventManagementEntity;
 }
 
 export default function EventDetail({ event }: IEventDetailProps) {
-    const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
-    const clans = useSelector(selectClanById(event?.clan_id || ''));
-    const menuBottomSheet = useRef<BottomSheetModal>(null)
+	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
+	const clans = useSelector(selectClanById(event?.clan_id || ''));
+	const menuBottomSheet = useRef<BottomSheetModal>(null);
 
-    function handlePress() {
-        menuBottomSheet?.current?.present();
-    }
+	function handlePress() {
+		menuBottomSheet?.current?.present();
+	}
 
-    return (
-        <View style={styles.container}>
-            <EventTime event={event} />
-            <Text style={styles.title}>{event.title}</Text>
+	return (
+		<View style={styles.container}>
+			<EventTime event={event} />
+			<Text style={styles.title}>{event.title}</Text>
 
-            <View>
-                <View style={styles.mainSection}>
-                    {/* TODO: Fix this */}
-                    <MezonAvatar
-                        avatarUrl={clans?.logo}
-                        userName={clans?.clan_name}
-                        height={20}
-                        width={20}
-                    />
+			<View>
+				<View style={styles.mainSection}>
+					{/* TODO: Fix this */}
+					<MezonAvatar avatarUrl={clans?.logo} userName={clans?.clan_name} height={20} width={20} />
 
-                    <EventLocation event={event} />
+					<EventLocation event={event} />
 
-                    <View style={styles.inline}>
-                        <BellIcon height={16} width={16} />
-                        <Text style={styles.smallText}>{event?.user_ids?.length}</Text>
-                    </View>
+					<View style={styles.inline}>
+						<BellIcon height={16} width={16} />
+						<Text style={styles.smallText}>{event?.user_ids?.length}</Text>
+					</View>
 
-                    {/* TODO: Fix this */}
-                    <MezonAvatar
-                        avatarUrl={userCreate?.user?.avatar_url}
-                        userName={userCreate?.user?.username}
-                        height={20}
-                        width={20}
-                    />
-                </View>
-            </View>
+					{/* TODO: Fix this */}
+					<MezonAvatar avatarUrl={userCreate?.user?.avatar_url} userName={userCreate?.user?.username} height={20} width={20} />
+				</View>
+			</View>
 
-            {event.description && <Text style={styles.description}>{event.description}</Text>}
+			{event.description && <Text style={styles.description}>{event.description}</Text>}
 
-            <View style={styles.inline}>
-                {/* <MezonButton title="End event" fluid /> */}
-                <MezonButton icon={<CheckIcon height={16} width={16} />} title="Interested" fluid border />
-                {/* <MezonButton title="Start event" fluid type="success" /> */}
-                <MezonButton icon={<ShareIcon height={20} width={20} />} />
-                <MezonButton icon={<ThreeDotIcon height={20} width={20} />} onPress={handlePress} />
-            </View>
+			<View style={styles.inline}>
+				{/* <MezonButton title="End event" fluid /> */}
+				<MezonButton icon={<CheckIcon height={16} width={16} />} title="Interested" fluid border />
+				{/* <MezonButton title="Start event" fluid type="success" /> */}
+				<MezonButton icon={<ShareIcon height={20} width={20} />} />
+				<MezonButton icon={<ThreeDotIcon height={20} width={20} />} onPress={handlePress} />
+			</View>
 
-            <MezonBottomSheet ref={menuBottomSheet}>
-                <EventMenu event={event} />
-            </MezonBottomSheet>
-        </View >
-    )
+			<MezonBottomSheet ref={menuBottomSheet}>
+				<EventMenu event={event} />
+			</MezonBottomSheet>
+		</View>
+	);
 }

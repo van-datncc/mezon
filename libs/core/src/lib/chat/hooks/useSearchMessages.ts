@@ -1,10 +1,10 @@
 import {
-	searchMessagesActions,
-	selectCurrentClan,
-	selectCurrentPage,
-	selectIsSearchMessage,
-	selectSearchMessagesChannel,
-	useAppDispatch,
+    searchMessagesActions,
+    selectCurrentClan,
+    selectCurrentPage,
+    selectIsSearchMessage,
+    selectSearchMessagesChannel,
+    useAppDispatch,
 } from '@mezon/store';
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';

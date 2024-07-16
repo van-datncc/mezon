@@ -1,29 +1,35 @@
+import { useMembersVoiceChannel } from '@mezon/core';
 import { AvatarUser } from '@mezon/mobile-components';
-import { selectMemberByDisplayName } from '@mezon/store-mobile';
+import { useTheme } from '@mezon/mobile-ui';
+import { selectMemberByGoogleId } from '@mezon/store-mobile';
 import { IChannelMember } from '@mezon/utils';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../../../../temp-ui/MezonAvatar';
 import { style } from './styles';
-import { useTheme } from '@mezon/mobile-ui';
 
 interface IUserVoiceProps {
 	userVoice: IChannelMember;
+	channelID: string;
 }
-const UserVoiceItem = React.memo(({ userVoice }: IUserVoiceProps) => {
+const UserVoiceItem = React.memo(({ userVoice, channelID }: IUserVoiceProps) => {
 	const styles = style(useTheme().themeValue);
-	const userVoiceDisplay = useSelector(selectMemberByDisplayName(userVoice?.participant || ''));
+	const member = useSelector(selectMemberByGoogleId(userVoice.id ?? ''));
+	const { setMembersVoiceChannel } = useMembersVoiceChannel();
 
+	useEffect(() => {
+		setMembersVoiceChannel(channelID, userVoice.id);
+	}, [setMembersVoiceChannel, channelID, userVoice.id]);
 	return (
 		<View style={styles.userVoiceWrapper}>
-			{userVoiceDisplay ? (
-				<MezonAvatar width={18} height={18} userName={userVoiceDisplay?.user?.username} avatarUrl={userVoiceDisplay?.user?.avatar_url} />
+			{member ? (
+				<MezonAvatar width={18} height={18} userName={member?.user?.username} avatarUrl={member?.user?.avatar_url} />
 			) : (
 				<AvatarUser width={18} height={18} />
 			)}
-			{userVoiceDisplay ? (
-				<Text style={styles.userVoiceName}>{userVoiceDisplay?.user?.username}</Text>
+			{member ? (
+				<Text style={styles.userVoiceName}>{member?.user?.username}</Text>
 			) : (
 				<Text style={styles.userVoiceName}>{userVoice?.participant} (guest)</Text>
 			)}

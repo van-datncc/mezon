@@ -1,7 +1,7 @@
+import { Block } from '@mezon/mobile-ui';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { styles as s } from './styles';
-import { Block } from '@mezon/mobile-ui';
 
 interface IMezonAvatarProps {
 	avatarUrl: string;
@@ -25,8 +25,8 @@ const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 					/>
 				) : (
 					<Block style={s.avatarMessageBoxDefault}>
-            <Text style={s.textAvatarMessageBoxDefault}>{userName?.charAt(0)?.toUpperCase() || 'A'}</Text>
-          </Block>
+						<Text style={s.textAvatarMessageBoxDefault}>{userName?.charAt(0)?.toUpperCase() || 'A'}</Text>
+					</Block>
 				)}
 			</View>
 			{userStatus && <View style={[s.statusCircle, userStatus ? s.online : s.offline]} />}

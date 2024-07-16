@@ -1,15 +1,11 @@
+import { CardStyleInterpolators, createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
 import React from 'react';
-import {
-	CardStyleInterpolators,
-	createStackNavigator,
-	TransitionSpecs,
-} from '@react-navigation/stack';
 
-import {APP_SCREEN} from "../../ScreenTypes";
 import Notifications from '../../../screens/Notifications';
+import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const NotificationStacks = ({} : any) => {
+export const NotificationStacks = ({}: any) => {
 	const Stack = createStackNavigator();
 	return (
 		<Stack.Navigator
@@ -25,7 +21,8 @@ export const NotificationStacks = ({} : any) => {
 				cardStyle: { backgroundColor: 'white' },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 			}}
-			initialRouteName={APP_SCREEN.NOTIFICATION.HOME}>
+			initialRouteName={APP_SCREEN.NOTIFICATION.HOME}
+		>
 			<Stack.Screen
 				name={APP_SCREEN.NOTIFICATION.HOME}
 				component={Notifications}

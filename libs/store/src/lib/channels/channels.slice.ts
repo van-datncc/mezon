@@ -2,8 +2,8 @@ import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
-import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelMessageEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
-import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiChannelMessageHeader, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
+import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -14,8 +14,8 @@ import { messagesActions } from '../messages/messages.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
-import { threadsActions } from '../threads/threads.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
+import { threadsActions } from '../threads/threads.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 

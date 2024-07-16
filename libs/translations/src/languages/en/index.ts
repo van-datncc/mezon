@@ -1,6 +1,6 @@
 import accountSetting from './accountSetting.json';
-import appThemeSetting from './appThemeSetting.json';
 import appearanceSetting from './appearanceSetting.json';
+import appThemeSetting from './appThemeSetting.json';
 import categoryCreator from './categoryCreator.json';
 import categoryMenu from './categoryMenu.json';
 import channelCreator from './channelCreator.json';
@@ -29,6 +29,7 @@ import screen from './screen.json';
 import screenStack from './screenStack.json';
 import setting from './setting.json';
 import userProfile from './userProfile.json';
+
 export default {
 	inviteToChannel,
 	notification,

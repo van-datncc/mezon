@@ -1,9 +1,9 @@
+import { useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import React from 'react';
-import ChannelListThreadItem from '../ChannelListThreadItem';
 import { View } from 'react-native';
-import { useTheme } from '@mezon/mobile-ui';
+import ChannelListThreadItem from '../ChannelListThreadItem';
 import { style } from './styles';
 
 type IListChannelThreadProps = {

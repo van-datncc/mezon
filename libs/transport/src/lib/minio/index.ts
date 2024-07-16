@@ -1,6 +1,6 @@
+import { Buffer as BufferMobile } from 'buffer';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { Buffer as BufferMobile } from 'buffer';
 
 export const isValidUrl = (urlString: string) => {
 	let url;

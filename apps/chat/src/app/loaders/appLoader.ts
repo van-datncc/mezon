@@ -28,7 +28,7 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	const paramString = window.location.href.split('?')[1];
 	const params = new URLSearchParams(paramString);
 	const result = Object.fromEntries(params.entries());
-	const { deepLinkUrl, notificationUrl } = result;
+	const { deepLinkUrl, notificationPath } = result;
 
 	if (deepLinkUrl) {
 		redirectTo = '/guess/login?deepLinkUrl=' + deepLinkUrl;
@@ -36,10 +36,8 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 		await dispatch(authActions.setSession(data));
 	}
 
-	if (notificationUrl) {
-		const parsedUrl = new URL(notificationUrl);
-		const path = parsedUrl.pathname;
-		redirectTo = path;
+	if (notificationPath) {
+		redirectTo = notificationPath;
 	}
 
 	dispatch(appActions.setInitialPath(pathname));

@@ -9,18 +9,15 @@ import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
 	channelId: string;
-	channelLabel: string;
 	clanId?: string;
 	mode: number;
 };
 
-export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
-	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, channelLabel, mode });
+export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, mode });
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { subPanelActive } = useGifsStickersEmoji();
-	const [classNamePopup, setClassNamePopup] = useState<string>(
-		`fixed bottom-[66px] z-10 max-sm:hidden bl ${isShowMemberList ? 'right-64' : 'right-4'}`,
-	);
+	const [classNamePopup] = useState<string>(`fixed bottom-[66px] z-10 max-sm:hidden bl ${isShowMemberList ? 'right-64' : 'right-4'}`);
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
@@ -33,7 +30,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 			references?: Array<ApiMessageRef>,
 			value?: ThreadValue,
 			anonymous?: boolean,
-			mentionEveryone?: boolean
+			mentionEveryone?: boolean,
 		) => {
 			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
 		},
@@ -89,7 +86,7 @@ export function ChannelMessageBox({ channelId, channelLabel, clanId, mode }: Rea
 			)}
 			<ReplyMessageBox />
 			<MessageBox
-				listMentions={UserMentionList({channelID: channelId})}
+				listMentions={UserMentionList({ channelID: channelId })}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}

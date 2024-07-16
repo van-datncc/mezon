@@ -26,6 +26,7 @@ import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from '.
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { attachmentReducer } from './attachment/attachments.slice';
+import { directChannelVoidReducer } from './channels/directChannelVoid.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
@@ -38,86 +39,85 @@ import { defaultNotificationClanReducer } from './notificationSetting/notificati
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
+import { settingClanEmojiReducer } from "./settingEmoji/settingEmoji.slice";
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
-import { directChannelVoidReducer } from './channels/directChannelVoid.slice';
-import {settingClanEmojiReducer} from "./settingEmoji/settingEmoji.slice";
 
 const persistedReducer = persistReducer(
-	{
-		key: 'auth',
-		storage,
-	},
-	authReducer,
+  {
+    key: 'auth',
+    storage,
+  },
+  authReducer,
 );
 
 const persistedClansReducer = persistReducer(
-	{
-		key: 'clans',
-		storage,
-	},
-	clansReducer,
+  {
+    key: 'clans',
+    storage,
+  },
+  clansReducer,
 );
 
 const persistedAppReducer = persistReducer(
-	{
-		key: 'apps',
-		storage,
-	},
-	appReducer,
+  {
+    key: 'apps',
+    storage,
+  },
+  appReducer,
 );
 
 const reducer = {
-	app: persistedAppReducer,
-	account: accountReducer,
-	auth: persistedReducer,
-	attachments: attachmentReducer,
-	clans: persistedClansReducer,
-	channels: channelsReducer,
-	channelMembers: channelMembersReducer,
-	threads: threadsReducer,
-	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
-	messages: messagesReducer,
-	users: usersReducer,
-	categories: categoriesReducer,
-	rolesclan: RolesClanReducer,
-	eventmanagement: eventManagementReducer,
-	usersClan: usersClanReducer,
-	[POLICIES_FEATURE_KEY]: policiesReducer,
-	userClanProfile: userClanProfileReducer,
-	friends: friendsReducer,
-	direct: directReducer,
-	roleId: roleIdReducer,
-	policiesDefaultSlice: policiesDefaultReducer,
-	notificationsetting: notificationSettingReducer,
-	pinmessages: pinMessageReducer,
-	defaultnotificationclan: defaultNotificationClanReducer,
-	defaultnotificationcategory: defaultNotificationCategoryReducer,
-	notichannelcategorysetting: channelCategorySettingReducer,
-	directchannelvoid: directChannelVoidReducer,
-	notifireactmessage: notifiReactMessageReducer,
-	invite: inviteReducer,
-	isshow: IsShowReducer,
-	forwardmessage: popupForwardReducer,
-	notification: notificationReducer,
-	voice: voiceReducer,
-	references: referencesReducer,
-	reaction: reactionReducer,
-	suggestionEmoji: emojiSuggestionReducer,
-	gifs: gifsReducer,
-	stickers: stickersReducer,
-	gifsStickersEmojis: gifsStickerEmojiReducer,
-	dragAndDrop: dragAndDropReducer,
-	[ERRORS_FEATURE_KEY]: errorsReducer,
-	[TOASTS_FEATURE_KEY]: toastsReducer,
+  app: persistedAppReducer,
+  account: accountReducer,
+  auth: persistedReducer,
+  attachments: attachmentReducer,
+  clans: persistedClansReducer,
+  channels: channelsReducer,
+  channelMembers: channelMembersReducer,
+  threads: threadsReducer,
+  [SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
+  messages: messagesReducer,
+  users: usersReducer,
+  categories: categoriesReducer,
+  rolesclan: RolesClanReducer,
+  eventmanagement: eventManagementReducer,
+  usersClan: usersClanReducer,
+  [POLICIES_FEATURE_KEY]: policiesReducer,
+  userClanProfile: userClanProfileReducer,
+  friends: friendsReducer,
+  direct: directReducer,
+  roleId: roleIdReducer,
+  policiesDefaultSlice: policiesDefaultReducer,
+  notificationsetting: notificationSettingReducer,
+  pinmessages: pinMessageReducer,
+  defaultnotificationclan: defaultNotificationClanReducer,
+  defaultnotificationcategory: defaultNotificationCategoryReducer,
+  notichannelcategorysetting: channelCategorySettingReducer,
+  directchannelvoid: directChannelVoidReducer,
+  notifireactmessage: notifiReactMessageReducer,
+  invite: inviteReducer,
+  isshow: IsShowReducer,
+  forwardmessage: popupForwardReducer,
+  notification: notificationReducer,
+  voice: voiceReducer,
+  references: referencesReducer,
+  reaction: reactionReducer,
+  suggestionEmoji: emojiSuggestionReducer,
+  gifs: gifsReducer,
+  stickers: stickersReducer,
+  gifsStickersEmojis: gifsStickerEmojiReducer,
+  dragAndDrop: dragAndDropReducer,
+  [ERRORS_FEATURE_KEY]: errorsReducer,
+  [TOASTS_FEATURE_KEY]: toastsReducer,
   settingEmoji: settingClanEmojiReducer
 };
 
 let storeInstance = configureStore({
-	reducer,
+  reducer,
 });
 
 let storeCreated = false;
@@ -127,24 +127,24 @@ export type RootState = ReturnType<typeof storeInstance.getState>;
 export type PreloadedRootState = RootState | undefined;
 
 export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRootState) => {
-	const store = configureStore({
-		reducer,
-		preloadedState,
-		middleware: (getDefaultMiddleware) =>
-			getDefaultMiddleware({
-				thunk: {
-					extraArgument: {
-						mezon,
-					},
-				},
-				immutableCheck: false,
-				serializableCheck: false,
-			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware),
-	});
-	storeInstance = store;
-	storeCreated = true;
-	const persistor = persistStore(store);
-	return { store, persistor };
+  const store = configureStore({
+    reducer,
+    preloadedState,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        thunk: {
+          extraArgument: {
+            mezon,
+          },
+        },
+        immutableCheck: false,
+        serializableCheck: false,
+      }).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware),
+  });
+  storeInstance = store;
+  storeCreated = true;
+  const persistor = persistStore(store);
+  return { store, persistor };
 };
 
 export type Store = typeof storeInstance;
@@ -154,21 +154,21 @@ export type AppThunkDispatch = ThunkDispatch<RootState, unknown, UnknownAction>;
 export type AppDispatch = typeof storeInstance.dispatch & AppThunkDispatch;
 
 export const getStore = () => {
-	return storeInstance;
+  return storeInstance;
 };
 
 export const getStoreAsync = async () => {
-	if (!storeCreated) {
-		return new Promise<Store>((resolve) => {
-			const interval = setInterval(() => {
-				if (storeCreated) {
-					clearInterval(interval);
-					resolve(storeInstance);
-				}
-			}, 100);
-		});
-	}
-	return storeInstance;
+  if (!storeCreated) {
+    return new Promise<Store>((resolve) => {
+      const interval = setInterval(() => {
+        if (storeCreated) {
+          clearInterval(interval);
+          resolve(storeInstance);
+        }
+      }, 100);
+    });
+  }
+  return storeInstance;
 };
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
