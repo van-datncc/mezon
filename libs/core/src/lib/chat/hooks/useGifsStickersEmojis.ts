@@ -1,7 +1,5 @@
-import { gifsStickerEmojiActions, useAppDispatch } from '@mezon/store';
+import { gifsStickerEmojiActions, selectPlaceHolder, selectSubPanelActive, selectValueInputSearch, useAppDispatch } from '@mezon/store';
 import { SubPanelName } from '@mezon/utils';
-import { selectPlaceHolder, selectSubPanelActive, selectValueInputSearch } from '@mezon/store';
-import { selectPlaceHolder, selectSubPanelActive, selectValueInputSearch } from '@mezon/store-mobile';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -41,11 +39,6 @@ export function useGifsStickersEmoji() {
 			setPlaceHolderInput,
 			valuePlaceHolder,
 		}),
-		[subPanelActive,
-		setSubPanelActive,
-		valueInputToCheckHandleSearch,
-		setValueInputSearch,
-		setPlaceHolderInput,
-		valuePlaceHolder],
+		[subPanelActive, setSubPanelActive, valueInputToCheckHandleSearch, setValueInputSearch, setPlaceHolderInput, valuePlaceHolder],
 	);
 }

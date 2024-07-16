@@ -1,6 +1,5 @@
 import { useAppDispatch } from '@mezon/store';
 import { notificationActions, selectAllNotification, selectMessageNotifed } from '@mezon/store';
-import { notificationActions, selectAllNotification, selectMessageNotifed } from '@mezon/store-mobile';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
