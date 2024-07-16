@@ -8,10 +8,11 @@ import PinMessage from '../../PinMessage';
 import AssetsHeader from '../AssetsHeader';
 import { threadDetailContext } from '../MenuThreadDetail';
 import styles from './style';
+import MediaChannel from '../../MediaChannel';
 
 const TabList = [
 	'Members',
-	// "Media",
+	"Media",
 	'Pins',
 	// "Links",
 	// "Files"
@@ -44,7 +45,7 @@ export const AssetsViewer = React.memo(() => {
 			<View style={styles.container}>
 				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
 					<MemberListStatus />
-					{/*<Page2 />*/}
+					<MediaChannel />
 					<PinMessage
 						currentChannelId={
 							[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
@@ -63,7 +64,7 @@ export const AssetsViewer = React.memo(() => {
 // Just for testing purposes
 function Page2() {
 	return (
-		<View style={{ width: Dimensions.get('screen').width }}>
+		<View style={{ width: Dimensions.get('screen').width}}>
 			<Text style={{ color: 'white' }}>tab content</Text>
 		</View>
 	);

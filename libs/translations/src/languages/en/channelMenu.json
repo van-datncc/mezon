@@ -15,6 +15,10 @@
             "muteCategory": "Mute Channel",
             "notification": "Notification Settings"
         },
+        "thread": {
+          "title": "",
+          "threads": "Threads"
+        },
         "organizationMenu": {
             "title": "",
             "edit": "Edit Channel",
