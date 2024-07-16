@@ -1,4 +1,4 @@
-import { load, save, STORAGE_CLAN_ID, STORAGE_IS_FROM_FCM } from '@mezon/mobile-components';
+import { load, save, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
 import { Metrics } from '@mezon/mobile-ui';
 import {
 	appActions,
@@ -9,11 +9,12 @@ import {
 	messagesActions,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectIsFromFCMMobile,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { delay } from 'lodash';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
@@ -64,8 +65,10 @@ const DrawerScreen = React.memo(({ navigation }: { navigation: any }) => {
 const HomeScreen = React.memo((props: any) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const dispatch = useDispatch();
 	const { sessionRef } = useMezon();
+	const timerRef = useRef<any>();
 
 	useCheckUpdatedVersion();
 
@@ -74,46 +77,48 @@ const HomeScreen = React.memo((props: any) => {
 			if (state === 'active') {
 				dispatch(appActions.setLoadingMainMobile(true));
 			}
-			delay(handleAppStateChange, 800, state);
+			timerRef.current = delay(handleAppStateChange, 800, state);
 		});
 
 		return () => {
 			appStateSubscription.remove();
+			timerRef?.current && clearTimeout(timerRef.current);
 		};
-	}, [currentClan, currentChannelId]);
+	}, [currentClan, currentChannelId, isFromFcmMobile]);
 
 	const handleAppStateChange = async (state: string) => {
-		const isFromFCM = await load(STORAGE_IS_FROM_FCM);
-		if (isFromFCM?.toString() === 'true') {
+		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+		if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 			dispatch(appActions.setLoadingMainMobile(false));
+			return;
 		}
-		if (state === 'active' && isFromFCM?.toString() !== 'true') {
-			await messageLoader();
+		if (state === 'active' && isFromFCM?.toString() !== 'true' && !isFromFcmMobile) {
+			await messageLoaderBackground();
 		}
 	};
 
-	const messageLoader = async () => {
-		if (!currentClan?.clan_id) {
+	const messageLoaderBackground = async () => {
+		try {
+			if (!currentClan?.clan_id) {
+				dispatch(appActions.setLoadingMainMobile(false));
+				return null;
+			}
+			const store = await getStoreAsync();
+			sessionRef.current.token = '';
+			await store.dispatch(authActions.refreshSession());
+			await store.dispatch(
+				channelsActions.joinChannel({
+					clanId: currentClan?.clan_id,
+					channelId: currentChannelId,
+					noFetchMembers: true,
+				}),
+			);
 			dispatch(appActions.setLoadingMainMobile(false));
+			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
 			return null;
+		} catch (error) {
+			console.log('error messageLoaderBackground', error);
 		}
-		const store = await getStoreAsync();
-		sessionRef.current.token = '';
-		await store.dispatch(authActions.refreshSession());
-		dispatch(appActions.setLoadingMainMobile(false));
-		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
-		await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
-		save(STORAGE_CLAN_ID, currentClan?.clan_id);
-		await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
-		await store.dispatch(
-			channelsActions.joinChannel({
-				clanId: currentClan?.clan_id,
-				channelId: currentChannelId,
-				noFetchMembers: true,
-			}),
-		);
-		await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
-		return null;
 	};
 
 	return <DrawerScreen navigation={props.navigation} />;

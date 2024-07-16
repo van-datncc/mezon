@@ -1,5 +1,5 @@
 import { clansActions, emojiSuggestionActions, notificationActions } from '@mezon/store';
-import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
+import { gifsActions } from '@mezon/store';
 import { CustomLoaderFunction } from './appLoader';
 
 export const mainLoader: CustomLoaderFunction = async ({ dispatch }) => {

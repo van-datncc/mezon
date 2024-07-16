@@ -1,4 +1,4 @@
-import { useChannelMembers } from '@mezon/core';
+import { useChannelMembersActions } from '@mezon/core';
 import { ActionEmitEvent, ClockWarning, HammerIcon, SettingIcon, UserMinus } from '@mezon/mobile-components';
 import { Block, Colors, Text } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity, ClansEntity, selectCurrentClanId } from '@mezon/store-mobile';
@@ -43,7 +43,7 @@ const UserSettingProfile = ({
 }: IUserSettingProfileProps) => {
 	const [visibleKickUserModal, setVisibleKickUserModal] = useState<boolean>(false);
 	const [visibleManageUserModal, setVisibleManageUserModal] = useState<boolean>(false);
-	const { removeMemberClan } = useChannelMembers();
+	const { removeMemberClan } = useChannelMembersActions();
 	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
 	const checkUser = useMemo(() => userProfile?.user?.id === user?.user?.id, [user?.user?.id, userProfile?.user?.id]);
 	const currentClanId = useSelector(selectCurrentClanId);

@@ -15,22 +15,21 @@
 
 ## Prerequisites
 
-- Node.js 18.17.0
-- yarn 1.22.17
-- git bash
+-   Node.js 18.17.0
+-   yarn 1.22.17
+-   git bash
 
 ## Setup
 
-- Clone the repository
-
+-   Clone the repository
 
 ## Install the dependencies
 
-- Run `yarn` to install the dependencies
+-   Run `yarn` to install the dependencies
 
 ## Prepare the environment variables
 
-- Create a `.env` file in the `apps/chat` directory
+-   Create a `.env` file in the `apps/chat` directory
 
 ## Start the chat app
 
@@ -80,6 +79,69 @@ All libraries are located in the `libs` directory. Each library is a reusable co
 -   `logger`: Logger library, contains the logic to log the messages
 -   `utils`: Utility functions library
 
+### Dependencies
+
+Codebase is divided into multiple dependencies which are managed by `Nx`. There are 2 types of modules:
+
+-   apps: standalone applications
+-   libs: reusable codebase
+
+the libraries are shared by multiple applications and could be reused by multiple applications.
+
+There are several types of libraries:
+
+-   `ui`: UI elements library, the components are `stateless` and `dumb`
+-   `components`: Shared components library, the components are `stateful` and `smart` perform some logic through `context` and `hooks`
+-   `logic`: Logic library, contains the core logic of the application, could be reused by multiple applications e.g. web, mobile, desktop
+-   `utils`: Utility functions library
+
+The dependencies are depend on each other based on the following rules `(<- = depend on)`:
+
+-   `apps` <- `libs` ✅
+-   `libs` <- `libs` ✅
+-   `components` <- `ui` ✅
+-   `components` <- `store` ✅
+-   `store` <- `transports` ✅
+-   `store` <- `utils` ✅
+
+Bad dependencies:
+
+-   `apps` <- `apps` ❌
+-   `libs` <- `apps` ❌
+-  `components` <- `apps` ❌
+-   `ui` <- `components` ❌
+-   `store` <- `components` ❌
+-   `transports` <- `store` ❌
+-   `utils` <- `store` ❌
+-   `utils` <- `transports` ❌
+-   `mobile libs` <- `web libs` ❌
+-   `web libs` <- `desktop libs` ❌
+
+### Dependency Graph
+
+The dependency graph is managed by `Nx` and could be visualized by running the following command:
+
+```bash
+ npx nx graph
+```
+
+the output will be the dependency graph of the workspace.
+
+![Dependency Graph](./docs/dependency-graph.png)
+
+how to read the dependency graph:
+
+-   dependencies are represented by the arrows
+-   the `apps` are the standalone applications
+-   the `libs` are the reusable codebase
+-   the bad dependencies are the dependencies that are not allowed, for example, `apps` <- `apps`, `libs` <- `apps`, `ui` <- `components`, etc.
+-   in summary, all dependencies should be in top -> bottom direction, if a dependency is in the bottom -> top direction, it is a bad dependency
+-   Cycle dependencies are not allowed, a cycle dependency is a dependency that forms a cycle, to remove the cycle dependency, we need to move the shared code to the shared library or create a new library to manage the shared code
+
+for example, we have bad dependencies between `components` and `apps` which are not allowed.
+
+![alt text](./docs/bad-dependencies.png)
+
 ## Data Flow
 
 We are using `one-way` data flow architecture to manage the data flow of the application. The data flow is unidirectional follow the `Redux` pattern.
@@ -90,7 +152,7 @@ See more about the `Redux` pattern [here](https://redux.js.org/tutorials/fundame
 
 The core concepts are `one-way` data flow and `single source of truth`.
 
-## Application data flow
+## Application data
 
 ![Data Flow](./docs/data-flow.svg)
 
@@ -126,9 +188,10 @@ The application data flow is managed by some packages:
 -   The component could use the custom hook to manage the data and logic of the component
 
 ![Data Flow for voice](./docs/voice.svg)
-- voice context se co ham de tao room voice createVoiceConnection. 
-- Khi co nguoi join vao thi voicecontext se gui len chat server va chat server trigger onVoiceJoined (notify all) o mezon-js. 
-- Ben FE tao slice de luu va khi onVoiceJoined trigger va update so nguoi trong channel.
+
+-   voice context se co ham de tao room voice createVoiceConnection.
+-   Khi co nguoi join vao thi voicecontext se gui len chat server va chat server trigger onVoiceJoined (notify all) o mezon-js.
+-   Ben FE tao slice de luu va khi onVoiceJoined trigger va update so nguoi trong channel.
 
 ## Layouting
 
@@ -164,15 +227,15 @@ Toast notification is managed by the `toasts` slice. each toast has it own messa
 
 Actions
 
-- `addToast`: add a toast to the list
-- `removeToast`: remove a toast from the list
+-   `addToast`: add a toast to the list
+-   `removeToast`: remove a toast from the list
 
 Toast are displayed in the `<ToastContainer />` component.
 
 There are several ways to manage the toast notification:
 
-- dispatch the `addToast` action to add the toast to the list
-- dispatch any action with `withToast` meta
+-   dispatch the `addToast` action to add the toast to the list
+-   dispatch any action with `withToast` meta
 
 ```tsx
     // add toast notification to any action
@@ -200,34 +263,29 @@ Error handling is managed by the `errors` slice. each error has it own message a
 By default, the error is displayed as toast notification. in case you want to disable the toast notification, you could set the `toast` meta to `false`.
 
 ```tsx
-    // No toast notification
-    return thunkAPI.rejectWithValue(
-        error,
-        withError({
-            toast: false,
-        })
-    );
+// No toast notification
+return thunkAPI.rejectWithValue(
+	error,
+	withError({
+		toast: false,
+	}),
+);
 
-    // toast with custom message
-    return thunkAPI.rejectWithValue(
-        error,
-        withError('Custom error message')
-    );
+// toast with custom message
+return thunkAPI.rejectWithValue(error, withError('Custom error message'));
 
-    // fully custom error
-    return thunkAPI.rejectWithValue(
-        error,
-        withError({
-            toast: {
-                message: 'Custom error message',
-                type: 'error',
-                theme: 'dark',
-            }
-        })
-    );
+// fully custom error
+return thunkAPI.rejectWithValue(
+	error,
+	withError({
+		toast: {
+			message: 'Custom error message',
+			type: 'error',
+			theme: 'dark',
+		},
+	}),
+);
 ```
-
-
 
 ## Performance Optimization
 
@@ -263,14 +321,15 @@ Using `Prettier` and `ESLint` to format the codebase. The codebase should be for
 See more about the naming convention [here](https://github.com/airbnb/javascript/tree/master/react#naming)
 
 ## 🔔 Coding Rules
--  Stick with the architecture
--  Do not cause blocks to other team members
+
+-   Stick with the architecture
+-   Do not cause blocks to other team members
 
 ## ⚠ Notice
--  Identify and clarify to the team what and where you are going to add to the repo
--  Do self-test for your own codes
--  Contact **2 team members** to review your changes
 
+-   Identify and clarify to the team what and where you are going to add to the repo
+-   Do self-test for your own codes
+-   Contact **2 team members** to review your changes
 
 ## Troubleshooting
 
@@ -278,8 +337,8 @@ See more about the naming convention [here](https://github.com/airbnb/javascript
 
 See: https://github.com/electron/electron/issues/3331
 
-- 1, First build and package the app as usual
-- 2, Run the app with `./dist/executables/win-unpacked/mezon.exe --remote-debugging-port=8315`
-- 3, Open Chrome and navigate to `chrome://inspect`
-- 4, Click on `Configure...` and add `localhost:8315` to the list
-- 5, Click on `inspect` to open the DevTools
+-   1, First build and package the app as usual
+-   2, Run the app with `./dist/executables/win-unpacked/mezon.exe --remote-debugging-port=8315`
+-   3, Open Chrome and navigate to `chrome://inspect`
+-   4, Click on `Configure...` and add `localhost:8315` to the list
+-   5, Click on `inspect` to open the DevTools

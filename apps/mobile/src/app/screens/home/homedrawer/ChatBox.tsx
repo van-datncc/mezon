@@ -101,7 +101,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [listChannelsMention, setListChannelsMention] = useState<ChannelsMention[]>([]);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({
 		channelId: props.channelId,
-		channelLabel: props.channelLabel,
 		mode: props.mode,
 		directMessageId: props?.channelId,
 	});
@@ -275,15 +274,15 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		} else {
 			const reference = currentSelectedReplyMessage
 				? [
-						{
-							message_id: '',
-							message_ref_id: currentSelectedReplyMessage.id,
-							ref_type: 0,
-							message_sender_id: currentSelectedReplyMessage?.user?.id,
-							content: JSON.stringify(currentSelectedReplyMessage.content),
-							has_attachment: Boolean(currentSelectedReplyMessage?.attachments?.length),
-						},
-					]
+					{
+						message_id: '',
+						message_ref_id: currentSelectedReplyMessage.id,
+						ref_type: 0,
+						message_sender_id: currentSelectedReplyMessage?.user?.id,
+						content: JSON.stringify(currentSelectedReplyMessage.content),
+						has_attachment: Boolean(currentSelectedReplyMessage?.attachments?.length),
+					},
+				]
 				: undefined;
 			setEmojiSuggestion('');
 			if (![EMessageActionType.CreateThread].includes(props.messageAction)) {
@@ -501,16 +500,16 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const handleMentionInput = (mentions: MentionDataProps[]) => {
 		const mentionedUsers: UserMentionsOpt[] = [];
 		const mentionList =
-			members[0].users?.map((item: ChannelMembersEntity) => ({
+			members?.map((item: ChannelMembersEntity) => ({
 				id: item?.user?.id ?? '',
 				display: item?.user?.username ?? '',
 				avatarUrl: item?.user?.avatar_url ?? '',
 			})) ?? [];
 		const convertedMentions: UserMentionsOpt[] = mentionList
 			? mentionList.map((mention) => ({
-					user_id: mention.id.toString() ?? '',
-					username: mention.display ?? '',
-				}))
+				user_id: mention.id.toString() ?? '',
+				username: mention.display ?? '',
+			}))
 			: [];
 		if (mentions?.length > 0) {
 			if (mentions.some((mention) => mention.display === '@here')) {

@@ -172,15 +172,16 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		}
 
 		const session = sessionRef.current;
+
 		if (!session) {
 			return;
 		}
 
-		if (!socketRef.current) {
-			return;
-		}
+		const socket = clientRef.current.createSocket(clientRef.current.useSSL, false, new WebSocketAdapterPb());
+		socketRef.current = socket;
 
 		const session2 = await socketRef.current.connect(session, true);
+
 		sessionRef.current = session2;
 	}, [clientRef, sessionRef, socketRef]);
 
