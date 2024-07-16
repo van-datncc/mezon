@@ -1,4 +1,4 @@
-import { useAppParams } from '@mezon/core';
+import { useAppParams } from '../../app/hooks/useAppParams';
 import {
 	channelMembersActions,
 	channelsActions,

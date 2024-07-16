@@ -13,7 +13,8 @@ import {
 	selectTheme,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
+import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from '@mezon/store';
+import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from '@mezon/store-mobile';
 import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
