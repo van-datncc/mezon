@@ -1,14 +1,14 @@
 import { Icons } from '@mezon/mobile-components';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { authActions, channelsActions, clansActions, messagesActions, useAppDispatch } from '@mezon/store-mobile';
-import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView } from 'react-native';
-import { style } from './styles';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import MezonSearch from '../../temp-ui/MezonSearch';
-import { reserve, MezonMenu, IMezonMenuItemProps, IMezonMenuSectionProps } from '../../temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../temp-ui';
 import MezonMenuItem from '../../temp-ui/MezonMenuItem';
+import MezonSearch from '../../temp-ui/MezonSearch';
+import { style } from './styles';
 
 export const Settings = ({ navigation }: { navigation: any }) => {
 	const { t, i18n } = useTranslation(['setting']);
@@ -44,116 +44,116 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.getNitro'),
-			icon: <Icons.NitroWheelIcon color={themeValue.textStrong}/>,
+			icon: <Icons.NitroWheelIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
-					screen: APP_SCREEN.SETTINGS.ACCOUNT
+					screen: APP_SCREEN.SETTINGS.ACCOUNT,
 				});
 			},
 			expandable: true,
 			title: t('accountSettings.account'),
-			icon: <Icons.UserCircleIcon color={themeValue.textStrong}/>,
+			icon: <Icons.UserCircleIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.privacySafety'),
-			icon: <Icons.ShieldIcon color={themeValue.textStrong}/>,
+			icon: <Icons.ShieldIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.familyCenter'),
-			icon: <Icons.GroupIcon color={themeValue.textStrong}/>,
+			icon: <Icons.GroupIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.authorizedApp'),
-			icon: <Icons.KeyIcon color={themeValue.textStrong}/>,
+			icon: <Icons.KeyIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.device'),
-			icon: <Icons.LaptopPhoneIcon color={themeValue.textStrong}/>,
+			icon: <Icons.LaptopPhoneIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.connection'),
-			icon: <Icons.PuzzlePieceIcon color={themeValue.textStrong}/>,
+			icon: <Icons.PuzzlePieceIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.clip'),
-			icon: <Icons.ClipIcon color={themeValue.textStrong}/>,
+			icon: <Icons.ClipIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.friendRequests'),
-			icon: <Icons.FriendIcon color={themeValue.textStrong}/>,
+			icon: <Icons.FriendIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.QRScan'),
-			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong}/>,
+			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} />,
 		},
-	]
+	];
 
 	const PaymentMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.serverBoost'),
-			icon: <Icons.BoostTier2Icon color={themeValue.textStrong}/>,
+			icon: <Icons.BoostTier2Icon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.nitroGift'),
-			icon: <Icons.GiftIcon color={themeValue.textStrong}/>,
+			icon: <Icons.GiftIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('paymentSettings.restoreSubscription'),
-			icon: <Icons.NitroWheelIcon color={themeValue.textStrong}/>,
+			icon: <Icons.NitroWheelIcon color={themeValue.textStrong} />,
 		},
-	]
+	];
 
 	const AppMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.voice'),
-			icon: <Icons.MicrophoneIcon color={themeValue.textStrong}/>,
+			icon: <Icons.MicrophoneIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
-					screen: APP_SCREEN.SETTINGS.APPEARANCE
+					screen: APP_SCREEN.SETTINGS.APPEARANCE,
 				});
 			},
 			expandable: true,
 			title: t('appSettings.appearance'),
-			icon: <Icons.PaintPaletteIcon color={themeValue.textStrong}/>,
+			icon: <Icons.PaintPaletteIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.accessibility'),
-			icon: <Icons.AccessibilityIcon color={themeValue.textStrong}/>,
+			icon: <Icons.AccessibilityIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
-					screen: APP_SCREEN.SETTINGS.LANGUAGE
+					screen: APP_SCREEN.SETTINGS.LANGUAGE,
 				});
 			},
 			title: t('appSettings.language'),
@@ -165,40 +165,40 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.chat'),
-			icon: <Icons.ImageTextIcon color={themeValue.textStrong}/>,
+			icon: <Icons.ImageTextIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.webBrowser'),
-			icon: <Icons.GlobeEarthIcon color={themeValue.textStrong}/>,
+			icon: <Icons.GlobeEarthIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.notifications'),
-			icon: <Icons.BellIcon color={themeValue.textStrong}/>,
+			icon: <Icons.BellIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.appIcon'),
-			icon: <Icons.BrandDiscordIcon color={themeValue.textStrong}/>,
+			icon: <Icons.BrandDiscordIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('appSettings.advanced'),
-			icon: <Icons.SettingsIcon color={themeValue.textStrong}/>,
+			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
 		},
-	]
+	];
 
 	const SupportMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.support'),
-			icon: <Icons.CircleQuestionIcon color={themeValue.textStrong}/>,
+			icon: <Icons.CircleQuestionIcon color={themeValue.textStrong} />,
 		},
 		{
 			onPress: () => reserve(),
@@ -210,18 +210,18 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('supportSettings.acknowledgement'),
-			icon: <Icons.CircleInformationIcon color={themeValue.textStrong}/>,
+			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
-	]
+	];
 
 	const WhatsNew: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('whatsNew.whatsNew'),
-			icon: <Icons.CircleInformationIcon color={themeValue.textStrong}/>,
+			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
-	]
+	];
 
 	const menu: IMezonMenuSectionProps[] = [
 		{
@@ -244,7 +244,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('whatsNew.title'),
 			items: WhatsNew,
 		},
-	]
+	];
 
 	return (
 		<ScrollView contentContainerStyle={styles.settingContainer}>
@@ -262,4 +262,3 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		</ScrollView>
 	);
 };
-

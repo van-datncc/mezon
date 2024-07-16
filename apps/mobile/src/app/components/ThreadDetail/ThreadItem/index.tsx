@@ -1,6 +1,6 @@
 import { AngleRightIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { ChannelsEntity, channelsActions, getStoreAsync, messagesActions, selectMemberByUserId } from '@mezon/store-mobile';
+import { ChannelsEntity, channelsActions, getStoreAsync, selectMemberByUserId } from '@mezon/store-mobile';
 import { IChannel, convertTimeMessage } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
@@ -31,13 +31,13 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 			return lastTime;
 		}
 	}, [thread]);
-  let lastSentMessage = '';
-  try {
-    const lastSentMessageContent = thread?.last_sent_message?.content ? JSON.parse(thread?.last_sent_message?.content): {};
-    lastSentMessage = lastSentMessageContent?.t || '';
-  } catch (error) {
-    console.error('JSON parse error:', error);
-  }
+	let lastSentMessage = '';
+	try {
+		const lastSentMessageContent = thread?.last_sent_message?.content ? JSON.parse(thread?.last_sent_message?.content) : {};
+		lastSentMessage = lastSentMessageContent?.t || '';
+	} catch (error) {
+		console.error('JSON parse error:', error);
+	}
 
 	return (
 		<Pressable

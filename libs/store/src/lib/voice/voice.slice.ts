@@ -1,6 +1,6 @@
-import { ChannelType } from 'mezon-js';
 import { IChannelMember, IVoice, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ChannelType } from 'mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
 
 export const VOICE_FEATURE_KEY = 'voice';

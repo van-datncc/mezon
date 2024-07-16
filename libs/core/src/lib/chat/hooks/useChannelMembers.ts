@@ -1,17 +1,17 @@
 import {
-	ChannelMembersEntity,
-	channelMembersActions,
-	clansActions,
-	selectMemberByUserId,
-	selectMemberStatus,
-	selectMembersByChannelId,
-	useAppDispatch,
+    ChannelMembersEntity,
+    channelMembersActions,
+    clansActions,
+    selectMemberByUserId,
+    selectMemberStatus,
+    selectMembersByChannelId,
+    useAppDispatch,
 } from '@mezon/store';
 import { RemoveChannelUsers, RemoveClanUsers } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { ChannelType } from 'mezon-js';
 
 export type useChannelMembersOptions = {
 	channelId?: string | null;

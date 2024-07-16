@@ -1,5 +1,14 @@
-import { useApp } from '@mezon/core';
-import { RolesClanEntity, getIsShow, getNewNameRole, getSelectedRoleId, selectTheme, setAddMemberRoles, setNameRoleNew, setSelectedPermissions, setSelectedRoleId } from '@mezon/store';
+import {
+	RolesClanEntity,
+	getIsShow,
+	getNewNameRole,
+	getSelectedRoleId,
+	selectTheme,
+	setAddMemberRoles,
+	setNameRoleNew,
+	setSelectedPermissions,
+	setSelectedRoleId,
+} from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
@@ -36,7 +45,7 @@ const SettingListRole = (props: closeEditRole) => {
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
 	return (
 		<div className="w-1/3 pr-3 flex flex-col">
-			<div className="font-semibold mb-4 flex cursor-pointer"  onClick={() => handleClose()} >
+			<div className="font-semibold mb-4 flex cursor-pointer" onClick={() => handleClose()}>
 				<div className="rotate-90 -ml-[10px] dark:text-textDarkTheme text-textLightTheme">
 					<Icons.ArrowDown />
 				</div>
@@ -44,12 +53,12 @@ const SettingListRole = (props: closeEditRole) => {
 					BACK
 				</div>
 			</div>
-			<div className={`overflow-y-scroll flex flex-col gap-y-2 hide-scrollbar  ${appearanceTheme === "light" ? 'customScrollLightMode' : ''}`}>
+			<div className={`overflow-y-scroll flex flex-col gap-y-2 hide-scrollbar  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 				{clickedRole === 'New Role' ? (
 					<div>
 						<button className="w-full py-1.5 px-[10px] text-[15px] dark:bg-[#4e5058] bg-bgModifierHoverLight dark:text-textDarkTheme text-textSecondary800 font-medium inline-flex gap-x-2 items-center rounded">
-							<div className='size-3 bg-contentTertiary rounded-full min-w-3'></div>
-							<span className='one-line'>{nameRoleNew ?? 'New Role'}</span>
+							<div className="size-3 bg-contentTertiary rounded-full min-w-3"></div>
+							<span className="one-line">{nameRoleNew ?? 'New Role'}</span>
 						</button>
 					</div>
 				) : (
@@ -61,8 +70,8 @@ const SettingListRole = (props: closeEditRole) => {
 									clickedRole === role.id ? 'dark:bg-[#4e5058] bg-bgModifierHoverLight' : ''
 								} dark:text-textDarkTheme text-textLightTheme`}
 							>
-								<div className='size-3 bg-contentTertiary rounded-full min-w-3'></div>
-								<span className='one-line'>{role.title}</span>
+								<div className="size-3 bg-contentTertiary rounded-full min-w-3"></div>
+								<span className="one-line">{role.title}</span>
 							</button>
 						</div>
 					))

@@ -1,11 +1,10 @@
+import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction } from '@mezon/core';
-import {
-	ActionEmitEvent,
-	CopyIcon,
-	Icons,
-} from '@mezon/mobile-components';
-import { baseColor, Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
+import { Colors, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { useAppDispatch } from '@mezon/store';
 import { appActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -13,7 +12,9 @@ import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Platform, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import RNFetchBlob from 'rn-fetch-blob';
+import { MezonBottomSheet } from '../../../../../../app/temp-ui';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
@@ -21,16 +22,11 @@ import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
 import { style } from './styles';
-import { MezonBottomSheet } from '../../../../../../app/temp-ui';
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-import RNFetchBlob from 'rn-fetch-blob';
-import { useAppDispatch } from '@mezon/store';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const dispatch = useAppDispatch()
+	const dispatch = useAppDispatch();
 	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -76,18 +72,18 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const saveImageToCameraRoll = async (filePath: string, type: string) => {
 		try {
-			const a = await CameraRoll.save(filePath, { type: type === "video" ? "video" : "photo" });
+			const a = await CameraRoll.save(filePath, { type: type === 'video' ? 'video' : 'photo' });
 			console.log(a);
 
 			Toast.show({
-				text1: "Save successfully",
-				type: "info"
-			})
+				text1: 'Save successfully',
+				type: 'info',
+			});
 		} catch (err) {
 			Toast.show({
-				text1: "Error saving image",
-				type: "error"
-			})
+				text1: 'Error saving image',
+				type: 'error',
+			});
 		} finally {
 			if (Platform.OS === 'android') {
 				await RNFetchBlob.fs.unlink(filePath);
@@ -154,26 +150,20 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const handleActionPinMessage = () => {
 		if (message) onClose();
-		timeoutRef.current = setTimeout(
-			() => {
-				onConfirmAction({
-					type: EMessageActionType.PinMessage,
-				});
-			},
-			500
-		);
+		timeoutRef.current = setTimeout(() => {
+			onConfirmAction({
+				type: EMessageActionType.PinMessage,
+			});
+		}, 500);
 	};
 
 	const handleActionUnPinMessage = () => {
 		if (message) onClose();
-		timeoutRef.current = setTimeout(
-			() => {
-				onConfirmAction({
-					type: EMessageActionType.UnPinMessage,
-				});
-			},
-			500
-		);
+		timeoutRef.current = setTimeout(() => {
+			onConfirmAction({
+				type: EMessageActionType.UnPinMessage,
+			});
+		}, 500);
 	};
 
 	const handleActionMarkUnRead = () => {
@@ -199,7 +189,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			const url = media[0].url;
 			Clipboard.setString(url);
 		}
-	}
+	};
 
 	const handleActionSaveImage = async () => {
 		const media = message?.attachments;
@@ -207,16 +197,16 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		dispatch(appActions.setLoadingMainMobile(true));
 		if (media && media.length > 0) {
 			const url = media[0].url;
-			const type = media?.[0]?.filetype?.split?.("/");
+			const type = media?.[0]?.filetype?.split?.('/');
 			const filePath = await downloadImage(url, type[1]);
 			console.log(filePath);
 
 			if (filePath) {
-				await saveImageToCameraRoll("file://" + filePath, type[0]);
+				await saveImageToCameraRoll('file://' + filePath, type[0]);
 			}
 		}
 		dispatch(appActions.setLoadingMainMobile(false));
-	}
+	};
 
 	const handleActionReportMessage = () => {
 		onClose();
@@ -305,7 +295,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.CopyText:
 				return <Icons.CopyIcon color={themeValue.text} />;
 			case EMessageActionType.DeleteMessage:
-				return <Icons.TrashIcon color={baseColor.red} height={20} width={20}/>;
+				return <Icons.TrashIcon color={baseColor.red} height={20} width={20} />;
 			case EMessageActionType.PinMessage:
 				return <Icons.PinIcon color={themeValue.text} />;
 			case EMessageActionType.UnPinMessage:
@@ -336,18 +326,20 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
-			isDM && EMessageActionType.CreateThread
+			isDM && EMessageActionType.CreateThread,
 		];
 
 		let availableMessageActions: IMessageAction[] = [];
 		if (isMyMessage) {
-			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyOtherMessage, ...listOfActionShouldHide].includes(action.type));
+			availableMessageActions = getMessageActions(t).filter(
+				(action) => ![...listOfActionOnlyOtherMessage, ...listOfActionShouldHide].includes(action.type),
+			);
 		} else {
-			availableMessageActions = getMessageActions(t).filter((action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type));
+			availableMessageActions = getMessageActions(t).filter(
+				(action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type),
+			);
 		}
-		const mediaList = message?.attachments.length > 0
-			? []
-			: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
+		const mediaList = message?.attachments.length > 0 ? [] : [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
 		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
@@ -355,8 +347,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		return {
 			frequent: availableMessageActions.filter((action) => frequentActionList.includes(action.type)),
 			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
-			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
-		}
+			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type)),
+		};
 	}, [t, userProfile, message, listPinMessages, isDM]);
 
 	const renderUserInformation = () => {
@@ -373,7 +365,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			emoji?.trim(),
 			1,
 			senderId ?? '',
-			false
+			false,
 		);
 		onClose();
 	};
@@ -387,7 +379,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 							<Pressable
 								key={index}
 								style={styles.favouriteIconItem}
-								onPress={() => handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, item.shortname, userProfile?.user?.id)}
+								onPress={() =>
+									handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, item.shortname, userProfile?.user?.id)
+								}
 							>
 								<FastImage
 									source={{
@@ -403,7 +397,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 						);
 					})}
 
-					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28, }}>
+					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28 }}>
 						<Icons.ReactionIcon color={themeValue.text} />
 					</Pressable>
 				</View>
@@ -414,7 +408,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
 								<Text style={styles.actionText}>{action.title}</Text>
 							</Pressable>
-						)
+						);
 					})}
 				</View>
 				<View style={styles.messageActionGroup}>
@@ -424,7 +418,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
 								<Text style={styles.actionText}>{action.title}</Text>
 							</Pressable>
-						)
+						);
 					})}
 				</View>
 				<View style={styles.messageActionGroup}>
@@ -434,7 +428,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
 								<Text style={styles.warningActionText}>{action.title}</Text>
 							</Pressable>
-						)
+						);
 					})}
 				</View>
 			</View>
@@ -491,13 +485,13 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const snapPoints = useMemo(() => {
 		if (isShowEmojiPicker || isOnlyEmojiPicker) {
-			return ['90%']
+			return ['90%'];
 		}
 		if ([EMessageBSToShow.UserInformation].includes(type)) {
-			return ['60%']
+			return ['60%'];
 		}
-		return ['50%']
-	}, [isShowEmojiPicker, isOnlyEmojiPicker, type])
+		return ['50%'];
+	}, [isShowEmojiPicker, isOnlyEmojiPicker, type]);
 
 	return (
 		<MezonBottomSheet
@@ -514,7 +508,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 					<View style={styles.bottomSheetBarWrapper}>
 						<View style={styles.bottomSheetBar} />
 					</View>
-				)
+				);
 			}}
 		>
 			<BottomSheetScrollView style={styles.bottomSheetWrapper}>{content}</BottomSheetScrollView>

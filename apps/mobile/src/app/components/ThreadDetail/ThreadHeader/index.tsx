@@ -1,14 +1,13 @@
+import { useMemberStatus } from '@mezon/core';
 import { ArrowLeftIcon, HashSignIcon, HashSignLockIcon, UserGroupIcon } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
-import { Text } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { styles } from './styles';
-import { useMemberStatus } from '@mezon/core';
 
 export const ThreadHeader = memo(() => {
 	const currentChannel = useContext(threadDetailContext);
@@ -31,7 +30,7 @@ export const ThreadHeader = memo(() => {
 							</View>
 						) : (
 							<View style={styles.avatarSize}>
-								<Image source={{ uri: currentChannel.channel_avatar[0] }} style={[styles.friendAvatar, styles.avatarSize]} />
+								<Image source={{ uri: currentChannel.channel_avatar?.[0] }} style={[styles.friendAvatar, styles.avatarSize]} />
 								<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 							</View>
 						)}

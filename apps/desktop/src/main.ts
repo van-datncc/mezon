@@ -38,17 +38,21 @@ ipcMain.handle('get-device-id', async () => {
 	return await machineId();
 });
 
-ipcMain.on('navigate-to-url', async (event, url) => {
+ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 	if (App.mainWindow) {
 		const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
-		App.mainWindow.loadURL(
-			format({
-				pathname: baseUrl,
-				protocol: 'file:',
-				slashes: true,
-				query: { notificationUrl: url },
-			}),
-		);
+
+		if (path && !isSubPath) {
+			App.mainWindow.loadURL(
+				format({
+					pathname: baseUrl,
+					protocol: 'file:',
+					slashes: true,
+					query: { notificationPath: path },
+				}),
+			);
+		}
+
 		if (!App.mainWindow.isVisible()) {
 			App.mainWindow.show();
 		}

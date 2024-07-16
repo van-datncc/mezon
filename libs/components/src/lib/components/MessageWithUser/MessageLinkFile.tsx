@@ -2,7 +2,6 @@ import { RenderAttachmentThumbnail } from '@mezon/ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useState } from 'react';
 import { Icons } from '../../components';
-import { useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
@@ -45,7 +44,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 			{hideTheInformationFile && (
 				<div className=" cursor-pointer " onClick={handleDownload} onKeyDown={handleDownload}>
 					<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
-					<p className='dark:text-textDarkTheme text-textLightTheme'>size: {formatFileSize(attachmentData.size || 0)}</p>
+					<p className="dark:text-textDarkTheme text-textLightTheme">size: {formatFileSize(attachmentData.size || 0)}</p>
 				</div>
 			)}
 			{hideTheInformationFile && hoverShowOptButtonStatus && (

@@ -8,8 +8,8 @@ import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonModal } from '../../../../../../../../app/temp-ui/MezonModal';
 import KickUserClanModal from '../KickUserClanModal';
-import { styles } from './UserSettingProfile.style';
 import { ManageUserModal } from '../ManageUserModal';
+import { styles } from './UserSettingProfile.style';
 
 export enum EActionSettingUserProfile {
 	Manage = 'Manage',
@@ -27,11 +27,11 @@ interface IUserSettingProfileProps {
 }
 
 export interface IProfileSetting {
-    label: string;
-    value: EActionSettingUserProfile;
-    icon: React.JSX.Element;
-    action: (action?: EActionSettingUserProfile) => void;
-    isShow: boolean;
+	label: string;
+	value: EActionSettingUserProfile;
+	icon: React.JSX.Element;
+	action: (action?: EActionSettingUserProfile) => void;
+	isShow: boolean;
 }
 
 const UserSettingProfile = ({
@@ -110,20 +110,19 @@ const UserSettingProfile = ({
 		<Block>
 			{profileSetting.some(action => action.isShow) && (
 				<Block style={styles.wrapper}>
-					{profileSetting?.map((item, index) => (
-						<TouchableOpacity onPress={() => item.action(item.value)} key={index}>
-							{item?.isShow ? (
+					{profileSetting?.map((item, index) => {
+						if (!item?.isShow) return <Block />;
+						return (
+							<TouchableOpacity onPress={() => item.action(item.value)} key={index}>
 								<Block style={styles.option}>
 									{item?.icon}
-									<Text
-										style={styles.textOption}
-									>
+									<Text style={styles.textOption}>
 										{item?.label}
 									</Text>
 								</Block>
-							) : null}
-						</TouchableOpacity>
-					))}
+							</TouchableOpacity>
+						)
+					})}
 				</Block>
 			)}
 

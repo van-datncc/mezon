@@ -5,12 +5,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 type ChannelMessageBoxProps = {
 	channelId: string;
-	channelLabel: string;
 	mode: number;
 };
 
-function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelId, channelLabel, mode });
+function ImageSquare({ channelId, mode }: ChannelMessageBoxProps) {
+	const { sendMessage } = useChatSending({ channelId, mode });
 
 	const handleSend = useCallback(
 		(
@@ -86,7 +85,7 @@ function ImageSquare({ channelId, channelLabel, mode }: ChannelMessageBoxProps) 
 							alt={`Img`}
 							className="w-full h-auto cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton hover:rounded-lg border border-bgHoverMember rounded-lg"
 							onClick={() => handleClickImage(image.url)}
-							role='button'
+							role="button"
 						/>
 					))}
 				</div>

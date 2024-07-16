@@ -1,6 +1,6 @@
+import { trackError } from '@mezon/utils';
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { Toast, ToastPayload, toastActions } from '../toasts';
-import { trackError } from '@mezon/utils';
 
 // Create the middleware instance and methods
 export const errorListenerMiddleware = createListenerMiddleware({

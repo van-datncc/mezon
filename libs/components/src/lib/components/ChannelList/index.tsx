@@ -4,8 +4,8 @@ import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel } fr
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { CreateNewChannelModal } from '../CreateChannelModal';
 import * as Icons from '../../../../../ui/src/lib/Icons';
+import { CreateNewChannelModal } from '../CreateChannelModal';
 import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };
@@ -61,7 +61,9 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 		>
 			{<CreateNewChannelModal />}
 			{currentClan?.banner && (
-				<div className="h-[136px]">{currentClan?.banner && <img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />}</div>
+				<div className="h-[136px]">
+					{currentClan?.banner && <img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />}
+				</div>
 			)}
 			<div className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
 				<Events />

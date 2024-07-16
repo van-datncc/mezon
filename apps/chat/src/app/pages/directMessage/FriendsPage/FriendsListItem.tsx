@@ -40,10 +40,11 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	return (
 		<div className="border-t-[1px] dark:border-borderDefault border-gray-300">
 			<div
-				key={friend.user?.id} onClick={() => directMessageWithUser(friend.user?.id ?? '')}
+				key={friend.user?.id}
+				onClick={() => directMessageWithUser(friend.user?.id ?? '')}
 				className=" py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-gray-800 hover:bg-white rounded-lg"
 			>
-				<div key={friend.user?.id} >
+				<div key={friend.user?.id}>
 					<MemberProfile
 						avatar={friend?.user?.avatar_url ?? ''}
 						name={friend?.user?.username ?? ''}
@@ -76,7 +77,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 										<Icons.IconEditThreeDot className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
 									</button>
 								)}
-								style={{boxShadow: "rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px"}}
+								style={{ boxShadow: 'rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px' }}
 							>
 								<Dropdown.Item
 									theme={{

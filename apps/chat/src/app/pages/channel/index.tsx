@@ -118,7 +118,6 @@ export default function ChannelMain() {
 									<ChannelMessageBox
 										clanId={currentChannel?.clan_id}
 										channelId={currentChannel?.id}
-										channelLabel={currentChannel?.channel_label || ''}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 									/>
 								) : (
