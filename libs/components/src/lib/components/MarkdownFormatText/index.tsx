@@ -167,7 +167,7 @@ const MarkdownFormatText: React.FC<MarkdownFormatTextProps> = ({ mentions, isOnl
 	}, [mentions, getLinkinvites, isOnlyEmoji]);
 
 	return (
-		<article style={{ letterSpacing: '-0.02rem' }} className={classes}>
+		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
 			{memoizedMentions}
 		</article>
 	);
