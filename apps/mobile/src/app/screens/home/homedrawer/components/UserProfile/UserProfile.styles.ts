@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
 	},
 	container: {
 		paddingHorizontal: size.s_14,
-		paddingVertical: size.s_50,
+		marginTop: size.s_30
 	},
 	userInfo: {
 		backgroundColor: Colors.secondary,
@@ -67,6 +67,7 @@ export const styles = StyleSheet.create({
 	roles: {
 		flexDirection: 'row',
 		gap: size.s_10,
+		flexWrap: 'wrap'
 	},
 	roleItem: {
 		flexDirection: 'row',
