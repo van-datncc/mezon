@@ -2,7 +2,7 @@ import { IChannelCategorySetting, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ApiDirectChannelVoice } from 'mezon-js/api.gen';
-import { IDirectChannelVoid } from '../../../../utils/src';
+import { IDirectChannelVoid } from '@mezon/utils';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 
 export interface DirectChannelVoidEntity extends IDirectChannelVoid {
