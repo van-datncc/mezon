@@ -226,37 +226,55 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 
-	const setCallbackEventFn = React.useCallback((socket: Socket) => {
-		socket.onvoicejoined = onvoicejoined;
+	const setCallbackEventFn = React.useCallback(
+		(socket: Socket) => {
+			socket.onvoicejoined = onvoicejoined;
 
-		socket.onvoiceleaved = onvoiceleaved;
+			socket.onvoiceleaved = onvoiceleaved;
 
-		socket.onchannelmessage = onchannelmessage;
+			socket.onchannelmessage = onchannelmessage;
 
-		socket.onchannelpresence = onchannelpresence;
+			socket.onchannelpresence = onchannelpresence;
 
-		socket.ondisconnect = ondisconnect;
+			socket.ondisconnect = ondisconnect;
 
-		socket.onerror = onerror;
+			socket.onerror = onerror;
 
-		socket.onmessagetyping = onmessagetyping;
+			socket.onmessagetyping = onmessagetyping;
 
-		socket.onmessagereaction = onmessagereaction;
+			socket.onmessagereaction = onmessagereaction;
 
-		socket.onnotification = onnotification;
+			socket.onnotification = onnotification;
 
-		socket.onpinmessage = onpinmessage;
+			socket.onpinmessage = onpinmessage;
 
-		socket.onstatuspresence = onstatuspresence;
+			socket.onstatuspresence = onstatuspresence;
 
-		socket.onchannelcreated = onchannelcreated;
+			socket.onchannelcreated = onchannelcreated;
 
-		socket.onchanneldeleted = onchanneldeleted;
+			socket.onchanneldeleted = onchanneldeleted;
 
-		socket.onchannelupdated = onchannelupdated;
+			socket.onchannelupdated = onchannelupdated;
 
-		socket.onheartbeattimeout = onHeartbeatTimeout;
-	}, [onchannelcreated, onchanneldeleted, onchannelmessage, onchannelpresence, onchannelupdated, onerror, onmessagereaction, onmessagetyping, onnotification, onpinmessage, onstatuspresence, onvoicejoined, onvoiceleaved]);
+			socket.onheartbeattimeout = onHeartbeatTimeout;
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[
+			onchannelcreated,
+			onchanneldeleted,
+			onchannelmessage,
+			onchannelpresence,
+			onchannelupdated,
+			onerror,
+			onmessagereaction,
+			onmessagetyping,
+			onnotification,
+			onpinmessage,
+			onstatuspresence,
+			onvoicejoined,
+			onvoiceleaved,
+		],
+	);
 
 	const ondisconnect = useCallback(() => {
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
@@ -265,6 +283,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setCallbackEventFn(socket as Socket);
 		});
 	}, [dispatch, reconnect, clanIdActive, setCallbackEventFn]);
+
 	const onHeartbeatTimeout = useCallback(() => {
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect(clanIdActive ?? '').then((socket) => {
@@ -309,6 +328,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchanneldeleted,
 		onchannelupdated,
 		onHeartbeatTimeout,
+		setCallbackEventFn,
 	]);
 
 	useEffect(() => {
