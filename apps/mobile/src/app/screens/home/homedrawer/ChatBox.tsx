@@ -101,7 +101,6 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	const [listChannelsMention, setListChannelsMention] = useState<ChannelsMention[]>([]);
 	const { sendMessage, sendMessageTyping, EditSendMessage } = useChatSending({
 		channelId: props.channelId,
-		channelLabel: props.channelLabel,
 		mode: props.mode,
 		directMessageId: props?.channelId,
 	});
