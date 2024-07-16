@@ -177,9 +177,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			return;
 		}
 
-		if (!socketRef.current) {
-			return;
-		}
+		const socket = clientRef.current.createSocket(clientRef.current.useSSL, false, new WebSocketAdapterPb());
+		socketRef.current = socket;
 
 		const session2 = await socketRef.current.connect(session, true);
 
