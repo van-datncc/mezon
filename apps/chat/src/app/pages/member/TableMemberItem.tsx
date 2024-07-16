@@ -28,7 +28,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, discordJoinTi
   }, [userById?.role_id, RolesClan]);
   
   return (
-    <div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-[#ccced3] last:border-b-0">
+    <div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-[textSecondary] last:border-b-0">
       <div className="flex-3 p-1">
         <div className="flex flex-row gap-2 items-center">
           <img src={avatar} alt={username} className="w-[36px] h-[36px] min-w-[36px] rounded-full object-cover"/>
@@ -49,7 +49,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, discordJoinTi
           <span className={'inline-flex items-center'}>
             <RoleNameCard roleName={userRolesClan[0]?.title || ''}/>
             {userRolesClan.length > 1 &&
-              <span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant ml-1">
+              <span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-textThreadPrimary text-colorTextLightMode hoverIconBlackImportant ml-1">
                 <Tooltip
                   content={
                     <div className={'flex flex-col items-start'}>
