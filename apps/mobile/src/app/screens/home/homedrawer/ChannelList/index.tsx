@@ -1,35 +1,19 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
-import {
-	Icons,
-	STORAGE_CLAN_ID,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getInfoChannelByClanId,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save,
-} from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	categoriesActions,
-	channelsActions,
-	clansActions,
-	directActions,
-	friendsActions,
-	getStoreAsync,
-	notificationActions,
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
 	selectCurrentClan,
-	selectIsFromFCMMobile,
 	useAppDispatch,
 } from '@mezon/store-mobile';
-import { ICategoryChannel, IChannel, IThread } from '@mezon/utils';
+import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
-import { isEmpty, isEqual } from 'lodash';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isEmpty } from 'lodash';
+import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
@@ -115,8 +99,8 @@ const ChannelList = React.memo((props: any) => {
 			params: {
 				onGoBack: () => {
 					bottomSheetEventRef?.current?.present();
-				}
-			}
+				},
+			},
 		});
 	}
 

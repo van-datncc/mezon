@@ -93,32 +93,32 @@ const HomeScreen = React.memo((props: any) => {
 			return;
 		}
 		if (state === 'active' && isFromFCM?.toString() !== 'true' && !isFromFcmMobile) {
-			await messageLoader();
+			await messageLoaderBackground();
 		}
 	};
 
-	const messageLoader = async () => {
-		if (!currentClan?.clan_id) {
+	const messageLoaderBackground = async () => {
+		try {
+			if (!currentClan?.clan_id) {
+				dispatch(appActions.setLoadingMainMobile(false));
+				return null;
+			}
+			const store = await getStoreAsync();
+			sessionRef.current.token = '';
+			await store.dispatch(authActions.refreshSession());
+			await store.dispatch(
+				channelsActions.joinChannel({
+					clanId: currentClan?.clan_id,
+					channelId: currentChannelId,
+					noFetchMembers: true,
+				}),
+			);
 			dispatch(appActions.setLoadingMainMobile(false));
+			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
 			return null;
+		} catch (error) {
+			console.log('error messageLoaderBackground', error);
 		}
-		const store = await getStoreAsync();
-		sessionRef.current.token = '';
-		await store.dispatch(authActions.refreshSession());
-		dispatch(appActions.setLoadingMainMobile(false));
-		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
-		await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
-		save(STORAGE_CLAN_ID, currentClan?.clan_id);
-		await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
-		await store.dispatch(
-			channelsActions.joinChannel({
-				clanId: currentClan?.clan_id,
-				channelId: currentChannelId,
-				noFetchMembers: true,
-			}),
-		);
-		await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
-		return null;
 	};
 
 	return <DrawerScreen navigation={props.navigation} />;

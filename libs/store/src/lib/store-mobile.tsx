@@ -70,21 +70,13 @@ const persistedAppReducer = persistReducer(
 	appReducer,
 );
 
-const persistedChannelReducer = persistReducer(
-	{
-		key: 'channel',
-		storage,
-	},
-	channelsReducer,
-);
-
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
-	channels: persistedChannelReducer,
+	channels: channelsReducer,
 	channelMembers: channelMembersReducer,
 	threads: threadsReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,

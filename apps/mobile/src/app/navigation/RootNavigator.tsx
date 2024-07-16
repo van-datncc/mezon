@@ -92,7 +92,6 @@ const NavigationMain = () => {
 	}, [isLoggedIn, hasInternet]);
 
 	const initAppLoading = async () => {
-		dispatch(appActions.setLoadingMainMobile(false));
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		await mainLoader({ isFromFCM: isFromFCM?.toString() === 'true' });
 	};
@@ -130,31 +129,36 @@ const NavigationMain = () => {
 	};
 
 	const mainLoader = async ({ isFromFCM = false }) => {
-		const store = await getStoreAsync();
-		await store.dispatch(notificationActions.fetchListNotification());
-		await store.dispatch(friendsActions.fetchListFriends({}));
-		const clanResp = await store.dispatch(clansActions.fetchClans());
-		await store.dispatch(gifsActions.fetchGifCategories());
-		await store.dispatch(gifsActions.fetchGifCategoryFeatured());
-		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
+		try {
+			const store = await getStoreAsync();
+			await store.dispatch(notificationActions.fetchListNotification());
+			await store.dispatch(friendsActions.fetchListFriends({}));
+			const clanResp = await store.dispatch(clansActions.fetchClans());
+			await store.dispatch(gifsActions.fetchGifCategories());
+			await store.dispatch(gifsActions.fetchGifCategoryFeatured());
+			await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 
-		// If is from FCM don't join current clan
-		if (!isFromFCM) {
-			if (currentClan && currentClan?.clan_id) {
-				save(STORAGE_CLAN_ID, currentClan?.clan_id);
-				await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
-				await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
-				const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: currentClan?.clan_id, noCache: true }));
-				await setDefaultChannelLoader(respChannel.payload, currentClan?.clan_id);
+			// If is from FCM don't join current clan
+			if (!isFromFCM) {
+				if (currentClan && currentClan?.clan_id) {
+					save(STORAGE_CLAN_ID, currentClan?.clan_id);
+					await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
+					await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
+					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: currentClan?.clan_id, noCache: true }));
+					await setDefaultChannelLoader(respChannel.payload, currentClan?.clan_id);
+				} else {
+					await store.dispatch(directActions.fetchDirectMessage({}));
+					await setCurrentClanLoader(clanResp.payload);
+				}
 			} else {
 				await store.dispatch(directActions.fetchDirectMessage({}));
-				await setCurrentClanLoader(clanResp.payload);
 			}
-		} else {
-			await store.dispatch(directActions.fetchDirectMessage({}));
+			dispatch(appActions.setLoadingMainMobile(false));
+			return null;
+		} catch (error) {
+			console.log('error mainLoader', error);
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
-
-		return null;
 	};
 
 	return (
