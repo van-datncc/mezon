@@ -1,12 +1,14 @@
 import { ApiClanEmojiListResponse } from "mezon-js/api.gen";
 import SettingEmojiItem from "../SettingEmojiItem";
 
+
 type SettingEmojiListProps = {
   title: string;
   emojiList: ApiClanEmojiListResponse[]
 };
 
 const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
+
 
   return (
     <div className={'flex flex-col gap-3 dark:text-textDarkTheme text-textLightTheme pb-[60px]'}>

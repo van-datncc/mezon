@@ -1,4 +1,4 @@
-import { createEmoji, selectAllEmoji, selectCurrentChannelId, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import { createEmoji, selectAllEmoji, selectCurrentChannelId, selectCurrentClanId, selectEmojiLoading, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
 import { handleUploadFile, useMezon } from "@mezon/transport";
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from "mezon-js/api.gen";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
@@ -21,7 +21,6 @@ const SettingEmoji = () => {
       const imageSize = file?.size;
       const fileNameParts = file?.name.split('.');
       const fileName = fileNameParts.slice(0, -1).join('.').slice(0, 62);
-      console.log (fileNameParts, fileName);
       const session = sessionRef.current;
       const client = clientRef.current;
       const category = 'Custom';
@@ -46,7 +45,7 @@ const SettingEmoji = () => {
           shortname: ':' + fileName + ':',
           source: attachment.url,
         };
-        await dispatch(createEmoji(request));
+        await dispatch(createEmoji({ request: request, clanId: currentClanId }));
       })
     } else {
       return;
@@ -56,7 +55,7 @@ const SettingEmoji = () => {
 
   const fetchEmojis = useCallback(async () => {
     if (currentClanId) {
-      await dispatch(settingClanEmojiActions.fetchEmojisByClanId({ clanId: currentClanId }));
+      await dispatch(settingClanEmojiActions.fetchEmojisByClanId(currentClanId));
     }
   }, [dispatch]);
 
@@ -66,7 +65,6 @@ const SettingEmoji = () => {
 
   return (
     <>
-
 
       <div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
         <div className={'dark:text-textSecondary flex flex-col gap-2 text-textSecondary800'}>
@@ -92,8 +90,10 @@ const SettingEmoji = () => {
         </div>
       </div>
 
+
       <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji} />
       <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji} />
+
 
       <ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 

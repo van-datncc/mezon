@@ -21,7 +21,6 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 
   const handleUpdateEmoji = async () => {
     if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
-      console.log('update')
       const request: MezonUpdateClanEmojiByIdBody = {
         source: emoji.src,
         shortname: nameEmoji,
@@ -34,8 +33,7 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   }
 
   const handleDelete = () => {
-    console.log('delete')
-    dispatch(settingClanEmojiActions.deleteEmoji(emoji.id || ''));
+    dispatch(settingClanEmojiActions.deleteEmoji(emoji));
   }
   const handleOnMouseLeave = () => {
     setNameEmoji(emoji.shortname ?? '');
