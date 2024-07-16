@@ -154,7 +154,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
-			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId: clanID, channelId: body.channel_id }))
+			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({clanId: clanID, channelId: body.channel_id}))
 			thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: clanID,
@@ -290,7 +290,7 @@ export const channelsSlice = createSlice({
 			});
 		},
 		updateChannelThreadSocket: (state, action) => {
-			const payload = action.payload;
+			const payload  = action.payload;
 			channelsAdapter.updateOne(state, {
 				id: payload.channel_id,
 				changes: {
@@ -480,35 +480,35 @@ export const selectChannelsByClanId = (clainId: string) =>
 	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));
 
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
-	createSelector(selectChannelsByClanId(clanId), (channels) => {
+    createSelector(selectChannelsByClanId(clanId), (channels) => {
 		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
-		if (idsSelectedChannel && idsSelectedChannel[clanId]) {
-			const selectedChannel = channels.find(channel => channel.channel_id === idsSelectedChannel[clanId]);
-			if (selectedChannel) {
-				return selectedChannel.id;
-			}
-		}
+        if (idsSelectedChannel && idsSelectedChannel[clanId]) {
+            const selectedChannel = channels.find(channel => channel.channel_id === idsSelectedChannel[clanId]);
+            if (selectedChannel) {
+                return selectedChannel.id;
+            }
+        }
 
-		if (categories) {
-			for (const category of categories) {
-				const filteredChannel = channels.find(channel =>
-					channel.parrent_id === '0' &&
-					channel.type === ChannelType.CHANNEL_TYPE_TEXT &&
-					channel.category_id === category
-				);
-				if (filteredChannel) {
-					return filteredChannel.id;
-				}
-			}
-		}
+        if (categories) {
+            for (const category of categories) {
+                const filteredChannel = channels.find(channel =>
+                    channel.parrent_id === '0' &&
+                    channel.type === ChannelType.CHANNEL_TYPE_TEXT &&
+                    channel.category_id === category
+                );
+                if (filteredChannel) {
+                    return filteredChannel.id;
+                }
+            }
+        }
 
-		const defaultChannel = channels.find(channel =>
-			channel.parrent_id === '0' &&
-			channel.type === ChannelType.CHANNEL_TYPE_TEXT
-		);
+        const defaultChannel = channels.find(channel =>
+            channel.parrent_id === '0' &&
+            channel.type === ChannelType.CHANNEL_TYPE_TEXT
+        );
 
-		return defaultChannel ? defaultChannel.id : null;
-	});
+        return defaultChannel ? defaultChannel.id : null;
+    });
 
 
 export const selectIsUnreadChannelById = (channelId: string) =>
