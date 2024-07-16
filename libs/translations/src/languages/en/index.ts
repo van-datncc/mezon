@@ -1,24 +1,25 @@
-import accountSetting from "./accountSetting.json";
-import appearanceSetting from "./appearanceSetting.json";
-import appThemeSetting from "./appThemeSetting.json";
-import categoryCreator from "./categoryCreator.json";
-import categoryMenu from "./categoryMenu.json";
-import channelCreator from "./channelCreator.json";
-import channelMenu from "./channelMenu.json";
-import channelSetting from "./channelSetting.json";
+import accountSetting from './accountSetting.json';
+import appThemeSetting from './appThemeSetting.json';
+import appearanceSetting from './appearanceSetting.json';
+import categoryCreator from './categoryCreator.json';
+import categoryMenu from './categoryMenu.json';
+import channelCreator from './channelCreator.json';
+import channelMenu from './channelMenu.json';
+import channelSetting from './channelSetting.json';
 import clan from './clan.json';
-import clanMenu from "./clanMenu.json";
-import clanOverviewSetting from "./clanOverviewSetting.json";
-import clanRoles from "./clanRoles.json";
-import clanSetting from "./clanSetting.json";
+import clanMenu from './clanMenu.json';
+import clanOverviewSetting from './clanOverviewSetting.json';
+import clanRoles from './clanRoles.json';
+import clanSetting from './clanSetting.json';
 import common from './common.json';
 import createThread from './createThread.json';
-import deleteClan from "./deleteClan.json";
+import deleteClan from './deleteClan.json';
 import dmMessage from './dmMessage.json';
-import eventCreator from "./eventCreator.json";
-import eventMenu from "./eventMenu.json";
+import eventCreator from './eventCreator.json';
+import eventMenu from './eventMenu.json';
 import friends from './friends.json';
 import inviteToChannel from './inviteToChannel.json';
+import media from './media.json';
 import message from './message.json';
 import notification from './notification.json';
 import notificationSetting from './notificationSetting.json';
@@ -26,10 +27,9 @@ import pinMessage from './pinMessage.json';
 import profile from './profile.json';
 import profileSetting from './profileSetting.json';
 import screen from './screen.json';
-import screenStack from "./screenStack.json";
+import screenStack from './screenStack.json';
 import setting from './setting.json';
 import userProfile from './userProfile.json';
-import media from './media.json';
 
 export default {
 	inviteToChannel,
@@ -61,7 +61,7 @@ export default {
 	appearanceSetting,
 	appThemeSetting,
 	accountSetting,
-  deleteClan,
-  media,
-	clanRoles
+	deleteClan,
+	media,
+	clanRoles,
 };
