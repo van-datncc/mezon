@@ -1,4 +1,4 @@
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
@@ -511,7 +511,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				);
 			}}
 		>
-			<BottomSheetScrollView style={styles.bottomSheetWrapper}>{content}</BottomSheetScrollView>
+			<View style={styles.bottomSheetWrapper}>
+				{content}
+			</View>
 		</MezonBottomSheet>
 	);
 });
