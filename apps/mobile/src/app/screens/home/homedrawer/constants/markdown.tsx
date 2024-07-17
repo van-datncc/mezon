@@ -2,7 +2,6 @@ import { Colors, size } from '@mezon/mobile-ui';
 import {
 	ChannelMembersEntity,
 	ChannelsEntity,
-	ClansEntity,
 	UserClanProfileEntity,
 	UsersClanEntity,
 	selectAllChannelMembers,
@@ -159,7 +158,7 @@ export type IMarkdownProps = {
 	onChannelMention?: (channel: ChannelsEntity) => void;
 	isNumberOfLine?: boolean;
 	clansProfile?: UserClanProfileEntity[];
-	currentClan?: ClansEntity;
+	currentClanId?: string;
 	isMessageReply?: boolean;
 	mode?: number;
 };
@@ -174,7 +173,7 @@ type TRenderTextContentProps = {
 	onChannelMention?: (channel: ChannelsEntity) => void;
 	isNumberOfLine?: boolean;
 	clansProfile?: UserClanProfileEntity[];
-	currentClan?: ClansEntity;
+	currentClanId?: string;
 	isMessageReply?: boolean;
 	mode?: number;
 };
@@ -348,7 +347,7 @@ const RenderTextContent = React.memo(
 		onChannelMention,
 		isNumberOfLine,
 		clansProfile,
-		currentClan,
+		currentClanId,
 		isMessageReply,
 		mode,
 	}: IMarkdownProps) => {
@@ -365,7 +364,7 @@ const RenderTextContent = React.memo(
 		let content: string = lines?.trim();
 
 		if (matchesMentions) {
-			content = formatMention(content, matchesMentions, channelsEntities, clansProfile, currentClan, usersInChannel, usersClan, mode);
+			content = formatMention(content, matchesMentions, channelsEntities, clansProfile, currentClanId, usersInChannel, usersClan, mode);
 		}
 
 		if (matchesUrls) {
@@ -463,7 +462,7 @@ const formatMention = (
 	matchesMention: RegExpMatchArray,
 	channelsEntities: Record<string, ChannelsEntity>,
 	clansProfile: UserClanProfileEntity[],
-	currentClan?: ClansEntity,
+	currentClanId?: string,
 	usersInChannel?: ChannelMembersEntity[],
 	usersClan?: UsersClanEntity[],
 	mode?: number,
@@ -476,7 +475,7 @@ const formatMention = (
 			} else {
 				if (matchesMention.includes(part)) {
 					if (part.startsWith('@')) {
-						return renderMention(part, mode, usersInChannel, usersClan, clansProfile, currentClan);
+						return renderMention(part, mode, usersInChannel, usersClan, clansProfile, currentClanId);
 					}
 					if (part.startsWith('<#')) {
 						const channelId = part.match(channelIdRegex)[1];
@@ -514,7 +513,7 @@ export const renderTextContent = ({
 	onChannelMention,
 	isNumberOfLine = false,
 	clansProfile,
-	currentClan,
+	currentClanId,
 	isMessageReply = false,
 	mode,
 }: TRenderTextContentProps) => {
@@ -529,7 +528,7 @@ export const renderTextContent = ({
 			onChannelMention={onChannelMention}
 			isNumberOfLine={isNumberOfLine}
 			clansProfile={clansProfile}
-			currentClan={currentClan}
+			currentClanId={currentClanId}
 			isMessageReply={isMessageReply}
 			mode={mode}
 		/>
@@ -550,7 +549,7 @@ const renderMention = (
 	usersInChannel: ChannelMembersEntity[],
 	usersClan: UsersClanEntity[],
 	clansProfile: UserClanProfileEntity[],
-	currentClan: ClansEntity,
+	currentClanId: string,
 ) => {
 	const nameMention = part?.slice(1);
 
@@ -561,9 +560,7 @@ const renderMention = (
 	const userMention = getUserMention(nameMention, mode, usersInChannel, usersClan);
 	const { user } = userMention || {};
 
-	const clanProfileByIdUser = clansProfile?.find(
-		(clanProfile) => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id,
-	);
+	const clanProfileByIdUser = clansProfile?.find((clanProfile) => clanProfile?.clan_id === currentClanId && clanProfile?.user_id === user?.id);
 
 	if (clanProfileByIdUser) {
 		return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;

@@ -11,7 +11,7 @@ import {
 	getStoreAsync,
 	initStore,
 	notificationActions,
-	selectCurrentClan,
+	selectCurrentClanId,
 	selectHasInternetMobile,
 	selectIsLogin,
 } from '@mezon/store-mobile';
@@ -54,9 +54,9 @@ const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
 	const { reconnect } = useMezon();
-	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	useEffect(() => {
 		let timer;
@@ -77,13 +77,19 @@ const NavigationMain = () => {
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		}, 200);
-		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
 		return () => {
 			clearTimeout(timer);
-			appStateSubscription.remove();
 		};
 	}, []);
+	
+	useEffect(() => {
+		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+
+		return () => {
+			appStateSubscription.remove();
+		};
+	}, [currentClanId]);
 
 	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
@@ -98,7 +104,7 @@ const NavigationMain = () => {
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			timerRef.current = delay(reconnect, 1200);
+			await reconnect(currentClanId);
 			await notifee.cancelAllNotifications();
 		}
 		if (state === 'background') {
@@ -137,15 +143,16 @@ const NavigationMain = () => {
 			await store.dispatch(gifsActions.fetchGifCategories());
 			await store.dispatch(gifsActions.fetchGifCategoryFeatured());
 			await store.dispatch(clansActions.joinClan({ clanId: '0' }));
+			dispatch(appActions.setLoadingMainMobile(false));
 
 			// If is from FCM don't join current clan
 			if (!isFromFCM) {
-				if (currentClan && currentClan?.clan_id) {
-					save(STORAGE_CLAN_ID, currentClan?.clan_id);
-					await store.dispatch(clansActions.joinClan({ clanId: currentClan?.clan_id }));
-					await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClan?.clan_id, noCache: true }));
-					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: currentClan?.clan_id, noCache: true }));
-					await setDefaultChannelLoader(respChannel.payload, currentClan?.clan_id);
+				if (currentClanId) {
+					save(STORAGE_CLAN_ID, currentClanId);
+					await store.dispatch(clansActions.joinClan({ clanId: currentClanId }));
+					await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClanId, noCache: true }));
+					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
+					await setDefaultChannelLoader(respChannel.payload, currentClanId);
 				} else {
 					await store.dispatch(directActions.fetchDirectMessage({}));
 					await setCurrentClanLoader(clanResp.payload);
@@ -153,7 +160,6 @@ const NavigationMain = () => {
 			} else {
 				await store.dispatch(directActions.fetchDirectMessage({}));
 			}
-			dispatch(appActions.setLoadingMainMobile(false));
 			return null;
 		} catch (error) {
 			console.log('error mainLoader', error);
