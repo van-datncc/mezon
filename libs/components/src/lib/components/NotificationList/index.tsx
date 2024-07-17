@@ -69,8 +69,8 @@ function NotificationList({ unReadList }: NotificationProps) {
 						ref={tabIndividualRef}
 						className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto"
 					>
-						{notificationItem.map((notify: INotification) => (
-							<NotificationItem notify={notify} key={notify.id} />
+						{notificationItem.map((notify: INotification, index: number) => (
+							<NotificationItem notify={notify} key={`individual-${notify.id}-${index}`} />
 						))}
 					</div>
 				)}
@@ -80,8 +80,8 @@ function NotificationList({ unReadList }: NotificationProps) {
 						ref={tabMentionRef}
 						className={`dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 					>
-						{notifyMentionItem.map((notify: INotification) => (
-							<NotifyMentionItem isUnreadTab={false} notify={notify} key={notify.id} />
+						{notifyMentionItem.map((notify: INotification, index: number) => (
+							<NotifyMentionItem isUnreadTab={false} notify={notify} key={`mention-${notify.id}-${index}`} />
 						))}
 					</div>
 				)}
