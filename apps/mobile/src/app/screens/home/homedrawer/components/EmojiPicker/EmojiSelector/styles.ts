@@ -1,7 +1,7 @@
-import { Colors, Metrics, size } from '@mezon/mobile-ui';
+import { Attributes, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	cateContainer: {
 		gap: size.s_10,
 	},
@@ -29,14 +29,14 @@ const styles = StyleSheet.create({
 		marginBottom: size.s_10,
 	},
 	titleCategories: {
-		color: Colors.tertiary,
+		color: colors.text,
 		fontSize: size.medium,
 		fontWeight: '600',
 		paddingBottom: size.s_4,
 	},
 	textInputWrapper: {
 		flexDirection: 'row',
-		backgroundColor: Colors.black,
+		backgroundColor: colors.secondary,
 		marginVertical: 10,
 		alignItems: 'center',
 		paddingHorizontal: 10,
@@ -44,11 +44,9 @@ const styles = StyleSheet.create({
 		gap: 10,
 	},
 	textInput: {
-		color: Colors.white,
+		color: colors.textStrong,
 		flexGrow: 1,
 		fontSize: size.medium,
 		height: size.s_40,
 	},
 });
-
-export default styles;

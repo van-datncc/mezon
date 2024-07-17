@@ -7,7 +7,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	save,
 } from '@mezon/mobile-components';
-import { Block, Colors, Metrics, Text, baseColor, useAnimatedState, useTheme, verticalScale } from '@mezon/mobile-ui';
+import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	ClansEntity,
@@ -28,7 +28,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
-import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Image, Linking, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -48,8 +48,6 @@ import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { RenderDocumentsChat } from './components/RenderDocumentsChat';
 import { RenderImageChat } from './components/RenderImageChat';
-import { openUrl } from 'react-native-markdown-display';
-import { MezonClanAvatar } from '../../../temp-ui';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 
@@ -198,7 +196,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		onMessageAction({
 			type: EMessageBSToShow.UserInformation,
 			user: user?.user,
-      message
+			message
 		});
 	}, [preventAction, user?.user]);
 
@@ -210,7 +208,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		onMessageAction({
 			type: EMessageBSToShow.UserInformation,
 			user: user?.user,
-      message
+			message
 		});
 	}, [checkAnonymous, message?.name, message?.user?.id, message?.user?.name, message?.user?.username, message?.username, preventAction, user]);
 

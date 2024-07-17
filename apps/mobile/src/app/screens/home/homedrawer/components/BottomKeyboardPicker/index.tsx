@@ -1,8 +1,8 @@
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Colors } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import React, { Ref, forwardRef } from 'react';
-import styles from './styles';
+import { style } from './styles';
 
 export type IModeKeyboardPicker = 'text' | 'emoji' | 'attachment';
 
@@ -13,13 +13,15 @@ interface IProps {
 }
 
 export default forwardRef(function BottomKeyboardPicker({ height = 1, children, isStickyHeader = false }: IProps, ref: Ref<BottomSheetMethods>) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return (
 		<BottomSheet
 			ref={ref}
 			snapPoints={[height === 0 ? 1 : height, '100%']}
 			animateOnMount
 			backgroundStyle={{
-				backgroundColor: Colors.secondary,
+				backgroundColor: themeValue.primary,
 			}}
 		>
 			<BottomSheetScrollView stickyHeaderIndices={isStickyHeader ? [0] : []} style={styles.contentContainer}>
