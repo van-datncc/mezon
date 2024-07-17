@@ -24,6 +24,7 @@ import {
 	ChannelMessageEvent,
 	ChannelPresenceEvent,
 	ChannelUpdatedEvent,
+	CustomStatusEvent,
 	LastPinMessageEvent,
 	MessageReactionEvent,
 	MessageTypingEvent,
@@ -35,7 +36,6 @@ import {
 } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
@@ -142,7 +142,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 
 			if (notification.code === -2 || notification.code === -3) {
-				toast.info(notification.subject);
+				dispatch(toastActions.addToast({ message: notification.subject, type: 'info', id: 'ACTION_FRIEND' }));
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
@@ -159,6 +159,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 		},
 		[currentChannel?.channel_id, currentChannel?.clan_id, dispatch],
+	);
+
+	const oncustomstatus = useCallback(
+		(statusEvent: CustomStatusEvent) => {
+			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent.user_id, customStatus: statusEvent.status }));
+		},
+		[dispatch],
 	);
 
 	const onerror = useCallback(
@@ -249,6 +256,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onpinmessage = onpinmessage;
 
+			socket.oncustomstatus = oncustomstatus;
+
 			socket.onstatuspresence = onstatuspresence;
 
 			socket.onchannelcreated = onchannelcreated;
@@ -271,6 +280,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onmessagetyping,
 			onnotification,
 			onpinmessage,
+			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
@@ -300,17 +310,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.oncustomstatus = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstatuspresence = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.ondisconnect = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -320,6 +334,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onmessagereaction,
 		onnotification,
 		onpinmessage,
+		oncustomstatus,
 		onstatuspresence,
 		socketRef,
 		onvoicejoined,
@@ -345,3 +360,4 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+
