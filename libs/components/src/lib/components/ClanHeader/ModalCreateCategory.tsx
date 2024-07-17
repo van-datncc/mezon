@@ -1,7 +1,7 @@
-import {InputField} from '@mezon/ui';
-import {ValidateSpecialCharacters} from '@mezon/utils';
-import {Modal} from 'flowbite-react';
-import {useState} from 'react';
+import { InputField } from '@mezon/ui';
+import { ValidateSpecialCharacters } from '@mezon/utils';
+import { Modal } from 'flowbite-react';
+import { useState } from 'react';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 
 type ModalCreateCategoryProps = {
