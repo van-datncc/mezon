@@ -1,6 +1,6 @@
 import { useAuth, useDirect, useMemberStatus } from '@mezon/core';
-import { CallIcon, MessageIcon, VideoIcon } from '@mezon/mobile-components';
-import { Block, Colors } from '@mezon/mobile-ui';
+import { Icons } from '@mezon/mobile-components';
+import { Block, Colors, useTheme } from '@mezon/mobile-ui';
 import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import { useMixImageColor } from '../../../../../../app/hooks/useMixImageColor';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import MezonAvatar from '../../../../../../app/temp-ui/MezonAvatar';
-import { styles } from './UserProfile.styles';
+import { style } from './UserProfile.styles';
 import UserSettingProfile from './component/UserSettingProfile';
 
 interface userProfileProps {
@@ -24,6 +24,8 @@ interface userProfileProps {
 }
 
 const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message }: userProfileProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { userProfile } = useAuth();
 	const { t } = useTranslation(['userProfile']);
 	const userById = useSelector(selectMemberByUserId(userId || user?.id || ''));
@@ -101,15 +103,15 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					{!checkOwner(userById?.user?.google_id || '') && (
 						<View style={[styles.userAction]}>
 							<TouchableOpacity onPress={() => navigateToMessageDetail()} style={[styles.actionItem]}>
-								<MessageIcon width={25} height={20}></MessageIcon>
+								<Icons.ChatIcon color={themeValue.text} />
 								<Text style={[styles.actionText]}>{t('userAction.sendMessage')}</Text>
 							</TouchableOpacity>
 							<View style={[styles.actionItem]}>
-								<CallIcon width={25} height={20}></CallIcon>
+								<Icons.PhoneCallIcon color={themeValue.text} />
 								<Text style={[styles.actionText]}>{t('userAction.voiceCall')}</Text>
 							</View>
 							<View style={[styles.actionItem]}>
-								<VideoIcon width={20} height={20}></VideoIcon>
+								<Icons.VideoIcon color={themeValue.text} />
 								<Text style={[styles.actionText]}>{t('userAction.videoCall')}</Text>
 							</View>
 						</View>
