@@ -65,7 +65,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								? 'assets/images/avatar-group.png'
 								: currentDmGroup?.channel_avatar?.at(0) ?? ''
 						}
-						name={''}
+						name={currentDmGroup?.channel_label || ''}
 						status={userStatus}
 						isHideStatus={true}
 						isHideIconStatus={false}

@@ -206,7 +206,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{checkCreateUser && !checkUser && (
+					{(checkCreateUser && !checkUser) && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />

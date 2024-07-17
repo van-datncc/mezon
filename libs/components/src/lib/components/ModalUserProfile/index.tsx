@@ -1,4 +1,4 @@
-import { useAppNavigation, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
+import { useAppNavigation, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import { selectAllAccount, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -44,7 +44,7 @@ const ModalUserProfile = ({
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
-
+	const userCustomStatus = useMemberCustomStatus(userID || '')
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 
 	const [content, setContent] = useState<string>('');
@@ -128,6 +128,7 @@ const ModalUserProfile = ({
 				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
+				customStatus={userCustomStatus}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">

@@ -1,7 +1,15 @@
 import { useCategory, useReference } from '@mezon/core';
 import { CloseIcon, PenIcon, STORAGE_CLAN_ID, SearchIcon, SendIcon, getAttachmentUnique, save } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, clansActions, directActions, getStoreAsync, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
+import {
+	channelsActions,
+	clansActions,
+	directActions,
+	getStoreAsync,
+	selectCurrentClan,
+	selectCurrentClanId,
+	selectDirectsOpenlist,
+} from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -34,6 +42,7 @@ export const Sharing = ({ data, onClose }) => {
 	}, [data]);
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const { reconnect } = useMezon();
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	useEffect(() => {
 		reConnectSocket();
@@ -45,7 +54,7 @@ export const Sharing = ({ data, onClose }) => {
 	}, [data]);
 
 	const reConnectSocket = async () => {
-		await reconnect();
+		await reconnect(currentClanId);
 	};
 
 	useEffect(() => {

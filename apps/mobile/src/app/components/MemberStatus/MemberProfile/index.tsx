@@ -1,8 +1,9 @@
 import { OfflineStatus, OnlineStatus, OwnerIcon } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { useMemo } from 'react';
 import { Image, Text, View } from 'react-native';
-import style from './style';
+import { style } from './style';
 interface IProps {
 	user: ChannelMembersEntity;
 	status?: boolean;
@@ -28,26 +29,28 @@ export default function MemberProfile({
 	creatorDMId,
 	isDMThread,
 }: IProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const name = useMemo(() => {
 		if (user) {
 			return nickName || user?.user?.display_name || user?.user?.username;
 		}
 	}, [user]);
 	return (
-		<View style={{ ...style.container, opacity: isOffline ? 0.5 : 1 }}>
+		<View style={{ ...styles.container, opacity: isOffline ? 0.5 : 1 }}>
 			{/* Avatar */}
 			<View style={{ padding: 0 }}>
-				<View style={style.avatarContainer}>
-					<Image style={style.avatar} source={{ uri: user?.user?.avatar_url }} />
+				<View style={styles.avatarContainer}>
+					<Image style={styles.avatar} source={{ uri: user?.user?.avatar_url }} />
 
-					{!isHideIconStatus && <View style={style.statusWrapper}>{status ? <OnlineStatus /> : <OfflineStatus />}</View>}
+					{!isHideIconStatus && <View style={styles.statusWrapper}>{status ? <OnlineStatus /> : <OfflineStatus />}</View>}
 				</View>
 			</View>
 
 			{/* Name */}
-			<View style={{ ...style.nameContainer, borderBottomWidth: 1 }}>
+			<View style={{ ...styles.nameContainer, borderBottomWidth: 1 }}>
 				{!isHideUserName && (
-					<Text style={style.textName}>
+					<Text style={styles.textName}>
 						{user?.user?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
 					</Text>
 				)}

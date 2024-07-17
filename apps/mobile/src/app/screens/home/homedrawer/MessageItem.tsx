@@ -62,7 +62,7 @@ export type MessageItemProps = {
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;
-	currentClan?: ClansEntity;
+	currentClanId?: string;
 	clansProfile?: UserClanProfileEntity[];
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
@@ -83,7 +83,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		mode,
 		onOpenImage,
 		isNumberOfLine,
-		currentClan,
+		currentClanId,
 		clansProfile,
 		jumpToRepliedMessage,
 		onMessageAction,
@@ -113,9 +113,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
 	}, [message, userProfile]);
 	const isCombine = !message?.isStartedMessageGroup;
-	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
+	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClanId as string, user?.user?.id as string));
 	const clanProfileSender = useSelector(
-		selectUserClanProfileByClanID(currentClan?.clan_id as string, messageRefFetchFromServe?.user?.id as string),
+		selectUserClanProfileByClanID(currentClanId as string, messageRefFetchFromServe?.user?.id as string),
 	);
 	const swipeableRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -198,6 +198,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		onMessageAction({
 			type: EMessageBSToShow.UserInformation,
 			user: user?.user,
+      message
 		});
 	}, [preventAction, user?.user]);
 
@@ -205,23 +206,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		if (preventAction) return;
 		setIsOnlyEmojiPicker(false);
 
-		const userForDisplay: ApiUser = user
-			? user?.user
-			: checkAnonymous
-				? {
-						username: message?.username,
-						display_name: message?.name,
-						id: '',
-					}
-				: {
-						username: message?.user?.username,
-						display_name: message?.user?.name,
-						id: message?.user?.id,
-					};
 
 		onMessageAction({
 			type: EMessageBSToShow.UserInformation,
-			user: userForDisplay,
+			user: user?.user,
+      message
 		});
 	}, [checkAnonymous, message?.name, message?.user?.id, message?.user?.name, message?.user?.username, message?.username, preventAction, user]);
 
@@ -415,7 +404,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 										emojiListPNG,
 										isNumberOfLine: true,
 										clansProfile,
-										currentClan,
+										currentClanId,
 										isMessageReply: true,
 										mode
 									})}
@@ -483,7 +472,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							onChannelMention,
 							isNumberOfLine,
 							clansProfile,
-							currentClan,
+							currentClanId,
 							isMessageReply: false,
 							mode
 						})}

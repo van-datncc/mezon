@@ -190,6 +190,8 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId));
 	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
 	useEscapeKey(() => setIsShowPinMessage(false));
+	const shouldShowPinIndicator = lastPinMessage && (!lastSeenPinMessageChannel || lastPinMessage !== lastSeenPinMessageChannel);
+
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip
@@ -201,10 +203,8 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 			>
 				<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
-					{lastPinMessage && lastSeenPinMessageChannel && lastPinMessage !== lastSeenPinMessageChannel ? (
-						<span className="w-[8px] h-[8px] rounded-full bg-[#DA373C] absolute bottom-0 right-0"></span>
-					) : (
-						<></>
+					{shouldShowPinIndicator && (
+						<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
 					)}
 				</button>
 			</Tooltip>

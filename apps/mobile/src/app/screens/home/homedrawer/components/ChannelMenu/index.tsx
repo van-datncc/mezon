@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useClans } from '@mezon/core';
+import { useClans, useReference } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { IChannel } from '@mezon/utils';
@@ -21,9 +21,11 @@ interface IChannelMenuProps {
 
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
 export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
-	const { t } = useTranslation(['channelMenu']);
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+    const { t } = useTranslation(['channelMenu']);
+    const { themeValue } = useTheme()
+    const styles = style(themeValue);
+	const { setOpenThreadMessageState } = useReference();
+
 
 	const { currentClan } = useClans();
 	const { dismiss } = useBottomSheetModal();
@@ -78,26 +80,38 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		},
 	];
 
-	const organizationMenu: IMezonMenuItemProps[] = [
-		{
-			title: t('menu.organizationMenu.edit'),
-			onPress: () => {
-				dismiss();
-				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
-					params: {
-						channelId: channel?.channel_id,
-					},
-				});
-			},
-			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
-		},
-		{
-			title: t('menu.organizationMenu.duplicateChannel'),
-			onPress: () => reserve(),
-			icon: <Icons.CopyIcon color={themeValue.textStrong} />,
-		},
-	];
+    const threadMenu: IMezonMenuItemProps[] = [
+      {
+          title: t('menu.thread.threads'),
+          onPress: () => {
+            dismiss();
+            setOpenThreadMessageState(false);
+            navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD});
+          },
+          icon: <Icons.ThreadIcon color={themeValue.textStrong}/>
+      }
+  ]
+
+    const organizationMenu: IMezonMenuItemProps[] = [
+        {
+            title: t('menu.organizationMenu.edit'),
+            onPress: () => {
+                dismiss();
+                navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+                    screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
+                    params: {
+                        channelId: channel?.channel_id
+                    }
+                });
+            },
+            icon: <Icons.SettingsIcon color={themeValue.textStrong}/>
+        },
+        {
+            title: t('menu.organizationMenu.duplicateChannel'),
+            onPress: () => reserve(),
+            icon: <Icons.CopyIcon color={themeValue.textStrong}/>
+        }
+    ];
 
 	const devMenu: IMezonMenuItemProps[] = [
 		{
@@ -113,23 +127,26 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		},
 	];
 
-	const menu: IMezonMenuSectionProps[] = [
-		{
-			items: watchMenu,
-		},
-		{
-			items: inviteMenu,
-		},
-		{
-			items: notificationMenu,
-		},
-		{
-			items: organizationMenu,
-		},
-		{
-			items: devMenu,
-		},
-	];
+    const menu: IMezonMenuSectionProps[] = [
+        {
+            items: watchMenu,
+        },
+        {
+            items: inviteMenu,
+        },
+        {
+            items: notificationMenu,
+        },
+        {
+            items: threadMenu,
+        },
+        {
+            items: organizationMenu,
+        },
+        {
+            items: devMenu
+        }
+    ]
 
 	return (
 		<View style={styles.container}>
