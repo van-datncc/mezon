@@ -7,7 +7,7 @@ import {
 	selectAllUserClanProfile,
 	selectAttachmentPhoto,
 	selectChannelMemberByUserIds,
-	selectCurrentClan,
+	selectCurrentClanId,
 	selectHasMoreMessageByChannelId,
 	selectMessageIdsByChannelId,
 	selectTypingUserIdsByChannelId,
@@ -66,7 +66,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
-	const currentClan = useSelector(selectCurrentClan);
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous, [messageSelected?.sender_id]);
 
@@ -236,13 +236,13 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					mode={mode}
 					channelId={channelId}
 					onOpenImage={onOpenImage}
-					currentClan={currentClan}
+					currentClanId={currentClanId}
 					onMessageAction={onMessageAction}
 					setIsOnlyEmojiPicker={setIsOnlyEmojiPicker}
 				/>
 			);
 		},
-		[jumpToRepliedMessage, clansProfile, mode, channelId, onOpenImage, currentClan, onMessageAction],
+		[jumpToRepliedMessage, clansProfile, mode, channelId, onOpenImage, currentClanId, onMessageAction],
 	);
 
 	const onImageModalChange = useCallback(
@@ -329,7 +329,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 
 				<MessageItemBS
 					mode={mode}
-					clanId={currentClan.clan_id}
+					clanId={currentClanId}
 					message={messageSelected}
 					onConfirmAction={onConfirmAction}
 					type={openBottomSheet}
