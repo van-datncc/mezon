@@ -186,8 +186,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				const interval = setInterval(async () => {
 					console.log('reconnecting...');
 					const socket = await createSocket();
-					const refreshSession = await clientRef.current?.sessionRefresh(session);
-					const recsession = await socket.connect(refreshSession || session, true);
+					const recsession = await socket.connect(session, true);
 					socket.joinClanChat(clanId);
 					socketRef.current = socket;
 					sessionRef.current = recsession;
