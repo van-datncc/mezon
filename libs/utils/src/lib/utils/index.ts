@@ -296,16 +296,6 @@ export const formatTimeToMMSS = (duration: number): string => {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
-// export const isImageFile = (fileSrc: string) => {
-//   const normalizedFileSrc = fileSrc.toLowerCase();
-//   return normalizedFileSrc.endsWith('png') || normalizedFileSrc.endsWith('jpeg') || normalizedFileSrc.endsWith('jpg');
-// }
-
-// export const isGifFile = (fileSrc: string) => {
-//   const normalizedFileSrc = fileSrc.toLowerCase();
-//   return normalizedFileSrc.endsWith('gif');
-// }
-
 export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number, type: string, minWidth?: number, minHeight?: number) =>
 	new Promise((resolve) => {
 		Resizer.imageFileResizer(
