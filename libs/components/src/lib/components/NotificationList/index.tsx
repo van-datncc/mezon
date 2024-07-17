@@ -26,8 +26,9 @@ function NotificationList({ unReadList }: NotificationProps) {
 		setCurrentTabNotify(valueTab);
 	};
 
-	const notificationItem = notification.filter((item) => item.code !== -9 && item.code === -10);
+	const notificationItem = notification.filter((item) => item.code !== -9 && item.code !== -10);
 	const notifyMentionItem = notification.filter((item) => item.code === -9 || item.code === -10);
+
 	const appearanceTheme = useSelector(selectTheme);
 	useEffect(() => {
 		if (currentTabNotify === 'mentions' && tabMentionRef.current) {
