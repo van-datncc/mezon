@@ -46,7 +46,7 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 		}
 
 		const promises = Array.from(files).map((file) => {
-			return handleUploadFile(client, session, currentClanId, currentId, file.name, file, null, '', directId);
+			return handleUploadFile(client, session, currentClanId, currentId, file.name, file);
 		});
 		Promise.all(promises)
 			.then((attachments) => {

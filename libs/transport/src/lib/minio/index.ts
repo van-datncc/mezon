@@ -34,10 +34,8 @@ export async function handleUploadFile(
 			let fullfilename;
 			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 				fullfilename = (path ? path + '/' : '') + currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g, '_');
-				console.log('Here 1', fullfilename);
 			} else {
 				fullfilename = currentChannelId + '/' + (directId ? directId + '/' : '') + ms + filename.replace(/-|\(|\)| /g, '_');
-				console.log('Here 2', fullfilename);
 			}
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {
