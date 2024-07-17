@@ -1,6 +1,8 @@
-import { useOnClickOutside, useSettingFooter } from '@mezon/core';
+import { useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
 import {
+	channelMembersActions,
 	ChannelsEntity,
+	selectCurrentClanId,
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
 	selectTheme,
@@ -11,7 +13,7 @@ import {
 import { MemberProfileType } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { HeadPhoneICon, MicIcon, SettingProfile } from '../../../../../ui/src/lib/Icons';
 import MemberProfile from '../MemberProfile';
@@ -28,9 +30,13 @@ export type FooterProfileProps = {
 
 function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const appearanceTheme = useSelector(selectTheme);
+	const [customStatus, setCustomStatus] = useState<string>('');
+	const userCustomStatus = useMemberCustomStatus(userId || '')
+
 
 	const profileRef = useRef<HTMLDivElement | null>(null);
 
@@ -59,6 +65,11 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 		setIsShowSettingFooterStatus(true);
 	};
 
+	const handleSaveCustomStatus = () => {
+		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }))
+		handleCloseModalCustomStatus()
+	}
+
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
 
 	return (
@@ -83,6 +94,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 							isHideStatus={false}
 							classParent="memberProfile"
 							positionType={MemberProfileType.FOOTER_PROFILE}
+							customStatus={userCustomStatus}
 						/>
 					</div>
 					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} />}
@@ -98,7 +110,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 					</Tooltip>
 				</div>
 			</button>
-			{showModalCustomStatus && <ModalCustomStatus name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}
+			{showModalCustomStatus && <ModalCustomStatus setCustomStatus={setCustomStatus} customStatus={customStatus} handleSaveCustomStatus={handleSaveCustomStatus} name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}
 		</>
 	);
 }

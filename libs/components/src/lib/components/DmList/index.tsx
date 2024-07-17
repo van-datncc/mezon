@@ -2,13 +2,11 @@ import { useEscapeKey } from '@mezon/core';
 import { selectDirectsOpenlist, selectTheme, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { getIsShowPopupForward, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import { IconFriends } from '../../../../../ui/src/lib/Icons';
-import ForwardMessageModal from '../ForwardMessage';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
 import ListDMChannel from './listDMChannel';
 
@@ -39,7 +37,7 @@ function DirectMessageList() {
 
 	const sortedFilteredDataDM = useMemo(() => {
 		return sortDMItem(filterDmGroupsByChannelLabel(dmGroupChatList));
-	},[dmGroupChatList])
+	}, [dmGroupChatList])
 
 	useEffect(() => {
 		if (sortedFilteredDataDM.length === 0) {
@@ -50,11 +48,6 @@ function DirectMessageList() {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const onClickOpenModal = () => {
 		setIsOpen(!isOpen);
-	};
-	const openPopupForward = useSelector(getIsShowPopupForward);
-
-	const handleCloseModalForward = () => {
-		dispatch(toggleIsShowPopupForwardFalse());
 	};
 
 	useEscapeKey(() => setIsOpen(false));
@@ -90,7 +83,6 @@ function DirectMessageList() {
 					</button>
 				</div>
 			</div>
-			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
 			<div
 				className={`flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			>
