@@ -1,4 +1,4 @@
-import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak } from '@mezon/components';
+import { ChannelMessageOpt, MessageWithUser, UnreadMessageBreak, MessageContextMenuProps, useMessageContextMenu } from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
 	selectIdMessageRefEdit,
@@ -10,7 +10,6 @@ import {
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { MessageContextMenuProps, useMessageContextMenu } from './ContextMenu/MessageContextMenuContext';
 import MessageInput from './MessageInput';
 import ModalDeleteMess from './ModalDeleteMess';
 import { useDeleteMessageHook } from './useDeleteMessage';

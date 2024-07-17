@@ -1,10 +1,10 @@
-import { ArrowLeftIcon } from '@mezon/mobile-components';
+import { ArrowLeftIcon, Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode } from 'react';
 import { Modal, ModalBaseProps, Pressable, Text, View, ViewStyle } from 'react-native';
 import Toast from 'react-native-toast-message';
-import Feather from 'react-native-vector-icons/Feather';
 import { toastConfig } from '../../configs/toastConfig';
-import { styles } from './style';
+import { style as _style } from "./style";
 
 interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 	visible: boolean;
@@ -22,6 +22,8 @@ interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 }
 
 export const MezonModal = (props: IMezonModalProps) => {
+	const { themeValue } = useTheme();
+	const styles = _style(themeValue);
 	const {
 		visible,
 		visibleChange,
@@ -66,14 +68,14 @@ export const MezonModal = (props: IMezonModalProps) => {
 							<View />
 						)}
 						<Pressable onPress={() => setVisible(false)}>
-							<Feather size={27} name="x" style={styles.closeIcon} />
+							<Icons.CloseIcon color={themeValue.textStrong} />
 						</Pressable>
 					</View>
 				) : (
 					<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 						<View style={styles.headerContent}>
 							<Pressable onPress={() => setVisible(false)}>
-								<Feather size={27} name="x" style={styles.closeIcon} />
+								<Icons.CloseIcon color={themeValue.textStrong} />
 							</Pressable>
 							{isTitleString ? <Text style={[styles.textTitle, titleStyle]}>{title}</Text> : <View style={titleStyle}>{title}</View>}
 						</View>

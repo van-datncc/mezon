@@ -38,7 +38,7 @@ export const getSnapToOffets = (imageWidth: number, padding: number, width: numb
   return snapToOffsets;
 };
 export const isImage = (url?: string) => {
-  return /\.(jpg|jpeg|png|webp|avif|gif|svg|heic)/.test(url);
+  return /\.(jpg|jpeg|png|webp|avif|gif|svg|heic|PNG)/.test(url);
 };
 
 export const isVideo = (url?: string) => {

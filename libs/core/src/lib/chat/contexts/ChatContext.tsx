@@ -1,4 +1,3 @@
-import { useAppParams } from '@mezon/core';
 import {
 	channelMembersActions,
 	channelsActions,
@@ -13,6 +12,7 @@ import {
 	pinMessageActions,
 	reactionActions,
 	selectCurrentChannel,
+	selectCurrentClanId,
 	toastActions,
 	useAppDispatch,
 	voiceActions,
@@ -28,13 +28,15 @@ import {
 	MessageReactionEvent,
 	MessageTypingEvent,
 	Notification,
+	Socket,
 	StatusPresenceEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
 } from 'mezon-js';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
 
@@ -57,9 +59,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const { directId, channelId } = useAppParams();
+	const { directId, channelId, clanId } = useAppParams();
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
+	const currentClanId = useSelector(selectCurrentClanId);
+
+	const clanIdActive = useMemo(() => {
+		if (clanId !== undefined) {
+			return currentClanId;
+		} else {
+			return '0';
+		}
+	}, [clanId]);
 
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
@@ -118,15 +129,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onnotification = useCallback(
-		(notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id) {
-				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
-			}
-
+		async (notification: Notification) => {
 			if (currentChannel?.channel_id !== (notification as any).channel_id && notification.code === -9) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setStatusNoti());
+			}
+
+			if (currentChannel?.channel_id === (notification as any).channel_id) {
+				const timestamp = Date.now() / 1000;
+				dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
 			}
 
 			if (notification.code === -2 || notification.code === -3) {
@@ -146,13 +158,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelsActions.fetchChannels({ clanId: currentChannel?.clan_id ?? '', noCache: true }));
 			}
 		},
-		[currentChannel?.channel_id, dispatch],
+		[currentChannel?.channel_id, currentChannel?.clan_id, dispatch],
 	);
-
-	const ondisconnect = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect();
-	}, [reconnect, dispatch]);
 
 	const onerror = useCallback(
 		(event: unknown) => {
@@ -220,46 +227,76 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 
+	const setCallbackEventFn = React.useCallback(
+		(socket: Socket) => {
+			socket.onvoicejoined = onvoicejoined;
+
+			socket.onvoiceleaved = onvoiceleaved;
+
+			socket.onchannelmessage = onchannelmessage;
+
+			socket.onchannelpresence = onchannelpresence;
+
+			socket.ondisconnect = ondisconnect;
+
+			socket.onerror = onerror;
+
+			socket.onmessagetyping = onmessagetyping;
+
+			socket.onmessagereaction = onmessagereaction;
+
+			socket.onnotification = onnotification;
+
+			socket.onpinmessage = onpinmessage;
+
+			socket.onstatuspresence = onstatuspresence;
+
+			socket.onchannelcreated = onchannelcreated;
+
+			socket.onchanneldeleted = onchanneldeleted;
+
+			socket.onchannelupdated = onchannelupdated;
+
+			socket.onheartbeattimeout = onHeartbeatTimeout;
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[
+			onchannelcreated,
+			onchanneldeleted,
+			onchannelmessage,
+			onchannelpresence,
+			onchannelupdated,
+			onerror,
+			onmessagereaction,
+			onmessagetyping,
+			onnotification,
+			onpinmessage,
+			onstatuspresence,
+			onvoicejoined,
+			onvoiceleaved,
+		],
+	);
+
+	const ondisconnect = useCallback(() => {
+		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+		reconnect(clanIdActive ?? '').then((socket) => {
+			if (!socket) return;
+			setCallbackEventFn(socket as Socket);
+		});
+	}, [dispatch, reconnect, clanIdActive, setCallbackEventFn]);
+
 	const onHeartbeatTimeout = useCallback(() => {
 		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect();
-	}, [dispatch, reconnect]);
+		reconnect(clanIdActive ?? '').then((socket) => {
+			if (!socket) return;
+			setCallbackEventFn(socket as Socket);
+		});
+	}, [clanIdActive, dispatch, reconnect, setCallbackEventFn]);
 
 	useEffect(() => {
 		const socket = socketRef.current;
-		if (!socket) {
-			return;
-		}
-
-		socket.onvoicejoined = onvoicejoined;
-
-		socket.onvoiceleaved = onvoiceleaved;
-
-		socket.onchannelmessage = onchannelmessage;
-
-		socket.onchannelpresence = onchannelpresence;
-
-		socket.ondisconnect = ondisconnect;
-
-		socket.onerror = onerror;
-
-		socket.onmessagetyping = onmessagetyping;
-
-		socket.onmessagereaction = onmessagereaction;
-
-		socket.onnotification = onnotification;
-
-		socket.onpinmessage = onpinmessage;
-
-		socket.onstatuspresence = onstatuspresence;
-
-		socket.onchannelcreated = onchannelcreated;
-
-		socket.onchanneldeleted = onchanneldeleted;
-
-		socket.onchannelupdated = onchannelupdated;
-
-		socket.onheartbeattimeout = onHeartbeatTimeout;
+		if (!socket) return;
+		setCallbackEventFn(socket);
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -292,6 +329,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchanneldeleted,
 		onchannelupdated,
 		onHeartbeatTimeout,
+		setCallbackEventFn,
 	]);
 
 	useEffect(() => {

@@ -1,14 +1,14 @@
-import { ThunkDispatch } from '@reduxjs/toolkit';
 import {
-    gifsActions,
-    selectAllgifCategory,
-    selectButtonArrowBackStatus,
-    selectCategoriesStatus,
-    selectDataGifsFeatured,
-    selectGifsDataSearch,
-    selectLoadingStatusGifs,
-    selectTrendingClickingStatus,
-} from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
+	gifsActions,
+	selectAllgifCategory,
+	selectButtonArrowBackStatus,
+	selectCategoriesStatus,
+	selectDataGifsFeatured,
+	selectGifsDataSearch,
+	selectLoadingStatusGifs,
+	selectTrendingClickingStatus,
+} from '@mezon/store';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 

@@ -1,11 +1,11 @@
 import { useAttachments } from '@mezon/core';
 import { attachmentActions } from '@mezon/store';
 import { notImplementForGifOrStickerSendFromPanel, SHOW_POSITION } from '@mezon/utils';
-import { useMessageContextMenu } from 'apps/chat/src/app/pages/channel/ContextMenu/MessageContextMenuContext';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useMessageContextMenu } from '../ContextMenu';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
@@ -40,34 +40,34 @@ function MessageImage({ attachmentData, onContextMenu, mode, messageId }: Messag
 		setImageError(true);
 	};
 
-	const handleContextMenu = useCallback(() => {
+	const handleContextMenu = useCallback((e: any) => {
 		setImageURL(attachmentData?.url ?? '');
-		onContextMenu;
 		setPositionShow(SHOW_POSITION.NONE);
-	}, [attachmentData?.url]);
+		if (typeof onContextMenu === 'function') {
+			onContextMenu((e || {}) as React.MouseEvent<HTMLImageElement>);
+		}
+	}, [attachmentData?.url, onContextMenu, setImageURL, setPositionShow]);
 
 	if (imageError || !attachmentData.url) {
 		return null;
 	}
 	return (
-		<>
+		<div className="break-all">
 			{attachmentData.url ? (
-				<div className="break-all">
-					<img
-						onContextMenu={handleContextMenu}
-						className={
-							'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' +
-							(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
-						}
-						src={attachmentData.url?.toString()}
-						alt={attachmentData.url}
-						onClick={() => handleClick(attachmentData.url || '')}
-						style={imgStyle}
-						onError={handleImageError}
-					/>
-				</div>
+				<img
+					onContextMenu={handleContextMenu}
+					className={
+						'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' +
+						(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
+					}
+					src={attachmentData.url?.toString()}
+					alt={attachmentData.url}
+					onClick={() => handleClick(attachmentData.url || '')}
+					style={imgStyle}
+					onError={handleImageError}
+				/>
 			) : null}
-		</>
+		</div>
 	);
 }
 

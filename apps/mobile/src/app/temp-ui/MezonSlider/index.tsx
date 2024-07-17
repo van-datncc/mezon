@@ -1,7 +1,8 @@
+import { useTheme } from '@mezon/mobile-ui';
 import { Slider } from '@miblanchard/react-native-slider';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
-import styles from './styles';
+import { style } from './styles';
 
 export type IMezonSliderData = {
 	value: number;
@@ -16,6 +17,8 @@ interface IMezonSliderProps {
 }
 
 export default function MezonSlider({ title, maximumValue, minimumValue, data }: IMezonSliderProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [value, setValue] = useState<number>(minimumValue || 0);
 
 	function handleValueChange(arr: Array<number>, index: number) {

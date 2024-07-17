@@ -66,5 +66,11 @@
     "unpinSuccess": "Unpin Message Successfully",
     "Yes": "Yes",
     "No": "No",
-    "unableSendMessage": "Unable to send message. Please try again."
+    "unableSendMessage": "Unable to send message. Please try again.",
+    "manage": {
+        "edit": "Edit",
+        "roles": "Roles",
+        "editRoles": "Edit Roles",
+        "cancel": "Cancel"
+    }
 }

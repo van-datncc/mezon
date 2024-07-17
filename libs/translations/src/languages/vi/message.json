@@ -65,5 +65,11 @@
     "unpinSuccess": "bỏ ghim tin nhắn thành công",
      "Yes": "Có",
     "No": "Không",
-    "unableSendMessage": "Không thể gửi tin nhắn. Vui lòng thử lại."
+    "unableSendMessage": "Không thể gửi tin nhắn. Vui lòng thử lại.",
+    "manage": {
+        "edit": "Chỉnh sửa",
+        "roles": "Vài trò",
+        "editRoles": "Chỉnh sửa vai trò",
+        "cancel": "Đóng"
+    }
 }

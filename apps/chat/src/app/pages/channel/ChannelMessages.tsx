@@ -1,4 +1,4 @@
-import { ChatWelcome, MessageModalImage } from '@mezon/components';
+import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import { getJumpToMessageId, useAppParams, useJumpToMessage, useMessages, useNotification } from '@mezon/core';
 import {
   messagesActions,
@@ -14,7 +14,6 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
-import { MessageContextMenuProvider } from './ContextMenu/MessageContextMenuContext';
 
 type ChannelMessagesProps = {
   channelId: string;
