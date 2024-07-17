@@ -1,6 +1,6 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { messagesActions, selectChannelDraftMessage, selectTheme, useAppDispatch } from '@mezon/store';
+import { selectChannelDraftMessage, selectTheme } from '@mezon/store';
 import { IMessageWithUser, MentionDataProps } from '@mezon/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -59,8 +59,7 @@ const replaceChannelIdsWithDisplay = (text: string, listInput: ChannelsMentionPr
 };
 
 const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message }) => {
-	const dispatch = useAppDispatch();
-	const { openEditMessageState, idMessageRefEdit, content, setContent, handleCancelEdit, handleSend } = useEditMessage(
+	const { openEditMessageState, idMessageRefEdit, content, setContent, handleCancelEdit, handleSend, setChannelDraftMessage } = useEditMessage(
 		channelId,
 		channelLabel,
 		mode,
@@ -94,15 +93,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		if (channelDraftMessage.draft_content) {
 			const convertedHashtag = convertToPlainTextHashtag(channelDraftMessage.draft_content);
 			const replacedText = replaceChannelIdsWithDisplay(convertedHashtag, listChannelsMention);
-			dispatch(
-				messagesActions.setChannelDraftMessage({
-					channelId,
-					channelDraftMessage: {
-						message_id: messageId,
-						draft_content: replacedText,
-					},
-				}),
-			);
+			setChannelDraftMessage(channelId, messageId, replacedText);
 			setContent(convertedHashtag);
 		}
 	}, [channelDraftMessage.draft_content, listChannelsMention]);
@@ -166,15 +157,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const value = event.target.value;
-		dispatch(
-			messagesActions.setChannelDraftMessage({
-				channelId,
-				channelDraftMessage: {
-					message_id: messageId,
-					draft_content: value,
-				},
-			}),
-		);
+		setChannelDraftMessage(channelId, messageId, value);
+
 		if (newPlainTextValue.endsWith('@')) {
 			setTitleMention('Members');
 		} else if (newPlainTextValue.endsWith('#')) {

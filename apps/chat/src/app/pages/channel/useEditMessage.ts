@@ -19,19 +19,26 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 		dispatch(messagesActions.deleteChannelDraftMessage({ channelId }));
 	}, [dispatch]);
 
-	const handleSend = useCallback(
-		(editMessage: string, messageId: string) => {
-			const content = editMessage.trim();
-			EditSendMessage(content, messageId);
+	const setChannelDraftMessage = useCallback(
+		(channelId: string, message_id: string, draft_content: string) => {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: channelId as string,
 					channelDraftMessage: {
-						message_id: messageId,
-						draft_content: content,
+						message_id,
+						draft_content,
 					},
 				}),
 			);
+		},
+		[dispatch],
+	);
+
+	const handleSend = useCallback(
+		(editMessage: string, messageId: string) => {
+			const content = editMessage.trim();
+			EditSendMessage(content, messageId);
+			setChannelDraftMessage(channelId, messageId, content);
 		},
 		[EditSendMessage],
 	);
@@ -43,5 +50,6 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 		setContent,
 		handleCancelEdit,
 		handleSend,
+		setChannelDraftMessage,
 	};
 };
