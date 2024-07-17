@@ -93,6 +93,7 @@ export const fetchChannelMembers = createAsyncThunk(
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');
+		console.log('SSSSSSS: ', members);
 		const customStatusInit = members.map((member) => {
 			const status = (member?.user?.metadata as any)?.status ?? '';
 			return { userId: member.user?.id ?? '', customStatus: status };
@@ -129,20 +130,21 @@ export const followUserStatus = createAsyncThunk('channelMembers/followUserStatu
 export const fetchChannelMembersPresence = createAsyncThunk(
 	'channelMembers/fetchChannelMembersPresence',
 	async (channelPresence: ChannelPresenceEvent, thunkAPI) => {
-		//user exist
 		if (channelPresence.joins.length > 0) {
-			const userId = channelPresence.joins[0].user_id;
+			const joinUser = channelPresence.joins[0];
+			const userId = joinUser.user_id;
 			const user = selectMemberById(userId)(getChannelMemberRootState(thunkAPI));
+			//check user exist or not
 			if (!user) {
 				thunkAPI.dispatch(channelMembersActions.addNewMember(channelPresence));
 				thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: true }));
+				thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: joinUser.status ?? '' }));
 			}
 		}
 	},
 );
 
 export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus', async (statusPresence: StatusPresenceEvent, thunkAPI) => {
-	//user exist
 	if (statusPresence?.leaves?.length) {
 		for (const leave of statusPresence.leaves) {
 			const userId = leave.user_id;

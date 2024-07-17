@@ -163,7 +163,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
-			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent.user_id, customStatus: statusEvent.status }))
+			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent.user_id, customStatus: statusEvent.status }));
 		},
 		[dispatch],
 	);
@@ -317,7 +317,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onnotification = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onpinmessage = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstatuspresence = () => { };
