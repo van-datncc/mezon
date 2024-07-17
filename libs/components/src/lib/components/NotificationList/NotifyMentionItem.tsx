@@ -1,13 +1,5 @@
 import { useJumpToMessage, useNotification } from '@mezon/core';
-import {
-	INotification,
-	notificationActions,
-	referencesActions,
-	selectChannelById,
-	selectCurrentClan,
-	selectMemberByUserId,
-	selectMessageByMessageId,
-} from '@mezon/store';
+import { INotification, notificationActions, referencesActions, selectChannelById, selectClanById, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,63 +13,60 @@ export type NotifyMentionProps = {
 	readonly isUnreadTab?: boolean;
 };
 
-function parseObject(obj: any) {
-	let attachments;
-	let mentions;
-	let reactions;
-	let references;
-	try {
-		attachments = JSON.parse(obj.attachments);
-	} catch (err) {
-		attachments = {};
+function convertContentToObject(notify: any) {
+	if (notify && notify.content && typeof notify.content === 'object') {
+		try {
+			const parsedContent = {
+				...notify.content,
+				content: JSON.parse(notify.content.content),
+				mentions: JSON.parse(notify.content.mentions),
+				reactions: JSON.parse(notify.content.reactions),
+				references: JSON.parse(notify.content.references),
+				attachments: JSON.parse(notify.content.attachments),
+			};
+
+			return {
+				...notify,
+				content: parsedContent,
+			};
+		} catch (error) {
+			return notify;
+		}
 	}
-	try {
-		mentions = JSON.parse(obj.mentions);
-	} catch (err) {
-		mentions = {};
-	}
-	try {
-		references = JSON.parse(obj.references);
-	} catch (err) {
-		references = {};
-	}
-	try {
-		reactions = JSON.parse(obj.reactions);
-	} catch (err) {
-		reactions = {};
-	}
-	const parsedObj = {
-		...obj,
-		attachments: attachments,
-		mentions: mentions,
-		reactions: reactions,
-		references: references,
-	};
-	return parsedObj;
+	return notify;
 }
 
 function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
+	const parseNotify = convertContentToObject(notify);
+
 	const dispatch = useDispatch();
 	const { deleteNotify } = useNotification();
-	const currentClan = useSelector(selectCurrentClan);
-	const channelInfo = useSelector(selectChannelById(notify.content.channel_id));
-	const data = parseObject(notify.content);
+	const messageId = useMemo(() => {
+		if (parseNotify.content) {
+			return parseNotify.content.message_id;
+		}
+	}, [parseNotify.content]);
 
-	const messageID = useMemo(() => {
-		return notify.content.message_id;
-	}, [notify.content.message_id]);
 	const channelId = useMemo(() => {
-		return notify.content.channel_id;
-	}, [notify.content.channel_id]);
+		if (parseNotify.content) {
+			return parseNotify.content.channel_id;
+		}
+	}, [parseNotify.content]);
+
+	const clanId = useMemo(() => {
+		if (parseNotify.content) {
+			return parseNotify.content.clan_id;
+		}
+	}, [parseNotify.content]);
 
 	const notiId = useMemo(() => {
-		return notify.id;
-	}, [notify.id]);
+		return parseNotify.id;
+	}, [parseNotify.id]);
 
-	const message = useSelector(selectMessageByMessageId(messageID));
-	data.content = JSON.parse(data.content);
-	data.update_time = data.create_time;
-	const { directToMessageById } = useJumpToMessage({ channelId, messageID });
+	const clan = useSelector(selectClanById(clanId));
+	const channel = useSelector(selectChannelById(channelId));
+
+	const { directToMessageById } = useJumpToMessage({ channelId: channelId, messageID: messageId });
 
 	const handleMarkAsRead = useCallback(() => {
 		dispatch(notificationActions.setReadNotiStatus(notiId));
@@ -85,7 +74,7 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	}, []);
 
 	const handleClickJump = useCallback(() => {
-		dispatch(referencesActions.setIdMessageToJump(messageID));
+		dispatch(referencesActions.setIdMessageToJump(messageId));
 		directToMessageById();
 		handleMarkAsRead();
 	}, []);
@@ -97,22 +86,23 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 
 	return (
 		<>
-			{message !== undefined && (
+			{' '}
+			{clan && (
 				<div className="flex flex-col gap-2 py-3 px-3 w-full">
 					<div className="flex justify-between">
 						<div className="flex flex-row items-center gap-2">
 							<div>
-								{currentClan?.logo ? (
+								{clan?.logo ? (
 									<img
-										src={currentClan.logo}
+										src={clan.logo}
 										className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10"
-										alt={currentClan.logo}
+										alt={clan.logo}
 									/>
 								) : (
 									<div>
-										{currentClan?.clan_name && (
+										{clan?.clan_name && (
 											<div className="w-[45px] h-[45px] bg-bgDisable flex justify-center items-center text-contentSecondary text-[20px] rounded-xl">
-												{currentClan.clan_name.charAt(0).toUpperCase()}
+												{clan.clan_name.charAt(0).toUpperCase()}
 											</div>
 										)}
 									</div>
@@ -120,10 +110,10 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 							</div>
 							<div className="flex flex-col gap-1">
 								<div className="font-bold text-[16px] cursor-pointer flex gap-x-1">
-									# <p className=" hover:underline">{channelInfo?.channel_label}</p>
+									# <p className=" hover:underline">{channel?.channel_label}</p>
 								</div>
 								<div className="text-[10px] uppercase">
-									{currentClan?.clan_name} {'>'} {channelInfo?.category_name}
+									{clan?.clan_name} {'>'} {channel?.category_name}
 								</div>
 							</div>
 						</div>
@@ -152,7 +142,7 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 						>
 							Jump
 						</button>
-						{<MentionTabContent message={message} />}
+						{<MentionTabContent message={parseNotify.content} />}
 					</div>
 				</div>
 			)}
