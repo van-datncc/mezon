@@ -18,6 +18,13 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		alignSelf: 'center',
 		maxWidth: '70%'
 	},
+	dmLabel: {
+		color: Colors.white,
+		fontSize: size.h5,
+    fontWeight: '700',
+		paddingHorizontal: size.s_18,
+		textAlign: 'center'
+	},
 	channelLabel: {
 		color: colors.textStrong,
 		marginLeft: size.s_6,

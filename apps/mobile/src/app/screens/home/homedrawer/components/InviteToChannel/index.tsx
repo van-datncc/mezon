@@ -6,7 +6,7 @@ import { DirectEntity, selectCurrentChannelId, selectCurrentClan, selectCurrentC
 import { useMezon } from '@mezon/transport';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -15,6 +15,7 @@ import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../../../components/Common';
+import { threadDetailContext } from '../../../../../components/ThreadDetail/MenuThreadDetail';
 import { MezonModal, MezonSwitch } from '../../../../../temp-ui';
 import Backdrop from '../../../../../temp-ui/MezonBottomSheet/backdrop';
 import { normalizeString } from '../../../../../utils/helpers';
@@ -26,6 +27,7 @@ import { style } from './styles';
 interface IInviteToChannelProp {
 	isUnknownChannel: boolean;
 	onClose?: () => void;
+	isDMThread?: boolean;
 }
 
 interface IInviteToChannelIconProp {
@@ -35,9 +37,10 @@ interface IInviteToChannelIconProp {
 }
 
 export const InviteToChannel = React.memo(
-	React.forwardRef(({ isUnknownChannel, onClose }: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
+	React.forwardRef(({ isUnknownChannel, onClose, isDMThread = false }: IInviteToChannelProp, refRBSheet: React.Ref<BottomSheetModal>) => {
 		const [isVisibleEditLinkModal, setIsVisibleEditLinkModal] = useState(false);
 		const currentChannelId = useSelector(selectCurrentChannelId);
+		const currentChannel = useContext(threadDetailContext);
 		const reducedMotion = useReducedMotion();
 
 		const [currentInviteLink, setCurrentInviteLink] = useState('');
@@ -53,7 +56,7 @@ export const InviteToChannel = React.memo(
 		const [maxUserCanInviteSelected, setMaxUserCanInviteSelected] = useState<EMaxUserCanInvite>(EMaxUserCanInvite.Five);
 		const [expiredTimeSelected, setExpiredTimeSelected] = useState<string>(ExpireLinkValue.SevenDays);
 		const [isTemporaryMembership, setIsTemporaryMembership] = useState(true);
-		const { listDMInvite, listUserInvite } = useDMInvite(currentChannelId);
+		const { listDMInvite, listUserInvite } = useDMInvite(isDMThread ? currentChannel?.channel_id : currentChannelId);
 		const { createDirectMessageWithUser } = useDirect();
 		const { sendInviteMessage } = useSendInviteMessage();
 		const [sentIdList, setSentIdList] = useState<string[]>([]);
