@@ -1,4 +1,4 @@
-import { useChannels, useNotification } from '@mezon/core';
+import { useNotification } from '@mezon/core';
 import { INotification, selectTheme } from '@mezon/store';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,13 +27,8 @@ function NotificationList({ unReadList }: NotificationProps) {
 		setCurrentTabNotify(valueTab);
 	};
 
-	const { channels } = useChannels();
-	const notificationItem = notification.filter(
-		(item) => item.code !== -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
-	);
-	const notifyMentionItem = notification.filter(
-		(item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
-	);
+	const notificationItem = notification.filter((item) => item.code !== -9 && item.code === -10);
+	const notifyMentionItem = notification.filter((item) => item.code === -9 || item.code === -10);
 	const appearanceTheme = useSelector(selectTheme);
 	useEffect(() => {
 		if (currentTabNotify === 'mentions' && tabMentionRef.current) {
