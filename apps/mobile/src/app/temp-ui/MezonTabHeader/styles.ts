@@ -1,14 +1,14 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes, baseColor } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     switchContainer: {
         display: "flex",
         flexDirection: "row",
-        backgroundColor: Colors.primary,
+        backgroundColor: colors.tertiary,
         borderRadius: 50,
         margin: 10,
-        padding: 2,
+        padding: 5,
         gap: 10
     },
 
@@ -25,12 +25,14 @@ const styles = StyleSheet.create({
     },
 
     switchButtonActive: {
-        backgroundColor: Colors.bgViolet
+        backgroundColor: baseColor.blurple
     },
 
     switchText: {
-        color: Colors.white
+        color: colors.text
+    },
+
+    switchTextActive: {
+        color: baseColor.white
     }
 })
-
-export default styles;

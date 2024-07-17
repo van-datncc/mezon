@@ -1,7 +1,7 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes, Colors } from "@mezon/mobile-ui";
 import { Dimensions, StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     container: {
         flex: 1,
         width: Dimensions.get("screen").width
@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: Colors.bgViolet
     },
-    
+
     btnGroup: {
         flexDirection: "row",
         justifyContent: "flex-end",
@@ -20,5 +20,3 @@ const styles = StyleSheet.create({
         marginTop: -20
     }
 })
-
-export default styles;

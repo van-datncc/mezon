@@ -1,15 +1,17 @@
-import { Block, size } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 import { Platform, Text, View } from 'react-native';
 import { IUserProfileValue } from '../../..';
 import { MezonInput } from '../../../../../../../app/temp-ui';
-import styles from './styles';
+import { style } from './styles';
 
 interface IDetailInfoProps {
 	value: IUserProfileValue;
 	onChange: (value: Partial<IUserProfileValue>) => void;
 }
 export default function DetailInfo({ value, onChange }: IDetailInfoProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { t } = useTranslation(['profileSetting']);
 
 	return (

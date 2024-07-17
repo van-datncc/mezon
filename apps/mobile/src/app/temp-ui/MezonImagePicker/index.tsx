@@ -4,13 +4,13 @@ import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { memo, useEffect, useRef, useState } from 'react';
-import { DimensionValue, Platform, Text, View } from 'react-native';
+import { DimensionValue, Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { openCropper } from 'react-native-image-crop-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
 import MezonClanAvatar from '../MezonClanAvatar';
-import { style } from './styles';
+import { style as _style } from './styles';
 
 export interface IFile {
 	uri: string;
@@ -26,9 +26,19 @@ interface IMezonImagePickerProps {
 	defaultValue: string;
 	height?: DimensionValue;
 	width?: DimensionValue;
+	rounded?: boolean;
 	showHelpText?: boolean;
 	autoUpload?: boolean;
 	alt?: string;
+	style?: StyleProp<ViewStyle>;
+	defaultColor?: string;
+	penPosition?: {
+		top?: number;
+		left?: number;
+		right?: number;
+		bottom?: number;
+	},
+	noDefaultText?: boolean;
 }
 
 export default memo(function MezonImagePicker({
@@ -39,10 +49,20 @@ export default memo(function MezonImagePicker({
 	width = 60,
 	showHelpText,
 	autoUpload = false,
+	rounded = false,
 	alt,
+	style,
+	defaultColor,
+	penPosition = {
+		bottom: undefined,
+		top: -7,
+		left: undefined,
+		right: -7
+	},
+	noDefaultText
 }: IMezonImagePickerProps) {
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+	const styles = _style(themeValue);
 	const [image, setImage] = useState<string>(defaultValue);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { sessionRef, clientRef } = useMezon();
@@ -124,15 +144,20 @@ export default memo(function MezonImagePicker({
 	return (
 		<TouchableOpacity onPress={() => handleImage()}>
 			<View style={styles.bannerContainer}>
-				<View style={[styles.bannerWrapper, { height, width }]}>
+				<View style={[styles.bannerWrapper, { height, width }, rounded && { borderRadius: 999 }, style]}>
 					{image || !showHelpText ? (
-						<MezonClanAvatar image={image} alt={alt} />
+						<MezonClanAvatar
+							image={image}
+							alt={alt}
+							defaultColor={defaultColor}
+							noDefaultText={noDefaultText}
+						/>
 					) : (
 						<Text style={styles.textPlaceholder}>Choose an image</Text>
 					)}
 				</View>
 
-				<View style={styles.btnWrapper}>
+				<View style={[styles.btnWrapper, penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right }]}>
 					<Icons.PencilIcon height={12} width={12} color={themeValue.text} />
 				</View>
 			</View>
