@@ -28,6 +28,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 	currentChannelId?: string | null;
 	followingUserIds?: string[];
 	onlineStatusUser: Record<string, boolean>;
+	customStatusUser: Record<string, string>;
 	toFollowUserIds: string[];
 	memberChannels?: ChannelUserListChannelUser[];
 }
@@ -92,6 +93,11 @@ export const fetchChannelMembers = createAsyncThunk(
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');
+		const customStatusInit = members.map((member) => {
+			const status = (member?.user?.metadata as any)?.status ?? '';
+			return { userId: member.user?.id ?? '', customStatus: status };
+		});
+		thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
 		thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
 		thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
 		thunkAPI.dispatch(channelMembersActions.followUserStatus());
@@ -141,12 +147,14 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 		for (const leave of statusPresence.leaves) {
 			const userId = leave.user_id;
 			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: false }));
+			thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: leave.status }));
 		}
 	}
 	if (statusPresence?.joins?.length) {
 		for (const join of statusPresence.joins) {
 			const userId = join.user_id;
 			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: true }));
+			thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: join.status }));
 		}
 	}
 });
@@ -168,16 +176,39 @@ export const removeMemberChannel = createAsyncThunk(
 	},
 );
 
+type UpdateCustomStatus = {
+	clanId: string;
+	customStatus: string;
+};
+
+export const updateCustomStatus = createAsyncThunk(
+	'channelMembers/updateCustomStatusUser',
+	async ({ clanId, customStatus }: UpdateCustomStatus, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			await mezon.socketRef.current?.writeCustomStatus(clanId, customStatus);
+		} catch (e) {
+			console.error('Error updating custom status user', e);
+		}
+	},
+);
+
 export const initialChannelMembersState: ChannelMembersState = channelMembersAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 	onlineStatusUser: {},
 	toFollowUserIds: [],
+	customStatusUser: {},
 });
 
 export type StatusUserArgs = {
 	userId: string;
 	status: boolean;
+};
+
+export type CustomStatusUserArgs = {
+	userId: string;
+	customStatus: string;
 };
 
 export const channelMembers = createSlice({
@@ -193,6 +224,11 @@ export const channelMembers = createSlice({
 			});
 			return channelMembersAdapter.setAll(state, updatedMembers);
 		},
+		setManyCustomStatusUser: (state, action: PayloadAction<CustomStatusUserArgs[]>) => {
+			for (const i of action.payload) {
+				state.customStatusUser[i.userId] = i.customStatus;
+			}
+		},
 		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
 			for (const i of action.payload) {
 				state.onlineStatusUser[i.userId] = i.status;
@@ -205,6 +241,11 @@ export const channelMembers = createSlice({
 		setStatusUser: (state, action: PayloadAction<StatusUserArgs>) => {
 			state.onlineStatusUser[action.payload.userId] = action.payload.status;
 		},
+
+		setCustomStatusUser: (state, action: PayloadAction<CustomStatusUserArgs>) => {
+			state.customStatusUser[action.payload.userId] = action.payload.customStatus;
+		},
+
 		addUserIdsToFollow: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
 			const newUsers = [...state.toFollowUserIds, ...action.payload];
 			state.toFollowUserIds = [...new Set(newUsers)];
@@ -262,6 +303,7 @@ export const channelMembersActions = {
 	followUserStatus,
 	updateStatusUser,
 	removeMemberChannel,
+	updateCustomStatus,
 };
 
 /*
@@ -325,11 +367,18 @@ export const selectMembersMap = (channelId?: string | null) =>
 	});
 export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser);
 
+export const selectCustomUserStatus = createSelector(getChannelMembersState, (state) => state.customStatusUser);
+
 export const selectMemberChannels = createSelector(getChannelMembersState, (state) => state.memberChannels);
 
 export const selectMemberOnlineStatusById = (userId: string) =>
 	createSelector(selectMemberStatus, (status) => {
 		return status?.[userId] || false;
+	});
+
+export const selectMemberCustomStatusById = (userId: string) =>
+	createSelector(selectCustomUserStatus, (customStatus) => {
+		return customStatus?.[userId] || '';
 	});
 
 export const selectChannelMemberByUserIds = (channelId: string, userIds: string[]) =>
