@@ -93,7 +93,6 @@ export const fetchChannelMembers = createAsyncThunk(
 		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
 		thunkAPI.dispatch(channelMembersActions.addMany(members));
 		const userIds = members.map((member) => member.user?.id || '');
-		console.log('SSSSSSS: ', members);
 		const customStatusInit = members.map((member) => {
 			const status = (member?.user?.metadata as any)?.status ?? '';
 			return { userId: member.user?.id ?? '', customStatus: status };
