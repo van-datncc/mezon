@@ -40,16 +40,28 @@ const SideBar = ({ sideBarIsOpen, toggleSideBar }: SideBarProps) => {
 						<div>Careers</div>
 					</div>
 				</div>
-				<a
-					className="bottom flex items-center justify-center text-white bg-[#5865f2] px-[20px] py-[7px] font-semibold cursor-pointer mb-[70px]"
-					style={{ borderRadius: '28px' }}
-					href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
-					target="_blank"
-					rel="noreferrer"
-				>
-					<Icons.HomepageDownload className="text-white w-[24px]" />
-					<div className="">Download</div>
-				</a>
+				<div className='flex flex-col gap-3 mb-[70px]'>
+					<a
+						className="bottom flex flex-1 items-center justify-center text-white bg-[#5865f2] px-[20px] py-[7px] font-semibold cursor-pointer"
+						style={{ borderRadius: '28px' }}
+						href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
+						target="_blank"
+						rel="noreferrer"
+					>
+						<Icons.GooglePlay className="text-white w-[24px]" />
+						<div className="">Download for Android</div>
+					</a>
+					<a
+						className="bottom flex flex-1 items-center justify-center text-white bg-[#5865f2] px-[20px] py-[7px] font-semibold cursor-pointer"
+						style={{ borderRadius: '28px' }}
+						href="https://apps.apple.com/vn/app/mezon/id6502750046"
+						target="_blank"
+						rel="noreferrer"
+					>
+						<Icons.AppStore className="text-white w-[24px]" />
+						<div className="">Download for IOS</div>
+					</a>
+				</div>
 			</div>
 		</div>
 	);
