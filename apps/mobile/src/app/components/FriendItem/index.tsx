@@ -1,11 +1,11 @@
 import { useMemberStatus } from '@mezon/core';
 import { CallIcon, CheckIcon, CloseIcon, MessageIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity } from '@mezon/store-mobile';
 import React, { useMemo } from 'react';
 import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
-import { styles } from './styles';
+import { style } from './styles';
 
 export enum EFriendItemAction {
 	Call,
@@ -27,6 +27,8 @@ export interface IFriendItem {
 
 export const FriendItem = React.memo(
 	({ friend, handleFriendAction, onSelectChange, isChecked, disabled = false, showAction = true, selectMode = false }: IFriendItem) => {
+		const { themeValue } = useTheme();
+		const styles = style(themeValue);
 		const userStatus = useMemberStatus(friend.id || '');
 
 		const isFriend = friend.state === 0;
@@ -80,10 +82,10 @@ export const FriendItem = React.memo(
 						{isFriend && showAction && !selectMode ? (
 							<View style={styles.friendAction}>
 								<Pressable onPress={() => onPressAction(EFriendItemAction.Call)}>
-									<CallIcon width={24} height={18} color={Colors.textGray} />
+									<CallIcon width={24} height={18} color={themeValue.text} />
 								</Pressable>
 								<Pressable onPress={() => onPressAction(EFriendItemAction.MessageDetail)}>
-									<MessageIcon width={25} height={18} color={Colors.textGray} />
+									<MessageIcon width={25} height={18} color={themeValue.text} />
 								</Pressable>
 							</View>
 						) : null}

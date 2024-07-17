@@ -1,22 +1,22 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     addFriendModalContainer: {
         paddingHorizontal: size.s_18,
         gap: size.s_18,
         flex: 1
     },
     whiteText: {
-        color: Colors.white
+        color: colors.text
     },
     searchInput: {
         borderRadius: size.s_10,
-		color: Colors.white,
-        paddingVertical: size.s_12  
+        color: colors.textStrong,
+        paddingVertical: size.s_12
     },
     searchUsernameWrapper: {
-        backgroundColor: Colors.primary,
+        backgroundColor: colors.secondary,
         borderRadius: size.s_10,
         alignItems: 'center',
         paddingHorizontal: size.s_12,
@@ -26,12 +26,12 @@ export const styles = StyleSheet.create({
         flex: 1
     },
     headerTitle: {
-        color: Colors.white,
+        color: colors.textStrong,
         fontSize: size.h5,
         textAlign: 'center',
     },
     defaultText: {
-        color: Colors.textGray,
+        color: colors.text,
         paddingVertical: size.s_14
     },
     byTheWayText: {

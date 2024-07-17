@@ -1,6 +1,6 @@
 import { useDirect, useFriends } from '@mezon/core';
 import { ChevronIcon, PaperPlaneIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -14,9 +14,11 @@ import { FriendListByAlphabet } from '../../components/FriendListByAlphabet';
 import { UserInformationBottomSheet } from '../../components/UserInformationBottomSheet';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { normalizeString } from '../../utils/helpers';
-import { styles } from './styles';
+import { style } from './styles';
 
 export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [searchText, setSearchText] = useState<string>('');
 	const { t } = useTranslation(['common', 'friends']);
 	const { friends: allUser } = useFriends();
@@ -87,10 +89,10 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 	return (
 		<View style={styles.friendContainer}>
 			<View style={styles.searchFriend}>
-				<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
+				<Feather size={18} name="search" style={{ color: themeValue.text }} />
 				<TextInput
 					placeholder={t('common:searchPlaceHolder')}
-					placeholderTextColor={Colors.tertiary}
+					placeholderTextColor={themeValue.text}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
@@ -104,7 +106,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 
 			{!searchText?.trim()?.length || filteredFriendList?.length === 0 ? (
 				<Pressable style={styles.requestFriendWrapper} onPress={() => navigateToRequestFriendScreen()}>
-					<PaperPlaneIcon width={25} color={Colors.textGray} />
+					<PaperPlaneIcon width={25} color={themeValue.text} />
 					<View style={styles.fill}>
 						<Text style={styles.defaultText}>{t('friends:friendRequest.title')}</Text>
 						<View style={styles.requestContentWrapper}>
@@ -117,7 +119,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 							</Text>
 						</View>
 					</View>
-					<ChevronIcon width={25} color={Colors.textGray} />
+					<ChevronIcon width={25} color={themeValue.text} />
 				</Pressable>
 			) : null}
 			<FriendListByAlphabet
