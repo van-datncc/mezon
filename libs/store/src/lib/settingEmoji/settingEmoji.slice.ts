@@ -1,4 +1,4 @@
-import { isGifFile, isImageFile, LoadingStatus } from '@mezon/utils';
+import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ApiClanEmojiCreateRequest, ApiClanEmojiList, ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { StickersEntity } from '../giftStickerEmojiPanel/stickers.slice';
@@ -9,17 +9,10 @@ export const SETTING_CLAN_EMOJI = 'settingEmoji';
 export interface SettingClanEmojiState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	listEmoji: {
-		staticEmoji: Array<ApiClanEmojiListResponse>;
-		animatedEmoji: Array<ApiClanEmojiListResponse>;
-	};
+	listEmoji: Array<ApiClanEmojiListResponse>;
 }
 
-type fetchEmojiRequest = {
-	clanId: string;
-};
-
-type updateEmojiRequest = {
+type UpdateEmojiRequest = {
 	request: MezonUpdateClanEmojiByIdBody;
 	emojiId: string;
 };
@@ -27,10 +20,7 @@ type updateEmojiRequest = {
 export const initialSettingClanEmojiState: SettingClanEmojiState = {
 	loadingStatus: 'not loaded',
 	error: null,
-	listEmoji: {
-		staticEmoji: [],
-		animatedEmoji: [],
-	},
+	listEmoji: [],
 };
 
 export const emojiAdapter = createEntityAdapter<StickersEntity>();
@@ -63,7 +53,7 @@ export const createEmoji = createAsyncThunk(
 	},
 );
 
-export const updateEmoji = createAsyncThunk('settingClanEmoji/updateEmoji', async ({ request, emojiId }: updateEmojiRequest, thunkAPI) => {
+export const updateEmoji = createAsyncThunk('settingClanEmoji/updateEmoji', async ({ request, emojiId }: UpdateEmojiRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const res = await mezon.client.updateClanEmojiById(mezon.session, emojiId, request);
@@ -94,8 +84,7 @@ export const settingClanEmojiSlice = createSlice({
 		builder
 			.addCase(fetchEmojisByClanId.fulfilled, (state: SettingClanEmojiState, actions: PayloadAction<ApiClanEmojiList>) => {
 				state.loadingStatus = 'loaded';
-				state.listEmoji.staticEmoji = actions.payload.emoji_list?.filter((emoji) => isImageFile(emoji.src ?? '')) ?? [];
-				state.listEmoji.animatedEmoji = actions.payload.emoji_list?.filter((emoji) => isGifFile(emoji.src ?? '')) ?? [];
+				state.listEmoji = actions.payload.emoji_list ?? [];
 			})
 			.addCase(fetchEmojisByClanId.pending, (state: SettingClanEmojiState) => {
 				state.loadingStatus = 'loading';
@@ -108,11 +97,7 @@ export const settingClanEmojiSlice = createSlice({
 			.addCase(updateEmoji.fulfilled, (state: SettingClanEmojiState, action) => {})
 			.addCase(deleteEmoji.fulfilled, (state: SettingClanEmojiState, action) => {
 				if (action.payload) {
-					if (isImageFile(action.payload.src ?? '')) {
-						state.listEmoji.staticEmoji = state.listEmoji.staticEmoji.filter((emoji) => emoji.id !== action.payload?.id);
-					} else if (isGifFile(action.payload.src ?? '')) {
-						state.listEmoji.animatedEmoji = state.listEmoji.animatedEmoji.filter((emoji) => emoji.id !== action.payload?.id);
-					}
+					state.listEmoji = state.listEmoji.filter((emoji) => emoji.id !== action.payload?.id);
 				}
 			});
 	},
@@ -120,12 +105,8 @@ export const settingClanEmojiSlice = createSlice({
 
 export const { selectAll, selectEntities } = emojiAdapter.getSelectors();
 
-export const getEmojiSettingState = (rootState: { [SETTING_CLAN_EMOJI]: SettingClanEmojiState }): SettingClanEmojiState =>
-	rootState[SETTING_CLAN_EMOJI];
+export const getEmojiSettingState = (rootState: { [SETTING_CLAN_EMOJI]: SettingClanEmojiState }): SettingClanEmojiState => rootState[SETTING_CLAN_EMOJI];
 export const selectAllEmoji = createSelector(getEmojiSettingState, (state) => state?.listEmoji);
 export const selectEmojiLoading = createSelector(getEmojiSettingState, (state) => state?.loadingStatus);
-
-
 export const settingClanEmojiReducer = settingClanEmojiSlice.reducer;
-
 export const settingClanEmojiActions = { ...settingClanEmojiSlice.actions, fetchEmojisByClanId, createEmoji, updateEmoji, deleteEmoji };

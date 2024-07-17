@@ -24,6 +24,7 @@ export async function handleUploadFile(
 	filename: string,
 	file: File,
 	mode?: number,
+	path?: string,
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {

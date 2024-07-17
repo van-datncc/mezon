@@ -90,13 +90,9 @@ const SettingEmoji = () => {
         </div>
       </div>
 
-
-      <SettingEmojiList title={"Emoji"} emojiList={emojiList.staticEmoji} />
-      <SettingEmojiList title={"Emoji Animated"} emojiList={emojiList.animatedEmoji} />
-
+      <SettingEmojiList title={"Emoji"} emojiList={emojiList} />
 
       <ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
-
       <ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 
     </>
