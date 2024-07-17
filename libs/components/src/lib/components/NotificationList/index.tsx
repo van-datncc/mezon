@@ -12,7 +12,6 @@ export type NotificationProps = { unReadList?: string[] };
 
 const tabDataNotify = [
 	{ title: 'For you', value: 'individual' },
-	{ title: 'Unreads', value: 'unreads' },
 	{ title: 'Mentions', value: 'mentions' },
 ];
 
