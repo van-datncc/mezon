@@ -108,6 +108,7 @@ Bad dependencies:
 
 -   `apps` <- `apps` ❌
 -   `libs` <- `apps` ❌
+-  `components` <- `apps` ❌
 -   `ui` <- `components` ❌
 -   `store` <- `components` ❌
 -   `transports` <- `store` ❌

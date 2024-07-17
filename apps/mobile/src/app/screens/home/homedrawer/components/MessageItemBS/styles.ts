@@ -10,7 +10,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		paddingBottom: size.s_10,
 	},
 	messageActionsWrapper: {
-		paddingTop: size.s_20,
+		paddingVertical: size.s_20,
 		gap: size.s_10,
 	},
 	reactWrapper: {

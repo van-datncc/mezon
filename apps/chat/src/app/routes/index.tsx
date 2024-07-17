@@ -21,9 +21,8 @@ import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
 
 // Pages
-import { selectInitialPath, useAppDispatch } from '@mezon/store';
-import { useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { appActions, useAppDispatch } from '@mezon/store';
+import { useCallback, useEffect, useMemo } from 'react';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 import ThreadsMain from '../pages/thread';
 import ErrorRoutes from './ErrorRoutes';
@@ -50,7 +49,6 @@ const ChannelLayout = loadable(() => import('../layouts/ChannelLayout'));
 // Components
 export const Routes = () => {
 	const dispatch = useAppDispatch();
-	const initialPath = useSelector(selectInitialPath);
 
 	const loaderWithStore = useCallback(
 		(loaderFunction: CustomLoaderFunction) => {
@@ -58,11 +56,15 @@ export const Routes = () => {
 				await loaderFunction({
 					...props,
 					dispatch,
-					initialPath: initialPath,
+					initialPath: window.location.pathname,
 				});
 		},
-		[dispatch, initialPath],
+		[dispatch],
 	);
+
+	useEffect(() => {
+		dispatch(appActions.setInitialPath(window.location.pathname));
+	}, [dispatch]);
 
 	const routes = useMemo(
 		() =>

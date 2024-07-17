@@ -40,7 +40,6 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 		redirectTo = notificationPath;
 	}
 
-	dispatch(appActions.setInitialPath(pathname));
 	dispatch(appActions.setInitialParams(params));
 	return {
 		pathname,

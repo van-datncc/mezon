@@ -16,19 +16,24 @@ export function uploadImageToMinIO(url: string, stream: Buffer, size: number) {
 	return fetch(url, { method: 'PUT', body: stream });
 }
 
-export async function handleUploadFile(client: Client, session: Session, currentClanId: string, currentChannelId: string, filename: string, file: File, mode?: number, path?: string): Promise<ApiMessageAttachment> {
-	
+export async function handleUploadFile(
+	client: Client,
+	session: Session,
+	currentClanId: string,
+	currentChannelId: string,
+	filename: string,
+	file: File,
+	mode?: number,
+): Promise<ApiMessageAttachment> {
+	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
-			const ms = (new Date()).getTime();
+			const ms = new Date().getTime();
 			let fullfilename;
-      if(mode === 3) {
-        fullfilename = path + '/' + currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g,"_")
-      } else
-			if(mode === 2){
-				fullfilename = currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g,"_");
-			}else{
-				fullfilename = currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g,"_");
+			if (mode === 2) {
+				fullfilename = currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g, '_');
+			} else {
+				fullfilename = currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g, '_');
 			}
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {
@@ -60,6 +65,7 @@ export async function handleUploadFile(client: Client, session: Session, current
 }
 
 export async function handleUploadFileMobile(client: Client, session: Session, fullfilename: string, file: any): Promise<ApiMessageAttachment> {
+	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
 			if (file?.uri) {
@@ -78,7 +84,7 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 					return;
 				}
 				const buffer = BufferMobile.from(arrayBuffer);
-				
+
 				const res = await fetch(data.url, {
 					method: 'PUT',
 					headers: {

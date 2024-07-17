@@ -70,8 +70,8 @@ export default function DirectMessage() {
 	const { isShowMemberList, setIsShowMemberList } = useApp();
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 
-	const HEIGHT_EMOJI_PANEL: number = 457;
-	const WIDTH_EMOJI_PANEL: number = 500;
+	const HEIGHT_EMOJI_PANEL = 457;
+	const WIDTH_EMOJI_PANEL = 500;
 
 	const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 	const distanceToRight = window.innerWidth - positionOfSmileButton.right;

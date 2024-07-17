@@ -1,5 +1,5 @@
 import { CheckIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectChannelById, useAppDispatch } from '@mezon/store-mobile';
 import { BellIcon, FolderPlusIcon, LinkIcon, PinIcon, TrashIcon, UserShieldIcon, WebhookIcon } from 'libs/mobile-components/src/lib/icons2';
 import { isEqual } from 'lodash';
@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, IMezonOptionData, MezonConfirm, MezonInput, MezonMenu, MezonOption } from '../../temp-ui';
 import MezonSlider, { IMezonSliderData } from '../../temp-ui/MezonSlider';
-import styles from './styles';
+import { style } from './styles';
 
 interface IChannelSettingValue {
 	channelName: string;
@@ -22,6 +22,8 @@ interface IChannelSettingValue {
 
 type ScreenChannelSetting = typeof APP_SCREEN.MENU_CHANNEL.SETTINGS;
 export default function ChannelSetting({ navigation, route }: MenuChannelScreenProps<ScreenChannelSetting>) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { channelId } = route.params;
 	const { t } = useTranslation(['channelSetting']);
 	const dispatch = useAppDispatch();
@@ -85,7 +87,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{
 					title: t('fields.channelCategory.title'),
 					expandable: true,
-					icon: <FolderPlusIcon />,
+					icon: <FolderPlusIcon color={themeValue.text} />,
 				},
 			] satisfies IMezonMenuItemProps[],
 		[],
@@ -97,7 +99,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{
 					title: t('fields.channelPermission.permission'),
 					expandable: true,
-					icon: <UserShieldIcon />,
+					icon: <UserShieldIcon color={themeValue.text} />,
 				},
 			] satisfies IMezonMenuItemProps[],
 		[],
@@ -109,17 +111,17 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{
 					title: t('fields.channelNotifications.notification'),
 					expandable: true,
-					icon: <BellIcon />,
+					icon: <BellIcon color={themeValue.text} />,
 				},
 				{
 					title: t('fields.channelNotifications.pinned'),
 					expandable: true,
-					icon: <PinIcon />,
+					icon: <PinIcon color={themeValue.text} />,
 				},
 				{
 					title: t('fields.channelNotifications.invite'),
 					expandable: true,
-					icon: <LinkIcon />,
+					icon: <LinkIcon color={themeValue.text} />,
 				},
 			] satisfies IMezonMenuItemProps[],
 		[],
@@ -131,7 +133,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{
 					title: t('fields.channelWebhooks.webhook'),
 					expandable: true,
-					icon: <WebhookIcon />,
+					icon: <WebhookIcon color={themeValue.text} />,
 				},
 			] satisfies IMezonMenuItemProps[],
 		[],

@@ -1,6 +1,6 @@
 import accountSetting from './accountSetting.json';
-import appearanceSetting from './appearanceSetting.json';
 import appThemeSetting from './appThemeSetting.json';
+import appearanceSetting from './appearanceSetting.json';
 import categoryCreator from './categoryCreator.json';
 import categoryMenu from './categoryMenu.json';
 import channelCreator from './channelCreator.json';
@@ -19,6 +19,7 @@ import eventCreator from './eventCreator.json';
 import eventMenu from './eventMenu.json';
 import friends from './friends.json';
 import inviteToChannel from './inviteToChannel.json';
+import media from './media.json';
 import message from './message.json';
 import notification from './notification.json';
 import notificationSetting from './notificationSetting.json';
@@ -60,6 +61,7 @@ export default {
 	appearanceSetting,
 	appThemeSetting,
 	accountSetting,
-	clanRoles,
 	deleteClan,
+	media,
+	clanRoles,
 };
