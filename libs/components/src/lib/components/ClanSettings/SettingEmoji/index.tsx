@@ -1,5 +1,6 @@
 import { createEmoji, selectAllEmoji, selectCurrentChannelId, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
 import { handleUploadFile, useMezon } from "@mezon/transport";
+import { ChannelStreamMode } from "mezon-js";
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from "mezon-js/api.gen";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -38,7 +39,7 @@ const SettingEmoji = () => {
         setOpenModal(true);
         return;
       }
-      handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file, 3, path).then(async (attachment: ApiMessageAttachment) => {
+      handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file, ChannelStreamMode.STREAM_MODE_CHANNEL, path).then(async (attachment: ApiMessageAttachment) => {
         const request: ApiClanEmojiCreateRequest = {
           category: category,
           clan_id: currentClanId,
@@ -55,7 +56,7 @@ const SettingEmoji = () => {
 
   const fetchEmojis = useCallback(async () => {
     if (currentClanId) {
-      await dispatch(settingClanEmojiActions.fetchEmojisByClanId(currentClanId));
+      await dispatch(settingClanEmojiActions.fetchEmojisByClanId({ clanId: currentClanId, noCache: true }));
     }
   }, [dispatch]);
 

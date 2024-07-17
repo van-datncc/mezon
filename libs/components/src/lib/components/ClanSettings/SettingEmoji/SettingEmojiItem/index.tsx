@@ -27,8 +27,6 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
         category: emoji.category,
       }
       await dispatch(settingClanEmojiActions.updateEmoji({ request: request, emojiId: emoji.id || '' }))
-    } else {
-      setNameEmoji(emoji.shortname ?? '');
     }
   }
 
