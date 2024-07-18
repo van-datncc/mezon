@@ -1,5 +1,6 @@
 import { useNotification } from '@mezon/core';
 import { INotification, selectTheme } from '@mezon/store';
+import { NotificationCode } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
@@ -26,8 +27,12 @@ function NotificationList({ unReadList }: NotificationProps) {
 		setCurrentTabNotify(valueTab);
 	};
 
-	const notificationItem = notification.filter((item) => item.code !== -9 && item.code !== -10);
-	const notifyMentionItem = notification.filter((item) => item.code === -9 || item.code === -10);
+	const notificationItem = notification.filter(
+		(item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED,
+	);
+	const notifyMentionItem = notification.filter(
+		(item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED,
+	);
 
 	const appearanceTheme = useSelector(selectTheme);
 	useEffect(() => {
