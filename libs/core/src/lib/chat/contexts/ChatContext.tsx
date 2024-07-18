@@ -45,18 +45,13 @@ type ChatContextProviderProps = {
 	children: React.ReactNode;
 };
 
-export type ChatContextValue = object;
+export type ChatContextValue = {
+	setCallbackEventFn: (socket: Socket) => void;
+};
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-	const value = React.useMemo<ChatContextValue>(
-		() => ({
-			// add logic code
-		}),
-		[],
-	);
-
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -354,6 +349,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			unInitWorker();
 		};
 	}, [initWorker, unInitWorker]);
+
+	const value = React.useMemo<ChatContextValue>(
+		() => ({
+			// add logic code
+			setCallbackEventFn,
+		}),
+		[setCallbackEventFn],
+	);
 
 	return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };
