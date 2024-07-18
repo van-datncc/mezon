@@ -1,7 +1,7 @@
 import { useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, selectAllEmojiSuggestion, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { DirectEntity, RootState, selectAllClans, selectAllEmojiSuggestion, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
 import moment from 'moment';
 import React, { useMemo, useState } from 'react';
@@ -14,6 +14,7 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { emojiRegex, normalizeString } from '../../utils/helpers';
 import { removeBlockCode } from '../home/homedrawer/constants';
 import { style } from './styles';
+import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
 
 const SeparatorListFriend = () => {
 	return <View style={{ height: size.s_8 }} />;
@@ -121,6 +122,8 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const [searchText, setSearchText] = useState<string>('');
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const { t } = useTranslation(['dmMessage', 'common']);
+  const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
+	const clans = useSelector(selectAllClans);
 
 	const sortDM = (a, b) => {
 		const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
@@ -174,8 +177,11 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
 			</View>
-
-			<FlatList
+      {
+        clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ?
+        <UserEmptyMessage onPress={()=>{navigateToAddFriendScreen()}}/> :
+        (
+          <FlatList
 				data={filteredDataDM}
 				style={styles.dmMessageListContainer}
 				showsVerticalScrollIndicator={false}
@@ -183,6 +189,8 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 				ItemSeparatorComponent={SeparatorListFriend}
 				renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} />}
 			/>
+        )
+      }
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
 				<Icons.MessagePlusIcon width={22} height={22} />
