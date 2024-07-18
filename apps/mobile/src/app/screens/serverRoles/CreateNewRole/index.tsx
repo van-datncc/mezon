@@ -1,5 +1,5 @@
 import { useRoles } from '@mezon/core';
-import { CloseIcon, Icons } from '@mezon/mobile-components';
+import { CheckIcon, CloseIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId } from '@mezon/store-mobile';
 import { useState } from 'react';
@@ -35,13 +35,13 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
 		const response = (await createRole(currentClanId, currentClanId, roleName, [], [])) as any;
 		if (response?.id) {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS);
-			// Toast.show({
-			// 	type: 'success',
-			// 	props: {
-			// 		text2: t('createNewRole.createSuccess', { roleName }),
-			// 		leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-			// 	},
-			// });
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: t('createNewRole.createSuccess', { roleName }),
+					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
+				},
+			});
 		} else {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
 			Toast.show({
