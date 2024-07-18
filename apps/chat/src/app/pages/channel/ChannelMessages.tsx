@@ -32,7 +32,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
-	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '' });
+	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '', clanId: '' });
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const appearanceTheme = useSelector(selectTheme);
@@ -111,7 +111,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			id="scrollLoading"
 			ref={chatRef}
 		>
-			{remain === 0 && <ChatWelcome type={type} name={channelLabel??`${currentDirect.creator_name}'s Group`} avatarDM={avatarDM} />}
+			{remain === 0 && <ChatWelcome type={type} name={channelLabel ?? `${currentDirect.creator_name}'s Group`} avatarDM={avatarDM} />}
 			{isFetching && remain !== 0 && (
 				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
 			)}
