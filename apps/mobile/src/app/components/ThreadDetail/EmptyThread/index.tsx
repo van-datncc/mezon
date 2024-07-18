@@ -5,14 +5,15 @@ import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { styles } from './EmptyThread.style';
+import { style } from './EmptyThread.style';
 
 const EmptyThread = () => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { setValueThread } = useThreads();
 	const { setOpenThreadMessageState } = useReference();
 	const navigation = useNavigation<any>();
 	const { t } = useTranslation(['createThread']);
-	const { themeValue } = useTheme();
 
 	const handleNavigateCreateForm = () => {
 		setOpenThreadMessageState(false);

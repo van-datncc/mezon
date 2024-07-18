@@ -1,4 +1,4 @@
-import { Metrics, size } from '@mezon/mobile-ui';
+import { Metrics, size, useTheme } from '@mezon/mobile-ui';
 import {
 	AppDispatch,
 	PinMessageEntity,
@@ -11,10 +11,12 @@ import { Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import EmptyPinMessage from './EmptyPinMessage';
-import { styles } from './PinMessage';
+import { style } from './PinMessage';
 import PinMessageItem from './PinMessageItem';
 
 const PinMessage = ({ currentChannelId }: { currentChannelId: string }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannelId));
 
 	const dispatch = useDispatch<AppDispatch>();

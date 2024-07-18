@@ -1,11 +1,11 @@
-import { CloseIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, PinMessageEntity } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { renderTextContent } from '../../../screens/home/homedrawer/constants/markdown';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
-import { styles } from './PinMessageItem.styles';
+import { style } from './PinMessageItem.styles';
 
 interface IPinMessageItemProps {
 	pinMessageItem: PinMessageEntity;
@@ -16,6 +16,8 @@ interface IPinMessageItemProps {
 }
 
 const PinMessageItem = ({ pinMessageItem, handleUnpinMessage, contentMessage, channelsEntities, emojiListPNG }: IPinMessageItemProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return (
 		<View style={styles.pinMessageItemWrapper}>
 			<MezonAvatar avatarUrl={pinMessageItem?.avatar} userName={pinMessageItem?.username}></MezonAvatar>
@@ -30,7 +32,7 @@ const PinMessageItem = ({ pinMessageItem, handleUnpinMessage, contentMessage, ch
 						handleUnpinMessage(pinMessageItem);
 					}}
 				>
-					<CloseIcon width={20} height={20} color={Colors.textGray} />
+					<Icons.CircleXIcon color={themeValue.text} />
 				</TouchableOpacity>
 			</View>
 		</View>
