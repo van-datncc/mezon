@@ -1,9 +1,9 @@
-import { Icons } from '@mezon/components';
-import { Button } from 'flowbite-react';
+import {Icons} from '@mezon/components';
+import {Button} from 'flowbite-react';
 
 const MemberTopBar = () => {
 	return (
-		<div className="flex flex-row justify-between items-center py-2 px-4 border-b-[1px] border-borderDivider">
+		<div className="flex flex-row justify-between items-center py-2 px-4 border-b-[1px] dark:border-borderDivider border-buttonLightTertiary">
 			<h2 className="text-base font-semibold">Recent Members</h2>
 			<div className="flex flex-row items-center gap-2">
 				<div className="relative">
@@ -13,7 +13,7 @@ const MemberTopBar = () => {
 						<input
 							type="text"
 							placeholder="Search by user name or id"
-							className="dark:text-[#AEAEAE] text-textLightTheme placeholder-[#AEAEAE] outline-none bg-transparent w-full"
+							className="dark:text-contentTertiary text-textLightTheme placeholder-contentTertiary outline-none bg-transparent w-full"
 						/>
 					</div>
 					<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 bg-transparent top-1/2 transform -translate-y-1/2">

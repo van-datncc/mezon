@@ -18,6 +18,7 @@ import {
 	voiceActions,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { NotificationCode } from '@mezon/utils';
 import {
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -125,7 +126,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		async (notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id && notification.code === -9) {
+			if (currentChannel?.channel_id !== (notification as any).channel_id) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setStatusNoti());
@@ -136,7 +137,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
 			}
 
-			if (notification.code === -2 || notification.code === -3) {
+			if (notification.code === NotificationCode.FRIEND_REQUEST || notification.code === NotificationCode.FRIEND_ACCEPT) {
 				dispatch(toastActions.addToast({ message: notification.subject, type: 'info', id: 'ACTION_FRIEND' }));
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
@@ -305,21 +306,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => { };
+			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -363,4 +364,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-
