@@ -203,7 +203,7 @@ function MemberProfile({
 									)}
 							</div>
 							{customStatus && positionType === MemberProfileType.MEMBER_LIST && (
-								<p className="dark:text-white text-black w-full text-[11px] line-clamp-1">{customStatus}</p>
+								<p className="dark:text-white text-black w-full text-[12px] line-clamp-1">{customStatus}</p>
 							)}
 						</div>
 					)}
