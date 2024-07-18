@@ -111,8 +111,7 @@ const HomeDefault = React.memo((props: any) => {
 
 	const onOpenDrawer = () => {
 		onShowKeyboardBottomSheet(false, 0, 'text');
-		props.navigation.openDrawer();
-		Keyboard.dismiss();
+		DeviceEventEmitter.emit(ActionEmitEvent.HOME_DRAWER, { isShowDrawer: true });
 	};
 
 	const checkShowLicenseAgreement = async () => {
@@ -234,7 +233,7 @@ const HomeDefaultHeader = React.memo(
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 									<Icons.ThreadPlusIcon width={20} height={20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+									currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 									<Icons.TextLockIcon width={20} height={20} color={themeValue.textStrong} />
 								) : (
 									<Icons.TextIcon width={20} height={20} color={themeValue.textStrong} />
