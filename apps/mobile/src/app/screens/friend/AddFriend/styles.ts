@@ -1,11 +1,11 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     addFriendContainer: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.primary,
         flex: 1,
-        paddingHorizontal: size.s_18,
+        padding: size.s_18,
         gap: size.s_18
     },
     groupWrapper: {
@@ -13,13 +13,13 @@ export const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     whiteText: {
-        color: Colors.white
+        color: colors.text
     },
     addFriendItem: {
         padding: size.s_10,
-        backgroundColor: Colors.bgDarkCharcoal
+        backgroundColor: colors.secondary
     },
     addFriendText: {
-        color: Colors.white
+        color: colors.textStrong
     }
 })

@@ -1,4 +1,5 @@
 import { useFriends } from '@mezon/core';
+import { useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -7,7 +8,7 @@ import { FlatList, Pressable, Text, View } from 'react-native';
 import { SeparatorWithLine } from '../../../components/Common';
 import { EFriendItemAction, FriendItem } from '../../../components/FriendItem';
 import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
-import { styles } from './styles';
+import { style } from './styles';
 
 enum EFriendRequest {
 	Received,
@@ -15,6 +16,8 @@ enum EFriendRequest {
 }
 
 export const RequestFriendScreen = () => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [selectedTab, setSelectedTab] = useState(EFriendRequest.Received);
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const { friends, acceptFriend, deleteFriend } = useFriends();

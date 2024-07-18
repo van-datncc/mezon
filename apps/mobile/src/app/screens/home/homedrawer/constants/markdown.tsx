@@ -1,4 +1,4 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelMembersEntity,
 	ChannelsEntity,
@@ -51,9 +51,10 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = {
+export const markdownStyles = (colors: Attributes) => StyleSheet.create({
 	body: {
-		color: Colors.tertiary,
+		color: colors.textStrong,
+		// color: Colors.tertiary,
 		fontSize: size.medium,
 	},
 	paragraph: {
@@ -100,8 +101,8 @@ export const markdownStyles = {
 	},
 	mention: {
 		fontSize: size.medium,
-		color: Colors.textGray,
-		backgroundColor: Colors.midnightBlue,
+		color: colors.textLink,
+		backgroundColor: colors.midnightBlue,
 		lineHeight: size.s_20,
 	},
 	blockquote: {
@@ -128,7 +129,7 @@ export const markdownStyles = {
 		lineHeight: size.s_20,
 	},
 	unknownChannel: { fontStyle: 'italic' },
-};
+});
 
 const styleMessageReply = {
 	body: {
@@ -351,6 +352,7 @@ const RenderTextContent = React.memo(
 		isMessageReply,
 		mode,
 	}: IMarkdownProps) => {
+		const { themeValue } = useTheme();
 		const usersClan = useSelector(selectAllUsesClan);
 		const usersInChannel = useSelector(selectAllChannelMembers);
 		if (!lines) return null;
@@ -408,7 +410,7 @@ const RenderTextContent = React.memo(
 					/>
 				) : null}
 				<Markdown
-					style={{ ...(markdownStyles as StyleSheet.NamedStyles<any>), ...customStyle }}
+					style={{ ...(markdownStyles(themeValue) as StyleSheet.NamedStyles<any>), ...customStyle }}
 					rules={renderRulesCustom}
 					onLinkPress={(url) => {
 						if (url.startsWith('@')) {
@@ -431,7 +433,7 @@ const RenderTextContent = React.memo(
 			</View>
 		) : (
 			<Markdown
-				style={markdownStyles as StyleSheet.NamedStyles<any>}
+				style={markdownStyles(themeValue) as StyleSheet.NamedStyles<any>}
 				rules={renderRulesCustom}
 				onLinkPress={(url) => {
 					if (url.startsWith(TYPE_MENTION.userMention)) {

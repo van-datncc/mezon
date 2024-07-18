@@ -1,7 +1,7 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	wrapper: {
 		width: '100%',
 		height: '100%',
@@ -21,18 +21,18 @@ export const styles = StyleSheet.create({
 		marginTop: size.s_30
 	},
 	userInfo: {
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.secondary,
 		marginBottom: size.s_20,
 		padding: size.s_16,
 		borderRadius: 8,
 	},
 	userName: {
-		color: Colors.white,
+		color: colors.textStrong,
 		fontSize: size.h6,
 		fontWeight: '600',
 	},
 	subUserName: {
-		color: Colors.white,
+		color: colors.text,
 		fontSize: size.medium,
 		fontWeight: '400',
 	},
@@ -48,17 +48,17 @@ export const styles = StyleSheet.create({
 		gap: size.s_6,
 	},
 	actionText: {
-		color: Colors.textGray,
+		color: colors.text,
 		fontSize: size.medium,
 	},
 	aboutMe: {
-		color: Colors.white,
+		color: colors.textStrong,
 		fontSize: size.label,
 		fontWeight: '600',
 		marginBottom: size.s_10,
 	},
 	aboutMeText: {
-		color: Colors.white,
+		color: colors.text,
 		fontSize: size.medium,
 		fontWeight: '500',
 		marginBottom: size.s_10,
@@ -79,7 +79,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 8,
 	},
 	textRole: {
-		color: Colors.white,
+		color: colors.text,
 		fontSize: size.medium,
 		fontWeight: '400',
 	},

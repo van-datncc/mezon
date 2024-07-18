@@ -10,7 +10,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		backgroundColor: colors.primary,
 	},
 	bgDefault: {
-		backgroundColor: Colors.bgCharcoal,
+		backgroundColor: colors.secondary,
 	},
 	fill: {
 		flex: 1,
@@ -21,7 +21,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		paddingTop: 70,
 		paddingBottom: 15,
 		paddingHorizontal: 10,
-		backgroundColor: Colors.bgDarkSlate,
+		backgroundColor: colors.secondary,
 	},
 	headerContent: {
 		flexDirection: 'row',

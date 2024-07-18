@@ -1,15 +1,15 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	newMessageContainer: {
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.primary,
 		flex: 1,
-		paddingHorizontal: size.s_18,
+		padding: size.s_18,
 		gap: size.s_18,
 	},
 	searchFriend: {
-		backgroundColor: Colors.primary,
+		backgroundColor: colors.secondary,
 		borderRadius: 40,
 		alignItems: 'center',
 		paddingHorizontal: size.s_12,
@@ -18,12 +18,12 @@ export const styles = StyleSheet.create({
 	searchInput: {
 		width: '93%',
 		borderRadius: 20,
-		color: Colors.white,
+		color: colors.textStrong,
 		paddingVertical: size.s_6,
 		height: size.s_40,
 	},
 	defaultText: {
-		color: Colors.textGray,
+		color: colors.text,
 	},
 	actionsWrapper: {
 		borderRadius: size.s_12,
@@ -33,12 +33,12 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: size.s_12,
-		backgroundColor: Colors.bgDarkCharcoal,
+		backgroundColor: colors.secondary,
 		padding: size.s_10,
 	},
 	actionTitle: {
 		flex: 1,
-		color: Colors.white,
+		color: colors.text,
 	},
 	actionIconWrapper: {
 		padding: size.s_8,

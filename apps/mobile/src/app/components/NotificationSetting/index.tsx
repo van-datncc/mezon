@@ -1,4 +1,4 @@
-import { Colors } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import {
 	notifiReactMessageActions,
 	notificationSettingActions,
@@ -13,11 +13,11 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
+import { MezonRadioButton } from '../../temp-ui';
 import FilterCheckbox from './FilterCheckbox/FilterCheckbox';
-import { styles } from './NotificationSetting.styles';
+import { style } from './NotificationSetting.styles';
 
 export const enum ENotificationType {
 	CATEGORY_DEFAULT = 'Use Category Default',
@@ -27,6 +27,8 @@ export const enum ENotificationType {
 }
 
 export default function NotificationSetting() {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const optionNotifySetting = [
 		{
 			id: 0,
@@ -114,13 +116,7 @@ export default function NotificationSetting() {
 			<View style={styles.optionsSetting}>
 				<TouchableOpacity onPress={handleCheckboxPress} style={styles.option}>
 					<Text style={styles.labelOption}>{t('bottomSheet.labelOptions.reactionMessage')}</Text>
-					<BouncyCheckbox
-						isChecked={isChecked}
-						size={20}
-						fillColor={Colors.bgButton}
-						innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white }}
-						textStyle={{ fontFamily: 'JosefinSans-Regular' }}
-					/>
+					<MezonRadioButton checked={isChecked} />
 				</TouchableOpacity>
 				{radioBox.map((item) => (
 					<FilterCheckbox

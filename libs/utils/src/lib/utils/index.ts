@@ -296,7 +296,7 @@ export const formatTimeToMMSS = (duration: number): string => {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
-export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number, type:string, minWidth?:number, minHeight?: number) =>
+export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number, type: string, minWidth?: number, minHeight?: number) =>
 	new Promise((resolve) => {
 		Resizer.imageFileResizer(
 			file,

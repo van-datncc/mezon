@@ -1,29 +1,30 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     friendContainer: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.primary,
         flex: 1,
-        paddingHorizontal: size.s_18,
+        padding: size.s_18,
         gap: size.s_14
     },
     searchFriend: {
-		backgroundColor: Colors.primary,
-		borderRadius: 40,
-		alignItems: 'center',
-		paddingHorizontal: size.s_12,
-		flexDirection: 'row',
-	},
-	searchInput: {
-		width: '93%',
-		borderRadius: 20,
-		color: Colors.white,
+        backgroundColor: colors.secondary,
+        borderRadius: 40,
+        alignItems: 'center',
+        paddingHorizontal: size.s_12,
+        flexDirection: 'row',
+    },
+    searchInput: {
+        marginLeft: 5,
+        width: '93%',
+        borderRadius: 20,
+        color: Colors.white,
         paddingVertical: 0,
-		height: size.s_50,
-	},
+        height: size.s_50,
+    },
     requestFriendWrapper: {
-        backgroundColor: Colors.bgDarkCharcoal,
+        backgroundColor: colors.secondary,
         paddingHorizontal: size.s_10,
         paddingVertical: size.s_8,
         borderRadius: size.s_8,
@@ -40,6 +41,6 @@ export const styles = StyleSheet.create({
         gap: size.s_4
     },
     defaultText: {
-        color: Colors.textGray
+        color: colors.text
     },
 })

@@ -1,8 +1,8 @@
 {
     "friendRequest": {
         "title": "Friend Requests",
-        "received": "received",
-        "sent": "sent"
+        "received": "Received",
+        "sent": "Sent"
     },
     "addFriend": {
         "incomingFriendRequest": "Incoming Friend Request",

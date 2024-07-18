@@ -1,4 +1,5 @@
 import { useFriends } from '@mezon/core';
+import { useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -10,9 +11,11 @@ import { EFriendItemAction, FriendItem } from '../../../components/FriendItem';
 import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
 import { EAddFriendWays } from '../enum';
 import { AddFriendModal } from './components/AddFriendModal';
-import { styles } from './styles';
+import { style } from './styles';
 
 export const AddFriendScreen = () => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { friends, acceptFriend, deleteFriend } = useFriends();
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const { t } = useTranslation('friends');
