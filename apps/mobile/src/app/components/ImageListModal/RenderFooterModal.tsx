@@ -3,9 +3,10 @@ import { selectMemberByUserId } from '@mezon/store';
 import { convertTimeString } from '@mezon/utils';
 import { clearTimeout } from '@testing-library/react-native/build/helpers/timers';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { FlatList, Image, TouchableOpacity, View } from 'react-native';
+import { FlatList, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
+import { MezonClanAvatar } from '../../temp-ui';
 import { style } from './styles';
 
 interface IRenderFooterModalProps {
@@ -45,11 +46,10 @@ export const RenderFooterModal = React.memo((props: IRenderFooterModalProps) => 
 					paddingHorizontal={size.s_10}
 				>
 					<View style={styles.wrapperAvatar}>
-						{uploader?.user?.avatar_url ? (
-							<Image source={{ uri: uploader?.user?.avatar_url }} style={styles.logoUser} />
-						) : (
-							<Text style={styles.textAvatar}>{uploader?.user?.username?.charAt(0)?.toUpperCase() || 'A'}</Text>
-						)}
+						<MezonClanAvatar
+							alt={uploader?.user?.username}
+							image={uploader?.user?.avatar_url}
+						/>
 					</View>
 					<View style={styles.messageBoxTop}>
 						<Text style={styles.userNameMessageBox}>{uploader?.user?.username || 'Anonymous'}</Text>
