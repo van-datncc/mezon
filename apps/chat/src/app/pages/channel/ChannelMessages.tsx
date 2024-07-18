@@ -2,6 +2,7 @@ import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mez
 import { getJumpToMessageId, useAppParams, useJumpToMessage, useMessages, useNotification } from '@mezon/core';
 import {
 	messagesActions,
+	selectDirectById,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
@@ -24,6 +25,7 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
+	const currentDirect = useSelector(selectDirectById(channelId));
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement>(null);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
@@ -109,7 +111,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			id="scrollLoading"
 			ref={chatRef}
 		>
-			{remain === 0 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
+			{remain === 0 && <ChatWelcome type={type} name={channelLabel??`${currentDirect.creator_name}'s Group`} avatarDM={avatarDM} />}
 			{isFetching && remain !== 0 && (
 				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
 			)}
