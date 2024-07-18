@@ -551,3 +551,7 @@ export enum MouseButton {
 	MIDDLE = 1,
 	RIGHT = 2,
 }
+
+export enum ChannelIsNotThread{
+	TRUE = "0",
+}
