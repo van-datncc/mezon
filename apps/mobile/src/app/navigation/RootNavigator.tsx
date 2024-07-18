@@ -18,13 +18,13 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ChatContextProvider } from '@mezon/core';
+import { ChatContext, ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
@@ -57,6 +57,7 @@ const NavigationMain = () => {
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const { setCallbackEventFn } = useContext(ChatContext);
 
 	useEffect(() => {
 		let timer;
@@ -104,7 +105,8 @@ const NavigationMain = () => {
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			await reconnect(currentClanId);
+			const socket = await reconnect(currentClanId);
+			if (socket) setCallbackEventFn(socket);
 			await notifee.cancelAllNotifications();
 		}
 		if (state === 'background') {
