@@ -14,6 +14,7 @@ import {
 } from "@mezon/store";
 import {useSelector} from "react-redux";
 import {format} from "date-fns";
+import {NotificationType} from "mezon-js";
 
 type PanelChannel = {
 	coords: Coords;
@@ -38,9 +39,23 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const [positionTop, setPositionTop] = useState(false);
   const [nameChildren, setNameChildren] = useState('');
   const [mutedUntil, setmutedUntil] = useState('');
+  const [defaultNotifiName, setDefaultNotifiName] = useState('');
   const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
   const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
-  const [defaultNotifiName, setDefaultNotifiName] = useState('');
+  const notificationTypesList = [
+    {
+      label: 'All',
+      value: NotificationType.ALL_MESSAGE
+    },
+    {
+      label: 'Only @mention',
+      value: NotificationType.MENTION_MESSAGE
+    },
+    {
+      label: 'Nothing',
+      value: NotificationType.NOTHING_MESSAGE
+    },
+  ]
   
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -118,7 +133,6 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
         }
       }
     }
-    console.log ('effect: ', nameChildren, ' ', mutedUntil);
     if (defaultNotificationCategory?.notification_setting_type) {
       setDefaultNotifiName(defaultNotificationCategory.notification_setting_type);
     } else if (defaultNotificationClan?.notification_setting_type) {
@@ -176,6 +190,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
               <ItemPanel
                 children={nameChildren}
                 onClick={() => muteOrUnMuteChannel(1)}
+                muteTime={mutedUntil}
               />
             )}
 						
@@ -190,12 +205,26 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 								)}
 								label=""
 								placement="right-start"
-								className="dark:bg-[#323232] bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+                className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
-								<ItemPanel children="Use Category Default" type="radio" />
-								<ItemPanel children="All Messages" type="radio" />
-								<ItemPanel children="Only @mentions" type="radio" />
-								<ItemPanel children="Nothing" type="radio" />
+                <ItemPanel
+                  children="Use Category Default"
+                  type="radio"
+                  name="NotificationSetting"
+                  defaultNotifi={true}
+                  notifiSelected={getNotificationChannelSelected?.notification_setting_type === undefined}
+                  defaultNotifiName={defaultNotifiName}
+                />
+                {notificationTypesList.map(notification => (
+                  <ItemPanel
+                    children={notification.label}
+                    notificationId={notification.value}
+                    type="radio"
+                    name="NotificationSetting"
+                    key={notification.value}
+                    notifiSelected={getNotificationChannelSelected?.notification_setting_type === notification.value}
+                  />
+                ))}
 							</Dropdown>
 						)}
 					</GroupPanels>
