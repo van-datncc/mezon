@@ -2,6 +2,7 @@ import { useChannelMembers, useChannels, useChatSending, useDirectMessages, useE
 import {
 	ActionEmitEvent,
 	Icons,
+	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
 	getAttachmentUnique,
@@ -136,6 +137,11 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		return allCachedMessage;
 	};
 
+	const getAllCachedAttachments = async () => {
+		const allCachedAttachment = await load(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+		return allCachedAttachment || {};
+	}
+
 	const saveMessageToCache = async (text: string) => {
 		const allCachedMessage = await getAllCachedMessage();
 		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
@@ -144,9 +150,31 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		});
 	};
 
+	async function saveAttachmentToCache(attachment: any) {
+		const allCachedAttachments = getAllCachedAttachments();
+		console.log("x", allCachedAttachments);
+		console.log(props.channelId);
+
+		console.log({
+			...allCachedAttachments,
+			[props?.channelId]: attachment
+		});
+
+
+		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+			...allCachedAttachments,
+			[props?.channelId]: attachment,
+		});
+	}
+
 	const setMessageFromCache = async () => {
 		const allCachedMessage = await getAllCachedMessage();
 		setText(convertMentionsToText(allCachedMessage?.[props?.channelId] || ''));
+	};
+
+	const setAttachmentFromCache = async () => {
+		const allCachedAttachment = await getAllCachedAttachments();
+		setAttachmentData(allCachedAttachment?.[props?.channelId] || []);
 	};
 
 	const resetCachedText = async () => {
@@ -157,9 +185,18 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		});
 	};
 
+	const resetCachedAttachment = async () => {
+		const allCachedAttachments = await getAllCachedAttachments();
+		delete allCachedAttachments[props?.channelId];
+		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+			...allCachedAttachments,
+		});
+	};
+
 	useEffect(() => {
 		if (props?.channelId) {
 			setMessageFromCache();
+			setAttachmentFromCache();
 		}
 	}, [props?.channelId]);
 
@@ -298,6 +335,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 						break;
 				}
 				setAttachmentData([]);
+				saveAttachmentToCache([]);
 				removeAction(EMessageActionType.Reply);
 			}
 		}
@@ -306,6 +344,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		[EMessageActionType.CreateThread].includes(props.messageAction) &&
 			DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
 		resetCachedText();
+		resetCachedAttachment();
 	}, [
 		sendMessage,
 		handleSendDM,
@@ -643,6 +682,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 		});
 
 		setAttachmentData(removedAttachment);
+		saveAttachmentToCache(removedAttachment);
 	}
 
 	return (

@@ -225,7 +225,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	channelMetadata: channelMetaAdapter.getInitialState(),
 	currentVoiceChannelId: '',
 	valueTextInput: {},
-	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	// idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
+	idChannelSelected: {},
 	membersVoiceChannel: {},
 	mode: 'dm',
 });
@@ -323,7 +324,7 @@ export const channelsSlice = createSlice({
 		},
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
-			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
+			// localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
 		},
 		setMembersVoiceChannel: (state, action: PayloadAction<{ channelId: string; member: string }>) => {
 			const { channelId, member } = action.payload;
@@ -481,13 +482,13 @@ export const selectChannelsByClanId = (clainId: string) =>
 
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
     createSelector(selectChannelsByClanId(clanId), (channels) => {
-		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
-        if (idsSelectedChannel && idsSelectedChannel[clanId]) {
-            const selectedChannel = channels.find(channel => channel.channel_id === idsSelectedChannel[clanId]);
-            if (selectedChannel) {
-                return selectedChannel.id;
-            }
-        }
+		// const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
+        // if (idsSelectedChannel && idsSelectedChannel[clanId]) {
+        //     const selectedChannel = channels.find(channel => channel.channel_id === idsSelectedChannel[clanId]);
+        //     if (selectedChannel) {
+        //         return selectedChannel.id;
+        //     }
+        // }
 
         if (categories) {
             for (const category of categories) {

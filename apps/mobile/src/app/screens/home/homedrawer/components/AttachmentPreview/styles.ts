@@ -1,10 +1,10 @@
-import { Colors, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
+import { Attributes, Colors, horizontalScale, size, verticalScale } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	container: {
-		backgroundColor: Colors.secondary,
-		borderTopColor: Colors.gray72,
+		backgroundColor: colors.secondary,
+		borderTopColor: colors.border,
 		padding: size.s_16,
 	},
 	attachmentItem: {
@@ -22,9 +22,9 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		top: 0,
 		right: -size.s_10,
-		backgroundColor: Colors.tertiary,
+		backgroundColor: colors.primary,
 		borderWidth: 2,
-		borderColor: Colors.secondary,
+		borderColor: colors.border,
 		borderRadius: size.s_20,
 		padding: size.s_2,
 		zIndex: size.s_2,
@@ -59,5 +59,3 @@ const styles = StyleSheet.create({
 		textTransform: 'uppercase'
 	}
 });
-
-export default styles;

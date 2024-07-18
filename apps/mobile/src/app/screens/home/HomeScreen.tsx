@@ -6,7 +6,6 @@ import { delay } from 'lodash';
 import React, { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 
@@ -57,7 +56,7 @@ const HomeScreen = React.memo((props: any) => {
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 
-	useCheckUpdatedVersion();
+	// useCheckUpdatedVersion();
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', (state) => {
