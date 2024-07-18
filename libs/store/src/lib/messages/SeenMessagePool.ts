@@ -64,7 +64,7 @@ class SeenMessagePool {
 		return knownMessage.messageCreatedAt > messageCreatedAt;
 	}
 
-	public registerSeenMessageWorker(fn: (payload: SeenMessagePayload) => void, ms: number = 1000): void {
+	public registerSeenMessageWorker(fn: (payload: SeenMessagePayload) => void, ms = 1000): void {
 		this.interval = setInterval(async () => {
 			const payload = this.popSeenMessage();
 

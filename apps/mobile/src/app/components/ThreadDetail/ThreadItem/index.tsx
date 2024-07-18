@@ -1,5 +1,5 @@
 import { AngleRightIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, channelsActions, getStoreAsync, selectMemberByUserId } from '@mezon/store-mobile';
 import { IChannel, convertTimeMessage } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -8,12 +8,14 @@ import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useMessageSender } from '../../../hooks/useMessageSender';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { styles } from './ThreadItem.style';
+import { style } from './ThreadItem.style';
 
 interface IThreadItemProps {
 	thread: ChannelsEntity;
 }
 const ThreadItem = ({ thread }: IThreadItemProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const navigation = useNavigation();
 	const user = useSelector(selectMemberByUserId(thread?.last_sent_message?.sender_id as string));
 
@@ -57,7 +59,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 					<Text style={styles.createTime}>{timeMessage}</Text>
 				</View>
 			</View>
-			<AngleRightIcon width={25} height={25} color={Colors.white} />
+			<AngleRightIcon width={25} height={25} color={themeValue.textDisabled} />
 		</Pressable>
 	);
 };

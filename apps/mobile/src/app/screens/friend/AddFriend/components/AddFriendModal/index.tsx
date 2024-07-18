@@ -1,6 +1,6 @@
 import { useAuth, useFriends } from '@mezon/core';
 import { CheckIcon, CloseIcon } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { friendsActions, requestAddFriendParam, selectStatusSentMobile } from '@mezon/store-mobile';
 import { MezonButton, MezonModal } from 'apps/mobile/src/app/temp-ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -9,7 +9,7 @@ import { Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, View } from 
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import { EAddFriendBy, EAddFriendWays } from '../../../enum';
-import { styles } from './styles';
+import { style } from './styles';
 
 interface IAddFriendModal {
 	type: EAddFriendWays;
@@ -17,6 +17,8 @@ interface IAddFriendModal {
 }
 
 export const AddFriendModal = React.memo((props: IAddFriendModal) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { type, onClose } = props;
 	const { userProfile } = useAuth();
 	const { addFriend } = useFriends();
@@ -131,7 +133,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	const addFriendByUsernameContent = () => {
 		return (
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.fill}>
-				<View style={styles.fill}>
+				<View style={[styles.fill, { paddingVertical: 20 }]}>
 					<View style={styles.fill}>
 						<Text style={styles.headerTitle}>{t('addFriend.addByUserName')}</Text>
 						<Text style={styles.defaultText}>{t('addFriend.whoYouWantToAddFriend')}</Text>
@@ -140,7 +142,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 								ref={inputRef}
 								value={requestAddFriend.usernames[0]}
 								placeholder={t('addFriend.searchUsernamePlaceholder')}
-								placeholderTextColor={Colors.tertiary}
+								placeholderTextColor={themeValue.textDisabled}
 								style={styles.searchInput}
 								onChangeText={(text) => handleTextChange(EAddFriendBy.Username, text)}
 							/>

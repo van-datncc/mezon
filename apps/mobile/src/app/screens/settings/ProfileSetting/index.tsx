@@ -1,6 +1,6 @@
 import { useAuth } from '@mezon/core';
-import { ArrowLeftIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { isEqual } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import MezonTabHeader from '../../../temp-ui/MezonTabHeader';
 import MezonTabView from '../../../temp-ui/MezonTabView';
 import ServerProfile from './ServerProfile';
 import UserProfile from './UserProfile';
-import styles from './styles';
+import { style } from './styles';
 
 export enum EProfileTab {
 	UserProfile,
@@ -30,6 +30,8 @@ export interface IClanProfileValue {
 }
 
 export const ProfileSetting = ({ navigation }: { navigation: any }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const user = useAuth();
 	const [tab, setTab] = useState<number>(0);
 	const [triggerToSaveTab, setTriggerToSaveTab] = useState<EProfileTab | null>(null);
@@ -96,7 +98,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
 		),
 		headerLeft: () => (
 			<TouchableOpacity onPress={() => handleBack()} style={styles.backArrow}>
-				<ArrowLeftIcon color={Colors.textGray} />
+				<Icons.CloseSmallBoldIcon color={themeValue.text} />
 			</TouchableOpacity>
 		),
 	});

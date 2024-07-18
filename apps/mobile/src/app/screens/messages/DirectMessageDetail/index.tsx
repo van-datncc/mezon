@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, ArrowLeftIcon, STORAGE_CLAN_ID, UserGroupIcon, save } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	channelMembersActions,
 	clansActions,
@@ -23,7 +23,7 @@ import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
 import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
 import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
-import { styles } from './styles';
+import { style } from './styles';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -38,6 +38,8 @@ function useChannelSeen(channelId: string) {
 }
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const directMessageId = route.params?.directMessageId as string;
 	const from = route.params?.from;
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(10);
@@ -138,12 +140,12 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		<SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
 			<View style={styles.headerWrapper}>
 				<Pressable onPress={() => handleBack()} style={styles.backButton}>
-					<ArrowLeftIcon color={Colors.textGray} />
+					<Icons.ArrowLargeLeftIcon color={themeValue.text} height={20} width={20} />
 				</Pressable>
 				<Pressable style={styles.channelTitle} onPress={() => navigateToThreadDetail()}>
 					{currentDmGroup?.channel_avatar?.length > 1 ? (
 						<View style={styles.groupAvatar}>
-							<UserGroupIcon width={15} height={15} />
+							<Icons.GroupIcon width={18} height={18} />
 						</View>
 					) : (
 						<View>

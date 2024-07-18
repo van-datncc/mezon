@@ -89,17 +89,7 @@ function Homepage() {
 							</div>
 							<img src={BannerImg} alt="" className="object-cover w-6/12 block max-lg:hidden" />
 						</div>
-						<div className="block2 flex justify-center items-center gap-[24px] mt-10 max-md:flex-col mb-10">
-							<a
-								style={{ borderRadius: '28px' }}
-								className="max-md:w-7/12 max-sm:w-11/12 flex items-center justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
-								href="https://drive.google.com/file/d/1zfLNnJMlFKEGLbm9ce-8VPqLbIZFvh5O/view"
-								target="_blank"
-								rel="noreferrer"
-							>
-								<Icons.HomepageDownload className="text-black" />
-								<div>Download for Windows</div>
-							</a>
+						<div className='flex justify-center mt-10'>
 							<Link
 								to={'/mezon'}
 								className="max-md:w-7/12 max-sm:w-11/12 text-white bg-[#161cbb] px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] text-center hoverBoxShadow"
@@ -110,6 +100,39 @@ function Homepage() {
 								Open Mezon in your browser
 							</Link>
 						</div>
+						<div className="block2 flex justify-center items-center gap-[24px] mt-10 max-md:flex-col mb-10">
+							<a
+								style={{ borderRadius: '28px' }}
+								className="max-md:w-7/12 max-sm:w-11/12 flex items-center gap-2 justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
+								href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
+								target="_blank"
+								rel="noreferrer"
+							>
+								<Icons.GooglePlay className="w-[35px]" />
+								<div>Mezon on Google Play</div>
+							</a>
+							<a
+								style={{ borderRadius: '28px' }}
+								className="max-md:w-7/12 max-sm:w-11/12 flex items-center gap-2 justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
+								href="https://apps.apple.com/vn/app/mezon/id6502750046"
+								target="_blank"
+								rel="noreferrer"
+							>
+								<Icons.AppStore className="w-[35px]" />
+								<div>Mezon on App Store</div>
+							</a>
+							<a
+								style={{ borderRadius: '28px' }}
+								className="max-md:w-7/12 max-sm:w-11/12 flex items-center gap-2 justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
+								href="https://drive.google.com/file/d/1zfLNnJMlFKEGLbm9ce-8VPqLbIZFvh5O/view"
+								target="_blank"
+								rel="noreferrer"
+							>
+								<Icons.WindowIcon className="text-black w-[35px]" />
+								<div>Download for Windows</div>
+							</a>
+						</div>
+						
 					</div>
 				</div>
 			</div>

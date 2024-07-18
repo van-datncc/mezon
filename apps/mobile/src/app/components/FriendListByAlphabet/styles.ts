@@ -1,7 +1,7 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     listUserByAlphabetContainer: {
         flex: 1,
         overflow: 'scroll',
@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
         paddingTop: size.s_20,
     },
     groupFriendTitle: {
-        color: Colors.textGray,
+        color: colors.text,
         paddingVertical: size.s_6
     },
     groupWrapper: {

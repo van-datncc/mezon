@@ -1,22 +1,23 @@
 import {
-    Direction_Mode,
-    EmojiDataOptionals,
-    IMessageSendPayload,
-    IMessageWithUser,
-    LIMIT_MESSAGE,
-    LoadingStatus,
-    checkContinuousMessagesByCreateTimeMs,
-    checkSameDayByCreateTime,
+	ChannelDraftMessages,
+	Direction_Mode,
+	EmojiDataOptionals,
+	IMessageSendPayload,
+	IMessageWithUser,
+	LIMIT_MESSAGE,
+	LoadingStatus,
+	checkContinuousMessagesByCreateTimeMs,
+	checkSameDayByCreateTime,
 } from '@mezon/utils';
 import {
-    EntityState,
-    PayloadAction,
-    createAsyncThunk,
-    createEntityAdapter,
-    createSelector,
-    createSelectorCreator,
-    createSlice,
-    weakMapMemoize,
+	EntityState,
+	PayloadAction,
+	createAsyncThunk,
+	createEntityAdapter,
+	createSelector,
+	createSelectorCreator,
+	createSlice,
+	weakMapMemoize,
 } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
@@ -88,6 +89,7 @@ export interface MessagesState {
 	quantitiesMessageRemain: number;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
 	isFocused: boolean;
+	channelDraftMessage: Record<string, ChannelDraftMessages>;
 	channelMessages: Record<
 		string,
 		EntityState<MessagesEntity, string> & {
@@ -95,7 +97,6 @@ export interface MessagesState {
 		}
 	>;
 }
-
 export type FetchMessagesMeta = {
 	arg: {
 		channelId: string;
@@ -426,6 +427,7 @@ export const initialMessagesState: MessagesState = {
 	quantitiesMessageRemain: 0,
 	dataReactionGetFromLoadMessage: [],
 	channelMessages: {},
+	channelDraftMessage: {},
 	isFocused: false,
 };
 
@@ -596,6 +598,12 @@ export const messagesSlice = createSlice({
 		},
 		setIsFocused(state, action) {
 			state.isFocused = action.payload;
+		},
+		setChannelDraftMessage(state, action: PayloadAction<{ channelId: string; channelDraftMessage: ChannelDraftMessages }>) {
+			state.channelDraftMessage[action.payload.channelId] = action.payload.channelDraftMessage;
+		},
+		deleteChannelDraftMessage(state, action: PayloadAction<{ channelId: string }>) {
+			delete state.channelDraftMessage[action.payload.channelId];
 		},
 	},
 	extraReducers: (builder) => {
@@ -810,6 +818,16 @@ export const selectLassSendMessageEntityBySenderId = createCachedSelector(
 	(entities, ids, senderId) => {
 		const matchedId = [...ids].reverse().find((id) => entities?.[id]?.sender_id === senderId);
 		return matchedId ? entities[matchedId] : null;
+	},
+);
+
+export const selectChannelDraftMessage = createCachedSelector(
+	(state, channelId, messageId) => {
+		const messagesState = getMessagesState(state);
+		return messagesState.channelDraftMessage[channelId] || null;
+	},
+	(draftMessagesState) => {
+		return (draftMessagesState as ChannelDraftMessages) || {};
 	},
 );
 

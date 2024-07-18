@@ -1,8 +1,8 @@
 {
     "friendRequest": {
         "title": "Yêu cầu kết bạn",
-        "received": "đã nhận",
-        "sent": "đã gửi"
+        "received": "Đã nhận",
+        "sent": "Đã gửi"
     },
     "addFriend": {
         "incomingFriendRequest": "Yêu Cầu Kết Bạn Được Nhận",

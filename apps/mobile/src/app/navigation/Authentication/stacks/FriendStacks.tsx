@@ -2,7 +2,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
 import { SettingIcon } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text } from 'react-native';
 import { FriendScreen } from '../../../screens/friend';
@@ -25,12 +25,13 @@ const AddFriendButton = ({ navigation }: { navigation: any }) => {
 
 const SettingFriendRequestButton = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation(['screen']);
+	const { themeValue } = useTheme()
 	return (
 		<Pressable
 			onPress={() => navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.REQUEST_FRIEND_SETTING })}
 			style={{ marginRight: size.s_18 }}
 		>
-			<SettingIcon height={20} width={20} />
+			<SettingIcon height={20} width={20} color={themeValue.text} />
 		</Pressable>
 	);
 };
@@ -38,6 +39,7 @@ const SettingFriendRequestButton = ({ navigation }: { navigation: any }) => {
 // eslint-disable-next-line no-empty-pattern
 export const FriendStacks = ({ navigation }: { navigation: any }) => {
 	const Stack = createStackNavigator();
+	const { themeValue } = useTheme()
 	const { t } = useTranslation(['screen']);
 	return (
 		<Stack.Navigator
@@ -46,6 +48,15 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				headerShadowVisible: false,
 				gestureEnabled: true,
 				gestureDirection: 'horizontal',
+				headerTitleAlign: 'center',
+				headerStyle: {
+					backgroundColor: themeValue.secondary
+				},
+				headerTitleStyle: {
+					color: themeValue.textStrong
+				},
+				headerTintColor: themeValue.text,
+				headerLeftLabelVisible: false,
 			}}
 		>
 			<Stack.Screen
@@ -53,13 +64,7 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				component={FriendScreen}
 				options={{
 					headerTitle: t('headerTitle.Friends'),
-					headerTitleAlign: 'center',
-					headerTintColor: Colors.white,
-					headerStyle: {
-						backgroundColor: Colors.secondary,
-					},
 					headerRight: () => <AddFriendButton navigation={navigation} />,
-					headerLeftLabelVisible: false,
 				}}
 			/>
 			<Stack.Screen
@@ -67,12 +72,6 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				component={AddFriendScreen}
 				options={{
 					headerTitle: t('headerTitle.addFriends'),
-					headerTitleAlign: 'center',
-					headerTintColor: Colors.white,
-					headerStyle: {
-						backgroundColor: Colors.secondary,
-					},
-					headerLeftLabelVisible: false,
 				}}
 			/>
 			<Stack.Screen
@@ -80,11 +79,6 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				component={RequestFriendScreen}
 				options={{
 					headerTitle: t('headerTitle.requestFriend'),
-					headerTitleAlign: 'center',
-					headerTintColor: Colors.white,
-					headerStyle: {
-						backgroundColor: Colors.secondary,
-					},
 					headerRight: () => <SettingFriendRequestButton navigation={navigation} />,
 				}}
 			/>
@@ -92,12 +86,7 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				name={APP_SCREEN.FRIENDS.REQUEST_FRIEND_SETTING}
 				component={SettingFriendRequestScreen}
 				options={{
-					headerTitle: t('headerTitle.friendRequestSettings'),
-					headerTitleAlign: 'center',
-					headerTintColor: Colors.white,
-					headerStyle: {
-						backgroundColor: Colors.secondary,
-					},
+					headerTitle: t('headerTitle.friendRequestSettings')
 				}}
 			/>
 		</Stack.Navigator>

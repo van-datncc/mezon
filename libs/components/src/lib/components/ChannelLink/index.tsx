@@ -110,7 +110,6 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = () => {
 		setTurnOffThreadMessage();
-		dispatch(referencesActions.setOpenEditMessageState(false));
 		dispatch(referencesActions.setOpenReplyMessageState(false));
 		if (closeMenu) {
 			setStatusMenu(false);

@@ -1,4 +1,4 @@
-import { Attributes, baseColor, Fonts } from "@mezon/mobile-ui";
+import { Attributes, Fonts } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -27,7 +27,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         alignItems: "center",
         padding: 7,
         borderRadius: 50,
-        backgroundColor: baseColor.white
+        backgroundColor: colors.secondary
     },
 
     textPlaceholder: {

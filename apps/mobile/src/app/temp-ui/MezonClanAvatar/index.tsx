@@ -7,10 +7,11 @@ interface IMezonClanAvatarProps {
     image?: string;
     alt?: string;
     defaultColor?: string;
-    textStyle?: StyleProp<TextStyle>
+    textStyle?: StyleProp<TextStyle>,
+    noDefaultText?: boolean
 }
 
-export default function MezonClanAvatar({ image, alt = "anonymous", defaultColor, textStyle }: IMezonClanAvatarProps) {
+export default function MezonClanAvatar({ image, alt = "anonymous", defaultColor, textStyle, noDefaultText }: IMezonClanAvatarProps) {
     const styles = style(useTheme().themeValue)
 
     return (
@@ -22,9 +23,13 @@ export default function MezonClanAvatar({ image, alt = "anonymous", defaultColor
                     style={styles.image}
                 />
                 : <View style={[styles.fakeBox, { backgroundColor: defaultColor || baseColor.blurple }]}>
-                    <Text style={[styles.altText, textStyle]}>
-                        {alt?.charAt(0).toUpperCase()}
-                    </Text>
+                    {!noDefaultText
+                        ? (
+                            <Text style={[styles.altText, textStyle]}>
+                                {alt?.charAt(0).toUpperCase()}
+                            </Text>
+                        ) : null
+                    }
                 </View>
             }
         </>

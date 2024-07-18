@@ -70,25 +70,27 @@ export const notificationSlice = createSlice({
 		},
 
 		setNotiListUnread(state, action) {
-			let storedIds = localStorage.getItem('notiUnread');
-			let ids = storedIds ? JSON.parse(storedIds) : [];
+			const storedIds = localStorage.getItem('notiUnread');
+			const ids = storedIds ? JSON.parse(storedIds) : [];
 			ids.push(action.payload.id);
 			localStorage.setItem('notiUnread', JSON.stringify(ids));
 		},
 
 		setStatusNoti(state) {
 			const ids = localStorage.getItem('notiUnread');
-			state.newNotificationStatus = !state.newNotificationStatus
+			state.newNotificationStatus = !state.newNotificationStatus;
 		},
 
 		setReadNotiStatus(state, action) {
-			let storedIds = localStorage.getItem('notiUnread');
-			let ids = storedIds ? JSON.parse(storedIds) : [];
-			
-			if(ids && ids?.length > 0){
-				const updatedIdsList = ids.filter((id:string) =>  id !== action.payload)
-				localStorage.setItem('notiUnread', JSON.stringify(updatedIdsList))
-			} else {}
+			const storedIds = localStorage.getItem('notiUnread');
+			const ids = storedIds ? JSON.parse(storedIds) : [];
+
+			if (ids && ids?.length > 0) {
+				const updatedIdsList = ids.filter((id: string) => id !== action.payload);
+				localStorage.setItem('notiUnread', JSON.stringify(updatedIdsList));
+			} else {
+				console.log('No unread notification');
+			}
 		},
 	},
 
@@ -162,4 +164,3 @@ export const selectMessageNotifed = createSelector(getNotificationState, (state:
 export const selectIsMessageRead = createSelector(getNotificationState, (state: NotificationState) => state.isMessageRead);
 
 export const selectNewNotificationStatus = createSelector(getNotificationState, (state: NotificationState) => state.newNotificationStatus);
-

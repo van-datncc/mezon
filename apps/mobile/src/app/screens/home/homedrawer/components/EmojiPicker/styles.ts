@@ -1,7 +1,7 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	container: {
 		padding: size.s_10,
 		height: '100%',
@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		gap: 10,
 		padding: 6,
-		backgroundColor: Colors.primary,
+		backgroundColor: colors.secondary,
 		borderRadius: 50,
 	},
 	selected: {
@@ -23,8 +23,9 @@ const styles = StyleSheet.create({
 		paddingVertical: 6,
 	},
 	textInput: {
-		color: Colors.white,
+		color: colors.text,
 		flexGrow: 1,
+		flexBasis: 10,
 		fontSize: size.medium,
 		height: size.s_40,
 	},
@@ -33,13 +34,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		display: 'flex',
 		flexDirection: 'row',
-		backgroundColor: Colors.black,
 		marginVertical: 10,
 		alignItems: 'center',
 		paddingHorizontal: 10,
 		borderRadius: 10,
 		gap: 10,
+		backgroundColor: colors.secondary
 	},
 });
-
-export default styles;

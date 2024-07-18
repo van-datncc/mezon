@@ -1,6 +1,7 @@
 import { useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import {
 	appActions,
+	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
 	selectCurrentChannelId,
@@ -190,6 +191,8 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId));
 	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
 	useEscapeKey(() => setIsShowPinMessage(false));
+	const shouldShowPinIndicator = lastPinMessage && (!lastSeenPinMessageChannel || lastPinMessage !== lastSeenPinMessageChannel);
+
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip
@@ -201,10 +204,8 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 			>
 				<button className="focus-visible:outline-none relative" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
-					{lastPinMessage && lastSeenPinMessageChannel && lastPinMessage !== lastSeenPinMessageChannel ? (
-						<span className="w-[8px] h-[8px] rounded-full bg-[#DA373C] absolute bottom-0 right-0"></span>
-					) : (
-						<></>
+					{shouldShowPinIndicator && (
+						<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
 					)}
 				</button>
 			</Tooltip>
@@ -214,6 +215,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
+	const dispatch = useDispatch();
 	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const newNotificationStatus = useSelector(selectNewNotificationStatus);
@@ -243,6 +245,8 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 
 	const handleShowInbox = () => {
 		setIsShowInbox(!isShowInbox);
+		localStorage.setItem('notiUnread', JSON.stringify([]));
+		dispatch(notificationActions.setStatusNoti());
 	};
 
 	useOnClickOutside(inboxRef, () => setIsShowInbox(false));

@@ -1,15 +1,19 @@
 import { Icons } from '@mezon/components';
-import { useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Button, Dropdown, Label, Modal } from 'flowbite-react';
 import { ReactNode, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 type ModalCustomStatusProps = {
 	name: string;
 	openModal: boolean;
 	onClose?: () => void;
+	customStatus?: string;
+	setCustomStatus: (customStatus: string) => void;
+	handleSaveCustomStatus?: () => void
 };
 
-const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps) => {
+const ModalCustomStatus = ({ openModal, name, customStatus, onClose, setCustomStatus, handleSaveCustomStatus }: ModalCustomStatusProps) => {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
@@ -17,6 +21,7 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 			dispatch(userClanProfileActions.setShowModalFooterProfile(false));
 		}
 	}, [dispatch, openModal]);
+
 	return (
 		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[440px]' } }} show={openModal} dismissible={true} onClose={onClose}>
 			<div className="dark:bg-bgPrimary bg-bgLightMode pt-4 rounded">
@@ -33,8 +38,10 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 						</div>
 						<input
 							type="text"
+							value={customStatus}
 							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
 							placeholder="Support has arrived!"
+							onChange={e => { setCustomStatus(e.target.value) }}
 						/>
 					</div>
 					<div className="px-4">
@@ -102,7 +109,8 @@ const ModalCustomStatus = ({ openModal, name, onClose }: ModalCustomStatusProps)
 						</Button>
 						<Button
 							className="h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent"
-							type="submit"
+							type="button"
+							onClick={handleSaveCustomStatus}
 						>
 							Save
 						</Button>

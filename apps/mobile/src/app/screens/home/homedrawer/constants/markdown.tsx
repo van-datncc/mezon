@@ -1,8 +1,7 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelMembersEntity,
 	ChannelsEntity,
-	ClansEntity,
 	UserClanProfileEntity,
 	UsersClanEntity,
 	selectAllChannelMembers,
@@ -52,9 +51,10 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = {
+export const markdownStyles = (colors: Attributes) => StyleSheet.create({
 	body: {
-		color: Colors.tertiary,
+		color: colors.textStrong,
+		// color: Colors.tertiary,
 		fontSize: size.medium,
 	},
 	paragraph: {
@@ -101,8 +101,8 @@ export const markdownStyles = {
 	},
 	mention: {
 		fontSize: size.medium,
-		color: Colors.textGray,
-		backgroundColor: Colors.midnightBlue,
+		color: colors.textLink,
+		backgroundColor: colors.midnightBlue,
 		lineHeight: size.s_20,
 	},
 	blockquote: {
@@ -129,7 +129,7 @@ export const markdownStyles = {
 		lineHeight: size.s_20,
 	},
 	unknownChannel: { fontStyle: 'italic' },
-};
+});
 
 const styleMessageReply = {
 	body: {
@@ -159,7 +159,7 @@ export type IMarkdownProps = {
 	onChannelMention?: (channel: ChannelsEntity) => void;
 	isNumberOfLine?: boolean;
 	clansProfile?: UserClanProfileEntity[];
-	currentClan?: ClansEntity;
+	currentClanId?: string;
 	isMessageReply?: boolean;
 	mode?: number;
 };
@@ -174,7 +174,7 @@ type TRenderTextContentProps = {
 	onChannelMention?: (channel: ChannelsEntity) => void;
 	isNumberOfLine?: boolean;
 	clansProfile?: UserClanProfileEntity[];
-	currentClan?: ClansEntity;
+	currentClanId?: string;
 	isMessageReply?: boolean;
 	mode?: number;
 };
@@ -348,10 +348,11 @@ const RenderTextContent = React.memo(
 		onChannelMention,
 		isNumberOfLine,
 		clansProfile,
-		currentClan,
+		currentClanId,
 		isMessageReply,
 		mode,
 	}: IMarkdownProps) => {
+		const { themeValue } = useTheme();
 		const usersClan = useSelector(selectAllUsesClan);
 		const usersInChannel = useSelector(selectAllChannelMembers);
 		if (!lines) return null;
@@ -365,7 +366,7 @@ const RenderTextContent = React.memo(
 		let content: string = lines?.trim();
 
 		if (matchesMentions) {
-			content = formatMention(content, matchesMentions, channelsEntities, clansProfile, currentClan, usersInChannel, usersClan, mode);
+			content = formatMention(content, matchesMentions, channelsEntities, clansProfile, currentClanId, usersInChannel, usersClan, mode);
 		}
 
 		if (matchesUrls) {
@@ -409,7 +410,7 @@ const RenderTextContent = React.memo(
 					/>
 				) : null}
 				<Markdown
-					style={{ ...(markdownStyles as StyleSheet.NamedStyles<any>), ...customStyle }}
+					style={{ ...(markdownStyles(themeValue) as StyleSheet.NamedStyles<any>), ...customStyle }}
 					rules={renderRulesCustom}
 					onLinkPress={(url) => {
 						if (url.startsWith('@')) {
@@ -432,7 +433,7 @@ const RenderTextContent = React.memo(
 			</View>
 		) : (
 			<Markdown
-				style={markdownStyles as StyleSheet.NamedStyles<any>}
+				style={markdownStyles(themeValue) as StyleSheet.NamedStyles<any>}
 				rules={renderRulesCustom}
 				onLinkPress={(url) => {
 					if (url.startsWith(TYPE_MENTION.userMention)) {
@@ -463,7 +464,7 @@ const formatMention = (
 	matchesMention: RegExpMatchArray,
 	channelsEntities: Record<string, ChannelsEntity>,
 	clansProfile: UserClanProfileEntity[],
-	currentClan?: ClansEntity,
+	currentClanId?: string,
 	usersInChannel?: ChannelMembersEntity[],
 	usersClan?: UsersClanEntity[],
 	mode?: number,
@@ -476,7 +477,7 @@ const formatMention = (
 			} else {
 				if (matchesMention.includes(part)) {
 					if (part.startsWith('@')) {
-						return renderMention(part, mode, usersInChannel, usersClan, clansProfile, currentClan);
+						return renderMention(part, mode, usersInChannel, usersClan, clansProfile, currentClanId);
 					}
 					if (part.startsWith('<#')) {
 						const channelId = part.match(channelIdRegex)[1];
@@ -514,7 +515,7 @@ export const renderTextContent = ({
 	onChannelMention,
 	isNumberOfLine = false,
 	clansProfile,
-	currentClan,
+	currentClanId,
 	isMessageReply = false,
 	mode,
 }: TRenderTextContentProps) => {
@@ -529,7 +530,7 @@ export const renderTextContent = ({
 			onChannelMention={onChannelMention}
 			isNumberOfLine={isNumberOfLine}
 			clansProfile={clansProfile}
-			currentClan={currentClan}
+			currentClanId={currentClanId}
 			isMessageReply={isMessageReply}
 			mode={mode}
 		/>
@@ -550,7 +551,7 @@ const renderMention = (
 	usersInChannel: ChannelMembersEntity[],
 	usersClan: UsersClanEntity[],
 	clansProfile: UserClanProfileEntity[],
-	currentClan: ClansEntity,
+	currentClanId: string,
 ) => {
 	const nameMention = part?.slice(1);
 
@@ -561,9 +562,7 @@ const renderMention = (
 	const userMention = getUserMention(nameMention, mode, usersInChannel, usersClan);
 	const { user } = userMention || {};
 
-	const clanProfileByIdUser = clansProfile?.find(
-		(clanProfile) => clanProfile?.clan_id === currentClan?.clan_id && clanProfile?.user_id === user?.id,
-	);
+	const clanProfileByIdUser = clansProfile?.find((clanProfile) => clanProfile?.clan_id === currentClanId && clanProfile?.user_id === user?.id);
 
 	if (clanProfileByIdUser) {
 		return `[@${clanProfileByIdUser?.nick_name}](@${user?.username})`;

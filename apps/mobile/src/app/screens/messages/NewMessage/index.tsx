@@ -1,6 +1,6 @@
 import { useDirect, useFriends } from '@mezon/core';
 import { ChevronIcon, UserGroupIcon, UserIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -14,9 +14,11 @@ import { FriendListByAlphabet } from '../../../components/FriendListByAlphabet';
 import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { normalizeString } from '../../../utils/helpers';
-import { styles } from './styles';
+import { style } from './styles';
 
 export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [searchText, setSearchText] = useState<string>('');
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const { t } = useTranslation(['']);
@@ -108,7 +110,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				<TextInput
 					ref={inputRef}
 					placeholder={t('common:searchPlaceHolder')}
-					placeholderTextColor={Colors.tertiary}
+					placeholderTextColor={themeValue.textDisabled}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
@@ -120,7 +122,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 						<UserGroupIcon />
 					</View>
 					<Text style={styles.actionTitle}>{t('message:newMessage.newGroup')}</Text>
-					<ChevronIcon height={15} width={15} />
+					<ChevronIcon height={15} width={15} color={themeValue.text} />
 				</TouchableOpacity>
 				<SeparatorWithLine />
 				<TouchableOpacity onPress={() => navigateToAddFriendScreen()} style={styles.actionItem}>
@@ -128,7 +130,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 						<UserIcon />
 					</View>
 					<Text style={styles.actionTitle}>{t('message:newMessage.addFriend')}</Text>
-					<ChevronIcon height={15} width={15} />
+					<ChevronIcon height={15} width={15} color={themeValue.text} />
 				</TouchableOpacity>
 			</View>
 

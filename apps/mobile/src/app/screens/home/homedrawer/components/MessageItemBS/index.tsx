@@ -4,7 +4,7 @@ import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch } from '@mezon/store';
 import { appActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
-import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -511,7 +511,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				);
 			}}
 		>
-			<View style={styles.bottomSheetWrapper}>{content}</View>
+			<View style={styles.bottomSheetWrapper}>
+				{content}
+			</View>
 		</MezonBottomSheet>
 	);
 });

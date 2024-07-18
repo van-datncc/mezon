@@ -1,11 +1,10 @@
-import { Colors } from "@mezon/mobile-ui";
+import { Attributes, baseColor, Colors } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     bannerContainer: {
         height: 150,
-        width: "100%",
-        padding: 20
+        width: "100%"
     },
 
     btnRound: {
@@ -50,8 +49,7 @@ const styles = StyleSheet.create({
         width: 25,
         borderRadius: 100,
         borderWidth: 3,
-        backgroundColor: Colors.green
+        backgroundColor: baseColor.green,
+        borderColor: colors.primary
     }
 })
-
-export default styles;

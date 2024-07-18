@@ -1,9 +1,9 @@
 import { Icons, ShortUserProfile } from '@mezon/components';
-import { useChannelMembers, useOnClickOutside } from '@mezon/core';
+import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
 import { Coords } from '../ChannelLink';
@@ -15,6 +15,7 @@ export type MemberProfileProps = {
 	avatar: string;
 	name: string;
 	status?: boolean;
+	customStatus?: string;
 	isHideStatus?: boolean;
 	isHideIconStatus?: boolean;
 	numberCharacterCollapse?: number;
@@ -38,6 +39,7 @@ function MemberProfile({
 	avatar,
 	name,
 	status,
+	customStatus,
 	isHideStatus,
 	isHideIconStatus,
 	numberCharacterCollapse = 6,
@@ -67,7 +69,7 @@ function MemberProfile({
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
 
-	const { removeMemberClan } = useChannelMembers();
+	const { removeMemberClan } = useChannelMembersActions();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
 	const userProfile = useSelector(selectAllAccount);
@@ -129,6 +131,8 @@ function MemberProfile({
 
 	useOnClickOutside(panelRef, handleClickOutSide);
 
+	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
+
 	return (
 		<div className="relative group">
 			<div
@@ -141,7 +145,7 @@ function MemberProfile({
 						<img src={avatar} className="w-[32px] h-[32px] min-w-[32px] rounded-full object-cover" />
 					) : (
 						<div className="w-[32px] h-[32px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-							{(userProfile?.user?.username || name).charAt(0).toUpperCase()}
+							{(isFooter ? userProfile?.user?.username || '' : name || '').charAt(0).toUpperCase()}
 						</div>
 					)}
 					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
@@ -160,9 +164,16 @@ function MemberProfile({
 					>
 						{!isHideStatus && (
 							<>
-								<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode`}>
-									{!status ? 'Offline' : 'Online'}
-								</span>
+								{customStatus && positionType === MemberProfileType.FOOTER_PROFILE ? (
+									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode line-clamp-1`}>
+										{customStatus}
+									</span>
+								) : (
+									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode`}>
+										{!status ? 'Offline' : 'Online'}
+									</span>
+								)}
+
 								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode overflow-x-hidden whitespace-nowrap text-ellipsis w-full">
 									{userProfile?.user?.username}
 								</p>
@@ -170,25 +181,30 @@ function MemberProfile({
 						)}
 					</div>
 					{!isHideUserName && (
-						<div className="flex flex-row items-center w-full overflow-x-hidden">
-							<p
-								className={`text-base font-medium nameMemberProfile
-                  ${positionType === MemberProfileType.FOOTER_PROFILE ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+						<div>
+							<div className="flex flex-row items-center w-full overflow-x-hidden">
+								<p
+									className={`text-base font-medium nameMemberProfile
+                  ${isFooter ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.MEMBER_LIST ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'}
                   ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
 							`}
-								title={name}
-							>
-								{name}
-							</p>
-							{(dataMemberCreate?.createId || currentClan?.creator_id) &&
-								(dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id && (
-									<button className="w-[14px] h-[14px] ml-1">
-										<Icons.OwnerIcon />
-									</button>
-								)}
+									title={name}
+								>
+									{!isHiddenAvatarPanel && name}
+								</p>
+								{(dataMemberCreate?.createId || currentClan?.creator_id) &&
+									(dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id && (
+										<button className="w-[14px] h-[14px] ml-1">
+											<Icons.OwnerIcon />
+										</button>
+									)}
+							</div>
+							{customStatus && positionType === MemberProfileType.MEMBER_LIST && (
+								<p className="dark:text-white text-black w-full text-[11px] line-clamp-1">{customStatus}</p>
+							)}
 						</div>
 					)}
 

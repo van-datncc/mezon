@@ -1,6 +1,6 @@
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AngleRight, MuteIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import {
 	notificationSettingActions,
 	selectCurrentChannel,
@@ -11,81 +11,64 @@ import {
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { IMezonMenuSectionProps, MezonBottomSheet, MezonMenu } from '../../temp-ui';
 import NotificationSetting from '../NotificationSetting';
-import { styles } from './MuteThreadDetailModal.styles';
+import { style } from './MuteThreadDetailModal.styles';
 
 const MuteThreadDetailModal = () => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { t } = useTranslation(['notificationSetting']);
-	const listMuteDuration = [
+	const menu = useMemo(() => ([
 		{
-			id: 1,
-			label: t('notifySettingThreadModal.muteDuration.forFifteenMinutes'),
-			action: () => {
-				handleScheduleMute(15 * 60 * 1000);
-			},
-		},
-		{
-			id: 2,
-			label: t('notifySettingThreadModal.muteDuration.forOneHour'),
-			action: () => {
-				handleScheduleMute(60 * 60 * 1000);
-			},
-		},
-		{
-			id: 3,
-			label: t('notifySettingThreadModal.muteDuration.forThreeHours'),
-			action: () => {
-				handleScheduleMute(3 * 60 * 60 * 1000);
-			},
-		},
-		{
-			id: 4,
-			label: t('notifySettingThreadModal.muteDuration.forEightHours'),
-			action: () => {
-				handleScheduleMute(8 * 60 * 60 * 1000);
-			},
-		},
-		{
-			id: 5,
-			label: t('notifySettingThreadModal.muteDuration.forTwentyFourHours'),
-			action: () => {
-				handleScheduleMute(24 * 60 * 60 * 1000);
-			},
-		},
-		{
-			id: 6,
-			label: t('notifySettingThreadModal.muteDuration.untilTurnItBackOn'),
-			action: () => {
-				handleScheduleMute(Infinity);
-			},
-		},
-	];
+			items: [
+				{
+					title: t('notifySettingThreadModal.muteDuration.forFifteenMinutes'),
+					onPress: () => { handleScheduleMute(15 * 60 * 1000); },
+				},
+				{
+					title: t('notifySettingThreadModal.muteDuration.forOneHour'),
+					onPress: () => { handleScheduleMute(60 * 60 * 1000); },
+				},
+				{
+					title: t('notifySettingThreadModal.muteDuration.forThreeHours'),
+					onPress: () => { handleScheduleMute(3 * 60 * 60 * 1000); },
+				},
+				{
+					title: t('notifySettingThreadModal.muteDuration.forEightHours'),
+					onPress: () => { handleScheduleMute(8 * 60 * 60 * 1000); },
+				},
+				{
+					title: t('notifySettingThreadModal.muteDuration.forTwentyFourHours'),
+					onPress: () => { handleScheduleMute(24 * 60 * 60 * 1000); },
+				},
+				{
+					title: t('notifySettingThreadModal.muteDuration.untilTurnItBackOn'),
+					onPress: () => { handleScheduleMute(Infinity); },
+				},
+			],
+		}
+	]) as IMezonMenuSectionProps[], [])
+
 	const navigation = useNavigation();
 	const [mutedUntil, setMutedUntil] = useState('');
-	const bottomSheetRef = useRef<BottomSheet>(null);
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const [isShowNotifySettingBottomSheet, setIsShowNotifySettingBottomSheet] = useState<boolean>(false);
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const snapPoints = useMemo(() => ['15%', '45%'], []);
 	const dispatch = useAppDispatch();
 
 	const openBottomSheet = () => {
-		bottomSheetRef.current?.snapToIndex(1);
-		setIsShowNotifySettingBottomSheet(!isShowNotifySettingBottomSheet);
+		bottomSheetRef.current?.present();
 	};
 
-	const closeBottomSheet = () => {
-		bottomSheetRef.current?.close();
-		setIsShowNotifySettingBottomSheet(false);
-	};
 	useEffect(() => {
 		let idTimeOut;
 		if (getNotificationChannelSelected?.active === 1) {
@@ -154,17 +137,13 @@ const MuteThreadDetailModal = () => {
 		// @ts-expect-error
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 	};
-	const renderBackdrop = useCallback((props) => <BottomSheetBackdrop {...props} opacity={0.5} onPress={closeBottomSheet} appearsOnIndex={1} />, []);
+
 	return (
 		<View style={styles.wrapper}>
-			<View style={styles.optionsBox}>
-				{getNotificationChannelSelected?.active === 1 ? (
-					listMuteDuration.map((item) => (
-						<TouchableOpacity onPress={item.action} style={styles.wrapperItem} key={item.id}>
-							<Text style={styles.option}>{item.label}</Text>
-						</TouchableOpacity>
-					))
-				) : (
+			{getNotificationChannelSelected?.active === 1 ? (
+				<MezonMenu menu={menu} />
+			) : (
+				<View style={styles.optionsBox}>
 					<TouchableOpacity
 						onPress={() => {
 							muteOrUnMuteChannel(1);
@@ -174,25 +153,22 @@ const MuteThreadDetailModal = () => {
 						<MuteIcon width={20} height={20} style={{ marginRight: 20 }} />
 						<Text style={styles.option}>{`Unmute #${currentChannel?.channel_label}`}</Text>
 					</TouchableOpacity>
-				)}
-			</View>
+				</View>
+			)}
+
 			<Text style={styles.InfoTitle}>{mutedUntil}</Text>
 			<TouchableOpacity onPress={() => openBottomSheet()} style={styles.wrapperItemNotification}>
 				<Text style={styles.option}>Notification Settings</Text>
-				<AngleRight width={20} height={20} />
+				<AngleRight width={20} height={20} color={themeValue.text} />
 			</TouchableOpacity>
 			<Text style={styles.InfoTitle}>{t('notifySettingThreadModal.description')}</Text>
-			<BottomSheet
-				ref={bottomSheetRef}
-				enablePanDownToClose={true}
-				backdropComponent={renderBackdrop}
-				index={-1}
-				snapPoints={snapPoints}
-				backgroundStyle={{ backgroundColor: Colors.secondary }}
-			>
-				<BottomSheetView>{isShowNotifySettingBottomSheet && <NotificationSetting />}</BottomSheetView>
-			</BottomSheet>
-		</View>
+
+			<MezonBottomSheet
+				heightFitContent
+				ref={bottomSheetRef} >
+				<NotificationSetting />
+			</MezonBottomSheet>
+		</View >
 	);
 };
 

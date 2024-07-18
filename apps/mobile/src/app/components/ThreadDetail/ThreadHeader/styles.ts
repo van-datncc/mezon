@@ -1,13 +1,14 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	channelLabelWrapper: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		paddingTop: size.s_16,
 		gap: size.s_12,
+		// backgroundColor: colors.secondary,
+		paddingVertical: Metrics.size.m
 	},
 	channelText: {
 		flexDirection: 'row',
@@ -17,14 +18,21 @@ export const styles = StyleSheet.create({
 		alignSelf: 'center',
 		maxWidth: '70%'
 	},
-	channelLabel: {
+	dmLabel: {
 		color: Colors.white,
+		fontSize: size.h5,
+    fontWeight: '700',
+		paddingHorizontal: size.s_18,
+		textAlign: 'center'
+	},
+	channelLabel: {
+		color: colors.textStrong,
 		marginLeft: size.s_6,
 		fontSize: size.h5,
-    fontWeight: '700'
+		fontWeight: '700'
 	},
 	groupAvatar: {
-		backgroundColor: Colors.bgToggleOnBtn,
+		backgroundColor: baseColor.blurple,
 		borderRadius: 50,
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -40,7 +48,7 @@ export const styles = StyleSheet.create({
 		bottom: 0,
 		right: 0,
 		borderWidth: 2,
-		borderColor: Colors.secondary,
+		borderColor: colors.secondary,
 	},
 	online: {
 		backgroundColor: Colors.green,

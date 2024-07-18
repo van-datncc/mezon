@@ -1,13 +1,13 @@
 import { useReference, useThreadMessage, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
+	Icons,
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	ThreadIcon,
 	getUpdateOrAddClanChannelCache,
-	save,
+	save
 } from '@mezon/mobile-components';
-import { Colors, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	channelsActions,
@@ -26,7 +26,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import UseMentionList from '../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -34,23 +34,25 @@ import ChatBox from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
 import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
+import { MezonInput, MezonSwitch } from '../../../temp-ui';
 import { validInput } from '../../../utils/validate';
-import { ErrorInput } from '../../ErrorInput';
-import { styles } from './CreateThreadForm.style';
+import { style } from './CreateThreadForm.style';
 
 export default function CreateThreadForm() {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const [keyboardHeight, setKeyboardHeight] = useAnimatedState<number>(0);
 	const { t } = useTranslation(['createThread']);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const currentChannelId = useSelector(selectCurrentChannelId);
+
 	const navigation = useNavigation();
 	const formikRef = useRef(null);
 	const { openThreadMessageState } = useReference();
 	const { valueThread, threadCurrentChannel } = useThreads();
-	const listMentions = UseMentionList(currentChannelId || '');
+	const listMentions = UseMentionList((currentChannel?.parrent_id === '0' ?  currentChannel?.channel_id : currentChannel?.parrent_id) || '');
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		channelLabel: threadCurrentChannel?.channel_label as string,
@@ -77,7 +79,7 @@ export default function CreateThreadForm() {
 				clan_id: currentClanId?.toString(),
 				channel_label: value.nameValueThread,
 				channel_private: value.isPrivate,
-				parrent_id: currentChannelId as string,
+				parrent_id: (currentChannel?.parrent_id === '0' ?  currentChannel?.channel_id : currentChannel?.parrent_id) || '',
 				category_id: currentChannel?.category_id,
 				type: ChannelType.CHANNEL_TYPE_TEXT,
 			};
@@ -93,7 +95,7 @@ export default function CreateThreadForm() {
 				Alert.alert('Created Thread Failed', "Thread not found or you're not allowed to update");
 			}
 		},
-		[currentChannel, currentChannelId, currentClanId, dispatch],
+		[currentChannel, currentChannel?.parrent_id, currentClanId, dispatch],
 	);
 
 	const handleSendMessageThread = useCallback(
@@ -137,7 +139,7 @@ export default function CreateThreadForm() {
 
 	const handleRouteData = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
-		navigation.navigate(APP_SCREEN.HOME as never);
+		navigation.navigate('HomeDefault' as never);
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
@@ -145,7 +147,7 @@ export default function CreateThreadForm() {
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 
-	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => {};
+	const onShowKeyboardBottomSheet = (isShow: boolean, height: number, type?: IModeKeyboardPicker) => { };
 	return (
 		<View style={styles.createChannelContainer}>
 			<ScrollView contentContainerStyle={{ flex: 1 }}>
@@ -155,37 +157,36 @@ export default function CreateThreadForm() {
 					}}
 					innerRef={formikRef}
 					initialValues={{ nameValueThread: null, isPrivate: false }}
-					onSubmit={() => {}}
+					onSubmit={() => { }}
 				>
 					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values, touched, errors }) => (
 						<View style={styles.createChannelContent}>
-							<View style={styles.iconContainer}>
-								<ThreadIcon width={22} height={22} />
+							<View style={{ marginHorizontal: 20 }}>
+								<View style={styles.iconContainer}>
+									<Icons.ThreadIcon width={22} height={22} color={themeValue.text} />
+								</View>
+
+								<SafeAreaView style={styles.inputContainer}>
+									<MezonInput
+										label={t('threadName')}
+										onTextChange={handleChange('nameValueThread')}
+										// onBlur={handleBlur('nameValueThread')}
+										value={values.nameValueThread}
+										placeHolder='New Thread'
+										maxCharacter={64}
+										errorMessage={t('errorMessage')}
+
+									/>
+								</SafeAreaView>
 							</View>
-							<Text style={styles.threadName}>{t('threadName')}</Text>
-							<SafeAreaView style={styles.inputContainer}>
-								<TextInput
-									onChangeText={handleChange('nameValueThread')}
-									onBlur={handleBlur('nameValueThread')}
-									value={values.nameValueThread}
-									placeholderTextColor="#7e848c"
-									placeholder="New Thread"
-									style={styles.inputThreadName}
-									maxLength={64}
-								/>
-								{!isCheckValid && <ErrorInput style={styles.errorMessage} errorMessage={t('errorMessage')} />}
-							</SafeAreaView>
 							{!openThreadMessageState && (
 								<View style={styles.threadPolicy}>
 									<View style={styles.threadPolicyInfo}>
 										<Text style={styles.threadPolicyTitle}>{t('privateThread')}</Text>
 										<Text style={styles.threadPolicyContent}>{t('onlyPeopleInviteThread')}</Text>
 									</View>
-									<Switch
+									<MezonSwitch
 										value={values.isPrivate}
-										trackColor={{ false: '#676b73', true: '#5a62f4' }}
-										thumbColor={'white'}
-										ios_backgroundColor="#3e3e3e"
 										onValueChange={(value) => {
 											setFieldValue('isPrivate', value);
 										}}
