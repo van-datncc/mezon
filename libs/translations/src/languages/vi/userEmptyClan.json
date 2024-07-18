@@ -1,0 +1,22 @@
+{
+  "joinClan": {
+    "joinExistClan":"Tham gia clan hiện có",
+    "enterInvite":"Nhập mã mời bên dưới để tham gia một clan hiện có.",
+    "labelInput": "Liên kết mời",
+    "linkInviteEx":"Mã mời nên có dạng như https://mezon.vn/invite/1813407038846046912",
+    "joinInviteLink":"Tham gia với liên kết mời",
+    "errorMessage": "Vui lòng nhập một liên kết mời hoặc mã mời hợp lệ."
+  },
+  "emptyClans": {
+    "clans": "Các clan",
+    "readyChat":"Sẵn sàng cho cuộc trò chuyện nhóm cấp độ tiếp theo?",
+    "buildYourCommunity":"Xây dựng cộng đồng của bạn với các cuộc trò chuyện có tổ chức, các buổi gặp gỡ tự phát và các tính năng tùy chỉnh mạnh mẽ!",
+    "createClan":"Tạo Clan của bạn",
+    "joinClan":"Tham gia một Clan"
+  },
+  "emptyMessage": {
+    "dMsWith":"Tin nhắn trực tiếp với sức mạnh siêu phàm",
+    "inviteYourFriends":"Mời bạn bè của bạn chơi game, nghe nhạc cùng nhau và nhiều hơn nữa.",
+    "addFriend":"Thêm bạn bè"
+  }
+}
