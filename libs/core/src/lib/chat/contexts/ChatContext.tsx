@@ -284,7 +284,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const ondisconnect = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+		dispatch(toastActions.addToast({ message: 'Socket disconnected', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect(clanIdActive ?? '').then((socket) => {
 			if (!socket) return;
 			setCallbackEventFn(socket as Socket);
@@ -292,7 +292,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, [dispatch, reconnect, clanIdActive, setCallbackEventFn]);
 
 	const onHeartbeatTimeout = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+		dispatch(toastActions.addToast({ message: 'Socket hearbeat timeout', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect(clanIdActive ?? '').then((socket) => {
 			if (!socket) return;
 			setCallbackEventFn(socket as Socket);
