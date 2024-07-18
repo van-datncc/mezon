@@ -17,7 +17,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		borderTopColor: colors.border,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
-    paddingHorizontal: size.s_6
+		paddingHorizontal: size.s_6
 	},
 	aboveTextBoxWrapper: {
 		flexDirection: 'column',
@@ -439,7 +439,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		gap: 4
 	},
 	tapToSeeAttachmentText: {
-		color: Colors.tertiary,
+		color: colors.text,
 		fontSize: size.small
 	},
 	userNameMessageBox: {

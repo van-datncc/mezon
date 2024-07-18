@@ -1,6 +1,6 @@
-import { referencesActions, selectMemberByUserId } from '@mezon/store';
+import { referencesActions, selectIsUseProfileDM, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../../ui/src/lib/Icons/index';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
@@ -12,6 +12,8 @@ type MessageReplyProps = {
 
 // TODO: refactor component for message lines
 const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
+	const isUseProfileDM = useSelector(selectIsUseProfileDM);
+
 	const senderID = useMemo(() => {
 		if (message.references) {
 			return message.references[0].message_sender_id;
@@ -52,9 +54,19 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	);
 
 	const { mentions } = useMessageLine(messageContentReplied.t);
+	const markUpOnReplyParent = useRef<HTMLDivElement | null>(null);
+
+	const [parentWidth, setParentWidth] = useState<number>();
+	const getWidthParent = useMemo(() => {
+		return markUpOnReplyParent.current?.getBoundingClientRect().width;
+	}, [isUseProfileDM, window.innerWidth, markUpOnReplyParent]);
+
+	useLayoutEffect(() => {
+		setParentWidth(getWidthParent);
+	}, [getWidthParent, isUseProfileDM]);
 
 	return (
-		<div className="overflow-hidden">
+		<div className="overflow-hidden " ref={markUpOnReplyParent}>
 			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 				<Icons.ReplyCorner />
 				<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
@@ -82,7 +94,11 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 								<Icons.ImageThumbnail />
 							</div>
 						) : mentions.length > 0 ? (
-							<MarkUpOnReply onClickToMove={(e) => getIdMessageToJump(messageIdIsReplied ?? '', e)} mention={mentions} />
+							<MarkUpOnReply
+								parentWidth={parentWidth}
+								onClickToMove={(e) => getIdMessageToJump(messageIdIsReplied ?? '', e)}
+								mention={mentions}
+							/>
 						) : null}
 					</div>
 				</div>

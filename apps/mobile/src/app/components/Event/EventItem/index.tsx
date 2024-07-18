@@ -13,9 +13,10 @@ import { style } from './styles';
 interface IEventItemProps {
 	event: EventManagementEntity;
 	onPress?: () => void;
+	showActions?: boolean;
 }
 
-export default function EventItem({ event, onPress }: IEventItemProps) {
+export default function EventItem({ event, onPress, showActions = true }: IEventItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
@@ -54,10 +55,12 @@ export default function EventItem({ event, onPress }: IEventItemProps) {
 					<EventLocation event={event} />
 				</View>
 
-				<View style={styles.inline}>
-					<MezonButton icon={<Icons.CheckmarkSmallIcon height={20} width={20} color={themeValue.text} />} title="Interested" fluid border />
-					<MezonButton icon={<Icons.ShareIcon height={20} width={20} color={themeValue.text} />} />
-				</View>
+				{showActions &&
+					<View style={styles.inline}>
+						<MezonButton icon={<Icons.CheckmarkSmallIcon height={20} width={20} color={themeValue.text} />} title="Interested" fluid border />
+						<MezonButton icon={<Icons.ShareIcon height={20} width={20} color={themeValue.text} />} />
+					</View>
+				}
 			</View>
 		</Pressable>
 	);
