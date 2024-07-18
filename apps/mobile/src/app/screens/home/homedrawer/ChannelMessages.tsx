@@ -34,15 +34,15 @@ import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
+const ITEM_HEIGHT = 100;
+const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
+
 type ChannelMessagesProps = {
 	channelId: string;
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: ChannelStreamMode;
 };
-
-const idUserAnonymous = '1767478432163172999';
-const ITEM_HEIGHT = 100;
 
 const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
@@ -68,7 +68,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const currentClanId = useSelector(selectCurrentClanId);
 
-	const checkAnonymous = useMemo(() => messageSelected?.sender_id === idUserAnonymous, [messageSelected?.sender_id]);
+	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
 
 	const loadMoreMessage = React.useCallback(async () => {
 		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
