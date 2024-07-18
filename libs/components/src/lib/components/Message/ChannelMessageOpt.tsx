@@ -15,7 +15,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
   const currentChannel = useSelector(selectCurrentChannel);
   const refOpt = useRef<HTMLDivElement>(null);
 
-  const checkHiddenIconThread = !(currentChannel && !Number(currentChannel.parrent_id));
+  const checkHiddenIconThread = Number(currentChannel?.parrent_id) !== 0;
 
   const replyMenu = useMenuReplyMenuBuilder(message);
   const editMenu = useEditMenuBuilder(message);
