@@ -1,6 +1,6 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import { selectAllAccount, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -13,9 +13,11 @@ import BottomSheet from 'react-native-raw-bottom-sheet';
 import { useSelector } from 'react-redux';
 import { UserInformationBottomSheet } from '../../../../../../app/components/UserInformationBottomSheet';
 import { IDetailReactionBottomSheet, IMessageReactionProps } from '../../types';
-import { styles } from './styles';
+import { style } from './styles';
 
 export const MessageAction = React.memo((props: IMessageReactionProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { message, emojiListPNG, openEmojiPicker, mode, preventAction = false } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
 	const { reactionMessageDispatch } = useChatReaction();
@@ -132,6 +134,8 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 });
 
 const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { emojiSelectedId, onClose, allReactionDataOnOneMessage, emojiListPNG, removeEmoji, userId } = props;
 	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -292,6 +296,8 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 });
 
 const MemberReact = React.memo((props: { userId: string; onSelectUserId: (userId: string) => void }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { userId, onSelectUserId } = props;
 	const user = useSelector(selectMemberByUserId(userId || ''));
 	const showUserInformation = () => {
