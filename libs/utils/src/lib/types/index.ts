@@ -551,3 +551,17 @@ export enum MouseButton {
 	MIDDLE = 1,
 	RIGHT = 2,
 }
+
+export enum NotificationCode {
+	DM_REQUEST = -1,
+	FRIEND_REQUEST = -2,
+	FRIEND_ACCEPT = -3,
+	GROUP_ADD = -4,
+	GROUP_JOIN_REQUEST = -5,
+	FRIEND_JOIN_GAME = -6,
+	SINGLE_SOCKET = -7,
+	USER_BANNED = -8,
+	USER_MENTIONED = -9,
+	USER_REACTIONED = -10,
+	USER_REPLIED = -11,
+}

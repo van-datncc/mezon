@@ -18,6 +18,7 @@ import {
 	voiceActions,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { NotificationCode } from '@mezon/utils';
 import {
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -141,7 +142,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
 			}
 
-			if (notification.code === -2 || notification.code === -3) {
+			if (notification.code === NotificationCode.FRIEND_REQUEST || notification.code === NotificationCode.FRIEND_ACCEPT) {
 				dispatch(toastActions.addToast({ message: notification.subject, type: 'info', id: 'ACTION_FRIEND' }));
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
