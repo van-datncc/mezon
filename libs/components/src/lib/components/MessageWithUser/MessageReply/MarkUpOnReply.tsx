@@ -21,11 +21,7 @@ const MarkUpOnReply = ({ mention, onClickToMove, posMention }: IMarkUpOnReply) =
 				<HashTagMentionById posMention={posMention} key={`markUpId-${index}`} id={markUpId} />,
 			);
 		} else {
-			acc.push(
-				<div className="w-full truncate" key={`nonMatchText-${index}`}>
-					{item.nonMatchText}
-				</div>,
-			);
+			acc.push(<span key={`nonMatchText-${index}`}>{item.nonMatchText}</span>);
 		}
 		return acc;
 	}, []);
@@ -33,7 +29,7 @@ const MarkUpOnReply = ({ mention, onClickToMove, posMention }: IMarkUpOnReply) =
 	return (
 		<span
 			onClick={onClickToMove}
-			className={`${posMention ? ' whitespace-normal' : 'inline whitespace-nowrap overflow-x-hidden'} dark:hover:text-white dark:text-[#A8BAB8] text-[#818388] hover:text-[#060607] cursor-pointer noselect w-8/12 max-w-[500px] flex gap-[2px]`}
+			className={`${posMention ? ' whitespace-normal' : 'inline whitespace-nowrap overflow-x-hidden'} dark:hover:text-white dark:text-[#A8BAB8] text-[#818388] hover:text-[#060607] cursor-pointer  noselect`}
 		>
 			{processedMessage}
 		</span>
