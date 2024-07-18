@@ -1,17 +1,17 @@
 import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
-	getIsShowPopupForward,
-	selectAllClans,
-	selectCloseMenu,
-	selectCurrentChannel,
-	selectCurrentClan,
-	selectDirectsUnreadlist,
-	selectDmGroupCurrentId,
-	selectDmGroupCurrentType,
-	selectStatusMenu,
-	selectTheme,
-	toggleIsShowPopupForwardFalse,
+  getIsShowPopupForward,
+  selectAllClans,
+  selectCloseMenu,
+  selectCurrentChannel,
+  selectCurrentClan,
+  selectDirectsUnreadlist,
+  selectDmGroupCurrentId,
+  selectDmGroupCurrentType,
+  selectStatusMenu,
+  selectTheme,
+  toggleIsShowPopupForwardFalse,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -141,7 +141,7 @@ function MyApp() {
 			return `/chat/clans/${currentClan?.id}`;
 		} else if (clans?.length > 0) {
 			return `/chat/clans/${clans[0].id}`;
-		} 
+		}
 		return ``;
 	},[clans, currentChannel?.id, currentClan?.id]);
 
@@ -177,7 +177,7 @@ function MyApp() {
 				{dmGroupChatUnreadList.map((dmGroupChatUnread) => (
 					<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 				))}
-				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
+        <div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3 mx-auto my-2"></div>
 				{Boolean(initClan) && (
 					<NavLink
 						to={initClan}
