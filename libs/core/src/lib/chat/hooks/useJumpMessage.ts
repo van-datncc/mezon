@@ -11,7 +11,6 @@ let messID: string | null = null;
 
 export function useJumpToMessage({ channelId, messageID, clanId }: useJumpToMessagesOptions) {
 	const { navigate, toMessageChannel } = useAppNavigation();
-	// const currentClanId = useSelector(selectCurrentClanId);
 
 	const jumpToMessage = React.useCallback(async (messageId: string | null = null, positionToJump: ScrollLogicalPosition = 'center') => {
 		if (messageId) {
