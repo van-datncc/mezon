@@ -1,20 +1,20 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useClanProfileSetting } from '@mezon/core';
-import { CheckIcon, ChevronIcon, HashSignIcon } from '@mezon/mobile-components';
-import { Text } from '@mezon/mobile-ui';
+import { CheckIcon, Icons } from '@mezon/mobile-components';
+import { Text, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Dimensions, FlatList, Image, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, FlatList, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { EProfileTab, IClanProfileValue } from '..';
 import { SeparatorWithLine } from '../../../../../app/components/Common';
-import { MezonBottomSheet, MezonInput } from '../../../../../app/temp-ui';
-import BannerAvatar, { IFile } from '../UserProfile/components/Banner';
-import { styles } from './styles';
+import { IFile, MezonBottomSheet, MezonClanAvatar, MezonInput } from '../../../../../app/temp-ui';
+import BannerAvatar from '../UserProfile/components/Banner';
+import { style } from './styles';
 
 interface IServerProfile {
 	triggerToSave: EProfileTab;
@@ -31,6 +31,8 @@ export default function ServerProfile({
 	setDefaultValue,
 	setCurrentClanProfileValue,
 }: IServerProfile) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { userProfile, userId } = useAuth();
 	const { sessionRef, clientRef } = useMezon();
 	const bottomSheetDetail = useRef<BottomSheetModal>(null);
@@ -139,25 +141,22 @@ export default function ServerProfile({
 		<View style={{ width: Dimensions.get('screen').width }}>
 			<TouchableOpacity onPress={() => openBottomSheet()} style={styles.actionItem}>
 				<View style={[styles.clanAvatarWrapper]}>
-					{selectedClan?.logo ? (
-						<Image style={styles.avatar} source={{ uri: selectedClan?.logo }} resizeMode="cover" />
-					) : (
-						<View style={styles.avatar}>
-							<Text style={styles.textAvatar}>{selectedClan?.clan_name?.charAt(0).toUpperCase()}</Text>
-						</View>
-					)}
+					<MezonClanAvatar
+						image={selectedClan?.logo}
+						alt={selectedClan?.clan_name}
+					/>
 				</View>
 				<View style={{ flex: 1 }}>
 					<Text style={styles.clanName}>{selectedClan?.clan_name}</Text>
 				</View>
-				<ChevronIcon height={15} width={15} />
+				<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
 			</TouchableOpacity>
 
 			<BannerAvatar avatar={clanProfileValue?.imgUrl} onChange={handleAvatarChange} />
 
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => onPressHashtag()} style={styles.btnIcon}>
-					<HashSignIcon width={16} height={16} />
+					<Icons.TextIcon width={16} height={16} />
 				</TouchableOpacity>
 			</View>
 
@@ -176,7 +175,7 @@ export default function ServerProfile({
 				/>
 			</View>
 
-			<MezonBottomSheet ref={bottomSheetDetail} title="Choose a server">
+			<MezonBottomSheet ref={bottomSheetDetail} title="Choose a server" heightFitContent>
 				<View style={styles.bottomSheetContainer}>
 					<FlatList
 						data={clans}
@@ -187,13 +186,10 @@ export default function ServerProfile({
 								<TouchableOpacity style={styles.clanItem} onPress={() => switchClan(item)}>
 									<View style={styles.optionTitle}>
 										<View style={[styles.clanAvatarWrapper]}>
-											{item?.logo ? (
-												<Image style={styles.avatar} source={{ uri: item?.logo }} resizeMode="cover" />
-											) : (
-												<View style={styles.avatar}>
-													<Text style={styles.textAvatar}>{item?.clan_name?.charAt(0).toUpperCase()}</Text>
-												</View>
-											)}
+											<MezonClanAvatar
+												alt={item?.clan_name}
+												image={item?.logo}
+											/>
 										</View>
 
 										<Text style={styles.clanName}>{item?.clan_name}</Text>

@@ -66,7 +66,7 @@ const EmptyPinMessage = ({ onClick }: EmptyPinMessageProps) => {
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center ">
-					{listPinMessages.reverse().map((pinMessage) => {
+					{listPinMessages.slice().reverse().map((pinMessage) => {
 						// Parse content if it's a JSON string
 						let contentString = pinMessage.content;
 						if (typeof contentString === 'string') {

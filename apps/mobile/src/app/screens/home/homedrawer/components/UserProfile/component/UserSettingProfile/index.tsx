@@ -1,6 +1,6 @@
 import { useChannelMembersActions } from '@mezon/core';
-import { ActionEmitEvent, ClockWarning, HammerIcon, SettingIcon, UserMinus } from '@mezon/mobile-components';
-import { Block, Colors, Text } from '@mezon/mobile-ui';
+import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
+import { baseColor, Block, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ChannelsEntity, ClansEntity, selectCurrentClanId } from '@mezon/store-mobile';
 import { ApiAccount } from 'mezon-js/api.gen';
 import React, { useMemo, useState } from 'react';
@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { MezonModal } from '../../../../../../../../app/temp-ui/MezonModal';
 import KickUserClanModal from '../KickUserClanModal';
 import { ManageUserModal } from '../ManageUserModal';
-import { styles } from './UserSettingProfile.style';
+import { style } from './UserSettingProfile.style';
 
 export enum EActionSettingUserProfile {
 	Manage = 'Manage',
@@ -41,6 +41,8 @@ const UserSettingProfile = ({
 	userProfile,
 	isClanOwner
 }: IUserSettingProfileProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [visibleKickUserModal, setVisibleKickUserModal] = useState<boolean>(false);
 	const [visibleManageUserModal, setVisibleManageUserModal] = useState<boolean>(false);
 	const { removeMemberClan } = useChannelMembersActions();
@@ -68,28 +70,28 @@ const UserSettingProfile = ({
 			{
 				label: `${EActionSettingUserProfile.Manage}`,
 				value: EActionSettingUserProfile.Manage,
-				icon: <SettingIcon color={Colors.textGray} width={20} height={20} />,
+				icon: <Icons.SettingsIcon color={themeValue.text} width={20} height={20} />,
 				action: handleSettingUserProfile,
 				isShow: isClanOwner,
 			},
 			{
 				label: `${EActionSettingUserProfile.TimeOut}`,
 				value: EActionSettingUserProfile.TimeOut,
-				icon: <ClockWarning width={20} height={20} />,
+				icon: <Icons.ClockWarningIcon color={themeValue.text} width={20} height={20} />,
 				action: handleSettingUserProfile,
 				isShow: checkCreateUser && !checkUser,
 			},
 			{
 				label: `${EActionSettingUserProfile.Kick}`,
 				value: EActionSettingUserProfile.Kick,
-				icon: <UserMinus width={20} height={20} />,
+				icon: <Icons.UserMinusIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
 				isShow: checkCreateUser && !checkUser,
 			},
 			{
 				label: `${EActionSettingUserProfile.Ban}`,
 				value: EActionSettingUserProfile.Ban,
-				icon: <HammerIcon width={20} height={20} />,
+				icon: <Icons.HammerIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
 				isShow: checkCreateUser && !checkUser,
 			},

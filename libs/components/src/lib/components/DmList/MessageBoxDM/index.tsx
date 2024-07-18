@@ -3,7 +3,7 @@ import { useDirectMessages, useGifsStickersEmoji } from '@mezon/core';
 import { RootState, selectIdMessageRefReaction, selectIsShowMemberList } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
@@ -20,9 +20,14 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
-	const [classNamePopup, setClassNamePopup] = useState<string>(
-		`fixed bottom-[66px] z-10 max-sm:hidden bl ${isShowMemberList ? 'right-64' : 'right-4'}`,
-	);
+	const messageBox = useRef<HTMLDivElement>(null);
+
+	const setMarginleft = useMemo(() => {
+		if (messageBox?.current?.getBoundingClientRect()) {
+			return window.innerWidth - messageBox?.current?.getBoundingClientRect().right + 10;
+		}
+	}, [messageBox.current?.getBoundingClientRect()]);
+
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -75,10 +80,14 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	}, [subPanelActive]);
 
 	return (
-		<div className="mx-2 relative " role="button" aria-hidden>
+		<div className="mx-2 relative " role="button" aria-hidden ref={messageBox}>
 			{isEmojiOnChat && (
 				<div
-					className={classNamePopup}
+					style={{
+						position: 'fixed',
+						bottom: '76px',
+						right: setMarginleft,
+					}}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}

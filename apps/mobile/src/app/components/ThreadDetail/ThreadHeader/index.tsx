@@ -39,7 +39,7 @@ export const ThreadHeader = memo(() => {
 							</View>
 						)}
 					</View>
-					<Text numberOfLines={1} style={styles.channelLabel}>
+					<Text numberOfLines={5} style={styles.dmLabel}>
 						{currentChannel?.channel_label}
 					</Text>
 				</View>

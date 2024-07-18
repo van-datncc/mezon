@@ -1,13 +1,16 @@
+import { useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Text, View } from 'react-native';
 import { SeparatorWithLine, SeparatorWithSpace } from '../Common';
 import { FriendItem } from '../FriendItem';
-import { styles } from './styles';
+import { style } from './styles';
 import { IFriendGroupByCharacter, IListUserByAlphabetProps } from './type';
 
 export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { friendList, isSearching, showAction, selectMode, selectedFriendDefault = [], handleFriendAction, onSelectedChange } = props;
 	const [friendIdSelectedList, setFriendIdSelectedList] = useState<string[]>([]);
 	const { t } = useTranslation(['friends']);

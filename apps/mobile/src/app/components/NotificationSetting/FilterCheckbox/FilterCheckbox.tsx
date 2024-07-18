@@ -1,10 +1,10 @@
-import { Colors } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { Text, View } from 'react-native';
-import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { MezonRadioButton } from '../../../temp-ui';
 import { ENotificationType } from '../../NotificationSetting';
-import { styles } from '../NotificationSetting.styles';
+import { style } from '../NotificationSetting.styles';
 
 interface FilterCheckboxProps {
 	id: number;
@@ -15,6 +15,8 @@ interface FilterCheckboxProps {
 }
 
 const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(({ id, isChecked, label, defaultNotifyName, onCheckboxPress }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const handleCheckboxPress = () => {
 		onCheckboxPress(!isChecked, id);
 	};
@@ -28,13 +30,8 @@ const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(({ id, isChecke
 					</Text>
 				)}
 			</View>
-			<BouncyCheckbox
-				size={20}
-				fillColor={Colors.bgButton}
-				isChecked={isChecked}
-				innerIconStyle={{ borderWidth: 1.5, borderColor: isChecked ? Colors.bgButton : Colors.white }}
-				textStyle={{ fontFamily: 'JosefinSans-Regular', textDecorationLine: 'none' }}
-			/>
+
+			<MezonRadioButton checked={isChecked} />
 		</TouchableOpacity>
 	);
 });

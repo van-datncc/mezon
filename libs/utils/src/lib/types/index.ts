@@ -1,30 +1,30 @@
 import { ChannelMessage, ChannelType } from 'mezon-js';
 import {
-    ApiAccount,
-    ApiCategoryDesc,
-    ApiChannelAttachment,
-    ApiChannelDescription,
-    ApiClanDesc,
-    ApiClanProfile,
-    ApiDirectChannelVoice,
-    ApiEventManagement,
-    ApiInviteUserRes,
-    ApiMessageAttachment,
-    ApiMessageMention,
-    ApiMessageReaction,
-    ApiMessageRef,
-    ApiNotifiReactMessage,
-    ApiNotificationChannelCategoySetting,
-    ApiNotificationSetting,
-    ApiNotificationUserChannel,
-    ApiPermission,
-    ApiPinMessage,
-    ApiRole,
-    ApiSearchMessageDocument,
-    ApiUser,
-    ChannelUserListChannelUser,
-    ClanUserListClanUser,
-    RoleUserListRoleUser,
+	ApiAccount,
+	ApiCategoryDesc,
+	ApiChannelAttachment,
+	ApiChannelDescription,
+	ApiClanDesc,
+	ApiClanProfile,
+	ApiDirectChannelVoice,
+	ApiEventManagement,
+	ApiInviteUserRes,
+	ApiMessageAttachment,
+	ApiMessageMention,
+	ApiMessageReaction,
+	ApiMessageRef,
+	ApiNotifiReactMessage,
+	ApiNotificationChannelCategoySetting,
+	ApiNotificationSetting,
+	ApiNotificationUserChannel,
+	ApiPermission,
+	ApiPinMessage,
+	ApiRole,
+	ApiSearchMessageDocument,
+	ApiUser,
+	ChannelUserListChannelUser,
+	ClanUserListClanUser,
+	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
 
 export * from './permissions';
@@ -381,6 +381,11 @@ export type EmojiDataOptionals = {
 export type SenderInfoOptionals = {
 	sender_id?: string;
 	count: number | undefined;
+};
+
+export type ChannelDraftMessages = {
+	message_id: string;
+	draft_content: string;
 };
 
 export interface IGifCategory {

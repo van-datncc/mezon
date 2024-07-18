@@ -15,7 +15,7 @@ export function useMessageParser(message: IMessageWithUser) {
 	}, [message]);
 
 	const lines = useMemo(() => {
-		const values = content.t;
+		const values = content?.t;
 		return values;
 	}, [content]);
 
@@ -31,11 +31,11 @@ export function useMessageParser(message: IMessageWithUser) {
 		return convertTimeHour(message?.create_time || ('' as string));
 	}, [message]);
 
-	const [isEdited, setIsEdited] = useState(false)
+	const [isEdited, setIsEdited] = useState(false);
 
-	useEffect(()=>{
-		setIsEdited(message.create_time < (message.update_time || "") || false);
-	}, [message.update_time, message.create_time])
+	useEffect(() => {
+		setIsEdited(message.create_time < (message.update_time || '') || false);
+	}, [message.update_time, message.create_time]);
 
 	const hasAttachments = attachments && attachments.length > 0;
 

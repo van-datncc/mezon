@@ -1,9 +1,10 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, Icons, getChannelById } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, channelMembersActions, selectChannelsEntities, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
+import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
@@ -16,6 +17,7 @@ import ChatBox from './ChatBox';
 import AttachmentPicker from './components/AttachmentPicker';
 import BottomKeyboardPicker, { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
+import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
 
 const HomeDefault = React.memo((props: any) => {
@@ -27,6 +29,7 @@ const HomeDefault = React.memo((props: any) => {
 	const bottomPickerRef = useRef<BottomSheet>(null);
 	const timeoutRef = useRef<any>(null);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
+	const [isShowLicenseAgreement, setIsShowLicenseAgreement] = useState<boolean>(false);
 
 	const dispatch = useAppDispatch();
 
@@ -76,10 +79,13 @@ const HomeDefault = React.memo((props: any) => {
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
-
+		const timeout = setTimeout(() => {
+			checkShowLicenseAgreement();
+		}, 500);
 		return () => {
 			appStateSubscription.remove();
 			timeoutRef?.current && clearTimeout(timeoutRef.current);
+			clearTimeout(timeout);
 		};
 	}, []);
 
@@ -109,8 +115,21 @@ const HomeDefault = React.memo((props: any) => {
 		Keyboard.dismiss();
 	};
 
+	const checkShowLicenseAgreement = async () => {
+		const isAgreed = await load(STORAGE_AGREED_POLICY);
+
+		setIsShowLicenseAgreement(Platform.OS === 'ios' && isAgreed?.toString() !== 'true');
+	};
+
 	return (
 		<View style={[styles.homeDefault]}>
+			<LicenseAgreement
+				show={isShowLicenseAgreement}
+				onClose={() => {
+					setIsShowLicenseAgreement(false);
+					save(STORAGE_AGREED_POLICY, 'true');
+				}}
+			/>
 			<HomeDefaultHeader
 				openBottomSheet={openBottomSheet}
 				navigation={props.navigation}

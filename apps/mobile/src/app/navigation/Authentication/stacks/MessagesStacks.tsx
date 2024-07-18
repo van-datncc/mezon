@@ -1,7 +1,7 @@
 import { CardStyleInterpolators, createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
 import React from 'react';
 
-import { Colors } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 import { DirectMessageDetailScreen } from '../../../screens/messages/DirectMessageDetail';
 import { NewGroupScreen } from '../../../screens/messages/NewGroup';
@@ -9,8 +9,9 @@ import { NewMessageScreen } from '../../../screens/messages/NewMessage';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const MessagesStacks = ({}: any) => {
+export const MessagesStacks = ({ }: any) => {
 	const Stack = createStackNavigator();
+	const { themeValue } = useTheme();
 	const { t } = useTranslation('screen');
 	return (
 		<Stack.Navigator
@@ -25,6 +26,12 @@ export const MessagesStacks = ({}: any) => {
 				},
 				cardStyle: { backgroundColor: 'white' },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+				headerTitleAlign: 'center',
+				headerTintColor: themeValue.text,
+				headerStyle: {
+					backgroundColor: themeValue.secondary,
+				},
+				headerLeftLabelVisible: false,
 			}}
 		>
 			<Stack.Screen
@@ -40,13 +47,6 @@ export const MessagesStacks = ({}: any) => {
 				component={NewMessageScreen}
 				options={{
 					headerTitle: t('headerTitle.newMessage'),
-					headerTitleAlign: 'center',
-					headerTintColor: Colors.white,
-					headerStyle: {
-						backgroundColor: Colors.secondary,
-					},
-					headerShadowVisible: false,
-					headerLeftLabelVisible: false,
 				}}
 			/>
 			<Stack.Screen
@@ -54,7 +54,6 @@ export const MessagesStacks = ({}: any) => {
 				component={NewGroupScreen}
 				options={{
 					headerShown: false,
-					headerShadowVisible: false,
 				}}
 			/>
 		</Stack.Navigator>

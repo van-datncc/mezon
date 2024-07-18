@@ -4,8 +4,9 @@ import { Dimensions, StyleSheet } from "react-native";
 export const style = (colors: Attributes) => StyleSheet.create({
     container: {
         backgroundColor: colors.primary,
-        padding: 20,
+        paddingHorizontal: size.s_18,
         width: Dimensions.get("screen").width,
+        paddingBottom: size.s_60
     },
 
     text: {
