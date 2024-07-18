@@ -305,8 +305,8 @@ export interface NotificationContent {
 	persistent?: boolean;
 	sender_id: string;
 	update_time?: { seconds: number };
-	user_id_one?: string;
-	user_id_two?: string;
+	clan_logo?: string;
+	category_name?: string;
 	username?: string;
 }
 
