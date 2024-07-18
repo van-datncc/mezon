@@ -44,7 +44,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         bottom: 0,
         right: -2,
         borderWidth: 2,
-        borderColor: Colors.secondary,
+        borderColor: colors.secondary,
     },
     friendAction: {
         flexDirection: 'row',
@@ -60,7 +60,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         borderRadius: 50
     },
     whiteText: {
-        color: Colors.white
+        color: colors.textStrong
     },
     textAvatar: {
         backgroundColor: Colors.bgGrayDark,
