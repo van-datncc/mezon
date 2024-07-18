@@ -1,7 +1,15 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, channelMembersActions, selectChannelsEntities, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
+import {
+	ChannelsEntity,
+	RootState,
+	channelMembersActions,
+	selectAllClans,
+	selectChannelsEntities,
+	selectCurrentChannel,
+	useAppDispatch,
+} from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
@@ -31,6 +39,8 @@ const HomeDefault = React.memo((props: any) => {
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
 	const [isShowLicenseAgreement, setIsShowLicenseAgreement] = useState<boolean>(false);
 
+	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
+	const clans = useSelector(selectAllClans);
 	const dispatch = useAppDispatch();
 
 	const prevChannelIdRef = useRef<string>();
@@ -45,6 +55,10 @@ const HomeDefault = React.memo((props: any) => {
 			bottomPickerRef.current?.close();
 		}
 	}, []);
+
+	useEffect(() => {
+		if (clansLoadingStatus === 'loaded' && !clans?.length) onOpenDrawer();
+	}, [clans, clansLoadingStatus]);
 
 	const bottomSheetRef = useRef<BottomSheet>(null);
 	const snapPoints = useMemo(() => ['15%', '40%'], []);

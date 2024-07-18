@@ -1,12 +1,12 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     userItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: size.s_8,
-        backgroundColor: Colors.bgDarkCharcoal,
+        backgroundColor: colors.secondary,
         paddingHorizontal: size.s_10,
         paddingVertical: size.s_8
     },
@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.bgGrayDark,
     },
     defaultText: {
-        color: Colors.textGray
+        color: colors.textStrong
     },
     avatarDisabled: {
         opacity: .4
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
         bottom: 0,
         right: -2,
         borderWidth: 2,
-        borderColor: Colors.secondary,
+        borderColor: colors.secondary,
     },
     friendAction: {
         flexDirection: 'row',
@@ -60,7 +60,7 @@ export const styles = StyleSheet.create({
         borderRadius: 50
     },
     whiteText: {
-        color: Colors.white
+        color: colors.textStrong
     },
     textAvatar: {
         backgroundColor: Colors.bgGrayDark,

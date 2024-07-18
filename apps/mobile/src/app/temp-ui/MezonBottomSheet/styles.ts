@@ -50,6 +50,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
         paddingLeft: Metrics.size.m
     },
     handleIndicator: {
-        backgroundColor: colors.textStrong
+        backgroundColor: colors.secondary
     }
 });

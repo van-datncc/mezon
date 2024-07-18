@@ -1,5 +1,6 @@
-import { useChannels, useNotification } from '@mezon/core';
+import { useNotification } from '@mezon/core';
 import { INotification, selectTheme } from '@mezon/store';
+import { NotificationCode } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
@@ -12,7 +13,6 @@ export type NotificationProps = { unReadList?: string[] };
 
 const tabDataNotify = [
 	{ title: 'For you', value: 'individual' },
-	{ title: 'Unreads', value: 'unreads' },
 	{ title: 'Mentions', value: 'mentions' },
 ];
 
@@ -27,13 +27,13 @@ function NotificationList({ unReadList }: NotificationProps) {
 		setCurrentTabNotify(valueTab);
 	};
 
-	const { channels } = useChannels();
 	const notificationItem = notification.filter(
-		(item) => item.code !== -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
+		(item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED,
 	);
 	const notifyMentionItem = notification.filter(
-		(item) => item.code === -9 && channels.some((channel) => channel.channel_id === item.content.channel_id),
+		(item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED,
 	);
+
 	const appearanceTheme = useSelector(selectTheme);
 	useEffect(() => {
 		if (currentTabNotify === 'mentions' && tabMentionRef.current) {
@@ -75,8 +75,8 @@ function NotificationList({ unReadList }: NotificationProps) {
 						ref={tabIndividualRef}
 						className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto"
 					>
-						{notificationItem.map((notify: INotification) => (
-							<NotificationItem notify={notify} key={notify.id} />
+						{notificationItem.map((notify: INotification, index: number) => (
+							<NotificationItem notify={notify} key={`individual-${notify.id}-${index}`} />
 						))}
 					</div>
 				)}
@@ -86,8 +86,8 @@ function NotificationList({ unReadList }: NotificationProps) {
 						ref={tabMentionRef}
 						className={`dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 					>
-						{notifyMentionItem.map((notify: INotification) => (
-							<NotifyMentionItem isUnreadTab={false} notify={notify} key={notify.id} />
+						{notifyMentionItem.map((notify: INotification, index: number) => (
+							<NotifyMentionItem isUnreadTab={false} notify={notify} key={`mention-${notify.id}-${index}`} />
 						))}
 					</div>
 				)}

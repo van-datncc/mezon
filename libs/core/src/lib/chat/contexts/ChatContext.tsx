@@ -18,6 +18,7 @@ import {
 	voiceActions,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
+import { NotificationCode } from '@mezon/utils';
 import {
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -44,18 +45,13 @@ type ChatContextProviderProps = {
 	children: React.ReactNode;
 };
 
-export type ChatContextValue = object;
+export type ChatContextValue = {
+	setCallbackEventFn: (socket: Socket) => void;
+};
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
-	const value = React.useMemo<ChatContextValue>(
-		() => ({
-			// add logic code
-		}),
-		[],
-	);
-
 	const { socketRef, reconnect } = useMezon();
 	const { userId } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -130,7 +126,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		async (notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id && notification.code === -9) {
+			if (currentChannel?.channel_id !== (notification as any).channel_id) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setStatusNoti());
@@ -141,7 +137,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
 			}
 
-			if (notification.code === -2 || notification.code === -3) {
+			if (notification.code === NotificationCode.FRIEND_REQUEST || notification.code === NotificationCode.FRIEND_ACCEPT) {
 				dispatch(toastActions.addToast({ message: notification.subject, type: 'info', id: 'ACTION_FRIEND' }));
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
@@ -288,7 +284,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const ondisconnect = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+		dispatch(toastActions.addToast({ message: 'Socket disconnected', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect(clanIdActive ?? '').then((socket) => {
 			if (!socket) return;
 			setCallbackEventFn(socket as Socket);
@@ -296,7 +292,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, [dispatch, reconnect, clanIdActive, setCallbackEventFn]);
 
 	const onHeartbeatTimeout = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket connection failed', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+		dispatch(toastActions.addToast({ message: 'Socket hearbeat timeout', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 		reconnect(clanIdActive ?? '').then((socket) => {
 			if (!socket) return;
 			setCallbackEventFn(socket as Socket);
@@ -310,21 +306,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => { };
+			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -354,10 +350,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		};
 	}, [initWorker, unInitWorker]);
 
+	const value = React.useMemo<ChatContextValue>(
+		() => ({
+			// add logic code
+			setCallbackEventFn,
+		}),
+		[setCallbackEventFn],
+	);
+
 	return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };
 
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-

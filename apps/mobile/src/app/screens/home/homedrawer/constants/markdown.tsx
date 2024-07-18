@@ -1,4 +1,4 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelMembersEntity,
 	ChannelsEntity,
@@ -51,9 +51,9 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = {
+export const markdownStyles = (colors: Attributes) => StyleSheet.create({
 	body: {
-		color: Colors.tertiary,
+		color: colors.textStrong,
 		fontSize: size.medium,
 	},
 	paragraph: {
@@ -63,24 +63,24 @@ export const markdownStyles = {
 		paddingBottom: 0,
 	},
 	code_block: {
-		color: Colors.textGray,
-		backgroundColor: Colors.bgCharcoal,
+		color: colors.text,
+		backgroundColor: colors.primary,
 		paddingVertical: 1,
-		borderColor: Colors.black,
+		borderColor: colors.text,
 		borderRadius: 5,
 		lineHeight: size.s_20,
 	},
 	code_inline: {
-		color: Colors.textGray,
-		backgroundColor: Colors.bgCharcoal,
+		color: colors.text,
+		backgroundColor: colors.primary,
 		fontSize: size.small,
 		lineHeight: size.s_20,
 	},
 	fence: {
-		color: Colors.textGray,
-		backgroundColor: Colors.bgCharcoal,
+		color: colors.text,
+		backgroundColor: colors.primary,
 		paddingVertical: 5,
-		borderColor: Colors.black,
+		borderColor: colors.borderHighlight,
 		borderRadius: 5,
 		fontSize: size.small,
 		lineHeight: size.s_20,
@@ -100,8 +100,8 @@ export const markdownStyles = {
 	},
 	mention: {
 		fontSize: size.medium,
-		color: Colors.textGray,
-		backgroundColor: Colors.midnightBlue,
+		color: colors.textLink,
+		backgroundColor: colors.midnightBlue,
 		lineHeight: size.s_20,
 	},
 	blockquote: {
@@ -116,7 +116,7 @@ export const markdownStyles = {
 		height: 2,
 	},
 	voiceChannel: {
-		backgroundColor: Colors.midnightIndigoBg,
+		backgroundColor: colors.midnightBlue,
 		flexDirection: 'row',
 		gap: size.s_2,
 		alignItems: 'center',
@@ -124,11 +124,11 @@ export const markdownStyles = {
 	},
 	textVoiceChannel: {
 		fontSize: size.medium,
-		color: Colors.textGray,
+		color: colors.textLink,
 		lineHeight: size.s_20,
 	},
 	unknownChannel: { fontStyle: 'italic' },
-};
+});
 
 const styleMessageReply = {
 	body: {
@@ -215,7 +215,7 @@ export const renderRulesCustom = {
 				return (
 					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 						<Text>
-							<FontAwesome name="volume-2" size={14} color={Colors?.white} />{' '}
+							<FontAwesome name="volume-2" size={14} color={baseColor.gray} /> {' '}
 						</Text>
 						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>
@@ -351,6 +351,7 @@ const RenderTextContent = React.memo(
 		isMessageReply,
 		mode,
 	}: IMarkdownProps) => {
+		const { themeValue } = useTheme();
 		const usersClan = useSelector(selectAllUsesClan);
 		const usersInChannel = useSelector(selectAllChannelMembers);
 		if (!lines) return null;
@@ -408,7 +409,7 @@ const RenderTextContent = React.memo(
 					/>
 				) : null}
 				<Markdown
-					style={{ ...(markdownStyles as StyleSheet.NamedStyles<any>), ...customStyle }}
+					style={{ ...(markdownStyles(themeValue) as StyleSheet.NamedStyles<any>), ...customStyle }}
 					rules={renderRulesCustom}
 					onLinkPress={(url) => {
 						if (url.startsWith('@')) {
@@ -431,7 +432,7 @@ const RenderTextContent = React.memo(
 			</View>
 		) : (
 			<Markdown
-				style={markdownStyles as StyleSheet.NamedStyles<any>}
+				style={markdownStyles(themeValue) as StyleSheet.NamedStyles<any>}
 				rules={renderRulesCustom}
 				onLinkPress={(url) => {
 					if (url.startsWith(TYPE_MENTION.userMention)) {

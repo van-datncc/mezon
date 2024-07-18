@@ -1,6 +1,6 @@
 import { useFriends } from '@mezon/core';
-import { ArrowLeftIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, FriendsEntity, directActions, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType, User } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
@@ -15,9 +15,11 @@ import { FriendListByAlphabet } from '../../../components/FriendListByAlphabet';
 import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { normalizeString } from '../../../utils/helpers';
-import { styles } from './styles';
+import { style } from './styles';
 
 export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: any }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const directMessage = route?.params?.directMessage as DirectEntity;
 	const [searchText, setSearchText] = useState<string>('');
 	const { t } = useTranslation(['common', 'friends']);
@@ -79,12 +81,12 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.secondary }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: themeValue.primary }}>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 				<View style={styles.newGroupContainer}>
 					<View style={styles.headerWrapper}>
 						<Pressable onPress={() => navigation.goBack()}>
-							<ArrowLeftIcon color={Colors.textGray} />
+							<Icons.ArrowLargeLeftIcon height={20} width={20} color={themeValue.text} />
 						</Pressable>
 						<View style={styles.screenTitleWrapper}>
 							<Text style={styles.screenTitle}>{t('screen:headerTitle.newGroup')}</Text>
@@ -99,10 +101,10 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 					<View style={styles.contentWrapper}>
 						{/* TODO: update later - autocomplete input */}
 						<View style={styles.searchFriend}>
-							<Feather size={18} name="search" style={{ color: Colors.tertiary }} />
+							<Feather size={18} name="search" style={{ color: themeValue.text }} />
 							<TextInput
 								placeholder={t('common:searchPlaceHolder')}
-								placeholderTextColor={Colors.tertiary}
+								placeholderTextColor={themeValue.text}
 								style={styles.searchInput}
 								onChangeText={(text) => typingSearchDebounce(text)}
 							/>

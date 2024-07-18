@@ -23,6 +23,10 @@ export type Attributes = {
     jet: HexColor,
     channelUnread: HexColor,
     channelNormal: HexColor,
+    midnightBlue: HexColor,
+    textLink: HexColor,
+    reactionBg: HexColor,
+    reactionBorder: HexColor,
 }
 
 type ThemeColor = Record<ThemeModeBase, Attributes>
@@ -62,7 +66,11 @@ export const themeColors: ThemeColor = {
         charcoal: '#2b2b2e',
         jet: "#29292b",
         channelUnread: "#ffffff",
-        channelNormal: "#aeaeae"
+        channelNormal: "#aeaeae",
+        midnightBlue: "#3b426e",
+        textLink: "#3297ff",
+        reactionBg: "#373a54",
+        reactionBorder: "#2563eb",
     },
     light: {
         primary: "#f2f3f5",
@@ -84,6 +92,10 @@ export const themeColors: ThemeColor = {
         charcoal: "#f2f3f5",
         jet: "#ecedef",
         channelUnread: "#000000",
-        channelNormal: "#535353"
+        channelNormal: "#535353",
+        midnightBlue: "#d1e0ff",
+        textLink: "#3297ff",
+        reactionBg: "#e5e7eb",
+        reactionBorder: "#2563eb"
     }
 }

@@ -1,0 +1,22 @@
+{
+  "joinClan": {
+    "joinExistClan":"Join an existing clan",
+    "enterInvite":"Enter an invite below to join an existing clan.",
+    "labelInput": "Invite link",
+    "linkInviteEx":"Invites should look like https://mezon.vn/invite/1813407038846046912",
+    "joinInviteLink":"Join with invite Link",
+    "errorMessage": "Please enter a valid invite link or invite code."
+  },
+  "emptyClans": {
+    "clans": "Clans",
+    "readyChat":"Ready for a next-level group chat ?",
+    "buildYourCommunity":"Build your community with organized conversations, spontaneous hangouts, an powerful customization features!",
+    "createClan":"Create Your Clan",
+    "joinClan":"Join a Clan"
+  },
+  "emptyMessage": {
+    "dMsWith":"DMs with superpowers",
+    "inviteYourFriends":"Invite your friends to play games, listen to music together, and more.",
+    "addFriend":"Add Friends"
+  }
+}

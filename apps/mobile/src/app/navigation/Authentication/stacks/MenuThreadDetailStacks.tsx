@@ -27,9 +27,9 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 	const [isChannel, setIsChannel] = useState<boolean>();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const channelsEntities = useSelector(selectChannelsEntities);
-  const currentChannelById =  useMemo(() =>{
-    return channelsEntities?.[(currentChannel?.parrent_id === '0' ?  currentChannel?.channel_id : currentChannel?.parrent_id) || '']
-  },[currentChannel?.parrent_id, currentChannel?.channel_id, channelsEntities])
+	const currentChannelById = useMemo(() => {
+		return channelsEntities?.[(currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || '']
+	}, [currentChannel?.parrent_id, currentChannel?.channel_id, channelsEntities])
 
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
@@ -127,24 +127,16 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 					headerShown: true,
 					headerTitle: () => (
 						<View>
-							<Text style={{ color: Colors.white, fontSize: size.label, fontWeight: '700' }}>
+							<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>
 								{isChannel
 									? t('notifySettingThreadModal.headerTitleMuteChannel')
 									: t('notifySettingThreadModal.headerTitleMuteThread')}
 							</Text>
-							<Text style={{ color: Colors.textGray, fontSize: size.medium, fontWeight: '400' }}>
+							<Text style={{ color: themeValue.text, fontSize: size.medium, fontWeight: '400' }}>
 								{isChannel ? `#${currentChannel?.channel_label}` : `"${currentChannel?.channel_label}"`}
 							</Text>
 						</View>
-					),
-					headerTitleStyle: {
-						color: Colors.white,
-					},
-					headerStyle: {
-						backgroundColor: Colors.secondary,
-					},
-					headerTintColor: Colors.white,
-					headerLeftLabelVisible: false,
+					)
 				}}
 			/>
 		</Stack.Navigator>

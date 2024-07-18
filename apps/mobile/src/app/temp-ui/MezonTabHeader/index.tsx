@@ -1,6 +1,7 @@
+import { useTheme } from '@mezon/mobile-ui';
 import { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import styles from './styles';
+import { style } from './styles';
 
 interface IMezonTabHeaderProps {
 	tabIndex: number;
@@ -11,6 +12,8 @@ interface IMezonTabHeaderProps {
 }
 
 export default function MezonTabHeader({ tabIndex, tabs, isNeedConfirmWhenSwitch = false, confirmCallback, onChange }: IMezonTabHeaderProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [tab, setTab] = useState<number>(tabIndex);
 
 	useEffect(() => {
@@ -38,7 +41,7 @@ export default function MezonTabHeader({ tabIndex, tabs, isNeedConfirmWhenSwitch
 						style={[styles.switchButton, tab === index && styles.switchButtonActive]}
 						onPress={() => handleTabHeaderPress(index)}
 					>
-						<Text style={styles.switchText}>{tabItem}</Text>
+						<Text style={[styles.switchText, tab === index && styles.switchTextActive]}>{tabItem}</Text>
 					</TouchableOpacity>
 				</View>
 			))}

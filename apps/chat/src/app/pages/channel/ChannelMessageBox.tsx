@@ -1,9 +1,9 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
-import { selectIdMessageRefReaction, selectIsShowMemberList } from '@mezon/store';
+import { selectIdMessageRefReaction } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
@@ -15,12 +15,17 @@ export type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, mode });
-	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { subPanelActive } = useGifsStickersEmoji();
-	const [classNamePopup] = useState<string>(`fixed bottom-[66px] z-10 max-sm:hidden bl ${isShowMemberList ? 'right-64' : 'right-4'}`);
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
+
+	const messageBox = useRef<HTMLDivElement>(null);
+	const setMarginleft = useMemo(() => {
+		if (messageBox?.current?.getBoundingClientRect()) {
+			return window.innerWidth - messageBox?.current?.getBoundingClientRect().right + 10;
+		}
+	}, [messageBox.current?.getBoundingClientRect()]);
 
 	const handleSend = useCallback(
 		(
@@ -73,10 +78,14 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 	}, [subPanelActive]);
 
 	return (
-		<div className="mx-2 relative " role="button" aria-hidden>
+		<div className="mx-2 relative " role="button" aria-hidden ref={messageBox}>
 			{isEmojiOnChat && (
 				<div
-					className={classNamePopup}
+					style={{
+						position: 'fixed',
+						bottom: '76px',
+						right: setMarginleft,
+					}}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}

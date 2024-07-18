@@ -1,20 +1,20 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, Metrics, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
   container: {
-    backgroundColor: Colors.secondary,
-    paddingHorizontal: size.s_20
+    backgroundColor: colors.primary,
+    padding: Metrics.size.xl
   },
   headerTitle: {
     textAlign: 'center',
-    color: Colors.white,
+    color: colors.textStrong,
     fontSize: size.h6,
     fontWeight: '700',
     marginBottom: size.s_10
   },
   optionsSetting: {
-    backgroundColor: Colors.bgDarkCharcoal,
+    backgroundColor: colors.secondary,
     borderRadius: 8
   },
   option: {
@@ -24,14 +24,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   labelOption: {
-    color: Colors.white,
+    color: colors.text,
     fontSize: size.label,
     fontWeight: '600',
     fontFamily: "JosefinSans-Regular",
   },
   iconImageStyle: {},
   defaultNotifyName: {
-    color: Colors.white,
+    color: colors.text,
     fontSize: size.s_14
   },
   checkbox: {

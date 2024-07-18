@@ -21,7 +21,6 @@ import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
-import ThreadsMain from '../../thread';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -100,20 +99,27 @@ export default function DirectMessage() {
 			setIsShowMemberList(false);
 		}
 	}, [isShowCreateThread]);
+
+	const setMarginleft = useMemo(() => {
+		if (messagesContainerRef?.current?.getBoundingClientRect()) {
+			return window.innerWidth - messagesContainerRef?.current?.getBoundingClientRect().right + 155;
+		}
+	}, [messagesContainerRef.current?.getBoundingClientRect()]);
+
 	return (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
 			<div
 				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-			  h-[100%] overflow-visible`}
+				h-[100%] overflow-visible`}
 				onDragEnter={handleDragEnter}
 			>
 				{' '}
 				<DmTopbar dmGroupId={directId} />
 				<div className="flex flex-row h-full w-full">
 					<div className={`flex-col flex-1 w-full h-full max-h-messageViewChatDM ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}>
-						<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink" ref={messagesContainerRef}>
+						<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink " ref={messagesContainerRef}>
 							{
 								<ChannelMessages
 									channelId={directId ?? ''}
@@ -135,6 +141,9 @@ export default function DirectMessage() {
 							<div
 								id="emojiPicker"
 								className={`fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
+								style={{
+									right: setMarginleft,
+								}}
 							>
 								<div className="mb-0 z-10 h-full">
 									<GifStickerEmojiPopup
@@ -213,14 +222,7 @@ export default function DirectMessage() {
 					)}
 				</div>
 			</div>
-			{isShowCreateThread && (
-				<>
-					<div className="w-2 cursor-ew-resize dark:bg-bgTertiary bg-white" />
-					<div className="w-[480px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-l-lg">
-						<ThreadsMain />
-					</div>
-				</>
-			)}
+
 		</>
 	);
 }

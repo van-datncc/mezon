@@ -1,7 +1,7 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	containerItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
 		overflow: 'hidden',
 	},
 	borderBoxImage: {
-		borderColor: Colors.gray48,
+		borderColor: colors.secondary,
 		borderWidth: 5,
 	},
 	image: {
@@ -33,20 +33,20 @@ export const styles = StyleSheet.create({
 		bottom: 1,
 		right: 5,
 		borderWidth: 2,
-		borderColor: Colors.secondary,
+		borderColor: colors.secondary,
 	},
 	online: {
-		backgroundColor: Colors.green,
+		backgroundColor: baseColor.green,
 	},
 	offline: {
-		backgroundColor: Colors.bgGrayDark,
+		backgroundColor: baseColor.gray,
 	},
-  avatarMessageBoxDefault: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: Colors.titleReset,
-    flexDirection:'row',
-    alignItems:'center',
-    justifyContent:'center'
-  }
+	avatarMessageBoxDefault: {
+		width: '100%',
+		height: '100%',
+		backgroundColor: Colors.titleReset,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center'
+	}
 });

@@ -1,14 +1,14 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, baseColor, Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     dmMessageContainer: {
-        backgroundColor: Colors.secondary,
+        backgroundColor: colors.secondary,
         flex: 1,
     },
     headerWrapper: {
         flexDirection: 'row',
-        borderBottomColor: Colors.borderPrimary,
+        borderBottomColor: colors.border,
         borderBottomWidth: 1,
         alignItems: 'center',
     },
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
         gap: size.s_8,
     },
     titleText: {
-        color: Colors.textGray,
+        color: colors.text,
         fontSize: size.label,
         flex: 1
     },
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
         gap: size.s_20
     },
     groupAvatar: {
-        backgroundColor: Colors.bgToggleOnBtn,
+        backgroundColor: baseColor.blurple,
         width: size.s_30,
         height: size.s_30,
         borderRadius: 50,
@@ -56,12 +56,12 @@ export const styles = StyleSheet.create({
         bottom: 0,
         right: -2,
         borderWidth: 2,
-        borderColor: Colors.secondary,
+        borderColor: colors.secondary,
     },
     online: {
-        backgroundColor: Colors.green,
+        backgroundColor: baseColor.green,
     },
     offline: {
-        backgroundColor: Colors.bgGrayDark,
+        backgroundColor: baseColor.gray,
     },
 })

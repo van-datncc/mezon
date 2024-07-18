@@ -1,6 +1,7 @@
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 import { useAccount, useAuth } from '@mezon/core';
-import { HashSignIcon } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useNavigation } from '@react-navigation/native';
@@ -11,7 +12,7 @@ import { useSelector } from 'react-redux';
 import { EProfileTab, IUserProfileValue } from '..';
 import BannerAvatar, { IFile } from './components/Banner';
 import DetailInfo from './components/Info';
-import styles from './styles';
+import { style } from './styles';
 
 interface IUserProfile {
 	triggerToSave: EProfileTab;
@@ -20,6 +21,8 @@ interface IUserProfile {
 }
 
 export default function UserProfile({ triggerToSave, userProfileValue, setCurrentUserProfileValue }: IUserProfile) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const auth = useAuth();
 	const { updateUser } = useAccount();
 	const { sessionRef, clientRef } = useMezon();
@@ -87,7 +90,7 @@ export default function UserProfile({ triggerToSave, userProfileValue, setCurren
 
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => handleHashtagPress()} style={styles.btnIcon}>
-					<HashSignIcon width={16} height={16} />
+					<Icons.TextIcon width={16} height={16} />
 				</TouchableOpacity>
 			</View>
 
