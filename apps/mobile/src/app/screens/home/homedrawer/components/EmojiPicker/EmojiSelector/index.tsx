@@ -4,24 +4,24 @@ import {
 	BowlIcon,
 	GameControllerIcon,
 	HeartIcon,
+	Icons,
 	LeafIcon,
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
-	SearchIcon,
-	SmilingFaceIcon,
+	SmilingFaceIcon
 } from '@mezon/mobile-components';
-import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
+import { baseColor, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import { debounce } from 'lodash';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
-import styles from './styles';
+import { style } from './styles';
 
 type EmojiSelectorProps = {
 	onSelected: (url: string) => void;
@@ -32,17 +32,6 @@ type EmojiSelectorProps = {
 	handleBottomSheetCollapse?: () => void;
 };
 
-const cateIcon = [
-	<PenIcon />,
-	<SmilingFaceIcon height={24} width={24} />,
-	<LeafIcon />,
-	<BowlIcon />,
-	<GameControllerIcon />,
-	<BicycleIcon />,
-	<ObjectIcon />,
-	<HeartIcon />,
-	<RibbonIcon />,
-];
 
 type DisplayByCategoriesProps = {
 	readonly categoryName?: string;
@@ -52,6 +41,8 @@ type DisplayByCategoriesProps = {
 };
 
 function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		return emojis
 			.filter((emoji) => emoji.category.includes(categoryParam))
@@ -71,6 +62,8 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 }
 
 const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect }) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return (
 		<View style={styles.emojisPanel}>
 			{emojisData.map((item, index) => {
@@ -91,6 +84,8 @@ export default function EmojiSelector({
 	handleBottomSheetExpand,
 	handleBottomSheetCollapse,
 }: EmojiSelectorProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
 	const { categoriesEmoji, setEmojiSuggestion } = useEmojiSuggestion();
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
@@ -98,6 +93,17 @@ export default function EmojiSelector({
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const refScrollView = useRef<ScrollView>(null);
 	const { t } = useTranslation('message');
+	const cateIcon = useMemo(() => ([
+		<PenIcon color={themeValue.textStrong} />,
+		<SmilingFaceIcon height={24} width={24} color={themeValue.textStrong} />,
+		<LeafIcon color={themeValue.textStrong} />,
+		<BowlIcon color={themeValue.textStrong} />,
+		<GameControllerIcon color={themeValue.textStrong} />,
+		<BicycleIcon color={themeValue.textStrong} />,
+		<ObjectIcon color={themeValue.textStrong} />,
+		<HeartIcon color={themeValue.textStrong} />,
+		<RibbonIcon color={themeValue.textStrong} />,
+	]), [themeValue]);
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: cateIcon[index] }));
 	const categoryRefs = useRef(
 		categoriesEmoji.reduce((refs, item) => {
@@ -137,9 +143,9 @@ export default function EmojiSelector({
 			style={{ height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3) }}
 			contentContainerStyle={{ paddingBottom: size.s_50 }}
 		>
-			<View style={{ backgroundColor: isReactMessage ? Colors.primary : Colors.secondary }}>
+			<View style={{ backgroundColor: isReactMessage ? themeValue.primary : themeValue.primary }}>
 				<View style={styles.textInputWrapper}>
-					<SearchIcon height={18} width={18} />
+					<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
 					<TextInput
 						onFocus={handleBottomSheetExpand}
 						placeholder={t('findThePerfectReaction')}
@@ -166,7 +172,7 @@ export default function EmojiSelector({
 							}}
 							style={{
 								...styles.cateItem,
-								backgroundColor: item.name === selectedCategory ? Colors.bgViolet : 'transparent',
+								backgroundColor: item.name === selectedCategory ? baseColor.blurple : 'transparent',
 							}}
 						>
 							{item.icon}
