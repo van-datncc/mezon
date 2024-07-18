@@ -177,7 +177,7 @@ function MyApp() {
 				{dmGroupChatUnreadList.map((dmGroupChatUnread) => (
 					<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 				))}
-        <div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-[#ccced3] duration-100 w-2/3 mx-auto my-2"></div>
+        <div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3 mx-auto my-2"></div>
 				{Boolean(initClan) && (
 					<NavLink
 						to={initClan}
