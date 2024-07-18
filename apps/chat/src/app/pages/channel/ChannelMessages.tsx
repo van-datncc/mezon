@@ -3,12 +3,12 @@ import { getJumpToMessageId, useAppParams, useJumpToMessage, useMessages, useNot
 import {
 	messagesActions,
 	selectDirectById,
+	selectFirstMessageId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
 	selectMessageIdsByChannelId,
 	selectOpenModalAttachment,
-	selectQuantitiesMessageRemain,
 	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
@@ -37,7 +37,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const appearanceTheme = useSelector(selectTheme);
 	const { idMessageNotifed } = useNotification();
-	const remain = useSelector(selectQuantitiesMessageRemain);
+	const firstMessageId = useSelector((state) => selectFirstMessageId(state, channelId));
 
 	const { messageId } = useAppParams();
 
@@ -62,7 +62,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
-	const { isFetching } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, channelId, messages });
+	const { isFetching } = useMessages({ chatRef, hasMoreMessage, loadMoreMessage, channelId, messages, firstMessageId });
 
 	useEffect(() => {
 		if (idMessageNotifed || idMessageNotifed === '') setMessageIdToJump(idMessageNotifed);
@@ -88,6 +88,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	const messagesView = useMemo(() => {
 		return messages.map((messageId) => {
+			if (firstMessageId === messageId) return null;
 			return (
 				<MemorizedChannelMessage
 					key={messageId}
@@ -105,20 +106,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		<div
 			className={`dark:bg-bgPrimary pb-5
 			bg-bgLightPrimary
-			relative h-full overflow-y-scroll
-			overflow-x-hidden flex-col flex
+      overflow-y-scroll
+			overflow-x-hidden h-full
 			${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			id="scrollLoading"
 			ref={chatRef}
 		>
-			{remain === 0 && <ChatWelcome type={type} name={channelLabel??`${currentDirect.creator_name}'s Group`} avatarDM={avatarDM} />}
-			{isFetching && remain !== 0 && (
-				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
-			)}
-			<MessageContextMenuProvider>
-				{messagesView}
-				{openModalAttachment && <MessageModalImage />}
-			</MessageContextMenuProvider>
+			<div className="flex flex-col min-h-full justify-end">
+				{firstMessageId && <ChatWelcome type={type} name={channelLabel ?? `${currentDirect.creator_name}'s Group`} avatarDM={avatarDM} />}
+				{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
+				<MessageContextMenuProvider>
+					{messagesView}
+					{openModalAttachment && <MessageModalImage />}
+				</MessageContextMenuProvider>
+			</div>
 		</div>
 	);
 }
