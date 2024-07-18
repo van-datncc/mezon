@@ -1,6 +1,7 @@
 import { useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import {
 	appActions,
+	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
 	selectCurrentChannelId,
@@ -214,6 +215,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
+	const dispatch = useDispatch();
 	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const newNotificationStatus = useSelector(selectNewNotificationStatus);
@@ -243,6 +245,8 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 
 	const handleShowInbox = () => {
 		setIsShowInbox(!isShowInbox);
+		localStorage.setItem('notiUnread', JSON.stringify([]));
+		dispatch(notificationActions.setStatusNoti());
 	};
 
 	useOnClickOutside(inboxRef, () => setIsShowInbox(false));
