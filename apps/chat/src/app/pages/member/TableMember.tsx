@@ -1,9 +1,9 @@
 import TableMemberHeader from './TableMemberHeader';
 import TableMemberItem from './TableMemberItem';
-import {useSelector} from 'react-redux';
-import {selectAllUsesClan} from '@mezon/store';
-import {getTimeDifferenceDate} from "@mezon/utils";
-import React, {useMemo} from "react";
+import { useSelector } from 'react-redux';
+import { selectAllUsesClan } from '@mezon/store';
+import { getTimeDifferenceDate } from "@mezon/utils";
+import React, { useMemo } from "react";
 
 interface ITableMemberProps {
   currentPage: number;
@@ -16,7 +16,7 @@ const TableMember: React.FC<ITableMemberProps> = ({currentPage, pageSize}) => {
     const start = (currentPage - 1) * pageSize;
     const end = Math.min(start + pageSize, usersClan.length);
     return usersClan.slice(start, end);
-  }, [currentPage, pageSize])
+  }, [currentPage, pageSize, usersClan])
   
   return (
     <div className="flex flex-col flex-1 min-h-[48px]">
@@ -27,7 +27,7 @@ const TableMember: React.FC<ITableMemberProps> = ({currentPage, pageSize}) => {
             key={user.id}
             username={user.user?.username ?? ''}
             avatar={user.user?.avatar_url ?? ''}
-            discordJoinTime={getTimeDifferenceDate (user.user?.create_time || '')}
+            mezonJoinTime={getTimeDifferenceDate (user.user?.create_time || '')}
             clanJoinTime={user.user?.join_time}
             userId={user.id}
             displayName={user.user?.display_name ?? ''}

@@ -1,7 +1,7 @@
-import {useSelector} from "react-redux";
-import {selectAllRolesClan, selectMemberByUserId, selectTheme} from "@mezon/store";
-import {useMemo} from "react";
-import {Tooltip} from "flowbite-react";
+import { useSelector } from "react-redux";
+import { selectAllRolesClan, selectMemberByUserId, selectTheme } from "@mezon/store";
+import { useMemo } from "react";
+import { Tooltip } from "flowbite-react";
 import RoleNameCard from "./RoleNameCard";
 
 type TableMemberItemProps = {
@@ -9,12 +9,11 @@ type TableMemberItemProps = {
   username: string;
   avatar: string;
   clanJoinTime?: string;
-  discordJoinTime?: string;
+  mezonJoinTime?: string;
   displayName: string;
 };
 
-const TableMemberItem = ({ userId, username, avatar, clanJoinTime, discordJoinTime, displayName }: TableMemberItemProps) => {
-  const userById = useSelector (selectMemberByUserId (userId ?? ''));
+const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime, displayName }: TableMemberItemProps) => {
   const RolesClan = useSelector (selectAllRolesClan);
   const appearanceTheme = useSelector (selectTheme);
   const userRolesClan = useMemo (() => {
@@ -25,7 +24,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, discordJoinTi
       }
       return false;
     });
-  }, [userById?.role_id, RolesClan]);
+  }, [userId, RolesClan]);
   
   return (
     <div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0">
@@ -42,7 +41,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, discordJoinTi
         <span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">{clanJoinTime ?? '-'}</span>
       </div>
       <div className="flex-1 p-1 text-center">
-        <span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">{discordJoinTime + ' ago' ?? '-'}</span>
+        <span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">{mezonJoinTime ? mezonJoinTime + ' ago' : '-'}</span>
       </div>
       <div className="flex-1 p-1 text-center">
         {userRolesClan?.length ?
@@ -54,8 +53,8 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, discordJoinTi
                   content={
                     <div className={'flex flex-col items-start'}>
                       {userRolesClan.slice(1).map ((role, id) => (
-                        <div className={'my-0.5'}>
-                          <RoleNameCard key={role.id} roleName={role.title || ''}/>
+                        <div className={'my-0.5'} key={role.id}>
+                          <RoleNameCard roleName={role.title || ''}/>
                         </div>
                       ))}
                     </div>
