@@ -10,7 +10,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		width: width,
 		paddingBottom: verticalScale(60),
 		paddingTop: verticalScale(20),
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.primary,
 	},
 	footerImagesModal: {
 		maxWidth: '70%',
@@ -21,7 +21,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		marginHorizontal: horizontalScale(5),
 		borderRadius: horizontalScale(5),
 		borderWidth: 1,
-		borderColor: Colors.tertiaryWeight,
+		borderColor: colors.primary,
 	},
 	imageFooterModalActive: {
 		width: horizontalScale(80),
@@ -47,11 +47,11 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontSize: size.medium,
 		marginRight: size.s_10,
 		fontWeight: '600',
-		color: Colors.white,
+		color: colors.textStrong,
 	},
 	dateMessageBox: {
 		fontSize: size.small,
-		color: Colors.gray72,
+		color: colors.text,
 	},
 	logoUser: {
 		width: '100%',

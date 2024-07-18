@@ -10,7 +10,6 @@ import {
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
-	ClansEntity,
 	UserClanProfileEntity,
 	channelsActions,
 	getStoreAsync,
@@ -25,7 +24,7 @@ import {
 	selectMessageByMessageId,
 	selectMessageEntityById,
 	selectUserClanProfileByClanID,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';

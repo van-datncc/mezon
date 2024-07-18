@@ -10,7 +10,7 @@ const TableMemberHeader = () => {
 				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">Member since</span>
 			</div>
 			<div className="flex-1 p-1 text-center">
-				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">Joined discord</span>
+				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">Joined Mezon</span>
 			</div>
 			<div className="flex-1 flex flex-row gap-1 p-1 justify-center cursor-pointer">
 				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase select-none">Roles</span>

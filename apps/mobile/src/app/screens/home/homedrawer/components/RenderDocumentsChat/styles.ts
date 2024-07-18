@@ -11,11 +11,11 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			borderRadius: size.s_6,
 			flexDirection: 'row',
-			backgroundColor: Colors.bgPrimary,
+			backgroundColor: colors.primary,
 		},
 		fileName: {
 			fontSize: size.small,
-			color: Colors.white,
+			color: colors.text,
 		},
 		typeFile: {
 			fontSize: size.small,
