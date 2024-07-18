@@ -15,7 +15,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
   const currentChannel = useSelector(selectCurrentChannel);
   const refOpt = useRef<HTMLDivElement>(null);
 
-  const checkHiddenIconThread = !currentChannel || Snowflake.isValid(currentChannel?.parrent_id ?? '');
+  const checkHiddenIconThread = !currentChannel || Snowflake.isValid(currentChannel.parrent_id ?? '');
 
   const replyMenu = useMenuReplyMenuBuilder(message);
   const editMenu = useEditMenuBuilder(message);
