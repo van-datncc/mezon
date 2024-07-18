@@ -1,8 +1,8 @@
 import { TouchableOpacity, TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
-import { ArrowLeftIcon, SearchIcon } from '@mezon/mobile-components';
-import { Block, Colors, Fonts, size } from '@mezon/mobile-ui';
+import { Icons } from '@mezon/mobile-components';
+import { Block, Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
 import { debounce } from 'lodash';
@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import EmojiSelector from './EmojiSelector';
 import GifSelector from './GifSelector';
 import StickerSelector from './StickerSelector';
-import styles from './styles';
+import { style } from './styles';
 
 export type IProps = {
 	onDone: () => void;
@@ -28,6 +28,8 @@ interface TextTabProps {
 	onPress: () => void;
 }
 function TextTab({ selected, title, onPress }: TextTabProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return (
 		<View style={{ flex: 1 }}>
 			<TouchableOpacity onPress={onPress} style={{ backgroundColor: selected ? Colors.bgViolet : 'transparent', ...styles.selected }}>
@@ -40,6 +42,8 @@ function TextTab({ selected, title, onPress }: TextTabProps) {
 type ExpressionType = 'emoji' | 'gif' | 'sticker';
 
 function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDirectMessage = useSelector(selectDmGroupCurrent(directMessageId)); //Note: prioritize DM first
 	const { valueInputToCheckHandleSearch, setValueInputSearch } = useGifsStickersEmoji();
@@ -134,13 +138,13 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 									setValueInputSearch('');
 								}}
 							>
-								<ArrowLeftIcon />
+								<Icons.ArrowLargeLeftIcon height={20} width={20} color={themeValue.text} />
 							</TouchableOpacity>
 						)}
 
 						<View style={styles.textInputWrapper}>
-							<SearchIcon height={18} width={18} />
-							<TextInput style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} />
+							<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
+							<TextInput placeholder='search' placeholderTextColor={themeValue.text} style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} />
 						</View>
 					</Block>
 				)}
