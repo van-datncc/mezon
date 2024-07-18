@@ -1,4 +1,4 @@
-import { Attributes, Colors, Fonts, Metrics } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, Fonts, Metrics } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -39,7 +39,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		title: {
-			color: colors.textStrong,
+			color: baseColor.white,
 			fontSize: Fonts.size.h8,
 		},
 	});

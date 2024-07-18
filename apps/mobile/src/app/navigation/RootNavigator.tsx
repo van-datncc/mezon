@@ -13,18 +13,19 @@ import {
 	notificationActions,
 	selectCurrentClanId,
 	selectHasInternetMobile,
+	selectIsFromFCMMobile,
 	selectIsLogin,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ChatContextProvider } from '@mezon/core';
+import { ChatContext, ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
@@ -54,9 +55,11 @@ const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
 	const { reconnect } = useMezon();
+	const { setCallbackEventFn } = useContext(ChatContext);
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 
 	useEffect(() => {
 		let timer;
@@ -82,14 +85,32 @@ const NavigationMain = () => {
 			clearTimeout(timer);
 		};
 	}, []);
-	
-	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
+	useEffect(() => {
+		let timeout;
+		const appStateSubscription = AppState.addEventListener('change', (state) => {
+			timeout = delay(handleAppStateChange, 200, state);
+		});
+		return () => {
+			appStateSubscription.remove();
+			timeout && clearTimeout(timeout);
+		};
+	}, [currentClanId, isFromFcmMobile]);
+
+	useEffect(() => {
+		const appStateSubscription = AppState.addEventListener('change', async (state) => {
+			if (state === 'active') {
+				await notifee.cancelAllNotifications();
+			}
+			if (state === 'background') {
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, 'false');
+				dispatch(appActions.setLoadingMainMobile(false));
+			}
+		});
 		return () => {
 			appStateSubscription.remove();
 		};
-	}, [currentClanId]);
+	}, []);
 
 	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
@@ -103,13 +124,34 @@ const NavigationMain = () => {
 	};
 
 	const handleAppStateChange = async (state: string) => {
+		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		if (state === 'active') {
-			await reconnect(currentClanId);
-			await notifee.cancelAllNotifications();
+			if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
+				return;
+			}
+			const socket = await reconnect(currentClanId, true);
+			if (socket) setCallbackEventFn(socket);
 		}
-		if (state === 'background') {
-			await remove(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-			dispatch(appActions.setLoadingMainMobile(false));
+	};
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			onClanChangeFromFCM();
+		}, 200);
+
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [currentClanId, isFromFcmMobile]);
+
+	const onClanChangeFromFCM = async () => {
+		if (currentClanId) {
+			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+			if (isFromFCM?.toString() === 'true' && isFromFcmMobile) {
+				const socket = await reconnect(currentClanId, true);
+				if (socket) setCallbackEventFn(socket);
+				return;
+			}
 		}
 	};
 

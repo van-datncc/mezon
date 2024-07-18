@@ -305,8 +305,8 @@ export interface NotificationContent {
 	persistent?: boolean;
 	sender_id: string;
 	update_time?: { seconds: number };
-	user_id_one?: string;
-	user_id_two?: string;
+	clan_logo?: string;
+	category_name?: string;
 	username?: string;
 }
 
@@ -459,7 +459,7 @@ export type ILineMention = {
 export type IMessageLine = {
 	mentions: ILineMention[];
 	isOnlyEmoji: boolean;
-	imageLinks: ILineMention[];
+	links: ILineMention[];
 };
 
 export interface UsersClanEntity extends IUsersClan {
@@ -550,4 +550,18 @@ export enum MouseButton {
 	LEFT = 0,
 	MIDDLE = 1,
 	RIGHT = 2,
+}
+
+export enum NotificationCode {
+	DM_REQUEST = -1,
+	FRIEND_REQUEST = -2,
+	FRIEND_ACCEPT = -3,
+	GROUP_ADD = -4,
+	GROUP_JOIN_REQUEST = -5,
+	FRIEND_JOIN_GAME = -6,
+	SINGLE_SOCKET = -7,
+	USER_BANNED = -8,
+	USER_MENTIONED = -9,
+	USER_REACTIONED = -10,
+	USER_REPLIED = -11,
 }

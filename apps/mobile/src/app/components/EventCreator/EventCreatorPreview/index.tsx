@@ -70,6 +70,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 						description: description,
 						channel_id: channelId,
 					}}
+					showActions={false}
 				/>
 
 				<View style={styles.headerSection}>
