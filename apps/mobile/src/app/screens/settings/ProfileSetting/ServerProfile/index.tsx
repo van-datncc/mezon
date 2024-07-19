@@ -140,7 +140,7 @@ export default function ServerProfile({
 	};
 
 	const filteredClanList = useMemo(() => {
-		return clans.filter((it) => normalizeString(it?.clan_name).includes(normalizeString(searchClanText)));
+		return clans?.filter((it) => normalizeString(it?.clan_name)?.includes(normalizeString(searchClanText)));
 	}, [searchClanText, clans]);
 	return (
 		<View style={{ width: Dimensions.get('screen').width }}>
