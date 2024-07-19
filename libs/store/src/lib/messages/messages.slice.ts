@@ -174,7 +174,12 @@ export const fetchMessages = createAsyncThunk(
 			return [];
 		}
 
-		const messages = response.messages.map((item) => mapMessageChannelToEntity(item, response.last_seen_message?.id));
+		const messages = response.messages.map((item) => {
+			if (item.code === EMessageCode.FIRST_MESSAGE) {
+				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: item.id }));
+			}
+			return mapMessageChannelToEntity(item, response.last_seen_message?.id);
+		});
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 
@@ -183,11 +188,6 @@ export const fetchMessages = createAsyncThunk(
 			thunkAPI.dispatch(
 				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }),
 			);
-			messages.forEach((message) => {
-				if (message.code === EMessageCode.FIRST_MESSAGE) {
-					thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: message.id }));
-				}
-			});
 		}
 
 		if (response.last_seen_message?.id) {

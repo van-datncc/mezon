@@ -46,7 +46,7 @@ const EmptyPinMessage = ({ onClick }: EmptyPinMessageProps) => {
 				}),
 			);
 		}
-	}, []);
+	}, [listPinMessages]);
 
 	return (
 		<div>

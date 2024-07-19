@@ -2,7 +2,6 @@ import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mez
 import { getJumpToMessageId, useAppParams, useJumpToMessage, useMessages, useNotification } from '@mezon/core';
 import {
 	messagesActions,
-	selectDirectById,
 	selectFirstMessageId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageRefReply,
@@ -22,17 +21,17 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
+	userName?: string;
 };
 
-export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
-	const currentDirect = useSelector(selectDirectById(channelId));
+export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement>(null);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
-	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '' });
+	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '', clanId: '' });
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const appearanceTheme = useSelector(selectTheme);
@@ -113,7 +112,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			ref={chatRef}
 		>
 			<div className="flex flex-col min-h-full justify-end">
-				{firstMessageId && <ChatWelcome type={type} name={channelLabel ?? `${currentDirect.creator_name}'s Group`} avatarDM={avatarDM} />}
+				{firstMessageId && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} userName={userName} />}
 				{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
 				<MessageContextMenuProvider>
 					{messagesView}
