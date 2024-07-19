@@ -3,8 +3,9 @@ import {
 	referencesActions,
 	selectCloseMenu,
 	selectCurrentChannel,
-	selectCurrentClanId,
 	selectIsUnreadChannelById,
+	selectLastChannelTimestamp,
+	selectNotificationMentionCountByChannelId,
 	useAppDispatch,
 } from '@mezon/store';
 import { IChannel, MouseButton } from '@mezon/utils';
@@ -24,11 +25,12 @@ type ThreadLinkProps = {
 
 const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const dispatch = useAppDispatch();
+	const lastThreadTimestamp = useSelector(selectLastChannelTimestamp(thread.id));
 
 	const { toChannelPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
+	const numberNotification = useSelector(selectNotificationMentionCountByChannelId(thread.id, lastThreadTimestamp));
 	const currentChanel = useSelector(selectCurrentChannel);
-	const clanId = useSelector(selectCurrentClanId);
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const { setIsShowCreateThread } = useThreads();
@@ -132,6 +134,11 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 					/>
 				)}
 			</Link>
+			{numberNotification !== 0 && (
+				<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs font-medium">
+					{numberNotification}
+				</div>
+			)}
 		</div>
 	);
 };

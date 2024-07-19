@@ -26,7 +26,7 @@ function NotificationItem({ notify }: NotifyProps) {
 		return notify.content.channel_id;
 	}, [notify.content.channel_id]);
 
-	const { directToMessageById } = useJumpToMessage({ channelId, messageID });
+	const { directToMessageById } = useJumpToMessage({ channelId, messageID, clanId: '' });
 
 	return (
 		<div className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton py-3 px-3 w-full cursor-pointer">

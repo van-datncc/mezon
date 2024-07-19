@@ -90,15 +90,15 @@ const ModalUserProfile = ({
 
 	useEffect(() => {
 		const getColor = async () => {
-			if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
-				const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
+			if ((isFooterProfile && checkUrl(userProfile?.user?.avatar_url)) || checkUrl(message?.avatar) || checkUrl(userById?.user?.avatar_url)) {
+				const url = (isFooterProfile && userProfile?.user?.avatar_url) || message?.avatar || userById?.user?.avatar_url;
 				const colorImg = await getColorAverageFromURL(url || '');
 				if (colorImg) setColor(colorImg);
 			}
 		};
 
 		getColor();
-	}, [userProfile?.user?.avatar_url, userById?.user?.avatar_url, isFooterProfile, userID]);
+	}, [userProfile?.user?.avatar_url, isFooterProfile, userID, message?.avatar, userById?.user?.avatar_url]);
 
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
@@ -127,10 +127,11 @@ const ModalUserProfile = ({
 				)}
 			</div>
 			<AvatarProfile
-				avatar={isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url}
-				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
+				avatar={(isFooterProfile && userProfile?.user?.avatar_url) || message?.avatar || userById?.user?.avatar_url}
+				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={userCustomStatus}
+				isAnonymous={checkAnonymous}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
@@ -169,11 +170,11 @@ const ModalUserProfile = ({
 							<input
 								type="text"
 								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgDisable bg-bgLightModeSecond p-[5px] "
-								placeholder={`Message @${userById?.user?.username}`}
+								placeholder={`Message @${message?.username || userById?.user?.username}`}
 								value={content}
 								onKeyPress={(e) => {
 									if (e.key === 'Enter') {
-										sendMessage(userById?.user?.id || '');
+										sendMessage(message?.sender_id || userById?.user?.id || '');
 									}
 								}}
 								onChange={handleContent}
