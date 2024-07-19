@@ -19,9 +19,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		maxWidth: '70%'
 	},
 	dmLabel: {
-		color: Colors.white,
+		color: colors.textStrong,
 		fontSize: size.h5,
-    fontWeight: '700',
+		fontWeight: '700',
 		paddingHorizontal: size.s_18,
 		textAlign: 'center'
 	},

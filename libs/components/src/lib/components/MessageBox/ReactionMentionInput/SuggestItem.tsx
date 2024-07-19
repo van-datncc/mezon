@@ -1,9 +1,10 @@
 import { useEmojiSuggestion } from '@mezon/core';
-import { ChannelsEntity, selectAllChannels, selectMembersVoiceChannel } from '@mezon/store';
+import { selectAllChannels, selectAllDirectChannelVoids, selectMembersVoiceChannel } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { Icons } from '../../../components';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
@@ -23,7 +24,9 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	const { emojis } = useEmojiSuggestion();
 	const urlEmoji = getSrcEmoji(name, emojis);
 	const allChannels = useSelector(selectAllChannels);
-	const [specificChannel, setSpecificChannel] = useState<ChannelsEntity | null>(null);
+	const { directId } = useParams();
+	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
+	const [specificChannel, setSpecificChannel] = useState<any>(null);
 	const membersVoice = useSelector(selectMembersVoiceChannel);
 	const checkVoiceStatus = useMemo(() => {
 		if (channelId !== undefined && membersVoice[channelId] && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -33,11 +36,19 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	}, [channelId, membersVoice, specificChannel?.type]);
 
 	useEffect(() => {
-		allChannels.map((channel) => {
-			if (channel.channel_id === channelId) {
-				setSpecificChannel(channel);
-			}
-		});
+		if (directId) {
+			commonChannelVoids.map((channel) => {
+				if (channel.channel_id === channelId) {
+					setSpecificChannel(channel);
+				}
+			})
+		} else {
+			allChannels.map((channel) => {
+				if (channel.channel_id === channelId) {
+					setSpecificChannel(channel);
+				}
+			});
+		}
 	}, []);
 
 	const highlightMatch = (name: string, getUserName: string) => {
@@ -60,7 +71,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	return (
 		<div className="flex flex-row items-center justify-between h-[24px]">
 			<div className="flex flex-row items-center gap-2 py-[3px]">
-				{showAvatar && <AvatarImage alt="user avatar" userName={name} src={avatarUrl} className="size-4" />}
+				{showAvatar && <AvatarImage alt="user avatar" userName={name} src={avatarUrl} className="size-4" classNameText='text-[9px] min-w-5 min-h-5 pt-[3px]'/>}
 				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />}
 				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 					<Icons.Hashtag defaultSize="w-5 h-5" />
@@ -68,7 +79,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 					<Icons.HashtagLocked defaultSize="w-5 h-5 " />
 				)}
-				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+				{(!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE)&& (
 					<Icons.Speaker defaultSize="w-5 5-5" />
 				)}
 				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (

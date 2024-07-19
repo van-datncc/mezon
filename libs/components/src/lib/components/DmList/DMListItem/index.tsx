@@ -1,6 +1,7 @@
 import { useAppNavigation, useAppParams, useMemberStatus, useMenu } from '@mezon/core';
 import { directActions, selectCloseMenu, selectIsUnreadDMById, useAppDispatch } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -77,11 +78,12 @@ function DMListItem({ directMessage }: DirectMessProp) {
 		>
 			<MemberProfile
 				avatar={
-					Array.isArray(directMessage?.channel_avatar) && directMessage?.channel_avatar?.length !== 1
+					Number(directMessage.type) === ChannelType.CHANNEL_TYPE_GROUP
 						? 'assets/images/avatar-group.png'
 						: directMessage?.channel_avatar?.at(0) ?? ''
 				}
 				name={directMessage?.channel_label ?? ''}
+				userNameAva={directMessage?.usernames}
 				status={userStatus}
 				isHideStatus={true}
 				isHideIconStatus={false}
@@ -90,7 +92,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 				directMessageValue={directMessageValue}
 				isHideAnimation={true}
 				positionType={MemberProfileType.DM_LIST}
-				countMember={directMessage?.channel_avatar?.length + 1}
+				countMember={(directMessage?.user_id?.length || 0) +1}
 			/>
 			{isHovered && (
 				<button

@@ -1,4 +1,4 @@
-import { Colors, Fonts, useTheme } from '@mezon/mobile-ui';
+import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import ChannelSetting from '../../../components/ChannelSetting';
@@ -18,9 +18,9 @@ export function MenuChannelStacks({ }: any) {
 				gestureEnabled: true,
 				gestureDirection: 'horizontal',
 				headerTitleAlign: 'center',
-				headerTintColor: Colors.white,
+				headerTintColor: themeValue.text,
 				headerStyle: {
-					backgroundColor: Colors.primary,
+					backgroundColor: themeValue.secondary,
 				},
 				headerTitleStyle: {
 					fontSize: Fonts.size.h6,

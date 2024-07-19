@@ -9,7 +9,7 @@ import {
 	selectOpenModalAttachment,
 	selectQuantitiesMessageRemain,
 	selectTheme,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,16 +21,17 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
+	userName?: string;
 };
 
-export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
+export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement>(null);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const [messageid, setMessageIdToJump] = useState(getJumpToMessageId());
 	const [timeToJump, setTimeToJump] = useState(1000);
 	const [positionToJump, setPositionToJump] = useState<ScrollLogicalPosition>('center');
-	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '' });
+	const { jumpToMessage } = useJumpToMessage({ channelId: '', messageID: '', clanId: '' });
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const appearanceTheme = useSelector(selectTheme);
@@ -109,7 +110,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			id="scrollLoading"
 			ref={chatRef}
 		>
-			{remain === 0 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} />}
+			{remain <= 15 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} userName={userName}/>}
 			{isFetching && remain !== 0 && (
 				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
 			)}

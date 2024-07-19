@@ -1,4 +1,4 @@
-import { useAuth, useFriends } from '@mezon/core';
+import { useAppParams, useAuth, useChannelMembersActions, useFriends } from '@mezon/core';
 import { selectCurrentChannel, selectDmGroupCurrent, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -19,16 +19,18 @@ type PanelMemberProps = {
 	onRemoveMember?: () => void;
 	directMessageValue?: directMessageValueProps;
 	name?: string;
-	isMemberDMGroup: boolean;
+	isMemberDMGroup?: boolean;
+	isMemberChannel?: boolean;
 	dataMemberCreate?: DataMemberCreate;
 };
 
-const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, dataMemberCreate }: PanelMemberProps) => {
+const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, isMemberChannel, dataMemberCreate }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
-
+	const { removeMemberChannel } = useChannelMembersActions();
+	const { directId } = useAppParams();
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
@@ -39,6 +41,14 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const handleRemoveMember = () => {
 		onRemoveMember?.();
 	};
+
+	const handleRemoveMemberChannel = async () => {
+		if (member) {
+			const userIds = [member?.user?.id ?? ''];
+			await removeMemberChannel({ channelId: directId || "", userIds });
+		}
+	};
+
 
 	const checkAddFriend = useSelector(selectFriendStatus(directMessageValue ? directMessageValue?.userId[0] : member?.user?.id || ''));
 	const checkCreateUser = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
@@ -97,7 +107,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 					</GroupPanelMember>
 					{isMemberDMGroup && !checkUser && dataMemberCreate?.createId === userProfile?.user?.id && (
 						<GroupPanelMember>
-							<ItemPanelMember children="Remove From Group" danger />
+							<ItemPanelMember children="Remove From Group" onClick={handleRemoveMemberChannel} danger  />
 							<ItemPanelMember children="Make Group Owner" danger />
 						</GroupPanelMember>
 					)}
@@ -206,7 +216,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{(checkCreateUser && !checkUser) && (
+					{(checkCreateUser && !checkUser && isMemberChannel) && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
