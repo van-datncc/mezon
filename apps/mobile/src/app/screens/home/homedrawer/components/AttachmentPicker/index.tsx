@@ -1,14 +1,17 @@
 import { useReference } from '@mezon/core';
 import { Icons, load, save, STORAGE_KEY_TEMPORARY_ATTACHMENT } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { appActions } from '@mezon/store';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
+import { delay } from 'lodash';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import Toast from 'react-native-toast-message';
+import { useDispatch } from 'react-redux';
 import Gallery, { IFile } from './Gallery';
 import { style } from './styles';
 
@@ -25,7 +28,15 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const { t } = useTranslation(['message']);
 	const { sessionRef, clientRef } = useMezon();
 	const { setAttachmentData } = useReference();
+	const timeRef = useRef<any>();
+	const dispatch = useDispatch();
 
+	useEffect(() => {
+		return () => {
+			timeRef?.current && clearTimeout(timeRef.current);
+		};
+	}, []);
+	
 	const getAllCachedAttachment = async () => {
 		const allCachedMessage = await load(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 		return allCachedMessage;
@@ -44,6 +55,9 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 
 	const onPickFiles = async () => {
 		try {
+			timeRef.current = delay(() => {
+				dispatch(appActions.setIsFromFCMMobile(true));
+			}, 500);
 			const res = await DocumentPicker.pick({
 				type: [DocumentPicker.types.allFiles],
 			});
@@ -64,9 +78,14 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				size: file?.size?.toString(),
 				fileData,
 			};
-
+			timeRef.current = delay(() => {
+				dispatch(appActions.setIsFromFCMMobile(false));
+			}, 2000);
 			handleFiles([fileFormat]);
 		} catch (err) {
+			timeRef.current = delay(() => {
+				dispatch(appActions.setIsFromFCMMobile(false));
+			}, 2000);
 			if (DocumentPicker.isCancel(err)) {
 				onCancel?.();
 				// User cancelled the picker
