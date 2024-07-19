@@ -29,6 +29,21 @@ const typeChannel = {
 	voice: 4,
 };
 
+export const notificationTypesList = [
+  {
+    label: 'All',
+    value: NotificationType.ALL_MESSAGE
+  },
+  {
+    label: 'Only @mention',
+    value: NotificationType.MENTION_MESSAGE
+  },
+  {
+    label: 'Nothing',
+    value: NotificationType.NOTHING_MESSAGE
+  },
+]
+
 const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel }: PanelChannel) => {
   const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
   const dispatch = useAppDispatch();
@@ -42,20 +57,6 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
   const [defaultNotifiName, setDefaultNotifiName] = useState('');
   const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
   const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
-  const notificationTypesList = [
-    {
-      label: 'All',
-      value: NotificationType.ALL_MESSAGE
-    },
-    {
-      label: 'Only @mention',
-      value: NotificationType.MENTION_MESSAGE
-    },
-    {
-      label: 'Nothing',
-      value: NotificationType.NOTHING_MESSAGE
-    },
-  ]
   
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -98,6 +99,19 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
       active: active,
     };
     dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+  };
+  
+  const setNotification = (notificationType: string | undefined) => {
+    if(notificationType) {
+      const body = {
+        channel_id: currentChannelId || '',
+        notification_type: notificationType || '',
+        clan_id: currentClanId || '',
+      };
+      dispatch(notificationSettingActions.setNotificationSetting(body));
+    } else {
+      dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: currentChannelId || '', clan_id: currentClanId || '' }));
+    }
   };
 
 	useEffect(() => {
@@ -212,8 +226,9 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
                   type="radio"
                   name="NotificationSetting"
                   defaultNotifi={true}
-                  notifiSelected={getNotificationChannelSelected?.notification_setting_type === undefined}
+                  defaultChecked={getNotificationChannelSelected?.notification_setting_type === undefined}
                   defaultNotifiName={defaultNotifiName}
+                  onClickRadio={() => setNotification('')}
                 />
                 {notificationTypesList.map(notification => (
                   <ItemPanel
@@ -222,7 +237,8 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
                     type="radio"
                     name="NotificationSetting"
                     key={notification.value}
-                    notifiSelected={getNotificationChannelSelected?.notification_setting_type === notification.value}
+                    defaultChecked={getNotificationChannelSelected?.notification_setting_type === notification.value}
+                    onClickRadio={() => setNotification(notification.value)}
                   />
                 ))}
 							</Dropdown>

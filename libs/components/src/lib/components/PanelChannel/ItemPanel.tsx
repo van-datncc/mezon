@@ -11,29 +11,21 @@ type ItemPanelProps = {
 	onClick?: () => void;
   notificationId?: string;
   defaultNotifi?: boolean;
-  notifiSelected?: boolean;
+  defaultChecked?: boolean;
   name?: string;
   muteTime?: string;
   defaultNotifiName?: string;
+  onClickCheckbox?: (params: boolean) => void;
+  onClickRadio?: (params: any) => void;
 };
 
-const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, defaultNotifi, notifiSelected, name, muteTime, defaultNotifiName }: ItemPanelProps) => {
-  const currentChannelId = useSelector(selectCurrentChannelId);
-  const currentClanId = useSelector(selectCurrentClanId);
-  const dispatch = useAppDispatch();
-  
-  const setNotification = () => {
-    if (defaultNotifi) {
-      dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: currentChannelId || '', clan_id: currentClanId || '' }));
-    } else {
-      const body = {
-        channel_id: currentChannelId || '',
-        notification_type: notificationId || '',
-        clan_id: currentClanId || '',
-      };
-      dispatch(notificationSettingActions.setNotificationSetting(body));
+const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, defaultNotifi, defaultChecked, name, muteTime, defaultNotifiName, onClickCheckbox, onClickRadio }: ItemPanelProps) => {
+  const handleOnClickCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+    if(onClickCheckbox) {
+      onClickCheckbox(isChecked)
     }
-  };
+  }
   
 	return (
 		<button
@@ -47,8 +39,8 @@ const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, 
           {children}
         </li>
         {dropdown && <Icons.RightIcon defaultFill="#fff" />}
-        {type === 'checkbox' && <Checkbox id="accept" defaultChecked />}
-        {type === 'radio' && <Radio className="" name={name} value="change here" onClick={setNotification} defaultChecked={notifiSelected}/>}
+        {type === 'checkbox' && <Checkbox id="accept" defaultChecked={defaultChecked} onChange={handleOnClickCheckbox}/>}
+        {type === 'radio' && <Radio className="" name={name} value="change here" onClick={onClickRadio} defaultChecked={defaultChecked}/>}
       </div>
       {defaultNotifi && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{defaultNotifiName}</div>}
       {muteTime != '' && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{muteTime}</div>}
