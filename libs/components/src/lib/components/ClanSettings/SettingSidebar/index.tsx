@@ -35,9 +35,9 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
     <div className="flex flex-row flex-1 justify-end">
       <div className="w-[220px] py-[60px] pl-5 pr-[6px]">
         <p className="text-[#84ADFF] pl-[10px] pb-[6px] font-bold text-sm tracking-wider uppercase truncate">{currentClan?.clan_name}</p>
-        {sideBarListItem.map((item) => (
-          <div className='mt-[20px] relative before:absolute before:content-[""] before:left-[10px] before:w-[calc(100%_-_10px)] before:h-[1px] before:bg-black before:top-[-10px]'>
-            {item.title && <p className='select-none font-bold px-[10px] text-sm uppercase dark:text-textPrimary text-buttonProfile'>{item.title}</p>}
+        {sideBarListItem.map((item, index) => (
+          <div className={`${index !== 0 && 'mt-[20px] relative before:absolute before:content-[""] before:left-[10px] before:w-[calc(100%_-_20px)] before:h-[1px] before:bg-black before:top-[-10px]'}`}>
+            {item.title && <p className='select-none font-semibold px-[10px] py-[4px] text-sm uppercase dark:text-[#949ba4] text-[#5c5e66]'>{item.title}</p>}
             {
               item.listItem.map((setting) => (
                 <SettingItem

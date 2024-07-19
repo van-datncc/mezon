@@ -10,6 +10,7 @@ type SettingEmojiItemProp = {
 const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
   const [showEdit, setShowEdit] = useState<boolean>(false);
+  const [focus, setFocus] = useState<boolean>(false);
   const dispatch = useAppDispatch()
 
   const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
@@ -33,14 +34,17 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
     dispatch(settingClanEmojiActions.deleteEmoji(emoji));
   }
   const handleOnMouseLeave = () => {
-    setNameEmoji(emoji.shortname ?? '');
-    setShowEdit(false);
+    if (!focus) {
+      setNameEmoji(emoji.shortname ?? '');
+      setShowEdit(false);
+    }
   }
   return (
     <div
       className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'}
       onMouseEnter={() => setShowEdit(true)}
       onMouseLeave={handleOnMouseLeave}
+      onBlur={handleOnMouseLeave}
     >
       <div className="w-full h-full flex flex-row shadow-emoji_item dark:shadow-emoji_item_dark items-center">
 
@@ -64,6 +68,8 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
               value={nameEmoji}
               onChange={(e) => handleChangeEmojiName(e)}
               onKeyDown={(e) => { e.key === 'Enter' && handleUpdateEmoji() }}
+              onFocus={() => setFocus(true)}
+              onBlurCapture={() => setFocus(false)}
             />
           }
         </div>
