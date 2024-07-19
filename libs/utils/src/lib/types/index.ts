@@ -108,6 +108,7 @@ export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
 	description?: string;
+	usernames?: string;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -565,3 +566,5 @@ export enum NotificationCode {
 	USER_REACTIONED = -10,
 	USER_REPLIED = -11,
 }
+
+export const IdUserAnonymous = '1767478432163172999';

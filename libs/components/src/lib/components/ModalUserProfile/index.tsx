@@ -1,6 +1,6 @@
 import { useAppNavigation, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import { selectAllAccount, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
+import { IdUserAnonymous, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -90,7 +90,7 @@ const ModalUserProfile = ({
 
 	useEffect(() => {
 		const getColor = async () => {
-			if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
+			if (isFooterProfile ? checkUrl(userProfile?.user?.avatar_url) : checkUrl(userById?.user?.avatar_url)) {
 				const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
 				const colorImg = await getColorAverageFromURL(url || '');
 				if (colorImg) setColor(colorImg);
@@ -102,7 +102,7 @@ const ModalUserProfile = ({
 
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
-	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === IdUserAnonymous, [message?.sender_id]);
 
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab } = useSettingFooter();
 	const openSetting = () => {
@@ -131,6 +131,7 @@ const ModalUserProfile = ({
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={userCustomStatus}
+				isAnonymous={checkAnonymous}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
