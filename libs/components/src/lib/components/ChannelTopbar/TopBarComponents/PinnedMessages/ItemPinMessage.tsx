@@ -16,7 +16,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	return (
 		<div
 			key={pinMessage.id}
-			className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgSecondary hover:bg-bgLightModeThird bg-bgLightMode dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded"
+			className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgSecondary hover:bg-bgLightModeThird bg-bgLightMode dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden"
 		>
 			<div className="flex items-center gap-2">
 				<MemberProfile
