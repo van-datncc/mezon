@@ -1,5 +1,5 @@
 import { Icons, PlayIcon } from '@mezon/mobile-components';
-import { size, useTheme, verticalScale } from '@mezon/mobile-ui';
+import { baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React from 'react';
 import { ActivityIndicator, Image, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -38,7 +38,7 @@ const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
 								activeOpacity={0.8}
 								onPress={() => onRemove(attachment.url ?? '', attachment?.filename || '')}
 							>
-								<Icons.CloseSmallBoldIcon width={size.s_18} height={size.s_18} color={themeValue.textStrong} />
+								<Icons.CloseSmallBoldIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
 							</TouchableOpacity>
 						)}
 						{(isVideo || !isUploaded) && (

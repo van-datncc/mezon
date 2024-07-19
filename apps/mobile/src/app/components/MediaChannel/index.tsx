@@ -1,4 +1,4 @@
-import { Colors, Metrics, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectAttachmentPhoto } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -6,11 +6,13 @@ import { Platform, ScrollView, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../ImageListModal';
-import styles from './MediaChannel.styles';
-import MediaItem from './MediaItem';
 import EmptyMedia from './EmptyMedia';
+import { style } from './MediaChannel.styles';
+import MediaItem from './MediaItem';
 
 const MediaChannel = () => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const attachments = useSelector(selectAttachmentPhoto());
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);

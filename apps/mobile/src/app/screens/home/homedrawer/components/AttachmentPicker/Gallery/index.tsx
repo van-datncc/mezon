@@ -1,26 +1,16 @@
 import { useReference } from '@mezon/core';
-import { CameraIcon, CheckIcon, PlayIcon, save, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
+import { CameraIcon, CheckIcon, load, PlayIcon, save, STORAGE_KEY_TEMPORARY_ATTACHMENT } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { appActions, selectCurrentChannelId } from '@mezon/store';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { delay } from 'lodash';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {
-	Alert,
-	FlatList,
-	Image,
-	Linking,
-	PermissionsAndroid,
-	Platform,
-	Text,
-	TouchableOpacity,
-	View
-} from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
-import { styles } from './styles';
-import {appActions} from "@mezon/store";
-import {useDispatch} from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
+import { style } from './styles';
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
 }
@@ -33,13 +23,43 @@ export interface IFile {
 	fileData: any;
 }
 const Gallery = ({ onPickGallery }: IProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const [photos, setPhotos] = useState([]);
 	const [pageInfo, setPageInfo] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
-	
+
+	const currentChannelId = useSelector(selectCurrentChannelId)
+
+	const getAllCachedAttachment = async () => {
+		const allCachedMessage = await load(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+		return allCachedMessage;
+	};
+
+	const pushAttachmentToCache = async (attachment: any) => {
+		const allCachedAttachment = (await getAllCachedAttachment()) || {};
+
+		if (Array.isArray(attachment)) {
+			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+				...allCachedAttachment,
+				[currentChannelId]: attachment,
+			});
+		} else {
+			const currentAttachment = allCachedAttachment[currentChannelId] || [];
+			currentAttachment.push(attachment);
+
+			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+				...allCachedAttachment,
+				[currentChannelId]: currentAttachment,
+			});
+		}
+	};
+
+
+
 	const attachmentsFileName = useMemo(() => {
 		if (!attachmentDataRef?.length) return [];
 		return attachmentDataRef.map((attachment) => attachment.filename);
@@ -47,10 +67,10 @@ const Gallery = ({ onPickGallery }: IProps) => {
 
 	useEffect(() => {
 		checkAndRequestPermissions();
-		
+
 		return () => {
 			timerRef?.current && clearTimeout(timerRef.current);
-		}
+		};
 	}, []);
 
 	const checkAndRequestPermissions = async () => {
@@ -62,9 +82,24 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		}
 	};
 
+	const getCheckPermissionPromise = () => {
+		if (Number(Platform.Version) >= 33) {
+			return Promise.all([
+				PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES),
+				PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO),
+			]).then(([hasReadMediaImagesPermission, hasReadMediaVideoPermission]) => hasReadMediaImagesPermission && hasReadMediaVideoPermission);
+		} else {
+			return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+		}
+	};
+
 	const requestPermission = async () => {
 		if (Platform.OS === 'android') {
 			dispatch(appActions.setIsFromFCMMobile(true));
+			const hasPermission = await getCheckPermissionPromise();
+			if (hasPermission) {
+				return true;
+			}
 			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
 			timerRef.current = delay(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
 			if (granted === 'never_ask_again') {
@@ -79,9 +114,9 @@ const Gallery = ({ onPickGallery }: IProps) => {
 							openAppSettings();
 						},
 					},
-				])
+				]);
 			}
-			
+
 			return granted === PermissionsAndroid.RESULTS.GRANTED;
 		} else if (Platform.OS === 'ios') {
 			dispatch(appActions.setIsFromFCMMobile(true));
@@ -95,7 +130,7 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		}
 		return false;
 	};
-	
+
 	const openAppSettings = () => {
 		if (Platform.OS === 'ios') {
 			Linking.openURL('app-settings:');
@@ -133,13 +168,14 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		});
 
 		setAttachmentData(removedAttachment);
+		pushAttachmentToCache(removedAttachment)
 	}
 
 	const renderItem = ({ item }) => {
 		if (item?.isUseCamera) {
 			return (
 				<TouchableOpacity style={styles.cameraPicker} onPress={onOpenCamera}>
-					<CameraIcon color={Colors.textGray} width={size.s_24} height={size.s_24} />
+					<CameraIcon color={themeValue.text} width={size.s_24} height={size.s_24} />
 				</TouchableOpacity>
 			);
 		}
@@ -201,11 +237,17 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				size: image?.fileSize,
 				fileData,
 			};
+
 			setAttachmentData({
 				url: filePath,
 				filename: image?.filename || image?.uri,
 				filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
 			});
+			pushAttachmentToCache({
+				url: filePath,
+				filename: image?.filename || image?.uri,
+				filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
+			})
 			onPickGallery([fileFormat]);
 		} catch (err) {
 			console.log('Error: ', err);
@@ -231,6 +273,12 @@ const Gallery = ({ onPickGallery }: IProps) => {
 					filename: file?.fileName || file?.uri,
 					filetype: file?.type,
 				});
+
+				pushAttachmentToCache({
+					url: file?.uri,
+					filename: file?.fileName || file?.uri,
+					filetype: file?.type,
+				})
 
 				const fileBase64 = await RNFS.readFile(file?.uri, 'base64');
 				const fileFormat: IFile = {

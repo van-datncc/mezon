@@ -1,5 +1,5 @@
 import { useJumpToMessage, useNotification } from '@mezon/core';
-import { INotification, notificationActions, referencesActions, selectChannelById, selectClanById, selectMemberByUserId } from '@mezon/store';
+import { INotification, notificationActions, referencesActions, selectClanById, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,35 +38,46 @@ function convertContentToObject(notify: any) {
 
 function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	const parseNotify = convertContentToObject(notify);
-
 	const dispatch = useDispatch();
 	const { deleteNotify } = useNotification();
 	const messageId = useMemo(() => {
 		if (parseNotify.content) {
 			return parseNotify.content.message_id;
 		}
-	}, [parseNotify.content]);
+	}, [parseNotify.content.message_id]);
 
 	const channelId = useMemo(() => {
 		if (parseNotify.content) {
 			return parseNotify.content.channel_id;
 		}
-	}, [parseNotify.content]);
+	}, [parseNotify.content.channel_id]);
 
 	const clanId = useMemo(() => {
 		if (parseNotify.content) {
 			return parseNotify.content.clan_id;
 		}
-	}, [parseNotify.content]);
+	}, [parseNotify.content.clan_id]);
 
 	const notiId = useMemo(() => {
 		return parseNotify.id;
 	}, [parseNotify.id]);
 
-	const clan = useSelector(selectClanById(clanId));
-	const channel = useSelector(selectChannelById(channelId));
+	//
+	const channelName = useMemo(() => {
+		return parseNotify.content.channel_label;
+	}, [parseNotify.content.channel_label]);
 
-	const { directToMessageById } = useJumpToMessage({ channelId: channelId, messageID: messageId });
+	const categoryName = useMemo(() => {
+		return parseNotify.content.category_name;
+	}, [parseNotify.content.category_name]);
+
+	const clanLogo = useMemo(() => {
+		return parseNotify.content.clan_logo;
+	}, [parseNotify.content.clan_logo]);
+
+	const clan = useSelector(selectClanById(clanId));
+
+	const { directToMessageById } = useJumpToMessage({ channelId: channelId, messageID: messageId, clanId: clanId });
 
 	const handleMarkAsRead = useCallback(() => {
 		dispatch(notificationActions.setReadNotiStatus(notiId));
@@ -92,12 +103,8 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 					<div className="flex justify-between">
 						<div className="flex flex-row items-center gap-2">
 							<div>
-								{clan?.logo ? (
-									<img
-										src={clan.logo}
-										className="rounded-full size-10 object-cover max-w-10 max-h-10 min-w-10 min-h-10"
-										alt={clan.logo}
-									/>
+								{clanLogo ? (
+									<img src={clan.logo} className="w-[45px] h-[45px] rounded-xl" alt={clan.logo} />
 								) : (
 									<div>
 										{clan?.clan_name && (
@@ -108,15 +115,17 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 									</div>
 								)}
 							</div>
+
 							<div className="flex flex-col gap-1">
 								<div className="font-bold text-[16px] cursor-pointer flex gap-x-1">
-									# <p className=" hover:underline">{channel?.channel_label}</p>
+									# <p className=" hover:underline">{channelName}</p>
 								</div>
 								<div className="text-[10px] uppercase">
-									{clan?.clan_name} {'>'} {channel?.category_name}
+									{clan?.clan_name} {'>'} {categoryName}
 								</div>
 							</div>
 						</div>
+
 						<div className="flex flex-row">
 							{isUnreadTab && (
 								<button
@@ -183,7 +192,7 @@ function MentionTabContent({ message }: IMentionTabContent) {
 			)}
 
 			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
-				<AvatarImage alt="user avatar" className="w-15 h-15" userName={senderMessage?.user?.username} src={senderMessage?.user?.avatar_url} />
+				<AvatarImage alt="user avatar" className="w-15 h-15" userName={senderMessage?.user?.username} src={message.avatar} />
 
 				<div className="h-full ">
 					<MessageHead message={message} user={senderMessage} isCombine={true} isShowFull={true} />

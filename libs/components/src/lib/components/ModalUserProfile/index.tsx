@@ -13,6 +13,8 @@ import StatusProfile from './StatusProfile';
 import GroupIconBanner from './StatusProfile/groupIconBanner';
 import PendingFriend from './pendingFriend';
 
+const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
+
 type ModalUserProfileProps = {
 	userID?: string;
 	isFooterProfile?: boolean;
@@ -44,7 +46,7 @@ const ModalUserProfile = ({
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
-	const userCustomStatus = useMemberCustomStatus(userID || '')
+	const userCustomStatus = useMemberCustomStatus(userID || '');
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 
 	const [content, setContent] = useState<string>('');
@@ -88,7 +90,7 @@ const ModalUserProfile = ({
 
 	useEffect(() => {
 		const getColor = async () => {
-			if (checkUrl(userProfile?.user?.avatar_url) && checkUrl(userById?.user?.avatar_url)) {
+			if (isFooterProfile ? checkUrl(userProfile?.user?.avatar_url) : checkUrl(userById?.user?.avatar_url)) {
 				const url = isFooterProfile ? userProfile?.user?.avatar_url : userById?.user?.avatar_url;
 				const colorImg = await getColorAverageFromURL(url || '');
 				if (colorImg) setColor(colorImg);
@@ -100,7 +102,7 @@ const ModalUserProfile = ({
 
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
-	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999', [message?.sender_id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab } = useSettingFooter();
 	const openSetting = () => {
@@ -129,6 +131,7 @@ const ModalUserProfile = ({
 				username={isFooterProfile ? userProfile?.user?.username : userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={userCustomStatus}
+				isAnonymous={checkAnonymous}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgProfileBody bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">

@@ -1,35 +1,33 @@
-import { StyleProp, Text, TextInput, TextStyle, View, ViewStyle } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { useRef } from "react";
-import { useState } from "react";
 import { size, useTheme } from "@mezon/mobile-ui";
 import { CircleXIcon } from "libs/mobile-components/src/lib/icons2";
-import { style } from "./styles";
-import { useEffect } from "react";
-import { validInput } from "../../utils/validate";
+import { useEffect, useRef, useState } from "react";
+import { StyleProp, Text, TextInput, TextStyle, View, ViewStyle } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { ErrorInput } from "../../components/ErrorInput";
+import { validInput } from "../../utils/validate";
+import { style } from "./styles";
 
 interface IMezonInputProps {
-    placeHolder?: string;
-    label?: string;
-    titleStyle?: StyleProp<TextStyle>,
-    titleUppercase?: boolean
-    textarea?: boolean;
-    value: string;
-    onTextChange?: (value: string) => void;
-    maxCharacter?: number,
-    inputWrapperStyle?: StyleProp<ViewStyle>,
-    showBorderOnFocus?: boolean,
-    errorMessage?: string;
+	placeHolder?: string;
+	label?: string;
+	titleStyle?: StyleProp<TextStyle>,
+	titleUppercase?: boolean
+	textarea?: boolean;
+	value: string;
+	onTextChange?: (value: string) => void;
+	maxCharacter?: number,
+	inputWrapperStyle?: StyleProp<ViewStyle>,
+	showBorderOnFocus?: boolean,
+	errorMessage?: string;
 }
 
 export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage, titleUppercase, titleStyle }: IMezonInputProps) {
-    const { themeValue } = useTheme();
-    const styles = style(themeValue);
-    const ref = useRef<TextInput>(null);
-    const [showCount, setShowCount] = useState<boolean>(false);
-    const [isFocus, setFocus] = useState<boolean>(false);
-    const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const ref = useRef<TextInput>(null);
+	const [showCount, setShowCount] = useState<boolean>(false);
+	const [isFocus, setFocus] = useState<boolean>(false);
+	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 
 	useEffect(() => {
 		setIsCheckValid(validInput(value));
@@ -58,29 +56,29 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
 		}
 	};
 
-    return (
-        <View style={styles.container}>
-            <Text style={[styles.label, titleUppercase ? styles.titleUppercase : {}, titleStyle]}>{label}</Text>
-            <View style={[styles.fakeInput, textarea && { paddingTop: 10 }, renderBorder(), inputWrapperStyle]}>
-                <View style={styles.inputBox}>
-                    <TextInput
-                        ref={ref}
-                        value={value}
-                        onChangeText={onTextChange}
-                        multiline={textarea}
-                        numberOfLines={textarea ? 4 : 1}
-                        textAlignVertical={textarea ? 'top' : 'center'}
-                        maxLength={maxCharacter}
-                        style={[styles.input, textarea && { height: size.s_100 }]}
-                        placeholder={placeHolder}
-                        placeholderTextColor="gray"
-                        onFocus={handleFocus}
-                        onBlur={handleBlur}
-                    />
+	return (
+		<View style={styles.container}>
+			<Text style={[styles.label, titleUppercase ? styles.titleUppercase : {}, titleStyle]}>{label}</Text>
+			<View style={[styles.fakeInput, textarea && { paddingTop: 10 }, renderBorder(), inputWrapperStyle]}>
+				<View style={styles.inputBox}>
+					<TextInput
+						ref={ref}
+						value={value}
+						onChangeText={onTextChange}
+						multiline={textarea}
+						numberOfLines={textarea ? 4 : 1}
+						textAlignVertical={textarea ? 'top' : 'center'}
+						maxLength={maxCharacter}
+						style={[styles.input, textarea && { height: size.s_100 }]}
+						placeholder={placeHolder}
+						placeholderTextColor="gray"
+						onFocus={handleFocus}
+						onBlur={handleBlur}
+					/>
 
 					{!textarea && value?.length > 0 && (
 						<TouchableOpacity onPress={handleClearBtn} style={styles.clearBtn}>
-							<CircleXIcon height={18} width={18} />
+							<CircleXIcon height={18} width={18} color={themeValue.text} />
 						</TouchableOpacity>
 					)}
 				</View>

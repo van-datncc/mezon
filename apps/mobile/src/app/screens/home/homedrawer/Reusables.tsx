@@ -1,5 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, UsersClanEntity } from '@mezon/store-mobile';
+import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -52,7 +53,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 					style={[styles.friendItemWrapper, isSent && styles.friendItemWrapperInvited]}
 				>
 					<View style={styles.friendItemContent}>
-						{Array.isArray(dmGroup?.channel_avatar) && dmGroup?.channel_avatar?.length > 1 ? (
+						{Number(dmGroup.type) === ChannelType.CHANNEL_TYPE_GROUP? (
 							<Image source={Images.AVATAR_GROUP} style={{ width: 40, height: 40, borderRadius: 50 }} />
 						) : (
 							<FastImage

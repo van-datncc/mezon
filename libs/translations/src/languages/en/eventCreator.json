@@ -72,6 +72,6 @@
     },
     "notify": {
         "locationBlank": "A location is required",
-        "titleBlank": "A title is required"
+        "titleBlank": "An event topic is required"
     }
 }

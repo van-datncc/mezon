@@ -21,7 +21,6 @@ import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
-import ThreadsMain from '../../thread';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -107,13 +106,15 @@ export default function DirectMessage() {
 		}
 	}, [messagesContainerRef.current?.getBoundingClientRect()]);
 
+	const isDmChannel = useMemo(() => currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM,[currentDmGroup.type]);
+
 	return (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
 			<div
-				className={` flex flex-col 
+				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
-			  h-[100%] overflow-visible`}
+				h-[100%] overflow-visible`}
 				onDragEnter={handleDragEnter}
 			>
 				{' '}
@@ -125,12 +126,13 @@ export default function DirectMessage() {
 								<ChannelMessages
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}
-									type={currentDmGroup?.user_id?.length === 1 ? 'DM' : 'GROUP'}
+									userName={isDmChannel ? currentDmGroup?.usernames : undefined}
+									type={isDmChannel ? 'DM' : 'GROUP'}
 									mode={
-										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
+										isDmChannel ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 									}
 									avatarDM={
-										currentDmGroup?.user_id?.length === 1
+										isDmChannel
 											? currentDmGroup.channel_avatar?.at(0)
 											: 'assets/images/avatar-group.png'
 									}
@@ -223,14 +225,7 @@ export default function DirectMessage() {
 					)}
 				</div>
 			</div>
-			{isShowCreateThread && (
-				<>
-					<div className="w-2 cursor-ew-resize dark:bg-bgTertiary bg-white" />
-					<div className="w-[480px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-l-lg">
-						<ThreadsMain />
-					</div>
-				</>
-			)}
+
 		</>
 	);
 }

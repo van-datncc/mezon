@@ -13,7 +13,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
     paddingHorizontal: size.s_10,
-    backgroundColor: Colors.bgDarkCharcoal,
+    backgroundColor: colors.secondary,
   },
   wrapperItem: {
     paddingVertical: size.s_20,
@@ -25,9 +25,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
   wrapperUnmuteBox: {
     paddingVertical: size.s_20,
     paddingHorizontal: size.s_10,
-    backgroundColor: Colors.bgDarkCharcoal,
-    borderBottomColor: Colors.gray48,
-    borderBottomWidth: 0.5,
+    backgroundColor: colors.secondary,
     flexDirection: 'row',
     alignItems: 'center'
   },

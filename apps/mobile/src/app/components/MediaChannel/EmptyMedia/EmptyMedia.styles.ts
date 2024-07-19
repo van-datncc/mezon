@@ -1,18 +1,17 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
   emptyBox: {
     flexDirection: "column",
-    alignItems:"center",
+    alignItems: "center",
     marginTop: size.s_60,
+    width: "100%"
   },
   textEmpty: {
     marginTop: size.s_10,
     fontSize: size.label,
-    color: Colors.textGray,
+    color: colors.text,
     textAlign: 'center'
   }
 })
-
-export default styles;

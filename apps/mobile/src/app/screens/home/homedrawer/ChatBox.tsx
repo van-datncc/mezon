@@ -151,16 +151,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 	};
 
 	async function saveAttachmentToCache(attachment: any) {
-		const allCachedAttachments = getAllCachedAttachments();
-		console.log("x", allCachedAttachments);
-		console.log(props.channelId);
-
-		console.log({
-			...allCachedAttachments,
-			[props?.channelId]: attachment
-		});
-
-
+		const allCachedAttachments = await getAllCachedAttachments();
 		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
 			...allCachedAttachments,
 			[props?.channelId]: attachment,

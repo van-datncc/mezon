@@ -1,17 +1,17 @@
 import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useAppNavigation, useAppParams, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
-	getIsShowPopupForward,
-	selectAllClans,
-	selectCloseMenu,
-	selectCurrentChannel,
-	selectCurrentClan,
-	selectDirectsUnreadlist,
-	selectDmGroupCurrentId,
-	selectDmGroupCurrentType,
-	selectStatusMenu,
-	selectTheme,
-	toggleIsShowPopupForwardFalse,
+  getIsShowPopupForward,
+  selectAllClans,
+  selectCloseMenu,
+  selectCurrentChannel,
+  selectCurrentClan,
+  selectDirectsUnreadlist,
+  selectDmGroupCurrentId,
+  selectDmGroupCurrentType,
+  selectStatusMenu,
+  selectTheme,
+  toggleIsShowPopupForwardFalse,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -24,6 +24,7 @@ function MyApp() {
 	const elementHTML = document.documentElement;
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
+	const { userId } = useAuth();
 	const [openListClans, setOpenListClans] = useState(false);
 	const { navigate, toClanPage } = useAppNavigation();
 	const pathName = useLocation().pathname;
@@ -91,19 +92,19 @@ function MyApp() {
 		}
 	};
 
-	const handleKeyDown = (event: any) => {
+	const handleKeyDown = useCallback((event: any) => {
 		if (event.ctrlKey && event.key === 'k') {
 			event.preventDefault();
 			openSearchModal();
 		}
-	};
+	}, [openSearchModal]);
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyDown);
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown);
 		};
-	}, []);
+	}, [handleKeyDown]);
 
 	const openPopupForward = useSelector(getIsShowPopupForward);
 	const handleCloseModalForward = () => {
@@ -135,15 +136,15 @@ function MyApp() {
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
 
 	const initClan = useMemo(() => {
-		if(currentChannel?.id && currentClan?.id) {
+		if (currentChannel?.id && currentClan?.id) {
 			return `/chat/clans/${currentClan?.id}/channels/${currentChannel?.id}`;
 		} else if (currentClan?.id) {
 			return `/chat/clans/${currentClan?.id}`;
 		} else if (clans?.length > 0) {
 			return `/chat/clans/${clans[0].id}`;
-		} 
+		}
 		return ``;
-	},[clans, currentChannel?.id, currentClan?.id]);
+	}, [clans, currentChannel?.id, currentClan?.id]);
 
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
@@ -175,15 +176,15 @@ function MyApp() {
 					</NavLinkComponent>
 				</NavLink>
 				{dmGroupChatUnreadList.map((dmGroupChatUnread) => (
-					<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
+					dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
+						<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
+					)
 				))}
-				<div className="py-2 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '16px' }}></div>
+        <div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3 mx-auto my-2"></div>
 				{Boolean(initClan) && (
-					<NavLink
-						to={initClan}
-					>
+					<NavLink to={initClan}>
 						<NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || clans[0]?.clan_name || ''}>
-							{(currentClan?.logo ||  clans[0]?.logo) ? (
+							{currentClan?.logo || clans[0]?.logo ? (
 								<Image
 									src={currentClan?.logo || clans[0]?.logo || ''}
 									alt={currentClan?.clan_name || clans[0]?.clan_name || ''}

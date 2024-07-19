@@ -1,9 +1,12 @@
 import { EmptyPinIcon } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-import { styles } from './EmptyPinMessage.style';
+import { style } from './EmptyPinMessage.style';
 
 const EmptyPinMessage = () => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	const { t } = useTranslation(['pinMessage']);
 	return (
 		<View style={styles.emptyPinMessageBox}>

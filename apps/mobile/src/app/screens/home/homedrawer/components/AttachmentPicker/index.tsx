@@ -9,7 +9,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import Toast from 'react-native-toast-message';
-import { IFile } from './Gallery';
+import Gallery, { IFile } from './Gallery';
 import { style } from './styles';
 
 export type AttachmentPickerProps = {
@@ -35,11 +35,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		const allCachedAttachment = (await getAllCachedAttachment()) || {};
 		const currentAttachment = allCachedAttachment[currentChannelId] || [];
 		currentAttachment.push(attachment);
-
-		console.log({
-			...allCachedAttachment,
-			[currentChannelId]: currentAttachment
-		});
 
 		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
 			...allCachedAttachment,
@@ -119,7 +114,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					<Text style={styles.titleButtonHeader}>{t('message:actions.files')}</Text>
 				</TouchableOpacity>
 			</View>
-			{/* <Gallery onPickGallery={handleFiles} /> */}
+			<Gallery onPickGallery={handleFiles} />
 		</View>
 	);
 }
