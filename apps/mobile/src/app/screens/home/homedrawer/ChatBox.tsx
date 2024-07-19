@@ -151,7 +151,7 @@ const ChatBox = memo((props: IChatBoxProps) => {
 
 	const resetCachedText = async () => {
 		const allCachedMessage = await getAllCachedMessage();
-		delete allCachedMessage[props?.channelId];
+		delete allCachedMessage?.[props?.channelId];
 		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
 			...allCachedMessage,
 		});

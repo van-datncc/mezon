@@ -1,5 +1,13 @@
-import { ActionEmitEvent, load, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
-import { appActions, getStoreAsync, messagesActions, selectCurrentChannelId, selectIsFromFCMMobile } from '@mezon/store-mobile';
+import { ActionEmitEvent, load, save, setCurrentClanLoader, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND } from '@mezon/mobile-components';
+import {
+	appActions,
+	clansActions,
+	getStoreAsync,
+	messagesActions,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectIsFromFCMMobile,
+} from '@mezon/store-mobile';
 import { delay } from 'lodash';
 import React, { useEffect, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Dimensions } from 'react-native';
@@ -12,6 +20,7 @@ import HomeDefault from './homedrawer/HomeDefault';
 const HomeScreen = React.memo((props: any) => {
 	const homeDrawerRef = useRef<DrawerLayout>(null);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
@@ -20,7 +29,7 @@ const HomeScreen = React.memo((props: any) => {
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', (state) => {
 			if (state === 'active') {
-				timerRef.current = delay(handleAppStateChange, 200, state);
+				timerRef.current = delay(handleAppStateChange, 1200, state);
 			}
 		});
 
@@ -28,7 +37,7 @@ const HomeScreen = React.memo((props: any) => {
 			appStateSubscription.remove();
 			timerRef?.current && clearTimeout(timerRef.current);
 		};
-	}, [currentChannelId, isFromFcmMobile]);
+	}, [currentChannelId, currentClanId, isFromFcmMobile]);
 
 	const handleAppStateChange = async (state: string) => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
@@ -43,34 +52,39 @@ const HomeScreen = React.memo((props: any) => {
 
 	const messageLoaderBackground = async () => {
 		try {
-			if (!currentChannelId) {
+			if (!currentChannelId || !currentClanId) {
 				dispatch(appActions.setLoadingMainMobile(false));
 				return null;
 			}
 			const store = await getStoreAsync();
-			dispatch(appActions.setLoadingMainMobile(false));
+			save(STORAGE_CLAN_ID, currentClanId);
+			const clanResp = await store.dispatch(clansActions.fetchClans());
+			await setCurrentClanLoader(clanResp.payload);
 			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
+			dispatch(appActions.setLoadingMainMobile(false));
 			return null;
 		} catch (error) {
+			alert('error messageLoaderBackground' + error.message);
+			dispatch(appActions.setLoadingMainMobile(false));
 			console.log('error messageLoaderBackground', error);
 		}
 	};
 
 	useEffect(() => {
-		dispatch(appActions.setHiddenBottomTabMobile(true))
-	}, [])
+		dispatch(appActions.setHiddenBottomTabMobile(true));
+	}, []);
 
 	const onDrawerStateChanged = (newState: DrawerState, drawerWillShow: boolean) => {
 		if (newState === 'Dragging') {
-			dispatch(appActions.setHiddenBottomTabMobile(true))
+			dispatch(appActions.setHiddenBottomTabMobile(true));
 			return;
 		}
 
-		if ((newState === 'Settling')) {
-			dispatch(appActions.setHiddenBottomTabMobile(!drawerWillShow))
+		if (newState === 'Settling') {
+			dispatch(appActions.setHiddenBottomTabMobile(!drawerWillShow));
 			return;
 		}
-	}
+	};
 
 	useEffect(() => {
 		const sendMessage = DeviceEventEmitter.addListener(ActionEmitEvent.HOME_DRAWER, ({ isShowDrawer }) => {
@@ -95,10 +109,10 @@ const HomeScreen = React.memo((props: any) => {
 			drawerType="back"
 			overlayColor="transparent"
 			enableTrackpadTwoFingerGesture
-			keyboardDismissMode='on-drag'
+			keyboardDismissMode="on-drag"
 			useNativeAnimations={true}
 			onDrawerStateChanged={onDrawerStateChanged}
-			renderNavigationView={(props) => <LeftDrawerContent dProps={props} />}
+			renderNavigationView={() => <LeftDrawerContent />}
 		>
 			<HomeDefault {...props} />
 		</DrawerLayout>
