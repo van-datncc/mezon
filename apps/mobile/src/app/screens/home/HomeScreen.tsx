@@ -15,7 +15,6 @@ const HomeScreen = React.memo((props: any) => {
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
-
 	useCheckUpdatedVersion();
 
 	useEffect(() => {
