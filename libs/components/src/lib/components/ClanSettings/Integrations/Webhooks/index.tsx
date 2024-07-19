@@ -8,16 +8,16 @@ import WebhookItemModal from './WebhookItemModal';
 const Webhooks = () => {
 	const dispatch = useAppDispatch();
 	const allChannel = useSelector(selectAllChannels);
-	const [normalChannels, setNormalChannel] = useState<ChannelsEntity[]>([]);
+	const [normalChannelsInClan, setNormalChannelsInClan] = useState<ChannelsEntity[]>([]);
 
 	useEffect(() => {
 		const normalChannels = allChannel.filter((channel) => channel.parrent_id === ChannelIsNotThread.TRUE);
-		setNormalChannel(normalChannels);
+		setNormalChannelsInClan(normalChannels);
 	}, [allChannel]);
 
 	const handleAddWebhook = () => {
 		const newWebhookReq: ApiCreateWebhookRequest = {
-			channel_id: normalChannels[0].channel_id,
+			channel_id: normalChannelsInClan[0].channel_id,
 			hook_name: 'Captain hook',
 		};
 		dispatch(generateWebhook(newWebhookReq));
