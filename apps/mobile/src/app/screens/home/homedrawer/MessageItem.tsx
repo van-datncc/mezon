@@ -24,7 +24,7 @@ import {
 	selectMessageByMessageId,
 	selectMessageEntityById,
 	selectUserClanProfileByClanID,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -51,6 +51,8 @@ import { RenderImageChat } from './components/RenderImageChat';
 import { RenderVideoChat } from './components/RenderVideoChat';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 
+const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
+
 export type MessageItemProps = {
 	message?: IMessageWithUser;
 	messageId?: string;
@@ -71,8 +73,6 @@ export type MessageItemProps = {
 const arePropsEqual = (prevProps, nextProps) => {
 	return prevProps.message === nextProps.message;
 };
-
-const idUserAnonymous = '1767478432163172999';
 
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { themeValue } = useTheme();
@@ -104,7 +104,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const channelsEntities = useSelector(selectChannelsEntities);
-	const checkAnonymous = useMemo(() => message?.sender_id === idUserAnonymous, [message?.sender_id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const { t } = useTranslation('message');
 	const userProfile = useSelector(selectAllAccount);
 	const hasIncludeMention = useMemo(() => {
@@ -112,9 +112,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message, userProfile]);
 	const isCombine = !message?.isStartedMessageGroup;
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClanId as string, user?.user?.id as string));
-	const clanProfileSender = useSelector(
-		selectUserClanProfileByClanID(currentClanId as string, messageRefFetchFromServe?.user?.id as string),
-	);
+	const clanProfileSender = useSelector(selectUserClanProfileByClanID(currentClanId as string, messageRefFetchFromServe?.user?.id as string));
 	const swipeableRef = React.useRef(null);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
@@ -196,7 +194,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		onMessageAction({
 			type: EMessageBSToShow.UserInformation,
 			user: user?.user,
-			message
+			message,
 		});
 	}, [preventAction, user?.user]);
 
@@ -204,11 +202,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		if (preventAction) return;
 		setIsOnlyEmojiPicker(false);
 
-
 		onMessageAction({
 			type: EMessageBSToShow.UserInformation,
 			user: user?.user,
-			message
+			message,
 		});
 	}, [checkAnonymous, message?.name, message?.user?.id, message?.user?.name, message?.user?.username, message?.username, preventAction, user]);
 
@@ -356,7 +353,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					styles.messageWrapper,
 					(isCombine || preventAction) && { marginTop: 0 },
 					hasIncludeMention && styles.highlightMessageMention,
-					checkMessageTargetToMoved && styles.highlightMessageReply
+					checkMessageTargetToMoved && styles.highlightMessageReply,
 				]}
 			>
 				{/* NEW LINE MESSAGE - TO BE UPDATE CORRECT LOGIC*/}
@@ -371,7 +368,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						<View style={styles.iconReply}>
 							<ReplyIcon width={34} height={30} />
 						</View>
-						<Pressable onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)} style={styles.repliedMessageWrapper}>
+						<Pressable
+							onPress={() => !preventAction && handleJumpToMessage(messageRefFetchFromServe?.id)}
+							style={styles.repliedMessageWrapper}
+						>
 							{repliedSender?.user?.avatar_url ? (
 								<View style={styles.replyAvatar}>
 									<Image source={{ uri: repliedSender?.user?.avatar_url }} style={styles.replyAvatar} />
@@ -404,7 +404,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 											clansProfile,
 											currentClanId,
 											isMessageReply: true,
-											mode
+											mode,
 										})}
 									</>
 								)}
@@ -433,8 +433,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							onMessageAction({
 								type: EMessageBSToShow.MessageAction,
 								senderDisplayName,
-								message
-							})
+								message,
+							});
 							dispatch(setSelectedMessage(message));
 						}}
 					>
@@ -459,7 +459,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								);
 							})}
 						{documents?.length > 0 && renderDocuments()}
-						<Block opacity={(message?.isSending || message.isError) ? 0.6 : 1}>
+						<Block opacity={message?.isSending || message.isError ? 0.6 : 1}>
 							{renderTextContent({
 								lines,
 								isEdited,
@@ -472,7 +472,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								clansProfile,
 								currentClanId,
 								isMessageReply: false,
-								mode
+								mode,
 							})}
 						</Block>
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
@@ -487,8 +487,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									onMessageAction({
 										type: EMessageBSToShow.MessageAction,
 										senderDisplayName,
-										message
-									})
+										message,
+									});
 								}}
 							/>
 						) : null}

@@ -90,7 +90,7 @@ const LabelDm = (props: LabelDmProps) => {
 					className="shrink-1 dark:text-white text-black text-ellipsis"
 					onClick={handleOpenEditName}
 				>
-					{label}
+					{label || `${currentDmGroup.creator_name}'s Group`}
 				</h2>
 			) : (
 				<input

@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 export function useMessageLine(line: string): IMessageLine {
 	const combinedRegex = /(?<!`)((?<=\s|^)(@)\S+(?=\s|$)|<#[^>`\s]+>|:[a-zA-Z0-9_]*:)(?!`)/g;
 	const emojiRegex = /^:\w+:$/;
-	const extensionsRegex = /https?:[^,\s;]+?\.(jpg|jpeg|png|gif|bmp|webp)(\?.*)?(?:![^.\s]+)?(?:,|;|$)/gi;
+	const extensionsRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
 
 	const isOnlyEmoji = useMemo(() => {
 		if (!line?.trim()) {
@@ -54,7 +54,8 @@ export function useMessageLine(line: string): IMessageLine {
 
 		return processedMatches;
 	};
-	const imageLinks = useMemo(() => {
+
+	const links = useMemo(() => {
 		return processMatches(extensionsRegex, line);
 	}, [line, extensionsRegex]);
 
@@ -77,6 +78,6 @@ export function useMessageLine(line: string): IMessageLine {
 	return {
 		mentions,
 		isOnlyEmoji,
-		imageLinks,
+		links,
 	};
 }

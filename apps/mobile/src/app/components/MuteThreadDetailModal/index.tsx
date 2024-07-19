@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { AngleRight, MuteIcon } from '@mezon/mobile-components';
+import { AngleRight, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	notificationSettingActions,
@@ -150,7 +150,7 @@ const MuteThreadDetailModal = () => {
 						}}
 						style={styles.wrapperUnmuteBox}
 					>
-						<MuteIcon width={20} height={20} style={{ marginRight: 20 }} />
+						<Icons.BellSlashIcon width={20} height={20} style={{ marginRight: 20 }} color={themeValue.text} />
 						<Text style={styles.option}>{`Unmute #${currentChannel?.channel_label}`}</Text>
 					</TouchableOpacity>
 				</View>

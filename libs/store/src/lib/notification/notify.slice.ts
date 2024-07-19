@@ -1,4 +1,4 @@
-import { LoadingStatus } from '@mezon/utils';
+import { LoadingStatus, NotificationCode } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Notification } from 'mezon-js';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -54,7 +54,6 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	isMessageRead: false,
 	newNotificationStatus: false,
 });
-const NOTIFICATION_CODE = -9;
 
 export const notificationSlice = createSlice({
 	name: NOTIFICATION_FEATURE_KEY,
@@ -129,9 +128,8 @@ export const selectNotificationByCode = (code: number) =>
 	createSelector(selectAllNotification, (notifications) => notifications.filter((notification) => notification.code === code));
 
 export const selectNotificationMentions = createSelector(selectAllNotification, (notifications) =>
-	notifications.filter((notification) => notification.code === NOTIFICATION_CODE),
+	notifications.filter((notification) => (notification.code === NotificationCode.USER_MENTIONED ||  notification.code === NotificationCode.USER_REPLIED) ),
 );
-
 export const selectNotificationMentionsByChannelId = (channelId: string, after = 0) =>
 	createSelector(selectNotificationMentions, (notifications) =>
 		notifications.filter(

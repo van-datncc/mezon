@@ -1,18 +1,16 @@
-import { selectCurrentClanId } from '@mezon/store';
 import React, { useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { useAppNavigation } from '../../app/hooks/useAppNavigation';
 
 export type useJumpToMessagesOptions = {
 	channelId: string;
 	messageID: string;
+	clanId: string;
 };
 
 let messID: string | null = null;
 
-export function useJumpToMessage({ channelId, messageID }: useJumpToMessagesOptions) {
+export function useJumpToMessage({ channelId, messageID, clanId }: useJumpToMessagesOptions) {
 	const { navigate, toMessageChannel } = useAppNavigation();
-	const currentClanId = useSelector(selectCurrentClanId);
 
 	const jumpToMessage = React.useCallback(async (messageId: string | null = null, positionToJump: ScrollLogicalPosition = 'center') => {
 		if (messageId) {
@@ -25,8 +23,8 @@ export function useJumpToMessage({ channelId, messageID }: useJumpToMessagesOpti
 	}, []);
 
 	const directToMessageById = useCallback(async () => {
-		await navigate(toMessageChannel(channelId, currentClanId ?? '', messageID ?? ''));
-	}, [navigate, channelId, currentClanId, messageID]);
+		await navigate(toMessageChannel(channelId, clanId ?? '', messageID ?? ''));
+	}, [navigate, channelId, clanId, messageID]);
 
 	return useMemo(
 		() => ({

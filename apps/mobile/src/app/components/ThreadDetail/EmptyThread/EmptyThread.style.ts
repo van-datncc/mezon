@@ -1,9 +1,9 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	emptyThreadContainer: {
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.primary,
 		height: '100%',
 		width: '100%',
 		position: 'relative',
@@ -20,12 +20,12 @@ export const styles = StyleSheet.create({
 		fontSize: size.h5,
 		lineHeight: 1.25 * 20,
 		fontWeight: '600',
-		color: '#f2f3f5',
+		color: colors.textStrong,
 		marginBottom: 8,
 	},
 	textNotify: {
 		textAlign: 'center',
-		color: Colors.textGray,
+		color: colors.textDisabled,
 		fontSize: size.label,
 		lineHeight: 1.25 * 16,
 		fontWeight: '400',
@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: Colors.bgButton,
+		backgroundColor: baseColor.blurple,
 		borderRadius: 50,
 		paddingVertical: 2,
 		paddingHorizontal: 16,
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
 		marginTop: 20,
 	},
 	buttonText: {
-		color: 'white',
+		color: baseColor.white,
 		fontSize: size.medium,
 		fontWeight: '500',
 		lineHeight: 16,
@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
 		width: 50,
 		height: 50,
 		borderRadius: 50,
-		backgroundColor: Colors.tertiaryWeight,
+		backgroundColor: colors.secondary,
 		marginBottom: 16,
 		display: 'flex',
 		justifyContent: 'center',
