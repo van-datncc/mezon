@@ -1,6 +1,6 @@
 import { AvatarImage, ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
-import { IChannelMember, IdUserAnonymous, IMessageWithUser, MouseButton } from '@mezon/utils';
+import { IChannelMember, IMessageWithUser, MouseButton } from '@mezon/utils';
 import { useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 type IMessageAvatarProps = {
@@ -36,7 +36,7 @@ const MessageAvatar = ({ user, message, isCombine, isEditing, isShowFull, mode }
 		e.stopPropagation();
 	};
 
-	const isAnonymous = useMemo(() => message?.sender_id === IdUserAnonymous, [message?.sender_id]);
+	const isAnonymous = useMemo(() => message?.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
 	if (message.references?.length === 0 && isCombine && !isShowFull) {
 		return (

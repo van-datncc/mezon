@@ -1,7 +1,7 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
-import { IChannelMember, IdUserAnonymous, IMessageWithUser, MouseButton } from '@mezon/utils';
+import { IChannelMember, IMessageWithUser, MouseButton } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from './useMessageParser';
@@ -76,7 +76,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 		};
 	}, [positionLeft]);
 
-	const checkAnonymous = useMemo(() => message?.sender_id === IdUserAnonymous, [message?.sender_id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
 	if (isCombine && message.references?.length === 0 && !isShowFull) {
 		return <></>;

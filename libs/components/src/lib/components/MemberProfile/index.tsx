@@ -1,7 +1,7 @@
 import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
-import { IdUserAnonymous, MemberProfileType, MouseButton } from '@mezon/utils';
+import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -135,7 +135,7 @@ function MemberProfile({
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 
-	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === IdUserAnonymous, []);
+	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, []);
 
 	const userName = useMemo(() => isFooter ? userProfile?.user?.username || '' : name || '',[]);
 	return (

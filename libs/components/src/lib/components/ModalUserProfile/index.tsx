@@ -1,6 +1,6 @@
 import { useAppNavigation, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import { selectAllAccount, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
-import { IdUserAnonymous, IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -102,7 +102,7 @@ const ModalUserProfile = ({
 
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
-	const checkAnonymous = useMemo(() => message?.sender_id === IdUserAnonymous, [message?.sender_id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab } = useSettingFooter();
 	const openSetting = () => {
