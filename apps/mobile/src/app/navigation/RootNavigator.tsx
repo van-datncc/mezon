@@ -105,7 +105,7 @@ const NavigationMain = () => {
 			}
 			if (state === 'background') {
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, 'false');
-				dispatch(appActions.setLoadingMainMobile(false));
+				dispatch(appActions.setIsFromFCMMobile(false));
 			}
 		});
 		return () => {
