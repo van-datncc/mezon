@@ -170,7 +170,7 @@ const NotificationSetting = () => {
           type="radio"
           name="NotificationSetting"
           defaultNotifi={true}
-          defaultChecked={getNotificationChannelSelected?.notification_setting_type === undefined}
+          checked={getNotificationChannelSelected?.notification_setting_type === undefined}
           defaultNotifiName={defaultNotifiName}
           onClick={() => setNotification('')}
         />
@@ -181,7 +181,7 @@ const NotificationSetting = () => {
             type="radio"
             name="NotificationSetting"
             key={notification.value}
-            defaultChecked={getNotificationChannelSelected?.notification_setting_type === notification.value}
+            checked={getNotificationChannelSelected?.notification_setting_type === notification.value}
             onClick={() => setNotification(notification.value)}
           />
         ))}
