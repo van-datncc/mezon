@@ -105,7 +105,7 @@ const NavigationMain = () => {
 			}
 			if (state === 'background') {
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, 'false');
-				dispatch(appActions.setLoadingMainMobile(false));
+				dispatch(appActions.setIsFromFCMMobile(false));
 			}
 		});
 		return () => {
@@ -126,6 +126,8 @@ const NavigationMain = () => {
 
 	const handleAppStateChange = async (state: string) => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+		console.log('Tom log  => isFromFCM?.', isFromFCM?.toString() === 'true');
+		console.log('Tom log  => isFromFcmMobile', isFromFcmMobile);
 		if (state === 'active') {
 			if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 				return;
