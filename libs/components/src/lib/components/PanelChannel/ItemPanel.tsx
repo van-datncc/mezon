@@ -12,6 +12,7 @@ type ItemPanelProps = {
   notificationId?: string;
   defaultNotifi?: boolean;
   defaultChecked?: boolean;
+  checked?: boolean;
   name?: string;
   muteTime?: string;
   defaultNotifiName?: string;
@@ -19,14 +20,7 @@ type ItemPanelProps = {
   onClickRadio?: (params: any) => void;
 };
 
-const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, defaultNotifi, defaultChecked, name, muteTime, defaultNotifiName, onClickCheckbox, onClickRadio }: ItemPanelProps) => {
-  const handleOnClickCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isChecked = e.target.checked;
-    if(onClickCheckbox) {
-      onClickCheckbox(isChecked)
-    }
-  }
-  
+const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, defaultNotifi, defaultChecked, checked, name, muteTime, defaultNotifiName, onClickCheckbox, onClickRadio }: ItemPanelProps) => {
 	return (
 		<button
 			onClick={onClick}
@@ -39,8 +33,8 @@ const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, 
           {children}
         </li>
         {dropdown && <Icons.RightIcon defaultFill="#fff" />}
-        {type === 'checkbox' && <Checkbox id="accept" defaultChecked={defaultChecked} onChange={handleOnClickCheckbox}/>}
-        {type === 'radio' && <Radio className="" name={name} value="change here" onClick={onClickRadio} defaultChecked={defaultChecked}/>}
+        {type === 'checkbox' && <Checkbox id="accept" checked={checked} defaultChecked={defaultChecked}/>}
+        {type === 'radio' && <Radio className="" name={name} value="change here" checked={defaultChecked}/>}
       </div>
       {defaultNotifi && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{defaultNotifiName}</div>}
       {muteTime != '' && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{muteTime}</div>}

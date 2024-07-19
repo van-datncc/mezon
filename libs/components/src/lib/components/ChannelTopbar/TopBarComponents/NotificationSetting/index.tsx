@@ -27,6 +27,8 @@ const NotificationSetting = () => {
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const notifiReactMessage = useSelector(selectNotifiReactMessage);
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
+  const [isNotifyReactMessage, setisNotifyReactMessage] = useState (notifiReactMessage?.id !== '0')
+  
 	useEffect(() => {
 		if (getNotificationChannelSelected?.active === 1) {
 			setNameChildren('Mute Channel');
@@ -108,12 +110,13 @@ const NotificationSetting = () => {
     }
   };
   
-  const setNotiReactMess = (isChecked: boolean) => {
-    if (isChecked) {
+  const setNotiReactMess = () => {
+    if (!isNotifyReactMessage) {
       dispatch(notifiReactMessageActions.setNotifiReactMessage({ channel_id: currentChannelId || '' }));
     } else {
       dispatch(notifiReactMessageActions.deleteNotifiReactMessage({ channel_id: currentChannelId || '' }));
     }
+    setisNotifyReactMessage(!isNotifyReactMessage);
   };
 
 	return (
@@ -158,8 +161,8 @@ const NotificationSetting = () => {
 						children="Reaction Message"
 						type="checkbox"
 						name="NotifiReactionSetting"
-						defaultChecked={notifiReactMessage?.id !== '0'}
-            onClickCheckbox={setNotiReactMess}
+						checked={isNotifyReactMessage}
+            onClick={setNotiReactMess}
 					/>
 				</div>
         <ItemPanel
@@ -169,7 +172,7 @@ const NotificationSetting = () => {
           defaultNotifi={true}
           defaultChecked={getNotificationChannelSelected?.notification_setting_type === undefined}
           defaultNotifiName={defaultNotifiName}
-          onClickRadio={() => setNotification('')}
+          onClick={() => setNotification('')}
         />
         {notificationTypesList.map(notification => (
           <ItemPanel
@@ -179,7 +182,7 @@ const NotificationSetting = () => {
             name="NotificationSetting"
             key={notification.value}
             defaultChecked={getNotificationChannelSelected?.notification_setting_type === notification.value}
-            onClickRadio={() => setNotification(notification.value)}
+            onClick={() => setNotification(notification.value)}
           />
         ))}
 			</div>

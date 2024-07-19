@@ -228,7 +228,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
                   defaultNotifi={true}
                   defaultChecked={getNotificationChannelSelected?.notification_setting_type === undefined}
                   defaultNotifiName={defaultNotifiName}
-                  onClickRadio={() => setNotification('')}
+                  onClick={() => setNotification('')}
                 />
                 {notificationTypesList.map(notification => (
                   <ItemPanel
@@ -238,7 +238,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
                     name="NotificationSetting"
                     key={notification.value}
                     defaultChecked={getNotificationChannelSelected?.notification_setting_type === notification.value}
-                    onClickRadio={() => setNotification(notification.value)}
+                    onClick={() => setNotification(notification.value)}
                   />
                 ))}
 							</Dropdown>
