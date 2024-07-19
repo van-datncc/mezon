@@ -566,3 +566,7 @@ export enum NotificationCode {
 	USER_REACTIONED = -10,
 	USER_REPLIED = -11,
 }
+
+export enum EMessageCode {
+	FIRST_MESSAGE = 11,
+}
