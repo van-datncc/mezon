@@ -1,11 +1,11 @@
 import { useAppParams } from '@mezon/core';
 import {
-    PinMessageEntity,
-    pinMessageActions,
-    selectCurrentChannelId,
-    selectCurrentClanId,
-    selectPinMessageByChannelId,
-    useAppDispatch,
+	PinMessageEntity,
+	pinMessageActions,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectPinMessageByChannelId,
+	useAppDispatch,
 } from '@mezon/store';
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -70,7 +70,7 @@ const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
 						}
 
 						return (
-							<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage} cl/>
+							<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage}/>
 						);
 					})}
 				</div>
