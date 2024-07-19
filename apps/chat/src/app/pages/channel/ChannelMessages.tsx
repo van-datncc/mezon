@@ -2,7 +2,6 @@ import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mez
 import { getJumpToMessageId, useAppParams, useJumpToMessage, useMessages, useNotification } from '@mezon/core';
 import {
 	messagesActions,
-	selectDirectById,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
@@ -10,7 +9,7 @@ import {
 	selectOpenModalAttachment,
 	selectQuantitiesMessageRemain,
 	selectTheme,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -22,10 +21,10 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
+	userName?: string;
 };
 
-export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, mode }: ChannelMessagesProps) {
-	const currentDirect = useSelector(selectDirectById(channelId));
+export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
 	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement>(null);
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
@@ -111,7 +110,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			id="scrollLoading"
 			ref={chatRef}
 		>
-			{remain === 0 && <ChatWelcome type={type} name={channelLabel ?? `${currentDirect.creator_name}'s Group`} avatarDM={avatarDM} />}
+			{remain <= 15 && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} userName={userName}/>}
 			{isFetching && remain !== 0 && (
 				<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
 			)}
