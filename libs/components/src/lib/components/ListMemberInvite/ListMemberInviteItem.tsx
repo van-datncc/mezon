@@ -53,7 +53,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	}, [isSent]);
 	return dmGroup ? (
 		<div key={dmGroup.channel_id} className="flex items-center justify-between h-14">
-			{Array.isArray(dmGroup.channel_avatar) && dmGroup.channel_avatar.length > 1 ? (
+			{Number(dmGroup.type) === ChannelType.CHANNEL_TYPE_GROUP ? (
 				<img src={`/assets/images/avatar-group.png`} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
 			) : (
 				<img src={dmGroup.channel_avatar?.at(0)} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />

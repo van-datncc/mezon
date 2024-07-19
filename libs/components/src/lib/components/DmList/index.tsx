@@ -1,5 +1,5 @@
 import { useEscapeKey } from '@mezon/core';
-import { selectDirectsOpenlist, selectTheme, useAppDispatch } from '@mezon/store';
+import { selectDirectsOpenlist, selectTheme } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -22,14 +22,13 @@ const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
 };
 
 function DirectMessageList() {
-	const dispatch = useAppDispatch();
 	const pathname = useLocation().pathname;
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
 	const filterDmGroupsByChannelLabel = (data: IChannel[]) => {
 		const uniqueLabels = new Set();
 		return data.filter((obj: IChannel) => {
-			const isUnique = !uniqueLabels.has(obj.channel_label);
-			uniqueLabels.add(obj.channel_label);
+			const isUnique = !uniqueLabels.has(obj.channel_id);
+			uniqueLabels.add(obj.channel_id);
 			return isUnique;
 		});
 	};

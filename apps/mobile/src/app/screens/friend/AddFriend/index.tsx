@@ -4,8 +4,7 @@ import { FriendsEntity } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Text, View } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { SeparatorWithLine } from '../../../components/Common';
 import { EFriendItemAction, FriendItem } from '../../../components/FriendItem';
 import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
@@ -64,9 +63,9 @@ export const AddFriendScreen = () => {
 					keyExtractor={(item) => item.type.toString()}
 					ItemSeparatorComponent={SeparatorWithLine}
 					renderItem={({ item }) => (
-						<TouchableHighlight onPress={() => setCurrentAddFriendType(item.type)} style={styles.addFriendItem} key={item.type}>
+						<TouchableOpacity onPress={() => setCurrentAddFriendType(item.type)} style={styles.addFriendItem} key={item.type}>
 							<Text style={styles.addFriendText}>{item.title}</Text>
-						</TouchableHighlight>
+						</TouchableOpacity>
 					)}
 				/>
 			</View>

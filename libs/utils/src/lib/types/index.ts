@@ -108,6 +108,7 @@ export type IChannel = ApiChannelDescription & {
 	id: string;
 	unread?: boolean;
 	description?: string;
+	usernames?: string;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -305,8 +306,8 @@ export interface NotificationContent {
 	persistent?: boolean;
 	sender_id: string;
 	update_time?: { seconds: number };
-	user_id_one?: string;
-	user_id_two?: string;
+	clan_logo?: string;
+	category_name?: string;
 	username?: string;
 }
 
@@ -459,7 +460,7 @@ export type ILineMention = {
 export type IMessageLine = {
 	mentions: ILineMention[];
 	isOnlyEmoji: boolean;
-	imageLinks: ILineMention[];
+	links: ILineMention[];
 };
 
 export interface UsersClanEntity extends IUsersClan {
@@ -564,4 +565,8 @@ export enum NotificationCode {
 	USER_MENTIONED = -9,
 	USER_REACTIONED = -10,
 	USER_REPLIED = -11,
+}
+
+export enum EMessageCode {
+	FIRST_MESSAGE = 11,
 }

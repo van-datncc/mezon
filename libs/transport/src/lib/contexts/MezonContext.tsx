@@ -124,9 +124,17 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	const logOutMezon = useCallback(async () => {
 		if (socketRef.current) {
-			await socketRef.current.disconnect(true);
+			socketRef.current.ondisconnect = () => {
+				console.log('loged out');
+			};
+			await socketRef.current.disconnect(false);
+			socketRef.current = null;
 		}
-		socketRef.current = null;
+
+		if (clientRef.current && sessionRef.current) {
+			await clientRef.current.sessionLogout(sessionRef.current, sessionRef.current?.token, sessionRef.current?.refresh_token);
+		}
+
 		sessionRef.current = null;
 	}, [socketRef]);
 
@@ -188,7 +196,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 					const socket = await createSocket();
 					const refreshSession = await clientRef.current?.sessionRefresh(session);
 					const recsession = await socket.connect(refreshSession || session, true);
-					socket.joinClanChat(clanId);
+					await socket.joinClanChat(clanId);
 					socketRef.current = socket;
 					sessionRef.current = recsession;
 					resolve(socket);

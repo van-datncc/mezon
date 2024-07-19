@@ -1,7 +1,7 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	reactionWrapper: {
 		paddingTop: size.s_6,
 		flexDirection: 'row',
@@ -11,10 +11,11 @@ export const styles = StyleSheet.create({
 	},
 	myReaction: {
 		borderWidth: 1,
-		borderColor: Colors.bgViolet,
+		backgroundColor: colors.reactionBg,
+		borderColor: colors.reactionBorder,
 	},
 	otherReaction: {
-		backgroundColor: Colors.bgCharcoal,
+		backgroundColor: colors.primary,
 	},
 	reactItem: {
 		flexDirection: 'row',
@@ -24,7 +25,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 5,
 	},
 	reactCount: {
-		color: Colors.white,
+		color: colors.text,
 		fontSize: size.small
 	},
 	bottomSheetWrapper: {

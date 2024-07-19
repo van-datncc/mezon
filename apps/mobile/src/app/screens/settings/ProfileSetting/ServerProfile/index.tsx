@@ -175,7 +175,7 @@ export default function ServerProfile({
 				/>
 			</View>
 
-			<MezonBottomSheet ref={bottomSheetDetail} title="Choose a server" heightFitContent>
+			<MezonBottomSheet ref={bottomSheetDetail} title="Choose a clan" heightFitContent>
 				<View style={styles.bottomSheetContainer}>
 					<FlatList
 						data={clans}

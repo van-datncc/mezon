@@ -32,14 +32,14 @@ const MessageText = ({ message, lines, isEdited, mode }: { message: IMessageWith
 );
 
 const MessageContent = ({ message, mode }: IMessageContentProps) => {
-	const { attachments, lines, hasAttachments, isEdited } = useMessageParser(message);
+	const { lines, isEdited } = useMessageParser(message);
 	const lineValue = useMemo(() => {
-		if (lines === undefined) {
+		if (lines === undefined && typeof message.content === 'string') {
 			return JSON.parse(message.content).t;
 		} else {
 			return lines;
 		}
-	}, [lines]);
+	}, [lines, message.content]);
 	return <MessageText message={message} lines={lineValue as string} isEdited={isEdited} mode={mode} />;
 };
 

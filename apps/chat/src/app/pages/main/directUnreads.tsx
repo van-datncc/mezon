@@ -36,7 +36,6 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 	}, [currentDirect?.count_mess_unread]);
 	return (
 		<div>
-			<div className="py-0 border-t-2 dark:border-t-borderDefault border-t-[#E1E1E1] duration-100" style={{ marginTop: '8px' }}></div>
 			<div onClick={() => openDirectMessage(directMessage)}>
 				<NavLink to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`} onClick={handleDirectMessage}>
 					<NavLinkComponent clanName={directMessage.channel_label || ''}>

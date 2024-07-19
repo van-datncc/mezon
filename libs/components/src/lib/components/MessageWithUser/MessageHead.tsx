@@ -6,6 +6,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageParser } from './useMessageParser';
 import { useMessageSender } from './useMessageSender';
+
+const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
+
 type IMessageHeadProps = {
 	user?: IChannelMember | null;
 	message: IMessageWithUser;
@@ -73,7 +76,7 @@ const MessageHead = ({ user, message, isCombine, isShowFull, mode }: IMessageHea
 		};
 	}, [positionLeft]);
 
-	const checkAnonymous = useMemo(() => message?.sender_id === '1767478432163172999', [message?.sender_id]);
+	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
 	if (isCombine && message.references?.length === 0 && !isShowFull) {
 		return <></>;
