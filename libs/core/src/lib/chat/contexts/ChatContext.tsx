@@ -61,12 +61,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const clanIdActive = useMemo(() => {
-		if (clanId !== undefined) {
+		if (clanId !== undefined || currentClanId) {
 			return currentClanId;
 		} else {
 			return '0';
 		}
-	}, [clanId]);
+	}, [clanId, currentClanId]);
 
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
