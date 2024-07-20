@@ -1,4 +1,4 @@
-import { clansActions, directActions } from '@mezon/store';
+import { clansActions, directActions, emojiSuggestionActions } from '@mezon/store';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -11,6 +11,7 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	if (!clanId) {
 		throw new Error('Clan ID null');
 	}
+	dispatch(emojiSuggestionActions.fetchEmoji({ clanId: clanId, noCache: true }));
 	dispatch(directActions.fetchDirectMessage({}));
 	dispatch(clansActions.joinClan({ clanId }));
 	dispatch(clansActions.changeCurrentClan({ clanId: clanId }));

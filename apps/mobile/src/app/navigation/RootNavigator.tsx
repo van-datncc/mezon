@@ -99,7 +99,7 @@ const NavigationMain = () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentClanId, currentChannelId, isFromFcmMobile]);
+	}, [currentChannelId, isFromFcmMobile]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', async (state) => {
@@ -129,32 +129,24 @@ const NavigationMain = () => {
 
 	const handleAppStateChange = async (state: string) => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-		dispatch(appActions.setLoadingMainMobile(true));
 		if (state === 'active') {
+			dispatch(appActions.setLoadingMainMobile(true));
 			if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 				dispatch(appActions.setLoadingMainMobile(false));
-				return;
+			} else {
+				await messageLoaderBackground();
 			}
-			const socket = await reconnect(currentClanId, true);
-			if (socket) setCallbackEventFn(socket);
-
-			timerRef.current = setTimeout(() => {
-				messageLoaderBackground();
-			}, 1500);
 		}
 	};
 
 	const messageLoaderBackground = async () => {
 		try {
-			if (!currentChannelId || !currentClanId) {
+			if (!currentChannelId) {
 				dispatch(appActions.setLoadingMainMobile(false));
 				return null;
 			}
 			const store = await getStoreAsync();
-			save(STORAGE_CLAN_ID, currentClanId);
-			const clanResp = await store.dispatch(clansActions.fetchClans());
 			dispatch(appActions.setLoadingMainMobile(false));
-			await setCurrentClanLoader(clanResp.payload);
 			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
 			return null;
 		} catch (error) {
