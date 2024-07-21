@@ -4,8 +4,7 @@ import { checkLastChar, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
-import { EmojiMarkdown } from '../../MarkdownFormatText';
+import { EmojiMarkdown, Icons } from '../../../components';
 
 interface IHashtagMentionById {
 	id: string;

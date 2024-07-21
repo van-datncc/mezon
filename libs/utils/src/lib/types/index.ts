@@ -27,6 +27,7 @@ import {
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
 
+export * from './messageLine';
 export * from './permissions';
 export * from './thumbnailPos';
 
@@ -187,6 +188,11 @@ export type IMessageWithUser = IMessage & {
 export type IMessageSendPayload = {
 	t: string;
 	contentThread?: string;
+	mentions?: any;
+	hashtags?: any;
+	emojis?: any;
+	links?: any;
+	markdowns?: any;
 };
 
 export type IUser = {
