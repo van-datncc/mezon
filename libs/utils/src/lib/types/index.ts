@@ -26,6 +26,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, IMentionOnMessage, ImarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -188,11 +189,12 @@ export type IMessageWithUser = IMessage & {
 export type IMessageSendPayload = {
 	t: string;
 	contentThread?: string;
-	mentions?: any;
-	hashtags?: any;
-	emojis?: any;
-	links?: any;
-	markdowns?: any;
+	mentions?: IMentionOnMessage[];
+	hashtags?: IHashtagOnMessage[];
+	emojis?: IEmojiOnMessage[];
+	links?: ILinkOnMessage[];
+	markdowns?: ImarkdownOnMessage[];
+	plainText?: string;
 };
 
 export type IUser = {

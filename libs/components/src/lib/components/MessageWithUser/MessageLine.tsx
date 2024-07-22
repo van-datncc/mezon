@@ -1,6 +1,6 @@
 import { selectTheme } from '@mezon/store';
 import clx from 'classnames';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
 import { useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
@@ -18,7 +18,6 @@ type MessageLineProps = {
 const RenderContent = ({ data }: any, mode: number) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
-	console.log('data', data);
 	// Combine and sort hashtags and mentions by start_index
 	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.start_index - b.start_index);
 	let lastIndex = 0;
@@ -66,7 +65,6 @@ const RenderContent = ({ data }: any, mode: number) => {
 			);
 		}
 		if (markdown) {
-			console.log(markdown);
 			content.push(
 				<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
 					<div key={index} className="lineText contents dark:text-white text-colorTextLightMode">
@@ -98,9 +96,9 @@ const RenderContent = ({ data }: any, mode: number) => {
 	if (lastIndex < t.length) {
 		content.push(t.slice(lastIndex));
 	}
-
 	return <div>{content}</div>;
 };
+
 const MessageLine = ({ line, messageId, mode, content }: MessageLineProps) => {
 	return (
 		<div>
@@ -109,4 +107,4 @@ const MessageLine = ({ line, messageId, mode, content }: MessageLineProps) => {
 	);
 };
 
-export default MessageLine;
+export default memo(MessageLine);

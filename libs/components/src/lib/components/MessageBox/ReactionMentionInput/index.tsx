@@ -131,6 +131,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const markdownRegex =
 		/(?:^|\s)(#{1,6}\s.*)|(?:\*\*(.*?)\*\*|_(.*?)_|~~(.*?)~~|`(.*?)`)|\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)|!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)|(?:^|\s)([\-\*]\s+.*)|(?:^|\s)(\d+\.\s+.*)|(?:^|\s)>(.*)/g; // Extended Markdown regex
 
+	// const removeBackstickRegex =
+
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
@@ -149,12 +151,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const [emojisOnMessage, setEmojisOnMessage] = useState<IEmojiOnMessage[]>([]);
 	const [linksOnMessage, setLinksOnMessage] = useState<ILinkOnMessage[]>([]);
 	const [markdownsOnMessage, setMarkdownsOnMessage] = useState<ImarkdownOnMessage[]>([]);
+	const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
 	const mentionList: IMentionOnMessage[] = [];
 	const hashtagList: IHashtagOnMessage[] = [];
 	const emojiList: IEmojiOnMessage[] = [];
 	const linkList: ILinkOnMessage[] = [];
 	const markdownList: ImarkdownOnMessage[] = [];
+
 	//
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
@@ -320,6 +324,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							emojis: emojisOnMessage,
 							links: linksOnMessage,
 							markdowns: markdownsOnMessage,
+							plainText: plainTextMessage,
 						},
 						mentionData,
 						attachmentDataRef,
@@ -420,6 +425,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		const convertedHashtag = convertToPlainTextHashtag(newValue);
 		setContent(convertedHashtag);
+		setPlainTextMessage(newPlainTextValue);
 		let match;
 		while ((match = emojiRegex.exec(convertedHashtag)) !== null) {
 			emojiList.push({
@@ -440,6 +446,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setLinksOnMessage(linkList);
 
 		while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
+			console.log('match[0]', match[0]);
 			markdownList.push({
 				markdown: match[0],
 				start_index: match.index,
