@@ -58,6 +58,7 @@ import {
 	UsersClanEntity,
 	convertMarkdown,
 	focusToElement,
+	markdownRegex,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
@@ -131,8 +132,6 @@ export type MentionReactInputProps = {
 const neverMatchingRegex = /($a)/;
 const emojiRegex = /:[a-zA-Z0-9_]+:/g;
 const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
-const markdownRegex =
-	/(?:^|\s)(#{1,6}\s.*)|(?:\*\*(.*?)\*\*|_(.*?)_|~~(.*?)~~|```([\s\S]*?)```|`([^`]*)`)|\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)|!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)|(?:^|\s)([\-\*]\s+.*)|(?:^|\s)(\d+\.\s+.*)|(?:^|\s)>(.*)/g;
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();

@@ -21,7 +21,7 @@ export { default as GifStickerEmojiPopup } from './components/GifsStickersEmojis
 export { default as ListMemberInvite } from './components/ListMemberInvite';
 export { default as ModalInvite } from './components/ListMemberInvite/modalInvite';
 export { default as EmojiMarkup } from './components/MarkdownFormatText/EmojiMarkup';
-export { default as MarkdownText } from './components/MarkdownFormatText/MarkdownText';
+export { default as MarkdownContent } from './components/MarkdownFormatText/MarkdownContent';
 export { default as PlainText } from './components/MarkdownFormatText/PlainText';
 
 export { default as PreClass } from './components/MarkdownFormatText/PreClass';
