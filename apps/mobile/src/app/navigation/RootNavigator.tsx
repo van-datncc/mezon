@@ -10,7 +10,9 @@ import {
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	messagesActions,
 	notificationActions,
+	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
@@ -60,6 +62,7 @@ const NavigationMain = () => {
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 
 	useEffect(() => {
@@ -96,7 +99,7 @@ const NavigationMain = () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentClanId, isFromFcmMobile]);
+	}, [currentChannelId, isFromFcmMobile]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', async (state) => {
@@ -127,11 +130,29 @@ const NavigationMain = () => {
 	const handleAppStateChange = async (state: string) => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		if (state === 'active') {
+			dispatch(appActions.setLoadingMainMobile(true));
 			if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
-				return;
+				dispatch(appActions.setLoadingMainMobile(false));
+			} else {
+				await messageLoaderBackground();
 			}
-			const socket = await reconnect(currentClanId, true);
-			if (socket) setCallbackEventFn(socket);
+		}
+	};
+
+	const messageLoaderBackground = async () => {
+		try {
+			if (!currentChannelId) {
+				dispatch(appActions.setLoadingMainMobile(false));
+				return null;
+			}
+			const store = await getStoreAsync();
+			dispatch(appActions.setLoadingMainMobile(false));
+			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
+			return null;
+		} catch (error) {
+			alert('error messageLoaderBackground' + error.message);
+			dispatch(appActions.setLoadingMainMobile(false));
+			console.log('error messageLoaderBackground', error);
 		}
 	};
 
