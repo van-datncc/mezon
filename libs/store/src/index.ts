@@ -37,6 +37,7 @@ export * from './lib/reactionMessage/reactionMessage.slice';
 export * from './lib/roleclan/roleclan.slice';
 export * from './lib/searchmessages/searchmessage.slice';
 export * from './lib/settingEmoji/settingEmoji.slice';
+export * from './lib/webhook/webhook.slice';
 export * from './lib/store';
 export * from './lib/threads/threads.slice';
 export * from './lib/toasts/toasts.slice';
