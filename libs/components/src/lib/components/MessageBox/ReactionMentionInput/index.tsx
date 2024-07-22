@@ -56,6 +56,7 @@ import {
 	ThreadValue,
 	UserMentionsOpt,
 	UsersClanEntity,
+	convertMarkdown,
 	focusToElement,
 	searchMentionsHashtag,
 	threadError,
@@ -133,9 +134,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const emojiRegex = /:[a-zA-Z0-9_]+:/g;
 	const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
 	const markdownRegex =
-		/(?:^|\s)(#{1,6}\s.*)|(?:\*\*(.*?)\*\*|_(.*?)_|~~(.*?)~~|`(.*?)`)|\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)|!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)|(?:^|\s)([\-\*]\s+.*)|(?:^|\s)(\d+\.\s+.*)|(?:^|\s)>(.*)/g; // Extended Markdown regex
-
-	// const removeBackstickRegex =
+		/(?:^|\s)(#{1,6}\s.*)|(?:\*\*(.*?)\*\*|_(.*?)_|~~(.*?)~~|```([\s\S]*?)```|`([^`]*)`)|\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)|!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)|(?:^|\s)([\-\*]\s+.*)|(?:^|\s)(\d+\.\s+.*)|(?:^|\s)>(.*)/g;
 
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -450,9 +449,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		setLinksOnMessage(linkList);
 
 		while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
-			console.log('match[0]', match[0]);
+			const startsWithTripleBackticks = match[0].startsWith('```');
+			const endsWithNoTripleBackticks = match[0].endsWith('```');
+			const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
 			markdownList.push({
-				markdown: match[0],
+				markdown: convertedMarkdown,
 				start_index: match.index,
 				end_index: match.index + match[0].length,
 			});

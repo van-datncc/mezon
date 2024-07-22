@@ -16,7 +16,6 @@ type MessageLineProps = {
 
 // TODO: refactor component for message lines
 const RenderContent = ({ data }: any, mode: number) => {
-	console.log('data', data);
 	const appearanceTheme = useSelector(selectTheme);
 	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
 	// Combine and sort hashtags and mentions by start_index
