@@ -148,7 +148,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 
-	// new
 	const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
 	const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
 	const [emojisOnMessage, setEmojisOnMessage] = useState<IEmojiOnMessage[]>([]);
@@ -161,8 +160,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const emojiList: IEmojiOnMessage[] = [];
 	const linkList: ILinkOnMessage[] = [];
 	const markdownList: ImarkdownOnMessage[] = [];
-
-	//
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
@@ -467,13 +464,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			let positionTracker: PositionTracker = {};
 
 			for (const mention of mentions) {
-				if (mention.display.startsWith('@')) {
-					mentionedUsers.push({
-						user_id: mention.id.toString() ?? '',
-						username: mention.display ?? '',
-					});
-				}
-				///
 				let startIndex = -1;
 				let endIndex = -1;
 				if (mention.display.startsWith('@')) {

@@ -18,7 +18,6 @@ type MessageLineProps = {
 const RenderContent = ({ data }: any, mode: number) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
-	// Combine and sort hashtags and mentions by start_index
 	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.start_index - b.start_index);
 	let lastIndex = 0;
 	const content = [];

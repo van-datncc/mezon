@@ -45,7 +45,6 @@ const MessageText = ({
 
 const MessageContent = ({ message, mode }: IMessageContentProps) => {
 	const { lines, isEdited, content } = useMessageParser(message);
-	// console.log('contnt', content);
 	const lineValue = useMemo(() => {
 		if (lines === undefined && typeof message.content === 'string') {
 			return JSON.parse(message.content).t;
