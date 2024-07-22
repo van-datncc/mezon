@@ -1,7 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { appActions } from '@mezon/store-mobile';
 import React, { useEffect, useRef } from 'react';
-import { DeviceEventEmitter, Dimensions } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Keyboard } from 'react-native';
 import { DrawerLayout, DrawerState } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
@@ -18,13 +18,9 @@ const HomeScreen = React.memo((props: any) => {
 	}, []);
 
 	const onDrawerStateChanged = (newState: DrawerState, drawerWillShow: boolean) => {
-		if (newState === 'Dragging') {
-			dispatch(appActions.setHiddenBottomTabMobile(true));
-			return;
-		}
-
 		if (newState === 'Settling') {
 			dispatch(appActions.setHiddenBottomTabMobile(!drawerWillShow));
+			Keyboard.dismiss();
 			return;
 		}
 	};
@@ -49,7 +45,7 @@ const HomeScreen = React.memo((props: any) => {
 			drawerWidth={Dimensions.get('window').width}
 			enableContextMenu
 			drawerPosition={'left'}
-			drawerType="back"
+			drawerType="slide"
 			overlayColor="transparent"
 			enableTrackpadTwoFingerGesture
 			keyboardDismissMode="on-drag"

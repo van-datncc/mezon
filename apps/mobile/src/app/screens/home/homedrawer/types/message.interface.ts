@@ -1,4 +1,4 @@
-import { EmojiDataOptionals, IEmoji, IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
+import { EmojiDataOptionals, IEmoji, IMessageSendPayload, IMessageWithUser, IUserAccount } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiUser } from 'mezon-js/api.gen';
 import { EMessageActionType, EMessageBSToShow } from '../enums';
 
@@ -11,7 +11,7 @@ export interface IReplyBottomSheet {
 	clanId?: string;
 	isOnlyEmojiPicker?: boolean;
 	user?: ApiUser | null;
-  	checkAnonymous?: boolean;
+	checkAnonymous?: boolean;
 	senderDisplayName?: string;
 }
 
@@ -48,6 +48,7 @@ export interface IMessageReactionProps {
 	emojiListPNG?: IEmoji[];
 	openEmojiPicker?: () => void;
 	preventAction?: boolean;
+	userProfile?: IUserAccount;
 }
 
 export interface IDetailReactionBottomSheet {
