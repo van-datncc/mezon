@@ -43,17 +43,18 @@ const RenderContent = ({ data }: any, mode: number) => {
 		}
 
 		if (channel_id && channel_lable) {
-			content.push(<ChannelHashtag key={start_index} channelHastagId={`<#${channel_id}>`} />);
+			content.push(<ChannelHashtag key={channel_id} channelHastagId={`<#${channel_id}>`} />);
 		}
 		if (username) {
-			content.push(<MentionUser key={start_index} tagName={username} mode={mode} />);
+			content.push(<MentionUser key={username} tagName={username} mode={mode} />);
 		}
 		if (shortname) {
-			content.push(<EmojiMarkdown emojiSyntax={shortname} onlyEmoji={false} />);
+			content.push(<EmojiMarkdown key={`${start_index}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 		}
 		if (link) {
 			content.push(
 				<a
+					key={`${start_index}${link}`}
 					style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
 					className=" hover: underline"
 					href={link}
@@ -66,8 +67,8 @@ const RenderContent = ({ data }: any, mode: number) => {
 		}
 		if (markdown) {
 			content.push(
-				<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
-					<div key={index} className="lineText contents dark:text-white text-colorTextLightMode">
+				<article key={`${start_index}${markdown}`} style={{ letterSpacing: '-0.01rem' }} className={classes}>
+					<div className="lineText contents dark:text-white text-colorTextLightMode">
 						<Markdown
 							children={markdown}
 							remarkPlugins={[remarkGfm]}
