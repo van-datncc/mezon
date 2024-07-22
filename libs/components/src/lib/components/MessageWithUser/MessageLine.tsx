@@ -16,6 +16,7 @@ type MessageLineProps = {
 
 // TODO: refactor component for message lines
 const RenderContent = ({ data }: any, mode: number) => {
+	console.log('data', data);
 	const appearanceTheme = useSelector(selectTheme);
 	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
 	// Combine and sort hashtags and mentions by start_index
@@ -43,18 +44,18 @@ const RenderContent = ({ data }: any, mode: number) => {
 		}
 
 		if (channel_id && channel_lable) {
-			content.push(<ChannelHashtag key={channel_id} channelHastagId={`<#${channel_id}>`} />);
+			content.push(<ChannelHashtag key={`${index}${start_index}${channel_id}`} channelHastagId={`<#${channel_id}>`} />);
 		}
 		if (username) {
-			content.push(<MentionUser key={username} tagName={username} mode={mode} />);
+			content.push(<MentionUser key={`${index}${start_index}${username}`} tagName={username} mode={mode} />);
 		}
 		if (shortname) {
-			content.push(<EmojiMarkdown key={`${start_index}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
+			content.push(<EmojiMarkdown key={`${index}${start_index}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 		}
 		if (link) {
 			content.push(
 				<a
-					key={`${start_index}${link}`}
+					key={`${index}${start_index}${link}`}
 					style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
 					className=" hover: underline"
 					href={link}
@@ -67,7 +68,7 @@ const RenderContent = ({ data }: any, mode: number) => {
 		}
 		if (markdown) {
 			content.push(
-				<article key={`${start_index}${markdown}`} style={{ letterSpacing: '-0.01rem' }} className={classes}>
+				<article key={`${index}${start_index}${markdown}`} style={{ letterSpacing: '-0.01rem' }} className={classes}>
 					<div className="lineText contents dark:text-white text-colorTextLightMode">
 						<Markdown
 							children={markdown}

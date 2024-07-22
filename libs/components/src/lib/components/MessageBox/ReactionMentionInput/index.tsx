@@ -91,6 +91,10 @@ import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 
+interface PositionTracker {
+	[key: string]: number;
+}
+
 type ChannelsMentionProps = {
 	id: string;
 	display: string;
@@ -459,6 +463,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			if (mentions.some((mention) => mention.display === '@here')) {
 				setMentionEveryone(true);
 			}
+			let positionTracker: PositionTracker = {};
+
 			for (const mention of mentions) {
 				if (mention.display.startsWith('@')) {
 					mentionedUsers.push({
@@ -467,20 +473,39 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					});
 				}
 				///
+				let startIndex = -1;
+				let endIndex = -1;
 				if (mention.display.startsWith('@')) {
+					if (!positionTracker[mention.display]) {
+						positionTracker[mention.display] = 0;
+					}
+					startIndex = convertedHashtag.indexOf(mention.display, positionTracker[mention.display]);
+					endIndex = startIndex + mention.display.length;
+					positionTracker[mention.display] = endIndex;
 					mentionList.push({
 						user_id: mention.id.toString() ?? '',
 						username: mention.display ?? '',
-						start_index: convertedHashtag.indexOf(mention.display),
-						end_index: convertedHashtag.indexOf(mention.display) + mention.display.length,
+						start_index: startIndex,
+						end_index: endIndex,
 					});
 				}
+
 				if (mention.display.startsWith('#')) {
+					const hashtagPattern = `<#${mention.id.toString()}>`;
+
+					if (positionTracker[hashtagPattern] === undefined) {
+						positionTracker[hashtagPattern] = 0;
+					}
+					startIndex = convertedHashtag.indexOf(hashtagPattern, positionTracker[hashtagPattern]);
+					endIndex = startIndex + hashtagPattern.length;
+
+					positionTracker[hashtagPattern] = endIndex;
+
 					hashtagList.push({
 						channel_id: mention.id.toString() ?? '',
 						channel_lable: mention.display ?? '',
-						start_index: convertedHashtag.indexOf('<#' + mention.id.toString() + '>'),
-						end_index: convertedHashtag.indexOf('<#' + mention.id.toString() + '>') + ('<#' + mention.id.toString() + '>').length,
+						start_index: startIndex,
+						end_index: endIndex,
 					});
 				}
 			}
