@@ -1,3 +1,4 @@
+import { notificationActions } from '@mezon/store';
 import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
@@ -16,6 +17,7 @@ import { notificationSettingActions } from '../notificationSetting/notificationS
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
+
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -53,7 +55,13 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	idChannelSelected: Record<string, string>;
 	membersVoiceChannel: Record<string, string[]>;
 	mode: 'clan' | 'dm';
+	// quantityNotifyChannels: Record<string, number>;
 }
+
+// export type QuantityNotifyChannelArgs = {
+// 	channelId: string;
+// 	quantityNotify: number;
+// };
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
 
@@ -154,7 +162,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
-			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({clanId: clanID, channelId: body.channel_id}))
+			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId: clanID, channelId: body.channel_id }));
 			thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: clanID,
@@ -210,6 +218,12 @@ export const fetchChannels = createAsyncThunk('channels/fetchChannels', async ({
 		return [];
 	}
 
+	if (channelType === 1) {
+		const lastSeenTimeStampInit = response.channeldesc.map((channel) => {
+			return { channelId: channel.channel_id ?? '', lastSeenTimeStamp:  Number(channel.last_seen_message?.timestamp || 0), };
+		});
+		thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
+	}
 	const channels = response.channeldesc.map(mapChannelToEntity);
 	const meta = channels.map((ch) => extractChannelMeta(ch));
 	thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
@@ -228,6 +242,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
 	membersVoiceChannel: {},
 	mode: 'dm',
+	quantityNotifyChannels: {},
 });
 
 export const channelsSlice = createSlice({
@@ -247,6 +262,14 @@ export const channelsSlice = createSlice({
 		setCurrentVoiceChannelId: (state, action: PayloadAction<string>) => {
 			state.currentVoiceChannelId = action.payload;
 		},
+		// setAllQuantityNotifyChannel: (state, action: PayloadAction<QuantityNotifyChannelArgs[]>) => {
+		// 	for (const i of action.payload) {
+		// 		state.quantityNotifyChannels[i.channelId] = i.quantityNotify;
+		// 	}
+		// },
+		// setQuantityNotifyChannel: (state, action: PayloadAction<QuantityNotifyChannelArgs>) => {
+		// 	state.quantityNotifyChannels[action.payload.channelId] = action.payload.quantityNotify;
+		// },
 		openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
 			state.isOpenCreateNewChannel = action.payload;
 		},
@@ -290,7 +313,7 @@ export const channelsSlice = createSlice({
 			});
 		},
 		updateChannelThreadSocket: (state, action) => {
-			const payload  = action.payload;
+			const payload = action.payload;
 			channelsAdapter.updateOne(state, {
 				id: payload.channel_id,
 				changes: {
@@ -418,6 +441,7 @@ export const channelsActions = {
 	deleteChannel,
 	updateChannel,
 	updateChannelPrivate,
+	// changeCountNotifyChannel
 };
 
 /*
@@ -446,7 +470,7 @@ export const selectChannelById = (id: string) => createSelector(selectChannelsEn
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 
-export const selectEntitiesChannel = createSelector(getChannelsState, (state) => state.entities);
+// export const selectNotifyListChannels = createSelector(getChannelsState, (state) => state.quantityNotifyChannels);
 
 export const selectMode = createSelector(getChannelsState, (state) => state.mode);
 
@@ -459,7 +483,7 @@ export const selectCurrentChannel = createSelector(selectChannelsEntities, selec
 );
 
 export const selectLastSeenPinMessageChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
-    clanId && clansEntities[clanId] ? clansEntities[clanId].last_pin_message : ''
+	clanId && clansEntities[clanId] ? clansEntities[clanId].last_pin_message : '',
 );
 
 export const selectClanId = () => createSelector(selectCurrentChannel, (channel) => channel?.clan_id);
@@ -480,36 +504,30 @@ export const selectChannelsByClanId = (clainId: string) =>
 	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));
 
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
-    createSelector(selectChannelsByClanId(clanId), (channels) => {
+	createSelector(selectChannelsByClanId(clanId), (channels) => {
 		const idsSelectedChannel = JSON.parse(localStorage.getItem('remember_channel') || '{}');
-        if (idsSelectedChannel && idsSelectedChannel[clanId]) {
-            const selectedChannel = channels.find(channel => channel.channel_id === idsSelectedChannel[clanId]);
-            if (selectedChannel) {
-                return selectedChannel.id;
-            }
-        }
+		if (idsSelectedChannel && idsSelectedChannel[clanId]) {
+			const selectedChannel = channels.find((channel) => channel.channel_id === idsSelectedChannel[clanId]);
+			if (selectedChannel) {
+				return selectedChannel.id;
+			}
+		}
 
-        if (categories) {
-            for (const category of categories) {
-                const filteredChannel = channels.find(channel =>
-                    channel.parrent_id === '0' &&
-                    channel.type === ChannelType.CHANNEL_TYPE_TEXT &&
-                    channel.category_id === category
-                );
-                if (filteredChannel) {
-                    return filteredChannel.id;
-                }
-            }
-        }
+		if (categories) {
+			for (const category of categories) {
+				const filteredChannel = channels.find(
+					(channel) => channel.parrent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_TEXT && channel.category_id === category,
+				);
+				if (filteredChannel) {
+					return filteredChannel.id;
+				}
+			}
+		}
 
-        const defaultChannel = channels.find(channel =>
-            channel.parrent_id === '0' &&
-            channel.type === ChannelType.CHANNEL_TYPE_TEXT
-        );
+		const defaultChannel = channels.find((channel) => channel.parrent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_TEXT);
 
-        return defaultChannel ? defaultChannel.id : null;
-    });
-
+		return defaultChannel ? defaultChannel.id : null;
+	});
 
 export const selectIsUnreadChannelById = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {

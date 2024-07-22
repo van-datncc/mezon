@@ -1,4 +1,4 @@
-import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectNotificationMentionCountByChannelId } from '@mezon/store';
+import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectNotificationMentionCountByChannelId, selectNotifyListChannel, useAppDispatch } from '@mezon/store';
 import { ChannelThreads } from '@mezon/utils';
 import { Fragment } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -11,7 +11,6 @@ import UserListVoiceChannel from '../../UserListVoiceChannel';
 function useChannelBadgeCount(channelId: string) {
 	const lastChannelTimestamp = useSelector(selectLastChannelTimestamp(channelId));
 	const numberNotification = useSelector(selectNotificationMentionCountByChannelId(channelId, lastChannelTimestamp));
-
 	return numberNotification;
 }
 
@@ -21,9 +20,11 @@ type ChannelListItemProp = {
 
 const ChannelListItem = (props: ChannelListItemProp) => {
 	const { channel } = props;
-
+	const dispatch = useAppDispatch()
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(channel.id));
 	const numberNotification = useChannelBadgeCount(channel.id);
+
+	const NotifyChannel = useSelector(selectNotifyListChannel());
 
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />
@@ -33,6 +34,11 @@ const ChannelListItem = (props: ChannelListItemProp) => {
 		openInviteChannelModal();
 	};
 
+	console.log('NOTIFY: ', NotifyChannel)
+
+	// useEffect(() => {
+	// 	dispatch(channelsActions.setQuantityNotifyChannel({ channelId: channel.id ?? '', quantityNotify: numberNotification ?? 0 }))
+	// }, [numberNotification]);
 	return (
 		<Fragment>
 			<ChannelLink

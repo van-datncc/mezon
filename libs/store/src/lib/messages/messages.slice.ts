@@ -269,6 +269,7 @@ type UpdateMessageArgs = {
 export const updateLastSeenMessage = createAsyncThunk(
 	'messages/updateLastSeenMessage',
 	async ({ clanId, channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
+		console.log('DDDDDDDDDDDDDD ')
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
