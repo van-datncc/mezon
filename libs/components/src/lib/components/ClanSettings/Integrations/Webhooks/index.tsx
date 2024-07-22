@@ -1,11 +1,26 @@
-import { useState } from 'react';
+import { ChannelsEntity, generateWebhook, selectAllChannels, useAppDispatch } from '@mezon/store';
+import { ChannelIsNotThread } from '@mezon/utils';
+import { ApiCreateWebhookRequest } from 'mezon-js/api.gen';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import WebhookItemModal from './WebhookItemModal';
 
 const Webhooks = () => {
-	const [webhookCount, setWebhookCount] = useState(0);
+	const dispatch = useAppDispatch();
+	const allChannel = useSelector(selectAllChannels);
+	const [normalChannelsInClan, setNormalChannelsInClan] = useState<ChannelsEntity[]>([]);
+
+	useEffect(() => {
+		const normalChannels = allChannel.filter((channel) => channel.parrent_id === ChannelIsNotThread.TRUE);
+		setNormalChannelsInClan(normalChannels);
+	}, [allChannel]);
 
 	const handleAddWebhook = () => {
-		setWebhookCount(webhookCount + 1);
+		const newWebhookReq: ApiCreateWebhookRequest = {
+			channel_id: normalChannelsInClan[0].channel_id,
+			hook_name: 'Captain hook',
+		};
+		dispatch(generateWebhook(newWebhookReq));
 	};
 	return (
 		<>
@@ -18,9 +33,7 @@ const Webhooks = () => {
 			<div onClick={handleAddWebhook} className="py-2 px-4 bg-[#5865f2] rounded-sm mb-[24px] w-fit text-[14px] font-semibold cursor-pointer">
 				New Webhook
 			</div>
-			{Array.from({ length: webhookCount }).map((_, index) => (
-				<WebhookItemModal key={index} />
-			))}
+			<WebhookItemModal />
 		</>
 	);
 };
