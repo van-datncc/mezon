@@ -32,15 +32,13 @@ const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
 						) : (
 							<Image source={{ uri: attachment.url }} style={styles.attachmentItemImage} />
 						)}
-						{isUploaded && (
-							<TouchableOpacity
-								style={styles.iconClose}
-								activeOpacity={0.8}
-								onPress={() => onRemove(attachment.url ?? '', attachment?.filename || '')}
-							>
-								<Icons.CloseSmallBoldIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
-							</TouchableOpacity>
-						)}
+						<TouchableOpacity
+							style={styles.iconClose}
+							activeOpacity={0.8}
+							onPress={() => onRemove(attachment.url ?? '', attachment?.filename || '')}
+						>
+							<Icons.CloseSmallBoldIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
+						</TouchableOpacity>
 						{(isVideo || !isUploaded) && (
 							<View style={styles.videoOverlay}>
 								{!isUploaded ? (
