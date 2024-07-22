@@ -129,13 +129,12 @@ export type MentionReactInputProps = {
 };
 
 const neverMatchingRegex = /($a)/;
+const emojiRegex = /:[a-zA-Z0-9_]+:/g;
+const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
+const markdownRegex =
+	/(?:^|\s)(#{1,6}\s.*)|(?:\*\*(.*?)\*\*|_(.*?)_|~~(.*?)~~|```([\s\S]*?)```|`([^`]*)`)|\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)|!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)|(?:^|\s)([\-\*]\s+.*)|(?:^|\s)(\d+\.\s+.*)|(?:^|\s)>(.*)/g;
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
-	const emojiRegex = /:[a-zA-Z0-9_]+:/g;
-	const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
-	const markdownRegex =
-		/(?:^|\s)(#{1,6}\s.*)|(?:\*\*(.*?)\*\*|_(.*?)_|~~(.*?)~~|```([\s\S]*?)```|`([^`]*)`)|\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)|!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)|(?:^|\s)([\-\*]\s+.*)|(?:^|\s)(\d+\.\s+.*)|(?:^|\s)>(.*)/g;
-
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
@@ -430,8 +429,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		while ((match = emojiRegex.exec(convertedHashtag)) !== null) {
 			emojiList.push({
 				shortname: match[0],
-				start_index: match.index,
-				end_index: match.index + match[0].length,
+				startIndex: match.index,
+				endIndex: match.index + match[0].length,
 			});
 		}
 		setEmojisOnMessage(emojiList);
@@ -439,8 +438,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		while ((match = linkRegex.exec(convertedHashtag)) !== null) {
 			linkList.push({
 				link: match[0],
-				start_index: match.index,
-				end_index: match.index + match[0].length,
+				startIndex: match.index,
+				endIndex: match.index + match[0].length,
 			});
 		}
 		setLinksOnMessage(linkList);
@@ -451,8 +450,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
 			markdownList.push({
 				markdown: convertedMarkdown,
-				start_index: match.index,
-				end_index: match.index + match[0].length,
+				startIndex: match.index,
+				endIndex: match.index + match[0].length,
 			});
 		}
 		setMarkdownsOnMessage(markdownList);
@@ -474,10 +473,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					endIndex = startIndex + mention.display.length;
 					positionTracker[mention.display] = endIndex;
 					mentionList.push({
-						user_id: mention.id.toString() ?? '',
+						userId: mention.id.toString() ?? '',
 						username: mention.display ?? '',
-						start_index: startIndex,
-						end_index: endIndex,
+						startIndex: startIndex,
+						endIndex: endIndex,
 					});
 				}
 
@@ -493,10 +492,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					positionTracker[hashtagPattern] = endIndex;
 
 					hashtagList.push({
-						channel_id: mention.id.toString() ?? '',
-						channel_lable: mention.display ?? '',
-						start_index: startIndex,
-						end_index: endIndex,
+						channelId: mention.id.toString() ?? '',
+						channelLable: mention.display ?? '',
+						startIndex: startIndex,
+						endIndex: endIndex,
 					});
 				}
 			}

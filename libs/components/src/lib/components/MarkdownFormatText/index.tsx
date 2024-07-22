@@ -9,7 +9,7 @@ import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import remarkGFM from 'remark-gfm';
 import ExpiryTimeModal from '../ExpiryTime';
-import EmojiMarkdown from './EmojiMarkdown';
+import EmojiMarkdown from './EmojiMarkup';
 import ChannelHashtag from './HashTag';
 import MentionUser from './MentionUser';
 import PreClass from './PreClass';

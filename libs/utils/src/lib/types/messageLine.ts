@@ -1,28 +1,29 @@
-export interface IMentionOnMessage {
-	user_id: string | undefined;
-	username: string | undefined;
-	start_index?: number | undefined;
-	end_index?: number | undefined;
+export interface IStartEndIndex {
+	startIndex?: number | undefined;
+	endIndex?: number | undefined;
 }
 
-export interface IHashtagOnMessage {
-	channel_id: string | undefined;
-	channel_lable: string | undefined;
-	start_index?: number | undefined;
-	end_index?: number | undefined;
+export interface IMention {
+	userId: string | undefined;
+	username: string | undefined;
 }
-export interface IEmojiOnMessage {
+
+export interface IHashtag {
+	channelId: string | undefined;
+	channelLable: string | undefined;
+}
+export interface IEmoji {
 	shortname: string | undefined;
-	start_index?: number | undefined;
-	end_index?: number | undefined;
 }
-export interface ILinkOnMessage {
+export interface ILink {
 	link: string | undefined;
-	start_index?: number | undefined;
-	end_index?: number | undefined;
 }
-export interface ImarkdownOnMessage {
+export interface Imarkdown {
 	markdown: string | undefined;
-	start_index?: number | undefined;
-	end_index?: number | undefined;
 }
+
+export interface IMentionOnMessage extends IMention, IStartEndIndex {}
+export interface IHashtagOnMessage extends IHashtag, IStartEndIndex {}
+export interface IEmojiOnMessage extends IEmoji, IStartEndIndex {}
+export interface ILinkOnMessage extends ILink, IStartEndIndex {}
+export interface ImarkdownOnMessage extends Imarkdown, IStartEndIndex {}

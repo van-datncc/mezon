@@ -3,13 +3,13 @@ import { getSrcEmoji, SHOW_POSITION } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMessageContextMenu } from '../ContextMenu';
 
-type EmojiMarkdownOpt = {
+type MarkdownTextOpt = {
 	emojiSyntax: string;
 	onlyEmoji: boolean;
 	posReply?: boolean;
 };
 
-export const EmojiMarkdown: React.FC<EmojiMarkdownOpt> = ({ emojiSyntax, onlyEmoji, posReply }) => {
+export const MarkdownText: React.FC<MarkdownTextOpt> = ({ emojiSyntax, onlyEmoji, posReply }) => {
 	const { emojis } = useEmojiSuggestion();
 	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.5 m-0`);
 
@@ -35,4 +35,4 @@ export const EmojiMarkdown: React.FC<EmojiMarkdownOpt> = ({ emojiSyntax, onlyEmo
 		</span>
 	);
 };
-export default EmojiMarkdown;
+export default MarkdownText;

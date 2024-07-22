@@ -4,8 +4,7 @@ import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
 import { useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
-import { ChannelHashtag, EmojiMarkdown, MentionUser } from '../../components';
-import PreClass from '../MarkdownFormatText/PreClass';
+import { ChannelHashtag, EmojiMarkup, MentionUser, PreClass } from '../../components';
 
 type MessageLineProps = {
 	line: string;
@@ -18,7 +17,7 @@ type MessageLineProps = {
 const RenderContent = ({ data }: any, mode: number) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
-	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.start_index - b.start_index);
+	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
 	let lastIndex = 0;
 	const content = [];
 
@@ -35,25 +34,25 @@ const RenderContent = ({ data }: any, mode: number) => {
 	);
 
 	elements.forEach((element, index) => {
-		const { start_index, end_index, channel_id, channel_lable, username, shortname, link, markdown } = element;
+		const { startIndex, endIndex, channelId, channelLable, username, shortname, link, markdown } = element;
 
-		if (lastIndex < start_index) {
-			content.push(t.slice(lastIndex, start_index));
+		if (lastIndex < startIndex) {
+			content.push(t.slice(lastIndex, startIndex));
 		}
 
-		if (channel_id && channel_lable) {
-			content.push(<ChannelHashtag key={`${index}${start_index}${channel_id}`} channelHastagId={`<#${channel_id}>`} />);
+		if (channelId && channelLable) {
+			content.push(<ChannelHashtag key={`${index}${startIndex}${channelId}`} channelHastagId={`<#${channelId}>`} />);
 		}
 		if (username) {
-			content.push(<MentionUser key={`${index}${start_index}${username}`} tagName={username} mode={mode} />);
+			content.push(<MentionUser key={`${index}${startIndex}${username}`} tagName={username} mode={mode} />);
 		}
 		if (shortname) {
-			content.push(<EmojiMarkdown key={`${index}${start_index}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
+			content.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 		}
 		if (link) {
 			content.push(
 				<a
-					key={`${index}${start_index}${link}`}
+					key={`${index}${startIndex}${link}`}
 					style={{ color: 'rgb(59,130,246)', cursor: 'pointer' }}
 					className=" hover: underline"
 					href={link}
@@ -66,7 +65,7 @@ const RenderContent = ({ data }: any, mode: number) => {
 		}
 		if (markdown) {
 			content.push(
-				<article key={`${index}${start_index}${markdown}`} style={{ letterSpacing: '-0.01rem' }} className={classes}>
+				<article key={`${index}${startIndex}${markdown}`} style={{ letterSpacing: '-0.01rem' }} className={classes}>
 					<div className="lineText contents dark:text-white text-colorTextLightMode">
 						<Markdown
 							children={markdown}
@@ -90,7 +89,7 @@ const RenderContent = ({ data }: any, mode: number) => {
 				</article>,
 			);
 		}
-		lastIndex = end_index;
+		lastIndex = endIndex;
 	});
 
 	if (lastIndex < t.length) {
