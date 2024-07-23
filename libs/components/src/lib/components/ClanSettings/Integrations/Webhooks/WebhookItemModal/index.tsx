@@ -45,6 +45,10 @@ const WebhookItemModal = ({ parentChannelsInClan, webhookName, channelId, create
 	{/* Dropdown */}
 
 	const appearanceTheme = useSelector(selectTheme);
+
+	const handleCopyUrl = (url: string) => {
+		navigator.clipboard.writeText(url);
+	}
 	return (
 		<div className="dark:bg-[#2b2d31] bg-bgLightMode p-[20px] border dark:border-black rounded-md mb-[20px]">
 			<div className="flex gap-[20px] items-center mb-[12px]">
@@ -92,7 +96,7 @@ const WebhookItemModal = ({ parentChannelsInClan, webhookName, channelId, create
 									</div>
 									<input
 										type="text"
-										defaultValue={'Captain Hook'}
+										defaultValue={webhookName}
 										className="w-full dark:text-[#b5bac1] text-textLightTheme dark:bg-[#1e1f22] bg-bgLightModeThird p-[10px] rounded-sm outline-none"
 									/>
 								</div>
@@ -148,7 +152,7 @@ const WebhookItemModal = ({ parentChannelsInClan, webhookName, channelId, create
 							</div>
 							<div className="border-t dark:border-[#3b3d44] my-[24px]"></div>
 							<div className="flex items-center gap-[20px]">
-								<div className="px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer">
+								<div onClick={()=>handleCopyUrl(url as string)} className="px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer">
 									Copy Webhook URL
 								</div>
 								<div onClick={() => handleDeleteWebhook(id || '')} className="text-red-400 hover:underline cursor-pointer">

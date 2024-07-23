@@ -39,7 +39,7 @@ const Webhooks = () => {
 	
 
 	return (
-		<>
+		<div className='pb-5'>
 			<div className="dark:text-[#b5bac1] text-textLightTheme text-sm pt-5">
 				Webhooks are a simple way to post messages from other apps and websites into Discord using internet magic.
 				<b className="font-semibold text-[#00a8fc] hover:underline cursor-pointer"> Learn more</b> or try{' '}
@@ -62,7 +62,7 @@ const Webhooks = () => {
 						url={webhook.url}
 					/>
 				))}
-		</>
+		</div>
 	);
 };
 
