@@ -10,7 +10,7 @@ import {
 	save,
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import {
 	IEmojiOnMessage,
@@ -33,6 +33,7 @@ import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
 import { EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../../../../components/Suggestions';
+import UseMentionList from '../../../../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
@@ -113,6 +114,8 @@ export const ChatBoxBottomBar = memo(
 		const { setOpenThreadMessageState } = useReference();
 		const { setValueThread } = useThreads();
 		const { sessionRef, clientRef } = useMezon();
+		const channelsEntities = useSelector(selectChannelsEntities);
+		const listMentions = UseMentionList(channelId || '');
 		const { textInputProps, triggers } = useMentions({
 			value: mentionTextValue,
 			onChange: (newValue) => handleTextInputChange(newValue),
@@ -204,6 +207,7 @@ export const ChatBoxBottomBar = memo(
 			setEmojisOnMessage([]);
 			setLinksOnMessage([]);
 			setMarkdownsOnMessage([]);
+			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
 		}, [resetCachedText]);
 
@@ -219,6 +223,15 @@ export const ChatBoxBottomBar = memo(
 			},
 			[keyboardHeight, onShowKeyboardBottomSheet],
 		);
+
+		const getChannelById = (channelId: string) => {
+			const channel = channelsEntities?.[channelId];
+			if (channel) {
+				return channel;
+			} else {
+				return null;
+			}
+		};
 
 		const handleTextInputChange = async (text: string) => {
 			const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
@@ -248,7 +261,6 @@ export const ChatBoxBottomBar = memo(
 				}
 				setLinksOnMessage(linkList);
 
-				console.log('Tom log  => text', text);
 				while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
 					const startsWithTripleBackticks = match[0].startsWith('```');
 					const endsWithNoTripleBackticks = match[0].endsWith('```');
@@ -259,16 +271,12 @@ export const ChatBoxBottomBar = memo(
 						endIndex: match.index + match[0].length,
 					});
 				}
-
 				while ((match = mentionRegex.exec(convertedHashtag)) !== null) {
-					if (match) {
-						const username = match[0].substring(1); // Remove the '@' symbol
-						const regexId = new RegExp(`{@}\\[${username}\\]\\((\\d+)\\)`);
-						const matchId = text.match(regexId);
-						const id = matchId[1];
+					const mention = listMentions.find((m) => `@${m.display}` === match?.[0]);
+					if (mention) {
 						mentionList.push({
-							userId: id.toString() ?? '',
-							username: `@${username}`,
+							userId: mention?.id?.toString() ?? '',
+							username: `@${mention?.display}`,
 							startIndex: match.index,
 							endIndex: match.index + match[0].length,
 						});
@@ -277,16 +285,12 @@ export const ChatBoxBottomBar = memo(
 
 				while ((match = channelRegex.exec(convertedHashtag)) !== null) {
 					const matchChannelId = match[0].match(/<#(\d+)>/);
-					const channelId = matchChannelId ? matchChannelId[1] : null;
-
-					const regexChannelLabel = new RegExp(`\\{#\\}\\[([^\\]]+)\\]\\(${channelId}\\)`);
-					const matchLabel = text.match(regexChannelLabel);
-					const label = matchLabel[1];
-
-					if (channelId && label) {
+					const channelId = matchChannelId ? matchChannelId?.[1] : null;
+					const channelInfo = getChannelById(channelId);
+					if (channelInfo) {
 						hashtagList.push({
-							channelId: channelId.toString() ?? '',
-							channelLable: `#${label}`,
+							channelId: channelInfo.id.toString() ?? '',
+							channelLable: `#${channelInfo.channel_label}`,
 							startIndex: match.index,
 							endIndex: match.index + match[0].length,
 						});
@@ -477,7 +481,7 @@ export const ChatBoxBottomBar = memo(
 					<AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
 				)}
 
-				<Block flexDirection="row" justifyContent="space-between" alignItems="center" gap={size.s_10} paddingVertical={size.s_10}>
+				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
 					<ChatMessageLeftArea
 						isShowAttachControl={isShowAttachControl}
 						setIsShowAttachControl={setIsShowAttachControl}
