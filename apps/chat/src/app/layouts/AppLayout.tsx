@@ -70,7 +70,7 @@ const AppLayout = () => {
 					fcmActions.registFcmDeviceToken({
 						tokenId: fcmTokenObject.token ?? '',
 						deviceId: fcmTokenObject.deviceId ?? '',
-						platform: 'website',
+						platform: 'desktop',
 					}),
 				);
 			} else {
