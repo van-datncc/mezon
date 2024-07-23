@@ -1,6 +1,6 @@
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
-import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser } from '../../components';
+import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
 type MessageLineProps = {
 	line: string;
@@ -22,15 +22,12 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 
 	const content = useMemo(() => {
 		const tempContent: React.ReactNode[] = [];
-		if (elements.length === 0) {
-			tempContent.push(t);
-		}
 
 		elements.forEach((element, index) => {
-			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown } = element;
+			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
 
 			if (lastIndex < startIndex) {
-				tempContent.push(t.slice(lastIndex, startIndex));
+				tempContent.push(<PlainText text={t.slice(lastIndex, startIndex)} />);
 			}
 
 			if (channelId && channelLable) {
@@ -43,11 +40,15 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 				tempContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 			}
 
-			if (markdown) {
+			if (markdown || link) {
 				tempContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
 			}
 			lastIndex = endIndex;
 		});
+
+		if (lastIndex < t.length) {
+			tempContent.push(t.slice(lastIndex));
+		}
 
 		return tempContent;
 	}, [elements, t, mode]);
