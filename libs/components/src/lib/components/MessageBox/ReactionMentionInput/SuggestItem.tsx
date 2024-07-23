@@ -18,9 +18,10 @@ type SuggestItemProps = {
 	subTextStyle?: string;
 	showAvatar?: boolean;
 	channelId?: string | number;
+	isOpenSearchModal?: boolean;
 };
 
-const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText, subTextStyle, valueHightLight, showAvatar }: SuggestItemProps) => {
+const SuggestItem = ({ isOpenSearchModal, avatarUrl, symbol, name, displayName, channelId, subText, subTextStyle, valueHightLight, showAvatar }: SuggestItemProps) => {
 	const { emojis } = useEmojiSuggestion();
 	const urlEmoji = getSrcEmoji(name, emojis);
 	const allChannels = useSelector(selectAllChannels);
@@ -36,7 +37,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	}, [channelId, membersVoice, specificChannel?.type]);
 
 	useEffect(() => {
-		if (directId) {
+		if (directId && !isOpenSearchModal) {
 			commonChannelVoids.map((channel) => {
 				if (channel.channel_id === channelId) {
 					setSpecificChannel(channel);
@@ -69,7 +70,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, displayName, channelId, subText,
 	};
 
 	return (
-		<div className="flex flex-row items-center justify-between h-[24px]">
+		<div className="flex flex-row items-center justify-between h-[24px]" onMouseDown={() => console.log(specificChannel)}>
 			<div className="flex flex-row items-center gap-2 py-[3px]">
 				{showAvatar && (
 					<AvatarImage

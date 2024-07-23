@@ -1,17 +1,17 @@
 import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
-  getIsShowPopupForward,
-  selectAllClans,
-  selectCloseMenu,
-  selectCurrentChannel,
-  selectCurrentClan,
-  selectDirectsUnreadlist,
-  selectDmGroupCurrentId,
-  selectDmGroupCurrentType,
-  selectStatusMenu,
-  selectTheme,
-  toggleIsShowPopupForwardFalse,
+	getIsShowPopupForward,
+	selectAllClans,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectDirectsUnreadlist,
+	selectDmGroupCurrentId,
+	selectDmGroupCurrentType,
+	selectStatusMenu,
+	selectTheme,
+	toggleIsShowPopupForwardFalse,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -137,10 +137,13 @@ function MyApp() {
 
 	const initClan = useMemo(() => {
 		if (currentChannel?.id && currentClan?.id) {
+			localStorage.setItem('initClan', currentClan?.id);
 			return `/chat/clans/${currentClan?.id}/channels/${currentChannel?.id}`;
 		} else if (currentClan?.id) {
+			localStorage.setItem('initClan', currentClan?.id);
 			return `/chat/clans/${currentClan?.id}`;
 		} else if (clans?.length > 0) {
+			localStorage.setItem('initClan', clans[0].id);
 			return `/chat/clans/${clans[0].id}`;
 		}
 		return ``;
