@@ -1,6 +1,6 @@
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
-import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser } from '../../components';
+import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
 type MessageLineProps = {
 	line: string;
@@ -21,35 +21,36 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 	let lastIndex = 0;
 
 	const content = useMemo(() => {
-		const tempContent: React.ReactNode[] = [];
-		if (elements.length === 0) {
-			tempContent.push(t);
-		}
+		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown } = element;
+			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
 
 			if (lastIndex < startIndex) {
-				tempContent.push(t.slice(lastIndex, startIndex));
+				formattedContent.push(<PlainText key={`plain-${lastIndex}`} text={t.slice(lastIndex, startIndex)} />);
 			}
 
 			if (channelId && channelLable) {
-				tempContent.push(<ChannelHashtag key={`${index}${startIndex}${channelId}`} channelHastagId={`<#${channelId}>`} />);
+				formattedContent.push(<ChannelHashtag key={`${index}${startIndex}${channelId}`} channelHastagId={`<#${channelId}>`} />);
 			}
 			if (username) {
-				tempContent.push(<MentionUser key={`${index}${startIndex}${username}`} tagName={username} mode={mode} />);
+				formattedContent.push(<MentionUser key={`${index}${startIndex}${username}`} tagName={username} mode={mode} />);
 			}
 			if (shortname) {
-				tempContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
+				formattedContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 			}
 
-			if (markdown) {
-				tempContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
+			if (markdown || link) {
+				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
 			}
 			lastIndex = endIndex;
 		});
 
-		return tempContent;
+		if (lastIndex < t.length) {
+			formattedContent.push(<PlainText key={`plain-${lastIndex}-end`} text={t.slice(lastIndex)} />);
+		}
+
+		return formattedContent;
 	}, [elements, t, mode]);
 	return <div>{content}</div>;
 });
