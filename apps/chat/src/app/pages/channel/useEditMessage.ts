@@ -7,19 +7,19 @@ import {
 	selectOpenEditMessageState,
 	useAppSelector,
 } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
+import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const useEditMessage = (channelId: string, channelLabel: string, mode: number, message: IMessageWithUser) => {
 	const dispatch = useDispatch();
-	const { EditSendMessage } = useChatSending({ channelId: channelId || '', mode });
+	const { editSendMessage } = useChatSending({ channelId: channelId || '', mode });
 
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
-	const [content, setContent] = useState(channelDraftMessage.draft_content);
+	const [content, setContent] = useState(channelDraftMessage.draftContent);
 
 	const handleCancelEdit = useCallback(() => {
 		dispatch(referencesActions.setIdReferenceMessageEdit(''));
@@ -27,13 +27,13 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [dispatch]);
 
 	const setChannelDraftMessage = useCallback(
-		(channelId: string, message_id: string, draft_content: string) => {
+		(channelId: string, message_id: string, draftContent: string) => {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: channelId as string,
 					channelDraftMessage: {
 						message_id,
-						draft_content,
+						draftContent,
 					},
 				}),
 			);
@@ -42,12 +42,11 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	);
 
 	const handleSend = useCallback(
-		(editMessage: string, messageId: string) => {
-			const content = editMessage.trim();
-			EditSendMessage(content, messageId);
-			setChannelDraftMessage(channelId, messageId, content);
+		(editMessage: IMessageSendPayload, messageId: string) => {
+			editSendMessage(editMessage, messageId);
+			setChannelDraftMessage(channelId, messageId, editMessage.t);
 		},
-		[EditSendMessage],
+		[editSendMessage],
 	);
 
 	return {

@@ -19,7 +19,6 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
 	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
 	let lastIndex = 0;
-
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 

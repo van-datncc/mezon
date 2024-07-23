@@ -54,11 +54,13 @@ import {
 	MentionDataProps,
 	SubPanelName,
 	ThreadValue,
-	UserMentionsOpt,
 	UsersClanEntity,
 	convertMarkdown,
+	emojiRegex,
 	focusToElement,
+	linkRegex,
 	markdownRegex,
+	neverMatchingRegex,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
@@ -128,10 +130,6 @@ export type MentionReactInputProps = {
 	readonly currentChannelId?: string;
 	readonly mode?: number;
 };
-
-const neverMatchingRegex = /($a)/;
-const emojiRegex = /:[a-zA-Z0-9_]+:/g;
-const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
@@ -392,9 +390,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setOpenThreadMessageState,
 		],
 	);
-
-	const mentionedUsers: UserMentionsOpt[] = [];
-	//
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode !== 3 && props.mode !== 4) {

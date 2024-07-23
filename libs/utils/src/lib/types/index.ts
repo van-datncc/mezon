@@ -394,7 +394,7 @@ export type SenderInfoOptionals = {
 
 export type ChannelDraftMessages = {
 	message_id: string;
-	draft_content: string;
+	draftContent: string;
 };
 
 export interface IGifCategory {
@@ -575,10 +575,9 @@ export enum NotificationCode {
 	USER_REPLIED = -11,
 }
 
-export enum ChannelIsNotThread{
-	TRUE = "0",
+export enum ChannelIsNotThread {
+	TRUE = '0',
 }
-
 
 export enum EMessageCode {
 	FIRST_MESSAGE = 11,
