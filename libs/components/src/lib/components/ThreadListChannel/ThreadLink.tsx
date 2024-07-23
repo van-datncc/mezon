@@ -2,10 +2,9 @@ import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useThreads 
 import {
 	referencesActions,
 	selectCloseMenu,
+	selectCountNotifyByChannelId,
 	selectCurrentChannel,
 	selectIsUnreadChannelById,
-	selectLastChannelTimestamp,
-	selectNotificationMentionCountByChannelId,
 	useAppDispatch
 } from '@mezon/store';
 import { IChannel, MouseButton } from '@mezon/utils';
@@ -25,10 +24,9 @@ type ThreadLinkProps = {
 
 const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const dispatch = useAppDispatch();
-	const lastThreadTimestamp = useSelector(selectLastChannelTimestamp(thread.id));
 	const { toChannelPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
-	const numberNotification = useSelector(selectNotificationMentionCountByChannelId(thread.id, lastThreadTimestamp));
+	const numberNotification = useSelector(selectCountNotifyByChannelId(thread.id));
 	const currentChanel = useSelector(selectCurrentChannel);
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
@@ -42,8 +40,6 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 		mouseY: 0,
 		distanceToBottom: 0,
 	});
-
-	console.log('AAAAAAAAAAAA: ', thread)
 
 	const channelPath = toChannelPage(thread.channel_id as string, thread.clan_id || '');
 
@@ -84,10 +80,6 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			setStatusMenu(false);
 		}
 	};
-
-	// useEffect(() => {
-	// 	dispatch(channelsActions.setQuantityNotifyChannel({ channelId: thread.id ?? '', quantityNotify: numberNotification ?? 0 }))
-	// }, [numberNotification]);
 
 	return (
 		<div className="flex flex-row items-center h-[34px] relative ">

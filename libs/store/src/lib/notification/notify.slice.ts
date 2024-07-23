@@ -87,10 +87,15 @@ export const notificationSlice = createSlice({
 	initialState: initialNotificationState,
 	reducers: {
 		add(state, action) {
-			const newState = notificationAdapter.addOne(state,action.payload);
-			console.log('ACCTION PAYLOAD', JSON.stringify(state, null,2))
-			const quantityNotify = countNotifyByChannelId(newState, action.payload.channel_id, newState.lastSeenTimeStampChannels[action.payload.channel_id])
-			state.quantityNotifyChannels[action.payload.channel_id] = quantityNotify;	
+			const newState = notificationAdapter.addOne(state, action.payload);
+			const quantityNotify = countNotifyByChannelId(
+				newState,
+				action.payload.channel_id,
+				newState.lastSeenTimeStampChannels[action.payload.channel_id],
+			);
+			if (newState.lastSeenTimeStampChannels[action.payload.channel_id]) {
+				state.quantityNotifyChannels[action.payload.channel_id] = quantityNotify;
+			}
 		},
 		remove: notificationAdapter.removeOne,
 		setMessageNotifedId(state, action) {
@@ -111,18 +116,20 @@ export const notificationSlice = createSlice({
 			const ids = localStorage.getItem('notiUnread');
 			state.newNotificationStatus = !state.newNotificationStatus;
 		},
-
 		setAllLastSeenTimeStampChannel: (state, action: PayloadAction<LastSeenTimeStampChannelArgs[]>) => {
+			const newQuantityNotifyChannels: Record<string, number> = {};
+			const newLastSeenTimeStampChannels: Record<string, number> = {};
 			for (const i of action.payload) {
-				state.lastSeenTimeStampChannels[i.channelId] = i.lastSeenTimeStamp;
-				const countBadgeNotifyChannel =  countNotifyByChannelId(state, i.channelId,i.lastSeenTimeStamp )
-				state.quantityNotifyChannels[i.channelId] = countBadgeNotifyChannel;
+				newLastSeenTimeStampChannels[i.channelId] = i.lastSeenTimeStamp;
+				const countBadgeNotifyChannel = countNotifyByChannelId(state, i.channelId, i.lastSeenTimeStamp);
+				newQuantityNotifyChannels[i.channelId] = countBadgeNotifyChannel;
 			}
-			
+			state.lastSeenTimeStampChannels = newLastSeenTimeStampChannels;
+			state.quantityNotifyChannels = newQuantityNotifyChannels;
 		},
 		setLastSeenTimeStampChannel: (state, action: PayloadAction<LastSeenTimeStampChannelArgs>) => {
 			state.lastSeenTimeStampChannels[action.payload.channelId] = action.payload.lastSeenTimeStamp;
-			const quantityNotify =  countNotifyByChannelId(state, action.payload.channelId,action.payload.lastSeenTimeStamp )
+			const quantityNotify = countNotifyByChannelId(state, action.payload.channelId, action.payload.lastSeenTimeStamp);
 			state.quantityNotifyChannels[action.payload.channelId] = quantityNotify;
 		},
 		setReadNotiStatus(state, action) {
@@ -195,16 +202,16 @@ export const selectNotificationMentionCountByChannelId = (channelId: string, aft
 			).length,
 	);
 
-export const countNotifyByChannelId = (state:NotificationState, channelId:string, after=0) => {
+export const countNotifyByChannelId = (state: NotificationState, channelId: string, after = 0) => {
 	const listNotifies = Object.values(state.entities);
-	
-	const listNotifiesMention = listNotifies.filter((notify:INotification) => notify.code === NotificationCode.USER_MENTIONED || notify.code === NotificationCode.USER_REPLIED,)
-	console.log('LIst Notifies: ', listNotifiesMention)
+	const listNotifiesMention = listNotifies.filter(
+		(notify: INotification) => notify.code === NotificationCode.USER_MENTIONED || notify.code === NotificationCode.USER_REPLIED,
+	);
 	const quantityNotify = listNotifiesMention.filter(
 		(notification) => notification?.content?.channel_id === channelId && notification?.content?.update_time?.seconds > after,
-	).length
-	return quantityNotify
-}
+	).length;
+	return quantityNotify;
+};
 
 export const selectNotificationMessages = createSelector(selectAllNotification, (notifications) => {
 	return notifications.filter((notification) => notification.code !== -2 && notification.code !== -3);
@@ -223,25 +230,21 @@ export const selectIsMessageRead = createSelector(getNotificationState, (state: 
 
 export const selectNewNotificationStatus = createSelector(getNotificationState, (state: NotificationState) => state.newNotificationStatus);
 
-export const selectLastSeenTimestampById = (channelId: string) =>
-	createSelector(getNotificationState, (state) => {
-		return state.lastSeenTimeStampChannels[channelId] || 0;
-	});
-
 export const selectCountNotifyByChannelId = (channelId: string) =>
 	createSelector(getNotificationState, (state) => {
 		return state.quantityNotifyChannels[channelId] || 0;
 	});
 
-	export const selectNotifyListChannel = () =>
-		createSelector(getNotificationState, (state) => {
-			return state.quantityNotifyChannels || 0;
-		});
-// setAllQuantityNotifyChannel: (state, action: PayloadAction<QuantityNotifyChannelArgs[]>) => {
-// 	for (const i of action.payload) {
-// 		state.quantityNotifyChannels[i.channelId] = i.quantityNotify;
-// 	}
-// },
-// setQuantityNotifyChannel: (state, action: PayloadAction<QuantityNotifyChannelArgs>) => {
-// 	state.quantityNotifyChannels[action.payload.channelId] = action.payload.quantityNotify;
-// },
+export const selectAllCountState = () =>
+	createSelector(getNotificationState, (state) => {
+		return state.quantityNotifyChannels || null;
+	});
+export const selectAllLastSeenTimeStampState = () =>
+	createSelector(getNotificationState, (state) => {
+		return state.lastSeenTimeStampChannels || null;
+	});
+export const selectTotalQuantityNotify = () =>
+	createSelector(getNotificationState, (state: NotificationState) => {
+		const quantityNotifyChannels = state.quantityNotifyChannels;
+		return Object.values(quantityNotifyChannels).reduce((total, quantity) => total + quantity, 0);
+	});
