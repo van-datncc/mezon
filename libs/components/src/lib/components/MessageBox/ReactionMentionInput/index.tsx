@@ -1,60 +1,67 @@
 import {
-  useChannelMembers,
-  useChannels,
-  useClickUpToEdit,
-  useEmojiSuggestion,
-  useGifsStickersEmoji,
-  useMessageValue,
-  useReference,
-  useSearchMessages,
-  useThreads,
+	useChannelMembers,
+	useChannels,
+	useClickUpToEdit,
+	useEmojiSuggestion,
+	useGifsStickersEmoji,
+	useMessageValue,
+	useReference,
+	useSearchMessages,
+	useThreads,
 } from '@mezon/core';
 import {
-  ChannelsEntity,
-  channelUsersActions,
-  messagesActions,
-  reactionActions,
-  referencesActions,
-  selectAllAccount,
-  selectAllDirectChannelVoids,
-  selectAllUsesClan,
-  selectAttachmentData,
-  selectCloseMenu,
-  selectCurrentChannel,
-  selectCurrentChannelId,
-  selectDataReferences,
-  selectDmGroupCurrentId,
-  selectIdMessageRefReply,
-  selectIsFocused,
-  selectIsShowMemberList,
-  selectIsShowMemberListDM,
-  selectIsUseProfileDM,
-  selectLassSendMessageEntityBySenderId,
-  selectMessageByMessageId,
-  selectOpenEditMessageState,
-  selectOpenReplyMessageState,
-  selectOpenThreadMessageState,
-  selectReactionRightState,
-  selectStatusMenu,
-  selectTheme,
-  threadsActions,
-  useAppDispatch,
+	ChannelsEntity,
+	channelUsersActions,
+	messagesActions,
+	reactionActions,
+	referencesActions,
+	selectAllAccount,
+	selectAllDirectChannelVoids,
+	selectAllUsesClan,
+	selectAttachmentData,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectCurrentChannelId,
+	selectDataReferences,
+	selectDmGroupCurrentId,
+	selectIdMessageRefReply,
+	selectIsFocused,
+	selectIsShowMemberList,
+	selectIsShowMemberListDM,
+	selectIsUseProfileDM,
+	selectLassSendMessageEntityBySenderId,
+	selectMessageByMessageId,
+	selectOpenEditMessageState,
+	selectOpenReplyMessageState,
+	selectOpenThreadMessageState,
+	selectReactionRightState,
+	selectStatusMenu,
+	selectTheme,
+	threadsActions,
+	useAppDispatch,
 } from '@mezon/store';
 import {
-  ChannelMembersEntity,
-  EmojiPlaces,
-  ILineMention,
-  IMessageSendPayload,
-  MIN_THRESHOLD_CHARS,
-  MentionDataProps,
-  SubPanelName,
-  ThreadValue,
-  UserMentionsOpt,
-  UsersClanEntity,
-  focusToElement,
-  searchMentionsHashtag,
-  threadError,
-  uniqueUsers,
+	ChannelMembersEntity,
+	EmojiPlaces,
+	IEmojiOnMessage,
+	IHashtagOnMessage,
+	ILineMention,
+	ILinkOnMessage,
+	IMentionOnMessage,
+	IMessageSendPayload,
+	ImarkdownOnMessage,
+	MIN_THRESHOLD_CHARS,
+	MentionDataProps,
+	SubPanelName,
+	ThreadValue,
+	UserMentionsOpt,
+	UsersClanEntity,
+	convertMarkdown,
+	focusToElement,
+	markdownRegex,
+	searchMentionsHashtag,
+	threadError,
+	uniqueUsers,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -68,23 +75,27 @@ import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
 import {
-  defaultMaxWidth,
-  maxWidthWithChatThread,
-  maxWidthWithDmGroupMemberList,
-  maxWidthWithDmUserProfile,
-  maxWidthWithMemberList,
-  maxWidthWithSearchMessage,
-  widthDmGroupMemberList,
-  widthDmUserProfile,
-  widthMessageViewChat,
-  widthMessageViewChatThread,
-  widthSearchMessage,
-  widthThumbnailAttachment,
+	defaultMaxWidth,
+	maxWidthWithChatThread,
+	maxWidthWithDmGroupMemberList,
+	maxWidthWithDmUserProfile,
+	maxWidthWithMemberList,
+	maxWidthWithSearchMessage,
+	widthDmGroupMemberList,
+	widthDmUserProfile,
+	widthMessageViewChat,
+	widthMessageViewChatThread,
+	widthSearchMessage,
+	widthThumbnailAttachment,
 } from './CustomWidth';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
+
+interface PositionTracker {
+	[key: string]: number;
+}
 
 type ChannelsMentionProps = {
 	id: string;
@@ -119,6 +130,8 @@ export type MentionReactInputProps = {
 };
 
 const neverMatchingRegex = /($a)/;
+const emojiRegex = /:[a-zA-Z0-9_]+:/g;
+const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
@@ -132,6 +145,20 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+
+	const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
+	const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
+	const [emojisOnMessage, setEmojisOnMessage] = useState<IEmojiOnMessage[]>([]);
+	const [linksOnMessage, setLinksOnMessage] = useState<ILinkOnMessage[]>([]);
+	const [markdownsOnMessage, setMarkdownsOnMessage] = useState<ImarkdownOnMessage[]>([]);
+	const [plainTextMessage, setPlainTextMessage] = useState<string>();
+
+	const mentionList: IMentionOnMessage[] = [];
+	const hashtagList: IHashtagOnMessage[] = [];
+	const emojiList: IEmojiOnMessage[] = [];
+	const linkList: ILinkOnMessage[] = [];
+	const markdownList: ImarkdownOnMessage[] = [];
+
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const attachmentDataRef = useSelector(selectAttachmentData);
@@ -288,7 +315,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					setOpenThreadMessageState(false);
 				} else {
 					props.onSend(
-						{ t: content.trim() },
+						{
+							t: content.trim(),
+							mentions: mentionsOnMessage,
+							hashtags: hashtagsOnMessage,
+							emojis: emojisOnMessage,
+							links: linksOnMessage,
+							markdowns: markdownsOnMessage,
+							plainText: plainTextMessage,
+						},
 						mentionData,
 						attachmentDataRef,
 						undefined,
@@ -309,6 +344,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
+
+			setMentionsOnMessage([]);
+			setHashtagsOnMessage([]);
+			setEmojisOnMessage([]);
+			setLinksOnMessage([]);
+			setMarkdownsOnMessage([]);
 		},
 		[
 			valueTextInput,
@@ -344,6 +385,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	);
 
 	const mentionedUsers: UserMentionsOpt[] = [];
+	//
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode !== 3 && props.mode !== 4) {
@@ -381,21 +423,87 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		const convertedHashtag = convertToPlainTextHashtag(newValue);
 		setContent(convertedHashtag);
+		setPlainTextMessage(newPlainTextValue);
+		let match;
+		while ((match = emojiRegex.exec(convertedHashtag)) !== null) {
+			emojiList.push({
+				shortname: match[0],
+				startIndex: match.index,
+				endIndex: match.index + match[0].length,
+			});
+		}
+		setEmojisOnMessage(emojiList);
+
+		while ((match = linkRegex.exec(convertedHashtag)) !== null) {
+			linkList.push({
+				link: match[0],
+				startIndex: match.index,
+				endIndex: match.index + match[0].length,
+			});
+		}
+		setLinksOnMessage(linkList);
+
+		while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
+			const startsWithTripleBackticks = match[0].startsWith('```');
+			const endsWithNoTripleBackticks = match[0].endsWith('```');
+			const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
+			markdownList.push({
+				markdown: convertedMarkdown,
+				startIndex: match.index,
+				endIndex: match.index + match[0].length,
+			});
+		}
+		setMarkdownsOnMessage(markdownList);
 
 		if (mentions.length > 0) {
 			if (mentions.some((mention) => mention.display === '@here')) {
 				setMentionEveryone(true);
 			}
+			let positionTracker: PositionTracker = {};
+
 			for (const mention of mentions) {
+				let startIndex = -1;
+				let endIndex = -1;
 				if (mention.display.startsWith('@')) {
-					mentionedUsers.push({
-						user_id: mention.id.toString() ?? '',
+					if (!positionTracker[mention.display]) {
+						positionTracker[mention.display] = 0;
+					}
+					startIndex = convertedHashtag.indexOf(mention.display, positionTracker[mention.display]);
+					endIndex = startIndex + mention.display.length;
+					positionTracker[mention.display] = endIndex;
+					mentionList.push({
+						userId: mention.id.toString() ?? '',
 						username: mention.display ?? '',
+						startIndex: startIndex,
+						endIndex: endIndex,
+					});
+				}
+
+				if (mention.display.startsWith('#')) {
+					const hashtagPattern = `<#${mention.id.toString()}>`;
+
+					if (positionTracker[hashtagPattern] === undefined) {
+						positionTracker[hashtagPattern] = 0;
+					}
+					startIndex = convertedHashtag.indexOf(hashtagPattern, positionTracker[hashtagPattern]);
+					endIndex = startIndex + hashtagPattern.length;
+
+					positionTracker[hashtagPattern] = endIndex;
+
+					hashtagList.push({
+						channelId: mention.id.toString() ?? '',
+						channelLable: mention.display ?? '',
+						startIndex: startIndex,
+						endIndex: endIndex,
 					});
 				}
 			}
+
+			setMentionsOnMessage(mentionList);
+			setHashtagsOnMessage(hashtagList);
 			setMentionData(mentionedUsers);
 		}
+
 		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(convertedHashtag);
 			setContent('');

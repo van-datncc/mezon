@@ -1,11 +1,10 @@
-import { CloseIcon, PlayIcon } from '@mezon/mobile-components';
-import { size, verticalScale } from '@mezon/mobile-ui';
+import { Icons, PlayIcon } from '@mezon/mobile-components';
+import { baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React from 'react';
 import { ActivityIndicator, Image, ScrollView, TouchableOpacity, View } from 'react-native';
-import colors from 'tailwindcss/colors';
 import AttachmentFilePreview from '../AttachmentFilePreview';
-import styles from './styles';
+import { style } from './styles';
 
 interface IProps {
 	attachments: ApiMessageAttachment[];
@@ -13,6 +12,8 @@ interface IProps {
 }
 
 const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return (
 		<ScrollView
 			horizontal
@@ -31,15 +32,13 @@ const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
 						) : (
 							<Image source={{ uri: attachment.url }} style={styles.attachmentItemImage} />
 						)}
-						{isUploaded && (
-							<TouchableOpacity
-								style={styles.iconClose}
-								activeOpacity={0.8}
-								onPress={() => onRemove(attachment.url ?? '', attachment?.filename || '')}
-							>
-								<CloseIcon width={size.s_18} height={size.s_18} color={colors.black} />
-							</TouchableOpacity>
-						)}
+						<TouchableOpacity
+							style={styles.iconClose}
+							activeOpacity={0.8}
+							onPress={() => onRemove(attachment.url ?? '', attachment?.filename || '')}
+						>
+							<Icons.CloseSmallBoldIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
+						</TouchableOpacity>
 						{(isVideo || !isUploaded) && (
 							<View style={styles.videoOverlay}>
 								{!isUploaded ? (

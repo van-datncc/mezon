@@ -1,19 +1,20 @@
 import {
-	notificationSettingActions,
-	selectCurrentChannelId,
-	selectCurrentClanId,
-	selectDefaultNotificationCategory,
-	selectDefaultNotificationClan,
-	selectNotifiReactMessage,
-	selectnotificatonSelected,
-	useAppDispatch,
+  notificationSettingActions,
+  selectCurrentChannelId,
+  selectCurrentClanId,
+  selectDefaultNotificationCategory,
+  selectDefaultNotificationClan,
+  selectNotifiReactMessage,
+  selectnotificatonSelected,
+  useAppDispatch, notifiReactMessageActions,
 } from '@mezon/store';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import ItemNotificationSetting from './ItemNotificationSetting';
+import { notificationTypesList } from "../../../PanelChannel";
+import ItemPanel from "../../../PanelChannel/ItemPanel";
 
 const NotificationSetting = () => {
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
@@ -26,9 +27,10 @@ const NotificationSetting = () => {
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const notifiReactMessage = useSelector(selectNotifiReactMessage);
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
-	const notificationTypes = Object.values(NotificationType);
+  const [isNotifyReactMessage, setisNotifyReactMessage] = useState (notifiReactMessage?.id !== '0')
+  
 	useEffect(() => {
-		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.active === undefined) {
+		if (getNotificationChannelSelected?.active === 1) {
 			setNameChildren('Mute Channel');
 			setmutedUntil('');
 		} else {
@@ -94,6 +96,28 @@ const NotificationSetting = () => {
 		};
 		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 	};
+  
+  const setNotification = (notificationType: string) => {
+    if(notificationType) {
+      const body = {
+        channel_id: currentChannelId || '',
+        notification_type: notificationType || '',
+        clan_id: currentClanId || '',
+      };
+      dispatch(notificationSettingActions.setNotificationSetting(body));
+    } else {
+      dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: currentChannelId || '', clan_id: currentClanId || '' }));
+    }
+  };
+  
+  const setNotiReactMess = () => {
+    if (!isNotifyReactMessage) {
+      dispatch(notifiReactMessageActions.setNotifiReactMessage({ channel_id: currentChannelId || '' }));
+    } else {
+      dispatch(notifiReactMessageActions.deleteNotifiReactMessage({ channel_id: currentChannelId || '' }));
+    }
+    setisNotifyReactMessage(!isNotifyReactMessage);
+  };
 
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
@@ -105,7 +129,7 @@ const NotificationSetting = () => {
 							dismissOnClick={false}
 							renderTrigger={() => (
 								<div>
-									<ItemNotificationSetting
+									<ItemPanel
 										children={nameChildren}
 										muteTime={mutedUntil}
 										dropdown="change here"
@@ -117,48 +141,50 @@ const NotificationSetting = () => {
 							placement="right-start"
 							className="dark:bg-black bg-white border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 						>
-							<ItemNotificationSetting children="For 15 Minutes" onClick={() => handleScheduleMute(15 * 60 * 1000)} />
-							<ItemNotificationSetting children="For 1 Hour" onClick={() => handleScheduleMute(60 * 60 * 1000)} />
-							<ItemNotificationSetting children="For 3 Hours" onClick={() => handleScheduleMute(3 * 60 * 60 * 1000)} />
-							<ItemNotificationSetting children="For 8 Hours" onClick={() => handleScheduleMute(8 * 60 * 60 * 1000)} />
-							<ItemNotificationSetting children="For 24 Hours" onClick={() => handleScheduleMute(24 * 60 * 60 * 1000)} />
-							<ItemNotificationSetting children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
+							<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(15 * 60 * 1000)} />
+							<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(60 * 60 * 1000)} />
+							<ItemPanel children="For 3 Hours" onClick={() => handleScheduleMute(3 * 60 * 60 * 1000)} />
+							<ItemPanel children="For 8 Hours" onClick={() => handleScheduleMute(8 * 60 * 60 * 1000)} />
+							<ItemPanel children="For 24 Hours" onClick={() => handleScheduleMute(24 * 60 * 60 * 1000)} />
+							<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
 						</Dropdown>
 					) : (
-						<ItemNotificationSetting
+						<ItemPanel
 							children={nameChildren}
 							muteTime={mutedUntil}
-							dropdown="change here"
 							onClick={() => muteOrUnMuteChannel(1)}
 						/>
 					)}
 				</div>
 				<div className="flex flex-col pb-2 mb-1 border-b-[0.08px] dark:border-b-[#6A6A6A] border-b-[#E1E1E1] last:border-b-0 last:mb-0 last:pb-0">
-					<ItemNotificationSetting
+					<ItemPanel
 						children="Reaction Message"
 						type="checkbox"
 						name="NotifiReactionSetting"
-						notifiSelected={notifiReactMessage?.id !== '0'}
+						checked={isNotifyReactMessage}
+            onClick={setNotiReactMess}
 					/>
 				</div>
-				<ItemNotificationSetting
-					children="Use Category Default"
-					type="radio"
-					name="NotificationSetting"
-					defaultNotifi={true}
-					defaultNotifiName={defaultNotifiName}
-					notifiSelected={getNotificationChannelSelected?.notification_setting_type === undefined}
-				/>
-				{notificationTypes.map((notification) => (
-					<ItemNotificationSetting
-						children={notification}
-						notificationId={notification}
-						type="radio"
-						name="NotificationSetting"
-						key={notification}
-						notifiSelected={getNotificationChannelSelected?.notification_setting_type === notification}
-					/>
-				))}
+        <ItemPanel
+          children="Use Category Default"
+          type="radio"
+          name="NotificationSetting"
+          defaultNotifi={true}
+          checked={getNotificationChannelSelected?.notification_setting_type === undefined}
+          defaultNotifiName={defaultNotifiName}
+          onClick={() => setNotification('')}
+        />
+        {notificationTypesList.map(notification => (
+          <ItemPanel
+            children={notification.label}
+            notificationId={notification.value}
+            type="radio"
+            name="NotificationSetting"
+            key={notification.value}
+            checked={getNotificationChannelSelected?.notification_setting_type === notification.value}
+            onClick={() => setNotification(notification.value)}
+          />
+        ))}
 			</div>
 		</div>
 	);

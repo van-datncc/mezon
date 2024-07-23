@@ -146,7 +146,7 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 						onChange={(e) => handleChangeClanName(e.target.value)}
 						className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
 						placeholder="Support has arrived!"
-						maxLength={64}
+						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>
 				</div>
 				{checkValidate && (

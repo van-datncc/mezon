@@ -29,3 +29,33 @@ export const fileTypeVideo = ['video/mp4', 'video/webm', 'video/mpeg', 'video/x-
 
 export const fileTypeImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
+const headerRegex = /(?:^|\s)(#{1,6}\s.*)/;
+const boldRegex = /\*\*(.*?)\*\*/;
+const italicRegex = /_(.*?)_/;
+const strikethroughRegex = /~~(.*?)~~/;
+const codeBlockRegex = /```([\s\S]*?)```/;
+const inlineCodeRegex = /`([^`]*)`/;
+const hyperLink = /\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)/;
+const imageRegex = /!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)/;
+const unorderedListRegex = /(?:^|\s)([\-\*]\s+.*?)(?:\n|$)/;
+const orderedListRegex = /(?:^|\s)(\d+\.\s+.*?)(?:\n|$)/;
+const blockquoteRegex = /(?:^|\s)>(.*?)(?:\n|$)/;
+const urlRegex = /((http[s]?:\/\/[^\s()<>"]+|www\.[^\s()<>"]+))/g;
+
+export const markdownRegex = new RegExp(
+	[
+		headerRegex.source,
+		boldRegex.source,
+		italicRegex.source,
+		strikethroughRegex.source,
+		codeBlockRegex.source,
+		inlineCodeRegex.source,
+		hyperLink.source,
+		imageRegex.source,
+		unorderedListRegex.source,
+		orderedListRegex.source,
+		blockquoteRegex.source,
+		urlRegex.source,
+	].join('|'),
+	'g',
+);

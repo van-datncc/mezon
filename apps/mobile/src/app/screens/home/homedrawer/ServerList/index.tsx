@@ -15,7 +15,7 @@ import ListClanPopupProps from '../components/ListClanPopup';
 import { UnreadDMBadgeList } from '../components/UnreadDMBadgeList';
 import { style } from './styles';
 
-const ServerList = React.memo((props: any) => {
+const ServerList = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [isVisible, setIsVisible] = useState<boolean>(false);

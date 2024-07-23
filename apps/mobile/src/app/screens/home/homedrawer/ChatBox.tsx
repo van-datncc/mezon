@@ -1,5 +1,5 @@
 import {
-  ActionEmitEvent
+  ActionEmitEvent,
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';

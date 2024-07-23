@@ -10,7 +10,9 @@ import {
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	messagesActions,
 	notificationActions,
+	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
@@ -29,10 +31,11 @@ import { ChatContext, ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { AppState, StatusBar } from 'react-native';
+import { AppState, DeviceEventEmitter, StatusBar } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
 // import SplashScreen from '../components/SplashScreen';
 import {
+	ActionEmitEvent,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
@@ -60,6 +63,7 @@ const NavigationMain = () => {
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 
 	useEffect(() => {
@@ -96,7 +100,7 @@ const NavigationMain = () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentClanId, isFromFcmMobile]);
+	}, [currentChannelId, isFromFcmMobile]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', async (state) => {
@@ -127,11 +131,29 @@ const NavigationMain = () => {
 	const handleAppStateChange = async (state: string) => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		if (state === 'active') {
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 			if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
-				return;
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+			} else {
+				await messageLoaderBackground();
 			}
-			const socket = await reconnect(currentClanId, true);
-			if (socket) setCallbackEventFn(socket);
+		}
+	};
+
+	const messageLoaderBackground = async () => {
+		try {
+			if (!currentChannelId) {
+				return null;
+			}
+			const store = await getStoreAsync();
+			dispatch(appActions.setLoadingMainMobile(false));
+			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+			return null;
+		} catch (error) {
+			alert('error messageLoaderBackground' + error.message);
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+			console.log('error messageLoaderBackground', error);
 		}
 	};
 
