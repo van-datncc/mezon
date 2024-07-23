@@ -21,36 +21,36 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 	let lastIndex = 0;
 
 	const content = useMemo(() => {
-		const tempContent: React.ReactNode[] = [];
+		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
 			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
 
 			if (lastIndex < startIndex) {
-				tempContent.push(<PlainText text={t.slice(lastIndex, startIndex)} />);
+				formattedContent.push(<PlainText text={t.slice(lastIndex, startIndex)} />);
 			}
 
 			if (channelId && channelLable) {
-				tempContent.push(<ChannelHashtag key={`${index}${startIndex}${channelId}`} channelHastagId={`<#${channelId}>`} />);
+				formattedContent.push(<ChannelHashtag key={`${index}${startIndex}${channelId}`} channelHastagId={`<#${channelId}>`} />);
 			}
 			if (username) {
-				tempContent.push(<MentionUser key={`${index}${startIndex}${username}`} tagName={username} mode={mode} />);
+				formattedContent.push(<MentionUser key={`${index}${startIndex}${username}`} tagName={username} mode={mode} />);
 			}
 			if (shortname) {
-				tempContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
+				formattedContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 			}
 
 			if (markdown || link) {
-				tempContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
+				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
 			}
 			lastIndex = endIndex;
 		});
 
 		if (lastIndex < t.length) {
-			tempContent.push(<PlainText text={t.slice(lastIndex)} />);
+			formattedContent.push(<PlainText text={t.slice(lastIndex)} />);
 		}
 
-		return tempContent;
+		return formattedContent;
 	}, [elements, t, mode]);
 	return <div>{content}</div>;
 });
