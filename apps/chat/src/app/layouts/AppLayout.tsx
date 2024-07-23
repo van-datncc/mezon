@@ -77,7 +77,7 @@ const AppLayout = () => {
 				requestForToken()
 					.then((token) => {
 						if (token) {
-							dispatch(fcmActions.registFcmDeviceToken({ tokenId: token, deviceId: userProfile?.user?.id || '', platform: 'website' }));
+							dispatch(fcmActions.registFcmDeviceToken({ tokenId: token, deviceId: userProfile?.user?.id || '', platform: 'desktop' }));
 						}
 					})
 					.catch((error: Error) => {
