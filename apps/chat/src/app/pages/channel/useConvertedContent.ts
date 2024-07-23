@@ -1,4 +1,5 @@
 import {
+	convertMarkdown,
 	emojiRegex,
 	hashtagRegex,
 	IEmojiOnMessage,
@@ -71,8 +72,11 @@ export const useConvertedContent = (plainText: string) => {
 
 		// Detect markdown
 		while ((match = markdownRegex.exec(plainText)) !== null) {
+			const startsWithTripleBackticks = match[0].startsWith('```');
+			const endsWithNoTripleBackticks = match[0].endsWith('```');
+			const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
 			markdownArr.push({
-				markdown: match[0],
+				markdown: convertedMarkdown,
 				startIndex: match.index,
 				endIndex: markdownRegex.lastIndex,
 			});
