@@ -47,7 +47,7 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 		});
 
 		if (lastIndex < t.length) {
-			tempContent.push(t.slice(lastIndex));
+			tempContent.push(<PlainText text={t.slice(lastIndex)} />);
 		}
 
 		return tempContent;
