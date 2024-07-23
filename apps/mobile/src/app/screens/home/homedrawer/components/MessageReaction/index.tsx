@@ -18,10 +18,9 @@ import { style } from './styles';
 export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { message, emojiListPNG, openEmojiPicker, mode, preventAction = false } = props || {};
+	const { message, emojiListPNG, openEmojiPicker, mode, preventAction = false, userProfile } = props || {};
 	const [currentEmojiSelectedId, setCurrentEmojiSelectedId] = useState<string | null>(null);
 	const { reactionMessageDispatch } = useChatReaction();
-	const userProfile = useSelector(selectAllAccount);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
 

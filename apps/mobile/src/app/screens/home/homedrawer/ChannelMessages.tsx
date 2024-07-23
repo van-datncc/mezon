@@ -113,8 +113,13 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
 			isHiddenBottomSheet && setOpenBottomSheet(null);
 		});
+		
+		const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, ({ isShow }) => {
+			setIsShowSkeleton(isShow);
+		});
 		return () => {
 			messageItemBSListener.remove();
+			showSKlListener.remove();
 		};
 	}, []);
 
@@ -149,6 +154,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	}, [typingUsers]);
 
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
+	const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
 	const onLoadMore = useCallback(async () => {
 		if (isLoadMore || isLoading === 'loading') {
 			return;
@@ -276,7 +282,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		<View style={{ flex: 1 }}>
 			<View style={styles.wrapperChannelMessage}>
 				{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
-				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && <MessageItemSkeleton skeletonNumber={15} />}
+				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && <MessageItemSkeleton skeletonNumber={15} />}
 				<FlashList
 					ref={flatListRef}
 					inverted
