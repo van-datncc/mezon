@@ -27,6 +27,7 @@ import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from '.
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { attachmentReducer } from './attachment/attachments.slice';
+import { directChannelVoidReducer } from './channels/directChannelVoid.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
@@ -39,12 +40,13 @@ import { defaultNotificationClanReducer } from './notificationSetting/notificati
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
+import { settingClanEmojiReducer } from "./settingEmoji/settingEmoji.slice";
+import { integrationWebhookReducer } from './webhook/webhook.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
-import { directChannelVoidReducer } from './channels/directChannelVoid.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -113,6 +115,8 @@ const reducer = {
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
+	settingEmoji: settingClanEmojiReducer,
+	webhook: integrationWebhookReducer,
 };
 
 let storeInstance = configureStore({

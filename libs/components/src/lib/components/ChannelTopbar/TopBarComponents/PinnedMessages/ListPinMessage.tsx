@@ -39,7 +39,7 @@ const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
 	const checkListPinMessages = useMemo(() => listPinMessages.length <= 0,[listPinMessages.length]);
 
 	useEffect(() => {
-		if (checkListPinMessages) {
+		if (!checkListPinMessages) {
 			dispatch(
 				pinMessageActions.updateLastSeenPin({
 					clanId: currentClanId ?? '',
@@ -48,7 +48,7 @@ const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
 				}),
 			);
 		}
-	}, [listPinMessages]);
+	}, []);
 
 	return (
 		<div className='min-h-36'>
@@ -57,7 +57,7 @@ const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
 			) : 
 			(
 				<div className="flex flex-col items-center justify-center space-y-2 py-2">
-					{listPinMessages.slice().reverse().map((pinMessage) => {
+					{listPinMessages.slice().reverse().map((pinMessage, index) => {
 						// Parse content if it's a JSON string
 						let contentString = pinMessage.content;
 						if (typeof contentString === 'string') {
@@ -70,7 +70,7 @@ const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
 						}
 
 						return (
-							<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage}/>
+							<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage} key={index}/>
 						);
 					})}
 				</div>
