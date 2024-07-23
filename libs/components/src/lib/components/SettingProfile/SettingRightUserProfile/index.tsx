@@ -76,7 +76,7 @@ const SettingRightUser = ({
 			e.target.value = null;
 			return;
 		}
-		handleUploadFile(client, session, currentClanId, currentChannelId, imageAvatarResize?.name, imageAvatarResize).then((attachment: any) => {
+		handleUploadFile(client, session, currentClanId || 'temp', currentChannelId || 'temp', imageAvatarResize?.name, imageAvatarResize).then((attachment: any) => {
 			setUrlImage(attachment.url ?? '');
 		});
 		setFlags(true);
