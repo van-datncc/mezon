@@ -86,7 +86,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 					channelId,
 					channelDraftMessage: {
 						message_id: messageId,
-						draft_content: channelDraftMessage.draft_content ?? ((mess as IMessageWithUser).content?.t as string),
+						draftContent: channelDraftMessage.draftContent ?? ((mess as IMessageWithUser).content?.t as string),
 					},
 				}),
 			);
