@@ -358,6 +358,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setEmojisOnMessage([]);
 			setLinksOnMessage([]);
 			setMarkdownsOnMessage([]);
+			setMentionData([]);
 		},
 		[
 			valueTextInput,
