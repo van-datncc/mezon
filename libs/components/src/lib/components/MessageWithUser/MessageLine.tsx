@@ -22,6 +22,9 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 
 	const content = useMemo(() => {
 		const tempContent: React.ReactNode[] = [];
+		if (elements.length === 0) {
+			tempContent.push(t);
+		}
 
 		elements.forEach((element, index) => {
 			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown } = element;
