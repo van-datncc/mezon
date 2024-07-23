@@ -282,7 +282,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0 && openReplyMessageState) {
 				props.onSend(
-					{ t: content },
+					{
+						t: content,
+						mentions: mentionsOnMessage,
+						hashtags: hashtagsOnMessage,
+						emojis: emojisOnMessage,
+						links: linksOnMessage,
+						markdowns: markdownsOnMessage,
+						plainText: plainTextMessage,
+					},
 					mentionData,
 					attachmentDataRef,
 					dataReferences,
@@ -350,6 +358,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			setEmojisOnMessage([]);
 			setLinksOnMessage([]);
 			setMarkdownsOnMessage([]);
+			setMentionData([]);
 		},
 		[
 			valueTextInput,
@@ -501,7 +510,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 			setMentionsOnMessage(mentionList);
 			setHashtagsOnMessage(hashtagList);
-			setMentionData(mentionedUsers);
+			const simplifiedMentionList = mentionList.map((mention) => ({
+				user_id: mention.userId,
+				username: mention.username,
+			}));
+			setMentionData(simplifiedMentionList);
 		}
 
 		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {

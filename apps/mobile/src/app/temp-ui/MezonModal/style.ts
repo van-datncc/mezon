@@ -8,6 +8,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: colors.primary,
+		paddingHorizontal: size.s_20,
 	},
 	bgDefault: {
 		backgroundColor: colors.secondary,
@@ -25,11 +26,12 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	headerContent: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'space-between',
+		width: '100%',
 	},
 	textTitle: {
 		color: colors.textStrong,
 		fontSize: 20,
-		marginLeft: 10,
 	},
 	confirm: {
 		color: colors.textStrong,
