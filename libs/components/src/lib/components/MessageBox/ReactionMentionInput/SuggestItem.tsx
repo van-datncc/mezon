@@ -70,7 +70,7 @@ const SuggestItem = ({ isOpenSearchModal, avatarUrl, symbol, name, displayName, 
 	};
 
 	return (
-		<div className="flex flex-row items-center justify-between h-[24px]" onMouseDown={() => console.log(specificChannel)}>
+		<div className="flex flex-row items-center justify-between h-[24px]" >
 			<div className="flex flex-row items-center gap-2 py-[3px]">
 				{showAvatar && (
 					<AvatarImage
