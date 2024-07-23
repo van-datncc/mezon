@@ -277,7 +277,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			);
 		});
 
-		builder.when((pinMessageStatus === true) && checkAdmintrator, (builder) => {
+		builder.when(pinMessageStatus === true, (builder) => {
 			builder.addMenuItem(
 				'pinMessage', 
 				'Pin Message', 
@@ -285,7 +285,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				<Icons.PinMessageRightClick defaultSize="w-4 h-4" />
 			);
 		});
-		builder.when((pinMessageStatus === false) && checkAdmintrator, (builder) => {
+		builder.when(pinMessageStatus === false, (builder) => {
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
