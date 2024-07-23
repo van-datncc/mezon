@@ -9,6 +9,7 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
+import { useConvertedContent } from './useConvertedContent';
 import { useEditMessage } from './useEditMessage';
 
 type MessageInputProps = {
@@ -70,6 +71,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionList = UserMentionList({ channelID: channelId, channelMode: mode });
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
+
+	const contentConverted = useConvertedContent(channelDraftMessage.draft_content);
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
@@ -135,8 +138,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				}
 				return;
 			}
-			if (content) {
-				handleSend(content, message.id);
+			if (contentConverted) {
+				handleSend(contentConverted, message.id);
 				handleCancelEdit();
 			}
 		}
@@ -148,8 +151,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	};
 
 	const handleSave = () => {
-		if (content) {
-			handleSend(content, message.id);
+		if (contentConverted) {
+			handleSend(contentConverted, message.id);
 			handleCancelEdit();
 		}
 	};
@@ -158,7 +161,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const value = event.target.value;
 		setChannelDraftMessage(channelId, messageId, value);
-
 		if (newPlainTextValue.endsWith('@')) {
 			setTitleMention('Members');
 		} else if (newPlainTextValue.endsWith('#')) {
@@ -174,7 +176,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				<MentionsInput
 					onFocus={handleFocus}
 					inputRef={textareaRef}
-					value={channelDraftMessage.draft_content}
+					value={channelDraftMessage.draft_content ?? ''}
 					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}

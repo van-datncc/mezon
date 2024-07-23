@@ -29,9 +29,14 @@ export const fileTypeVideo = ['video/mp4', 'video/webm', 'video/mpeg', 'video/x-
 
 export const fileTypeImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
+export const neverMatchingRegex = /($a)/;
+export const emojiRegex = /:[a-zA-Z0-9_]+:/g;
+export const linkRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
+export const mentionRegex = /@\[(.*?)\]/g;
+export const hashtagRegex = /#\[(.*?)\]\((.*?)\)/g;
+
 const headerRegex = /(?:^|\s)(#{1,6}\s.*)/;
 const boldRegex = /\*\*(.*?)\*\*/;
-const italicRegex = /_(.*?)_/;
 const strikethroughRegex = /~~(.*?)~~/;
 const codeBlockRegex = /```([\s\S]*?)```/;
 const inlineCodeRegex = /`([^`]*)`/;
@@ -40,13 +45,11 @@ const imageRegex = /!\[([^\[]*)\]\((http[s]?:\/\/[^\)]+)\)/;
 const unorderedListRegex = /(?:^|\s)([\-\*]\s+.*?)(?:\n|$)/;
 const orderedListRegex = /(?:^|\s)(\d+\.\s+.*?)(?:\n|$)/;
 const blockquoteRegex = /(?:^|\s)>(.*?)(?:\n|$)/;
-const urlRegex = /((http[s]?:\/\/[^\s()<>"]+|www\.[^\s()<>"]+))/g;
 
 export const markdownRegex = new RegExp(
 	[
 		headerRegex.source,
 		boldRegex.source,
-		italicRegex.source,
 		strikethroughRegex.source,
 		codeBlockRegex.source,
 		inlineCodeRegex.source,
@@ -55,7 +58,7 @@ export const markdownRegex = new RegExp(
 		unorderedListRegex.source,
 		orderedListRegex.source,
 		blockquoteRegex.source,
-		urlRegex.source,
+		linkRegex.source,
 	].join('|'),
 	'g',
 );
