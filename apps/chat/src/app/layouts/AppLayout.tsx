@@ -58,7 +58,7 @@ const AppLayout = () => {
 
 	// TODO: move this to a firebase context
 	useEffect(() => {
-		if (!isElectron()) {
+		if (isElectron()) {
 			onMessageListener()
 				.then(handleNewMessage)
 				.catch((error: Error) => {
