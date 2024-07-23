@@ -3,8 +3,6 @@ import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessag
 import {
 	getIsShowPopupForward,
 	selectAllClans,
-	selectAllCountState,
-	selectAllLastSeenTimeStampState,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClan,
@@ -14,7 +12,7 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	selectTotalQuantityNotify,
-	toggleIsShowPopupForwardFalse,
+	toggleIsShowPopupForwardFalse
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -34,11 +32,6 @@ function MyApp() {
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 	const numberOfNotifyClan = useSelector(selectTotalQuantityNotify());
-	const allCount = useSelector(selectAllCountState());
-	const allLast = useSelector(selectAllLastSeenTimeStampState());
-
-	console.log('AAAAAAAA:A ALL COUNT ', allCount);
-	console.log('AAAAAAAA:A ALL LAST STAMP ', allLast);
 
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));

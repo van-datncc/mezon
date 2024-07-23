@@ -37,6 +37,7 @@ interface ChannelMeta {
 	id: string;
 	lastSeenTimestamp: number;
 	lastSentTimestamp: number;
+	lastSeenPinMessage: string;
 }
 
 const channelMetaAdapter = createEntityAdapter<ChannelMeta>();
@@ -183,12 +184,15 @@ function extractChannelMeta(channel: ChannelsEntity): ChannelMeta {
 		id: channel.id,
 		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp || 0),
 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp || 0),
+		lastSeenPinMessage: channel.last_pin_message || '',
 	};
 }
 
 export const fetchChannelsCached = memoize(
-	(mezon: MezonValueContext, limit: number, state: number, clanId: string, channelType: number) =>
-		mezon.client.listChannelDescs(mezon.session, limit, state, '', clanId, channelType),
+	async (mezon: MezonValueContext, limit: number, state: number, clanId: string, channelType: number) => {
+		const response = await mezon.client.listChannelDescs(mezon.session, limit, state, '', clanId, channelType);
+		return { ...response, time: Date.now() };
+	},
 	{
 		promise: true,
 		maxAge: LIST_CHANNEL_CACHED_TIME,
@@ -202,22 +206,21 @@ export const fetchChannels = createAsyncThunk(
 	'channels/fetchChannels',
 	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_TEXT, noCache }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
 		if (noCache) {
 			fetchChannelsCached.clear(mezon, 100, 1, clanId, channelType);
 		}
-
 		const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
 		if (!response.channeldesc) {
 			return [];
 		}
-		console.log('SSSSSSSSS', response);
-		const lastSeenTimeStampInit = response.channeldesc
-			.filter((channel) => channel.type === 1)
-			.map((channelText) => {
-				return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) };
-			});
-		thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
+		if (Date.now() - response.time < 100) {
+			const lastSeenTimeStampInit = response.channeldesc
+				.filter((channel) => channel.type === 1)
+				.map((channelText) => {
+					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) };
+				});
+			thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
+		}
 		const channels = response.channeldesc.map(mapChannelToEntity);
 		const meta = channels.map((ch) => extractChannelMeta(ch));
 		thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
@@ -273,6 +276,12 @@ export const channelsSlice = createSlice({
 			const channel = state.channelMetadata.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSeenTimestamp = action.payload.timestamp;
+			}
+		},
+		setChannelLastSeenPinMessage: (state, action: PayloadAction<{ channelId: string; lastSeenPinMess: string }>) => {
+			const channel = state.channelMetadata.entities[action.payload.channelId];
+			if (channel) {
+				channel.lastSeenPinMessage = action.payload.lastSeenPinMess;
 			}
 		},
 		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMeta[]>) => {
@@ -467,10 +476,6 @@ export const selectCurrentChannel = createSelector(selectChannelsEntities, selec
 	clanId ? clansEntities[clanId] : null,
 );
 
-export const selectLastSeenPinMessageChannel = createSelector(selectChannelsEntities, selectCurrentChannelId, (clansEntities, clanId) =>
-	clanId && clansEntities[clanId] ? clansEntities[clanId].last_pin_message : '',
-);
-
 export const selectClanId = () => createSelector(selectCurrentChannel, (channel) => channel?.clan_id);
 
 export const selectCurrentVoiceChannel = createSelector(selectChannelsEntities, selectCurrentVoiceChannelId, (clansEntities, clanId) =>
@@ -512,6 +517,12 @@ export const selectDefaultChannelIdByClanId = (clanId: string, categories?: stri
 		const defaultChannel = channels.find((channel) => channel.parrent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_TEXT);
 
 		return defaultChannel ? defaultChannel.id : null;
+	});
+
+export const selectLastSeenPinMessageChannelById = (channelId: string) =>
+	createSelector(getChannelsState, (state) => {
+		const channel = state.channelMetadata.entities[channelId];
+		return channel?.lastSeenPinMessage || '';
 	});
 
 export const selectIsUnreadChannelById = (channelId: string) =>

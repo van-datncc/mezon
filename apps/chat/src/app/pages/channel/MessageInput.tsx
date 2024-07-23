@@ -1,6 +1,6 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { selectChannelDraftMessage, selectTheme } from '@mezon/store';
+import { selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
 import { IMessageWithUser, MentionDataProps } from '@mezon/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
@@ -69,7 +69,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionList = UserMentionList({ channelID: channelId, channelMode: mode });
-	const channelDraftMessage = useSelector((state) => selectChannelDraftMessage(state, channelId, messageId));
+	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 

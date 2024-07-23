@@ -234,15 +234,6 @@ export const selectCountNotifyByChannelId = (channelId: string) =>
 	createSelector(getNotificationState, (state) => {
 		return state.quantityNotifyChannels[channelId] || 0;
 	});
-
-export const selectAllCountState = () =>
-	createSelector(getNotificationState, (state) => {
-		return state.quantityNotifyChannels || null;
-	});
-export const selectAllLastSeenTimeStampState = () =>
-	createSelector(getNotificationState, (state) => {
-		return state.lastSeenTimeStampChannels || null;
-	});
 export const selectTotalQuantityNotify = () =>
 	createSelector(getNotificationState, (state: NotificationState) => {
 		const quantityNotifyChannels = state.quantityNotifyChannels;

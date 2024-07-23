@@ -45,7 +45,6 @@ export default function ChannelMain() {
 	const { isSearchMessage } = useSearchMessages();
 
 	useChannelSeen(currentChannel?.id || '');
-	// console.log('BBBBBBBBBBBBBBBBBBBBBB : ', currentChannel?.last_seen_message?.timestamp);
 	const showScreen = useSelector(selectShowScreen);
 	const { statusCall } = useVoice();
 

@@ -48,7 +48,7 @@ const ListPinMessage = () => {
 				}),
 			);
 		}
-	}, []);
+	}, [listPinMessages]);
 
 	return (
 		<div className='min-h-36'>
@@ -70,7 +70,7 @@ const ListPinMessage = () => {
 							}
 
 							return (
-								<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage} />
+								<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage} key={pinMessage.id} />
 							);
 						})}
 					</div>
