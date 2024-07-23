@@ -12,7 +12,7 @@ const ModalSaveChanges = ({ onSave, onReset }: ModalSaveChangesProps) => {
 		>
 			<div className="flex flex-row justify-between items-center">
 				<h3>Careful — you have unsaved changes!</h3>
-				<div className="flex flex-row justify-end gap-[10px]">
+				<div className="flex flex-row justify-end gap-[20px]">
 					<button
 						onClick={onReset}
 						className="rounded px-4 py-1.5 hover:underline"
