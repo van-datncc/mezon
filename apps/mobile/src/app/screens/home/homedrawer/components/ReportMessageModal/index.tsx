@@ -1,16 +1,15 @@
 import { CheckIcon, ChevronIcon, DotIcon } from '@mezon/mobile-components';
-import { Colors, size } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import UseMentionList from '../../../../../../app/hooks/useUserMentionList';
 import { MezonModal } from '../../../../../../app/temp-ui';
 import { SeparatorWithSpace } from '../../../../../components/Common';
 import MessageItem from '../../MessageItem';
-import { styles } from './styles';
+import { style } from './styles';
 
 interface IReportMessageModalProps {
 	isVisible: boolean;
@@ -51,10 +50,11 @@ const reportOptionList: IReportOption[] = [
 
 export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
 	const { isVisible, onClose, message } = props;
+	const { themeValue } = useTheme();
+	const styles = style(themeValue)
 	const [reportSelected, setReportSelected] = useState<IReportOption | null>(null);
 	const slideAnim = useRef(new Animated.Value(1)).current;
 	const { t } = useTranslation('message');
-	const listMentions = UseMentionList(message?.channel_id || '');
 
 	const onVisibleChange = (value: boolean) => {
 		if (!value) {
@@ -100,7 +100,7 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
 								<Text style={styles.title}>{t('reportMessage.reportSummary')}</Text>
 								<Text style={styles.subTitle}>{t('reportMessage.reviewYourReportBeforeSubmitting')}</Text>
 							</View>
-							<View style={{ marginVertical: 10 }}>
+							<View style={styles.categoryTitle}>
 								<Text style={styles.reportCategory}>{t('reportMessage.reportCategory')}</Text>
 
 								<View style={styles.reportCategoryWrapper}>

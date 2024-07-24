@@ -55,6 +55,9 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 				headerTitleStyle: {
 					color: themeValue.textStrong
 				},
+				cardStyle: {
+					backgroundColor: "transparent"
+				},
 				headerTintColor: themeValue.text,
 				headerLeftLabelVisible: false,
 				animationEnabled: false
