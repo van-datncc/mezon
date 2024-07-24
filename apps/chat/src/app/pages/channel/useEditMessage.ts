@@ -19,7 +19,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
-	const [content, setContent] = useState(channelDraftMessage.draft_content);
+	const [content, setContent] = useState(channelDraftMessage.draftContent);
 
 	const handleCancelEdit = useCallback(() => {
 		dispatch(referencesActions.setIdReferenceMessageEdit(''));
@@ -27,13 +27,13 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [dispatch]);
 
 	const setChannelDraftMessage = useCallback(
-		(channelId: string, message_id: string, draft_content: string) => {
+		(channelId: string, message_id: string, draftContent: string) => {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: channelId as string,
 					channelDraftMessage: {
 						message_id,
-						draft_content,
+						draftContent,
 					},
 				}),
 			);
