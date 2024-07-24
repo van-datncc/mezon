@@ -5,7 +5,7 @@ import { Text, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Dimensions, FlatList, Keyboard, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, FlatList, Keyboard, KeyboardAvoidingView, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IClanProfileValue } from '..';
@@ -19,15 +19,10 @@ interface IServerProfile {
 	clanProfileValue: IClanProfileValue;
 	isClanProfileNotChanged?: boolean;
 	setCurrentClanProfileValue: (updateFn: (prevValue: IClanProfileValue) => IClanProfileValue) => void;
-  onSelectedClan: (clan: ClansEntity) => void;
+	onSelectedClan: (clan: ClansEntity) => void;
 }
 
-export default function ServerProfile({
-	clanProfileValue,
-	isClanProfileNotChanged,
-	setCurrentClanProfileValue,
-  onSelectedClan
-}: IServerProfile) {
+export default function ServerProfile({ clanProfileValue, isClanProfileNotChanged, setCurrentClanProfileValue, onSelectedClan }: IServerProfile) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { userProfile, userId } = useAuth();
@@ -56,7 +51,7 @@ export default function ServerProfile({
 	const switchClan = (clan: ClansEntity) => {
 		if (isClanProfileNotChanged) {
 			setSelectedClan(clan);
-      onSelectedClan(clan)
+			onSelectedClan(clan);
 			return;
 		}
 
@@ -76,7 +71,6 @@ export default function ServerProfile({
 			{ cancelable: false },
 		);
 	};
-
 
 	const handleAvatarChange = (url: string) => {
 		setCurrentClanProfileValue((prevValue) => ({ ...prevValue, imgUrl: url }));
@@ -99,13 +93,10 @@ export default function ServerProfile({
 		return clans?.filter((it) => normalizeString(it?.clan_name)?.includes(normalizeString(searchClanText)));
 	}, [searchClanText, clans]);
 	return (
-		<View style={{ width: Dimensions.get('screen').width }}>
+		<KeyboardAvoidingView behavior={'position'} style={{ width: Dimensions.get('screen').width }}>
 			<TouchableOpacity onPress={() => openBottomSheet()} style={styles.actionItem}>
 				<View style={[styles.clanAvatarWrapper]}>
-					<MezonClanAvatar
-						image={selectedClan?.logo}
-						alt={selectedClan?.clan_name}
-					/>
+					<MezonClanAvatar image={selectedClan?.logo} alt={selectedClan?.clan_name} />
 				</View>
 				<View style={{ flex: 1 }}>
 					<Text style={styles.clanName}>{selectedClan?.clan_name}</Text>
@@ -148,10 +139,7 @@ export default function ServerProfile({
 								<TouchableOpacity style={styles.clanItem} onPress={() => switchClan(item)}>
 									<View style={styles.optionTitle}>
 										<View style={[styles.clanAvatarWrapper]}>
-											<MezonClanAvatar
-												alt={item?.clan_name}
-												image={item?.logo}
-											/>
+											<MezonClanAvatar alt={item?.clan_name} image={item?.logo} />
 										</View>
 
 										<Text style={styles.clanName}>{item?.clan_name}</Text>
@@ -163,6 +151,7 @@ export default function ServerProfile({
 					/>
 				</View>
 			</MezonBottomSheet>
-		</View>
+			<View style={{ height: 250 }} />
+		</KeyboardAvoidingView>
 	);
 }
