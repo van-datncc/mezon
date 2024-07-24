@@ -165,14 +165,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const sortedInitialDraftContent = sortObjectKeys(initialDraftContent);
 
 	const handleSave = () => {
+		delete sortedInitialDraftContent.plainText;
 		if (channelDraftMessage.draftContent === '') {
 			return setOpenModalDelMess(true);
-		} else if (JSON.stringify(sortedInitialDraftContent) === JSON.stringify(sortedContentConverted)) {
+		} else if (JSON.stringify(sortedInitialDraftContent) === JSON.stringify(sortedContentConverted) && channelDraftMessage.draftContent !== '') {
 			return handleCancelEdit();
 		} else {
 			handleSend(contentConverted, message.id);
-			handleCancelEdit();
 		}
+		handleCancelEdit();
 	};
 
 	const [titleMention, setTitleMention] = useState('');
