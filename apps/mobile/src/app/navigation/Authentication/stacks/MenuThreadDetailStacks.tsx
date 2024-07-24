@@ -52,7 +52,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				headerStyle: {
 					backgroundColor: themeValue.secondary,
 				},
-				cardStyle: { backgroundColor: Colors.secondary },
+				cardStyle: { backgroundColor: "transparent" },
 				cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 			}}
 		>
