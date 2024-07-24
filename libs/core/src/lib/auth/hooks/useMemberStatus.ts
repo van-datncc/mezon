@@ -14,8 +14,3 @@ export function useMemberCustomStatus(memberId: string) {
 	const memberStatus = useSelector(selectMemberCustomStatusById(memberId));
 	return memberStatus;
 }
-
-// export function useQuantityNotifyClan() {
-// 	const notifyListChannels = useSelector(selectNotifyListChannels)
-// 	return notifyListChannels
-// }

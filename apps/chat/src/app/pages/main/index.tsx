@@ -142,10 +142,13 @@ function MyApp() {
 
 	const initClan = useMemo(() => {
 		if (currentChannel?.id && currentClan?.id) {
+			localStorage.setItem('initClan', currentClan?.id);
 			return `/chat/clans/${currentClan?.id}/channels/${currentChannel?.id}`;
 		} else if (currentClan?.id) {
+			localStorage.setItem('initClan', currentClan?.id);
 			return `/chat/clans/${currentClan?.id}`;
 		} else if (clans?.length > 0) {
+			localStorage.setItem('initClan', clans[0].id);
 			return `/chat/clans/${clans[0].id}`;
 		}
 		return ``;

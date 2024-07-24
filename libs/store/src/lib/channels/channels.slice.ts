@@ -437,7 +437,6 @@ export const channelsActions = {
 	deleteChannel,
 	updateChannel,
 	updateChannelPrivate,
-	// changeCountNotifyChannel
 };
 
 /*
