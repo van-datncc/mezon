@@ -78,7 +78,7 @@ export const ChatMessageInput = memo(forwardRef(({
   const styles = style(themeValue);
   const { attachmentDataRef, setAttachmentData } = useReference();
   const { t } = useTranslation(['message']);
-  const { sendMessage, sendMessageTyping: channelMessageTyping, EditSendMessage } = useChatSending({
+  const { sendMessage, sendMessageTyping: channelMessageTyping, editSendMessage } = useChatSending({
     channelId,
     mode,
     directMessageId: channelId || '',
@@ -140,11 +140,11 @@ export const ChatMessageInput = memo(forwardRef(({
     }
   }
 
-  const editMessage = useCallback(
-    (editMessage: string, messageId: string) => {
-      EditSendMessage(editMessage?.trim(), messageId);
+  const onEditMessage = useCallback(
+    (editMessage: IMessageSendPayload, messageId: string) => {
+      editSendMessage(editMessage, messageId);
     },
-    [EditSendMessage],
+    [editSendMessage],
   );
 
   const isCanSendMessage = useMemo(() => {
@@ -189,7 +189,7 @@ export const ChatMessageInput = memo(forwardRef(({
     }
     const { targetMessage, type } = messageActionNeedToResolve || {};
     if (type === EMessageActionType.EditMessage) {
-      editMessage(text, messageActionNeedToResolve?.targetMessage?.id);
+      onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id);
     } else {
       const reference = targetMessage
         ? [

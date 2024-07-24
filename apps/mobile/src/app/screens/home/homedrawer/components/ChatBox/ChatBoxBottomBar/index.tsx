@@ -290,7 +290,7 @@ export const ChatBoxBottomBar = memo(
 					if (channelInfo) {
 						hashtagList.push({
 							channelId: channelInfo.id.toString() ?? '',
-							channelLable: `#${channelInfo.channel_label}`,
+							channelLable: channelInfo.channel_label ?? '',
 							startIndex: match.index,
 							endIndex: match.index + match[0].length,
 						});
@@ -327,7 +327,7 @@ export const ChatBoxBottomBar = memo(
 					break;
 				case EMessageActionType.EditMessage:
 					handleTextInputChange(targetMessage.content.t);
-					setText(targetMessage.content.t);
+					// setText(targetMessage.content.t);
 					break;
 				case EMessageActionType.CreateThread:
 					setOpenThreadMessageState(true);
