@@ -92,7 +92,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const userProfile = useSelector(selectAllAccount);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClanId as string, message?.user?.id as string));
-	const [isSending, setIsSending] = useState<boolean>(false);
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
@@ -124,20 +123,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 		}
 	}, [dispatch, markMessageAsSeen, message, props.messageId]);
-
-	useEffect(() => {
-		let timer;
-		if (message?.isSending) {
-			setIsSending(true);
-			timer = setTimeout(() => {
-				setIsSending(false);
-			}, 200)
-		}
-		
-		return () => {
-			timer && clearTimeout(timer);
-		}
-	}, [message?.isSending]);
 
 	const onLongPressImage = useCallback(() => {
 		if (preventAction) return;
@@ -337,7 +322,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							createTime={message?.create_time}
 						/>
 						<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-						<Block opacity={isSending|| message.isError ? 0.6 : 1}>
+						<Block opacity={message.isError ? 0.6 : 1}>
 							{renderTextContent({
 								lines,
 								isEdited,
