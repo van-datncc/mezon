@@ -35,7 +35,7 @@ export default function EventMember({ event }: IEventMemberProps) {
 	const styles = style(themeValue);
 	return (
 		<View style={styles.container}>
-			{event.user_ids.map((uid, index) => renderAvatar(uid, index))}
+			{event?.user_ids?.map((uid, index) => renderAvatar(uid, index))}
 		</View>
 	);
 }
