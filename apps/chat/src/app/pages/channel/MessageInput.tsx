@@ -180,7 +180,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const value = event.target.value;
-		setInitialDraftContent(value);
 		setChannelDraftMessage(channelId, messageId, value);
 		if (newPlainTextValue.endsWith('@')) {
 			setTitleMention('Members');
