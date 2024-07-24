@@ -32,7 +32,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
 					</div>
 					<span className="text-[11px]">
-						<MessageLine line={contentString as string} />
+						<MessageLine content={{t: contentString as string}} line={contentString as string}/>
 					</span>
 				</div>
 			</div>
