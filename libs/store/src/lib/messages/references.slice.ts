@@ -59,6 +59,7 @@ export const referencesSlice = createSlice({
 		},
 
 		setDataReferences(state, action) {
+			console.log(action.payload);
 			state.dataReferences = action.payload;
 		},
 

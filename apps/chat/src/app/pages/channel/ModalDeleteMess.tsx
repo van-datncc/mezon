@@ -1,9 +1,7 @@
 import { MessageWithUser } from '@mezon/components';
 import { useDeleteMessage } from '@mezon/core';
-import { selectMemberClanByUserId } from '@mezon/store';
-import { IChannelMember, IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
 type ModalDeleteMessProps = {
 	mess: IMessageWithUser;
@@ -13,7 +11,6 @@ type ModalDeleteMessProps = {
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 	const { mess, closeModal, mode } = props;
-	const user = useSelector(selectMemberClanByUserId(mess.sender_id || ''));
 	const { deleteSendMessage } = useDeleteMessage({
 		channelId: mess.channel_id,
 		mode: mode,
@@ -47,14 +44,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 						<p>Are you sure you want to delete this message?</p>
 					</div>
 					<div className="p-4">
-						<MessageWithUser
-							message={mess}
-							user={user as IChannelMember}
-							isMessNotifyMention={true}
-							mode={mode}
-							isMention={true}
-							isShowFull={true}
-						/>
+						<MessageWithUser message={mess} isMessNotifyMention={true} mode={mode} isMention={true} isShowFull={true} />
 					</div>
 					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
 						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
