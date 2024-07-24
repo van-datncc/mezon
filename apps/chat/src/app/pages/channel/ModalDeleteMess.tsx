@@ -4,11 +4,14 @@ import { selectMemberClanByUserId } from '@mezon/store';
 import { IChannelMember, IMessageWithUser } from '@mezon/utils';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useEditMessage } from './useEditMessage';
 
 type ModalDeleteMessProps = {
 	mess: IMessageWithUser;
 	closeModal: () => void;
 	mode: number;
+	channelId?: string;
+	channelLable?: string;
 };
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
@@ -19,8 +22,11 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		mode: mode,
 	});
 
+	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);
+
 	const handleDeleteMess = () => {
 		deleteSendMessage(mess.id);
+		handleCancelEdit();
 		closeModal();
 	};
 
