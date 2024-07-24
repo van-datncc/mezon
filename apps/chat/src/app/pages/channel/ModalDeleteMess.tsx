@@ -2,11 +2,14 @@ import { MessageWithUser } from '@mezon/components';
 import { useDeleteMessage } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect } from 'react';
+import { useEditMessage } from './useEditMessage';
 
 type ModalDeleteMessProps = {
 	mess: IMessageWithUser;
 	closeModal: () => void;
 	mode: number;
+	channelId?: string;
+	channelLable?: string;
 };
 
 const ModalDeleteMess = (props: ModalDeleteMessProps) => {
@@ -16,8 +19,11 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		mode: mode,
 	});
 
+	const { handleCancelEdit } = useEditMessage(props.channelId ?? '', props.channelLable ?? '', mode, mess);
+
 	const handleDeleteMess = () => {
 		deleteSendMessage(mess.id);
+		handleCancelEdit();
 		closeModal();
 	};
 
