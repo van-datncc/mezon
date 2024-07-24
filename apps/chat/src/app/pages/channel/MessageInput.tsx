@@ -130,6 +130,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
+
 			if (channelDraftMessage.draftContent?.trim() === '') {
 				if (channelDraftMessage.draftContent.length !== 0) {
 					handleCancelEdit();
@@ -151,6 +152,14 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	};
 
 	const handleSave = () => {
+		if (channelDraftMessage.draftContent?.trim() === '') {
+			if (channelDraftMessage.draftContent.length !== 0) {
+				handleCancelEdit();
+			} else {
+				setOpenModalDelMess(true);
+			}
+			return;
+		}
 		if (contentConverted) {
 			handleSend(contentConverted, message.id);
 			handleCancelEdit();
