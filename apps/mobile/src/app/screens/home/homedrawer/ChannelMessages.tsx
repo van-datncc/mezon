@@ -33,7 +33,6 @@ import { EMessageActionType, EMessageBSToShow } from './enums';
 import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import WelcomeMessage from './WelcomeMessage';
 
 const ITEM_HEIGHT = 100;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -242,6 +241,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
+					channelName={channelLabel}
 					onOpenImage={onOpenImage}
 					currentClanId={currentClanId}
 					onMessageAction={onMessageAction}
@@ -282,7 +282,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	return (
 		<View style={{ flex: 1 }}>
 			<View style={styles.wrapperChannelMessage}>
-				{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
 				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && <MessageItemSkeleton skeletonNumber={15} />}
 				<FlashList
 					ref={flatListRef}
@@ -299,8 +298,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 						messages?.length
 							? onLoadMore
 							: () => {
-									// 	empty
-								}
+								// 	empty
+							}
 					}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}

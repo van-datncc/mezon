@@ -21,10 +21,10 @@ import {
 	selectMessageEntityById,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
-	UserClanProfileEntity,
+	UserClanProfileEntity
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
@@ -44,6 +44,7 @@ import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
+import WelcomeMessage from './WelcomeMessage';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -53,6 +54,7 @@ export type MessageItemProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	channelId?: string;
+	channelName?: string;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;
@@ -248,6 +250,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 		}
 	};
+
+	if (message.isStartedMessageGroup && message.sender_id == "0")
+		return (
+			<WelcomeMessage channelTitle={props.channelName} />
+		)
 
 	return (
 		<Swipeable

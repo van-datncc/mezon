@@ -59,7 +59,8 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 					backgroundColor: "transparent"
 				},
 				headerTintColor: themeValue.text,
-				headerLeftLabelVisible: false
+				headerLeftLabelVisible: false,
+				animationEnabled: false
 			}}
 		>
 			<Stack.Screen
