@@ -18,13 +18,14 @@ import {
 	selectAllUsesClan,
 	selectChannelsEntities,
 	selectIdMessageToJump,
+	selectMemberByUserId,
 	selectMessageEntityById,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
 	UserClanProfileEntity,
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
@@ -36,7 +37,7 @@ import { style } from './styles';
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { Swipeable } from 'react-native-gesture-handler';
 import { AvatarMessage } from './components/AvatarMessage';
@@ -92,6 +93,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const userProfile = useSelector(selectAllAccount);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClanId as string, message?.user?.id as string));
+	const user = useSelector(selectMemberByUserId(message.sender_id));
+
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
@@ -216,8 +219,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	const senderDisplayName = useMemo(() => {
-		return clanProfile?.nick_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
-	}, [checkAnonymous, clanProfile?.nick_name, message?.user?.username, message?.username]);
+		const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+		if (isDM) {
+			return user?.user?.display_name || message?.user?.username;
+		}
+		return clanProfile?.nick_name || user?.user?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
+	}, [checkAnonymous, clanProfile?.nick_name, message?.user?.username, message?.username, user?.user?.display_name, mode]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
