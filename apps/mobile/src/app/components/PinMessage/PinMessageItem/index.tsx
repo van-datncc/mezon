@@ -20,7 +20,7 @@ const PinMessageItem = ({ pinMessageItem, handleUnpinMessage, contentMessage, ch
 	const styles = style(themeValue);
 	return (
 		<View style={styles.pinMessageItemWrapper}>
-			<MezonAvatar avatarUrl={pinMessageItem?.avatar} userName={pinMessageItem?.username}></MezonAvatar>
+			<MezonAvatar avatarUrl={pinMessageItem?.avatar} username={pinMessageItem?.username}></MezonAvatar>
 			<View style={styles.pinMessageItemBox}>
 				<Text style={styles.pinMessageItemName}>{pinMessageItem?.username}</Text>
 				{renderTextContent({ lines: contentMessage, isEdited: false, channelsEntities, emojiListPNG })}
