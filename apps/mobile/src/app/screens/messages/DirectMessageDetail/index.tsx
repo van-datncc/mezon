@@ -175,6 +175,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						channelId={currentDmGroup?.id}
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
+						hiddenIcon={{
+							threadIcon: true,
+						}}
 					/>
 
 					<View
@@ -194,7 +197,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
+								<AttachmentPicker currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
 							) : (
 								<View />
 							)}
