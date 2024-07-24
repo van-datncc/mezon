@@ -12,11 +12,7 @@ import { useSelector } from 'react-redux';
 import EmptyPinMess from './EmptyPinMess';
 import ItemPinMessage from './ItemPinMessage';
 
-type ListPinMessageProps = {
-	onClick?: () => void;
-};
-
-const ListPinMessage = ({ onClick }: ListPinMessageProps) => {
+const ListPinMessage = () => {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);

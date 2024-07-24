@@ -14,6 +14,7 @@ import {
 	toggleIsShowPopupForwardFalse,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
+import { ModeResponsive } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -125,7 +126,7 @@ function MyApp() {
 		}
 	}, [appearanceTheme]);
 
-	const { setMode } = useMessageValue();
+	const { setModeResponsive } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
 
 	const handleClick = useCallback(() => {
@@ -159,7 +160,7 @@ function MyApp() {
 			>
 				<NavLink
 					to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
-					onClick={() => setMode('dm')}
+					onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
 				>
 					<NavLinkComponent active={pathName.includes('direct')} clanName="Direct Messages">
 						<div>

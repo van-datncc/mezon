@@ -1,4 +1,4 @@
-import { ICategory, IChannel, LoadingStatus } from '@mezon/utils';
+import { ICategory, IChannel, LoadingStatus, ModeResponsive } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
@@ -52,7 +52,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	valueTextInput: Record<string, string>;
 	idChannelSelected: Record<string, string>;
 	membersVoiceChannel: Record<string, string[]>;
-	mode: 'clan' | 'dm';
+	modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -86,7 +86,7 @@ export const joinChannel = createAsyncThunk(
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
-			thunkAPI.dispatch(channelsActions.setMode('clan'));
+			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
 
 			return channel;
 		} catch (error) {
@@ -227,7 +227,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	valueTextInput: {},
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
 	membersVoiceChannel: {},
-	mode: 'dm',
+	modeResponsive: ModeResponsive.MODE_DM,
 });
 
 export const channelsSlice = createSlice({
@@ -238,8 +238,8 @@ export const channelsSlice = createSlice({
 		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
-		setMode: (state, action) => {
-			state.mode = action.payload;
+		setModeResponsive: (state, action) => {
+			state.modeResponsive = action.payload;
 		},
 		setCurrentChannelId: (state, action: PayloadAction<string>) => {
 			state.currentChannelId = action.payload;
@@ -448,7 +448,7 @@ export const selectCurrentChannelId = createSelector(getChannelsState, (state) =
 
 export const selectEntitiesChannel = createSelector(getChannelsState, (state) => state.entities);
 
-export const selectMode = createSelector(getChannelsState, (state) => state.mode);
+export const selectModeResponsive = createSelector(getChannelsState, (state) => state.modeResponsive);
 
 export const selectMembersVoiceChannel = createSelector(getChannelsState, (state) => state.membersVoiceChannel);
 
