@@ -111,9 +111,9 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 							<label className="w-full h-full">
 								<div
 									style={{ backgroundImage: `url(${urlLogo})` }}
-									className={`flex items-center justify-center bg-cover bg-no-repeat bg-center w-[100px] h-[100px] bg-transparent rounded-full relative cursor-pointer`}
+									className={`flex items-center justify-start bg-cover bg-no-repeat bg-center w-[100px] h-[100px] bg-transparent rounded-full relative cursor-pointer overflow-hidden`}
 								>
-									{!urlLogo && <span>{currentClan?.clan_name}</span>}
+									{!urlLogo && <span className={'whitespace-nowrap'}>{currentClan?.clan_name}</span>}
 								</div>
 								<input ref={fileInputRef} id="upload_logo" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 							</label>

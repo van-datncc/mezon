@@ -19,7 +19,6 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
 	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
 	let lastIndex = 0;
-
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 
@@ -27,7 +26,7 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
 
 			if (lastIndex < startIndex) {
-				formattedContent.push(<PlainText text={t.slice(lastIndex, startIndex)} />);
+				formattedContent.push(<PlainText key={`plain-${lastIndex}`} text={t.slice(lastIndex, startIndex)} />);
 			}
 
 			if (channelId && channelLable) {
@@ -47,7 +46,7 @@ const RenderContent = memo(({ data, mode }: RenderContentProps) => {
 		});
 
 		if (lastIndex < t.length) {
-			formattedContent.push(<PlainText text={t.slice(lastIndex)} />);
+			formattedContent.push(<PlainText key={`plain-${lastIndex}-end`} text={t.slice(lastIndex)} />);
 		}
 
 		return formattedContent;
