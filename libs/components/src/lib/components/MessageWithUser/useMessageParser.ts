@@ -86,29 +86,25 @@ export function useMessageParser(message: IMessageWithUser) {
 
 	const messageUsernameSenderRef = useMemo(() => {
 		if (message.references) {
-			// return JSON.parse(message?.references[0]?.message_sender_username ?? '');
-			return '';
+			return message?.references[0]?.message_sender_username ?? '';
 		}
 	}, [message.references]);
 
 	const messageAvatarSenderRef = useMemo(() => {
 		if (message.references) {
-			// return JSON.parse(message?.references[0]?.mesages_sender_avatar ?? '');
-			return '';
+			return message?.references[0]?.mesages_sender_avatar ?? '';
 		}
 	}, [message.references]);
 
 	const messageClanNicknameSenderRef = useMemo(() => {
 		if (message.references) {
-			// return JSON.parse(message?.references[0]?.message_sender_clan_nickname ?? '');
-			return '';
+			return message?.references[0]?.message_sender_clan_nick ?? '';
 		}
 	}, [message.references]);
 
 	const messageDisplayNameSenderRef = useMemo(() => {
 		if (message.references) {
-			// return JSON.parse(message?.references[0]?.mesages_sender_display_name ?? '');
-			return '';
+			return message?.references[0]?.message_sender_display_name ?? '';
 		}
 	}, [message.references]);
 

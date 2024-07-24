@@ -27,6 +27,17 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		hasAttachmentInMessageRef,
 	} = useMessageParser(message);
 
+	console.log(
+		senderIdMessageRef,
+		messageContentRef,
+		messageUsernameSenderRef,
+		messageAvatarSenderRef,
+		messageClanNicknameSenderRef,
+		messageDisplayNameSenderRef,
+		messageIdRef,
+		hasAttachmentInMessageRef,
+	);
+
 	const dispatch = useDispatch();
 
 	const getIdMessageToJump = useCallback(
@@ -58,7 +69,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		messageUsernameSenderRef ?? '',
 		senderIdMessageRef ?? '',
 	);
-
+	console.log(nameShowed);
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
 			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">

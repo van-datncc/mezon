@@ -22,6 +22,7 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
@@ -37,6 +38,7 @@ import {
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
+	selectUserClanProfileByClanID,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -120,6 +122,8 @@ export type MentionReactInputProps = {
 		value?: ThreadValue,
 		anonymousMessage?: boolean,
 		mentionEveryone?: boolean,
+		displayName?: string,
+		clanNick?: string,
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
@@ -176,6 +180,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 
 	const userProfile = useSelector(selectAllAccount);
+
+	const currentClanId = useSelector(selectCurrentClanId);
+	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClanId as string, userProfile?.user?.id as string));
+
+	const displayName = useMemo(() => {
+		return userProfile?.user?.display_name;
+	}, [userProfile?.user?.display_name]);
+	const clanNick = useMemo(() => {
+		return clanProfile?.nick_name;
+	}, [clanProfile?.nick_name]);
+
 	const lastMessageByUserId = useSelector((state) =>
 		selectLassSendMessageEntityBySenderId(
 			state,
@@ -289,12 +304,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						markdowns: markdownsOnMessage,
 						plainText: plainTextMessage,
 					},
+
 					mentionData,
 					attachmentDataRef,
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
 					mentionEveryone,
+					displayName,
+					clanNick,
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setValueTextInput('', props.isThread);
@@ -591,6 +609,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	useEffect(() => {
 		if (getRefMessageReply && getRefMessageReply.attachments) {
+			console.log('getRefMessageReply', getRefMessageReply);
 			dispatch(
 				referencesActions.setDataReferences([
 					{
