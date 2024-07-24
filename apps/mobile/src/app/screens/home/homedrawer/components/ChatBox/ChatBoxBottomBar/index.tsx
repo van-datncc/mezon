@@ -435,9 +435,6 @@ export const ChatBoxBottomBar = memo(
         handleMessageAction(messageActionNeedToResolve);
         openKeyBoard();
       }
-      return () => {
-        resetInput();
-      };
     }, [messageActionNeedToResolve]);
 
     useEffect(() => {
