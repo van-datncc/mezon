@@ -40,7 +40,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onFocu
 	}
 
 	function handleFocus() {
-		onFocus && onFocus();
+		onFocus?.();
 		setShowCount(true);
 		setFocus(true);
 	}
