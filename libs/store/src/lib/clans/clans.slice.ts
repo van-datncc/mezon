@@ -197,11 +197,12 @@ type UpdateLinkUser = {
 	avatar_url: string;
 	display_name: string;
 	about_me: string;
+  noCache?: boolean
 };
 
 export const updateUser = createAsyncThunk(
 	'clans/updateUser',
-	async ({ user_name, avatar_url, display_name, about_me }: UpdateLinkUser, thunkAPI) => {
+	async ({ user_name, avatar_url, display_name, about_me, noCache = false }: UpdateLinkUser, thunkAPI) => {
 		try {
 			const mezon = ensureClient(getMezonCtx(thunkAPI));
 			const body = {
@@ -218,7 +219,7 @@ export const updateUser = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			if (response) {
-				thunkAPI.dispatch(getUserProfile());
+				thunkAPI.dispatch(getUserProfile({noCache}));
 			}
 			return response as true;
 		} catch (error: any) {
