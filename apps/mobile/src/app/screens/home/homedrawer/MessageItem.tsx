@@ -21,7 +21,7 @@ import {
 	selectMessageEntityById,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
-	UserClanProfileEntity,
+	UserClanProfileEntity
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
