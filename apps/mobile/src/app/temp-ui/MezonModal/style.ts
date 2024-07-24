@@ -11,7 +11,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     paddingHorizontal: size.s_20,
 	},
 	bgDefault: {
-		backgroundColor: colors.secondary,
+		backgroundColor: colors.primary,
 	},
 	fill: {
 		flex: 1,

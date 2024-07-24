@@ -1,6 +1,5 @@
-import BottomSheet from "@gorhom/bottom-sheet";
 import { useChannelMembers, useEmojiSuggestion, useReference, useThreads } from "@mezon/core";
-import { ActionEmitEvent, convertMentionsToText, getAttachmentUnique, load, save, STORAGE_KEY_TEMPORARY_INPUT_MESSAGES } from "@mezon/mobile-components";
+import { convertMentionsToText, getAttachmentUnique, load, save, STORAGE_KEY_TEMPORARY_INPUT_MESSAGES } from "@mezon/mobile-components";
 import { Block, Colors, size } from "@mezon/mobile-ui";
 import { selectCurrentChannel } from "@mezon/store-mobile";
 import { handleUploadFileMobile, useMezon } from "@mezon/transport";
@@ -9,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ChannelStreamMode } from "mezon-js";
 import { ApiMessageAttachment, ApiMessageMention } from "mezon-js/api.gen";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { DeviceEventEmitter, Keyboard, Platform, TextInput, View } from "react-native";
+import { Keyboard, Platform, TextInput } from "react-native";
 import { TriggersConfig, useMentions } from "react-native-controlled-mentions";
 import RNFS from 'react-native-fs';
 import { useSelector } from "react-redux";
@@ -17,11 +16,9 @@ import { EmojiSuggestion, HashtagSuggestions, Suggestions } from "../../../../..
 import { APP_SCREEN } from "../../../../../../navigation/ScreenTypes";
 import { EMessageActionType } from "../../../enums";
 import { IMessageActionNeedToResolve } from "../../../types";
-import AttachmentPicker from "../../AttachmentPicker";
 import { IFile } from "../../AttachmentPicker/Gallery";
 import AttachmentPreview from "../../AttachmentPreview";
-import BottomKeyboardPicker, { IModeKeyboardPicker } from "../../BottomKeyboardPicker";
-import EmojiPicker from "../../EmojiPicker";
+import { IModeKeyboardPicker } from "../../BottomKeyboardPicker";
 import { ChatMessageInput } from "../ChatMessageInput";
 import { ChatMessageLeftArea } from "../ChatMessageLeftArea";
 
@@ -56,7 +53,7 @@ interface IChatInputProps {
   messageActionNeedToResolve: IMessageActionNeedToResolve | null;
   messageAction?: EMessageActionType;
   onDeleteMessageActionNeedToResolve?: () => void;
-  clanId?: string;
+  onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
 }
 
 export const ChatBoxBottomBar = memo(({
@@ -66,7 +63,7 @@ export const ChatBoxBottomBar = memo(({
   messageActionNeedToResolve,
   messageAction,
   onDeleteMessageActionNeedToResolve,
-  clanId = ''
+  onShowKeyboardBottomSheet,
 }: IChatInputProps) => {
   const [text, setText] = useState<string>('');
   const [mentionTextValue, setMentionTextValue] = useState('');
@@ -79,9 +76,6 @@ export const ChatBoxBottomBar = memo(({
   const inputRef = useRef<TextInput>();
   const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
   const { members } = useChannelMembers({ channelId });
-  const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(10);
-  const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
-  const bottomPickerRef = useRef<BottomSheet>(null);
   const cursorPositionRef = useRef(0);
   const currentTextInput = useRef('');
   const { emojiPicked, setEmojiSuggestion } = useEmojiSuggestion();
@@ -126,17 +120,6 @@ export const ChatBoxBottomBar = memo(({
     });
   }, [channelId]);
 
-  const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
-    setHeightKeyboardShow(height);
-    if (isShow) {
-      setTypeKeyboardBottomSheet(type);
-      bottomPickerRef.current?.collapse();
-    } else {
-      setTypeKeyboardBottomSheet('text');
-      bottomPickerRef.current?.close();
-    }
-  }, []);
-
   useEffect(() => {
     if (channelId) {
       setMessageFromCache();
@@ -166,6 +149,7 @@ export const ChatBoxBottomBar = memo(({
 
   const onSendSuccess = useCallback(() => {
     setText('');
+    onDeleteMessageActionNeedToResolve();
     resetCachedText();
   }, [resetCachedText])
 
@@ -451,32 +435,6 @@ export const ChatBoxBottomBar = memo(({
           keyboardHeight={keyboardHeight}
         />
       </Block>
-
-      <View
-        style={{
-          height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 10,
-          backgroundColor: 'transparent',
-        }}
-      />
-
-      {heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-        <BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
-          {typeKeyboardBottomSheet === 'emoji' ? (
-            <EmojiPicker
-              directMessageId={clanId === "0" ? channelId : ''}
-              onDone={() => {
-                onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
-                DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
-              }}
-              bottomSheetRef={bottomPickerRef}
-            />
-          ) : typeKeyboardBottomSheet === 'attachment' ? (
-            <AttachmentPicker currentChannelId={channelId} currentClanId={clanId} />
-          ) : (
-            <View />
-          )}
-        </BottomKeyboardPicker>
-      )}
     </Block>
   )
 })
