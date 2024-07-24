@@ -33,7 +33,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
   iconEmoji: {
 		position: 'absolute',
 		right: 10,
-		top: size.s_8,
+		top: '20%',
 	},
   iconSend: {
 		backgroundColor: baseColor.blurple,

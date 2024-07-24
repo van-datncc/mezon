@@ -19,9 +19,10 @@ interface IMezonInputProps {
 	inputWrapperStyle?: StyleProp<ViewStyle>,
 	showBorderOnFocus?: boolean,
 	errorMessage?: string;
+	onFocus?: () => void;
 }
 
-export default function MezonInput({ placeHolder, label, textarea, value, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage, titleUppercase, titleStyle }: IMezonInputProps) {
+export default function MezonInput({ placeHolder, label, textarea, value, onFocus, onTextChange, maxCharacter = 60, inputWrapperStyle, showBorderOnFocus, errorMessage, titleUppercase, titleStyle }: IMezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const ref = useRef<TextInput>(null);
@@ -39,6 +40,7 @@ export default function MezonInput({ placeHolder, label, textarea, value, onText
 	}
 
 	function handleFocus() {
+		onFocus?.();
 		setShowCount(true);
 		setFocus(true);
 	}

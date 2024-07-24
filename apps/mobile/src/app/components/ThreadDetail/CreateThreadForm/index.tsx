@@ -1,3 +1,4 @@
+import BottomSheet from '@gorhom/bottom-sheet';
 import { useReference, useThreadMessage, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
@@ -7,7 +8,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	save
 } from '@mezon/mobile-components';
-import { Colors, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	channelsActions,
@@ -25,11 +26,14 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import UseMentionList from '../../../hooks/useUserMentionList';
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
+import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
+import AttachmentPicker from '../../../screens/home/homedrawer/components/AttachmentPicker';
+import BottomKeyboardPicker from '../../../screens/home/homedrawer/components/BottomKeyboardPicker';
+import EmojiPicker from '../../../screens/home/homedrawer/components/EmojiPicker';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { MezonInput, MezonSwitch } from '../../../temp-ui';
 import { validInput } from '../../../utils/validate';
@@ -39,7 +43,6 @@ export default function CreateThreadForm() {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const [keyboardHeight, setKeyboardHeight] = useAnimatedState<number>(0);
 	const { t } = useTranslation(['createThread']);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -49,23 +52,24 @@ export default function CreateThreadForm() {
 	const formikRef = useRef(null);
 	const { openThreadMessageState } = useReference();
 	const { valueThread, threadCurrentChannel } = useThreads();
-	const listMentions = UseMentionList((currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || '');
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		channelLabel: threadCurrentChannel?.channel_label as string,
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
 	});
+	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
+	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
+	const bottomPickerRef = useRef<BottomSheet>(null);
 
-	function keyboardWillShow(event: KeyboardEvent) {
-		setKeyboardHeight(event.endCoordinates.height);
-	}
-	useEffect(() => {
-		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
-		const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardHeight(0));
-		return () => {
-			keyboardListener.remove();
-			keyboardDidHideListener.remove();
-		};
+	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+		setHeightKeyboardShow(height);
+		if (isShow) {
+			setTypeKeyboardBottomSheet(type);
+			bottomPickerRef.current?.collapse();
+		} else {
+			setTypeKeyboardBottomSheet('text');
+			bottomPickerRef.current?.close();
+		}
 	}, []);
 
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
@@ -165,6 +169,10 @@ export default function CreateThreadForm() {
 									<MezonInput
 										label={t('threadName')}
 										onTextChange={handleChange('nameValueThread')}
+										onFocus={() => {
+											setHeightKeyboardShow(0);
+											bottomPickerRef.current?.close();
+										}}
 										// onBlur={handleBlur('nameValueThread')}
 										value={values.nameValueThread}
 										placeHolder='New Thread'
@@ -206,13 +214,31 @@ export default function CreateThreadForm() {
 								hiddenIcon={{
 									threadIcon: true,
 								}}
+								onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 							/>
 							<View
 								style={{
-									height: Platform.OS === 'ios' ? keyboardHeight : 0,
-									backgroundColor: Colors.secondary,
+									height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
+									backgroundColor: themeValue.secondary,
 								}}
 							/>
+							{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
+								<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
+									{typeKeyboardBottomSheet === 'emoji' ? (
+										<EmojiPicker
+											onDone={() => {
+												onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
+												DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
+											}}
+											bottomSheetRef={bottomPickerRef}
+										/>
+									) : typeKeyboardBottomSheet === 'attachment' ? (
+										<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
+									) : (
+										<View />
+									)}
+								</BottomKeyboardPicker>
+							)}
 						</View>
 					)}
 				</Formik>
