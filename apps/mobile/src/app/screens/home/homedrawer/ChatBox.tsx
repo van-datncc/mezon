@@ -19,7 +19,7 @@ interface IChatBoxProps {
     threadIcon: boolean;
   };
   directMessageId?: string;
-  clanId?: string;
+  onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
 }
 export const ChatBox = memo((props: IChatBoxProps) => {
   const { themeValue } = useTheme();
@@ -42,6 +42,12 @@ export const ChatBox = memo((props: IChatBoxProps) => {
     };
   }, []);
 
+  const deleteMessageActionNeedToResolve = () => {
+    if (messageActionNeedToResolve) {
+      setMessageActionNeedToResolve(null)
+    }
+  }
+
   return (
     <View style={styles.wrapperChatBox}>
       <ActionMessageSelected
@@ -50,11 +56,11 @@ export const ChatBox = memo((props: IChatBoxProps) => {
       />
       <ChatBoxBottomBar
         messageActionNeedToResolve={messageActionNeedToResolve}
-        onDeleteMessageActionNeedToResolve={() => setMessageActionNeedToResolve(null)}
+        onDeleteMessageActionNeedToResolve={() => deleteMessageActionNeedToResolve()}
         channelId={props?.channelId}
-        clanId={props?.clanId}
         mode={props?.mode}
         messageAction={props?.messageAction}
+        onShowKeyboardBottomSheet={props?.onShowKeyboardBottomSheet}
       />
     </View>
   );
