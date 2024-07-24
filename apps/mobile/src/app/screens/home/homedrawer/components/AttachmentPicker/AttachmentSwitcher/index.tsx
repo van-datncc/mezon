@@ -34,6 +34,17 @@ function AttachmentSwitcher({ mode: _mode, onChange }: AttachmentPickerProps) {
 
 	useEffect(() => {
 		setMode(_mode);
+		if (_mode === 'attachment' ) {
+			Animated.spring(rotation, {
+				toValue: 1, // Animate to 45deg
+				useNativeDriver: true,
+			}).start();
+		} else {
+			Animated.spring(rotation, {
+				toValue: 0, // Animate back to 0deg
+				useNativeDriver: true,
+			}).start();
+		}
 	}, [_mode]);
 
 	const rotate = rotation.interpolate({

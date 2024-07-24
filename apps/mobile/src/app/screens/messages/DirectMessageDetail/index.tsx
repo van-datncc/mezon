@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { Block, useTheme } from '@mezon/mobile-ui';
 import {
 	channelMembersActions,
 	clansActions,
@@ -179,7 +179,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 							threadIcon: true,
 						}}
 					/>
-
+					<Block height={Platform.OS === 'ios' ? 10 : 0} backgroundColor={themeValue.secondary} />
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
