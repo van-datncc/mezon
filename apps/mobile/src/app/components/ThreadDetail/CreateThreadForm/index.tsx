@@ -114,8 +114,6 @@ export default function CreateThreadForm() {
 					if (thread) {
 						await dispatch(clansActions.joinClan({ clanId: currentClanId as string }));
 						save(STORAGE_CLAN_ID, currentClanId);
-						console.log('Tom log  => content', content);
-
 						await sendMessageThread(content, mentions, attachments, references, thread as ApiChannelDescription);
 					}
 				}
