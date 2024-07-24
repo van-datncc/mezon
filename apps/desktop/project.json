@@ -9,10 +9,29 @@
       "outputs": [
         "{options.outputPath}"
       ],
+      "appId": "Mezon",
+      "publish": [
+        {
+          "provider": "github",
+          "private": true,
+          "owner": "nccasia",
+          "repo": "mezon-fe",
+          "token": "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"
+        }
+      ],
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
         "target": "nsis",
-        "appId": "Mezon"
+        "appId": "Mezon",
+        "publish": [
+          {
+            "provider": "github",
+            "private": true,
+            "owner": "nccasia",
+            "repo": "mezon-fe",
+            "token": "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"
+          }
+        ]
       },
       "linux": {
         "category": "Utility",
@@ -88,7 +107,16 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
-          "appId": "Mezon"
+          "appId": "Mezon",
+          "publish": [
+            {
+              "provider": "github",
+              "private": true,
+              "owner": "nccasia",
+              "repo": "mezon-fe",
+              "token": "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"
+            }
+          ]
         },
         "linux": {
           "category": "Utility",
@@ -113,7 +141,16 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
-          "appId": "Mezon"
+          "appId": "Mezon",
+          "publish": [
+            {
+              "provider": "github",
+              "private": true,
+              "owner": "nccasia",
+              "repo": "mezon-fe",
+              "token": "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"
+            }
+          ]
         },
         "linux": {
           "category": "Utility",

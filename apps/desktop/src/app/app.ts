@@ -1,4 +1,5 @@
-import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, autoUpdater, nativeImage, screen, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, nativeImage, screen, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import { format } from 'url';
 import { environment } from '../environments/environment';
@@ -38,6 +39,14 @@ export default class App {
 	}
 
 	private static onReady() {
+		autoUpdater.setFeedURL({
+			provider: 'github',
+			owner: 'nccasia',
+			repo: 'mezon-fe',
+			private: true,
+			token: environment.GH_TOKEN,
+		});
+		autoUpdater.checkForUpdates();
 		if (rendererAppName) {
 			App.initMainWindow();
 			App.loadMainWindow();
@@ -73,6 +82,7 @@ export default class App {
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
+
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
@@ -100,6 +110,8 @@ export default class App {
 			App.application.quit();
 			return;
 		}
+
+		App.mainWindow.webContents.openDevTools();
 
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
