@@ -23,8 +23,6 @@ function ReplyMessageBox({ idMessage }: MessageReplyProps) {
 		dispatch(referencesActions.setDataReferences(null));
 	};
 
-	console.log(nameShowed);
-
 	return (
 		messageReplyState && (
 			<div className="flex flex-row items-center justify-between w-full my-2 dark:bg-[#2B2D31] bg-bgLightMode p-2 rounded-md text-[14px]">
