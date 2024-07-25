@@ -29,7 +29,6 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 	const dispatch = useAppDispatch();
 	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
-	// const user = useSelector(selectMemberByUserId(message.sender_id));
 	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);

@@ -8,7 +8,6 @@ import useShowName from './useShowName';
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
 type IMessageHeadProps = {
-	// user?: IChannelMember | null;
 	message: IMessageWithUser;
 	isCombine: boolean;
 	isShowFull?: boolean;
