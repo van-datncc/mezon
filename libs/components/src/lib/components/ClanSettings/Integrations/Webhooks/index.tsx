@@ -1,27 +1,17 @@
 import { ChannelsEntity, fetchWebhooksByChannelId, generateWebhook, selectAllChannels, selectAllWebhooks, useAppDispatch } from '@mezon/store';
 import { ChannelIsNotThread } from '@mezon/utils';
-import { ApiWebhookCreateRequest } from 'mezon-js/api.gen';
+import { ApiWebhook, ApiWebhookCreateRequest } from 'mezon-js/api.gen';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import WebhookItemModal from './WebhookItemModal';
 
-const Webhooks = () => {
+interface IWebhooksProps{
+	allWebhooks?: ApiWebhook[] | undefined;
+	parentChannelsInClan: ChannelsEntity[];
+}
+
+const Webhooks = ({allWebhooks, parentChannelsInClan} : IWebhooksProps) => {
 	const dispatch = useAppDispatch();
-	const allChannel = useSelector(selectAllChannels);
-	const AllWebhooks = useSelector(selectAllWebhooks);
-	const [parentChannelsInClan, setParentChannelsInClan] = useState<ChannelsEntity[]>([]);
-
-	useEffect(() => {
-		const normalChannels = allChannel.filter((channel) => channel.parrent_id === ChannelIsNotThread.TRUE);
-		setParentChannelsInClan(normalChannels);
-	}, [allChannel]);
-
-	useEffect(() => {
-		if (parentChannelsInClan[0]?.channel_id) {
-			dispatch(fetchWebhooksByChannelId({ channelId: parentChannelsInClan[0].channel_id as string }));
-		}
-	});
-
 	const webhookNames = ['Captain hook', 'Spidey bot', 'Komu Knight', 'Anh ThaiPQ', 'Chi Nga Tester'];
 
 	const getRandomWebhookName = (): string => {
@@ -49,17 +39,11 @@ const Webhooks = () => {
 			<div onClick={handleAddWebhook} className="py-2 px-4 bg-[#5865f2] rounded-sm mb-[24px] w-fit text-[14px] font-semibold cursor-pointer">
 				New Webhook
 			</div>
-			{AllWebhooks &&
-				AllWebhooks.map((webhook) => (
+			{allWebhooks &&
+				allWebhooks.map((webhook) => (
 					<WebhookItemModal
 						parentChannelsInClan={parentChannelsInClan}
-						id={webhook.id}
-						key={webhook.id}
-						webhookName={webhook.webhook_name}
-						channelId={webhook.channel_id}
-						createTime={webhook.create_time}
-						creatorId={webhook.creator_id}
-						url={webhook.url}
+						webhookItem={webhook}
 					/>
 				))}
 		</div>
