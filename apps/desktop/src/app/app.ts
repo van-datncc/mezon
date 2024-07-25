@@ -116,7 +116,7 @@ export default class App {
 			return;
 		}
 
-		App.mainWindow.webContents.openDevTools();
+		//App.mainWindow.webContents.openDevTools();
 
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
