@@ -120,6 +120,8 @@ export type MentionReactInputProps = {
 		value?: ThreadValue,
 		anonymousMessage?: boolean,
 		mentionEveryone?: boolean,
+		displayName?: string,
+		clanNick?: string,
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
@@ -176,6 +178,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 
 	const userProfile = useSelector(selectAllAccount);
+
 	const lastMessageByUserId = useSelector((state) =>
 		selectLassSendMessageEntityBySenderId(
 			state,
@@ -289,6 +292,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						markdowns: markdownsOnMessage,
 						plainText: plainTextMessage,
 					},
+
 					mentionData,
 					attachmentDataRef,
 					dataReferences,
@@ -599,6 +603,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						ref_type: 0,
 						message_sender_id: getRefMessageReply.sender_id,
 						content: JSON.stringify(getRefMessageReply.content),
+						message_sender_username: getRefMessageReply.username,
+						mesages_sender_avatar: getRefMessageReply.avatar,
+						message_sender_clan_nick: getRefMessageReply.clan_nick,
+						message_sender_display_name: getRefMessageReply.display_name,
 						has_attachment: getRefMessageReply.attachments?.length > 0,
 					},
 				]),
