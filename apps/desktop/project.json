@@ -146,7 +146,7 @@
             {
               "provider": "github",
               "private": true,
-              "owner": "nccasia",
+              "owner": "nguyentrannhan",
               "repo": "mezon-fe",
               "token": "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"
             }
