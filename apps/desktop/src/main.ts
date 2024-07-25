@@ -2,7 +2,6 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { machineId } from 'node-machine-id';
-import * as path from 'path';
 import { join } from 'path';
 import { format } from 'url';
 import App from './app/app';
@@ -63,7 +62,8 @@ ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 	}
 });
 
-log.transports.file.resolvePathFn = () => path.join('D:/NCC/PROJECT/mezon-fe/apps/desktop', 'logs/main.log');
+// Tạo file để xem log
+// log.transports.file.resolvePathFn = () => path.join('D:/NCC/PROJECT/mezon-fe/apps/desktop', 'logs/main.log');
 autoUpdater.autoDownload = false;
 log.info('App starting...');
 
