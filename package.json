@@ -1,7 +1,12 @@
 {
   "name": "Mezon",
-  "version": "1.0.1",
+  "version": "1.0.12",
   "license": "MIT",
+  "description": "Mezon application",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nguyentrannhan/mezon-fe.git"
+  },
   "scripts": {
     "dev:chat": "nx run chat:serve",
     "dev:admin": "nx run admin:serve",
@@ -43,7 +48,9 @@
     "buffer": "^6.0.3",
     "date-fns": "^3.3.1",
     "device-uuid": "^1.0.4",
+    "electron-log": "^5.1.6",
     "electron-push-receiver": "^2.1.3",
+    "electron-updater": "^6.2.1",
     "fast-average-color": "^9.4.0",
     "firebase": "^10.9.0",
     "flowbite": "^2.2.1",
