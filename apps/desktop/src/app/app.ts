@@ -45,7 +45,11 @@ export default class App {
 			repo: 'mezon-fe',
 			private: true,
 			token: environment.GH_TOKEN,
+			requestHeaders: {
+				Authorization: `Bearer ${environment.GH_TOKEN}`,
+			},
 		});
+
 		autoUpdater.checkForUpdates();
 		if (rendererAppName) {
 			App.initMainWindow();
