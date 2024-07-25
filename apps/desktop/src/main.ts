@@ -110,9 +110,7 @@ autoUpdater.on('error', (error) => {
 	dialog.showMessageBox({
 		message: `err: ${error.message} !!`,
 	});
-	dialog.showMessageBox({
-		message: `err1: ${error} !!`,
-	});
+	log.info('error: ', error);
 });
 
 // handle setup events as quickly as possible

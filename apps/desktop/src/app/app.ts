@@ -39,17 +39,17 @@ export default class App {
 	}
 
 	private static onReady() {
-		autoUpdater.setFeedURL({
-			provider: 'github',
-			owner: 'nguyentrannhan',
-			repo: 'mezon-fe',
-			private: true,
-			token: environment.GH_TOKEN,
-			host: 'github.com',
-			requestHeaders: {
-				Authorization: `Bearer ${environment.GH_TOKEN}`,
-			},
-		});
+		// autoUpdater.setFeedURL({
+		// 	provider: 'github',
+		// 	owner: 'nguyentrannhan',
+		// 	repo: 'mezon-fe',
+		// 	private: true,
+		// 	token: environment.GH_TOKEN,
+		// 	host: 'github.com',
+		// 	requestHeaders: {
+		// 		Authorization: `Bearer ${environment.GH_TOKEN}`,
+		// 	},
+		// });
 
 		autoUpdater.checkForUpdates();
 		if (rendererAppName) {

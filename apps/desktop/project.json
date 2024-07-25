@@ -10,7 +10,7 @@
         "{options.outputPath}"
       ],
       "appId": "com.nguyentrannhan.mezon-fe",
-      "productName": "Mezon",
+      "productName": "mezon-ncc",
       "publish": [
         {
           "provider": "github",
