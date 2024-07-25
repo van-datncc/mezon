@@ -33,7 +33,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 									<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
 								</div>
 								<span>
-									<MessageLine content={JSON.parse(pinMessage.content || '')} line={contentString as string} />
+									<MessageLine content={JSON.parse(pinMessage.content || '')} />
 								</span>
 							</div>
 						</div>
