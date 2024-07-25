@@ -6,12 +6,10 @@ const useShowName = (clanNickname: string, displayName: string, username: string
 
 	const nameShowed = useMemo(() => {
 		if (checkAnonymous) return 'Anonymous';
-		if (clanNickname) return clanNickname;
-		if (displayName) return displayName;
+		if (clanNickname && clanNickname !== username) return clanNickname;
+		if (clanNickname === username && displayName) return displayName;
 		if (username) return '@' + username;
-		return 'Anonymous';
 	}, [checkAnonymous, clanNickname, displayName, username]);
-
 	return nameShowed;
 };
 

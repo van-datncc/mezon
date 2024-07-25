@@ -42,7 +42,6 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 	const creationTime = new Date(channelMess.create_time || '');
 	const creationTimeMs = creationTime.getTime();
 	const isAnonymous = channelMess?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
-
 	return {
 		...channelMess,
 		creationTime,

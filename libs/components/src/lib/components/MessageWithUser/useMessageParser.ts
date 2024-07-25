@@ -3,33 +3,33 @@ import { useEffect, useMemo, useState } from 'react';
 
 export function useMessageParser(message: IMessageWithUser) {
 	const attachments = useMemo(() => {
-		return message.attachments;
-	}, [message]);
+		return message?.attachments;
+	}, [message?.attachments]);
 
 	const mentions = useMemo(() => {
-		return message.mentions;
-	}, [message]);
+		return message?.mentions;
+	}, [message?.mentions]);
 
 	const content = useMemo(() => {
-		return message.content;
-	}, [message]);
+		return message?.content;
+	}, [message?.content]);
 
 	const lines = useMemo(() => {
 		const values = content?.t;
 		return values;
-	}, [content]);
+	}, [content?.t]);
 
 	const messageTime = useMemo(() => {
 		return convertTimeString(message?.create_time as string);
-	}, [message]);
+	}, [message?.create_time]);
 
 	const messageDate = useMemo(() => {
 		return convertDateString(message?.create_time as string);
-	}, [message]);
+	}, [message?.create_time]);
 
 	const messageHour = useMemo(() => {
 		return convertTimeHour(message?.create_time || ('' as string));
-	}, [message]);
+	}, [message?.create_time]);
 
 	const [isEdited, setIsEdited] = useState(false);
 
@@ -39,25 +39,23 @@ export function useMessageParser(message: IMessageWithUser) {
 
 	const hasAttachments = attachments && attachments.length > 0;
 
-	/////////////////
-
 	const userClanNickname = useMemo(() => {
 		return message?.clan_nick;
-	}, [message]);
+	}, [message?.clan_nick]);
 	const userDisplayName = useMemo(() => {
 		return message?.display_name;
-	}, [message]);
+	}, [message?.display_name]);
 	const username = useMemo(() => {
 		return message?.username;
-	}, [message]);
+	}, [message?.username]);
 
 	const senderId = useMemo(() => {
 		return message?.sender_id;
-	}, [message]);
+	}, [message?.sender_id]);
 
 	const avatarSender = useMemo(() => {
 		return message?.avatar;
-	}, [message]);
+	}, [message?.avatar]);
 
 	/// References message
 	const senderIdMessageRef = useMemo(() => {
@@ -118,7 +116,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		messageDate,
 		hasAttachments,
 		isEdited,
-		////////////////
 		userClanNickname,
 		userDisplayName,
 		username,

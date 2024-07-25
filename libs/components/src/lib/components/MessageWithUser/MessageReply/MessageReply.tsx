@@ -4,10 +4,10 @@ import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'r
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../../ui/src/lib/Icons/index';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
+import MessageLine from '../MessageLine';
 import { useMessageLine } from '../useMessageLine';
 import { useMessageParser } from '../useMessageParser';
 import useShowName from '../useShowName';
-import MarkUpOnReply from './MarkUpOnReply';
 type MessageReplyProps = {
 	message: IMessageWithUser;
 };
@@ -26,17 +26,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		messageIdRef,
 		hasAttachmentInMessageRef,
 	} = useMessageParser(message);
-
-	console.log(
-		senderIdMessageRef,
-		messageContentRef,
-		messageUsernameSenderRef,
-		messageAvatarSenderRef,
-		messageClanNicknameSenderRef,
-		messageDisplayNameSenderRef,
-		messageIdRef,
-		hasAttachmentInMessageRef,
-	);
 
 	const dispatch = useDispatch();
 
@@ -69,7 +58,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 		messageUsernameSenderRef ?? '',
 		senderIdMessageRef ?? '',
 	);
-	console.log(nameShowed);
+
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
 			<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
@@ -91,13 +80,13 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 								</div>
 								<Icons.ImageThumbnail />
 							</div>
-						) : mentions.length > 0 ? (
-							<MarkUpOnReply
-								parentWidth={parentWidth}
-								onClickToMove={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
-								mention={mentions}
+						) : (
+							<MessageLine
+								showOnchannelLayout={false}
+								onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
+								content={messageContentRef}
 							/>
-						) : null}
+						)}
 					</div>
 				</div>
 			</div>

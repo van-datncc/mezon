@@ -22,7 +22,6 @@ export type ReactedOutsideOptional = {
 
 export type MessageWithUserProps = {
 	message: MessagesEntity;
-	// user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
 	isMention?: boolean;
@@ -36,7 +35,6 @@ export type MessageWithUserProps = {
 
 function MessageWithUser({
 	message,
-	// user,
 	isMessNotifyMention,
 	mode,
 	editor,
@@ -98,8 +96,6 @@ function MessageWithUser({
 	);
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
-
-	// console.log('message-mwu', message);
 
 	return (
 		<>

@@ -22,7 +22,6 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
@@ -38,7 +37,6 @@ import {
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
-	selectUserClanProfileByClanID,
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
@@ -181,16 +179,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const userProfile = useSelector(selectAllAccount);
 
-	const currentClanId = useSelector(selectCurrentClanId);
-	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClanId as string, userProfile?.user?.id as string));
-
-	const displayName = useMemo(() => {
-		return userProfile?.user?.display_name;
-	}, [userProfile?.user?.display_name]);
-	const clanNick = useMemo(() => {
-		return clanProfile?.nick_name;
-	}, [clanProfile?.nick_name]);
-
 	const lastMessageByUserId = useSelector((state) =>
 		selectLassSendMessageEntityBySenderId(
 			state,
@@ -311,8 +299,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
 					mentionEveryone,
-					displayName,
-					clanNick,
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setValueTextInput('', props.isThread);
@@ -609,7 +595,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	useEffect(() => {
 		if (getRefMessageReply && getRefMessageReply.attachments) {
-			console.log('getRefMessageReply', getRefMessageReply);
 			dispatch(
 				referencesActions.setDataReferences([
 					{
@@ -620,8 +605,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						content: JSON.stringify(getRefMessageReply.content),
 						message_sender_username: getRefMessageReply.username,
 						mesages_sender_avatar: getRefMessageReply.avatar,
-						message_sender_clan_nickname: getRefMessageReply.clan_nick,
-						mesages_sender_display_name: getRefMessageReply.display_name,
+						message_sender_clan_nick: getRefMessageReply.clan_nick,
+						message_sender_display_name: getRefMessageReply.display_name,
 						has_attachment: getRefMessageReply.attachments?.length > 0,
 					},
 				]),
