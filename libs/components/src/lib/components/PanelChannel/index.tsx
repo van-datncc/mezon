@@ -1,10 +1,4 @@
 import { useAuth } from '@mezon/core';
-import { IChannel } from '@mezon/utils';
-import { Dropdown } from 'flowbite-react';
-import { useEffect, useRef, useState } from 'react';
-import { Coords } from '../ChannelLink';
-import GroupPanels from './GroupPanels';
-import ItemPanel from './ItemPanel';
 import {
   notificationSettingActions,
   selectCurrentChannelId,
@@ -12,9 +6,15 @@ import {
   selectnotificatonSelected,
   useAppDispatch
 } from "@mezon/store";
-import {useSelector} from "react-redux";
-import {format} from "date-fns";
-import {NotificationType} from "mezon-js";
+import { IChannel } from '@mezon/utils';
+import { format } from "date-fns";
+import { Dropdown } from 'flowbite-react';
+import { NotificationType } from "mezon-js";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSelector } from "react-redux";
+import { Coords } from '../ChannelLink';
+import GroupPanels from './GroupPanels';
+import ItemPanel from './ItemPanel';
 
 type PanelChannel = {
 	coords: Coords;
@@ -154,7 +154,8 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
     }
   }, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
   
-  
+  const checkOwnerChannel = useMemo(() => channel.creator_id === userProfile?.user?.id, [channel.creator_id, userProfile?.user?.id]);
+
   return (
 		<div
 			ref={panelRef}
@@ -245,7 +246,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{channel.creator_id === userProfile?.user?.id && (
+					{checkOwnerChannel && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
 							<ItemPanel children="Duplicate Channel" />
@@ -298,7 +299,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{channel.creator_id === userProfile?.user?.id && (
+					{checkOwnerChannel && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
 							<ItemPanel children="Duplicate Thread" />

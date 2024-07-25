@@ -1,6 +1,5 @@
 import { useDirect, useSendInviteMessage } from '@mezon/core';
 import { DirectEntity, UsersClanEntity } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 
@@ -15,12 +14,11 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	const { dmGroup, isSent, url, onSend, user } = props;
 	const { createDirectMessageWithUser } = useDirect();
 	const [isInviteSent, setIsInviteSent] = useState(isSent);
-	const mezon = useMezon();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const directMessageWithUser = async (userId: string) => {
-		const response = await createDirectMessageWithUser(userId);
+		const response = await createDirectMessageWithUser(userId, true);
 		if (response.channel_id) {
-			var channelMode = 0;
+			let channelMode = 0;
 			if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
 				channelMode = ChannelStreamMode.STREAM_MODE_DM;
 			}
@@ -37,7 +35,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			directMessageWithUser(userId);
 		}
 		if (directParamId && dmGroup) {
-			var channelMode = 0;
+			let channelMode = 0;
 			if (type === ChannelType.CHANNEL_TYPE_DM) {
 				channelMode = ChannelStreamMode.STREAM_MODE_DM;
 			}

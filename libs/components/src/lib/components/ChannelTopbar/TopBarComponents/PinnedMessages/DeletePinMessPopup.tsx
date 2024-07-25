@@ -18,7 +18,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 						<h3 className="font-semibold pb-4 text-xl">Unpin Message</h3>
 						<p>You sure you want to remove this pinned message?</p>
 					</div>
-					<div className="p-4 flex">
+					<div className="p-4 flex items-start">
 						<MemberProfile
 							isHideUserName={true}
 							avatar={pinMessage.avatar || ''}
@@ -31,8 +31,8 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 							<div>
 								<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
 							</div>
-							<span className="text-[11px]">
-								<MessageLine line={contentString as string} />
+							<span>
+								<MessageLine showOnchannelLayout={false} content={JSON.parse(pinMessage.content || '')} />
 							</span>
 						</div>
 					</div>

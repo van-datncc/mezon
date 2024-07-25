@@ -145,7 +145,7 @@ const NavigationMain = () => {
 			}
 			const store = await getStoreAsync();
 			dispatch(appActions.setLoadingMainMobile(false));
-			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
+			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true, isFetchingLatestMessages: true }));
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			return null;
 		} catch (error) {

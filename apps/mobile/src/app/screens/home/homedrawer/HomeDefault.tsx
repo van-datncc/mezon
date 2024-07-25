@@ -154,7 +154,7 @@ const HomeDefault = React.memo((props: any) => {
 			{currentChannel && isFocusChannelView && (
 				<View style={styles.channelView}>
 					<ChannelMessages
-						channelId={currentChannel.channel_id}
+						channelId={currentChannel?.channel_id}
 						channelLabel={currentChannel?.channel_label}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
@@ -165,7 +165,7 @@ const HomeDefault = React.memo((props: any) => {
 					)} */}
 
 					<ChatBox
-						channelId={currentChannel.channel_id}
+						channelId={currentChannel?.channel_id}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
