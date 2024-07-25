@@ -1,6 +1,4 @@
-import {
-  ActionEmitEvent,
-} from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
@@ -12,50 +10,53 @@ import { style } from './styles';
 import { IMessageActionNeedToResolve } from './types';
 
 interface IChatBoxProps {
-  channelId: string;
-  mode: ChannelStreamMode;
-  messageAction?: EMessageActionType;
-  hiddenIcon?: {
-    threadIcon: boolean;
-  };
-  directMessageId?: string;
-  clanId?: string;
+	channelId: string;
+	mode: ChannelStreamMode;
+	messageAction?: EMessageActionType;
+	hiddenIcon?: {
+		threadIcon: boolean;
+	};
+	directMessageId?: string;
+	onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
 }
 export const ChatBox = memo((props: IChatBoxProps) => {
-  const { themeValue } = useTheme();
-  const styles = style(themeValue);
-  const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
 
-  useEffect(() => {
-    if (props?.channelId && messageActionNeedToResolve) {
-      setMessageActionNeedToResolve(null);
-    }
-  }, [props?.channelId]);
+	useEffect(() => {
+		if (props?.channelId && messageActionNeedToResolve) {
+			setMessageActionNeedToResolve(null);
+		}
+	}, [props?.channelId]);
 
-  useEffect(() => {
-    const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_KEYBOARD, (value) => {
-      //NOTE: trigger from message action 'MessageItemBS and MessageItem component'
-      setMessageActionNeedToResolve(value);
-    });
-    return () => {
-      showKeyboard.remove();
-    };
-  }, []);
+	useEffect(() => {
+		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_KEYBOARD, (value) => {
+			//NOTE: trigger from message action 'MessageItemBS and MessageItem component'
+			setMessageActionNeedToResolve(value);
+		});
+		return () => {
+			showKeyboard.remove();
+		};
+	}, []);
 
-  return (
-    <View style={styles.wrapperChatBox}>
-      <ActionMessageSelected
-        messageActionNeedToResolve={messageActionNeedToResolve}
-        onClose={() => setMessageActionNeedToResolve(null)}
-      />
-      <ChatBoxBottomBar
-        messageActionNeedToResolve={messageActionNeedToResolve}
-        onDeleteMessageActionNeedToResolve={() => setMessageActionNeedToResolve(null)}
-        channelId={props?.channelId}
-        clanId={props?.clanId}
-        mode={props?.mode}
-        messageAction={props?.messageAction}
-      />
-    </View>
-  );
+	const deleteMessageActionNeedToResolve = () => {
+		setMessageActionNeedToResolve(null);
+	};
+
+	return (
+		<View style={styles.wrapperChatBox}>
+			{messageActionNeedToResolve && (
+				<ActionMessageSelected messageActionNeedToResolve={messageActionNeedToResolve} onClose={() => setMessageActionNeedToResolve(null)} />
+			)}
+			<ChatBoxBottomBar
+				messageActionNeedToResolve={messageActionNeedToResolve}
+				onDeleteMessageActionNeedToResolve={() => deleteMessageActionNeedToResolve()}
+				channelId={props?.channelId}
+				mode={props?.mode}
+				messageAction={props?.messageAction}
+				onShowKeyboardBottomSheet={props?.onShowKeyboardBottomSheet}
+			/>
+		</View>
+	);
 });

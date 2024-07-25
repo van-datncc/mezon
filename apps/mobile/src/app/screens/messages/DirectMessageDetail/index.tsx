@@ -1,5 +1,6 @@
+import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	channelMembersActions,
@@ -11,13 +12,17 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useCallback, useEffect } from 'react';
-import { AppState, Image, Pressable, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, DeviceEventEmitter, Image, Platform, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelMessages from '../../home/homedrawer/ChannelMessages';
 import { ChatBox } from '../../home/homedrawer/ChatBox';
+import { IModeKeyboardPicker } from '../../home/homedrawer/components';
+import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
+import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
+import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
 import { style } from './styles';
 
 function useChannelSeen(channelId: string) {
@@ -42,6 +47,20 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	useChannelSeen(directMessageId || '');
 	const currentChannel = useSelector(selectCurrentChannel);
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
+	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
+	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
+	const bottomPickerRef = useRef<BottomSheet>(null);
+
+	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+		setHeightKeyboardShow(height);
+		if (isShow) {
+			setTypeKeyboardBottomSheet(type);
+			bottomPickerRef.current?.collapse();
+		} else {
+			setTypeKeyboardBottomSheet('text');
+			bottomPickerRef.current?.close();
+		}
+	}, []);
 
 	const navigateToThreadDetail = () => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
@@ -155,7 +174,32 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					<ChatBox
 						channelId={currentDmGroup?.id}
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
+						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
+
+					<View
+						style={{
+							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
+							backgroundColor: themeValue.secondary,
+						}}
+					/>
+					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
+						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
+							{typeKeyboardBottomSheet === 'emoji' ? (
+								<EmojiPicker
+									onDone={() => {
+										onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
+										DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
+									}}
+									bottomSheetRef={bottomPickerRef}
+								/>
+							) : typeKeyboardBottomSheet === 'attachment' ? (
+								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
+							) : (
+								<View />
+							)}
+						</BottomKeyboardPicker>
+					)}
 				</View>
 			) : null}
 		</SafeAreaView>

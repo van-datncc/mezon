@@ -9,6 +9,7 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
+import { useConvertedContent } from './useConvertedContent';
 import { useEditMessage } from './useEditMessage';
 
 type MessageInputProps = {
@@ -71,9 +72,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const mentionList = UserMentionList({ channelID: channelId, channelMode: mode });
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
+	const contentConverted = useConvertedContent(channelDraftMessage.draftContent);
+
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
+
+	const [initialDraftContent, setInitialDraftContent] = useState<string>(message.content);
 
 	const listChannelsMention = useMemo(() => {
 		if (mode !== 3 && mode !== 4) {
@@ -90,13 +95,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [mode, listChannels]);
 
 	useEffect(() => {
-		if (channelDraftMessage.draft_content) {
-			const convertedHashtag = convertToPlainTextHashtag(channelDraftMessage.draft_content);
+		if (channelDraftMessage.draftContent) {
+			const convertedHashtag = convertToPlainTextHashtag(channelDraftMessage.draftContent);
 			const replacedText = replaceChannelIdsWithDisplay(convertedHashtag, listChannelsMention);
 			setChannelDraftMessage(channelId, messageId, replacedText);
 			setContent(convertedHashtag);
 		}
-	}, [channelDraftMessage.draft_content, listChannelsMention]);
+	}, [channelDraftMessage.draftContent, listChannelsMention]);
 
 	useEffect(() => {
 		if (openEditMessageState && message.id === idMessageRefEdit) {
@@ -127,16 +132,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
-			if (channelDraftMessage.draft_content?.trim() === '') {
-				if (channelDraftMessage.draft_content.length !== 0) {
-					handleCancelEdit();
-				} else {
-					setOpenModalDelMess(true);
-				}
-				return;
-			}
-			if (content) {
-				handleSend(content, message.id);
+			if (channelDraftMessage.draftContent === '') {
+				setOpenModalDelMess(true);
+			} else {
+				handleSend(contentConverted, message.id);
 				handleCancelEdit();
 			}
 		}
@@ -147,18 +146,41 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
-	const handleSave = () => {
-		if (content) {
-			handleSend(content, message.id);
-			handleCancelEdit();
+	const sortObjectKeys = (obj: any): any => {
+		if (obj === null || typeof obj !== 'object') {
+			return obj;
 		}
+		if (Array.isArray(obj)) {
+			return obj.map(sortObjectKeys);
+		}
+		return Object.keys(obj)
+			.sort()
+			.reduce((accumulator, key) => {
+				accumulator[key] = sortObjectKeys(obj[key]);
+				return accumulator;
+			}, {} as any);
 	};
+
+	const sortedContentConverted = sortObjectKeys(contentConverted);
+	const sortedInitialDraftContent = sortObjectKeys(initialDraftContent);
+
+	const handleSave = () => {
+		delete sortedInitialDraftContent.plainText;
+		if (channelDraftMessage.draftContent === '') {
+			return setOpenModalDelMess(true);
+		} else if (JSON.stringify(sortedInitialDraftContent) === JSON.stringify(sortedContentConverted) && channelDraftMessage.draftContent !== '') {
+			return handleCancelEdit();
+		} else {
+			handleSend(contentConverted, message.id);
+		}
+		handleCancelEdit();
+	};
+
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const value = event.target.value;
 		setChannelDraftMessage(channelId, messageId, value);
-
 		if (newPlainTextValue.endsWith('@')) {
 			setTitleMention('Members');
 		} else if (newPlainTextValue.endsWith('#')) {
@@ -174,11 +196,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				<MentionsInput
 					onFocus={handleFocus}
 					inputRef={textareaRef}
-					value={channelDraftMessage.draft_content}
+					value={channelDraftMessage.draftContent ?? '{}'}
 					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
-					rows={channelDraftMessage.draft_content?.split('\n').length}
+					rows={channelDraftMessage.draftContent?.split('\n').length}
 					forceSuggestionsAboveCursor={true}
 					style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 					customSuggestionsContainer={(children: React.ReactNode) => {
@@ -255,7 +277,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					</p>
 				</div>
 			</div>
-			{openModalDelMess && <ModalDeleteMess mess={message} closeModal={() => setOpenModalDelMess(false)} mode={mode} />}
+			{openModalDelMess && (
+				<ModalDeleteMess
+					channelId={channelId}
+					channelLable={channelLabel}
+					mess={message}
+					closeModal={() => setOpenModalDelMess(false)}
+					mode={mode}
+				/>
+			)}
 		</div>
 	);
 };
