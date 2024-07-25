@@ -104,6 +104,11 @@ export type FetchMessagesMeta = {
 	};
 };
 
+type FetchMessagesPayloadAction = {
+	messages: MessagesEntity[];
+	isFetchingLatestMessages?: boolean;
+};
+
 export interface MessagesRootState {
 	[MESSAGES_FEATURE_KEY]: MessagesState;
 }
@@ -142,11 +147,15 @@ type fetchMessageChannelPayload = {
 	messageId?: string;
 	direction?: number;
 	lastSeenMess?: string;
+	isFetchingLatestMessages?: boolean;
 };
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
-	async ({ channelId, noCache, messageId, direction, lastSeenMess }: fetchMessageChannelPayload, thunkAPI) => {
+	async (
+		{ channelId, noCache, messageId, direction, lastSeenMess, isFetchingLatestMessages }: fetchMessageChannelPayload,
+		thunkAPI,
+	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		if (noCache) {
@@ -156,7 +165,9 @@ export const fetchMessages = createAsyncThunk(
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 
 		if (!response.messages) {
-			return [];
+			return {
+				messages: [],
+			};
 		}
 
 		if (Date.now() - response.time > 1000) {
@@ -172,7 +183,9 @@ export const fetchMessages = createAsyncThunk(
 					}),
 				);
 			}
-			return [];
+			return {
+				messages: [],
+			};
 		}
 
 		const messages = response.messages.map((item) => {
@@ -212,7 +225,10 @@ export const fetchMessages = createAsyncThunk(
 			}
 		}
 
-		return messages;
+		return {
+			messages,
+			isFetchingLatestMessages,
+		};
 	},
 );
 
@@ -241,10 +257,11 @@ type JumpToMessageArgs = {
 	channelId: string;
 	messageId: string;
 	noCache?: boolean;
+	isFetchingLatestMessages?: boolean;
 };
 export const jumpToMessage = createAsyncThunk(
 	'messages/jumpToMessage',
-	async ({ messageId, channelId, noCache = false }: JumpToMessageArgs, thunkAPI) => {
+	async ({ messageId, channelId, noCache = false, isFetchingLatestMessages = false }: JumpToMessageArgs, thunkAPI) => {
 		try {
 			await thunkAPI.dispatch(
 				fetchMessages({
@@ -252,6 +269,7 @@ export const jumpToMessage = createAsyncThunk(
 					noCache: noCache,
 					messageId: messageId,
 					direction: Direction_Mode.AROUND_TIMESTAMP,
+					isFetchingLatestMessages,
 				}),
 			);
 		} catch (e) {
@@ -617,21 +635,25 @@ export const messagesSlice = createSlice({
 			.addCase(fetchMessages.pending, (state: MessagesState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[], string, FetchMessagesMeta>) => {
-				const channelId = action?.meta?.arg?.channelId;
+			.addCase(
+				fetchMessages.fulfilled,
+				(state: MessagesState, action: PayloadAction<FetchMessagesPayloadAction, string, FetchMessagesMeta>) => {
+					const channelId = action?.meta?.arg?.channelId;
+					const isFetchingLatestMessages = action.payload.isFetchingLatestMessages;
+					state.loadingStatus = 'loaded';
 
-				state.loadingStatus = 'loaded';
+					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
+					if (!isNew || !channelId) return state;
+					const reversedMessages = action.payload.messages.reverse();
 
-				const isNew = channelId && action.payload.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
-				if (!isNew || !channelId) return state;
-				const reversedMessages = action.payload.reverse();
-
-				handleSetManyMessages({
-					state,
-					channelId,
-					adapterPayload: reversedMessages,
-				});
-			})
+					handleSetManyMessages({
+						state,
+						channelId,
+						adapterPayload: reversedMessages,
+						isFetchingLatestMessages,
+					});
+				},
+			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
@@ -877,10 +899,12 @@ const handleSetManyMessages = ({
 	state,
 	channelId,
 	adapterPayload,
+	isFetchingLatestMessages,
 }: {
 	state: MessagesState;
 	channelId?: string;
 	adapterPayload: MessagesEntity[];
+	isFetchingLatestMessages?: boolean;
 }) => {
 	if (!channelId) return state;
 	if (!state.channelMessages[channelId])
@@ -891,7 +915,8 @@ const handleSetManyMessages = ({
 	state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
 
 	const channelEntity = state.channelMessages[channelId];
-	handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(0, adapterPayload.length + 1));
+	const startSlicePosition = isFetchingLatestMessages ? channelEntity.ids.length - adapterPayload.length : 0;
+	handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startSlicePosition, adapterPayload.length + startSlicePosition + 1));
 };
 
 const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: MessagesState; channelId: string; messageId: string }) => {
