@@ -1,4 +1,5 @@
-import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, autoUpdater, nativeImage, screen, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, nativeImage, screen, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import { format } from 'url';
 import { environment } from '../environments/environment';
@@ -38,6 +39,19 @@ export default class App {
 	}
 
 	private static onReady() {
+		// autoUpdater.setFeedURL({
+		// 	provider: 'github',
+		// 	owner: 'nguyentrannhan',
+		// 	repo: 'mezon-fe',
+		// 	private: true,
+		// 	token: environment.GH_TOKEN,
+		// 	host: 'github.com',
+		// 	requestHeaders: {
+		// 		Authorization: `Bearer ${environment.GH_TOKEN}`,
+		// 	},
+		// });
+
+		autoUpdater.checkForUpdates();
 		if (rendererAppName) {
 			App.initMainWindow();
 			App.loadMainWindow();
@@ -73,6 +87,7 @@ export default class App {
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
+
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
@@ -100,6 +115,8 @@ export default class App {
 			App.application.quit();
 			return;
 		}
+
+		App.mainWindow.webContents.openDevTools();
 
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
@@ -163,7 +180,7 @@ export default class App {
 		if (process.platform == 'win32' || process.platform == 'linux') {
 			// Keep only command line / deep linked arguments
 			deeplinkingUrl = process.argv.slice(1);
-			App.application.setAppUserModelId('Mezon');
+			App.application.setAppUserModelId('com.nguyentrannhan.mezon-fe');
 		}
 	}
 	private static handleTray() {

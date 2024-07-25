@@ -9,10 +9,32 @@
       "outputs": [
         "{options.outputPath}"
       ],
+      "appId": "com.nguyentrannhan.mezon-fe",
+      "productName": "mezon-ncc",
+      "publish": [
+        {
+          "provider": "github",
+          "private": true,
+          "owner": "nguyentrannhan",
+          "repo": "mezon-fe",
+          "token": "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",
+          "releaseType": "release"
+        }
+      ],
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
         "target": "nsis",
-        "appId": "Mezon"
+        "appId": "com.nguyentrannhan.mezon-fe",
+        "publish": [
+          {
+            "provider": "github",
+            "private": true,
+            "owner": "nguyentrannhan",
+            "repo": "mezon-fe",
+            "token": "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",
+            "releaseType": "release"
+          }
+        ]
       },
       "linux": {
         "category": "Utility",
@@ -88,7 +110,17 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
-          "appId": "Mezon"
+          "appId": "com.nguyentrannhan.mezon-fe",
+          "publish": [
+            {
+              "provider": "github",
+              "private": true,
+              "owner": "nguyentrannhan",
+              "repo": "mezon-fe",
+              "token": "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",
+              "releaseType": "release"
+            }
+          ]
         },
         "linux": {
           "category": "Utility",
@@ -99,7 +131,7 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "Mezon"
+          "appId": "com.nguyentrannhan.mezon-fe"
         }
       }
     },
@@ -113,7 +145,17 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
-          "appId": "Mezon"
+          "appId": "com.nguyentrannhan.mezon-fe",
+          "publish": [
+            {
+              "provider": "github",
+              "private": true,
+              "owner": "nguyentrannhan",
+              "repo": "mezon-fe",
+              "token": "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",
+              "releaseType": "release"
+            }
+          ]
         },
         "linux": {
           "category": "Utility",
