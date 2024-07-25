@@ -3,6 +3,6 @@ type PlainTextOpt = {
 };
 
 export const PlainText: React.FC<PlainTextOpt> = ({ text }) => {
-	return <span className="dark:text-white text-colorTextLightMode">{text}</span>;
+	return <span className="dark:text-white text-colorTextLightMode whitespace-pre-line">{text}</span>;
 };
 export default PlainText;

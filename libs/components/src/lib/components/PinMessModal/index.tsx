@@ -21,7 +21,7 @@ export const ModalAddPinMess = (props: ModalAddPinMessProps) => {
 						<h3 className="font-semibold pb-4 text-xl">Pin It. Pin It Good.</h3>
 						<p>Hey, just double-checking that you want to pin this message to #{channelLabel} for posterity and greatness?</p>
 					</div>
-					<div className="p-4">
+					<div className="p-4 max-h-[60vh] overflow-y-auto hide-scrollbar">
 						<MessageWithUser
 							message={mess}
 							user={user as IChannelMember}
@@ -35,7 +35,7 @@ export const ModalAddPinMess = (props: ModalAddPinMessProps) => {
 						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
 							Cancel
 						</button>
-						<button onClick={() => {handlePinMessage(); closeModal();}} className="px-4 py-2 hover:bg-opacity-85 rounded bg-primary">
+						<button onClick={() => {handlePinMessage(); closeModal();}} className="px-4 py-2 hover:bg-opacity-85 rounded bg-primary text-white font-medium">
                             Oh yeah. Pin it
 						</button>
 					</div>
