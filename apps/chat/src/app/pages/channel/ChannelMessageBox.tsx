@@ -94,7 +94,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 					<GifStickerEmojiPopup />
 				</div>
 			)}
-			{idMessageRefReply && <ReplyMessageBox />}
+			{idMessageRefReply && <ReplyMessageBox idMessage={idMessageRefReply} />}
 			<MessageBox
 				listMentions={UserMentionList({ channelID: channelId })}
 				onSend={handleSend}

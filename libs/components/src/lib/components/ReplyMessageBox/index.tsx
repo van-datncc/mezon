@@ -1,23 +1,21 @@
-import { referencesActions, selectIdMessageRefReply, selectMessageByMessageId, selectOpenReplyMessageState } from '@mezon/store';
+import { referencesActions, selectMessageByMessageId, selectOpenReplyMessageState } from '@mezon/store';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons/index';
 import { useMessageParser } from '../MessageWithUser/useMessageParser';
 import useShowName from '../MessageWithUser/useShowName';
 
-function ReplyMessageBox() {
+type MessageReplyProps = {
+	idMessage: string;
+};
+
+function ReplyMessageBox({ idMessage }: MessageReplyProps) {
 	const dispatch = useDispatch();
-	const idMessageRefReply = useSelector(selectIdMessageRefReply);
-	const refMessage = useSelector(selectMessageByMessageId(idMessageRefReply));
+	const refMessage = useSelector(selectMessageByMessageId(idMessage));
 	const messageReplyState = useSelector(selectOpenReplyMessageState);
 
-	const { senderIdMessageRef, messageUsernameSenderRef, messageClanNicknameSenderRef, messageDisplayNameSenderRef } = useMessageParser(refMessage);
+	const { userClanNickname, userDisplayName, username, senderId } = useMessageParser(refMessage);
 
-	const nameShowed = useShowName(
-		messageClanNicknameSenderRef ?? '',
-		messageDisplayNameSenderRef ?? '',
-		messageUsernameSenderRef ?? '',
-		senderIdMessageRef ?? '',
-	);
+	const nameShowed = useShowName(userClanNickname ?? '', userDisplayName ?? '', username ?? '', senderId ?? '');
 
 	const handleRemoveReply = () => {
 		dispatch(referencesActions.setOpenReplyMessageState(false));
@@ -25,8 +23,9 @@ function ReplyMessageBox() {
 		dispatch(referencesActions.setDataReferences(null));
 	};
 
+	console.log(nameShowed);
+
 	return (
-		idMessageRefReply &&
 		messageReplyState && (
 			<div className="flex flex-row items-center justify-between w-full my-2 dark:bg-[#2B2D31] bg-bgLightMode p-2 rounded-md text-[14px]">
 				<div className="dark:text-white text-black">

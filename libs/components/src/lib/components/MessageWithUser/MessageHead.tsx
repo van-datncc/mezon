@@ -1,11 +1,9 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import useShowName from './useShowName';
-
-const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
 type IMessageHeadProps = {
 	message: IMessageWithUser;
@@ -70,8 +68,6 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 			window.removeEventListener('resize', updatePosition);
 		};
 	}, [positionLeft]);
-
-	const checkAnonymous = useMemo(() => senderId === NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
 
 	const nameShowed = useShowName(userClanNickname ?? '', userDisplayName ?? '', username ?? '', senderId ?? '');
 
