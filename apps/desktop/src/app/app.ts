@@ -45,6 +45,7 @@ export default class App {
 			repo: 'mezon-fe',
 			private: true,
 			token: environment.GH_TOKEN,
+			host: 'github.com',
 			requestHeaders: {
 				Authorization: `Bearer ${environment.GH_TOKEN}`,
 			},
@@ -179,7 +180,7 @@ export default class App {
 		if (process.platform == 'win32' || process.platform == 'linux') {
 			// Keep only command line / deep linked arguments
 			deeplinkingUrl = process.argv.slice(1);
-			App.application.setAppUserModelId('Mezon');
+			App.application.setAppUserModelId('com.nguyentrannhan.mezon-fe');
 		}
 	}
 	private static handleTray() {

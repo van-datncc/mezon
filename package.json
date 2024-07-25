@@ -3,10 +3,7 @@
   "version": "1.0.15",
   "license": "MIT",
   "description": "Mezon application",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nguyentrannhan/mezon-fe.git"
-  },
+  "repository": "https://github.com/nguyentrannhan/mezon-fe",
   "scripts": {
     "dev:chat": "nx run chat:serve",
     "dev:admin": "nx run admin:serve",
