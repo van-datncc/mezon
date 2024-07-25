@@ -231,14 +231,16 @@ export const fetchChannels = createAsyncThunk(
 		if (!response.channeldesc) {
 			return [];
 		}
-		if (Date.now() - response.time < 100) {
+
+		if(Date.now() - response.time < 100) {
 			const lastSeenTimeStampInit = response.channeldesc
-				.filter((channel) => channel.type === 1)
+				.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_TEXT)
 				.map((channelText) => {
-					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) };
+					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) , clanId: channelText.clan_id ?? ''};
 				});
 			thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
 		}
+
 		const channels = response.channeldesc.map(mapChannelToEntity);
 		const meta = channels.map((ch) => extractChannelMeta(ch));
 		thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
