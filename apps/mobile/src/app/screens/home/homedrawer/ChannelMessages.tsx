@@ -1,6 +1,7 @@
 import { useDeleteMessage } from '@mezon/core';
 import { ActionEmitEvent, Icons, load, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { useAppSelector } from '@mezon/store';
 import {
 	messagesActions,
 	RootState,
@@ -47,8 +48,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
-	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
+	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
+	const isLoading = useAppSelector((state: RootState) => state?.messages?.loadingStatus);
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
 	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
 	const attachments = useSelector(selectAttachmentPhoto());
