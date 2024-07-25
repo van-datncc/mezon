@@ -197,9 +197,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
-			if (channelCreated) {
+			if (channelCreated && channelCreated.channel_private === 0) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-
 				dispatch(
 					channelsActions.joinChat({
 						clanId: channelCreated.clan_id,
