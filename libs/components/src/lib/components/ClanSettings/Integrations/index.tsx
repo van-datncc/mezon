@@ -1,10 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icons } from '../../../components';
 import MainIntegrations from './MainIntegrations';
 import Webhooks from './Webhooks';
+import { ChannelsEntity, selectAllChannels, selectAllWebhooks, useAppDispatch } from '@mezon/store';
+import { useSelector } from 'react-redux';
+import { ChannelIsNotThread } from '@mezon/utils';
 
 const Integrations = () => {
 	const [isOpenWebhooks, setIsOpenWebhooks] = useState(false);
+
+	const allChannel = useSelector(selectAllChannels);
+	const allWebhooks = useSelector(selectAllWebhooks);
+	const [parentChannelsInClan, setParentChannelsInClan] = useState<ChannelsEntity[]>([]);
+
+	useEffect(() => {
+		const normalChannels = allChannel.filter((channel) => channel.parrent_id === ChannelIsNotThread.TRUE);
+		setParentChannelsInClan(normalChannels);
+	}, [allChannel]);
+
 	return (
 		<div className="sbm:mt-[60px] mt-[10px]">
 			<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme flex">
@@ -24,7 +37,7 @@ const Integrations = () => {
 				)}
 			</h2>
 
-			{!isOpenWebhooks ? <MainIntegrations setIsOpenWebhooks={() => setIsOpenWebhooks(true)} /> : <Webhooks />}
+			{isOpenWebhooks ? <Webhooks allWebhooks={allWebhooks} parentChannelsInClan={parentChannelsInClan}/> : <MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} />}
 		</div>
 	);
 };
