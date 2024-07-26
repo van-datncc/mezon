@@ -50,6 +50,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { delay } from 'lodash';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '../configs/toastConfig';
 
 const RootStack = createStackNavigator();
 
@@ -262,6 +264,7 @@ const RootNavigation = () => {
 			<ChatContextProvider>
 				<NavigationMain />
 			</ChatContextProvider>
+			<Toast config={toastConfig} />
 		</MezonStoreProvider>
 	);
 };
