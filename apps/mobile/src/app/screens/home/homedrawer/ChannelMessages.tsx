@@ -5,13 +5,9 @@ import { useAppSelector } from '@mezon/store';
 import {
 	messagesActions,
 	RootState,
-	selectAllUserClanProfile,
 	selectAttachmentPhoto,
-	selectChannelMemberByUserIds,
-	selectCurrentClanId,
 	selectHasMoreMessageByChannelId,
 	selectMessageIdsByChannelId,
-	selectTypingUserIdsByChannelId,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
@@ -20,7 +16,7 @@ import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
@@ -28,6 +24,7 @@ import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkelet
 import { MessageItemBS } from './components';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 import ForwardMessageModal from './components/ForwardMessage';
+import { MessageUserTyping } from './components/MessageUserTyping';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import MessageItem from './MessageItem';
@@ -50,11 +47,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const styles = style(themeValue);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const isLoading = useAppSelector((state: RootState) => state?.messages?.loadingStatus);
-	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
-	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
-	const clansProfile = useSelector(selectAllUserClanProfile);
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
 	const [showScrollToBottomButton, setShowScrollToBottomButton] = useState(false);
@@ -66,7 +60,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
-	const currentClanId = useSelector(selectCurrentClanId);
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
 
@@ -142,16 +135,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		},
 		[deleteSendMessage],
 	);
-
-	const typingLabel = useMemo(() => {
-		if (typingUsers?.length === 1) {
-			return `${typingUsers?.[0]?.user?.username} is typing...`;
-		}
-		if (typingUsers?.length > 1) {
-			return 'Several people are typing...';
-		}
-		return '';
-	}, [typingUsers]);
 
 	const [isLoadMore, setIsLoadMore] = React.useState<boolean>(false);
 	const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
@@ -237,19 +220,17 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				<MessageItem
 					key={`message_item_${item}`}
 					jumpToRepliedMessage={jumpToRepliedMessage}
-					clansProfile={clansProfile}
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
 					channelName={channelLabel}
 					onOpenImage={onOpenImage}
-					currentClanId={currentClanId}
 					onMessageAction={onMessageAction}
 					setIsOnlyEmojiPicker={setIsOnlyEmojiPicker}
 				/>
 			);
 		},
-		[jumpToRepliedMessage, clansProfile, mode, channelId, onOpenImage, currentClanId, onMessageAction],
+		[jumpToRepliedMessage, mode, channelId, channelLabel, onOpenImage, onMessageAction],
 	);
 
 	const onImageModalChange = useCallback(
@@ -298,8 +279,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 						messages?.length
 							? onLoadMore
 							: () => {
-								// 	empty
-							}
+									// 	empty
+								}
 					}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}
@@ -312,7 +293,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					</TouchableOpacity>
 				)}
 
-				{!!typingLabel && <Text style={styles.typingLabel}>{typingLabel}</Text>}
+				<MessageUserTyping channelId={channelId} />
 			</View>
 
 			<View>
@@ -335,7 +316,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 
 				<MessageItemBS
 					mode={mode}
-					clanId={currentClanId}
 					message={messageSelected}
 					onConfirmAction={onConfirmAction}
 					type={openBottomSheet}
