@@ -89,7 +89,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageReferences = useMemo(() => {
 		return message?.references?.[0] as ApiMessageRef;
 	}, [message?.references]);
-	console.log('Tom log  => message?.references', message?.references);
 
 	const isCombine = !message?.isStartedMessageGroup;
 	const swipeableRef = React.useRef(null);

@@ -163,18 +163,6 @@ export type IMarkdownProps = {
 	themeValue?: any;
 };
 
-type TRenderTextContentProps = {
-	content: any;
-	isEdited?: boolean;
-	translate?: TFunction;
-	onMention?: (url: string) => void;
-	onChannelMention?: (channel: ChannelsEntity) => void;
-	isNumberOfLine?: boolean;
-	isMessageReply?: boolean;
-	mode?: number;
-	themeValue?: any;
-};
-
 /**
  * custom render if you need
  * react-native-markdown-display/src/lib/renderRules.js to see more
@@ -312,7 +300,7 @@ export const formatBlockCode = (text: string) => {
 		}
 		return '\n' + block + '\n';
 	};
-	return text.replace(codeBlockRegexGlobal, addNewlinesToCodeBlock);
+	return text?.replace?.(codeBlockRegexGlobal, addNewlinesToCodeBlock);
 };
 
 export const removeBlockCode = (text: string) => {
@@ -336,7 +324,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const contentRender = () => {
 			let formattedContent = '';
 
-			elements.forEach((element, index) => {
+			elements.forEach((element) => {
 				const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
 
 				if (lastIndex < startIndex) {
@@ -368,10 +356,6 @@ export const RenderTextMarkdownContent = React.memo(
 			}
 			return formattedContent;
 		};
-
-		if (isMessageReply) {
-			customStyle = { ...styleMessageReply };
-		}
 
 		const renderMarkdown = () => (
 			<Markdown
@@ -408,7 +392,7 @@ export const RenderTextMarkdownContent = React.memo(
 			<View
 				style={{
 					flex: 1,
-					maxHeight: isMessageReply ? size.s_18 : size.s_20 * 10 - size.s_10,
+					maxHeight: isMessageReply ? size.s_36 : size.s_20 * 10 - size.s_10,
 					overflow: 'hidden',
 				}}
 			>
@@ -432,10 +416,3 @@ export const RenderTextMarkdownContent = React.memo(
 	},
 );
 
-const getUserMention = (nameMention: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[]) => {
-	if (mode === 4 || mode === 3) {
-		return usersInChannel?.find((channelUser) => channelUser?.user?.username === nameMention);
-	} else {
-		return usersClan?.find((userClan) => userClan?.user?.username === nameMention);
-	}
-};
