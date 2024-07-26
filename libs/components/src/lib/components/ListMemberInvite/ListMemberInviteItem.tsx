@@ -28,7 +28,14 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			directMessageWithUser(userId);
 		}
 		if (directParamId && dmGroup) {
-			sendInviteMessage(url, directParamId, ChannelStreamMode.STREAM_MODE_GROUP);
+			let channelMode = 0;
+			if (type === ChannelType.CHANNEL_TYPE_DM) {
+				channelMode = ChannelStreamMode.STREAM_MODE_DM;
+			}
+			if (type === ChannelType.CHANNEL_TYPE_GROUP) {
+				channelMode = ChannelStreamMode.STREAM_MODE_GROUP;
+			}
+			sendInviteMessage(url, directParamId, channelMode);
 			onSend(dmGroup);
 		}
 	};
@@ -37,20 +44,20 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	}, [isSent]);
 	return dmGroup ? (
 		<ItemInviteDM 
-			channelID={dmGroup.channel_id || ''}
+			channelID={dmGroup.channel_id}
 			type={Number(dmGroup.type)}
-			avatar={dmGroup.channel_avatar?.at(0) || ''}
-			label={dmGroup.channel_label || ''}
-			isInviteSent={isInviteSent??true}
+			avatar={dmGroup.channel_avatar?.at(0)}
+			label={dmGroup.channel_label}
+			isInviteSent={isInviteSent}
 			onHandle={() => handleButtonClick(dmGroup.channel_id || '', dmGroup.type || 0)}
 		/>
 	) : (
 		<ItemInviteUser 
-			userId={user?.id || ''}
-			avatar={user?.user?.avatar_url || ''}
-			displayName={user?.user?.display_name || ''}
-			userName={user?.user?.username || ''}
-			isInviteSent={isInviteSent ?? true}
+			userId={user?.id}
+			avatar={user?.user?.avatar_url}
+			displayName={user?.user?.display_name}
+			userName={user?.user?.username}
+			isInviteSent={isInviteSent}
 			onHandle={() => handleButtonClick('', 0, user?.id)}
 		/>
 	);
@@ -58,16 +65,16 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 export default ListMemberInviteItem;
 
 type ItemInviteDMProps = {
-	channelID: string;
-	type: number;
-	avatar: string;
-	label: string;
-	isInviteSent: boolean;
+	channelID?: string;
+	type?: number;
+	avatar?: string;
+	label?: string;
+	isInviteSent?: boolean;
 	onHandle: () => void;
 }
 
 const ItemInviteDM = (props: ItemInviteDMProps) => {
-	const {channelID, type, avatar, label, isInviteSent, onHandle} = props;
+	const {channelID='', type='', avatar='', label='', isInviteSent=false, onHandle=()=>{}} = props;
 	return (
 		<div key={channelID} className="flex items-center justify-between h-14">
 			{type === ChannelType.CHANNEL_TYPE_GROUP ? (
@@ -94,16 +101,16 @@ const ItemInviteDM = (props: ItemInviteDMProps) => {
 }
 
 type ItemInviteUserProps = {
-	userId: string;
-	avatar: string;
-	displayName: string;
-	userName: string;
-	isInviteSent: boolean;
-	onHandle: () => void;
+	userId?: string;
+	avatar?: string;
+	displayName?: string;
+	userName?: string;
+	isInviteSent?: boolean;
+	onHandle?: () => void;
 }
 
 const ItemInviteUser = (props: ItemInviteUserProps) => {
-	const {userId, avatar, displayName, userName, isInviteSent, onHandle} = props;
+	const {userId='', avatar='', displayName='', userName='', isInviteSent=false, onHandle=()=>{}} = props;
 	return (
 		<div key={userId} className="flex items-center justify-between h-14">
 			{!avatar ? (

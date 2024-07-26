@@ -9,7 +9,7 @@ import {
 	setSelectedPermissions,
 	setSelectedRoleId,
 } from '@mezon/store';
-import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
 type closeEditRole = {
@@ -27,7 +27,7 @@ const SettingListRole = (props: closeEditRole) => {
 	const [clickedRole, setClickedRole] = useState<null | string>(clickRole);
 	const nameRoleNew = useSelector(getNewNameRole);
 
-	const isNewRole = useMemo(() => clickedRole === 'New Role', [clickedRole]);
+	const isNewRole = clickedRole === 'New Role';
 	const handleRoleClick = (roleId: string) => {
 		handleUpdateUser();
 		if (!isChange || isNewRole) {
@@ -90,9 +90,9 @@ type ItemRoleProps = {
 }
 
 const ItemRole = forwardRef<HTMLDivElement, ItemRoleProps>((props, ref) => {
-	const {title, isChoose, onHandle} = props;
+	const {title, isChoose, onHandle=()=>{}} = props;
 	return (
-		<div ref={ref} onClick={onHandle ? () => onHandle() : undefined}>
+		<div ref={ref} onClick={onHandle}>
 			<button 
 				className={`w-full py-1.5 px-[10px] text-[15px] bg-transparent dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton font-medium inline-flex gap-x-2 items-center rounded dark:text-textDarkTheme text-textLightTheme
 					${isChoose ? 'dark:bg-[#4e5058] bg-bgModifierHoverLight' : ''}
