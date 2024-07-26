@@ -191,7 +191,8 @@ function MemberProfile({
 						<div>
 							<div className="flex flex-row items-center w-full overflow-x-hidden">
 								<p
-									className={`text-base font-medium nameMemberProfile inline-flex justify-start
+									className={`text-base font-medium nameMemberProfile
+				  ${isListFriend ? ' inline-flex justify-start' : ''}
                   ${isFooter ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.MEMBER_LIST ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
@@ -200,7 +201,7 @@ function MemberProfile({
 							`}
 									title={name}
 								>
-									<span className={isListFriend ? 'text-white one-line' : ''}>{!isHiddenAvatarPanel && name}</span>
+									<span className={isListFriend ? 'dark:text-white text-black one-line' : ''}>{!isHiddenAvatarPanel && name}</span>
 									{isListFriend && <span className='hidden group-hover/list_friends:inline'>&nbsp;{userNameAva}</span>}
 								</p>
 								{(dataMemberCreate?.createId || currentClan?.creator_id) &&
