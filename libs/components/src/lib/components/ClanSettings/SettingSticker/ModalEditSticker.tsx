@@ -36,24 +36,12 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
           <div className={'flex items-center justify-center rounded-lg border-[0.08px] border-borderDivider overflow-hidden'}>
             <div className={'relative h-56 w-[50%] flex items-center justify-center bg-bgPrimary'}>
               {
-                preview ? (
-                  <div className={'m-auto absolute w-40 aspect-square overflow-hidden flex items-center justify-end'}>
-                    <img className="h-full w-auto object-cover" src={preview} />
-                  </div>
-                )
-                  :
-                  <Icons.UploadImage className="w-16 h-16 text-bgLightModeSecond" />
+                preview ? <PreviewStickerBox preview={preview} /> : <Icons.UploadImage className="w-16 h-16 text-bgLightModeSecond" />
               }
             </div>
             <div className={'h-56 w-[50%] flex items-center justify-center bg-bgLightModeSecond'}>
               {
-                preview ? (
-                  <div className={'m-auto absolute w-40 aspect-square overflow-hidden flex items-center justify-end'}>
-                    <img className="h-full w-auto object-cover" src={preview} />
-                  </div>
-                )
-                  :
-                  <Icons.UploadImage className="w-16 h-16 text-bgPrimary" />
+                preview ? <PreviewStickerBox preview={preview} /> : <Icons.UploadImage className="w-16 h-16 text-bgPrimary" />
               }
             </div>
           </div>
@@ -77,7 +65,6 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
                   </button>
                 )
               }
-
             </div>
           </div>
           <div className={'w-1/2 flex flex-col gap-2'}>
@@ -97,3 +84,11 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 }
 
 export default ModalSticker;
+
+const PreviewStickerBox = ({ preview }: { preview: string }) => {
+  return (
+    <div className={'m-auto absolute w-40 aspect-square overflow-hidden flex items-center justify-end'}>
+      <img className="h-full w-auto object-cover" src={preview} />
+    </div>
+  )
+}

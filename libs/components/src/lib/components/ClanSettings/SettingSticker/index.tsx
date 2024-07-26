@@ -78,7 +78,6 @@ const SettingSticker = () => {
           <Button label="upload sticker" className="capitalize" onClick={handleOpenModalUpload}></Button>
         </div>
         <div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] gap-x-[calc((100%_-_116px_*_4)/3)] w">
-
           {
             stickers.map(sticker => (
               <SettingStickerItem key={sticker.id} sticker={sticker} deleteSticker={handleDeleteSticker} updateSticker={handleUpdateSticker} />
