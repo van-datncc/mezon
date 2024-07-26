@@ -7,6 +7,7 @@ interface IIntegrationProps {
 }
 
 const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps) => {
+	const numberOfWebhooks = allWebhooks?.length;
 	return (
 		<>
 			<div className="dark:text-[#b5bac1] text-textLightTheme text-sm pt-5">
@@ -16,7 +17,7 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 			<div className="border-b-[1px] border-[#616161] my-[32px]"></div>
 			<div
 				onClick={() => {
-					if (allWebhooks?.length !== 0) {
+					if (numberOfWebhooks !== 0) {
 						setIsOpenWebhooks();
 					}
 				}}
@@ -29,11 +30,11 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 					<div>
 						<div className="pb-[3px] font-semibold">Webhooks</div>
 						<div className="text-[12px]">
-							{allWebhooks && allWebhooks?.length > 1 ? allWebhooks?.length + ' webhooks' : allWebhooks?.length + ' webhook'}
+							{numberOfWebhooks && numberOfWebhooks > 1 ? numberOfWebhooks + ' webhooks' : numberOfWebhooks + ' webhook'}
 						</div>
 					</div>
 				</div>
-				{allWebhooks?.length === 0 ? (
+				{numberOfWebhooks === 0 ? (
 					<div
 						onClick={setIsOpenWebhooks}
 						className="bg-[#5865f2] hover:bg-[#4752c4] text-white rounded-md py-2 px-3 cursor-pointer font-semibold"
