@@ -2,7 +2,7 @@ import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
@@ -137,6 +137,10 @@ function MemberProfile({
 
 	const isListFriend = useMemo(() => positionType === MemberProfileType.LIST_FRIENDS, [positionType]);
 
+	const isMemberDMGroup = useMemo(() => positionType === MemberProfileType.DM_MEMBER_GROUP, [positionType]);
+
+	const isMemberChannel = useMemo(() => positionType === MemberProfileType.MEMBER_LIST, [positionType]);
+
 	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, []);
 
 	const userName = useMemo(() => isFooter ? userProfile?.user?.username || '' : name || '', []);
@@ -145,7 +149,7 @@ function MemberProfile({
 			<div
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
-				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${positionType === MemberProfileType.FOOTER_PROFILE ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
+				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${isFooter ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
 				<a className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
 					<AvatarImage
@@ -171,7 +175,7 @@ function MemberProfile({
 					>
 						{!isHideStatus && (
 							<>
-								{customStatus && positionType === MemberProfileType.FOOTER_PROFILE ? (
+								{customStatus && isFooter ? (
 									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode line-clamp-1`}>
 										{customStatus}
 									</span>
@@ -194,7 +198,7 @@ function MemberProfile({
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
                   ${isFooter ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
-                  ${positionType === MemberProfileType.MEMBER_LIST ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+                  ${isMemberChannel ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'}
                   ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
@@ -211,7 +215,7 @@ function MemberProfile({
 										</button>
 									)}
 							</div>
-							{customStatus && (positionType === MemberProfileType.MEMBER_LIST || positionType === MemberProfileType.DM_MEMBER_GROUP) && (
+							{customStatus && (isMemberChannel || isMemberDMGroup) && (
 								<p className="dark:text-contentTertiary text-black w-full text-[12px] line-clamp-1 break-all" title={customStatus}>
 									{customStatus}
 								</p>
@@ -234,7 +238,7 @@ function MemberProfile({
 					name={name}
 					isMemberDMGroup={dataMemberCreate ? true : false}
 					dataMemberCreate={dataMemberCreate}
-					isMemberChannel={positionType === MemberProfileType.MEMBER_LIST}
+					isMemberChannel={isMemberChannel}
 				/>
 			)}
 			{isShowUserProfile && listProfile ? (
@@ -244,7 +248,7 @@ function MemberProfile({
 					onMouseDown={handleDefault}
 					onClick={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} />
+					<ShortUserProfile userID={user?.user?.id || ''} mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}/>
 				</div>
 			) : null}
 
