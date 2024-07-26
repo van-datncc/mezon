@@ -1,3 +1,4 @@
+import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
 import {
@@ -14,7 +15,6 @@ import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
-import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '../../../../../app/utils/helpers';
 import { ChannelHashtag } from '../components/MarkdownFormatText/ChannelHashtag';
 import { EmojiMarkup } from '../components/MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../components/MarkdownFormatText/MentionUser';

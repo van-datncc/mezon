@@ -1,5 +1,6 @@
 import { load } from '@mezon/mobile-components';
 import { ChannelMembersEntity, UsersClanEntity } from '@mezon/store';
+import { ChannelStreamMode } from 'mezon-js/client';
 
 type IMentionUser = {
 	tagName: string;
@@ -12,11 +13,11 @@ export const MentionUser = ({ tagName, mode, usersClan, usersInChannel, clansPro
 	const currentClanId = load('persist:clans').currentClanId;
 
 	const getUserMention = (nameMention: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[]) => {
-		if (mode === 4 || mode === 3) {
+		if (mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 			return usersInChannel?.find((channelUser) => channelUser?.user?.username === nameMention);
-		} else {
-			return usersClan?.find((userClan) => userClan?.user?.username === nameMention);
 		}
+
+		return usersClan?.find((userClan) => userClan?.user?.username === nameMention);
 	};
 
 	const userMention = getUserMention(tagName?.substring(1), mode, usersInChannel, usersClan);

@@ -28,12 +28,18 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 		jumpToRepliedMessage(messageReferences?.message_ref_id);
 	};
 
+	const onPressAvatar = () => {
+		if (!preventAction) {
+			handleJumpToMessage(messageReferences?.message_ref_id);
+		}
+	};
+
 	return (
 		<View style={styles.aboveMessage}>
 			<View style={styles.iconReply}>
 				<ReplyIcon width={34} height={30} />
 			</View>
-			<Pressable onPress={() => !preventAction && handleJumpToMessage(messageReferences?.message_ref_id)} style={styles.repliedMessageWrapper}>
+			<Pressable onPress={onPressAvatar} style={styles.repliedMessageWrapper}>
 				{messageReferences?.mesages_sender_avatar ? (
 					<View style={styles.replyAvatar}>
 						<Image source={{ uri: messageReferences?.mesages_sender_avatar }} style={styles.replyAvatar} />
