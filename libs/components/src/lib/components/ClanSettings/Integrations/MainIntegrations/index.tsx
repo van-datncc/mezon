@@ -20,7 +20,7 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 						setIsOpenWebhooks();
 					}
 				}}
-				className={`dark:text-[#b5bac1] text-textLightTheme py-[20px] px-[16px] flex justify-between items-center border dark:border-black border-[#d1d4d9] rounded-md dark:bg-[#2b2d31] bg-bgLightSecondary ${allWebhooks?.length !== 0 ? "cursor-pointer" : ""}`}
+				className={`dark:text-[#b5bac1] text-textLightTheme py-[20px] px-[16px] flex justify-between items-center border dark:border-black border-[#d1d4d9] rounded-md dark:bg-[#2b2d31] bg-bgLightSecondary ${allWebhooks?.length !== 0 ? 'cursor-pointer' : ''}`}
 			>
 				<div className="flex gap-3 items-center">
 					<div className="rounded-full p-4 dark:bg-[#111214]">
@@ -28,7 +28,9 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 					</div>
 					<div>
 						<div className="pb-[3px] font-semibold">Webhooks</div>
-						<div className="text-[12px]">{allWebhooks?.length} webhooks</div>
+						<div className="text-[12px]">
+							{allWebhooks && allWebhooks?.length > 1 ? allWebhooks?.length + ' webhooks' : allWebhooks?.length + ' webhook'}
+						</div>
 					</div>
 				</div>
 				{allWebhooks?.length === 0 ? (
@@ -39,9 +41,7 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 						Create Webhook
 					</div>
 				) : (
-					<div
-						className="items-center cursor-pointer text-[#4e5058] dark:text-[#b5bac1] text-[14px] flex gap-[4px]"
-					>
+					<div className="items-center cursor-pointer text-[#4e5058] dark:text-[#b5bac1] text-[14px] flex gap-[4px]">
 						<div>View Webhook</div>
 						<Icons.ArrowDown defaultSize="h-[15px] w-[15px] dark:text-[#b5bac1] text-black -rotate-90" />
 					</div>
