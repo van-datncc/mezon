@@ -28,7 +28,8 @@
     "build:desktop": "yarn build:desktop:app && yarn build:desktop:renderer",
     "package:desktop": "nx run desktop:package",
     "make:desktop": "nx run desktop:make",
-    "release:desktop": "yarn build:desktop && yarn package:desktop && yarn make:desktop"
+    "release:desktop": "yarn build:desktop && yarn package:desktop && yarn make:desktop",
+    "release": "npx electron-builder --config=./electron-builder.json --win --x64"
   },
   "private": true,
   "dependencies": {
