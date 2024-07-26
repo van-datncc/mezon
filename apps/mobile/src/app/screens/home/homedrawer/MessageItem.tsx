@@ -61,10 +61,6 @@ export type MessageItemProps = {
 	preventAction?: boolean;
 };
 
-const arePropsEqual = (prevProps, nextProps) => {
-	return prevProps.message === nextProps.message;
-};
-
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -93,6 +89,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageReferences = useMemo(() => {
 		return message?.references?.[0] as ApiMessageRef;
 	}, [message?.references]);
+	console.log('Tom log  => message?.references', message?.references);
 
 	const isCombine = !message?.isStartedMessageGroup;
 	const swipeableRef = React.useRef(null);
@@ -348,6 +345,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			</View>
 		</Swipeable>
 	);
-}, arePropsEqual);
+});
 
 export default MessageItem;
