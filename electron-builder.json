@@ -1,0 +1,21 @@
+{
+    "appId": "mezon.chat",
+    "productName": "Mezon",
+    "copyright": "Copyright © Mezon",
+    "directories": {
+      "output": "release/"
+    },
+    "mac": {
+      "icon": "dist",
+      "target": [
+        "zip",
+        "dmg"
+      ],
+      "category": "communication tool"
+    },
+    "publish": {
+      "provider": "s3",
+      "bucket": "bucketName",
+      "region": "mezon-release-asia"
+    }
+}
