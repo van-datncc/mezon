@@ -1,8 +1,8 @@
-import { Icons } from "@mezon/mobile-components";
+import { ActionEmitEvent, Icons } from "@mezon/mobile-components";
 import { Block, size, Text, useTheme } from "@mezon/mobile-ui";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable } from "react-native";
+import { DeviceEventEmitter, Pressable } from "react-native";
 import { EMessageActionType } from "../../../enums";
 import { IMessageActionNeedToResolve } from "../../../types";
 
@@ -42,7 +42,10 @@ export const ActionMessageSelected = memo(({ messageActionNeedToResolve, onClose
           borderBottomWidth={1}
           borderBottomColor={themeValue.border}
         >
-          <Pressable onPress={() => onClose()}>
+          <Pressable onPress={() => {
+            onClose();
+            DeviceEventEmitter.emit(ActionEmitEvent.CLEAR_TEXT_INPUT)
+          }}>
             <Icons.CircleXIcon height={20} width={20} color={themeValue.text} />
           </Pressable>
           <Text color={themeValue.text} h6>{t('chatBox.editingMessage')}</Text>

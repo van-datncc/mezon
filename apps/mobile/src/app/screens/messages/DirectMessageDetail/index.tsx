@@ -140,7 +140,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const onHandlerStateChange = (event) => {
 		const { translationX, velocityX } = event.nativeEvent;
-		if (translationX > 5 && velocityX > 120) {
+		if (translationX > 5 && velocityX > 200) {
 			handleBack()
 		}
 	};
