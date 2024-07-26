@@ -1,4 +1,5 @@
 import { Icons } from '@mezon/components';
+import { useMemberCustomStatus } from '@mezon/core';
 import { ChannelMembersEntity, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Dropdown } from 'flowbite-react';
 import { OnlineStatus } from '../../../../../../ui/src/lib/Icons';
@@ -17,6 +18,8 @@ const StatusProfile = ({ userById }: StatusProfileProps) => {
 	const handleCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
 	};
+
+	const userCustomStatus = useMemberCustomStatus(user?.id || '');
 
 	return (
 		<>
@@ -40,7 +43,11 @@ const StatusProfile = ({ userById }: StatusProfileProps) => {
 					<ItemStatus children="Invisible" startIcon={<Icons.OfflineStatus />} />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 				</Dropdown>
-				<ItemStatus onClick={handleCustomStatus} children="Set Custom Status" startIcon={<Icons.SmilingFace />} />
+				<ItemStatus
+					onClick={handleCustomStatus}
+					children={`${userCustomStatus ? 'Edit' : 'Set'} Custom Status`}
+					startIcon={<Icons.SmilingFace />}
+				/>
 			</div>
 			<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>
 			<Dropdown

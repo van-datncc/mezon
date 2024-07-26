@@ -1,6 +1,8 @@
 import { useAuth, useClanProfileSetting } from '@mezon/core';
 import { selectUserClanProfileByClanID } from '@mezon/store';
+import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
+import { fileTypeImage, resizeFileImage } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SettingRightClanCard, { Profilesform } from '../SettingUserClanProfileCard';
@@ -18,7 +20,7 @@ const SettingRightClanEdit = ({
 	clanId: string;
 }) => {
 	const { userProfile } = useAuth();
-
+	const { sessionRef, clientRef } = useMezon();
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId ?? '', userProfile?.user?.id ?? ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
 
@@ -67,15 +69,35 @@ const SettingRightClanEdit = ({
 
 	const { updateUserClanProfile } = useClanProfileSetting({ clanId });
 
-	const handleFile = (e: any) => {
-		const fileToStore: File = e.target.files[0];
-		const newUrl = URL.createObjectURL(fileToStore);
-		setUrlImage(newUrl);
-		if (newUrl !== userProfile?.user?.avatar_url) {
-			setFlagOptionsTrue?.();
-		} else {
-			setFlagOptionsfalse?.();
+	const handleFile = async (e: any) => {
+		const file = e?.target?.files[0];
+		const sizeImage = file?.size;
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		const imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
+		if (!file) return;
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
 		}
+
+		const allowedTypes = fileTypeImage;
+		if (!allowedTypes.includes(file.type)) {
+			e.target.value = null;
+			return;
+		}
+
+		if (sizeImage > 1000000) {
+			e.target.value = null;
+			return;
+		}
+		handleUploadFile(client, session, '0', '0', imageAvatarResize?.name, imageAvatarResize).then((attachment: any) => {
+			setUrlImage(attachment.url ?? '');
+			if (attachment.url !== userProfile?.user?.avatar_url) {
+				setFlagOptionsTrue?.();
+			} else {
+				setFlagOptionsfalse?.();
+			}
+		});
 	};
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setDisplayName(e.target.value);
