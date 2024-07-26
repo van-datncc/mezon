@@ -271,6 +271,9 @@ export const channelsSlice = createSlice({
 		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
+		removeByChannelID: (state, action: PayloadAction<string>) => {
+			channelsAdapter.removeOne(state, action.payload);
+		},
 		setModeResponsive: (state, action) => {
 			state.modeResponsive = action.payload;
 		},

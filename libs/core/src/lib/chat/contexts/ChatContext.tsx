@@ -1,6 +1,9 @@
 import {
+	channelMembers,
 	channelMembersActions,
 	channelsActions,
+	channelsSlice,
+	clansSlice,
 	directActions,
 	friendsActions,
 	mapMessageChannelToEntity,
@@ -33,12 +36,16 @@ import {
 	StatusPresenceEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
+	UserChannelRemovedEvent,
+	UserClanRemovedEvent,
+	UserChannelAddedEvent,
 } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
+import { useNavigate } from 'react-router-dom';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -58,6 +65,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -155,6 +163,51 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[currentChannel?.channel_id, currentChannel?.clan_id, dispatch],
 	);
 
+	const onuserchannelremoved = useCallback(
+		(user: UserChannelRemovedEvent) => {
+			user.user_ids.forEach((userID:any) => {
+				if (userID === userId){
+					if(channelId === user.channel_id){
+						navigate(`/chat/clans/${clanId}`);
+					}
+					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
+				} else {
+					dispatch(channelMembers.actions.removeUserByUserIdAndChannelId({userId: userID, channelId: user.channel_id}))
+				}
+			});
+		},
+		[channelId, userId],
+	);
+	const onuserclanremoved = useCallback(
+		(user: UserClanRemovedEvent) => {
+			user.user_ids.forEach((userID:any) => {
+				if (userID === userId){
+					if(clanId === user.clan_id){
+						navigate(`/chat/direct/friends`);
+					}
+					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
+				}
+			});
+		},
+		[clanId],
+	);
+	const onuserchanneladded = useCallback(
+		(userAdds: UserChannelAddedEvent) => {
+			userAdds.users.forEach((user:any) => {
+				if (user.user_id === userId){
+					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
+					dispatch(
+						channelsActions.joinChat({
+							clanId: userAdds.clan_id,
+							channelId: userAdds.channel_id,
+							channelType: userAdds.channel_type,
+						}),
+					);
+				}
+			});
+		},
+		[clanId, userId],
+	);
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
 			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent.user_id, customStatus: statusEvent.status }));
@@ -256,6 +309,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onpinmessage = onpinmessage;
 
+			socket.onuserchannelremoved = onuserchannelremoved;
+
+			socket.onuserclanremoved = onuserclanremoved;
+
+			socket.onuserchanneladded = onuserchanneladded;
+
 			socket.oncustomstatus = oncustomstatus;
 
 			socket.onstatuspresence = onstatuspresence;
@@ -280,6 +339,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onmessagetyping,
 			onnotification,
 			onpinmessage,
+			onuserchannelremoved,
+			onuserclanremoved,
+			onuserchanneladded,
 			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
@@ -325,6 +387,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ondisconnect = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onuserchannelremoved = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onuserclanremoved = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onuserchanneladded = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -334,6 +402,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onmessagereaction,
 		onnotification,
 		onpinmessage,
+		onuserchannelremoved,
+		onuserclanremoved,
+		onuserchanneladded,
 		oncustomstatus,
 		onstatuspresence,
 		socketRef,
