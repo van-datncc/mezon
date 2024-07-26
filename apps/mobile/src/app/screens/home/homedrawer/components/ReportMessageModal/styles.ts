@@ -1,7 +1,7 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, Colors, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
     reportMessageModalContainer: {
         gap: size.s_18,
         flex: 1,
@@ -9,15 +9,16 @@ export const styles = StyleSheet.create({
     },
     cancelButtonWrapper: {
         borderTopWidth: 1,
-        borderTopColor: Colors.borderNeutralDisable,
+        borderTopColor: colors.borderDim,
     },
     buttonWrapper: {
+        paddingBottom: size.s_30,
         borderTopWidth: 1,
-        borderTopColor: Colors.borderNeutralDisable,
+        borderTopColor: colors.borderDim,
     },
     cannelText: {
         paddingVertical: size.s_18,
-        color: Colors.white,
+        color: colors.white,
         textAlign: 'center',
     },
     SubmitButton: {
@@ -32,12 +33,13 @@ export const styles = StyleSheet.create({
     },
     messageBox: {
         paddingTop: size.s_10,
+        paddingBottom: size.s_6,
         borderRadius: size.s_4,
         borderWidth: 1,
-        borderColor: Colors.borderNeutralDisable
+        borderColor: colors.borderDim
     },
     selectedMessageText: {
-        color: Colors.tertiary,
+        color: colors.textStrong,
         marginBottom: size.s_10
     },
     contentWrapper: {
@@ -47,35 +49,39 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: Colors.bgDarkSlate,
+        backgroundColor: colors.bgInputPrimary,
         padding: size.s_14,
         borderRadius: size.s_8
     },
     reportTitle: {
-        color: Colors.white
+        color: colors.white
     },
     reportList: {
         marginTop: size.s_10
     },
     title: {
-        color: Colors.white,
+        color: colors.white,
         fontSize: size.h4,
         textAlign: 'center',
     },
     subTitle: {
-        color: Colors.tertiary,
+        color: colors.textStrong,
         textAlign: 'center',
         paddingHorizontal: size.s_14
     },
     reportCategory: {
-        color: Colors.tertiary,
+        color: colors.textStrong,
     },
     reportCategoryTitle: {
-        color: Colors.white,
+        color: colors.white,
     },
     reportCategoryWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: size.s_8
+    },
+    categoryTitle: {
+        marginVertical: 20,
+        gap: size.s_10
     }
 })

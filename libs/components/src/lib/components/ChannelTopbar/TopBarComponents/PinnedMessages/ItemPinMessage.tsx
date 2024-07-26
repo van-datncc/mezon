@@ -1,24 +1,24 @@
-import { PinMessageEntity } from "@mezon/store";
-import { useState } from "react";
-import MemberProfile from "../../../MemberProfile";
-import MessageLine from "../../../MessageWithUser/MessageLine";
-import { ModalDeletePinMess } from "./DeletePinMessPopup";
+import { PinMessageEntity } from '@mezon/store';
+import { useState } from 'react';
+import MemberProfile from '../../../MemberProfile';
+import MessageLine from '../../../MessageWithUser/MessageLine';
+import { ModalDeletePinMess } from './DeletePinMessPopup';
 
 type ItemPinMessageProps = {
 	pinMessage: PinMessageEntity;
 	contentString: string | undefined;
 	handleUnPinMessage: (value: string) => void;
-}
+};
 
 const ItemPinMessage = (props: ItemPinMessageProps) => {
-	const {pinMessage, contentString, handleUnPinMessage} = props;
+	const { pinMessage, contentString, handleUnPinMessage } = props;
 	const [openModalDelPin, setOpenModalDelPin] = useState(false);
 	return (
 		<div
 			key={pinMessage.id}
 			className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgSecondary hover:bg-bgLightModeThird bg-bgLightMode dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden"
 		>
-			<div className="flex items-center gap-2">
+			<div className="flex items-start gap-2">
 				<MemberProfile
 					isHideUserName={true}
 					avatar={pinMessage.avatar || ''}
@@ -31,9 +31,9 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					<div>
 						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">{pinMessage.username}</span>
 					</div>
-					<span className="text-[11px]">
-						<MessageLine line={contentString as string} />
-					</span>
+					<div>
+						<MessageLine content={JSON.parse(pinMessage.content || '')} showOnchannelLayout={false} />
+					</div>
 				</div>
 			</div>
 			<button
@@ -44,7 +44,14 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			>
 				✕
 			</button>
-			{openModalDelPin && <ModalDeletePinMess pinMessage={pinMessage} contentString={contentString} handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')} closeModal={() => setOpenModalDelPin(false)}/>}
+			{openModalDelPin && (
+				<ModalDeletePinMess
+					pinMessage={pinMessage}
+					contentString={contentString}
+					handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')}
+					closeModal={() => setOpenModalDelPin(false)}
+				/>
+			)}
 		</div>
 	);
 };

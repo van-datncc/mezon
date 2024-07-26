@@ -135,9 +135,11 @@ function MemberProfile({
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 
+	const isListFriend = useMemo(() => positionType === MemberProfileType.LIST_FRIENDS, [positionType]);
+
 	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, []);
 
-	const userName = useMemo(() => isFooter ? userProfile?.user?.username || '' : name || '',[]);
+	const userName = useMemo(() => isFooter ? userProfile?.user?.username || '' : name || '', []);
 	return (
 		<div className="relative group">
 			<div
@@ -146,7 +148,7 @@ function MemberProfile({
 				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${positionType === MemberProfileType.FOOTER_PROFILE ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
 				<a className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
-					<AvatarImage 
+					<AvatarImage
 						alt={userName}
 						userName={userNameAva ?? userName}
 						className="min-w-8 min-h-8 max-w-8 max-h-8"
@@ -189,7 +191,7 @@ function MemberProfile({
 						<div>
 							<div className="flex flex-row items-center w-full overflow-x-hidden">
 								<p
-									className={`text-base font-medium nameMemberProfile
+									className={`text-base font-medium nameMemberProfile inline-flex justify-start
                   ${isFooter ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.MEMBER_LIST ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
@@ -198,7 +200,8 @@ function MemberProfile({
 							`}
 									title={name}
 								>
-									{!isHiddenAvatarPanel && name}
+									<span className={isListFriend ? 'text-white one-line' : ''}>{!isHiddenAvatarPanel && name}</span>
+									{isListFriend && <span className='hidden group-hover/list_friends:inline'>&nbsp;{userNameAva}</span>}
 								</p>
 								{(dataMemberCreate?.createId || currentClan?.creator_id) &&
 									(dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id && (
@@ -207,8 +210,10 @@ function MemberProfile({
 										</button>
 									)}
 							</div>
-							{customStatus && positionType === MemberProfileType.MEMBER_LIST && (
-								<p className="dark:text-white text-black w-full text-[12px] line-clamp-1">{customStatus}</p>
+							{customStatus && (positionType === MemberProfileType.MEMBER_LIST || positionType === MemberProfileType.DM_MEMBER_GROUP) && (
+								<p className="dark:text-contentTertiary text-black w-full text-[12px] line-clamp-1 break-all" title={customStatus}>
+									{customStatus}
+								</p>
 							)}
 						</div>
 					)}

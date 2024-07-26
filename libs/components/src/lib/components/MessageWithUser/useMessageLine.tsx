@@ -56,10 +56,16 @@ export function useMessageLine(line: string): IMessageLine {
 	};
 
 	const links = useMemo(() => {
+		if (!line) {
+			return [];
+		}
 		return processMatches(extensionsRegex, line);
 	}, [line, extensionsRegex]);
 
 	const mentions = useMemo(() => {
+		if (!line) {
+			return [];
+		}
 		const trimmedLine = line.trim();
 		if ((trimmedLine.startsWith('```') && trimmedLine.endsWith('```')) || (trimmedLine.startsWith('`') && trimmedLine.endsWith('`'))) {
 			return [

@@ -5,10 +5,10 @@ import {
 	selectChannelDraftMessage,
 	selectIdMessageRefEdit,
 	selectLastSeenMessage,
-	selectMemberByUserId,
 	selectMessageEntityById,
 	selectOpenEditMessageState,
 	useAppDispatch,
+	useAppSelector,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -29,12 +29,11 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 	const dispatch = useAppDispatch();
 	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
-	const user = useSelector(selectMemberByUserId(message.sender_id));
 	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu, preloadMessageContextMenu } = useMessageContextMenu();
-	const channelDraftMessage = useSelector((state) => selectChannelDraftMessage(state, channelId, messageId));
+	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
 	const isEditing = useMemo(() => {
 		if (channelDraftMessage.message_id === messageId) {
@@ -85,7 +84,7 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 					channelId,
 					channelDraftMessage: {
 						message_id: messageId,
-						draft_content: channelDraftMessage.draft_content ?? ((mess as IMessageWithUser).content?.t as string),
+						draftContent: channelDraftMessage.draftContent ?? ((mess as IMessageWithUser).content?.t as string),
 					},
 				}),
 			);
@@ -97,7 +96,6 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 			<div className="fullBoxText relative group ">
 				<MessageWithUser
 					message={mess as IMessageWithUser}
-					user={user}
 					mode={mode}
 					isEditing={isEditing}
 					isHighlight={isHighlight}

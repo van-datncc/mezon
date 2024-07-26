@@ -1,25 +1,28 @@
 import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
-  getIsShowPopupForward,
-  selectAllClans,
-  selectCloseMenu,
-  selectCurrentChannel,
-  selectCurrentClan,
-  selectDirectsUnreadlist,
-  selectDmGroupCurrentId,
-  selectDmGroupCurrentType,
-  selectStatusMenu,
-  selectTheme,
-  toggleIsShowPopupForwardFalse,
+	getIsShowPopupForward,
+	selectAllClans,
+	selectCloseMenu,
+	selectCountNotifyByClanId,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectDirectsUnreadlist,
+	selectDmGroupCurrentId,
+	selectDmGroupCurrentType,
+	selectStatusMenu,
+	selectTheme,
+	toggleIsShowPopupForwardFalse
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
+import { ModeResponsive } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
+
 function MyApp() {
 	const elementHTML = document.documentElement;
 	const clans = useSelector(selectAllClans);
@@ -30,11 +33,10 @@ function MyApp() {
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
-
+	const numberOfNotifyClan = useSelector(selectCountNotifyByClanId(currentClan?.clan_id ?? ''));
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
 	};
-
 	const { directId: currentDmGroupId } = useAppParams();
 	const listDirectMessage = useSelector(selectDirectsUnreadlist);
 	const dmGroupChatUnreadList = listDirectMessage.filter((directMessage) => directMessage.id !== currentDmGroupId);
@@ -92,12 +94,15 @@ function MyApp() {
 		}
 	};
 
-	const handleKeyDown = useCallback((event: any) => {
-		if (event.ctrlKey && event.key === 'k') {
-			event.preventDefault();
-			openSearchModal();
-		}
-	}, [openSearchModal]);
+	const handleKeyDown = useCallback(
+		(event: any) => {
+			if (event.ctrlKey && event.key === 'k') {
+				event.preventDefault();
+				openSearchModal();
+			}
+		},
+		[openSearchModal],
+	);
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyDown);
@@ -125,7 +130,7 @@ function MyApp() {
 		}
 	}, [appearanceTheme]);
 
-	const { setMode } = useMessageValue();
+	const { setModeResponsive } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
 
 	const handleClick = useCallback(() => {
@@ -137,10 +142,13 @@ function MyApp() {
 
 	const initClan = useMemo(() => {
 		if (currentChannel?.id && currentClan?.id) {
+			localStorage.setItem('initClan', currentClan?.id);
 			return `/chat/clans/${currentClan?.id}/channels/${currentChannel?.id}`;
 		} else if (currentClan?.id) {
+			localStorage.setItem('initClan', currentClan?.id);
 			return `/chat/clans/${currentClan?.id}`;
 		} else if (clans?.length > 0) {
+			localStorage.setItem('initClan', clans[0].id);
 			return `/chat/clans/${clans[0].id}`;
 		}
 		return ``;
@@ -156,7 +164,7 @@ function MyApp() {
 			>
 				<NavLink
 					to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
-					onClick={() => setMode('dm')}
+					onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
 				>
 					<NavLinkComponent active={pathName.includes('direct')} clanName="Direct Messages">
 						<div>
@@ -175,35 +183,44 @@ function MyApp() {
 						</div>
 					</NavLinkComponent>
 				</NavLink>
-				{dmGroupChatUnreadList.map((dmGroupChatUnread) => (
-					dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-						<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
-					)
-				))}
-        <div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3 mx-auto my-2"></div>
-				{Boolean(initClan) && (
-					<NavLink to={initClan}>
-						<NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || clans[0]?.clan_name || ''}>
-							{currentClan?.logo || clans[0]?.logo ? (
-								<Image
-									src={currentClan?.logo || clans[0]?.logo || ''}
-									alt={currentClan?.clan_name || clans[0]?.clan_name || ''}
-									placeholder="blur"
-									width={48}
-									blurdataurl={currentClan?.logo || clans[0]?.logo}
-									className="min-w-12 min-h-12 object-cover clan"
-								/>
-							) : (
-								(currentClan?.clan_name || clans[0]?.clan_name) && (
-									<div className="w-[48px] h-[48px] dark:bg-bgTertiary bg-bgLightMode rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
-										{(currentClan?.clan_name || clans[0]?.clan_name || '').charAt(0).toUpperCase()}
-									</div>
-								)
-							)}
-						</NavLinkComponent>
-					</NavLink>
+				{dmGroupChatUnreadList.map(
+					(dmGroupChatUnread) =>
+						dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
+							<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
+						),
 				)}
-
+				<div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3 mx-auto my-2"></div>
+				<div className="relative">
+					{Boolean(initClan) && (
+						<NavLink to={initClan}>
+							<NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || clans[0]?.clan_name || ''}>
+								{currentClan?.logo || clans[0]?.logo ? (
+									<Image
+										src={currentClan?.logo || clans[0]?.logo || ''}
+										alt={currentClan?.clan_name || clans[0]?.clan_name || ''}
+										placeholder="blur"
+										width={48}
+										blurdataurl={currentClan?.logo || clans[0]?.logo}
+										className="min-w-12 min-h-12 object-cover clan"
+									/>
+								) : (
+									(currentClan?.clan_name || clans[0]?.clan_name) && (
+										<div className="w-[48px] h-[48px] dark:bg-bgTertiary bg-bgLightMode rounded-full flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
+											{(currentClan?.clan_name || clans[0]?.clan_name || '').charAt(0).toUpperCase()}
+										</div>
+									)
+								)}
+							</NavLinkComponent>
+						</NavLink>
+					)}
+					{numberOfNotifyClan ? (
+						<div className="w-[20px] h-[20px] flex items-center justify-center text-[13px] font-medium rounded-full bg-colorDanger absolute bottom-[-3px] right-[-3px] border-[2px] border-solid dark:border-bgPrimary border-white">
+							{numberOfNotifyClan}
+						</div>
+					) : (
+						<></>
+					)}
+				</div>
 				<div
 					className="relative py-2"
 					onClick={() => {

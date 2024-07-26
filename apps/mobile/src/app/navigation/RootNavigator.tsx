@@ -21,20 +21,21 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ChatContext, ChatContextProvider } from '@mezon/core';
+import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { AppState, StatusBar } from 'react-native';
+import { AppState, DeviceEventEmitter, StatusBar } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
 // import SplashScreen from '../components/SplashScreen';
 import {
+	ActionEmitEvent,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
@@ -57,8 +58,6 @@ SplashScreen.preventAutoHideAsync();
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
-	const { reconnect } = useMezon();
-	const { setCallbackEventFn } = useContext(ChatContext);
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -130,9 +129,9 @@ const NavigationMain = () => {
 	const handleAppStateChange = async (state: string) => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		if (state === 'active') {
-			dispatch(appActions.setLoadingMainMobile(true));
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 			if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
-				dispatch(appActions.setLoadingMainMobile(false));
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} else {
 				await messageLoaderBackground();
 			}
@@ -142,38 +141,17 @@ const NavigationMain = () => {
 	const messageLoaderBackground = async () => {
 		try {
 			if (!currentChannelId) {
-				dispatch(appActions.setLoadingMainMobile(false));
 				return null;
 			}
 			const store = await getStoreAsync();
 			dispatch(appActions.setLoadingMainMobile(false));
-			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
+			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true, isFetchingLatestMessages: true }));
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			return null;
 		} catch (error) {
 			alert('error messageLoaderBackground' + error.message);
-			dispatch(appActions.setLoadingMainMobile(false));
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			console.log('error messageLoaderBackground', error);
-		}
-	};
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			onClanChangeFromFCM();
-		}, 200);
-
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [currentClanId, isFromFcmMobile]);
-
-	const onClanChangeFromFCM = async () => {
-		if (currentClanId) {
-			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-			if (isFromFCM?.toString() === 'true' && isFromFcmMobile) {
-				const socket = await reconnect(currentClanId, true);
-				if (socket) setCallbackEventFn(socket);
-				return;
-			}
 		}
 	};
 

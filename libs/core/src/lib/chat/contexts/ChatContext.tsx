@@ -1,7 +1,6 @@
 import {
 	channelMembersActions,
 	channelsActions,
-	clansActions,
 	directActions,
 	friendsActions,
 	mapMessageChannelToEntity,
@@ -131,7 +130,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setStatusNoti());
 			}
-
 			if (currentChannel?.channel_id === (notification as any).channel_id) {
 				const timestamp = Date.now() / 1000;
 				dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
@@ -151,7 +149,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannel?.channel_id ?? '', noCache: true }));
 			}
 			if (pin.operation === 0) {
-				dispatch(channelsActions.fetchChannels({ clanId: currentChannel?.clan_id ?? '', noCache: true }));
+				dispatch(channelsActions.setChannelLastSeenPinMessage({ channelId: pin.channel_id, lastSeenPinMess: pin.message_id }));
 			}
 		},
 		[currentChannel?.channel_id, currentChannel?.clan_id, dispatch],
@@ -199,9 +197,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
-			if (channelCreated) {
+			if (channelCreated && channelCreated.channel_private === 0) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-				dispatch(clansActions.joinClan({ clanId: channelCreated.clan_id as string }));
+				dispatch(
+					channelsActions.joinChat({
+						clanId: channelCreated.clan_id,
+						channelId: channelCreated.channel_id,
+						channelType: channelCreated.channel_type,
+					}),
+				);
 			}
 		},
 		[dispatch],

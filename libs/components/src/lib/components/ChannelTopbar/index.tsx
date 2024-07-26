@@ -1,7 +1,6 @@
 import { useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import {
 	appActions,
-	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
 	selectCurrentChannelId,
@@ -9,7 +8,7 @@ import {
 	selectDefaultNotificationClan,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
-	selectLastSeenPinMessageChannel,
+	selectLastSeenPinMessageChannelById,
 	selectNewNotificationStatus,
 	selectStatusMenu,
 	selectTheme,
@@ -186,8 +185,8 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleShowPinMessage = () => {
 		setIsShowPinMessage(!isShowPinMessage);
 	};
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const lastSeenPinMessageChannel = useSelector(selectLastSeenPinMessageChannel);
+	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
+	const lastSeenPinMessageChannel = useSelector(selectLastSeenPinMessageChannelById(currentChannelId));
 	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId));
 	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
 	useEscapeKey(() => setIsShowPinMessage(false));
@@ -245,8 +244,6 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 
 	const handleShowInbox = () => {
 		setIsShowInbox(!isShowInbox);
-		localStorage.setItem('notiUnread', JSON.stringify([]));
-		dispatch(notificationActions.setStatusNoti());
 	};
 
 	useOnClickOutside(inboxRef, () => setIsShowInbox(false));

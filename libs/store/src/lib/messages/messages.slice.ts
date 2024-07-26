@@ -42,7 +42,6 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 	const creationTime = new Date(channelMess.create_time || '');
 	const creationTimeMs = creationTime.getTime();
 	const isAnonymous = channelMess?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
-
 	return {
 		...channelMess,
 		creationTime,
@@ -104,6 +103,11 @@ export type FetchMessagesMeta = {
 	};
 };
 
+type FetchMessagesPayloadAction = {
+	messages: MessagesEntity[];
+	isFetchingLatestMessages?: boolean;
+};
+
 export interface MessagesRootState {
 	[MESSAGES_FEATURE_KEY]: MessagesState;
 }
@@ -142,11 +146,15 @@ type fetchMessageChannelPayload = {
 	messageId?: string;
 	direction?: number;
 	lastSeenMess?: string;
+	isFetchingLatestMessages?: boolean;
 };
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
-	async ({ channelId, noCache, messageId, direction, lastSeenMess }: fetchMessageChannelPayload, thunkAPI) => {
+	async (
+		{ channelId, noCache, messageId, direction, lastSeenMess, isFetchingLatestMessages }: fetchMessageChannelPayload,
+		thunkAPI,
+	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		if (noCache) {
@@ -156,11 +164,14 @@ export const fetchMessages = createAsyncThunk(
 		const response = await fetchMessagesCached(mezon, channelId, messageId, direction);
 
 		if (!response.messages) {
-			return [];
+			return {
+				messages: [],
+			};
 		}
 
 		if (Date.now() - response.time > 1000) {
 			const state = getMessagesState(getMessagesRootState(thunkAPI));
+			//@ts-expect-error This error is expected because the type information for this line is missing.
 			const lastSeenMessageId = selectMessageIdsByChannelId(state, channelId)?.at(-1);
 
 			if (lastSeenMessageId) {
@@ -171,7 +182,9 @@ export const fetchMessages = createAsyncThunk(
 					}),
 				);
 			}
-			return [];
+			return {
+				messages: [],
+			};
 		}
 
 		const messages = response.messages.map((item) => {
@@ -211,7 +224,10 @@ export const fetchMessages = createAsyncThunk(
 			}
 		}
 
-		return messages;
+		return {
+			messages,
+			isFetchingLatestMessages,
+		};
 	},
 );
 
@@ -240,10 +256,11 @@ type JumpToMessageArgs = {
 	channelId: string;
 	messageId: string;
 	noCache?: boolean;
+	isFetchingLatestMessages?: boolean;
 };
 export const jumpToMessage = createAsyncThunk(
 	'messages/jumpToMessage',
-	async ({ messageId, channelId, noCache = false }: JumpToMessageArgs, thunkAPI) => {
+	async ({ messageId, channelId, noCache = false, isFetchingLatestMessages = false }: JumpToMessageArgs, thunkAPI) => {
 		try {
 			await thunkAPI.dispatch(
 				fetchMessages({
@@ -251,6 +268,7 @@ export const jumpToMessage = createAsyncThunk(
 					noCache: noCache,
 					messageId: messageId,
 					direction: Direction_Mode.AROUND_TIMESTAMP,
+					isFetchingLatestMessages,
 				}),
 			);
 		} catch (e) {
@@ -616,21 +634,25 @@ export const messagesSlice = createSlice({
 			.addCase(fetchMessages.pending, (state: MessagesState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchMessages.fulfilled, (state: MessagesState, action: PayloadAction<MessagesEntity[], string, FetchMessagesMeta>) => {
-				const channelId = action?.meta?.arg?.channelId;
+			.addCase(
+				fetchMessages.fulfilled,
+				(state: MessagesState, action: PayloadAction<FetchMessagesPayloadAction, string, FetchMessagesMeta>) => {
+					const channelId = action?.meta?.arg?.channelId;
+					const isFetchingLatestMessages = action.payload.isFetchingLatestMessages;
+					state.loadingStatus = 'loaded';
 
-				state.loadingStatus = 'loaded';
+					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
+					if (!isNew || !channelId) return state;
+					const reversedMessages = action.payload.messages.reverse();
 
-				const isNew = channelId && action.payload.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
-				if (!isNew || !channelId) return state;
-				const reversedMessages = action.payload.reverse();
-
-				handleSetManyMessages({
-					state,
-					channelId,
-					adapterPayload: reversedMessages,
-				});
-			})
+					handleSetManyMessages({
+						state,
+						channelId,
+						adapterPayload: reversedMessages,
+						isFetchingLatestMessages,
+					});
+				},
+			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
@@ -781,38 +803,28 @@ export const selectIsFocused = createSelector(getMessagesState, (state) => state
 
 // V2
 
+const emptyObject = {};
+const emptyArray: string[] = [];
+
 export const createCachedSelector = createSelectorCreator({
 	memoize: weakMapMemoize,
 	argsMemoize: weakMapMemoize,
 });
 
-export const selectMessageEntitiesByChannelId = createCachedSelector(
-	(state, channelId) => {
-		const messagesState = getMessagesState(state);
-		return messagesState.channelMessages[channelId]?.entities || null;
-	},
-	(channelMessageEntities) => {
-		return channelMessageEntities || {};
-	},
-);
+export const getChannelIdAsSecondParam = (_: unknown, channelId: string) => channelId;
 
-export const selectMessageIdsByChannelId = createCachedSelector(
-	(state, channelId: string) => {
-		const messagesState = getMessagesState(state);
-		return messagesState?.channelMessages[channelId]?.ids || null;
-	},
-	(messagesState: string[] | null) => {
-		return messagesState || [];
-	},
-);
+export const selectMessageEntitiesByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState.channelMessages[channelId]?.entities || emptyObject;
+});
+
+export const selectMessageIdsByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState?.channelMessages[channelId]?.ids || emptyArray;
+});
 
 export const selectMessageEntityById = createCachedSelector(
-	(state, channelId, messageId) => {
-		const messagesState = getMessagesState(state);
-		return messagesState.channelMessages[channelId]?.entities?.[messageId] || null;
-	},
-	(messagesState) => {
-		return messagesState || {};
+	[getMessagesState, getChannelIdAsSecondParam, (_, __, messageId) => messageId],
+	(messagesState, channelId, messageId) => {
+		return messagesState.channelMessages[channelId]?.entities?.[messageId] || emptyObject;
 	},
 );
 
@@ -824,25 +836,13 @@ export const selectLassSendMessageEntityBySenderId = createCachedSelector(
 	},
 );
 
-export const selectChannelDraftMessage = createCachedSelector(
-	(state, channelId, messageId) => {
-		const messagesState = getMessagesState(state);
-		return messagesState.channelDraftMessage[channelId] || null;
-	},
-	(draftMessagesState) => {
-		return (draftMessagesState as ChannelDraftMessages) || {};
-	},
-);
+export const selectChannelDraftMessage = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState.channelDraftMessage[channelId] || emptyObject;
+});
 
-export const selectFirstMessageId = createCachedSelector(
-	(state, channelId) => {
-		const messagesState = getMessagesState(state);
-		return messagesState.firstMessageId[channelId] || null;
-	},
-	(firstMessageId) => {
-		return (firstMessageId as string) || '';
-	},
-);
+export const selectFirstMessageId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	return messagesState.firstMessageId[channelId] ?? '';
+});
 
 export const selectLastMessageIdByChannelId = createSelector(selectMessageIdsByChannelId, (ids) => {
 	return ids.at(-1);
@@ -898,10 +898,12 @@ const handleSetManyMessages = ({
 	state,
 	channelId,
 	adapterPayload,
+	isFetchingLatestMessages,
 }: {
 	state: MessagesState;
 	channelId?: string;
 	adapterPayload: MessagesEntity[];
+	isFetchingLatestMessages?: boolean;
 }) => {
 	if (!channelId) return state;
 	if (!state.channelMessages[channelId])
@@ -912,7 +914,8 @@ const handleSetManyMessages = ({
 	state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
 
 	const channelEntity = state.channelMessages[channelId];
-	handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(0, adapterPayload.length + 1));
+	const startSlicePosition = isFetchingLatestMessages ? channelEntity.ids.length - adapterPayload.length : 0;
+	handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startSlicePosition, adapterPayload.length + startSlicePosition + 1));
 };
 
 const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: MessagesState; channelId: string; messageId: string }) => {
