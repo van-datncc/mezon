@@ -1,7 +1,6 @@
 import {
 	channelMembersActions,
 	channelsActions,
-	clansActions,
 	directActions,
 	friendsActions,
 	mapMessageChannelToEntity,
@@ -198,9 +197,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
-			if (channelCreated) {
+			if (channelCreated && channelCreated.channel_private === 0) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-				dispatch(clansActions.joinClan({ clanId: channelCreated.clan_id as string }));
+				dispatch(
+					channelsActions.joinChat({
+						clanId: channelCreated.clan_id,
+						channelId: channelCreated.channel_id,
+						channelType: channelCreated.channel_type,
+					}),
+				);
 			}
 		},
 		[dispatch],

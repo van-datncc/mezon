@@ -31,6 +31,7 @@ export type MessageWithUserProps = {
 	editor?: JSX.Element;
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
 	popup?: JSX.Element;
+	isSearchMessage?: boolean
 };
 
 function MessageWithUser({
@@ -44,6 +45,7 @@ function MessageWithUser({
 	isHighlight,
 	popup,
 	isShowFull,
+	isSearchMessage
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
@@ -53,7 +55,6 @@ function MessageWithUser({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
-
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
@@ -105,9 +106,8 @@ function MessageWithUser({
 					<div className={childDivClass}></div>
 					<div className={parentDivClass}>
 						{checkMessageHasReply && <MessageReply message={message} />}
-						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
+						<div className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}>
 							<MessageAvatar message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull} mode={mode} />
-
 							<div className="w-full relative h-full">
 								<MessageHead message={message} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
 								<div id={message.id} className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">

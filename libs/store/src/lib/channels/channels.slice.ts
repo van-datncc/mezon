@@ -10,7 +10,7 @@ import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
@@ -72,6 +72,23 @@ type fetchChannelMembersPayload = {
 	channelId: string;
 	noFetchMembers?: boolean;
 };
+
+type JoinChatPayload = {
+	clanId: string;
+	channelId: string;
+	channelType: number;
+};
+
+export const joinChat = createAsyncThunk('channels/joinChat', 
+	async ({ clanId, channelId, channelType }: JoinChatPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType);
+		return channel
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 
 export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
@@ -214,14 +231,16 @@ export const fetchChannels = createAsyncThunk(
 		if (!response.channeldesc) {
 			return [];
 		}
-		if (Date.now() - response.time < 100) {
+
+		if(Date.now() - response.time < 100) {
 			const lastSeenTimeStampInit = response.channeldesc
-				.filter((channel) => channel.type === 1)
+				.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_TEXT)
 				.map((channelText) => {
-					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) };
+					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) , clanId: channelText.clan_id ?? ''};
 				});
 			thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
 		}
+
 		const channels = response.channeldesc.map(mapChannelToEntity);
 		const meta = channels.map((ch) => extractChannelMeta(ch));
 		thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
@@ -434,6 +453,7 @@ export const channelsActions = {
 	...channelsSlice.actions,
 	fetchChannels,
 	joinChannel,
+	joinChat,
 	createNewChannel,
 	deleteChannel,
 	updateChannel,
