@@ -34,18 +34,18 @@ import {
 	Notification,
 	Socket,
 	StatusPresenceEvent,
-	VoiceJoinedEvent,
-	VoiceLeavedEvent,
+	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
-	UserChannelAddedEvent,
+	VoiceJoinedEvent,
+	VoiceLeavedEvent,
 } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
-import { useNavigate } from 'react-router-dom';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -165,14 +165,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserchannelremoved = useCallback(
 		(user: UserChannelRemovedEvent) => {
-			user.user_ids.forEach((userID:any) => {
-				if (userID === userId){
-					if(channelId === user.channel_id){
+			user.user_ids.forEach((userID: any) => {
+				if (userID === userId) {
+					if (channelId === user.channel_id) {
 						navigate(`/chat/clans/${clanId}`);
 					}
 					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndChannelId({userId: userID, channelId: user.channel_id}))
+					dispatch(channelMembers.actions.removeUserByUserIdAndChannelId({ userId: userID, channelId: user.channel_id }));
 				}
 			});
 		},
@@ -180,33 +180,32 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 	const onuserclanremoved = useCallback(
 		(user: UserClanRemovedEvent) => {
-			user.user_ids.forEach((userID:any) => {
-				if (userID === userId){
-					if(clanId === user.clan_id){
-						navigate(`/chat/direct/friends`);
-					}
-					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
+			const userID = user.user_ids.find((userID: any) => userID === userId);
+			if (userID) {
+				if (clanId === user.clan_id) {
+					navigate(`/chat/direct/friends`);
 				}
-			});
+				dispatch(clansSlice.actions.removeByClanID(user.clan_id));
+			}
 		},
-		[clanId],
+		[userId, clanId, navigate, dispatch],
 	);
+
 	const onuserchanneladded = useCallback(
 		(userAdds: UserChannelAddedEvent) => {
-			userAdds.users.forEach((user:any) => {
-				if (user.user_id === userId){
-					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
-					dispatch(
-						channelsActions.joinChat({
-							clanId: userAdds.clan_id,
-							channelId: userAdds.channel_id,
-							channelType: userAdds.channel_type,
-						}),
-					);
-				}
-			});
+			const user = userAdds.users.find((user: any) => user.user_id === userId);
+			if (user) {
+				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
+				dispatch(
+					channelsActions.joinChat({
+						clanId: userAdds.clan_id,
+						channelId: userAdds.channel_id,
+						channelType: userAdds.channel_type,
+					}),
+				);
+			}
 		},
-		[clanId, userId],
+		[userId, dispatch],
 	);
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
