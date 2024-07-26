@@ -333,20 +333,22 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					/>
 				) : null}
 
-				<MessageItemBS
-					mode={mode}
-					clanId={currentClanId}
-					message={messageSelected}
-					onConfirmAction={onConfirmAction}
-					type={openBottomSheet}
-					isOnlyEmojiPicker={isOnlyEmojiPicker}
-					onClose={() => {
-						setOpenBottomSheet(null);
-					}}
-					user={userSelected}
-					checkAnonymous={checkAnonymous}
-					senderDisplayName={senderDisplayName}
-				/>
+				{openBottomSheet !== null && (
+					<MessageItemBS
+						mode={mode}
+						clanId={currentClanId}
+						message={messageSelected}
+						onConfirmAction={onConfirmAction}
+						type={openBottomSheet}
+						isOnlyEmojiPicker={isOnlyEmojiPicker}
+						onClose={() => {
+							setOpenBottomSheet(null);
+						}}
+						user={userSelected}
+						checkAnonymous={checkAnonymous}
+						senderDisplayName={senderDisplayName}
+					/>
+				)}
 
 				{currentMessageActionType === EMessageActionType.ForwardMessage && (
 					<ForwardMessageModal
