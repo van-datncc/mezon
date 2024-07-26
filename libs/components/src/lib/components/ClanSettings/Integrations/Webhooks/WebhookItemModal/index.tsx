@@ -9,19 +9,19 @@ interface IWebhookItemModalProps {
 	parentChannelsInClan: ChannelsEntity[];
 }
 
+const convertDate = (isoDateString: string): string => {
+	const date = new Date(isoDateString);
+	const options: Intl.DateTimeFormatOptions = {
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+	};
+	return date.toLocaleDateString('en-GB', options);
+};
+
 const WebhookItemModal = ({ parentChannelsInClan, webhookItem }: IWebhookItemModalProps) => {
 	const [isExpand, setIsExpand] = useState(false);
 	const webhookOwner = useSelector(selectMemberById(webhookItem.creator_id as string));
-	const convertDate = (isoDateString: string): string => {
-		const date = new Date(isoDateString);
-		const options: Intl.DateTimeFormatOptions = {
-			day: 'numeric',
-			month: 'long',
-			year: 'numeric',
-		};
-		return date.toLocaleDateString('en-GB', options);
-	};
-
 	return (
 		<div className="dark:bg-[#2b2d31] bg-bgLightMode p-[20px] border dark:border-black rounded-md mb-[20px]">
 			<div className="flex gap-[20px] items-center mb-[12px]">
@@ -48,11 +48,7 @@ const WebhookItemModal = ({ parentChannelsInClan, webhookItem }: IWebhookItemMod
 					</div>
 				</div>
 			</div>
-			{isExpand ? (
-				<ExpendedWebhookModal parentChannelsInClan={parentChannelsInClan} webhookItem={webhookItem} />
-			) : (
-				''
-			)}
+			{isExpand && <ExpendedWebhookModal parentChannelsInClan={parentChannelsInClan} webhookItem={webhookItem} />}
 		</div>
 	);
 };
