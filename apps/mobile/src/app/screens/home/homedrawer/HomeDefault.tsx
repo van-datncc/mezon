@@ -11,7 +11,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
-import { useFocusEffect } from '@react-navigation/native';
+import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -40,7 +40,7 @@ const HomeDefault = React.memo((props: any) => {
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
-
+	const navigation = useNavigation<any>();
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const dispatch = useAppDispatch();
@@ -126,7 +126,7 @@ const HomeDefault = React.memo((props: any) => {
 
 	const onOpenDrawer = () => {
 		onShowKeyboardBottomSheet(false, 0, 'text');
-		DeviceEventEmitter.emit(ActionEmitEvent.HOME_DRAWER, { isShowDrawer: true });
+		navigation.dispatch(DrawerActions.openDrawer());
 		Keyboard.dismiss();
 	};
 
