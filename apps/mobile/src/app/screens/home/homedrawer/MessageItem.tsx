@@ -32,7 +32,7 @@ import { style } from './styles';
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { Swipeable } from 'react-native-gesture-handler';
 import { AvatarMessage } from './components/AvatarMessage';
@@ -204,8 +204,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	const senderDisplayName = useMemo(() => {
+		const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+		if (isDM) {
+			return message?.display_name || message?.username || '';
+		}
 		return message?.clan_nick || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
-	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username]);
+	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, mode, message?.display_name]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({

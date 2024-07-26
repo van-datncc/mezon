@@ -14,6 +14,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Image, Platform, Pressable, Text, View } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -136,6 +137,13 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		dispatch(directActions.setDmGroupCurrentId(''));
 		navigation.goBack();
 	};
+
+	const onHandlerStateChange = (event) => {
+		const { translationX, velocityX } = event.nativeEvent;
+		if (translationX > 5 && velocityX > 120) {
+			handleBack()
+		}
+	};
 	return (
 		<SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
 			<View style={styles.headerWrapper}>
@@ -166,11 +174,18 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 			{currentDmGroup?.id ? (
 				<View style={styles.content}>
-					<ChannelMessages
-						channelId={currentDmGroup.id}
-						channelLabel={currentDmGroup?.channel_label}
-						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
-					/>
+					<PanGestureHandler
+						failOffsetY={[-5, 5]}
+						onHandlerStateChange={onHandlerStateChange}
+					>
+						<View style={{ flex: 1 }}>
+							<ChannelMessages
+								channelId={currentDmGroup.id}
+								channelLabel={currentDmGroup?.channel_label}
+								mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
+							/>
+						</View>
+					</PanGestureHandler>
 					<ChatBox
 						channelId={currentDmGroup?.id}
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
