@@ -1,22 +1,15 @@
-import {
-	ChannelMembersEntity,
-	UsersClanEntity,
-	selectAllChannelMembers,
-	selectAllUserClanProfile,
-	selectAllUsesClan,
-	selectCurrentClanId,
-} from '@mezon/store';
-import { useSelector } from 'react-redux';
+import { load } from '@mezon/mobile-components';
+import { ChannelMembersEntity, UsersClanEntity } from '@mezon/store';
 
 type IMentionUser = {
 	tagName: string;
 	mode: number;
+	usersClan: any;
+	usersInChannel: any;
+	clansProfile: any;
 };
-export const MentionUser = ({ tagName, mode }: IMentionUser) => {
-	const usersClan = useSelector(selectAllUsesClan);
-	const usersInChannel = useSelector(selectAllChannelMembers);
-	const clansProfile = useSelector(selectAllUserClanProfile);
-	const currentClanId = useSelector(selectCurrentClanId);
+export const MentionUser = ({ tagName, mode, usersClan, usersInChannel, clansProfile }: IMentionUser) => {
+	const currentClanId = load('persist:clans').currentClanId;
 
 	const getUserMention = (nameMention: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[]) => {
 		if (mode === 4 || mode === 3) {

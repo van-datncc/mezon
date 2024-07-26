@@ -1,13 +1,11 @@
-import { selectAllEmojiSuggestion } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
-import { useSelector } from 'react-redux';
 
 type IEmojiMarkup = {
 	isMessageReply: boolean;
 	shortname: string;
+	emojiListPNG: any;
 };
-export const EmojiMarkup = ({ isMessageReply, shortname }: IEmojiMarkup) => {
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
+export const EmojiMarkup = ({ isMessageReply, shortname, emojiListPNG }: IEmojiMarkup) => {
 	const srcEmoji = getSrcEmoji(shortname, emojiListPNG);
 
 	return isMessageReply ? `![${shortname}](${srcEmoji})` : `[:${shortname}](${srcEmoji})`;

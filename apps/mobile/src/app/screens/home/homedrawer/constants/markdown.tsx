@@ -1,7 +1,15 @@
 import { Attributes, Colors, baseColor, size } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, ChannelsEntity, UsersClanEntity } from '@mezon/store-mobile';
+import { useAppSelector } from '@mezon/store';
+import {
+	ChannelsEntity,
+	selectAllChannelMembers,
+	selectAllEmojiSuggestion,
+	selectAllUserClanProfile,
+	selectAllUsesClan,
+	selectChannelsEntities,
+} from '@mezon/store-mobile';
 import { TFunction } from 'i18next';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
@@ -310,8 +318,12 @@ export const removeBlockCode = (text: string) => {
 
 export const RenderTextMarkdownContent = React.memo(
 	({ content, isEdited, translate, onMention, onChannelMention, isNumberOfLine, isMessageReply, mode, themeValue }: IMarkdownProps) => {
-		if (!content) return null;
 		let customStyle = {};
+		const usersClan = useAppSelector(selectAllUsesClan);
+		const usersInChannel = useAppSelector(selectAllChannelMembers);
+		const clansProfile = useAppSelector(selectAllUserClanProfile);
+		const emojiListPNG = useAppSelector(selectAllEmojiSuggestion);
+		const channelsEntities = useAppSelector(selectChannelsEntities);
 
 		if (isMessageReply) {
 			customStyle = { ...styleMessageReply };
@@ -321,7 +333,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
 		let lastIndex = 0;
 
-		const contentRender = () => {
+		const contentRender = useMemo(() => {
 			let formattedContent = '';
 
 			elements.forEach((element) => {
@@ -332,13 +344,13 @@ export const RenderTextMarkdownContent = React.memo(
 				}
 
 				if (channelId && channelLable) {
-					formattedContent += ChannelHashtag({ channelHashtagId: channelId });
+					formattedContent += ChannelHashtag({ channelHashtagId: channelId, channelsEntities });
 				}
 				if (username) {
-					formattedContent += MentionUser({ tagName: username, mode });
+					formattedContent += MentionUser({ tagName: username, mode, usersClan, usersInChannel, clansProfile });
 				}
 				if (shortname) {
-					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply });
+					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });
 				}
 
 				if (markdown) {
@@ -355,7 +367,7 @@ export const RenderTextMarkdownContent = React.memo(
 				formattedContent += ` [${translate('edited')}](${EDITED_FLAG})`;
 			}
 			return formattedContent;
-		};
+		}, [elements, t, mode]);
 
 		const renderMarkdown = () => (
 			<Markdown
@@ -384,7 +396,7 @@ export const RenderTextMarkdownContent = React.memo(
 					return true;
 				}}
 			>
-				{contentRender()}
+				{contentRender}
 			</Markdown>
 		);
 
@@ -415,4 +427,3 @@ export const RenderTextMarkdownContent = React.memo(
 		);
 	},
 );
-
