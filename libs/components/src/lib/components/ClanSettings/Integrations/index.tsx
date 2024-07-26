@@ -37,7 +37,7 @@ const Integrations = () => {
 				)}
 			</h2>
 
-			{!isOpenWebhooks ? <MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} /> : <Webhooks allWebhooks={allWebhooks} parentChannelsInClan={parentChannelsInClan}/>}
+			{isOpenWebhooks ? <Webhooks allWebhooks={allWebhooks} parentChannelsInClan={parentChannelsInClan}/> : <MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} />}
 		</div>
 	);
 };

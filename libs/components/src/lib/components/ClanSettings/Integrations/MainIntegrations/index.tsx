@@ -17,7 +17,7 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 			<div className="border-b-[1px] border-[#616161] my-[32px]"></div>
 			<div
 				onClick={() => {
-					if (numberOfWebhooks !== 0) {
+					if (numberOfWebhooks && numberOfWebhooks !== 0) {
 						setIsOpenWebhooks();
 					}
 				}}
@@ -34,7 +34,7 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 						</div>
 					</div>
 				</div>
-				{numberOfWebhooks === 0 ? (
+				{numberOfWebhooks && numberOfWebhooks === 0 ? (
 					<div
 						onClick={setIsOpenWebhooks}
 						className="bg-[#5865f2] hover:bg-[#4752c4] text-white rounded-md py-2 px-3 cursor-pointer font-semibold"
