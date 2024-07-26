@@ -29,7 +29,7 @@ const fetchWebhooksCached = memoizee((mezon: MezonValueContext, channelId: strin
 	promise: true,
 	maxAge: LIST_WEBHOOK_CACHED_TIME,
 	normalizer: (args) => {
-		return args[0]!.session!.username!;
+		return args[1] + args[0].session.username;
 	},
 });
 
