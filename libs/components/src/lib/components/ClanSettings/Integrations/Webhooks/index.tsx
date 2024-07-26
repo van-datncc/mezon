@@ -44,6 +44,7 @@ const Webhooks = ({allWebhooks, parentChannelsInClan} : IWebhooksProps) => {
 					<WebhookItemModal
 						parentChannelsInClan={parentChannelsInClan}
 						webhookItem={webhook}
+						key={webhook.id}
 					/>
 				))}
 		</div>
