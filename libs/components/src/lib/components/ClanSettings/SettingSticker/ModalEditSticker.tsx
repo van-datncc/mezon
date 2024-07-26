@@ -60,7 +60,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
                       title=" "
                       tabIndex={0}
                       accept=".jpg,.jpeg,.png,.gif"
-                      onChange={(e) => handleChooseFile(e)}
+                      onChange={handleChooseFile}
                     ></input>
                   </button>
                 )
@@ -70,7 +70,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
           <div className={'w-1/2 flex flex-col gap-2'}>
             <p className={`text-xs font-bold uppercase select-none`}>Sticker Name</p>
             <div className={"bg-bgLightModeSecond dark:bg-bgTertiary border-[0.08px] dark:border-textLightTheme border-textDarkTheme flex flex-row rounded justify-between items-center p-2 pl-3 dark:text-textPrimary box-border overflow-hidden"}>
-              <InputField type="string" placeholder="ex. cat hug" className={'px-[8px]'} value={shortName} onChange={(e) => handleChangeShortNameSticker(e)} />
+              <InputField type="string" placeholder="ex. cat hug" className={'px-[8px]'} value={shortName} onChange={handleChangeShortNameSticker} />
             </div>
           </div>
         </div>
