@@ -1,3 +1,4 @@
+import BottomSheet from '@gorhom/bottom-sheet';
 import { useReference, useThreadMessage, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
@@ -5,9 +6,9 @@ import {
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
-	save
+	save,
 } from '@mezon/mobile-components';
-import { Colors, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	channelsActions,
@@ -16,7 +17,7 @@ import {
 	getStoreAsync,
 	selectCurrentChannel,
 	selectCurrentClanId,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -25,11 +26,15 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Keyboard, KeyboardEvent, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import UseMentionList from '../../../hooks/useUserMentionList';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
+import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
+import AttachmentPicker from '../../../screens/home/homedrawer/components/AttachmentPicker';
+import BottomKeyboardPicker from '../../../screens/home/homedrawer/components/BottomKeyboardPicker';
+import EmojiPicker from '../../../screens/home/homedrawer/components/EmojiPicker';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { MezonInput, MezonSwitch } from '../../../temp-ui';
 import { validInput } from '../../../utils/validate';
@@ -39,33 +44,33 @@ export default function CreateThreadForm() {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const [keyboardHeight, setKeyboardHeight] = useAnimatedState<number>(0);
 	const { t } = useTranslation(['createThread']);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 
-	const navigation = useNavigation();
+	const navigation = useNavigation<any>();
 	const formikRef = useRef(null);
 	const { openThreadMessageState } = useReference();
 	const { valueThread, threadCurrentChannel } = useThreads();
-	const listMentions = UseMentionList((currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || '');
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		channelLabel: threadCurrentChannel?.channel_label as string,
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
 	});
+	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
+	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
+	const bottomPickerRef = useRef<BottomSheet>(null);
 
-	function keyboardWillShow(event: KeyboardEvent) {
-		setKeyboardHeight(event.endCoordinates.height);
-	}
-	useEffect(() => {
-		const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
-		const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardHeight(0));
-		return () => {
-			keyboardListener.remove();
-			keyboardDidHideListener.remove();
-		};
+	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+		setHeightKeyboardShow(height);
+		if (isShow) {
+			setTypeKeyboardBottomSheet(type);
+			bottomPickerRef.current?.collapse();
+		} else {
+			setTypeKeyboardBottomSheet('text');
+			bottomPickerRef.current?.close();
+		}
 	}, []);
 
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
@@ -136,7 +141,7 @@ export default function CreateThreadForm() {
 
 	const handleRouteData = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
-		navigation.navigate('HomeDefault' as never);
+		navigation.navigate(APP_SCREEN.HOME);
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
@@ -152,7 +157,7 @@ export default function CreateThreadForm() {
 					}}
 					innerRef={formikRef}
 					initialValues={{ nameValueThread: null, isPrivate: false }}
-					onSubmit={() => { }}
+					onSubmit={() => {}}
 				>
 					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values, touched, errors }) => (
 						<View style={styles.createChannelContent}>
@@ -165,12 +170,15 @@ export default function CreateThreadForm() {
 									<MezonInput
 										label={t('threadName')}
 										onTextChange={handleChange('nameValueThread')}
+										onFocus={() => {
+											setHeightKeyboardShow(0);
+											bottomPickerRef.current?.close();
+										}}
 										// onBlur={handleBlur('nameValueThread')}
 										value={values.nameValueThread}
-										placeHolder='New Thread'
+										placeHolder="New Thread"
 										maxCharacter={64}
 										errorMessage={t('errorMessage')}
-
 									/>
 								</SafeAreaView>
 							</View>
@@ -193,7 +201,7 @@ export default function CreateThreadForm() {
 									<MessageItem
 										messageId={valueThread?.id}
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-										channelId={currentChannel.channel_id}
+										channelId={currentChannel?.channel_id}
 										isNumberOfLine={true}
 										preventAction
 									/>
@@ -201,18 +209,40 @@ export default function CreateThreadForm() {
 							)}
 							<ChatBox
 								messageAction={EMessageActionType.CreateThread}
-								channelId={currentChannel.channel_id}
+								channelId={currentChannel?.channel_id}
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								hiddenIcon={{
 									threadIcon: true,
 								}}
+								onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 							/>
 							<View
 								style={{
-									height: Platform.OS === 'ios' ? keyboardHeight : 0,
-									backgroundColor: Colors.secondary,
+									height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
+									backgroundColor: themeValue.secondary,
 								}}
 							/>
+							{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
+								<BottomKeyboardPicker
+									height={heightKeyboardShow}
+									ref={bottomPickerRef}
+									isStickyHeader={typeKeyboardBottomSheet === 'emoji'}
+								>
+									{typeKeyboardBottomSheet === 'emoji' ? (
+										<EmojiPicker
+											onDone={() => {
+												onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
+												DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
+											}}
+											bottomSheetRef={bottomPickerRef}
+										/>
+									) : typeKeyboardBottomSheet === 'attachment' ? (
+										<AttachmentPicker currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
+									) : (
+										<View />
+									)}
+								</BottomKeyboardPicker>
+							)}
 						</View>
 					)}
 				</Formik>

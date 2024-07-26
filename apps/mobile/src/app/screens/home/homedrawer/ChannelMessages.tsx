@@ -1,6 +1,7 @@
 import { useDeleteMessage } from '@mezon/core';
 import { ActionEmitEvent, Icons, load, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { useAppSelector } from '@mezon/store';
 import {
 	messagesActions,
 	RootState,
@@ -32,7 +33,6 @@ import { EMessageActionType, EMessageBSToShow } from './enums';
 import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import WelcomeMessage from './WelcomeMessage';
 
 const ITEM_HEIGHT = 100;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -48,8 +48,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const messages = useSelector((state) => selectMessageIdsByChannelId(state, channelId));
-	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
+	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
+	const isLoading = useAppSelector((state: RootState) => state?.messages?.loadingStatus);
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
 	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
 	const attachments = useSelector(selectAttachmentPhoto());
@@ -113,7 +113,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
 			isHiddenBottomSheet && setOpenBottomSheet(null);
 		});
-		
+
 		const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, ({ isShow }) => {
 			setIsShowSkeleton(isShow);
 		});
@@ -241,6 +241,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					messageId={item}
 					mode={mode}
 					channelId={channelId}
+					channelName={channelLabel}
 					onOpenImage={onOpenImage}
 					currentClanId={currentClanId}
 					onMessageAction={onMessageAction}
@@ -281,7 +282,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	return (
 		<View style={{ flex: 1 }}>
 			<View style={styles.wrapperChannelMessage}>
-				{!isLoadMore && isLoading === 'loaded' && !messages?.length && <WelcomeMessage channelTitle={channelLabel} />}
 				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && <MessageItemSkeleton skeletonNumber={15} />}
 				<FlashList
 					ref={flatListRef}
@@ -298,8 +298,8 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 						messages?.length
 							? onLoadMore
 							: () => {
-									// 	empty
-								}
+								// 	empty
+							}
 					}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}
@@ -333,20 +333,22 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					/>
 				) : null}
 
-				<MessageItemBS
-					mode={mode}
-					clanId={currentClanId}
-					message={messageSelected}
-					onConfirmAction={onConfirmAction}
-					type={openBottomSheet}
-					isOnlyEmojiPicker={isOnlyEmojiPicker}
-					onClose={() => {
-						setOpenBottomSheet(null);
-					}}
-					user={userSelected}
-					checkAnonymous={checkAnonymous}
-					senderDisplayName={senderDisplayName}
-				/>
+				{openBottomSheet !== null && (
+					<MessageItemBS
+						mode={mode}
+						clanId={currentClanId}
+						message={messageSelected}
+						onConfirmAction={onConfirmAction}
+						type={openBottomSheet}
+						isOnlyEmojiPicker={isOnlyEmojiPicker}
+						onClose={() => {
+							setOpenBottomSheet(null);
+						}}
+						user={userSelected}
+						checkAnonymous={checkAnonymous}
+						senderDisplayName={senderDisplayName}
+					/>
+				)}
 
 				{currentMessageActionType === EMessageActionType.ForwardMessage && (
 					<ForwardMessageModal

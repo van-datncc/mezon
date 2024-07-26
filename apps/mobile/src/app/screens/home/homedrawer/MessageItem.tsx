@@ -12,6 +12,7 @@ import {
 	ChannelsEntity,
 	getStoreAsync,
 	messagesActions,
+	MessagesEntity,
 	selectAllAccount,
 	selectAllEmojiSuggestion,
 	selectAllUsesClan,
@@ -20,9 +21,8 @@ import {
 	selectMessageEntityById,
 	selectUserClanProfileByClanID,
 	useAppDispatch,
-	UserClanProfileEntity,
+	UserClanProfileEntity
 } from '@mezon/store-mobile';
-import { IMessageWithUser } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
@@ -36,7 +36,7 @@ import { style } from './styles';
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { Swipeable } from 'react-native-gesture-handler';
 import { AvatarMessage } from './components/AvatarMessage';
@@ -44,15 +44,17 @@ import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
+import WelcomeMessage from './WelcomeMessage';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
 export type MessageItemProps = {
-	message?: IMessageWithUser;
+	message?: MessagesEntity;
 	messageId?: string;
 	isMessNotifyMention?: boolean;
 	mode: number;
 	channelId?: string;
+	channelName?: string;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;
@@ -86,16 +88,15 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('message');
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
-	const message = props?.message ? props?.message : selectedMessage;
+	const message: MessagesEntity = props?.message ? props?.message : (selectedMessage as MessagesEntity);
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const channelsEntities = useSelector(selectChannelsEntities);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const userProfile = useSelector(selectAllAccount);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClanId as string, message?.user?.id as string));
-
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
-		return message?.content?.t?.includes('@here') || message?.content?.t?.includes(`@${userProfile?.user?.username}`);
+		return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
 	}, [message, userProfile]);
 	const messageReferences = useMemo(() => {
 		return message?.references?.[0] as ApiMessageRef;
@@ -217,8 +218,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	const senderDisplayName = useMemo(() => {
-		return clanProfile?.nick_name || message?.user?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
-	}, [checkAnonymous, clanProfile?.nick_name, message?.user?.display_name, message?.user?.username, message?.username]);
+		const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+		if (isDM) {
+			return message?.display_name || message?.username || '';
+		}
+		return clanProfile?.nick_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
+	}, [checkAnonymous, clanProfile?.nick_name, message?.user?.username, message?.username, mode, message?.display_name]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
@@ -249,6 +254,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 		}
 	};
+
+	if (message.isStartedMessageGroup && message.sender_id == "0")
+		return (
+			<WelcomeMessage channelTitle={props.channelName} />
+		)
 
 	return (
 		<Swipeable
@@ -323,7 +333,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 							createTime={message?.create_time}
 						/>
 						<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-						<Block opacity={message?.isSending || message.isError ? 0.6 : 1}>
+						<Block opacity={message.isError ? 0.6 : 1}>
 							{renderTextContent({
 								lines,
 								isEdited,

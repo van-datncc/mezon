@@ -21,13 +21,13 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
 import { UnAuthentication } from './UnAuthentication';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ChatContext, ChatContextProvider } from '@mezon/core';
+import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
@@ -49,7 +49,6 @@ import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { delay } from 'lodash';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const RootStack = createStackNavigator();
 
@@ -58,8 +57,6 @@ SplashScreen.preventAutoHideAsync();
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
-	const { reconnect } = useMezon();
-	const { setCallbackEventFn } = useContext(ChatContext);
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -147,34 +144,13 @@ const NavigationMain = () => {
 			}
 			const store = await getStoreAsync();
 			dispatch(appActions.setLoadingMainMobile(false));
-			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true }));
+			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true, isFetchingLatestMessages: true }));
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			return null;
 		} catch (error) {
 			alert('error messageLoaderBackground' + error.message);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			console.log('error messageLoaderBackground', error);
-		}
-	};
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			onClanChangeFromFCM();
-		}, 200);
-
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [currentClanId, isFromFcmMobile]);
-
-	const onClanChangeFromFCM = async () => {
-		if (currentClanId) {
-			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-			if (isFromFCM?.toString() === 'true' && isFromFcmMobile) {
-				const socket = await reconnect(currentClanId, true);
-				if (socket) setCallbackEventFn(socket);
-				return;
-			}
 		}
 	};
 
@@ -233,32 +209,30 @@ const NavigationMain = () => {
 	};
 
 	return (
-		<GestureHandlerRootView style={{ flex: 1 }}>
-			<NavigationContainer>
-				<NetInfoComp />
-				<RootStack.Navigator screenOptions={{ headerShown: false }}>
-					{isLoggedIn ? (
-						<RootStack.Group
-							screenOptions={{
-								gestureEnabled: false,
-							}}
-						>
-							<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
-						</RootStack.Group>
-					) : (
-						<RootStack.Group
-							screenOptions={{
-								animationTypeForReplace: 'pop',
-								gestureEnabled: false,
-							}}
-						>
-							<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
-						</RootStack.Group>
-					)}
-				</RootStack.Navigator>
-				{/*{isLoadingSplashScreen && <SplashScreen />}*/}
-			</NavigationContainer>
-		</GestureHandlerRootView>
+		<NavigationContainer>
+			<NetInfoComp />
+			<RootStack.Navigator screenOptions={{ headerShown: false }}>
+				{isLoggedIn ? (
+					<RootStack.Group
+						screenOptions={{
+							gestureEnabled: false,
+						}}
+					>
+						<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
+					</RootStack.Group>
+				) : (
+					<RootStack.Group
+						screenOptions={{
+							animationTypeForReplace: 'pop',
+							gestureEnabled: false,
+						}}
+					>
+						<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
+					</RootStack.Group>
+				)}
+			</RootStack.Navigator>
+			{/*{isLoadingSplashScreen && <SplashScreen />}*/}
+		</NavigationContainer>
 	);
 };
 
