@@ -275,13 +275,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					removeClippedSubviews={true}
 					keyExtractor={(item) => `${item}`}
 					estimatedItemSize={ITEM_HEIGHT}
-					onEndReached={
-						messages?.length
-							? onLoadMore
-							: () => {
-									// 	empty
-								}
-					}
+					onEndReached={messages?.length ? onLoadMore : undefined}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}
 					ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}

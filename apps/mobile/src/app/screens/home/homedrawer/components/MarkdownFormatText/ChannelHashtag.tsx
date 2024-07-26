@@ -10,12 +10,12 @@ export const ChannelHashtag = ({ channelHashtagId, channelsEntities }: IChannelH
 		const channel = channelsEntities?.[channelHashtagId];
 		if (channel) {
 			return channel;
-		} else {
-			return {
-				id: channelHashtagId,
-				channel_label: 'unknown',
-			};
 		}
+
+		return {
+			id: channelHashtagId,
+			channel_label: 'unknown',
+		};
 	};
 
 	const channel = getChannelById(channelHashtagId);
