@@ -14,7 +14,7 @@
       "publish": [
         {
           "provider": "generic",
-          "url": "https://releases.mattermost.com/desktop"
+          "url": "https://cdn.mezon.vn/release/"
         }
       ],
       "win": {
@@ -24,7 +24,7 @@
         "publish": [
           {
             "provider": "generic",
-            "url": "https://releases.mattermost.com/desktop"
+            "url": "https://cdn.mezon.vn/release/"
           }
         ]
       },
@@ -106,7 +106,7 @@
           "publish": [
             {
               "provider": "generic",
-              "url": "https://releases.mattermost.com/desktop"
+              "url": "https://cdn.mezon.vn/release/"
             }
           ]
         },
@@ -137,7 +137,7 @@
           "publish": [
             {
               "provider": "generic",
-              "url": "https://releases.mattermost.com/desktop"
+              "url": "https://cdn.mezon.vn/release/"
             }
           ]
         },
