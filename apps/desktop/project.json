@@ -9,30 +9,22 @@
       "outputs": [
         "{options.outputPath}"
       ],
-      "appId": "com.nguyentrannhan.mezon-fe",
-      "productName": "mezon-ncc",
+      "appId": "mezon.ai",
+      "productName": "Mezon",
       "publish": [
         {
-          "provider": "github",
-          "private": true,
-          "owner": "nguyentrannhan",
-          "repo": "mezon-fe",
-          "token": "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",
-          "releaseType": "release"
+          "provider": "generic",
+          "url": "https://cdn.mezon.vn/release/"
         }
       ],
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
         "target": "nsis",
-        "appId": "com.nguyentrannhan.mezon-fe",
+        "appId": "mezon.ai",
         "publish": [
           {
-            "provider": "github",
-            "private": true,
-            "owner": "nguyentrannhan",
-            "repo": "mezon-fe",
-            "token": "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",
-            "releaseType": "release"
+            "provider": "generic",
+            "url": "https://cdn.mezon.vn/release/"
           }
         ]
       },
@@ -110,15 +102,11 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
-          "appId": "com.nguyentrannhan.mezon-fe",
+          "appId": "mezon.ai",
           "publish": [
             {
-              "provider": "github",
-              "private": true,
-              "owner": "nguyentrannhan",
-              "repo": "mezon-fe",
-              "token": "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",
-              "releaseType": "release"
+              "provider": "generic",
+              "url": "https://cdn.mezon.vn/release/"
             }
           ]
         },
@@ -131,7 +119,7 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "com.nguyentrannhan.mezon-fe"
+          "appId": "mezon.ai"
         }
       }
     },
@@ -145,15 +133,11 @@
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
-          "appId": "com.nguyentrannhan.mezon-fe",
+          "appId": "mezon.ai",
           "publish": [
             {
-              "provider": "github",
-              "private": true,
-              "owner": "nguyentrannhan",
-              "repo": "mezon-fe",
-              "token": "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",
-              "releaseType": "release"
+              "provider": "generic",
+              "url": "https://cdn.mezon.vn/release/"
             }
           ]
         },

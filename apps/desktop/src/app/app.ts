@@ -39,18 +39,6 @@ export default class App {
 	}
 
 	private static onReady() {
-		// autoUpdater.setFeedURL({
-		// 	provider: 'github',
-		// 	owner: 'nguyentrannhan',
-		// 	repo: 'mezon-fe',
-		// 	private: true,
-		// 	token: environment.GH_TOKEN,
-		// 	host: 'github.com',
-		// 	requestHeaders: {
-		// 		Authorization: `Bearer ${environment.GH_TOKEN}`,
-		// 	},
-		// });
-
 		autoUpdater.checkForUpdates();
 		if (rendererAppName) {
 			App.initMainWindow();
@@ -116,8 +104,7 @@ export default class App {
 			return;
 		}
 
-		App.mainWindow.webContents.openDevTools();
-
+		//App.mainWindow.webContents.openDevTools();
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
 		}
