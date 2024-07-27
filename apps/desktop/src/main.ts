@@ -62,7 +62,6 @@ ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 	}
 });
 
-// Tạo file để xem log
 // log.transports.file.resolvePathFn = () => path.join('D:/NCC/PROJECT/mezon-fe/apps/desktop', 'logs/main.log');
 autoUpdater.autoDownload = false;
 log.info('App starting...');
