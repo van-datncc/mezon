@@ -1,8 +1,5 @@
-import { ChannelsEntity, fetchWebhooksByChannelId, generateWebhook, selectAllChannels, selectAllWebhooks, useAppDispatch } from '@mezon/store';
-import { ChannelIsNotThread } from '@mezon/utils';
+import { ChannelsEntity, generateWebhook, useAppDispatch } from '@mezon/store';
 import { ApiWebhook, ApiWebhookCreateRequest } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import WebhookItemModal from './WebhookItemModal';
 
 interface IWebhooksProps{
