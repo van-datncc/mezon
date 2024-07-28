@@ -43,7 +43,14 @@ export const setCurrentClanLoader = async (clans: any) => {
 	return null;
 };
 
-export const setDefaultChannelLoader = async (dataChannel: any, clanId: string) => {
+export const setDefaultChannelLoader = async (dataChannel: any, clanId: string, dataSave?: any) => {
+	if (dataSave) {
+		const infoChannelCache = getInfoChannelByClanId(dataSave || [], clanId);
+		if (infoChannelCache?.channelId && infoChannelCache?.clanId) {
+			await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
+		}
+		return;
+	}
 	const data = load(STORAGE_DATA_CLAN_CHANNEL_CACHE);
 	const infoChannelCache = getInfoChannelByClanId(data || [], clanId);
 	if (infoChannelCache?.channelId && infoChannelCache?.clanId) {

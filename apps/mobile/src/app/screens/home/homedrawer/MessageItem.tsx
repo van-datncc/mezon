@@ -85,7 +85,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
-	}, [message, userProfile]);
+	}, [message?.content?.t, userProfile]);
 	const messageReferences = useMemo(() => {
 		return message?.references?.[0] as ApiMessageRef;
 	}, [message?.references]);
@@ -197,7 +197,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			return updateDate > createDate;
 		}
 		return false;
-	}, [message]);
+	}, [message?.create_time, message?.update_time]);
 
 	const senderDisplayName = useMemo(() => {
 		const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
@@ -240,13 +240,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	if (message.isStartedMessageGroup && message.sender_id == '0') return <WelcomeMessage channelTitle={props.channelName} />;
 
 	return (
-		<Swipeable
-			renderRightActions={renderRightActions}
-			ref={swipeableRef}
-			overshootRight={false}
-			onSwipeableOpen={handleSwipeableOpen}
-			hitSlop={{ left: -10 }}
-		>
+		// <Swipeable
+		// 	renderRightActions={renderRightActions}
+		// 	ref={swipeableRef}
+		// 	overshootRight={false}
+		// 	onSwipeableOpen={handleSwipeableOpen}
+		// 	hitSlop={{ left: -10 }}
+		// >
 			<View
 				style={[
 					styles.messageWrapper,
@@ -342,7 +342,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					</Pressable>
 				</View>
 			</View>
-		</Swipeable>
+		// </Swipeable>
 	);
 });
 
