@@ -17,16 +17,14 @@ interface RenderContentProps {
 
 // TODO: refactor component for message lines
 const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentProps) => {
-	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
-	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
+	const { t, mentions = [], hashtags = [], emojis = [], markdowns = [] } = data;
+	const elements = [...mentions, ...hashtags, ...emojis, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
 	let lastIndex = 0;
-	const maxEndIndex = elements.reduce((max, element) => (element.endIndex > max ? element.endIndex : max), 0);
-
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startIndex, endIndex, channelId, channelLable, username, shortname, link, markdown } = element;
+			const { startIndex, endIndex, channelId, channelLabel, username, shortname, markdown } = element;
 
 			if (lastIndex < startIndex) {
 				formattedContent.push(
@@ -34,7 +32,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 				);
 			}
 
-			if (channelId && channelLable) {
+			if (channelId && channelLabel) {
 				formattedContent.push(
 					<ChannelHashtag
 						showOnchannelLayout={showOnchannelLayout}
@@ -52,10 +50,10 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 				formattedContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 			}
 
-			if (markdown || link) {
+			if (markdown) {
 				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
 			}
-			lastIndex = maxEndIndex;
+			lastIndex = endIndex;
 		});
 
 		if (lastIndex < t?.length) {
