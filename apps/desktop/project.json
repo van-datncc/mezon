@@ -103,6 +103,7 @@
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
           "target": "nsis",
           "appId": "mezon.ai",
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "publish": [
             {
               "provider": "generic",
@@ -119,7 +120,8 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "mezon.ai"
+          "appId": "mezon.ai",
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         }
       }
     },
