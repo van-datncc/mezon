@@ -31,7 +31,7 @@ function ChatWelCome({ type, name, userName, avatarDM, mode }: ChatWelComeProp) 
 			) : avatarDM ? (
 				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />
 			) : (
-				<div className="h-[75px] w-[75px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-4xl">
+				<div className="h-[75px] w-[75px] bg-bgLightModeButton dark:bg-zinc-700 rounded-full flex justify-center items-center text-contentSecondary text-4xl">
 					{(userName ?? name)?.charAt(0).toUpperCase()}
 				</div>
 			)}
