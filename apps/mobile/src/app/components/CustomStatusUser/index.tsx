@@ -63,9 +63,6 @@ const CustomStatusUser = forwardRef(function CustomStatusUser(props: ICustomStat
 		}
 	]) as IMezonMenuSectionProps[], [userCustomStatus])
 
-	console.log(userCustomStatus);
-
-
 	return (
 		<MezonBottomSheet ref={ref} title={t('changeOnlineStatus')} heightFitContent>
 			<Block paddingHorizontal={size.s_20} paddingVertical={size.s_10}>
