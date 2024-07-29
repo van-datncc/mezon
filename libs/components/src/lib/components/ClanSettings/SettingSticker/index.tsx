@@ -88,7 +88,7 @@ const SettingSticker = () => {
           </div>
         </div>
       </div>
-      <Modal showModal={showModalSticker} onClose={handleCloseModal} classNameBox={"max-w-[600px]"} children={<ModalSticker editSticker={editSticker} handleCloseModal={handleCloseModal} />} />
+      <Modal showModal={showModalSticker} onClose={handleCloseModal} classNameBox={"max-w-[600px]"} children={<ModalSticker key={editSticker?.id} editSticker={editSticker} handleCloseModal={handleCloseModal} />} />
 
     </>
   )
