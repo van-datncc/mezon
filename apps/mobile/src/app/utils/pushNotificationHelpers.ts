@@ -3,8 +3,9 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	getUpdateOrAddClanChannelCache,
+	load,
 	save,
-	setDefaultChannelLoader
+	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
@@ -155,7 +156,7 @@ const jumpChannelOnNotification = async (store: any, channelId: string, clanId: 
 	store.dispatch(appActions.setLoadingMainMobile(false));
 };
 
-export const navigateToNotification = async (store: any, notification: any, navigation: any) => {
+export const navigateToNotification = async (store: any, notification: any, navigation: any, time?: number) => {
 	const link = notification?.data?.link;
 	if (link) {
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
@@ -190,6 +191,14 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				const messageId = linkDirectMessageMatch[1];
 				await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 				store.dispatch(appActions.setLoadingMainMobile(false));
+				const clanIdCache = load(STORAGE_CLAN_ID);
+				// force from killed app
+				if (time && Number(clanIdCache || 0) !== 0) {
+					await store.dispatch(clansActions.joinClan({ clanId: clanIdCache }));
+					await store.dispatch(clansActions.changeCurrentClan({ clanId: clanIdCache, noCache: true }));
+					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanIdCache, noCache: true }));
+					await setDefaultChannelLoader(respChannel.payload, clanIdCache);
+				}
 				delay(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -227,7 +236,7 @@ const processNotification = async ({ notification, navigation, time = 0 }) => {
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
 		setTimeout(() => {
-			navigateToNotification(store, notification, navigation);
+			navigateToNotification(store, notification, navigation, time);
 		}, time);
 	} else {
 		navigateToNotification(store, notification, navigation);

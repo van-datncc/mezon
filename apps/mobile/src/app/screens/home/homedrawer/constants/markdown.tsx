@@ -155,7 +155,7 @@ const styleMessageReply = (colors: Attributes) =>
 		mention: {
 			fontSize: size.small,
 			color: colors.textLink,
-			backgroundColor: colors.selectedOverlay,
+			backgroundColor: colors.midnightBlue,
 			lineHeight: size.s_20,
 		},
 	});
@@ -405,7 +405,7 @@ export const RenderTextMarkdownContent = React.memo(
 			<View
 				style={{
 					flex: 1,
-					maxHeight: isMessageReply ? size.s_36 : size.s_20 * 10 - size.s_10,
+					maxHeight: isMessageReply ? size.s_17 : size.s_20 * 10 - size.s_10,
 					overflow: 'hidden',
 				}}
 			>
