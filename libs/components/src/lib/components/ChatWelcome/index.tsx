@@ -1,5 +1,6 @@
 import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
-import { ETypeMessage } from '@mezon/utils';
+import { ChannelIsNotThread, ETypeMessage } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { Hashtag, ThreadIcon } from '../../../../../ui/src/lib/Icons';
 
@@ -7,12 +8,16 @@ export type ChatWelComeProp = {
 	readonly type: Readonly<string>;
 	readonly name?: Readonly<string>;
 	readonly avatarDM?: Readonly<string>;
-	userName?: string
+	userName?: string;
+	mode: number;
 };
 
-function ChatWelCome({ type, name, userName, avatarDM }: ChatWelComeProp) {
+function ChatWelCome({ type, name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const user = useSelector(selectMemberByUserId(currentChannel?.creator_id as string));
+	const classNameSubtext = 'dark:text-zinc-400 text-colorTextLightMode text-sm';
+	const showName = <span className='font-medium'>{name}</span>;
+
 	return (
 		<div className="space-y-2 px-4 mb-0 mt-[50px] flex-1 flex flex-col justify-end">
 			{type === ETypeMessage.CHANNEL ? (
@@ -36,21 +41,28 @@ function ChatWelCome({ type, name, userName, avatarDM }: ChatWelComeProp) {
 					Welcome to #{name}
 				</p>
 			</div>
-			<div>
-				{currentChannel?.parrent_id !== '0' && !avatarDM ? (
-					<div className="mb-1 dark:text-textDarkTheme text-textLightTheme">
-						<span className="text-base">Started by &nbsp;</span>
-						<span className="text-base font-semibold">{user?.user?.username}</span>
-					</div>
-				) : (
-					<p className="dark:text-zinc-400 text-colorTextLightMode text-sm">
-						{avatarDM
-							? type === 'DM'
-								? `This is the beginning of your direct message history with ${name}`
-								: `Welcome to the beginning of the #${name} group`
-							: `This is the start of the #${name} ${currentChannel?.channel_private ? 'private' : ''} channel`}
+			<div className='text-base'>
+				{mode === ChannelStreamMode.STREAM_MODE_CHANNEL && (
+					currentChannel?.parrent_id !== ChannelIsNotThread.TRUE ?(
+						<p className={classNameSubtext}>
+							Started by <span className='dark:text-white text-black font-medium'>{user?.user?.username}</span>
+						</p>
+					) : (
+						<p className={classNameSubtext}>
+							This is the start of the #{showName} {currentChannel?.channel_private ? 'private' : ''} channel
+						</p>
+					))
+				}
+				{mode === ChannelStreamMode.STREAM_MODE_DM && 
+					<p className={classNameSubtext}>
+						This is the beginning of your direct message history with {showName}
 					</p>
-				)}
+				}
+				{mode === ChannelStreamMode.STREAM_MODE_GROUP && 
+					<p className={classNameSubtext}>
+						Welcome to the beginning of the #{showName} group
+					</p>
+				}
 			</div>
 		</div>
 	);

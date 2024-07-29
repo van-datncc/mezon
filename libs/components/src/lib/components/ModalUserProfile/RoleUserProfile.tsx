@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { UserRestrictionZone, useClanRestriction, useRoles } from '@mezon/core';
-import { selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { RolesClanEntity, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -9,6 +9,11 @@ import { useSelector } from 'react-redux';
 type RoleUserProfileProps = {
 	userID?: string;
 };
+
+const checkAdminPermission = (role: RolesClanEntity, slug: string) => {
+	const item = role.permission_list?.permissions?.find(obj => obj.slug === slug);
+	return item ? item.active === 1 : false;
+}
 
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -23,9 +28,18 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
-	const activeRolesWithoutUserRoles = activeRoles.filter((role) => !userRolesClan.some((userRole) => userRole.id === role.id));
-
-	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
+	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
+	const activeRolesWithoutUserRoles = activeRoles
+		.filter((role) => !userRolesClan.some((userRole) => userRole.id === role.id))
+		.filter((role) => {
+			if (!isClanCreator) {
+				const hasAdminPermission = role?.permission_list?.permissions?.some(
+					(permission) => permission.slug === 'administrator' && permission.active === 1
+				);
+				return !hasAdminPermission;
+			}
+			return role;
+		});
 
 	const [positionTop, setPositionTop] = useState(40);
 	const [positionLeft, setPositionLeft] = useState(0);
@@ -70,12 +84,13 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		<div className="flex flex-col">
 			<div className="font-bold tracking-wider text-sm pt-2">ROLES</div>
 			<div className="mt-2 flex flex-wrap gap-2">
-				{userRolesClan.map((role, index) => (
+				{userRolesClan.map((role, index) => 
 					<span
 						key={`${role.id}_${index}`}
 						className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant"
 					>
 						<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
+							{ isClanCreator || (hasAdminPermission && !checkAdminPermission(role, EPermission.administrator)) ? 
 							<Tooltip
 								content="Remove role"
 								trigger="hover"
@@ -84,14 +99,16 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 								className="dark:!text-white !text-black"
 							>
 								<Icons.IconRemove className="text-transparent size-2" />
-							</Tooltip>
+							</Tooltip>:
+							<div className="size-2.5 bg-white rounded-full"></div>
+							}
 						</button>
 						<span className="text-xs font-medium" style={{ lineHeight: '15px' }}>
 							{role.title}
 						</span>
 					</span>
-				))}
-				<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
+				)}
+				<UserRestrictionZone policy={isClanCreator || hasAdminPermission}>
 					<div className="relative" onClick={handModalAddRole}>
 						<Tooltip
 							content="Add roles"
