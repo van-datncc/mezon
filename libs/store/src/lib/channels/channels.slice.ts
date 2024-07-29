@@ -225,9 +225,9 @@ export const fetchChannels = createAsyncThunk(
 	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_TEXT, noCache }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchChannelsCached.clear(mezon, 100, 1, clanId, channelType);
+			fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
 		}
-		const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
+		const response = await fetchChannelsCached(mezon, 500, 1, clanId, channelType);
 		if (!response.channeldesc) {
 			return [];
 		}
