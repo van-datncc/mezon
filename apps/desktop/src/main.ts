@@ -1,6 +1,5 @@
 import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
-import log from 'electron-log';
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, UpdateInfo } from 'electron-updater';
 import { machineId } from 'node-machine-id';
 import { join } from 'path';
 import { format } from 'url';
@@ -62,25 +61,20 @@ ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 	}
 });
 
-// log.transports.file.resolvePathFn = () => path.join('D:/NCC/PROJECT/mezon-fe/apps/desktop', 'logs/main.log');
 autoUpdater.autoDownload = false;
-log.info('App starting...');
 
 autoUpdater.on('checking-for-update', () => {
-	new Notification({
-		title: 'Checking for update',
-		body: `Checking for update ${app.getVersion()}!!`,
-	}).show();
+	// checking for update
 });
 
-autoUpdater.on('update-available', () => {
-	const window = BrowserWindow.getFocusedWindow();
+autoUpdater.on('update-available', (info: UpdateInfo) => {
+	const window = App.BrowserWindow.getFocusedWindow();
 	dialog
 		.showMessageBox(window, {
 			type: 'info',
 			buttons: ['Download', 'Cancel'],
 			title: 'Updates available',
-			message: `There is a new update for the app ${app.getVersion()}!! Do you want to download??`,
+			message: `There is a new update for the app ${info.version}!! Do you want to download??`,
 		})
 		.then((result) => {
 			if (result.response === 0) {
@@ -96,12 +90,20 @@ autoUpdater.on('update-not-available', () => {
 	}).show();
 });
 
-autoUpdater.on('update-downloaded', () => {
-	new Notification({
-		title: 'Downloaded successfully',
-		body: 'Update downloaded successfully',
-	}).show();
-	autoUpdater.quitAndInstall();
+autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
+	const window = App.BrowserWindow.getFocusedWindow();
+	dialog
+		.showMessageBox(window, {
+			type: 'info',
+			buttons: ['Install now', 'Cancel'],
+			title: 'Mezon install',
+			message: `Install mezon version ${info.version} now.`,
+		})
+		.then((result) => {
+			if (result.response === 0) {
+				autoUpdater.quitAndInstall();
+			}
+		});
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
@@ -112,7 +114,7 @@ autoUpdater.on('download-progress', (progressObj) => {
 
 autoUpdater.on('error', (error) => {
 	dialog.showMessageBox({
-		message: `err: ${error.message} !!`,
+		message: `Error: ${error.message} !!`,
 	});
 });
 

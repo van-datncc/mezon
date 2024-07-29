@@ -52,7 +52,7 @@
         "desktop": {
           "exec": "mezonapp %U"
         },
-        "appId": "Mezon"
+        "appId": "mezon.ai"
       },
       "options": {
         "outputPath": "dist/apps/desktop",
@@ -197,7 +197,7 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "Mezon",
+          "appId": "mezon.ai",
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         }
       }
