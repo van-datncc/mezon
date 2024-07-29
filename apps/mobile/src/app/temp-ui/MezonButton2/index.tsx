@@ -8,11 +8,12 @@ interface IMezonButton {
 	titleStyle?: StyleProp<TextStyle>;
 	fluid?: boolean;
 	border?: boolean;
-	type?: 'success' | 'warning' | 'danger';
+	type?: 'success' | 'warning' | 'danger' | 'theme';
+	size?: "md" | "lg"
 	onPress?: () => void;
 }
 
-export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress }: IMezonButton) {
+export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress, size = "md" }: IMezonButton) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -20,11 +21,24 @@ export default function MezonButton({ icon, title, titleStyle, fluid, border, ty
 		if (type === 'success') return styles.containerSuccess;
 		if (type === 'warning') return styles.containerWarning;
 		if (type === 'danger') return styles.containerDanger;
+		if (type === 'theme') return styles.containerTheme;
+		return {};
+	}
+
+	function renderContainerSize() {
+		if (size === "md") return styles.containerMd;
+		if (size === "lg") return styles.containerLg;
 		return {};
 	}
 
 	return (
-		<Pressable style={[styles.container, fluid && styles.fluid, border && styles.border, renderContainerStyle()]} onPress={onPress}>
+		<Pressable style={[
+			styles.container,
+			fluid && styles.fluid,
+			border && styles.border,
+			renderContainerStyle(),
+			renderContainerSize()]
+		} onPress={onPress}>
 			{icon}
 			{title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
 		</Pressable>

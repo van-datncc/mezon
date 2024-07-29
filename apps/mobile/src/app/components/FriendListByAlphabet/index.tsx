@@ -74,6 +74,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 						style={styles.groupByAlphabetWrapper}
 						ItemSeparatorComponent={SeparatorWithLine}
 						keyExtractor={(friend) => friend.id.toString()}
+						onScroll={props.onScroll}
 						renderItem={({ item }) => (
 							<FriendItem
 								friend={item}
@@ -100,6 +101,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 							data={friendList}
 							keyExtractor={(friend) => friend.id.toString()}
 							ItemSeparatorComponent={SeparatorWithLine}
+							onScroll={props.onScroll}
 							renderItem={({ item }) => (
 								<FriendItem
 									friend={item}

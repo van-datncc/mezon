@@ -86,7 +86,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					<MezonAvatar
 						width={80}
 						height={80}
-						avatarUrl={userById?.user?.avatar_url || user?.avatar_url}
+						// @ts-ignore
+						avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
 						username={userById?.user?.username || user?.display_name}
 						userStatus={userStatus}
 						isBorderBoxImage={true}
@@ -119,7 +120,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 						</View>
 					)}
 				</View>
-				{userById || user ? (
+
+				{userById ? (
 					<View style={[styles.userInfo]}>
 						{userById?.user?.about_me && (
 							<View>

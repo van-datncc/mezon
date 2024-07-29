@@ -71,7 +71,13 @@ const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, handleC
 			}}
 		>
 			<Block>
-				<MezonInput value={lineStatus} onTextChange={setLineStatus} placeHolder={t('placeholder')} textarea={true} maxCharacter={128} />
+				<MezonInput
+					value={lineStatus}
+					onTextChange={setLineStatus}
+					placeHolder={t('placeholder')}
+					textarea={true}
+					maxCharacter={128}
+				/>
 				<Text style={styles.durationText}>{t('statusDuration.label')}</Text>
 				<Block borderRadius={size.s_10} overflow={'hidden'}>
 					{statusDurationOption?.map((option, index) => (

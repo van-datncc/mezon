@@ -8,7 +8,7 @@ export const style = (colors: Attributes) =>
 			display: 'flex',
 			flexDirection: 'row',
 			justifyContent: 'center',
-			borderRadius: 5,
+			borderRadius: 10,
 			overflow: 'hidden',
 			borderWidth: 1,
 			backgroundColor: colors.primary,
@@ -29,6 +29,18 @@ export const style = (colors: Attributes) =>
 			backgroundColor: Colors.green,
 		},
 
+		containerTheme: {
+			backgroundColor: colors.secondary
+		},
+
+		containerMd: {
+			padding: Metrics.size.l,
+		},
+
+		containerLg: {
+			padding: Metrics.size.l,
+		},
+
 		fluid: {
 			flexBasis: 10,
 			flexGrow: 1,
@@ -40,6 +52,8 @@ export const style = (colors: Attributes) =>
 
 		title: {
 			color: baseColor.white,
-			fontSize: Fonts.size.h8,
+			fontSize: Fonts.size.h7,
+			textAlign: "center",
+			width: "100%"
 		},
 	});
