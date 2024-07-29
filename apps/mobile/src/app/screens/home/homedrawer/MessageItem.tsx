@@ -319,7 +319,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								isNumberOfLine={isNumberOfLine}
 								isMessageReply={false}
 								mode={mode}
-								themeValue={themeValue}
 							/>
 						</Block>
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
