@@ -8,9 +8,9 @@ const useProcessedContent = (inputText: string) => {
 
 	useEffect(() => {
 		const processInput = () => {
-			setEmojiList(checkAfterMarker(inputText, findColons(inputText)));
-			setLinkList(checkAfterMarker(inputText, findLinks(inputText)));
-			setMarkdownList(checkAfterMarker(inputText, findBackticks(inputText)));
+			setEmojiList(checkAfterMarker(inputText, findColons(inputText), 'emoji'));
+			setLinkList(checkAfterMarker(inputText, findLinks(inputText), 'link'));
+			setMarkdownList(checkAfterMarker(inputText, findBackticks(inputText), 'markdown'));
 		};
 
 		processInput();
@@ -32,14 +32,12 @@ const findLinks = (inputString: string): ILinkOnMessage[] => {
 			const startIndex = i;
 			i += minLength;
 
-			// Find the end of the link
 			while (i < inputString.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
 				i++;
 			}
 
 			const endIndex = i;
 
-			// Ensure the link is not preceded or followed by a colon or backtick
 			if (
 				(startIndex === 0 || ![':', '`'].includes(inputString[startIndex - 1])) &&
 				(endIndex === inputString.length || ![':', '`'].includes(inputString[endIndex]))
@@ -85,7 +83,6 @@ const findColons = (inputString: string) => {
 			i++;
 		}
 	}
-
 	return result;
 };
 
@@ -152,19 +149,27 @@ const findBackticks = (inputString: string) => {
 
 	return classifyBackticks(inputString);
 };
-
-const checkAfterMarker = (inputText: string, sections: any) => {
+const checkAfterMarker = (inputText: string, sections: any, type: string) => {
 	const validSections = [];
 
 	for (const section of sections) {
-		const { endIndex } = section;
+		const { endIndex, startIndex } = section;
 		const nextChar = inputText[endIndex ?? -1];
+		const preCharFour = inputText.substring(startIndex - 4, startIndex);
+		const preCharFive = inputText.substring(startIndex - 5, startIndex);
 
 		// Check if the next character is not a backtick
-		if (nextChar !== '`') {
-			validSections.push(section);
+
+		if (type === 'emoji') {
+			// Ensure that the character before the colon is not part of "http" or "https"
+			if (preCharFour !== 'http' && preCharFive !== 'https' && nextChar !== '`') {
+				validSections.push(section);
+			}
+		} else {
+			if (nextChar !== '`') {
+				validSections.push(section);
+			}
 		}
 	}
-
 	return validSections;
 };
