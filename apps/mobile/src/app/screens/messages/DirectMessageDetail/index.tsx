@@ -99,6 +99,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				channelName: currentDmGroup.channel_label,
 				type: currentDmGroup.type,
 				noCache: true,
+				isFetchingLatestMessages: true,
 			}),
 		);
 		return null;
@@ -114,7 +115,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		if (currentDmGroup?.id) {
 			directMessageLoader();
 		}
-	}, [currentDmGroup?.id]);
+	}, [currentDmGroup?.id, currentDmGroup?.clan_id]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -122,25 +123,35 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		return () => {
 			appStateSubscription.remove();
 		};
-	}, [currentDmGroup?.id]);
+	}, [currentDmGroup?.id, currentDmGroup?.clan_id, directMessageId]);
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			const store = await getStoreAsync();
-			store.dispatch(appActions.setIsFromFCMMobile(true));
-			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-			await store.dispatch(
-				directActions.joinDirectMessage({
-					directMessageId: currentDmGroup.id,
-					channelName: currentDmGroup.channel_label,
-					type: currentDmGroup.type,
-					noCache: true,
-				}),
-			);
-			await store.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true }))
-
-			store.dispatch(appActions.setIsFromFCMMobile(false));
-			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+			try {
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
+				const store = await getStoreAsync();
+				store.dispatch(appActions.setIsFromFCMMobile(true));
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+				await store.dispatch(
+					directActions.joinDirectMessage({
+						directMessageId: currentDmGroup.id,
+						channelName: currentDmGroup.channel_label,
+						type: currentDmGroup.type,
+						noCache: true,
+						isFetchingLatestMessages: true,
+					}),
+				);
+				
+				store.dispatch(appActions.setIsFromFCMMobile(false));
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+			} catch (error) {
+				console.log('error messageLoaderBackground', error);
+				const store = await getStoreAsync();
+				store.dispatch(appActions.setIsFromFCMMobile(false));
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+			}
 		}
 	};
 
@@ -237,7 +248,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
+								<AttachmentPicker currentChannelId={directMessageId} currentClanId={currentChannel?.clan_id} />
 							) : (
 								<View />
 							)}
