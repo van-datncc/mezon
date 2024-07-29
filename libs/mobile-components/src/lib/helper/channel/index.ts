@@ -1,5 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
+import { ChannelType } from 'mezon-js';
 import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
 import { load, save } from '../storage';
 
@@ -56,12 +57,15 @@ export const setDefaultChannelLoader = async (dataChannel: any, clanId: string, 
 	if (infoChannelCache?.channelId && infoChannelCache?.clanId) {
 		await jumpToChannel(infoChannelCache.channelId, infoChannelCache.clanId);
 	} else {
-		const firstChannelId = dataChannel?.[0]?.channel_id;
-		const firstClanId = dataChannel?.[0]?.clan_id;
-		if (firstChannelId && firstClanId) {
-			const dataSave = getUpdateOrAddClanChannelCache(firstClanId, firstChannelId);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-			await jumpToChannel(firstChannelId, firstClanId);
+		const firstChannelText = dataChannel?.find?.((channel: { type: ChannelType }) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT);
+		if (firstChannelText) {
+			const firstChannelId = firstChannelText?.channel_id;
+			const firstClanId = firstChannelText?.clan_id;
+			if (firstChannelId && firstClanId) {
+				const dataSave = getUpdateOrAddClanChannelCache(firstClanId, firstChannelId);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+				await jumpToChannel(firstChannelId, firstClanId);
+			}
 		}
 	}
 };
