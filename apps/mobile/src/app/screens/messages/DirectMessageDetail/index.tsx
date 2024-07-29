@@ -3,8 +3,8 @@ import { useChatMessages, useMemberStatus } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	Icons,
-	STORAGE_CLAN_ID,
 	save,
+	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND
 } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
@@ -138,7 +138,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				}),
 			);
 			await store.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true }))
-			
+
 			store.dispatch(appActions.setIsFromFCMMobile(false));
 			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 		}
@@ -177,8 +177,12 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 							<Icons.GroupIcon width={18} height={18} />
 						</View>
 					) : (
-						<View>
-							<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
+						<View style={styles.avatarWrapper}>
+							{currentDmGroup?.channel_avatar?.[0] ? (
+								<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
+							) : (
+								<Text style={[styles.textAvatar]}>{currentDmGroup?.channel_label?.charAt?.(0)}</Text>
+							)}
 							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 						</View>
 					)}

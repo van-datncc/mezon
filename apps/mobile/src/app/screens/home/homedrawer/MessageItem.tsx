@@ -100,6 +100,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return !messageReferences && message?.references && message?.references?.length;
 	}, [messageReferences, message.references]);
 
+	const isDM = useMemo(() => {
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode)
+	}, [mode])
+
 	useEffect(() => {
 		if (props?.messageId) {
 			const timestamp = Date.now() / 1000;
@@ -200,12 +204,11 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [message]);
 
 	const senderDisplayName = useMemo(() => {
-		const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 		if (isDM) {
 			return message?.display_name || message?.username || '';
 		}
 		return message?.clan_nick || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
-	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, mode, message?.display_name]);
+	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, message?.display_name, isDM]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
@@ -286,7 +289,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<AvatarMessage
 						onPress={onPressAvatar}
 						avatar={message?.isMe ? userProfile?.user?.avatar_url : message?.user?.avatarSm}
-						username={message?.user?.username}
+						textAvatar={isDM ? message?.display_name || message?.user?.username : message?.user?.username}
 						isShow={!isCombine || !!message?.references?.length || showUserInformation}
 					/>
 					<Pressable
