@@ -438,10 +438,14 @@ export const ChatBoxBottomBar = memo(
       }
     }, [messageActionNeedToResolve]);
 
+    const handleClearText = () => {
+      setText('');
+    };
+
     useEffect(() => {
       const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
       const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
-        setText('');
+        handleClearText();
       });
       return () => {
         keyboardListener.remove();
