@@ -41,7 +41,7 @@ export const initialAppState: AppState = {
 	hasInternetMobile: false,
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
-	isShowSettingFooter: {status: false, initTab: 'Account'},
+	isShowSettingFooter: { status: false, initTab: 'Account' },
 };
 
 export const appSlice = createSlice({
@@ -113,7 +113,7 @@ export const getAppState = (rootState: { [APP_FEATURE_KEY]: AppState }): AppStat
 
 export const selectAllApp = createSelector(getAppState, (state: AppState) => state);
 
-export const selectTheme = createSelector(getAppState, (state: AppState) => state.themeApp);
+export const selectTheme = createSelector(getAppState, (state: AppState) => state.themeApp || 'dark');
 
 export const selectError = createSelector(getAppState, (state: AppState) => state.error);
 
