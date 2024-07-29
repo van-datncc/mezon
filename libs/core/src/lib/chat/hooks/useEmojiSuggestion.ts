@@ -1,12 +1,12 @@
 import {
-	emojiSuggestionActions,
-	selectAddEmojiState,
-	selectAllEmojiSuggestion,
-	selectEmojiListStatus,
-	selectEmojiSuggestion,
-	selectShiftPressedStatus,
-	selectTextToSearchEmojiSuggestion,
-	useAppDispatch,
+    emojiSuggestionActions,
+    selectAddEmojiState,
+    selectAllEmojiSuggestion,
+    selectEmojiListStatus,
+    selectEmojiSuggestion,
+    selectShiftPressedStatus,
+    selectTextToSearchEmojiSuggestion,
+    useAppDispatch,
 } from '@mezon/store';
 import { EmojiStorage, IEmoji } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';

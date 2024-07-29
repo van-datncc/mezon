@@ -79,16 +79,16 @@ type JoinChatPayload = {
 	channelType: number;
 };
 
-export const joinChat = createAsyncThunk('channels/joinChat',
+export const joinChat = createAsyncThunk('channels/joinChat', 
 	async ({ clanId, channelId, channelType }: JoinChatPayload, thunkAPI) => {
-		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType);
-			return channel
-		} catch (error) {
-			return thunkAPI.rejectWithValue([]);
-		}
-	});
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType);
+		return channel
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 
 export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
@@ -232,11 +232,11 @@ export const fetchChannels = createAsyncThunk(
 			return [];
 		}
 
-		if (Date.now() - response.time < 100) {
+		if(Date.now() - response.time < 100) {
 			const lastSeenTimeStampInit = response.channeldesc
 				.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_TEXT)
 				.map((channelText) => {
-					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0), clanId: channelText.clan_id ?? '' };
+					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) , clanId: channelText.clan_id ?? ''};
 				});
 			thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
 		}
