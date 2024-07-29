@@ -1,5 +1,5 @@
 import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { useAppNavigation, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
 	getIsShowPopupForward,
 	selectAllClans,
@@ -7,9 +7,9 @@ import {
 	selectCountNotifyByClanId,
 	selectCurrentChannel,
 	selectCurrentClan,
-	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectListDMUnread,
 	selectStatusMenu,
 	selectTheme,
 	toggleIsShowPopupForwardFalse
@@ -37,9 +37,7 @@ function MyApp() {
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
 	};
-	const { directId: currentDmGroupId } = useAppParams();
-	const listDirectMessage = useSelector(selectDirectsUnreadlist);
-	const dmGroupChatUnreadList = listDirectMessage.filter((directMessage) => directMessage.id !== currentDmGroupId);
+	const listUnreadDM = useSelector(selectListDMUnread);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { quantityPendingRequest } = useFriends();
 
@@ -183,7 +181,7 @@ function MyApp() {
 						</div>
 					</NavLinkComponent>
 				</NavLink>
-				{dmGroupChatUnreadList.map(
+				{listUnreadDM.map(
 					(dmGroupChatUnread) =>
 						dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
 							<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
@@ -227,7 +225,6 @@ function MyApp() {
 						setOpenListClans(!openListClans);
 					}}
 				>
-					{/* <Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} className="cursor-pointer" /> */}
 					<div className="size-12 dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer hover:rounded-xl dark:hover:bg-slate-800 hover:bg-bgLightModeButton  transition-all duration-200 ">
 						<p className="text-2xl font-bold text-[#155EEF]">+</p>
 					</div>
@@ -244,7 +241,6 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
-			{/* <MessageContextMenuProvider>{openModalAttachment && <MessageModalImage />}</MessageContextMenuProvider> */}
 		</div>
 	);
 }

@@ -6,6 +6,7 @@ import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { useHover } from 'usehooks-ts';
 import * as Icons from '../../../../../ui/src/lib/Icons/index';
+import useIsWithinBackticks from '../MessageBox/ReactionMentionInput/useIsWithinBackticks';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
@@ -31,7 +32,7 @@ export type MessageWithUserProps = {
 	editor?: JSX.Element;
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
 	popup?: JSX.Element;
-	isSearchMessage?: boolean
+	isSearchMessage?: boolean;
 };
 
 function MessageWithUser({
@@ -45,7 +46,7 @@ function MessageWithUser({
 	isHighlight,
 	popup,
 	isShowFull,
-	isSearchMessage
+	isSearchMessage,
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
@@ -58,9 +59,18 @@ function MessageWithUser({
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
-	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
-	const checkReferences = message.references?.length !== 0;
 
+	const isWithinBackticks = useIsWithinBackticks(message.content.t ?? '');
+	const hasIncludeMention = useMemo(() => {
+		const userMention = `@${userLogin.userProfile?.user?.username}`;
+		const startIndexHere = message.content.t?.indexOf('@here');
+		const startIndexUser = message.content.t?.indexOf(userMention);
+		const includesHere = message.content.t?.includes('@here') && !isWithinBackticks(startIndexHere ?? -1);
+		const includesUser = message.content.t?.includes(userMention) && !isWithinBackticks(startIndexUser ?? -1);
+		return includesHere || includesUser;
+	}, [message.content.t, userLogin.userProfile?.user?.username]);
+
+	const checkReferences = message.references?.length !== 0;
 	const shouldShowDateDivider = useMemo(() => {
 		return message.isStartedMessageOfTheDay;
 	}, [message]);

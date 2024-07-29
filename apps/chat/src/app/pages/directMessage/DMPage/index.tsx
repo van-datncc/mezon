@@ -15,7 +15,7 @@ import {
 	selectStatusMenu,
 	useAppDispatch,
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -28,7 +28,7 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (lastMessage) {
 			const timestamp = Date.now() / 1000;
-			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
+			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directActions.updateLastSeenTime(lastMessage));
 		}
 	}, [channelId, dispatch, lastMessage]);

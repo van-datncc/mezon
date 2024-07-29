@@ -86,7 +86,7 @@ const ModalUserProfile = ({
 		if (url !== undefined && url !== '') return true;
 		return false;
 	};
-	const [color, setColor] = useState<string>('#323232');
+	const [color, setColor] = useState<string>('');
 
 	useEffect(() => {
 		const getColor = async () => {
@@ -99,7 +99,6 @@ const ModalUserProfile = ({
 
 		getColor();
 	}, [userProfile?.user?.avatar_url, isFooterProfile, userID, message?.avatar, userById?.user?.avatar_url]);
-
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
 	const checkUser = useMemo(() => userProfile?.user?.id === userID, [userID, userProfile?.user?.id]);
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
@@ -113,7 +112,7 @@ const ModalUserProfile = ({
 	return (
 		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} flex justify-end gap-x-2 p-2 `}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} ${!color && 'dark:bg-bgAvatarDark bg-bgAvatarLight'} flex justify-end gap-x-2 p-2 `}
 				style={{ backgroundColor: color }}
 			>
 				{!checkUser && !checkAnonymous && (

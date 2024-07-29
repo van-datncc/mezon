@@ -59,11 +59,17 @@ export const FriendItem = React.memo(
 				onPress={() => onPressAction(showAction ? EFriendItemAction.ShowInformation : EFriendItemAction.MessageDetail)}
 				onLongPress={() => onLongPress()}
 			>
-				<View>
+				<View style={styles.avatarWrapper}>
 					{friend?.user?.avatar_url ? (
-						<Image source={{ uri: friend?.user?.avatar_url }} style={[styles.friendAvatar, disabled && styles.avatarDisabled]} />
+						<Image
+							source={{ uri: friend?.user?.avatar_url }}
+							style={[styles.friendAvatar, disabled && styles.avatarDisabled]}
+							resizeMode="cover"
+						/>
 					) : (
-						<Text style={[styles.textAvatar, disabled && styles.avatarDisabled]}>{friend?.user?.username?.charAt?.(0)}</Text>
+						<View style={styles.wrapperTextAvatar}>
+							<Text style={[styles.textAvatar, disabled && styles.avatarDisabled]}>{friend?.user?.username?.charAt?.(0)}</Text>
+						</View>
 					)}
 					{!isPendingFriendRequest ? <View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} /> : null}
 				</View>

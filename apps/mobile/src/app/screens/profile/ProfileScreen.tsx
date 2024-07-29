@@ -87,8 +87,16 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					{user?.userProfile?.user?.avatar_url ? (
 						<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
 					) : (
-						<Block overflow={'hidden'} width={'100%'} height={'100%'} borderRadius={50}>
-							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>
+						<Block
+							backgroundColor={themeValue.colorAvatarDefault}
+							overflow={'hidden'}
+							width={'100%'}
+							height={'100%'}
+							borderRadius={50}
+							alignItems={'center'}
+							justifyContent={'center'}
+						>
+							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
 						</Block>
 					)}
 					<View style={styles.dotOnline} />

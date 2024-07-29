@@ -36,7 +36,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         gap: size.s_20
     },
     groupAvatar: {
-        backgroundColor: baseColor.blurple,
+        backgroundColor: Colors.orange,
         width: size.s_30,
         height: size.s_30,
         borderRadius: 50,
@@ -63,5 +63,22 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
     offline: {
         backgroundColor: baseColor.gray,
+    },
+    avatarWrapper: {
+        borderRadius: 50,
+        backgroundColor: colors.colorAvatarDefault,
+        height: size.s_30,
+        width: size.s_30,
+    },
+    wrapperTextAvatar: {
+        width: size.s_30,
+        height: size.s_30,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textAvatar: {
+        textAlign: 'center',
+        fontSize: size.h6,
+        color: Colors.white
     },
 })

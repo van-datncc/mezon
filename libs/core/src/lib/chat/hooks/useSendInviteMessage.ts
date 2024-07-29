@@ -1,7 +1,6 @@
 import { useMezon } from '@mezon/transport';
-import { convertMarkdown, ILinkOnMessage, ImarkdownOnMessage, IMessageSendPayload, linkRegex, markdownRegex } from '@mezon/utils';
+import { convertMarkdown, ILinkOnMessage, IMarkdownOnMessage, IMessageSendPayload, linkRegex, markdownRegex } from '@mezon/utils';
 import React, { useMemo } from 'react';
-
 
 export function useSendInviteMessage() {
 	const { clientRef, sessionRef, socketRef } = useMezon();
@@ -10,7 +9,7 @@ export function useSendInviteMessage() {
 	const sendInviteMessage = React.useCallback(
 		async (url: string, channel_id: string, channelMode: number) => {
 			const linkList: ILinkOnMessage[] = [];
-			const markdownList: ImarkdownOnMessage[] = [];
+			const markdownList: IMarkdownOnMessage[] = [];
 			let match;
 			while ((match = linkRegex.exec(url)) !== null) {
 				linkList.push({
@@ -30,12 +29,12 @@ export function useSendInviteMessage() {
 					endIndex: match.index + match[0].length,
 				});
 			}
-            const content: IMessageSendPayload = {
-                t: url,
+			const content: IMessageSendPayload = {
+				t: url,
 				links: linkList,
 				markdowns: markdownList,
-            };
-			
+			};
+
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -44,19 +43,17 @@ export function useSendInviteMessage() {
 				console.log(client, session, socket, channel_id);
 				throw new Error('Client is not initialized');
 			}
-			
+
 			await socket.writeChatMessage('DM', channel_id, channelMode, content, [], [], []);
 		},
 		[sessionRef, clientRef, socketRef],
 	);
-
-	
 
 	return useMemo(
 		() => ({
 			client,
 			sendInviteMessage,
 		}),
-		[client,sendInviteMessage],
+		[client, sendInviteMessage],
 	);
 }
