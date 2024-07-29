@@ -171,7 +171,7 @@ function MemberProfile({
 				</a>
 				<div className="flex flex-col items-start">
 					<div
-						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
+						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
@@ -185,7 +185,7 @@ function MemberProfile({
 									</span>
 								)}
 
-								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode overflow-x-hidden whitespace-nowrap text-ellipsis w-full">
+								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode overflow-x-hidden whitespace-nowrap text-ellipsis text-left w-full">
 									{userProfile?.user?.username}
 								</p>
 							</>
@@ -248,7 +248,7 @@ function MemberProfile({
 					onMouseDown={handleDefault}
 					onClick={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}/>
+					<ShortUserProfile userID={user?.user?.id || ''} mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined} />
 				</div>
 			) : null}
 
