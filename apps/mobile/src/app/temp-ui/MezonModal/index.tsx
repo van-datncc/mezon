@@ -21,6 +21,7 @@ interface IMezonModalProps extends Pick<ModalBaseProps, 'animationType'> {
 	visibleBackButton?: boolean;
 	rightBtnText?: string;
 	onClickRightBtn?: () => void | undefined;
+	containerStyle?: ViewStyle;
 }
 
 export const MezonModal = (props: IMezonModalProps) => {
@@ -42,6 +43,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 		visibleBackButton = false,
 		rightBtnText,
 		onClickRightBtn,
+		containerStyle,
 	} = props;
 
 	const setVisible = (value: boolean) => {
@@ -62,7 +64,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 	return (
 		<Modal visible={visible} animationType={animationType} statusBarTranslucent={true}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.container}>
+      <View style={[styles.container, containerStyle]}>
 				{rightClose ? (
 					<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 						{visibleBackButton ? (
