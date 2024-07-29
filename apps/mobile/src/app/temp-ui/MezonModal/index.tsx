@@ -98,7 +98,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 								) : (
 									<View />
 								)}
-								reaV		</View>
+							</View>
 						)}
 						<View style={[styles.fill, style]}>{children}</View>
 					</View>
