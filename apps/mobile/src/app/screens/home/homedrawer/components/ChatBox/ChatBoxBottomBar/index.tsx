@@ -1,10 +1,13 @@
 import { useEmojiSuggestion, useReference, useThreads } from '@mezon/core';
 import {
+	ActionEmitEvent,
+	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
 	convertToPlainTextHashtag,
 	getAttachmentUnique,
 	load,
+	pushAttachmentToCache,
 	save,
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
@@ -26,7 +29,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, Platform, TextInput } from 'react-native';
+import { DeviceEventEmitter, Keyboard, Platform, TextInput } from 'react-native';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
@@ -150,6 +153,11 @@ export const ChatBoxBottomBar = memo(
 			setText(convertMentionsToText(allCachedMessage?.[channelId] || ''));
 		};
 
+		const setAttachmentFromCache = async () => {
+			const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			setAttachmentData(allCachedAttachment?.[channelId] || []);
+		};
+
 		const resetCachedText = useCallback(async () => {
 			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
 			delete allCachedMessage[channelId];
@@ -158,9 +166,18 @@ export const ChatBoxBottomBar = memo(
 			});
 		}, [channelId]);
 
+		const resetCachedAttachment = useCallback(async () => {
+			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			delete allCachedAttachments[channelId];
+			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+				...allCachedAttachments,
+			});
+		}, [channelId]);
+
 		useEffect(() => {
 			if (channelId) {
 				setMessageFromCache();
+				setAttachmentFromCache();
 			}
 		}, [channelId]);
 
@@ -184,6 +201,17 @@ export const ChatBoxBottomBar = memo(
 			});
 
 			setAttachmentData(removedAttachment);
+			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			const attachmentCached = allCachedAttachments?.[channelId];
+			if (attachmentCached) {
+				const removedAttachmentCache = attachmentCached.filter((attachment) => {
+					if (attachment.url === urlToRemove) {
+						return false;
+					}
+					return !(fileName && attachment.filename === fileName);
+				});
+				pushAttachmentToCache(removedAttachmentCache, channelId);
+			}
 		};
 
 		const onSendSuccess = useCallback(() => {
@@ -195,7 +223,8 @@ export const ChatBoxBottomBar = memo(
 			setMarkdownsOnMessage([]);
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
-		}, [resetCachedText]);
+			resetCachedAttachment();
+		}, []);
 
 		const handleKeyboardBottomSheetMode = useCallback(
 			(mode: IModeKeyboardPicker) => {
@@ -276,7 +305,7 @@ export const ChatBoxBottomBar = memo(
 					if (channelInfo) {
 						hashtagList.push({
 							channelId: channelInfo.id.toString() ?? '',
-							channelLable: channelInfo.channel_label ?? '',
+							channelLabel: channelInfo.channel_label ?? '',
 							startIndex: match.index,
 							endIndex: match.index + match[0].length,
 						});
@@ -308,12 +337,8 @@ export const ChatBoxBottomBar = memo(
 		const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
 			const { type, targetMessage } = messageAction;
 			switch (type) {
-				case EMessageActionType.Reply:
-					setText('');
-					break;
 				case EMessageActionType.EditMessage:
 					handleTextInputChange(targetMessage.content.t);
-					// setText(targetMessage.content.t);
 					break;
 				case EMessageActionType.CreateThread:
 					setOpenThreadMessageState(true);
@@ -441,10 +466,18 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, [messageActionNeedToResolve]);
 
+		const handleClearText = () => {
+			setText('');
+		};
+
 		useEffect(() => {
 			const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
+			const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
+				handleClearText();
+			});
 			return () => {
 				keyboardListener.remove();
+				clearTextInputListener.remove();
 			};
 		}, []);
 
