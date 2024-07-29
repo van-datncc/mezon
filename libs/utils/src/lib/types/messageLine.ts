@@ -19,6 +19,7 @@ export interface ILink {
 	link: string | undefined;
 }
 export interface IMarkdown {
+	type?: string;
 	markdown: string | undefined;
 }
 
