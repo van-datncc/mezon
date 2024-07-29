@@ -2,7 +2,8 @@ import { useAuth } from '@mezon/core';
 import {
   notificationSettingActions,
   selectCurrentChannelId,
-  selectCurrentClanId, selectDefaultNotificationCategory, selectDefaultNotificationClan,
+  selectCurrentClan,
+  selectDefaultNotificationCategory, selectDefaultNotificationClan,
   selectnotificatonSelected,
   useAppDispatch
 } from "@mezon/store";
@@ -48,7 +49,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
   const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
   const dispatch = useAppDispatch();
   const currentChannelId = useSelector(selectCurrentChannelId);
-  const currentClanId = useSelector(selectCurrentClanId);
+  const currentClan = useSelector(selectCurrentClan);
 	const { userProfile } = useAuth();
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
@@ -76,7 +77,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
       const body = {
         channel_id: currentChannelId || '',
         notification_type: getNotificationChannelSelected?.notification_setting_type || '',
-        clan_id: currentClanId || '',
+        clan_id: currentClan?.clan_id || '',
         time_mute: unmuteTimeISO,
       };
       dispatch(notificationSettingActions.setNotificationSetting(body));
@@ -84,7 +85,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
       const body = {
         channel_id: currentChannelId || '',
         notification_type: getNotificationChannelSelected?.notification_setting_type || '',
-        clan_id: currentClanId || '',
+        clan_id: currentClan?.clan_id || '',
         active: 0,
       };
       dispatch(notificationSettingActions.setMuteNotificationSetting(body));
@@ -95,7 +96,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
     const body = {
       channel_id: currentChannelId || '',
       notification_type: getNotificationChannelSelected?.notification_setting_type || '',
-      clan_id: currentClanId || '',
+      clan_id: currentClan?.clan_id || '',
       active: active,
     };
     dispatch(notificationSettingActions.setMuteNotificationSetting(body));
@@ -106,11 +107,11 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
       const body = {
         channel_id: currentChannelId || '',
         notification_type: notificationType || '',
-        clan_id: currentClanId || '',
+        clan_id: currentClan?.clan_id || '',
       };
       dispatch(notificationSettingActions.setNotificationSetting(body));
     } else {
-      dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: currentChannelId || '', clan_id: currentClanId || '' }));
+      dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: currentChannelId || '', clan_id: currentClan?.clan_id || '' }));
     }
   };
 
@@ -139,7 +140,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
             const body = {
               channel_id: currentChannelId || '',
               notification_type: getNotificationChannelSelected?.notification_setting_type || '',
-              clan_id: currentClanId || '',
+              clan_id: currentClan?.clan_id || '',
               active: 1,
             };
             dispatch(notificationSettingActions.setMuteNotificationSetting(body));
@@ -155,6 +156,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
   }, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
   
   const checkOwnerChannel = useMemo(() => channel.creator_id === userProfile?.user?.id, [channel.creator_id, userProfile?.user?.id]);
+  const checkOwnerClan = useMemo(() => currentClan?.creator_id === userProfile?.user?.id, [currentClan?.creator_id, userProfile?.user?.id]);
 
   return (
 		<div
@@ -246,7 +248,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{checkOwnerChannel && (
+					{(checkOwnerChannel || checkOwnerClan) && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
 							<ItemPanel children="Duplicate Channel" />
@@ -299,7 +301,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{checkOwnerChannel && (
+					{(checkOwnerChannel || checkOwnerClan) && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
 							<ItemPanel children="Duplicate Thread" />
