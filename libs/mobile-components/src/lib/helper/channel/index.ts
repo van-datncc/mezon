@@ -73,10 +73,10 @@ export const setDefaultChannelLoader = async (dataChannel: any, clanId: string, 
 export const jumpToChannel = async (channelId: string, clanId: string) => {
 	if (channelId && clanId) {
 		const store = await getStoreAsync();
-		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-		if (!channelsCache?.includes(channelId)) {
-			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-		}
+		// const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+		// if (!channelsCache?.includes(channelId)) {
+		// 	save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+		// }
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	}
 };

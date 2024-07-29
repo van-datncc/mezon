@@ -1,5 +1,5 @@
 import { useDeleteMessage } from '@mezon/core';
-import { ActionEmitEvent, Icons, load, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
 import {
@@ -11,13 +11,13 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
-import { FlashList } from '@shopify/flash-list';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
+import { FlatList } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
@@ -30,7 +30,6 @@ import { EMessageActionType, EMessageBSToShow } from './enums';
 import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import { FlatList } from "react-native-gesture-handler";
 
 const ITEM_HEIGHT = 100;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -47,7 +46,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
-	const isLoading = useAppSelector((state: RootState) => state?.messages?.loadingStatus);
+	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
 	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
@@ -257,8 +256,16 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	);
 
 	const checkChannelCacheLoading = useMemo(() => {
+		let isCached = false;
 		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-		return channelsCache?.includes(channelId);
+
+		// have cached
+		if (channelsCache?.includes(channelId)) {
+			isCached = true;
+		} else {
+			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+		}
+		return isCached;
 	}, [channelId]);
 
 	return (

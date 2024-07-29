@@ -244,7 +244,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
+								<AttachmentPicker currentChannelId={directMessageId} currentClanId={currentChannel?.clan_id} />
 							) : (
 								<View />
 							)}
