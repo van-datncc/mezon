@@ -30,6 +30,7 @@ import { EMessageActionType, EMessageBSToShow } from './enums';
 import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
+import { FlatList } from "react-native-gesture-handler";
 
 const ITEM_HEIGHT = 100;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -264,17 +265,17 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		<View style={{ flex: 1 }}>
 			<View style={styles.wrapperChannelMessage}>
 				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && <MessageItemSkeleton skeletonNumber={15} />}
-				<FlashList
+				<FlatList
 					ref={flatListRef}
 					inverted
 					data={dataReverse || []}
-					onScroll={handleScroll}
+					// onScroll={handleScroll}
 					keyboardShouldPersistTaps={'handled'}
 					contentContainerStyle={styles.listChannels}
 					renderItem={renderItem}
 					removeClippedSubviews={true}
 					keyExtractor={(item) => `${item}`}
-					estimatedItemSize={ITEM_HEIGHT}
+					// estimatedItemSize={ITEM_HEIGHT}
 					onEndReached={messages?.length ? onLoadMore : undefined}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}

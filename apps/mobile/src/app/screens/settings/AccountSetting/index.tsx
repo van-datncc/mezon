@@ -4,6 +4,7 @@ import {
 	remove,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
@@ -46,6 +47,7 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 		await remove(STORAGE_DATA_CLAN_CHANNEL_CACHE);
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		await remove(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+		await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 		store.dispatch(authActions.logOut());
 	};
 

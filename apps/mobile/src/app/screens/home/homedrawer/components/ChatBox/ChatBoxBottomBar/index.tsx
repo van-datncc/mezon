@@ -5,7 +5,9 @@ import {
   convertToPlainTextHashtag,
   getAttachmentUnique,
   load,
-  save
+  save,
+  STORAGE_KEY_TEMPORARY_ATTACHMENT,
+  pushAttachmentToCache
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import { selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
@@ -149,6 +151,11 @@ export const ChatBoxBottomBar = memo(
       handleTextInputChange(allCachedMessage?.[channelId] || '');
       setText(convertMentionsToText(allCachedMessage?.[channelId] || ''));
     };
+    
+    const setAttachmentFromCache = async () => {
+      const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+      setAttachmentData(allCachedAttachment?.[channelId] || []);
+    };
 
     const resetCachedText = useCallback(async () => {
       const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
@@ -157,10 +164,19 @@ export const ChatBoxBottomBar = memo(
         ...allCachedMessage,
       });
     }, [channelId]);
+    
+    const resetCachedAttachment = useCallback(async () => {
+      const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+      delete allCachedAttachments[channelId];
+      save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+        ...allCachedAttachments,
+      });
+    }, [channelId]);
 
     useEffect(() => {
       if (channelId) {
         setMessageFromCache();
+        setAttachmentFromCache();
       }
     }, [channelId]);
 
@@ -184,6 +200,17 @@ export const ChatBoxBottomBar = memo(
       });
 
       setAttachmentData(removedAttachment);
+      const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+      const attachmentCached = allCachedAttachments?.[channelId];
+      if (attachmentCached) {
+        const removedAttachmentCache = attachmentCached.filter((attachment) => {
+          if (attachment.url === urlToRemove) {
+            return false;
+          }
+          return !(fileName && attachment.filename === fileName);
+        });
+        pushAttachmentToCache(removedAttachmentCache, channelId);
+      }
     };
 
     const onSendSuccess = useCallback(() => {
@@ -195,7 +222,8 @@ export const ChatBoxBottomBar = memo(
       setMarkdownsOnMessage([]);
       onDeleteMessageActionNeedToResolve();
       resetCachedText();
-    }, [resetCachedText]);
+      resetCachedAttachment();
+    }, []);
 
     const handleKeyboardBottomSheetMode = useCallback(
       (mode: IModeKeyboardPicker) => {
