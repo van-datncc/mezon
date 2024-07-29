@@ -1,5 +1,6 @@
 import { useEmojiSuggestion, useReference, useThreads } from '@mezon/core';
 import {
+  ActionEmitEvent,
   STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
   convertMentionsToText,
   convertToPlainTextHashtag,
@@ -26,7 +27,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, Platform, TextInput } from 'react-native';
+import { DeviceEventEmitter, Keyboard, Platform, TextInput } from 'react-native';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
@@ -131,7 +132,7 @@ export const ChatBoxBottomBar = memo(
     const emojiList: IEmojiOnMessage[] = [];
     const linkList: ILinkOnMessage[] = [];
     const markdownList: ImarkdownOnMessage[] = [];
-    
+
     const isShowCreateThread = useMemo(() => {
       return !hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
     }, [currentChannel?.channel_label, currentChannel?.parrent_id, hiddenIcon?.threadIcon])
@@ -308,12 +309,8 @@ export const ChatBoxBottomBar = memo(
     const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
       const { type, targetMessage } = messageAction;
       switch (type) {
-        case EMessageActionType.Reply:
-          setText('');
-          break;
         case EMessageActionType.EditMessage:
           handleTextInputChange(targetMessage.content.t);
-          // setText(targetMessage.content.t);
           break;
         case EMessageActionType.CreateThread:
           setOpenThreadMessageState(true);
@@ -441,10 +438,18 @@ export const ChatBoxBottomBar = memo(
       }
     }, [messageActionNeedToResolve]);
 
+    const handleClearText = () => {
+      setText('');
+    };
+
     useEffect(() => {
       const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
+      const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
+        handleClearText();
+      });
       return () => {
         keyboardListener.remove();
+        clearTextInputListener.remove();
       };
     }, []);
 
