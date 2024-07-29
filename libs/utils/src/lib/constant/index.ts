@@ -33,6 +33,7 @@ export const fileTypeImage = ['image/jpeg', 'image/png', 'image/gif', 'image/web
 
 export const neverMatchingRegex = /($a)/;
 export const emojiRegex = /:[a-zA-Z0-9_]+:/g;
+
 export const linkRegex = /(?<![`]|```)\bhttps?:\/\/[^\s/$.?#].[^\s]*\b(?![`]|```)/gi;
 export const mentionRegex = /@\[(.*?)\]/g;
 export const hashtagRegex = /#\[(.*?)\]\((.*?)\)/g;

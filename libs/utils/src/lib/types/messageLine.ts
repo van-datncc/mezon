@@ -10,7 +10,7 @@ export interface IMention {
 
 export interface IHashtag {
 	channelId: string | undefined;
-	channelLable: string | undefined;
+	channelLabel: string | undefined;
 }
 export interface IEmoji {
 	shortname: string | undefined;
@@ -18,7 +18,8 @@ export interface IEmoji {
 export interface ILink {
 	link: string | undefined;
 }
-export interface Imarkdown {
+export interface IMarkdown {
+	type?: string;
 	markdown: string | undefined;
 }
 
@@ -26,4 +27,4 @@ export interface IMentionOnMessage extends IMention, IStartEndIndex {}
 export interface IHashtagOnMessage extends IHashtag, IStartEndIndex {}
 export interface IEmojiOnMessage extends IEmoji, IStartEndIndex {}
 export interface ILinkOnMessage extends ILink, IStartEndIndex {}
-export interface ImarkdownOnMessage extends Imarkdown, IStartEndIndex {}
+export interface IMarkdownOnMessage extends IMarkdown, IStartEndIndex {}
