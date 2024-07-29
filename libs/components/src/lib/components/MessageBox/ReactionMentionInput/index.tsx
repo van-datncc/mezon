@@ -43,12 +43,7 @@ import {
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
-	IEmojiOnMessage,
-	IHashtagOnMessage,
 	ILineMention,
-	ILinkOnMessage,
-	IMarkdownOnMessage,
-	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -140,11 +135,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 
-	const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
-	const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
-	const [emojisOnMessage, setEmojisOnMessage] = useState<IEmojiOnMessage[]>([]);
-	const [linksOnMessage, setLinksOnMessage] = useState<ILinkOnMessage[]>([]);
-	const [markdownsOnMessage, setMarkdownsOnMessage] = useState<IMarkdownOnMessage[]>([]);
 	const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
@@ -245,30 +235,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { emojiList, linkList, markdownList } = useProcessedContent(content);
 	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(mentionRaw, content);
 
-	useMemo(() => {
-		return setEmojisOnMessage(emojiList);
-	}, [emojiList]);
-
-	useMemo(() => {
-		return setLinksOnMessage(linkList);
-	}, [linkList]);
-
-	useMemo(() => {
-		return setMarkdownsOnMessage(markdownList);
-	}, [markdownList]);
-
-	useMemo(() => {
-		return setMentionsOnMessage(mentionList);
-	}, [content, mentionRaw]);
-
-	useMemo(() => {
-		return setHashtagsOnMessage(hashtagList);
-	}, [content, mentionRaw]);
-
-	useMemo(() => {
-		return setMentionData(simplifiedMentionList);
-	}, [content, mentionRaw]);
-
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
@@ -301,15 +267,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					{
 						t: content,
-						mentions: mentionsOnMessage,
-						hashtags: hashtagsOnMessage,
-						emojis: emojisOnMessage,
-						links: linksOnMessage,
-						markdowns: markdownsOnMessage,
+						mentions: mentionList,
+						hashtags: hashtagList,
+						emojis: emojiList,
+						links: linkList,
+						markdowns: markdownList,
 						plainText: plainTextMessage,
 					},
 
-					mentionData,
+					simplifiedMentionList,
 					attachmentDataRef,
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -343,14 +309,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					props.onSend(
 						{
 							t: content.trim(),
-							mentions: mentionsOnMessage,
-							hashtags: hashtagsOnMessage,
-							emojis: emojisOnMessage,
-							links: linksOnMessage,
-							markdowns: markdownsOnMessage,
+							mentions: mentionList,
+							hashtags: hashtagList,
+							emojis: emojiList,
+							links: linkList,
+							markdowns: markdownList,
 							plainText: plainTextMessage,
 						},
-						mentionData,
+						simplifiedMentionList,
 						attachmentDataRef,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -370,13 +336,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
-
-			setMentionsOnMessage([]);
-			setHashtagsOnMessage([]);
-			setEmojisOnMessage([]);
-			setLinksOnMessage([]);
-			setMarkdownsOnMessage([]);
-			setMentionData([]);
 		},
 		[
 			valueTextInput,
@@ -669,12 +628,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						return (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
+								name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
 								avatarUrl={suggestion.avatarUrl ?? ''}
 								subText={
 									suggestion.display === 'here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.display ?? '')
+										: suggestion.display ?? ''
 								}
 								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== 'here'}
