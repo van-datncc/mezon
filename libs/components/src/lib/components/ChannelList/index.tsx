@@ -17,6 +17,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	const appearanceTheme = useSelector(selectTheme);
 	const currentClan = useSelector(selectCurrentClan);
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
+	const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
 
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
@@ -91,7 +92,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 								>
 									<Icons.UpDownIcon />
 								</button>
-								<UserRestrictionZone policy={isClanCreator || hasManageChannelPermission}>
+								<UserRestrictionZone policy={isClanCreator || hasAdminPermission || hasManageChannelPermission}>
 									<button
 										className="focus-visible:outline-none"
 										onClick={() => {

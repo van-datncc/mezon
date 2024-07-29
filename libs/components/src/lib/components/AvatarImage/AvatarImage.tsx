@@ -40,7 +40,7 @@ export const AvatarImage = ({ userName, src, alt, className = '', isAnonymous, c
 		const avatarChar = userName?.charAt(0)?.toUpperCase() || '';
 
 		return (
-			<div className={`size-10 dark:bg-slate-700 bg-slate-200 rounded-full flex justify-center items-center dark:text-white text-black text-[16px] ${className} ${classNameText}`}>
+			<div className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] ${className} ${classNameText}`}>
 				{avatarChar}
 			</div>
 		);

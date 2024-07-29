@@ -15,7 +15,7 @@ const AvatarProfile = ({ customStatus, avatar, username, userToDisplay, isAnonym
 			<AvatarImage
 				alt={username || ''}
 				userName={username}
-				className="w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] dark:bg-bgSecondary bg-white border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0"
+				className="w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0"
 				src={avatar}
 				isAnonymous={isAnonymous}
 				classNameText="!text-5xl"
