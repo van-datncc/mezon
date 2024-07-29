@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { machineId } from 'node-machine-id';
@@ -67,49 +67,53 @@ autoUpdater.autoDownload = false;
 log.info('App starting...');
 
 autoUpdater.on('checking-for-update', () => {
-	log.info('checking-for-update');
-	dialog.showMessageBox({
-		message: `CHECKING FOR UPDATES ${app.getVersion()}!!`,
-	});
+	new Notification({
+		title: 'Checking for update',
+		body: `Checking for update ${app.getVersion()}!!`,
+	}).show();
 });
 
 autoUpdater.on('update-available', () => {
-	log.info('update-available');
-	dialog.showMessageBox({
-		message: ' update-available !!',
-	});
-	autoUpdater.downloadUpdate();
+	const window = BrowserWindow.getFocusedWindow();
+	dialog
+		.showMessageBox(window, {
+			type: 'info',
+			buttons: ['Download', 'Cancel'],
+			title: 'Updates available',
+			message: `There is a new update for the app ${app.getVersion()}!! Do you want to download??`,
+		})
+		.then((result) => {
+			if (result.response === 0) {
+				autoUpdater.downloadUpdate();
+			}
+		});
 });
 
 autoUpdater.on('update-not-available', () => {
-	log.info('update-not-available');
-	dialog.showMessageBox({
-		message: 'update-not-available !!',
-	});
+	new Notification({
+		title: 'No update',
+		body: 'The current version is the latest.',
+	}).show();
 });
 
 autoUpdater.on('update-downloaded', () => {
-	log.info('update-downloaded: ', app.getVersion());
-	dialog.showMessageBox({
-		message: 'update Downloaded !!',
-	});
+	new Notification({
+		title: 'Downloaded successfully',
+		body: 'Update downloaded successfully',
+	}).show();
+	autoUpdater.quitAndInstall();
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
 	let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
 	log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
 	log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
-	log.info('download-progress: ', log_message);
-	dialog.showMessageBox({
-		message: `update Downloaded: ${log_message} !!`,
-	});
 });
 
 autoUpdater.on('error', (error) => {
 	dialog.showMessageBox({
 		message: `err: ${error.message} !!`,
 	});
-	log.info('error: ', error);
 });
 
 // handle setup events as quickly as possible

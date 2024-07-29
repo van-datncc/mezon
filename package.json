@@ -3,6 +3,7 @@
   "version": "1.1.5",
   "license": "MIT",
   "description": "Mezon application",
+  "productName": "Mezon",
   "repository": "https://github.com/nccasia/mezon-fe",
   "scripts": {
     "dev:chat": "nx run chat:serve",
