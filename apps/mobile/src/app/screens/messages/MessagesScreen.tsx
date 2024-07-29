@@ -100,7 +100,9 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 					{directMessage?.channel_avatar?.[0] ? (
 						<Image source={{ uri: directMessage?.channel_avatar?.[0] }} style={styles.friendAvatar} />
 					) : (
-						<Text style={styles.textAvatar}>{directMessage?.channel_label?.charAt?.(0)}</Text>
+						<View style={styles.wrapperTextAvatar}>
+							<Text style={styles.textAvatar}>{directMessage?.channel_label?.charAt?.(0)}</Text>
+						</View>
 					)}
 					<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 				</View>

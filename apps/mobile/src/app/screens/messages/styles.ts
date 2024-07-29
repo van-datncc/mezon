@@ -54,7 +54,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
         borderRadius: 20,
         height: size.s_50,
         color: colors.textStrong,
-        paddingVertical: size.s_6
+        paddingVertical: size.s_6,
+        paddingHorizontal: size.s_12
     },
 
     statusCircle: {
@@ -135,16 +136,18 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
     avatarWrapper: {
         borderRadius: 50,
-        backgroundColor: Colors.bgGrayDark,
+        backgroundColor: colors.colorAvatarDefault,
         height: size.s_40,
         width: size.s_40,
     },
-    textAvatar: {
+    wrapperTextAvatar: {
         width: size.s_40,
         height: size.s_40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textAvatar: {
         textAlign: 'center',
-        textAlignVertical: 'center',
-        borderRadius: 50,
         fontSize: size.h6,
         color: Colors.white
     },

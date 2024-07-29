@@ -65,6 +65,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		gap: size.s_14,
 	},
 	iconBackHeader: {
+		zIndex: 1000,
 		position: 'absolute',
 		left: size.s_2,
 		top: size.s_10,

@@ -10,7 +10,7 @@ import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../temp-ui';
 import MezonMenuItem from '../../temp-ui/MezonMenuItem';
@@ -259,18 +259,20 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 	];
 
 	return (
-		<ScrollView contentContainerStyle={styles.settingContainer}>
-			<MezonSearch />
+		<View style={styles.settingContainer}>
+			<ScrollView contentContainerStyle={styles.settingScroll}>
+				<MezonSearch />
 
-			<MezonMenu menu={menu} />
+				<MezonMenu menu={menu} />
 
-			<MezonMenuItem
-				isLast
-				onPress={() => confirmLogout()}
-				title={t('logOut')}
-				textStyle={{ color: baseColor.red }}
-				icon={<Icons.DoorExitIcon color={baseColor.red} />}
-			/>
-		</ScrollView>
+				<MezonMenuItem
+					isLast
+					onPress={() => confirmLogout()}
+					title={t('logOut')}
+					textStyle={{ color: baseColor.red }}
+					icon={<Icons.DoorExitIcon color={baseColor.red} />}
+				/>
+			</ScrollView>
+		</View>
 	);
 };
