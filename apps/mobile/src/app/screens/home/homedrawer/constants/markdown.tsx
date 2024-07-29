@@ -97,7 +97,7 @@ export const markdownStyles = (colors: Attributes) =>
 			lineHeight: size.s_20,
 		},
 		link: {
-			color: Colors.textLink,
+			color: colors.textLink,
 			textDecorationLine: 'none',
 			lineHeight: size.s_20,
 		},
@@ -107,7 +107,7 @@ export const markdownStyles = (colors: Attributes) =>
 		},
 		editedText: {
 			fontSize: size.small,
-			color: Colors.gray72,
+			color: colors.textDisabled,
 		},
 		mention: {
 			fontSize: size.medium,
@@ -120,10 +120,10 @@ export const markdownStyles = (colors: Attributes) =>
 			borderColor: Colors.textGray,
 		},
 		tr: {
-			borderColor: Colors.textGray,
+			borderColor: colors.border,
 		},
 		hr: {
-			backgroundColor: Colors.white,
+			backgroundColor: colors.borderRadio,
 			height: 2,
 		},
 		voiceChannel: {
@@ -141,23 +141,23 @@ export const markdownStyles = (colors: Attributes) =>
 		unknownChannel: { fontStyle: 'italic' },
 	});
 
-const styleMessageReply = {
+const styleMessageReply = (colors: Attributes) => StyleSheet.create({
 	body: {
-		color: Colors.tertiary,
+		color: colors.text,
 		fontSize: size.small,
 	},
 	textVoiceChannel: {
 		fontSize: size.small,
-		color: Colors.textGray,
+		color: colors.textDisabled,
 		lineHeight: size.s_20,
 	},
 	mention: {
 		fontSize: size.small,
-		color: Colors.textGray,
-		backgroundColor: '#3b426e',
+		color: colors.textLink,
+		backgroundColor: colors.selectedOverlay,
 		lineHeight: size.s_20,
 	},
-};
+});
 
 export type IMarkdownProps = {
 	content: any;
@@ -326,7 +326,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const channelsEntities = useAppSelector(selectChannelsEntities);
 
 		if (isMessageReply) {
-			customStyle = { ...styleMessageReply };
+			customStyle = { ...(styleMessageReply(themeValue)) };
 		}
 
 		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = content;
