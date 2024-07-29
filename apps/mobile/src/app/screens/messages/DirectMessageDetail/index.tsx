@@ -1,12 +1,20 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	Icons,
+	STORAGE_CLAN_ID,
+	save,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND
+} from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import {
+	appActions,
 	channelMembersActions,
 	clansActions,
 	directActions,
 	getStoreAsync,
+	messagesActions,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
 	useAppDispatch,
@@ -118,8 +126,21 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			await fetchMemberChannel();
-			await directMessageLoader();
+			const store = await getStoreAsync();
+			store.dispatch(appActions.setIsFromFCMMobile(true));
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+			await store.dispatch(
+				directActions.joinDirectMessage({
+					directMessageId: currentDmGroup.id,
+					channelName: currentDmGroup.channel_label,
+					type: currentDmGroup.type,
+					noCache: true,
+				}),
+			);
+			await store.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true }))
+			
+			store.dispatch(appActions.setIsFromFCMMobile(false));
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 		}
 	};
 
