@@ -1,7 +1,8 @@
 import { ArrowLeftIcon, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import React, { ReactNode } from 'react';
-import { Keyboard, Modal, ModalBaseProps, Pressable, SafeAreaView, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { Keyboard, Modal, ModalBaseProps, Pressable, Text, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../../configs/toastConfig';
 import { style as _style } from './style';
@@ -97,7 +98,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 								) : (
 									<View />
 								)}
-							</View>
+								reaV		</View>
 						)}
 						<View style={[styles.fill, style]}>{children}</View>
 					</View>
