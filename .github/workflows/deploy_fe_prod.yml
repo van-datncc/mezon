@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: mezon-server-prod
+    runs-on: mezon-fe-prod
     name: Build Mezon FE
     environment: prod
     steps:
@@ -27,7 +27,7 @@ jobs:
           npm run build:chat
 
   deploy:
-    runs-on: mezon-server-prod
+    runs-on: mezon-fe-prod
     name: Deploy Mezon FE
     environment: prod
     needs:
@@ -35,10 +35,10 @@ jobs:
     steps:
       - name: Clear www folder
         run: |
-          echo "Clearing /var/www/mezon/"
-          rm -rf /var/www/mezon/*
+          echo "Clearing /var/www/mezon-fe/"
+          rm -rf /var/www/mezon-fe/*
    
       - name: Copy files to www
         run: |
-          echo "Copying files to /var/www/mezon/"
-          cp -r ./dist/apps/chat/* /var/www/mezon/
+          echo "Copying files to /var/www/mezon-fe/"
+          cp -r ./dist/apps/chat/* /var/www/mezon-fe/
