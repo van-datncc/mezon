@@ -57,10 +57,10 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
       }
       await dispatch(updateSticker({ stickerId: editSticker?.id ?? '', request: stickerChange }))
       handleCloseModal();
-    } else {
-      handleCreateSticker();
+      return;
     }
     handleCreateSticker();
+
   }
   const handleCreateSticker = () => {
     const checkAvilableCreate = editingSticker.fileName && editingSticker.shortname && editingSticker.source;
@@ -107,6 +107,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
     setOpenModal(false);
 
   }
+
   return (
     <>
       <div className={'relative w-full h-[468px] flex flex-col dark:bg-bgPrimary text-textPrimary '}>
