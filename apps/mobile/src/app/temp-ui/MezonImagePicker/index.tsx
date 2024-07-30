@@ -41,6 +41,8 @@ interface IMezonImagePickerProps {
 	noDefaultText?: boolean;
 }
 
+const scale = 5;
+
 export default memo(function MezonImagePicker({
 	onChange,
 	onLoad,
@@ -124,8 +126,8 @@ export default memo(function MezonImagePicker({
 						mediaType: 'photo',
 						includeBase64: true,
 						compressImageQuality: 1,
-						...(typeof width === 'number' && { width: width }),
-						...(typeof height === 'number' && { height: height }),
+						...(typeof width === 'number' && { width: width * scale }),
+						...(typeof height === 'number' && { height: height * scale }),
 					});
 					setImage(croppedFile.path);
 					onChange && onChange(croppedFile);
