@@ -22,7 +22,7 @@ export default function MezonClanAvatar({ image, alt = "anonymous", defaultColor
                     resizeMode="cover"
                     style={styles.image}
                 />
-                : <View style={[styles.fakeBox, { backgroundColor: defaultColor || baseColor.blurple }]}>
+                : <View style={[styles.fakeBox, { backgroundColor: defaultColor || useTheme().themeValue.colorAvatarDefault }]}>
                     {!noDefaultText
                         ? (
                             <Text

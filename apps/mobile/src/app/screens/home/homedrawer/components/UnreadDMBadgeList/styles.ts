@@ -1,7 +1,8 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import {Attributes, Colors, size} from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) =>
+StyleSheet.create({
     container: {
         maxHeight: '34%',
     },
@@ -39,5 +40,22 @@ export const styles = StyleSheet.create({
     },
     mb10: {
         marginBottom: size.s_10,
-    }
+    },
+    avatarWrapper: {
+        borderRadius: 50,
+        backgroundColor: colors.colorAvatarDefault,
+        height: size.s_50,
+        width: size.s_50,
+    },
+    wrapperTextAvatar: {
+        width: size.s_50,
+        height: size.s_50,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textAvatar: {
+        textAlign: 'center',
+        fontSize: size.h5,
+        color: Colors.white
+    },
 })

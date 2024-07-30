@@ -1,3 +1,4 @@
+import { convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
@@ -17,14 +18,14 @@ interface RenderContentProps {
 
 // TODO: refactor component for message lines
 const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentProps) => {
-	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
-	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
+	const { t, mentions = [], hashtags = [], emojis = [], markdowns = [], links = [] } = data;
+	const elements = [...mentions, ...hashtags, ...emojis, ...markdowns, ...links].sort((a, b) => a.startIndex - b.startIndex);
 	let lastIndex = 0;
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
+			const { startIndex, endIndex, channelId, channelLabel, username, shortname, markdown, link } = element;
 
 			if (lastIndex < startIndex) {
 				formattedContent.push(
@@ -32,7 +33,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 				);
 			}
 
-			if (channelId && channelLable) {
+			if (channelId && channelLabel) {
 				formattedContent.push(
 					<ChannelHashtag
 						showOnchannelLayout={showOnchannelLayout}
@@ -50,8 +51,13 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 				formattedContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 			}
 
-			if (markdown || link) {
-				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
+			if (link) {
+				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={link} />);
+			}
+
+			if (markdown) {
+				const converted = markdown.startsWith('```') && markdown.endsWith('```') ? convertMarkdown(markdown) : markdown;
+				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={converted} />);
 			}
 			lastIndex = endIndex;
 		});

@@ -1,12 +1,20 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	Icons,
+	save,
+	STORAGE_CLAN_ID,
+	STORAGE_IS_DISABLE_LOAD_BACKGROUND
+} from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import {
+	appActions,
 	channelMembersActions,
 	clansActions,
 	directActions,
 	getStoreAsync,
+	messagesActions,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
 	useAppDispatch,
@@ -84,13 +92,13 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
 		store.dispatch(clansActions.joinClan({ clanId: currentDmGroup?.clan_id }));
-		save(STORAGE_CLAN_ID, currentDmGroup?.clan_id);
 		store.dispatch(
 			directActions.joinDirectMessage({
 				directMessageId: currentDmGroup.id,
 				channelName: currentDmGroup.channel_label,
 				type: currentDmGroup.type,
 				noCache: true,
+				isFetchingLatestMessages: true,
 			}),
 		);
 		return null;
@@ -106,7 +114,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		if (currentDmGroup?.id) {
 			directMessageLoader();
 		}
-	}, [currentDmGroup?.id]);
+	}, [currentDmGroup?.id, currentDmGroup?.clan_id]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -114,12 +122,35 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		return () => {
 			appStateSubscription.remove();
 		};
-	}, [currentDmGroup?.id]);
+	}, [currentDmGroup?.id, currentDmGroup?.clan_id, directMessageId]);
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
-			await fetchMemberChannel();
-			await directMessageLoader();
+			try {
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
+				const store = await getStoreAsync();
+				store.dispatch(appActions.setIsFromFCMMobile(true));
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+				await store.dispatch(
+					directActions.joinDirectMessage({
+						directMessageId: currentDmGroup.id,
+						channelName: currentDmGroup.channel_label,
+						type: currentDmGroup.type,
+						noCache: true,
+						isFetchingLatestMessages: true,
+					}),
+				);
+				
+				store.dispatch(appActions.setIsFromFCMMobile(false));
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+			} catch (error) {
+				console.log('error messageLoaderBackground', error);
+				const store = await getStoreAsync();
+				store.dispatch(appActions.setIsFromFCMMobile(false));
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+			}
 		}
 	};
 
@@ -140,7 +171,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const onHandlerStateChange = (event) => {
 		const { translationX, velocityX } = event.nativeEvent;
-		if (translationX > 5 && velocityX > 120) {
+		if (translationX > 5 && velocityX > 200) {
 			handleBack()
 		}
 	};
@@ -156,8 +187,14 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 							<Icons.GroupIcon width={18} height={18} />
 						</View>
 					) : (
-						<View>
-							<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
+						<View style={styles.avatarWrapper}>
+							{currentDmGroup?.channel_avatar?.[0] ? (
+								<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
+							) : (
+								<View style={styles.wrapperTextAvatar} >
+									<Text style={[styles.textAvatar]}>{currentDmGroup?.channel_label?.charAt?.(0)}</Text>
+								</View>
+							)}
 							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 						</View>
 					)}
@@ -212,7 +249,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 									bottomSheetRef={bottomPickerRef}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
+								<AttachmentPicker currentChannelId={directMessageId} currentClanId={currentChannel?.clan_id} />
 							) : (
 								<View />
 							)}

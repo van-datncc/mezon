@@ -38,7 +38,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const listDM = useSelector(selectDirectsOpenlist);
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const userCustomStatus = useMemberCustomStatus(userProfile?.user?.id || '');
+	const userCustomStatus = useMemberCustomStatus(userId || user?.id || '');
 
 	const isClanOwner = useMemo(() => {
 		return currentClan?.creator_id === userProfile?.user?.id

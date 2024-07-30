@@ -15,7 +15,7 @@ import {
 	selectStatusMenu,
 	useAppDispatch,
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -28,7 +28,7 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (lastMessage) {
 			const timestamp = Date.now() / 1000;
-			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
+			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directActions.updateLastSeenTime(lastMessage));
 		}
 	}, [channelId, dispatch, lastMessage]);
@@ -128,14 +128,8 @@ export default function DirectMessage() {
 									channelLabel={currentDmGroup?.channel_label}
 									userName={isDmChannel ? currentDmGroup?.usernames : undefined}
 									type={isDmChannel ? 'DM' : 'GROUP'}
-									mode={
-										isDmChannel ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
-									}
-									avatarDM={
-										isDmChannel
-											? currentDmGroup.channel_avatar?.at(0)
-											: 'assets/images/avatar-group.png'
-									}
+									mode={isDmChannel ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
+									avatarDM={isDmChannel ? currentDmGroup.channel_avatar?.at(0) : 'assets/images/avatar-group.png'}
 								/>
 							}
 						</div>
@@ -211,7 +205,7 @@ export default function DirectMessage() {
 					)}
 					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
 						<div
-							className={`dark:bg-bgSecondary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[340px]'}`}
+							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[340px]'}`}
 						>
 							<ModalUserProfile
 								userID={Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id}
@@ -225,7 +219,6 @@ export default function DirectMessage() {
 					)}
 				</div>
 			</div>
-
 		</>
 	);
 }

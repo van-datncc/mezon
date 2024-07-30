@@ -116,7 +116,7 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
                             ) : (
                                 <Text
                                     style={{
-                                        backgroundColor: Colors.vividScarlet,
+                                        backgroundColor: themeValue.colorAvatarDefault,
                                         width: size.s_40,
                                         height: size.s_40,
                                         textAlign: 'center',

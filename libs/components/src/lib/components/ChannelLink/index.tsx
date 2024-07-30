@@ -1,6 +1,6 @@
-import { useAppNavigation, useAppParams, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
-import { channelsActions, referencesActions, selectAllAccount, selectCloseMenu, selectCurrentClan, useAppDispatch, voiceActions } from '@mezon/store';
-import { ChannelStatusEnum, IChannel, MouseButton, getVoiceChannelName } from '@mezon/utils';
+import { useAppNavigation, useAppParams, useClanRestriction, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
+import { channelsActions, referencesActions, selectCloseMenu, selectCurrentClan, useAppDispatch, voiceActions } from '@mezon/store';
+import { ChannelStatusEnum, EPermission, IChannel, MouseButton, getVoiceChannelName } from '@mezon/utils';
 import { useMezonVoice } from '@mezon/voice';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -41,9 +41,9 @@ export const classes = {
 };
 
 function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, channelType }: ChannelLinkProps) {
-	const userProfile = useSelector(selectAllAccount);
 	const currentClan = useSelector(selectCurrentClan);
 	const voice = useMezonVoice();
+	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
 
 	const [openSetting, setOpenSetting] = useState(false);
 	const [showModal, setShowModal] = useState(false);
@@ -177,7 +177,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				</Link>
 			)}
 
-			{currentClan?.creator_id === userProfile?.user?.id ? (
+			{(isClanCreator || hasAdminPermission) ? (
 				numberNotification !== 0 ? (
 					<>
 						<AddPerson
