@@ -1,17 +1,20 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useClans } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
-import React, { MutableRefObject } from 'react';
+import React, { MutableRefObject, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../../../../../app/temp-ui';
+import { getUserPermissionsStatus } from '../../../../../utils/helpers';
 import { style } from './styles';
 
 interface ICategoryMenuProps {
@@ -22,10 +25,20 @@ interface ICategoryMenuProps {
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
 export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps) {
 	const { t } = useTranslation(['categoryMenu']);
+	const { userId, userProfile } = useAuth();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { currentClan } = useClans();
 	const { dismiss } = useBottomSheetModal();
+	const userById = useSelector(selectMemberByUserId(userId || ''));
+	const RolesClan = useSelector(selectAllRolesClan);
+	const currentClan = useSelector(selectCurrentClan);
+	const userPermissionsStatus = useMemo(() => {
+		return getUserPermissionsStatus(userById?.role_id, RolesClan)
+	}, [userById?.role_id, RolesClan])
+
+	const isClanOwner = useMemo(() => {
+		return currentClan?.creator_id === userProfile?.user?.id
+	}, [currentClan?.creator_id, userProfile?.user?.id])
 
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
 
@@ -66,6 +79,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 			title: t('menu.organizationMenu.edit'),
 			onPress: () => reserve(),
 			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
+			isShow: userPermissionsStatus['manage-channel'] || isClanOwner
 		},
 		{
 			title: t('menu.organizationMenu.createChannel'),
@@ -79,6 +93,7 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 				});
 			},
 			icon: <Icons.PlusLargeIcon color={themeValue.textStrong} />,
+			isShow: userPermissionsStatus['manage-channel'] || isClanOwner
 		},
 	];
 

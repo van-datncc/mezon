@@ -1,21 +1,23 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
+import { useAuth } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { selectAllRolesClan, selectMemberByUserId, selectnotificatonSelected } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { getUserPermissionsStatus } from '../../../utils/helpers';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './style';
-import { useSelector } from 'react-redux';
-import { selectnotificatonSelected } from '@mezon/store-mobile';
 enum EActionRow {
-  Search,
-  Threads,
-  Mute,
-  Settings
+	Search,
+	Threads,
+	Mute,
+	Settings
 }
 
 export const ActionRow = React.memo(() => {
@@ -25,16 +27,29 @@ export const ActionRow = React.memo(() => {
 	const navigation = useNavigation<any>();
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
+	const { userId, userProfile } = useAuth();
+	const userById = useSelector(selectMemberByUserId(userId || ''));
+	const RolesClan = useSelector(selectAllRolesClan);
+	const userPermissionsStatus = useMemo(() => {
+		return getUserPermissionsStatus(userById?.role_id, RolesClan)
+	}, [userById?.role_id, RolesClan])
+
+	const isClanOwner = useMemo(() => {
+		return currentChannel?.creator_id === userProfile?.user?.id
+	}, [currentChannel?.creator_id, userProfile?.user?.id])
+
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
 	}, [currentChannel]);
 	const actionList = [
 		{
 			title: 'Search',
-			action: () => { },
+			action: () => {
+				//
+			},
 			icon: <Icons.MagnifyingIcon width={22} height={22} color={themeValue.text} />,
 			hidden: true,
-      type: EActionRow.Search
+			type: EActionRow.Search
 		},
 		{
 			title: 'Threads',
@@ -43,7 +58,7 @@ export const ActionRow = React.memo(() => {
 			},
 			icon: <Icons.ThreadIcon width={22} height={22} color={themeValue.text} />,
 			hidden: isChannel,
-      type: EActionRow.Threads
+			type: EActionRow.Threads
 		},
 		{
 			title: 'Mute',
@@ -51,7 +66,7 @@ export const ActionRow = React.memo(() => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL, params: { currentChannel } });
 			},
 			hidden: true,
-      type: EActionRow.Mute
+			type: EActionRow.Mute
 		},
 		{
 			title: 'Settings',
@@ -64,8 +79,8 @@ export const ActionRow = React.memo(() => {
 				});
 			},
 			icon: <Icons.SettingsIcon width={22} height={22} color={themeValue.text} />,
-			hidden: true,
-      type: EActionRow.Settings
+			hidden: !(userPermissionsStatus['manage-channel'] || userPermissionsStatus['manage-thread'] || isClanOwner),
+			type: EActionRow.Settings
 		},
 	];
 
@@ -82,10 +97,10 @@ export const ActionRow = React.memo(() => {
 					<Pressable key={index.toString()} onPress={action.action}>
 						<View style={styles.iconBtn}>
 							<View style={styles.iconWrapper}>{[EActionRow.Mute].includes(action.type) ? (
-                getNotificationChannelSelected?.active === EActionMute.Mute
-                ? <Icons.BellIcon width={22} height={22} color={themeValue.text} />
-                : <Icons.BellSlashIcon width={22} height={22} color={themeValue.text} />
-              ) : action.icon}</View>
+								getNotificationChannelSelected?.active === EActionMute.Mute
+									? <Icons.BellIcon width={22} height={22} color={themeValue.text} />
+									: <Icons.BellSlashIcon width={22} height={22} color={themeValue.text} />
+							) : action.icon}</View>
 							<Text style={styles.optionText}>{action.title}</Text>
 						</View>
 					</Pressable>

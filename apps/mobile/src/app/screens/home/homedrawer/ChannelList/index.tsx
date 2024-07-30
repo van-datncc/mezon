@@ -10,7 +10,7 @@ import {
 	selectCurrentClan,
 	useAppDispatch,
 } from '@mezon/store-mobile';
-import { ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { isEmpty } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
@@ -46,7 +46,7 @@ const ChannelList = React.memo((props: any) => {
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
-	const [currentPressedChannel, setCurrentPressedChannel] = useState<IChannel>(null);
+	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
 	const user = useAuth();
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const dispatch = useAppDispatch();
@@ -77,10 +77,16 @@ const ChannelList = React.memo((props: any) => {
 		setCurrentPressedCategory(category);
 	}
 
-	function handleLongPressChannel(channel: IChannel) {
+	function handleLongPressChannel(channel: ChannelThreads) {
+		console.log('channel:', channel);
 		bottomSheetChannelMenuRef.current?.present();
 		setCurrentPressedChannel(channel);
 		setIsUnKnownChannel(!channel?.channel_id);
+	}
+
+	function handleLongPressThread(channel: ChannelThreads) {
+		bottomSheetChannelMenuRef.current?.present();
+		setCurrentPressedChannel(channel);
 	}
 
 	function handleOnPressSortChannel(channel: IChannel) {
@@ -150,6 +156,7 @@ const ChannelList = React.memo((props: any) => {
 							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
 							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
 							collapseItems={collapseChannelItems}
+							onLongPressThread={(channel) => handleLongPressThread(channel)}
 						/>
 					)}
 				/>
@@ -163,7 +170,7 @@ const ChannelList = React.memo((props: any) => {
 				<CategoryMenu inviteRef={bottomSheetInviteRef} category={currentPressedCategory} />
 			</MezonBottomSheet>
 
-			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent>
+			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent onDismiss={() => setCurrentPressedChannel(null)}>
 				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedChannel} />
 			</MezonBottomSheet>
 

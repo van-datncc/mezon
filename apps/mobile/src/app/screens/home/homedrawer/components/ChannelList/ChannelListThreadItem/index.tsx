@@ -1,5 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectNotificationMentionCountByChannelId } from '@mezon/store-mobile';
+import { ChannelThreads } from '@mezon/utils';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import LongCornerIcon from '../../../../../../../assets/svg/long-corner.svg';
@@ -8,6 +9,7 @@ import { style } from './styles';
 
 interface IChannelListThreadItemProps {
 	onPress?: (thread: any) => void;
+	onLongPress?: (thread: ChannelThreads) => void;
 	thread: any;
 	isActive?: boolean;
 	isFirstThread?: boolean;
@@ -20,20 +22,27 @@ function useChannelBadgeCount(channelId: string) {
 	return numberNotification;
 }
 
-export default function ChannelListThreadItem({ onPress, thread, isActive, isFirstThread }: IChannelListThreadItemProps) {
+export default function ChannelListThreadItem({ onPress, onLongPress, thread, isActive, isFirstThread }: IChannelListThreadItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
 	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
 	const numberNotification = useChannelBadgeCount(thread.id);
 
+	const onPressThreadItem = () => {
+		onPress && onPress(thread);
+	}
+
+	const onLongPressThreadItem = () => {
+		onLongPress && onLongPress(thread);
+	}
+
 	return (
 		<TouchableOpacity
 			key={thread.id}
 			activeOpacity={1}
-			onPress={() => {
-				onPress(thread);
-			}}
+			onPress={() => onPressThreadItem()}
+			onLongPress={() => onLongPressThreadItem()}
 			style={[styles.channelListLink]}
 		>
 			<View style={[styles.threadItem]}>

@@ -3,7 +3,7 @@ import { useAuth, useChatReaction } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { appActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
+import { appActions, selectAllRolesClan, selectCurrentClan, selectMemberByUserId, selectPinMessageByChannelId } from '@mezon/store-mobile';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
@@ -15,6 +15,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import RNFetchBlob from 'rn-fetch-blob';
 import { MezonBottomSheet } from '../../../../../../app/temp-ui';
+import { getUserPermissionsStatus } from '../../../../../utils/helpers';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
@@ -25,16 +26,20 @@ import { style } from './styles';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
+	const { userId, userProfile } = useAuth();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, checkAnonymous, senderDisplayName = '' } = props;
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
 	const { t } = useTranslation(['message']);
-	const { userProfile } = useAuth();
 	const { reactionMessageDispatch } = useChatReaction();
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useAnimatedState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentClan = useSelector(selectCurrentClan);
+	const userById = useSelector(selectMemberByUserId(userId || ''));
+	const RolesClan = useSelector(selectAllRolesClan);
+
 	const handleActionEditMessage = () => {
 		onClose();
 		const payload: IMessageActionNeedToResolve = {
@@ -49,6 +54,11 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 	}, [mode]);
+
+	const isClanOwner = useMemo(() => {
+		if (isDM) return false;
+		return currentClan?.creator_id === userProfile?.user?.id
+	}, [currentClan?.creator_id, userProfile?.user?.id, isDM])
 
 	const downloadImage = async (imageUrl: string, type: string) => {
 		try {
@@ -73,8 +83,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const saveImageToCameraRoll = async (filePath: string, type: string) => {
 		try {
-			const a = await CameraRoll.save(filePath, { type: type === 'video' ? 'video' : 'photo' });
-			console.log(a);
+			await CameraRoll.save(filePath, { type: type === 'video' ? 'video' : 'photo' });
 
 			Toast.show({
 				text1: 'Save successfully',
@@ -319,15 +328,19 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const messageActionList = useMemo(() => {
+		const userPermissionsStatus = !isDM ? getUserPermissionsStatus(userById?.role_id, RolesClan) : {};
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
+		const isHideCreateThread = !(!isDM || isClanOwner || userPermissionsStatus['manage-thread']);
+		const isHideDeleteMessage = !(userPermissionsStatus['delete-message'] || isMyMessage || isClanOwner);
 
-		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
+		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
-			isDM && EMessageActionType.CreateThread,
+			isHideCreateThread && EMessageActionType.CreateThread,
+			isHideDeleteMessage && EMessageActionType.DeleteMessage
 		];
 
 		let availableMessageActions: IMessageAction[] = [];
@@ -341,7 +354,6 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			);
 		}
 		const mediaList = message?.attachments?.length > 0 ? [] : [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
-
 		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
@@ -350,7 +362,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
 			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type)),
 		};
-	}, [t, userProfile, message, listPinMessages, isDM]);
+	}, [t, userProfile, message, listPinMessages, isDM, RolesClan, userById?.role_id, isClanOwner]);
 
 	const renderUserInformation = () => {
 		return <UserProfile userId={user?.id} user={user} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
