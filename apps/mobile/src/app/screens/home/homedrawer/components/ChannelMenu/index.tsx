@@ -1,8 +1,8 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useReference } from '@mezon/core';
+import { useReference } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, selectAllRolesClan, selectCurrentClan, selectMemberByUserId, useAppDispatch } from '@mezon/store-mobile';
+import { channelsActions, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
@@ -14,7 +14,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
-import { getUserPermissionsStatus } from '../../../../../utils/helpers';
+import { useUserPermission } from '../../../../../hooks/useUserPermission';
 import { style } from './styles';
 
 interface IChannelMenuProps {
@@ -29,18 +29,9 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 	const styles = style(themeValue);
 	const { setOpenThreadMessageState } = useReference();
 	const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
-	const { userId, userProfile } = useAuth();
-	const userById = useSelector(selectMemberByUserId(userId || ''));
-	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useAppDispatch();
-	const userPermissionsStatus = useMemo(() => {
-		return getUserPermissionsStatus(userById?.role_id, RolesClan)
-	}, [userById?.role_id, RolesClan])
-
-	const isClanOwner = useMemo(() => {
-		return currentClan?.creator_id === userProfile?.user?.id
-	}, [currentClan?.creator_id, userProfile?.user?.id])
+	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 
 	const isChannel = useMemo(() => {
 		return Array.isArray(channel?.threads);

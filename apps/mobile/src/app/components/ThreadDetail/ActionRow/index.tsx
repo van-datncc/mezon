@@ -1,16 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
-import { useAuth } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectMemberByUserId, selectnotificatonSelected } from '@mezon/store-mobile';
+import { selectnotificatonSelected } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EActionMute } from '../../../hooks/useStatusMuteChannel';
+import { useUserPermission } from '../../../hooks/useUserPermission';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { getUserPermissionsStatus } from '../../../utils/helpers';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './style';
 enum EActionRow {
@@ -27,16 +26,7 @@ export const ActionRow = React.memo(() => {
 	const navigation = useNavigation<any>();
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
-	const { userId, userProfile } = useAuth();
-	const userById = useSelector(selectMemberByUserId(userId || ''));
-	const RolesClan = useSelector(selectAllRolesClan);
-	const userPermissionsStatus = useMemo(() => {
-		return getUserPermissionsStatus(userById?.role_id, RolesClan)
-	}, [userById?.role_id, RolesClan])
-
-	const isClanOwner = useMemo(() => {
-		return currentChannel?.creator_id === userProfile?.user?.id
-	}, [currentChannel?.creator_id, userProfile?.user?.id])
+	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
@@ -48,7 +38,7 @@ export const ActionRow = React.memo(() => {
 				//
 			},
 			icon: <Icons.MagnifyingIcon width={22} height={22} color={themeValue.text} />,
-			hidden: true,
+			isShow: true,
 			type: EActionRow.Search
 		},
 		{
@@ -57,7 +47,7 @@ export const ActionRow = React.memo(() => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD });
 			},
 			icon: <Icons.ThreadIcon width={22} height={22} color={themeValue.text} />,
-			hidden: isChannel,
+			isShow: isChannel,
 			type: EActionRow.Threads
 		},
 		{
@@ -65,7 +55,7 @@ export const ActionRow = React.memo(() => {
 			action: () => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL, params: { currentChannel } });
 			},
-			hidden: true,
+			isShow: true,
 			type: EActionRow.Mute
 		},
 		{
@@ -79,7 +69,7 @@ export const ActionRow = React.memo(() => {
 				});
 			},
 			icon: <Icons.SettingsIcon width={22} height={22} color={themeValue.text} />,
-			hidden: !(userPermissionsStatus['manage-channel'] || userPermissionsStatus['manage-thread'] || isClanOwner),
+			isShow: userPermissionsStatus['manage-channel'] || userPermissionsStatus['manage-thread'] || isClanOwner,
 			type: EActionRow.Settings
 		},
 	];
@@ -93,7 +83,7 @@ export const ActionRow = React.memo(() => {
 	return (
 		<View style={styles.container}>
 			{filteredActionList.map((action, index) =>
-				action?.hidden ? (
+				action?.isShow ? (
 					<Pressable key={index.toString()} onPress={action.action}>
 						<View style={styles.iconBtn}>
 							<View style={styles.iconWrapper}>{[EActionRow.Mute].includes(action.type) ? (

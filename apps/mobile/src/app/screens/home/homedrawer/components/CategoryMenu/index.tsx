@@ -1,12 +1,11 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectCurrentClan } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
-import React, { MutableRefObject, useMemo } from 'react';
+import React, { MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -14,7 +13,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../../../../../app/temp-ui';
-import { getUserPermissionsStatus } from '../../../../../utils/helpers';
+import { useUserPermission } from '../../../../../hooks/useUserPermission';
 import { style } from './styles';
 
 interface ICategoryMenuProps {
@@ -25,20 +24,11 @@ interface ICategoryMenuProps {
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CLAN.STACK;
 export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps) {
 	const { t } = useTranslation(['categoryMenu']);
-	const { userId, userProfile } = useAuth();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { dismiss } = useBottomSheetModal();
-	const userById = useSelector(selectMemberByUserId(userId || ''));
-	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
-	const userPermissionsStatus = useMemo(() => {
-		return getUserPermissionsStatus(userById?.role_id, RolesClan)
-	}, [userById?.role_id, RolesClan])
-
-	const isClanOwner = useMemo(() => {
-		return currentClan?.creator_id === userProfile?.user?.id
-	}, [currentClan?.creator_id, userProfile?.user?.id])
+	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
 

@@ -78,7 +78,6 @@ const ChannelList = React.memo((props: any) => {
 	}
 
 	function handleLongPressChannel(channel: ChannelThreads) {
-		console.log('channel:', channel);
 		bottomSheetChannelMenuRef.current?.present();
 		setCurrentPressedChannel(channel);
 		setIsUnKnownChannel(!channel?.channel_id);

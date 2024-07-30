@@ -1,14 +1,12 @@
-import { useAuth, useReference, useThreads } from '@mezon/core';
+import { useReference, useThreads } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useUserPermission } from '../../../hooks/useUserPermission';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { getUserPermissionsStatus } from '../../../utils/helpers';
 import { style } from './EmptyThread.style';
 
 const EmptyThread = () => {
@@ -18,15 +16,11 @@ const EmptyThread = () => {
 	const { setOpenThreadMessageState } = useReference();
 	const navigation = useNavigation<any>();
 	const { t } = useTranslation(['createThread']);
-	const { userId, userProfile } = useAuth();
-	const userById = useSelector(selectMemberByUserId(userId || ''));
-	const RolesClan = useSelector(selectAllRolesClan);
-	const currentClan = useSelector(selectCurrentClan);
+	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 
 	const showCreateThreadButton = useMemo(() => {
-		const userPermissionsStatus = getUserPermissionsStatus(userById?.role_id, RolesClan);
-		return userPermissionsStatus['manage-thread'] || currentClan?.creator_id === userProfile?.user?.id;
-	}, [userById?.role_id, RolesClan, currentClan?.creator_id, userProfile?.user?.id])
+		return userPermissionsStatus['manage-thread'] || isClanOwner;
+	}, [userPermissionsStatus, isClanOwner])
 
 	const handleNavigateCreateForm = () => {
 		setOpenThreadMessageState(false);
