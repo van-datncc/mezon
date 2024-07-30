@@ -330,7 +330,7 @@ export const RenderTextMarkdownContent = React.memo(
 			customStyle = { ...styleMessageReply(themeValue) };
 		}
 
-		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = content;
+		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = content || {};
 		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
 		let lastIndex = 0;
 
