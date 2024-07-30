@@ -17,7 +17,7 @@ import UserSettingProfile from './component/UserSettingProfile';
 
 interface userProfileProps {
 	userId?: string;
-	user?: User;
+	user?: User & { avatarSm: string };
 	message?: IMessageWithUser;
 	checkAnonymous?: boolean;
 	onClose?: () => void;
@@ -86,7 +86,6 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					<MezonAvatar
 						width={80}
 						height={80}
-						// @ts-ignore
 						avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
 						username={userById?.user?.username || user?.display_name}
 						userStatus={userStatus}
