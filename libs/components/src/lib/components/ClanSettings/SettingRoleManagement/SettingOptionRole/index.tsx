@@ -1,9 +1,10 @@
 import { RolesClanEntity, getSelectedRoleId, toggleIsShowFalse } from '@mezon/store';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SettingDisplayRole from '../SettingDisplayRole';
 import SettingManageMembers from '../SettingManageMembers';
 import SettingPermissions from '../SettingPermissions';
+import { TabsSelectRole } from './tabSelectRole';
 
 const SettingValueDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesClanEntity[], isCreateNewRole: boolean }) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>('Display');
@@ -13,6 +14,19 @@ const SettingValueDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: Ro
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 	};
+
+	const renderContent = useCallback(() => {
+		switch (selectedButton) {
+			case TabsSelectRole.Tab_Display:
+				return <SettingDisplayRole RolesClan={RolesClan} isCreateNewRole={isCreateNewRole} />;
+			case TabsSelectRole.Tab_Permissions:
+				return <SettingPermissions RolesClan={RolesClan} isCreateNewRole={isCreateNewRole} />;
+			case TabsSelectRole.Tab_Manage_Members:
+				return <SettingManageMembers RolesClan={RolesClan} isCreateNewRole={isCreateNewRole} />;
+			default:
+				return null;
+		}
+	  }, [selectedButton, RolesClan, isCreateNewRole]);
 
 	const roleUsersCount = activeRole?.role_user_list?.role_users?.length || 0;
 	return (
@@ -56,9 +70,7 @@ const SettingValueDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: Ro
 					/>
 				</button>
 			</div>
-			{selectedButton === 'Display' && <SettingDisplayRole RolesClan={RolesClan} isCreateNewRole={isCreateNewRole}/>}
-			{selectedButton === 'Permissions' && <SettingPermissions RolesClan={RolesClan} isCreateNewRole={isCreateNewRole}/>}
-			{selectedButton === 'Manage Members' && <SettingManageMembers RolesClan={RolesClan} isCreateNewRole={isCreateNewRole}/>}
+			{renderContent()}
 		</>
 	);
 };

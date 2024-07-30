@@ -20,7 +20,7 @@ const SettingManageMembers = ({ RolesClan, isCreateNewRole }: { RolesClan: Roles
 	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
 	const userProfile = useSelector(selectAllAccount);
 	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
-	const isPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
+	const hasPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
 	const commonUsers = usersClan.filter((user) => addUsers.includes(user.id));
 
 	const [searchResults, setSearchResults] = useState<any[]>(commonUsers);
@@ -49,7 +49,7 @@ const SettingManageMembers = ({ RolesClan, isCreateNewRole }: { RolesClan: Roles
 		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', [], [], userIDArray, []);
 	};
 	return (
-		<div style={{pointerEvents: isPermissionEdit ? undefined : 'none'}}>
+		<div style={{pointerEvents: hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex gap-x-3">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full py-1 px-2 font-normal border dark:border-bgTertiary border-bgLightModeThird rounded"

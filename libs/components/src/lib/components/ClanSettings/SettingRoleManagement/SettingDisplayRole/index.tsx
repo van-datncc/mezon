@@ -29,7 +29,7 @@ const SettingDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 	const userProfile = useSelector(selectAllAccount);
 	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
 	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
-	const isPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
+	const hasPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
 	const permissionsRole = activeRole?.permission_list;
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
@@ -54,7 +54,7 @@ const SettingDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 	return (
 		<div 
 			className='w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800'
-			style={{pointerEvents: isPermissionEdit ? undefined : 'none'}}
+			style={{pointerEvents: hasPermissionEdit ? undefined : 'none'}}
 		>
 			<div className="text-xs font-bold uppercase mb-2">
 				Role name<b className="text-red-600">*</b>

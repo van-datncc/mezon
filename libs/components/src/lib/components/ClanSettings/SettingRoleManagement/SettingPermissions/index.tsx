@@ -36,7 +36,7 @@ const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
 	const userProfile = useSelector(selectAllAccount);
 	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
-	const isPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
+	const hasPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
 	const permissionsRole = activeRole?.permission_list;
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
@@ -71,7 +71,7 @@ const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
 	return (
-		<div style={{pointerEvents: isPermissionEdit ? undefined : 'none'}}>
+		<div style={{pointerEvents: hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded-lg"
