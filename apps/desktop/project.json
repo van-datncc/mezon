@@ -10,7 +10,6 @@
         "{options.outputPath}"
       ],
       "appId": "mezon.ai",
-      "productName": "Mezon",
       "publish": [
         {
           "provider": "generic",
@@ -19,7 +18,9 @@
       ],
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
-        "target": "nsis",
+        "target": [
+          "nsis"
+        ],
         "appId": "mezon.ai",
         "publish": [
           {
@@ -28,6 +29,19 @@
           }
         ]
       },
+      "nsis": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "uninstallDisplayName": "${productName}",
+          "include": "scripts/installer.nsh",
+          "packElevateHelper": false,
+          "runAfterFinish": true,
+          "createDesktopShortcut": true,
+          "deleteAppDataOnUninstall": true
+        },
+        "msi": {
+          "additionalWixArgs": ["-ext", "WixUtilExtension"],
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
+        },
       "linux": {
         "category": "Utility",
         "target": "deb",
@@ -37,7 +51,7 @@
         "desktop": {
           "exec": "mezonapp %U"
         },
-        "appId": "Mezon"
+        "appId": "mezon.ai"
       },
       "options": {
         "outputPath": "dist/apps/desktop",
@@ -101,15 +115,29 @@
         "prepackageOnly": true,
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
-          "target": "nsis",
+          "target": [
+            "nsis"
+          ],
           "appId": "mezon.ai",
-          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "publish": [
             {
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
           ]
+        },
+        "nsis": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "uninstallDisplayName": "${productName}",
+          "include": "scripts/installer.nsh",
+          "packElevateHelper": false,
+          "runAfterFinish": true,
+          "createDesktopShortcut": true,
+          "deleteAppDataOnUninstall": true
+        },
+        "msi": {
+          "additionalWixArgs": ["-ext", "WixUtilExtension"],
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
           "category": "Utility",
@@ -134,15 +162,28 @@
         "outputPath": "dist/executables",
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
-          "target": "nsis",
+          "target": [
+            "nsis"
+          ],
           "appId": "mezon.ai",
-          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "publish": [
             {
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
           ]
+        },
+        "nsis": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "uninstallDisplayName": "${productName}",
+          "include": "scripts/installer.nsh",
+          "runAfterFinish": true,
+          "createDesktopShortcut": true,
+          "deleteAppDataOnUninstall": true
+        },
+        "msi": {
+          "additionalWixArgs": ["-ext", "WixUtilExtension"],
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
           "category": "Utility",
@@ -153,7 +194,7 @@
           "desktop": {
             "exec": "mezonapp %U"
           },
-          "appId": "Mezon",
+          "appId": "mezon.ai",
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         }
       }

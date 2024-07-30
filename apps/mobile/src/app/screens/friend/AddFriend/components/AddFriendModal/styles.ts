@@ -5,10 +5,10 @@ export const style = (colors: Attributes) => StyleSheet.create({
     addFriendModalContainer: {
         paddingHorizontal: size.s_18,
         gap: size.s_18,
-        flex: 1
+        flex: 1,
     },
     whiteText: {
-        color: colors.text
+        color: colors.text,
     },
     searchInput: {
         borderRadius: size.s_10,
@@ -23,7 +23,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         flexDirection: 'row',
     },
     fill: {
-        flex: 1
+        flex: 1,
     },
     headerTitle: {
         color: colors.textStrong,

@@ -32,6 +32,7 @@ module.exports = {
   bgSelectItem: '#505cdc',
   bgSelectItemHover: '#4752C4',
   bgModalDark: 'rgba(0, 0, 0, 0.7)',
+  bgAvatarDark: '#F7E4F0',
 
   /* background light*/
   bgLightPrimary: '#FFFFFF',
@@ -45,6 +46,7 @@ module.exports = {
   bgModalLight: 'rgba(0, 0, 0, 0.54)',
   bgTextarea: '#EBEBEB',
   bgInputDark: '#26262B',
+  bgAvatarLight: '#A612A2',
 
   /* text */
   channelTextarea: '#383A40',

@@ -33,6 +33,7 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 	currentDirectMessageId?: string | null;
 	currentDirectMessageType?: string | null;
 	dmMetadata: EntityState<DMMeta, string>;
+	statusDMChannelUnread: Record<string, boolean>;
 }
 
 function extractDMMeta(channel: DirectEntity): DMMeta {
@@ -119,6 +120,14 @@ export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', 
 	if (!response.channeldesc) {
 		return [];
 	}
+	if(Date.now() - response.time < 100) {
+		const listStatusUnreadDM = response.channeldesc.map((channel) => {
+			const status = getStatusUnread(Number(channel.last_seen_message?.timestamp ?? ''), Number(channel.last_sent_message?.timestamp ?? ''));
+			return { dmId: channel.channel_id ?? '', isUnread: status };
+		});
+			thunkAPI.dispatch(directActions.setAllStatusDMUnread(listStatusUnreadDM));
+		}
+
 	const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
 		if (
 			a === undefined ||
@@ -158,6 +167,11 @@ interface members {
     user?: ApiUser | undefined;
 }
 
+export type StatusDMUnreadArgs = {
+	dmId: string;
+	isUnread: boolean;
+};
+
 export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload>(
 	'direct/joinDirectMessage',
 	async ({ directMessageId, channelName, type, noCache = false, isFetchingLatestMessages = false }, thunkAPI) => {
@@ -189,6 +203,7 @@ export const initialDirectState: DirectState = directAdapter.getInitialState({
 	socketStatus: 'not loaded',
 	error: null,
 	dmMetadata: dmMetaAdapter.getInitialState(),
+	statusDMChannelUnread: {}
 });
 
 export const directSlice = createSlice({
@@ -236,10 +251,17 @@ export const directSlice = createSlice({
 		updateBulkDirectMetadata: (state, action: PayloadAction<DMMeta[]>) => {
 			state.dmMetadata = dmMetaAdapter.upsertMany(state.dmMetadata, action.payload);
 		},
+		setAllStatusDMUnread: (state, action: PayloadAction<StatusDMUnreadArgs[]>) => {
+			for (const i of action.payload) {
+				state.statusDMChannelUnread[i.dmId] = i.isUnread;
+			}
+		},
 		setDirectLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
 			const channel = state.dmMetadata.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSentTimestamp = action.payload.timestamp;
+				const status = getStatusUnread(channel.lastSeenTimestamp, action.payload.timestamp)
+				state.statusDMChannelUnread[action.payload.channelId] = status;
 			}
 		},
 		setCountMessUnread: (state, action: PayloadAction<{ channelId: string }>) => {
@@ -265,6 +287,8 @@ export const directSlice = createSlice({
 						count_mess_unread: 0,
 					},
 				});
+				const status = getStatusUnread(action.payload.timestamp, channel.lastSentTimestamp)
+				state.statusDMChannelUnread[action.payload.channelId] = status;
 			}
 		},
 		setNotifiDirectCount: (state, action: PayloadAction<{ channelId: string; notifiCount: number }>) => {
@@ -302,6 +326,13 @@ export const directActions = {
 	openDirectMessage,
 };
 
+const getStatusUnread = (lastSeenStamp: number, lastSentStamp: number) => {
+	if(lastSeenStamp && lastSentStamp) {
+		return Number(lastSeenStamp) < Number(lastSentStamp);
+	}
+	return true
+};
+
 const { selectAll, selectEntities } = directAdapter.getSelectors();
 
 export const getDirectState = (rootState: { [DIRECT_FEATURE_KEY]: DirectState }): DirectState => rootState[DIRECT_FEATURE_KEY];
@@ -334,6 +365,14 @@ export const selectDirectsUnreadlist = createSelector(selectAllDirectMessages, g
 		return channel ? channel.lastSeenTimestamp < channel.lastSentTimestamp : false;
 	});
 });
+
+export const selectListDMUnread = createSelector(selectAllDirectMessages, getDirectState, (directMessages, state) => {
+	return directMessages.filter((dm) => {
+		return state.statusDMChannelUnread[dm.channel_id??'']
+	});
+});
+
+export const selectListStatusDM = createSelector(getDirectState, (state) => state.statusDMChannelUnread);
 
 export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, (directMessages) => {
 	return directMessages.filter((dm) => dm.active === 1);

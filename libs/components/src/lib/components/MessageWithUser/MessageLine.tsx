@@ -1,5 +1,8 @@
+import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
+import { convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
 type MessageLineProps = {
@@ -8,25 +11,23 @@ type MessageLineProps = {
 	showOnchannelLayout?: boolean;
 	onClickToMessage?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 };
-
 interface RenderContentProps {
 	data: any;
 	mode: number;
 	showOnchannelLayout?: boolean;
+	allChannelVoice?: ChannelsEntity[];
 }
 
 // TODO: refactor component for message lines
-const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentProps) => {
-	const { t, mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = data;
-	const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
+const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }: RenderContentProps) => {
+	const { t, mentions = [], hashtags = [], emojis = [], markdowns = [], links = [], voiceLinks = [] } = data;
+	const elements = [...mentions, ...hashtags, ...emojis, ...markdowns, ...links, ...voiceLinks].sort((a, b) => a.startIndex - b.startIndex);
 	let lastIndex = 0;
-	const maxEndIndex = elements.reduce((max, element) => (element.endIndex > max ? element.endIndex : max), 0);
-
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startIndex, endIndex, channelId, channelLable, username, shortname, link, markdown } = element;
+			const { startIndex, endIndex, channelId, channelLabel, username, shortname, markdown, link, voiceLink } = element;
 
 			if (lastIndex < startIndex) {
 				formattedContent.push(
@@ -34,7 +35,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 				);
 			}
 
-			if (channelId && channelLable) {
+			if (channelId && channelLabel) {
 				formattedContent.push(
 					<ChannelHashtag
 						showOnchannelLayout={showOnchannelLayout}
@@ -52,10 +53,28 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 				formattedContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 			}
 
-			if (markdown || link) {
-				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={markdown} />);
+			if (link) {
+				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={link} />);
 			}
-			lastIndex = maxEndIndex;
+
+			if (voiceLink) {
+				const meetingCode = voiceLink?.split('/').pop();
+				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+
+				formattedContent.push(
+					<ChannelHashtag
+						showOnchannelLayout={showOnchannelLayout}
+						key={`${index}${startIndex}${channelId}`}
+						channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
+					/>,
+				);
+			}
+
+			if (markdown) {
+				const converted = markdown.startsWith('```') && markdown.endsWith('```') ? convertMarkdown(markdown) : markdown;
+				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={converted} />);
+			}
+			lastIndex = endIndex;
 		});
 
 		if (lastIndex < t?.length) {
@@ -68,9 +87,17 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout }: RenderContentPr
 });
 
 const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: MessageLineProps) => {
+	const allChannels = useSelector(selectChannelsEntities);
+	const allChannelVoice = Object.values(allChannels).flat();
+
 	return (
 		<div onClick={!showOnchannelLayout ? onClickToMessage : () => {}} className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}>
-			<RenderContent data={content} mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL} showOnchannelLayout={showOnchannelLayout} />
+			<RenderContent
+				data={content}
+				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
+				showOnchannelLayout={showOnchannelLayout}
+				allChannelVoice={allChannelVoice}
+			/>
 		</div>
 	);
 };

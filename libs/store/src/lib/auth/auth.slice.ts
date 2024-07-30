@@ -59,7 +59,7 @@ export type AuthenticateEmailPayload = {
 
 export const authenticateEmail = createAsyncThunk('auth/authenticateEmail', async ({ username, password }: AuthenticateEmailPayload, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	const session = await mezon?.authenticateEmail(username, password).catch(function (err) {
+	const session = await mezon?.authenticateEmail(username, password).catch(function (err: any) {
 		err.json().then((data: any) => {
 			toast.error(data.message);
 		});
