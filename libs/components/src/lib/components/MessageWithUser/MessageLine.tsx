@@ -87,8 +87,8 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 });
 
 const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: MessageLineProps) => {
-	const allChannelVoice = useSelector(selectChannelsEntities);
-	const allChannels = Object.values(allChannelVoice).flat();
+	const allChannels = useSelector(selectChannelsEntities);
+	const allChannelVoice = Object.values(allChannels).flat();
 
 	return (
 		<div onClick={!showOnchannelLayout ? onClickToMessage : () => {}} className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}>
@@ -96,7 +96,7 @@ const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: M
 				data={content}
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
 				showOnchannelLayout={showOnchannelLayout}
-				allChannelVoice={allChannels}
+				allChannelVoice={allChannelVoice}
 			/>
 		</div>
 	);
