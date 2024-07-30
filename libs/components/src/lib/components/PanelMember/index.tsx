@@ -1,5 +1,5 @@
 import { useAppParams, useAuth, useChannelMembersActions, useClanRestriction, useFriends } from '@mezon/core';
-import { selectCurrentChannel, selectCurrentClan, selectDmGroupCurrent, selectFriendStatus } from '@mezon/store';
+import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDmGroupCurrent, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
 import { ChannelMembersEntity, EPermission } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -24,6 +24,23 @@ type PanelMemberProps = {
 	dataMemberCreate?: DataMemberCreate;
 };
 
+const useCheckRoleAdminMember = (userId: string) => {
+	const userById = useSelector(selectMemberByUserId(userId));
+	const RolesClan = useSelector(selectAllRolesClan);
+	const userRolesClan = useMemo(() => {
+		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
+	}, [userById?.role_id, RolesClan]);
+	const hasAdminRole = useMemo(() => {
+		return userRolesClan.some(role => 
+			role?.permission_list?.permissions?.some(permission => 
+				permission.slug === 'administrator' && permission.active === 1
+			)
+		);
+	}, [userRolesClan]);
+	
+	return hasAdminRole;
+}
+
 const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, isMemberChannel, dataMemberCreate }: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -31,6 +48,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
 	const { removeMemberChannel } = useChannelMembersActions();
+	const hasAdminRole = useCheckRoleAdminMember(member?.user?.id || '');
 	const { directId } = useAppParams();
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
@@ -51,10 +69,11 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	};
 
 	const [hasAdministratorPermission] = useClanRestriction([EPermission.administrator]);
-	const checkAddFriend = useSelector(selectFriendStatus(directMessageValue ? directMessageValue?.userId[0] : member?.user?.id || ''));
-	const checkOwnerChannel = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
-	const checkOwnerClan = useMemo(() => currentClan?.creator_id === member?.user?.id, [currentClan?.creator_id, member?.user?.id]);
-	const checkUser = useMemo(() => userProfile?.user?.id === member?.user?.id, [member?.user?.id, userProfile?.user?.id]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const hasAddFriend = useSelector(selectFriendStatus(directMessageValue ? directMessageValue?.userId[0] : member?.user?.id || ''));
+	const isOwnerChannel = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
+	const isOwnerClan = useMemo(() => currentClan?.creator_id === member?.user?.id, [currentClan?.creator_id, member?.user?.id]);
+	const isSelf = useMemo(() => userProfile?.user?.id === member?.user?.id, [member?.user?.id, userProfile?.user?.id]);
 	const checkDm = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM, [directMessageValue?.type]);
 	const checkDmGroup = useMemo(() => Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP, [directMessageValue?.type]);
 	const { deleteFriend, addFriend } = useFriends();
@@ -93,7 +112,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 						<ItemPanelMember children="Profile" />
 						{directMessageValue ? checkDm && <ItemPanelMember children="Call" /> : <ItemPanelMember children="Mention" />}
 
-						{!checkUser && (
+						{!isSelf && (
 							<>
 								{!checkDm && (
 									<>
@@ -107,7 +126,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 						)}
 						{directMessageValue && <ItemPanelMember children="Close DM" />}
 					</GroupPanelMember>
-					{isMemberDMGroup && !checkUser && dataMemberCreate?.createId === userProfile?.user?.id && (
+					{isMemberDMGroup && !isSelf && dataMemberCreate?.createId === userProfile?.user?.id && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Remove From Group" onClick={handleRemoveMemberChannel} danger  />
 							<ItemPanelMember children="Make Group Owner" danger />
@@ -117,14 +136,14 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 					{!isMemberDMGroup && (
 						<GroupPanelMember>
 							{!directMessageValue && <ItemPanelMember children="Mute" type="checkbox" />}
-							{checkUser && (
+							{isSelf && (
 								<>
 									<ItemPanelMember children="Deafen" type="checkbox" />
 									<ItemPanelMember children="Edit Serve Profile" />
 									<ItemPanelMember children="Apps" />
 								</>
 							)}
-							{!checkUser && (
+							{!isSelf && (
 								<>
 									{directMessageValue && <ItemPanelMember children="Apps" />}
 									<Dropdown
@@ -144,7 +163,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 										<ItemPanelMember children="Clan 2" />
 										<ItemPanelMember children="Clan 3" />
 									</Dropdown>
-									{checkAddFriend.friend ? (
+									{hasAddFriend.friend ? (
 										<ItemPanelMember
 											children="Remove Friend"
 											onClick={() => {
@@ -171,7 +190,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 					{isMemberDMGroup && (
 						<>
 							<ItemPanelMember children="Apps" />
-							{!checkUser && (
+							{!isSelf && (
 								<>
 									<Dropdown
 										trigger="hover"
@@ -190,7 +209,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 										<ItemPanelMember children="Clan 2" />
 										<ItemPanelMember children="Clan 3" />
 									</Dropdown>
-									{checkAddFriend.friend ? (
+									{hasAddFriend.friend ? (
 										<ItemPanelMember
 											children="Remove Friend"
 											onClick={() =>
@@ -218,7 +237,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{((checkOwnerChannel || hasAdministratorPermission) && !checkOwnerClan && !checkUser && isMemberChannel) && (
+					{((isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel) && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
@@ -226,7 +245,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							<ItemPanelMember children={`Ban ${member?.user?.username}`} danger />
 						</GroupPanelMember>
 					)}
-					{checkUser && !isMemberDMGroup && (
+					{isSelf && !isMemberDMGroup && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Roles" />
 						</GroupPanelMember>

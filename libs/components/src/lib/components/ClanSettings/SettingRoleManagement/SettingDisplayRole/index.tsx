@@ -1,12 +1,15 @@
+import { useClanRestriction } from '@mezon/core';
 import {
 	RolesClanEntity,
 	getNewNameRole,
 	getNewSelectedPermissions,
 	getSelectedRoleId,
+	selectAllAccount,
 	setNameRoleNew,
 	toggleIsShowFalse,
 	toggleIsShowTrue,
 } from '@mezon/store';
+import { EPermission } from '@mezon/utils';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -17,12 +20,16 @@ export type ModalSettingSave = {
 	handleUpdateUser: () => void;
 };
 
-const SettingDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
+const SettingDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesClanEntity[], isCreateNewRole: boolean }) => {
 	const nameRole = useSelector(getNewNameRole);
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const clickRole = useSelector(getSelectedRoleId);
 
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
+	const userProfile = useSelector(selectAllAccount);
+	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
+	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const isPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
 	const permissionsRole = activeRole?.permission_list;
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
@@ -45,7 +52,10 @@ const SettingDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => 
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
 	return (
-		<div className="w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800">
+		<div 
+			className='w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800'
+			style={{pointerEvents: isPermissionEdit ? undefined : 'none'}}
+		>
 			<div className="text-xs font-bold uppercase mb-2">
 				Role name<b className="text-red-600">*</b>
 			</div>

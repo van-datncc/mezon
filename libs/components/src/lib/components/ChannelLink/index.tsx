@@ -44,6 +44,8 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const currentClan = useSelector(selectCurrentClan);
 	const voice = useMezonVoice();
 	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
 
 	const [openSetting, setOpenSetting] = useState(false);
 	const [showModal, setShowModal] = useState(false);
@@ -125,6 +127,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		},
 		[channel.status],
 	);
+	const isShowSettingChannel = isClanCreator || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 	return (
 		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
@@ -177,7 +180,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				</Link>
 			)}
 
-			{(isClanCreator || hasAdminPermission) ? (
+			{(isShowSettingChannel) ? (
 				numberNotification !== 0 ? (
 					<>
 						<AddPerson

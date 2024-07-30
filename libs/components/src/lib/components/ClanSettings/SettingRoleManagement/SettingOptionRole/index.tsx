@@ -5,7 +5,7 @@ import SettingDisplayRole from '../SettingDisplayRole';
 import SettingManageMembers from '../SettingManageMembers';
 import SettingPermissions from '../SettingPermissions';
 
-const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
+const SettingValueDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesClanEntity[], isCreateNewRole: boolean }) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>('Display');
 	const clickRole = useSelector(getSelectedRoleId);
 	const activeRole = useMemo(() => RolesClan.find((role) => role.id === clickRole), [RolesClan, clickRole]);
@@ -56,9 +56,9 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 					/>
 				</button>
 			</div>
-			{selectedButton === 'Display' && <SettingDisplayRole RolesClan={RolesClan} />}
-			{selectedButton === 'Permissions' && <SettingPermissions RolesClan={RolesClan} />}
-			{selectedButton === 'Manage Members' && <SettingManageMembers RolesClan={RolesClan} />}
+			{selectedButton === 'Display' && <SettingDisplayRole RolesClan={RolesClan} isCreateNewRole={isCreateNewRole}/>}
+			{selectedButton === 'Permissions' && <SettingPermissions RolesClan={RolesClan} isCreateNewRole={isCreateNewRole}/>}
+			{selectedButton === 'Manage Members' && <SettingManageMembers RolesClan={RolesClan} isCreateNewRole={isCreateNewRole}/>}
 		</>
 	);
 };
