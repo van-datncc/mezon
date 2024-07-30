@@ -7,20 +7,12 @@ import { Icons } from "../../../components";
 import ModalSticker from "./ModalEditSticker";
 import SettingStickerItem from "./SettingStickerItem";
 
-
-
-
-
 const SettingSticker = () => {
   const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
   const [editSticker, setEditSticker] = useState<ApiClanSticker | null>(null);
   const dispatch = useAppDispatch();
   const currentClanId = useSelector(selectCurrentClanId) || '';
   const listSticker = useSelector(selectListStickerByClanID);
-
-  const handleDeleteSticker = (sticker: ApiClanSticker) => {
-    // console.log(id);
-  }
   const handleUpdateSticker = (sticker: ApiClanSticker) => {
     setEditSticker(sticker);
     setShowModalSticker(true);
