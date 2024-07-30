@@ -8,8 +8,7 @@ export interface IListUserByAlphabetProps {
     showAction?: boolean;
     selectMode?: boolean;
     onSelectedChange?: (friendIdSelectedList: string[]) => void;
-    handleFriendAction: (friend: FriendsEntity, action: EFriendItemAction) => void,
-    onScroll?: () => void;
+    handleFriendAction: (friend: FriendsEntity, action: EFriendItemAction) => void
 }
 
 export interface IFriendGroupByCharacter {

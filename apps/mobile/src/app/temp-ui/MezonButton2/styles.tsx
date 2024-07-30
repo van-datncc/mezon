@@ -1,4 +1,4 @@
-import { Attributes, baseColor, Colors, Fonts, Metrics } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, Fonts, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -8,11 +8,11 @@ export const style = (colors: Attributes) =>
 			display: 'flex',
 			flexDirection: 'row',
 			justifyContent: 'center',
-			borderRadius: 10,
+			borderRadius: size.s_10,
 			overflow: 'hidden',
 			borderWidth: 1,
 			backgroundColor: colors.primary,
-			gap: 5,
+			gap: size.s_6,
 			alignItems: 'center',
 			borderColor: colors.border,
 		},
@@ -34,11 +34,11 @@ export const style = (colors: Attributes) =>
 		},
 
 		containerMd: {
-			padding: Metrics.size.l,
+			padding: size.s_16,
 		},
 
 		containerLg: {
-			padding: Metrics.size.l,
+			padding: size.s_16,
 		},
 
 		fluid: {

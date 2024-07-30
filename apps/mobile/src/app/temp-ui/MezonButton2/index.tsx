@@ -1,43 +1,67 @@
 import { useTheme } from '@mezon/mobile-ui';
+import { useMemo } from 'react';
 import { Pressable, StyleProp, Text, TextStyle } from 'react-native';
 import { style } from './styles';
 
+export enum EMezonButtonTheme {
+	SUCCESS = "success",
+	WARNING = "warning",
+	DANGER = "danger",
+	THEME = "theme",
+}
+
+export enum EMezonButtonSize {
+	MD = "md",
+	LG = "lg",
+}
 interface IMezonButton {
 	icon?: any;
 	title?: string;
 	titleStyle?: StyleProp<TextStyle>;
 	fluid?: boolean;
 	border?: boolean;
-	type?: 'success' | 'warning' | 'danger' | 'theme';
-	size?: "md" | "lg"
+	type?: EMezonButtonTheme
+	size?: EMezonButtonSize
 	onPress?: () => void;
 }
 
-export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress, size = "md" }: IMezonButton) {
+export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress, size = EMezonButtonSize.MD }: IMezonButton) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
-	function renderContainerStyle() {
-		if (type === 'success') return styles.containerSuccess;
-		if (type === 'warning') return styles.containerWarning;
-		if (type === 'danger') return styles.containerDanger;
-		if (type === 'theme') return styles.containerTheme;
-		return {};
-	}
+	const renderContainerStyle = useMemo(() => {
+		switch (type) {
+			case EMezonButtonTheme.SUCCESS:
+				return styles.containerSuccess;
+			case EMezonButtonTheme.WARNING:
+				return styles.containerWarning;
+			case EMezonButtonTheme.DANGER:
+				return styles.containerDanger;
+			case EMezonButtonTheme.THEME:
+				return styles.containerTheme;
+			default:
+				break;
+		}
+	}, [type])
 
-	function renderContainerSize() {
-		if (size === "md") return styles.containerMd;
-		if (size === "lg") return styles.containerLg;
-		return {};
-	}
+	const renderContainerSize = useMemo(() => {
+		switch (size) {
+			case EMezonButtonSize.MD:
+				return styles.containerMd;
+			case EMezonButtonSize.LG:
+				return styles.containerLg;
+			default:
+				break;
+		}
+	}, [size])
 
 	return (
 		<Pressable style={[
 			styles.container,
 			fluid && styles.fluid,
 			border && styles.border,
-			renderContainerStyle(),
-			renderContainerSize()]
+			renderContainerStyle,
+			renderContainerSize]
 		} onPress={onPress}>
 			{icon}
 			{title && <Text style={[styles.title, titleStyle]}>{title}</Text>}

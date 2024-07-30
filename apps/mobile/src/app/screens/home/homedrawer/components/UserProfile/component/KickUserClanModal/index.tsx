@@ -2,7 +2,7 @@ import { UserMinus } from '@mezon/mobile-components';
 import { Block, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, ClansEntity } from '@mezon/store-mobile';
 import { MezonInput } from 'apps/mobile/src/app/temp-ui';
-import MezonButton from 'apps/mobile/src/app/temp-ui/MezonButton2';
+import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from 'apps/mobile/src/app/temp-ui/MezonButton2';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform } from 'react-native';
@@ -52,8 +52,8 @@ const KickUserClanModal = ({
 				<MezonButton
 					onPress={() => onRemoveUserClan(reason)}
 					title={t('kickUserClanModal.buttonName', { userName: user?.user?.username || user?.['username'] })}
-					type='theme'
-					size='lg'
+					type={EMezonButtonTheme.THEME}
+					size={EMezonButtonSize.LG}
 					titleStyle={styles.textButton}
 				/>
 			</KeyboardAvoidingView>

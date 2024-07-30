@@ -5,7 +5,7 @@ import { FriendsEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { SeparatorWithLine } from '../../../components/Common';
@@ -126,7 +126,6 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				friendList={filteredFriendList}
 				handleFriendAction={handleFriendAction}
 				showAction={false}
-				onScroll={() => { Keyboard.dismiss() }}
 			/>
 
 			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
