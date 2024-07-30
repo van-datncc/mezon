@@ -124,6 +124,10 @@ const NavigationMain = () => {
 		}
 	}, [isLoggedIn, hasInternet]);
 
+	useEffect(() => {
+		if (currentClanId) emojiLoader();
+	}, [currentClanId]);
+
 	const initAppLoading = async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		await mainLoader({ isFromFCM: isFromFCM?.toString() === 'true' });
@@ -160,9 +164,12 @@ const NavigationMain = () => {
 		}
 	};
 
+	const emojiLoader = async () => {
+		const store = await getStoreAsync();
+		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true }));
+	};
 	const authLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: '0', noCache: false }));
 		try {
 			const response = await store.dispatch(authActions.refreshSession());
 			if ((response as unknown as IWithError).error) {
