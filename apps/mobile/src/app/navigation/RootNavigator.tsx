@@ -39,6 +39,7 @@ import {
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
+	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	load,
 	remove,
 	save,
@@ -83,6 +84,7 @@ const NavigationMain = () => {
 			await SplashScreen.hideAsync();
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 		}, 200);
 
 		return () => {
@@ -146,7 +148,9 @@ const NavigationMain = () => {
 			}
 			const store = await getStoreAsync();
 			dispatch(appActions.setLoadingMainMobile(false));
-			await store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true, isFetchingLatestMessages: true }));
+			await store.dispatch(
+				messagesActions.jumpToMessage({ messageId: '', channelId: currentChannelId, noCache: true, isFetchingLatestMessages: true }),
+			);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			return null;
 		} catch (error) {

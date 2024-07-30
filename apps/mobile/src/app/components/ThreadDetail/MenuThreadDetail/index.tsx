@@ -29,7 +29,7 @@ export default function MenuThreadDetail(props: { route: any }) {
 
 	return (
 		<threadDetailContext.Provider value={channel}>
-			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.secondary }}>
+			<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
 				<View style={styles.container}>
 					<ThreadHeader />
 					<ActionRow />

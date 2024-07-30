@@ -1,29 +1,29 @@
 import { useEmojiSuggestion, useReference, useThreads } from '@mezon/core';
 import {
-  ActionEmitEvent,
-  STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
-  convertMentionsToText,
-  convertToPlainTextHashtag,
-  getAttachmentUnique,
-  load,
-  save,
-  STORAGE_KEY_TEMPORARY_ATTACHMENT,
-  pushAttachmentToCache
+	ActionEmitEvent,
+	STORAGE_KEY_TEMPORARY_ATTACHMENT,
+	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
+	convertMentionsToText,
+	convertToPlainTextHashtag,
+	getAttachmentUnique,
+	load,
+	pushAttachmentToCache,
+	save,
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import { selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import {
-  IEmojiOnMessage,
-  IHashtagOnMessage,
-  ILinkOnMessage,
-  IMentionOnMessage,
-  ImarkdownOnMessage,
-  MIN_THRESHOLD_CHARS,
-  MentionDataProps,
-  convertMarkdown,
-  markdownRegex,
-  typeConverts,
+	IEmojiOnMessage,
+	IHashtagOnMessage,
+	ILinkOnMessage,
+	IMarkdownOnMessage,
+	IMentionOnMessage,
+	MIN_THRESHOLD_CHARS,
+	MentionDataProps,
+	convertMarkdown,
+	markdownRegex,
+	typeConverts,
 } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
@@ -50,490 +50,490 @@ const mentionRegex = /(?<!\w)@[\w.]+(?!\w)/g;
 const channelRegex = /<#[0-9]{19}\b>/g;
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
-  mention: {
-    trigger: '@',
-    allowedSpacesCount: 0,
-    isInsertSpaceAfterMention: true,
-  },
-  hashtag: {
-    trigger: '#',
-    allowedSpacesCount: 0,
-    isInsertSpaceAfterMention: true,
-    textStyle: {
-      fontWeight: 'bold',
-      color: Colors.white,
-    },
-  },
-  emoji: {
-    trigger: ':',
-    allowedSpacesCount: 0,
-    isInsertSpaceAfterMention: true,
-  },
+	mention: {
+		trigger: '@',
+		allowedSpacesCount: 0,
+		isInsertSpaceAfterMention: true,
+	},
+	hashtag: {
+		trigger: '#',
+		allowedSpacesCount: 0,
+		isInsertSpaceAfterMention: true,
+		textStyle: {
+			fontWeight: 'bold',
+			color: Colors.white,
+		},
+	},
+	emoji: {
+		trigger: ':',
+		allowedSpacesCount: 0,
+		isInsertSpaceAfterMention: true,
+	},
 };
 
 interface IChatInputProps {
-  mode: ChannelStreamMode;
-  channelId: string;
-  hiddenIcon?: {
-    threadIcon?: boolean;
-  };
-  messageActionNeedToResolve: IMessageActionNeedToResolve | null;
-  messageAction?: EMessageActionType;
-  onDeleteMessageActionNeedToResolve?: () => void;
-  onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
+	mode: ChannelStreamMode;
+	channelId: string;
+	hiddenIcon?: {
+		threadIcon?: boolean;
+	};
+	messageActionNeedToResolve: IMessageActionNeedToResolve | null;
+	messageAction?: EMessageActionType;
+	onDeleteMessageActionNeedToResolve?: () => void;
+	onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
 }
 
 export const ChatBoxBottomBar = memo(
-  ({
-    mode = 2,
-    channelId = '',
-    hiddenIcon,
-    messageActionNeedToResolve,
-    messageAction,
-    onDeleteMessageActionNeedToResolve,
-    onShowKeyboardBottomSheet
-  }: IChatInputProps) => {
-    const [text, setText] = useState<string>('');
-    const [mentionTextValue, setMentionTextValue] = useState('');
-    const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
-    const [isFocus, setIsFocus] = useState<boolean>(false);
-    const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
-    const { attachmentDataRef, setAttachmentData } = useReference();
-    const currentChannel = useSelector(selectCurrentChannel);
-    const channelsEntities = useSelector(selectChannelsEntities);
-    const navigation = useNavigation<any>();
-    const inputRef = useRef<TextInput>();
-    const cursorPositionRef = useRef(0);
-    const currentTextInput = useRef('');
-    const { emojiPicked } = useEmojiSuggestion();
-    const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
-    const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
-    const { setOpenThreadMessageState } = useReference();
-    const { setValueThread } = useThreads();
-    const { sessionRef, clientRef } = useMezon();
-    const listMentions = UseMentionList(channelId || '');
-    const { textInputProps, triggers } = useMentions({
-      value: mentionTextValue,
-      onChange: (newValue) => handleTextInputChange(newValue),
-      onSelectionChange: (position) => {
-        handleSelectionChange(position);
-      },
-      triggersConfig,
-    });
+	({
+		mode = 2,
+		channelId = '',
+		hiddenIcon,
+		messageActionNeedToResolve,
+		messageAction,
+		onDeleteMessageActionNeedToResolve,
+		onShowKeyboardBottomSheet,
+	}: IChatInputProps) => {
+		const [text, setText] = useState<string>('');
+		const [mentionTextValue, setMentionTextValue] = useState('');
+		const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
+		const [isFocus, setIsFocus] = useState<boolean>(false);
+		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
+		const { attachmentDataRef, setAttachmentData } = useReference();
+		const currentChannel = useSelector(selectCurrentChannel);
+		const channelsEntities = useSelector(selectChannelsEntities);
+		const navigation = useNavigation<any>();
+		const inputRef = useRef<TextInput>();
+		const cursorPositionRef = useRef(0);
+		const currentTextInput = useRef('');
+		const { emojiPicked } = useEmojiSuggestion();
+		const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
+		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
+		const { setOpenThreadMessageState } = useReference();
+		const { setValueThread } = useThreads();
+		const { sessionRef, clientRef } = useMezon();
+		const listMentions = UseMentionList(channelId || '');
+		const { textInputProps, triggers } = useMentions({
+			value: mentionTextValue,
+			onChange: (newValue) => handleTextInputChange(newValue),
+			onSelectionChange: (position) => {
+				handleSelectionChange(position);
+			},
+			triggersConfig,
+		});
 
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
-    const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
-    const [emojisOnMessage, setEmojisOnMessage] = useState<IEmojiOnMessage[]>([]);
-    const [linksOnMessage, setLinksOnMessage] = useState<ILinkOnMessage[]>([]);
-    const [markdownsOnMessage, setMarkdownsOnMessage] = useState<ImarkdownOnMessage[]>([]);
-    const [plainTextMessage, setPlainTextMessage] = useState<string>();
+		const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+		const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
+		const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
+		const [emojisOnMessage, setEmojisOnMessage] = useState<IEmojiOnMessage[]>([]);
+		const [linksOnMessage, setLinksOnMessage] = useState<ILinkOnMessage[]>([]);
+		const [markdownsOnMessage, setMarkdownsOnMessage] = useState<IMarkdownOnMessage[]>([]);
+		const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
-    const mentionList: IMentionOnMessage[] = [];
-    const hashtagList: IHashtagOnMessage[] = [];
-    const emojiList: IEmojiOnMessage[] = [];
-    const linkList: ILinkOnMessage[] = [];
-    const markdownList: ImarkdownOnMessage[] = [];
+		const mentionList: IMentionOnMessage[] = [];
+		const hashtagList: IHashtagOnMessage[] = [];
+		const emojiList: IEmojiOnMessage[] = [];
+		const linkList: ILinkOnMessage[] = [];
+		const markdownList: IMarkdownOnMessage[] = [];
 
-    const isShowCreateThread = useMemo(() => {
-      return !hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
-    }, [currentChannel?.channel_label, currentChannel?.parrent_id, hiddenIcon?.threadIcon])
+		const isShowCreateThread = useMemo(() => {
+			return !hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
+		}, [currentChannel?.channel_label, currentChannel?.parrent_id, hiddenIcon?.threadIcon]);
 
-    const saveMessageToCache = (text: string) => {
-      const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
-      save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
-        ...allCachedMessage,
-        [channelId]: text,
-      });
-    };
+		const saveMessageToCache = (text: string) => {
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
+				...allCachedMessage,
+				[channelId]: text,
+			});
+		};
 
-    const setMessageFromCache = async () => {
-      const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
-      handleTextInputChange(allCachedMessage?.[channelId] || '');
-      setText(convertMentionsToText(allCachedMessage?.[channelId] || ''));
-    };
-    
-    const setAttachmentFromCache = async () => {
-      const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
-      setAttachmentData(allCachedAttachment?.[channelId] || []);
-    };
+		const setMessageFromCache = async () => {
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			handleTextInputChange(allCachedMessage?.[channelId] || '');
+			setText(convertMentionsToText(allCachedMessage?.[channelId] || ''));
+		};
 
-    const resetCachedText = useCallback(async () => {
-      const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
-      delete allCachedMessage[channelId];
-      save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
-        ...allCachedMessage,
-      });
-    }, [channelId]);
-    
-    const resetCachedAttachment = useCallback(async () => {
-      const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
-      delete allCachedAttachments[channelId];
-      save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
-        ...allCachedAttachments,
-      });
-    }, [channelId]);
+		const setAttachmentFromCache = async () => {
+			const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			setAttachmentData(allCachedAttachment?.[channelId] || []);
+		};
 
-    useEffect(() => {
-      if (channelId) {
-        setMessageFromCache();
-        setAttachmentFromCache();
-      }
-    }, [channelId]);
+		const resetCachedText = useCallback(async () => {
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			delete allCachedMessage[channelId];
+			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
+				...allCachedMessage,
+			});
+		}, [channelId]);
 
-    useEffect(() => {
-      if (emojiPicked) {
-        handleEventAfterEmojiPicked();
-      }
-    }, [emojiPicked]);
+		const resetCachedAttachment = useCallback(async () => {
+			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			delete allCachedAttachments[channelId];
+			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
+				...allCachedAttachments,
+			});
+		}, [channelId]);
 
-    const handleEventAfterEmojiPicked = async () => {
-      const textFormat = `${text?.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `;
-      await handleTextInputChange(textFormat);
-    };
+		useEffect(() => {
+			if (channelId) {
+				setMessageFromCache();
+				setAttachmentFromCache();
+			}
+		}, [channelId]);
 
-    const removeAttachmentByUrl = (urlToRemove: string, fileName: string) => {
-      const removedAttachment = attachmentDataRef.filter((attachment) => {
-        if (attachment.url === urlToRemove) {
-          return false;
-        }
-        return !(fileName && attachment.filename === fileName);
-      });
+		useEffect(() => {
+			if (emojiPicked) {
+				handleEventAfterEmojiPicked();
+			}
+		}, [emojiPicked]);
 
-      setAttachmentData(removedAttachment);
-      const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
-      const attachmentCached = allCachedAttachments?.[channelId];
-      if (attachmentCached) {
-        const removedAttachmentCache = attachmentCached.filter((attachment) => {
-          if (attachment.url === urlToRemove) {
-            return false;
-          }
-          return !(fileName && attachment.filename === fileName);
-        });
-        pushAttachmentToCache(removedAttachmentCache, channelId);
-      }
-    };
+		const handleEventAfterEmojiPicked = async () => {
+			const textFormat = `${text?.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `;
+			await handleTextInputChange(textFormat);
+		};
 
-    const onSendSuccess = useCallback(() => {
-      setText('');
-      setMentionsOnMessage([]);
-      setHashtagsOnMessage([]);
-      setEmojisOnMessage([]);
-      setLinksOnMessage([]);
-      setMarkdownsOnMessage([]);
-      onDeleteMessageActionNeedToResolve();
-      resetCachedText();
-      resetCachedAttachment();
-    }, []);
+		const removeAttachmentByUrl = (urlToRemove: string, fileName: string) => {
+			const removedAttachment = attachmentDataRef.filter((attachment) => {
+				if (attachment.url === urlToRemove) {
+					return false;
+				}
+				return !(fileName && attachment.filename === fileName);
+			});
 
-    const handleKeyboardBottomSheetMode = useCallback(
-      (mode: IModeKeyboardPicker) => {
-        setModeKeyBoardBottomSheet(mode);
-        if (mode === 'emoji' || mode === 'attachment') {
-          onShowKeyboardBottomSheet(true, keyboardHeight, mode);
-        } else {
-          inputRef && inputRef.current && inputRef.current.focus();
-          onShowKeyboardBottomSheet(false, 0);
-        }
-      },
-      [keyboardHeight, onShowKeyboardBottomSheet],
-    );
+			setAttachmentData(removedAttachment);
+			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			const attachmentCached = allCachedAttachments?.[channelId];
+			if (attachmentCached) {
+				const removedAttachmentCache = attachmentCached.filter((attachment) => {
+					if (attachment.url === urlToRemove) {
+						return false;
+					}
+					return !(fileName && attachment.filename === fileName);
+				});
+				pushAttachmentToCache(removedAttachmentCache, channelId);
+			}
+		};
 
-    const getChannelById = (channelId: string) => {
-      const channel = channelsEntities?.[channelId];
-      if (channel) {
-        return channel;
-      } else {
-        return null;
-      }
-    };
+		const onSendSuccess = useCallback(() => {
+			setText('');
+			setMentionsOnMessage([]);
+			setHashtagsOnMessage([]);
+			setEmojisOnMessage([]);
+			setLinksOnMessage([]);
+			setMarkdownsOnMessage([]);
+			onDeleteMessageActionNeedToResolve();
+			resetCachedText();
+			resetCachedAttachment();
+		}, []);
 
-    const handleTextInputChange = async (text: string) => {
-      const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
-      if (isConvertToFileTxt) {
-        setText('');
-        currentTextInput.current = '';
-        await onConvertToFiles(text);
-      } else {
-        const convertedHashtag = convertMentionsToText(text);
+		const handleKeyboardBottomSheetMode = useCallback(
+			(mode: IModeKeyboardPicker) => {
+				setModeKeyBoardBottomSheet(mode);
+				if (mode === 'emoji' || mode === 'attachment') {
+					onShowKeyboardBottomSheet(true, keyboardHeight, mode);
+				} else {
+					inputRef && inputRef.current && inputRef.current.focus();
+					onShowKeyboardBottomSheet(false, 0);
+				}
+			},
+			[keyboardHeight, onShowKeyboardBottomSheet],
+		);
 
-        let match;
-        while ((match = emojiRegex.exec(convertedHashtag)) !== null) {
-          emojiList.push({
-            shortname: match[0],
-            startIndex: match.index,
-            endIndex: match.index + match[0].length,
-          });
-        }
-        setEmojisOnMessage(emojiList);
+		const getChannelById = (channelId: string) => {
+			const channel = channelsEntities?.[channelId];
+			if (channel) {
+				return channel;
+			} else {
+				return null;
+			}
+		};
 
-        while ((match = linkRegex.exec(convertedHashtag)) !== null) {
-          linkList.push({
-            link: match[0],
-            startIndex: match.index,
-            endIndex: match.index + match[0].length,
-          });
-        }
-        setLinksOnMessage(linkList);
+		const handleTextInputChange = async (text: string) => {
+			const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
+			if (isConvertToFileTxt) {
+				setText('');
+				currentTextInput.current = '';
+				await onConvertToFiles(text);
+			} else {
+				const convertedHashtag = convertMentionsToText(text);
 
-        while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
-          const startsWithTripleBackticks = match[0].startsWith('```');
-          const endsWithNoTripleBackticks = match[0].endsWith('```');
-          const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
-          markdownList.push({
-            markdown: convertedMarkdown,
-            startIndex: match.index,
-            endIndex: match.index + match[0].length,
-          });
-        }
-        while ((match = mentionRegex.exec(convertedHashtag)) !== null) {
-          const mention = listMentions.find((m) => `@${m.display}` === match?.[0]);
-          if (mention) {
-            mentionList.push({
-              userId: mention?.id?.toString() ?? '',
-              username: `@${mention?.display}`,
-              startIndex: match.index,
-              endIndex: match.index + match[0].length,
-            });
-          }
-        }
+				let match;
+				while ((match = emojiRegex.exec(convertedHashtag)) !== null) {
+					emojiList.push({
+						shortname: match[0],
+						startIndex: match.index,
+						endIndex: match.index + match[0].length,
+					});
+				}
+				setEmojisOnMessage(emojiList);
 
-        while ((match = channelRegex.exec(convertedHashtag)) !== null) {
-          const matchChannelId = match[0].match(/<#(\d+)>/);
-          const channelId = matchChannelId ? matchChannelId?.[1] : null;
-          const channelInfo = getChannelById(channelId);
-          if (channelInfo) {
-            hashtagList.push({
-              channelId: channelInfo.id.toString() ?? '',
-              channelLable: channelInfo.channel_label ?? '',
-              startIndex: match.index,
-              endIndex: match.index + match[0].length,
-            });
-          }
-        }
+				while ((match = linkRegex.exec(convertedHashtag)) !== null) {
+					linkList.push({
+						link: match[0],
+						startIndex: match.index,
+						endIndex: match.index + match[0].length,
+					});
+				}
+				setLinksOnMessage(linkList);
 
-        setMarkdownsOnMessage(markdownList);
-        setHashtagsOnMessage(hashtagList);
-        setMentionsOnMessage(mentionList);
-        setMentionTextValue(text);
-        setText(convertedHashtag);
-        setPlainTextMessage(convertToPlainTextHashtag(text));
-      }
-      setIsShowAttachControl(false);
-      saveMessageToCache(text);
-    };
+				while ((match = markdownRegex.exec(convertedHashtag)) !== null) {
+					const startsWithTripleBackticks = match[0].startsWith('```');
+					const endsWithNoTripleBackticks = match[0].endsWith('```');
+					const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
+					markdownList.push({
+						markdown: convertedMarkdown,
+						startIndex: match.index,
+						endIndex: match.index + match[0].length,
+					});
+				}
+				while ((match = mentionRegex.exec(convertedHashtag)) !== null) {
+					const mention = listMentions.find((m) => `@${m.display}` === match?.[0]);
+					if (mention) {
+						mentionList.push({
+							userId: mention?.id?.toString() ?? '',
+							username: `@${mention?.display}`,
+							startIndex: match.index,
+							endIndex: match.index + match[0].length,
+						});
+					}
+				}
 
-    const handleSelectionChange = (selection: { start: number; end: number }) => {
-      cursorPositionRef.current = selection.start;
-    };
+				while ((match = channelRegex.exec(convertedHashtag)) !== null) {
+					const matchChannelId = match[0].match(/<#(\d+)>/);
+					const channelId = matchChannelId ? matchChannelId?.[1] : null;
+					const channelInfo = getChannelById(channelId);
+					if (channelInfo) {
+						hashtagList.push({
+							channelId: channelInfo.id.toString() ?? '',
+							channelLabel: channelInfo.channel_label ?? '',
+							startIndex: match.index,
+							endIndex: match.index + match[0].length,
+						});
+					}
+				}
 
-    function keyboardWillShow(event) {
-      if (keyboardHeight !== event.endCoordinates.height) {
-        setIsShowEmojiNativeIOS(event.endCoordinates.height >= 380 && Platform.OS === 'ios');
-        setKeyboardHeight(event.endCoordinates.height <= 345 ? 345 : event.endCoordinates.height);
-      }
-    }
+				setMarkdownsOnMessage(markdownList);
+				setHashtagsOnMessage(hashtagList);
+				setMentionsOnMessage(mentionList);
+				setMentionTextValue(text);
+				setText(convertedHashtag);
+				setPlainTextMessage(convertToPlainTextHashtag(text));
+			}
+			setIsShowAttachControl(false);
+			saveMessageToCache(text);
+		};
 
-    const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
-      const { type, targetMessage } = messageAction;
-      switch (type) {
-        case EMessageActionType.EditMessage:
-          handleTextInputChange(targetMessage.content.t);
-          break;
-        case EMessageActionType.CreateThread:
-          setOpenThreadMessageState(true);
-          setValueThread(targetMessage);
-          timeoutRef.current = setTimeout(() => {
-            navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
-          }, 500);
-          break;
-        default:
-          break;
-      }
-    };
+		const handleSelectionChange = (selection: { start: number; end: number }) => {
+			cursorPositionRef.current = selection.start;
+		};
 
-    const handleInsertMentionTextInput = async (mentionMessage) => {
-      const cursorPosition = cursorPositionRef?.current;
-      const inputValue = currentTextInput?.current;
-      if (!mentionMessage?.display) return;
-      const textMentions = `@${mentionMessage?.display} `;
-      const textArray = inputValue?.split?.('');
-      textArray.splice(cursorPosition, 0, textMentions);
-      const textConverted = textArray.join('');
-      setText(textConverted);
-      setMentionTextValue(textConverted);
-    };
+		function keyboardWillShow(event) {
+			if (keyboardHeight !== event.endCoordinates.height) {
+				setIsShowEmojiNativeIOS(event.endCoordinates.height >= 380 && Platform.OS === 'ios');
+				setKeyboardHeight(event.endCoordinates.height <= 345 ? 345 : event.endCoordinates.height);
+			}
+		}
 
-    const onAddMentionMessageAction = useCallback(
-      async (data: MentionDataProps[]) => {
-        const mention = data?.find((mention) => {
-          return mention.id === messageActionNeedToResolve?.targetMessage?.sender_id;
-        });
-        await handleInsertMentionTextInput(mention);
-        onDeleteMessageActionNeedToResolve();
-        openKeyBoard();
-      },
-      [messageActionNeedToResolve?.targetMessage?.sender_id, onDeleteMessageActionNeedToResolve],
-    );
+		const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
+			const { type, targetMessage } = messageAction;
+			switch (type) {
+				case EMessageActionType.EditMessage:
+					handleTextInputChange(targetMessage.content.t);
+					break;
+				case EMessageActionType.CreateThread:
+					setOpenThreadMessageState(true);
+					setValueThread(targetMessage);
+					timeoutRef.current = setTimeout(() => {
+						navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL });
+					}, 500);
+					break;
+				default:
+					break;
+			}
+		};
 
-    const onConvertToFiles = useCallback(async (content: string) => {
-      try {
-        if (content?.length > MIN_THRESHOLD_CHARS) {
-          const fileTxtSaved = await writeTextToFile(content);
-          const session = sessionRef.current;
-          const client = clientRef.current;
+		const handleInsertMentionTextInput = async (mentionMessage) => {
+			const cursorPosition = cursorPositionRef?.current;
+			const inputValue = currentTextInput?.current;
+			if (!mentionMessage?.display) return;
+			const textMentions = `@${mentionMessage?.display} `;
+			const textArray = inputValue?.split?.('');
+			textArray.splice(cursorPosition, 0, textMentions);
+			const textConverted = textArray.join('');
+			setText(textConverted);
+			setMentionTextValue(textConverted);
+		};
 
-          if (!client || !session || !currentChannel.channel_id) {
-            console.log('Client is not initialized');
-          }
-          handleUploadFileMobile(client, session, fileTxtSaved.name, fileTxtSaved)
-            .then((attachment) => {
-              handleFinishUpload(attachment);
-              return 'handled';
-            })
-            .catch((err) => {
-              console.log('err', err);
-              return 'not-handled';
-            });
-        }
-      } catch (e) {
-        console.log('err', e);
-      }
-    }, []);
+		const onAddMentionMessageAction = useCallback(
+			async (data: MentionDataProps[]) => {
+				const mention = data?.find((mention) => {
+					return mention.id === messageActionNeedToResolve?.targetMessage?.sender_id;
+				});
+				await handleInsertMentionTextInput(mention);
+				onDeleteMessageActionNeedToResolve();
+				openKeyBoard();
+			},
+			[messageActionNeedToResolve?.targetMessage?.sender_id, onDeleteMessageActionNeedToResolve],
+		);
 
-    const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
-      typeConverts.map((typeConvert) => {
-        if (typeConvert.type === attachment.filetype) {
-          return (attachment.filetype = typeConvert.typeConvert);
-        }
-      });
-      setAttachmentData(attachment);
-    }, []);
+		const onConvertToFiles = useCallback(async (content: string) => {
+			try {
+				if (content?.length > MIN_THRESHOLD_CHARS) {
+					const fileTxtSaved = await writeTextToFile(content);
+					const session = sessionRef.current;
+					const client = clientRef.current;
 
-    const writeTextToFile = async (text: string) => {
-      // Define the path to the file
-      const now = Date.now();
-      const filename = now + '.txt';
-      const path = RNFS.DocumentDirectoryPath + `/${filename}`;
+					if (!client || !session || !currentChannel.channel_id) {
+						console.log('Client is not initialized');
+					}
+					handleUploadFileMobile(client, session, fileTxtSaved.name, fileTxtSaved)
+						.then((attachment) => {
+							handleFinishUpload(attachment);
+							return 'handled';
+						})
+						.catch((err) => {
+							console.log('err', err);
+							return 'not-handled';
+						});
+				}
+			} catch (e) {
+				console.log('err', e);
+			}
+		}, []);
 
-      // Write the text to the file
-      await RNFS.writeFile(path, text, 'utf8')
-        .then((success) => {
-          console.log('FILE WRITTEN!');
-        })
-        .catch((err) => {
-          console.log(err.message);
-        });
+		const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
+			typeConverts.map((typeConvert) => {
+				if (typeConvert.type === attachment.filetype) {
+					return (attachment.filetype = typeConvert.typeConvert);
+				}
+			});
+			setAttachmentData(attachment);
+		}, []);
 
-      // Read the file to get its base64 representation
-      const fileData = await RNFS.readFile(path, 'base64');
+		const writeTextToFile = async (text: string) => {
+			// Define the path to the file
+			const now = Date.now();
+			const filename = now + '.txt';
+			const path = RNFS.DocumentDirectoryPath + `/${filename}`;
 
-      // Create the file object
-      const fileFormat: IFile = {
-        uri: path,
-        name: filename,
-        type: 'text/plain',
-        size: (await RNFS.stat(path)).size.toString(),
-        fileData: fileData,
-      };
+			// Write the text to the file
+			await RNFS.writeFile(path, text, 'utf8')
+				.then((success) => {
+					console.log('FILE WRITTEN!');
+				})
+				.catch((err) => {
+					console.log(err.message);
+				});
 
-      return fileFormat;
-    };
+			// Read the file to get its base64 representation
+			const fileData = await RNFS.readFile(path, 'base64');
 
-    const resetInput = () => {
-      setIsFocus(false);
-      inputRef.current?.blur();
-      if (timeoutRef) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
+			// Create the file object
+			const fileFormat: IFile = {
+				uri: path,
+				name: filename,
+				type: 'text/plain',
+				size: (await RNFS.stat(path)).size.toString(),
+				fileData: fileData,
+			};
 
-    const openKeyBoard = () => {
-      timeoutRef.current = setTimeout(() => {
-        inputRef.current?.focus();
-        setIsFocus(true);
-      }, 300);
-    };
+			return fileFormat;
+		};
 
-    useEffect(() => {
-      if (messageActionNeedToResolve !== null) {
-        const { isStillShowKeyboard } = messageActionNeedToResolve;
-        if (!isStillShowKeyboard) {
-          resetInput();
-        }
-        handleMessageAction(messageActionNeedToResolve);
-        openKeyBoard();
-      }
-    }, [messageActionNeedToResolve]);
+		const resetInput = () => {
+			setIsFocus(false);
+			inputRef.current?.blur();
+			if (timeoutRef) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
 
-    const handleClearText = () => {
-      setText('');
-    };
+		const openKeyBoard = () => {
+			timeoutRef.current = setTimeout(() => {
+				inputRef.current?.focus();
+				setIsFocus(true);
+			}, 300);
+		};
 
-    useEffect(() => {
-      const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
-      const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
-        handleClearText();
-      });
-      return () => {
-        keyboardListener.remove();
-        clearTextInputListener.remove();
-      };
-    }, []);
+		useEffect(() => {
+			if (messageActionNeedToResolve !== null) {
+				const { isStillShowKeyboard } = messageActionNeedToResolve;
+				if (!isStillShowKeyboard) {
+					resetInput();
+				}
+				handleMessageAction(messageActionNeedToResolve);
+				openKeyBoard();
+			}
+		}, [messageActionNeedToResolve]);
 
-    return (
-      <Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
-        <Suggestions
-          channelId={channelId}
-          {...triggers.mention}
-          messageActionNeedToResolve={messageActionNeedToResolve}
-          onAddMentionMessageAction={onAddMentionMessageAction}
-          mentionTextValue={mentionTextValue}
-        />
-        <HashtagSuggestions {...triggers.hashtag} />
-        <EmojiSuggestion {...triggers.emoji} />
+		const handleClearText = () => {
+			setText('');
+		};
 
-        {!!attachmentDataRef?.length && (
-          <AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
-        )}
+		useEffect(() => {
+			const keyboardListener = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
+			const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
+				handleClearText();
+			});
+			return () => {
+				keyboardListener.remove();
+				clearTextInputListener.remove();
+			};
+		}, []);
 
-        <Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
-          <ChatMessageLeftArea
-            isShowAttachControl={isShowAttachControl}
-            setIsShowAttachControl={setIsShowAttachControl}
-            text={text}
-            isShowCreateThread={isShowCreateThread}
-            modeKeyBoardBottomSheet={modeKeyBoardBottomSheet}
-            handleKeyboardBottomSheetMode={handleKeyboardBottomSheetMode}
-          />
+		return (
+			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
+				<Suggestions
+					channelId={channelId}
+					{...triggers.mention}
+					messageActionNeedToResolve={messageActionNeedToResolve}
+					onAddMentionMessageAction={onAddMentionMessageAction}
+					mentionTextValue={mentionTextValue}
+				/>
+				<HashtagSuggestions {...triggers.hashtag} />
+				<EmojiSuggestion {...triggers.emoji} />
 
-          <ChatMessageInput
-            channelId={channelId}
-            mode={mode}
-            isFocus={isFocus}
-            isShowAttachControl={isShowAttachControl}
-            text={text}
-            textInputProps={textInputProps}
-            ref={inputRef}
-            messageAction={messageAction}
-            messageActionNeedToResolve={messageActionNeedToResolve}
-            modeKeyBoardBottomSheet={modeKeyBoardBottomSheet}
-            onSendSuccess={onSendSuccess}
-            handleKeyboardBottomSheetMode={handleKeyboardBottomSheetMode}
-            setIsShowAttachControl={setIsShowAttachControl}
-            onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
-            setModeKeyBoardBottomSheet={setModeKeyBoardBottomSheet}
-            keyboardHeight={keyboardHeight}
-            mentionsOnMessage={mentionsOnMessage}
-            hashtagsOnMessage={hashtagsOnMessage}
-            emojisOnMessage={emojisOnMessage}
-            linksOnMessage={linksOnMessage}
-            markdownsOnMessage={markdownsOnMessage}
-            plainTextMessage={plainTextMessage}
-            isShowCreateThread={isShowCreateThread}
-          />
-        </Block>
-      </Block>
-    );
-  },
+				{!!attachmentDataRef?.length && (
+					<AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
+				)}
+
+				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
+					<ChatMessageLeftArea
+						isShowAttachControl={isShowAttachControl}
+						setIsShowAttachControl={setIsShowAttachControl}
+						text={text}
+						isShowCreateThread={isShowCreateThread}
+						modeKeyBoardBottomSheet={modeKeyBoardBottomSheet}
+						handleKeyboardBottomSheetMode={handleKeyboardBottomSheetMode}
+					/>
+
+					<ChatMessageInput
+						channelId={channelId}
+						mode={mode}
+						isFocus={isFocus}
+						isShowAttachControl={isShowAttachControl}
+						text={text}
+						textInputProps={textInputProps}
+						ref={inputRef}
+						messageAction={messageAction}
+						messageActionNeedToResolve={messageActionNeedToResolve}
+						modeKeyBoardBottomSheet={modeKeyBoardBottomSheet}
+						onSendSuccess={onSendSuccess}
+						handleKeyboardBottomSheetMode={handleKeyboardBottomSheetMode}
+						setIsShowAttachControl={setIsShowAttachControl}
+						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
+						setModeKeyBoardBottomSheet={setModeKeyBoardBottomSheet}
+						keyboardHeight={keyboardHeight}
+						mentionsOnMessage={mentionsOnMessage}
+						hashtagsOnMessage={hashtagsOnMessage}
+						emojisOnMessage={emojisOnMessage}
+						linksOnMessage={linksOnMessage}
+						markdownsOnMessage={markdownsOnMessage}
+						plainTextMessage={plainTextMessage}
+						isShowCreateThread={isShowCreateThread}
+					/>
+				</Block>
+			</Block>
+		);
+	},
 );

@@ -1,5 +1,12 @@
 import { useAppParams, useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectDirectById, selectMessageByMessageId, selectReactionPlaceActive } from '@mezon/store';
+import {
+  reactionActions, selectAllAccount,
+  selectCurrentChannel, selectCurrentClan,
+  selectDirectById,
+  selectMessageByMessageId,
+  selectReactionPlaceActive, selectTheme,
+  useAppSelector
+} from '@mezon/store';
 import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -22,6 +29,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
+  const currentClan = useSelector(selectCurrentClan);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
 		return emojis.filter((emoji) => emoji?.shortname?.includes(searchTerm));
@@ -37,10 +45,16 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setEmojiSearch(result);
 		}
 	}, [valueInputToCheckHandleSearch]);
+  
+  const ClanLogo = () => {
+    return currentClan?.logo
+      ? <img src={currentClan?.logo} className={"w-7 h-7 rounded-full"}/>
+      : <div className={'dark:text-textDarkTheme text-textLightTheme'}>{currentClan?.clan_name?.charAt(0).toUpperCase()}</div>
+  }
 
 	const categoryIcons = [
 		<Icons.ClockHistory defaultSize="w-7 h-7" />,
-		<Icons.PenEdit defaultSize="w-7 h-7" />,
+    <ClanLogo/>,
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
 		<Icons.Bowl defaultSize="w-7 h-7" />,
@@ -245,6 +259,8 @@ type DisplayByCategoriesProps = {
 };
 
 function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
+  const currentClan = useAppSelector(selectCurrentClan);
+  
 	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		const filteredEmojis = emojis
 			.filter((emoji) => emoji?.category?.includes(categoryParam))
@@ -263,36 +279,51 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
 				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
 			>
-				{categoryName}
+        <p className={'uppercase'}>{categoryName !== 'Custom' ? categoryName : currentClan?.clan_name}</p>
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
 					{' '}
 					<Icons.ArrowRight />
 				</span>
 			</button>
-			{emojisPanel && <EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} />}
+			{emojisPanel && <EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} categoryName={categoryName}/>}
 		</div>
 	);
 }
 
-const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover }) => {
+const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover, categoryName }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
+  const appearanceTheme = useSelector (selectTheme);
+  const currentClan = useSelector(selectCurrentClan);
+  const userProfile = useSelector(selectAllAccount);
 
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
-			{emojisData.map((item, index) => (
-				<button
-					key={index}
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
-					onClick={() => onEmojiSelect(item.shortname + ' ')}
-					onMouseEnter={() => onEmojiHover(item)}
-				>
-					<img draggable="false" src={item?.src}></img>
-				</button>
-			))}
+      {emojisData.map((item, index) => (
+        <button
+          key={index}
+          className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
+          onClick={() => onEmojiSelect(item.shortname + ' ')}
+          onMouseEnter={() => onEmojiHover(item)}
+        >
+          <img draggable="false" src={item?.src}></img>
+        </button>
+      ))}
+      {(categoryName === 'Custom' && userProfile?.user?.id === currentClan?.creator_id) && (
+        <button
+          className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
+          onMouseEnter={() => onEmojiHover({
+            shortname: 'Upload a custom emoji',
+            src: ''
+          })}
+        >
+          <Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'}/>
+        </button>
+      )}
+			
 		</div>
 	);
 };
@@ -303,12 +334,14 @@ type EmojiHoverProps = {
 	isReaction: boolean | undefined;
 };
 
-const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction }: EmojiHoverProps) => {
+const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction}: EmojiHoverProps) => {
+  const appearanceTheme = useSelector (selectTheme);
+  
 	return (
 		<div
 			className={`w-full min-h-12 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2'}`}
 		>
-			<img draggable="false" className="w-10" src={emojiHoverSrc}></img>
+      {emojiHoverSrc ? <img draggable="false" className="w-10" src={emojiHoverSrc}/> : <Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'}/>}
 			{emojiHoverShortCode}
 		</div>
 	);

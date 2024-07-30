@@ -48,7 +48,15 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 		const selectedPermissions = clanRole?.permission_list?.permissions?.filter((it) => it?.active).map((it) => it?.id);
 		const removeMemberList =
 			clanRole?.role_user_list?.role_users?.filter((member) => !selectedMembers.includes(member?.id)).map((it) => it?.id) || [];
-		const response = await updateRole(clanRole?.clan_id, clanRole?.id, clanRole?.title, selectedMembers, selectedPermissions, removeMemberList, []);
+		const response = await updateRole(
+			clanRole?.clan_id,
+			clanRole?.id,
+			clanRole?.title,
+			selectedMembers,
+			selectedPermissions,
+			removeMemberList,
+			[],
+		);
 		if (response) {
 			Toast.show({
 				type: 'success',
@@ -73,17 +81,17 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 		headerTitle: !isEditRoleMode
 			? t('setupMember.title')
 			: () => {
-				return (
-					<Block>
-						<Text center bold h3 color={themeValue?.white}>
-							{clanRole?.title}
-						</Text>
-						<Text center color={themeValue?.text}>
-							{t('roleDetail.role')}
-						</Text>
-					</Block>
-				);
-			},
+					return (
+						<Block>
+							<Text center bold h3 color={themeValue?.white}>
+								{clanRole?.title}
+							</Text>
+							<Text center color={themeValue?.text}>
+								{t('roleDetail.role')}
+							</Text>
+						</Block>
+					);
+				},
 		headerLeft: () => (
 			<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
 				<Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.textStrong} />
@@ -198,7 +206,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 													) : (
 														<Text
 															style={{
-																backgroundColor: Colors.vividScarlet,
+																backgroundColor: themeValue.colorAvatarDefault,
 																width: size.s_40,
 																height: size.s_40,
 																textAlign: 'center',

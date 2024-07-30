@@ -64,9 +64,9 @@ export const MezonModal = (props: IMezonModalProps) => {
 
 	return (
 		<Modal visible={visible} animationType={animationType} statusBarTranslucent={true}>
-			<SafeAreaView style={{ flex: 1 }}>
-				<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-					<View style={styles.container}>
+			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+				<SafeAreaView style={{ flex: 1 }}>
+					<View style={[styles.container, containerStyle]}>
 						{rightClose ? (
 							<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 								{visibleBackButton ? (
@@ -104,8 +104,8 @@ export const MezonModal = (props: IMezonModalProps) => {
 						)}
 						<View style={[styles.fill, style]}>{children}</View>
 					</View>
-				</TouchableWithoutFeedback>
-			</SafeAreaView>
+				</SafeAreaView>
+			</TouchableWithoutFeedback>
 			<Toast config={toastConfig} />
 		</Modal>
 	);

@@ -92,7 +92,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
 		store.dispatch(clansActions.joinClan({ clanId: currentDmGroup?.clan_id }));
-		save(STORAGE_CLAN_ID, currentDmGroup?.clan_id);
 		store.dispatch(
 			directActions.joinDirectMessage({
 				directMessageId: currentDmGroup.id,
@@ -192,7 +191,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 							{currentDmGroup?.channel_avatar?.[0] ? (
 								<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
 							) : (
-								<Text style={[styles.textAvatar]}>{currentDmGroup?.channel_label?.charAt?.(0)}</Text>
+								<View style={styles.wrapperTextAvatar} >
+									<Text style={[styles.textAvatar]}>{currentDmGroup?.channel_label?.charAt?.(0)}</Text>
+								</View>
 							)}
 							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
 						</View>
