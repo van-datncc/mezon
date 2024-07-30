@@ -87,6 +87,8 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 		}
 	}, [currentDmGroup, userProfile]);
 
+	const isShowManageMember = (isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel;
+
 	return (
 		<div
 			ref={panelRef}
@@ -237,7 +239,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{((isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel) && (
+					{(isShowManageMember) && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
