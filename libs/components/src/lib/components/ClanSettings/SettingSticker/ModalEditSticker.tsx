@@ -1,28 +1,39 @@
+import { createSticker, selectCurrentChannelId, selectCurrentClanId, updateSticker, useAppDispatch } from "@mezon/store";
+import { handleUploadFile, useMezon } from "@mezon/transport";
 import { Button, Icons, InputField } from "@mezon/ui";
-import { ChangeEvent, useState } from "react";
-import { ISticker } from ".";
+// import { createSticker, settingClanStickerActions } from "libs/store/src/lib/settingSticker/settingSticker.slice";
+import { ChannelStreamMode } from "mezon-js";
+import { ApiClanSticker, ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from "mezon-js/api.gen";
+import { ChangeEvent, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+
 
 
 type ModalEditStickerProps = {
   handleCloseModal: () => void
-  editSticker: ISticker | null
+  editSticker: ApiClanSticker | null
 };
-type EdittingSticker = Pick<ISticker, 'source' | 'shortname'> & {
+type EdittingSticker = Pick<ApiClanSticker, 'source' | 'shortname'> & {
   fileName: string | null
 }
 const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) => {
   const [editingSticker, setEditingSticker] = useState<EdittingSticker>({
-    fileName: editSticker?.source.split('/').pop() ?? null,
+    fileName: editSticker?.source?.split('/').pop() ?? null,
     shortname: editSticker?.shortname ?? '',
     source: editSticker?.source ?? ''
   })
+  const currentClanId = useSelector(selectCurrentClanId) || '';
+  const currentChannelId = useSelector(selectCurrentChannelId) || '';
+  const dispatch = useAppDispatch();
+  const { sessionRef, clientRef } = useMezon()
+  const fileRef = useRef<HTMLInputElement>(null);
   const handleChooseFile = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const srcPreview = URL.createObjectURL(e.target.files[0]);
       setEditingSticker({
         ...editingSticker,
         source: srcPreview,
-        shortname: e.target.files[0].name
+        fileName: e.target.files[0].name
       })
     } else {
       console.error("No files selected.");
@@ -33,6 +44,60 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
       ...editingSticker,
       shortname: e.target.value
     })
+  }
+  const onSaveChange = () => {
+    if (editSticker && editSticker.shortname !== editingSticker.shortname) {
+      handleUpadteSticker();
+    } else {
+      handleCreateSticker();
+    }
+  }
+  const handleCreateSticker = () => {
+    const checkAvilableCreate = editingSticker.fileName && editingSticker.shortname && editingSticker.source;
+    if (fileRef.current?.files && checkAvilableCreate) {
+      const file = fileRef.current?.files[0];
+      const imageSize = file?.size;
+      const session = sessionRef.current;
+      const client = clientRef.current;
+      const category = "Among Us";
+      const path = 'stickers/' + category;
+      if (!client || !session) {
+        throw new Error('Client or file is not initialized')
+      }
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file?.type)) {
+        handleCloseModal();
+        return;
+      }
+
+      if (imageSize > 1000000) {
+        handleCloseModal();
+        return;
+      }
+      handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file, ChannelStreamMode.STREAM_MODE_CHANNEL, path).then(async (attachment: ApiMessageAttachment) => {
+        const request: ApiClanStickerAddRequest = {
+          category: category,
+          clan_id: currentClanId,
+          shortname: editingSticker.shortname,
+          source: attachment.url,
+        };
+        await dispatch(createSticker({ request: request, clanId: currentClanId }));
+      })
+      handleCloseModal();
+    } else {
+      handleCloseModal();
+      return;
+    }
+  }
+  const handleUpadteSticker = async () => {
+    const stickerChange: MezonUpdateClanStickerByIdBody = {
+      source: editSticker?.source?.replace('stickers', 'sticker'),
+      category: editSticker?.category,
+      shortname: editingSticker.shortname
+    }
+    await dispatch(updateSticker({ stickerId: editSticker?.id ?? '', request: stickerChange }))
+    handleCloseModal();
+
   }
   return (
     <div className={'relative w-full h-[468px] flex flex-col dark:bg-bgPrimary text-textPrimary '}>
@@ -60,7 +125,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
           <div className={'w-1/2 flex flex-col gap-2'}>
             <p className={`text-xs font-bold uppercase select-none`}>FILE {editSticker && ' (THIS CANNOT BE EDITED)'}</p>
             <div className={`dark:bg-bgSecondary bg-bgLightSecondary border-[0.08px] dark:border-textLightTheme border-textDarkTheme flex flex-row rounded justify-between items-center py-[6px] px-3 dark:text-textPrimary box-border ${editingSticker.fileName && 'cursor-not-allowed'}`}>
-              <p className="select-none">{editingSticker.fileName ?? 'Choose a file'}</p>
+              <p className="select-none flex-1 truncate">{editingSticker.fileName ?? 'Choose a file'}</p>
               {
                 !editSticker && (
                   <button className="hover:bg-hoverPrimary bg-primary rounded-[4px] py-[2px] px-2 text-nowrap relative select-none text-white overflow-hidden">Browse
@@ -71,6 +136,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
                       tabIndex={0}
                       accept=".jpg,.jpeg,.png,.gif"
                       onChange={handleChooseFile}
+                      ref={fileRef}
                     ></input>
                   </button>
                 )
@@ -86,8 +152,8 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
         </div>
       </div>
       <div className={`absolute w-full h-[54px] bottom-0 flex items-end justify-end select-none`}>
-        <Button label="Never Mind" className="dark:text-textPrimary text-[#313338] rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent" onClick={handleCloseModal} />
-        <Button label="Save Changes" className="bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white" onClick={handleCloseModal} />
+        <Button label="Never Mind" className="dark:text-textPrimary text-[#313338] rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent " onClick={handleCloseModal} />
+        <Button label="Save Changes" className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`} onClick={onSaveChange} />
       </div>
     </div >
   )
