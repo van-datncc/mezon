@@ -2,6 +2,7 @@ import { useSendInviteMessage, useSilentSendMess } from '@mezon/core';
 import { DirectEntity, UsersClanEntity } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
+import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 type ItemPorp = {
 	url: string;
@@ -50,6 +51,7 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 			label={dmGroup.channel_label}
 			isInviteSent={isInviteSent}
 			onHandle={() => handleButtonClick(dmGroup.channel_id || '', dmGroup.type || 0)}
+			userName={dmGroup.usernames}
 		/>
 	) : (
 		<ItemInviteUser 
@@ -70,18 +72,20 @@ type ItemInviteDMProps = {
 	avatar?: string;
 	label?: string;
 	isInviteSent?: boolean;
+	userName?: string;
 	onHandle: () => void;
 }
 
 const ItemInviteDM = (props: ItemInviteDMProps) => {
-	const {channelID='', type='', avatar='', label='', isInviteSent=false, onHandle=()=>{}} = props;
+	const {channelID='', type='', avatar='', label='', isInviteSent=false, userName='', onHandle=()=>{}} = props;
 	return (
 		<div key={channelID} className="flex items-center justify-between h-14">
-			{type === ChannelType.CHANNEL_TYPE_GROUP ? (
-				<img src={`/assets/images/avatar-group.png`} alt="" className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
-			) : (
-				<img src={avatar} alt={label} className="size-10 min-w-10 min-h-10 object-cover rounded-full" />
-			)}
+			<AvatarImage
+				alt={userName}
+				userName={userName}
+				className="min-w-10 min-h-10 max-w-10 max-h-10"
+				src={type === ChannelType.CHANNEL_TYPE_GROUP ? '/assets/images/avatar-group.png' : avatar}
+			/>
 			<p style={{ marginRight: 'auto' }} className="pl-[10px] max-w-full overflow-hidden text truncate">
 				{label}
 			</p>
@@ -113,13 +117,12 @@ const ItemInviteUser = (props: ItemInviteUserProps) => {
 	const {userId='', avatar='', displayName='', userName='', isInviteSent=false, onHandle=()=>{}} = props;
 	return (
 		<div key={userId} className="flex items-center justify-between h-14">
-			{!avatar ? (
-				<div className="w-[38px] h-[38px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px]">
-					{userName?.charAt(0).toUpperCase()}
-				</div>
-			) : (
-				<img src={avatar} alt={userName} className="w-[40px] h-[40px] rounded-full object-cover" />
-			)}
+			<AvatarImage
+				alt={userName}
+				userName={userName}
+				className="min-w-10 min-h-10 max-w-10 max-h-10"
+				src={avatar}
+			/>
 			<p style={{ marginRight: 'auto' }} className="pl-[10px]">
 				{displayName}
 			</p>

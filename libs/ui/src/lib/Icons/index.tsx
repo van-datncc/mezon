@@ -4,6 +4,11 @@ export * from './iconInEmojiPanel';
 export * from './iconRightClick';
 export * from './uploadThumbnail';
 
+interface ClassIconProps extends React.HTMLAttributes<SVGElement> {
+  fill?: string;
+  size?: string;
+}
+
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="false" aria-label="Discord" viewBox="0 0 28 20" {...props}>
@@ -158,14 +163,14 @@ export function UploadImage(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function AddIcon(props: React.HTMLAttributes<SVGElement>) {
+export function AddIcon({ fill , ...props }: ClassIconProps) {
 	return (
 		<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
 				d="M27.3332 14C27.3332 21.3638 21.3636 27.3333 13.9998 27.3333C6.63604 27.3333 0.666504 21.3638 0.666504 14C0.666504 6.63621 6.63604 0.666672 13.9998 0.666672C21.3636 0.666672 27.3332 6.63621 27.3332 14ZM13.9999 7.00001C14.9203 7.00001 15.6665 7.7462 15.6665 8.66667V12.3333H19.3332C20.2537 12.3333 20.9999 13.0795 20.9999 14C20.9999 14.9205 20.2537 15.6667 19.3332 15.6667H15.6665V19.3333C15.6665 20.2538 14.9203 21 13.9999 21C13.0794 21 12.3332 20.2538 12.3332 19.3333V15.6667H8.66657C7.7461 15.6667 6.9999 14.9205 6.9999 14C6.9999 13.0795 7.7461 12.3333 8.66657 12.3333H12.3332V8.66667C12.3332 7.7462 13.0794 7.00001 13.9999 7.00001Z"
-				fill="#155EEF"
+				fill={fill ? fill : "#155EEF"}
 			/>
 		</svg>
 	);

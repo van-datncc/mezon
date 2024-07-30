@@ -42,7 +42,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 						<AvatarImage 
 							alt={userProfile?.user?.username || ''}
 							userName={userProfile?.user?.username}
-							className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] dark:bg-bgSecondary bg-white border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover"
+							className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover"
 							src={urlImg}
 							classNameText='!text-5xl'
 						/>

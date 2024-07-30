@@ -1,11 +1,9 @@
+import { deleteSticker, selectMemberClanByUserId, useAppDispatch } from "@mezon/store";
 import { ApiClanSticker } from "mezon-js/api.gen";
+import { useSelector } from "react-redux";
 import { Icons } from "../../../components";
 
-import { deleteSticker, selectMemberClanByUserId, useAppDispatch } from "@mezon/store";
-import { useSelector } from "react-redux";
-
 type SettingEmojiListProps = {
-  // deleteSticker: (sticker: ApiClanSticker) => void;
   updateSticker: (sticker: ApiClanSticker) => void;
   sticker: ApiClanSticker
 };
@@ -18,8 +16,9 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
     updateSticker(sticker);
   }
   const handleDeleteSticker = async () => {
-    await dispatch(deleteSticker(sticker.id ?? ''));
-
+    if (sticker.id) {
+      await dispatch(deleteSticker(sticker.id));
+    }
   }
   return (
     <div className={'group relative text-xs w-[116px] h-[140px] rounded-lg flex flex-col items-center p-3 dark:hover:bg-bgTertiary dark:bg-bgSecondary bg-bgLightSecondary justify-between'}>

@@ -65,7 +65,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 	return (
 		<Modal visible={visible} animationType={animationType} statusBarTranslucent={true}>
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-				<SafeAreaView>
+				<SafeAreaView style={{ flex: 1 }}>
 					<View style={[styles.container, containerStyle]}>
 						{rightClose ? (
 							<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>

@@ -157,7 +157,7 @@ export const InviteToChannel = React.memo(
 			if (!response) {
 				return;
 			}
-			setCurrentInviteLink(`https://mezon.vn/invite/${response.invite_link}`);
+			setCurrentInviteLink(`https://mezon.ai/invite/${response.invite_link}`);
 		};
 
 		useEffect(() => {
@@ -276,7 +276,6 @@ export const InviteToChannel = React.memo(
 										onTextChange={setSearchUserText}
 										value={searchUserText}
 										prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
-
 									/>
 
 									<View style={styles.editInviteLinkWrapper}>

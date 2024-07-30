@@ -53,7 +53,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 		<div
 			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
 		>
-			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
+			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full" >
 				<div className="flex flex-row gap-1 items-center flex-1">
 					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
@@ -65,7 +65,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								? 'assets/images/avatar-group.png'
 								: currentDmGroup?.channel_avatar?.at(0) ?? ''
 						}
-						name={currentDmGroup?.channel_label || `${currentDmGroup.creator_name}'s Group`}
+						name={currentDmGroup?.usernames || `${currentDmGroup.creator_name}'s Group`}
 						status={userStatus}
 						isHideStatus={true}
 						isHideIconStatus={false}

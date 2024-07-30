@@ -1,7 +1,6 @@
 import { createSticker, selectCurrentChannelId, selectCurrentClanId, updateSticker, useAppDispatch } from "@mezon/store";
 import { handleUploadFile, useMezon } from "@mezon/transport";
 import { Button, Icons, InputField } from "@mezon/ui";
-// import { createSticker, settingClanStickerActions } from "libs/store/src/lib/settingSticker/settingSticker.slice";
 import { ChannelStreamMode } from "mezon-js";
 import { ApiClanSticker, ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from "mezon-js/api.gen";
 import { ChangeEvent, useRef, useState } from "react";
@@ -22,6 +21,8 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
     shortname: editSticker?.shortname ?? '',
     source: editSticker?.source ?? ''
   })
+  const [openModal, setOpenModal] = useState(false);
+  const [openModalType, setOpenModalType] = useState(false);
   const currentClanId = useSelector(selectCurrentClanId) || '';
   const currentChannelId = useSelector(selectCurrentChannelId) || '';
   const dispatch = useAppDispatch();
@@ -51,6 +52,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
     } else {
       handleCreateSticker();
     }
+    handleCreateSticker();
   }
   const handleCreateSticker = () => {
     const checkAvilableCreate = editingSticker.fileName && editingSticker.shortname && editingSticker.source;
@@ -99,6 +101,10 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
     handleCloseModal();
 
   }
+  const handleCloseTypeModal = () => {
+    setOpenModalType(false)
+  }
+
   return (
     <div className={'relative w-full h-[468px] flex flex-col dark:bg-bgPrimary text-textPrimary '}>
       <div className={`w-full flex-1 flex flex-col overflow-hidden overflow-y-auto gap-4`}>

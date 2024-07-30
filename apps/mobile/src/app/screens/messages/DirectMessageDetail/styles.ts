@@ -66,17 +66,19 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
     avatarWrapper: {
         borderRadius: 50,
-        backgroundColor: Colors.bgGrayDark,
+        backgroundColor: colors.colorAvatarDefault,
         height: size.s_30,
         width: size.s_30,
     },
-    textAvatar: {
+    wrapperTextAvatar: {
         width: size.s_30,
         height: size.s_30,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textAvatar: {
         textAlign: 'center',
-        textAlignVertical: 'center',
-        borderRadius: 50,
-        fontSize: size.h7,
+        fontSize: size.h6,
         color: Colors.white
     },
 })

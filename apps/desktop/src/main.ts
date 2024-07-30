@@ -1,6 +1,5 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import log from 'electron-log';
-import { autoUpdater } from 'electron-updater';
+import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
+import { autoUpdater, UpdateInfo } from 'electron-updater';
 import { machineId } from 'node-machine-id';
 import { join } from 'path';
 import { format } from 'url';
@@ -62,54 +61,61 @@ ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 	}
 });
 
-// log.transports.file.resolvePathFn = () => path.join('D:/NCC/PROJECT/mezon-fe/apps/desktop', 'logs/main.log');
 autoUpdater.autoDownload = false;
-log.info('App starting...');
 
 autoUpdater.on('checking-for-update', () => {
-	log.info('checking-for-update');
-	dialog.showMessageBox({
-		message: `CHECKING FOR UPDATES ${app.getVersion()}!!`,
-	});
+	// checking for update
 });
 
-autoUpdater.on('update-available', () => {
-	log.info('update-available');
-	dialog.showMessageBox({
-		message: ' update-available !!',
-	});
-	autoUpdater.downloadUpdate();
+autoUpdater.on('update-available', (info: UpdateInfo) => {
+	const window = App.BrowserWindow.getFocusedWindow();
+	dialog
+		.showMessageBox(window, {
+			type: 'info',
+			buttons: ['Download', 'Cancel'],
+			title: 'Updates available',
+			message: `There is a new update for the app ${info.version}!! Do you want to download??`,
+		})
+		.then((result) => {
+			if (result.response === 0) {
+				autoUpdater.downloadUpdate();
+			}
+		});
 });
 
 autoUpdater.on('update-not-available', () => {
-	log.info('update-not-available');
-	dialog.showMessageBox({
-		message: 'update-not-available !!',
-	});
+	new Notification({
+		title: 'No update',
+		body: 'The current version is the latest.',
+	}).show();
 });
 
-autoUpdater.on('update-downloaded', () => {
-	log.info('update-downloaded: ', app.getVersion());
-	dialog.showMessageBox({
-		message: 'update Downloaded !!',
-	});
+autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
+	const window = App.BrowserWindow.getFocusedWindow();
+	dialog
+		.showMessageBox(window, {
+			type: 'info',
+			buttons: ['Install now', 'Cancel'],
+			title: 'Mezon install',
+			message: `Install mezon version ${info.version} now.`,
+		})
+		.then((result) => {
+			if (result.response === 0) {
+				autoUpdater.quitAndInstall();
+			}
+		});
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
 	let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
 	log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
 	log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
-	log.info('download-progress: ', log_message);
-	dialog.showMessageBox({
-		message: `update Downloaded: ${log_message} !!`,
-	});
 });
 
 autoUpdater.on('error', (error) => {
 	dialog.showMessageBox({
-		message: `err: ${error.message} !!`,
+		message: `Error: ${error.message} !!`,
 	});
-	log.info('error: ', error);
 });
 
 // handle setup events as quickly as possible
