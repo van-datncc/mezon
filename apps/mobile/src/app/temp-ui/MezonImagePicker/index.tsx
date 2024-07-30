@@ -68,9 +68,9 @@ export default memo(function MezonImagePicker({
 	const { sessionRef, clientRef } = useMezon();
 	const timerRef = useRef<any>(null);
 
-  useEffect(()=>{
-    setImage(defaultValue)
-  },[defaultValue])
+	useEffect(() => {
+		setImage(defaultValue)
+	}, [defaultValue])
 
 	useEffect(() => {
 		return () => {
@@ -82,6 +82,7 @@ export default memo(function MezonImagePicker({
 		const response = await launchImageLibrary({
 			mediaType: 'photo',
 			includeBase64: true,
+			quality: 1
 		});
 
 		if (response.didCancel) {
