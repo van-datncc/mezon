@@ -67,7 +67,7 @@ function NotificationItem({ notify }: NotifyProps) {
 					✕
 				</button>
 			</div>
-			<UserProfileModalInner openModal={openUserProfileModalInner} onClose={handleCloseUserProfileModalInner} />
+			{openUserProfileModalInner && <UserProfileModalInner openModal={openUserProfileModalInner} onClose={handleCloseUserProfileModalInner} />}
 		</>
 	);
 }
