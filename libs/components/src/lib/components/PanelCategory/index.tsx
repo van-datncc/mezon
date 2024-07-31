@@ -20,6 +20,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
   const [positionTop, setPositionTop] = useState(false);
   const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
   const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
+  const hasManageCategoryPermission = isClanCreator || hasAdminPermission || hasManageChannelPermission;
   
   useEffect(() => {
     const heightPanel = panelRef.current?.clientHeight;
@@ -103,7 +104,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
           </Dropdown>
         </GroupPanels>
         
-        <UserRestrictionZone policy={isClanCreator || hasAdminPermission || hasManageChannelPermission}>
+        <UserRestrictionZone policy={hasManageCategoryPermission}>
           <GroupPanels>
             <ItemPanel children={'Edit Category'} onClick={handleOpenSetting}/>
             <ItemPanel children={'Delete Category'} onClick={onDeleteCategory} danger/>
