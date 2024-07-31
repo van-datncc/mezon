@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { AngleRight, ArrowLeftIcon, Icons } from '@mezon/mobile-components';
-import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { AngleRight, Icons } from '@mezon/mobile-components';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, notificationSettingActions, selectCurrentClanId, selectnotificatonSelected, useAppDispatch } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -94,12 +94,6 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 
 	navigation.setOptions({
 		headerShown: true,
-		headerTintColor: Colors.white,
-		headerLeft: () => (
-			<Pressable style={{ marginLeft: size.s_10 }} onPress={() => navigateToThreadDetail()}>
-				<ArrowLeftIcon />
-			</Pressable>
-		),
 		headerTitle: () => (
 			<View>
 				<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>

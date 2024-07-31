@@ -41,7 +41,9 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				headerShadowVisible: false,
 				gestureEnabled: true,
 				headerLeftLabelVisible: false,
+				headerBackTitleVisible: false,
 				gestureDirection: 'horizontal',
+				headerTintColor: themeValue.text,
 				transitionSpec: {
 					open: TransitionSpecs.TransitionIOSSpec,
 					close: TransitionSpecs.TransitionIOSSpec,
@@ -69,7 +71,6 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				options={{
 					headerShown: true,
 					headerTitle: 'Threads',
-					headerTintColor: Colors.white,
 					headerRight: () => <ThreadAddButton />,
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 20 }}>
