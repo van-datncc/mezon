@@ -18,7 +18,8 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const [selectedButton, setSelectedButton] = useState<string | null>(currentSetting);
 	const currentClan = useSelector(selectCurrentClan);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const itemsToRender = hasClanPermission ? sideBarListItemClanPermission : sideBarListItem;
+	const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
+	const itemsToRender = !hasAdminPermission && hasClanPermission ? sideBarListItemClanPermission : sideBarListItem;
 
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const dispatch = useAppDispatch();

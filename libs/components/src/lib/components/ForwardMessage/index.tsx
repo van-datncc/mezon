@@ -1,7 +1,6 @@
-import { Icons } from '@mezon/components';
+import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
 import { RootState, channelsActions, selectAllDirectMessages, selectTheme, useAppDispatch } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
 import { ChannelStatusEnum, removeDuplicatesById } from '@mezon/utils';
 import { Button, Checkbox, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -28,7 +27,6 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
 	const { sendForwardMessage } = useSendForwardMessage();
-	const mezon = useMezon();
 	const { userProfile } = useAuth();
 	const selectedMessage = useSelector(getSelectedMessage);
 	const accountId = userProfile?.user?.id ?? '';
@@ -81,6 +79,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						typeChat: 3,
+						userName: itemDM?.usernames,
 					};
 				})
 			: [];
@@ -92,6 +91,7 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 						avatarUser: 'assets/images/avatar-group.png' ?? '',
 						idDM: itemGr?.id ?? '',
 						typeChat: 2,
+						userName: itemGr?.usernames,
 					};
 				})
 			: [];
@@ -153,12 +153,13 @@ const ForwardMessageModal = ({ openModal, onClose }: ModalParam) => {
 													className="flex items-center px-4 py-1 dark:hover:bg-bgPrimary1 hover:bg-bgLightModeThird rounded"
 												>
 													<div className="flex flex-1 flex-row items-center">
-														<img
+														<AvatarImage 
+															alt={item.userName || ''}
+															userName={item.userName}
+															className="min-w-5 min-h-5 max-w-5 max-h-5"
 															src={item.avatarUser}
-															alt=""
-															className="size-5 object-cover rounded-full mr-[10px] my-[5px]"
 														/>
-														<p className="dark:text-[#B5BAC1] text-textLightTheme">{item.name}</p>
+														<p className="ml-2 dark:text-[#B5BAC1] text-textLightTheme">{item.name}</p>
 													</div>
 													<Checkbox
 														className="w-4 h-4 focus:ring-transparent"
