@@ -28,6 +28,14 @@ function NotificationItem({ notify }: NotifyProps) {
 		setOpenUserProfileModalInner(true);
 	};
 
+	const handleCloseUserProfileModalInner = () => {
+		setOpenUserProfileModalInner(false);
+	};
+
+	const handleDeleteNotification = (notificationId: string) => {
+		deleteNotify(notificationId);
+	};
+
 	return (
 		<>
 			<div
@@ -53,14 +61,12 @@ function NotificationItem({ notify }: NotifyProps) {
 				</div>
 				<button
 					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-					onClick={() => {
-						deleteNotify(notify.id);
-					}}
+					onClick={() => handleDeleteNotification(notify.id)}
 				>
 					✕
 				</button>
 			</div>
-			<UserProfileModalInner openModal={openUserProfileModalInner} onClose={() => setOpenUserProfileModalInner(false)} />
+			<UserProfileModalInner openModal={openUserProfileModalInner} onClose={handleCloseUserProfileModalInner} />
 		</>
 	);
 }
