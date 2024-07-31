@@ -54,20 +54,21 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 			}
 
 			if (link) {
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={link} />);
+				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link}`} content={link} />);
 			}
 
 			if (voicelink) {
 				const meetingCode = voicelink?.split('/').pop();
 				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
-
-				formattedContent.push(
-					<ChannelHashtag
-						showOnchannelLayout={showOnchannelLayout}
-						key={`${index}${startindex}${channelid}`}
-						channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
-					/>,
-				);
+				voiceChannelFound
+					? formattedContent.push(
+							<ChannelHashtag
+								showOnchannelLayout={showOnchannelLayout}
+								key={`${index}${startindex}${channelid}`}
+								channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
+							/>,
+						)
+					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink} />);
 			}
 
 			if (markdown) {

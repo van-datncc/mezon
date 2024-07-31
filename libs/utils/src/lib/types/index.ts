@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelType } from 'mezon-js';
+import { ChannelMessage, ChannelType, Notification } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -590,3 +590,21 @@ export enum ModeResponsive {
 	MODE_CLAN = 'clan',
 	MODE_DM = 'dm',
 }
+
+export interface INotification extends Notification {
+	id: string;
+	content?: any;
+}
+export interface NotificationEntity extends INotification {
+	id: string;
+}
+
+export type TNotificationChannel = {
+	channel_id?: string;
+	clan_logo?: string;
+	channel_label?: string;
+	clan_id?: string;
+	clan_name?: string;
+	category_name?: string;
+	notifications: NotificationEntity[];
+};
