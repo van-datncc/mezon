@@ -1,5 +1,5 @@
 import { NavLinkComponent } from '@mezon/components';
-import { clansActions, directActions, selectDirectById, useAppDispatch } from '@mezon/store';
+import { directActions, selectDirectById, useAppDispatch } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { useLayoutEffect, useState } from 'react';
@@ -16,17 +16,6 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 	const dispatch = useAppDispatch();
 	const openDirectMessage = (direct: any) => {
 		dispatch(directActions.openDirectMessage({ channel_id: direct.channel_id || '' }));
-		dispatch(
-			directActions.joinDirectMessage({
-				directMessageId: direct.channel_id,
-				channelName: '',
-				type: Number(directMessage.type),
-			}),
-		);
-	};
-
-	const handleDirectMessage = async () => {
-		await dispatch(clansActions.joinClan({ clanId: '0' }));
 	};
 
 	useLayoutEffect(() => {
@@ -37,7 +26,7 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 	return (
 		<div>
 			<div onClick={() => openDirectMessage(directMessage)}>
-				<NavLink to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`} onClick={handleDirectMessage}>
+				<NavLink to={`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`}>
 					<NavLinkComponent clanName={directMessage.channel_label || ''}>
 						<div>
 							<Image

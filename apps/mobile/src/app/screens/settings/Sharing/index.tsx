@@ -3,22 +3,15 @@ import {
 	CloseIcon,
 	PenIcon,
 	STORAGE_CLAN_ID,
+	STORAGE_DATA_CATEGORY_CHANNEL,
 	SearchIcon,
 	SendIcon,
 	getAttachmentUnique,
+	load,
 	save,
-	load, STORAGE_DATA_CATEGORY_CHANNEL
 } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	clansActions,
-	directActions,
-	getStoreAsync,
-	selectCurrentClan,
-	selectCurrentClanId,
-	selectDirectsOpenlist,
-} from '@mezon/store-mobile';
+import { channelsActions, directActions, getStoreAsync, selectCurrentClan, selectCurrentClanId, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -150,7 +143,13 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToDM = async (dataSend: { text: any }) => {
 		const store = await getStoreAsync();
-		store.dispatch(clansActions.joinClan({ clanId: channelSelected?.clan_id }));
+		store.dispatch(
+			channelsActions.joinChat({
+				clanId: channelSelected?.clan_id,
+				channelId: channelSelected?.channel_id,
+				channelType: channelSelected?.type,
+			}),
+		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
@@ -166,7 +165,13 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToGroup = async (dataSend: { text: any }) => {
 		const store = await getStoreAsync();
-		store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
+		store.dispatch(
+			channelsActions.joinChat({
+				clanId: channelSelected.clan_id,
+				channelId: channelSelected.channel_id,
+				channelType: channelSelected.type,
+			}),
+		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
