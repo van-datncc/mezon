@@ -1,9 +1,10 @@
-import { useUserPolicy } from '@mezon/core';
+import { useClanOwner, useUserPolicy } from '@mezon/core';
 import {
 	RolesClanEntity,
 	getNewNameRole,
 	getNewSelectedPermissions,
 	getSelectedRoleId,
+	selectAllAccount,
 	selectCurrentClan,
 	setAddPermissions,
 	setRemovePermissions,
@@ -21,7 +22,7 @@ export type ModalSettingSave = {
 	handleSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
-const SettingPermissions = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
+const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesClanEntity[], isCreateNewRole: boolean }) => {
 	const dispatch = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const { permissionsDefault } = useUserPolicy(currentClan?.id || '');
@@ -29,8 +30,12 @@ const SettingPermissions = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => 
 	const [searchTerm, setSearchTerm] = useState('');
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const nameRole = useSelector(getNewNameRole);
+	const isClanOwner = useClanOwner();
 
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
+	const userProfile = useSelector(selectAllAccount);
+	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
+	const hasPermissionEdit = isUserCreate || isClanOwner || isCreateNewRole;
 	const permissionsRole = activeRole?.permission_list;
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
@@ -64,8 +69,13 @@ const SettingPermissions = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => 
 		}
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
+	const hiddenPermissionAdmin = (slug: string) => {
+		return (!isClanOwner && slug === 'administrator') && (isCreateNewRole || isUserCreate);
+	}
+
+
 	return (
-		<>
+		<div style={{pointerEvents: hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded-lg"
@@ -87,13 +97,14 @@ const SettingPermissions = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => 
 									checked={selectedPermissions.includes(permission.id)}
 									onChange={() => handlePermissionToggle(permission.id)}
 									className="cursor-pointer"
+									disabled={hiddenPermissionAdmin(permission.slug)}
 								/>
 							</label>
 						</li>
 					))}
 				</ul>
 			</div>
-		</>
+		</div>
 	);
 };
 

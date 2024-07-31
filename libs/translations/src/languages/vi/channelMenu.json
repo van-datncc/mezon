@@ -13,19 +13,37 @@
     "notification": {
       "title": "",
       "muteCategory": "Tắt thông báo channel",
+      "muteThread": "Tắt thông báo Thread",
       "notification": "Cài đặt thông báo"
     },
     "organizationMenu": {
       "title": "",
       "edit": "Chỉnh sửa kênh",
+      "deleteChannel": "Xoá Channel",
       "duplicateChannel": "Nhân bản channel"
     },
     "devMode": {
       "title": "Chế độ phát triển",
       "copyChannelID": "Sao chép Channel ID"
+    },
+    "manageThreadMenu": {
+      "editThread": "Chỉnh sửa Thread",
+      "deleteThread": "Xoá Thread"
     }
   },
   "notify": {
     "serverIDCopied": "Đã sao chép Channel ID"
-  }
+  },
+  "modalConfirm": {
+    "thread": {
+        "title": "Xoá Thread {{threadName}}",
+        "content": "Bạn có chắc muốn xoá Thread này không?",
+        "confirmText": "Có"
+    },
+    "channel": {
+        "title": "Xoá Channel {{channelName}}",
+        "content": "Bạn có chắc muốn xoá Channel này không?",
+        "confirmText": "Có"
+    }
+}
 }

@@ -30,7 +30,7 @@ const NotificationSetting = () => {
   const [isNotifyReactMessage, setisNotifyReactMessage] = useState (notifiReactMessage?.id !== '0')
   
 	useEffect(() => {
-		if (getNotificationChannelSelected?.active === 1) {
+		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === "0") {
 			setNameChildren('Mute Channel');
 			setmutedUntil('');
 		} else {

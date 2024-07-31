@@ -1,4 +1,4 @@
-import { Icons } from '@mezon/components';
+import { AvatarImage, Icons } from '@mezon/components';
 import { channelUsersActions, selectAllAccount, selectMembersByChannelId, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useCallback, useLayoutEffect, useState } from 'react';
@@ -46,7 +46,13 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 	return memberList?.map((user) => (
 		<div className={`flex justify-between py-2 rounded`} key={user?.id}>
 			<div className="flex gap-x-2 items-center">
-				<img src={user?.avatar_url} alt={user?.display_name} className="size-6 object-cover rounded-full" />
+				<AvatarImage 
+					alt={user?.username || ''}
+					userName={user?.username}
+					className="min-w-6 min-h-6 max-w-6 max-h-6"
+					src={user?.avatar_url}
+					classNameText='text-[9px] pt-[3px]'
+				/>
 				<p className="text-sm">{user?.display_name}</p>
 			</div>
 			<div className="flex items-center gap-x-2">

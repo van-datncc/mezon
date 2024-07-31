@@ -20,6 +20,7 @@ export * from './lib/chat/hooks/useChatParams';
 export * from './lib/chat/hooks/useChatReaction';
 export * from './lib/chat/hooks/useChatSending';
 export * from './lib/chat/hooks/useChatTypings';
+export * from './lib/chat/hooks/useClanOwner';
 export * from './lib/chat/hooks/useClanProfileSetting';
 export * from './lib/chat/hooks/useClans';
 export * from './lib/chat/hooks/useClickUpToEdit';

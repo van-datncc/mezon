@@ -12,8 +12,9 @@ interface IMezonConfirmProps {
 	content?: string;
 	onVisibleChange?: (visible: boolean) => void;
 	onConfirm?: () => void;
+	hasBackdrop?: boolean;
 }
-export default function MezonConfirm({ children, visible, onVisibleChange, title, confirmText, content, onConfirm }: IMezonConfirmProps) {
+export default function MezonConfirm({ children, hasBackdrop = true, visible, onVisibleChange, title, confirmText, content, onConfirm }: IMezonConfirmProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -31,7 +32,7 @@ export default function MezonConfirm({ children, visible, onVisibleChange, title
 			isVisible={visible}
 			animationIn={'bounceIn'}
 			animationOut={'bounceOut'}
-			hasBackdrop={true}
+			hasBackdrop={hasBackdrop}
 			coverScreen={true}
 			avoidKeyboard={false}
 			onBackdropPress={handleClose}
