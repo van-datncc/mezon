@@ -59,7 +59,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
@@ -86,7 +86,7 @@ import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
-import { useProcessMention } from './useProcessMention';
+import useProcessMention from './useProcessMention';
 import useProcessedContent from './useProcessedContent';
 
 type ChannelsMentionProps = {
@@ -231,10 +231,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
 
 	const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
-	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(mentionRaw, content);
+	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(content);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -273,8 +272,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						emojis: emojiList,
 						links: linkList,
 						markdowns: markdownList,
-						voiceLinks: voiceLinkRoomList,
-						plainText: plainTextMessage,
+						voicelinks: voiceLinkRoomList,
+						plaintext: plainTextMessage,
 					},
 
 					simplifiedMentionList,
@@ -316,8 +315,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							emojis: emojiList,
 							links: linkList,
 							markdowns: markdownList,
-							voiceLinks: voiceLinkRoomList,
-							plainText: plainTextMessage,
+							voicelinks: voiceLinkRoomList,
+							plaintext: plainTextMessage,
 						},
 						simplifiedMentionList,
 						attachmentDataRef,
@@ -406,15 +405,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (typeof props.onTyping === 'function') {
 			props.onTyping();
 		}
-		if (mentions.length > 0) {
-			setMentionRaw(mentions);
-		}
-		const convertedHashtag = convertToPlainTextHashtag(newValue);
-		setContent(convertedHashtag);
+
+		setContent(newValue);
 		setPlainTextMessage(newPlainTextValue);
 
-		if (props.handleConvertToFile !== undefined && convertedHashtag.length > MIN_THRESHOLD_CHARS) {
-			props.handleConvertToFile(convertedHashtag);
+		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
+			props.handleConvertToFile(newValue);
 			setContent('');
 			setValueTextInput('');
 		}
@@ -430,14 +426,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleChangeNameThread = (nameThread: string) => {
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
-	};
-
-	const convertToPlainTextHashtag = (text: string) => {
-		const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
-		const result = text.replace(regex, (match, symbol, p1, p2) => {
-			return symbol === '#' ? `<#${p2}>` : `@${p1}`;
-		});
-		return result;
 	};
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
@@ -514,8 +502,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
 		if ((currentChannelId || currentDmGroupId) && valueTextInput) {
-			const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
-			setContent(convertedHashtag);
+			setContent(valueTextInput);
 			focusToElement(editorRef);
 		}
 	}, [currentChannelId, currentDmGroupId, valueTextInput]);
