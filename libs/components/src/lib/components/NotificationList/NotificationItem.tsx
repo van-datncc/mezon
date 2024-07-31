@@ -32,7 +32,8 @@ function NotificationItem({ notify }: NotifyProps) {
 		setOpenUserProfileModalInner(false);
 	};
 
-	const handleDeleteNotification = (notificationId: string) => {
+	const handleDeleteNotification = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, notificationId: string) => {
+		event.stopPropagation();
 		deleteNotify(notificationId);
 	};
 
@@ -40,7 +41,7 @@ function NotificationItem({ notify }: NotifyProps) {
 		<>
 			<div
 				onClick={handleClickNotificationItem}
-				className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton py-3 px-3 w-full cursor-pointer"
+				className="relative flex flex-row justify-between items-center dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton py-3 px-3 w-full cursor-pointer"
 			>
 				<div className="flex items-center gap-2">
 					<MemberProfile
@@ -61,7 +62,7 @@ function NotificationItem({ notify }: NotifyProps) {
 				</div>
 				<button
 					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-					onClick={() => handleDeleteNotification(notify.id)}
+					onClick={(event) => handleDeleteNotification(event, notify.id)}
 				>
 					✕
 				</button>
