@@ -405,7 +405,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onTyping();
 		}
 
-		// const convertedHashtag = convertToPlainTextHashtag(newValue);
 		setContent(newValue);
 		setPlainTextMessage(newPlainTextValue);
 
@@ -427,14 +426,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleChangeNameThread = (nameThread: string) => {
 		dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: nameThread }));
 	};
-
-	// const convertToPlainTextHashtag = (text: string) => {
-	// 	const regex = /([@#])\[(.*?)\]\((.*?)\)/g;
-	// 	const result = text.replace(regex, (match, symbol, p1, p2) => {
-	// 		return symbol === '#' ? `<#${p2}>` : `@${p1}`;
-	// 	});
-	// 	return result;
-	// };
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
@@ -510,7 +501,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
 		if ((currentChannelId || currentDmGroupId) && valueTextInput) {
-			// const convertedHashtag = convertToPlainTextHashtag(valueTextInput);
 			setContent(valueTextInput);
 			focusToElement(editorRef);
 		}
