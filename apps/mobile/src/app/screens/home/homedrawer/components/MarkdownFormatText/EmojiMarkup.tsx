@@ -8,5 +8,8 @@ type IEmojiMarkup = {
 export const EmojiMarkup = ({ isMessageReply, shortname, emojiListPNG }: IEmojiMarkup) => {
 	const srcEmoji = getSrcEmoji(shortname, emojiListPNG);
 
+	if (!srcEmoji) {
+		return shortname;
+	}
 	return isMessageReply ? `![${shortname}](${srcEmoji})` : `[:${shortname}](${srcEmoji})`;
 };

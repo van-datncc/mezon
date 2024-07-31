@@ -330,21 +330,21 @@ export const RenderTextMarkdownContent = React.memo(
 			customStyle = { ...styleMessageReply(themeValue) };
 		}
 
-		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [] } = content;
-		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns].sort((a, b) => a.startIndex - b.startIndex);
+		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [], voiceLinks = [] } = content || {};
+		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns, ...voiceLinks].sort((a, b) => a.startIndex - b.startIndex);
 		let lastIndex = 0;
 
 		const contentRender = useMemo(() => {
 			let formattedContent = '';
 
 			elements.forEach((element) => {
-				const { startIndex, endIndex, channelId, channelLable, username, shortname, markdown, link } = element;
+				const { startIndex, endIndex, channelId, channelLabel, username, shortname, markdown, link, voiceLink } = element;
 
 				if (lastIndex < startIndex) {
 					formattedContent += t?.slice?.(lastIndex, startIndex)?.toString();
 				}
 
-				if (channelId && channelLable) {
+				if (channelId && channelLabel) {
 					formattedContent += ChannelHashtag({ channelHashtagId: channelId, channelsEntities });
 				}
 				if (username) {
@@ -354,8 +354,20 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });
 				}
 
-				if (markdown) {
-					formattedContent += formatBlockCode(markdown);
+				if (markdown || link) {
+					formattedContent += formatBlockCode(markdown || link);
+				}
+
+				if (voiceLink) {
+					const meetingCode = voiceLink?.split('/').pop();
+					const allChannelVoice = Object.values(channelsEntities).flat();
+					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+
+					if (!voiceChannelFound) {
+						formattedContent += formatBlockCode(voiceLink);
+					} else {
+						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities });
+					}
 				}
 				lastIndex = endIndex;
 			});

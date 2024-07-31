@@ -67,6 +67,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
 	const [delMessage] = useClanRestriction([EPermission.manageChannel]);
 	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
+	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
 
 	const [createThread] = useClanRestriction([EPermission.manageChannel]);
 	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
@@ -289,7 +290,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when(checkPos, (builder) => {
+		builder.when((checkPos && !hasViewChannelPermission), (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',

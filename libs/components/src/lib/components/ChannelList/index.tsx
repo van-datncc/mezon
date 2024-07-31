@@ -33,6 +33,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
   const clickedCategory = useMemo(() => {
     return categorizedChannels.find(category => category.category_id === clickedCategoryId) as ICategory
   }, [clickedCategoryId, categorizedChannels])
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
@@ -66,6 +67,8 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
 
+	const isShowCreateCatetory = isClanCreator || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
+
 	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
   
   const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, category: ICategory) => {
@@ -89,10 +92,6 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
   
   const handleCloseCategorySetting = () => {
     setIsShowCategorySetting(false);
-  }
-  
-  const handleOpenCategorySetting = () => {
-    setIsShowCategorySetting(true);
   }
   
   return (
@@ -139,7 +138,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
                   >
                     <Icons.UpDownIcon />
                   </button>
-                  <UserRestrictionZone policy={isClanCreator || hasAdminPermission || hasManageChannelPermission}>
+                  <UserRestrictionZone policy={isShowCreateCatetory}>
                     <button
                       className="focus-visible:outline-none"
                       onClick={() => handleOpenCreateChannelModal(category)}
@@ -165,7 +164,6 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
             </div>
           ))}
         </div>
-        
       </div>
       
       {isShowPanelCategory && (

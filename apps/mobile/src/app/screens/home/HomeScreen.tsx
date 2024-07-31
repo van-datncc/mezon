@@ -4,7 +4,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import React from 'react';
 import { Keyboard } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import LeftDrawerContent from './homedrawer/DrawerContent';
 import HomeDefault from './homedrawer/HomeDefault';
 
@@ -12,7 +11,6 @@ const Drawer = createDrawerNavigator();
 
 const HomeScreen = React.memo((props: any) => {
 	const dispatch = useDispatch();
-	useCheckUpdatedVersion();
 	return (
 		<Drawer.Navigator
 			screenOptions={{

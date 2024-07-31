@@ -34,7 +34,9 @@ export function useMessageParser(message: IMessageWithUser) {
 	const [isEdited, setIsEdited] = useState(false);
 
 	useEffect(() => {
-		setIsEdited(message.create_time < (message.update_time || '') || false);
+		const createTime = new Date(message.create_time).getTime();
+		const updateTime = message.update_time ? new Date(message.update_time).getTime() : 0;
+		setIsEdited(createTime < updateTime);
 	}, [message.update_time, message.create_time]);
 
 	const hasAttachments = attachments && attachments.length > 0;
