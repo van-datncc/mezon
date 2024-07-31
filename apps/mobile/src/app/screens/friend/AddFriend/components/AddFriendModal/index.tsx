@@ -1,6 +1,6 @@
 import { useAuth, useFriends } from '@mezon/core';
 import { CheckIcon, CloseIcon } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { friendsActions, requestAddFriendParam, selectStatusSentMobile } from '@mezon/store-mobile';
 import { MezonButton, MezonModal } from 'apps/mobile/src/app/temp-ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -158,6 +158,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 								disabled={!requestAddFriend.usernames[0]?.length}
 								onPress={() => sentFriendRequest()}
 								viewContainerStyle={styles.sendButton}
+								textStyle={{ color: baseColor.white }}
 							>
 								{t('addFriend.sendRequestButton')}
 							</MezonButton>

@@ -232,7 +232,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const statusMenu = useSelector(selectStatusMenu);
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
 
-	const { emojiList, linkList, markdownList } = useProcessedContent(content);
+	const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
 	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(mentionRaw, content);
 
 	const handleSend = useCallback(
@@ -272,6 +272,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						emojis: emojiList,
 						links: linkList,
 						markdowns: markdownList,
+						voiceLinks: voiceLinkRoomList,
 						plainText: plainTextMessage,
 					},
 
@@ -314,6 +315,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							emojis: emojiList,
 							links: linkList,
 							markdowns: markdownList,
+							voiceLinks: voiceLinkRoomList,
 							plainText: plainTextMessage,
 						},
 						simplifiedMentionList,
@@ -628,12 +630,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						return (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
+								name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
 								avatarUrl={suggestion.avatarUrl ?? ''}
 								subText={
 									suggestion.display === 'here'
 										? 'Notify everyone who has permission to see this channel'
-										: suggestion.display ?? ''
+										: (suggestion.display ?? '')
 								}
 								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== 'here'}
