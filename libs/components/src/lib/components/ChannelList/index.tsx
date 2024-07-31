@@ -52,7 +52,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
 
-	const isShowCreateCatetory = isClanCreator || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
+	const isShowCreateChannel = isClanCreator || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
 
 	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
@@ -95,7 +95,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 								>
 									<Icons.UpDownIcon />
 								</button>
-								<UserRestrictionZone policy={isShowCreateCatetory}>
+								<UserRestrictionZone policy={isShowCreateChannel}>
 									<button
 										className="focus-visible:outline-none"
 										onClick={() => {
