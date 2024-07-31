@@ -123,7 +123,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	}, [coords.distanceToBottom]);
   
   useEffect(() => {
-    if (getNotificationChannelSelected?.active === 1) {
+    if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === "0") {
       setNameChildren('Mute Channel');
       setmutedUntil('');
     } else {

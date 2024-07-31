@@ -28,6 +28,13 @@ export async function handleUploadFile(
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
+			let fileType = file.type;
+			if (!fileType) {
+				const fileNameParts = file.name.split('.');
+				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
+				fileType = `text/${fileExtension}`;
+			}
+			
 			const ms = new Date().getTime();
 			if (filename.trim() === "") {
 				filename = ms + '.' + file.type;
@@ -43,7 +50,7 @@ export async function handleUploadFile(
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {
 				filename: fullfilename,
-				filetype: file.type,
+				filetype: fileType,
 				size: file.size,
 			});
 			if (!data?.url) {
@@ -58,7 +65,7 @@ export async function handleUploadFile(
 			resolve({
 				filename: file.name,
 				url: url,
-				filetype: file.type,
+				filetype: fileType,
 				size: file.size,
 				width: 0,
 				height: 0,
@@ -73,6 +80,12 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
+			let fileType = file.type;
+			if (!fileType) {
+				const fileNameParts = file.name.split('.');
+				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
+				fileType = `text/${fileExtension}`;
+			}
 			if (file?.uri) {
 				const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 				if (!arrayBuffer) {
@@ -81,7 +94,7 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 				}
 				const data = await client.uploadAttachmentFile(session, {
 					filename: fullfilename,
-					filetype: file.type,
+					filetype: fileType,
 					size: file.size,
 				});
 				if (!data?.url) {
@@ -93,7 +106,7 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 				const res = await fetch(data.url, {
 					method: 'PUT',
 					headers: {
-						'Content-Type': file.type,
+						'Content-Type': fileType,
 						'Content-Length': file?.size?.toString() || '1000',
 					},
 					body: buffer,
@@ -105,7 +118,7 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 				resolve({
 					filename: file.name,
 					url: url,
-					filetype: file.type,
+					filetype: fileType,
 					size: file.size,
 					width: 0,
 					height: 0,

@@ -4,7 +4,7 @@ import { ChannelMessageEvent, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { fetchChannelsCached } from '../channels/channels.slice';
+import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { directChannelVoidActions } from '../channels/directChannelVoid.slice';
 import { clansActions } from '../clans/clans.slice';
 import { friendsActions } from '../friends/friend.slice';
@@ -61,7 +61,13 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		if (response) {
 			await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
-			thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
+			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				thunkAPI.dispatch(channelsActions.joinChat({ 
+					clanId: '0',
+					channelId: response.channel_id as string,
+					channelType: response.type as number,
+				}));
+			}
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue([]);
