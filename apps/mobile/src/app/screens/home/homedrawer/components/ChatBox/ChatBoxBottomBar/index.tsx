@@ -108,7 +108,7 @@ export const ChatBoxBottomBar = memo(
 			},
 			triggersConfig,
 		});
-		const { emojiList, linkList, markdownList } = useProcessedContent(text);
+		const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(text);
 
 		const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 		const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
@@ -480,6 +480,7 @@ export const ChatBoxBottomBar = memo(
 						emojisOnMessage={emojiList}
 						linksOnMessage={linkList}
 						markdownsOnMessage={markdownList}
+						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						plainTextMessage={plainTextMessage}
 						isShowCreateThread={isShowCreateThread}
 					/>
