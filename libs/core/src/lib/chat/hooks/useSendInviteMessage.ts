@@ -9,7 +9,7 @@ export function useSendInviteMessage() {
 	const sendInviteMessage = React.useCallback(
 		async (url: string, channel_id: string, channelMode: number) => {
 			const { links, markdowns } = processText(url);
-			
+
 			const content: IMessageSendPayload = {
 				t: url,
 				links: links,
@@ -51,22 +51,22 @@ const processText = (inputString: string) => {
 	while (i < inputString.length) {
 		if (inputString.startsWith(httpPrefix, i)) {
 			// Link processing
-			const startIndex = i;
+			const startindex = i;
 			i += httpPrefix.length;
 			while (i < inputString.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
 				i++;
 			}
-			const endIndex = i;
-			const link = inputString.substring(startIndex, endIndex);
+			const endindex = i;
+			const link = inputString.substring(startindex, endindex);
 
 			links.push({
 				link,
-				startIndex,
-				endIndex,
+				startindex,
+				endindex,
 			});
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
 			// Triple backtick markdown processing
-			const startIndex = i;
+			const startindex = i;
 			i += tripleBacktick.length;
 			let markdown = '';
 			while (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) !== tripleBacktick) {
@@ -75,12 +75,12 @@ const processText = (inputString: string) => {
 			}
 			if (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
 				i += tripleBacktick.length;
-				const endIndex = i;
-				markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startIndex, endIndex });
+				const endindex = i;
+				markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startindex, endindex });
 			}
 		} else if (inputString[i] === singleBacktick) {
 			// Single backtick markdown processing
-			const startIndex = i;
+			const startindex = i;
 			i++;
 			let markdown = '';
 			while (i < inputString.length && inputString[i] !== singleBacktick) {
@@ -88,10 +88,10 @@ const processText = (inputString: string) => {
 				i++;
 			}
 			if (i < inputString.length && inputString[i] === singleBacktick) {
-				const endIndex = i + 1;
-				const nextChar = inputString[endIndex];
+				const endindex = i + 1;
+				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown !== '' && nextChar !== singleBacktick) {
-					markdowns.push({ type: 'single', markdown: `\`${markdown}\``, startIndex, endIndex });
+					markdowns.push({ type: 'single', markdown: `\`${markdown}\``, startindex, endindex });
 				}
 				i++;
 			}
