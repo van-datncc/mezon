@@ -5,7 +5,7 @@ import React, { useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { useHover } from 'usehooks-ts';
-import * as Icons from '../../../../../ui/src/lib/Icons/index';
+import { Icons } from '../../components';
 import useIsWithinBackticks from '../MessageBox/ReactionMentionInput/useIsWithinBackticks';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';

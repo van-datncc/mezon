@@ -20,7 +20,7 @@ import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../../../../../ui/src/lib/Icons';
+import { Icons } from '../../components';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -173,7 +173,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
-					{isMuteBell ? <Icons.MuteBell /> : <Icons.UnMuteBell />}
+					{isMuteBell ? <Icons.MuteBell /> : <Icons.UnMuteBell defaultSize="size-6" />}
 				</button>
 			</Tooltip>
 			{isShowNotificationSetting && <NotificationSetting />}
@@ -253,7 +253,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<Tooltip content="Inboxs" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox />
 					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
@@ -268,7 +268,7 @@ function RedDot() {
 	return (
 		<div
 			className="absolute border-[1px] dark:border-bgPrimary border-[#ffffff]
-		 w-[12px] h-[12px] rounded-full bg-colorDanger 
+		 w-[12px] h-[12px] rounded-full bg-colorDanger
 		  font-bold text-[11px] flex items-center justify-center -bottom-1.5 -right-1"
 		></div>
 	);
