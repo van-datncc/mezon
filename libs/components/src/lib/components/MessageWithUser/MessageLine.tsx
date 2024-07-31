@@ -20,66 +20,66 @@ interface RenderContentProps {
 
 // TODO: refactor component for message lines
 const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }: RenderContentProps) => {
-	const { t, mentions = [], hashtags = [], emojis = [], markdowns = [], links = [], voiceLinks = [] } = data;
-	const elements = [...mentions, ...hashtags, ...emojis, ...markdowns, ...links, ...voiceLinks].sort((a, b) => a.startIndex - b.startIndex);
-	let lastIndex = 0;
+	const { t, mentions = [], hashtags = [], emojis = [], markdowns = [], links = [], voicelinks = [] } = data;
+	const elements = [...mentions, ...hashtags, ...emojis, ...markdowns, ...links, ...voicelinks].sort((a, b) => a.startindex - b.endindex);
+	let lastindex = 0;
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startIndex, endIndex, channelId, channelLabel, username, shortname, markdown, link, voiceLink } = element;
+			const { startindex, endindex, channelid, channellabel, username, shortname, markdown, link, voicelink } = element;
 
-			if (lastIndex < startIndex) {
+			if (lastindex < startindex) {
 				formattedContent.push(
-					<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastIndex}`} text={t.slice(lastIndex, startIndex)} />,
+					<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}`} text={t.slice(lastindex, startindex)} />,
 				);
 			}
 
-			if (channelId && channelLabel) {
+			if (channelid && channellabel) {
 				formattedContent.push(
 					<ChannelHashtag
 						showOnchannelLayout={showOnchannelLayout}
-						key={`${index}${startIndex}${channelId}`}
-						channelHastagId={`<#${channelId}>`}
+						key={`${index}${startindex}${channelid}`}
+						channelHastagId={`<#${channelid}>`}
 					/>,
 				);
 			}
 			if (username) {
 				formattedContent.push(
-					<MentionUser showOnchannelLayout={showOnchannelLayout} key={`${index}${startIndex}${username}`} tagName={username} mode={mode} />,
+					<MentionUser showOnchannelLayout={showOnchannelLayout} key={`${index}${startindex}${username}`} tagName={username} mode={mode} />,
 				);
 			}
 			if (shortname) {
-				formattedContent.push(<EmojiMarkup key={`${index}${startIndex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
+				formattedContent.push(<EmojiMarkup key={`${index}${startindex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
 			}
 
 			if (link) {
-				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${link}`} content={link} />);
+				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link}`} content={link} />);
 			}
 
-			if (voiceLink) {
-				const meetingCode = voiceLink?.split('/').pop();
+			if (voicelink) {
+				const meetingCode = voicelink?.split('/').pop();
 				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 				voiceChannelFound
 					? formattedContent.push(
 							<ChannelHashtag
 								showOnchannelLayout={showOnchannelLayout}
-								key={`${index}${startIndex}${channelId}`}
+								key={`${index}${startindex}${channelid}`}
 								channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
 							/>,
 						)
-					: formattedContent.push(<MarkdownContent key={`${index}${startIndex}${voiceLink}`} content={voiceLink} />);
+					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink} />);
 			}
 
 			if (markdown) {
 				const converted = markdown.startsWith('```') && markdown.endsWith('```') ? convertMarkdown(markdown) : markdown;
-				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={converted} />);
+				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={converted} />);
 			}
-			lastIndex = endIndex;
+			lastindex = endindex;
 		});
 
-		if (lastIndex < t?.length) {
-			formattedContent.push(<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastIndex}-end`} text={t.slice(lastIndex)} />);
+		if (lastindex < t?.length) {
+			formattedContent.push(<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />);
 		}
 
 		return formattedContent;

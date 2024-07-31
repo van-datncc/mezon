@@ -1,16 +1,16 @@
 export interface IStartEndIndex {
-	startIndex?: number | undefined;
-	endIndex?: number | undefined;
+	startindex?: number | undefined;
+	endindex?: number | undefined;
 }
 
 export interface IMention {
-	userId: string | undefined;
+	userid: string | undefined;
 	username: string | undefined;
 }
 
 export interface IHashtag {
-	channelId: string | undefined;
-	channelLabel: string | undefined;
+	channelid: string | undefined;
+	channellabel: string | undefined;
 }
 export interface IEmoji {
 	shortname: string | undefined;
@@ -24,7 +24,7 @@ export interface IMarkdown {
 }
 
 export interface ILinkVoiceRoom {
-	voiceLink: string | undefined;
+	voicelink: string | undefined;
 }
 
 export interface IMentionOnMessage extends IMention, IStartEndIndex {}

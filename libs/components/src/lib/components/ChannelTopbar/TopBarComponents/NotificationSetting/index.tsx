@@ -13,7 +13,7 @@ import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { notificationTypesList } from "../../../PanelChannel";
+import { notificationTypesList, notiLabels } from "../../../PanelChannel";
 import ItemPanel from "../../../PanelChannel/ItemPanel";
 
 const NotificationSetting = () => {
@@ -46,7 +46,7 @@ const NotificationSetting = () => {
 					setTimeout(() => {
 						const body = {
 							channel_id: currentChannelId || '',
-							notification_type: getNotificationChannelSelected?.notification_setting_type || '',
+							notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 							clan_id: currentClanId || '',
 							active: 1,
 						};
@@ -57,9 +57,9 @@ const NotificationSetting = () => {
 		}
 
 		if (defaultNotificationCategory?.notification_setting_type) {
-			setDefaultNotifiName(defaultNotificationCategory.notification_setting_type);
+			setDefaultNotifiName(notiLabels[defaultNotificationCategory?.notification_setting_type]);
 		} else if (defaultNotificationClan?.notification_setting_type) {
-			setDefaultNotifiName(defaultNotificationClan.notification_setting_type);
+			setDefaultNotifiName(notiLabels[defaultNotificationClan.notification_setting_type]);
 		}
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
 
@@ -71,7 +71,7 @@ const NotificationSetting = () => {
 
 			const body = {
 				channel_id: currentChannelId || '',
-				notification_type: getNotificationChannelSelected?.notification_setting_type || '',
+				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 				clan_id: currentClanId || '',
 				time_mute: unmuteTimeISO,
 			};
@@ -79,7 +79,7 @@ const NotificationSetting = () => {
 		} else {
 			const body = {
 				channel_id: currentChannelId || '',
-				notification_type: getNotificationChannelSelected?.notification_setting_type || '',
+				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 				clan_id: currentClanId || '',
 				active: 0,
 			};
@@ -90,18 +90,18 @@ const NotificationSetting = () => {
 	const muteOrUnMuteChannel = (active: number) => {
 		const body = {
 			channel_id: currentChannelId || '',
-			notification_type: getNotificationChannelSelected?.notification_setting_type || '',
+			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 			clan_id: currentClanId || '',
 			active: active,
 		};
 		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 	};
   
-  const setNotification = (notificationType: string) => {
+  const setNotification = (notificationType: number) => {
     if(notificationType) {
       const body = {
         channel_id: currentChannelId || '',
-        notification_type: notificationType || '',
+        notification_type: notificationType || 0,
         clan_id: currentClanId || '',
       };
       dispatch(notificationSettingActions.setNotificationSetting(body));
@@ -172,7 +172,7 @@ const NotificationSetting = () => {
           defaultNotifi={true}
           checked={getNotificationChannelSelected?.notification_setting_type === undefined}
           defaultNotifiName={defaultNotifiName}
-          onClick={() => setNotification('')}
+          onClick={() => setNotification(0)}
         />
         {notificationTypesList.map(notification => (
           <ItemPanel

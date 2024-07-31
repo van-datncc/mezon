@@ -7,7 +7,7 @@ type ItemPanelProps = {
 	danger?: boolean;
 	type?: 'radio' | 'checkbox' | 'none';
 	onClick?: () => void;
-  notificationId?: string;
+  notificationId?: number;
   defaultNotifi?: boolean;
   defaultChecked?: boolean;
   checked?: boolean;
