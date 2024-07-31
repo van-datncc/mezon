@@ -79,7 +79,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 						) : (
 							<div className="tracking-wide mb-4 text-base uppercase">EDIT ROLE - {nameRole}</div>
 						)}
-						<SettingValueDisplayRole RolesClan={rolesClan} isCreateNewRole={isCreateNewRole}/>
+						<SettingValueDisplayRole RolesClan={rolesClan} />
 					</div>
 				</div>
 				<SettingUserClanProfileSave PropsSave={saveProfile} />
