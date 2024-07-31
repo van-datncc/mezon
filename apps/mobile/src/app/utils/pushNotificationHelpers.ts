@@ -189,6 +189,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			// IS message DM
 			if (linkDirectMessageMatch) {
 				const messageId = linkDirectMessageMatch[1];
+				//TODO: Phuoc check
 				await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				const clanIdCache = load(STORAGE_CLAN_ID);

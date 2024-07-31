@@ -10,6 +10,7 @@ interface IUserInformationBottomSheetProps {
 	userId?: string;
 	user?: User;
 	onClose: () => void;
+	showAction?: boolean;
 }
 
 export const UserInformationBottomSheet = React.memo((props: IUserInformationBottomSheetProps) => {
@@ -51,7 +52,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 				);
 			}}
 		>
-			<UserProfile userId={userId} user={user} onClose={() => onClose()}></UserProfile>
+			<UserProfile userId={userId} user={user} onClose={() => onClose()} showAction={props.showAction}></UserProfile>
 		</MezonBottomSheet>
 	);
 });

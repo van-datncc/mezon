@@ -1,5 +1,7 @@
 import { Icons } from '@mezon/components';
-import { RolesClanEntity, selectTheme } from '@mezon/store';
+import { useClanRestriction } from '@mezon/core';
+import { RolesClanEntity, selectAllAccount, selectTheme } from '@mezon/store';
+import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 
@@ -12,6 +14,8 @@ type ListActiveRoleProps = {
 
 const ListActiveRole = (props: ListActiveRoleProps) => {
 	const { activeRoles, handleRoleClick, setShowModal, setOpenEdit } = props;
+	const userProfile = useSelector(selectAllAccount);
+	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
 	const appearanceTheme = useSelector(selectTheme);
 
 	return activeRoles.map((role) => (
@@ -42,9 +46,14 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 							setOpenEdit(true);
 						}}
 					>
+						{(role.creator_id === userProfile?.user?.id || isClanCreator) ?
 						<Tooltip content="Edit" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 							<Icons.PenEdit defaultSize="size-5" />
+						</Tooltip> :
+						<Tooltip content="View" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+							<Icons.ViewRole defaultSize="size-5" />
 						</Tooltip>
+						}
 					</div>
 					<div
 						className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full"

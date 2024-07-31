@@ -1,4 +1,4 @@
-import { useAuth } from '@mezon/core';
+import { useAuth, useClanRestriction } from '@mezon/core';
 import {
   notificationSettingActions,
   selectCurrentChannelId,
@@ -7,7 +7,7 @@ import {
   selectnotificatonSelected,
   useAppDispatch
 } from "@mezon/store";
-import { IChannel } from '@mezon/utils';
+import { EPermission, IChannel } from '@mezon/utils';
 import { format } from "date-fns";
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from "mezon-js";
@@ -123,7 +123,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	}, [coords.distanceToBottom]);
   
   useEffect(() => {
-    if (getNotificationChannelSelected?.active === 1) {
+    if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === "0") {
       setNameChildren('Mute Channel');
       setmutedUntil('');
     } else {
@@ -156,7 +156,12 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
   }, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
   
   const checkOwnerChannel = useMemo(() => channel.creator_id === userProfile?.user?.id, [channel.creator_id, userProfile?.user?.id]);
-  const checkOwnerClan = useMemo(() => currentClan?.creator_id === userProfile?.user?.id, [currentClan?.creator_id, userProfile?.user?.id]);
+  const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+  const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+  const [hasThreadPermission] = useClanRestriction([EPermission.manageThread]);
+
+  const isShowManageChannel = checkOwnerChannel || isClanCreator || hasAdminPermission || hasClanPermission;
+  const isShowManageThread = checkOwnerChannel || isClanCreator || hasClanPermission || hasThreadPermission;
 
   return (
 		<div
@@ -248,7 +253,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{(checkOwnerChannel || checkOwnerClan) && (
+					{(isShowManageChannel) && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
 							<ItemPanel children="Duplicate Channel" />
@@ -301,7 +306,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{(checkOwnerChannel || checkOwnerClan) && (
+					{(isShowManageThread) && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
 							<ItemPanel children="Duplicate Thread" />

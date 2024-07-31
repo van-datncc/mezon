@@ -7,7 +7,6 @@ import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannel
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
@@ -122,7 +121,13 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
-			thunkAPI.dispatch(clansActions.joinClan({ clanId: body.clan_id as string }));
+			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				thunkAPI.dispatch(channelsActions.joinChat({ 
+					clanId: response.clan_id as string,
+					channelId: response.channel_id as string,
+					channelType: response.type as number
+				}));
+			}
 			if (response.parrent_id !== '0') {
 				await thunkAPI.dispatch(
 					threadsActions.setListThreadId({ channelId: response.parrent_id as string, threadId: response.channel_id as string }),
@@ -271,6 +276,9 @@ export const channelsSlice = createSlice({
 		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
+		removeByChannelID: (state, action: PayloadAction<string>) => {
+			channelsAdapter.removeOne(state, action.payload);
+		},
 		setModeResponsive: (state, action) => {
 			state.modeResponsive = action.payload;
 		},

@@ -225,6 +225,14 @@ export const channelMembers = createSlice({
 			});
 			return channelMembersAdapter.setAll(state, updatedMembers);
 		},
+
+		removeUserByUserIdAndChannelId: (state, action: PayloadAction<{ userId: string; channelId: string }>) => {
+			const { userId, channelId } = action.payload;
+			const updatedMembers = Object.values(state.entities).filter((member) => {
+				return !(member?.user?.id === userId && member.channelId === channelId);
+			});
+			return channelMembersAdapter.setAll(state, updatedMembers);
+		},
 		setManyCustomStatusUser: (state, action: PayloadAction<CustomStatusUserArgs[]>) => {
 			for (const i of action.payload) {
 				state.customStatusUser[i.userId] = i.customStatus;

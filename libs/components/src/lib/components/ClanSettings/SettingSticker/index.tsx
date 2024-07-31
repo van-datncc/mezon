@@ -1,58 +1,19 @@
+import { selectCurrentClanId, selectListStickerByClanID, settingClanStickerActions, useAppDispatch } from "@mezon/store";
 import { Button, Modal } from "@mezon/ui";
-import { useState } from "react";
+import { ApiClanSticker } from "mezon-js/api.gen";
+import { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Icons } from "../../../components";
 import ModalSticker from "./ModalEditSticker";
 import SettingStickerItem from "./SettingStickerItem";
 
-
-export interface ISticker {
-  id: string,
-  source: string,
-  shortname: string,
-  category: string,
-  creatorId: string,
-  createTime: string,
-  clanId: string
-}
-
-const stickers: ISticker[] = [
-  {
-    id: "1",
-    source: "https://cdn.mezon.vn/1809615577312923648/1809615577329700864/17218963672241721896367224.png",
-    shortname: "Number One",
-    category: "Emojis",
-    creatorId: "user123",
-    createTime: "2024-07-26T03:34:30.638Z",
-    clanId: "clan123",
-  },
-  {
-    id: "2",
-    source: "https://cdn.mezon.vn/1809615577312923648/1809615577329700864/17218152958651721815295864.png",
-    shortname: "Number Two",
-    category: "Emojis",
-    creatorId: "user123",
-    createTime: "2024-07-26T03:34:30.638Z",
-    clanId: "clan123",
-  },
-  {
-    id: "3",
-    source: "https://cdn.mezon.vn/1809615577312923648/1809615577329700864/17218964424771721896442476.png",
-    shortname: "Number Three",
-    category: "Emojis",
-    creatorId: "user123",
-    createTime: "2024-07-26T03:34:30.638Z",
-    clanId: "clan123",
-  },
-
-];
-
 const SettingSticker = () => {
   const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
-  const [editSticker, setEditSticker] = useState<ISticker | null>(null);
-  const handleDeleteSticker = (sticker: ISticker) => {
-    // console.log(id);
-  }
-  const handleUpdateSticker = (sticker: ISticker) => {
+  const [editSticker, setEditSticker] = useState<ApiClanSticker | null>(null);
+  const dispatch = useAppDispatch();
+  const currentClanId = useSelector(selectCurrentClanId) || '';
+  const listSticker = useSelector(selectListStickerByClanID);
+  const handleUpdateSticker = (sticker: ApiClanSticker) => {
     setEditSticker(sticker);
     setShowModalSticker(true);
   }
@@ -63,6 +24,17 @@ const SettingSticker = () => {
   const handleOpenModalUpload = () => {
     setShowModalSticker(true);
   }
+
+  const fetchStickers = useCallback(async () => {
+    if (currentClanId) {
+      await dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId, noCache: true }));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    fetchStickers();
+  }, [fetchStickers]);
+
   return (
     <>
       <div className="flex flex-col gap-6 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
@@ -79,8 +51,8 @@ const SettingSticker = () => {
         </div>
         <div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] gap-x-[calc((100%_-_116px_*_4)/3)] w">
           {
-            stickers.map(sticker => (
-              <SettingStickerItem key={sticker.id} sticker={sticker} deleteSticker={handleDeleteSticker} updateSticker={handleUpdateSticker} />
+            listSticker.map(sticker => (
+              <SettingStickerItem key={sticker.id} sticker={sticker} updateSticker={handleUpdateSticker} />
             ))
           }
           <div onClick={handleOpenModalUpload} className={'cursor-pointer group relative text-xs w-[116px] h-[140px] rounded-lg flex flex-col items-center p-3 border-[0.08px] border-dashed  dark:border-borderDivider border-spacing-2 border-bgTertiary justify-center'}>

@@ -13,7 +13,7 @@ export default function MezonMenuSection({ title, items, bottomDescription }: IM
 	const styles = style(useTheme().themeValue);
 
 	return (
-		<View style={styles.sectionWrapper}>
+		<View>
 			{title && <Text style={styles.sectionTitle}>{title}</Text>}
 
 			<View style={styles.section}>
