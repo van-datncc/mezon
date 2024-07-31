@@ -15,7 +15,7 @@ type MembersSearchTabProps = {
 		id: string;
 		idDM: string;
 		name: string;
-		typeChat: 3;
+		typeChat: number;
 		user: User;
 	}[];
 };

@@ -27,7 +27,6 @@ export default function MenuThreadDetail(props: { route: any }) {
 	const [isSearchMessageChannel, setIsSearchMessageChannel] = useState<boolean>(false);
 	const [searchText, setSearchText] = useState<string>('');
 
-
 	useEffect(() => {
 		setIsSearchMessageChannel(props?.route?.params?.openThreadDetailFrom === EOpenThreadDetailFrom.SearchChannel);
 	}, [props?.route?.params?.openThreadDetailFrom]);
@@ -35,7 +34,6 @@ export default function MenuThreadDetail(props: { route: any }) {
   const handleSearchText = (value)=>{
     setSearchText(value);
   }
-
 
 	const channel = useMemo(() => {
 		if (directMessage?.id) {
