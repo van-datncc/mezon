@@ -1,7 +1,8 @@
-import { useSelector } from "react-redux";
-import { selectAllRolesClan, selectMemberByUserId, selectTheme } from "@mezon/store";
-import { useMemo } from "react";
+import { AvatarImage } from "@mezon/components";
+import { selectAllRolesClan, selectTheme } from "@mezon/store";
 import { Tooltip } from "flowbite-react";
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import RoleNameCard from "./RoleNameCard";
 
 type TableMemberItemProps = {
@@ -30,7 +31,12 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
     <div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0">
       <div className="flex-3 p-1">
         <div className="flex flex-row gap-2 items-center">
-          <img src={avatar} alt={username} className="w-[36px] h-[36px] min-w-[36px] rounded-full object-cover"/>
+          <AvatarImage 
+            alt={username}
+            userName={username}
+            className="min-w-9 min-h-9 max-w-9 max-h-9"
+            src={avatar}
+          />
           <div className="flex flex-col">
             <p className="text-base font-medium">{displayName}</p>
             <p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{username}</p>

@@ -1,13 +1,11 @@
-import { useClanOwner } from '@mezon/core';
 import {
 	RolesClanEntity,
 	getNewNameRole,
 	getNewSelectedPermissions,
 	getSelectedRoleId,
-	selectAllAccount,
 	setNameRoleNew,
 	toggleIsShowFalse,
-	toggleIsShowTrue,
+	toggleIsShowTrue
 } from '@mezon/store';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,16 +17,12 @@ export type ModalSettingSave = {
 	handleUpdateUser: () => void;
 };
 
-const SettingDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesClanEntity[], isCreateNewRole: boolean }) => {
+const SettingDisplayRole = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
 	const nameRole = useSelector(getNewNameRole);
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const clickRole = useSelector(getSelectedRoleId);
 
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
-	const userProfile = useSelector(selectAllAccount);
-	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;	
-	const isClanOwner = useClanOwner();
-	const hasPermissionEdit = isUserCreate || isClanOwner || isCreateNewRole;
 	const permissionsRole = activeRole?.permission_list;
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
@@ -53,7 +47,7 @@ const SettingDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 	return (
 		<div 
 			className='w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800'
-			style={{pointerEvents: hasPermissionEdit ? undefined : 'none'}}
+			style={{pointerEvents: (!hasPermissionEdit) ? undefined : 'none'}}
 		>
 			<div className="text-xs font-bold uppercase mb-2">
 				Role name<b className="text-red-600">*</b>
@@ -63,6 +57,7 @@ const SettingDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 				type="text"
 				value={nameRole}
 				onChange={handleDisplayName}
+				maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 			/>
 		</div>
 	);
