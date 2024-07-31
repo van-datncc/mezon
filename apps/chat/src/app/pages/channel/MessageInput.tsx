@@ -153,8 +153,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const sortedInitialDraftContent = sortObjectKeys(initialDraftContent);
 
 	const handleSave = () => {
-		delete sortedInitialDraftContent.plainText;
-		delete sortedInitialDraftContent.voiceLinks;
+		delete sortedInitialDraftContent.plaintext;
+		delete sortedInitialDraftContent.voicelinks;
 
 		if (channelDraftMessage.draftContent === '') {
 			return setOpenModalDelMess(true);
@@ -208,12 +208,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						renderSuggestion={(suggestion: MentionDataProps) => {
 							return (
 								<SuggestItem
-									name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
+									name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
 									avatarUrl={suggestion.avatarUrl ?? ''}
 									subText={
 										suggestion.display === 'here'
 											? 'Notify everyone who has permission to see this channel'
-											: (suggestion.display ?? '')
+											: suggestion.display ?? ''
 									}
 									subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== 'here'}

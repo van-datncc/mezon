@@ -30,6 +30,7 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 			id: '1775731111020111321',
 			display: 'here',
 			avatarUrl: '',
+			clanNick: '@here',
 		};
 		const sortedMentionList = [...mentionList].sort((a, b) => {
 			if (a.display.toLowerCase() < b.display.toLowerCase()) return -1;

@@ -13,12 +13,14 @@ type SuggestItemProps = {
 	symbol?: string;
 	name: string;
 	displayName?: string;
+	clanNickname?: string;
 	subText?: string;
 	valueHightLight?: string;
 	subTextStyle?: string;
 	showAvatar?: boolean;
 	channelId?: string | number;
 	isOpenSearchModal?: boolean;
+	isHashtag?: boolean;
 };
 
 const SuggestItem = ({
@@ -27,14 +29,14 @@ const SuggestItem = ({
 	symbol,
 	name,
 	displayName,
+	clanNickname,
 	channelId,
 	subText,
 	subTextStyle,
 	valueHightLight,
 	showAvatar,
+	isHashtag,
 }: SuggestItemProps) => {
-	console.log('name', name);
-	console.log('displayName', displayName);
 	const { emojis } = useEmojiSuggestion();
 	const urlEmoji = getSrcEmoji(name, emojis);
 	const allChannels = useSelector(selectAllChannels);
@@ -65,23 +67,6 @@ const SuggestItem = ({
 		}
 	}, []);
 
-	const highlightMatch = (name: string, getUserName: string) => {
-		const index = name.toLowerCase().indexOf(getUserName.toLowerCase());
-		if (index === -1) {
-			return name;
-		}
-		const beforeMatch = name.slice(0, index);
-		const match = name.slice(index, index + getUserName.length);
-		const afterMatch = name.slice(index + getUserName.length);
-		return (
-			<>
-				{beforeMatch}
-				<span className="font-bold">{match}</span>
-				{afterMatch}
-			</>
-		);
-	};
-
 	return (
 		<div className="flex flex-row items-center justify-between h-[24px]">
 			<div className="flex flex-row items-center gap-2 py-[3px]">
@@ -107,17 +92,47 @@ const SuggestItem = ({
 				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 				)}
-				{displayName && <span className="text-[15px] font-thin dark:text-white text-textLightTheme">{displayName}</span>}
-				<span
-					className={`text-[15px] border font-thin ${displayName ? 'dark:text-zinc-400 text-colorTextLightMode' : 'dark:text-white text-textLightTheme'}`}
-				>
-					{highlightMatch(name, valueHightLight ?? '')}
-				</span>
+				{isHashtag && (
+					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
+						{HighlightMatch(name ?? '', valueHightLight ?? '')}
+					</span>
+				)}
+				{clanNickname && (
+					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
+						{HighlightMatch(clanNickname ?? '', valueHightLight ?? '')}
+					</span>
+				)}
+				{displayName && (
+					<span
+						className={`text-[15px] font-thin ${displayName ? 'dark:text-zinc-400 text-colorTextLightMode' : 'dark:text-white text-textLightTheme'}`}
+					>
+						{HighlightMatch(displayName, valueHightLight ?? '')}
+					</span>
+				)}
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}
 			</div>
-			<span className={`text-[10px] font-semibold text-[#A1A1AA] border border-red-500 ${subTextStyle}`}>{subText}</span>
+			<span className={`text-[10px] font-semibold text-[#A1A1AA]  ${subTextStyle}`}>
+				{HighlightMatch(subText ?? '', valueHightLight ?? '')}
+			</span>
 		</div>
 	);
 };
 
 export default SuggestItem;
+
+const HighlightMatch = (name: string, getUserName: string) => {
+	const index = name.toLowerCase().indexOf(getUserName.toLowerCase());
+	if (index === -1) {
+		return name;
+	}
+	const beforeMatch = name.slice(0, index);
+	const match = name.slice(index, index + getUserName.length);
+	const afterMatch = name.slice(index + getUserName.length);
+	return (
+		<>
+			{beforeMatch}
+			<span className="font-bold">{match}</span>
+			{afterMatch}
+		</>
+	);
+};

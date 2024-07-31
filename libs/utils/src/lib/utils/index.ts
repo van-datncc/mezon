@@ -243,8 +243,8 @@ export const checkLastChar = (text: string) => {
 		return false;
 	}
 };
+
 export function searchMentionsHashtag(searchValue: any, list: any[]) {
-	console.log(list);
 	if (!searchValue) return list;
 	const lowerCaseSearchValue = searchValue.toLowerCase();
 
@@ -283,7 +283,14 @@ export function searchMentionsHashtag(searchValue: any, list: any[]) {
 				indexB !== -1 ? indexB : Infinity,
 			);
 
-			if (firstA !== firstB) {
+			// Prioritize clanNick over displayName and display
+			if (indexClanA !== -1 && indexClanB === -1) {
+				return -1;
+			} else if (indexClanA === -1 && indexClanB !== -1) {
+				return 1;
+			} else if (indexClanA !== -1 && indexClanB !== -1) {
+				return indexClanA - indexClanB;
+			} else if (firstA !== firstB) {
 				return firstA - firstB;
 			} else {
 				// If the first occurrence is the same, sort lexicographically by clanNick, displayName, then display
