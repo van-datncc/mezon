@@ -140,6 +140,8 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	useEffect(() => {
 		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === 'NOTHING') {
 			setIsMuteBell(true);
+		} else if (getNotificationChannelSelected?.id !== "0" && getNotificationChannelSelected?.active !== 1) {
+			setIsMuteBell(true);
 		} else if (getNotificationChannelSelected?.id === '0') {
 			if (defaultNotificationCategory?.notification_setting_type && defaultNotificationCategory?.notification_setting_type === 'NOTHING') {
 				setIsMuteBell(true);
