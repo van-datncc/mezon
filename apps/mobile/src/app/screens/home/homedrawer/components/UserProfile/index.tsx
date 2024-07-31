@@ -21,9 +21,10 @@ interface userProfileProps {
 	message?: IMessageWithUser;
 	checkAnonymous?: boolean;
 	onClose?: () => void;
+	showAction?: boolean;
 }
 
-const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message }: userProfileProps) => {
+const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message, showAction = true }: userProfileProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { userProfile } = useAuth();
@@ -119,8 +120,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 						</View>
 					)}
 				</View>
-
-				{userById ? (
+				{showAction && userById ? (
 					<View style={[styles.userInfo]}>
 						{userById?.user?.about_me && (
 							<View>
