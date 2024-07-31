@@ -1,18 +1,18 @@
 import {
-    differenceInDays,
-    differenceInHours,
-    differenceInMonths,
-    differenceInSeconds,
-    format,
-    formatDistanceToNowStrict,
-    fromUnixTime,
-    isSameDay,
-    startOfDay,
-    subDays,
+	differenceInDays,
+	differenceInHours,
+	differenceInMonths,
+	differenceInSeconds,
+	format,
+	formatDistanceToNowStrict,
+	fromUnixTime,
+	isSameDay,
+	startOfDay,
+	subDays,
 } from 'date-fns';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
-import Resizer from "react-image-file-resizer";
+import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
 import { ChannelMembersEntity, EmojiDataOptionals, ILineMention, IMessageWithUser, SenderInfoOptionals, UsersClanEntity } from '../types/index';
 
@@ -162,7 +162,6 @@ export const convertMarkdown = (markdown: string): string => {
 };
 
 export const getSrcEmoji = (shortname: string, emojiListPNG: any[]) => {
-
 	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
 	return emoji ? emoji.src : undefined;
 };
@@ -244,26 +243,51 @@ export const checkLastChar = (text: string) => {
 		return false;
 	}
 };
-
 export function searchMentionsHashtag(searchValue: any, list: any[]) {
+	console.log(list);
 	if (!searchValue) return list;
 	const lowerCaseSearchValue = searchValue.toLowerCase();
-	return list
-		.filter((mention) => mention.display.toLowerCase().includes(lowerCaseSearchValue))
-		.sort((a, b) => {
-			const displayA = a.display.toLowerCase();
-			const displayB = b.display.toLowerCase();
-			const indexA = displayA.indexOf(lowerCaseSearchValue);
-			const indexB = displayB.indexOf(lowerCaseSearchValue);
 
-			if (indexA !== -1 && indexB !== -1) {
-				return indexA - indexB;
-			} else if (indexA !== -1) {
-				return -1;
-			} else if (indexB !== -1) {
-				return 1;
+	return list
+		.filter((mention) => {
+			return (
+				mention.display?.toLowerCase().includes(lowerCaseSearchValue) ||
+				mention.displayName?.toLowerCase().includes(lowerCaseSearchValue) ||
+				mention.clanNick?.toLowerCase().includes(lowerCaseSearchValue)
+			);
+		})
+		.sort((a, b) => {
+			const displayA = a.display?.toLowerCase();
+			const displayB = b.display?.toLowerCase();
+			const displayNameA = a.displayName?.toLowerCase();
+			const displayNameB = b.displayName?.toLowerCase();
+			const clanNickA = a.clanNick?.toLowerCase();
+			const clanNickB = b.clanNick?.toLowerCase();
+
+			const indexA = displayA?.indexOf(lowerCaseSearchValue);
+			const indexB = displayB?.indexOf(lowerCaseSearchValue);
+			const indexNameA = displayNameA?.indexOf(lowerCaseSearchValue);
+			const indexNameB = displayNameB?.indexOf(lowerCaseSearchValue);
+			const indexClanA = clanNickA?.indexOf(lowerCaseSearchValue);
+			const indexClanB = clanNickB?.indexOf(lowerCaseSearchValue);
+
+			// Find the first occurrence of the search value in any of the fields
+			const firstA = Math.min(
+				indexClanA !== -1 ? indexClanA : Infinity,
+				indexNameA !== -1 ? indexNameA : Infinity,
+				indexA !== -1 ? indexA : Infinity,
+			);
+			const firstB = Math.min(
+				indexClanB !== -1 ? indexClanB : Infinity,
+				indexNameB !== -1 ? indexNameB : Infinity,
+				indexB !== -1 ? indexB : Infinity,
+			);
+
+			if (firstA !== firstB) {
+				return firstA - firstB;
 			} else {
-				return displayA.localeCompare(displayB);
+				// If the first occurrence is the same, sort lexicographically by clanNick, displayName, then display
+				return clanNickA.localeCompare(clanNickB) || displayNameA.localeCompare(displayNameB) || displayA.localeCompare(displayB);
 			}
 		});
 }
@@ -291,9 +315,9 @@ export const checkSameDayByCreateTime = (createTime1: string | Date, createTime2
 };
 
 export const formatTimeToMMSS = (duration: number): string => {
-  const minutes = Math.floor(duration / 60);
-  const seconds = Math.floor(duration % 60);
-  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+	const minutes = Math.floor(duration / 60);
+	const seconds = Math.floor(duration % 60);
+	return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
 export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number, type: string, minWidth?: number, minHeight?: number) =>
@@ -310,6 +334,6 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 			},
 			type,
 			minWidth,
-			minHeight
+			minHeight,
 		);
 	});

@@ -422,6 +422,8 @@ export type MentionDataProps = {
 	display?: string;
 	avatarUrl?: string;
 	displayName?: string;
+	clanNick?: string;
+	clanAvatar?: string;
 	user?: ApiUser;
 };
 

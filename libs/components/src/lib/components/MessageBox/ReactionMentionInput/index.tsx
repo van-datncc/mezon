@@ -65,6 +65,7 @@ import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
+import useShowName from '../../MessageWithUser/useShowName';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
 import {
@@ -627,11 +628,20 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						return `@${display}`;
 					}}
 					renderSuggestion={(suggestion: MentionDataProps) => {
+						const name = useShowName(
+							suggestion.clanNick ?? '',
+							suggestion.displayName ?? '',
+							suggestion.display ?? '',
+							suggestion.user?.id ?? '',
+						);
+
+						const avatar = suggestion.clanAvatar ? suggestion.clanAvatar : suggestion.avatarUrl;
+
 						return (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
-								avatarUrl={suggestion.avatarUrl ?? ''}
+								name={suggestion.display === 'here' ? '@here' : (name ?? '')}
+								avatarUrl={avatar ?? ''}
 								subText={
 									suggestion.display === 'here'
 										? 'Notify everyone who has permission to see this channel'

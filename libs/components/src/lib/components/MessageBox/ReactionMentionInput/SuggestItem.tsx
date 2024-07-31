@@ -21,7 +21,20 @@ type SuggestItemProps = {
 	isOpenSearchModal?: boolean;
 };
 
-const SuggestItem = ({ isOpenSearchModal, avatarUrl, symbol, name, displayName, channelId, subText, subTextStyle, valueHightLight, showAvatar }: SuggestItemProps) => {
+const SuggestItem = ({
+	isOpenSearchModal,
+	avatarUrl,
+	symbol,
+	name,
+	displayName,
+	channelId,
+	subText,
+	subTextStyle,
+	valueHightLight,
+	showAvatar,
+}: SuggestItemProps) => {
+	console.log('name', name);
+	console.log('displayName', displayName);
 	const { emojis } = useEmojiSuggestion();
 	const urlEmoji = getSrcEmoji(name, emojis);
 	const allChannels = useSelector(selectAllChannels);
@@ -70,7 +83,7 @@ const SuggestItem = ({ isOpenSearchModal, avatarUrl, symbol, name, displayName, 
 	};
 
 	return (
-		<div className="flex flex-row items-center justify-between h-[24px]" >
+		<div className="flex flex-row items-center justify-between h-[24px]">
 			<div className="flex flex-row items-center gap-2 py-[3px]">
 				{showAvatar && (
 					<AvatarImage
@@ -96,13 +109,13 @@ const SuggestItem = ({ isOpenSearchModal, avatarUrl, symbol, name, displayName, 
 				)}
 				{displayName && <span className="text-[15px] font-thin dark:text-white text-textLightTheme">{displayName}</span>}
 				<span
-					className={`text-[15px] font-thin ${displayName ? 'dark:text-zinc-400 text-colorTextLightMode' : 'dark:text-white text-textLightTheme'}`}
+					className={`text-[15px] border font-thin ${displayName ? 'dark:text-zinc-400 text-colorTextLightMode' : 'dark:text-white text-textLightTheme'}`}
 				>
 					{highlightMatch(name, valueHightLight ?? '')}
 				</span>
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}
 			</div>
-			<span className={`text-[10px] font-semibold text-[#A1A1AA] ${subTextStyle}`}>{subText}</span>
+			<span className={`text-[10px] font-semibold text-[#A1A1AA] border border-red-500 ${subTextStyle}`}>{subText}</span>
 		</div>
 	);
 };
