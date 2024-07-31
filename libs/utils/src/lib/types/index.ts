@@ -194,8 +194,8 @@ export type IMessageSendPayload = {
 	emojis?: IEmojiOnMessage[];
 	links?: ILinkOnMessage[];
 	markdowns?: IMarkdownOnMessage[];
-	voiceLinks?: ILinkVoiceRoomOnMessage[];
-	plainText?: string;
+	voicelinks?: ILinkVoiceRoomOnMessage[];
+	plaintext?: string;
 };
 
 export type IUser = {
