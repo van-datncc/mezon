@@ -54,7 +54,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 			}
 
 			if (link) {
-				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${markdown}`} content={link} />);
+				formattedContent.push(<MarkdownContent key={`${index}${startIndex}${link}`} content={link} />);
 			}
 
 			if (voiceLink) {
