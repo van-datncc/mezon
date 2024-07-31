@@ -16,7 +16,7 @@ import {
 } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ChannelType } from 'mezon-js';
+import { ChannelType, NotificationType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -138,14 +138,14 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
-		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === 'NOTHING') {
+		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
 			setIsMuteBell(true);
 		} else if (getNotificationChannelSelected?.id !== "0" && getNotificationChannelSelected?.active !== 1) {
 			setIsMuteBell(true);
 		} else if (getNotificationChannelSelected?.id === '0') {
-			if (defaultNotificationCategory?.notification_setting_type && defaultNotificationCategory?.notification_setting_type === 'NOTHING') {
+			if (defaultNotificationCategory?.notification_setting_type && defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
 				setIsMuteBell(true);
-			} else if (defaultNotificationClan?.notification_setting_type && defaultNotificationClan?.notification_setting_type === 'NOTHING') {
+			} else if (defaultNotificationClan?.notification_setting_type && defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
 				setIsMuteBell(true);
 			} else {
 				setIsMuteBell(false);
