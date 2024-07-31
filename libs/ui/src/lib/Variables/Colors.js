@@ -75,6 +75,9 @@ module.exports = {
   buttonSearch: '#3B3C43',
   buttonSearchHover: '#2C2E32',
 
+  // Box shadows
+  boxShadowBorderLight: '0 0 0 1px hsla(0, 0%, 0%, 0.08)',
+
   primary: '#155EEF',
   hoverPrimary: '#124FC9',
   buttonSecondary: '#4E5057',
