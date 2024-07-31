@@ -1,5 +1,5 @@
 import { useMezon } from '@mezon/transport';
-import { convertMarkdown, ILinkOnMessage, IMarkdownOnMessage, IMessageSendPayload, linkRegex, markdownRegex } from '@mezon/utils';
+import { ILinkOnMessage, IMarkdownOnMessage, IMessageSendPayload } from '@mezon/utils';
 import React, { useMemo } from 'react';
 
 export function useSendInviteMessage() {
@@ -8,31 +8,12 @@ export function useSendInviteMessage() {
 
 	const sendInviteMessage = React.useCallback(
 		async (url: string, channel_id: string, channelMode: number) => {
-			const linkList: ILinkOnMessage[] = [];
-			const markdownList: IMarkdownOnMessage[] = [];
-			let match;
-			while ((match = linkRegex.exec(url)) !== null) {
-				linkList.push({
-					link: match[0],
-					startIndex: match.index,
-					endIndex: match.index + match[0].length,
-				});
-			}
-
-			while ((match = markdownRegex.exec(url)) !== null) {
-				const startsWithTripleBackticks = match[0].startsWith('```');
-				const endsWithNoTripleBackticks = match[0].endsWith('```');
-				const convertedMarkdown = startsWithTripleBackticks && endsWithNoTripleBackticks ? convertMarkdown(match[0]) : match[0];
-				markdownList.push({
-					markdown: convertedMarkdown,
-					startIndex: match.index,
-					endIndex: match.index + match[0].length,
-				});
-			}
+			const { links, markdowns } = processText(url);
+			
 			const content: IMessageSendPayload = {
 				t: url,
-				links: linkList,
-				markdowns: markdownList,
+				links: links,
+				markdowns: markdowns,
 			};
 
 			const session = sessionRef.current;
@@ -57,3 +38,67 @@ export function useSendInviteMessage() {
 		[client, sendInviteMessage],
 	);
 }
+
+const processText = (inputString: string) => {
+	const links: ILinkOnMessage[] = [];
+	const markdowns: IMarkdownOnMessage[] = [];
+
+	const singleBacktick: string = '`';
+	const tripleBacktick: string = '```';
+	const httpPrefix: string = 'http';
+
+	let i = 0;
+	while (i < inputString.length) {
+		if (inputString.startsWith(httpPrefix, i)) {
+			// Link processing
+			const startIndex = i;
+			i += httpPrefix.length;
+			while (i < inputString.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
+				i++;
+			}
+			const endIndex = i;
+			const link = inputString.substring(startIndex, endIndex);
+
+			links.push({
+				link,
+				startIndex,
+				endIndex,
+			});
+		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
+			// Triple backtick markdown processing
+			const startIndex = i;
+			i += tripleBacktick.length;
+			let markdown = '';
+			while (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) !== tripleBacktick) {
+				markdown += inputString[i];
+				i++;
+			}
+			if (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
+				i += tripleBacktick.length;
+				const endIndex = i;
+				markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startIndex, endIndex });
+			}
+		} else if (inputString[i] === singleBacktick) {
+			// Single backtick markdown processing
+			const startIndex = i;
+			i++;
+			let markdown = '';
+			while (i < inputString.length && inputString[i] !== singleBacktick) {
+				markdown += inputString[i];
+				i++;
+			}
+			if (i < inputString.length && inputString[i] === singleBacktick) {
+				const endIndex = i + 1;
+				const nextChar = inputString[endIndex];
+				if (!markdown.includes('``') && markdown !== '' && nextChar !== singleBacktick) {
+					markdowns.push({ type: 'single', markdown: `\`${markdown}\``, startIndex, endIndex });
+				}
+				i++;
+			}
+		} else {
+			i++;
+		}
+	}
+
+	return { links, markdowns };
+};
