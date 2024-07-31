@@ -93,7 +93,9 @@ const processText = (inputString: string) => {
 			if (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
 				i += tripleBacktick.length;
 				const endIndex = i;
-				markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startIndex, endIndex });
+				if (markdown.trim().length > 0) {
+					markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startIndex, endIndex });
+				}
 			}
 		} else if (inputString[i] === singleBacktick) {
 			// Single backtick markdown processing
@@ -107,7 +109,7 @@ const processText = (inputString: string) => {
 			if (i < inputString.length && inputString[i] === singleBacktick) {
 				const endIndex = i + 1;
 				const nextChar = inputString[endIndex];
-				if (!markdown.includes('``') && markdown !== '' && nextChar !== singleBacktick) {
+				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
 					markdowns.push({ type: 'single', markdown: `\`${markdown}\``, startIndex, endIndex });
 				}
 				i++;

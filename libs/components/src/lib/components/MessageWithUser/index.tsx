@@ -62,10 +62,10 @@ function MessageWithUser({
 
 	const isWithinBackticks = useIsWithinBackticks(message.content.t ?? '');
 	const hasIncludeMention = useMemo(() => {
-		const userMention = `@${userLogin.userProfile?.user?.username}`;
-		const startIndexHere = message.content.t?.indexOf('@here');
+		const userMention = `@[${userLogin.userProfile?.user?.username}]`;
+		const startIndexHere = message.content.t?.indexOf('@[here]');
 		const startIndexUser = message.content.t?.indexOf(userMention);
-		const includesHere = message.content.t?.includes('@here') && !isWithinBackticks(startIndexHere ?? -1);
+		const includesHere = message.content.t?.includes('@[here]') && !isWithinBackticks(startIndexHere ?? -1);
 		const includesUser = message.content.t?.includes(userMention) && !isWithinBackticks(startIndexUser ?? -1);
 		return includesHere || includesUser;
 	}, [message.content.t, userLogin.userProfile?.user?.username]);
