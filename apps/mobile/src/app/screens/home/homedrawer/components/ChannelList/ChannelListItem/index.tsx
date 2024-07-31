@@ -15,7 +15,7 @@ import {
 	selectNotificationMentionCountByChannelId,
 	selectVoiceChannelMembersByChannelId,
 } from '@mezon/store-mobile';
-import { ChannelStatusEnum, IChannel } from '@mezon/utils';
+import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
@@ -39,6 +39,7 @@ interface IChannelListItemProps {
 	isActive: boolean;
 	currentChanel: IChannel;
 	onLongPress: () => void;
+	onLongPressThread?: (thread: ChannelThreads) => void;
 }
 
 enum StatusVoiceChannel {
@@ -126,7 +127,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			</TouchableOpacity>
 
 			{!!props?.data?.threads?.length && (
-				<ListChannelThread threads={props?.data?.threads} currentChanel={props.currentChanel} onPress={handleRouteData} />
+				<ListChannelThread threads={props?.data?.threads} currentChanel={props.currentChanel} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />
 			)}
 			{!!voiceChannelMember?.length && <UserListVoiceChannel userListVoice={voiceChannelMember} />}
 		</View>
