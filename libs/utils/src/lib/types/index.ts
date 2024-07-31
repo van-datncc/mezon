@@ -588,3 +588,7 @@ export enum ModeResponsive {
 	MODE_CLAN = 'clan',
 	MODE_DM = 'dm',
 }
+
+export enum SlugPermission {
+	Admin = 'administrator',
+}

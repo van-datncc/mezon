@@ -12,6 +12,7 @@ import {
 	toggleIsShowTrue
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
+import { SlugPermission } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -21,6 +22,7 @@ export type ModalSettingSave = {
 	handleSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
+
 const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
 	const dispatch = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
@@ -66,7 +68,7 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 
 	const isClanOwner = useClanOwner();
 	const hiddenPermissionAdmin = (slug: string) => {
-		return isClanOwner ? false : (slug === 'administrator' && !hasPermissionEdit);
+		return isClanOwner ? false : (slug === SlugPermission.Admin && !hasPermissionEdit);
 	}
 
 
