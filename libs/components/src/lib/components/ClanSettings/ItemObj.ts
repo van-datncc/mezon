@@ -16,6 +16,7 @@ export const ItemSetting = {
 	DELETE_SERVER: 'delete_server',
 	INTEGRATIONS: 'integrations',
 	NOTIFICATION_SOUND: 'notification-sound',
+ 
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -37,3 +38,15 @@ export const sideBarListItem: ListSideBarProps[] = [
 		listItem: listItemSettingApp,
 	},
 ];
+
+export const categorySettingItem = {
+  OVERVIEW: 'overview',
+  PERMISSIONS: 'permissions'
+}
+
+export const categorySettingList = [
+  { id: categorySettingItem.OVERVIEW, name: 'Overview' },
+  { id: categorySettingItem.PERMISSIONS, name: 'Permissions' },
+]
+
+
