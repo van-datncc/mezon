@@ -14,13 +14,13 @@ import {
 	selectTheme,
 	selectnotificatonSelected,
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType, NotificationType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import { Icons } from '../../components';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -138,14 +138,23 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
-		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
+		if (
+			getNotificationChannelSelected?.active === 1 &&
+			getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+		) {
 			setIsMuteBell(true);
-		} else if (getNotificationChannelSelected?.id !== "0" && getNotificationChannelSelected?.active !== 1) {
+		} else if (getNotificationChannelSelected?.id !== '0' && getNotificationChannelSelected?.active !== 1) {
 			setIsMuteBell(true);
 		} else if (getNotificationChannelSelected?.id === '0') {
-			if (defaultNotificationCategory?.notification_setting_type && defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
+			if (
+				defaultNotificationCategory?.notification_setting_type &&
+				defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+			) {
 				setIsMuteBell(true);
-			} else if (defaultNotificationClan?.notification_setting_type && defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
+			} else if (
+				defaultNotificationClan?.notification_setting_type &&
+				defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+			) {
 				setIsMuteBell(true);
 			} else {
 				setIsMuteBell(false);

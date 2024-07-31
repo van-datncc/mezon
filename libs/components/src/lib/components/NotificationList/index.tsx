@@ -1,9 +1,9 @@
 import { useNotification } from '@mezon/core';
 import { notificationActions, selectTheme } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { INotification, NotificationCode } from '@mezon/utils';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Icons } from '../../components';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
 

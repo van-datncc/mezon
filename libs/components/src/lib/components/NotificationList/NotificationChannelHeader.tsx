@@ -1,6 +1,6 @@
 import { selectClanById, useAppSelector } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { INotification, TNotificationChannel } from '@mezon/utils';
-import { Icons } from '../../components';
 
 type NotificationChannelHeaderProps = {
 	itemUnread?: TNotificationChannel;
