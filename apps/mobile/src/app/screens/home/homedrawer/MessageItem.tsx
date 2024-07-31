@@ -16,8 +16,9 @@ import {
 	selectAllAccount,
 	selectAllUsesClan,
 	selectIdMessageToJump,
+	selectLastSeenMessage,
 	selectMessageEntityById,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
@@ -34,7 +35,6 @@ import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessageP
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
-import { Swipeable } from 'react-native-gesture-handler';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
@@ -82,6 +82,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
+	const lastSeen = useSelector(selectLastSeenMessage(props?.channelId || '', props?.messageId || ''));
+
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
@@ -250,100 +252,100 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		// 	onSwipeableOpen={handleSwipeableOpen}
 		// 	hitSlop={{ left: -10 }}
 		// >
-			<View
-				style={[
-					styles.messageWrapper,
-					(isCombine || preventAction) && { marginTop: 0 },
-					hasIncludeMention && styles.highlightMessageMention,
-					checkMessageTargetToMoved && styles.highlightMessageReply,
-				]}
-			>
-				{/* NEW LINE MESSAGE - TO BE UPDATE CORRECT LOGIC*/}
-				{/*{lastSeen &&*/}
-				{/*	<View style={styles.newMessageLine}>*/}
-				{/*		<View style={styles.newMessageContainer}>*/}
-				{/*			<Text style={styles.newMessageText}>NEW MESSAGE</Text>*/}
-				{/*		</View>*/}
-				{/*	</View>}*/}
-				{!!messageReferences && (
-					<MessageReferences
-						messageReferences={messageReferences}
-						preventAction={preventAction}
-						isMessageReply={true}
-						jumpToRepliedMessage={jumpToRepliedMessage}
-						mode={mode}
-					/>
-				)}
-				{isMessageReplyDeleted ? (
-					<View style={styles.aboveMessageDeleteReply}>
-						<View style={styles.iconReply}>
-							<ReplyIcon width={34} height={30} style={styles.deletedMessageReplyIcon} />
-						</View>
-						<View style={styles.iconMessageDeleteReply}>
-							<ReplyMessageDeleted width={18} height={9} />
-						</View>
-						<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
+		<View
+			style={[
+				styles.messageWrapper,
+				(isCombine || preventAction) && { marginTop: 0 },
+				hasIncludeMention && styles.highlightMessageMention,
+				checkMessageTargetToMoved && styles.highlightMessageReply,
+			]}
+		>
+			{!!messageReferences && (
+				<MessageReferences
+					messageReferences={messageReferences}
+					preventAction={preventAction}
+					isMessageReply={true}
+					jumpToRepliedMessage={jumpToRepliedMessage}
+					mode={mode}
+				/>
+			)}
+			{isMessageReplyDeleted ? (
+				<View style={styles.aboveMessageDeleteReply}>
+					<View style={styles.iconReply}>
+						<ReplyIcon width={34} height={30} style={styles.deletedMessageReplyIcon} />
 					</View>
-				) : null}
-				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
-					<AvatarMessage
-						onPress={onPressAvatar}
-						avatar={message?.isMe ? userProfile?.user?.avatar_url : message?.user?.avatarSm}
-						textAvatar={isDM ? message?.display_name || message?.user?.username : message?.user?.username}
-						isShow={!isCombine || !!message?.references?.length || showUserInformation}
-					/>
-					<Pressable
-						style={[styles.rowMessageBox]}
-						onLongPress={() => {
-							if (preventAction) return;
-							setIsOnlyEmojiPicker(false);
-							onMessageAction({
-								type: EMessageBSToShow.MessageAction,
-								senderDisplayName,
-								message,
-							});
-							dispatch(setSelectedMessage(message));
-						}}
-					>
-						<InfoUserMessage
-							onPress={onPressInfoUser}
-							senderDisplayName={senderDisplayName}
-							isShow={!isCombine || !!message?.references?.length || showUserInformation}
-							createTime={message?.create_time}
-						/>
-						<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-						<Block opacity={message.isError ? 0.6 : 1}>
-							<RenderTextMarkdownContent
-								content={message.content}
-								isEdited={isEdited}
-								translate={t}
-								onMention={onMention}
-								onChannelMention={onChannelMention}
-								isNumberOfLine={isNumberOfLine}
-								isMessageReply={false}
-								mode={mode}
-							/>
-						</Block>
-						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
-						{!preventAction ? (
-							<MessageAction
-								message={message}
-								mode={mode}
-								userProfile={userProfile}
-								preventAction={preventAction}
-								openEmojiPicker={() => {
-									setIsOnlyEmojiPicker(true);
-									onMessageAction({
-										type: EMessageBSToShow.MessageAction,
-										senderDisplayName,
-										message,
-									});
-								}}
-							/>
-						) : null}
-					</Pressable>
+					<View style={styles.iconMessageDeleteReply}>
+						<ReplyMessageDeleted width={18} height={9} />
+					</View>
+					<Text style={styles.messageDeleteReplyText}>{t('messageDeleteReply')}</Text>
 				</View>
+			) : null}
+			<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
+				<AvatarMessage
+					onPress={onPressAvatar}
+					avatar={message?.isMe ? userProfile?.user?.avatar_url : message?.user?.avatarSm}
+					textAvatar={isDM ? message?.display_name || message?.user?.username : message?.user?.username}
+					isShow={!isCombine || !!message?.references?.length || showUserInformation}
+				/>
+				<Pressable
+					style={[styles.rowMessageBox]}
+					onLongPress={() => {
+						if (preventAction) return;
+						setIsOnlyEmojiPicker(false);
+						onMessageAction({
+							type: EMessageBSToShow.MessageAction,
+							senderDisplayName,
+							message,
+						});
+						dispatch(setSelectedMessage(message));
+					}}
+				>
+					<InfoUserMessage
+						onPress={onPressInfoUser}
+						senderDisplayName={senderDisplayName}
+						isShow={!isCombine || !!message?.references?.length || showUserInformation}
+						createTime={message?.create_time}
+					/>
+					<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
+					<Block opacity={message.isError ? 0.6 : 1}>
+						<RenderTextMarkdownContent
+							content={message.content}
+							isEdited={isEdited}
+							translate={t}
+							onMention={onMention}
+							onChannelMention={onChannelMention}
+							isNumberOfLine={isNumberOfLine}
+							isMessageReply={false}
+							mode={mode}
+						/>
+					</Block>
+					{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
+					{!preventAction ? (
+						<MessageAction
+							message={message}
+							mode={mode}
+							userProfile={userProfile}
+							preventAction={preventAction}
+							openEmojiPicker={() => {
+								setIsOnlyEmojiPicker(true);
+								onMessageAction({
+									type: EMessageBSToShow.MessageAction,
+									senderDisplayName,
+									message,
+								});
+							}}
+						/>
+					) : null}
+				</Pressable>
 			</View>
+
+			{lastSeen &&
+				<View style={styles.newMessageLine}>
+					<View style={styles.newMessageContainer}>
+						<Text style={styles.newMessageText}>{t('newMessages')}</Text>
+					</View>
+				</View>}
+		</View>
 		// </Swipeable>
 	);
 });

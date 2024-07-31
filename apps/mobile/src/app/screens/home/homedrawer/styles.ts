@@ -361,7 +361,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
 	newMessageText: {
 		color: Colors.red,
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.secondary,
 		paddingHorizontal: Metrics.size.s,
 	},
 

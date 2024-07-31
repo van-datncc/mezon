@@ -14,7 +14,9 @@ import {
 	pinMessageActions,
 	reactionActions,
 	selectCurrentChannel,
+	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectDmGroupCurrentId,
 	toastActions,
 	useAppDispatch,
 	voiceActions,
@@ -66,6 +68,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentDirectId = useSelector(selectDmGroupCurrentId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
@@ -101,12 +105,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const senderId = message.sender_id;
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
-
 			mess.isMe = senderId === userId;
-			mess.isCurrentChannel = message.channel_id === directId;
-			if (directId === undefined) {
+			const isMobile = directId === undefined && channelId === undefined;
+
+			mess.isCurrentChannel = (message.channel_id === directId || (isMobile && message.channel_id === currentDirectId));
+			if (directId === undefined && !isMobile) {
 				mess.isCurrentChannel = message.channel_id === channelId;
 			}
+
+			if (isMobile && !currentDirectId) {
+				mess.isCurrentChannel = message.channel_id === currentChannelId;
+			}
+
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -115,7 +125,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
-		[dispatch, userId, channelId, directId],
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId],
 	);
 
 	const onchannelpresence = useCallback(
@@ -374,27 +384,27 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => {};
+			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => {};
+			socket.onuserchannelremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => {};
+			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => {};
+			socket.onuserchanneladded = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -441,3 +451,4 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+
