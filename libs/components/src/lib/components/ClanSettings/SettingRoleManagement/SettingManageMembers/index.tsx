@@ -1,7 +1,7 @@
-import { useClanRestriction, useRoles } from '@mezon/core';
+import { useClanOwner, useRoles } from '@mezon/core';
 import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllAccount, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { EPermission, UsersClanEntity } from '@mezon/utils';
+import { UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -17,10 +17,10 @@ const SettingManageMembers = ({ RolesClan, isCreateNewRole }: { RolesClan: Roles
 	const [searchTerm, setSearchTerm] = useState('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const isClanOwner = useClanOwner();
 	const userProfile = useSelector(selectAllAccount);
 	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
-	const hasPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
+	const hasPermissionEdit = isUserCreate || isClanOwner || isCreateNewRole;
 	const commonUsers = usersClan.filter((user) => addUsers.includes(user.id));
 
 	const [searchResults, setSearchResults] = useState<any[]>(commonUsers);

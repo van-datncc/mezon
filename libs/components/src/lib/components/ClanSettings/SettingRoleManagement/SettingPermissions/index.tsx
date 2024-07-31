@@ -1,4 +1,4 @@
-import { useClanRestriction, useUserPolicy } from '@mezon/core';
+import { useClanOwner, useUserPolicy } from '@mezon/core';
 import {
 	RolesClanEntity,
 	getNewNameRole,
@@ -13,7 +13,6 @@ import {
 	toggleIsShowTrue,
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { EPermission } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -31,12 +30,12 @@ const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 	const [searchTerm, setSearchTerm] = useState('');
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const nameRole = useSelector(getNewNameRole);
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const isClanOwner = useClanOwner();
 
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
 	const userProfile = useSelector(selectAllAccount);
 	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
-	const hasPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
+	const hasPermissionEdit = isUserCreate || isClanOwner || isCreateNewRole;
 	const permissionsRole = activeRole?.permission_list;
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
@@ -70,6 +69,11 @@ const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 		}
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
+	const hiddenPermissionAdmin = (slug: string) => {
+		return (!isClanOwner && slug === 'administrator') && (isCreateNewRole || isUserCreate);
+	}
+
+
 	return (
 		<div style={{pointerEvents: hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex">
@@ -93,7 +97,7 @@ const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 									checked={selectedPermissions.includes(permission.id)}
 									onChange={() => handlePermissionToggle(permission.id)}
 									className="cursor-pointer"
-									disabled={!isClanCreator && permission.slug === 'administrator'}
+									disabled={hiddenPermissionAdmin(permission.slug)}
 								/>
 							</label>
 						</li>

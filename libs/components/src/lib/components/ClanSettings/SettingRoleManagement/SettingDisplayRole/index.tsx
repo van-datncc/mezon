@@ -1,4 +1,4 @@
-import { useClanRestriction } from '@mezon/core';
+import { useClanOwner } from '@mezon/core';
 import {
 	RolesClanEntity,
 	getNewNameRole,
@@ -9,7 +9,6 @@ import {
 	toggleIsShowFalse,
 	toggleIsShowTrue,
 } from '@mezon/store';
-import { EPermission } from '@mezon/utils';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -27,9 +26,9 @@ const SettingDisplayRole = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
 	const userProfile = useSelector(selectAllAccount);
-	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
-	const hasPermissionEdit = isUserCreate || isClanCreator || isCreateNewRole;
+	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;	
+	const isClanOwner = useClanOwner();
+	const hasPermissionEdit = isUserCreate || isClanOwner || isCreateNewRole;
 	const permissionsRole = activeRole?.permission_list;
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
