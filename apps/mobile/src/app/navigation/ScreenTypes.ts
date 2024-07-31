@@ -3,6 +3,7 @@ import { IChannel, OptionEvent } from "@mezon/utils";
 import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackScreenProps } from "@react-navigation/stack";
+import { EOpenThreadDetailFrom } from "../components/ThreadDetail/MenuThreadDetail";
 
 export const APP_SCREEN = {
   UN_AUTHORIZE: 'UN_AUTHORIZE',
@@ -117,7 +118,7 @@ type ProfileStackParamList = {
 }
 
 type MenuThreadStackParamList = {
-  [APP_SCREEN.MENU_THREAD.BOTTOM_SHEET]: undefined;
+  [APP_SCREEN.MENU_THREAD.BOTTOM_SHEET]: {openThreadDetailFrom: EOpenThreadDetailFrom};
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD]: undefined;
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL]: undefined;
   [APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity};
