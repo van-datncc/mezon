@@ -49,7 +49,7 @@ export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationc
 
 type SetDefaultNotificationPayload = {
     clan_id?: string;
-    notification_type?: string;
+    notification_type?: number;
 };
 
 export const setDefaultNotificationClan = createAsyncThunk(
