@@ -1,27 +1,14 @@
+import { IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 
-interface Mention {
-	userId: string;
-	username: string;
-	startIndex: number;
-	endIndex: number;
-}
-
-interface Hashtag {
-	channelId: string;
-	channelLabel: string;
-	startIndex: number;
-	endIndex: number;
-}
-
 const useProcessMention = (text: string) => {
-	const [mentionList, setMentionList] = useState<Mention[]>([]);
-	const [hashtagList, setHashtagList] = useState<Hashtag[]>([]);
-	const [simplifiedMentionList, setSimplifiedMentionList] = useState<{ user_id: string; username: string }[]>([]);
+	const [mentionList, setMentionList] = useState<IMentionOnMessage[]>([]);
+	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
+	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
 
 	useEffect(() => {
-		const mentions: Mention[] = [];
-		const hashtags: Hashtag[] = [];
+		const mentions: IMentionOnMessage[] = [];
+		const hashtags: IHashtagOnMessage[] = [];
 
 		const mentionPrefix = '@[';
 		const hashtagPrefix = '#[';
@@ -30,7 +17,7 @@ const useProcessMention = (text: string) => {
 
 		while (index < text.length) {
 			if (text.startsWith(mentionPrefix, index)) {
-				let startIndex = index;
+				let startindex = index;
 				index += mentionPrefix.length;
 
 				// Extract username
@@ -41,35 +28,35 @@ const useProcessMention = (text: string) => {
 				// Extract userId
 				const userIdStart = text.indexOf('(', index) + 1;
 				const userIdEnd = text.indexOf(')', userIdStart);
-				const userId = text.substring(userIdStart, userIdEnd);
+				const userid = text.substring(userIdStart, userIdEnd);
 				index = userIdEnd + 1;
 
 				mentions.push({
-					userId,
+					userid,
 					username,
-					startIndex,
-					endIndex: index,
+					startindex,
+					endindex: index,
 				});
 			} else if (text.startsWith(hashtagPrefix, index)) {
-				let startIndex = index;
+				let startindex = index;
 				index += hashtagPrefix.length;
 
 				// Extract channelLabel
 				const labelEnd = text.indexOf(']', index);
-				const channelLabel = `#${text.substring(index, labelEnd)}`;
+				const channellabel = `#${text.substring(index, labelEnd)}`;
 				index = labelEnd + 1;
 
 				// Extract channelId
 				const channelIdStart = text.indexOf('(', index) + 1;
 				const channelIdEnd = text.indexOf(')', channelIdStart);
-				const channelId = text.substring(channelIdStart, channelIdEnd);
+				const channelid = text.substring(channelIdStart, channelIdEnd);
 				index = channelIdEnd + 1;
 
 				hashtags.push({
-					channelId,
-					channelLabel,
-					startIndex,
-					endIndex: index,
+					channelid,
+					channellabel,
+					startindex,
+					endindex: index,
 				});
 			} else {
 				index++;
@@ -79,7 +66,7 @@ const useProcessMention = (text: string) => {
 		setMentionList(mentions);
 		setHashtagList(hashtags);
 		const simplifiedList = mentions.map((mention) => ({
-			user_id: mention.userId,
+			user_id: mention.userid,
 			username: mention.username,
 		}));
 
