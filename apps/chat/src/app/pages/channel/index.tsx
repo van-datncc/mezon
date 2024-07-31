@@ -1,5 +1,5 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useClanRestriction, useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
+import { useCheckAlonePermission, useClanRestriction, useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
 import {
 	channelsActions,
 	notificationActions,
@@ -52,6 +52,7 @@ export default function ChannelMain() {
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
+	const isAlone = useCheckAlonePermission();
 	useChannelSeen(currentChannel?.id || '');
 	const showScreen = useSelector(selectShowScreen);
 	const { statusCall } = useVoice();
@@ -122,7 +123,10 @@ export default function ChannelMain() {
 							<div
 								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
 							>
-								{!hasViewChannelPermission ?
+							{(hasViewChannelPermission && isAlone) ?
+								<div className='opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line'>
+									You do not have permission to send messages in this channel.
+								</div>:
 								<>
 								{currentChannel && <ChannelTyping channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
 								{currentChannel ? (
@@ -134,10 +138,7 @@ export default function ChannelMain() {
 								) : (
 									<ChannelMessageBox.Skeleton />
 								)}
-								</>:
-								<div className='opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line'>
-									You do not have permission to send messages in this channel.
-								</div>
+								</>
 								}
 							</div>
 						)}

@@ -1,22 +1,24 @@
-import { IEmojiOnMessage, ILinkOnMessage, IMarkdownOnMessage } from '@mezon/utils';
+import {IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage} from '@mezon/utils';
 import { useEffect, useState } from 'react';
 
 const useProcessedContent = (inputText: string) => {
 	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
 	const [linkList, setLinkList] = useState<ILinkOnMessage[]>([]);
 	const [markdownList, setMarkdownList] = useState<IMarkdownOnMessage[]>([]);
+	const [voiceLinkRoomList, setVoiceLinkRoomList] = useState<ILinkVoiceRoomOnMessage[]>([]);
 
 	useEffect(() => {
 		const processInput = () => {
-			const { emojis, links, markdowns } = processText(inputText);
+			const { emojis, links, markdowns, voiceRooms } = processText(inputText);
 			setEmojiList(emojis);
 			setLinkList(links);
 			setMarkdownList(markdowns);
+			setVoiceLinkRoomList(voiceRooms);
 		};
 
 		processInput();
 	}, [inputText]);
-	return { emojiList, linkList, markdownList, inputText };
+	return { emojiList, linkList, markdownList, inputText, voiceLinkRoomList };
 };
 
 export default useProcessedContent;
@@ -25,10 +27,13 @@ const processText = (inputString: string) => {
 	const emojis: IEmojiOnMessage[] = [];
 	const links: ILinkOnMessage[] = [];
 	const markdowns: IMarkdownOnMessage[] = [];
-	const singleBacktick: string = '`';
-	const tripleBacktick: string = '```';
-	const httpPrefix: string = 'http';
+	const voiceRooms: ILinkVoiceRoomOnMessage[] = [];
 
+	const singleBacktick = '`';
+	const tripleBacktick = '```';
+	const httpPrefix = 'http';
+	const googleMeetPrefix = 'https://meet.google.com/';
+	
 	let i = 0;
 	while (i < inputString.length) {
 		if (inputString[i] === ':') {
@@ -61,11 +66,21 @@ const processText = (inputString: string) => {
 				i++;
 			}
 			const endIndex = i;
-			links.push({
-				link: inputString.substring(startIndex, endIndex),
-				startIndex,
-				endIndex,
-			});
+			const link = inputString.substring(startIndex, endIndex);
+			
+			if (link.startsWith(googleMeetPrefix)) {
+				voiceRooms.push({
+					voiceLink: link,
+					startIndex,
+					endIndex,
+				});
+			} else {
+				links.push({
+					link,
+					startIndex,
+					endIndex,
+				});
+			}
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
 			// Triple backtick markdown processing
 			const startIndex = i;
@@ -101,6 +116,6 @@ const processText = (inputString: string) => {
 			i++;
 		}
 	}
-
-	return { emojis, links, markdowns };
+	
+	return { emojis, links, markdowns, voiceRooms };
 };
