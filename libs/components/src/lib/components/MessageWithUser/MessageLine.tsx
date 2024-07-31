@@ -60,14 +60,15 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 			if (voiceLink) {
 				const meetingCode = voiceLink?.split('/').pop();
 				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
-
-				formattedContent.push(
-					<ChannelHashtag
-						showOnchannelLayout={showOnchannelLayout}
-						key={`${index}${startIndex}${channelId}`}
-						channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
-					/>,
-				);
+				voiceChannelFound
+					? formattedContent.push(
+							<ChannelHashtag
+								showOnchannelLayout={showOnchannelLayout}
+								key={`${index}${startIndex}${channelId}`}
+								channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
+							/>,
+						)
+					: formattedContent.push(<MarkdownContent key={`${index}${startIndex}${voiceLink}`} content={voiceLink} />);
 			}
 
 			if (markdown) {
