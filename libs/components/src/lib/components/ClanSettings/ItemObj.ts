@@ -25,12 +25,31 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
 	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
 ];
+
 export const listItemSettingApp: ItemObjProps[] = [{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' }];
 
 export const sideBarListItem: ListSideBarProps[] = [
 	{
 		title: '',
 		listItem: listItemSetting,
+	},
+	{
+		title: 'Apps',
+		listItem: listItemSettingApp,
+	},
+];
+
+export const listItemSettingClanPermission: ItemObjProps[] = [
+	{ id: ItemSetting.OVERVIEW, name: 'Overview' },
+	{ id: ItemSetting.EMOJI, name: 'Emoji' },
+	{ id: ItemSetting.STICKERS, name: 'Stickers' },
+	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
+];
+
+export const sideBarListItemClanPermission: ListSideBarProps[] = [
+	{
+		title: '',
+		listItem: listItemSettingClanPermission,
 	},
 	{
 		title: 'Apps',

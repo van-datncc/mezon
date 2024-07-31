@@ -1,5 +1,5 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
+import { useClanRestriction, useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
 import {
 	channelsActions,
 	notificationActions,
@@ -13,7 +13,7 @@ import {
 	selectStatusMenu,
 	useAppDispatch,
 } from '@mezon/store';
-import { TIME_OFFSET } from '@mezon/utils';
+import { EPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -51,6 +51,7 @@ export default function ChannelMain() {
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
+	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
 	useChannelSeen(currentChannel?.id || '');
 	const showScreen = useSelector(selectShowScreen);
 	const { statusCall } = useVoice();
@@ -121,6 +122,8 @@ export default function ChannelMain() {
 							<div
 								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
 							>
+								{!hasViewChannelPermission ?
+								<>
 								{currentChannel && <ChannelTyping channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
 								{currentChannel ? (
 									<ChannelMessageBox
@@ -131,6 +134,11 @@ export default function ChannelMain() {
 								) : (
 									<ChannelMessageBox.Skeleton />
 								)}
+								</>:
+								<div className='opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line'>
+									You do not have permission to send messages in this channel.
+								</div>
+								}
 							</div>
 						)}
 					</div>
