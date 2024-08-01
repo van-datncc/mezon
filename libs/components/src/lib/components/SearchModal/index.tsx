@@ -305,6 +305,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 														channelId={item.channelId}
 														valueHightLight={searchText}
 														isOpenSearchModal
+														displayName={item.displayName}
+														isHashtag={true}
 													/>
 												</div>
 											);
@@ -343,6 +345,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 															avatarUrl={item.avatarUser}
 															channelId={item.channelId}
 															valueHightLight={searchText.slice(1)}
+															clanNickname={item.name}
 														/>
 													</div>
 												);
@@ -381,6 +384,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 															subText={item.subText}
 															channelId={item.channelId}
 															valueHightLight={searchText.slice(1)}
+															displayName={item.displayName}
+															isHashtag={true}
 														/>
 													</div>
 												);
