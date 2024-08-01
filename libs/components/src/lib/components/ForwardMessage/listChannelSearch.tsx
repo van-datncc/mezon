@@ -10,7 +10,6 @@ type ListChannelSearchProps = {
 
 const ListChannelSearch = (props: ListChannelSearchProps) => {
     const {listChannelSearch, searchText, selectedObjectIdSends, handleToggle} = props;
-    console.log("🚀 ~ ListChannelSearch ~ listChannelSearch:", listChannelSearch)
     return (
         listChannelSearch.length
             && listChannelSearch
@@ -31,6 +30,8 @@ const ListChannelSearch = (props: ListChannelSearchProps) => {
                                     subText={channel.subText}
                                     channelId={channel.id}
                                     valueHightLight={searchText}
+                                    subTextStyle='uppercase'
+                                    isOpenSearchModal
                                 />
                             </div>
                             <Checkbox

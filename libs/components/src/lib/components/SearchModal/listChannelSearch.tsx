@@ -34,6 +34,7 @@ const ListChannelSearch = (props: ListChannelSearchProps) => {
                                 subText={item.subText}
                                 channelId={item.channelId}
                                 valueHightLight={searchText}
+                                subTextStyle='uppercase'
                                 isOpenSearchModal
                             />
                         </div>

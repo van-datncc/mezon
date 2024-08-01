@@ -290,7 +290,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								idActive={idActive}
 								setIdActive={setIdActive}
 							/>
-							{isNoResult && <span className=" flex flex-row justify-center">Can't seem to find what you're looking for?</span>}
+							{isNoResult && <span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">Can't seem to find what you're looking for?</span>}
 						</>
 					) : (
 						<>

@@ -160,7 +160,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 									selectedObjectIdSends={selectedObjectIdSends}
 									handleToggle={handleToggle}
 								/>
-								{isNoResult && <span className=" flex flex-row justify-center">Can't seem to find what you're looking for?</span>}
+								{isNoResult && <span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">Can't seem to find what you're looking for?</span>}
 							</>
 						) : (
 							<>
