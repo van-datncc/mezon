@@ -364,7 +364,13 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	}, [t, userProfile, message, listPinMessages, isDM, userPermissionsStatus, isClanOwner]);
 
 	const renderUserInformation = () => {
-		return <UserProfile userId={user?.id} user={user} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
+		return <UserProfile
+			userId={user?.id}
+			user={user}
+			message={message}
+			checkAnonymous={checkAnonymous}
+			showAction={!isDM}
+		/>
 	};
 
 	const handleReact = async (mode, messageId, emoji: string, senderId) => {
