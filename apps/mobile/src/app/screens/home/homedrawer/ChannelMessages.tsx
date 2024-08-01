@@ -249,7 +249,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				/>
 			);
 		},
-		[jumpToRepliedMessage, clansProfile, mode, channelId, onOpenImage, currentClanId, onMessageAction],
+		[jumpToRepliedMessage, clansProfile, mode, channelId, channelLabel, onOpenImage, currentClanId, onMessageAction],
 	);
 
 	const onImageModalChange = useCallback(

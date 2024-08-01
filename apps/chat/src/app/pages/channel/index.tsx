@@ -9,6 +9,7 @@ import {
 	selectIsMessageRead,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
+	selectIsViewingOlderMessagesByChannelId,
 	selectShowScreen,
 	selectStatusMenu,
 	useAppDispatch,
@@ -17,6 +18,7 @@ import { TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { ChannelJumpToPresent } from './ChannelJumpToPresent';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
 import { ChannelTyping } from './ChannelTyping';
@@ -41,19 +43,33 @@ function useChannelSeen(channelId: string) {
 	}, [channelId, currentChannel, dispatch, isMessageRead]);
 }
 
-export default function ChannelMain() {
-	const { draggingState, setDraggingState } = useDragAndDrop();
-
-	const currentChannel = useSelector(selectCurrentChannel);
-	const messagesContainerRef = useRef<HTMLDivElement>(null);
-	const isSearchMessage = useSelector(selectIsSearchMessage);
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
+const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
+	const currentChannel = useSelector(selectChannelById(channelId));
 	const isShowMemberList = useSelector(selectIsShowMemberList);
-	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
-	useChannelSeen(currentChannel?.id || '');
-	const showScreen = useSelector(selectShowScreen);
+	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
+
+	return (
+		<div
+			className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
+		>
+			{currentChannel && <ChannelTyping channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
+			{isViewingOldMessage && <ChannelJumpToPresent channelId={currentChannel?.id} mode={0} />}
+			{currentChannel ? (
+				<ChannelMessageBox
+					clanId={currentChannel?.clan_id}
+					channelId={currentChannel?.id}
+					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+				/>
+			) : (
+				<ChannelMessageBox.Skeleton />
+			)}
+		</div>
+	);
+}
+
+const ChannelMainContentVoice = ({ channelId }: ChannelMainContentProps) => {
 	const { statusCall } = useVoice();
+	const showScreen = useSelector(selectShowScreen);
 
 	const startScreenShare = useCallback(() => {
 		console.log('not implemented');
@@ -66,6 +82,45 @@ export default function ChannelMain() {
 	const leaveVoiceChannel = useCallback(() => {
 		console.log('not implemented');
 	}, []);
+
+	return (
+		<div className="flex-1 bg-[#1E1E1E]">
+			{!statusCall ? (
+				<div></div>
+			) : (
+				<div className="relative hidden justify-center items-center gap-x-5 w-full bottom-5 group-hover:flex">
+					<button
+						className="size-[50px] rounded-full bg-black hover:bg-slate-700"
+						onClick={showScreen ? stopScreenShare : startScreenShare}
+					>
+						<ShareScreen defaultFill={showScreen ? 'white' : '#AEAEAE'} />
+					</button>
+					<button className="size-[50px] rounded-full bg-red-500 hover:bg-red-950" onClick={leaveVoiceChannel}>
+						<PhoneOff defaultSize="rotate-[138deg] m-auto" />
+					</button>
+				</div>
+			)}
+		</div>
+	);
+}
+
+type ChannelMainContentProps = {
+	channelId: string;
+};
+
+const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
+	const currentChannel = useSelector(selectChannelById(channelId));
+	const { draggingState, setDraggingState } = useDragAndDrop();
+	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	const isSearchMessage = useSelector(selectIsSearchMessage);
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
+	const isShowMemberList = useSelector(selectIsShowMemberList);
+	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
+
+	const { statusCall } = useVoice();
+
+	useChannelSeen(currentChannel?.id || '');
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -99,39 +154,11 @@ export default function ChannelMain() {
 						>
 							<ChannelMedia currentChannel={currentChannel} statusCall={statusCall} key={currentChannel?.channel_id} />
 						</div>
-						{currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? (
-							<div className="flex-1 bg-[#1E1E1E]">
-								{!statusCall ? (
-									<div></div>
-								) : (
-									<div className="relative hidden justify-center items-center gap-x-5 w-full bottom-5 group-hover:flex">
-										<button
-											className="size-[50px] rounded-full bg-black hover:bg-slate-700"
-											onClick={showScreen ? stopScreenShare : startScreenShare}
-										>
-											<ShareScreen defaultFill={showScreen ? 'white' : '#AEAEAE'} />
-										</button>
-										<button className="size-[50px] rounded-full bg-red-500 hover:bg-red-950" onClick={leaveVoiceChannel}>
-											<PhoneOff defaultSize="rotate-[138deg] m-auto" />
-										</button>
-									</div>
-								)}
-							</div>
-						) : (
-							<div
-								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
-							>
-								{currentChannel && <ChannelTyping channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
-								{currentChannel ? (
-									<ChannelMessageBox
-										clanId={currentChannel?.clan_id}
-										channelId={currentChannel?.id}
-										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-									/>
-								) : (
-									<ChannelMessageBox.Skeleton />
-								)}
-							</div>
+						{currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
+							<ChannelMainContentVoice channelId={currentChannel?.id} />
+						)}
+						{currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
+							<ChannelMainContentText channelId={currentChannel?.id as string} />
 						)}
 					</div>
 					{isShowMemberList && (
@@ -149,6 +176,17 @@ export default function ChannelMain() {
 			</div>
 		</>
 	);
+}
+
+export default function ChannelMain() {
+	const currentChannel = useSelector(selectCurrentChannel);
+
+	if (!currentChannel) {
+		return null;
+	}
+
+	return <ChannelMainContent channelId={currentChannel.id} />;
+
 }
 
 const SearchMessageChannel = () => {

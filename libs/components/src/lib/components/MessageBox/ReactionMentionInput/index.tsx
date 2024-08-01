@@ -559,6 +559,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
+			dispatch(messagesActions.setChannelDraftMessage({ channelId: currentChannelId as string, channelDraftMessage: { message_id: idRefMessage, draftContent: lastMessageByUserId?.content } }));
 		}
 	};
 

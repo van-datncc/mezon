@@ -178,7 +178,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const jumpToChannel = async (channelId: string, clanId: string) => {
 		const store = await getStoreAsync();
-
+		// TODO: do we need to jump to message here?
 		store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
 		store.dispatch(
 			channelsActions.joinChannel({

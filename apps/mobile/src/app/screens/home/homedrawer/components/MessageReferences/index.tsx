@@ -1,7 +1,7 @@
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, UserClanProfileEntity, referencesActions, selectMemberByUserId, selectUserClanProfileByClanID } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { ChannelsEntity, UserClanProfileEntity, selectMemberByUserId, selectUserClanProfileByClanID } from '@mezon/store';
+import { messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import React from 'react';
@@ -15,7 +15,6 @@ interface IProps {
 	messageReferences?: ApiMessageRef;
 	preventAction: boolean;
 	currentClanId: string;
-	jumpToRepliedMessage?: (messageId: string) => void;
 	channelsEntities?: Record<string, ChannelsEntity>;
 	emojiListPNG?: IEmoji[];
 	clansProfile?: UserClanProfileEntity[];
@@ -24,7 +23,7 @@ interface IProps {
 }
 
 export const MessageReferences = React.memo(
-	({ messageReferences, preventAction, currentClanId, jumpToRepliedMessage, channelsEntities, emojiListPNG, clansProfile, mode }: IProps) => {
+	({ messageReferences, preventAction, currentClanId, channelsEntities, emojiListPNG, clansProfile, mode }: IProps) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 		const dispatch = useAppDispatch();
@@ -34,8 +33,7 @@ export const MessageReferences = React.memo(
 		const repliedSender = useSelector(selectMemberByUserId(messageReferences?.message_sender_id || ''));
 
 		const handleJumpToMessage = (messageId: string) => {
-			dispatch(referencesActions.setIdMessageToJump(messageId));
-			jumpToRepliedMessage(messageReferences?.message_ref_id);
+			dispatch(messagesActions.jumpToMessage({ messageId, channelId: currentClanId }));
 		};
 
 		return (

@@ -4,6 +4,7 @@ import {
 	ApiCategoryDesc,
 	ApiChannelAttachment,
 	ApiChannelDescription,
+	ApiChannelMessageHeader,
 	ApiClanDesc,
 	ApiClanProfile,
 	ApiDirectChannelVoice,
@@ -176,6 +177,7 @@ export type IMessage = ChannelMessage & {
 	isMe?: boolean;
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
+	isFirst?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -587,3 +589,7 @@ export enum ModeResponsive {
 	MODE_CLAN = 'clan',
 	MODE_DM = 'dm',
 }
+
+export type ApiChannelMessageHeaderWithChannel = ApiChannelMessageHeader & {
+	channel_id: string;
+};

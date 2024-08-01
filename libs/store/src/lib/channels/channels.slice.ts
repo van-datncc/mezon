@@ -1,5 +1,5 @@
 import { notificationActions } from '@mezon/store';
-import { ICategory, IChannel, LoadingStatus, ModeResponsive } from '@mezon/utils';
+import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
@@ -79,12 +79,11 @@ type JoinChatPayload = {
 	channelType: number;
 };
 
-export const joinChat = createAsyncThunk('channels/joinChat', 
-	async ({ clanId, channelId, channelType }: JoinChatPayload, thunkAPI) => {
+export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, channelId, channelType }: JoinChatPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType);
-		return channel
+		return channel;
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
 	}
@@ -232,13 +231,27 @@ export const fetchChannels = createAsyncThunk(
 			return [];
 		}
 
-		if(Date.now() - response.time < 100) {
+		if (Date.now() - response.time < 100) {
 			const lastSeenTimeStampInit = response.channeldesc
 				.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_TEXT)
 				.map((channelText) => {
-					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) , clanId: channelText.clan_id ?? ''};
+					return {
+						channelId: channelText.channel_id ?? '',
+						lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0),
+						clanId: channelText.clan_id ?? '',
+					};
 				});
 			thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
+
+			const lastChannelMessages =
+				response.channeldesc?.map((channel) => ({
+					...channel.last_sent_message,
+					channel_id: channel.channel_id,
+				})) ?? [];
+
+			const lastChannelMessagesTruthy = lastChannelMessages.filter((message) => message);
+
+			thunkAPI.dispatch(messagesActions.setManyLastMessages(lastChannelMessagesTruthy as ApiChannelMessageHeaderWithChannel[]));
 		}
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
@@ -466,6 +479,7 @@ export const channelsActions = {
  * e.g.
  * ```
  * import { useSelector } from 'react-redux';
+import { channel } from 'process';
  *
  * // ...
  *

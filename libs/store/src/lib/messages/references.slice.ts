@@ -32,6 +32,17 @@ export const fetchReferences = createAsyncThunk<ReferencesEntity[]>('references/
 	return Promise.resolve([]);
 });
 
+export type JumpToReferencedReplyMessageArgs = {
+	id: string;
+};
+
+export const jumpToReferencedReplyMessage = createAsyncThunk(
+	'references/jumpToReferencedReplyMessage',
+	async (args: JumpToReferencedReplyMessageArgs, thunkAPI) => {
+		thunkAPI.dispatch(referencesActions.setIdMessageToJump(args.id));
+	},
+);
+
 export const initialReferencesState: ReferencesState = referencesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
@@ -66,6 +77,7 @@ export const referencesSlice = createSlice({
 			state.statusLoadingAttachment = action.payload;
 		},
 		setIdMessageToJump(state, action) {
+			console.log('action.payload', action.payload);
 			state.idMessageToJump = action.payload;
 		},
 		setOpenEditMessageState(state, action) {
@@ -109,7 +121,9 @@ export const referencesSlice = createSlice({
 
 export const referencesReducer = referencesSlice.reducer;
 
-export const referencesActions = referencesSlice.actions;
+export const referencesActions = {
+	...referencesSlice.actions,
+};
 
 const { selectAll, selectEntities } = referencesAdapter.getSelectors();
 
