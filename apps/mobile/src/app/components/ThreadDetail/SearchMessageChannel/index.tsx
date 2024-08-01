@@ -1,80 +1,166 @@
-import { AngleLeft, FilterSearchIcon, Icons } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
-import { useNavigation } from '@react-navigation/native';
-import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
-import { useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import Tooltip from 'react-native-walkthrough-tooltip';
-import ListOptionSearch from './ListOptionSearch';
-import { styles } from './SearchMessageChannel.styles';
+import { useAuth, useChannels, useFriends } from '@mezon/core';
+import { Block, useTheme } from '@mezon/mobile-ui';
+import { selectAllDirectMessages, selectAllUsesClan } from '@mezon/store-mobile';
+import { removeDuplicatesById } from '@mezon/utils';
+import { debounce } from 'lodash';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Dimensions, Keyboard, NativeScrollEvent, NativeSyntheticEvent, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { useSelector } from 'react-redux';
+import ChannelsSearchTab from '../../ChannelsSearchTab';
+import MembersSearchTab from '../../MembersSearchTab';
+import AssetsHeader from '../AssetsHeader';
+import InputSearchMessageChannel from './InputSearchMessageChannel';
 
-type SearchMessageChannelProps = {
-	onChangeText: (value: string) => void;
-};
-
-const SearchMessageChannel = ({ onChangeText }: SearchMessageChannelProps) => {
-	const [textInput, setTextInput] = useState<string>('');
-	const [isIconClear, setIsIconClear] = useState<boolean>(false);
-	const [isVisible, setIsVisible] = useState<boolean>(false);
-	const navigation = useNavigation<any>();
-  const { t } = useTranslation(['searchMessageChannel']);
-
+const SearchMessageChannel = () => {
 	const { themeValue } = useTheme();
-	const handleTextChange = (e) => {
-		onChangeText(e);
-		setTextInput(e);
-		setIsIconClear(true);
-	};
-	const clearTextInput = () => {
-		setTextInput('');
-		onChangeText('');
-		setIsIconClear(false);
+	const { t } = useTranslation(['searchMessageChannel']);
+
+	const { listChannels } = useChannels();
+	const [searchText, setSearchText] = useState<string>('');
+	const dmGroupChatList = useSelector(selectAllDirectMessages);
+	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3 && groupChat.channel_avatar);
+	const { friends } = useFriends();
+	const usersClan = useSelector(selectAllUsesClan);
+	const { userProfile } = useAuth();
+	const accountId = userProfile?.user?.id ?? '';
+	const [pageID, setPageID] = useState<number>(0);
+	const ref = useRef<ScrollView>();
+
+	const handleSearchText = useCallback(
+		debounce((text) => setSearchText(text), 300),
+		[],
+	);
+
+	function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
+		const currentOffsetX = event.nativeEvent.contentOffset.x;
+		const windowWidth = Dimensions.get('window').width;
+
+		const pageID_ = Math.round(currentOffsetX / windowWidth);
+		if (pageID !== pageID_) {
+			setPageID(pageID_);
+		}
+	}
+
+	function handelHeaderTabChange(index: number) {
+		const windowWidth = Dimensions.get('window').width;
+		ref && ref.current && ref.current.scrollTo({ x: index * windowWidth, animated: true });
+	}
+
+	const listChannelSearch = useMemo(() => {
+		if (!searchText?.length) return listChannels;
+		return listChannels
+			.filter((item) => item?.channel_label?.toUpperCase()?.indexOf(searchText?.toUpperCase()) > -1)
+			.slice(0, 8)
+			.sort((a: any, b: any) => {
+				const indexA = a?.channel_label?.toUpperCase().indexOf(searchText?.toUpperCase());
+				const indexB = b?.channel_label?.toUpperCase().indexOf(searchText?.toUpperCase());
+				if (indexA === -1) return 1;
+				if (indexB === -1) return -1;
+				return indexA - indexB;
+			});
+	}, [listChannels, searchText]);
+
+	const listMember = useMemo(() => {
+		const listDMSearch = listDM?.length
+			? listDM.map((itemDM: any) => {
+					return {
+						id: itemDM?.user_id?.[0] ?? '',
+						name: itemDM?.usernames ?? '',
+						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
+						idDM: itemDM?.id ?? '',
+						displayName: '',
+						typeChat: 3,
+						user: {
+							username: itemDM?.usernames ?? '',
+							avatar_url: itemDM?.channel_avatar?.[0] ?? '',
+							id: itemDM?.user_id?.[0] ?? '',
+						},
+					};
+				})
+			: [];
+		const listFriendsSearch = friends.length
+			? friends.map((itemFriend: any) => {
+					return {
+						id: itemFriend?.id ?? '',
+						name: itemFriend?.user.username ?? '',
+						avatarUser: itemFriend?.user.avatar_url ?? '',
+						displayName: itemFriend?.user.display_name ?? '',
+						idDM: '',
+						user: {
+							username: itemFriend?.user.username ?? '',
+							avatar_url: itemFriend?.user.avatar_url ?? '',
+							id: itemFriend?.id ?? '',
+						},
+					};
+				})
+			: [];
+		const listUserClanSearch = usersClan.length
+			? usersClan.map((itemUserClan: any) => {
+					return {
+						id: itemUserClan?.id ?? '',
+						name: itemUserClan?.user?.username ?? '',
+						avatarUser: itemUserClan?.user?.avatar_url ?? '',
+						idDM: '',
+						user: {
+							username: itemUserClan?.user?.username ?? '',
+							avatar_url: itemUserClan?.user?.avatar_url ?? '',
+							id: itemUserClan?.id ?? '',
+						},
+					};
+				})
+			: [];
+
+		const friendsMap = new Map(listFriendsSearch?.map((friend) => [friend.id, friend]));
+		const listSearch = [
+			...listDMSearch.map((itemDM) => {
+				const friend = friendsMap.get(itemDM.id);
+				return friend ? { ...itemDM, displayName: friend?.displayName || itemDM?.displayName } : itemDM;
+			}),
+			...listUserClanSearch,
+		];
+		return removeDuplicatesById(listSearch?.filter((item) => item.id !== accountId));
+	}, [accountId, friends, listDM, usersClan]);
+
+	const listMemberSearch = useMemo(() => {
+		return listMember
+			.filter((item: any) => item?.name?.toUpperCase().indexOf(searchText?.toUpperCase()?.substring(1)) > -1)
+			.sort((a: any, b: any) => {
+				const indexA = a?.name?.toUpperCase().indexOf(searchText?.slice(1).toUpperCase());
+				const indexB = b?.name?.toUpperCase().indexOf(searchText?.slice(1).toUpperCase());
+				if (indexA === -1) return 1;
+				if (indexB === -1) return -1;
+				return indexA - indexB;
+			});
+	}, [searchText, listMember]);
+
+	const TabList = useMemo(() => {
+		return [
+			{
+				title: t('members'),
+				quantitySearch: searchText && listMemberSearch?.length,
+			},
+			{
+				title: t('channels'),
+				quantitySearch: searchText && listChannelSearch?.length,
+			},
+		];
+	}, [listChannelSearch, listMemberSearch, searchText, t]);
+
+	const dismissKeyBoard = () => {
+		Keyboard.dismiss();
 	};
 	return (
-		<View style={styles.wrapper}>
-			<TouchableOpacity
-				onPress={() => {
-					navigation.goBack();
-				}}
-			>
-				<AngleLeft width={20} height={20} color={Colors.textGray} />
-			</TouchableOpacity>
-			<View style={styles.searchBox}>
-				<View>
-					<Icons.MagnifyingIcon width={20} height={20} color={Colors.textGray} />
-				</View>
-				<TextInput
-					value={textInput}
-					onChangeText={handleTextChange}
-					style={styles.input}
-					placeholderTextColor={Colors.textGray}
-					placeholder={t('search')}
-					autoFocus
-				></TextInput>
-				{isIconClear ? (
-					<Pressable onPress={() => clearTextInput()}>
-						<CircleXIcon height={18} width={18} color={themeValue.text} />
-					</Pressable>
-				) : null}
-			</View>
-			<Tooltip
-				isVisible={isVisible}
-				closeOnBackgroundInteraction={true}
-				disableShadow={true}
-				closeOnContentInteraction={true}
-				content={<ListOptionSearch />}
-				contentStyle={{ minWidth: 220, padding: 0 }}
-				arrowSize={{ width: 0, height: 0 }}
-				placement="bottom"
-				onClose={() => setIsVisible(false)}
-			>
-				<TouchableOpacity activeOpacity={0.7} onPress={() => setIsVisible(true)} style={styles.listSearchIcon}>
-					<FilterSearchIcon width={20} height={20} color={Colors.textGray} />
-				</TouchableOpacity>
-			</Tooltip>
-		</View>
+		<TouchableWithoutFeedback onPress={() => dismissKeyBoard()}>
+			<Block backgroundColor={themeValue.secondary} width={'100%'} height={'100%'}>
+				<InputSearchMessageChannel onChangeText={handleSearchText} />
+				<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
+				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
+					<MembersSearchTab listMemberSearch={listMemberSearch} />
+					<ChannelsSearchTab listChannelSearch={listChannelSearch} />
+				</ScrollView>
+			</Block>
+		</TouchableWithoutFeedback>
 	);
 };
 

@@ -18,7 +18,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
-import { EOpenThreadDetailFrom } from '../../../components/ThreadDetail/MenuThreadDetail';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
@@ -224,8 +223,7 @@ const HomeDefaultHeader = React.memo(
 
 		const navigateToSearchPage = () => {
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
-				screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET,
-				params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel },
+				screen: APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL,
 			});
 		};
 		return (

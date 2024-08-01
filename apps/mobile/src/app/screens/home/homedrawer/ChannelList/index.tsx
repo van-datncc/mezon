@@ -19,7 +19,6 @@ import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native'
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
-import { EOpenThreadDetailFrom } from '../../../../components/ThreadDetail/MenuThreadDetail';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../../../temp-ui';
 import { ChannelListContext } from '../Reusables';
@@ -124,8 +123,7 @@ const ChannelList = React.memo((props: any) => {
 
 	const navigateToSearchPage = () => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
-			screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET,
-			params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel },
+			screen: APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL,
 		});
 	};
 	return (
