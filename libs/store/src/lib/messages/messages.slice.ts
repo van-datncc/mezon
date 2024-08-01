@@ -145,14 +145,13 @@ type fetchMessageChannelPayload = {
 	noCache?: boolean;
 	messageId?: string;
 	direction?: number;
-	lastSeenMess?: string;
 	isFetchingLatestMessages?: boolean;
 };
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
 	async (
-		{ channelId, noCache, messageId, direction, lastSeenMess, isFetchingLatestMessages }: fetchMessageChannelPayload,
+		{ channelId, noCache, messageId, direction, isFetchingLatestMessages }: fetchMessageChannelPayload,
 		thunkAPI,
 	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));

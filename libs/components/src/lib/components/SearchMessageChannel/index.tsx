@@ -15,7 +15,7 @@ const SearchMessageChannel = () => {
 	const dispatch = useAppDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
 	const { isSearchMessage, fetchSearchMessages, currentPage } = useSearchMessages();
-	const currentClanId = useSelector(selectCurrentClanId)
+	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { listUserSearch } = useClans();
 	const { setIsShowCreateThread } = useThreads();
@@ -52,8 +52,16 @@ const SearchMessageChannel = () => {
 		setValueInputSearch(value);
 		setValueDisplay(newPlainTextValue);
 		const filter = [];
+		filter.push();
 		if (mentions.length === 0) {
-			filter.push({ field_name: 'content', field_value: value }, { field_name: 'clan_id', field_value: currentClanId });
+			filter.push(
+				{
+					field_name: 'content',
+					field_value: value,
+				},
+				{ field_name: 'channel_id', field_value: currentChannel?.id },
+				{ field_name: 'clan_id', field_value: currentClanId },
+			);
 		}
 		for (const mention of mentions) {
 			const convertMemtion = mention.display.split(':');
@@ -108,8 +116,9 @@ const SearchMessageChannel = () => {
 	return (
 		<div className="relative" ref={inputRef}>
 			<div
-				className={`transition-all duration-300 ${expanded ? 'w-80' : 'w-40'
-					} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
+				className={`transition-all duration-300 ${
+					expanded ? 'w-80' : 'w-40'
+				} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
 			>
 				<MentionsInput
 					inputRef={searchRef}

@@ -1,7 +1,7 @@
 import { useReference } from '@mezon/core';
 import { CameraIcon, CheckIcon, PlayIcon, pushAttachmentToCache } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { appActions, selectCurrentChannelId } from '@mezon/store';
+import { appActions } from '@mezon/store';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { delay } from 'lodash';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -9,10 +9,11 @@ import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, To
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { style } from './styles';
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
+	currentChannelId: string;
 }
 
 export interface IFile {
@@ -22,7 +23,7 @@ export interface IFile {
 	size: string;
 	fileData: any;
 }
-const Gallery = ({ onPickGallery }: IProps) => {
+const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [photos, setPhotos] = useState([]);
@@ -31,8 +32,6 @@ const Gallery = ({ onPickGallery }: IProps) => {
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
-
-	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const attachmentsFileName = useMemo(() => {
 		if (!attachmentDataRef?.length) return [];
