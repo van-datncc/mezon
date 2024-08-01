@@ -1,7 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiWebhook, ApiWebhookCreateRequest } from 'mezon-js/api.gen';
+import { ApiWebhook, ApiWebhookCreateRequest, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const INTEGRATION_WEBHOOK = 'integrationWebhook';
@@ -72,12 +72,13 @@ export const generateWebhook = createAsyncThunk(
 	},
 );
 
-export const deleteWebhookById = createAsyncThunk('integration/deleteWebhook', async (webhook: ApiWebhook, thunkAPI) => {
+export const deleteWebhookById = createAsyncThunk(
+	'integration/deleteWebhook', 
+	async (webhook: ApiWebhook, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteWebhookById(mezon.session, webhook.id as string);
 		if (response) {
-			alert(`Deleted webhook successfully !`);
 			return webhook;
 		}
 	} catch (err) {
@@ -85,6 +86,23 @@ export const deleteWebhookById = createAsyncThunk('integration/deleteWebhook', a
 		return thunkAPI.rejectWithValue(err);
 	}
 });
+
+export const updateWebhookBySpecificId = createAsyncThunk(
+	'integration/editWebhook', 
+	async (data:{request: MezonUpdateWebhookByIdBody, webhook: ApiWebhook, channelId:string}, thunkAPI) => {
+	try{
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.updateWebhookById(mezon.session, data.webhook.id as string, data.request);
+		console.log(response);
+		if (response) {
+			thunkAPI.dispatch(fetchWebhooksByChannelId({ channelId: data.channelId, noCache: true }));
+		}
+		return data.webhook;
+	}catch(err){
+		console.log(err);
+		return thunkAPI.rejectWithValue(err);
+	}
+})
 
 export const integrationWebhookSlice = createSlice({
 	name: INTEGRATION_WEBHOOK,
