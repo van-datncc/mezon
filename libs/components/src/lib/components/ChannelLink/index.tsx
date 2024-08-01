@@ -43,7 +43,7 @@ export const classes = {
 function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, channelType }: ChannelLinkProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const voice = useMezonVoice();
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
 
@@ -200,11 +200,11 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				) : (
 					<>
 						<AddPerson
-							className={`absolute ml-auto w-4 h-4 top-[6px] group-hover:block dark:group-hover:text-white group-hover:text-black ${currentURL === channelPath ? 'dark:text-white text-black' : 'text-transparent'} block right-8 cursor-pointer`}
+							className={`absolute ml-auto w-4 h-4 top-[6px] hidden group-hover:block dark:group-hover:text-white group-hover:text-black ${currentURL === channelPath ? 'dark:text-white text-black' : 'text-transparent'} right-8 cursor-pointer`}
 							onClick={handleCreateLinkInvite}
 						/>
 						<SettingProfile
-							className={`absolute ml-auto w-4 h-4 top-[6px] right-3 ${currentURL === channelPath ? 'dark:text-white text-black' : 'text-transparent'} block group-hover:block dark:group-hover:text-white group-hover:text-black cursor-pointer`}
+							className={`absolute ml-auto w-4 h-4 top-[6px] right-3 ${currentURL === channelPath ? 'dark:text-white text-black' : 'text-transparent'} hidden group-hover:block dark:group-hover:text-white group-hover:text-black cursor-pointer`}
 							onClick={handleOpenCreate}
 						/>
 					</>
