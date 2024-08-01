@@ -47,14 +47,14 @@ function NotificationItem({ notify }: NotifyProps) {
 					<MemberProfile
 						isHideUserName={true}
 						avatar={user?.user?.avatar_url || ''}
-						name={user.user?.display_name || notify?.content?.username || ''}
+						name={user?.user?.display_name || notify?.content?.username || ''}
 						isHideStatus={true}
 						isHideIconStatus={true}
 						textColor="#fff"
 					/>
 					<div className="flex flex-col gap-1">
 						<div>
-							<span className="font-bold">{user.user?.display_name || userName}</span>
+							<span className="font-bold">{user?.user?.display_name || userName}</span>
 							<span>{notice}</span>
 						</div>
 						<span className="text-zinc-400 text-[11px]">{convertTimeString(notify.create_time as string)}</span>
