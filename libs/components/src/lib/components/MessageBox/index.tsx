@@ -151,6 +151,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const handleChildContextMenu = (event: React.MouseEvent) => {
 		event.stopPropagation();
 	};
+
 	return (
 		<div className="relative max-sm:-pb-2  ">
 			<div
