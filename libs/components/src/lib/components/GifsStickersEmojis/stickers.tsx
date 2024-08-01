@@ -25,16 +25,17 @@ function ImageSquare({ channelId, mode }: ChannelMessageBoxProps) {
 		[sendMessage],
 	);
 	// TODO: separate data to another file
-	const avts = [
-		{ id: 1, url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'cs' },
-		{ id: 2, url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'dog' },
-		{ id: 3, url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'cat' },
+	const categories = [
+		{ id: 1, url: 'https://cdn.mezon.vn/stickers/CrocosaurusStickers/emojibest_com_crocosaurus_0.gif', type: 'Among Us' },
+		{ id: 2, url: 'https://cdn.mezon.vn/stickers/FredTheDog/emojibest_com_fred_the_pug_11.gif', type: 'Hammy Ham' },
+		{ id: 3, url: 'https://cdn.mezon.vn/stickers/SamuraiDojo/emojibest_com_samorai__dojo_8.gif', type: 'Halloween' },
 	];
+
 
 	const stickerList = useSelector(selectAllStickerSuggestion)
 	const { setSubPanelActive } = useGifsStickersEmoji();
 	const [selectedType, setSelectedType] = useState('');
-	const [selectImage, setSelectImage] = useState<any>(stickerList);
+	const [selectImage, setSelectImage] = useState<ApiClanSticker[]>(stickerList);
 	const handleClickImage = (imageUrl: string) => {
 		handleSend({ t: '' }, [], [{ url: imageUrl, height: 40, width: 40, filetype: 'image/gif' }], []);
 		setSubPanelActive(SubPanelName.NONE);
@@ -54,13 +55,13 @@ function ImageSquare({ channelId, mode }: ChannelMessageBoxProps) {
 	return (
 		<div className="flex h-full pr-2 w-full md:w-[500px]">
 			<div className="w-[60%] md:w-[40%] md:max-w-[40%] flex flex-col px-2 gap-y-2 max-w-[60%]">
-				{avts.map((avt) => (
+				{categories.map((category) => (
 					<img
-						key={avt.id}
-						src={avt.url}
-						alt={`avt ${avt.id}`}
-						className={`w-full h-auto cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-lg justify-center items-center border border-bgHoverMember rounded-lg`}
-						onClick={() => handleClickAvt(avt.type)}
+						key={category.id}
+						src={category.url}
+						alt={`cate ${category}`}
+						className={`w-full h-auto cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${category.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-lg justify-center items-center border border-bgHoverMember rounded-lg`}
+						onClick={() => handleClickAvt(category.type)}
 						role="button"
 					/>
 				))}
