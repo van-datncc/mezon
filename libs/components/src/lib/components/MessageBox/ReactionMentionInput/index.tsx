@@ -663,7 +663,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;
 					}}
-					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
+					renderSuggestion={(suggestion) => (
+						<SuggestItem name={suggestion.display ?? ''} isEmoji={true} symbol={(suggestion as any).emoji} />
+					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}
 				/>
