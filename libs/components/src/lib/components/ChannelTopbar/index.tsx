@@ -1,11 +1,13 @@
 import { useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import {
 	appActions,
+	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
+	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
@@ -226,7 +228,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 
 export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	const dispatch = useDispatch();
-	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
+	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const newNotificationStatus = useSelector(selectNewNotificationStatus);
 
@@ -254,11 +256,15 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	}, [newNotificationStatus]);
 
 	const handleShowInbox = () => {
-		setIsShowInbox(!isShowInbox);
+		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 
-	useOnClickOutside(inboxRef, () => setIsShowInbox(false));
-	useEscapeKey(() => setIsShowInbox(false));
+	const handleSetIsShowInbox = () => {
+		dispatch(notificationActions.setIsShowInbox(false));
+	};
+
+	useOnClickOutside(inboxRef, () => handleSetIsShowInbox());
+	useEscapeKey(() => handleSetIsShowInbox());
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
