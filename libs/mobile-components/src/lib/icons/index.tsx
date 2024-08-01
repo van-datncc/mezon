@@ -1226,73 +1226,53 @@ export function EmptySearchIcon({ width = 50, height = 50, color = 'white', ...p
 
 export function IdleStatusIcon({ width = 20, height = 20, ...props }: SvgProps) {
 	return (
-    <Svg
-    width={width}
-    height={height}
-    viewBox="0 0 33 33"
-    fill="none"
-    {...props}
-  >
-    <Path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M16.117 26.287a9.61 9.61 0 009.61-9.609c0-4.693-3.364-8.6-7.812-9.441-.427-.081-.69.435-.45.797a7.207 7.207 0 01-9.992 9.992c-.361-.24-.878.022-.797.45.842 4.447 4.749 7.811 9.441 7.811z"
-      fill="#F0B232"
-    />
-  </Svg>
+		<Svg width={width} height={height} viewBox="0 0 33 33" fill="none" {...props}>
+			<Path
+				fillRule="evenodd"
+				clipRule="evenodd"
+				d="M16.117 26.287a9.61 9.61 0 009.61-9.609c0-4.693-3.364-8.6-7.812-9.441-.427-.081-.69.435-.45.797a7.207 7.207 0 01-9.992 9.992c-.361-.24-.878.022-.797.45.842 4.447 4.749 7.811 9.441 7.811z"
+				fill="#F0B232"
+			/>
+		</Svg>
 	);
 }
 
 export function DisturbStatusIcon({ width = 20, height = 20, ...props }: SvgProps) {
 	return (
-    <Svg
-    width={width}
-    height={height}
-    viewBox="0 0 32 33"
-    fill="none"
-    {...props}
-  >
-    <Path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M15.793 26.428a9.6 9.6 0 009.6-9.6 9.6 9.6 0 00-19.2 0 9.6 9.6 0 009.6 9.6zm-3.692-11.815a2.215 2.215 0 000 4.43h7.384a2.215 2.215 0 100-4.43h-7.384z"
-      fill="#F23F43"
-    />
-  </Svg>
+		<Svg width={width} height={height} viewBox="0 0 32 33" fill="none" {...props}>
+			<Path
+				fillRule="evenodd"
+				clipRule="evenodd"
+				d="M15.793 26.428a9.6 9.6 0 009.6-9.6 9.6 9.6 0 00-19.2 0 9.6 9.6 0 009.6 9.6zm-3.692-11.815a2.215 2.215 0 000 4.43h7.384a2.215 2.215 0 100-4.43h-7.384z"
+				fill="#F23F43"
+			/>
+		</Svg>
 	);
 }
 
-
-export function FilterSearchIcon({ width = 20, height = 20, color = 'white', ...props}: SvgProps) {
+export function FilterSearchIcon({ width = 20, height = 20, color = 'white', ...props }: SvgProps) {
 	return (
-    <Svg
-    width={width}
-    height={height}
-    viewBox="0 0 32 32"
-    fill="none"
-    {...props}
-  >
-    <Path
-      d="M19.333 8c0-.46.063-.903.162-1.333H2.667v2.666h16.828A5.947 5.947 0 0119.333 8zM19.333 24c0-.46.063-.903.162-1.333H2.667v2.666h16.828A5.948 5.948 0 0119.333 24zM6 16c0-.46.063-.903.161-1.333H2.667v2.666H6.16A5.944 5.944 0 016 16zM17.839 14.667c.098.43.161.873.161 1.333 0 .46-.063.903-.161 1.333h11.494v-2.666H17.84zM25.333 12a4 4 0 100-8 4 4 0 000 8zM12 20a4 4 0 100-8 4 4 0 000 8zM25.333 28a4 4 0 100-8 4 4 0 000 8z"
-      fill={color}
-    />
-  </Svg>
+		<Svg width={width} height={height} viewBox="0 0 32 32" fill="none" {...props}>
+			<Path
+				d="M19.333 8c0-.46.063-.903.162-1.333H2.667v2.666h16.828A5.947 5.947 0 0119.333 8zM19.333 24c0-.46.063-.903.162-1.333H2.667v2.666h16.828A5.948 5.948 0 0119.333 24zM6 16c0-.46.063-.903.161-1.333H2.667v2.666H6.16A5.944 5.944 0 016 16zM17.839 14.667c.098.43.161.873.161 1.333 0 .46-.063.903-.161 1.333h11.494v-2.666H17.84zM25.333 12a4 4 0 100-8 4 4 0 000 8zM12 20a4 4 0 100-8 4 4 0 000 8zM25.333 28a4 4 0 100-8 4 4 0 000 8z"
+				fill={color}
+			/>
+		</Svg>
 	);
 }
 
 export function AngleLeft({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
 	return (
-    <Svg
-    width={width}
-    height={height}
-    viewBox="0 0 17 28"
-    fill="none"
-    {...props}
-  >
-    <Path
-      d="M16.467 3.8L13.333.667 0 14l13.333 13.333 3.134-3.133L6.289 14 16.467 3.8z"
-      fill={color}
-    />
-  </Svg>
+		<Svg width={width} height={height} viewBox="0 0 17 28" fill="none" {...props}>
+			<Path d="M16.467 3.8L13.333.667 0 14l13.333 13.333 3.134-3.133L6.289 14 16.467 3.8z" fill={color} />
+		</Svg>
+	);
+}
+
+export function PlusAltIcon({ width = 60, height = 60, color = '#005fe9', ...props }) {
+	return (
+		<Svg width={width} height={height} viewBox="0 0 22 22" fill="none" {...props}>
+			<Path d="M21.667 12.778h-8.89v8.889H9.223v-8.89H.333V9.223h8.89V.333h3.555v8.89h8.889v3.555z" fill={color} />
+		</Svg>
 	);
 }

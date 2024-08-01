@@ -36,6 +36,7 @@ const ListMemberSearch = (props: ListMemberSearchProps) => {
 								subText={item?.name}
 								wrapSuggestItemStyle='gap-x-1'
 								subTextStyle='text-[13px]'
+								clanNickname={item?.name}
 							/>
 						</div>
 					);

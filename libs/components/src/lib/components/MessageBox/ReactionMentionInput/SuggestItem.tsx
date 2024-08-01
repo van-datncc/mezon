@@ -22,6 +22,7 @@ type SuggestItemProps = {
 	isOpenSearchModal?: boolean;
 	isHashtag?: boolean;
 	wrapSuggestItemStyle?: string;
+	isEmoji?: boolean;
 };
 
 const SuggestItem = ({
@@ -38,6 +39,7 @@ const SuggestItem = ({
 	showAvatar,
 	isHashtag,
 	wrapSuggestItemStyle,
+	isEmoji,
 }: SuggestItemProps) => {
 	const { emojis } = useEmojiSuggestion();
 	const urlEmoji = getSrcEmoji(name, emojis);
@@ -99,6 +101,12 @@ const SuggestItem = ({
 						{HighlightMatch(name ?? '', valueHightLight ?? '')}
 					</span>
 				)}
+				{isEmoji && (
+					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
+						{HighlightMatch(name ?? '', valueHightLight ?? '')}
+					</span>
+				)}
+
 				{clanNickname && (
 					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">
 						{HighlightMatch(clanNickname ?? '', valueHightLight ?? '')}
