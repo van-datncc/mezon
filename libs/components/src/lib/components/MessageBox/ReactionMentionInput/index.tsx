@@ -614,15 +614,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						return `@${display}`;
 					}}
 					renderSuggestion={(suggestion: MentionDataProps) => {
+						const avatar = suggestion.clanAvatar ? suggestion.clanAvatar : suggestion.avatarUrl;
+
 						return (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
-								avatarUrl={suggestion.avatarUrl ?? ''}
+								name={suggestion.display === 'here' ? '@here' : suggestion.display ?? ''}
+								displayName={suggestion.displayName}
+								clanNickname={suggestion.clanNick}
+								avatarUrl={avatar ?? ''}
 								subText={
 									suggestion.display === 'here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.display ?? '')
+										: suggestion.display ?? ''
 								}
 								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== 'here'}
@@ -648,6 +652,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
+							isHashtag={true}
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"

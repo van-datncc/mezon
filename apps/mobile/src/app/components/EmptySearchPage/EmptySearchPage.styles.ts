@@ -6,7 +6,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     marginTop: size.s_60,
-    width: "100%"
+    width: "100%",
+    height: '100%'
   },
   textEmpty: {
     marginTop: size.s_10,

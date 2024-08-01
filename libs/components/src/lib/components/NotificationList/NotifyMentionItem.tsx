@@ -99,9 +99,9 @@ function MentionTabContent({ message }: IMentionTabContent) {
 			)}
 
 			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
-				<AvatarImage alt="user avatar" className="w-15 h-15" userName={username} src={message.avatar} />
+				<AvatarImage alt="user avatar" className="w-10 h-10 min-w-10" userName={username} src={message.avatar} />
 
-				<div className="h-full ">
+				<div className="h-full">
 					<MessageHead message={message} isCombine={true} isShowFull={true} />
 					<MessageLine content={message.content} />
 				</div>
