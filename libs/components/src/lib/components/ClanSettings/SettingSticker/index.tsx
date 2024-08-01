@@ -1,7 +1,7 @@
-import { selectAllStickerSuggestion, selectCurrentClanId, settingClanStickerActions, useAppDispatch } from "@mezon/store";
+import { selectAllStickerSuggestion } from "@mezon/store";
 import { Button, Modal } from "@mezon/ui";
 import { ApiClanSticker } from "mezon-js/api.gen";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Icons } from "../../../components";
 import ModalSticker from "./ModalEditSticker";
@@ -10,8 +10,6 @@ import SettingStickerItem from "./SettingStickerItem";
 const SettingSticker = () => {
   const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
   const [editSticker, setEditSticker] = useState<ApiClanSticker | null>(null);
-  const dispatch = useAppDispatch();
-  const currentClanId = useSelector(selectCurrentClanId) || '';
   const listSticker = useSelector(selectAllStickerSuggestion);
   const handleUpdateSticker = (sticker: ApiClanSticker) => {
     setEditSticker(sticker);
@@ -24,16 +22,6 @@ const SettingSticker = () => {
   const handleOpenModalUpload = () => {
     setShowModalSticker(true);
   }
-
-  const fetchStickers = useCallback(async () => {
-    if (currentClanId) {
-      await dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId, noCache: true }));
-    }
-  }, [dispatch]);
-
-  useEffect(() => {
-    fetchStickers();
-  }, [fetchStickers]);
 
   return (
     <>
