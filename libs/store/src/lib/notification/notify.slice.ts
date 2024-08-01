@@ -17,6 +17,7 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	quantityNotifyChannels: Record<string, number>;
 	quantityNotifyClans: Record<string, number>;
 	lastSeenTimeStampChannels: Record<string, number>;
+	isShowInbox: boolean;
 }
 
 export type QuantityNotifyChannelArgs = {
@@ -75,6 +76,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	quantityNotifyChannels: {},
 	lastSeenTimeStampChannels: {},
 	quantityNotifyClans: {},
+	isShowInbox: false,
 });
 
 export const notificationSlice = createSlice({
@@ -139,6 +141,9 @@ export const notificationSlice = createSlice({
 			} else {
 				console.log('No unread notification');
 			}
+		},
+		setIsShowInbox(state, action: PayloadAction<boolean>) {
+			state.isShowInbox = action.payload;
 		},
 	},
 
@@ -233,6 +238,8 @@ export const selectMessageNotifed = createSelector(getNotificationState, (state:
 export const selectIsMessageRead = createSelector(getNotificationState, (state: NotificationState) => state.isMessageRead);
 
 export const selectNewNotificationStatus = createSelector(getNotificationState, (state: NotificationState) => state.newNotificationStatus);
+
+export const selectIsShowInbox = createSelector(getNotificationState, (state: NotificationState) => state.isShowInbox);
 
 export const selectCountNotifyByChannelId = (channelId: string) =>
 	createSelector(getNotificationState, (state) => {

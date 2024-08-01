@@ -1,24 +1,26 @@
-import { Block } from '@mezon/mobile-ui';
+import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
+import { Block, useTheme } from '@mezon/mobile-ui';
+import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useMemo, useRef } from 'react';
-import { Linking, ScrollView, Text } from 'react-native';
-import ChannelItem from '../ChannelItem';
-import EmptySearchPage from '../EmptySearchPage';
-import styles from './ChannelsSearchTab.styles';
 import { useTranslation } from 'react-i18next';
+import { Linking, ScrollView, Text, View } from 'react-native';
 import { StatusVoiceChannel } from '../../screens/home/homedrawer/components/ChannelList/ChannelListItem';
 import { linkGoogleMeet } from '../../utils/helpers';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
-import { getUpdateOrAddClanChannelCache, load, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
+import ChannelItem from '../ChannelItem';
+import EmptySearchPage from '../EmptySearchPage';
+import style from './ChannelsSearchTab.styles';
 
 type ChannelsSearchTabProps = {
 	listChannelSearch: ChannelThreads[];
 };
 const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
-  const { t } = useTranslation(['searchMessageChannel']);
-  const timeoutRef = useRef<any>();
+	const { t } = useTranslation(['searchMessageChannel']);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const timeoutRef = useRef<any>();
 	const navigation = useNavigation<any>();
 	const listVoiceChannel = useMemo(
 		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_VOICE),
@@ -32,7 +34,7 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 		[listChannelSearch],
 	);
 
-  const handleRouteData = async (channelData: ChannelThreads) => {
+	const handleRouteData = async (channelData: ChannelThreads) => {
 		if (channelData?.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
@@ -40,7 +42,7 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 				return;
 			}
 		} else {
-		  navigation.navigate('HomeDefault');
+			navigation.navigate('HomeDefault');
 			navigation.dispatch(DrawerActions.closeDrawer());
 			const store = await getStoreAsync();
 			const channelId = channelData?.channel_id;
@@ -58,34 +60,36 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 	};
 
 	return (
-		<ScrollView contentContainerStyle={styles.container}>
-			{(listChannelSearch?.length > 0) ? (
-				<>
-					<Block>
-						{(listTextChannelAndThreads?.length > 0) ? (
-							<Block>
-								<Text style={styles.title}>{t('textChannels')}</Text>
-								{listTextChannelAndThreads?.map((channel) => (
-									<ChannelItem  onPress={handleRouteData} channelData={channel} key={channel?.id} />
-								))}
-							</Block>
-						) : null}
-					</Block>
-					<Block>
-						{(listVoiceChannel?.length > 0) ? (
-							<Block>
-								<Text style={styles.title}>{t('voiceChannels')}</Text>
-								{listVoiceChannel?.map((channel) => (
-									<ChannelItem onPress={handleRouteData} channelData={channel} key={channel?.id} />
-								))}
-							</Block>
-						) : null}
-					</Block>
-				</>
+		<View style={styles.container}>
+			{listChannelSearch?.length > 0 ? (
+				<ScrollView showsVerticalScrollIndicator={false}>
+					<>
+						<Block>
+							{listTextChannelAndThreads?.length > 0 ? (
+								<Block>
+									<Text style={styles.title}>{t('textChannels')}</Text>
+									{listTextChannelAndThreads?.map((channel) => (
+										<ChannelItem onPress={handleRouteData} channelData={channel} key={channel?.id} />
+									))}
+								</Block>
+							) : null}
+						</Block>
+						<Block>
+							{listVoiceChannel?.length > 0 ? (
+								<Block>
+									<Text style={styles.title}>{t('voiceChannels')}</Text>
+									{listVoiceChannel?.map((channel) => (
+										<ChannelItem onPress={handleRouteData} channelData={channel} key={channel?.id} />
+									))}
+								</Block>
+							) : null}
+						</Block>
+					</>
+				</ScrollView>
 			) : (
 				<EmptySearchPage />
 			)}
-		</ScrollView>
+		</View>
 	);
 };
 
