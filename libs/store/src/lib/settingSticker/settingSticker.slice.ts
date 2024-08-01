@@ -36,21 +36,24 @@ const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) =
 	},
 });
 
-export const fetchStickerByClanId = createAsyncThunk('settingClanEmoji/fetchClanEmoji', async ({ clanId, noCache }: FetchStickerArgs, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchStickerCached.clear(mezon, clanId);
+export const fetchStickerByClanId = createAsyncThunk(
+	'settingClanSticker/fetchClanSticker',
+	async ({ clanId, noCache }: FetchStickerArgs, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			if (noCache) {
+				fetchStickerCached.clear(mezon, clanId);
+			}
+			const response = await fetchStickerCached(mezon, clanId);
+			if (!response.stickers) {
+				throw new Error('Emoji list is undefined or null');
+			}
+			return response;
+		} catch (error) {
+			return thunkAPI.rejectWithValue([]);
 		}
-		const response = await fetchStickerCached(mezon, clanId);
-		if (!response.stickers) {
-			throw new Error('Emoji list is undefined or null');
-		}
-		return response;
-	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
-	}
-});
+	},
+);
 export const createSticker = createAsyncThunk(
 	'settingClanSticker/createSticker',
 	async (form: { request: ApiClanStickerAddRequest; clanId: string }, thunkAPI) => {
@@ -120,7 +123,8 @@ export const settingClanStickerSlice = createSlice({
 			});
 	},
 });
-export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: SettingClanStickerState }): SettingClanStickerState => rootState[SETTING_CLAN_STICKER];
+export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: SettingClanStickerState }): SettingClanStickerState =>
+	rootState[SETTING_CLAN_STICKER];
 export const selectListStickerByClanID = createSelector(getStickerSettingState, (state) => state?.listSticker);
 export const settingStickerReducer = settingClanStickerSlice.reducer;
 export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByClanId };

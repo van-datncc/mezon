@@ -1,4 +1,4 @@
-import { selectMemberClanByUserId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import { emojiSuggestionActions, selectMemberClanByUserId, useAppDispatch } from "@mezon/store";
 import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from "mezon-js/api.gen";
 import { ChangeEvent, useState } from "react";
 import { useSelector } from "react-redux";
@@ -26,12 +26,12 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
         shortname: nameEmoji,
         category: emoji.category,
       }
-      await dispatch(settingClanEmojiActions.updateEmoji({ request: request, emojiId: emoji.id || '' }))
+      await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }))
     }
   }
 
   const handleDelete = () => {
-    dispatch(settingClanEmojiActions.deleteEmoji(emoji));
+    dispatch(emojiSuggestionActions.deleteEmojiSetting(emoji));
   }
   const handleOnMouseLeave = () => {
     if (!focus) {
