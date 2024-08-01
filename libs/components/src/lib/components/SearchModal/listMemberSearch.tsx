@@ -16,14 +16,8 @@ const ListMemberSearch = (props: ListMemberSearchProps) => {
 		? listMemSearch
 				.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
 				.slice(0, 7)
-				.sort((a: any, b: any) => {
-					const indexA = a.name.toUpperCase().indexOf(searchText.toUpperCase());
-					const indexB = b.name.toUpperCase().indexOf(searchText.toUpperCase());
-					if (indexA === -1) return 1;
-					if (indexB === -1) return -1;
-					return indexA - indexB;
-				})
-				.map((item: any, index: number) => {
+				.sort((a: any, b: any) => Number(b.lastSentTimeStamp) - Number(a.lastSentTimeStamp))
+				.map((item: any) => {
 					return (
 						<div
 							ref={itemRef}

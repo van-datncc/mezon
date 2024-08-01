@@ -1,6 +1,7 @@
 import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
 import { useAppNavigation, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	channelsActions,
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
@@ -12,7 +13,8 @@ import {
 	selectDmGroupCurrentType,
 	selectStatusMenu,
 	selectTheme,
-	toggleIsShowPopupForwardFalse
+	toggleIsShowPopupForwardFalse,
+	useAppDispatch
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { ModeResponsive } from '@mezon/utils';
@@ -151,6 +153,12 @@ function MyApp() {
 		}
 		return ``;
 	}, [clans, currentChannel?.id, currentClan?.id]);
+
+	const dispatchApp = useAppDispatch();
+	useEffect(() => {
+		const initClanId = localStorage.getItem('initClan');
+		if(initClanId) dispatchApp(channelsActions.fetchChannels({clanId: initClanId}));
+	},[dispatchApp, initClan]);
 
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
