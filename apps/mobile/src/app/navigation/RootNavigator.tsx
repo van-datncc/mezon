@@ -190,11 +190,9 @@ const NavigationMain = () => {
 	const mainLoader = async ({ isFromFCM = false }) => {
 		try {
 			const store = await getStoreAsync();
-			const clanResp = await store.dispatch(clansActions.fetchClans());
-			dispatch(appActions.setLoadingMainMobile(false));
-
 			// If is from FCM don't join current clan
 			if (!isFromFCM) {
+				const clanResp = await store.dispatch(clansActions.fetchClans());
 				if (currentClanId) {
 					save(STORAGE_CLAN_ID, currentClanId);
 					await store.dispatch(clansActions.joinClan({ clanId: currentClanId }));
@@ -204,6 +202,7 @@ const NavigationMain = () => {
 				} else {
 					await setCurrentClanLoader(clanResp.payload);
 				}
+				dispatch(appActions.setLoadingMainMobile(false));
 			}
 			await store.dispatch(notificationActions.fetchListNotification());
 			await store.dispatch(friendsActions.fetchListFriends({}));
