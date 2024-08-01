@@ -48,7 +48,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 	const onSaveChange = async () => {
 		if (editSticker && editSticker.id && editSticker.shortname !== editingSticker.shortname) {
 			const stickerChange: MezonUpdateClanStickerByIdBody = {
-				source: editSticker?.source?.replace('stickers', 'sticker'),
+				source: editSticker?.source,
 				category: editSticker?.category,
 				shortname: editingSticker.shortname,
 			};

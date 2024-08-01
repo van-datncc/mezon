@@ -17,7 +17,7 @@ import {
 	selectAllUsesClan,
 	selectIdMessageToJump,
 	selectMessageEntityById,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
@@ -34,11 +34,11 @@ import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessageP
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
-import { Swipeable } from 'react-native-gesture-handler';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
+import { NewMessageRedLine } from './components/NewMessageRedLine';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
@@ -82,6 +82,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
+
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
@@ -243,13 +244,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	if (message.isStartedMessageGroup && message.sender_id == '0') return <WelcomeMessage channelTitle={props.channelName} />;
 
 	return (
-		// <Swipeable
-		// 	renderRightActions={renderRightActions}
-		// 	ref={swipeableRef}
-		// 	overshootRight={false}
-		// 	onSwipeableOpen={handleSwipeableOpen}
-		// 	hitSlop={{ left: -10 }}
-		// >
+		<View>
+			{/* <Swipeable
+			renderRightActions={renderRightActions}
+			ref={swipeableRef}
+			overshootRight={false}
+			onSwipeableOpen={handleSwipeableOpen}
+			hitSlop={{ left: -10 }}
+		> */}
 			<View
 				style={[
 					styles.messageWrapper,
@@ -258,13 +260,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					checkMessageTargetToMoved && styles.highlightMessageReply,
 				]}
 			>
-				{/* NEW LINE MESSAGE - TO BE UPDATE CORRECT LOGIC*/}
-				{/*{lastSeen &&*/}
-				{/*	<View style={styles.newMessageLine}>*/}
-				{/*		<View style={styles.newMessageContainer}>*/}
-				{/*			<Text style={styles.newMessageText}>NEW MESSAGE</Text>*/}
-				{/*		</View>*/}
-				{/*	</View>}*/}
 				{!!messageReferences && (
 					<MessageReferences
 						messageReferences={messageReferences}
@@ -344,7 +339,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					</Pressable>
 				</View>
 			</View>
-		// </Swipeable>
+			{/* </Swipeable> */}
+			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} />
+		</View>
 	);
 });
 

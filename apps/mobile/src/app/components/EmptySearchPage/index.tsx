@@ -2,9 +2,9 @@ import { EmptySearchIcon } from "@mezon/mobile-components";
 import { useTheme } from "@mezon/mobile-ui";
 import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
-import { style } from "./EmptyMedia.styles";
+import { style } from "./EmptySearchPage.styles";
 
-const EmptyMedia = () => {
+const EmptySearchPage = () => {
   const { t } = useTranslation('media');
   const { themeValue } = useTheme();
   const styles = style(themeValue);
@@ -16,4 +16,4 @@ const EmptyMedia = () => {
   )
 }
 
-export default EmptyMedia;
+export default EmptySearchPage;

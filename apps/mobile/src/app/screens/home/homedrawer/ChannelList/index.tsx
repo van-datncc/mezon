@@ -14,12 +14,14 @@ import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { isEmpty } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
+import { EOpenThreadDetailFrom } from '../../../../components/ThreadDetail/MenuThreadDetail';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
-import { MezonBottomSheet, MezonSearch } from '../../../../temp-ui';
+import { MezonBottomSheet } from '../../../../temp-ui';
 import { ChannelListContext } from '../Reusables';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
@@ -36,6 +38,7 @@ const ChannelList = React.memo((props: any) => {
 	const { categorizedChannels } = useCategory();
 	const [dataCategoryChannel, setDataCategoryChannel] = useState<ICategoryChannel[]>(categorizedChannels || []);
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
+	const { t } = useTranslation(['searchMessageChannel']);
 
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
@@ -118,13 +121,23 @@ const ChannelList = React.memo((props: any) => {
 	if (isEmpty(currentClan)) {
 		return <Block height={20} />;
 	}
+
+	const navigateToSearchPage = () => {
+		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+			screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET,
+			params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel },
+		});
+	};
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
 			<View style={styles.mainList}>
 				<ChannelListHeader onPress={handlePress} clan={currentClan} />
 
 				<View style={styles.channelListSearch}>
-					<MezonSearch hasBackground />
+					<TouchableOpacity onPress={() => navigateToSearchPage()} style={styles.searchBox}>
+						<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />
+						<Text style={styles.placeholderSearchBox}>{t('search')}</Text>
+					</TouchableOpacity>
 					<Pressable
 						style={styles.inviteIconWrapper}
 						onPress={() => {

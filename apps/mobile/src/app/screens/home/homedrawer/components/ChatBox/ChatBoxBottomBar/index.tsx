@@ -123,7 +123,7 @@ export const ChatBoxBottomBar = memo(
 		}, [currentChannel?.channel_label, currentChannel?.parrent_id, hiddenIcon?.threadIcon]);
 
 		const saveMessageToCache = (text: string) => {
-			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
 				...allCachedMessage,
 				[channelId]: text,
@@ -131,26 +131,26 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const setMessageFromCache = async () => {
-			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
 			handleTextInputChange(allCachedMessage?.[channelId] || '');
 			setText(convertMentionsToText(allCachedMessage?.[channelId] || ''));
 		};
 
 		const setAttachmentFromCache = async () => {
-			const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
 			setAttachmentData(allCachedAttachment?.[channelId] || []);
 		};
 
 		const resetCachedText = useCallback(async () => {
-			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
 			if (allCachedMessage?.[channelId])
 				allCachedMessage[channelId] = '';
-			
+
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
 		}, [channelId]);
 
 		const resetCachedAttachment = useCallback(async () => {
-			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
 			if (allCachedAttachments?.[channelId])
 				allCachedAttachments[channelId] = [];
 			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, allCachedAttachments);
@@ -241,10 +241,10 @@ export const ChatBoxBottomBar = memo(
 					const mention = listMentions.find((m) => `@${m.display}` === match?.[0]);
 					if (mention) {
 						mentionList.push({
-							userId: mention?.id?.toString() ?? '',
+							userid: mention?.id?.toString() ?? '',
 							username: `@${mention?.display}`,
-							startIndex: match.index,
-							endIndex: match.index + match[0].length,
+							startindex: match.index,
+							endindex: match.index + match[0].length,
 						});
 					}
 				}
@@ -255,10 +255,10 @@ export const ChatBoxBottomBar = memo(
 					const channelInfo = getChannelById(channelId);
 					if (channelInfo) {
 						hashtagList.push({
-							channelId: channelInfo.id.toString() ?? '',
-							channelLabel: channelInfo.channel_label ?? '',
-							startIndex: match.index,
-							endIndex: match.index + match[0].length,
+							channelid: channelInfo.id.toString() ?? '',
+							channellabel: channelInfo.channel_label ?? '',
+							startindex: match.index,
+							endindex: match.index + match[0].length,
 						});
 					}
 				}

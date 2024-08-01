@@ -103,7 +103,7 @@ export type IRoleUsers = IRole & {
 };
 
 export type ChannelThreads = IChannel & {
-	threads: IChannel[];
+	threads?: IChannel[];
 };
 
 export type IChannel = ApiChannelDescription & {
@@ -422,6 +422,8 @@ export type MentionDataProps = {
 	display?: string;
 	avatarUrl?: string;
 	displayName?: string;
+	clanNick?: string;
+	clanAvatar?: string;
 	user?: ApiUser;
 };
 

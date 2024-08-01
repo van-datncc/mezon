@@ -56,3 +56,15 @@ export const sideBarListItemClanPermission: ListSideBarProps[] = [
 		listItem: listItemSettingApp,
 	},
 ];
+
+export const categorySettingItem = {
+  OVERVIEW: 'overview',
+  PERMISSIONS: 'permissions'
+}
+
+export const categorySettingList = [
+  { id: categorySettingItem.OVERVIEW, name: 'Overview' },
+  { id: categorySettingItem.PERMISSIONS, name: 'Permissions' },
+]
+
+

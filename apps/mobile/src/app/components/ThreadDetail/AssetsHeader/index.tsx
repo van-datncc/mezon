@@ -13,12 +13,17 @@ interface IPos {
 interface IProps {
 	pageID: number;
 	onChange?: (pageID: number) => void;
-	titles: string[];
+	tabList: {
+    title: string,
+    numberSearch: number,
+    isDisplay: boolean,
+    index: number
+  }[];
+  numberSearch?: number;
 }
 
-const usePos = (): [IPos[], (event: LayoutChangeEvent, index: number) => void] => {
+const usePos = (): [IPos[], (event: LayoutChangeEvent, index: number, isDisplay: boolean) => void] => {
 	const [pos, setPos] = useState<IPos[]>([]);
-
 	const onLayout = useCallback((event: LayoutChangeEvent, index: number) => {
 		const { width, height, x, y } = event.nativeEvent.layout;
 		setPos((p) => {
@@ -31,7 +36,7 @@ const usePos = (): [IPos[], (event: LayoutChangeEvent, index: number) => void] =
 	return [pos, onLayout];
 };
 
-export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IProps) {
+export default function AssetsHeader({ pageID = 0, onChange, tabList = [] }: IProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [pos, onLayout] = usePos();
@@ -48,10 +53,10 @@ export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IPro
 	return (
 		<>
 			<View style={styles.headerTab}>
-				{titles.map((title, index) => (
-					<Pressable key={index.toString()} onLayout={(e) => onLayout(e, index)} onPress={(e) => handlePress(e, index)}>
-						<Text style={{ color: index === selected ? baseColor.blurple : themeValue.text }}>{title}</Text>
-					</Pressable>
+				{tabList?.map((tab, index) => (
+				tab?.isDisplay ? 	<Pressable key={index.toString()} onLayout={(e) => onLayout(e, tab?.index, tab?.isDisplay)} onPress={(e) => handlePress(e, tab?.index)}>
+        <Text style={{ color: tab?.index === selected ? baseColor.blurple : themeValue.text }}>{tab?.title} {tab?.numberSearch ? `(${tab?.numberSearch})`: ''}</Text>
+      </Pressable> : null
 				))}
 			</View>
 
@@ -60,8 +65,8 @@ export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IPro
 					<View
 						style={{
 							...styles.b,
-							width: pos[selected].width || 0,
-							left: pos[selected].x || 0,
+							width: pos[selected]?.width || 0,
+							left: pos[selected]?.x || 0,
 						}}
 					></View>
 				</View>

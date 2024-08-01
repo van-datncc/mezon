@@ -330,22 +330,22 @@ export const RenderTextMarkdownContent = React.memo(
 			customStyle = { ...styleMessageReply(themeValue) };
 		}
 
-		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [], voiceLinks = [] } = content || {};
-		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns, ...voiceLinks].sort((a, b) => a.startIndex - b.startIndex);
+		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [], voicelinks = [] } = content || {};
+		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns, ...voicelinks].sort((a, b) => a.startindex - b.startindex);
 		let lastIndex = 0;
 
 		const contentRender = useMemo(() => {
 			let formattedContent = '';
 
 			elements.forEach((element) => {
-				const { startIndex, endIndex, channelId, channelLabel, username, shortname, markdown, link, voiceLink } = element;
+				const { startindex, endindex, channelid, channellabel, username, shortname, markdown, link, voicelink } = element;
 
-				if (lastIndex < startIndex) {
-					formattedContent += t?.slice?.(lastIndex, startIndex)?.toString();
+				if (lastIndex < startindex) {
+					formattedContent += t?.slice?.(lastIndex, startindex)?.toString();
 				}
 
-				if (channelId && channelLabel) {
-					formattedContent += ChannelHashtag({ channelHashtagId: channelId, channelsEntities });
+				if (channelid && channellabel) {
+					formattedContent += ChannelHashtag({ channelHashtagId: channelid, channelsEntities });
 				}
 				if (username) {
 					formattedContent += MentionUser({ tagName: username, mode, usersClan, usersInChannel, clansProfile });
@@ -358,18 +358,18 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += formatBlockCode(markdown || link);
 				}
 
-				if (voiceLink) {
-					const meetingCode = voiceLink?.split('/').pop();
+				if (voicelink) {
+					const meetingCode = voicelink?.split('/').pop();
 					const allChannelVoice = Object.values(channelsEntities).flat();
 					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 
 					if (!voiceChannelFound) {
-						formattedContent += formatBlockCode(voiceLink);
+						formattedContent += formatBlockCode(voicelink);
 					} else {
 						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities });
 					}
 				}
-				lastIndex = endIndex;
+				lastIndex = endindex;
 			});
 
 			if (lastIndex < t?.length) {

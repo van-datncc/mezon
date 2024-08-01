@@ -5,7 +5,6 @@ import {
 	authActions,
 	channelsActions,
 	clansActions,
-	directActions,
 	emojiSuggestionActions,
 	friendsActions,
 	getStoreAsync,
@@ -69,7 +68,7 @@ const NavigationMain = () => {
 	useEffect(() => {
 		let timer;
 		if (isLoggedIn) {
-			dispatch(appActions.setLoadingMainMobile(true));
+			// dispatch(appActions.setLoadingMainMobile(true));
 			timer = delay(initAppLoading, 800);
 		}
 
@@ -95,8 +94,7 @@ const NavigationMain = () => {
 	useEffect(() => {
 		let timeout: string | number | NodeJS.Timeout;
 		const appStateSubscription = AppState.addEventListener('change', (state) => {
-			if (isLoggedIn)
-				timeout = delay(handleAppStateChange, 200, state);
+			if (isLoggedIn) timeout = delay(handleAppStateChange, 200, state);
 		});
 		return () => {
 			appStateSubscription.remove();
@@ -192,12 +190,7 @@ const NavigationMain = () => {
 	const mainLoader = async ({ isFromFCM = false }) => {
 		try {
 			const store = await getStoreAsync();
-			await store.dispatch(notificationActions.fetchListNotification());
-			await store.dispatch(friendsActions.fetchListFriends({}));
 			const clanResp = await store.dispatch(clansActions.fetchClans());
-			await store.dispatch(gifsActions.fetchGifCategories());
-			await store.dispatch(gifsActions.fetchGifCategoryFeatured());
-			await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 			dispatch(appActions.setLoadingMainMobile(false));
 
 			// If is from FCM don't join current clan
@@ -209,12 +202,14 @@ const NavigationMain = () => {
 					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
 					await setDefaultChannelLoader(respChannel.payload, currentClanId);
 				} else {
-					await store.dispatch(directActions.fetchDirectMessage({}));
 					await setCurrentClanLoader(clanResp.payload);
 				}
-			} else {
-				await store.dispatch(directActions.fetchDirectMessage({}));
 			}
+			await store.dispatch(notificationActions.fetchListNotification());
+			await store.dispatch(friendsActions.fetchListFriends({}));
+			await store.dispatch(gifsActions.fetchGifCategories());
+			await store.dispatch(gifsActions.fetchGifCategoryFeatured());
+			await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 			return null;
 		} catch (error) {
 			console.log('error mainLoader', error);
