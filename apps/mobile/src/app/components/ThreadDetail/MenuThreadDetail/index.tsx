@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { style } from './style';
 
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { IChannel } from '@mezon/utils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionRow } from '../ActionRow';
@@ -19,7 +19,6 @@ export default function MenuThreadDetail(props: { route: any }) {
 	//NOTE: from DirectMessageDetail component
 	const directMessage = props.route?.params?.directMessage as DirectEntity;
 	const currentChannel = useSelector(selectCurrentChannel);
-
 	const channel = useMemo(() => {
 		if (directMessage?.id) {
 			return directMessage;

@@ -11,9 +11,15 @@ import styles from './style';
 import MediaChannel from '../../MediaChannel';
 
 const TabList = [
-	'Members',
-	"Media",
-	'Pins',
+  {
+    title: 'Members'
+  },
+  {
+    title: 'Media'
+  },
+  {
+    title: 'Pins'
+  },
 	// "Links",
 	// "Files"
 ];
@@ -41,7 +47,7 @@ export const AssetsViewer = React.memo(() => {
 
 	return (
 		<>
-			<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} titles={TabList} />
+			<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
 			<View style={styles.container}>
 				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
 					<MemberListStatus />
@@ -53,8 +59,8 @@ export const AssetsViewer = React.memo(() => {
 								: currentChannelId
 						}
 					/>
-					<Page2 />
-					<Page2 />
+					{/* <Page2 />
+					<Page2 /> */}
 				</ScrollView>
 			</View>
 		</>

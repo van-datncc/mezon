@@ -42,7 +42,7 @@ interface IChannelListItemProps {
 	onLongPressThread?: (thread: ChannelThreads) => void;
 }
 
-enum StatusVoiceChannel {
+export enum StatusVoiceChannel {
 	Active = 1,
 	No_Active = 0,
 }

@@ -72,5 +72,6 @@
         "roles": "Roles",
         "editRoles": "Edit Roles",
         "cancel": "Cancel"
-    }
+    },
+    "newMessages": "NEW MESSAGES"
 }

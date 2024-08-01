@@ -1,6 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { memo } from 'react';
-import { Image, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Image, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { style } from './styles';
 
 interface IClanIconProps {
@@ -9,6 +9,7 @@ interface IClanIconProps {
 	onPress?: any;
 	isActive?: boolean;
 	clanIconStyle?: ViewStyle;
+  clanNameStyle?: TextStyle;
 }
 export const ClanIcon = memo((props: IClanIconProps) => {
 	const styles = style(useTheme().themeValue);
@@ -29,7 +30,7 @@ export const ClanIcon = memo((props: IClanIconProps) => {
 				) : props?.data?.logo ? (
 					<Image source={{ uri: props.data.logo }} style={styles.logoClan} />
 				) : (
-					<Text style={styles.textLogoClanIcon}>{props?.data?.clan_name.charAt(0).toUpperCase()}</Text>
+					<Text style={{...styles.textLogoClanIcon, ...(props?.clanNameStyle && props?.clanNameStyle)}}>{props?.data?.clan_name.charAt(0).toUpperCase()}</Text>
 				)}
 			</View>
 			{props?.isActive && <View style={styles.lineActiveClan} />}
