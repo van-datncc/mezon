@@ -94,12 +94,17 @@ const SuggestItem = ({
 				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 				)}
-				{isHashtag ||
-					(isEmoji && (
-						<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
-							{HighlightMatch(name ?? '', valueHightLight ?? '')}
-						</span>
-					))}
+				{isHashtag && (
+					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
+						{HighlightMatch(name ?? '', valueHightLight ?? '')}
+					</span>
+				)}
+				{isEmoji && (
+					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
+						{HighlightMatch(name ?? '', valueHightLight ?? '')}
+					</span>
+				)}
+
 				{clanNickname && (
 					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
 						{HighlightMatch(clanNickname ?? '', valueHightLight ?? '')}
