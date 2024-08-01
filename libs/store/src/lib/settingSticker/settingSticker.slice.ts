@@ -1,25 +1,17 @@
 import { LoadingStatus } from '@mezon/utils';
-import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import memoizee from 'memoizee';
-import { ApiClanSticker, ApiClanStickerAddRequest, ApiClanStickerListByClanIdResponse, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
+import { ApiClanSticker, ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
 const LIST_STICKER_CACHED_TIME = 1000 * 60 * 3;
 
-export interface SettingClanStickerState {
+export interface SettingClanStickerState extends EntityState<ApiClanSticker, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	listSticker: Array<ApiClanSticker>;
 }
-
-export const initialSettingClanStickerState: SettingClanStickerState = {
-	loadingStatus: 'not loaded',
-	error: null,
-	listSticker: [],
-};
-
 export interface FetchStickerArgs {
 	clanId: string;
 	noCache: boolean;
@@ -28,6 +20,14 @@ export interface UpdateStickerArgs {
 	request: MezonUpdateClanStickerByIdBody;
 	stickerId: string;
 }
+export const stickerAdapter = createEntityAdapter({
+	selectId: (sticker: ApiClanSticker) => sticker.id || '',
+});
+
+export const initialSettingClanStickerState: SettingClanStickerState = stickerAdapter.getInitialState({
+	loadingStatus: 'not loaded',
+	error: null,
+});
 const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.client.listClanStickersByClanId(mezon.session, clanId), {
 	promise: true,
 	maxAge: LIST_STICKER_CACHED_TIME,
@@ -48,7 +48,7 @@ export const fetchStickerByClanId = createAsyncThunk(
 			if (!response.stickers) {
 				throw new Error('Emoji list is undefined or null');
 			}
-			return response;
+			return response.stickers;
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}
@@ -86,7 +86,7 @@ export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker'
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const res = await mezon.client.deleteClanStickerById(mezon.session, stickerId);
 		if (res) {
-			return { stickerId };
+			return stickerId;
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue({});
@@ -98,9 +98,9 @@ export const settingClanStickerSlice = createSlice({
 	reducers: {},
 	extraReducers(builder) {
 		builder
-			.addCase(fetchStickerByClanId.fulfilled, (state: SettingClanStickerState, actions: PayloadAction<ApiClanStickerListByClanIdResponse>) => {
+			.addCase(fetchStickerByClanId.fulfilled, (state: SettingClanStickerState, actions) => {
 				state.loadingStatus = 'loaded';
-				state.listSticker = actions.payload.stickers ?? [];
+				stickerAdapter.setAll(state, actions.payload);
 			})
 			.addCase(fetchStickerByClanId.pending, (state: SettingClanStickerState) => {
 				state.loadingStatus = 'loading';
@@ -112,19 +112,25 @@ export const settingClanStickerSlice = createSlice({
 		builder
 			.addCase(updateSticker.fulfilled, (state: SettingClanStickerState, action) => {
 				if (action.payload) {
-					const indexUpdateEmoji = state.listSticker.findIndex((sticker) => sticker.id === action.payload?.stickerId);
-					state.listSticker[indexUpdateEmoji].shortname = action.payload.request.shortname;
+					stickerAdapter.updateOne(state, {
+						id: action.payload.stickerId,
+						changes: {
+							shortname: action.payload.request.shortname,
+						},
+					});
 				}
 			})
-			.addCase(deleteSticker.fulfilled, (state: SettingClanStickerState, action) => {
+			.addCase(deleteSticker.fulfilled, (state, action) => {
 				if (action.payload) {
-					state.listSticker = state.listSticker.filter((sticker) => sticker.id !== action.payload?.stickerId);
+					stickerAdapter.removeOne(state, action.payload);
 				}
 			});
 	},
 });
 export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: SettingClanStickerState }): SettingClanStickerState =>
 	rootState[SETTING_CLAN_STICKER];
-export const selectListStickerByClanID = createSelector(getStickerSettingState, (state) => state?.listSticker);
+const { selectAll, selectEntities } = stickerAdapter.getSelectors();
+export const selectAllStickerSuggestion = createSelector(getStickerSettingState, selectAll);
+export const selectStickerSuggestionEntities = createSelector(getStickerSettingState, selectEntities);
 export const settingStickerReducer = settingClanStickerSlice.reducer;
 export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByClanId };

@@ -23,7 +23,7 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
     if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
       const request: MezonUpdateClanEmojiByIdBody = {
         source: emoji.src,
-        shortname: nameEmoji,
+        shortname: ":" + nameEmoji + ":",
         category: emoji.category,
       }
       await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }))

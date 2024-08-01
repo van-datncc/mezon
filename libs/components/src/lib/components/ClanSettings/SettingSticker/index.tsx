@@ -1,4 +1,4 @@
-import { selectCurrentClanId, selectListStickerByClanID, settingClanStickerActions, useAppDispatch } from "@mezon/store";
+import { selectAllStickerSuggestion, selectCurrentClanId, settingClanStickerActions, useAppDispatch } from "@mezon/store";
 import { Button, Modal } from "@mezon/ui";
 import { ApiClanSticker } from "mezon-js/api.gen";
 import { useCallback, useEffect, useState } from "react";
@@ -12,7 +12,7 @@ const SettingSticker = () => {
   const [editSticker, setEditSticker] = useState<ApiClanSticker | null>(null);
   const dispatch = useAppDispatch();
   const currentClanId = useSelector(selectCurrentClanId) || '';
-  const listSticker = useSelector(selectListStickerByClanID);
+  const listSticker = useSelector(selectAllStickerSuggestion);
   const handleUpdateSticker = (sticker: ApiClanSticker) => {
     setEditSticker(sticker);
     setShowModalSticker(true);
