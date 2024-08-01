@@ -22,7 +22,7 @@ const Integrations = () => {
 		if (parentChannelsInClan[0]) {
 			dispatch(fetchWebhooksByChannelId({ channelId: parentChannelsInClan[0].channel_id as string }));
 		}
-	}, [parentChannelsInClan]);
+	}, []);
 
 	return (
 		<div className="sbm:mt-[60px] mt-[10px]">
