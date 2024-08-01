@@ -56,8 +56,9 @@ export default function MemberProfile({
 						{user?.user?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
 					</Text>
 				)}
+				{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === user?.user?.id && <OwnerIcon width={16} height={16} />}
 			</View>
-			{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === user?.user?.id && <OwnerIcon width={16} height={16} />}
+
 		</View>
 	);
 }

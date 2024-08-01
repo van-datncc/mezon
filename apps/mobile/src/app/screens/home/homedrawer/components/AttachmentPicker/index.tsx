@@ -117,7 +117,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					<Text style={styles.titleButtonHeader}>{t('message:actions.files')}</Text>
 				</TouchableOpacity>
 			</View>
-			<Gallery onPickGallery={handleFiles} />
+			<Gallery onPickGallery={handleFiles} currentChannelId={currentChannelId} />
 		</View>
 	);
 }

@@ -26,6 +26,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     nameContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: size.s_6,
         paddingVertical: size.s_20,
         flexGrow: 1,
         borderBottomColor: colors.borderDim,
