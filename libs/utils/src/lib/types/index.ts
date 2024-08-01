@@ -103,7 +103,7 @@ export type IRoleUsers = IRole & {
 };
 
 export type ChannelThreads = IChannel & {
-	threads: IChannel[];
+	threads?: IChannel[];
 };
 
 export type IChannel = ApiChannelDescription & {
