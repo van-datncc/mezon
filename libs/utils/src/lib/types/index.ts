@@ -606,3 +606,7 @@ export type TNotificationChannel = {
 	category_name?: string;
 	notifications: NotificationEntity[];
 };
+
+export enum SlugPermission {
+	Admin = 'administrator',
+}

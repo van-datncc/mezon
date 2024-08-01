@@ -4,15 +4,15 @@ import {
 	getNewNameRole,
 	getNewSelectedPermissions,
 	getSelectedRoleId,
-	selectAllAccount,
 	selectCurrentClan,
 	setAddPermissions,
 	setRemovePermissions,
 	setSelectedPermissions,
 	toggleIsShowFalse,
-	toggleIsShowTrue,
+	toggleIsShowTrue
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
+import { SlugPermission } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -22,7 +22,8 @@ export type ModalSettingSave = {
 	handleSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
-const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesClanEntity[], isCreateNewRole: boolean }) => {
+
+const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
 	const dispatch = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const { permissionsDefault } = useUserPolicy(currentClan?.id || '');
@@ -30,12 +31,8 @@ const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 	const [searchTerm, setSearchTerm] = useState('');
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const nameRole = useSelector(getNewNameRole);
-	const isClanOwner = useClanOwner();
 
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
-	const userProfile = useSelector(selectAllAccount);
-	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
-	const hasPermissionEdit = isUserCreate || isClanOwner || isCreateNewRole;
 	const permissionsRole = activeRole?.permission_list;
 	const permissions = permissionsRole?.permissions?.filter((permission) => permission.active === 1) || [];
 	const permissionIds = permissions.map((permission) => permission.id) || [];
@@ -69,13 +66,14 @@ const SettingPermissions = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesCl
 		}
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
+	const isClanOwner = useClanOwner();
 	const hiddenPermissionAdmin = (slug: string) => {
-		return (!isClanOwner && slug === 'administrator') && (isCreateNewRole || isUserCreate);
+		return isClanOwner ? false : (slug === SlugPermission.Admin && !hasPermissionEdit);
 	}
 
 
 	return (
-		<div style={{pointerEvents: hasPermissionEdit ? undefined : 'none'}}>
+		<div style={{pointerEvents: !hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded-lg"
