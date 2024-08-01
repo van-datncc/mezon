@@ -35,7 +35,6 @@ export const setCurrentClanLoader = async (clans: any) => {
 	const store = await getStoreAsync();
 	if (lastClanId) {
 		save(STORAGE_CLAN_ID, lastClanId);
-		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 		await store.dispatch(clansActions.joinClan({ clanId: lastClanId }));
 		await store.dispatch(clansActions.changeCurrentClan({ clanId: lastClanId }));
 		const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: lastClanId, noCache: true }));

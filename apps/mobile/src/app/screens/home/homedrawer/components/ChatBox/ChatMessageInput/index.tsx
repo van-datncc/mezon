@@ -2,7 +2,15 @@ import { useChatSending, useDirectMessages, useEmojiSuggestion, useReference } f
 import { ActionEmitEvent, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelsEntities } from '@mezon/store-mobile';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, IMarkdownOnMessage, IMentionOnMessage, IMessageSendPayload } from '@mezon/utils';
+import {
+	IEmojiOnMessage,
+	IHashtagOnMessage,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
+	IMarkdownOnMessage,
+	IMentionOnMessage,
+	IMessageSendPayload
+} from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallback, useMemo, useState } from 'react';
@@ -39,6 +47,7 @@ interface IChatMessageInputProps {
 	emojisOnMessage?: IEmojiOnMessage[];
 	linksOnMessage?: ILinkOnMessage[];
 	markdownsOnMessage?: IMarkdownOnMessage[];
+	voiceLinkRoomOnMessage?: ILinkVoiceRoomOnMessage[];
 	plainTextMessage?: string;
 	isShowCreateThread?: boolean;
 }
@@ -68,6 +77,7 @@ export const ChatMessageInput = memo(
 				emojisOnMessage,
 				linksOnMessage,
 				markdownsOnMessage,
+				voiceLinkRoomOnMessage,
 				plainTextMessage,
 				isShowCreateThread,
 			}: IChatMessageInputProps,
@@ -174,6 +184,7 @@ export const ChatMessageInput = memo(
 					links: linksOnMessage,
 					markdowns: markdownsOnMessage,
 					plainText: plainTextMessage,
+					voiceLinks: voiceLinkRoomOnMessage,
 				};
 
 				const payloadThreadSendMessage: IPayloadThreadSendMessage = {
@@ -236,10 +247,10 @@ export const ChatMessageInput = memo(
 						setAttachmentData([]);
 					}
 				}
+				onSendSuccess();
 				ref.current?.clear?.();
 				[EMessageActionType.CreateThread].includes(messageAction) &&
 					DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
-				onSendSuccess();
 			};
 
 			return (

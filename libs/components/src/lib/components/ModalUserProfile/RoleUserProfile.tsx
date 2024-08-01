@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { UserRestrictionZone, useClanRestriction, useRoles } from '@mezon/core';
-import { RolesClanEntity, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { RolesClanEntity, selectAllAccount, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -10,9 +10,9 @@ type RoleUserProfileProps = {
 	userID?: string;
 };
 
-const checkAdminPermission = (role: RolesClanEntity, slug: string) => {
-	const item = role.permission_list?.permissions?.find(obj => obj.slug === slug);
-	return item ? item.active === 1 : false;
+const checkAdminPermission = (role: RolesClanEntity, userId: string) => {
+	const item = role.creator_id !== userId;
+	return item ?? false;
 }
 
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
@@ -21,6 +21,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const { updateRole } = useRoles(currentChannelId || '');
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
+	const userProfile = useSelector(selectAllAccount);
 
 	const [searchTerm, setSearchTerm] = useState('');
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
@@ -29,17 +30,10 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
 	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
-	const activeRolesWithoutUserRoles = activeRoles
-		.filter((role) => !userRolesClan.some((userRole) => userRole.id === role.id))
-		.filter((role) => {
-			if (!isClanCreator) {
-				const hasAdminPermission = role?.permission_list?.permissions?.some(
-					(permission) => permission.slug === 'administrator' && permission.active === 1
-				);
-				return !hasAdminPermission;
-			}
-			return role;
-		});
+	const activeRolesWithoutUserRoles = activeRoles.filter((role) => {
+		const isRoleInUserRoles = userRolesClan.some((userRole) => userRole.id === role.id);
+		return !isRoleInUserRoles;
+	});
 
 	const [positionTop, setPositionTop] = useState(40);
 	const [positionLeft, setPositionLeft] = useState(0);
@@ -90,7 +84,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant"
 					>
 						<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
-							{ isClanCreator || (hasAdminPermission && !checkAdminPermission(role, EPermission.administrator)) ? 
+							{ isClanCreator || (hasAdminPermission && !checkAdminPermission(role, userProfile?.user?.id || '')) ? 
 							<Tooltip
 								content="Remove role"
 								trigger="hover"
@@ -100,7 +94,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 							>
 								<Icons.IconRemove className="text-transparent size-2" />
 							</Tooltip>:
-							<div className="size-2.5 bg-white rounded-full"></div>
+							<div className="size-2 bg-white rounded-full"></div>
 							}
 						</button>
 						<span className="text-xs font-medium" style={{ lineHeight: '15px' }}>

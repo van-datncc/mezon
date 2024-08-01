@@ -17,13 +17,14 @@ import UserSettingProfile from './component/UserSettingProfile';
 
 interface userProfileProps {
 	userId?: string;
-	user?: User;
+	user?: User & { avatarSm: string };
 	message?: IMessageWithUser;
 	checkAnonymous?: boolean;
 	onClose?: () => void;
+	showAction?: boolean;
 }
 
-const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message }: userProfileProps) => {
+const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message, showAction = true }: userProfileProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { userProfile } = useAuth();
@@ -86,7 +87,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					<MezonAvatar
 						width={80}
 						height={80}
-						avatarUrl={userById?.user?.avatar_url || user?.avatar_url}
+						avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
 						username={userById?.user?.username || user?.display_name}
 						userStatus={userStatus}
 						isBorderBoxImage={true}
@@ -119,7 +120,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 						</View>
 					)}
 				</View>
-				{userById || user ? (
+				{showAction && userById ? (
 					<View style={[styles.userInfo]}>
 						{userById?.user?.about_me && (
 							<View>

@@ -1,3 +1,4 @@
+import { Block, size } from '@mezon/mobile-ui';
 import Toast from 'react-native-toast-message';
 import { IMezonMenuItemProps } from '../MezonMenuItem';
 import MezonMenuSection, { IMezonMenuSectionProps } from '../MezonMenuSection';
@@ -7,7 +8,11 @@ interface IMezonMenu {
 }
 
 export default function MezonMenu({ menu }: IMezonMenu) {
-	return menu.map((item, index) => <MezonMenuSection key={index.toString()} {...item} />);
+	return (
+		<Block gap={size.s_12} paddingBottom={size.s_18} marginBottom={size.s_18}>
+			{menu.map((item, index) => <MezonMenuSection key={index.toString()} {...item} />)}
+		</Block>
+	);
 }
 
 export const reserve = () => {
@@ -18,3 +23,4 @@ export const reserve = () => {
 };
 
 export { IMezonMenuItemProps, IMezonMenuSectionProps };
+

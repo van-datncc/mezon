@@ -1,3 +1,5 @@
+import { useClanRestriction } from '@mezon/core';
+import { EPermission } from '@mezon/utils';
 import { Coords } from '../../../ChannelLink';
 import ItemPanel from '../../../PanelChannel/ItemPanel';
 
@@ -11,6 +13,11 @@ type PanelEventItemProps = {
 
 function PanelEventItem(props: PanelEventItemProps) {
 	const { coords, checkUserCreate, onHandle, setOpenModalDelEvent, onClose } = props;
+
+	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.manageClan]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const isShow = checkUserCreate || hasAdminPermission || isClanCreator || hasClanPermission;
+
 
 	const handleDeleteEvent = async () => {
 		setOpenModalDelEvent(true);
@@ -27,7 +34,7 @@ function PanelEventItem(props: PanelEventItemProps) {
 			}}
 			onClick={onHandle}
 		>
-			{checkUserCreate && (
+			{(isShow) && (
 				<>
 					<ItemPanel children="Start Event" />
 					<ItemPanel children="Edit Event" />

@@ -189,8 +189,13 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			// IS message DM
 			if (linkDirectMessageMatch) {
 				const messageId = linkDirectMessageMatch[1];
-				await store.dispatch(clansActions.joinClan({ clanId: '0' }));
 				store.dispatch(appActions.setLoadingMainMobile(false));
+				if (navigation) {
+					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+						params: { directMessageId: messageId },
+					});
+				}
 				const clanIdCache = load(STORAGE_CLAN_ID);
 				// force from killed app
 				if (time && Number(clanIdCache || 0) !== 0) {
@@ -203,12 +208,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
-				if (navigation) {
-					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
-						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-						params: { directMessageId: messageId },
-					});
-				}
 			} else {
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				delay(() => {
@@ -217,9 +216,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				}, 4000);
 			}
 		}
-
-		// TODO: handle navigation
-		// handleRemoteNotificationNavigation(notification.data.action, notification);
 	} else {
 		store.dispatch(appActions.setLoadingMainMobile(false));
 		delay(() => {

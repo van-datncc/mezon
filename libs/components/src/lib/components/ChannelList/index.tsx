@@ -18,6 +18,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	const currentClan = useSelector(selectCurrentClan);
 	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
 	const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 
@@ -50,6 +51,8 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
+
+	const isShowCreateChannel = isClanCreator || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
 
 	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
@@ -92,7 +95,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 								>
 									<Icons.UpDownIcon />
 								</button>
-								<UserRestrictionZone policy={isClanCreator || hasAdminPermission || hasManageChannelPermission}>
+								<UserRestrictionZone policy={isShowCreateChannel}>
 									<button
 										className="focus-visible:outline-none"
 										onClick={() => {

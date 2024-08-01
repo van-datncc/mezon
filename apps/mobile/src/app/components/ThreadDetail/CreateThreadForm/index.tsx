@@ -12,7 +12,6 @@ import { useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	channelsActions,
-	clansActions,
 	createNewChannel,
 	getStoreAsync,
 	selectCurrentChannel,
@@ -110,11 +109,17 @@ export default function CreateThreadForm() {
 		) => {
 			if (sessionUser) {
 				if (value?.nameValueThread) {
-					const thread = await createThread(value);
+					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
-						await dispatch(clansActions.joinClan({ clanId: currentClanId as string }));
+						await dispatch(
+							channelsActions.joinChat({
+								clanId: currentClanId as string,
+								channelId: thread.channel_id as string,
+								channelType: thread.type as number,
+							}),
+						);
 						save(STORAGE_CLAN_ID, currentClanId);
-						await sendMessageThread(content, mentions, attachments, references, thread as ApiChannelDescription);
+						await sendMessageThread(content, mentions, attachments, references, thread);
 					}
 				}
 			} else {

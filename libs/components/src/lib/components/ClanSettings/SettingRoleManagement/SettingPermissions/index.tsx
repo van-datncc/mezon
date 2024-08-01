@@ -1,4 +1,4 @@
-import { useUserPolicy } from '@mezon/core';
+import { useClanOwner, useUserPolicy } from '@mezon/core';
 import {
 	RolesClanEntity,
 	getNewNameRole,
@@ -9,9 +9,10 @@ import {
 	setRemovePermissions,
 	setSelectedPermissions,
 	toggleIsShowFalse,
-	toggleIsShowTrue,
+	toggleIsShowTrue
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
+import { SlugPermission } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -21,7 +22,8 @@ export type ModalSettingSave = {
 	handleSaveClose: () => void;
 	handleUpdateUser: () => void;
 };
-const SettingPermissions = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
+
+const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
 	const dispatch = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const { permissionsDefault } = useUserPolicy(currentClan?.id || '');
@@ -64,8 +66,14 @@ const SettingPermissions = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => 
 		}
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
+	const isClanOwner = useClanOwner();
+	const hiddenPermissionAdmin = (slug: string) => {
+		return isClanOwner ? false : (slug === SlugPermission.Admin && !hasPermissionEdit);
+	}
+
+
 	return (
-		<>
+		<div style={{pointerEvents: !hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded-lg"
@@ -87,13 +95,14 @@ const SettingPermissions = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => 
 									checked={selectedPermissions.includes(permission.id)}
 									onChange={() => handlePermissionToggle(permission.id)}
 									className="cursor-pointer"
+									disabled={hiddenPermissionAdmin(permission.slug)}
 								/>
 							</label>
 						</li>
 					))}
 				</ul>
 			</div>
-		</>
+		</div>
 	);
 };
 
