@@ -7,15 +7,16 @@ type AvatarProfileProps = {
 	userToDisplay: any;
 	customStatus?: string;
 	isAnonymous?: boolean;
+	styleAvatar?: string;
 };
 
-const AvatarProfile = ({ customStatus, avatar, username, userToDisplay, isAnonymous }: AvatarProfileProps) => {
+const AvatarProfile = ({ customStatus, avatar, username, userToDisplay, isAnonymous, styleAvatar }: AvatarProfileProps) => {
 	return (
 		<div className="text-black flex flex-row gap-[6px] mt-[-50px] w-full px-[16px]">
 			<AvatarImage
 				alt={username || ''}
 				userName={username}
-				className="w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0"
+				className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0 ${styleAvatar}`}
 				src={avatar}
 				isAnonymous={isAnonymous}
 				classNameText="!text-5xl"

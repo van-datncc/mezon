@@ -1,5 +1,5 @@
 import { useNotification } from '@mezon/core';
-import { selectMemberClanByUserId } from '@mezon/store';
+import { selectMemberByUserId } from '@mezon/store';
 import { INotification, convertTimeString } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,7 +14,7 @@ function NotificationItem({ notify }: NotifyProps) {
 
 	const [openUserProfileModalInner, setOpenUserProfileModalInner] = useState<boolean>(false);
 
-	const user = useSelector(selectMemberClanByUserId(notify.sender_id || ''));
+	const user = useSelector(selectMemberByUserId(notify.sender_id ?? ''));
 	const userName = notify?.content?.username || notify?.content?.sender_name;
 	let notice = notify?.subject;
 
@@ -54,7 +54,7 @@ function NotificationItem({ notify }: NotifyProps) {
 					/>
 					<div className="flex flex-col gap-1">
 						<div>
-							<span className="font-bold">{user?.user?.display_name || userName}</span>
+							<span className="font-bold">{user?.clan_nick || user?.user?.display_name || userName}</span>
 							<span>{notice}</span>
 						</div>
 						<span className="text-zinc-400 text-[11px]">{convertTimeString(notify.create_time as string)}</span>
@@ -67,7 +67,14 @@ function NotificationItem({ notify }: NotifyProps) {
 					✕
 				</button>
 			</div>
-			{openUserProfileModalInner && <UserProfileModalInner openModal={openUserProfileModalInner} onClose={handleCloseUserProfileModalInner} />}
+			{openUserProfileModalInner && (
+				<UserProfileModalInner
+					notify={notify}
+					userId={notify.sender_id}
+					openModal={openUserProfileModalInner}
+					onClose={handleCloseUserProfileModalInner}
+				/>
+			)}
 		</>
 	);
 }
