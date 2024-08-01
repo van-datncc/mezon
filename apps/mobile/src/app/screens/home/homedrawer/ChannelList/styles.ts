@@ -17,6 +17,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			gap: size.s_8,
+      alignItems: 'center'
 		},
 		channelListSearchWrapperInput: {
 			backgroundColor: Colors.tertiaryWeight,
@@ -44,14 +45,14 @@ export const style = (colors: Attributes) =>
 		searchBox: {
 			backgroundColor: colors.primary,
 			borderRadius: size.s_50,
-			paddingHorizontal: Metrics.size.l,
+			paddingHorizontal: Metrics.size.m,
 			display: 'flex',
 			flexDirection: 'row',
 			alignItems: 'center',
-			justifyContent: 'center',
 			gap: Metrics.size.m,
 			flexBasis: size.s_50,
 			flexGrow: 1,
+      paddingVertical: size.s_8
 		},
 		placeholderSearchBox: {
 			color: colors.text,
