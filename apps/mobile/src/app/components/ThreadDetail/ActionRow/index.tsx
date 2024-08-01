@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { useUserPermission } from '../../../hooks/useUserPermission';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { threadDetailContext } from '../MenuThreadDetail';
+import { EOpenThreadDetailFrom, threadDetailContext } from '../MenuThreadDetail';
 import { style } from './style';
 enum EActionRow {
 	Search,
@@ -35,8 +35,9 @@ export const ActionRow = React.memo(() => {
 		{
 			title: 'Search',
 			action: () => {
-				//
-			},
+        navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET ,
+          params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel } });
+       },
 			icon: <Icons.MagnifyingIcon width={22} height={22} color={themeValue.text} />,
 			isShow: true,
 			type: EActionRow.Search
