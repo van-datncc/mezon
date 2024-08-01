@@ -1,14 +1,7 @@
 import { useChatSending } from '@mezon/core';
-import {
-	messagesActions,
-	referencesActions,
-	selectChannelDraftMessage,
-	selectIdMessageRefEdit,
-	selectOpenEditMessageState,
-	useAppSelector,
-} from '@mezon/store';
+import { messagesActions, referencesActions, selectIdMessageRefEdit, selectOpenEditMessageState } from '@mezon/store';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const useEditMessage = (channelId: string, channelLabel: string, mode: number, message: IMessageWithUser) => {
@@ -17,9 +10,6 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-
-	const [content, setContent] = useState(channelDraftMessage.draftContent);
 
 	const handleCancelEdit = useCallback(() => {
 		dispatch(referencesActions.setIdReferenceMessageEdit(''));
@@ -52,8 +42,6 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	return {
 		openEditMessageState,
 		idMessageRefEdit,
-		content,
-		setContent,
 		handleCancelEdit,
 		handleSend,
 		setChannelDraftMessage,

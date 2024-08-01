@@ -247,10 +247,10 @@ export const ChatMessageInput = memo(
 						setAttachmentData([]);
 					}
 				}
+				onSendSuccess();
 				ref.current?.clear?.();
 				[EMessageActionType.CreateThread].includes(messageAction) &&
 					DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
-				onSendSuccess();
 			};
 
 			return (

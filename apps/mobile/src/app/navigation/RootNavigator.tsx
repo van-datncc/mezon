@@ -93,15 +93,16 @@ const NavigationMain = () => {
 	}, []);
 
 	useEffect(() => {
-		let timeout;
+		let timeout: string | number | NodeJS.Timeout;
 		const appStateSubscription = AppState.addEventListener('change', (state) => {
-			timeout = delay(handleAppStateChange, 200, state);
+			if (isLoggedIn)
+				timeout = delay(handleAppStateChange, 200, state);
 		});
 		return () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentChannelId, isFromFcmMobile]);
+	}, [currentChannelId, isFromFcmMobile, isLoggedIn]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', async (state) => {
