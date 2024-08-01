@@ -15,7 +15,7 @@ import {
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BackHandler } from 'react-native';
+import { Platform } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
@@ -82,6 +82,7 @@ export const Authentication = () => {
 					type: 'info',
 					text1: remoteMessage.notification?.title,
 					text2: remoteMessage.notification?.body,
+					topOffset: Platform.OS === "ios" ? undefined : 10,
 					onPress: async () => {
 						Toast.hide();
 						const store = await getStoreAsync();
