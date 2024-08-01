@@ -15,7 +15,7 @@ export const style = (colors: Attributes, height: number, width: number) => Styl
 	},
 	borderBoxImage: {
 		borderColor: colors.secondary,
-		borderWidth: height / 10,
+		borderWidth: height / 10 > 5 ? 5 : height / 10,
 	},
 	image: {
 		width: '100%',

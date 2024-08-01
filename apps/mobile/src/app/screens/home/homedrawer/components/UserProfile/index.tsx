@@ -4,7 +4,6 @@ import { Block, Colors, useTheme } from '@mezon/mobile-ui';
 import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { User } from 'mezon-js';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -17,7 +16,7 @@ import UserSettingProfile from './component/UserSettingProfile';
 
 interface userProfileProps {
 	userId?: string;
-	user?: User & { avatarSm: string };
+	user?: any;
 	message?: IMessageWithUser;
 	checkAnonymous?: boolean;
 	onClose?: () => void;
@@ -33,7 +32,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 
 	const userStatus = useMemberStatus(userId || user?.id);
 	const RolesClan = useSelector(selectAllRolesClan);
-	const { color } = useMixImageColor(userById?.user?.avatar_url || userProfile?.user?.avatar_url);
+	const { color } = useMixImageColor(userById?.user?.avatar_url || user?.avatarSm || userProfile?.user?.avatar_url);
 	const navigation = useNavigation<any>();
 	const { createDirectMessageWithUser } = useDirect();
 	const listDM = useSelector(selectDirectsOpenlist);
@@ -82,12 +81,16 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 
 	return (
 		<View style={[styles.wrapper]}>
-			<View style={[styles.backdrop, { backgroundColor: userById?.user?.avatar_url || user?.avatar_url ? color : Colors.titleReset }]}>
+			<View style={[
+				styles.backdrop,
+				{ backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }
+			]}>
 				<View style={[styles.userAvatar]}>
 					<MezonAvatar
 						width={80}
 						height={80}
-						avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
+						// avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
+						avatarUrl={user?.avatar_url || user?.avatarSm}
 						username={userById?.user?.username || user?.display_name}
 						userStatus={userStatus}
 						isBorderBoxImage={true}
@@ -134,7 +137,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 								<View style={[styles.roles]}>
 									{userRolesClan?.map((role, index) => (
 										<View style={[styles.roleItem]} key={`${role.id}_${index}`}>
-											<Block width={15} height={15} borderRadius={50} backgroundColor={Colors.white}></Block>
+											<Block width={15} height={15} borderRadius={50} backgroundColor={Colors.bgToggleOnBtn}></Block>
 											<Text style={[styles.textRole]}>{role?.title}</Text>
 										</View>
 									))}
