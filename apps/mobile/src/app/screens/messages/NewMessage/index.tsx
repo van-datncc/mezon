@@ -6,6 +6,7 @@ import { User } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { SeparatorWithLine } from '../../../components/Common';
@@ -72,7 +73,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 		(friend: FriendsEntity, action: EFriendItemAction) => {
 			switch (action) {
 				case EFriendItemAction.Call:
-					console.log('handle phone call', friend);
+					Toast.show({ type: 'info', text1: 'Updating...' })
 					break;
 				case EFriendItemAction.MessageDetail:
 					directMessageWithUser(friend?.user?.id);
@@ -128,7 +129,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				showAction={false}
 			/>
 
-			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
+			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} showAction={false} showRole={false} />
 		</View>
 	);
 };

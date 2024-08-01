@@ -120,7 +120,7 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 						/>
 					</View>
 
-					<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
+					<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} showAction={false} showRole={false} />
 				</View>
 			</TouchableWithoutFeedback>
 		</SafeAreaView>

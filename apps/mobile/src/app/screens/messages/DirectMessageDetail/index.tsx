@@ -4,20 +4,17 @@ import {
 	ActionEmitEvent,
 	Icons,
 	save,
-	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND
 } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelMembersActions,
-	clansActions,
 	directActions,
 	getStoreAsync,
-	messagesActions,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -90,7 +87,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [currentChannel, dispatch]);
 
 	const directMessageLoader = useCallback(async () => {
-		const store = await getStoreAsync();		
+		const store = await getStoreAsync();
 		store.dispatch(
 			directActions.joinDirectMessage({
 				directMessageId: currentDmGroup.id,
@@ -139,7 +136,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						isFetchingLatestMessages: true,
 					}),
 				);
-				
+
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });

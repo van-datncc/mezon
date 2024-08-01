@@ -80,7 +80,7 @@ export const AddFriendScreen = () => {
 			</View>
 
 			<AddFriendModal type={currentAddFriendType} onClose={() => setCurrentAddFriendType(null)} />
-			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
+			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} showAction={false} showRole={false} />
 		</View>
 	);
 };

@@ -87,7 +87,7 @@ export const RequestFriendScreen = () => {
 				</View>
 			</View>
 
-			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
+			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} showAction={false} showRole={false} />
 		</View>
 	);
 };
