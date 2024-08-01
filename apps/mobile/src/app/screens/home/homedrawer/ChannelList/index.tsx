@@ -161,7 +161,7 @@ const ChannelList = React.memo((props: any) => {
 						</Text>
 					</TouchableOpacity>
 				</View>
-				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
+				{isLoading === 'loading' && !dataCategoryChannel?.length && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlatList
 					data={dataCategoryChannel || []}
 					keyExtractor={(_, index) => index.toString()}
