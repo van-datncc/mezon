@@ -7,6 +7,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		maxHeight: 300,
 		borderRadius: 10,
 		backgroundColor: colors.primary,
+    paddingHorizontal: size.s_4,
+    paddingVertical: size.s_2
 	},
 	serverItem: {
 		flexDirection: 'row',
@@ -14,19 +16,17 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		justifyContent: 'space-between',
 		borderRadius: 8,
 		padding: size.s_6,
-		marginBottom: size.s_4,
-		borderWidth: 1,
-		borderColor: colors.border,
+    backgroundColor: colors.primary,
 	},
 	serverName: {
 		flexDirection: 'row',
-		gap: 10,
+		gap: size.s_16,
 		alignItems: 'center',
 	},
 	wrapperPlusClan: {
-		height: verticalScale(50),
-		width: verticalScale(50),
-		borderRadius: verticalScale(15),
+		height: verticalScale(45),
+		width: verticalScale(45),
+		borderRadius: verticalScale(50),
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -38,17 +38,24 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		paddingTop: size.s_8,
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: size.s_10,
-		borderRadius: 8
+		borderRadius: 8,
+    gap: size.s_16,
 	},
 	clanName: {
 		color: colors.textStrong,
 		fontSize: size.label,
-		fontWeight: '600',
+		fontWeight: '400',
 		maxWidth: 150,
 	},
 	clanIcon: {
 		width: verticalScale(45),
 		height: verticalScale(45)
-	}
+	},
+  activeClanItem: {
+    backgroundColor: colors.secondaryLight
+  },
+  activeClanName: {
+		fontWeight: '700',
+    color: colors.white
+  }
 });

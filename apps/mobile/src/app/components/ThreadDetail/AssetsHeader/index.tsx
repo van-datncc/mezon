@@ -14,16 +14,14 @@ interface IProps {
 	pageID: number;
 	onChange?: (pageID: number) => void;
 	tabList: {
-    title: string,
-    numberSearch: number,
-    isDisplay: boolean,
-    index: number
-  }[];
-  numberSearch?: number;
+		title: string;
+		quantitySearch?: number;
+	}[];
 }
 
-const usePos = (): [IPos[], (event: LayoutChangeEvent, index: number, isDisplay: boolean) => void] => {
+const usePos = (): [IPos[], (event: LayoutChangeEvent, index: number) => void] => {
 	const [pos, setPos] = useState<IPos[]>([]);
+
 	const onLayout = useCallback((event: LayoutChangeEvent, index: number) => {
 		const { width, height, x, y } = event.nativeEvent.layout;
 		setPos((p) => {
@@ -54,9 +52,11 @@ export default function AssetsHeader({ pageID = 0, onChange, tabList = [] }: IPr
 		<>
 			<View style={styles.headerTab}>
 				{tabList?.map((tab, index) => (
-				tab?.isDisplay ? 	<Pressable key={index.toString()} onLayout={(e) => onLayout(e, tab?.index, tab?.isDisplay)} onPress={(e) => handlePress(e, tab?.index)}>
-        <Text style={{ color: tab?.index === selected ? baseColor.blurple : themeValue.text }}>{tab?.title} {tab?.numberSearch ? `(${tab?.numberSearch})`: ''}</Text>
-      </Pressable> : null
+					<Pressable key={index.toString()} onLayout={(e) => onLayout(e, index)} onPress={(e) => handlePress(e, index)}>
+						<Text style={{ color: index === selected ? baseColor.blurple : themeValue.text }}>
+							{tab.title} {tab?.quantitySearch ? `(${tab?.quantitySearch})` : ''}
+						</Text>
+					</Pressable>
 				))}
 			</View>
 
@@ -65,8 +65,8 @@ export default function AssetsHeader({ pageID = 0, onChange, tabList = [] }: IPr
 					<View
 						style={{
 							...styles.b,
-							width: pos[selected]?.width || 0,
-							left: pos[selected]?.x || 0,
+							width: pos[selected].width || 0,
+							left: pos[selected].x || 0,
 						}}
 					></View>
 				</View>
