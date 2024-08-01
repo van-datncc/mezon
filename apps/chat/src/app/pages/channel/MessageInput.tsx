@@ -46,7 +46,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
-	const { emojiList, linkList, markdownList } = useProcessedContent(channelDraftMessage.draftContent ?? '');
+	const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(channelDraftMessage.draftContent ?? '');
 	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(channelDraftMessage.draftContent ?? '');
 
 	const combinedContent = useMemo(() => {
@@ -57,14 +57,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			emojis: emojiList,
 			links: linkList,
 			markdowns: markdownList,
+			voicelinks: voiceLinkRoomList,
 		};
-	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList]);
+	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList, voiceLinkRoomList]);
 
 	const [convertedContent, setConvertedContent] = useState(combinedContent);
 
 	useEffect(() => {
 		setConvertedContent(combinedContent);
-	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList]);
+	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList, voiceLinkRoomList]);
 
 	const [initialDraftContent, setInitialDraftContent] = useState<string>(message.content);
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
@@ -154,8 +155,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const handleSave = () => {
 		delete sortedInitialDraftContent.plaintext;
-		delete sortedInitialDraftContent.voicelinks;
-
 		if (channelDraftMessage.draftContent === '') {
 			return setOpenModalDelMess(true);
 		} else if (JSON.stringify(sortedInitialDraftContent) === JSON.stringify(sortedContentConverted) && channelDraftMessage.draftContent !== '') {
@@ -208,12 +207,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						renderSuggestion={(suggestion: MentionDataProps) => {
 							return (
 								<SuggestItem
-									name={suggestion.display === 'here' ? '@here' : suggestion.displayName ?? ''}
+									name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
 									avatarUrl={suggestion.avatarUrl ?? ''}
 									subText={
 										suggestion.display === 'here'
 											? 'Notify everyone who has permission to see this channel'
-											: suggestion.display ?? ''
+											: (suggestion.display ?? '')
 									}
 									subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== 'here'}
