@@ -34,7 +34,13 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiSyntax, onlyEmoji, 
 	return (
 		<span onContextMenu={handleContextMenu}>
 			{srcEmoji ? (
-				<img src={srcEmoji} alt={srcEmoji} className={className} onDragStart={(e) => e.preventDefault()} />
+				<img
+					id={`emoji-${emojiSyntax}`}
+					src={srcEmoji}
+					alt={`[:${emojiSyntax}]`}
+					className={className}
+					onDragStart={(e) => e.preventDefault()}
+				/>
 			) : (
 				<PlainText showOnchannelLayout={showOnChannelLayOut} text={emojiSyntax} />
 			)}

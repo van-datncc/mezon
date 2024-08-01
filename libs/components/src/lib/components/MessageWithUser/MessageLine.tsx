@@ -1,7 +1,7 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import { convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
@@ -97,19 +97,9 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
-	const handleCopy = useCallback(
-		(e: React.ClipboardEvent<HTMLSpanElement>) => {
-			e.preventDefault();
-			e.clipboardData.setData('text/plain', content.t);
-		},
-		[content],
-	);
+
 	return (
-		<div
-			onCopy={handleCopy}
-			onClick={!showOnchannelLayout ? onClickToMessage : () => {}}
-			className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}
-		>
+		<div onClick={!showOnchannelLayout ? onClickToMessage : () => {}} className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}>
 			<RenderContent
 				data={content}
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}

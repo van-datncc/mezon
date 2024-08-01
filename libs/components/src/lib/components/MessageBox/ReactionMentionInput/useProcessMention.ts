@@ -1,21 +1,20 @@
-import { IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
+import { IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 
 const useProcessMention = (text: string) => {
 	const [mentionList, setMentionList] = useState<IMentionOnMessage[]>([]);
 	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
-	const [emojiList2, setEmojiList] = useState<{ emoji: string; startindex: number; endindex: number }[]>([]);
+	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
 	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
 
 	useEffect(() => {
-		console.log(text);
 		const mentions: IMentionOnMessage[] = [];
 		const hashtags: IHashtagOnMessage[] = [];
-		const emojis: { emoji: string; startindex: number; endindex: number }[] = [];
+		const emojis: IEmojiOnMessage[] = [];
 
 		const mentionPrefix = '@[';
 		const hashtagPrefix = '#[';
-		const emojiPrefix = '[;'; // Emoji prefix
+		const emojiPrefix = '[:'; // Emoji prefix
 		const emojiSuffix = ']';
 
 		let index = 0;
@@ -69,11 +68,11 @@ const useProcessMention = (text: string) => {
 
 				// Extract emoji
 				const emojiEnd = text.indexOf(emojiSuffix, index);
-				const emoji = text.substring(index, emojiEnd);
+				const shortname = text.substring(index, emojiEnd);
 				index = emojiEnd + emojiSuffix.length;
 
 				emojis.push({
-					emoji,
+					shortname,
 					startindex,
 					endindex: index,
 				});
@@ -94,7 +93,7 @@ const useProcessMention = (text: string) => {
 		setSimplifiedMentionList(simplifiedList);
 	}, [text]);
 
-	return { mentionList, simplifiedMentionList, hashtagList, emojiList2 };
+	return { mentionList, simplifiedMentionList, hashtagList, emojiList };
 };
 
 export default useProcessMention;
