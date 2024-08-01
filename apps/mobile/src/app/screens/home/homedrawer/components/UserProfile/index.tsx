@@ -4,7 +4,6 @@ import { Block, Colors, useTheme } from '@mezon/mobile-ui';
 import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { User } from 'mezon-js';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -17,7 +16,7 @@ import UserSettingProfile from './component/UserSettingProfile';
 
 interface userProfileProps {
 	userId?: string;
-	user?: User & { avatarSm: string };
+	user?: any;
 	message?: IMessageWithUser;
 	checkAnonymous?: boolean;
 	onClose?: () => void;
@@ -134,7 +133,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 								<View style={[styles.roles]}>
 									{userRolesClan?.map((role, index) => (
 										<View style={[styles.roleItem]} key={`${role.id}_${index}`}>
-											<Block width={15} height={15} borderRadius={50} backgroundColor={Colors.white}></Block>
+											<Block width={15} height={15} borderRadius={50} backgroundColor={Colors.bgToggleOnBtn}></Block>
 											<Text style={[styles.textRole]}>{role?.title}</Text>
 										</View>
 									))}

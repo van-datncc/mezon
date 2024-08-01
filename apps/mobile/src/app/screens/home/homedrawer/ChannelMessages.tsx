@@ -8,7 +8,7 @@ import {
 	selectAttachmentPhoto,
 	selectHasMoreMessageByChannelId,
 	selectMessageIdsByChannelId,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { cloneDeep } from 'lodash';
@@ -101,6 +101,16 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			if (timeOutRef?.current) clearTimeout(timeOutRef.current);
 		};
 	}, []);
+
+	useEffect(() => {
+		return () => {
+			dispatch(
+				messagesActions.UpdateChannelLastMessage({
+					channelId,
+				}),
+			);
+		};
+	}, [channelId, dispatch]);
 
 	useEffect(() => {
 		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
@@ -318,21 +328,19 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					/>
 				) : null}
 
-				{openBottomSheet !== null && (
-					<MessageItemBS
-						mode={mode}
-						message={messageSelected}
-						onConfirmAction={onConfirmAction}
-						type={openBottomSheet}
-						isOnlyEmojiPicker={isOnlyEmojiPicker}
-						onClose={() => {
-							setOpenBottomSheet(null);
-						}}
-						user={userSelected}
-						checkAnonymous={checkAnonymous}
-						senderDisplayName={senderDisplayName}
-					/>
-				)}
+				<MessageItemBS
+					mode={mode}
+					message={messageSelected}
+					onConfirmAction={onConfirmAction}
+					type={openBottomSheet}
+					isOnlyEmojiPicker={isOnlyEmojiPicker}
+					onClose={() => {
+						setOpenBottomSheet(null);
+					}}
+					user={userSelected}
+					checkAnonymous={checkAnonymous}
+					senderDisplayName={senderDisplayName}
+				/>
 
 				{currentMessageActionType === EMessageActionType.ForwardMessage && (
 					<ForwardMessageModal
