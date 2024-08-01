@@ -39,6 +39,7 @@ const ListMemberSearch = (props: ListMemberSearchProps) => {
 								showAvatar
 								displayName={item?.displayName}
 								valueHightLight={searchText}
+								clanNickname={item?.name}
 							/>
 						</div>
 					);
