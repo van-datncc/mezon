@@ -50,7 +50,14 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 				);
 			}
 			if (shortname) {
-				formattedContent.push(<EmojiMarkup key={`${index}${startindex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
+				formattedContent.push(
+					<EmojiMarkup
+						showOnChannelLayOut={showOnchannelLayout}
+						key={`${index}${startindex}${shortname}`}
+						emojiSyntax={shortname}
+						onlyEmoji={false}
+					/>,
+				);
 			}
 
 			if (link) {

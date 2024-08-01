@@ -1,16 +1,14 @@
-import { IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
+import { ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 
 const useProcessedContent = (inputText: string) => {
-	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
 	const [linkList, setLinkList] = useState<ILinkOnMessage[]>([]);
 	const [markdownList, setMarkdownList] = useState<IMarkdownOnMessage[]>([]);
 	const [voiceLinkRoomList, setVoiceLinkRoomList] = useState<ILinkVoiceRoomOnMessage[]>([]);
 
 	useEffect(() => {
 		const processInput = () => {
-			const { emojis, links, markdowns, voiceRooms } = processText(inputText);
-			setEmojiList(emojis);
+			const { links, markdowns, voiceRooms } = processText(inputText);
 			setLinkList(links);
 			setMarkdownList(markdowns);
 			setVoiceLinkRoomList(voiceRooms);
@@ -18,13 +16,12 @@ const useProcessedContent = (inputText: string) => {
 
 		processInput();
 	}, [inputText]);
-	return { emojiList, linkList, markdownList, inputText, voiceLinkRoomList };
+	return { linkList, markdownList, inputText, voiceLinkRoomList };
 };
 
 export default useProcessedContent;
 
 const processText = (inputString: string) => {
-	const emojis: IEmojiOnMessage[] = [];
 	const links: ILinkOnMessage[] = [];
 	const markdowns: IMarkdownOnMessage[] = [];
 	const voiceRooms: ILinkVoiceRoomOnMessage[] = [];
@@ -36,29 +33,7 @@ const processText = (inputString: string) => {
 
 	let i = 0;
 	while (i < inputString.length) {
-		if (inputString[i] === ':') {
-			// Emoji processing
-			const startindex = i;
-			i++;
-			let shortname = '';
-			while (i < inputString.length && inputString[i] !== ':') {
-				shortname += inputString[i];
-				i++;
-			}
-			if (i < inputString.length && inputString[i] === ':') {
-				const endindex = i + 1;
-				const preCharFour = inputString.substring(startindex - 4, startindex);
-				const preCharFive = inputString.substring(startindex - 5, startindex);
-				if (preCharFour !== 'http' && preCharFive !== 'https') {
-					emojis.push({
-						shortname: `:${shortname}:`,
-						startindex,
-						endindex,
-					});
-				}
-				i++;
-			}
-		} else if (inputString.startsWith(httpPrefix, i)) {
+		if (inputString.startsWith(httpPrefix, i)) {
 			// Link processing
 			const startindex = i;
 			i += httpPrefix.length;
@@ -118,6 +93,5 @@ const processText = (inputString: string) => {
 			i++;
 		}
 	}
-
-	return { emojis, links, markdowns, voiceRooms };
+	return { links, markdowns, voiceRooms };
 };
