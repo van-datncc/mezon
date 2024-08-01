@@ -123,8 +123,6 @@ const SearchMessageChannel = () => {
 	}, [accountId, friends, listDM, usersClan]);
 
 	const listMemberSearch = useMemo(() => {
-		console.log('searchText: ', searchText);
-
 		return listMember
 			.filter((item: any) => item?.name?.toUpperCase().indexOf(searchText?.toUpperCase()?.substring(1)) > -1)
 			.sort((a: any, b: any) => {
