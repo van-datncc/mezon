@@ -20,5 +20,10 @@ export const style = (colors: Attributes) => StyleSheet.create({
         fontSize: Fonts.size.h4,
         textAlign: 'center',
         fontWeight: "bold",
+    },
+
+    altTextLight: {
+        fontSize: Fonts.size.h5,
+        fontWeight: "normal"
     }
 })

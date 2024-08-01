@@ -1,11 +1,9 @@
-import {Attributes, Colors, size, verticalScale} from '@mezon/mobile-ui';
+import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) => StyleSheet.create({
 	wrapperAvatar: {
 		width: size.s_40,
-		height: size.s_40,
-		borderRadius: size.s_40,
-		overflow: 'hidden',
+		height: size.s_40
 	},
 	wrapperAvatarCombine: {
 		width: size.s_40,

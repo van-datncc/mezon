@@ -83,14 +83,13 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 		<View style={[styles.wrapper]}>
 			<View style={[
 				styles.backdrop,
-				{ backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }
+				{ backgroundColor: user?.avatar_url || user?.avatarSm || userById?.user?.avatar_url ? color : Colors.titleReset }
 			]}>
 				<View style={[styles.userAvatar]}>
 					<MezonAvatar
 						width={80}
 						height={80}
-						// avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
-						avatarUrl={user?.avatar_url || user?.avatarSm}
+						avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
 						username={userById?.user?.username || user?.display_name}
 						userStatus={userStatus}
 						isBorderBoxImage={true}

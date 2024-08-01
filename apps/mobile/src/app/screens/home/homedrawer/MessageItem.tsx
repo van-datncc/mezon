@@ -283,8 +283,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 					<AvatarMessage
 						onPress={onPressAvatar}
-						avatar={message?.isMe ? userProfile?.user?.avatar_url : message?.user?.avatarSm}
-						textAvatar={isDM ? message?.display_name || message?.user?.username : message?.user?.username}
+						id={message?.user?.id}
+						username={isDM ? message?.display_name || message?.user?.username : message?.user?.username}
 						isShow={!isCombine || !!message?.references?.length || showUserInformation}
 					/>
 					<Pressable
