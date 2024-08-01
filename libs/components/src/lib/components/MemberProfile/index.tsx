@@ -144,6 +144,9 @@ function MemberProfile({
 	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, []);
 
 	const userName = useMemo(() => isFooter ? userProfile?.user?.username || '' : name || '', []);
+
+	const subNameRef = useRef<HTMLInputElement>(null);
+	const minWidthNameMain = useMemo(() => subNameRef.current?.offsetWidth,[subNameRef?.current]);
 	return (
 		<div className="relative group">
 			<div
@@ -171,11 +174,12 @@ function MemberProfile({
 				</a>
 				<div className="flex flex-col items-start">
 					<div
+						ref={subNameRef}
 						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
-								{customStatus && isFooter ? (
+								{customStatus && (isFooter || isListFriend) ? (
 									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode line-clamp-1`}>
 										{customStatus}
 									</span>
@@ -193,7 +197,10 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<div>
-							<div className="flex flex-row items-center w-full overflow-x-hidden">
+							<div 
+								className="flex flex-row items-center w-full overflow-x-hidden" 
+								style={{minWidth: `${minWidthNameMain}px`}}
+							>
 								<p
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
@@ -205,7 +212,7 @@ function MemberProfile({
 							`}
 									title={name}
 								>
-									<span className={isListFriend ? 'dark:text-white text-black one-line' : ''}>{!isHiddenAvatarPanel && name}</span>
+									<span className={`one-line ${isListFriend ? 'dark:text-white text-black' : ''}`}>{!isHiddenAvatarPanel && name}</span>
 									{isListFriend && <span className='hidden group-hover/list_friends:inline'>&nbsp;{userNameAva}</span>}
 								</p>
 								{(dataMemberCreate?.createId || currentClan?.creator_id) &&

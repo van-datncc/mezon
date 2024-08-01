@@ -205,6 +205,10 @@ export type IUser = {
 	avatarSm: string;
 };
 
+export type MetaDateStatusUser = {
+	status: string;
+}
+
 export type IVoice = {
 	user_id: string;
 	clan_id: string;
