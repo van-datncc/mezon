@@ -5,7 +5,7 @@ export const TIME_OFFSET = 3;
 export const LIMIT_MESSAGE = 50;
 export const LIMIT_CLAN_ITEM = 50;
 export const SIZE_PAGE_SEARCH = 25;
-
+export const LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI = 1000000;
 export const KEY_KEYBOARD = { BACKSPACE: 8, TAB: 9, ENTER: 13, ESC: 27, UP: 38, DOWN: 40, RIGHT: 39, LEFT: 27 };
 export const threadError: ThreadError = {
 	name: 'Thread Name is required',

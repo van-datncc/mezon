@@ -37,9 +37,10 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const dispatch = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const isChange = useSelector(getIsShow);
+	const isCreateNewRole = clickRole === 'New Role';
 
 	const handleClose = () => {
-		if (clickRole === 'New Role') {
+		if (isCreateNewRole) {
 			props.handleClose();
 		} else {
 			const activeRole = rolesClan.find((role) => role.id === clickRole);
@@ -53,7 +54,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const handleSaveClose = () => {};
 
 	const handleUpdateUser = async (hasCloseModal?: boolean) => {
-		if (clickRole === 'New Role') {
+		if (isCreateNewRole) {
 			if(!hasCloseModal) props.handleClose();
 			await createRole(currentClan?.id || '', currentClan?.id || '', nameRole, addUsers, addPermissions);
 		} else {
@@ -73,7 +74,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} handleUpdateUser={() =>handleUpdateUser(true)}/>
 				<div className="w-2/3">
 					<div className="font-semibold pl-3 dark:text-white text-black">
-						{clickRole === 'New Role' ? (
+						{isCreateNewRole ? (
 							<div className="tracking-wide text-base mb-4">NEW ROLE</div>
 						) : (
 							<div className="tracking-wide mb-4 text-base uppercase">EDIT ROLE - {nameRole}</div>

@@ -5,7 +5,7 @@ import {
 	getSelectedRoleId,
 	setNameRoleNew,
 	toggleIsShowFalse,
-	toggleIsShowTrue,
+	toggleIsShowTrue
 } from '@mezon/store';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +17,7 @@ export type ModalSettingSave = {
 	handleUpdateUser: () => void;
 };
 
-const SettingDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
+const SettingDisplayRole = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
 	const nameRole = useSelector(getNewNameRole);
 	const selectedPermissions = useSelector(getNewSelectedPermissions);
 	const clickRole = useSelector(getSelectedRoleId);
@@ -45,7 +45,10 @@ const SettingDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => 
 	}, [nameRole, selectedPermissions, activeRole, permissionIds, dispatch]);
 
 	return (
-		<div className="w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800">
+		<div 
+			className='w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800'
+			style={{pointerEvents: (!hasPermissionEdit) ? undefined : 'none'}}
+		>
 			<div className="text-xs font-bold uppercase mb-2">
 				Role name<b className="text-red-600">*</b>
 			</div>
@@ -54,6 +57,7 @@ const SettingDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => 
 				type="text"
 				value={nameRole}
 				onChange={handleDisplayName}
+				maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 			/>
 		</div>
 	);

@@ -51,7 +51,7 @@ export const getNotificationSetting = createAsyncThunk('notificationsetting/getN
 
 type SetNotificationPayload = {
 	channel_id?: string;
-	notification_type?: string;
+	notification_type?: number;
 	time_mute?: string;
 	clan_id: string;
 };
@@ -77,7 +77,7 @@ export const setNotificationSetting = createAsyncThunk(
 
 type SetMuteNotificationPayload = {
 	channel_id?: string;
-	notification_type?: string;
+	notification_type?: number;
 	active: number;
 	clan_id: string;
 };

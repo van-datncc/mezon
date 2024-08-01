@@ -1,6 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import { Text, TouchableOpacity, TouchableOpacityProps, View, ViewStyle } from 'react-native';
+import { Text, TextStyle, TouchableOpacity, TouchableOpacityProps, View, ViewStyle } from 'react-native';
 import { style } from './style';
 
 interface IMezonButtonProps extends TouchableOpacityProps {
@@ -8,7 +8,7 @@ interface IMezonButtonProps extends TouchableOpacityProps {
 	disabled?: boolean;
 	onPress?: () => void;
 	viewContainerStyle?: ViewStyle | ViewStyle[];
-	textStyle?: ViewStyle | ViewStyle[];
+	textStyle?: TextStyle | TextStyle[];
 }
 
 export const MezonButton = (props: IMezonButtonProps) => {

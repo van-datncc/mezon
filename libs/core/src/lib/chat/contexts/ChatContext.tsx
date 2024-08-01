@@ -26,6 +26,7 @@ import {
 	ChannelDeletedEvent,
 	ChannelMessageEvent,
 	ChannelPresenceEvent,
+	ChannelType,
 	ChannelUpdatedEvent,
 	CustomStatusEvent,
 	LastPinMessageEvent,
@@ -251,13 +252,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated && channelCreated.channel_private === 0) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-				dispatch(
-					channelsActions.joinChat({
-						clanId: channelCreated.clan_id,
-						channelId: channelCreated.channel_id,
-						channelType: channelCreated.channel_type,
-					}),
-				);
+				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+					dispatch(
+						channelsActions.joinChat({
+							clanId: channelCreated.clan_id,
+							channelId: channelCreated.channel_id,
+							channelType: channelCreated.channel_type,
+						}),
+					);
+				}
 			}
 		},
 		[dispatch],

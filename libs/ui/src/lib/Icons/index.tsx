@@ -5,8 +5,8 @@ export * from './iconRightClick';
 export * from './uploadThumbnail';
 
 interface ClassIconProps extends React.HTMLAttributes<SVGElement> {
-  fill?: string;
-  size?: string;
+	fill?: string;
+	size?: string;
 }
 
 export function Discord(props: React.HTMLAttributes<SVGElement>) {
@@ -163,14 +163,14 @@ export function UploadImage(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function AddIcon({ fill , ...props }: ClassIconProps) {
+export function AddIcon({ fill, ...props }: ClassIconProps) {
 	return (
 		<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
 				d="M27.3332 14C27.3332 21.3638 21.3636 27.3333 13.9998 27.3333C6.63604 27.3333 0.666504 21.3638 0.666504 14C0.666504 6.63621 6.63604 0.666672 13.9998 0.666672C21.3636 0.666672 27.3332 6.63621 27.3332 14ZM13.9999 7.00001C14.9203 7.00001 15.6665 7.7462 15.6665 8.66667V12.3333H19.3332C20.2537 12.3333 20.9999 13.0795 20.9999 14C20.9999 14.9205 20.2537 15.6667 19.3332 15.6667H15.6665V19.3333C15.6665 20.2538 14.9203 21 13.9999 21C13.0794 21 12.3332 20.2538 12.3332 19.3333V15.6667H8.66657C7.7461 15.6667 6.9999 14.9205 6.9999 14C6.9999 13.0795 7.7461 12.3333 8.66657 12.3333H12.3332V8.66667C12.3332 7.7462 13.0794 7.00001 13.9999 7.00001Z"
-				fill={fill ? fill : "#155EEF"}
+				fill={fill ? fill : '#155EEF'}
 			/>
 		</svg>
 	);
@@ -1123,9 +1123,7 @@ export const UnMuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} ${defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -2226,6 +2224,29 @@ export const PenEdit: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 	);
 };
 
+export const ViewRole: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	const [isWhite, setIsWhite] = useState<boolean>(false);
+
+	const handleClick = () => {
+		setIsWhite(!isWhite);
+	};
+
+	return (
+		<svg 
+			className={isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}
+			role="img" 
+			xmlns="http://www.w3.org/2000/svg" 
+			onClick={handleClick}
+			width="20" height="20" fill="none" viewBox="0 0 24 24"
+		>
+			<path fill="currentColor" d="M15.56 11.77c.2-.1.44.02.44.23a4 4 0 1 1-4-4c.21 0 .33.25.23.44a2.5 2.5 0 0 0 3.32 3.32Z">
+			</path>
+			<path fill="currentColor" fillRule="evenodd" d="M22.89 11.7c.07.2.07.4 0 .6C22.27 13.9 19.1 21 12 21c-7.11 0-10.27-7.11-10.89-8.7a.83.83 0 0 1 0-.6C1.73 10.1 4.9 3 12 3c7.11 0 10.27 7.11 10.89 8.7Zm-4.5-3.62A15.11 15.11 0 0 1 20.85 12c-.38.88-1.18 2.47-2.46 3.92C16.87 17.62 14.8 19 12 19c-2.8 0-4.87-1.38-6.39-3.08A15.11 15.11 0 0 1 3.15 12c.38-.88 1.18-2.47 2.46-3.92C7.13 6.38 9.2 5 12 5c2.8 0 4.87 1.38 6.39 3.08Z" clipRule="evenodd">
+			</path>
+		</svg>
+	);
+};
+
 export const ImageThumbnail: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -3209,7 +3230,8 @@ export function WindowIcon(props: React.HTMLAttributes<SVGElement>) {
 			xmlnsXlink="http://www.w3.org/1999/xlink"
 			preserveAspectRatio="xMidYMid"
 			fill="#000000"
-			className="" {...props}
+			className=""
+			{...props}
 		>
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
 			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>

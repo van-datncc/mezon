@@ -1,20 +1,12 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import {
-	ActionEmitEvent,
-	Icons,
-	save,
-	STORAGE_CLAN_ID,
-	STORAGE_IS_DISABLE_LOAD_BACKGROUND
-} from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelMembersActions,
-	clansActions,
 	directActions,
 	getStoreAsync,
-	messagesActions,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
 	useAppDispatch,
@@ -91,7 +83,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
-		store.dispatch(clansActions.joinClan({ clanId: currentDmGroup?.clan_id }));
 		store.dispatch(
 			directActions.joinDirectMessage({
 				directMessageId: currentDmGroup.id,
@@ -140,7 +131,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						isFetchingLatestMessages: true,
 					}),
 				);
-				
+
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
@@ -172,7 +163,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const onHandlerStateChange = (event) => {
 		const { translationX, velocityX } = event.nativeEvent;
 		if (translationX > 5 && velocityX > 200) {
-			handleBack()
+			handleBack();
 		}
 	};
 	return (
@@ -191,7 +182,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 							{currentDmGroup?.channel_avatar?.[0] ? (
 								<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
 							) : (
-								<View style={styles.wrapperTextAvatar} >
+								<View style={styles.wrapperTextAvatar}>
 									<Text style={[styles.textAvatar]}>{currentDmGroup?.channel_label?.charAt?.(0)}</Text>
 								</View>
 							)}
@@ -211,15 +202,14 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 			{currentDmGroup?.id ? (
 				<View style={styles.content}>
-					<PanGestureHandler
-						failOffsetY={[-5, 5]}
-						onHandlerStateChange={onHandlerStateChange}
-					>
+					<PanGestureHandler failOffsetY={[-5, 5]} onHandlerStateChange={onHandlerStateChange}>
 						<View style={{ flex: 1 }}>
 							<ChannelMessages
 								channelId={currentDmGroup.id}
 								channelLabel={currentDmGroup?.channel_label}
-								mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
+								mode={Number(
+									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
+								)}
 							/>
 						</View>
 					</PanGestureHandler>

@@ -108,7 +108,7 @@ export const ChatBoxBottomBar = memo(
 			},
 			triggersConfig,
 		});
-		const { emojiList, linkList, markdownList } = useProcessedContent(text);
+		const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(text);
 
 		const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 		const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
@@ -142,19 +142,18 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const resetCachedText = useCallback(async () => {
-			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {}
-			delete allCachedMessage[channelId];
-			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
-				...allCachedMessage,
-			});
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
+			if (allCachedMessage?.[channelId])
+				allCachedMessage[channelId] = '';
+
+			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
 		}, [channelId]);
 
 		const resetCachedAttachment = useCallback(async () => {
 			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
-			delete allCachedAttachments[channelId];
-			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
-				...allCachedAttachments,
-			});
+			if (allCachedAttachments?.[channelId])
+				allCachedAttachments[channelId] = [];
+			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, allCachedAttachments);
 		}, [channelId]);
 
 		useEffect(() => {
@@ -204,7 +203,7 @@ export const ChatBoxBottomBar = memo(
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
 			resetCachedAttachment();
-		}, []);
+		}, [onDeleteMessageActionNeedToResolve, resetCachedAttachment, resetCachedText]);
 
 		const handleKeyboardBottomSheetMode = useCallback(
 			(mode: IModeKeyboardPicker) => {
@@ -480,6 +479,7 @@ export const ChatBoxBottomBar = memo(
 						emojisOnMessage={emojiList}
 						linksOnMessage={linkList}
 						markdownsOnMessage={markdownList}
+						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						plainTextMessage={plainTextMessage}
 						isShowCreateThread={isShowCreateThread}
 					/>

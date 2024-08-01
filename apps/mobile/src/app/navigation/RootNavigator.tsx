@@ -93,15 +93,16 @@ const NavigationMain = () => {
 	}, []);
 
 	useEffect(() => {
-		let timeout;
+		let timeout: string | number | NodeJS.Timeout;
 		const appStateSubscription = AppState.addEventListener('change', (state) => {
-			timeout = delay(handleAppStateChange, 200, state);
+			if (isLoggedIn)
+				timeout = delay(handleAppStateChange, 200, state);
 		});
 		return () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentChannelId, isFromFcmMobile]);
+	}, [currentChannelId, isFromFcmMobile, isLoggedIn]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', async (state) => {
@@ -123,6 +124,10 @@ const NavigationMain = () => {
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
+
+	useEffect(() => {
+		if (currentClanId) emojiLoader();
+	}, [currentClanId]);
 
 	const initAppLoading = async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
@@ -160,9 +165,12 @@ const NavigationMain = () => {
 		}
 	};
 
+	const emojiLoader = async () => {
+		const store = await getStoreAsync();
+		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true }));
+	};
 	const authLoader = async () => {
 		const store = await getStoreAsync();
-		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: '0', noCache: false }));
 		try {
 			const response = await store.dispatch(authActions.refreshSession());
 			if ((response as unknown as IWithError).error) {

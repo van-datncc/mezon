@@ -1,63 +1,79 @@
-import { MentionItem } from 'react-mentions';
-import useIsWithinBackticks from './useIsWithinBackticks';
-interface PositionTracker {
-	[key: string]: number;
-}
+import { IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
+import { useEffect, useState } from 'react';
 
-export const useProcessMention = (mentions: MentionItem[], convertedHashtag: string) => {
-	const mentionList = [];
-	const hashtagList = [];
-	let positionTracker: PositionTracker = {};
-	const isWithinBackticks = useIsWithinBackticks(convertedHashtag);
+const useProcessMention = (text: string) => {
+	const [mentionList, setMentionList] = useState<IMentionOnMessage[]>([]);
+	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
+	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
 
-	for (const mention of mentions) {
-		let startIndex = -1;
-		let endIndex = -1;
-		if (mention.display.startsWith('@') || mention.display.startsWith('#')) {
-			const mentionPattern = mention.display.startsWith('@') ? mention.display : `<#${mention.id.toString()}>`;
-			const patternLength = mentionPattern.length;
+	useEffect(() => {
+		const mentions: IMentionOnMessage[] = [];
+		const hashtags: IHashtagOnMessage[] = [];
 
-			if (!positionTracker[mentionPattern]) {
-				positionTracker[mentionPattern] = 0;
-			}
+		const mentionPrefix = '@[';
+		const hashtagPrefix = '#[';
 
-			startIndex = convertedHashtag.indexOf(mentionPattern, positionTracker[mentionPattern]);
+		let index = 0;
 
-			// Check if mention is within backticks
-			while (startIndex !== -1) {
-				if (!isWithinBackticks(startIndex)) {
-					endIndex = startIndex + patternLength;
-					positionTracker[mentionPattern] = endIndex;
+		while (index < text.length) {
+			if (text.startsWith(mentionPrefix, index)) {
+				let startindex = index;
+				index += mentionPrefix.length;
 
-					if (mention.display.startsWith('@')) {
-						mentionList.push({
-							userId: mention.id.toString() ?? '',
-							username: mention.display ?? '',
-							startIndex: startIndex,
-							endIndex: endIndex,
-						});
-					} else if (mention.display.startsWith('#')) {
-						hashtagList.push({
-							channelId: mention.id.toString() ?? '',
-							channelLabel: mention.display ?? '',
-							startIndex: startIndex,
-							endIndex: endIndex,
-						});
-					}
-					break;
-				} else {
-					// Mention is within backticks, find the next occurrence
-					positionTracker[mentionPattern] = startIndex + patternLength;
-					startIndex = convertedHashtag.indexOf(mentionPattern, positionTracker[mentionPattern]);
-				}
+				// Extract username
+				const usernameEnd = text.indexOf(']', index);
+				const username = `@${text.substring(index, usernameEnd)}`;
+				index = usernameEnd + 1;
+
+				// Extract userId
+				const userIdStart = text.indexOf('(', index) + 1;
+				const userIdEnd = text.indexOf(')', userIdStart);
+				const userid = text.substring(userIdStart, userIdEnd);
+				index = userIdEnd + 1;
+
+				mentions.push({
+					userid,
+					username,
+					startindex,
+					endindex: index,
+				});
+			} else if (text.startsWith(hashtagPrefix, index)) {
+				let startindex = index;
+				index += hashtagPrefix.length;
+
+				// Extract channelLabel
+				const labelEnd = text.indexOf(']', index);
+				const channellabel = `#${text.substring(index, labelEnd)}`;
+				index = labelEnd + 1;
+
+				// Extract channelId
+				const channelIdStart = text.indexOf('(', index) + 1;
+				const channelIdEnd = text.indexOf(')', channelIdStart);
+				const channelid = text.substring(channelIdStart, channelIdEnd);
+				index = channelIdEnd + 1;
+
+				hashtags.push({
+					channelid,
+					channellabel,
+					startindex,
+					endindex: index,
+				});
+			} else {
+				index++;
 			}
 		}
-	}
 
-	const simplifiedMentionList = mentionList.map((mention) => ({
-		user_id: mention.userId,
-		username: mention.username,
-	}));
+		setMentionList(mentions);
+		setHashtagList(hashtags);
+		const simplifiedList = mentions.map((mention) => ({
+			user_id: mention.userid,
+			username: mention.username,
+		}));
+
+		setSimplifiedMentionList(simplifiedList);
+	}, [text]);
 
 	return { mentionList, simplifiedMentionList, hashtagList };
 };
+
+export default useProcessMention;
