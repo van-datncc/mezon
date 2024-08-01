@@ -46,7 +46,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
-	const { emojiList, linkList, markdownList } = useProcessedContent(channelDraftMessage.draftContent ?? '');
+	const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(channelDraftMessage.draftContent ?? '');
 	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(channelDraftMessage.draftContent ?? '');
 
 	const combinedContent = useMemo(() => {
@@ -57,14 +57,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			emojis: emojiList,
 			links: linkList,
 			markdowns: markdownList,
+			voicelinks: voiceLinkRoomList,
 		};
-	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList]);
+	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList, voiceLinkRoomList]);
 
 	const [convertedContent, setConvertedContent] = useState(combinedContent);
 
 	useEffect(() => {
 		setConvertedContent(combinedContent);
-	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList]);
+	}, [channelDraftMessage.draftContent, mentionList, hashtagList, emojiList, linkList, markdownList, voiceLinkRoomList]);
 
 	const [initialDraftContent, setInitialDraftContent] = useState<string>(message.content);
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
@@ -153,9 +154,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const sortedInitialDraftContent = sortObjectKeys(initialDraftContent);
 
 	const handleSave = () => {
-		delete sortedInitialDraftContent.plainText;
-		delete sortedInitialDraftContent.voiceLinks;
-
+		delete sortedInitialDraftContent.plaintext;
 		if (channelDraftMessage.draftContent === '') {
 			return setOpenModalDelMess(true);
 		} else if (JSON.stringify(sortedInitialDraftContent) === JSON.stringify(sortedContentConverted) && channelDraftMessage.draftContent !== '') {
