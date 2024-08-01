@@ -109,12 +109,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const isMobile = directId === undefined && channelId === undefined;
 
 			mess.isCurrentChannel = (message.channel_id === directId || (isMobile && message.channel_id === currentDirectId));
-			if (directId === undefined && !isMobile) {
-				mess.isCurrentChannel = message.channel_id === channelId;
-			}
 
-			if (isMobile && !currentDirectId) {
-				mess.isCurrentChannel = message.channel_id === currentChannelId;
+			if ((directId === undefined && !isMobile) || (isMobile && !currentDirectId)) {
+				const idToCompare = !isMobile ? channelId : currentChannelId;
+				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
 
 			dispatch(directActions.updateDMSocket(message));

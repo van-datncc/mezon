@@ -103,6 +103,16 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	}, []);
 
 	useEffect(() => {
+		return () => {
+			dispatch(
+				messagesActions.UpdateChannelLastMessage({
+					channelId,
+				}),
+			);
+		};
+	}, [channelId, dispatch]);
+
+	useEffect(() => {
 		const messageItemBSListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
 			isHiddenBottomSheet && setOpenBottomSheet(null);
 		});

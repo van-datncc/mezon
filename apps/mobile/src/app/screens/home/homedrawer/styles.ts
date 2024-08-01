@@ -340,31 +340,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		backgroundColor: Colors.gray48,
 		overflow: 'hidden',
 	},
-
-	newMessageLine: {
-		height: 1,
-		width: "100%",
-		backgroundColor: Colors.red,
-		marginVertical: Metrics.size.xl,
-		position: "relative"
-	},
-
-	newMessageContainer: {
-		position: "absolute",
-		top: -size.s_10,
-		left: 0,
-		display: "flex",
-		justifyContent: "center",
-		alignItems: "center",
-		width: "100%"
-	},
-
-	newMessageText: {
-		color: Colors.red,
-		backgroundColor: colors.secondary,
-		paddingHorizontal: Metrics.size.s,
-	},
-
 	messageWrapper: {
 		flexDirection: 'column',
 		marginTop: size.s_10,
