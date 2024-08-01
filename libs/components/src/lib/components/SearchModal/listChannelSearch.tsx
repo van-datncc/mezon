@@ -28,7 +28,8 @@ const ListChannelSearch = (props: ListChannelSearchProps) => {
                             className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
                         >
                             <SuggestItem
-                                name={item.name ?? ''}
+                                name={item.name}
+                                displayName={item.name}
                                 symbol={item.icon}
                                 subText={item.subText}
                                 channelId={item.channelId}

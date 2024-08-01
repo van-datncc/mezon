@@ -29,10 +29,13 @@ const ListMemberSearch = (props: ListMemberSearchProps) => {
 						>
 							<SuggestItem
 								name={item?.name}
-								avatarUrl={item.avatarUser}
+								avatarUrl={item?.avatarUser}
 								showAvatar
-								displayName={item?.displayName}
+								displayName={item?.displayName || item.name}
 								valueHightLight={searchText}
+								subText={item?.name}
+								wrapSuggestItemStyle='gap-x-1'
+								subTextStyle='text-[13px]'
 							/>
 						</div>
 					);

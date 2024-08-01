@@ -42,7 +42,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						idDM: itemDM?.id ?? '',
 						displayName: '',
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
-						typeChat: 3,
+						typeChat: ChannelType.CHANNEL_TYPE_DM,
 					};
 				})
 			: [];
@@ -54,7 +54,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						avatarUser: 'assets/images/avatar-group.png' ?? '',
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp,
-						typeChat: 2,
+						typeChat: ChannelType.CHANNEL_TYPE_GROUP,
 					};
 				})
 			: [];

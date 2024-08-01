@@ -21,6 +21,7 @@ type SuggestItemProps = {
 	channelId?: string | number;
 	isOpenSearchModal?: boolean;
 	isHashtag?: boolean;
+	wrapSuggestItemStyle?: string;
 };
 
 const SuggestItem = ({
@@ -36,6 +37,7 @@ const SuggestItem = ({
 	valueHightLight,
 	showAvatar,
 	isHashtag,
+	wrapSuggestItemStyle,
 }: SuggestItemProps) => {
 	const { emojis } = useEmojiSuggestion();
 	const urlEmoji = getSrcEmoji(name, emojis);
@@ -68,7 +70,7 @@ const SuggestItem = ({
 	}, []);
 
 	return (
-		<div className="flex flex-row items-center justify-between h-[24px]">
+		<div className={`flex flex-row items-center h-[24px] ${wrapSuggestItemStyle ?? 'justify-between'}`}>
 			<div className="flex flex-row items-center gap-2 py-[3px]">
 				{showAvatar && (
 					<AvatarImage
@@ -93,25 +95,23 @@ const SuggestItem = ({
 					<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 				)}
 				{isHashtag && (
-					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
+					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">
 						{HighlightMatch(name ?? '', valueHightLight ?? '')}
 					</span>
 				)}
 				{clanNickname && (
-					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
+					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">
 						{HighlightMatch(clanNickname ?? '', valueHightLight ?? '')}
 					</span>
 				)}
 				{displayName && (
-					<span
-						className={`text-[15px] font-thin ${displayName ? 'dark:text-zinc-400 text-colorTextLightMode' : 'dark:text-white text-textLightTheme'}`}
-					>
+					<span className='text-[15px] font-thin dark:text-white text-textLightTheme one-line' >
 						{HighlightMatch(displayName, valueHightLight ?? '')}
 					</span>
 				)}
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}
 			</div>
-			<span className={`text-[10px] font-semibold text-[#A1A1AA]  ${subTextStyle}`}>
+			<span className={`text-[10px] font-semibold text-[#A1A1AA] one-line ${subTextStyle}`}>
 				{HighlightMatch(subText ?? '', valueHightLight ?? '')}
 			</span>
 		</div>
