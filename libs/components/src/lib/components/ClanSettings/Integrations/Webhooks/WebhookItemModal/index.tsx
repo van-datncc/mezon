@@ -11,8 +11,9 @@ import {
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from 'libs/components/src/lib/components';
 import { ApiMessageAttachment, ApiWebhook, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
-import { useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import ModalSaveChanges from '../../../ClanSettingOverview/ModalSaveChanges';
 import DeleteWebhookPopup from './DeleteWebhookPopup';
 
 interface IWebhookItemModalProps {
@@ -74,53 +75,74 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 	const handleCopyUrl = (url: string) => {
 		navigator.clipboard.writeText(url);
 	};
-
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const avatarRef = useRef<HTMLInputElement>(null);
-	const [avatarFile, setAvatarFile] = useState<FileList | null>(null);
-	const [channelIdForUpdate, setChannelIdForUpdate] = useState<string>('');
-	const [webhookNameInput, setWebhookNameInput] = useState<string>(webhookItem.webhook_name as string);
+	const [channelIdForUpdate, setChannelIdForUpdate] = useState<string | undefined>(webhookItem.channel_id);
+	const [webhookNameInput, setWebhookNameInput] = useState<string | undefined>(webhookItem.webhook_name);
+	const [webhookAvatarUrl, setWebhookAvatarUrl] = useState<string | undefined>(webhookItem.avatar);
+	const [hasChange, setHasChange] = useState<boolean>(false);
+	
+	useEffect(() => {
+		if (
+			webhookNameInput !== webhookItem.webhook_name ||
+			webhookAvatarUrl !== webhookItem.avatar ||
+			channelIdForUpdate !== webhookItem.channel_id
+		) {
+			setHasChange(true);
+		}else if(
+			webhookNameInput === webhookItem.webhook_name &&
+			webhookAvatarUrl === webhookItem.avatar &&
+			channelIdForUpdate === webhookItem.channel_id
+		){
+			setHasChange(false);
+		}
+	}, [webhookNameInput, webhookAvatarUrl, channelIdForUpdate]);
 
-	const handleEditWebhook = () => {
-		if (avatarFile) {
+	const handleChooseFile = (e: ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files) {
 			const client = clientRef.current;
 			const session = sessionRef.current;
 			if (!client || !session) {
 				throw new Error('Client or file is not initialized');
 			}
-			handleUploadFile(client, session, currentClanId || '', currentChannelId || '', avatarFile[0].name, avatarFile[0]).then(
+			handleUploadFile(client, session, currentClanId || '', currentChannelId || '', e.target.files[0].name, e.target.files[0]).then(
 				async (attachment: ApiMessageAttachment) => {
-					const request: MezonUpdateWebhookByIdBody = {
-						avatar: attachment.url,
-						channel_id: channelIdForUpdate,
-						webhook_name: webhookNameInput,
-					};
-					await dispatch(updateWebhookBySpecificId({ request: request, webhook: webhookItem, channelId: webhookItem.channel_id || '' }));
+					setWebhookAvatarUrl(attachment.url);
 				},
 			);
 		}
+	};
+
+	const handleEditWebhook = async() => {
+		const request: MezonUpdateWebhookByIdBody = {
+			avatar: webhookAvatarUrl,
+			channel_id: channelIdForUpdate,
+			webhook_name: webhookNameInput,
+		};
+		await dispatch(updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannelId || '' }));
+		setHasChange(false);
+	};
+
+	const handleResetChange = () => {
+		setChannelIdForUpdate(webhookItem.channel_id);
+		setWebhookAvatarUrl(webhookItem.avatar);
+		setWebhookNameInput(webhookItem.webhook_name);
+		setHasChange(false);
 	};
 	return (
 		<>
 			<div className="pt-[20px] mt-[12px] border-t dark:border-[#3b3d44]">
 				<div className="flex">
 					<div className="w-3/12 dark:text-[#b5bac1] text-textLightTheme">
-						<input
-							onChange={(e) => {
-								setAvatarFile(e.target.files);
-							}}
-							ref={avatarRef}
-							type="file"
-							hidden
-						/>
+						<input onChange={handleChooseFile} ref={avatarRef} type="file" hidden />
 						<div className="relative w-fit">
 							<div className="absolute right-0 top-0 p-[5px] bg-[#ffffff] rounded-full z-50 shadow-xl border">
 								<Icons.SelectFileIcon />
 							</div>
 							<img
-								src={webhookItem.avatar}
+								src={webhookAvatarUrl}
 								alt="Webhook avatar"
 								className="aspect-square w-[100px] rounded-full hover:grayscale-[50%] cursor-pointer"
 								onClick={() => avatarRef.current?.click()}
@@ -151,17 +173,12 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 									parentChannelsInClan={parentChannelsInClan}
 									webhookItem={webhookItem}
 									setChannelIdForUpdate={setChannelIdForUpdate}
+									hasChange = {hasChange}
 								/>
 							</div>
 						</div>
 						<div className="border-t dark:border-[#3b3d44] my-[24px]"></div>
 						<div className="flex items-center gap-[20px]">
-							<div
-								onClick={handleEditWebhook}
-								className="dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
-							>
-								Update webhook
-							</div>
 							<div
 								onClick={() => handleCopyUrl(webhookItem.url as string)}
 								className="px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
@@ -180,6 +197,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 					</div>
 				</div>
 			</div>
+			{hasChange && <ModalSaveChanges onSave={handleEditWebhook} onReset={handleResetChange} />}
 			{isShowPopup && <DeleteWebhookPopup webhookItem={webhookItem} handleShowPopUp={handleShowPopup} />}
 		</>
 	);
@@ -188,10 +206,11 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 interface IWebhookItemChannelDropdown {
 	parentChannelsInClan: ChannelsEntity[];
 	webhookItem: ApiWebhook;
-	setChannelIdForUpdate: (channel: string) => void;
+	setChannelIdForUpdate: (channel: string | undefined) => void;
+	hasChange: boolean;
 }
 
-const WebhookItemChannelDropdown = ({ webhookItem, parentChannelsInClan, setChannelIdForUpdate }: IWebhookItemChannelDropdown) => {
+const WebhookItemChannelDropdown = ({ webhookItem, parentChannelsInClan, setChannelIdForUpdate, hasChange }: IWebhookItemChannelDropdown) => {
 	const webhookChannel = useSelector(selectChannelById(webhookItem.channel_id as string));
 	const appearanceTheme = useSelector(selectTheme);
 	const [isOpenDropdown, setIsOpenDropdown] = useState(false);
@@ -199,6 +218,14 @@ const WebhookItemChannelDropdown = ({ webhookItem, parentChannelsInClan, setChan
 		setIsOpenDropdown(!isOpenDropdown);
 	};
 	const [dropdownValue, setDropdownValue] = useState(webhookChannel.channel_label);
+	
+	useEffect(()=>{
+		if(!hasChange){
+			setChannelIdForUpdate(webhookItem.channel_id);
+			setDropdownValue(webhookChannel.channel_label);
+		}
+	}, [hasChange]);
+
 	return (
 		<div className="relative">
 			<button
@@ -219,7 +246,7 @@ const WebhookItemChannelDropdown = ({ webhookItem, parentChannelsInClan, setChan
 			{isOpenDropdown && (
 				<div
 					id="dropdown"
-					className={`${appearanceTheme === 'dark' ? 'thread-scroll' : 'customSmallScrollLightMode'} absolute w-full top-[50px] left-0 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 max-h-[300px] overflow-y-scroll`}
+					className={`${appearanceTheme === 'dark' ? 'thread-scroll' : 'customSmallScrollLightMode'} absolute w-full top-[50px] left-0 z-20 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 max-h-[300px] overflow-y-scroll`}
 				>
 					<div className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
 						{parentChannelsInClan.map((channel) => (

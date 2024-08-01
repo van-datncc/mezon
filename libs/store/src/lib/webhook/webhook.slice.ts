@@ -42,9 +42,6 @@ export const fetchWebhooksByChannelId = createAsyncThunk(
 				fetchWebhooksCached.clear(mezon, channelId);
 			}
 			const response = await fetchWebhooksCached(mezon, channelId);
-			if (!response.webhooks) {
-				throw new Error('Webhook list are null or undefined');
-			}
 			return response.webhooks;
 		} catch (error) {
 			console.log(error);
@@ -80,6 +77,8 @@ export const deleteWebhookById = createAsyncThunk(
 		const response = await mezon.client.deleteWebhookById(mezon.session, webhook.id as string);
 		if (response) {
 			return webhook;
+		}else{
+			return thunkAPI.rejectWithValue({});
 		}
 	} catch (err) {
 		console.log(err);
@@ -89,15 +88,13 @@ export const deleteWebhookById = createAsyncThunk(
 
 export const updateWebhookBySpecificId = createAsyncThunk(
 	'integration/editWebhook', 
-	async (data:{request: MezonUpdateWebhookByIdBody, webhook: ApiWebhook, channelId:string}, thunkAPI) => {
+	async (data:{request: MezonUpdateWebhookByIdBody, webhookId: string | undefined, channelId:string}, thunkAPI) => {
 	try{
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.updateWebhookById(mezon.session, data.webhook.id as string, data.request);
-		console.log(response);
+		const response = await mezon.client.updateWebhookById(mezon.session, data.webhookId as string, data.request);
 		if (response) {
 			thunkAPI.dispatch(fetchWebhooksByChannelId({ channelId: data.channelId, noCache: true }));
 		}
-		return data.webhook;
 	}catch(err){
 		console.log(err);
 		return thunkAPI.rejectWithValue(err);
@@ -122,7 +119,7 @@ export const integrationWebhookSlice = createSlice({
 			})
 			.addCase(deleteWebhookById.fulfilled, (state, action) => {
 				state.webhookList = state.webhookList?.filter((webhook) => webhook.id !== action.payload?.id);
-			});
+			})
 	},
 });
 
