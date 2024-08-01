@@ -1,4 +1,4 @@
-import { useAuth, useClanRestriction } from '@mezon/core';
+import { useClanRestriction } from '@mezon/core';
 import {
   notificationSettingActions,
   selectCurrentChannelId,
@@ -11,7 +11,7 @@ import { EPermission, IChannel } from '@mezon/utils';
 import { format } from "date-fns";
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from "mezon-js";
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from "react-redux";
 import { Coords } from '../ChannelLink';
 import GroupPanels from './GroupPanels';
@@ -55,7 +55,6 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
   const dispatch = useAppDispatch();
   const currentChannelId = useSelector(selectCurrentChannelId);
   const currentClan = useSelector(selectCurrentClan);
-	const { userProfile } = useAuth();
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
   const [nameChildren, setNameChildren] = useState('');
@@ -160,13 +159,13 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
     }
   }, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
   
-  const checkOwnerChannel = useMemo(() => channel.creator_id === userProfile?.user?.id, [channel.creator_id, userProfile?.user?.id]);
   const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
   const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
   const [hasThreadPermission] = useClanRestriction([EPermission.manageThread]);
+  const [hasManageChannelPermission] = useClanRestriction([EPermission.manageThread]);
 
-  const isShowManageChannel = checkOwnerChannel || isClanCreator || hasAdminPermission || hasClanPermission;
-  const isShowManageThread = checkOwnerChannel || isClanCreator || hasClanPermission || hasThreadPermission;
+  const isShowManageChannel = isClanCreator || hasAdminPermission || hasClanPermission || hasManageChannelPermission;
+  const isShowManageThread = isClanCreator || hasAdminPermission || hasThreadPermission;
 
   return (
 		<div
@@ -314,9 +313,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 					{(isShowManageThread) && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
-							<ItemPanel children="Duplicate Thread" />
-							{channel.type === typeChannel.text && <ItemPanel children="Create Text Thread" />}
-							{channel.type === typeChannel.voice && <ItemPanel children="Create Voice Thread" />}
+							<ItemPanel children="Create Thread" />
 							<ItemPanel onClick={handleDeleteChannel} children="Delete Thread" danger />
 						</GroupPanels>
 					)}

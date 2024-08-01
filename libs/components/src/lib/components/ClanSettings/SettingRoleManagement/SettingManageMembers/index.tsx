@@ -1,5 +1,5 @@
-import { useClanOwner, useRoles } from '@mezon/core';
-import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllAccount, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import { useRoles } from '@mezon/core';
+import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { AddMembersModal } from '../AddMembersModal';
 
-const SettingManageMembers = ({ RolesClan, isCreateNewRole }: { RolesClan: RolesClanEntity[], isCreateNewRole: boolean }) => {
+const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
 	const { updateRole } = useRoles();
 	const dispatchRole = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
@@ -17,10 +17,6 @@ const SettingManageMembers = ({ RolesClan, isCreateNewRole }: { RolesClan: Roles
 	const [searchTerm, setSearchTerm] = useState('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
-	const isClanOwner = useClanOwner();
-	const userProfile = useSelector(selectAllAccount);
-	const isUserCreate = activeRole?.creator_id === userProfile?.user?.id;
-	const hasPermissionEdit = isUserCreate || isClanOwner || isCreateNewRole;
 	const commonUsers = usersClan.filter((user) => addUsers.includes(user.id));
 
 	const [searchResults, setSearchResults] = useState<any[]>(commonUsers);
@@ -49,7 +45,7 @@ const SettingManageMembers = ({ RolesClan, isCreateNewRole }: { RolesClan: Roles
 		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', [], [], userIDArray, []);
 	};
 	return (
-		<div style={{pointerEvents: hasPermissionEdit ? undefined : 'none'}}>
+		<div style={{pointerEvents: !hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex gap-x-3">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full py-1 px-2 font-normal border dark:border-bgTertiary border-bgLightModeThird rounded"

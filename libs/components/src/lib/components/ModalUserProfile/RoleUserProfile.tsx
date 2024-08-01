@@ -32,9 +32,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
 	const activeRolesWithoutUserRoles = activeRoles.filter((role) => {
 		const isRoleInUserRoles = userRolesClan.some((userRole) => userRole.id === role.id);
-		const isCreatedByUser = role.creator_id === userProfile?.user?.id;
-		
-		return !isRoleInUserRoles && (isClanCreator || isCreatedByUser);
+		return !isRoleInUserRoles;
 	});
 
 	const [positionTop, setPositionTop] = useState(40);
