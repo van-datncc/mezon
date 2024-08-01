@@ -14,9 +14,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		justifyContent: 'space-between',
 		borderRadius: 8,
 		padding: size.s_6,
-		marginBottom: size.s_4,
-		borderWidth: 1,
-		borderColor: colors.border,
+    backgroundColor: colors.primary,
 	},
 	serverName: {
 		flexDirection: 'row',
@@ -44,11 +42,18 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	clanName: {
 		color: colors.textStrong,
 		fontSize: size.label,
-		fontWeight: '600',
+		fontWeight: '400',
 		maxWidth: 150,
 	},
 	clanIcon: {
 		width: verticalScale(45),
 		height: verticalScale(45)
-	}
+	},
+  activeClanItem: {
+    backgroundColor: colors.secondaryLight
+  },
+  activeClanName: {
+		fontWeight: '700',
+    color: colors.white
+  }
 });

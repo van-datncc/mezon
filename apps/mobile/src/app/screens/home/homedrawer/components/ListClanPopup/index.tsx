@@ -1,5 +1,5 @@
 import { Icons, TickIcon } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Colors, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -63,24 +63,22 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 						style={[
 							styles.serverItem,
 							{
-								backgroundColor: currentClan?.clan_id === clan?.clan_id ? themeValue.secondaryLight : themeValue.secondaryWeight,
+								backgroundColor: currentClan?.clan_id === clan?.clan_id ? themeValue.colorActiveClan : themeValue.primary,
 							},
 						]}
 					>
 						<View style={styles.serverName}>
-							<ClanIcon
-								data={clan}
-								clanIconStyle={{
-									...styles.clanIcon,
-									...(currentClan?.clan_id === clan?.clan_id ? { backgroundColor: themeValue.tertiary } : {}),
-								}}
-							/>
-							<Text style={styles.clanName} numberOfLines={1} ellipsizeMode="tail">
+							<ClanIcon data={clan} clanIconStyle={styles.clanIcon} clanNameStyle={currentClan?.clan_id === clan?.clan_id ? styles.activeClanName : {}} />
+							<Text
+								style={{ ...styles.clanName, ...(currentClan?.clan_id === clan?.clan_id ? styles.activeClanName : {}) }}
+								numberOfLines={1}
+								ellipsizeMode="tail"
+							>
 								{clan?.clan_name}
 							</Text>
 						</View>
 
-						{currentClan?.clan_id === clan?.clan_id && <TickIcon width={10} height={10} color={baseColor.blurple} />}
+						{currentClan?.clan_id === clan?.clan_id && <TickIcon width={10} height={10} color={Colors.textLink} />}
 					</Pressable>
 				))}
 			</ScrollView>

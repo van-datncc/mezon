@@ -42,7 +42,7 @@ export const style = (colors: Attributes) =>
 			height: 40,
 		},
 		searchBox: {
-			backgroundColor: Colors.bgDarkCharcoal,
+			backgroundColor: colors.primary,
 			borderRadius: size.s_50,
 			paddingHorizontal: Metrics.size.l,
 			display: 'flex',
@@ -54,7 +54,7 @@ export const style = (colors: Attributes) =>
 			flexGrow: 1,
 		},
 		placeholderSearchBox: {
-			color: Colors.tertiary,
+			color: colors.text,
 			fontWeight: '600',
 			fontSize: size.s_16,
 		},
