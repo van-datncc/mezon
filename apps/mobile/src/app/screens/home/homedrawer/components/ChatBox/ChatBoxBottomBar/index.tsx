@@ -123,7 +123,7 @@ export const ChatBoxBottomBar = memo(
 		}, [currentChannel?.channel_label, currentChannel?.parrent_id, hiddenIcon?.threadIcon]);
 
 		const saveMessageToCache = (text: string) => {
-			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
 				...allCachedMessage,
 				[channelId]: text,
@@ -131,18 +131,18 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const setMessageFromCache = async () => {
-			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
 			handleTextInputChange(allCachedMessage?.[channelId] || '');
 			setText(convertMentionsToText(allCachedMessage?.[channelId] || ''));
 		};
 
 		const setAttachmentFromCache = async () => {
-			const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
 			setAttachmentData(allCachedAttachment?.[channelId] || []);
 		};
 
 		const resetCachedText = useCallback(async () => {
-			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
+			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {}
 			delete allCachedMessage[channelId];
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
 				...allCachedMessage,
@@ -150,7 +150,7 @@ export const ChatBoxBottomBar = memo(
 		}, [channelId]);
 
 		const resetCachedAttachment = useCallback(async () => {
-			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
+			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
 			delete allCachedAttachments[channelId];
 			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
 				...allCachedAttachments,

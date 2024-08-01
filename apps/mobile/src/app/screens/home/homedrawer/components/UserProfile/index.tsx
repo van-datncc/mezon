@@ -32,7 +32,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 
 	const userStatus = useMemberStatus(userId || user?.id);
 	const RolesClan = useSelector(selectAllRolesClan);
-	const { color } = useMixImageColor(userById?.user?.avatar_url || userProfile?.user?.avatar_url);
+	const { color } = useMixImageColor(userById?.user?.avatar_url || user?.avatarSm || userProfile?.user?.avatar_url);
 	const navigation = useNavigation<any>();
 	const { createDirectMessageWithUser } = useDirect();
 	const listDM = useSelector(selectDirectsOpenlist);
@@ -81,12 +81,16 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 
 	return (
 		<View style={[styles.wrapper]}>
-			<View style={[styles.backdrop, { backgroundColor: userById?.user?.avatar_url || user?.avatar_url ? color : Colors.titleReset }]}>
+			<View style={[
+				styles.backdrop,
+				{ backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }
+			]}>
 				<View style={[styles.userAvatar]}>
 					<MezonAvatar
 						width={80}
 						height={80}
-						avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
+						// avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
+						avatarUrl={user?.avatar_url || user?.avatarSm}
 						username={userById?.user?.username || user?.display_name}
 						userStatus={userStatus}
 						isBorderBoxImage={true}
