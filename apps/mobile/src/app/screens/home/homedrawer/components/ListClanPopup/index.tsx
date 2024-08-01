@@ -1,5 +1,5 @@
-import { Icons, TickIcon } from '@mezon/mobile-components';
-import { baseColor, Colors, useTheme } from '@mezon/mobile-ui';
+import { PlusAltIcon, TickIcon } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectCurrentClan } from '@mezon/store-mobile';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -90,7 +90,7 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 				}}
 			>
 				<View style={styles.wrapperPlusClan}>
-					<Icons.PlusLargeIcon color={baseColor.green} />
+          <PlusAltIcon width={size.s_14} height={size.s_14} />
 				</View>
 				<Text style={styles.clanName}>{t('addClan')}</Text>
 			</Pressable>

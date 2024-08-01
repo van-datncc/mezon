@@ -1,6 +1,6 @@
 import { useFriends } from '@mezon/core';
-import { Icons, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaultChannelLoader } from '@mezon/mobile-components';
-import { baseColor, Block, useTheme } from '@mezon/mobile-ui';
+import {  PlusAltIcon, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaultChannelLoader } from '@mezon/mobile-components';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { RootState, channelsActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
@@ -77,8 +77,7 @@ const ServerList = React.memo(() => {
 				closeOnContentInteraction={true}
 				content={<ListClanPopupProps handleChangeClan={handleChangeClan} clans={clans} />}
 				contentStyle={{ backgroundColor: themeValue.primary }}
-        placement="right"
-        displayInsets={{ top: 200, bottom: 24, left: 24, right: 24 }}
+        placement="bottom"
 				onClose={() => setIsVisible(false)}
 			>
 				<Pressable
@@ -87,7 +86,7 @@ const ServerList = React.memo(() => {
 						setIsVisible(!isVisible);
 					}}
 				>
-					<Icons.PlusLargeIcon color={baseColor.green} />
+          <PlusAltIcon width={size.s_14} height={size.s_14} />
 				</Pressable>
 			</Tooltip>
 		</View>
