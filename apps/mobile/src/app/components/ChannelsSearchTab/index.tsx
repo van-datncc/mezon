@@ -59,10 +59,10 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
-			{listChannelSearch?.length ? (
+			{(listChannelSearch?.length > 0) ? (
 				<>
 					<Block>
-						{listTextChannelAndThreads?.length ? (
+						{(listTextChannelAndThreads?.length > 0) ? (
 							<Block>
 								<Text style={styles.title}>{t('textChannels')}</Text>
 								{listTextChannelAndThreads?.map((channel) => (
@@ -72,7 +72,7 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 						) : null}
 					</Block>
 					<Block>
-						{listVoiceChannel?.length ? (
+						{(listVoiceChannel?.length > 0) ? (
 							<Block>
 								<Text style={styles.title}>{t('voiceChannels')}</Text>
 								{listVoiceChannel?.map((channel) => (

@@ -21,9 +21,12 @@ type MembersSearchTabProps = {
 };
 const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
+  const handleCloseUserInfoBS = () => {
+     setSelectedUser(null)
+  }
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
-			{listMemberSearch?.length ? (
+			{(listMemberSearch?.length > 0) ? (
 				<Block width={'100%'} marginTop={size.s_10} borderRadius={size.s_14} backgroundColor={Colors.secondary}>
 					{listMemberSearch?.map((user) => (
 						<MemberItem
@@ -38,8 +41,7 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 			) : (
 				<EmptySearchPage />
 			)}
-
-			<UserInformationBottomSheet user={selectedUser?.user} userId={selectedUser?.user?.id} onClose={() => setSelectedUser(null)} />
+			<UserInformationBottomSheet user={selectedUser?.user} userId={selectedUser?.user?.id} onClose={handleCloseUserInfoBS} />
 		</ScrollView>
 	);
 };
