@@ -241,10 +241,10 @@ export const ChatBoxBottomBar = memo(
 					const mention = listMentions.find((m) => `@${m.display}` === match?.[0]);
 					if (mention) {
 						mentionList.push({
-							userId: mention?.id?.toString() ?? '',
+							userid: mention?.id?.toString() ?? '',
 							username: `@${mention?.display}`,
-							startIndex: match.index,
-							endIndex: match.index + match[0].length,
+							startindex: match.index,
+							endindex: match.index + match[0].length,
 						});
 					}
 				}
@@ -255,10 +255,10 @@ export const ChatBoxBottomBar = memo(
 					const channelInfo = getChannelById(channelId);
 					if (channelInfo) {
 						hashtagList.push({
-							channelId: channelInfo.id.toString() ?? '',
-							channelLabel: channelInfo.channel_label ?? '',
-							startIndex: match.index,
-							endIndex: match.index + match[0].length,
+							channelid: channelInfo.id.toString() ?? '',
+							channellabel: channelInfo.channel_label ?? '',
+							startindex: match.index,
+							endindex: match.index + match[0].length,
 						});
 					}
 				}

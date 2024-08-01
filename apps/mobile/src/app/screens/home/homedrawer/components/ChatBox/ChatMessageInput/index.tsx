@@ -9,7 +9,7 @@ import {
 	ILinkVoiceRoomOnMessage,
 	IMarkdownOnMessage,
 	IMentionOnMessage,
-	IMessageSendPayload
+	IMessageSendPayload,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -172,7 +172,7 @@ export const ChatMessageInput = memo(
 				}
 
 				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => ({
-					user_id: mention.userId,
+					user_id: mention.userid,
 					username: mention.username,
 				}));
 
@@ -183,8 +183,8 @@ export const ChatMessageInput = memo(
 					emojis: emojisOnMessage,
 					links: linksOnMessage,
 					markdowns: markdownsOnMessage,
-					plainText: plainTextMessage,
-					voiceLinks: voiceLinkRoomOnMessage,
+					plaintext: plainTextMessage,
+					voicelinks: voiceLinkRoomOnMessage,
 				};
 
 				const payloadThreadSendMessage: IPayloadThreadSendMessage = {
