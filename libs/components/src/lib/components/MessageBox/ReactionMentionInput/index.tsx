@@ -51,7 +51,6 @@ import {
 	ThreadValue,
 	UsersClanEntity,
 	focusToElement,
-	neverMatchingRegex,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
@@ -232,8 +231,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
-	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(content);
+	const { mentionList, simplifiedMentionList, hashtagList, emojiList2 } = useProcessMention(content);
 
+	console.log(emojiList2);
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
@@ -398,6 +398,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [props.mode, commonChannelVoids]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		console.log(mentions);
+
 		dispatch(threadsActions.setMessageThreadError(''));
 		setValueTextInput(newValue, props.isThread);
 
@@ -654,12 +656,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				/>
 				<Mention
 					trigger=":"
-					markup="__id__"
-					regex={neverMatchingRegex}
+					markup="[:__display__]"
 					data={queryEmojis}
-					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
+					displayTransform={(id: any, display: any) => {
+						return `${display}`; // This is how it will be displayed
+					}}
+					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
-					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
 		</div>

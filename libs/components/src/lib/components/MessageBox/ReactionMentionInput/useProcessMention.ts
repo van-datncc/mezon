@@ -4,14 +4,19 @@ import { useEffect, useState } from 'react';
 const useProcessMention = (text: string) => {
 	const [mentionList, setMentionList] = useState<IMentionOnMessage[]>([]);
 	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
+	const [emojiList2, setEmojiList] = useState<{ emoji: string; startindex: number; endindex: number }[]>([]);
 	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
 
 	useEffect(() => {
+		console.log(text);
 		const mentions: IMentionOnMessage[] = [];
 		const hashtags: IHashtagOnMessage[] = [];
+		const emojis: { emoji: string; startindex: number; endindex: number }[] = [];
 
 		const mentionPrefix = '@[';
 		const hashtagPrefix = '#[';
+		const emojiPrefix = '[;'; // Emoji prefix
+		const emojiSuffix = ']';
 
 		let index = 0;
 
@@ -58,6 +63,20 @@ const useProcessMention = (text: string) => {
 					startindex,
 					endindex: index,
 				});
+			} else if (text.startsWith(emojiPrefix, index)) {
+				let startindex = index;
+				index += emojiPrefix.length;
+
+				// Extract emoji
+				const emojiEnd = text.indexOf(emojiSuffix, index);
+				const emoji = text.substring(index, emojiEnd);
+				index = emojiEnd + emojiSuffix.length;
+
+				emojis.push({
+					emoji,
+					startindex,
+					endindex: index,
+				});
 			} else {
 				index++;
 			}
@@ -65,6 +84,8 @@ const useProcessMention = (text: string) => {
 
 		setMentionList(mentions);
 		setHashtagList(hashtags);
+		setEmojiList(emojis);
+
 		const simplifiedList = mentions.map((mention) => ({
 			user_id: mention.userid,
 			username: mention.username,
@@ -73,7 +94,7 @@ const useProcessMention = (text: string) => {
 		setSimplifiedMentionList(simplifiedList);
 	}, [text]);
 
-	return { mentionList, simplifiedMentionList, hashtagList };
+	return { mentionList, simplifiedMentionList, hashtagList, emojiList2 };
 };
 
 export default useProcessMention;
