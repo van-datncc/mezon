@@ -2,7 +2,15 @@ import { useChatSending, useDirectMessages, useEmojiSuggestion, useReference } f
 import { ActionEmitEvent, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelsEntities } from '@mezon/store-mobile';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, IMarkdownOnMessage, IMentionOnMessage, IMessageSendPayload } from '@mezon/utils';
+import {
+	IEmojiOnMessage,
+	IHashtagOnMessage,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
+	IMarkdownOnMessage,
+	IMentionOnMessage,
+	IMessageSendPayload,
+} from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallback, useMemo, useState } from 'react';
@@ -39,6 +47,7 @@ interface IChatMessageInputProps {
 	emojisOnMessage?: IEmojiOnMessage[];
 	linksOnMessage?: ILinkOnMessage[];
 	markdownsOnMessage?: IMarkdownOnMessage[];
+	voiceLinkRoomOnMessage?: ILinkVoiceRoomOnMessage[];
 	plainTextMessage?: string;
 	isShowCreateThread?: boolean;
 }
@@ -68,6 +77,7 @@ export const ChatMessageInput = memo(
 				emojisOnMessage,
 				linksOnMessage,
 				markdownsOnMessage,
+				voiceLinkRoomOnMessage,
 				plainTextMessage,
 				isShowCreateThread,
 			}: IChatMessageInputProps,
@@ -88,9 +98,16 @@ export const ChatMessageInput = memo(
 				mode,
 				directMessageId: channelId || '',
 			});
-			const handleTyping = useCallback(() => {
-				channelMessageTyping();
+
+			const clearInputAfterSendMessage = useCallback(() => {
+				onSendSuccess();
+				ref.current?.clear?.();
+			}, [onSendSuccess, ref]);
+
+			const handleTyping = useCallback(async () => {
+				await channelMessageTyping();
 			}, [channelMessageTyping]);
+
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 			const { setEmojiSuggestion } = useEmojiSuggestion();
 
@@ -100,19 +117,19 @@ export const ChatMessageInput = memo(
 				mode,
 			});
 			const handleSendDM = useCallback(
-				(
+				async (
 					content: IMessageSendPayload,
 					mentions?: Array<ApiMessageMention>,
 					attachments?: Array<ApiMessageAttachment>,
 					references?: Array<ApiMessageRef>,
 				) => {
-					sendDirectMessage(content, mentions, attachments, references);
+					await sendDirectMessage(content, mentions, attachments, references);
 				},
 				[sendDirectMessage],
 			);
 
-			const handleDirectMessageTyping = useCallback(() => {
-				directMessageTyping();
+			const handleDirectMessageTyping = useCallback(async () => {
+				await directMessageTyping();
 			}, [directMessageTyping]);
 
 			const handleDirectMessageTypingDebounced = useThrottledCallback(handleDirectMessageTyping, 1000);
@@ -131,14 +148,14 @@ export const ChatMessageInput = memo(
 				}
 			};
 
-			const handleTypingMessage = () => {
+			const handleTypingMessage = async () => {
 				switch (mode) {
 					case ChannelStreamMode.STREAM_MODE_CHANNEL:
-						handleTypingDebounced();
+						await handleTypingDebounced();
 						break;
 					case ChannelStreamMode.STREAM_MODE_DM:
 					case ChannelStreamMode.STREAM_MODE_GROUP:
-						handleDirectMessageTypingDebounced();
+						await handleDirectMessageTypingDebounced();
 						break;
 					default:
 						break;
@@ -146,8 +163,8 @@ export const ChatMessageInput = memo(
 			};
 
 			const onEditMessage = useCallback(
-				(editMessage: IMessageSendPayload, messageId: string) => {
-					editSendMessage(editMessage, messageId);
+				async (editMessage: IMessageSendPayload, messageId: string) => {
+					await editSendMessage(editMessage, messageId);
 				},
 				[editSendMessage],
 			);
@@ -156,13 +173,14 @@ export const ChatMessageInput = memo(
 				return !!attachmentDataRef?.length || text?.length > 0;
 			}, [attachmentDataRef?.length, text?.length]);
 
-			const handleSendMessage = () => {
+			const handleSendMessage = async () => {
 				if (!isCanSendMessage) {
 					return;
 				}
+				clearInputAfterSendMessage();
 
 				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => ({
-					user_id: mention.userId,
+					user_id: mention.userid,
 					username: mention.username,
 				}));
 
@@ -173,7 +191,8 @@ export const ChatMessageInput = memo(
 					emojis: emojisOnMessage,
 					links: linksOnMessage,
 					markdowns: markdownsOnMessage,
-					plainText: plainTextMessage,
+					plaintext: plainTextMessage,
+					voicelinks: voiceLinkRoomOnMessage,
 				};
 
 				const payloadThreadSendMessage: IPayloadThreadSendMessage = {
@@ -194,7 +213,7 @@ export const ChatMessageInput = memo(
 				}
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				if (type === EMessageActionType.EditMessage) {
-					onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id);
+					await onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id);
 				} else {
 					const reference = targetMessage
 						? [
@@ -217,7 +236,7 @@ export const ChatMessageInput = memo(
 						const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here');
 						switch (mode) {
 							case ChannelStreamMode.STREAM_MODE_CHANNEL:
-								sendMessage(
+								await sendMessage(
 									payloadSendMessage,
 									simplifiedMentionList || [],
 									attachmentDataUnique || [],
@@ -228,7 +247,7 @@ export const ChatMessageInput = memo(
 								break;
 							case ChannelStreamMode.STREAM_MODE_DM:
 							case ChannelStreamMode.STREAM_MODE_GROUP:
-								handleSendDM(payloadSendMessage, simplifiedMentionList, attachmentDataUnique || [], reference);
+								await handleSendDM(payloadSendMessage, simplifiedMentionList, attachmentDataUnique || [], reference);
 								break;
 							default:
 								break;
@@ -236,10 +255,9 @@ export const ChatMessageInput = memo(
 						setAttachmentData([]);
 					}
 				}
-				ref.current?.clear?.();
+
 				[EMessageActionType.CreateThread].includes(messageAction) &&
 					DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
-				onSendSuccess();
 			};
 
 			return (

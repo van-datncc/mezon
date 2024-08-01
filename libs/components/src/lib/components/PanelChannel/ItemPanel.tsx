@@ -7,7 +7,7 @@ type ItemPanelProps = {
 	danger?: boolean;
 	type?: 'radio' | 'checkbox' | 'none';
 	onClick?: () => void;
-  notificationId?: string;
+  notificationId?: number;
   defaultNotifi?: boolean;
   defaultChecked?: boolean;
   checked?: boolean;
@@ -29,8 +29,8 @@ const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, 
           {children}
         </li>
         {dropdown && <Icons.RightIcon defaultFill="#fff" />}
-        {type === 'checkbox' && <Checkbox id="accept" checked={checked} defaultChecked={defaultChecked}/>}
-        {type === 'radio' && <Radio className="" name={name} value="change here" checked={checked}/>}
+        {type === 'checkbox' && <Checkbox id="accept" checked={checked} defaultChecked={defaultChecked} readOnly/>}
+        {type === 'radio' && <Radio className="" name={name} value="change here" checked={checked} readOnly/>}
       </div>
       {defaultNotifi && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{defaultNotifiName}</div>}
       {muteTime != '' && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{muteTime}</div>}

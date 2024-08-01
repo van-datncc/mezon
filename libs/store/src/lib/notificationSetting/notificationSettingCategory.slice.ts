@@ -36,7 +36,7 @@ export const getDefaultNotificationCategory = createAsyncThunk('defaultnotificat
 
 type SetDefaultNotificationPayload = {
     category_id?: string;
-    notification_type?: string;
+    notification_type?: number;
 	clan_id:string;
 };
 const LIST_NOTIFI_CATEGORY_CACHED_TIME = 1000 * 60 * 3;

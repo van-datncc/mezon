@@ -281,7 +281,9 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	return (
 		<View style={{ flex: 1 }}>
 			<View style={styles.wrapperChannelMessage}>
-				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && <MessageItemSkeleton skeletonNumber={15} />}
+				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
+					<MessageItemSkeleton skeletonNumber={15} />
+				)}
 				<FlatList
 					ref={flatListRef}
 					inverted

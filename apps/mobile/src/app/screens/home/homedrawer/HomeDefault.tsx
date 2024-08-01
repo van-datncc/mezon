@@ -1,6 +1,6 @@
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	RootState,
@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
+import { EOpenThreadDetailFrom } from '../../../components/ThreadDetail/MenuThreadDetail';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
@@ -220,6 +221,13 @@ const HomeDefaultHeader = React.memo(
 		useEffect(() => {
 			setChannelOfThread(getChannelById(currentChannel?.parrent_id, channelsEntities));
 		}, [currentChannel?.parrent_id, channelsEntities]);
+
+		const navigateToSearchPage = () => {
+			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+				screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET,
+				params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel },
+			});
+		};
 		return (
 			<View style={styles.homeDefaultHeader}>
 				<TouchableOpacity style={{ flex: 1 }} onPress={navigateMenuThreadDetail}>
@@ -253,7 +261,7 @@ const HomeDefaultHeader = React.memo(
 						)}
 					</View>
 				</TouchableOpacity>
-				{!!currentChannel?.channel_label && (
+				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
 						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
 						{statusMute === EActionMute.Mute ? (
@@ -261,6 +269,10 @@ const HomeDefaultHeader = React.memo(
 						) : (
 							<Icons.BellIcon width={20} height={20} color={themeValue.textStrong} />
 						)}
+					</TouchableOpacity>
+				) : (
+					<TouchableOpacity style={styles.iconBell} onPress={() => navigateToSearchPage()}>
+						<Icons.MagnifyingIcon width={20} height={20} color={Colors.textGray} />
 					</TouchableOpacity>
 				)}
 			</View>

@@ -169,16 +169,24 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 			const clanId = linkMatch[1];
 			const channelId = linkMatch[2];
+			const clanIdCache = load(STORAGE_CLAN_ID);
+			const isDifferentClan = clanIdCache !== clanId;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			save(STORAGE_CLAN_ID, clanId);
-			await store.dispatch(clansActions.joinClan({ clanId: clanId }));
-			await store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }));
-			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
-			await setDefaultChannelLoader(respChannel, clanId, dataSave);
-			delay(() => {
-				store.dispatch(appActions.setLoadingMainMobile(false));
-			}, 700);
+			if (isDifferentClan || time) {
+				const joinAndChangeClan = async (store: any, clanId: string) => {
+					await Promise.all([
+						store.dispatch(clansActions.joinClan({ clanId: clanId })),
+						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
+						store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }))
+					]);
+				};
+			  await joinAndChangeClan(store, clanId);
+			} else {
+				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }))
+			}
+			store.dispatch(appActions.setLoadingMainMobile(false));
 			delay(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -189,27 +197,32 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			// IS message DM
 			if (linkDirectMessageMatch) {
 				const messageId = linkDirectMessageMatch[1];
-				//TODO: Phuoc check
-				await store.dispatch(clansActions.joinClan({ clanId: '0' }));
-				store.dispatch(appActions.setLoadingMainMobile(false));
 				const clanIdCache = load(STORAGE_CLAN_ID);
-				// force from killed app
-				if (time && Number(clanIdCache || 0) !== 0) {
-					await store.dispatch(clansActions.joinClan({ clanId: clanIdCache }));
-					await store.dispatch(clansActions.changeCurrentClan({ clanId: clanIdCache, noCache: true }));
-					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanIdCache, noCache: true }));
-					await setDefaultChannelLoader(respChannel.payload, clanIdCache);
-				}
-				delay(() => {
-					store.dispatch(appActions.setIsFromFCMMobile(false));
-					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
-				}, 4000);
+				store.dispatch(clansActions.joinClan({ clanId: '0' }));
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
 						params: { directMessageId: messageId },
 					});
 				}
+				store.dispatch(appActions.setLoadingMainMobile(false));
+				// force from killed app call in background apply for back fetch channels
+				if (time && Number(clanIdCache || 0) !== 0) {
+					const joinChangeFetchAndSetLoader = async (store: any, clanIdCache: string) => {
+						const [respClan, respCurrentClan, respChannel] = await Promise.all([
+							store.dispatch(clansActions.joinClan({ clanId: clanIdCache })),
+							store.dispatch(clansActions.changeCurrentClan({ clanId: clanIdCache, noCache: true })),
+							store.dispatch(channelsActions.fetchChannels({ clanId: clanIdCache, noCache: true }))
+						]);
+						
+						await setDefaultChannelLoader(respChannel.payload, clanIdCache);
+					};
+					await joinChangeFetchAndSetLoader(store, clanIdCache);
+				}
+				delay(() => {
+					store.dispatch(appActions.setIsFromFCMMobile(false));
+					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+				}, 4000);
 			} else {
 				store.dispatch(appActions.setLoadingMainMobile(false));
 				delay(() => {
@@ -218,9 +231,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				}, 4000);
 			}
 		}
-
-		// TODO: handle navigation
-		// handleRemoteNotificationNavigation(notification.data.action, notification);
 	} else {
 		store.dispatch(appActions.setLoadingMainMobile(false));
 		delay(() => {
@@ -261,7 +271,7 @@ export const setupNotificationListeners = async (navigation) => {
 					processNotification({
 						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 						navigation,
-						time: 2000,
+						time: 100,
 					});
 				}
 			});

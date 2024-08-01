@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelType } from 'mezon-js';
+import { ChannelMessage, ChannelType, Notification } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -103,7 +103,7 @@ export type IRoleUsers = IRole & {
 };
 
 export type ChannelThreads = IChannel & {
-	threads: IChannel[];
+	threads?: IChannel[];
 };
 
 export type IChannel = ApiChannelDescription & {
@@ -194,8 +194,8 @@ export type IMessageSendPayload = {
 	emojis?: IEmojiOnMessage[];
 	links?: ILinkOnMessage[];
 	markdowns?: IMarkdownOnMessage[];
-	voiceLinks?: ILinkVoiceRoomOnMessage[];
-	plainText?: string;
+	voicelinks?: ILinkVoiceRoomOnMessage[];
+	plaintext?: string;
 };
 
 export type IUser = {
@@ -422,6 +422,8 @@ export type MentionDataProps = {
 	display?: string;
 	avatarUrl?: string;
 	displayName?: string;
+	clanNick?: string;
+	clanAvatar?: string;
 	user?: ApiUser;
 };
 
@@ -587,4 +589,26 @@ export enum EMessageCode {
 export enum ModeResponsive {
 	MODE_CLAN = 'clan',
 	MODE_DM = 'dm',
+}
+
+export interface INotification extends Notification {
+	id: string;
+	content?: any;
+}
+export interface NotificationEntity extends INotification {
+	id: string;
+}
+
+export type TNotificationChannel = {
+	channel_id?: string;
+	clan_logo?: string;
+	channel_label?: string;
+	clan_id?: string;
+	clan_name?: string;
+	category_name?: string;
+	notifications: NotificationEntity[];
+};
+
+export enum SlugPermission {
+	Admin = 'administrator',
 }
