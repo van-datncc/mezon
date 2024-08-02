@@ -87,6 +87,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 						bottom: '76px',
 						right: setMarginleft,
 					}}
+          className={'z-10'}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}

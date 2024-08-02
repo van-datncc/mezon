@@ -3,20 +3,21 @@ import {
   reactionActions, selectAllAccount,
   selectCurrentChannel, selectCurrentClan,
   selectDirectById,
-  selectMessageByMessageId,
+  selectMessageByMessageId, selectModeResponsive,
   selectReactionPlaceActive, selectTheme,
   useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, IEmoji, ModeResponsive, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Icons } from '../../components';
+import { Icons } from '@mezon/ui';
 
 export type EmojiCustomPanelOptions = {
 	messageEmojiId?: string | undefined;
 	mode?: number;
 	isReaction?: boolean;
+  onClickAddButton?: () => void;
 };
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
@@ -30,6 +31,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
   const currentClan = useSelector(selectCurrentClan);
+  const modeResponsive = useAppSelector(selectModeResponsive)
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
 		return emojis.filter((emoji) => emoji?.shortname?.includes(searchTerm));
@@ -54,7 +56,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 	const categoryIcons = [
 		<Icons.ClockHistory defaultSize="w-7 h-7" />,
-    <ClanLogo/>,
+    modeResponsive === ModeResponsive.MODE_CLAN ? <ClanLogo/> : <Icons.PenEdit defaultSize="w-7 h-7"/>,
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
 		<Icons.Bowl defaultSize="w-7 h-7" />,
@@ -216,7 +218,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				})}
 			</div>
 			{valueInputToCheckHandleSearch !== '' && emojisSearch ? (
-				<div className=" h-[400px]  w-full">
+				<div className=" h-[400px]  w-[90%] pr-2">
 					<div className="h-[352px]">
 						{' '}
 						<EmojisPanel emojisData={emojisSearch} onEmojiSelect={handleEmojiSelect} onEmojiHover={handleOnHover} />
@@ -224,7 +226,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					<EmojiHover emojiHoverSrc={emojiHoverSrc} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
 				</div>
 			) : (
-				<div className="flex flex-col">
+				<div className="flex flex-col w-[90%] pr-2">
 					<div
 						ref={containerRef}
 						className="w-full  max-h-[352px] overflow-y-scroll pt-0 overflow-x-hidden hide-scrollbar dark: bg-transparent bg-bgLightMode"
@@ -237,6 +239,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 										onEmojiSelect={handleEmojiSelect}
 										onEmojiHover={handleOnHover}
 										categoryName={item.name}
+                    onClickAddButton={props.onClickAddButton}
 									/>
 								</div>
 							);
@@ -256,10 +259,13 @@ type DisplayByCategoriesProps = {
 	readonly onEmojiSelect: (emoji: string) => void;
 	readonly onEmojiHover: (item: any) => void;
 	readonly emojisData: any[];
+  onClickAddButton?: () => void;
+  
 };
 
-function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
+function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover, onClickAddButton }: DisplayByCategoriesProps) {
   const currentClan = useAppSelector(selectCurrentClan);
+  const modeResponsive = useAppSelector(selectModeResponsive);
   
 	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		const filteredEmojis = emojis
@@ -271,6 +277,14 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 		return filteredEmojis;
 	};
 	const emojisByCategoryName = getEmojisByCategories(emojisData, categoryName ?? '');
+  
+  const displayCategoryName = (categoryName: string) => {
+    if(modeResponsive === ModeResponsive.MODE_DM) {
+      return categoryName;
+    }
+    
+    return categoryName === 'Custom' ? currentClan?.clan_name : categoryName;
+  }
 
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
 	return (
@@ -279,18 +293,18 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
 				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
 			>
-        <p className={'uppercase'}>{categoryName !== 'Custom' ? categoryName : currentClan?.clan_name}</p>
+        <p className={'uppercase text-left truncate'}>{displayCategoryName(categoryName || '')}</p>
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
 					{' '}
 					<Icons.ArrowRight />
 				</span>
 			</button>
-			{emojisPanel && <EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} categoryName={categoryName}/>}
+			{emojisPanel && <EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} categoryName={categoryName} onClickAddButton={onClickAddButton}/>}
 		</div>
 	);
 }
 
-const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover, categoryName }) => {
+const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover, categoryName, onClickAddButton }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
   const appearanceTheme = useSelector (selectTheme);
@@ -320,7 +334,10 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
             src: ''
           })}
         >
-          <Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'}/>
+          <div onClick={onClickAddButton}>
+            <Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'}/>
+          </div>
+          
         </button>
       )}
 			

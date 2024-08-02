@@ -13,7 +13,7 @@ const SettingEmoji = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const { sessionRef, clientRef } = useMezon();
-	const emojiList = useSelector(selectAllEmoji);
+	const emojiList = useSelector(selectAllEmoji).filter(emoji => emoji.creator_id !== '0');
 
 	const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
