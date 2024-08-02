@@ -16,7 +16,7 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
 
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
-    setNameEmoji(e.target.value);
+    setNameEmoji(e.target.value.split(':').join(''));
   }
 
   const handleUpdateEmoji = async () => {
@@ -42,9 +42,6 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleUpdateEmoji();
-    }
-    if (event.key === ':') {
-      event.preventDefault();
     }
   }
   return (
