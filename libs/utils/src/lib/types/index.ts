@@ -444,8 +444,10 @@ export type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: st
 
 export type UserMentionsOpt = {
 	type: ETypeMention;
-	user_id: string | undefined;
-	username: string | undefined;
+	user_id?: string | undefined;
+	username?: string | undefined;
+	role_id?: string | undefined;
+	rolename?: string | undefined;
 };
 
 export enum ETypeMention {

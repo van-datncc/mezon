@@ -1,7 +1,7 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectAllChannelMembers, selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
+import { selectAllChannelMembers, selectAllRolesClan, selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
 import { MouseButton, checkLastChar } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
@@ -22,6 +22,15 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps
 		e.stopPropagation();
 		e.preventDefault();
 	};
+
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = rolesInClan.map((item) => ({
+		roleId: item.id ?? '',
+		roleName: item.title ?? '',
+	}));
+	const matchingRole = useMemo(() => {
+		return roleList.find((role) => `@${role.roleName}` === tagName);
+	}, [tagName]);
 
 	const [userRemoveChar, setUserRemoveChar] = useState('');
 	const username = tagName.slice(1);
@@ -93,6 +102,7 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps
 					<ShortUserProfile userID={foundUser.user.id} mode={mode} />
 				</div>
 			)}
+
 			{foundUser !== null || tagName === '@here' ? (
 				<>
 					<Link
@@ -110,6 +120,8 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps
 					</Link>
 					{`${checkLastChar(username) ? `${username.charAt(username.length - 1)}` : ''}`}
 				</>
+			) : matchingRole ? (
+				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`@${matchingRole.roleName}`}</span>
 			) : (
 				<span>{tagName}</span>
 			)}

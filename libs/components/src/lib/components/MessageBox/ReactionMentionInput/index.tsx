@@ -232,7 +232,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
 	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content);
-
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {

@@ -102,12 +102,23 @@ const useProcessMention = (text: string) => {
 		setHashtagList(hashtags);
 		setEmojiList(emojis);
 
-		const simplifiedList = mentions.map((mention) => ({
-			type: doesIdExist(mention.userid ?? '', roleList ?? []) ? ETypeMention.ROLE : ETypeMention.USER,
-			user_id: mention.userid,
-			username: mention.username,
-		}));
-
+		const simplifiedList = mentions.map((mention) => {
+			const isRole = doesIdExist(mention.userid ?? '', roleList ?? []);
+			if (isRole) {
+				const role = roleList.find((role) => role.roleId === mention.userid);
+				return {
+					type: ETypeMention.ROLE,
+					role_id: role?.roleId,
+					rolename: `@${role?.roleName}`,
+				};
+			} else {
+				return {
+					type: ETypeMention.USER,
+					user_id: mention.userid,
+					username: mention.username,
+				};
+			}
+		});
 		setSimplifiedMentionList(simplifiedList);
 	}, [text]);
 
