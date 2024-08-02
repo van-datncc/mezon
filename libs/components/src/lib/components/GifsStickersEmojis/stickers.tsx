@@ -98,7 +98,7 @@ function stickersquare({ channelId, mode }: ChannelMessageBoxProps) {
           </button>
 				))}
 			</div>
-      <div className={'flex flex-col h-[400px] overflow-y-auto w-[90%] px-5'} ref={containerRef}>
+      <div className='flex flex-col h-[400px] overflow-y-auto w-[90%] px-5' ref={containerRef}>
         {categoryLogo.map((avt) => (
           <div ref={(el) => (categoryRefs.current[avt.type] = el)} key={avt.id}>
             <CategorizedStickers stickerList={stickers} onClickSticker={handleClickImage} categoryName={avt.type}/>
@@ -132,11 +132,11 @@ const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({stickerList, c
         onClick={handleToggleButton}
         className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black max-h-full"
       >
-        <p className={'uppercase'}>{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}</p>
-        <span className={`${isShowStickerList ? ' rotate-90' : ''}`}>
-        {' '}
+        <p className='uppercase'>{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}</p>
+        <span className={isShowStickerList ? ' rotate-90' : ''}>
+          &nbsp;
           <Icons.ArrowRight />
-      </span>
+        </span>
       </button>
       {isShowStickerList && <StickerPanel stickerList={stickersListByCategoryName} onClickSticker={onClickSticker}/>}
     </div>
@@ -156,7 +156,7 @@ const StickerPanel: React.FC<IStickerPanelProps> = ({stickerList, onClickSticker
           <img
             key={sticker.id}
             src={sticker.url}
-            alt={`Img`}
+            alt='sticker'
             className="w-full h-auto cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton hover:rounded-lg border border-bgHoverMember rounded-lg"
             onClick={() => onClickSticker(sticker.url)}
             role="button"
