@@ -1,11 +1,28 @@
-import { IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
+import { selectAllRolesClan } from '@mezon/store';
+import { ETypeMention, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+interface IRoleMention {
+	roleId: string;
+	roleName: string;
+}
 
 const useProcessMention = (text: string) => {
 	const [mentionList, setMentionList] = useState<IMentionOnMessage[]>([]);
 	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
 	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
 	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
+
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = rolesInClan.map((item) => ({
+		roleId: item.id ?? '',
+		roleName: item.title ?? '',
+	}));
+
+	function doesIdExist(id: string, roles: IRoleMention[]): boolean {
+		return roles.some((role) => role.roleId === id);
+	}
 
 	useEffect(() => {
 		const mentions: IMentionOnMessage[] = [];
@@ -86,6 +103,7 @@ const useProcessMention = (text: string) => {
 		setEmojiList(emojis);
 
 		const simplifiedList = mentions.map((mention) => ({
+			type: doesIdExist(mention.userid ?? '', roleList ?? []) ? ETypeMention.ROLE : ETypeMention.USER,
 			user_id: mention.userid,
 			username: mention.username,
 		}));

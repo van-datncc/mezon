@@ -1,7 +1,10 @@
 import { useChannelMembers } from '@mezon/core';
-import { ChannelMembersEntity } from '@mezon/store';
+import { ChannelMembersEntity, selectAllRolesClan } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
+import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 interface UserMentionListProps {
 	channelID: string;
@@ -10,6 +13,7 @@ interface UserMentionListProps {
 
 function UserMentionList({ channelID, channelMode }: UserMentionListProps): MentionDataProps[] {
 	const { members } = useChannelMembers({ channelId: channelID });
+	const rolesInClan = useSelector(selectAllRolesClan);
 
 	const newUserMentionList = useMemo(() => {
 		if (!members || members.length === 0) {
@@ -37,10 +41,18 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 			if (a.display.toLowerCase() > b.display.toLowerCase()) return 1;
 			return 0;
 		});
-		if (channelMode === 4) {
+		const roleMentions =
+			rolesInClan?.map((item: ApiRole) => ({
+				id: item.id ?? '',
+				display: item.title,
+				avatarUrl: '',
+				clanNick: item.title,
+			})) ?? [];
+
+		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 			return [...sortedMentionList];
 		} else {
-			return [...sortedMentionList, hardcodedUser];
+			return [...sortedMentionList, ...roleMentions, hardcodedUser];
 		}
 	}, [channelMode, members]);
 
