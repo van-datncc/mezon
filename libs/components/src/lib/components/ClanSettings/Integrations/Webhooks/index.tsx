@@ -9,17 +9,29 @@ interface IWebhooksProps{
 
 const Webhooks = ({allWebhooks, parentChannelsInClan} : IWebhooksProps) => {
 	const dispatch = useAppDispatch();
-	const webhookNames = ['Captain hook', 'Spidey bot', 'Komu Knight', 'Anh ThaiPQ', 'Chi Nga Tester'];
-
+	const webhookNames = ['Captain hook', 'Spidey bot', 'Komu Knight'];
 	const getRandomWebhookName = (): string => {
 		const randomIndex = Math.floor(Math.random() * webhookNames.length);
 		return webhookNames[randomIndex];
 	};
 
+	const webHookAvatars = [
+		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/red_webhook.png',
+		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/green_webhook.png',
+		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/yellow_webhook.png',
+		'https://cdn.mezon.vn/1787707828677382144/1790996992529272832/blue_webhook.png',
+	];
+
+	const getRandomAvatar = (): string =>{
+		const randomIndex = Math.floor(Math.random() * webHookAvatars.length);
+		return webHookAvatars[randomIndex];
+	}
+
 	const handleAddWebhook = () => {
 		const newWebhookReq: ApiWebhookCreateRequest = {
 			channel_id: parentChannelsInClan[0].channel_id,
 			webhook_name: getRandomWebhookName(),
+			avatar: getRandomAvatar()
 		};
 		dispatch(generateWebhook({ request: newWebhookReq, channelId: parentChannelsInClan[0].channel_id as string }));
 	};

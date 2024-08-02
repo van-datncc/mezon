@@ -130,7 +130,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 
 	const filterData = useCallback(
 		(input: string) => {
-			const inputData = input.trim();
+			const inputData = input.trim().toLowerCase();
 			if (inputData.startsWith('@')) {
 				const searchValue = inputData.substring(1);
 				const filteredMembers = listMembersNotInChannel.filter((item) => item?.display_name?.includes(searchValue));

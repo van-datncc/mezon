@@ -4,7 +4,7 @@ import {ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, Mous
 import { ChannelType } from 'mezon-js';
 import {useMemo, useRef, useState} from 'react';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../../../../ui/src/lib/Icons';
+import { Icons }  from "@mezon/ui";
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';

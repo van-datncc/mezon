@@ -9,7 +9,9 @@ type ListMemberProps = {
 
 const ListMember = (props: ListMemberProps) => {
 	const { lisMembers, isOffline } = props;
-	return lisMembers.map((user) => <MemberItem user={user} key={user?.user?.id} listProfile={true} isOffline={isOffline} positionType={MemberProfileType.MEMBER_LIST} />);
+	return lisMembers.map((user) => (
+		<MemberItem user={user} key={user?.user?.id} listProfile={true} isOffline={isOffline} positionType={MemberProfileType.MEMBER_LIST} />
+	));
 };
 
 export default ListMember;

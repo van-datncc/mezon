@@ -2,19 +2,34 @@ import { useAuth, useChannels, useFriends } from '@mezon/core';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { selectAllDirectMessages, selectAllUsesClan } from '@mezon/store-mobile';
 import { removeDuplicatesById } from '@mezon/utils';
+import { RouteProp } from '@react-navigation/native';
 import { debounce } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Keyboard, NativeScrollEvent, NativeSyntheticEvent, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native';
 import { useSelector } from 'react-redux';
 import ChannelsSearchTab from '../../ChannelsSearchTab';
 import MembersSearchTab from '../../MembersSearchTab';
 import AssetsHeader from '../AssetsHeader';
 import InputSearchMessageChannel from './InputSearchMessageChannel';
+import { EOpenSearchChannelFrom } from '@mezon/mobile-components';
 
-const SearchMessageChannel = () => {
+type RootStackParamList = {
+	SearchMessageChannel: {
+		openSearchChannelFrom: EOpenSearchChannelFrom;
+	};
+};
+
+type MuteThreadDetailRouteProp = RouteProp<RootStackParamList, 'SearchMessageChannel'>;
+
+type SearchMessageChannelProps = {
+	route: MuteThreadDetailRouteProp;
+};
+
+const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['searchMessageChannel']);
+	const { openSearchChannelFrom } = route?.params || {};
 
 	const { listChannels } = useChannels();
 	const [searchText, setSearchText] = useState<string>('');
@@ -146,21 +161,15 @@ const SearchMessageChannel = () => {
 			},
 		];
 	}, [listChannelSearch, listMemberSearch, searchText, t]);
-
-	const dismissKeyBoard = () => {
-		Keyboard.dismiss();
-	};
 	return (
-		<TouchableWithoutFeedback onPress={() => dismissKeyBoard()}>
-			<Block backgroundColor={themeValue.secondary} width={'100%'} height={'100%'}>
-				<InputSearchMessageChannel onChangeText={handleSearchText} />
-				<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
-				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
-					<MembersSearchTab listMemberSearch={listMemberSearch} />
-					<ChannelsSearchTab listChannelSearch={listChannelSearch} />
-				</ScrollView>
-			</Block>
-		</TouchableWithoutFeedback>
+		<Block backgroundColor={themeValue.secondary} width={'100%'} height={'100%'}>
+			<InputSearchMessageChannel openSearchChannelFrom={openSearchChannelFrom} onChangeText={handleSearchText} />
+			<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
+			<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
+				<MembersSearchTab listMemberSearch={listMemberSearch} />
+				<ChannelsSearchTab listChannelSearch={listChannelSearch} />
+			</ScrollView>
+		</Block>
 	);
 };
 

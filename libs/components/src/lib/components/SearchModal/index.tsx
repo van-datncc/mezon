@@ -1,13 +1,12 @@
 import { useAppNavigation, useAuth, useChannels, useDirect, useFriends } from '@mezon/core';
 import { directActions, DirectEntity, messagesActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { removeDuplicatesById } from '@mezon/utils';
+import { removeDuplicatesById, TypeSearch } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import ListChannelSearch from './listChannelSearch';
-import ListMemberSearch from './listMemberSearch';
+import ListSearchModal from './ListSearchModal';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -43,6 +42,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						displayName: '',
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
 						typeChat: ChannelType.CHANNEL_TYPE_DM,
+						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -55,6 +55,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp,
 						typeChat: ChannelType.CHANNEL_TYPE_GROUP,
+						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -67,6 +68,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						displayName: itemFriend?.user.display_name ?? '',
 						lastSentTimeStamp: '0',
 						idDM: '',
+						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -78,6 +80,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						avatarUser: itemUserClan?.user?.avatar_url ?? '',
 						lastSentTimeStamp: '0',
 						idDM: '',
+						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -93,7 +96,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
 	}, [accountId, friends, listDM, listGroup, usersClan]);
 
-
 	const listChannelSearch = useMemo(() => {
 		const list = listChannels.map((item) => {
 			return {
@@ -104,11 +106,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				clanId: item?.clan_id ?? '',
 				channelId: item?.channel_id ?? '',
 				lastSentTimeStamp: Number(item?.last_sent_message?.timestamp || 0),
+				type: TypeSearch.Channel_Type,
 			};
 		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
 		return sortedList;
 	}, [listChannels]);
+
+	const totalsData = [...listMemSearch, ...listChannelSearch];
 
 	const handleSelectMem = useCallback(
 		async (user: any) => {
@@ -143,6 +148,17 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			onClose();
 		},
 		[navigate, onClose, toChannelPage],
+	);
+
+	const handleSelect = useCallback(
+		async (isChannel: boolean, item: any) => {
+			if (isChannel) {
+				await handleSelectChannel(item);
+			} else {
+				await handleSelectMem(item);
+			}
+		},
+		[handleSelectMem, handleSelectChannel],
 	);
 
 	const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -274,18 +290,10 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				>
 					{(!searchText.startsWith('@') && !searchText.startsWith('#')) ? (
 						<>
-							<ListMemberSearch
-								listMemSearch={listMemSearch}
+							<ListSearchModal 
+								listSearch={totalsData}
 								itemRef={itemRef}
-								handleSelectMem={handleSelectMem}
-								searchText={searchText}
-								idActive={idActive}
-								setIdActive={setIdActive}
-							/>
-							<ListChannelSearch 
-								listChannelSearch={listChannelSearch}
-								itemRef={itemRef}
-								handleSelectChannel={handleSelectChannel}
+								handleSelect={handleSelect}
 								searchText={searchText}
 								idActive={idActive}
 								setIdActive={setIdActive}
@@ -297,10 +305,10 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 							{searchText.startsWith('@') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
-									<ListMemberSearch
-										listMemSearch={listMemSearch}
+									<ListSearchModal 
+										listSearch={listMemSearch}
 										itemRef={itemRef}
-										handleSelectMem={handleSelectMem}
+										handleSelect={handleSelect}
 										searchText={searchText.slice(1)}
 										idActive={idActive}
 										setIdActive={setIdActive}
@@ -310,10 +318,10 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 							{searchText.startsWith('#') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
-									<ListChannelSearch 
-										listChannelSearch={listChannelSearch}
+									<ListSearchModal 
+										listSearch={listChannelSearch}
 										itemRef={itemRef}
-										handleSelectChannel={handleSelectChannel}
+										handleSelect={handleSelect}
 										searchText={searchText.slice(1)}
 										idActive={idActive}
 										setIdActive={setIdActive}

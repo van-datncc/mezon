@@ -6,7 +6,6 @@ const style = (colors: Attributes) => StyleSheet.create({
 		backgroundColor: colors.primary,
 		paddingHorizontal: size.s_20,
 		width: Dimensions.get('screen').width,
-		paddingBottom: size.s_60,
 	},
 	title: {
 		fontSize: size.label,
