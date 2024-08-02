@@ -9,10 +9,11 @@ import { style } from './styles';
 interface IProps {
 	onPress: () => void;
 	id: string;
+	defaultAvatar: string;
 	username: string;
 	isShow: boolean;
 }
-export const AvatarMessage = React.memo(({ isShow, onPress, id, username }: IProps) => {
+export const AvatarMessage = React.memo(({ isShow, onPress, id, username, defaultAvatar }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const userById = useSelector(selectMemberByUserId(id || ''));
@@ -21,7 +22,7 @@ export const AvatarMessage = React.memo(({ isShow, onPress, id, username }: IPro
 		return (
 			<Pressable onPress={onPress} style={styles.wrapperAvatar}>
 				<MezonAvatar
-					avatarUrl={userById?.user?.avatar_url}
+					avatarUrl={defaultAvatar || userById?.user?.avatar_url}
 					username={username}
 				/>
 			</Pressable>

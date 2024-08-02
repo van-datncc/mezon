@@ -284,6 +284,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					<AvatarMessage
 						onPress={onPressAvatar}
 						id={message?.user?.id}
+						defaultAvatar={message?.user?.avatarSm}
 						username={isDM ? message?.display_name || message?.user?.username : message?.user?.username}
 						isShow={!isCombine || !!message?.references?.length || showUserInformation}
 					/>
