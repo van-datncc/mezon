@@ -61,7 +61,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 			}
 
 			if (link) {
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link}`} content={link} />);
+				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link as string}`} content={link as string} />);
 			}
 
 			if (voicelink) {
@@ -75,12 +75,12 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 								channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
 							/>,
 						)
-					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink} />);
+					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink as string} />);
 			}
 
 			if (markdown) {
 				const converted = markdown.startsWith('```') && markdown.endsWith('```') ? convertMarkdown(markdown) : markdown;
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={converted} />);
+				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={converted as string} />);
 			}
 			lastindex = endindex;
 		});
