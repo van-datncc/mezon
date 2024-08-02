@@ -69,16 +69,14 @@ export const generateWebhook = createAsyncThunk(
 	},
 );
 
-export const deleteWebhookById = createAsyncThunk(
-	'integration/deleteWebhook', 
-	async (webhook: ApiWebhook, thunkAPI) => {
+export const deleteWebhookById = createAsyncThunk('integration/deleteWebhook', async (webhook: ApiWebhook, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteWebhookById(mezon.session, webhook.id as string);
 		if (response) {
 			return webhook;
-		}else{
-			return thunkAPI.rejectWithValue({});
+		}else {
+			thunkAPI.rejectWithValue({});
 		}
 	} catch (err) {
 		console.log(err);
@@ -87,19 +85,20 @@ export const deleteWebhookById = createAsyncThunk(
 });
 
 export const updateWebhookBySpecificId = createAsyncThunk(
-	'integration/editWebhook', 
-	async (data:{request: MezonUpdateWebhookByIdBody, webhookId: string | undefined, channelId:string}, thunkAPI) => {
-	try{
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.updateWebhookById(mezon.session, data.webhookId as string, data.request);
-		if (response) {
-			thunkAPI.dispatch(fetchWebhooksByChannelId({ channelId: data.channelId, noCache: true }));
+	'integration/editWebhook',
+	async (data: { request: MezonUpdateWebhookByIdBody; webhookId: string | undefined; channelId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.updateWebhookById(mezon.session, data.webhookId as string, data.request);
+			if (response) {
+				thunkAPI.dispatch(fetchWebhooksByChannelId({ channelId: data.channelId, noCache: true }));
+			}
+		} catch (err) {
+			console.log(err);
+			return thunkAPI.rejectWithValue(err);
 		}
-	}catch(err){
-		console.log(err);
-		return thunkAPI.rejectWithValue(err);
-	}
-})
+	},
+);
 
 export const integrationWebhookSlice = createSlice({
 	name: INTEGRATION_WEBHOOK,
@@ -119,7 +118,7 @@ export const integrationWebhookSlice = createSlice({
 			})
 			.addCase(deleteWebhookById.fulfilled, (state, action) => {
 				state.webhookList = state.webhookList?.filter((webhook) => webhook.id !== action.payload?.id);
-			})
+			});
 	},
 });
 
