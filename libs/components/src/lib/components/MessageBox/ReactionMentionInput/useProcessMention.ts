@@ -1,5 +1,5 @@
 import { selectAllRolesClan } from '@mezon/store';
-import { ETypeMention, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
+import { IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -107,13 +107,11 @@ const useProcessMention = (text: string) => {
 			if (isRole) {
 				const role = roleList.find((role) => role.roleId === mention.userid);
 				return {
-					type: ETypeMention.ROLE,
 					role_id: role?.roleId,
 					rolename: `@${role?.roleName}`,
 				};
 			} else {
 				return {
-					type: ETypeMention.USER,
 					user_id: mention.userid,
 					username: mention.username,
 				};

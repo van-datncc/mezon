@@ -447,17 +447,11 @@ export type MentionsInputChangeEvent = {
 export type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: string, newPlainTextValue: string, mentions: any) => void;
 
 export type UserMentionsOpt = {
-	type: ETypeMention;
 	user_id?: string | undefined;
 	username?: string | undefined;
 	role_id?: string | undefined;
 	rolename?: string | undefined;
 };
-
-export enum ETypeMention {
-	ROLE = 1,
-	USER = 0,
-}
 
 export enum ETypeMessage {
 	CHANNEL = 'CHANNEL',
