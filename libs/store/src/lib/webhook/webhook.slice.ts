@@ -75,9 +75,8 @@ export const deleteWebhookById = createAsyncThunk('integration/deleteWebhook', a
 		const response = await mezon.client.deleteWebhookById(mezon.session, webhook.id as string);
 		if (response) {
 			return webhook;
-		}else {
-			thunkAPI.rejectWithValue({});
 		}
+		thunkAPI.rejectWithValue({});
 	} catch (err) {
 		console.log(err);
 		return thunkAPI.rejectWithValue(err);
@@ -123,5 +122,5 @@ export const integrationWebhookSlice = createSlice({
 });
 
 export const getWebHookState = (rootState: { [INTEGRATION_WEBHOOK]: IWebHookState }): IWebHookState => rootState[INTEGRATION_WEBHOOK];
-export const selectAllWebhooks = createSelector(getWebHookState, (state) => state?.webhookList);
+export const selectAllWebhooks = createSelector(getWebHookState, (state) => state?.webhookList || []);
 export const integrationWebhookReducer = integrationWebhookSlice.reducer;
