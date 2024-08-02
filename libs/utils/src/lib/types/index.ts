@@ -205,6 +205,10 @@ export type IUser = {
 	avatarSm: string;
 };
 
+export type MetaDateStatusUser = {
+	status: string;
+}
+
 export type IVoice = {
 	user_id: string;
 	clan_id: string;
@@ -611,4 +615,9 @@ export type TNotificationChannel = {
 
 export enum SlugPermission {
 	Admin = 'administrator',
+}
+
+export enum TypeSearch {
+	Dm_Type = 1,
+	Channel_type = 2,
 }
