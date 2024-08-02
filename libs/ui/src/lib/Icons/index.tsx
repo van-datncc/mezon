@@ -3252,3 +3252,26 @@ export function WindowIcon(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+
+export function MessageIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" {...props}>
+			<path fill="currentColor" d="M12 22a10 10 0 1 0-8.45-4.64c.13.19.11.44-.04.61l-2.06 2.37A1 1 0 0 0 2.2 22H12Z"></path>
+		</svg>
+	);
+}
+
+export function SelectFileIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 18 18" width="18" className='' {...props}>
+			<g fill="none" fillRule="evenodd">
+				<path d="m0 0h18v18h-18z" />
+				<path
+					d="m13.5 8.25v4.5c0 .8284271-.6715729 1.5-1.5 1.5h-10.5c-.82842712 0-1.5-.6715729-1.5-1.5v-10.5c0-.82842712.67157288-1.5 1.5-1.5h7.5-3v1.5h-4.5v10.5h10.5v-4.5zm-5.28-.5325 2.655 3.5325h-8.25l2.0625-2.6475 1.47 1.77zm3.78-5.4675h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25v-2.25h1.5z"
+					fill="#4f545c"
+					transform="translate(2.25 1.5)"
+				/>
+			</g>
+		</svg>
+	);
+}
