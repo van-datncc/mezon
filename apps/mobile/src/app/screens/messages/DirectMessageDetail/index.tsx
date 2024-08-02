@@ -10,7 +10,7 @@ import {
 	getStoreAsync,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -244,6 +244,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 										DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
 									}}
 									bottomSheetRef={bottomPickerRef}
+									directMessageId={currentDmGroup?.id || ''}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
 								<AttachmentPicker currentChannelId={directMessageId} currentClanId={currentChannel?.clan_id} />

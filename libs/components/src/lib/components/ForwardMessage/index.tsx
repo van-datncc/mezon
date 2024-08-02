@@ -1,14 +1,13 @@
 import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
-import { DirectEntity, RootState, channelsActions, selectAllDirectMessages, selectTheme, useAppDispatch } from '@mezon/store';
-import { ChannelThreads, removeDuplicatesById } from '@mezon/utils';
+import { channelsActions, DirectEntity, RootState, selectAllDirectMessages, selectTheme, useAppDispatch } from '@mezon/store';
+import { ChannelThreads, removeDuplicatesById, TypeSearch } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MessageContent from '../MessageWithUser/MessageContent';
-import ListChannelSearch from './listChannelSearch';
-import ListMemberSearch from './listMemSearch';
+import { default as ListSearch, default as ListSearchForwardMessage } from './ListSearchForwardMessage';
 type ModalParam = {
 	openModal: boolean;
 };
@@ -82,6 +81,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 						userName: itemDM?.usernames,
 						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
+						typeSearch: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -96,6 +96,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 						userName: itemGr?.usernames,
 						displayName: itemGr.channel_label,
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp,
+						typeSearch: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -116,10 +117,13 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 				clanId: item?.clan_id ?? '',
 				channel_label: item?.channel_label ?? '',
 				lastSentTimeStamp: item.last_sent_message?.timestamp,
+				typeSearch: TypeSearch.Channel_Type,
 			};
 		});
 		return list;
 	}, [listChannels]);
+
+	const totalsSearch = [...listMemSearch, ...listChannelSearch];
 
 	const isNoResult =
 		!listChannelSearch.filter((item) => item.name.indexOf(searchText) > -1).length &&
@@ -148,14 +152,8 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}>
 						{(!searchText.startsWith('@') && !searchText.startsWith('#')) ? (
 							<>
-								<ListMemberSearch 
-									listMemSearch={listMemSearch}
-									searchText={searchText}
-									selectedObjectIdSends={selectedObjectIdSends}
-									handleToggle={handleToggle}
-								/>
-								<ListChannelSearch 
-									listChannelSearch={listChannelSearch}
+								<ListSearchForwardMessage 
+									listSearch={totalsSearch}
 									searchText={searchText}
 									selectedObjectIdSends={selectedObjectIdSends}
 									handleToggle={handleToggle}
@@ -169,8 +167,8 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 										<span className="text-textPrimary text-left opacity-60 text-[11px] pb-1 uppercase">
 											Search friend and users
 										</span>
-										<ListMemberSearch 
-											listMemSearch={listMemSearch}
+										<ListSearch 
+											listSearch={listMemSearch}
 											searchText={searchText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
 											handleToggle={handleToggle}
@@ -180,8 +178,8 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 								{searchText.startsWith('#') && (
 									<>
 										<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
-										<ListChannelSearch 
-											listChannelSearch={listChannelSearch}
+										<ListSearch 
+											listSearch={listChannelSearch}
 											searchText={searchText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
 											handleToggle={handleToggle}
