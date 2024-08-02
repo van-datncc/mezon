@@ -60,11 +60,11 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 				);
 			}
 
-			if (link) {
+			if (link && typeof link === 'string') {
 				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link as string}`} content={link as string} />);
 			}
 
-			if (voicelink) {
+			if (voicelink && typeof voicelink === 'string') {
 				const meetingCode = voicelink?.split('/').pop();
 				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 				voiceChannelFound
@@ -78,7 +78,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink as string} />);
 			}
 
-			if (markdown) {
+			if (markdown && typeof markdown === 'string') {
 				const converted = markdown.startsWith('```') && markdown.endsWith('```') ? convertMarkdown(markdown) : markdown;
 				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={converted as string} />);
 			}
