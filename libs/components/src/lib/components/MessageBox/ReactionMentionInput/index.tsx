@@ -125,7 +125,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
@@ -138,7 +137,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
-	const attachmentDataRef = useSelector(selectAttachmentData);
 	const [content, setContent] = useState('');
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -153,6 +151,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const { isSearchMessage } = useSearchMessages();
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(
+		(props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || '',
+	);
+	const attachmentDataRef = useSelector(
+		selectAttachmentData((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
+	);
 
 	const userProfile = useSelector(selectAllAccount);
 
@@ -430,7 +434,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (!emojiPicked || !input) {
 			return;
 		}
-		textFieldEdit.insert(input, emojiPicked);
+		textFieldEdit.insert(input, `[:${emojiPicked}]`);
 	}
 
 	const clickUpToEditMessage = () => {
