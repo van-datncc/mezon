@@ -10,7 +10,7 @@ import {
 	startOfDay,
 	subDays,
 } from 'date-fns';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiRole } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
@@ -344,3 +344,10 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 			minHeight,
 		);
 	});
+
+export const getRoleList = (rolesInClan: ApiRole[]) => {
+	return rolesInClan.map((item) => ({
+		roleId: item.id ?? '',
+		roleName: item.title ?? '',
+	}));
+};

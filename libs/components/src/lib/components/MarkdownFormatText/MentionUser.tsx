@@ -1,6 +1,6 @@
 import { useOnClickOutside } from '@mezon/core';
 import { selectAllChannelMembers, selectAllRolesClan, selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
-import { MouseButton, checkLastChar } from '@mezon/utils';
+import { MouseButton, checkLastChar, getRoleList } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -24,10 +24,8 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps
 	};
 
 	const rolesInClan = useSelector(selectAllRolesClan);
-	const roleList = rolesInClan.map((item) => ({
-		roleId: item.id ?? '',
-		roleName: item.title ?? '',
-	}));
+	const roleList = getRoleList(rolesInClan);
+
 	const matchingRole = useMemo(() => {
 		return roleList.find((role) => `@${role.roleName}` === tagName);
 	}, [tagName]);

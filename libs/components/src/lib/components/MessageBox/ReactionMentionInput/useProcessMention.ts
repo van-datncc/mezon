@@ -1,5 +1,5 @@
 import { selectAllRolesClan } from '@mezon/store';
-import { IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
+import { getRoleList, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -15,10 +15,7 @@ const useProcessMention = (text: string) => {
 	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
 
 	const rolesInClan = useSelector(selectAllRolesClan);
-	const roleList = rolesInClan.map((item) => ({
-		roleId: item.id ?? '',
-		roleName: item.title ?? '',
-	}));
+	const roleList = getRoleList(rolesInClan);
 
 	function doesIdExist(id: string, roles: IRoleMention[]): boolean {
 		return roles.some((role) => role.roleId === id);
