@@ -37,6 +37,7 @@ export const getDefaultNotificationCategory = createAsyncThunk('defaultnotificat
 type SetDefaultNotificationPayload = {
     category_id?: string;
     notification_type?: number;
+	time_mute?: number;
 	clan_id:string;
 };
 const LIST_NOTIFI_CATEGORY_CACHED_TIME = 1000 * 60 * 3;
@@ -54,11 +55,12 @@ export const fetchNotificationCategorySetting = memoize(
 
 export const setDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/setDefaultNotificationCategory',
-	async ({ category_id, notification_type, clan_id }: SetDefaultNotificationPayload, thunkAPI) => {
+	async ({ category_id, notification_type, time_mute, clan_id }: SetDefaultNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
-			category_id: category_id,
+			channel_category_id: category_id,
 			notification_type: notification_type,
+			time_mute: time_mute,
 		}
 		const response = await mezon.client.setNotificationCategory(mezon.session, body);
 		if (!response) {
