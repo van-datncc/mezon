@@ -46,10 +46,10 @@ export const fetchStickerByClanId = createAsyncThunk(
 				fetchStickerCached.clear(mezon, clanId);
 			}
 			const response = await fetchStickerCached(mezon, clanId);
-			if (!response.stickers) {
-				throw new Error('Emoji list is undefined or null');
+			if (response) {
+				return response.stickers ?? [];
 			}
-			return response.stickers;
+			throw new Error('Emoji list is undefined or null');
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}
