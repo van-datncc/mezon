@@ -120,7 +120,9 @@ export default function DirectMessage() {
 				{' '}
 				<DmTopbar dmGroupId={directId} />
 				<div className="flex flex-row h-full w-full">
-					<div className={`flex-col flex-1 w-full h-full max-h-messageViewChatDM ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}>
+					<div
+						className={`flex-col flex-1 h-full max-h-messageViewChatDM ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
+					>
 						<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink " ref={messagesContainerRef}>
 							{
 								<ChannelMessages
@@ -205,7 +207,7 @@ export default function DirectMessage() {
 					)}
 					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
 						<div
-							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[340px]'}`}
+							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-widthDmProfile'}`}
 						>
 							<ModalUserProfile
 								userID={Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id}
