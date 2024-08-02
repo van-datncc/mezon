@@ -66,10 +66,16 @@ interface IExpendedWebhookModal {
 	parentChannelsInClan: ChannelsEntity[];
 }
 
+interface IDataForUpdate {
+	channelIdForUpdate: string | undefined;
+	webhookNameInput: string | undefined;
+	webhookAvatarUrl: string | undefined;
+}
+
 const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWebhookModal) => {
 	const dispatch = useAppDispatch();
 	const [isShowPopup, setIsShowPopup] = useState(false);
-	const handleShowPopup = () => {
+	const toggleShowPopup = () => {
 		setIsShowPopup(!isShowPopup);
 	};
 	const handleCopyUrl = (url: string) => {
@@ -79,26 +85,22 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const avatarRef = useRef<HTMLInputElement>(null);
-	const [channelIdForUpdate, setChannelIdForUpdate] = useState<string | undefined>(webhookItem.channel_id);
-	const [webhookNameInput, setWebhookNameInput] = useState<string | undefined>(webhookItem.webhook_name);
-	const [webhookAvatarUrl, setWebhookAvatarUrl] = useState<string | undefined>(webhookItem.avatar);
+
+	const [dataForUpdate, setDataForUpdate] = useState<IDataForUpdate>({
+		channelIdForUpdate: webhookItem.channel_id,
+		webhookAvatarUrl: webhookItem.avatar,
+		webhookNameInput: webhookItem.webhook_name,
+	});
+
 	const [hasChange, setHasChange] = useState<boolean>(false);
-	
+
 	useEffect(() => {
-		if (
-			webhookNameInput !== webhookItem.webhook_name ||
-			webhookAvatarUrl !== webhookItem.avatar ||
-			channelIdForUpdate !== webhookItem.channel_id
-		) {
-			setHasChange(true);
-		}else if(
-			webhookNameInput === webhookItem.webhook_name &&
-			webhookAvatarUrl === webhookItem.avatar &&
-			channelIdForUpdate === webhookItem.channel_id
-		){
-			setHasChange(false);
-		}
-	}, [webhookNameInput, webhookAvatarUrl, channelIdForUpdate]);
+		const computeHasChanges =
+			dataForUpdate.webhookNameInput !== webhookItem.webhook_name ||
+			dataForUpdate.webhookAvatarUrl !== webhookItem.avatar ||
+			dataForUpdate.channelIdForUpdate !== webhookItem.channel_id;
+		setHasChange(computeHasChanges);
+	}, [dataForUpdate.webhookNameInput, dataForUpdate.webhookAvatarUrl, dataForUpdate.channelIdForUpdate]);
 
 	const handleChooseFile = (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
@@ -108,27 +110,32 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 				throw new Error('Client or file is not initialized');
 			}
 			handleUploadFile(client, session, currentClanId || '', currentChannelId || '', e.target.files[0].name, e.target.files[0]).then(
-				async (attachment: ApiMessageAttachment) => {
-					setWebhookAvatarUrl(attachment.url);
+				(attachment: ApiMessageAttachment) => {
+					setDataForUpdate({
+						...dataForUpdate,
+						webhookAvatarUrl: attachment.url,
+					});
 				},
 			);
 		}
 	};
-
-	const handleEditWebhook = async() => {
+	
+	const handleEditWebhook = async () => {
 		const request: MezonUpdateWebhookByIdBody = {
-			avatar: webhookAvatarUrl,
-			channel_id: channelIdForUpdate,
-			webhook_name: webhookNameInput,
+			avatar: dataForUpdate.webhookAvatarUrl,
+			channel_id: dataForUpdate.channelIdForUpdate,
+			webhook_name: dataForUpdate.webhookNameInput,
 		};
 		await dispatch(updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannelId || '' }));
 		setHasChange(false);
 	};
 
 	const handleResetChange = () => {
-		setChannelIdForUpdate(webhookItem.channel_id);
-		setWebhookAvatarUrl(webhookItem.avatar);
-		setWebhookNameInput(webhookItem.webhook_name);
+		setDataForUpdate({
+			channelIdForUpdate: webhookItem.channel_id,
+			webhookAvatarUrl: webhookItem.avatar,
+			webhookNameInput: webhookItem.webhook_name,
+		});
 		setHasChange(false);
 	};
 	return (
@@ -142,7 +149,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 								<Icons.SelectFileIcon />
 							</div>
 							<img
-								src={webhookAvatarUrl}
+								src={dataForUpdate.webhookAvatarUrl}
 								alt="Webhook avatar"
 								className="aspect-square w-[100px] rounded-full hover:grayscale-[50%] cursor-pointer"
 								onClick={() => avatarRef.current?.click()}
@@ -159,9 +166,14 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 									<b>NAME</b>
 								</div>
 								<input
-									onChange={(e) => setWebhookNameInput(e.target.value)}
+									onChange={(e) =>
+										setDataForUpdate({
+											...dataForUpdate,
+											webhookNameInput: e.target.value,
+										})
+									}
 									type="text"
-									value={webhookNameInput}
+									value={dataForUpdate.webhookNameInput}
 									className="w-full dark:text-[#b5bac1] text-textLightTheme dark:bg-[#1e1f22] bg-bgLightModeThird p-[10px] rounded-sm outline-none"
 								/>
 							</div>
@@ -172,12 +184,13 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 								<WebhookItemChannelDropdown
 									parentChannelsInClan={parentChannelsInClan}
 									webhookItem={webhookItem}
-									setChannelIdForUpdate={setChannelIdForUpdate}
-									hasChange = {hasChange}
+									setDataForUpdate={setDataForUpdate}
+									hasChange={hasChange}
+									dataForUpdate={dataForUpdate}
 								/>
 							</div>
 						</div>
-						<div className="border-t dark:border-[#3b3d44] my-[24px]"></div>
+						<div className="border-t dark:border-[#3b3d44] my-[24px]" />
 						<div className="flex items-center gap-[20px]">
 							<div
 								onClick={() => handleCopyUrl(webhookItem.url as string)}
@@ -185,12 +198,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 							>
 								Copy Webhook URL
 							</div>
-							<div
-								onClick={() => {
-									handleShowPopup();
-								}}
-								className="text-red-400 hover:underline cursor-pointer"
-							>
+							<div onClick={() => toggleShowPopup()} className="text-red-400 hover:underline cursor-pointer">
 								Delete Webhook
 							</div>
 						</div>
@@ -198,7 +206,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 				</div>
 			</div>
 			{hasChange && <ModalSaveChanges onSave={handleEditWebhook} onReset={handleResetChange} />}
-			{isShowPopup && <DeleteWebhookPopup webhookItem={webhookItem} handleShowPopUp={handleShowPopup} />}
+			{isShowPopup && <DeleteWebhookPopup webhookItem={webhookItem} toggleShowPopup={toggleShowPopup} />}
 		</>
 	);
 };
@@ -206,11 +214,18 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 interface IWebhookItemChannelDropdown {
 	parentChannelsInClan: ChannelsEntity[];
 	webhookItem: ApiWebhook;
-	setChannelIdForUpdate: (channel: string | undefined) => void;
+	dataForUpdate: IDataForUpdate;
+	setDataForUpdate: (dataForUpdate: IDataForUpdate) => void;
 	hasChange: boolean;
 }
 
-const WebhookItemChannelDropdown = ({ webhookItem, parentChannelsInClan, setChannelIdForUpdate, hasChange }: IWebhookItemChannelDropdown) => {
+const WebhookItemChannelDropdown = ({
+	webhookItem,
+	parentChannelsInClan,
+	setDataForUpdate,
+	hasChange,
+	dataForUpdate,
+}: IWebhookItemChannelDropdown) => {
 	const webhookChannel = useSelector(selectChannelById(webhookItem.channel_id as string));
 	const appearanceTheme = useSelector(selectTheme);
 	const [isOpenDropdown, setIsOpenDropdown] = useState(false);
@@ -218,10 +233,13 @@ const WebhookItemChannelDropdown = ({ webhookItem, parentChannelsInClan, setChan
 		setIsOpenDropdown(!isOpenDropdown);
 	};
 	const [dropdownValue, setDropdownValue] = useState(webhookChannel.channel_label);
-	
-	useEffect(()=>{
-		if(!hasChange){
-			setChannelIdForUpdate(webhookItem.channel_id);
+
+	useEffect(() => {
+		if (!hasChange) {
+			setDataForUpdate({
+				...dataForUpdate,
+				channelIdForUpdate: webhookItem.channel_id,
+			});
 			setDropdownValue(webhookChannel.channel_label);
 		}
 	}, [hasChange]);
@@ -256,7 +274,10 @@ const WebhookItemChannelDropdown = ({ webhookItem, parentChannelsInClan, setChan
 								onClick={() => {
 									setDropdownValue(channel?.channel_label as string);
 									toggleDropdown();
-									setChannelIdForUpdate(channel.channel_id as string);
+									setDataForUpdate({
+										...dataForUpdate,
+										channelIdForUpdate: channel.channel_id as string,
+									});
 								}}
 							>
 								{channel?.channel_label}
