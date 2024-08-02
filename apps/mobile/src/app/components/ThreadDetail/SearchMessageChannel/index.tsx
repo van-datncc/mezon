@@ -10,9 +10,9 @@ import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 
 import { useSelector } from 'react-redux';
 import ChannelsSearchTab from '../../ChannelsSearchTab';
 import MembersSearchTab from '../../MembersSearchTab';
-import { EOpenSearchChannelFrom } from '../ActionRow';
 import AssetsHeader from '../AssetsHeader';
 import InputSearchMessageChannel from './InputSearchMessageChannel';
+import { EOpenSearchChannelFrom } from '@mezon/mobile-components';
 
 type RootStackParamList = {
 	SearchMessageChannel: {

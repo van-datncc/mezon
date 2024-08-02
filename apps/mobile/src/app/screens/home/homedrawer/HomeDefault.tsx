@@ -1,5 +1,5 @@
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -29,7 +29,6 @@ import BottomKeyboardPicker from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
-import { EOpenSearchChannelFrom } from '../../../components/ThreadDetail/ActionRow';
 
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();

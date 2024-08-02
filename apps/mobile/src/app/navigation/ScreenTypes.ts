@@ -1,9 +1,9 @@
+import { EOpenSearchChannelFrom } from "@mezon/mobile-components";
 import { DirectEntity } from "@mezon/store-mobile";
 import { IChannel, OptionEvent } from "@mezon/utils";
 import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackScreenProps } from "@react-navigation/stack";
-import { EOpenSearchChannelFrom } from "../components/ThreadDetail/ActionRow";
 
 export const APP_SCREEN = {
   UN_AUTHORIZE: 'UN_AUTHORIZE',

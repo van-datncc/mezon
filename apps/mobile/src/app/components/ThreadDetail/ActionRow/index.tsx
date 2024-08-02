@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
-import { Icons } from '@mezon/mobile-components';
+import { EOpenSearchChannelFrom, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectnotificatonSelected } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
@@ -19,11 +19,6 @@ enum EActionRow {
 	Settings,
 }
 
-export enum EOpenSearchChannelFrom {
-	ChannelList,
-	HeaderDefault,
-	ActionMenu,
-}
 
 export const ActionRow = React.memo(() => {
 	const { themeValue } = useTheme();

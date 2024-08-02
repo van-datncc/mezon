@@ -1,4 +1,4 @@
-import { AngleLeft, ArrowLeftIcon, FilterSearchIcon, Icons } from '@mezon/mobile-components';
+import { AngleLeft, ArrowLeftIcon, EOpenSearchChannelFrom, FilterSearchIcon, Icons } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Tooltip from 'react-native-walkthrough-tooltip';
-import { EOpenSearchChannelFrom } from '../../ActionRow';
 import ListOptionSearch from '../ListOptionSearch';
 import { style } from './InputSearchMessageChannel.styles';
 
@@ -43,11 +42,8 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom }: Inpu
 					navigation.goBack();
 				}}
 			>
-				{openSearchChannelFrom === EOpenSearchChannelFrom.ActionMenu ? (
-					<AngleLeft width={20} height={20} color={Colors.textGray} />
-				) : openSearchChannelFrom === EOpenSearchChannelFrom.ChannelList ? (
-					<ArrowLeftIcon width={20} height={20} color={Colors.textGray} />
-				) : null}
+				{openSearchChannelFrom === EOpenSearchChannelFrom.ActionMenu && <AngleLeft width={20} height={20} color={Colors.textGray} />}
+				{openSearchChannelFrom === EOpenSearchChannelFrom.ChannelList && <ArrowLeftIcon width={20} height={20} color={Colors.textGray} />}
 			</TouchableOpacity>
 			<View style={styles.searchBox}>
 				<View>

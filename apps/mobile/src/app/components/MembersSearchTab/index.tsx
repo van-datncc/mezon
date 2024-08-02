@@ -31,7 +31,7 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 			{listMemberSearch?.length > 0 ? (
 				<ScrollView contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
 					{
-						<View style={{ width: '100%', marginTop: size.s_10, borderRadius: size.s_14, backgroundColor: themeValue.secondary }}>
+						<View style={styles.boxMembers}>
 							{listMemberSearch?.map((user) => (
 								<MemberItem
 									onPress={(user) => {

@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
-import { Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
+import { EOpenSearchChannelFrom, Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -29,7 +29,6 @@ import { ChannelListSection } from '../components/ChannelList/ChannelListSection
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
-import { EOpenSearchChannelFrom } from '../../../../../app/components/ThreadDetail/ActionRow';
 
 const ChannelList = React.memo((props: any) => {
 	const { themeValue } = useTheme();
