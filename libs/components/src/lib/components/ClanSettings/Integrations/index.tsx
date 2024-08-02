@@ -20,9 +20,9 @@ const Integrations = () => {
 
 	useEffect(() => {
 		if (allChannel[0]) {
-			dispatch(fetchWebhooksByChannelId({ channelId: allChannel[0].channel_id as string }));
+			dispatch(fetchWebhooksByChannelId({ channelId: allChannel[0].channel_id as string, noCache: true }));
 		}
-	}, [allChannel]);
+	}, [allChannel[0]]);
 
 	return (
 		<div className="sbm:mt-[60px] mt-[10px]">
