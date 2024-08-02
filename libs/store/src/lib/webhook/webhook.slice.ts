@@ -1,7 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiWebhook, ApiWebhookCreateRequest } from 'mezon-js/api.gen';
+import { ApiWebhook, ApiWebhookCreateRequest, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const INTEGRATION_WEBHOOK = 'integrationWebhook';
@@ -42,9 +42,6 @@ export const fetchWebhooksByChannelId = createAsyncThunk(
 				fetchWebhooksCached.clear(mezon, channelId);
 			}
 			const response = await fetchWebhooksCached(mezon, channelId);
-			if (!response.webhooks) {
-				throw new Error('Webhook list are null or undefined');
-			}
 			return response.webhooks;
 		} catch (error) {
 			console.log(error);
@@ -77,14 +74,30 @@ export const deleteWebhookById = createAsyncThunk('integration/deleteWebhook', a
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteWebhookById(mezon.session, webhook.id as string);
 		if (response) {
-			alert(`Deleted webhook successfully !`);
 			return webhook;
 		}
+		thunkAPI.rejectWithValue({});
 	} catch (err) {
 		console.log(err);
 		return thunkAPI.rejectWithValue(err);
 	}
 });
+
+export const updateWebhookBySpecificId = createAsyncThunk(
+	'integration/editWebhook',
+	async (data: { request: MezonUpdateWebhookByIdBody; webhookId: string | undefined; channelId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.updateWebhookById(mezon.session, data.webhookId as string, data.request);
+			if (response) {
+				thunkAPI.dispatch(fetchWebhooksByChannelId({ channelId: data.channelId, noCache: true }));
+			}
+		} catch (err) {
+			console.log(err);
+			return thunkAPI.rejectWithValue(err);
+		}
+	},
+);
 
 export const integrationWebhookSlice = createSlice({
 	name: INTEGRATION_WEBHOOK,
@@ -109,5 +122,5 @@ export const integrationWebhookSlice = createSlice({
 });
 
 export const getWebHookState = (rootState: { [INTEGRATION_WEBHOOK]: IWebHookState }): IWebHookState => rootState[INTEGRATION_WEBHOOK];
-export const selectAllWebhooks = createSelector(getWebHookState, (state) => state?.webhookList);
+export const selectAllWebhooks = createSelector(getWebHookState, (state) => state?.webhookList || []);
 export const integrationWebhookReducer = integrationWebhookSlice.reducer;
