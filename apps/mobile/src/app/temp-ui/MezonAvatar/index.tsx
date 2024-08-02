@@ -58,7 +58,7 @@ const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 				/>
 			</View>
 
-			{userStatus && <View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />}
+			{!!userStatus && <View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />}
 		</View>
 	);
 });
