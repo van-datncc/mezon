@@ -1,7 +1,8 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { ChannelStreamMode } from 'mezon-js';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import useShowName from './useShowName';
 
@@ -14,7 +15,6 @@ type IMessageHeadProps = {
 
 const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps) => {
 	const { messageTime } = useMessageParser(message);
-
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const panelRefShort = useRef<HTMLDivElement>(null);
@@ -85,7 +85,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 					role="button"
 					style={{ letterSpacing: '-0.01rem' }}
 				>
-					{nameShowed}
+					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? nameShowed : userDisplayName ? userDisplayName : username}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>
@@ -108,4 +108,4 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 	);
 };
 
-export default MessageHead;
+export default memo(MessageHead);

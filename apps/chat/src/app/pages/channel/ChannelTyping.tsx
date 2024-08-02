@@ -11,7 +11,7 @@ export function ChannelTyping({ channelId, mode }: ChannelTypingProps) {
 
 	const typingLabel = useMemo(() => {
 		if (typingUsers.length === 1) {
-			return `${typingUsers[0].user?.username} is typing...`;
+			return `${typingUsers[0].clan_nick || typingUsers[0].user?.display_name || typingUsers[0].user?.username} is typing...`;
 		}
 		if (typingUsers.length > 1) {
 			return 'Several people are typing...';
