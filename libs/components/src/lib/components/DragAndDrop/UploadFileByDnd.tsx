@@ -11,7 +11,7 @@ type FileUploadByDnDOpt = {
 
 function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 	const { setDraggingState } = useDragAndDrop();
-	const { setAttachmentData, setStatusLoadingAttachment } = useReference();
+	const { setStatusLoadingAttachment, setAttachmentData } = useReference(currentId);
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 
@@ -49,7 +49,7 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 		});
 		Promise.all(promises)
 			.then((attachments) => {
-				attachments.forEach((attachment) => setAttachmentData(attachment));
+				attachments.forEach((attachment) => setAttachmentData([attachment]));
 			})
 			.then(() => {
 				setStatusLoadingAttachment(false);
