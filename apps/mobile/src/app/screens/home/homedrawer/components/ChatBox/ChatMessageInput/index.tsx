@@ -1,7 +1,6 @@
 import { useChatSending, useDirectMessages, useEmojiSuggestion, useReference } from '@mezon/core';
 import { ActionEmitEvent, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectChannelsEntities } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -17,7 +16,6 @@ import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallba
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Dimensions, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from '../../../types';
@@ -50,6 +48,7 @@ interface IChatMessageInputProps {
 	voiceLinkRoomOnMessage?: ILinkVoiceRoomOnMessage[];
 	plainTextMessage?: string;
 	isShowCreateThread?: boolean;
+	channelsEntities?: any;
 }
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.72;
 
@@ -80,11 +79,11 @@ export const ChatMessageInput = memo(
 				voiceLinkRoomOnMessage,
 				plainTextMessage,
 				isShowCreateThread,
+				channelsEntities,
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>,
 		) => {
 			const [heightInput, setHeightInput] = useState(size.s_40);
-			const channelsEntities = useSelector(selectChannelsEntities);
 			const { themeValue } = useTheme();
 			const styles = style(themeValue);
 			const { attachmentDataRef, setAttachmentData } = useReference();

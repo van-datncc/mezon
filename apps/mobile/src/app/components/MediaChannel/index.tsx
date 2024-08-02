@@ -1,7 +1,7 @@
 import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectAttachmentPhoto } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Platform, ScrollView, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
@@ -29,27 +29,6 @@ const MediaChannel = () => {
 		},
 		[setVisibleImageModal, setIdxSelectedImageModal],
 	);
-
-	const createAttachmentObject = (attachment) => ({
-		source: {
-			uri: attachment.url,
-		},
-		filename: attachment.filename,
-		title: attachment.filename,
-		width: Metrics.screenWidth,
-		height: Metrics.screenHeight - 150,
-		url: attachment.url,
-		uri: attachment.url,
-		uploader: attachment.uploader,
-		create_time: attachment.create_time,
-	});
-
-	const formatAttachments = useMemo(() => {
-		const imageSelectedUrl = imageSelected ? createAttachmentObject(imageSelected) : {};
-		const attachmentObjects = attachments?.filter((u) => u.url !== imageSelected?.url).map(createAttachmentObject);
-
-		return [imageSelectedUrl, ...attachmentObjects];
-	}, [attachments, imageSelected]);
 
 	const onImageModalChange = useCallback(
 		(idx: number) => {
@@ -97,12 +76,12 @@ const MediaChannel = () => {
 			)}
 			{visibleImageModal ? (
 				<ImageListModal
-					data={formatAttachments}
 					visible={visibleImageModal}
 					idxSelected={idxSelectedImageModal}
 					onImageChange={onImageModalChange}
 					onClose={() => setVisibleImageModal(false)}
 					onImageChangeFooter={onImageFooterChange}
+					imageSelected={imageSelected}
 				/>
 			) : null}
 		</View>

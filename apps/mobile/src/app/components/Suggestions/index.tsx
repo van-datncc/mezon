@@ -3,7 +3,7 @@ import { selectAllEmojiSuggestion } from '@mezon/store';
 import { MentionDataProps } from '@mezon/utils';
 import { FC, memo, useEffect, useMemo } from 'react';
 import { Pressable } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native';
 import { useSelector } from 'react-redux';
 import UseMentionList from '../../hooks/useUserMentionList';
 import { EMessageActionType } from '../../screens/home/homedrawer/enums';

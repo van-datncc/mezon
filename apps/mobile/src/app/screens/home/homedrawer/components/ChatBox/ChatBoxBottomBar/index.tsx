@@ -482,6 +482,7 @@ export const ChatBoxBottomBar = memo(
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						plainTextMessage={plainTextMessage}
 						isShowCreateThread={isShowCreateThread}
+						channelsEntities={channelsEntities}
 					/>
 				</Block>
 			</Block>

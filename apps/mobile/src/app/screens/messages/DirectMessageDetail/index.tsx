@@ -5,6 +5,7 @@ import { Block, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelMembersActions,
+	clansActions,
 	directActions,
 	getStoreAsync,
 	selectCurrentChannel,
@@ -71,7 +72,11 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		if (!currentChannel) {
 			return;
 		}
-		await dispatch(
+		const store = await getStoreAsync();
+		store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
+		store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
+
+		store.dispatch(
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',
 				channelId: currentChannel?.channel_id || '',
@@ -83,6 +88,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
+		store.dispatch(clansActions.joinClan({ clanId: '0' }));
+		store.dispatch(clansActions.setCurrentClanId('0'));
 		store.dispatch(
 			directActions.joinDirectMessage({
 				directMessageId: currentDmGroup.id,
