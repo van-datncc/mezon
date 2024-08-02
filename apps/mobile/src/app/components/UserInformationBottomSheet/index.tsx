@@ -41,9 +41,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 			ref={bottomSheetRef}
 			snapPoints={snapPoints}
 			heightFitContent={true}
-			onDismiss={() => {
-				onClose();
-			}}
+			onDismiss={onClose}
 			style={styles.bottomSheet}
 			handleComponent={() => {
 				return (
@@ -53,7 +51,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 				);
 			}}
 		>
-			<UserProfile userId={userId} user={user} onClose={() => onClose()} showAction={showAction} showRole={showRole}></UserProfile>
+			<UserProfile userId={userId} user={user} onClose={onClose} showAction={showAction} showRole={showRole}></UserProfile>
 		</MezonBottomSheet>
 	);
 });

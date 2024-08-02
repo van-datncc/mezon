@@ -62,6 +62,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 	const { sendMessage } = useChatSending({
 		channelId: currentDirectMessage?.channel_id || currentChannel?.id || '',
 		mode: dmMode || channelMode,
+		directMessageId: currentDirectMessage?.channel_id || ''
 	});
 
 	const handleSend = useCallback(

@@ -88,6 +88,10 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 		[directMessageWithUser],
 	);
 
+	const onClose = useCallback(() => {
+		setSelectedUser(null)
+	}, [])
+
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 
 	return (
@@ -129,7 +133,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				showAction={false}
 			/>
 
-			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} showAction={false} showRole={false} />
+			<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />
 		</View>
 	);
 };

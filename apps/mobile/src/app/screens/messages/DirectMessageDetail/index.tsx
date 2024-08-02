@@ -237,6 +237,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 										DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
 									}}
 									bottomSheetRef={bottomPickerRef}
+									directMessageId={currentDmGroup?.id || ''}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
 								<AttachmentPicker currentChannelId={directMessageId} currentClanId={currentChannel?.clan_id} />

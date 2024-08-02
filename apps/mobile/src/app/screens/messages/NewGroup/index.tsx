@@ -79,6 +79,10 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 		}
 	};
 
+	const onClose = useCallback(() => {
+		setSelectedUser(null)
+	}, [])
+
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: themeValue.primary }}>
@@ -120,7 +124,7 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 						/>
 					</View>
 
-					<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} showAction={false} showRole={false} />
+					<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />
 				</View>
 			</TouchableWithoutFeedback>
 		</SafeAreaView>
