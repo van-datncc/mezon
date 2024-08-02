@@ -9,10 +9,12 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { Dropdown } from 'flowbite-react';
 import { Icons } from 'libs/components/src/lib/components';
 import { ApiMessageAttachment, ApiWebhook, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import ItemPanel from '../../../../PanelChannel/ItemPanel';
 import ModalSaveChanges from '../../../ClanSettingOverview/ModalSaveChanges';
 import DeleteWebhookPopup from './DeleteWebhookPopup';
 
@@ -86,11 +88,23 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const avatarRef = useRef<HTMLInputElement>(null);
 
+	const webhookChannel = useSelector(selectChannelById(webhookItem.channel_id as string));
+	const [dropdownValue, setDropdownValue] = useState(webhookChannel.channel_label);
+
 	const [dataForUpdate, setDataForUpdate] = useState<IDataForUpdate>({
 		channelIdForUpdate: webhookItem.channel_id,
 		webhookAvatarUrl: webhookItem.avatar,
 		webhookNameInput: webhookItem.webhook_name,
 	});
+
+	useEffect(() => {
+		setDataForUpdate({
+			channelIdForUpdate: webhookItem.channel_id,
+			webhookAvatarUrl: webhookItem.avatar,
+			webhookNameInput: webhookItem.webhook_name,
+		});
+		setDropdownValue(webhookChannel.channel_label);
+	}, [webhookItem.channel_id]);
 
 	const [hasChange, setHasChange] = useState<boolean>(false);
 
@@ -119,7 +133,7 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 			);
 		}
 	};
-	
+
 	const handleEditWebhook = async () => {
 		const request: MezonUpdateWebhookByIdBody = {
 			avatar: dataForUpdate.webhookAvatarUrl,
@@ -174,11 +188,11 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 									}
 									type="text"
 									value={dataForUpdate.webhookNameInput}
-									className="w-full dark:text-[#b5bac1] text-textLightTheme dark:bg-[#1e1f22] bg-bgLightModeThird p-[10px] rounded-sm outline-none"
+									className="w-full dark:text-[#b5bac1] text-textLightTheme dark:bg-[#1e1f22] bg-bgLightModeThird p-[10px] rounded-sm outline-none h-[50px]"
 								/>
 							</div>
-							<div className="w-1/2">
-								<div className="dark:text-[#b5bac1] text-textLightTheme text-[12px] mb-[10px]">
+							<div className="w-1/2 dark:text-[#b5bac1] text-textLightTheme">
+								<div className="text-[12px] mb-[10px]">
 									<b>CHANNEL</b>
 								</div>
 								<WebhookItemChannelDropdown
@@ -187,6 +201,8 @@ const ExpendedWebhookModal = ({ webhookItem, parentChannelsInClan }: IExpendedWe
 									setDataForUpdate={setDataForUpdate}
 									hasChange={hasChange}
 									dataForUpdate={dataForUpdate}
+									dropdownValue={dropdownValue}
+									setDropdownValue={setDropdownValue}
 								/>
 							</div>
 						</div>
@@ -217,6 +233,8 @@ interface IWebhookItemChannelDropdown {
 	dataForUpdate: IDataForUpdate;
 	setDataForUpdate: (dataForUpdate: IDataForUpdate) => void;
 	hasChange: boolean;
+	dropdownValue: string | undefined;
+	setDropdownValue: (label: string | undefined) => void;
 }
 
 const WebhookItemChannelDropdown = ({
@@ -225,14 +243,11 @@ const WebhookItemChannelDropdown = ({
 	setDataForUpdate,
 	hasChange,
 	dataForUpdate,
+	dropdownValue,
+	setDropdownValue,
 }: IWebhookItemChannelDropdown) => {
-	const webhookChannel = useSelector(selectChannelById(webhookItem.channel_id as string));
+	
 	const appearanceTheme = useSelector(selectTheme);
-	const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-	const toggleDropdown = () => {
-		setIsOpenDropdown(!isOpenDropdown);
-	};
-	const [dropdownValue, setDropdownValue] = useState(webhookChannel.channel_label);
 
 	useEffect(() => {
 		if (!hasChange) {
@@ -240,53 +255,43 @@ const WebhookItemChannelDropdown = ({
 				...dataForUpdate,
 				channelIdForUpdate: webhookItem.channel_id,
 			});
-			setDropdownValue(webhookChannel.channel_label);
 		}
 	}, [hasChange]);
 
 	return (
-		<div className="relative">
-			<button
-				id="dropdownDefaultButton"
-				onClick={toggleDropdown}
-				className="w-full p-[10px] cursor-pointer justify-between dark:text-[#b5bac1] text-textLightTheme dark:bg-[#1e1f22] bg-bgLightModeThird rounded-sm outline-none inline-flex items-center"
-				type="button"
-			>
-				<input
-					type="text"
-					className="outline-none border-none dark:bg-[#1e1f22] bg-bgLightModeThird cursor-pointer truncate"
-					readOnly
-					value={dropdownValue}
-				/>
-				<Icons.ArrowDown defaultSize="h-[15px] w-[15px] dark:text-[#b5bac1] text-black" />
-			</button>
-
-			{isOpenDropdown && (
-				<div
-					id="dropdown"
-					className={`${appearanceTheme === 'dark' ? 'thread-scroll' : 'customSmallScrollLightMode'} absolute w-full top-[50px] left-0 z-20 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 max-h-[300px] overflow-y-scroll`}
-				>
-					<div className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-						{parentChannelsInClan.map((channel) => (
-							<div
-								key={channel?.channel_id}
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white truncate cursor-pointer"
-								onClick={() => {
-									setDropdownValue(channel?.channel_label as string);
-									toggleDropdown();
-									setDataForUpdate({
-										...dataForUpdate,
-										channelIdForUpdate: channel.channel_id as string,
-									});
-								}}
-							>
-								{channel?.channel_label}
-							</div>
-						))}
+		<Dropdown
+			trigger="click"
+			renderTrigger={() => (
+				<div className="w-full h-[50px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex flex-row px-3 justify-between items-center">
+					<p>{dropdownValue}</p>
+					<div>
+						<Icons.ArrowDownFill />
 					</div>
 				</div>
 			)}
-		</div>
+			label=""
+			placement="bottom-end"
+			className={`dark:bg-black bg-white border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === "light" ? "customSmallScrollLightMode" : "thread-scroll"} z-20`}
+		>
+			{parentChannelsInClan.map((channel) => {
+				if (webhookItem.channel_id !== channel.channel_id) {
+					return (
+						<Dropdown.Item
+							key={channel.channel_id}
+							children={channel.channel_label ?? ''}
+							className='truncate'
+							onClick={() => {
+								setDataForUpdate({
+									...dataForUpdate,
+									channelIdForUpdate: channel.channel_id,
+								});
+								setDropdownValue(channel.channel_label);
+							}}
+						/>
+					);
+				}
+			})}
+		</Dropdown>
 	);
 };
 
