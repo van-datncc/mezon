@@ -29,6 +29,7 @@ import BottomKeyboardPicker from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
+import { EOpenSearchChannelFrom } from '../../../components/ThreadDetail/ActionRow';
 
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
@@ -222,8 +223,11 @@ const HomeDefaultHeader = React.memo(
 		}, [currentChannel?.parrent_id, channelsEntities]);
 
 		const navigateToSearchPage = () => {
-			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
-				screen: APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL,
+			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+        params: {
+          openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+        }
 			});
 		};
 		return (

@@ -29,6 +29,7 @@ import { ChannelListSection } from '../components/ChannelList/ChannelListSection
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
+import { EOpenSearchChannelFrom } from '../../../../../app/components/ThreadDetail/ActionRow';
 
 const ChannelList = React.memo((props: any) => {
 	const { themeValue } = useTheme();
@@ -122,8 +123,11 @@ const ChannelList = React.memo((props: any) => {
 	}
 
 	const navigateToSearchPage = () => {
-		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
-			screen: APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL,
+		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+      params: {
+        openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
+      }
 		});
 	};
 	return (
