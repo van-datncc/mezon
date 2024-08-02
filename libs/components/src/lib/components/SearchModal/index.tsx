@@ -6,7 +6,7 @@ import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import ListSearch from './listSearch';
+import ListSearchModal from './ListSearchModal';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -106,7 +106,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				clanId: item?.clan_id ?? '',
 				channelId: item?.channel_id ?? '',
 				lastSentTimeStamp: Number(item?.last_sent_message?.timestamp || 0),
-				type: TypeSearch.Channel_type,
+				type: TypeSearch.Channel_Type,
 			};
 		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
@@ -290,7 +290,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				>
 					{(!searchText.startsWith('@') && !searchText.startsWith('#')) ? (
 						<>
-							<ListSearch 
+							<ListSearchModal 
 								listSearch={totalsData}
 								itemRef={itemRef}
 								handleSelect={handleSelect}
@@ -305,7 +305,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 							{searchText.startsWith('@') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
-									<ListSearch 
+									<ListSearchModal 
 										listSearch={listMemSearch}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
@@ -318,7 +318,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 							{searchText.startsWith('#') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
-									<ListSearch 
+									<ListSearchModal 
 										listSearch={listChannelSearch}
 										itemRef={itemRef}
 										handleSelect={handleSelect}

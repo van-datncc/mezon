@@ -96,7 +96,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 							isHideStatus={false}
 							classParent="memberProfile"
 							positionType={MemberProfileType.FOOTER_PROFILE}
-							customStatus={userStatusProfile || userCustomStatus}
+							customStatus={userCustomStatus || userStatusProfile}
 						/>
 					</div>
 					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} />}
@@ -112,7 +112,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 					</Tooltip>
 				</div>
 			</button>
-			{showModalCustomStatus && <ModalCustomStatus setCustomStatus={setCustomStatus} customStatus={userStatusProfile || userCustomStatus} handleSaveCustomStatus={handleSaveCustomStatus} name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}
+			{showModalCustomStatus && <ModalCustomStatus setCustomStatus={setCustomStatus} customStatus={userCustomStatus || userStatusProfile } handleSaveCustomStatus={handleSaveCustomStatus} name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}
 		</>
 	);
 }

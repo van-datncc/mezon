@@ -7,7 +7,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MessageContent from '../MessageWithUser/MessageContent';
-import ListSearch from './listSearch';
+import { default as ListSearch, default as ListSearchForwardMessage } from './ListSearchForwardMessage';
 type ModalParam = {
 	openModal: boolean;
 };
@@ -117,7 +117,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 				clanId: item?.clan_id ?? '',
 				channel_label: item?.channel_label ?? '',
 				lastSentTimeStamp: item.last_sent_message?.timestamp,
-				typeSearch: TypeSearch.Channel_type,
+				typeSearch: TypeSearch.Channel_Type,
 			};
 		});
 		return list;
@@ -152,7 +152,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}>
 						{(!searchText.startsWith('@') && !searchText.startsWith('#')) ? (
 							<>
-								<ListSearch 
+								<ListSearchForwardMessage 
 									listSearch={totalsSearch}
 									searchText={searchText}
 									selectedObjectIdSends={selectedObjectIdSends}
