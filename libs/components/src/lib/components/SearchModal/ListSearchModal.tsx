@@ -1,7 +1,7 @@
 import { TypeSearch } from "@mezon/utils";
 import SuggestItem from "../MessageBox/ReactionMentionInput/SuggestItem";
 
-type ListSearchProps = {
+type ListSearchModalProps = {
     listSearch: any;
     searchText: string;
     itemRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -10,7 +10,7 @@ type ListSearchProps = {
     setIdActive: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const ListSearch = (props: ListSearchProps) => {
+const ListSearchModal = (props: ListSearchModalProps) => {
     const {listSearch, itemRef, searchText, idActive, handleSelect, setIdActive} = props;
     return (
         listSearch.length
@@ -19,7 +19,7 @@ const ListSearch = (props: ListSearchProps) => {
                 .sort((a: any, b: any) => b.lastSentTimeStamp - a.lastSentTimeStamp)
                 .slice(0, 15)
                 .map((item: any) => {
-                    const isTypeChannel = item.type === TypeSearch.Channel_type;
+                    const isTypeChannel = item.type === TypeSearch.Channel_Type;
                     return (
                         <div
                             ref={itemRef}
@@ -58,4 +58,4 @@ const ListSearch = (props: ListSearchProps) => {
     )
 }
 
-export default ListSearch;
+export default ListSearchModal;

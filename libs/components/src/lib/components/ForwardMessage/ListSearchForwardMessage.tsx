@@ -2,14 +2,14 @@ import { Checkbox } from "@mezon/ui";
 import { TypeSearch } from "@mezon/utils";
 import SuggestItem from "../MessageBox/ReactionMentionInput/SuggestItem";
 
-type ListSearchProps = {
+type ListSearchForwardMessageProps = {
     listSearch: any[];
     searchText: string;
     selectedObjectIdSends: any[];
     handleToggle: (id: string, type: number, clanId?: string, channel_label?: string) => void;
 }
 
-const ListSearch = (props: ListSearchProps) => {
+const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
     const {listSearch, searchText, selectedObjectIdSends, handleToggle} = props;
     return (
         listSearch.length
@@ -48,7 +48,7 @@ const ListSearch = (props: ListSearchProps) => {
             ))
 }
 
-export default ListSearch;
+export default ListSearchForwardMessage;
 
 type ItemDmProps = {
     id: string;

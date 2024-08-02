@@ -619,5 +619,5 @@ export enum SlugPermission {
 
 export enum TypeSearch {
 	Dm_Type = 1,
-	Channel_type = 2,
+	Channel_Type = 2,
 }
