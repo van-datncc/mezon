@@ -1,6 +1,6 @@
 import { ICategory, LoadingStatus, SortChannel } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiCategoryDesc, ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
+import {ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest} from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
@@ -29,6 +29,11 @@ export const categoriesAdapter = createEntityAdapter<CategoriesEntity>();
 type fetchCategoriesPayload = {
 	clanId: string;
 };
+
+type updatCategoryPayload = {
+  clanId: string;
+  request: ApiUpdateCategoryDescRequest;
+}
 export const fetchCategories = createAsyncThunk('categories/fetchCategories', async ({ clanId }: fetchCategoriesPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.listCategoryDescs(mezon.session, clanId);
@@ -52,6 +57,16 @@ export const createNewCategory = createAsyncThunk('categories/createCategories',
 		return thunkAPI.rejectWithValue([]);
 	}
 });
+
+export const updateCategory = createAsyncThunk('categories/updateCategory', async({clanId, request}: updatCategoryPayload, thunkAPI) => {
+    try {
+      const mezon = await ensureSession(getMezonCtx(thunkAPI));
+      const response = await mezon.client.updateCategory(mezon.session, request);
+      thunkAPI.dispatch(fetchCategories({clanId}))
+    } catch (error) {
+      return thunkAPI.rejectWithValue([])
+    }
+})
 
 export const initialCategoriesState: CategoriesState = categoriesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -126,7 +141,7 @@ export const categoriesReducer = categoriesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const categoriesActions = { ...categoriesSlice.actions, fetchCategories, createNewCategory };
+export const categoriesActions = { ...categoriesSlice.actions, fetchCategories, createNewCategory, updateCategory };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.

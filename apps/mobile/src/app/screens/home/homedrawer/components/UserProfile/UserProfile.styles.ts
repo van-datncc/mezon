@@ -1,4 +1,4 @@
-import { Attributes, Colors, size } from '@mezon/mobile-ui';
+import { Attributes, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -73,18 +73,18 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: 8,
-		backgroundColor: Colors.bgGrayLight,
+		backgroundColor: colors.charcoal,
 		minWidth: 80,
 		padding: size.s_6,
 		borderRadius: 8,
 	},
 	textRole: {
-		color: colors.text,
+		color: colors.white,
 		fontSize: size.medium,
 		fontWeight: '400',
 	},
 	title: {
-		color: Colors.white,
+		color: colors.white,
 		fontSize: size.label,
 		fontWeight: '600',
 		marginBottom: size.s_10,
@@ -94,4 +94,18 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontSize: size.medium,
 		fontWeight: '400',
 	},
+	defaultText: {
+		color: colors.white,
+		textAlign: 'center'
+	},
+	button: {
+		flex: 1,
+		paddingVertical: size.s_6,
+		borderRadius: size.s_2
+	},
+	receivedFriendRequestTitle: {
+		color: colors.text,
+		fontSize: size.h7,
+		fontWeight: 'bold'
+	}
 });

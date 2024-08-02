@@ -5,7 +5,6 @@ import {
 	authActions,
 	channelsActions,
 	clansActions,
-	directActions,
 	emojiSuggestionActions,
 	friendsActions,
 	getStoreAsync,
@@ -69,7 +68,7 @@ const NavigationMain = () => {
 	useEffect(() => {
 		let timer;
 		if (isLoggedIn) {
-			dispatch(appActions.setLoadingMainMobile(true));
+			// dispatch(appActions.setLoadingMainMobile(true));
 			timer = delay(initAppLoading, 800);
 		}
 
@@ -95,8 +94,7 @@ const NavigationMain = () => {
 	useEffect(() => {
 		let timeout: string | number | NodeJS.Timeout;
 		const appStateSubscription = AppState.addEventListener('change', (state) => {
-			if (isLoggedIn)
-				timeout = delay(handleAppStateChange, 200, state);
+			if (isLoggedIn) timeout = delay(handleAppStateChange, 200, state);
 		});
 		return () => {
 			appStateSubscription.remove();
@@ -192,29 +190,52 @@ const NavigationMain = () => {
 	const mainLoader = async ({ isFromFCM = false }) => {
 		try {
 			const store = await getStoreAsync();
-			await store.dispatch(notificationActions.fetchListNotification());
-			await store.dispatch(friendsActions.fetchListFriends({}));
-			const clanResp = await store.dispatch(clansActions.fetchClans());
-			await store.dispatch(gifsActions.fetchGifCategories());
-			await store.dispatch(gifsActions.fetchGifCategoryFeatured());
-			await store.dispatch(clansActions.joinClan({ clanId: '0' }));
-			dispatch(appActions.setLoadingMainMobile(false));
+			const promises = [];
 
-			// If is from FCM don't join current clan
+			// Fetch messages if currentChannelId is available
+			if (currentChannelId) {
+				promises.push(
+					store.dispatch(messagesActions.fetchMessages({ channelId: currentChannelId, noCache: true, isFetchingLatestMessages: true })),
+				);
+			}
+
+			// If not from FCM, join current clan and fetch channels
 			if (!isFromFCM) {
+				promises.push(store.dispatch(clansActions.fetchClans()));
+
 				if (currentClanId) {
 					save(STORAGE_CLAN_ID, currentClanId);
-					await store.dispatch(clansActions.joinClan({ clanId: currentClanId }));
-					await store.dispatch(clansActions.changeCurrentClan({ clanId: currentClanId, noCache: true }));
-					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
+					promises.push(store.dispatch(clansActions.joinClan({ clanId: currentClanId })));
+					promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: currentClanId, noCache: true })));
+					promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true })));
+				}
+			}
+
+			// Additional API calls
+			promises.push(store.dispatch(notificationActions.fetchListNotification()));
+			promises.push(store.dispatch(friendsActions.fetchListFriends({})));
+			promises.push(store.dispatch(gifsActions.fetchGifCategories()));
+			promises.push(store.dispatch(gifsActions.fetchGifCategoryFeatured()));
+			promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
+
+			// Execute all promises concurrently
+			const results = await Promise.all(promises);
+
+			// Handle results if necessary
+			if (!isFromFCM) {
+				const respChannel = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
+				if (respChannel && currentClanId) {
 					await setDefaultChannelLoader(respChannel.payload, currentClanId);
 				} else {
-					await store.dispatch(directActions.fetchDirectMessage({}));
-					await setCurrentClanLoader(clanResp.payload);
+					const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
+
+					if (clanResp && !currentClanId) {
+						await setCurrentClanLoader(clanResp.payload);
+					}
 				}
-			} else {
-				await store.dispatch(directActions.fetchDirectMessage({}));
 			}
+
+			dispatch(appActions.setLoadingMainMobile(false));
 			return null;
 		} catch (error) {
 			console.log('error mainLoader', error);

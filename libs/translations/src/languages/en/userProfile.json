@@ -2,7 +2,9 @@
   "userAction": {
     "sendMessage": "Message",
     "voiceCall": "VoiceCall",
-    "videoCall": "VideoCall"
+    "videoCall": "VideoCall",
+    "addFriend": "Add Friend",
+    "pending": "Pending"
   },
   "aboutMe": {
     "headerTitle": "ABOUT ME",
@@ -15,5 +17,16 @@
     "description":"Are you sure you want to kick {{userName}} from the clan? They will be able to rejoin again with a new invite.",
     "reasonKick": "REASON FOR KICK",
     "buttonName": "Kick"
-  }
+  },
+  "pendingContent": {
+    "block": "Block",
+    "reportUserProfile": "Report User Profile",
+    "acceptFriend": "Accept Friend",
+    "cancelFriendRequest": "Cancel Friend Request",
+    "copyUsername": "Copy Username",
+    "copiedUserName": "Copied '{{username}}'"
+  },
+  "incomingFriendRequest": "INCOMING FRIEND REQUEST",
+  "accept": "Accept",
+  "ignore": "Ignore"
 }

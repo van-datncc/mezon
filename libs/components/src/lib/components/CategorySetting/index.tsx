@@ -1,0 +1,67 @@
+import React, { useState } from "react";
+import { Icons }  from "@mezon/ui";
+import ExitSetting from "../ChannelSetting/exitSetting";
+import { categorySettingItem, categorySettingList, ItemObjProps } from "../ClanSettings/ItemObj";
+import CategorySettingSidebar from "./CategorySettingSidebar";
+import OverviewSetting from "./OverviewSetting";
+import {ICategory} from "@mezon/utils";
+
+interface ICategorySettingProps {
+  onClose: () => void,
+  category: ICategory | null
+}
+
+const CategorySetting: React.FC<ICategorySettingProps> = ({onClose, category}) => {
+  const [menu, setMenu] = useState(true);
+  const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
+  const [currentSetting, setCurrentSetting] = useState<ItemObjProps> (categorySettingList[0])
+  
+  const handleSettingItemClick = (settingItem: ItemObjProps) => {
+    setCurrentSetting(settingItem);
+  };
+  
+  return (
+    <div className="flex fixed inset-0  w-screen z-10" onMouseDown={(event) => event.stopPropagation()} role="button">
+      <div className="flex text-gray- w-screen relative text-white">
+        <div className="h-fit absolute top-5 right-5 block sbm:hidden z-[1]">
+          <button
+            className="bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out"
+            onClick={onClose}
+          >
+            X
+          </button>
+        </div>
+        <div className="h-fit absolute top-5 left-5 block sbm:hidden z-[1]">
+          <button
+            className={`bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out flex justify-center items-center ${menu ? 'rotate-90' : '-rotate-90'}`}
+            onClick={() => setMenu(!menu)}
+          >
+            <Icons.ArrowDown defaultFill="white" defaultSize="w-[20px] h-[30px]" />
+          </button>
+        </div>
+        <div
+          className={`overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-white dark:text-white text-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow`}
+        >
+          <CategorySettingSidebar
+            onClickItem={handleSettingItemClick}
+            handleMenu={(value: boolean) => setMenu(value)}
+            currentSetting={currentSetting}
+            setIsShowDeletePopup={() => setIsShowDeletePopup(true)}
+            categoryName={category?.category_name || ''}
+          />
+        </div>
+        <div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
+          <div className="dark:text-white text-black text-[15px]">
+            <h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme sbm:mt-[60px] mt-[10px]">
+              {currentSetting.name}
+              {currentSetting.id === categorySettingItem.OVERVIEW && <OverviewSetting category={category}/>}
+            </h2>
+          </div>
+        </div>
+        <ExitSetting onClose={onClose} />
+      </div>
+    </div>
+  )
+}
+
+export default CategorySetting;

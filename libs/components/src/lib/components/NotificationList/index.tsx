@@ -9,7 +9,10 @@ import NotificationItem from './NotificationItem';
 
 export type MemberListProps = { className?: string };
 
-export type NotificationProps = { unReadList?: string[] };
+export type NotificationProps = {
+	unReadList?: string[];
+	onClose?: () => void;
+};
 
 const InboxType = {
 	INDIVIDUAL: 'individual',
@@ -23,7 +26,7 @@ const tabDataNotify = [
 	{ title: 'Mentions', value: InboxType.MENTIONS },
 ];
 
-function NotificationList({ unReadList }: NotificationProps) {
+function NotificationList({ unReadList, onClose }: NotificationProps) {
 	const dispatch = useDispatch();
 
 	const { notification } = useNotification();
@@ -97,7 +100,7 @@ function NotificationList({ unReadList }: NotificationProps) {
 				>
 					{currentTabNotify === InboxType.INDIVIDUAL &&
 						notificationItem.map((notify: INotification, index: number) => {
-							return <NotificationItem notify={notify} key={`individual-${notify.id}-${index}`} />;
+							return <NotificationItem notify={notify} key={`individual-${notify?.id}-${index}`} />;
 						})}
 
 					{currentTabNotify === InboxType.UNREADS && unreadListConverted.length > 0 && (
@@ -106,7 +109,12 @@ function NotificationList({ unReadList }: NotificationProps) {
 
 					{currentTabNotify === InboxType.MENTIONS &&
 						notifyMentionItem.map((notification: INotification, index: number) => (
-							<NotificationChannel isUnreadTab={false} unreadListConverted={[]} notification={notification} />
+							<NotificationChannel
+								key={`mention-${notification?.id}-${index}`}
+								isUnreadTab={false}
+								unreadListConverted={[]}
+								notification={notification}
+							/>
 						))}
 				</div>
 			</div>

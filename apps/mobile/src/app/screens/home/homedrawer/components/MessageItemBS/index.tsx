@@ -176,7 +176,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleActionMarkUnRead = () => {
-		console.log('MarkUnRead');
+		Toast.show({ type: 'info', text1: 'Updating...' })
 	};
 
 	const handleActionMention = () => {
@@ -189,7 +189,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleActionCopyMessageLink = () => {
-		console.log('CopyMessageLink');
+		Toast.show({ type: 'info', text1: 'Updating...' })
 	};
 
 	const handleActionCopyMediaLink = () => {
@@ -208,7 +208,6 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			const url = media[0].url;
 			const type = media?.[0]?.filetype?.split?.('/');
 			const filePath = await downloadImage(url, type[1]);
-			console.log(filePath);
 
 			if (filePath) {
 				await saveImageToCameraRoll('file://' + filePath, type[0]);
@@ -352,7 +351,13 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 				(action) => ![...listOfActionOnlyMyMessage, ...listOfActionShouldHide].includes(action.type),
 			);
 		}
-		const mediaList = message?.attachments?.length > 0 ? [] : [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
+		const mediaList = message?.attachments?.length > 0 &&
+			message.attachments?.every(
+				att => att?.filetype?.includes("image") ||
+					att?.filetype?.includes("video"))
+			? []
+			: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
+
 		const frequentActionList = [EMessageActionType.EditMessage, EMessageActionType.Reply, EMessageActionType.CreateThread];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
@@ -364,7 +369,13 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	}, [t, userProfile, message, listPinMessages, isDM, userPermissionsStatus, isClanOwner]);
 
 	const renderUserInformation = () => {
-		return <UserProfile userId={user?.id} user={user} message={message} checkAnonymous={checkAnonymous}></UserProfile>;
+		return <UserProfile
+			userId={user?.id}
+			user={user}
+			message={message}
+			checkAnonymous={checkAnonymous}
+			showAction={!isDM}
+		/>
 	};
 
 	const handleReact = async (mode, messageId, emoji: string, senderId) => {

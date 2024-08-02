@@ -51,7 +51,6 @@ import {
 	ThreadValue,
 	UsersClanEntity,
 	focusToElement,
-	neverMatchingRegex,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
@@ -231,8 +230,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
-	const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
-	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(content);
+	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
+	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -308,7 +307,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				} else {
 					props.onSend(
 						{
-							t: content.trim(),
+							t: content,
 							mentions: mentionList,
 							hashtags: hashtagList,
 							emojis: emojiList,
@@ -614,15 +613,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						return `@${display}`;
 					}}
 					renderSuggestion={(suggestion: MentionDataProps) => {
+						const avatar = suggestion.clanAvatar ? suggestion.clanAvatar : suggestion.avatarUrl;
+
 						return (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display === 'here' ? '@here' : (suggestion.displayName ?? '')}
-								avatarUrl={suggestion.avatarUrl ?? ''}
+								name={suggestion.display === 'here' ? '@here' : suggestion.display ?? ''}
+								displayName={suggestion.displayName}
+								clanNickname={suggestion.clanNick}
+								avatarUrl={avatar ?? ''}
 								subText={
 									suggestion.display === 'here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.display ?? '')
+										: suggestion.display ?? ''
 								}
 								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== 'here'}
@@ -648,16 +651,21 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
+							isHashtag={true}
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention
 					trigger=":"
-					markup="__id__"
-					regex={neverMatchingRegex}
+					markup="[:__display__]"
 					data={queryEmojis}
-					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
+					displayTransform={(id: any, display: any) => {
+						return `${display}`;
+					}}
+					renderSuggestion={(suggestion) => (
+						<SuggestItem name={suggestion.display ?? ''} isEmoji={true} symbol={(suggestion as any).emoji} />
+					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}
 				/>

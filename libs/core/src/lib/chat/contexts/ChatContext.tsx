@@ -14,7 +14,9 @@ import {
 	pinMessageActions,
 	reactionActions,
 	selectCurrentChannel,
+	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectDmGroupCurrentId,
 	toastActions,
 	useAppDispatch,
 	voiceActions,
@@ -66,6 +68,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentDirectId = useSelector(selectDmGroupCurrentId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
@@ -101,12 +105,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const senderId = message.sender_id;
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
-
 			mess.isMe = senderId === userId;
-			mess.isCurrentChannel = message.channel_id === directId;
-			if (directId === undefined) {
-				mess.isCurrentChannel = message.channel_id === channelId;
+			const isMobile = directId === undefined && channelId === undefined;
+
+			mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
+
+			if ((directId === undefined && !isMobile) || (isMobile && !currentDirectId)) {
+				const idToCompare = !isMobile ? channelId : currentChannelId;
+				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
+
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -115,7 +123,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
-		[dispatch, userId, channelId, directId],
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId],
 	);
 
 	const onchannelpresence = useCallback(
@@ -134,6 +142,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		async (notification: Notification) => {
+			console.log(notification);
 			if (currentChannel?.channel_id !== (notification as any).channel_id) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));

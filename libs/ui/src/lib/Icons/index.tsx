@@ -2232,17 +2232,23 @@ export const ViewRole: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	};
 
 	return (
-		<svg 
+		<svg
 			className={isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}
-			role="img" 
-			xmlns="http://www.w3.org/2000/svg" 
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
 			onClick={handleClick}
-			width="20" height="20" fill="none" viewBox="0 0 24 24"
+			width="20"
+			height="20"
+			fill="none"
+			viewBox="0 0 24 24"
 		>
-			<path fill="currentColor" d="M15.56 11.77c.2-.1.44.02.44.23a4 4 0 1 1-4-4c.21 0 .33.25.23.44a2.5 2.5 0 0 0 3.32 3.32Z">
-			</path>
-			<path fill="currentColor" fillRule="evenodd" d="M22.89 11.7c.07.2.07.4 0 .6C22.27 13.9 19.1 21 12 21c-7.11 0-10.27-7.11-10.89-8.7a.83.83 0 0 1 0-.6C1.73 10.1 4.9 3 12 3c7.11 0 10.27 7.11 10.89 8.7Zm-4.5-3.62A15.11 15.11 0 0 1 20.85 12c-.38.88-1.18 2.47-2.46 3.92C16.87 17.62 14.8 19 12 19c-2.8 0-4.87-1.38-6.39-3.08A15.11 15.11 0 0 1 3.15 12c.38-.88 1.18-2.47 2.46-3.92C7.13 6.38 9.2 5 12 5c2.8 0 4.87 1.38 6.39 3.08Z" clipRule="evenodd">
-			</path>
+			<path fill="currentColor" d="M15.56 11.77c.2-.1.44.02.44.23a4 4 0 1 1-4-4c.21 0 .33.25.23.44a2.5 2.5 0 0 0 3.32 3.32Z"></path>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M22.89 11.7c.07.2.07.4 0 .6C22.27 13.9 19.1 21 12 21c-7.11 0-10.27-7.11-10.89-8.7a.83.83 0 0 1 0-.6C1.73 10.1 4.9 3 12 3c7.11 0 10.27 7.11 10.89 8.7Zm-4.5-3.62A15.11 15.11 0 0 1 20.85 12c-.38.88-1.18 2.47-2.46 3.92C16.87 17.62 14.8 19 12 19c-2.8 0-4.87-1.38-6.39-3.08A15.11 15.11 0 0 1 3.15 12c.38-.88 1.18-2.47 2.46-3.92C7.13 6.38 9.2 5 12 5c2.8 0 4.87 1.38 6.39 3.08Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 };
@@ -3242,6 +3248,29 @@ export function WindowIcon(props: React.HTMLAttributes<SVGElement>) {
 						fill="#00ADEF"
 					></path>
 				</g>
+			</g>
+		</svg>
+	);
+}
+
+export function MessageIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" {...props}>
+			<path fill="currentColor" d="M12 22a10 10 0 1 0-8.45-4.64c.13.19.11.44-.04.61l-2.06 2.37A1 1 0 0 0 2.2 22H12Z"></path>
+		</svg>
+	);
+}
+
+export function SelectFileIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 18 18" width="18" className='' {...props}>
+			<g fill="none" fillRule="evenodd">
+				<path d="m0 0h18v18h-18z" />
+				<path
+					d="m13.5 8.25v4.5c0 .8284271-.6715729 1.5-1.5 1.5h-10.5c-.82842712 0-1.5-.6715729-1.5-1.5v-10.5c0-.82842712.67157288-1.5 1.5-1.5h7.5-3v1.5h-4.5v10.5h10.5v-4.5zm-5.28-.5325 2.655 3.5325h-8.25l2.0625-2.6475 1.47 1.77zm3.78-5.4675h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25v-2.25h1.5z"
+					fill="#4f545c"
+					transform="translate(2.25 1.5)"
+				/>
 			</g>
 		</svg>
 	);

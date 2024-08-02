@@ -35,8 +35,8 @@ export const ActionRow = React.memo(() => {
 		{
 			title: 'Search',
 			action: () => {
-				//
-			},
+        navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL});
+       },
 			icon: <Icons.MagnifyingIcon width={22} height={22} color={themeValue.text} />,
 			isShow: true,
 			type: EActionRow.Search
