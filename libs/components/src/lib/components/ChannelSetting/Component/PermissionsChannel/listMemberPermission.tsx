@@ -67,9 +67,8 @@ type ItemMemberPermissionProps =  {
 
 const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 	const {id='', userName='', displayName='', avatar='', onDelete} = props;
-	const [checkClanOwner, checkChannelOwner] = useCheckOwnerForUser();
+	const [checkClanOwner] = useCheckOwnerForUser();
 	const isClanOwner = checkClanOwner(id);
-	const isChannelOwner = checkChannelOwner(id);
 	return(
 		<div className={`flex justify-between py-2 rounded`} key={id}>
 			<div className="flex gap-x-2 items-center">
@@ -85,12 +84,11 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 			<div className="flex items-center gap-x-2">
 				<p className="text-xs text-[#AEAEAE]">
 					{isClanOwner && 'Clan Owner'}
-					{(isChannelOwner && !isClanOwner) && 'Channel Owner'}
 				</p>
-				<div onClick={!isChannelOwner ? () => onDelete() : ()=>{}} role="button">
+				<div onClick={!isClanOwner ? () => onDelete() : ()=>{}} role="button">
 					<Icons.EscIcon
-						defaultSize={`${isChannelOwner ? '' : 'cursor-pointer'} size-[15px]`}
-						defaultFill={isChannelOwner ? '#4C4D55' : '#AEAEAE'}
+						defaultSize={`${isClanOwner ? 'cursor-not-allowed' : 'cursor-pointer'} size-[15px]`}
+						defaultFill={isClanOwner ? '#4C4D55' : '#AEAEAE'}
 					/>
 				</div>
 			</div>
