@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCategory } from '@mezon/core';
-import { Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
+import { EOpenSearchChannelFrom, Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -123,8 +123,11 @@ const ChannelList = React.memo((props: any) => {
 	}
 
 	const navigateToSearchPage = () => {
-		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
-			screen: APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL,
+		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+      params: {
+        openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
+      }
 		});
 	};
 	return (
