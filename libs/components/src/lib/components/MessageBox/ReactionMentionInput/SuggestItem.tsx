@@ -7,11 +7,12 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Icons } from '../../../components';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
+import useShowName from '../../MessageWithUser/useShowName';
 
 type SuggestItemProps = {
 	avatarUrl?: string;
 	symbol?: string;
-	name: string;
+	username?: string;
 	displayName?: string;
 	clanNickname?: string;
 	subText?: string;
@@ -29,7 +30,7 @@ const SuggestItem = ({
 	isOpenSearchModal,
 	avatarUrl,
 	symbol,
-	name,
+	username,
 	displayName,
 	clanNickname,
 	channelId,
@@ -42,7 +43,7 @@ const SuggestItem = ({
 	isEmoji,
 }: SuggestItemProps) => {
 	const { emojis } = useEmojiSuggestion();
-	const urlEmoji = getSrcEmoji(name, emojis);
+	const urlEmoji = getSrcEmoji(clanNickname ?? '', emojis);
 	const allChannels = useSelector(selectAllChannels);
 	const { directId } = useParams();
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
@@ -71,6 +72,8 @@ const SuggestItem = ({
 		}
 	}, []);
 
+	const nameShowed = useShowName(clanNickname ?? '', displayName ?? '', username ?? '', '');
+
 	return (
 		<div className={`flex flex-row items-center h-[24px] ${wrapSuggestItemStyle ?? 'justify-between'}`}>
 			<div className="flex flex-row items-center gap-2 py-[3px]">
@@ -96,27 +99,13 @@ const SuggestItem = ({
 				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 				)}
-				{isHashtag && (
+
+				{nameShowed && !isHashtag && !isEmoji && (
 					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">
-						{HighlightMatch(name ?? '', valueHightLight ?? '')}
-					</span>
-				)}
-				{isEmoji && (
-					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
-						{HighlightMatch(name ?? '', valueHightLight ?? '')}
+						{HighlightMatch(nameShowed ?? '', valueHightLight ?? '')}
 					</span>
 				)}
 
-				{clanNickname && (
-					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">
-						{HighlightMatch(clanNickname ?? '', valueHightLight ?? '')}
-					</span>
-				)}
-				{displayName && (
-					<span className='text-[15px] font-thin dark:text-white text-textLightTheme one-line' >
-						{HighlightMatch(displayName, valueHightLight ?? '')}
-					</span>
-				)}
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}
 			</div>
 			<span className={`text-[10px] font-semibold text-[#A1A1AA] one-line ${subTextStyle}`}>

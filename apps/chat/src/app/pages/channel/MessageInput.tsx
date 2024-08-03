@@ -233,7 +233,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 							return (
 								<SuggestItem
 									valueHightLight={valueHighlight}
-									name={suggestion.display === 'here' ? '@here' : suggestion.display ?? ''}
+									username={suggestion?.user?.username}
 									displayName={suggestion.displayName}
 									clanNickname={suggestion.clanNick}
 									avatarUrl={avatar ?? ''}
@@ -262,11 +262,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						renderSuggestion={(suggestion) => (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display ?? ''}
+								clanNickname={suggestion.display ?? ''}
 								symbol="#"
 								subText={(suggestion as ChannelsMentionProps).subText}
 								channelId={suggestion.id}
-								isHashtag={true}
 							/>
 						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -278,9 +277,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						renderSuggestion={(suggestion) => (
-							<SuggestItem name={suggestion.display ?? ''} isEmoji={true} symbol={(suggestion as any).emoji} />
-						)}
+						renderSuggestion={(suggestion) => <SuggestItem clanNickname={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 						appendSpaceOnAdd={true}
 					/>

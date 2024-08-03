@@ -244,6 +244,12 @@ export const checkLastChar = (text: string) => {
 	}
 };
 
+const getNameForSorting = (clanNickname: string, displayName: string, username: string) => {
+	if (clanNickname && clanNickname !== username) return clanNickname;
+	if (clanNickname === username && displayName) return displayName;
+	return username;
+};
+
 export function searchMentionsHashtag(searchValue: any, list: any[]) {
 	if (!searchValue) return list;
 	const lowerCaseSearchValue = searchValue.toLowerCase();
@@ -257,45 +263,14 @@ export function searchMentionsHashtag(searchValue: any, list: any[]) {
 			);
 		})
 		.sort((a, b) => {
-			const displayA = a.display?.toLowerCase();
-			const displayB = b.display?.toLowerCase();
-			const displayNameA = a.displayName?.toLowerCase();
-			const displayNameB = b.displayName?.toLowerCase();
-			const clanNickA = a.clanNick?.toLowerCase();
-			const clanNickB = b.clanNick?.toLowerCase();
+			const nameA = getNameForSorting(a.clanNick, a.displayName, a.display)?.toLowerCase() ?? '';
+			const nameB = getNameForSorting(b.clanNick, b.displayName, b.display)?.toLowerCase() ?? '';
 
-			const indexA = displayA?.indexOf(lowerCaseSearchValue);
-			const indexB = displayB?.indexOf(lowerCaseSearchValue);
-			const indexNameA = displayNameA?.indexOf(lowerCaseSearchValue);
-			const indexNameB = displayNameB?.indexOf(lowerCaseSearchValue);
-			const indexClanA = clanNickA?.indexOf(lowerCaseSearchValue);
-			const indexClanB = clanNickB?.indexOf(lowerCaseSearchValue);
+			const indexA = nameA.indexOf(lowerCaseSearchValue);
+			const indexB = nameB.indexOf(lowerCaseSearchValue);
 
-			// Find the first occurrence of the search value in any of the fields
-			const firstA = Math.min(
-				indexClanA !== -1 ? indexClanA : Infinity,
-				indexNameA !== -1 ? indexNameA : Infinity,
-				indexA !== -1 ? indexA : Infinity,
-			);
-			const firstB = Math.min(
-				indexClanB !== -1 ? indexClanB : Infinity,
-				indexNameB !== -1 ? indexNameB : Infinity,
-				indexB !== -1 ? indexB : Infinity,
-			);
-
-			// Prioritize clanNick over displayName and display
-			if (indexClanA !== -1 && indexClanB === -1) {
-				return -1;
-			} else if (indexClanA === -1 && indexClanB !== -1) {
-				return 1;
-			} else if (indexClanA !== -1 && indexClanB !== -1) {
-				return indexClanA - indexClanB;
-			} else if (firstA !== firstB) {
-				return firstA - firstB;
-			} else {
-				// If the first occurrence is the same, sort lexicographically by clanNick, displayName, then display
-				return clanNickA.localeCompare(clanNickB) || displayNameA.localeCompare(displayNameB) || displayA.localeCompare(displayB);
-			}
+			if (indexA !== indexB) return indexA - indexB;
+			return nameA.localeCompare(nameB);
 		});
 }
 
