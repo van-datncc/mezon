@@ -159,6 +159,7 @@ function MemberProfile({
 						alt={userName}
 						userName={userNameAva ?? userName}
 						className="min-w-8 min-h-8 max-w-8 max-h-8"
+						classNameText='font-semibold'
 						src={avatar}
 						isAnonymous={isAnonymous}
 					/>

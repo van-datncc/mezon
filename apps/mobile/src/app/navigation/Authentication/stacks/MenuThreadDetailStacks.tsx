@@ -126,13 +126,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL}
 				component={MuteThreadDetailModal}
 			/>
-      <Stack.Screen
-				name={APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL}
-				component={SearchMessageChannel}
-				options={{
-					headerShown: false,
-				}}
-			/>
+
 		</Stack.Navigator>
 	);
 };

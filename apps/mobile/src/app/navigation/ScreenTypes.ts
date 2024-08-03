@@ -1,3 +1,4 @@
+import { EOpenSearchChannelFrom } from "@mezon/mobile-components";
 import { DirectEntity } from "@mezon/store-mobile";
 import { IChannel, OptionEvent } from "@mezon/utils";
 import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
@@ -53,7 +54,6 @@ export const APP_SCREEN = {
     CREATE_THREAD: 'ROUTES.MENU_THREAD.CREATE_THREAD',
     CREATE_THREAD_FORM_MODAL: 'ROUTES.MENU_THREAD.CREATE_THREAD_FORM_MODAL',
     MUTE_THREAD_DETAIL_CHANNEL: 'ROUTES.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL',
-    SEARCH_MESSAGE_CHANNEL: 'SEARCH_MESSAGE_CHANNEL',
   },
 
   MENU_CLAN: {
@@ -75,6 +75,7 @@ export const APP_SCREEN = {
   MENU_CHANNEL: {
     STACK: 'ROUTES.MENU_CHANNEL.STACk',
     SETTINGS: 'ROUTES.MENU_CHANNEL.SETTINGS',
+    SEARCH_MESSAGE_CHANNEL: 'SEARCH_MESSAGE_CHANNEL'
   },
 
   SETTINGS: {
@@ -122,12 +123,14 @@ type MenuThreadStackParamList = {
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD]: undefined;
   [APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL]: undefined;
   [APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity};
-  [APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL]: undefined;
 }
 
 type MenuChannelStackParamList = {
   [APP_SCREEN.MENU_CHANNEL.SETTINGS]: {
     channelId: string;
+  };
+  [APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL]: {
+    openSearchChannelFrom: EOpenSearchChannelFrom;
   };
 }
 

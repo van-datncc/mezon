@@ -6,8 +6,8 @@ const style = (colors: Attributes) => StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: size.s_20,
     width: Dimensions.get("screen").width,
-    paddingBottom: size.s_60,
-  }
+  },
+  boxMembers: { width: '100%', marginTop: size.s_10, borderRadius: size.s_14, backgroundColor: colors.secondary }
 })
 
 export default style;
