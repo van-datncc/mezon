@@ -11,8 +11,8 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	if (!clanId) {
 		throw new Error('Clan ID null');
 	}
-	dispatch(emojiSuggestionActions.fetchEmoji({ clanId: clanId, noCache: true }));
-	dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: clanId, noCache: true }));
+	dispatch(emojiSuggestionActions.fetchEmoji({ clanId: clanId }));
+	dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: clanId }));
 	dispatch(directActions.fetchDirectMessage({}));
 	dispatch(clansActions.joinClan({ clanId }));
 	dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
