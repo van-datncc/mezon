@@ -1,5 +1,5 @@
 import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, load, save } from '@mezon/mobile-components';
-import { Block, useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
@@ -62,7 +62,7 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 	return (
 		<View style={styles.container}>
 			{listChannelSearch?.length > 0 ? (
-				<ScrollView showsVerticalScrollIndicator={false}>
+				<ScrollView contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
 					<>
 						<Block>
 							{listTextChannelAndThreads?.length > 0 ? (

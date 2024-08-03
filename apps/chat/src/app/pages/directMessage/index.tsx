@@ -12,7 +12,10 @@ export default function Direct() {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	useEffect(() => {
-		localStorage.setItem('recentEmojis', JSON.stringify([]));
+		const recentEmojis = localStorage.getItem('recentEmojis');
+		if (!recentEmojis) {
+			localStorage.setItem('recentEmojis', JSON.stringify([]));
+		}
 	}, []);
 
 	return (

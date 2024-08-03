@@ -1,7 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
@@ -62,13 +62,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 		<>
 			<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
 				<div className="dark:text-white text-[15px] text-black">
-					<h3 className="mb-4 font-bold">Channel Permissions</h3>
-					<p className="mb-3">Use permissions to customise who can do what in this channel.</p>
-					<div className="flex mt-4 p-4">
-						<Icons.SyncIcon defaultFill="#F0B033" defaultSize="mr-2" />
-						<p>Permissions synced with category: </p>
-						<p className="font-bold pl-1"> {channel.category_name}</p>
-					</div>
+					<HeaderModal name={channel.category_name}/>
 					<div className="rounded-md overflow-hidden mt-4">
 						<div className="dark:bg-black bg-white flex justify-between items-start p-4">
 							<div>
@@ -138,3 +132,24 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 };
 
 export default PermissionsChannel;
+
+type HeaderModalProps = {
+	name?: string;
+}
+
+const HeaderModal = memo(
+	(props: HeaderModalProps) => {
+		const {name=''} = props;
+		return (
+			<>
+				<h3 className="mb-4 font-bold">Channel Permissions</h3>
+				<p className="mb-3">Use permissions to customise who can do what in this channel.</p>
+				<div className="flex mt-4 p-4">
+					<Icons.SyncIcon defaultFill="#F0B033" defaultSize="mr-2" />
+					<p>Permissions synced with category: </p>
+					<p className="font-bold pl-1"> {name}</p>
+				</div>
+			</>
+		)
+	}
+)

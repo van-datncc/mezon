@@ -1,4 +1,4 @@
-import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import { useState } from 'react';
@@ -21,7 +21,7 @@ type MembersSearchTabProps = {
 };
 const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
-  const { themeValue } = useTheme();
+	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const handleCloseUserInfoBS = () => {
 		setSelectedUser(null);
@@ -29,9 +29,9 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	return (
 		<View style={styles.container}>
 			{listMemberSearch?.length > 0 ? (
-				<ScrollView showsVerticalScrollIndicator={false}>
+				<ScrollView contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
 					{
-						<Block width={'100%'} marginTop={size.s_10} borderRadius={size.s_14} backgroundColor={themeValue.secondary}>
+						<View style={styles.boxMembers}>
 							{listMemberSearch?.map((user) => (
 								<MemberItem
 									onPress={(user) => {
@@ -40,9 +40,8 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 									user={user as any}
 									key={user?.user?.id}
 								/>
-							))
-              }
-						</Block>
+							))}
+						</View>
 					}
 				</ScrollView>
 			) : (
