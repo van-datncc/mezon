@@ -629,7 +629,7 @@ export type SearchItemProps = {
 	id?: string;
 	name?: string;
 	avatarUser?: string;
-	lastSentTimeStamp?: number;
+	lastSentTimeStamp?: any;
 	idDM?: string;
 	type?: number;
 	clanAvatar?: string;

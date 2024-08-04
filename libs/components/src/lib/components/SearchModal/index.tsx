@@ -11,7 +11,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { TypeSearch, UsersClanEntity, addAttributesSearchList, findDisplayNameByUserId, removeDuplicatesById } from '@mezon/utils';
+import { SearchItemProps, TypeSearch, UsersClanEntity, addAttributesSearchList, findDisplayNameByUserId, removeDuplicatesById } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -109,7 +109,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			...listGroupSearch,
 			...listUserClanSearch,
 		];
-		const removeDuplicate = removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
+		const removeDuplicate = removeDuplicatesById(listSearch.filter((item) => item?.id !== accountId));
 		const addPropsIntoSearchList = useMemo(() => addAttributesSearchList(removeDuplicate, membersInClan), [removeDuplicate, membersInClan]);
 
 		return addPropsIntoSearchList;
@@ -210,7 +210,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			const nextIndex = (currentIndex: number, length: number) => (currentIndex === length - 1 ? 0 : currentIndex + 1);
 			const prevIndex = (currentIndex: number) => (currentIndex === 0 ? totalLists.length - 1 : currentIndex - 1);
-			const itemSelect = totalLists.find((item: any) => item.id === idActive);
+			const itemSelect = totalLists.find((item: SearchItemProps) => item?.id === idActive);
 
 			switch (event.key) {
 				case 'ArrowDown':
@@ -218,7 +218,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						maxHight =
 							itemRef.current.clientHeight *
 							(nextIndex(
-								totalLists.findIndex((item: any) => item.id === idActive),
+								totalLists.findIndex((item: SearchItemProps) => item?.id === idActive),
 								totalLists.length,
 							) +
 								1);
@@ -239,7 +239,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					setIdActive(
 						totalLists[
 							nextIndex(
-								totalLists.findIndex((item: any) => item.id === idActive),
+								totalLists.findIndex((item: SearchItemProps) => item?.id === idActive),
 								totalLists.length,
 							)
 						]?.id ?? '',
@@ -247,7 +247,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					break;
 				case 'ArrowUp':
 					if (itemRef && itemRef.current) {
-						maxHight = itemRef.current.clientHeight * (prevIndex(totalLists.findIndex((item: any) => item.id === idActive)) + 1);
+						maxHight =
+							itemRef.current.clientHeight * (prevIndex(totalLists.findIndex((item: SearchItemProps) => item?.id === idActive)) + 1);
 
 						if (maxHight > boxHight) {
 							boxRef.current?.scroll({
@@ -262,15 +263,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 							});
 						}
 					}
-					setIdActive(totalLists[prevIndex(totalLists.findIndex((item: any) => item.id === idActive))]?.id ?? '');
+					setIdActive(totalLists[prevIndex(totalLists.findIndex((item: SearchItemProps) => item?.id === idActive))]?.id ?? '');
 					break;
 				case 'Enter':
 					if (itemSelect?.subText) {
 						event.preventDefault();
-						handleSelectChannel(totalLists.find((item: any) => item.id === idActive));
+						handleSelectChannel(totalLists.find((item: SearchItemProps) => item?.id === idActive));
 						dispatch(messagesActions.setIsFocused(true));
 					} else {
-						handleSelectMem(totalLists.find((item: any) => item.id === idActive));
+						handleSelectMem(totalLists.find((item: SearchItemProps) => item?.id === idActive));
 					}
 					break;
 
