@@ -148,7 +148,11 @@ function LoginForm(props: LoginFormProps) {
 									autoComplete="password"
 								/>
 								<button onClick={togglePasswordVisibility} className="outline-none z-50 fill-current left-0">
-									{showPassword ? <Icons.EyeOpen /> : <Icons.EyeClose />}
+									{showPassword ? (
+										<Icons.EyeOpen className="w-5 h-5 text-borderFocus" />
+									) : (
+										<Icons.EyeClose className="w-5 h-5 text-borderFocus" />
+									)}
 								</button>
 							</div>
 
