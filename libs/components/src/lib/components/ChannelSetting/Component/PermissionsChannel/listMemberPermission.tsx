@@ -1,4 +1,5 @@
 import { AvatarImage, Icons } from '@mezon/components';
+import { useCheckOwnerForUser } from '@mezon/core';
 import { channelUsersActions, selectAllAccount, selectMembersByChannelId, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useCallback, useLayoutEffect, useState } from 'react';
@@ -43,29 +44,54 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 		}
 	}, [rawMembers.length, props.selectedUserIds]);
 
-	return memberList?.map((user) => (
-		<div className={`flex justify-between py-2 rounded`} key={user?.id}>
-			<div className="flex gap-x-2 items-center">
-				<AvatarImage 
-					alt={user?.username || ''}
-					userName={user?.username}
-					className="min-w-6 min-h-6 max-w-6 max-h-6"
-					src={user?.avatar_url}
-					classNameText='text-[9px] pt-[3px]'
-				/>
-				<p className="text-sm">{user?.display_name}</p>
-			</div>
-			<div className="flex items-center gap-x-2">
-				<p className="text-xs text-[#AEAEAE]">{checkOwner(user?.google_id || '') ? 'Clan Owner' : ''}</p>
-				<div onClick={() => deleteMember(user?.id || '')} role="button">
-					<Icons.EscIcon
-						defaultSize={`${checkOwner(user?.google_id || '') ? '' : 'cursor-pointer'} size-[15px]`}
-						defaultFill={`${checkOwner(user?.google_id || '') ? '#4C4D55' : '#AEAEAE'}`}
-					/>
-				</div>
-			</div>
-		</div>
+	return memberList?.map((user) => ( 
+		<ItemMemberPermission 
+			id={user.id}
+			userName={user.username}
+			displayName={user.display_name}
+			avatar={user.avatar_url}
+			onDelete={() => deleteMember(user.id)}
+		/>
 	));
 };
 
 export default ListMemberPermission;
+
+type ItemMemberPermissionProps =  {
+	id?: string;
+	userName?: string;
+	avatar?: string;
+	displayName?: string;
+	onDelete: () => void;
+}
+
+const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
+	const {id='', userName='', displayName='', avatar='', onDelete} = props;
+	const [checkClanOwner] = useCheckOwnerForUser();
+	const isClanOwner = checkClanOwner(id);
+	return(
+		<div className={`flex justify-between py-2 rounded`} key={id}>
+			<div className="flex gap-x-2 items-center">
+				<AvatarImage 
+					alt={userName}
+					userName={userName}
+					className="min-w-6 min-h-6 max-w-6 max-h-6"
+					src={avatar}
+					classNameText='text-[9px] pt-[3px]'
+				/>
+				<p className="text-sm">{displayName || userName}</p>
+			</div>
+			<div className="flex items-center gap-x-2">
+				<p className="text-xs text-[#AEAEAE]">
+					{isClanOwner && 'Clan Owner'}
+				</p>
+				<div onClick={!isClanOwner ? () => onDelete() : ()=>{}} role="button">
+					<Icons.EscIcon
+						defaultSize={`${isClanOwner ? 'cursor-not-allowed' : 'cursor-pointer'} size-[15px]`}
+						defaultFill={isClanOwner ? '#4C4D55' : '#AEAEAE'}
+					/>
+				</div>
+			</div>
+		</div>
+	)
+}

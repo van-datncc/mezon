@@ -1,5 +1,5 @@
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -222,8 +222,11 @@ const HomeDefaultHeader = React.memo(
 		}, [currentChannel?.parrent_id, channelsEntities]);
 
 		const navigateToSearchPage = () => {
-			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
-				screen: APP_SCREEN.MENU_THREAD.SEARCH_MESSAGE_CHANNEL,
+			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+        params: {
+          openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+        }
 			});
 		};
 		return (

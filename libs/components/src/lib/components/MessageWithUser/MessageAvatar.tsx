@@ -59,6 +59,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					userName={username}
 					src={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (userClanAvatar ? userClanAvatar : avatarSender) : avatarSender}
 					className="min-w-10 min-h-10"
+					classNameText='font-semibold'
 					isAnonymous={isAnonymous}
 				/>
 			</div>
