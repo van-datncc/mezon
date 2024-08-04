@@ -80,9 +80,6 @@ module.exports = {
   buttonMore: '#272120',
   buttonMoreHover: '#1E1A19',
 
-  // Box shadows
-  boxShadowBorderLight: '0 0 0 1px hsla(0, 0%, 0%, 0.08)',
-
   primary: '#155EEF',
   hoverPrimary: '#124FC9',
   buttonSecondary: '#4E5057',

@@ -12,6 +12,7 @@ const avatarWidth = '68px';
 const widthModalSearch = '400px';
 const widthResultSearch = '420px';
 const heightModalSearch = '300px';
+const dmProfileWidth = '340px'
 const iconWidth = '160px';
 
 const plugin = require('tailwindcss/plugin');
@@ -65,6 +66,7 @@ module.exports = {
         widthModalSearch: widthModalSearch,
         widthPinMess: `calc(100% - 16px)`,
         widthInputViewChannelPermission: `calc(100% - 30px)`,
+        widthDmProfile: dmProfileWidth,
         450: '450px',
         "4/5": "80%",
         "9/10": "90%",
