@@ -57,7 +57,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 						<Icons.Download defaultSize="w-4 h-4" />
 					</div>
 					<div className={` rounded-r-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#E13542]`}>
-						<Icons.TrashIcon defaultSize="w-4 h-4" />
+						<Icons.TrashIcon className="w-4 h-4" />
 					</div>
 				</div>
 			)}
