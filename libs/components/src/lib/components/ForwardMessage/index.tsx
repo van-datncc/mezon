@@ -136,14 +136,19 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const addPropsIntoListMember = useMemo(() => addAttributesSearchList(listMemSearch, membersInClan), [listMemSearch, membersInClan]);
 	const totalsSearch = [...addPropsIntoListMember, ...listChannelSearch];
 
-	const replaceText = normalizeString(searchText);
+	const normalizedSearchText = normalizeString(searchText);
+
 	const isNoResult = useMemo(() => {
 		const memberResults = addPropsIntoListMember.some(
-			(item) => item.prioritizeName && item.prioritizeName.toUpperCase().includes(replaceText.toUpperCase()),
+			(item) =>
+				(item.prioritizeName && item.prioritizeName.toUpperCase().includes(normalizedSearchText)) ||
+				(item.name && item.name.toUpperCase().includes(normalizedSearchText)),
 		);
-		const channelResults = listChannelSearch.some((item) => item.prioritizeName.toUpperCase().includes(replaceText.toUpperCase()));
+		const channelResults = listChannelSearch.some(
+			(item) => item.prioritizeName && item.prioritizeName.toUpperCase().includes(normalizedSearchText),
+		);
 		return !memberResults && !channelResults;
-	}, [addPropsIntoListMember, listChannelSearch, replaceText]);
+	}, [addPropsIntoListMember, listChannelSearch, normalizedSearchText]);
 
 	const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -166,11 +171,11 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						onKeyDown={(e) => handleInputKeyDown(e)}
 					/>
 					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}>
-						{!replaceText.startsWith('@') && !replaceText.startsWith('#') ? (
+						{!normalizedSearchText.startsWith('@') && !normalizedSearchText.startsWith('#') ? (
 							<>
 								<ListSearchForwardMessage
 									listSearch={totalsSearch}
-									searchText={replaceText}
+									searchText={normalizedSearchText}
 									selectedObjectIdSends={selectedObjectIdSends}
 									handleToggle={handleToggle}
 								/>
@@ -182,25 +187,25 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 							</>
 						) : (
 							<>
-								{replaceText.startsWith('@') && (
+								{normalizedSearchText.startsWith('@') && (
 									<>
 										<span className="text-textPrimary text-left opacity-60 text-[11px] pb-1 uppercase">
 											Search friend and users
 										</span>
 										<ListSearch
 											listSearch={addPropsIntoListMember}
-											searchText={replaceText.slice(1)}
+											searchText={normalizedSearchText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
 											handleToggle={handleToggle}
 										/>
 									</>
 								)}
-								{replaceText.startsWith('#') && (
+								{normalizedSearchText.startsWith('#') && (
 									<>
 										<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 										<ListSearch
 											listSearch={listChannelSearch}
-											searchText={replaceText.slice(1)}
+											searchText={normalizedSearchText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
 											handleToggle={handleToggle}
 										/>
