@@ -1,6 +1,13 @@
-import { IMessage } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
+import {IMessage} from '@mezon/utils';
+import {
+	createAsyncThunk,
+	createEntityAdapter,
+	createSelector,
+	createSlice,
+	EntityState,
+	PayloadAction
+} from '@reduxjs/toolkit';
+import {ApiMessageAttachment, ApiMessageRef} from 'mezon-js/api.gen';
 
 export const REFERENCES_FEATURE_KEY = 'references';
 
@@ -86,9 +93,12 @@ export const referencesSlice = createSlice({
 			}
 		},
 		removeAttachment(state, action: PayloadAction<{ channelId: string; urlAttachment: string }>) {
-			state.attachmentDataRef[action.payload.channelId] = state.attachmentDataRef[action.payload.channelId].filter(
-				(attachment) => attachment.url !== action.payload.urlAttachment,
-			);
+			const attachments = state.attachmentDataRef[action.payload.channelId];
+			if (attachments) {
+				state.attachmentDataRef[action.payload.channelId] = attachments.filter(
+					(attachment) => attachment.url !== action.payload.urlAttachment && attachment.filename !== action.payload.urlAttachment
+				);
+			}
 		},
 		setIdReferenceMessageReply(state, action) {
 			state.idMessageRefReply = action.payload;
@@ -98,6 +108,9 @@ export const referencesSlice = createSlice({
 		},
 		setIdReferenceMessageEdit(state, action) {
 			state.idMessageRefEdit = action.payload;
+		},
+		resetDataAttachment(state, action: PayloadAction<{ channelId: string; }>) {
+			state.attachmentDataRef[action.payload.channelId] = [];
 		},
 	},
 	extraReducers: (builder) => {

@@ -1,7 +1,6 @@
-import { useReference } from '@mezon/core';
 import { Icons, pushAttachmentToCache } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions } from '@mezon/store';
+import { appActions, referencesActions } from '@mezon/store';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { delay } from 'lodash';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -27,7 +26,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const styles = style(themeValue);
 	const { t } = useTranslation(['message']);
 	const { sessionRef, clientRef } = useMezon();
-	const { setAttachmentData } = useReference();
 	const timeRef = useRef<any>();
 	const dispatch = useDispatch();
 
@@ -51,8 +49,12 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				filename: file?.name || file?.uri,
 				filetype: file?.type,
 			};
-
-			setAttachmentData(attachment);
+			dispatch(
+				referencesActions.setAttachmentData({
+					channelId: currentChannelId,
+					attachments: [attachment],
+				}),
+			);
 			const fileData = await RNFS.readFile(file?.uri || file?.fileCopyUri, 'base64');
 
 			const fileFormat: IFile = {
@@ -99,10 +101,15 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
-			setAttachmentData(attachment);
+			dispatch(
+				referencesActions.setAttachmentData({
+					channelId: currentChannelId,
+					attachments: [attachment],
+				}),
+			);
 			pushAttachmentToCache(attachment, currentChannelId);
 		},
-		[currentChannelId, setAttachmentData],
+		[currentChannelId, dispatch],
 	);
 
 	return (

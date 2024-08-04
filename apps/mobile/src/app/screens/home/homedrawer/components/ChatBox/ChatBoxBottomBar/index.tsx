@@ -1,17 +1,15 @@
 import { useEmojiSuggestion, useReference, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
-	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
 	convertToPlainTextHashtag,
 	getAttachmentUnique,
 	load,
-	pushAttachmentToCache,
 	save,
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
-import { selectChannelsEntities, selectCurrentChannel } from '@mezon/store-mobile';
+import { referencesActions, selectAttachmentData, selectChannelsEntities, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -33,9 +31,6 @@ import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import { ChatMessageInput } from '../ChatMessageInput';
 import { ChatMessageLeftArea } from '../ChatMessageLeftArea';
 import useProcessedContent from './useProcessedContent';
-
-const mentionRegex = /(?<!\w)@[\w.]+(?!\w)/g;
-const channelRegex = /<#[0-9]{19}\b>/g;
 
 export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
@@ -81,12 +76,13 @@ export const ChatBoxBottomBar = memo(
 		onDeleteMessageActionNeedToResolve,
 		onShowKeyboardBottomSheet,
 	}: IChatInputProps) => {
+		const dispatch = useAppDispatch();
 		const [text, setText] = useState<string>('');
 		const [mentionTextValue, setMentionTextValue] = useState('');
 		const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
-		const { attachmentDataRef, setAttachmentData } = useReference();
+		const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 		const currentChannel = useSelector(selectCurrentChannel);
 		const channelsEntities = useSelector(selectChannelsEntities);
 		const navigation = useNavigation<any>();
@@ -136,30 +132,16 @@ export const ChatBoxBottomBar = memo(
 			setText(convertMentionsToText(allCachedMessage?.[channelId] || ''));
 		};
 
-		const setAttachmentFromCache = async () => {
-			const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
-			setAttachmentData(allCachedAttachment?.[channelId] || []);
-		};
-
 		const resetCachedText = useCallback(async () => {
 			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
-			if (allCachedMessage?.[channelId])
-				allCachedMessage[channelId] = '';
+			if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = '';
 
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
-		}, [channelId]);
-
-		const resetCachedAttachment = useCallback(async () => {
-			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
-			if (allCachedAttachments?.[channelId])
-				allCachedAttachments[channelId] = [];
-			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, allCachedAttachments);
 		}, [channelId]);
 
 		useEffect(() => {
 			if (channelId) {
 				setMessageFromCache();
-				setAttachmentFromCache();
 			}
 		}, [channelId]);
 
@@ -174,26 +156,13 @@ export const ChatBoxBottomBar = memo(
 			await handleTextInputChange(textFormat);
 		};
 
-		const removeAttachmentByUrl = (urlToRemove: string, fileName: string) => {
-			const removedAttachment = attachmentDataRef.filter((attachment) => {
-				if (attachment.url === urlToRemove) {
-					return false;
-				}
-				return !(fileName && attachment.filename === fileName);
-			});
-
-			setAttachmentData(removedAttachment);
-			const allCachedAttachments = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || [];
-			const attachmentCached = allCachedAttachments?.[channelId];
-			if (attachmentCached) {
-				const removedAttachmentCache = attachmentCached.filter((attachment) => {
-					if (attachment.url === urlToRemove) {
-						return false;
-					}
-					return !(fileName && attachment.filename === fileName);
-				});
-				pushAttachmentToCache(removedAttachmentCache, channelId);
-			}
+		const removeAttachmentByUrl = (urlToRemove: string) => {
+			dispatch(
+				referencesActions.removeAttachment({
+					channelId: channelId,
+					urlAttachment: urlToRemove,
+				}),
+			);
 		};
 
 		const onSendSuccess = useCallback(() => {
@@ -202,8 +171,7 @@ export const ChatBoxBottomBar = memo(
 			setHashtagsOnMessage([]);
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
-			resetCachedAttachment();
-		}, [onDeleteMessageActionNeedToResolve, resetCachedAttachment, resetCachedText]);
+		}, [onDeleteMessageActionNeedToResolve, resetCachedText]);
 
 		const handleKeyboardBottomSheetMode = useCallback(
 			(mode: IModeKeyboardPicker) => {
@@ -236,32 +204,39 @@ export const ChatBoxBottomBar = memo(
 			} else {
 				const convertedHashtag = convertMentionsToText(text);
 
-				let match;
-				while ((match = mentionRegex.exec(convertedHashtag)) !== null) {
-					const mention = listMentions.find((m) => `@${m.display}` === match?.[0]);
-					if (mention) {
-						mentionList.push({
-							userid: mention?.id?.toString() ?? '',
-							username: `@${mention?.display}`,
-							startindex: match.index,
-							endindex: match.index + match[0].length,
-						});
-					}
-				}
+				const mentionList = [];
+				const hashtagList = [];
 
-				while ((match = channelRegex.exec(convertedHashtag)) !== null) {
-					const matchChannelId = match[0].match(/<#(\d+)>/);
-					const channelId = matchChannelId ? matchChannelId?.[1] : null;
-					const channelInfo = getChannelById(channelId);
-					if (channelInfo) {
-						hashtagList.push({
-							channelid: channelInfo.id.toString() ?? '',
-							channellabel: channelInfo.channel_label ?? '',
-							startindex: match.index,
-							endindex: match.index + match[0].length,
-						});
+				const words = convertedHashtag.split(' ');
+
+				words.forEach((word) => {
+					if (word.startsWith('@')) {
+						const mention = listMentions.find((m) => `@${m.display}` === word);
+						if (mention) {
+							const startindex = convertedHashtag.indexOf(word);
+							mentionList.push({
+								userid: mention.id?.toString() ?? '',
+								username: `@${mention.display}`,
+								startindex,
+								endindex: startindex + word.length,
+							});
+						}
 					}
-				}
+
+					if (word.startsWith('<#') && word.endsWith('>')) {
+						const channelId = word.slice(2, -1);
+						const channelInfo = getChannelById(channelId);
+						if (channelInfo) {
+							const startindex = convertedHashtag.indexOf(word);
+							hashtagList.push({
+								channelid: channelInfo.id.toString() ?? '',
+								channellabel: channelInfo.channel_label ?? '',
+								startindex,
+								endindex: startindex + word.length,
+							});
+						}
+					}
+				});
 
 				setHashtagsOnMessage(hashtagList);
 				setMentionsOnMessage(mentionList);
@@ -351,14 +326,22 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, []);
 
-		const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
-			typeConverts.map((typeConvert) => {
-				if (typeConvert.type === attachment.filetype) {
-					return (attachment.filetype = typeConvert.typeConvert);
-				}
-			});
-			setAttachmentData(attachment);
-		}, []);
+		const handleFinishUpload = useCallback(
+			(attachment: ApiMessageAttachment) => {
+				typeConverts.map((typeConvert) => {
+					if (typeConvert.type === attachment.filetype) {
+						return (attachment.filetype = typeConvert.typeConvert);
+					}
+				});
+				dispatch(
+					referencesActions.setAttachmentData({
+						channelId: channelId,
+						attachments: [attachment],
+					}),
+				);
+			},
+			[channelId, dispatch],
+		);
 
 		const writeTextToFile = async (text: string) => {
 			// Define the path to the file

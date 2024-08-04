@@ -1,5 +1,6 @@
-import { useCategory, useReference } from '@mezon/core';
+import { useCategory } from '@mezon/core';
 import {
+	CHANNEL_ID_SHARING,
 	CloseIcon,
 	PenIcon,
 	STORAGE_CLAN_ID,
@@ -11,7 +12,15 @@ import {
 	save,
 } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
-import { channelsActions, directActions, getStoreAsync, selectCurrentClan, selectCurrentClanId, selectDirectsOpenlist } from '@mezon/store-mobile';
+import {
+	channelsActions,
+	directActions,
+	getStoreAsync,
+	referencesActions,
+	selectAttachmentData,
+	selectCurrentClan,
+	selectDirectsOpenlist,
+} from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { ILinkOnMessage } from '@mezon/utils';
 import { cloneDeep, debounce } from 'lodash';
@@ -44,7 +53,7 @@ export const Sharing = ({ data, onClose }) => {
 	const dataMedia = useMemo(() => {
 		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
-	const { attachmentDataRef, setAttachmentData } = useReference();
+	const attachmentDataRef = useSelector(selectAttachmentData(CHANNEL_ID_SHARING || ''));
 
 	useEffect(() => {
 		if (data) {
@@ -208,8 +217,8 @@ export const Sharing = ({ data, onClose }) => {
 				const endIndex = i;
 				links.push({
 					link: inputString.substring(startIndex, endIndex),
-					startIndex,
-					endIndex,
+					startindex: startIndex,
+					endindex: endIndex,
 				});
 			} else {
 				i++;
@@ -238,11 +247,18 @@ export const Sharing = ({ data, onClose }) => {
 	const convertFileFormat = async () => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
-				setAttachmentData({
-					url: media?.contentUri || media?.filePath,
-					filename: media?.fileName || media?.contentUri || media?.filePath,
-					filetype: media?.mimeType,
-				});
+				dispatch(
+					referencesActions.setAttachmentData({
+						channelId: CHANNEL_ID_SHARING,
+						attachments: [
+							{
+								url: media?.contentUri || media?.filePath,
+								filename: media?.fileName || media?.contentUri || media?.filePath,
+								filetype: media?.mimeType,
+							},
+						],
+					}),
+				);
 				const fileData = await RNFS.readFile(media.contentUri || media?.filePath, 'base64');
 
 				return {
@@ -281,20 +297,23 @@ export const Sharing = ({ data, onClose }) => {
 
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
-			setAttachmentData(attachment);
+			dispatch(
+				referencesActions.setAttachmentData({
+					channelId: CHANNEL_ID_SHARING,
+					attachments: [attachment],
+				}),
+			);
 		},
-		[setAttachmentData],
+		[dispatch],
 	);
 
-	function removeAttachmentByUrl(urlToRemove: string, fileName: string) {
-		const removedAttachment = attachmentDataRef.filter((attachment) => {
-			if (attachment.url === urlToRemove) {
-				return false;
-			}
-			return !(fileName && attachment.filename === fileName);
-		});
-
-		setAttachmentData(removedAttachment);
+	function removeAttachmentByUrl(urlToRemove: string) {
+		dispatch(
+			referencesActions.removeAttachment({
+				channelId: CHANNEL_ID_SHARING,
+				urlAttachment: urlToRemove,
+			}),
+		);
 	}
 
 	return (
@@ -322,7 +341,7 @@ export const Sharing = ({ data, onClose }) => {
 					{!!getAttachmentUnique(attachmentDataRef)?.length && (
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
 							<ScrollView horizontal style={styles.wrapperMedia}>
-								{getAttachmentUnique(attachmentDataRef)?.map((media, index) => {
+								{getAttachmentUnique(attachmentDataRef)?.map((media: any, index) => {
 									let isFile;
 
 									if (Platform.OS === 'android') {
@@ -347,7 +366,7 @@ export const Sharing = ({ data, onClose }) => {
 											{isUploaded && (
 												<TouchableOpacity
 													style={styles.iconRemoveMedia}
-													onPress={() => removeAttachmentByUrl(media.url ?? '', media?.filename || '')}
+													onPress={() => removeAttachmentByUrl(media.url ?? '')}
 												>
 													<CloseIcon width={size.s_18} height={size.s_18} />
 												</TouchableOpacity>

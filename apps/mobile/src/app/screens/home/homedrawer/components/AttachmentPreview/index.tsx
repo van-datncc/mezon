@@ -8,7 +8,7 @@ import { style } from './styles';
 
 interface IProps {
 	attachments: ApiMessageAttachment[];
-	onRemove: (url: string, filename: string) => void;
+	onRemove: (url: string) => void;
 }
 
 const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
@@ -35,7 +35,7 @@ const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
 						<TouchableOpacity
 							style={styles.iconClose}
 							activeOpacity={0.8}
-							onPress={() => onRemove(attachment.url ?? '', attachment?.filename || '')}
+							onPress={() => onRemove(attachment?.filename || attachment.url || '')}
 						>
 							<Icons.CloseSmallBoldIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
 						</TouchableOpacity>

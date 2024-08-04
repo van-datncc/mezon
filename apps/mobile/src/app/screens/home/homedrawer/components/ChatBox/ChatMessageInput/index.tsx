@@ -1,6 +1,8 @@
-import { useChatSending, useDirectMessages, useEmojiSuggestion, useReference } from '@mezon/core';
+import { useChatSending, useDirectMessages, useEmojiSuggestion } from '@mezon/core';
 import { ActionEmitEvent, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { referencesActions, selectAttachmentData } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -16,6 +18,7 @@ import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallba
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Dimensions, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from '../../../types';
@@ -85,8 +88,9 @@ export const ChatMessageInput = memo(
 		) => {
 			const [heightInput, setHeightInput] = useState(size.s_40);
 			const { themeValue } = useTheme();
+			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
-			const { attachmentDataRef, setAttachmentData } = useReference();
+			const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 			const { t } = useTranslation(['message']);
 			const {
 				sendMessage,
@@ -251,7 +255,11 @@ export const ChatMessageInput = memo(
 							default:
 								break;
 						}
-						setAttachmentData([]);
+						dispatch(
+							referencesActions.resetDataAttachment({
+								channelId: channelId,
+							}),
+						);
 					}
 				}
 
