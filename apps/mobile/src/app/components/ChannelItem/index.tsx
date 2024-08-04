@@ -15,9 +15,11 @@ const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-
+	const handleOnPress = () => {
+		onPress && onPress(channelData);
+	};
 	return (
-		<TouchableOpacity onPress={() => onPress(channelData)} style={{ marginBottom: size.s_20 }}>
+		<TouchableOpacity onPress={handleOnPress} style={{ marginBottom: size.s_20 }}>
 			{channelData?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 				<Block flexDirection="row" gap={size.s_10} alignItems="center">
 					{!!channelData?.channel_label && !!Number(channelData?.parrent_id) ? (

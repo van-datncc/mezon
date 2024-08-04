@@ -2,6 +2,7 @@ import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import ChannelSetting from '../../../components/ChannelSetting';
+import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 type StackMenuChannelScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
@@ -27,8 +28,8 @@ export function MenuChannelStacks({ }: any) {
 					fontWeight: 'bold',
 				},
 				cardStyle: {
-					backgroundColor: "transparent",
-				}
+					backgroundColor: 'transparent',
+				},
 			}}
 		>
 			<Stack.Screen
@@ -37,12 +38,18 @@ export function MenuChannelStacks({ }: any) {
 				options={{
 					headerTitle: t('menuChannelStack.channelSetting'),
 					headerStyle: {
-						backgroundColor: themeValue.secondary
+						backgroundColor: themeValue.secondary,
 					},
 					headerTitleStyle: {
-						color: themeValue.textStrong
-					}
-
+						color: themeValue.textStrong,
+					},
+				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL}
+				component={SearchMessageChannel}
+				options={{
+					headerShown: false,
 				}}
 			/>
 		</Stack.Navigator>

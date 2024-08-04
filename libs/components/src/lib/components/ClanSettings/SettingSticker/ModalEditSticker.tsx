@@ -81,7 +81,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 			return;
 		}
 		const category = 'Among Us';
-		const path = 'stickers/' + category;
+		const path = 'stickers/' + "Custom";
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file, path).then(async (attachment: ApiMessageAttachment) => {
 			const request: ApiClanStickerAddRequest = {
 				category: category,

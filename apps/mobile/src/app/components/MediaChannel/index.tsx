@@ -1,14 +1,14 @@
-import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { Block, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectAttachmentPhoto } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
+import { Dimensions, ScrollView, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
+import EmptySearchPage from '../EmptySearchPage';
 import { ImageListModal } from '../ImageListModal';
 import { style } from './MediaChannel.styles';
 import MediaItem from './MediaItem';
-import EmptySearchPage from '../EmptySearchPage';
 
 const MediaChannel = () => {
 	const { themeValue } = useTheme();
@@ -19,7 +19,10 @@ const MediaChannel = () => {
 	const [idxSelectedImageModal, setIdxSelectedImageModal] = useAnimatedState<number>(0);
 	const [visibleImageModalOverlay, setVisibleImageModalOverlay] = useState<boolean>(false);
 	const timeOutRef = useRef(null);
-
+	const widthScreen = Dimensions.get('screen').width;
+	const widthImage = useMemo(() => {
+		return (widthScreen - (size.s_10 * 2 + size.s_6 * 2)) / 3;
+	}, [widthScreen]);
 
 	const openImage = useCallback(
 		(image: ApiMessageAttachment) => {
@@ -74,17 +77,19 @@ const MediaChannel = () => {
 	);
 
 	return (
-		<View>
+		<View style={styles.wrapper}>
 			<ScrollView
-				style={{ height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3) }}
+				style={{flex: 1}}
 				contentContainerStyle={{ paddingBottom: size.s_50 }}
 				showsVerticalScrollIndicator={false}
 			>
-				<View
-					style={styles.container}
-				>
+				<View style={styles.container}>
 					{attachments?.length ? (
-						attachments?.map((item, index) => <MediaItem data={item} onPress={openImage} key={index} />)
+						attachments?.map((item, index) => (
+							<Block height={widthImage} width={widthImage}>
+								<MediaItem data={item} onPress={openImage} key={index} />
+							</Block>
+						))
 					) : (
 						<EmptySearchPage />
 					)}
