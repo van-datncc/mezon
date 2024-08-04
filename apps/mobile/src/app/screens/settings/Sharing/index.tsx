@@ -326,13 +326,13 @@ export const Sharing = ({ data, onClose }) => {
 									let isFile;
 
 									if (Platform.OS === 'android') {
-										isFile = !media.filetype.includes('video') && !media.filetype.includes('image');
+										isFile = !media?.filetype?.includes?.('video') && !media?.filetype?.includes?.('image');
 									} else {
 										const checkIsImage = isImage(media?.url?.toLowerCase());
 										const checkIsVideo = isVideo(media?.url?.toLowerCase());
 										isFile = !checkIsImage && !checkIsVideo;
 									}
-									const isUploaded = !!media?.size || (!media?.size && media.filetype.includes('video')) || !!media?.url;
+									const isUploaded = !!media?.size || (!media?.size && media?.filetype?.includes?.('video')) || !!media?.url;
 
 									return (
 										<View

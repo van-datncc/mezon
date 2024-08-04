@@ -22,8 +22,8 @@ const AttachmentPreview = ({ attachments, onRemove }: IProps) => {
 			contentContainerStyle={{ paddingRight: verticalScale(20) }}
 		>
 			{attachments.map((attachment, index) => {
-				const isFile = !attachment.filetype.includes('video') && !attachment.filetype.includes('image');
-				const isVideo = attachment.filetype.includes('video');
+				const isFile = !attachment?.filetype?.includes?.('video') && !attachment?.filetype?.includes?.('image');
+				const isVideo = attachment?.filetype?.includes?.('video');
 				const isUploaded = !!attachment?.size;
 				return (
 					<View key={index + attachment.filename} style={styles.attachmentItem}>
