@@ -1,23 +1,23 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectAllChannelMembers, selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
+import { selectAllChannelMembers, selectAllUsesClan } from '@mezon/store';
 import { MouseButton, checkLastChar } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 
 type ChannelHashtagProps = {
 	tagName: string;
+	tagUserId: string;
 	mode?: number;
 	showOnchannelLayout?: boolean;
 };
 
-const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps) => {
+const MentionUser = ({ tagName, mode, showOnchannelLayout, tagUserId }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const usersClan = useSelector(selectAllUsesClan);
 	const usersInChannel = useSelector(selectAllChannelMembers);
 	const [foundUser, setFoundUser] = useState<any>(null);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.stopPropagation();
 		e.preventDefault();
@@ -33,9 +33,9 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps
 		}
 		let user;
 		if (mode === 4 || mode === 3) {
-			user = usersInChannel.find((channelUsers) => channelUsers.user?.username === userRemoveChar);
+			user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
 		} else {
-			user = usersClan.find((userClan) => userClan.user?.username === userRemoveChar);
+			user = usersClan.find((userClan) => userClan.user?.id === tagUserId);
 		}
 
 		if (user) {
@@ -106,7 +106,7 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps
 
 				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${showOnchannelLayout ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 					>
-						@{foundUser?.user?.username ? foundUser?.user?.username : 'here'}
+						{foundUser?.user?.username ? tagName : 'here'}
 					</Link>
 					{`${checkLastChar(username) ? `${username.charAt(username.length - 1)}` : ''}`}
 				</>
@@ -117,4 +117,4 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout }: ChannelHashtagProps
 	);
 };
 
-export default MentionUser;
+export default memo(MentionUser);

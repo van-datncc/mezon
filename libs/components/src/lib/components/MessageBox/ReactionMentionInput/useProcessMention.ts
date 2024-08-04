@@ -6,7 +6,6 @@ const useProcessMention = (text: string) => {
 	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
 	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
 	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
-
 	useEffect(() => {
 		const mentions: IMentionOnMessage[] = [];
 		const hashtags: IHashtagOnMessage[] = [];

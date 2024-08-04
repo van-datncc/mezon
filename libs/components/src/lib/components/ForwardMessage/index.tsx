@@ -1,6 +1,14 @@
 import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
-import { channelsActions, DirectEntity, RootState, selectAllDirectMessages, selectTheme, useAppDispatch } from '@mezon/store';
-import { ChannelThreads, removeDuplicatesById, TypeSearch } from '@mezon/utils';
+import {
+	DirectEntity,
+	RootState,
+	channelsActions,
+	selectAllChannelMembers,
+	selectAllDirectMessages,
+	selectTheme,
+	useAppDispatch,
+} from '@mezon/store';
+import { ChannelThreads, TypeSearch, addAttributesSearchList, findDisplayNameByUserId, normalizeString, removeDuplicatesById } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -17,7 +25,7 @@ type OpjectSend = {
 	clanId?: string;
 	channel_label?: string;
 };
-const ForwardMessageModal = ({ openModal}: ModalParam) => {
+const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
@@ -29,6 +37,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 	const { userProfile } = useAuth();
 	const selectedMessage = useSelector(getSelectedMessage);
 	const accountId = userProfile?.user?.id ?? '';
+	const membersInClan = useSelector(selectAllChannelMembers);
 
 	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<OpjectSend[]>([]);
 	const [searchText, setSearchText] = useState('');
@@ -74,12 +83,12 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 			? listDM.map((itemDM: DirectEntity) => {
 					return {
 						id: itemDM?.user_id?.[0] ?? '',
-						name: itemDM?.channel_label ?? '',
+						name: itemDM?.usernames ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						typeChat: ChannelType.CHANNEL_TYPE_DM,
 						userName: itemDM?.usernames,
-						displayName: itemDM.channel_label,
+						displayName: findDisplayNameByUserId(itemDM?.user_id?.[0] ?? '', membersInClan),
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
 						typeSearch: TypeSearch.Dm_Type,
 					};
@@ -118,16 +127,23 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 				channel_label: item?.channel_label ?? '',
 				lastSentTimeStamp: item.last_sent_message?.timestamp,
 				typeSearch: TypeSearch.Channel_Type,
+				prioritizeName: item?.channel_label ?? '',
 			};
 		});
 		return list;
 	}, [listChannels]);
 
-	const totalsSearch = [...listMemSearch, ...listChannelSearch];
+	const addPropsIntoListMember = useMemo(() => addAttributesSearchList(listMemSearch, membersInClan), [listMemSearch, membersInClan]);
+	const totalsSearch = [...addPropsIntoListMember, ...listChannelSearch];
 
-	const isNoResult =
-		!listChannelSearch.filter((item) => item.name.indexOf(searchText) > -1).length &&
-		!listMemSearch.filter((item: any) => item.name.indexOf(searchText) > -1).length;
+	const replaceText = normalizeString(searchText);
+	const isNoResult = useMemo(() => {
+		const memberResults = addPropsIntoListMember.some(
+			(item) => item.prioritizeName && item.prioritizeName.toUpperCase().includes(replaceText.toUpperCase()),
+		);
+		const channelResults = listChannelSearch.some((item) => item.prioritizeName.toUpperCase().includes(replaceText.toUpperCase()));
+		return !memberResults && !channelResults;
+	}, [addPropsIntoListMember, listChannelSearch, replaceText]);
 
 	const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -150,37 +166,41 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 						onKeyDown={(e) => handleInputKeyDown(e)}
 					/>
 					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}>
-						{(!searchText.startsWith('@') && !searchText.startsWith('#')) ? (
+						{!replaceText.startsWith('@') && !replaceText.startsWith('#') ? (
 							<>
-								<ListSearchForwardMessage 
+								<ListSearchForwardMessage
 									listSearch={totalsSearch}
-									searchText={searchText}
+									searchText={replaceText}
 									selectedObjectIdSends={selectedObjectIdSends}
 									handleToggle={handleToggle}
 								/>
-								{isNoResult && <span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">Can't seem to find what you're looking for?</span>}
+								{isNoResult && (
+									<span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">
+										Can't seem to find what you're looking for?
+									</span>
+								)}
 							</>
 						) : (
 							<>
-								{searchText.startsWith('@') && (
+								{replaceText.startsWith('@') && (
 									<>
 										<span className="text-textPrimary text-left opacity-60 text-[11px] pb-1 uppercase">
 											Search friend and users
 										</span>
-										<ListSearch 
-											listSearch={listMemSearch}
-											searchText={searchText.slice(1)}
+										<ListSearch
+											listSearch={addPropsIntoListMember}
+											searchText={replaceText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
 											handleToggle={handleToggle}
 										/>
 									</>
 								)}
-								{searchText.startsWith('#') && (
+								{replaceText.startsWith('#') && (
 									<>
 										<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
-										<ListSearch 
+										<ListSearch
 											listSearch={listChannelSearch}
-											searchText={searchText.slice(1)}
+											searchText={replaceText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
 											handleToggle={handleToggle}
 										/>
@@ -199,7 +219,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 					>
 						<MessageContent message={selectedMessage} />
 					</div>
-					<FooterButtonsModal onClose={handleCloseModal} sentToMessage={() => sentToMessage()}/>
+					<FooterButtonsModal onClose={handleCloseModal} sentToMessage={() => sentToMessage()} />
 				</div>
 			</div>
 		</Modal>
@@ -210,11 +230,11 @@ export default ForwardMessageModal;
 type FooterButtonsModalProps = {
 	onClose: () => void;
 	sentToMessage: () => Promise<void>;
-}
+};
 
 const FooterButtonsModal = (props: FooterButtonsModalProps) => {
-	const {onClose, sentToMessage} = props;
-	return(
+	const { onClose, sentToMessage } = props;
+	return (
 		<div className="flex justify-end p-4 rounded-b gap-4">
 			<Button
 				className="h-10 px-4 rounded dark:bg-slate-500 bg-slate-500 hover:!underline focus:ring-transparent"
@@ -230,5 +250,5 @@ const FooterButtonsModal = (props: FooterButtonsModalProps) => {
 				Send
 			</Button>
 		</div>
-	)
-}
+	);
+};

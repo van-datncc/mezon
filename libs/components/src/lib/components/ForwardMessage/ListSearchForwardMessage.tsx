@@ -1,5 +1,6 @@
 import { Checkbox } from '@mezon/ui';
-import { TypeSearch } from '@mezon/utils';
+import { filterListByName, sortFilteredList, TypeSearch } from '@mezon/utils';
+import { useMemo } from 'react';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 
 type ListSearchForwardMessageProps = {
@@ -11,39 +12,41 @@ type ListSearchForwardMessageProps = {
 
 const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
 	const { listSearch, searchText, selectedObjectIdSends, handleToggle } = props;
+
+	const filteredList = useMemo(() => filterListByName(listSearch, searchText, false), [listSearch, searchText]);
+	const sortedList = useMemo(() => sortFilteredList(filteredList, searchText, false), [filteredList, searchText]);
+	if (sortedList.length === 0) {
+		return null;
+	}
 	return (
-		listSearch.length &&
-		listSearch
-			.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
-			.sort((a: any, b: any) => Number(b.lastSentTimeStamp) - Number(a.lastSentTimeStamp))
-			.slice(0, 15)
-			.map((item: any) => {
-				const isTypeDm = item.typeSearch === TypeSearch.Dm_Type;
-				return (
-					<div key={item.id} className="flex items-center px-4 py-1 dark:hover:bg-bgPrimary1 hover:bg-bgLightModeThird rounded">
-						{isTypeDm ? (
-							<ItemDm
-								id={item.idDM}
-								avatar={item.avatarUser}
-								name={item.name}
-								displayName={item.displayName}
-								searchText={searchText}
-								checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.idDM)}
-								handleToggle={() => handleToggle(item.idDM, item.typeChat || 0)}
-							/>
-						) : (
-							<ItemChannel
-								id={item.id}
-								name={item.name}
-								subText={item.subText}
-								searchText={searchText}
-								checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.id)}
-								handleToggle={() => handleToggle(item.id, item.type || 0, item.clanId, item.channel_label || '')}
-							/>
-						)}
-					</div>
-				);
-			})
+		sortedList.length &&
+		sortedList.slice(0, 15).map((item: any) => {
+			const isTypeDm = item.typeSearch === TypeSearch.Dm_Type;
+			return (
+				<div key={item.id} className="flex items-center px-4 py-1 dark:hover:bg-bgPrimary1 hover:bg-bgLightModeThird rounded">
+					{isTypeDm ? (
+						<ItemDm
+							id={item.idDM}
+							avatar={item.avatarUser}
+							name={item.prioritizeName}
+							searchText={searchText}
+							checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.idDM)}
+							handleToggle={() => handleToggle(item.idDM, item.typeChat || 0)}
+							userName={item.userName}
+						/>
+					) : (
+						<ItemChannel
+							id={item.id}
+							name={item.prioritizeName}
+							subText={item.subText}
+							searchText={searchText}
+							checked={selectedObjectIdSends.some((selectedItem: any) => selectedItem.id === item.id)}
+							handleToggle={() => handleToggle(item.id, item.type || 0, item.clanId, item.channel_label || '')}
+						/>
+					)}
+				</div>
+			);
+		})
 	);
 };
 
@@ -53,24 +56,23 @@ type ItemDmProps = {
 	id: string;
 	name: string;
 	avatar: string;
-	displayName: string;
 	searchText: string;
 	checked: boolean;
 	handleToggle: () => void;
+	userName?: string;
 };
 
 const ItemDm = (props: ItemDmProps) => {
-	const { id, name, avatar, displayName, searchText, checked, handleToggle } = props;
+	const { id, name, avatar, searchText, checked, handleToggle, userName } = props;
 	return (
 		<>
 			<div className="flex-1 mr-1">
 				<SuggestItem
-					username={name}
+					display={name}
 					avatarUrl={avatar}
 					showAvatar
-					displayName={displayName || name}
 					valueHightLight={searchText}
-					subText={name}
+					subText={userName}
 					wrapSuggestItemStyle="gap-x-1"
 					subTextStyle="text-[13px]"
 				/>
@@ -95,8 +97,7 @@ const ItemChannel = (props: ItemChannelProps) => {
 		<>
 			<div className="flex-1 mr-1">
 				<SuggestItem
-					username={name}
-					displayName={name}
+					display={name}
 					subText={subText}
 					channelId={id}
 					valueHightLight={searchText}

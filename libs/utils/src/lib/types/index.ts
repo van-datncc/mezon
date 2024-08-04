@@ -207,7 +207,7 @@ export type IUser = {
 
 export type MetaDateStatusUser = {
 	status: string;
-}
+};
 
 export type IVoice = {
 	user_id: string;
@@ -423,12 +423,13 @@ export interface IGif {
 
 export type MentionDataProps = {
 	id: string | number;
-	display?: string;
-	avatarUrl?: string;
-	displayName?: string;
-	clanNick?: string;
-	clanAvatar?: string;
+	display?: string | undefined;
+	avatarUrl?: string | undefined;
+	displayName?: string | undefined;
+	clanNick?: string | undefined;
+	clanAvatar?: string | undefined;
 	user?: ApiUser;
+	username?: string | undefined;
 };
 
 export type UserSearchDataProps = {
@@ -621,3 +622,20 @@ export enum TypeSearch {
 	Dm_Type = 1,
 	Channel_Type = 2,
 }
+
+export type SearchItemProps = {
+	typeChat?: number;
+	displayName?: string;
+	id?: string;
+	name?: string;
+	avatarUser?: string;
+	lastSentTimeStamp?: number;
+	idDM?: string;
+	type?: number;
+	clanAvatar?: string;
+	clanNick?: string;
+	prioritizeName?: string;
+	subText?: string;
+	icon?: string;
+	channelId?: string;
+};

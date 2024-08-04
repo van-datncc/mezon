@@ -10,11 +10,20 @@ import {
 	startOfDay,
 	subDays,
 } from 'date-fns';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
-import { ChannelMembersEntity, EmojiDataOptionals, ILineMention, IMessageWithUser, SenderInfoOptionals, UsersClanEntity } from '../types/index';
+import {
+	ChannelMembersEntity,
+	EmojiDataOptionals,
+	ILineMention,
+	IMessageWithUser,
+	MentionDataProps,
+	SearchItemProps,
+	SenderInfoOptionals,
+	UsersClanEntity,
+} from '../types/index';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -244,34 +253,51 @@ export const checkLastChar = (text: string) => {
 	}
 };
 
-const getNameForSorting = (clanNickname: string, displayName: string, username: string) => {
+export const getNameForPrioritize = (clanNickname: string | undefined, displayName: string | undefined, username: string | undefined) => {
 	if (clanNickname && clanNickname !== username) return clanNickname;
-	if (clanNickname === username && displayName) return displayName;
-	return username;
+	if (clanNickname === username || (clanNickname === '' && displayName && displayName !== username)) return displayName;
+	if (displayName === '' || displayName === username) return username;
 };
 
-export function searchMentionsHashtag(searchValue: any, list: any[]) {
+export function compareObjects(a: any, b: any, searchText: string, prioritizeProp: string, nameProp: string) {
+	const aIndex = a[prioritizeProp]?.toUpperCase().indexOf(searchText.toUpperCase()) ?? -1;
+	const bIndex = b[prioritizeProp]?.toUpperCase().indexOf(searchText.toUpperCase()) ?? -1;
+	const aNameIndex = a[nameProp]?.toUpperCase().indexOf(searchText.toUpperCase()) ?? -1;
+	const bNameIndex = b[nameProp]?.toUpperCase().indexOf(searchText.toUpperCase()) ?? -1;
+
+	if (aIndex === -1 && bIndex === -1) {
+		return aNameIndex - bNameIndex;
+	}
+
+	if (aIndex !== bIndex) {
+		if (aIndex === -1) return 1;
+		if (bIndex === -1) return -1;
+		return aIndex - bIndex;
+	}
+
+	return aNameIndex - bNameIndex;
+}
+
+export function normalizeString(str: string): string {
+	return str
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toUpperCase();
+}
+
+export function searchMentionsHashtag(searchValue: string, list: MentionDataProps[]) {
 	if (!searchValue) return list;
-	const lowerCaseSearchValue = searchValue.toLowerCase();
 
-	return list
-		.filter((mention) => {
-			return (
-				mention.display?.toLowerCase().includes(lowerCaseSearchValue) ||
-				mention.displayName?.toLowerCase().includes(lowerCaseSearchValue) ||
-				mention.clanNick?.toLowerCase().includes(lowerCaseSearchValue)
-			);
-		})
-		.sort((a, b) => {
-			const nameA = getNameForSorting(a.clanNick, a.displayName, a.display)?.toLowerCase() ?? '';
-			const nameB = getNameForSorting(b.clanNick, b.displayName, b.display)?.toLowerCase() ?? '';
-
-			const indexA = nameA.indexOf(lowerCaseSearchValue);
-			const indexB = nameB.indexOf(lowerCaseSearchValue);
-
-			if (indexA !== indexB) return indexA - indexB;
-			return nameA.localeCompare(nameB);
-		});
+	// Normalize and remove diacritical marks from the search value
+	const normalizedSearchValue = normalizeString(searchValue).toUpperCase();
+	const filteredList: MentionDataProps[] = list.filter((mention) => {
+		const displayNormalized = normalizeString(mention.display ?? '').toUpperCase();
+		const usernameNormalized = normalizeString(mention.username ?? '').toUpperCase();
+		return displayNormalized.includes(normalizedSearchValue) || usernameNormalized.includes(normalizedSearchValue);
+	});
+	// Sort the filtered list
+	const sortedList = filteredList.sort((a, b) => compareObjects(a, b, normalizedSearchValue, 'display', 'display'));
+	return sortedList;
 }
 
 export const ValidateSpecialCharacters = () => {
@@ -319,3 +345,72 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 			minHeight,
 		);
 	});
+
+export function findClanAvatarByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+	for (let item of data) {
+		if (item?.user?.id === userId) {
+			return item.clan_avatar;
+		}
+	}
+	return '';
+}
+
+export function findClanNickByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+	for (let item of data) {
+		if (item?.user?.id === userId) {
+			return item.clan_nick;
+		}
+	}
+	return '';
+}
+
+export function findDisplayNameByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+	for (let item of data) {
+		if (item?.user?.id === userId) {
+			return item.user.display_name;
+		}
+	}
+	return '';
+}
+
+export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ChannelUserListChannelUser[]): SearchItemProps[] {
+	return data.map((item) => {
+		const avatarClanFinding = findClanAvatarByUserId(item.id ?? '', dataUserClan);
+		const clanNickFinding = findClanNickByUserId(item.id ?? '', dataUserClan);
+		const prioritizeName = getNameForPrioritize(clanNickFinding ?? '', item.displayName ?? '', item.name ?? '');
+		return {
+			...item,
+			clanAvatar: avatarClanFinding,
+			clanNick: clanNickFinding,
+			prioritizeName: prioritizeName,
+		};
+	});
+}
+
+export function filterListByName(listSearch: SearchItemProps[], searchText: string, isSearchByUsername: boolean): SearchItemProps[] {
+	return listSearch.filter((item: SearchItemProps) => {
+		if (isSearchByUsername) {
+			const searchName = normalizeString(searchText.slice(1));
+			const itemName = item.name ? normalizeString(item.name) : '';
+			return itemName.includes(searchName);
+		} else {
+			const searchUpper = normalizeString(searchText);
+			const prioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
+			const itemName = item.name ? normalizeString(item.name) : '';
+			return prioritizeName.includes(searchUpper) || itemName.includes(searchUpper);
+		}
+	});
+}
+
+export function sortFilteredList(filteredList: SearchItemProps[], searchText: string, isSearchByUsername: boolean): SearchItemProps[] {
+	return filteredList.sort((a: SearchItemProps, b: SearchItemProps) => {
+		if (searchText === '') {
+			return (b.lastSentTimeStamp || 0) - (a.lastSentTimeStamp || 0);
+		} else if (isSearchByUsername) {
+			const searchWithoutAt = searchText.slice(1);
+			return compareObjects(a, b, searchWithoutAt, 'name', 'prioritizeName');
+		} else {
+			return compareObjects(a, b, searchText, 'prioritizeName', 'name');
+		}
+	});
+}
