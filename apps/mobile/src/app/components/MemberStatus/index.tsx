@@ -126,7 +126,7 @@ export const MemberListStatus = React.memo(() => {
 					</View>
 				)}
 			</View>
-			<UserInformationBottomSheet userId={selectedUser?.user?.id} onClose={onClose} />
+			<UserInformationBottomSheet user={selectedUser?.user} onClose={onClose} />
 			<InviteToChannel isUnknownChannel={false} ref={bottomSheetRef} isDMThread={isDMThread} />
 		</ScrollView>
 	);
