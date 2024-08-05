@@ -86,7 +86,7 @@ const NavigationMain = () => {
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		}, 900);
+		}, 1000);
 
 		return () => {
 			clearTimeout(timer);
