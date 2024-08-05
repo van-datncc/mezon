@@ -1,4 +1,4 @@
-import { useNotification } from '@mezon/core';
+import { useAppParams, useNotification } from '@mezon/core';
 import { selectMemberByUserId } from '@mezon/store';
 import { INotification, convertTimeString } from '@mezon/utils';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ export type NotifyProps = {
 
 function NotificationItem({ notify }: NotifyProps) {
 	const { deleteNotify } = useNotification();
+	const { clanId } = useAppParams();
 
 	const [openUserProfileModalInner, setOpenUserProfileModalInner] = useState<boolean>(false);
 
@@ -34,7 +35,7 @@ function NotificationItem({ notify }: NotifyProps) {
 
 	const handleDeleteNotification = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, notificationId: string) => {
 		event.stopPropagation();
-		deleteNotify(notificationId);
+		deleteNotify(notificationId, clanId ?? '0');
 	};
 
 	return (
