@@ -613,25 +613,21 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					data={handleSearchUserMention}
 					trigger="@"
 					displayTransform={(id: any, display: any) => {
-						return `@${display}`;
+						return display === '@here' ? `${display}` : `@${display}`;
 					}}
 					renderSuggestion={(suggestion: MentionDataProps) => {
-						const avatar = suggestion.clanAvatar ? suggestion.clanAvatar : suggestion.avatarUrl;
-
 						return (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display === 'here' ? '@here' : (suggestion.display ?? '')}
-								displayName={suggestion.displayName}
-								clanNickname={suggestion.clanNick}
-								avatarUrl={avatar ?? ''}
+								avatarUrl={suggestion.avatarUrl}
 								subText={
-									suggestion.display === 'here'
+									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.display ?? '')
+										: (suggestion.username ?? '')
 								}
-								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
-								showAvatar={suggestion.display !== 'here'}
+								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
+								showAvatar={suggestion.display !== '@here'}
+								display={suggestion.display}
 							/>
 						);
 					}}
@@ -650,11 +646,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					renderSuggestion={(suggestion) => (
 						<SuggestItem
 							valueHightLight={valueHighlight}
-							name={suggestion.display ?? ''}
+							display={suggestion?.display}
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
-							isHashtag={true}
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -666,9 +661,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;
 					}}
-					renderSuggestion={(suggestion) => (
-						<SuggestItem name={suggestion.display ?? ''} isEmoji={true} symbol={(suggestion as any).emoji} />
-					)}
+					renderSuggestion={(suggestion) => <SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}
 				/>

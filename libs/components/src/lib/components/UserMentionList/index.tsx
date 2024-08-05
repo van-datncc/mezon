@@ -1,6 +1,6 @@
 import { useChannelMembers } from '@mezon/core';
 import { ChannelMembersEntity, selectAllRolesClan } from '@mezon/store';
-import { MentionDataProps } from '@mezon/utils';
+import { MentionDataProps, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -24,21 +24,22 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 		const mentionList =
 			userMentionRaw?.map((item: ChannelMembersEntity) => ({
 				id: item?.user?.id ?? '',
-				display: item?.user?.username ?? '',
-				avatarUrl: item?.user?.avatar_url ?? '',
-				displayName: item?.user?.display_name ?? '',
-				clanNick: item?.clan_nick,
-				clanAvatar: item?.clan_avatar,
+				display: getNameForPrioritize(item.clan_nick ?? '', item.user?.display_name ?? '', item.user?.username ?? ''),
+				avatarUrl: item.clan_avatar ? item.clan_avatar : item?.user?.avatar_url ?? '',
+				username: item.user?.username,
 			})) ?? [];
 		const hardcodedUser: MentionDataProps = {
 			id: '1775731111020111321',
-			display: 'here',
+			display: '@here',
 			avatarUrl: '',
-			clanNick: '@here',
+			username: '@here',
 		};
 		const sortedMentionList = [...mentionList].sort((a, b) => {
-			if (a.display.toLowerCase() < b.display.toLowerCase()) return -1;
-			if (a.display.toLowerCase() > b.display.toLowerCase()) return 1;
+			const displayA = a.display?.toLowerCase() || '';
+			const displayB = b.display?.toLowerCase() || '';
+
+			if (displayA < displayB) return -1;
+			if (displayA > displayB) return 1;
 			return 0;
 		});
 		const roleMentions =
