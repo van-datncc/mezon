@@ -16,7 +16,9 @@ import {
 	TypeSearch,
 	UsersClanEntity,
 	addAttributesSearchList,
+	filterListByName,
 	findDisplayNameByUserId,
+	normalizeString,
 	removeDuplicatesById,
 	sortFilteredList,
 } from '@mezon/utils';
@@ -193,104 +195,83 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		}
 	};
 
+	const normalizeSearchText = useMemo(() => {
+		return normalizeString(searchText);
+	}, [searchText]);
+
+	const isSearchByUsername = useMemo(() => {
+		return searchText.startsWith('@');
+	}, [searchText]);
+
 	const isNoResult =
-		!listChannelSearch.filter((item) => item.name.indexOf(searchText) > -1).length &&
-		!listMemSearch.filter((item: any) => item.name.indexOf(searchText) > -1).length;
-
-	const memSearchs = listMemSearch
-		.filter((item) => item.name && item.name.indexOf(searchText.startsWith('@') ? searchText.substring(1) : searchText) > -1)
-		.slice(0, searchText.startsWith('@') ? 25 : 7);
-
-	const channelSearchs = listChannelSearch
-		.filter((item) => item.name.indexOf(searchText.startsWith('#') ? searchText.substring(1) : searchText) > -1)
-		.slice(0, searchText.startsWith('#') ? 25 : 8);
+		!listChannelSearch.filter((item) => item.prioritizeName.indexOf(normalizeSearchText) > -1 || item.name.indexOf(normalizeSearchText) > -1)
+			.length && !listMemSearch.filter((item: any) => item.prioritizeName.indexOf(normalizeSearchText) > -1).length;
 
 	const totalLists = useMemo(() => {
-		return sortFilteredList(memSearchs.concat(channelSearchs).slice(), searchText, false);
-	}, [memSearchs, channelSearchs, searchText]);
+		return listMemSearch.concat(listChannelSearch);
+	}, [listMemSearch, listChannelSearch, normalizeSearchText]);
 
-	const memSearchListSorted = useMemo(() => {
-		return sortFilteredList(memSearchs, searchText, false);
-	}, [memSearchs, searchText]);
+	const totalListsFiltered = useMemo(() => {
+		return filterListByName(totalLists, normalizeSearchText, isSearchByUsername);
+	}, [totalLists, normalizeSearchText, isSearchByUsername]);
 
-	const channelSearchListSorted = useMemo(() => {
-		return sortFilteredList(channelSearchs, searchText, false);
-	}, [channelSearchs, searchText]);
+	const totalListsSorted = useMemo(() => {
+		return sortFilteredList(totalListsFiltered, normalizeSearchText, isSearchByUsername);
+	}, [totalListsFiltered, normalizeSearchText, isSearchByUsername]);
+
+	const channelSearchSorted = useMemo(() => {
+		return totalListsSorted.filter((item) => item.type === 2);
+	}, [totalListsSorted]);
+
+	const memSearchSorted = useMemo(() => {
+		return totalListsSorted.filter((item) => item.type === 1);
+	}, [totalListsSorted]);
+
+	const [listToUse, setListToUse] = useState<SearchItemProps[]>([]);
+
+	// Define a function to get the list to use based on the search text
+	const getListToUse = (
+		normalizeSearchText: string,
+		memSearchSorted: SearchItemProps[],
+		channelSearchSorted: SearchItemProps[],
+		totalListsSorted: SearchItemProps[],
+	) => {
+		if (normalizeSearchText.startsWith('@')) {
+			return memSearchSorted;
+		} else if (normalizeSearchText.startsWith('#')) {
+			return channelSearchSorted;
+		}
+		return totalListsSorted;
+	};
 
 	useEffect(() => {
-		if (idActive === '') {
-			setIdActive(totalLists[0]?.id ?? '');
+		const listToUseChecked = getListToUse(normalizeSearchText, memSearchSorted, channelSearchSorted, totalListsSorted);
+		setListToUse(listToUseChecked);
+		setIdActive('');
+	}, [normalizeSearchText]);
+
+	useEffect(() => {
+		console.log(idActive);
+		console.log(listToUse);
+		if (idActive === '' && listToUse.length > 0) {
+			setIdActive(listToUse[0]?.id ?? '');
 		}
 
-		let maxHight = itemRef.current?.clientHeight ?? 0;
-
-		const boxHight = boxRef.current?.clientHeight ?? 0;
 		const handleKeyDown = (event: KeyboardEvent) => {
-			const nextIndex = (currentIndex: number, length: number) => (currentIndex === length - 1 ? 0 : currentIndex + 1);
-			const prevIndex = (currentIndex: number) => (currentIndex === 0 ? totalLists.length - 1 : currentIndex - 1);
-			const itemSelect = totalLists.find((item: SearchItemProps) => item?.id === idActive);
+			const currentIndex = listToUse.findIndex((item) => item?.id === idActive);
+			if (currentIndex === -1) return;
 
 			switch (event.key) {
 				case 'ArrowDown':
-					if (itemRef && itemRef.current) {
-						maxHight =
-							itemRef.current.clientHeight *
-							(nextIndex(
-								totalLists.findIndex((item: SearchItemProps) => item?.id === idActive),
-								totalLists.length,
-							) +
-								1);
-
-						if (maxHight > boxHight) {
-							boxRef.current?.scroll({
-								top: maxHight - boxHight + 46,
-								behavior: 'smooth',
-							});
-						}
-						if (maxHight === itemRef.current?.clientHeight) {
-							boxRef.current?.scroll({
-								top: 0,
-								behavior: 'smooth',
-							});
-						}
-					}
-					setIdActive(
-						totalLists[
-							nextIndex(
-								totalLists.findIndex((item: SearchItemProps) => item?.id === idActive),
-								totalLists.length,
-							)
-						]?.id ?? '',
-					);
+					handleArrowDown(listToUse, currentIndex);
 					break;
+
 				case 'ArrowUp':
-					if (itemRef && itemRef.current) {
-						maxHight =
-							itemRef.current.clientHeight * (prevIndex(totalLists.findIndex((item: SearchItemProps) => item?.id === idActive)) + 1);
-
-						if (maxHight > boxHight) {
-							boxRef.current?.scroll({
-								top: maxHight - boxHight + 46,
-								behavior: 'smooth',
-							});
-						}
-						if (maxHight === itemRef.current?.clientHeight) {
-							boxRef.current?.scroll({
-								top: 0,
-								behavior: 'smooth',
-							});
-						}
-					}
-					setIdActive(totalLists[prevIndex(totalLists.findIndex((item: SearchItemProps) => item?.id === idActive))]?.id ?? '');
+					handleArrowUp(listToUse, currentIndex);
 					break;
+
 				case 'Enter':
-					if (itemSelect?.subText) {
-						event.preventDefault();
-						handleSelectChannel(totalLists.find((item: SearchItemProps) => item?.id === idActive));
-						dispatch(messagesActions.setIsFocused(true));
-					} else {
-						handleSelectMem(totalLists.find((item: SearchItemProps) => item?.id === idActive));
-					}
+					handleEnter(listToUse, idActive);
 					break;
 
 				default:
@@ -303,7 +284,61 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown);
 		};
-	}, [handleSelectChannel, handleSelectMem, idActive, listChannelSearch, listMemSearch, searchText]);
+	}, [idActive, listToUse]);
+
+	const handleArrowDown = (listToUse: any[], currentIndex: number) => {
+		const nextIndex = currentIndex === listToUse.length - 1 ? 0 : currentIndex + 1;
+		const newItem = listToUse[nextIndex];
+
+		if (!itemRef.current || !boxRef.current || !newItem) return;
+
+		const itemHeight = itemRef.current.clientHeight;
+		const boxHeight = boxRef.current.clientHeight;
+		const newItemOffset = (itemHeight + 4) * nextIndex;
+		const newScrollTop = newItemOffset + itemHeight - boxHeight;
+		const totalItemsHeight = listToUse.length * itemHeight;
+		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
+
+		boxRef.current.scroll({
+			top: Math.min(newScrollTop, maxScrollTop),
+			behavior: 'smooth',
+		});
+
+		setIdActive(newItem.id ?? '');
+	};
+
+	const handleArrowUp = (listToUse: any[], currentIndex: number) => {
+		const prevIndex = currentIndex === 0 ? listToUse.length - 1 : currentIndex - 1;
+		const newItem = listToUse[prevIndex];
+
+		if (!itemRef.current || !boxRef.current || !newItem) return;
+
+		const itemHeight = itemRef.current.clientHeight;
+		const boxHeight = boxRef.current.clientHeight;
+		const newItemOffset = (itemHeight + 4) * prevIndex;
+		const newScrollTop = newItemOffset - boxHeight + itemHeight;
+		const totalItemsHeight = listToUse.length * itemHeight;
+		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
+
+		boxRef.current.scroll({
+			top: Math.min(Math.max(newScrollTop, 0), maxScrollTop),
+			behavior: 'smooth',
+		});
+
+		setIdActive(newItem.id ?? '');
+	};
+
+	const handleEnter = (listToUse: SearchItemProps[], idActive: string) => {
+		const selectedItem = listToUse.find((item) => item.id === idActive);
+		if (!selectedItem) return;
+
+		if (selectedItem.subText) {
+			handleSelectChannel(selectedItem);
+			dispatch(messagesActions.setIsFocused(true));
+		} else {
+			handleSelectMem(selectedItem);
+		}
+	};
 
 	return (
 		<Modal
@@ -325,15 +360,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				</div>
 				<div
 					ref={boxRef}
-					className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+					className={`w-full max-h-[250px]  overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px]  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 				>
-					{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
+					{!normalizeSearchText.startsWith('@') && !normalizeSearchText.startsWith('#') ? (
 						<>
 							<ListSearchModal
-								listSearch={totalLists}
+								listSearch={totalListsSorted}
 								itemRef={itemRef}
 								handleSelect={handleSelect}
-								searchText={searchText}
+								searchText={normalizeSearchText}
 								idActive={idActive}
 								setIdActive={setIdActive}
 							/>
@@ -345,27 +380,28 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						</>
 					) : (
 						<>
-							{searchText.startsWith('@') && (
+							{normalizeSearchText.startsWith('@') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
 									<ListSearchModal
-										listSearch={memSearchListSorted}
+										listSearch={memSearchSorted}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
-										searchText={searchText}
+										searchText={normalizeSearchText}
 										idActive={idActive}
 										setIdActive={setIdActive}
+										isSearchByUsername={isSearchByUsername}
 									/>
 								</>
 							)}
-							{searchText.startsWith('#') && (
+							{normalizeSearchText.startsWith('#') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 									<ListSearchModal
-										listSearch={channelSearchListSorted}
+										listSearch={channelSearchSorted}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
-										searchText={searchText.slice(1)}
+										searchText={normalizeSearchText.slice(1)}
 										idActive={idActive}
 										setIdActive={setIdActive}
 									/>

@@ -1,5 +1,5 @@
-import { filterListByName, SearchItemProps, sortFilteredList, TypeSearch } from '@mezon/utils';
-import { memo, useMemo } from 'react';
+import { SearchItemProps, TypeSearch } from '@mezon/utils';
+import { memo } from 'react';
 import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
 
 type ListSearchModalProps = {
@@ -9,20 +9,15 @@ type ListSearchModalProps = {
 	idActive: string;
 	handleSelect: (type: boolean, item: SearchItemProps) => Promise<void>;
 	setIdActive: React.Dispatch<React.SetStateAction<string>>;
+	isSearchByUsername?: boolean;
 };
 
 const ListSearchModal = (props: ListSearchModalProps) => {
-	const { listSearch, itemRef, searchText, idActive, handleSelect, setIdActive } = props;
-	const isSearchByUsername = useMemo(() => {
-		return searchText.startsWith('@');
-	}, [searchText]);
-
-	const filteredList = useMemo(() => filterListByName(listSearch, searchText, isSearchByUsername), [listSearch, searchText, isSearchByUsername]);
-	const sortedList = useMemo(() => sortFilteredList(filteredList, searchText, isSearchByUsername), [filteredList, searchText, isSearchByUsername]);
+	const { listSearch, itemRef, searchText, idActive, handleSelect, setIdActive, isSearchByUsername } = props;
 
 	return (
-		sortedList.length > 0 &&
-		sortedList.slice(0, 15).map((item: SearchItemProps) => {
+		listSearch.length > 0 &&
+		listSearch.map((item: SearchItemProps) => {
 			const isTypeChannel = item.type === TypeSearch.Channel_Type;
 			return (
 				<div

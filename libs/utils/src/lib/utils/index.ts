@@ -259,23 +259,39 @@ export const getNameForPrioritize = (clanNickname: string | undefined, displayNa
 	if (displayName === '' || displayName === username) return username;
 };
 
-export function compareObjects(a: any, b: any, searchText: string, prioritizeProp: string, nameProp: string) {
-	const aIndex = a[prioritizeProp]?.toUpperCase().indexOf(searchText.toUpperCase()) ?? -1;
-	const bIndex = b[prioritizeProp]?.toUpperCase().indexOf(searchText.toUpperCase()) ?? -1;
-	const aNameIndex = a[nameProp]?.toUpperCase().indexOf(searchText.toUpperCase()) ?? -1;
-	const bNameIndex = b[nameProp]?.toUpperCase().indexOf(searchText.toUpperCase()) ?? -1;
+export function compareObjects(a: any, b: any, searchText: string, prioritizeProp: string, nameProp?: string) {
+	const normalizedSearchText = searchText.toUpperCase();
 
-	if (aIndex === -1 && bIndex === -1) {
+	const aIndex = a[prioritizeProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
+	const bIndex = b[prioritizeProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
+
+	if (nameProp) {
+		const aNameIndex = a[nameProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
+		const bNameIndex = b[nameProp]?.toUpperCase().indexOf(normalizedSearchText) ?? -1;
+
+		if (aIndex === -1 && bIndex === -1) {
+			return aNameIndex - bNameIndex;
+		}
+
+		if (aIndex !== bIndex) {
+			if (aIndex === -1) return 1;
+			if (bIndex === -1) return -1;
+			return aIndex - bIndex;
+		}
+
 		return aNameIndex - bNameIndex;
-	}
+	} else {
+		if (aIndex === -1 && bIndex === -1) {
+			return 0;
+		}
 
-	if (aIndex !== bIndex) {
-		if (aIndex === -1) return 1;
-		if (bIndex === -1) return -1;
-		return aIndex - bIndex;
+		if (aIndex !== bIndex) {
+			if (aIndex === -1) return 1;
+			if (bIndex === -1) return -1;
+			return aIndex - bIndex;
+		}
+		return (a[prioritizeProp]?.toUpperCase() ?? '').localeCompare(b[prioritizeProp]?.toUpperCase() ?? '');
 	}
-
-	return aNameIndex - bNameIndex;
 }
 
 export function normalizeString(str: string): string {
@@ -394,7 +410,7 @@ export function filterListByName(listSearch: SearchItemProps[], searchText: stri
 			const itemName = item.name ? normalizeString(item.name) : '';
 			return itemName.includes(searchName);
 		} else {
-			const searchUpper = normalizeString(searchText);
+			const searchUpper = normalizeString(searchText.startsWith('#') ? searchText.substring(1) : searchText);
 			const prioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
 			return prioritizeName.includes(searchUpper) || itemName.includes(searchUpper);
@@ -404,8 +420,10 @@ export function filterListByName(listSearch: SearchItemProps[], searchText: stri
 
 export function sortFilteredList(filteredList: SearchItemProps[], searchText: string, isSearchByUsername: boolean): SearchItemProps[] {
 	return filteredList.sort((a: SearchItemProps, b: SearchItemProps) => {
-		if (searchText === '') {
+		if (searchText === '' || searchText.startsWith('@' || searchText.startsWith('#'))) {
 			return (b.lastSentTimeStamp || 0) - (a.lastSentTimeStamp || 0);
+		} else if (searchText.startsWith('#')) {
+			return compareObjects(a, b, searchText.substring(1), 'prioritizeName');
 		} else if (isSearchByUsername) {
 			const searchWithoutAt = searchText.slice(1);
 			return compareObjects(a, b, searchWithoutAt, 'name', 'prioritizeName');
