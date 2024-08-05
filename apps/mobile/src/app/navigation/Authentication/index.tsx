@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { useAuth, useReference } from '@mezon/core';
-import { getAppInfo } from '@mezon/mobile-components';
+import { useAuth } from '@mezon/core';
+import { CHANNEL_ID_SHARING, getAppInfo } from '@mezon/mobile-components';
 import {
 	appActions,
 	fcmActions,
 	getStoreAsync,
+	referencesActions,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDmGroupCurrentId,
@@ -15,7 +16,6 @@ import {
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BackHandler } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
@@ -52,7 +52,6 @@ export const Authentication = () => {
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
 	const [fileShared, setFileShared] = useState<any>();
-	const { setAttachmentData } = useReference();
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
 	useCheckUpdatedVersion();
@@ -137,7 +136,11 @@ export const Authentication = () => {
 
 	const onCloseFileShare = () => {
 		setFileShared(undefined);
-		setAttachmentData([]);
+		dispatch(
+			referencesActions.resetDataAttachment({
+				channelId: CHANNEL_ID_SHARING,
+			}),
+		);
 		navigation.goBack();
 	};
 

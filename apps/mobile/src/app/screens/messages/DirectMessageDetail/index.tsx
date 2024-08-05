@@ -1,15 +1,16 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, Icons, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelMembersActions,
+	clansActions,
 	directActions,
 	getStoreAsync,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -67,33 +68,44 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
 	};
 
-	const fetchMemberChannel = useCallback(async () => {
+	const fetchMemberChannel = useCallback(() => {
 		if (!currentChannel) {
 			return;
 		}
-		await dispatch(
-			channelMembersActions.fetchChannelMembers({
-				clanId: currentChannel?.clan_id || '',
-				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type,
-				noCache: true,
-			}),
-		);
-	}, [currentChannel, dispatch]);
+
+		requestAnimationFrame(async () => {
+			const store = await getStoreAsync();
+			await Promise.all([
+				store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id })),
+				store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id)),
+				store.dispatch(
+					channelMembersActions.fetchChannelMembers({
+						clanId: currentChannel?.clan_id || '',
+						channelId: currentChannel?.channel_id || '',
+						channelType: currentChannel?.type,
+						noCache: true,
+					}),
+				),
+			]);
+		});
+	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
-		store.dispatch(
+		await store.dispatch(clansActions.joinClan({ clanId: '0' }));
+		await store.dispatch(clansActions.setCurrentClanId('0'));
+		await store.dispatch(
 			directActions.joinDirectMessage({
-				directMessageId: currentDmGroup.id,
-				channelName: currentDmGroup.channel_label,
-				type: currentDmGroup.type,
+				directMessageId: currentDmGroup?.id,
+				channelName: currentDmGroup?.channel_label,
+				type: currentDmGroup?.type,
 				noCache: true,
 				isFetchingLatestMessages: true,
 			}),
 		);
+		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 		return null;
-	}, [currentDmGroup]);
+	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type]);
 
 	useEffect(() => {
 		return () => {
