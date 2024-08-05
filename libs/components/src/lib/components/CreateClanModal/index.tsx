@@ -19,19 +19,17 @@ type openModalErrorProps = {
 	errorType: boolean;
 	errorSize: boolean;
 };
-const validateListMessage = {
-	INVALID_NAME:
-		'Please enter a valid clan name (max 64 characters, only words, numbers, _ or -)',
-	DUPLICATE_NAME:
-		'The clan name already exists. Please enter another name.'
+enum EValidateListMessage {
+	INVALID_NAME = 'Please enter a valid clan name (max 64 characters, only words, numbers, _ or -)',
+	DUPLICATE_NAME = 'The clan name already exists. Please enter another name.',
+	VALIDATED = 'VALIDATED'
 }
 
 const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const { open, onClose } = props;
 	const [urlImage, setUrlImage] = useState('');
 	const [nameClan, setNameClan] = useState('');
-	const [checkvalidate, setCheckValidate] = useState<string | null>(validateListMessage.INVALID_NAME);
-	const [onTyping, setOnTyping] = useState<boolean>(false);
+	const [checkvalidate, setCheckValidate] = useState<EValidateListMessage | null>(EValidateListMessage.INVALID_NAME);
 	const { sessionRef, clientRef } = useMezon();
 	const { navigate, toClanPage } = useAppNavigation();
 	const { createClans } = useClans();
@@ -42,24 +40,22 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setNameClan(value);
-		setOnTyping(true);
+		setCheckValidate(null);
 		const regex = ValidateSpecialCharacters();
 		if (regex.test(value) && value !== '') {
-			debouncedSetClanName(e.target.value);
+			debouncedSetClanName(value);
 		} else {
 			debouncedSetClanName.cancel();
-			setCheckValidate(validateListMessage.INVALID_NAME);
-			setOnTyping(false);
+			setCheckValidate(EValidateListMessage.INVALID_NAME);
 		}
 	};
 	const debouncedSetClanName = useDebouncedCallback(async (value) => {
 		await dispatch(checkDuplicateNameClan(value)).then(unwrapResult).then(result => {
 			if (result) {
-				setCheckValidate(validateListMessage.DUPLICATE_NAME)
-			} else {
-				setCheckValidate(null)
+				setCheckValidate(EValidateListMessage.DUPLICATE_NAME)
+				return;
 			}
-			setOnTyping(false);
+			setCheckValidate(EValidateListMessage.VALIDATED)
 		});
 	}, 700);
 
@@ -117,7 +113,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			title=""
 			titleConfirm="Create"
 			confirmButton={handleCreateClan}
-			disableButtonConfirm={onTyping || checkvalidate !== null}
+			disableButtonConfirm={checkvalidate !== EValidateListMessage.VALIDATED}
 			classNameBox="h-full"
 		>
 			<div className="flex items-center flex-col justify-center ">
@@ -140,7 +136,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 							<span className="text-[14px]">Upload</span>
 						</div>
 					)}
-					<input id="preview_img" type="file" onChange={(e) => handleFile(e)} className="block w-full text-sm text-slate-500 hidden" />
+					<input id="preview_img" type="file" onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 hidden" />
 				</label>
 				<div className="w-full">
 					<span className="font-[700] text-[16px] leading-6">CLAN NAME</span>
@@ -151,7 +147,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 						placeholder={`Enter the clan name`}
 						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>
-					{checkvalidate && !onTyping && (
+					{checkvalidate !== EValidateListMessage.VALIDATED && (
 						<p className="text-[#e44141] text-xs italic font-thin">
 							{checkvalidate}
 						</p>

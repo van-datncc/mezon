@@ -3,7 +3,7 @@ import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Button, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI } from '@mezon/utils';
 import { ApiClanSticker, ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
-import { ChangeEvent, useRef, useState } from 'react';
+import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 
@@ -101,6 +101,9 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 	const handleCloseOverModal = () => {
 		setOpenModal(false);
 	};
+	const validateSaveChange = useMemo(() => {
+		return editingSticker?.fileName && editingSticker.shortname && editingSticker.shortname !== editSticker?.shortname ? false : true
+	}, [editingSticker?.fileName, editingSticker.shortname]);
 
 	return (
 		<>
@@ -176,7 +179,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 						className="dark:text-textPrimary !text-textPrimaryLight rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent "
 						onClick={handleCloseModal}
 					/>
-					<Button label="Save Changes" className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`} disable={(editingSticker?.fileName && editingSticker.shortname && editingSticker.shortname !== editSticker?.shortname) ? false : true} onClick={onSaveChange} />
+					<Button label="Save Changes" className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`} disable={validateSaveChange} onClick={onSaveChange} />
 				</div>
 			</div>
 
