@@ -1,7 +1,8 @@
-import { useChatSending, useDirectMessages, useEmojiSuggestion, useReference } from '@mezon/core';
+import { useChatSending, useDirectMessages, useEmojiSuggestion } from '@mezon/core';
 import { ActionEmitEvent, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectChannelsEntities } from '@mezon/store-mobile';
+import { referencesActions, selectAttachmentData } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -50,6 +51,7 @@ interface IChatMessageInputProps {
 	voiceLinkRoomOnMessage?: ILinkVoiceRoomOnMessage[];
 	plainTextMessage?: string;
 	isShowCreateThread?: boolean;
+	channelsEntities?: any;
 }
 const inputWidthWhenHasInput = Dimensions.get('window').width * 0.72;
 
@@ -80,14 +82,15 @@ export const ChatMessageInput = memo(
 				voiceLinkRoomOnMessage,
 				plainTextMessage,
 				isShowCreateThread,
+				channelsEntities,
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>,
 		) => {
 			const [heightInput, setHeightInput] = useState(size.s_40);
-			const channelsEntities = useSelector(selectChannelsEntities);
 			const { themeValue } = useTheme();
+			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
-			const { attachmentDataRef, setAttachmentData } = useReference();
+			const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 			const { t } = useTranslation(['message']);
 			const {
 				sendMessage,
@@ -211,53 +214,65 @@ export const ChatMessageInput = memo(
 					});
 					return;
 				}
-				const { targetMessage, type } = messageActionNeedToResolve || {};
-				if (type === EMessageActionType.EditMessage) {
-					await onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id);
-				} else {
-					const reference = targetMessage
-						? [
-								{
-									message_id: '',
-									message_ref_id: targetMessage.id,
-									ref_type: 0,
-									message_sender_id: targetMessage?.sender_id,
-									message_sender_username: targetMessage?.username,
-									mesages_sender_avatar: targetMessage?.avatar,
-									message_sender_clan_nick: targetMessage?.clan_nick,
-									message_sender_display_name: targetMessage?.display_name,
-									content: JSON.stringify(targetMessage.content),
-									has_attachment: Boolean(targetMessage?.attachments?.length),
-								},
-							]
-						: undefined;
-					setEmojiSuggestion('');
-					if (![EMessageActionType.CreateThread].includes(messageAction)) {
-						const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here');
-						switch (mode) {
-							case ChannelStreamMode.STREAM_MODE_CHANNEL:
-								await sendMessage(
-									payloadSendMessage,
-									simplifiedMentionList || [],
-									attachmentDataUnique || [],
-									reference,
-									false,
-									isMentionEveryOne,
-								);
-								break;
-							case ChannelStreamMode.STREAM_MODE_DM:
-							case ChannelStreamMode.STREAM_MODE_GROUP:
-								await handleSendDM(payloadSendMessage, simplifiedMentionList, attachmentDataUnique || [], reference);
-								break;
-							default:
-								break;
-						}
-						setAttachmentData([]);
-					}
-				}
 
-				[EMessageActionType.CreateThread].includes(messageAction) &&
-					DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
+				const { targetMessage, type } = messageActionNeedToResolve || {};
+				const reference = targetMessage
+					? [
+							{
+								message_id: '',
+								message_ref_id: targetMessage.id,
+								ref_type: 0,
+								message_sender_id: targetMessage?.sender_id,
+								message_sender_username: targetMessage?.username,
+								mesages_sender_avatar: targetMessage?.avatar,
+								message_sender_clan_nick: targetMessage?.clan_nick,
+								message_sender_display_name: targetMessage?.display_name,
+								content: JSON.stringify(targetMessage.content),
+								has_attachment: Boolean(targetMessage?.attachments?.length),
+							},
+						]
+					: undefined;
+
+				setEmojiSuggestion('');
+
+				const sendMessageAsync = async () => {
+					if (type === EMessageActionType.EditMessage) {
+						await onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id);
+					} else {
+						if (![EMessageActionType.CreateThread].includes(messageAction)) {
+							const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here');
+							switch (mode) {
+								case ChannelStreamMode.STREAM_MODE_CHANNEL:
+									await sendMessage(
+										payloadSendMessage,
+										simplifiedMentionList || [],
+										attachmentDataUnique || [],
+										reference,
+										false,
+										isMentionEveryOne,
+									);
+									break;
+								case ChannelStreamMode.STREAM_MODE_DM:
+								case ChannelStreamMode.STREAM_MODE_GROUP:
+									await handleSendDM(payloadSendMessage, simplifiedMentionList, attachmentDataUnique || [], reference);
+									break;
+								default:
+									break;
+							}
+							dispatch(
+								referencesActions.resetDataAttachment({
+									channelId: channelId,
+								}),
+							);
+						}
+					}
+
+					if ([EMessageActionType.CreateThread].includes(messageAction)) {
+						DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
+					}
+				};
+
+				requestAnimationFrame(sendMessageAsync);
 			};
 
 			return (

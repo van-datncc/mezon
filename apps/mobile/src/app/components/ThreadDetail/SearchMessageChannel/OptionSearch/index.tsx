@@ -1,9 +1,12 @@
 import { NittroIcon } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { Text, View } from 'react-native';
-import { styles } from './OptionSearch.styles';
+import { style } from './OptionSearch.styles';
 
 type Option = { option: { title: string; content: string; value: string } };
 const OptionSearch = ({ option }: Option) => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 	return (
 		<View style={styles.wrapperOption}>
 			<View style={styles.content}>

@@ -8,7 +8,7 @@ const widthMedia = Metrics.screenWidth - 150;
 export const RenderImageChat = React.memo(({ image, index, disable, onPress, onLongPress }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(180);
+	const [calcImgHeight, setCalcImgHeight] = useAnimatedState<number>(0);
 
 	return (
 		<TouchableOpacity disabled={disable} activeOpacity={0.8} key={index} onPress={() => onPress(image)} onLongPress={onLongPress}>

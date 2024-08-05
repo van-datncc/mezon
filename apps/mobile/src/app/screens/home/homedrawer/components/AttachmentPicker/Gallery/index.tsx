@@ -1,7 +1,6 @@
-import { useReference } from '@mezon/core';
-import { CameraIcon, CheckIcon, PlayIcon, pushAttachmentToCache } from '@mezon/mobile-components';
+import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { appActions } from '@mezon/store';
+import { appActions, referencesActions, selectAttachmentData, useAppDispatch } from '@mezon/store-mobile';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { delay } from 'lodash';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -9,7 +8,7 @@ import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, To
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { style } from './styles';
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
@@ -29,8 +28,8 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const [photos, setPhotos] = useState([]);
 	const [pageInfo, setPageInfo] = useState(null);
 	const [loading, setLoading] = useState(false);
-	const { attachmentDataRef, setAttachmentData } = useReference();
-	const dispatch = useDispatch();
+	const attachmentDataRef = useSelector(selectAttachmentData(currentChannelId || ''));
+	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>();
 
 	const attachmentsFileName = useMemo(() => {
@@ -132,16 +131,13 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 	};
 
-	function removeAttachmentByUrl(urlToRemove: string, fileName: string) {
-		const removedAttachment = attachmentDataRef.filter((attachment) => {
-			if (attachment?.url === urlToRemove) {
-				return false;
-			}
-			return !(fileName && attachment?.filename === fileName);
-		});
-
-		setAttachmentData(removedAttachment);
-		pushAttachmentToCache(removedAttachment, currentChannelId);
+	function removeAttachmentByUrl(urlToRemove: string) {
+		dispatch(
+			referencesActions.removeAttachment({
+				channelId: currentChannelId,
+				urlAttachment: urlToRemove
+			}),
+		);
 	}
 
 	const renderItem = ({ item }) => {
@@ -162,7 +158,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				onPress={() => {
 					if (isSelected) {
 						const infoAttachment = attachmentDataRef?.find?.((attachment) => attachment?.filename === fileName);
-						removeAttachmentByUrl(infoAttachment.url, infoAttachment?.filename);
+						removeAttachmentByUrl(infoAttachment?.filename || infoAttachment?.url || '');
 					} else {
 						handleGalleryPress(item);
 					}
@@ -190,6 +186,18 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			const type = file?.node?.type;
 
 			let filePath = image?.uri;
+			dispatch(
+				referencesActions.setAttachmentData({
+					channelId: currentChannelId,
+					attachments: [
+						{
+							url: filePath,
+							filename: image?.filename,
+							filetype: type,
+						},
+					],
+				}),
+			);
 			if (Platform.OS === 'ios' && filePath.startsWith('ph://')) {
 				const ms = new Date().getTime();
 				const ext = image.extension;
@@ -211,19 +219,6 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				fileData,
 			};
 
-			setAttachmentData({
-				url: filePath,
-				filename: image?.filename || image?.uri,
-				filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
-			});
-			pushAttachmentToCache(
-				{
-					url: filePath,
-					filename: image?.filename || image?.uri,
-					filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
-				},
-				currentChannelId,
-			);
 			onPickGallery([fileFormat]);
 		} catch (err) {
 			console.log('Error: ', err);
@@ -244,21 +239,18 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			} else {
 				const file = response.assets[0];
 
-				setAttachmentData({
-					url: file?.uri,
-					filename: file?.fileName || file?.uri,
-					filetype: file?.type,
-				});
-
-				pushAttachmentToCache(
-					{
-						url: file?.uri,
-						filename: file?.fileName || file?.uri,
-						filetype: file?.type,
-					},
-					currentChannelId,
+				dispatch(
+					referencesActions.setAttachmentData({
+						channelId: currentChannelId,
+						attachments: [
+							{
+								url: file?.uri,
+								filename: file?.fileName || file?.uri,
+								filetype: file?.type,
+							},
+						],
+					}),
 				);
-
 				const fileBase64 = await RNFS.readFile(file?.uri, 'base64');
 				const fileFormat: IFile = {
 					uri: file?.uri,
