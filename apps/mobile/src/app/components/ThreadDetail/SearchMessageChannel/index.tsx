@@ -1,4 +1,5 @@
 import { useAuth, useChannels, useFriends } from '@mezon/core';
+import { EOpenSearchChannelFrom } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { selectAllDirectMessages, selectAllUsesClan } from '@mezon/store-mobile';
 import { removeDuplicatesById } from '@mezon/utils';
@@ -7,12 +8,12 @@ import { debounce } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import ChannelsSearchTab from '../../ChannelsSearchTab';
 import MembersSearchTab from '../../MembersSearchTab';
 import AssetsHeader from '../AssetsHeader';
 import InputSearchMessageChannel from './InputSearchMessageChannel';
-import { EOpenSearchChannelFrom } from '@mezon/mobile-components';
 
 type RootStackParamList = {
 	SearchMessageChannel: {
@@ -162,14 +163,16 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		];
 	}, [listChannelSearch, listMemberSearch, searchText, t]);
 	return (
-		<Block backgroundColor={themeValue.secondary} width={'100%'} height={'100%'}>
-			<InputSearchMessageChannel openSearchChannelFrom={openSearchChannelFrom} onChangeText={handleSearchText} />
-			<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
-			<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
-				<MembersSearchTab listMemberSearch={listMemberSearch} />
-				<ChannelsSearchTab listChannelSearch={listChannelSearch} />
-			</ScrollView>
-		</Block>
+		<SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: themeValue.secondary }}>
+			<Block backgroundColor={themeValue.secondary} width={'100%'} height={'100%'}>
+				<InputSearchMessageChannel openSearchChannelFrom={openSearchChannelFrom} onChangeText={handleSearchText} />
+				<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
+				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
+					<MembersSearchTab listMemberSearch={listMemberSearch} />
+					<ChannelsSearchTab listChannelSearch={listChannelSearch} />
+				</ScrollView>
+			</Block>
+		</SafeAreaView>
 	);
 };
 
