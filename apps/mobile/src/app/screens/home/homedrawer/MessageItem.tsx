@@ -17,11 +17,11 @@ import {
 	selectAllUsesClan,
 	selectIdMessageToJump,
 	selectMessageEntityById,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
+import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction } from './components';
@@ -102,8 +102,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [messageReferences, message.references]);
 
 	const isDM = useMemo(() => {
-		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode)
-	}, [mode])
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+	}, [mode]);
 
 	useEffect(() => {
 		if (props?.messageId) {
@@ -289,6 +289,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					/>
 					<Pressable
 						style={[styles.rowMessageBox]}
+						delayLongPress={Platform.OS === 'ios' ? 300 : 100}
 						onLongPress={() => {
 							if (preventAction) return;
 							setIsOnlyEmojiPicker(false);
