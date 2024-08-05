@@ -7,7 +7,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MessageContent from '../MessageWithUser/MessageContent';
-import { default as ListSearch, default as ListSearchForwardMessage } from './ListSearchForwardMessage';
+import ListSearchForwardMessage from './ListSearchForwardMessage';
 type ModalParam = {
 	openModal: boolean;
 };
@@ -167,7 +167,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 										<span className="text-textPrimary text-left opacity-60 text-[11px] pb-1 uppercase">
 											Search friend and users
 										</span>
-										<ListSearch 
+										<ListSearchForwardMessage 
 											listSearch={listMemSearch}
 											searchText={searchText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
@@ -178,7 +178,7 @@ const ForwardMessageModal = ({ openModal}: ModalParam) => {
 								{searchText.startsWith('#') && (
 									<>
 										<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
-										<ListSearch 
+										<ListSearchForwardMessage 
 											listSearch={listChannelSearch}
 											searchText={searchText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
