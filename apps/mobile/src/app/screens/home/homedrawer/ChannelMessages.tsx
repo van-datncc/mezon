@@ -1,23 +1,16 @@
 import { useDeleteMessage } from '@mezon/core';
 import { ActionEmitEvent, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
-import { Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
-import {
-	messagesActions,
-	RootState,
-	selectAttachmentPhoto,
-	selectHasMoreMessageByChannelId,
-	selectMessageIdsByChannelId,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { messagesActions, RootState, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
+import { FlashList } from '@shopify/flash-list';
 import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
-import { FlatList } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
@@ -47,7 +40,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const styles = style(themeValue);
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
 	const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
-	const attachments = useSelector(selectAttachmentPhoto());
 	const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const { deleteSendMessage } = useDeleteMessage({ channelId, mode });
 
@@ -67,25 +59,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
-	const createAttachmentObject = (attachment: any) => ({
-		source: {
-			uri: attachment.url,
-		},
-		filename: attachment.filename,
-		title: attachment.filename,
-		width: Metrics.screenWidth,
-		height: Metrics.screenHeight - 150,
-		url: attachment.url,
-		uri: attachment.url,
-		uploader: attachment.uploader,
-		create_time: attachment.create_time,
-	});
-
-	const formatAttachments: any[] = useMemo(() => {
-		const imageSelectedUrl = imageSelected ? createAttachmentObject(imageSelected) : {};
-		const attachmentObjects = attachments.filter((u) => u.url !== imageSelected?.url).map(createAttachmentObject);
-		return [imageSelectedUrl, ...attachmentObjects];
-	}, [attachments, imageSelected]);
 	const [currentMessageActionType, setCurrentMessageActionType] = useState<EMessageActionType | null>(null);
 
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
@@ -284,7 +257,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
 					<MessageItemSkeleton skeletonNumber={15} />
 				)}
-				<FlatList
+				<FlashList
 					ref={flatListRef}
 					inverted
 					data={dataReverse || []}
@@ -294,7 +267,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 					renderItem={renderItem}
 					removeClippedSubviews={true}
 					keyExtractor={(item) => `${item}`}
-					// estimatedItemSize={ITEM_HEIGHT}
+					estimatedItemSize={ITEM_HEIGHT}
 					onEndReached={messages?.length ? onLoadMore : undefined}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}
@@ -319,12 +292,12 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 
 				{visibleImageModal ? (
 					<ImageListModal
-						data={formatAttachments}
 						visible={visibleImageModal}
 						idxSelected={idxSelectedImageModal}
 						onImageChange={onImageModalChange}
 						onClose={() => setVisibleImageModal(false)}
 						onImageChangeFooter={onImageFooterChange}
+						imageSelected={imageSelected}
 					/>
 				) : null}
 
