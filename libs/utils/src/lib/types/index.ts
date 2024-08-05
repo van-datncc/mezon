@@ -599,6 +599,12 @@ export enum ModeResponsive {
 	MODE_DM = 'dm',
 }
 
+export enum ThemeApp {
+	Light = 'light',
+	Dark = 'dark',
+	System = 'system',
+}
+
 export interface INotification extends Notification {
 	id: string;
 	content?: any;
@@ -642,3 +648,6 @@ export type SearchItemProps = {
 	icon?: string;
 	channelId?: string;
 };
+export enum EEmojiCategory {
+	CUSTOM = 'Custom',
+}

@@ -22,8 +22,13 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setValueInputSearch('');
 			dispatch(reactionActions.setReactionRightState(false));
 			dispatch(reactionActions.setReactionBottomState(false));
+			if (subPanelActive === SubPanelName.GIFS) {
+				setSubPanelActive(SubPanelName.NONE);
+			} else {
+				setSubPanelActive(SubPanelName.GIFS);
+			}
 		},
-		[setSubPanelActive],
+		[subPanelActive, setSubPanelActive],
 	);
 
 	const handleOpenStickers = useCallback(
@@ -34,8 +39,13 @@ function GifStickerEmojiButtons({ activeTab }: GifStickerEmojiButtonsProps) {
 			setValueInputSearch('');
 			dispatch(reactionActions.setReactionRightState(false));
 			dispatch(reactionActions.setReactionBottomState(false));
+			if (subPanelActive === SubPanelName.STICKERS) {
+				setSubPanelActive(SubPanelName.NONE);
+			} else {
+				setSubPanelActive(SubPanelName.STICKERS);
+			}
 		},
-		[setSubPanelActive],
+		[subPanelActive, setSubPanelActive],
 	);
 
 	const handleOpenEmoji = useCallback(

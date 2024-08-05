@@ -1,6 +1,6 @@
 import { createEmojiSetting, selectAllEmojiSuggestion, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI } from '@mezon/utils';
+import {EEmojiCategory, LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI} from '@mezon/utils';
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
 import { ChangeEvent, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -14,7 +14,7 @@ const SettingEmoji = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const { sessionRef, clientRef } = useMezon();
-	const emojiList = useSelector(selectAllEmojiSuggestion);
+	const emojiList = useSelector(selectAllEmojiSuggestion).filter(emoji => emoji.category === EEmojiCategory.CUSTOM);
 	const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files) {
 			return;

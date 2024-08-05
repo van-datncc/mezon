@@ -1,7 +1,15 @@
-import { emojiSuggestionActions, selectMemberClanByUserId, useAppDispatch } from "@mezon/store";
+import {
+	emojiSuggestionActions,
+	selectCurrentUserId,
+	selectMemberClanByUserId,
+	useAppDispatch,
+	useAppSelector
+} from "@mezon/store";
 import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from "mezon-js/api.gen";
-import { ChangeEvent, KeyboardEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { useClanRestriction } from "@mezon/core";
+import { EPermission } from "@mezon/utils";
 
 type SettingEmojiItemProp = {
   emoji: ApiClanEmojiListResponse,
@@ -14,6 +22,12 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   const dispatch = useAppDispatch()
 
   const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
+	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const currentUserId = useAppSelector(selectCurrentUserId);
+	const hasDeleteOrEditPermission = useMemo(() => {
+		if(hasAdminPermission || isClanCreator) return true;
+		return currentUserId === emoji.creator_id
+	}, [hasAdminPermission, currentUserId]) ;
 
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value.split(':').join(''));
@@ -44,10 +58,17 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
       handleUpdateEmoji();
     }
   }
+	
+	const handleHoverEmoji = () => {
+		if(hasDeleteOrEditPermission) {
+			setShowEdit(true);
+		}
+	}
+	
   return (
     <div
       className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'}
-      onMouseOver={() => setShowEdit(true)}
+      onMouseOver={handleHoverEmoji}
       onMouseLeave={handleOnMouseLeave}
       onBlur={handleOnMouseLeave}
     >

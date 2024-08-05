@@ -39,7 +39,7 @@ const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => 
 	promise: true,
 	maxAge: LIST_EMOJI_CACHED_TIME,
 	normalizer: (args) => {
-		return args[0]!.session!.username!;
+		return args[1] + args[0].session.username;
 	},
 });
 
