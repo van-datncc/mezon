@@ -1,7 +1,7 @@
 import { channelMembersActions, rolesClanActions, useAppDispatch } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
-export function useRoles(channelID?: string) {
+export function useRoles() {
 	const dispatch = useAppDispatch();
 	const deleteRole = React.useCallback(
 		async (roleId: string) => {
@@ -33,15 +33,6 @@ export function useRoles(channelID?: string) {
 				rolesClanActions.fetchUpdateRole({ role_id, title, add_user_ids, active_permission_ids, remove_user_ids, remove_permission_ids }),
 			);
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
-			await dispatch(
-				channelMembersActions.fetchChannelMembers({
-					clanId: clanId,
-					channelId: channelID || '',
-					channelType: ChannelType.CHANNEL_TYPE_TEXT,
-					noCache: true,
-					repace: true,
-				}),
-			);
 			return response?.payload;
 		},
 		[dispatch],

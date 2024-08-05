@@ -60,6 +60,10 @@ export const RequestFriendScreen = () => {
 		return friends.filter((friend) => friend.state === 1);
 	}, [friends]);
 
+	const onClose = useCallback(() => {
+		setSelectedUser(null)
+	}, [])
+
 	return (
 		<View style={styles.requestFriendContainer}>
 			<View style={styles.toggleWrapper}>
@@ -87,7 +91,7 @@ export const RequestFriendScreen = () => {
 				</View>
 			</View>
 
-			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
+			<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />
 		</View>
 	);
 };

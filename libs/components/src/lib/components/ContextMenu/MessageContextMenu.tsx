@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
-import { useAuth, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
+import { useAuth, useCheckAlonePermission, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
 import {
 	directActions,
 	gifsStickerEmojiActions,
@@ -68,6 +68,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [delMessage] = useClanRestriction([EPermission.manageChannel]);
 	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
 	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
+	const isAlone = useCheckAlonePermission();
 
 	const [createThread] = useClanRestriction([EPermission.manageChannel]);
 	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
@@ -290,7 +291,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when((checkPos && !hasViewChannelPermission), (builder) => {
+		builder.when((checkPos && !(hasViewChannelPermission && isAlone)), (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',

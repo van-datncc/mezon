@@ -17,6 +17,7 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	quantityNotifyChannels: Record<string, number>;
 	quantityNotifyClans: Record<string, number>;
 	lastSeenTimeStampChannels: Record<string, number>;
+	isShowInbox: boolean;
 }
 
 export type QuantityNotifyChannelArgs = {
@@ -31,9 +32,9 @@ export type LastSeenTimeStampChannelArgs = {
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
 
-export const fetchListNotification = createAsyncThunk('notification/fetchListNotification', async (_, thunkAPI) => {
+export const fetchListNotification = createAsyncThunk('notification/fetchListNotification', async (clanId: string, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listNotifications(mezon.session, 50);
+	const response = await mezon.client.listNotifications(mezon.session, clanId, 50);
 	if (!response.notifications) {
 		return [];
 	}
@@ -41,13 +42,13 @@ export const fetchListNotification = createAsyncThunk('notification/fetchListNot
 	return notifications;
 });
 
-export const deleteNotify = createAsyncThunk('notification/deleteNotify', async (ids: string[], thunkAPI) => {
+export const deleteNotify = createAsyncThunk('notification/deleteNotify', async ({ ids, clanId }: { ids: string[]; clanId: string }, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.deleteNotifications(mezon.session, ids);
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	thunkAPI.dispatch(notificationActions.fetchListNotification());
+	thunkAPI.dispatch(notificationActions.fetchListNotification(clanId));
 	return response;
 });
 
@@ -75,6 +76,7 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	quantityNotifyChannels: {},
 	lastSeenTimeStampChannels: {},
 	quantityNotifyClans: {},
+	isShowInbox: false,
 });
 
 export const notificationSlice = createSlice({
@@ -139,6 +141,9 @@ export const notificationSlice = createSlice({
 			} else {
 				console.log('No unread notification');
 			}
+		},
+		setIsShowInbox(state, action: PayloadAction<boolean>) {
+			state.isShowInbox = action.payload;
 		},
 	},
 
@@ -233,6 +238,8 @@ export const selectMessageNotifed = createSelector(getNotificationState, (state:
 export const selectIsMessageRead = createSelector(getNotificationState, (state: NotificationState) => state.isMessageRead);
 
 export const selectNewNotificationStatus = createSelector(getNotificationState, (state: NotificationState) => state.newNotificationStatus);
+
+export const selectIsShowInbox = createSelector(getNotificationState, (state: NotificationState) => state.isShowInbox);
 
 export const selectCountNotifyByChannelId = (channelId: string) =>
 	createSelector(getNotificationState, (state) => {

@@ -1,4 +1,4 @@
-import { useNotification } from '@mezon/core';
+import { useAppParams, useNotification } from '@mezon/core';
 import { notificationActions, useAppDispatch } from '@mezon/store';
 import { INotification, TNotificationChannel } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
@@ -14,6 +14,7 @@ type NotificationChannelProps = {
 const NotificationChannel = ({ unreadListConverted, isUnreadTab, notification }: NotificationChannelProps) => {
 	const dispatch = useAppDispatch();
 	const { deleteNotify } = useNotification();
+	const { clanId } = useAppParams();
 
 	const groupedUnread = useMemo(() => {
 		return unreadListConverted.reduce((acc: Record<string, TNotificationChannel>, unreadNotification) => {
@@ -49,9 +50,9 @@ const NotificationChannel = ({ unreadListConverted, isUnreadTab, notification }:
 	const handleDeleteNotification = useCallback(
 		(notification: INotification) => {
 			dispatch(notificationActions.setReadNotiStatus([notification.id]));
-			deleteNotify(notification.id);
+			deleteNotify(notification.id, clanId ?? '0');
 		},
-		[deleteNotify, dispatch],
+		[clanId, deleteNotify, dispatch],
 	);
 
 	return (

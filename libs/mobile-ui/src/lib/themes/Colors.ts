@@ -148,6 +148,7 @@ const colors = {
 	bgMention: '#3b426e',
 	red: "red",
 	orange: "#e77132",
+	goldenrodYellow: "#f2b13a",
 	green: 'green',
 	bgDarkCharcoal: '#323232',
 	bgMessageHighlight: '#c99d072b',

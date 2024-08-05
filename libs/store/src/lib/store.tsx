@@ -39,7 +39,6 @@ import { defaultNotificationClanReducer } from './notificationSetting/notificati
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
-import { settingClanEmojiReducer } from './settingEmoji/settingEmoji.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
@@ -114,7 +113,6 @@ const reducer = {
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
-	settingEmoji: settingClanEmojiReducer,
 	integrationWebhook: integrationWebhookReducer,
 	settingSticker: settingStickerReducer
 };

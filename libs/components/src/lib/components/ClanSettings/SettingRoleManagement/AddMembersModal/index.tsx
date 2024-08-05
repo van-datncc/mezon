@@ -7,6 +7,7 @@ import {
 	getSelectedRoleId,
 	selectAllUsesClan,
 	selectCurrentClan,
+	selectTheme,
 	setAddMemberRoles,
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
@@ -77,9 +78,11 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 		}
 	};
 
+	const appearanceTheme = useSelector(selectTheme);
+
 	return (
 		isOpen && (
-			<div className="fixed  inset-0 flex items-center justify-center z-50">
+			<div className={`fixed  inset-0 flex items-center justify-center z-50 ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}>
 				<div className="fixed inset-0 bg-black opacity-80"></div>
 				<div className="relative z-10 dark:bg-bgDisable bg-bgLightMode p-6 rounded-[5px] text-center w-[440px] flex flex-col justify-between gap-y-2">
 					<div>

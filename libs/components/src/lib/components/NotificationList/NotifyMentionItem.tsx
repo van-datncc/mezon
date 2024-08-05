@@ -1,9 +1,11 @@
 import { useJumpToMessage } from '@mezon/core';
 import { notificationActions, referencesActions } from '@mezon/store';
 import { IMessageWithUser, INotification } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
+import MessageAttachment from '../MessageWithUser/MessageAttachment';
 import MessageHead from '../MessageWithUser/MessageHead';
 import MessageLine from '../MessageWithUser/MessageLine';
 import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
@@ -62,6 +64,7 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 		dispatch(notificationActions.setStatusNoti());
 		dispatch(referencesActions.setIdMessageToJump(messageId));
 		directToMessageById();
+		dispatch(notificationActions.setIsShowInbox(false));
 	}, [directToMessageById, dispatch, messageId, notify.id]);
 
 	return (
@@ -104,6 +107,7 @@ function MentionTabContent({ message }: IMentionTabContent) {
 				<div className="h-full">
 					<MessageHead message={message} isCombine={true} isShowFull={true} />
 					<MessageLine content={message.content} />
+					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
 				</div>
 			</div>
 		</div>

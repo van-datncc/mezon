@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
-import { Icons } from '@mezon/mobile-components';
+import { EOpenSearchChannelFrom, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectnotificatonSelected } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,14 +10,15 @@ import { useSelector } from 'react-redux';
 import { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { useUserPermission } from '../../../hooks/useUserPermission';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { EOpenThreadDetailFrom, threadDetailContext } from '../MenuThreadDetail';
+import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './style';
 enum EActionRow {
 	Search,
 	Threads,
 	Mute,
-	Settings
+	Settings,
 }
+
 
 export const ActionRow = React.memo(() => {
 	const { themeValue } = useTheme();
@@ -35,12 +36,16 @@ export const ActionRow = React.memo(() => {
 		{
 			title: 'Search',
 			action: () => {
-        navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET ,
-          params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel } });
-       },
+				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+					screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+					params: {
+						openSearchChannelFrom: EOpenSearchChannelFrom.ActionMenu,
+					},
+				});
+			},
 			icon: <Icons.MagnifyingIcon width={22} height={22} color={themeValue.text} />,
 			isShow: true,
-			type: EActionRow.Search
+			type: EActionRow.Search,
 		},
 		{
 			title: 'Threads',
@@ -49,15 +54,18 @@ export const ActionRow = React.memo(() => {
 			},
 			icon: <Icons.ThreadIcon width={22} height={22} color={themeValue.text} />,
 			isShow: isChannel,
-			type: EActionRow.Threads
+			type: EActionRow.Threads,
 		},
 		{
 			title: 'Mute',
 			action: () => {
-				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL, params: { currentChannel } });
+				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+					screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL,
+					params: { currentChannel },
+				});
 			},
 			isShow: true,
-			type: EActionRow.Mute
+			type: EActionRow.Mute,
 		},
 		{
 			title: 'Settings',
@@ -71,7 +79,7 @@ export const ActionRow = React.memo(() => {
 			},
 			icon: <Icons.SettingsIcon width={22} height={22} color={themeValue.text} />,
 			isShow: userPermissionsStatus['manage-channel'] || userPermissionsStatus['manage-thread'] || isClanOwner,
-			type: EActionRow.Settings
+			type: EActionRow.Settings,
 		},
 	];
 
@@ -87,11 +95,17 @@ export const ActionRow = React.memo(() => {
 				action?.isShow ? (
 					<Pressable key={index.toString()} onPress={action.action}>
 						<View style={styles.iconBtn}>
-							<View style={styles.iconWrapper}>{[EActionRow.Mute].includes(action.type) ? (
-								getNotificationChannelSelected?.active === EActionMute.Mute
-									? <Icons.BellIcon width={22} height={22} color={themeValue.text} />
-									: <Icons.BellSlashIcon width={22} height={22} color={themeValue.text} />
-							) : action.icon}</View>
+							<View style={styles.iconWrapper}>
+								{[EActionRow.Mute].includes(action.type) ? (
+									getNotificationChannelSelected?.active === EActionMute.Mute ? (
+										<Icons.BellIcon width={22} height={22} color={themeValue.text} />
+									) : (
+										<Icons.BellSlashIcon width={22} height={22} color={themeValue.text} />
+									)
+								) : (
+									action.icon
+								)}
+							</View>
 							<Text style={styles.optionText}>{action.title}</Text>
 						</View>
 					</Pressable>

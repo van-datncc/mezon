@@ -18,7 +18,7 @@ const checkAdminPermission = (role: RolesClanEntity, userId: string) => {
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
-	const { updateRole } = useRoles(currentChannelId || '');
+	const { updateRole } = useRoles();
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
 	const userProfile = useSelector(selectAllAccount);

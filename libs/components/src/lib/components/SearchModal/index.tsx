@@ -1,13 +1,12 @@
 import { useAppNavigation, useAuth, useChannels, useDirect, useFriends } from '@mezon/core';
-import { directActions, messagesActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
+import { directActions, DirectEntity, messagesActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { removeDuplicatesById } from '@mezon/utils';
+import { removeDuplicatesById, TypeSearch } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
-import ListMemberSearch from './listMemberSearch';
+import ListSearchModal from './ListSearchModal';
 export type SearchModalProps = {
 	readonly open: boolean;
 	onClose: () => void;
@@ -34,25 +33,29 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM?.length
-			? listDM.map((itemDM: any) => {
+			? listDM.map((itemDM: DirectEntity) => {
 					return {
 						id: itemDM?.user_id?.[0] ?? '',
 						name: itemDM?.usernames ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						displayName: '',
-						typeChat: 3,
+						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
+						typeChat: ChannelType.CHANNEL_TYPE_DM,
+						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
 		const listGroupSearch = listGroup.length
-			? listGroup.map((itemGr: any) => {
+			? listGroup.map((itemGr: DirectEntity) => {
 					return {
 						id: itemGr?.channel_id ?? '',
 						name: itemGr?.channel_label ?? '',
 						avatarUser: 'assets/images/avatar-group.png' ?? '',
 						idDM: itemGr?.id ?? '',
-						typeChat: 2,
+						lastSentTimeStamp: itemGr.last_sent_message?.timestamp,
+						typeChat: ChannelType.CHANNEL_TYPE_GROUP,
+						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -63,7 +66,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemFriend?.user.username ?? '',
 						avatarUser: itemFriend?.user.avatar_url ?? '',
 						displayName: itemFriend?.user.display_name ?? '',
+						lastSentTimeStamp: '0',
 						idDM: '',
+						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -73,7 +78,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
 						avatarUser: itemUserClan?.user?.avatar_url ?? '',
+						lastSentTimeStamp: '0',
 						idDM: '',
+						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -99,11 +106,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				clanId: item?.clan_id ?? '',
 				channelId: item?.channel_id ?? '',
 				lastSentTimeStamp: Number(item?.last_sent_message?.timestamp || 0),
+				type: TypeSearch.Channel_Type,
 			};
 		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
 		return sortedList;
 	}, [listChannels]);
+
+	const totalsData = [...listMemSearch, ...listChannelSearch];
 
 	const handleSelectMem = useCallback(
 		async (user: any) => {
@@ -138,6 +148,17 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			onClose();
 		},
 		[navigate, onClose, toChannelPage],
+	);
+
+	const handleSelect = useCallback(
+		async (isChannel: boolean, item: any) => {
+			if (isChannel) {
+				await handleSelectChannel(item);
+			} else {
+				await handleSelectMem(item);
+			}
+		},
+		[handleSelectMem, handleSelectChannel],
 	);
 
 	const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -267,140 +288,63 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					ref={boxRef}
 					className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 				>
-					{!searchText.startsWith('@') && !searchText.startsWith('#') ? (
+					{(!searchText.startsWith('@') && !searchText.startsWith('#')) ? (
 						<>
-							<ListMemberSearch
-								listMemSearch={listMemSearch}
+							<ListSearchModal 
+								listSearch={totalsData}
 								itemRef={itemRef}
-								handleSelectMem={handleSelectMem}
+								handleSelect={handleSelect}
 								searchText={searchText}
 								idActive={idActive}
 								setIdActive={setIdActive}
 							/>
-							{listChannelSearch.length
-								? listChannelSearch
-										.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
-										.slice(0, 8)
-										.sort((a: any, b: any) => {
-											const indexA = a.name.toUpperCase().indexOf(searchText.toUpperCase());
-											const indexB = b.name.toUpperCase().indexOf(searchText.toUpperCase());
-											if (indexA === -1) return 1;
-											if (indexB === -1) return -1;
-											return indexA - indexB;
-										})
-										.map((item: any) => {
-											return (
-												<div
-													ref={itemRef}
-													key={item.id}
-													onClick={() => handleSelectChannel(item)}
-													onMouseEnter={() => setIdActive(item.id)}
-													onMouseLeave={() => setIdActive(item.id)}
-													className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
-												>
-													<SuggestItem
-														name={item.name ?? ''}
-														symbol={item.icon}
-														subText={item.subText}
-														channelId={item.channelId}
-														valueHightLight={searchText}
-														isOpenSearchModal
-													/>
-												</div>
-											);
-										})
-								: null}
-							{isNoResult && <span className=" flex flex-row justify-center">Can't seem to find what you're looking for?</span>}
+							{isNoResult && <span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">Can't seem to find what you're looking for?</span>}
 						</>
 					) : (
 						<>
 							{searchText.startsWith('@') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
-									{listMemSearch.length ? (
-										listMemSearch
-											.filter((item: any) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
-											.sort((a: any, b: any) => {
-												const indexA = a.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
-												const indexB = b.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
-												if (indexA === -1) return 1;
-												if (indexB === -1) return -1;
-												return indexA - indexB;
-											})
-											.map((item: any) => {
-												return (
-													<div
-														ref={itemRef}
-														key={item.id}
-														onClick={() => handleSelectMem(item)}
-														className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
-														onMouseEnter={() => setIdActive(item.id)}
-														onMouseLeave={() => setIdActive(item.id)}
-													>
-														<SuggestItem
-															displayName={item?.displayName}
-															name={item?.name}
-															avatarUrl={item.avatarUser}
-															channelId={item.channelId}
-															valueHightLight={searchText.slice(1)}
-														/>
-													</div>
-												);
-											})
-									) : (
-										<></>
-									)}
+									<ListSearchModal 
+										listSearch={listMemSearch}
+										itemRef={itemRef}
+										handleSelect={handleSelect}
+										searchText={searchText.slice(1)}
+										idActive={idActive}
+										setIdActive={setIdActive}
+									/>
 								</>
 							)}
 							{searchText.startsWith('#') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
-									{listChannelSearch.length ? (
-										listChannelSearch
-											.filter((item) => item.name.toUpperCase().indexOf(searchText.toUpperCase().substring(1)) > -1)
-											.sort((a: any, b: any) => {
-												const indexA = a.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
-												const indexB = b.name.toUpperCase().indexOf(searchText.slice(1).toUpperCase());
-												if (indexA === -1) return 1;
-												if (indexB === -1) return -1;
-												return indexA - indexB;
-											})
-											.map((item: any) => {
-												return (
-													<div
-														ref={itemRef}
-														key={item.id}
-														onClick={() => handleSelectChannel(item)}
-														className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
-														onMouseEnter={() => setIdActive(item.id)}
-														onMouseLeave={() => setIdActive(item.id)}
-													>
-														<SuggestItem
-															name={item.name ?? ''}
-															symbol={item.icon}
-															subText={item.subText}
-															channelId={item.channelId}
-															valueHightLight={searchText.slice(1)}
-														/>
-													</div>
-												);
-											})
-									) : (
-										<></>
-									)}
+									<ListSearchModal 
+										listSearch={listChannelSearch}
+										itemRef={itemRef}
+										handleSelect={handleSelect}
+										searchText={searchText.slice(1)}
+										idActive={idActive}
+										setIdActive={setIdActive}
+									/>
 								</>
 							)}
 						</>
 					)}
 				</div>
-				<div className="pt-2">
-					<span className="text-[13px] font-medium dark:text-contentTertiary text-textLightTheme">
-						<span className="text-[#2DC770] opacity-100 font-bold">PROTIP: </span>Start searches with @, # to narrow down results.
-					</span>
-				</div>
+				<FooterNoteModal />
 			</Modal.Body>
 		</Modal>
 	);
 }
 
 export default SearchModal;
+
+const FooterNoteModal = memo(() => {
+	return (
+		<div className="pt-2">
+			<span className="text-[13px] font-medium dark:text-contentTertiary text-textLightTheme">
+				<span className="text-[#2DC770] opacity-100 font-bold">PROTIP: </span>Start searches with @, # to narrow down results.
+			</span>
+		</div>
+	)
+})

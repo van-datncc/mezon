@@ -1,7 +1,6 @@
 import { useMemberCustomStatus, useMemberStatus } from '@mezon/core';
-import { ChannelMembersEntity, selectCurrentClan, selectUserClanProfileByClanID } from '@mezon/store';
+import { ChannelMembersEntity } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
-import { useSelector } from 'react-redux';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import MemberProfile from '../MemberProfile';
 export type MemberItemProps = {
@@ -14,17 +13,16 @@ export type MemberItemProps = {
 
 function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate }: MemberItemProps) {
 	const userStatus = useMemberStatus(user.user?.id || '');
-	const currentClan = useSelector(selectCurrentClan);
-	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '');
+
 	return (
 		<MemberProfile
 			numberCharacterCollapse={30}
-			avatar={user?.user?.avatar_url ?? ''}
+			avatar={user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '')}
 			name={
 				positionType === MemberProfileType.DM_MEMBER_GROUP
 					? user?.user?.display_name || ''
-					: clanProfile?.nick_name || user?.user?.display_name || user?.user?.username || ''
+					: user.clan_nick || user?.user?.display_name || user?.user?.username || ''
 			}
 			userNameAva={user?.user?.username}
 			status={userStatus}

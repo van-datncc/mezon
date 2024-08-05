@@ -46,6 +46,10 @@ export const MemberListStatus = React.memo(() => {
 		});
 	};
 
+	const onClose = useCallback(() => {
+		setSelectedUser(null)
+	}, [])
+
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
 			{currentChannel?.type === ChannelType.CHANNEL_TYPE_DM ? (
@@ -122,7 +126,7 @@ export const MemberListStatus = React.memo(() => {
 					</View>
 				)}
 			</View>
-			<UserInformationBottomSheet userId={selectedUser?.user?.id} onClose={() => setSelectedUser(null)} />
+			<UserInformationBottomSheet userId={selectedUser?.user?.id} onClose={onClose} />
 			<InviteToChannel isUnknownChannel={false} ref={bottomSheetRef} isDMThread={isDMThread} />
 		</ScrollView>
 	);

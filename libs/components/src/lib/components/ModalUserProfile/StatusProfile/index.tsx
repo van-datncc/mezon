@@ -1,7 +1,8 @@
 import { Icons } from '@mezon/components';
 import { useMemberCustomStatus } from '@mezon/core';
-import { ChannelMembersEntity, useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { ChannelMembersEntity, selectAllAccount, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Dropdown } from 'flowbite-react';
+import { useSelector } from 'react-redux';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
 
@@ -15,6 +16,8 @@ const StatusProfile = ({ userById }: StatusProfileProps) => {
 	const handleCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
 	};
+	const userProfile = useSelector(selectAllAccount);
+	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '').status;
 	const userCustomStatus = useMemberCustomStatus(user?.id || '');
 
 	return (
@@ -41,7 +44,7 @@ const StatusProfile = ({ userById }: StatusProfileProps) => {
 				</Dropdown>
 				<ItemStatus
 					onClick={handleCustomStatus}
-					children={`${userCustomStatus ? 'Edit' : 'Set'} Custom Status`}
+					children={`${userStatusProfile || userCustomStatus ? 'Edit' : 'Set'} Custom Status`}
 					startIcon={<Icons.SmilingFace />}
 				/>
 			</div>

@@ -14,11 +14,11 @@ import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-export function useReference() {
+export function useReference(channelId?: string) {
 	const dispatch = useAppDispatch();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
-	const attachmentDataRef = useSelector(selectAttachmentData);
+	const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
@@ -52,10 +52,10 @@ export function useReference() {
 	);
 
 	const setAttachmentData = useCallback(
-		(attachment: ApiMessageAttachment | ApiMessageAttachment[]) => {
-			dispatch(referencesActions.setAttachmentData(attachment));
+		(attachments: ApiMessageAttachment[]) => {
+			dispatch(referencesActions.setAttachmentData({ channelId: channelId || '', attachments }));
 		},
-		[dispatch],
+		[channelId, dispatch],
 	);
 
 	const setOpenOptionMessageState = useCallback(

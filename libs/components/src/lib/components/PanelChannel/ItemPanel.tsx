@@ -24,7 +24,7 @@ const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, 
 		>
       <div className={'flex flex-row items-center justify-between w-full'}>
         <li
-          className={`text-[14px] ${danger ? 'dark:text-colorDanger text-colorDanger' : 'dark:text-[#B5BAC1] text-textSecondary800'} font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none textWhiteHoverImportant m-0`}
+          className={`text-[14px] ${danger ? 'dark:text-colorDanger text-colorDanger' : 'dark:text-[#B5BAC1] text-textSecondary800'} font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none textWhiteHoverImportant m-0 truncate`}
         >
           {children}
         </li>

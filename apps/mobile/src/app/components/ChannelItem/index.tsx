@@ -1,25 +1,25 @@
-import {
-	Icons,
-	LockIcon,
-} from '@mezon/mobile-components';
-import { Block, Colors, size } from '@mezon/mobile-ui';
+import { Icons, LockIcon } from '@mezon/mobile-components';
+import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-import styles from './ChannelItem.styles';
 import { useTranslation } from 'react-i18next';
-import { ChannelThreads } from '@mezon/utils';
+import { Text, TouchableOpacity } from 'react-native';
+import style from './ChannelItem.styles';
 
 type ChannelItemProps = {
 	channelData?: ChannelThreads;
-  onPress: (channelData: ChannelThreads) => void
+	onPress: (channelData: ChannelThreads) => void;
 };
-const ChannelItem = React.memo(({ channelData , onPress}: ChannelItemProps) => {
-
-  const { t } = useTranslation(['searchMessageChannel']);
-
+const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
+	const { t } = useTranslation(['searchMessageChannel']);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const handleOnPress = () => {
+		onPress && onPress(channelData);
+	};
 	return (
-		<TouchableOpacity onPress={() => onPress(channelData)} style={{ marginBottom: size.s_20 }}>
+		<TouchableOpacity onPress={handleOnPress} style={{ marginBottom: size.s_20 }}>
 			{channelData?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 				<Block flexDirection="row" gap={size.s_10} alignItems="center">
 					{!!channelData?.channel_label && !!Number(channelData?.parrent_id) ? (

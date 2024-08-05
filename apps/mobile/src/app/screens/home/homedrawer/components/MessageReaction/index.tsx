@@ -259,6 +259,10 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 		}
 	}, [emojiSelectedId]);
 
+	const onCloseUserInformationBottomSheet = useCallback(() => {
+		setSelectedUserId(null)
+	}, [])
+
 	return (
 		<View>
 			<BottomSheet
@@ -290,7 +294,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 					)}
 				</View>
 			</BottomSheet>
-			<UserInformationBottomSheet userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
+			<UserInformationBottomSheet userId={selectedUserId} onClose={onCloseUserInformationBottomSheet} />
 		</View>
 	);
 });

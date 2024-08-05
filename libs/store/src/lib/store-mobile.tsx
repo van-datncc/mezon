@@ -6,15 +6,22 @@ import { persistReducer, persistStore } from 'redux-persist';
 
 import { accountReducer } from './account/account.slice';
 import { appReducer } from './app/app.slice';
+import { attachmentReducer } from './attachment/attachments.slice';
 import { authReducer } from './auth/auth.slice';
 import { categoriesReducer } from './categories/categories.slice';
 import { channelMembersReducer } from './channelmembers/channel.members';
 import { channelsReducer } from './channels/channels.slice';
+import { directChannelVoidReducer } from './channels/directChannelVoid.slice';
 import { usersClanReducer } from './clanMembers/clan.members';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
 import { directReducer } from './direct/direct.slice';
+import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { emojiSuggestionReducer } from './emojiSuggestion/emojiSuggestion.slice';
+import { errorListenerMiddleware } from './errors/errors.listener';
+import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
+import { eventManagementReducer } from './eventManagement/eventManagement.slice';
+import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
 import { gifsStickerEmojiReducer } from './giftStickerEmojiPanel/gifsStickerEmoji.slice';
@@ -23,24 +30,15 @@ import { inviteReducer } from './invite/invite.slice';
 import { messagesReducer } from './messages/messages.slice';
 import { referencesReducer } from './messages/references.slice';
 import { notificationReducer } from './notification/notify.slice';
-import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
-import { reactionReducer } from './reactionMessage/reactionMessage.slice';
-
-import { attachmentReducer } from './attachment/attachments.slice';
-import { directChannelVoidReducer } from './channels/directChannelVoid.slice';
-import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
-import { errorListenerMiddleware } from './errors/errors.listener';
-import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
-import { eventManagementReducer } from './eventManagement/eventManagement.slice';
-import { popupForwardReducer } from './forwardMessage/forwardMessage.slice';
 import { notifiReactMessageReducer } from './notificationSetting/notificationReactMessage.slice';
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
+import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
+import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
-import { settingClanEmojiReducer } from './settingEmoji/settingEmoji.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
@@ -115,7 +113,6 @@ const reducer = {
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
-	settingEmoji: settingClanEmojiReducer,
 	integrationWebhook: integrationWebhookReducer,
 };
 

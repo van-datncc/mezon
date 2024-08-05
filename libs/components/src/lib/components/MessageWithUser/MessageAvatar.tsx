@@ -1,7 +1,8 @@
 import { AvatarImage, ShortUserProfile } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
-import { useMemo, useRef, useState } from 'react';
+import { ChannelStreamMode } from 'mezon-js';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 type IMessageAvatarProps = {
 	message: IMessageWithUser;
@@ -12,8 +13,7 @@ type IMessageAvatarProps = {
 };
 
 const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
-	const { senderId, username, avatarSender } = useMessageParser(message);
-
+	const { senderId, username, avatarSender, userClanAvatar } = useMessageParser(message);
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -57,8 +57,9 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					}}
 					alt={username ?? ''}
 					userName={username}
-					src={avatarSender}
+					src={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (userClanAvatar ? userClanAvatar : avatarSender) : avatarSender}
 					className="min-w-10 min-h-10"
+					classNameText='font-semibold'
 					isAnonymous={isAnonymous}
 				/>
 			</div>
@@ -75,4 +76,4 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 	);
 };
 
-export default MessageAvatar;
+export default memo(MessageAvatar);

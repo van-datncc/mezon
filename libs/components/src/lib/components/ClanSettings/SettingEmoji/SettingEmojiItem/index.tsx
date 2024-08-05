@@ -1,6 +1,6 @@
-import { selectMemberClanByUserId, settingClanEmojiActions, useAppDispatch } from "@mezon/store";
+import { emojiSuggestionActions, selectMemberClanByUserId, useAppDispatch } from "@mezon/store";
 import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from "mezon-js/api.gen";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useState } from "react";
 import { useSelector } from "react-redux";
 
 type SettingEmojiItemProp = {
@@ -8,7 +8,7 @@ type SettingEmojiItemProp = {
 }
 
 const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
-  const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
+  const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname?.slice(1, -1) || '');
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const [focus, setFocus] = useState<boolean>(false);
   const dispatch = useAppDispatch()
@@ -16,27 +16,32 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
 
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
-    setNameEmoji(e.target.value);
+    setNameEmoji(e.target.value.split(':').join(''));
   }
 
   const handleUpdateEmoji = async () => {
     if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
       const request: MezonUpdateClanEmojiByIdBody = {
         source: emoji.src,
-        shortname: nameEmoji,
+        shortname: ":" + nameEmoji + ":",
         category: emoji.category,
       }
-      await dispatch(settingClanEmojiActions.updateEmoji({ request: request, emojiId: emoji.id || '' }))
+      await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }))
     }
   }
 
   const handleDelete = () => {
-    dispatch(settingClanEmojiActions.deleteEmoji(emoji));
+    dispatch(emojiSuggestionActions.deleteEmojiSetting(emoji));
   }
   const handleOnMouseLeave = () => {
     if (!focus) {
-      setNameEmoji(emoji.shortname ?? '');
+      setNameEmoji(emoji.shortname?.slice(1, -1) ?? '');
       setShowEdit(false);
+    }
+  }
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleUpdateEmoji();
     }
   }
   return (
@@ -66,8 +71,8 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
             <input
               className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`}
               value={nameEmoji}
-              onChange={(e) => handleChangeEmojiName(e)}
-              onKeyDown={(e) => { e.key === 'Enter' && handleUpdateEmoji() }}
+              onChange={handleChangeEmojiName}
+              onKeyDown={handleKeyDown}
               onFocus={() => setFocus(true)}
               onBlurCapture={() => setFocus(false)}
             />

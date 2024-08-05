@@ -14,7 +14,7 @@ interface IUserVoiceProps {
 }
 const UserVoiceItem = React.memo(({ userVoice, channelID }: IUserVoiceProps) => {
 	const styles = style(useTheme().themeValue);
-	const member = useSelector(selectMemberByGoogleId(userVoice.id ?? ''));
+	const member = useSelector(selectMemberByGoogleId(userVoice.user_id ?? ''));
 	const { setMembersVoiceChannel } = useMembersVoiceChannel();
 
 	useEffect(() => {
