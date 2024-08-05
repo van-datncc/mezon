@@ -66,7 +66,132 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 			</div>
 			<br />
 			<div className={appearanceTheme === ThemeApp.Light ? 'lightModeScrollBarMention' : ''}>
-				<ul className="flex flex-col gap-y-4">
+				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto">
+					{searchResults.map((member: UsersClanEntity) => (
+						<li key={member?.user?.id} className="flex justify-between items-center group">
+							<div className="flex gap-x-2">
+								<AvatarImage 
+									alt={member?.user?.username || ''}
+									userName={member?.user?.username}
+									className="min-w-6 min-h-6 max-w-6 max-h-6"
+									src={member?.user?.avatar_url}
+								/>
+								<span className="dark:text-white text-black font-medium">{member?.user?.display_name}</span>
+								<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{member?.user?.username}</span>
+							</div>
+							{clickRole !== 'New Role' ? (
+								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
+									<span
+										onClick={() => handleRemoveMember(member?.user?.id || '')}
+										className="text-white cursor-pointer"
+										role="button"
+									>
+										x
+									</span>
+								</div>
+							) : null}
+						</li>
+					))}
+					{searchResults.map((member: UsersClanEntity) => (
+						<li key={member?.user?.id} className="flex justify-between items-center group">
+							<div className="flex gap-x-2">
+								<AvatarImage 
+									alt={member?.user?.username || ''}
+									userName={member?.user?.username}
+									className="min-w-6 min-h-6 max-w-6 max-h-6"
+									src={member?.user?.avatar_url}
+								/>
+								<span className="dark:text-white text-black font-medium">{member?.user?.display_name}</span>
+								<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{member?.user?.username}</span>
+							</div>
+							{clickRole !== 'New Role' ? (
+								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
+									<span
+										onClick={() => handleRemoveMember(member?.user?.id || '')}
+										className="text-white cursor-pointer"
+										role="button"
+									>
+										x
+									</span>
+								</div>
+							) : null}
+						</li>
+					))}
+					{searchResults.map((member: UsersClanEntity) => (
+						<li key={member?.user?.id} className="flex justify-between items-center group">
+							<div className="flex gap-x-2">
+								<AvatarImage 
+									alt={member?.user?.username || ''}
+									userName={member?.user?.username}
+									className="min-w-6 min-h-6 max-w-6 max-h-6"
+									src={member?.user?.avatar_url}
+								/>
+								<span className="dark:text-white text-black font-medium">{member?.user?.display_name}</span>
+								<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{member?.user?.username}</span>
+							</div>
+							{clickRole !== 'New Role' ? (
+								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
+									<span
+										onClick={() => handleRemoveMember(member?.user?.id || '')}
+										className="text-white cursor-pointer"
+										role="button"
+									>
+										x
+									</span>
+								</div>
+							) : null}
+						</li>
+					))}
+					{searchResults.map((member: UsersClanEntity) => (
+						<li key={member?.user?.id} className="flex justify-between items-center group">
+							<div className="flex gap-x-2">
+								<AvatarImage 
+									alt={member?.user?.username || ''}
+									userName={member?.user?.username}
+									className="min-w-6 min-h-6 max-w-6 max-h-6"
+									src={member?.user?.avatar_url}
+								/>
+								<span className="dark:text-white text-black font-medium">{member?.user?.display_name}</span>
+								<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{member?.user?.username}</span>
+							</div>
+							{clickRole !== 'New Role' ? (
+								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
+									<span
+										onClick={() => handleRemoveMember(member?.user?.id || '')}
+										className="text-white cursor-pointer"
+										role="button"
+									>
+										x
+									</span>
+								</div>
+							) : null}
+						</li>
+					))}
+					{searchResults.map((member: UsersClanEntity) => (
+						<li key={member?.user?.id} className="flex justify-between items-center group">
+							<div className="flex gap-x-2">
+								<AvatarImage 
+									alt={member?.user?.username || ''}
+									userName={member?.user?.username}
+									className="min-w-6 min-h-6 max-w-6 max-h-6"
+									src={member?.user?.avatar_url}
+								/>
+								<span className="dark:text-white text-black font-medium">{member?.user?.display_name}</span>
+								<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{member?.user?.username}</span>
+							</div>
+							{clickRole !== 'New Role' ? (
+								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">
+									<span
+										onClick={() => handleRemoveMember(member?.user?.id || '')}
+										className="text-white cursor-pointer"
+										role="button"
+									>
+										x
+									</span>
+								</div>
+							) : null}
+						</li>
+					))}
 					{searchResults.map((member: UsersClanEntity) => (
 						<li key={member?.user?.id} className="flex justify-between items-center group">
 							<div className="flex gap-x-2">
