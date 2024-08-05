@@ -64,10 +64,10 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
 					</p>
 				)}
-        <div className={"flex flex-row justify-between my-2 items-center"}>
-          <div className={'flex flex-row items-center'}>
+        <div className="flex flex-row justify-between my-2 items-center">
+          <div className='flex flex-row items-center'>
             <Icons.LockIcon/>
-            <span className={'dark:text-textSecondary text-textSecondary800 text-lg font-semibold'}>Private Category</span>
+            <span className='dark:text-textSecondary text-textSecondary800 text-lg font-semibold'>Private Category</span>
           </div>
           <div className="relative flex flex-wrap items-center">
             <input
@@ -84,10 +84,10 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
             />
           </div>
         </div>
-        <p className={'dark:text-textSecondary text-textSecondary800 text-sm'}>By making a category private, only select members and roles will be able to view this category. Synced channels in this  category will automatically match to this setting</p>
+        <p className='dark:text-textSecondary text-textSecondary800 text-sm'>By making a category private, only select members and roles will be able to view this category. Synced channels in this  category will automatically match to this setting</p>
 			</Modal.Body>
 			<div className=" text-white font-semibold text-sm flex dark:bg-bgTertiary bg-bgLightMode justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
-				<button onClick={onClose} className={"dark:text-textSecondary text-textSecondary800"}>Cancel</button>
+				<button onClick={onClose} className="dark:text-textSecondary text-textSecondary800">Cancel</button>
 				<button
 					className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
 					onClick={handleCreateCate}

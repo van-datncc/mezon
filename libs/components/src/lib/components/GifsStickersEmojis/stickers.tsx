@@ -86,7 +86,7 @@ function stickersquare({ channelId, mode }: ChannelMessageBoxProps) {
 				px-1 md:items-start h-[25rem] pb-1 rounded
 				md:ml-2 mb-2">
         {categoryLogo.map((avt) => (
-          <button key={avt.id} onClick={(e) => scrollToCategory(e, avt.type)} className={'flex justify-center items-center w-9 h-9 rounded-lg hover:bg-[#41434A]'}>
+          <button key={avt.id} onClick={(e) => scrollToCategory(e, avt.type)} className='flex justify-center items-center w-9 h-9 rounded-lg hover:bg-[#41434A]'>
             <img
               src={avt.url}
               alt={`avt ${avt.id}`}

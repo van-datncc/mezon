@@ -7,7 +7,7 @@ import {
   selectReactionPlaceActive, selectTheme,
   useAppSelector
 } from '@mezon/store';
-import {EmojiPlaces, EPermission, IEmoji, ModeResponsive, SubPanelName} from '@mezon/utils';
+import {EEmojiCategory, EmojiPlaces, EPermission, IEmoji, ModeResponsive, SubPanelName} from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -50,13 +50,13 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
   
   const ClanLogo = () => {
     return currentClan?.logo
-      ? <img src={currentClan?.logo} className={"w-7 h-7 rounded-full"}/>
-      : <div className={'dark:text-textDarkTheme text-textLightTheme'}>{currentClan?.clan_name?.charAt(0).toUpperCase()}</div>
+      ? <img src={currentClan?.logo} className="w-7 h-7 rounded-full"/>
+      : <div className='dark:text-textDarkTheme text-textLightTheme'>{currentClan?.clan_name?.charAt(0).toUpperCase()}</div>
   }
 
 	const categoryIcons = [
 		<Icons.ClockHistory defaultSize="w-7 h-7" />,
-    modeResponsive === ModeResponsive.MODE_CLAN ? <ClanLogo/> : <Icons.PenEdit className={"w-7 h-7 text-colorNeutral"}/>,
+    modeResponsive === ModeResponsive.MODE_CLAN ? <ClanLogo/> : <Icons.PenEdit className="w-7 h-7 text-colorNeutral"/>,
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
 		<Icons.Bowl defaultSize="w-7 h-7" />,
@@ -285,7 +285,7 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
       return categoryName;
     }
     
-    return categoryName === 'Custom' ? currentClan?.clan_name : categoryName;
+    return categoryName === EEmojiCategory.CUSTOM ? currentClan?.clan_name : categoryName;
   }
 
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
@@ -323,7 +323,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
   const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
   const hasClanManagementPermission = hasAdminPermission || isClanCreator || hasClanPermission;
   const isShowAddButton = useMemo(() => {
-    return hasClanManagementPermission && showAddButton && categoryName === "Custom"
+    return hasClanManagementPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM
   }, [hasClanManagementPermission, categoryName, showAddButton])
 
 	return (
