@@ -432,3 +432,9 @@ export function sortFilteredList(filteredList: SearchItemProps[], searchText: st
 		}
 	});
 }
+export const getRoleList = (rolesInClan: ApiRole[]) => {
+	return rolesInClan.map((item) => ({
+		roleId: item.id ?? '',
+		roleName: item.title ?? '',
+	}));
+};
