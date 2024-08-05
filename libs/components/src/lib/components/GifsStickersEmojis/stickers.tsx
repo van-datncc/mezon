@@ -81,23 +81,24 @@ function stickersquare({ channelId, mode }: ChannelMessageBoxProps) {
 
 
   return (
-    <div className="flex h-full pr-2 w-full md:w-[500px]">
-      <div className="w-[10%] max-sm:gap-x-1
-        flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1
-        max-sm:w-full dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1
-        px-1 md:items-start h-[25rem] pb-1 rounded-lg">
+    <div className="flex h-full w-full md:w-[500px]">
+      <div className="w-[10%] md:w-[44px] max-sm:gap-x-1
+				flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1
+				max-sm:w-full dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1
+				px-1 md:items-start h-[25rem] pb-1 rounded
+				md:ml-2 mb-2">
         {categoryLogo.map((avt) => (
-          <button key={avt.id} onClick={(e) => scrollToCategory(e, avt.type)}>
+          <button key={avt.id} onClick={(e) => scrollToCategory(e, avt.type)} className={'flex justify-center items-center w-9 h-9 rounded-full'}>
             <img
               src={avt.url}
               alt={`avt ${avt.id}`}
-              className={`w-full h-full object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-lg justify-center items-center border border-bgHoverMember rounded-lg aspect-square`}
+              className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
               role="button"
             />
           </button>
         ))}
       </div>
-      <div className='flex flex-col h-[400px] overflow-y-auto w-[90%] px-5' ref={containerRef}>
+      <div className='flex flex-col h-[400px] overflow-y-auto w-[90%]' ref={containerRef}>
         {categoryLogo.map((avt) => (
           <div ref={(el) => (categoryRefs.current[avt.type] = el)} key={avt.id}>
             <CategorizedStickers stickerList={stickers} onClickSticker={handleClickImage} categoryName={avt.type} />
@@ -140,8 +141,8 @@ const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticke
   return (
     <>
       {
-        stickerList.length > 0 &&
-        <div className="w-auto pb-2">
+        stickerList.length > 0 && (
+        <div className="w-auto pb-2 px-2">
           <div className="grid grid-cols-3 gap-4 max-h-[400px] overflow-y-scroll hide-scrollbar">
             {stickerList.map((sticker: any) => (
               <img
@@ -155,7 +156,7 @@ const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticke
             ))}
           </div>
         </div>
-      }
+        )}
     </>
   )
 }

@@ -97,7 +97,7 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
           )}
           
           {subPanelActive === SubPanelName.STICKERS && (
-            <div className="flex h-full pr-1 w-full md:w-[500px]">
+            <div className="flex h-full pr-2 w-full md:w-[500px]">
               <ImageSquare channelId={currentChannel?.id ?? ''} mode={mod} />
             </div>
           )}
