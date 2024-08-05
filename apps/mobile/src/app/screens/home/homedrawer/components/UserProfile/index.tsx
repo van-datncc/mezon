@@ -41,7 +41,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const userById = useSelector(selectMemberByUserId(userId || user?.id || ''));
 	const userStatus = useMemberStatus(userId || user?.id);
 	const RolesClan = useSelector(selectAllRolesClan);
-	const { color } = useMixImageColor(user?.avatar_url || user?.avatarSm);
+	const { color } = useMixImageColor(userById?.user?.avatar_url || user?.avatarSm || userProfile?.user?.avatar_url);
 	const navigation = useNavigation<any>();
 	const { createDirectMessageWithUser } = useDirect();
 	const listDM = useSelector(selectDirectsOpenlist);
@@ -185,7 +185,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 						width={80}
 						height={80}
 						avatarUrl={user?.avatar_url || user?.avatarSm}
-						username={user?.display_name}
+						username={userById?.user?.username || user?.display_name}
 						userStatus={userStatus}
 						isBorderBoxImage={true}
 					/>
@@ -194,10 +194,10 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			<View style={[styles.container]}>
 				<View style={[styles.userInfo]}>
 					<Text style={[styles.userName]}>
-						{user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
+						{userById ? userById?.user?.display_name : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 					</Text>
 					<Text style={[styles.subUserName]}>
-						{user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
+						{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 					</Text>
 					{userCustomStatus ? <Text style={styles.customStatusText}>{userCustomStatus}</Text> : null}
 					{!checkOwner(userById?.user?.google_id || '') && (
