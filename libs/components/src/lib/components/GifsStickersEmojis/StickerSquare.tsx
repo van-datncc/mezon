@@ -87,55 +87,13 @@ function StickerSquare({ channelId, mode }: ChannelMessageBoxProps) {
 				flex flex-col max-sm:flex-row max-sm:justify-end max-sbm:justify-start gap-y-1
 				max-sm:w-full max-sbm:w-11 dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1
 				px-1 md:items-start pb-1 rounded max-sbm:flex-col
-				items-center"
+				items-center min-h-[25rem]"
 				>
 					{categoryLogo.map((avt) => (
 						<button
 							key={avt.id}
 							onClick={(e) => scrollToCategory(e, avt.type)}
 							className="flex justify-center items-center max-sm:px-1 w-9 h-9 rounded-lg hover:bg-[#41434A]"
-						>
-							<img
-								src={avt.url}
-								alt={`avt ${avt.id}`}
-								className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
-								role="button"
-							/>
-						</button>
-					))}
-					{categoryLogo.map((avt) => (
-						<button
-							key={avt.id}
-							onClick={(e) => scrollToCategory(e, avt.type)}
-							className="flex justify-center items-center w-9 h-9 rounded-lg hover:bg-[#41434A]"
-						>
-							<img
-								src={avt.url}
-								alt={`avt ${avt.id}`}
-								className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
-								role="button"
-							/>
-						</button>
-					))}
-					{categoryLogo.map((avt) => (
-						<button
-							key={avt.id}
-							onClick={(e) => scrollToCategory(e, avt.type)}
-							className="flex justify-center items-center w-9 h-9 rounded-lg hover:bg-[#41434A]"
-						>
-							<img
-								src={avt.url}
-								alt={`avt ${avt.id}`}
-								className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
-								role="button"
-							/>
-						</button>
-					))}
-					{categoryLogo.map((avt) => (
-						<button
-							key={avt.id}
-							onClick={(e) => scrollToCategory(e, avt.type)}
-							className="flex justify-center items-center w-9 h-9 rounded-lg hover:bg-[#41434A]"
 						>
 							<img
 								src={avt.url}
