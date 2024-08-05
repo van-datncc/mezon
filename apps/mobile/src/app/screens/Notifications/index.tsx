@@ -2,14 +2,10 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNotification } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	getStoreAsync,
-	selectCurrentClan,
-} from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { INotification, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -27,7 +23,7 @@ const Notifications = () => {
 	const styles = style(themeValue);
 	const { notification, deleteNotify } = useNotification();
 	const [notify, setNotify] = useState<INotification>();
-	const currentClan = useSelector(selectCurrentClan);
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const { t } = useTranslation(['notification']);
 	const navigation = useNavigation();
@@ -37,19 +33,17 @@ const Notifications = () => {
 	const [selectedTabs, setSelectedTabs] = useState({ individual: true, mention: true });
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 
-	const sortNotifications = useMemo(() => {
-		return notification.sort((a, b) => {
+	useEffect(() => {
+		handleFilterNotify(EActionDataNotify.All);
+	}, [notification]);
+
+	const handleFilterNotify = (tabNotify) => {
+		const sortNotifications = notification.sort((a, b) => {
 			const dateA = new Date(a.create_time || '').getTime();
 			const dateB = new Date(b.create_time || '').getTime();
 			return dateB - dateA;
 		});
-	}, [notification]);
 
-	useEffect(() => {
-		setNotificationsFilter(sortNotifications);
-	}, [sortNotifications]);
-
-	const handleFilterNotify = (tabNotify) => {
 		switch (tabNotify) {
 			case EActionDataNotify.Individual:
 				setNotificationsFilter(
@@ -79,15 +73,12 @@ const Notifications = () => {
 
 	useEffect(() => {
 		setSelectedTabs({ individual: true, mention: true });
-	}, [currentClan]);
+	}, [currentClanId]);
 
 	useEffect(() => {
 		const { individual, mention } = selectedTabs;
 		handleFilterNotify(
-			individual && mention ?
-      EActionDataNotify.All : individual ?
-      EActionDataNotify.Individual : mention ?
-      EActionDataNotify.Mention : null,
+			individual && mention ? EActionDataNotify.All : individual ? EActionDataNotify.Individual : mention ? EActionDataNotify.Mention : null,
 		);
 	}, [selectedTabs.individual, selectedTabs.mention]);
 
@@ -107,7 +98,7 @@ const Notifications = () => {
 	};
 
 	const handleDeleteNotify = (notify?: INotification) => {
-		notify && deleteNotify(notify.id, currentClan?.clan_id || '0');
+		notify && deleteNotify(notify.id, currentClanId || '0');
 		closeBottomSheet();
 	};
 
