@@ -176,7 +176,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 						className="dark:text-textPrimary !text-textPrimaryLight rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent "
 						onClick={handleCloseModal}
 					/>
-					<Button label="Save Changes" className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white `} onClick={onSaveChange} />
+					<Button label="Save Changes" className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`} disable={(editingSticker?.fileName && editingSticker.shortname && editingSticker.shortname !== editSticker?.shortname) ? false : true} onClick={onSaveChange} />
 				</div>
 			</div>
 
