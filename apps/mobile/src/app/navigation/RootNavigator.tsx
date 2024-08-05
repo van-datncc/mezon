@@ -45,9 +45,9 @@ import {
 	setCurrentClanLoader,
 	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
+import { gifsActions } from '@mezon/store-mobile';
 import notifee from '@notifee/react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import { gifsActions } from 'libs/store/src/lib/giftStickerEmojiPanel/gifs.slice';
 import { delay } from 'lodash';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
@@ -124,7 +124,9 @@ const NavigationMain = () => {
 	}, [isLoggedIn, hasInternet]);
 
 	useEffect(() => {
-		if (currentClanId) emojiLoader();
+		if (currentClanId) {
+			switchClanLoader();
+		}
 	}, [currentClanId]);
 
 	const initAppLoading = async () => {
@@ -163,9 +165,12 @@ const NavigationMain = () => {
 		}
 	};
 
-	const emojiLoader = async () => {
+	const switchClanLoader = async () => {
+		const promises = [];
 		const store = await getStoreAsync();
-		store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true }));
+		promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true })));
+		promises.push(store.dispatch(notificationActions.fetchListNotification(currentClanId)));
+		await Promise.all(promises);
 	};
 	const authLoader = async () => {
 		const store = await getStoreAsync();
@@ -212,7 +217,6 @@ const NavigationMain = () => {
 			}
 
 			// Additional API calls
-			promises.push(store.dispatch(notificationActions.fetchListNotification()));
 			promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 			promises.push(store.dispatch(gifsActions.fetchGifCategories()));
 			promises.push(store.dispatch(gifsActions.fetchGifCategoryFeatured()));

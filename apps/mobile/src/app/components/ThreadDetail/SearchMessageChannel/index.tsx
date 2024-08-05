@@ -90,6 +90,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 							username: itemDM?.usernames ?? '',
 							avatar_url: itemDM?.channel_avatar?.[0] ?? '',
 							id: itemDM?.user_id?.[0] ?? '',
+              avatarSm: itemDM?.channel_avatar?.[0] ?? '',
 						},
 					};
 				})
@@ -104,8 +105,9 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 						idDM: '',
 						user: {
 							username: itemFriend?.user.username ?? '',
-							avatar_url: itemFriend?.user.avatar_url ?? '',
+							avatar_url: itemFriend?.user?.avatar_url ?? '',
 							id: itemFriend?.id ?? '',
+              avatarSm: itemFriend?.user?.avatar_url ?? ''
 						},
 					};
 				})
@@ -121,6 +123,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 							username: itemUserClan?.user?.username ?? '',
 							avatar_url: itemUserClan?.user?.avatar_url ?? '',
 							id: itemUserClan?.id ?? '',
+              avatarSm: itemUserClan?.user?.avatar_url ?? ''
 						},
 					};
 				})
