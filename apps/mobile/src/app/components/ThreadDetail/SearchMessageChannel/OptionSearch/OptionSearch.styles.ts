@@ -1,7 +1,7 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
   wrapperOption: {
     flexDirection: 'row',
     paddingHorizontal: size.s_10,
@@ -12,12 +12,12 @@ export const styles = StyleSheet.create({
     borderTopWidth: 0.2,
   },
   textOption: {
-    color: Colors.white,
+    color: colors.text,
     fontSize: size.label,
     fontWeight: '500',
     maxWidth: 200
   },
-  content:{
+  content: {
     flexDirection: "row",
     alignItems: "center"
   }
