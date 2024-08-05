@@ -48,7 +48,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			debouncedSetClanName(e.target.value);
 		} else {
 			debouncedSetClanName.cancel();
-			setCheckValidate(validateListMessage.DUPLICATE_NAME);
+			setCheckValidate(validateListMessage.INVALID_NAME);
 			setOnTyping(false);
 		}
 	};
