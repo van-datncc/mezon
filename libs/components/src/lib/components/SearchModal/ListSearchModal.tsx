@@ -26,7 +26,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 					onClick={() => handleSelect(isTypeChannel, item)}
 					onMouseEnter={() => setIdActive(item.id ?? '')}
 					onMouseLeave={() => setIdActive(item.id ?? '')}
-					className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} dark:hover:bg-[#424549] hover:bg-bgLightModeButton w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+					className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 				>
 					{isTypeChannel ? (
 						<SuggestItem
