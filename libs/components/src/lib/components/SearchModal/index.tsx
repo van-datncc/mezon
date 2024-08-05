@@ -50,7 +50,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const [idActive, setIdActive] = useState('');
 	const boxRef = useRef<HTMLDivElement | null>(null);
 	const itemRef = useRef<HTMLDivElement | null>(null);
-
+	const ITEM_HEIGHT = 32;
 	const appearanceTheme = useSelector(selectTheme);
 
 	const listMemSearch = useMemo(() => {
@@ -205,7 +205,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const isNoResult =
 		!listChannelSearch.filter((item) => item.prioritizeName.indexOf(normalizeSearchText) > -1 || item.name.indexOf(normalizeSearchText) > -1)
-			.length && !listMemSearch.filter((item: any) => item.prioritizeName.indexOf(normalizeSearchText) > -1).length;
+			.length &&
+		!listMemSearch.filter((item: SearchItemProps) => item.prioritizeName && item.prioritizeName.indexOf(normalizeSearchText) > -1).length;
 
 	const totalLists = useMemo(() => {
 		return listMemSearch.concat(listChannelSearch);
@@ -220,11 +221,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	}, [totalListsFiltered, normalizeSearchText, isSearchByUsername]);
 
 	const channelSearchSorted = useMemo(() => {
-		return totalListsSorted.filter((item) => item.type === 2);
+		return totalListsSorted.filter((item) => item.type === TypeSearch.Channel_Type);
 	}, [totalListsSorted]);
 
 	const memSearchSorted = useMemo(() => {
-		return totalListsSorted.filter((item) => item.type === 1);
+		return totalListsSorted.filter((item) => item.type === TypeSearch.Dm_Type);
 	}, [totalListsSorted]);
 
 	const [listToUse, setListToUse] = useState<SearchItemProps[]>([]);
@@ -251,8 +252,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	}, [normalizeSearchText]);
 
 	useEffect(() => {
-		console.log(idActive);
-		console.log(listToUse);
 		if (idActive === '' && listToUse.length > 0) {
 			setIdActive(listToUse[0]?.id ?? '');
 		}
@@ -286,17 +285,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		};
 	}, [idActive, listToUse]);
 
-	const handleArrowDown = (listToUse: any[], currentIndex: number) => {
+	const handleArrowDown = (listToUse: SearchItemProps[], currentIndex: number) => {
 		const nextIndex = currentIndex === listToUse.length - 1 ? 0 : currentIndex + 1;
 		const newItem = listToUse[nextIndex];
 
-		if (!itemRef.current || !boxRef.current || !newItem) return;
-
-		const itemHeight = itemRef.current.clientHeight;
+		if (!boxRef.current || !newItem) return;
 		const boxHeight = boxRef.current.clientHeight;
-		const newItemOffset = (itemHeight + 4) * nextIndex;
-		const newScrollTop = newItemOffset + itemHeight - boxHeight;
-		const totalItemsHeight = listToUse.length * itemHeight;
+		const newItemOffset = (ITEM_HEIGHT + 4) * nextIndex;
+		const newScrollTop = newItemOffset + ITEM_HEIGHT - boxHeight;
+		const totalItemsHeight = listToUse.length * ITEM_HEIGHT;
 		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
 
 		boxRef.current.scroll({
@@ -307,17 +304,16 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		setIdActive(newItem.id ?? '');
 	};
 
-	const handleArrowUp = (listToUse: any[], currentIndex: number) => {
+	const handleArrowUp = (listToUse: SearchItemProps[], currentIndex: number) => {
 		const prevIndex = currentIndex === 0 ? listToUse.length - 1 : currentIndex - 1;
 		const newItem = listToUse[prevIndex];
 
-		if (!itemRef.current || !boxRef.current || !newItem) return;
+		if (!boxRef.current || !newItem) return;
 
-		const itemHeight = itemRef.current.clientHeight;
 		const boxHeight = boxRef.current.clientHeight;
-		const newItemOffset = (itemHeight + 4) * prevIndex;
-		const newScrollTop = newItemOffset - boxHeight + itemHeight;
-		const totalItemsHeight = listToUse.length * itemHeight;
+		const newItemOffset = (ITEM_HEIGHT + 4) * prevIndex;
+		const newScrollTop = newItemOffset - boxHeight + ITEM_HEIGHT;
+		const totalItemsHeight = listToUse.length * ITEM_HEIGHT;
 		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
 
 		boxRef.current.scroll({
