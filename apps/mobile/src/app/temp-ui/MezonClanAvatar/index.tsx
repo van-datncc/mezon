@@ -9,9 +9,10 @@ interface IMezonClanAvatarProps {
 	defaultColor?: string;
 	textStyle?: StyleProp<TextStyle>;
 	noDefaultText?: boolean;
+	lightMode?: boolean;
 }
 
-export default function MezonClanAvatar({ image, alt = 'anonymous', defaultColor, textStyle, noDefaultText }: IMezonClanAvatarProps) {
+export default function MezonClanAvatar({ image, alt = 'anonymous', defaultColor, textStyle, noDefaultText, lightMode }: IMezonClanAvatarProps) {
 	const { themeValue } = useTheme();
 
 	const styles = style(themeValue);
@@ -23,7 +24,7 @@ export default function MezonClanAvatar({ image, alt = 'anonymous', defaultColor
 			) : (
 				<View style={[styles.fakeBox, { backgroundColor: defaultColor || themeValue.colorAvatarDefault }]}>
 					{!noDefaultText ? (
-						<Text adjustsFontSizeToFit numberOfLines={1} style={[styles.altText, textStyle]}>
+						<Text adjustsFontSizeToFit numberOfLines={1} style={[styles.altText, lightMode && styles.altTextLight, textStyle]}>
 							{alt?.charAt(0).toUpperCase()}
 						</Text>
 					) : null}

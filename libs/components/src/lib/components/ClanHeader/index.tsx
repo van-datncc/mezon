@@ -125,16 +125,14 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 											}
 										/>
 									)}
-									{(isShow) && (
-										<ItemModal
-											onClick={() => {
-												openNotiSettingModal();
-												setIsShowModalPanelClan(false);
-											}}
-											children="Notification Settings"
-											endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
-										/>
-									)}
+									<ItemModal
+										onClick={() => {
+											openNotiSettingModal();
+											setIsShowModalPanelClan(false);
+										}}
+										children="Notification Settings"
+										endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
+									/>
 								</div>
 							</div>
 						)}

@@ -73,7 +73,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom }: Inpu
 				onClose={() => setIsVisible(false)}
 			>
 				<TouchableOpacity activeOpacity={0.7} onPress={() => setIsVisible(true)} style={styles.listSearchIcon}>
-					<FilterSearchIcon width={20} height={20} color={Colors.textGray} />
+					<FilterSearchIcon width={20} height={20} color={themeValue.textStrong} />
 				</TouchableOpacity>
 			</Tooltip>
 		</View>

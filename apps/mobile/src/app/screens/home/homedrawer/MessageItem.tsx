@@ -17,11 +17,11 @@ import {
 	selectAllUsesClan,
 	selectIdMessageToJump,
 	selectMessageEntityById,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
+import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction } from './components';
@@ -102,8 +102,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	}, [messageReferences, message.references]);
 
 	const isDM = useMemo(() => {
-		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode)
-	}, [mode])
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+	}, [mode]);
 
 	useEffect(() => {
 		if (props?.messageId) {
@@ -211,6 +211,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return message?.clan_nick || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
 	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, message?.display_name, isDM]);
 
+	const usernameMessage = useMemo(() => {
+		return isDM ? message?.display_name || message?.user?.username : message?.user?.username
+	}, [isDM, isDM, message?.display_name, message?.user?.username]);
+
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
 			inputRange: [-50, 0],
@@ -283,12 +287,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 					<AvatarMessage
 						onPress={onPressAvatar}
-						avatar={message?.isMe ? userProfile?.user?.avatar_url : message?.user?.avatarSm}
-						textAvatar={isDM ? message?.display_name || message?.user?.username : message?.user?.username}
+						id={message?.user?.id}
+						avatar={message?.avatar}
+						username={usernameMessage}
 						isShow={!isCombine || !!message?.references?.length || showUserInformation}
 					/>
 					<Pressable
 						style={[styles.rowMessageBox]}
+						delayLongPress={Platform.OS === 'ios' ? 300 : 100}
 						onLongPress={() => {
 							if (preventAction) return;
 							setIsOnlyEmojiPicker(false);
