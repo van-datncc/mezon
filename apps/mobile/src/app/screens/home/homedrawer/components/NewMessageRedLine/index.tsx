@@ -21,17 +21,15 @@ export const NewMessageRedLine = memo((props: INewMessageRedLineProps) => {
           height={1}
           width={'95%'}
           backgroundColor={Colors.red}
-          margin={size.s_20}
+          margin={size.s_10}
         >
           <Block
             position="absolute"
-            top={-size.s_10}
             left={0}
-            justifyContent="center"
             alignItems="center"
             width={'100%'}
           >
-            <Block paddingHorizontal={size.s_10} backgroundColor={themeValue.secondary}>
+            <Block paddingHorizontal={size.s_10} marginTop={-size.s_10} backgroundColor={themeValue.secondary}>
               <Text color={Colors.red}>{t('newMessages')}</Text>
             </Block>
           </Block>

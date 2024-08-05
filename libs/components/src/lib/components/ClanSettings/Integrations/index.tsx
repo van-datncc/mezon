@@ -19,10 +19,10 @@ const Integrations = () => {
 	}, [allChannel]);
 
 	useEffect(() => {
-		if (parentChannelsInClan[0]) {
-			dispatch(fetchWebhooksByChannelId({ channelId: parentChannelsInClan[0].channel_id as string }));
+		if (allChannel[0]) {
+			dispatch(fetchWebhooksByChannelId({ channelId: allChannel[0].channel_id as string, noCache: true }));
 		}
-	}, [parentChannelsInClan]);
+	}, [allChannel[0]]);
 
 	return (
 		<div className="sbm:mt-[60px] mt-[10px]">

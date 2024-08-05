@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import * as Icons from "../../../../../ui/src/lib/Icons";
+import { Icons }  from "@mezon/ui";
 import ExitSetting from "../ChannelSetting/exitSetting";
 import { categorySettingItem, categorySettingList, ItemObjProps } from "../ClanSettings/ItemObj";
 import CategorySettingSidebar from "./CategorySettingSidebar";

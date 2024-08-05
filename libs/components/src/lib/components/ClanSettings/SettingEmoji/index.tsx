@@ -1,7 +1,8 @@
-import { createEmoji, selectAllEmoji, selectCurrentChannelId, selectCurrentClanId, settingClanEmojiActions, useAppDispatch } from '@mezon/store';
+import { createEmojiSetting, selectAllEmojiSuggestion, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI } from '@mezon/utils';
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingEmojiList from './SettingEmojiList';
@@ -13,57 +14,42 @@ const SettingEmoji = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const { sessionRef, clientRef } = useMezon();
-	const emojiList = useSelector(selectAllEmoji).filter(emoji => emoji.creator_id !== '0');
-
+	const emojiList = useSelector(selectAllEmojiSuggestion).filter(emoji => emoji.category === 'Custom');
 	const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files) {
-			const file = e.target.files[0];
-			const imageSize = file?.size;
-			const fileNameParts = file?.name.split('.');
-			const fileName = fileNameParts.slice(0, -1).join('.').slice(0, 62);
-			const session = sessionRef.current;
-			const client = clientRef.current;
-			const category = 'Custom';
-			const path = 'emojis/' + category;
-			if (!client || !session) {
-				throw new Error('Client or file is not initialized');
-			}
-			const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-			if (!allowedTypes.includes(file?.type)) {
-				setOpenModalType(true);
-				return;
-			}
-
-			if (imageSize > 1000000) {
-				setOpenModal(true);
-				return;
-			}
-			handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file, path).then(
-				async (attachment: ApiMessageAttachment) => {
-					const request: ApiClanEmojiCreateRequest = {
-						category: category,
-						clan_id: currentClanId,
-						shortname: ':' + fileName + ':',
-						source: attachment.url,
-					};
-					await dispatch(createEmoji({ request: request, clanId: currentClanId }));
-				},
-			);
-		} else {
+		if (!e.target.files) {
 			return;
 		}
-	};
-
-	const fetchEmojis = useCallback(async () => {
-		if (currentClanId) {
-			await dispatch(settingClanEmojiActions.fetchEmojisByClanId({ clanId: currentClanId, noCache: true }));
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
 		}
-	}, [dispatch]);
-
-	useEffect(() => {
-		fetchEmojis();
-	}, [fetchEmojis]);
-
+		const file = e.target.files[0];
+		if (file.size > LIMIT_SIZE_UPLOAD_STICKER_AND_EMOJI) {
+			setOpenModal(true);
+			return;
+		}
+		const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+		if (!allowedTypes.includes(file.type)) {
+			setOpenModalType(true);
+			return;
+		}
+		const fileNameParts = file.name.split('.');
+		const fileName = fileNameParts.slice(0, -1).join('.').slice(0, 62);
+		const category = 'Custom';
+		const path = 'emojis/' + category;
+		handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file, path).then(
+			async (attachment: ApiMessageAttachment) => {
+				const request: ApiClanEmojiCreateRequest = {
+					category: category,
+					clan_id: currentClanId,
+					shortname: ':' + fileName + ':',
+					source: attachment.url,
+				};
+				dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
+			},
+		);
+	};
 	return (
 		<>
 			<div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">

@@ -513,7 +513,7 @@ input:-webkit-autofill:active {
 	background: #151515;
 }
 
-// attachment-scroll
+// attachment-scroll-dark
 .attachment-scroll::-webkit-scrollbar {
 	height: 8px;
 }
@@ -524,6 +524,19 @@ input:-webkit-autofill:active {
 
 .message-channel-scroll::-webkit-scrollbar-thumb {
 	background: #2b2d31;
+}
+
+// attachment-scroll-light
+.attachment-scroll-light::-webkit-scrollbar {
+	height: 8px;
+}
+
+.attachment-scroll-light::-webkit-scrollbar-track {
+	background: #D3D5D7;
+}
+
+.attachment-scroll-light::-webkit-scrollbar-thumb {
+	background: #7F8081;
 }
 
 // css tagLink of markdown

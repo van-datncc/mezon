@@ -1,8 +1,9 @@
 import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
-import { ChannelIsNotThread, ETypeMessage } from '@mezon/utils';
+import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { Hashtag, ThreadIcon } from '../../../../../ui/src/lib/Icons';
+import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 export type ChatWelComeProp = {
 	readonly type: Readonly<string>;
@@ -20,21 +21,26 @@ function ChatWelCome({ type, name, userName, avatarDM, mode }: ChatWelComeProp) 
 
 	return (
 		<div className="space-y-2 px-4 mb-0 mt-[50px] flex-1 flex flex-col justify-end">
-			{type === ETypeMessage.CHANNEL ? (
-				<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
-					<Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
-				</div>
-			) : type === ETypeMessage.THREAD ? (
-				<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
-					<ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
-				</div>
-			) : avatarDM ? (
-				<img className="h-[75px] w-[75px] rounded-full flex items-center justify-center object-cover" alt="" src={avatarDM} />
-			) : (
-				<div className="h-[75px] w-[75px] bg-bgLightModeButton dark:bg-zinc-700 rounded-full flex justify-center items-center text-contentSecondary text-4xl">
-					{(userName ?? name)?.charAt(0).toUpperCase()}
-				</div>
-			)}
+			{mode === ChannelStreamMode.STREAM_MODE_CHANNEL && (
+				currentChannel?.parrent_id !== ChannelIsNotThread.TRUE ?(
+					<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
+						<ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10" />
+					</div>
+				) : (
+					<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
+						<Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
+					</div>
+				))
+			}
+			{(mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) && 
+				<AvatarImage 
+					alt={userName || ''}
+					userName={userName}
+					className="min-w-[75px] min-h-[75px] max-w-[75px] max-h-[75px] font-semibold"
+					src={avatarDM}
+					classNameText='!text-4xl font-semibold'
+				/>
+			}
 
 			<div>
 				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>

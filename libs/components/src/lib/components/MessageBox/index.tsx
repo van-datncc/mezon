@@ -1,7 +1,7 @@
 import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useReference } from '@mezon/core';
 import {
 	messagesActions,
+	referencesActions,
 	selectAttachmentData,
 	selectCloseMenu,
 	selectStatusLoadingAttachment,
@@ -39,8 +39,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
-	const { setAttachmentData } = useReference();
-	const attachmentDataRef = useSelector(selectAttachmentData);
+	const attachmentDataRef = useSelector(selectAttachmentData(currentChannelId || ''));
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
 	const appearanceTheme = useSelector(selectTheme);
 
@@ -68,28 +67,23 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		}
 	}, []);
 
-	const handleFinishUpload = useCallback((attachment: ApiMessageAttachment) => {
-		typeConverts.map((typeConvert) => {
-			if (typeConvert.type === attachment.filetype) {
-				return (attachment.filetype = typeConvert.typeConvert);
-			}
-		});
-		dispatch(messagesActions.setIsFocused(true));
-		setAttachmentData(attachment);
-	}, []);
-
-	function removeAttachmentByUrl(urlToRemove: string) {
-		const removedAttachment: ApiMessageAttachment[] = attachmentDataRef.reduce(
-			(acc: ApiMessageAttachment[], attachment: ApiMessageAttachment) => {
-				if (attachment.url !== urlToRemove) {
-					acc.push(attachment);
+	const handleFinishUpload = useCallback(
+		async (attachment: ApiMessageAttachment) => {
+			typeConverts.map((typeConvert) => {
+				if (typeConvert.type === attachment.filetype) {
+					return (attachment.filetype = typeConvert.typeConvert);
 				}
-				return acc;
-			},
-			[],
-		);
-		setAttachmentData(removedAttachment);
-	}
+			});
+			dispatch(messagesActions.setIsFocused(true));
+			dispatch(referencesActions.setAttachmentData({ channelId: currentChannelId || '', attachments: [attachment] }));
+		},
+		[currentChannelId],
+	);
+
+	const removeAttachmentByUrl = (urlToRemove: string) => {
+		dispatch(referencesActions.removeAttachment({ channelId: currentChannelId || '', urlAttachment: urlToRemove }));
+	};
+
 	const onPastedFiles = useCallback(
 		(event: React.ClipboardEvent<HTMLDivElement>) => {
 			const items = (event.clipboardData || (window as any).clipboardData).items;
@@ -155,13 +149,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative max-sm:-pb-2  ">
 			<div
-				className={`w-wrappBoxChatView sbm:max-w-wrappBoxChatView max-w-wrappBoxChatViewMobile
-				${attachmentDataRef.length > 0 || statusLoadingAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+				className={`${attachmentDataRef.length > 0 || statusLoadingAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 			>
 				<div
-					className={`max-h-full flex gap-2 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+					className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'attachment-scroll-light' : ''}`}
 				>
-					{attachmentDataRef.map((item: ApiMessageAttachment, index: number) => {
+					{attachmentDataRef?.map((item: ApiMessageAttachment, index: number) => {
 						return (
 							<Fragment key={index}>
 								<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} />
