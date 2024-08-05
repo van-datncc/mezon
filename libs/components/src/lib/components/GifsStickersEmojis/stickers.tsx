@@ -77,18 +77,16 @@ function stickersquare({ channelId, mode }: ChannelMessageBoxProps) {
       }
     }
   };
-
-
-
+  
   return (
     <div className="flex h-full w-full md:w-[500px]">
-      <div className="w-[10%] md:w-[44px] max-sm:gap-x-1
+      <div className="w-[10%] max-sm:gap-x-1
 				flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1
 				max-sm:w-full dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1
 				px-1 md:items-start h-[25rem] pb-1 rounded
 				md:ml-2 mb-2">
         {categoryLogo.map((avt) => (
-          <button key={avt.id} onClick={(e) => scrollToCategory(e, avt.type)} className={'flex justify-center items-center w-9 h-9 rounded-full'}>
+          <button key={avt.id} onClick={(e) => scrollToCategory(e, avt.type)} className={'flex justify-center items-center w-9 h-9 rounded-lg hover:bg-[#41434A]'}>
             <img
               src={avt.url}
               alt={`avt ${avt.id}`}
