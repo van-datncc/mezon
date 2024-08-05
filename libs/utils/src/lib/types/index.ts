@@ -631,3 +631,7 @@ export enum TypeSearch {
 	Dm_Type = 1,
 	Channel_Type = 2,
 }
+
+export enum EEmojiCategory {
+	CUSTOM = 'Custom',
+}
