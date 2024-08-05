@@ -70,7 +70,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	};
 	return flagOption ? (
 		<>
-			<div className="absolute top-0 left-0 w-full h-full pl-2 overflow-y-auto flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary overflow-hidden sbm:pt-[-60px] pt-[10px]">
+			<div className="absolute top-0 left-0 w-full h-full pl-2 flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary overflow-hidden sbm:pt-[-60px] pt-[10px]">
 				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} handleUpdateUser={() =>handleUpdateUser(true)}/>
 				<div className="w-2/3">
 					<div className="font-semibold pl-3 dark:text-white text-black">
@@ -84,7 +84,7 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 				</div>
 				<SettingUserClanProfileSave PropsSave={saveProfile} />
 			</div>
-			<div className="border-l border-gray-200 dark:border-gray-500 h-screen absolute sbm:top-[-60px] top-[-10px] left-1/3"></div>
+			<div className="border-l border-gray-200 dark:border-gray-500 h-screen absolute sbm:top-[-60px] top-[-10px] left-1/3"/>
 		</>
 	) : null;
 };

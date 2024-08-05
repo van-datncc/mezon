@@ -29,7 +29,6 @@ const AvatarProfile = ({ customStatus, avatar, username, userToDisplay, isAnonym
 						<div className="absolute dark:bg-bgPrimary bg-white px-[16px] py-[12px] flex items-center justify-center rounded-[12px] w-fit max-w-full">
 							<span
 								className="text-left font-medium text-[14px] dark:text-white text-black w-full break-all overflow-hidden transition-all duration-300 hover:line-clamp-none line-clamp-2"
-								title={customStatus}
 							>
 								{customStatus}
 							</span>
