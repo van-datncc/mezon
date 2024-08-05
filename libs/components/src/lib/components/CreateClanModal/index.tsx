@@ -70,7 +70,6 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
       e.target.value = null;
       return;
     }
-
     if (sizeImage > 1000000) {
       seOpenModalError((prev) => ({ ...prev, errorSize: true }));
       e.target.value = null;
