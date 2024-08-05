@@ -8,8 +8,8 @@ import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 export default function ThreadAddButton() {
 	const navigation = useNavigation<any>();
 	const { themeValue } = useTheme();
-	const { isClanOwner, userPermissionsStatus } = useUserPermission();
-	if (!(userPermissionsStatus['manage-thread'] || isClanOwner)) {
+	const { isCanManageThread } = useUserPermission();
+	if (!isCanManageThread) {
 		return <View />;
 	}
 	return (

@@ -27,7 +27,7 @@ export const ActionRow = React.memo(() => {
 	const navigation = useNavigation<any>();
 	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
-	const { isClanOwner, userPermissionsStatus } = useUserPermission();
+	const { isCanManageThread, isCanManageChannel } = useUserPermission();
 
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
@@ -78,7 +78,7 @@ export const ActionRow = React.memo(() => {
 				});
 			},
 			icon: <Icons.SettingsIcon width={22} height={22} color={themeValue.text} />,
-			isShow: userPermissionsStatus['manage-channel'] || userPermissionsStatus['manage-thread'] || isClanOwner,
+			isShow: isCanManageThread || isCanManageChannel,
 			type: EActionRow.Settings,
 		},
 	];

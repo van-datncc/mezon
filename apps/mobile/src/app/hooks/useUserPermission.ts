@@ -19,6 +19,12 @@ export const useUserPermission = () => {
 
   return {
     userPermissionsStatus,
-    isClanOwner
+    isClanOwner,
+    isCanManageThread: userPermissionsStatus["manage-thread"] || userPermissionsStatus.administrator || isClanOwner,
+    isCanManageChannel: userPermissionsStatus["manage-channel"] || userPermissionsStatus.administrator || isClanOwner,
+    isCanManageClan: userPermissionsStatus["manage-clan"] || userPermissionsStatus.administrator || isClanOwner,
+    isCanDeleteMessage: userPermissionsStatus["delete-message"] || userPermissionsStatus.administrator || isClanOwner,
+    isCanSendMessage: userPermissionsStatus["send-message"] || userPermissionsStatus.administrator || isClanOwner,
+    isCanManageEvent: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus["manage-clan"]
   }
 }

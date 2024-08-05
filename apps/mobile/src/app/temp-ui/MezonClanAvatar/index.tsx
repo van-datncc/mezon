@@ -11,7 +11,7 @@ interface IMezonClanAvatarProps {
 	noDefaultText?: boolean;
 }
 
-export default function MezonClanAvatar({ image, alt = 'anonymous', defaultColor, textStyle, noDefaultText }: IMezonClanAvatarProps) {
+export default function MezonClanAvatar({ image, alt = 'anonymous', defaultColor, textStyle, noDefaultText = false }: IMezonClanAvatarProps) {
 	const { themeValue } = useTheme();
 
 	const styles = style(themeValue);

@@ -82,11 +82,12 @@ export const linkGoogleMeet = 'https://meet.google.com/';
 export const getUserPermissionsStatus = (activeRoleIds: string[] = [], clanRoles: RolesClanEntity[] = []) => {
   const result: { [key in EPermission]: boolean } = {
     [EPermission.administrator]: false,
-    [EPermission.viewMessage]: false,
+    [EPermission.viewChannel]: false,
     [EPermission.manageChannel]: false,
     [EPermission.sendMessage]: false,
     [EPermission.deleteMessage]: false,
     [EPermission.manageThread]: false,
+    [EPermission.manageClan]: false,
   };
 
   clanRoles.forEach((role) => {
