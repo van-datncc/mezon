@@ -24,12 +24,32 @@ const ClanSetting = (props: ModalSettingProps) => {
   const currentSetting = useMemo(() => {
     return listItemSetting.find(item => item.id === currentSettingId);
   }, [currentSettingId])
+  
 	const handleSettingItemClick = (settingItem: ItemObjProps) => {
 		setCurrentSettingId(settingItem.id);
 	};
+ 
 	const [menu, setMenu] = useState(true);
 	const closeMenu = useSelector(selectCloseMenu);
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
+  
+  const currentSettingPage = () => {
+    switch (currentSettingId) {
+      case ItemSetting.OVERVIEW:
+        return <ClanSettingOverview />;
+      case ItemSetting.ROLES:
+        return <ServerSettingMainRoles />;
+      case ItemSetting.INTEGRATIONS:
+        return <Integrations />;
+      case ItemSetting.EMOJI:
+        return <SettingEmoji />;
+      case ItemSetting.NOTIFICATION_SOUND:
+        return <NotificationSoundSetting />;
+      case ItemSetting.STICKERS:
+        return <SettingSticker />;
+    }
+  }
+  
 	useEffect(() => {
 		if (currentSettingId === ItemSetting.DELETE_SERVER) {
 			setIsShowDeletePopup(true);
@@ -74,12 +94,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 								) : (
 									''
 								)}
-								{currentSetting?.id === ItemSetting.OVERVIEW && <ClanSettingOverview />}
-								{currentSetting?.id === ItemSetting.ROLES && <ServerSettingMainRoles />}
-								{currentSetting?.id === ItemSetting.INTEGRATIONS && <Integrations />}
-								{currentSetting?.id === ItemSetting.EMOJI && <SettingEmoji />}
-								{currentSetting?.id === ItemSetting.NOTIFICATION_SOUND && <NotificationSoundSetting />}
-								{currentSetting?.id === ItemSetting.STICKERS && <SettingSticker />}
+                {currentSettingPage()}
 							</div>
 						</div>
 						{isShowDeletePopup && <DeleteClanModal onClose={() => setIsShowDeletePopup(false)} />}
