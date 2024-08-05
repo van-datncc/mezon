@@ -213,7 +213,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 
 	const usernameMessage = useMemo(() => {
 		return isDM ? message?.display_name || message?.user?.username : message?.user?.username
-	}, [isDM, message]);
+	}, [isDM, isDM, message?.display_name, message?.user?.username]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
