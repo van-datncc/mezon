@@ -112,7 +112,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 					</div>
 					<div className={'flex flex-col select-none dark:text-textPrimary text-textPrimaryLight'}>
 						<p className="text-xs font-bold h-6 uppercase">PREVIEW</p>
-						<div className={'flex items-center justify-center rounded-lg border-[0.08px] border-borderDivider overflow-hidden'}>
+						<div className={'flex items-center justify-center rounded-lg border-[0.08px] dark:border-borderDivider border-borderLightTabs overflow-hidden'}>
 							<div className={'relative h-56 w-[50%] flex items-center justify-center bg-bgPrimary'}>
 								{editingSticker.source ? (
 									<PreviewStickerBox preview={editingSticker.source} />
@@ -133,7 +133,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 						<div className={'w-1/2 flex flex-col gap-2'}>
 							<p className={`text-xs font-bold uppercase select-none`}>FILE {editSticker && ' (THIS CANNOT BE EDITED)'}</p>
 							<div
-								className={`dark:bg-bgSecondary bg-bgLightSecondary border-[0.08px] dark:border-textLightTheme border-textDarkTheme flex flex-row rounded justify-between items-center py-[6px] px-3 dark:text-textPrimary box-border ${editingSticker.fileName && 'cursor-not-allowed'}`}
+								className={`dark:bg-bgSecondary bg-bgLightSecondary border-[0.08px] dark:border-textLightTheme border-borderLightTabs flex flex-row rounded justify-between items-center py-[6px] px-3 dark:text-textPrimary box-border ${editingSticker.fileName && 'cursor-not-allowed'}`}
 							>
 								<p className="select-none flex-1 truncate">{editingSticker.fileName ?? 'Choose a file'}</p>
 								{!editSticker && (
@@ -156,13 +156,13 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 							<p className={`text-xs font-bold uppercase select-none`}>Sticker Name</p>
 							<div
 								className={
-									'bg-bgLightModeSecond dark:bg-bgTertiary border-[0.08px] dark:border-textLightTheme border-textDarkTheme flex flex-row rounded justify-between items-center p-2 pl-3 dark:text-textPrimary box-border overflow-hidden'
+									'bg-bgLightSearchHover dark:bg-bgTertiary border-[0.08px] dark:border-textLightTheme border-borderLightTabs flex flex-row rounded justify-between items-center p-2 pl-3 dark:text-textPrimary box-border overflow-hidden'
 								}
 							>
 								<InputField
 									type="string"
 									placeholder="ex. cat hug"
-									className={'px-[8px]'}
+									className={'px-[8px] bg-bgLightSearchHover dark:bg-bgTertiary'}
 									value={editingSticker.shortname}
 									onChange={handleChangeShortNameSticker}
 								/>
@@ -173,10 +173,10 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
 				<div className={`absolute w-full h-[54px] bottom-0 flex items-end justify-end select-none`}>
 					<Button
 						label="Never Mind"
-						className="dark:text-textPrimary text-[#313338] rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent "
+						className="dark:text-textPrimary !text-textPrimaryLight rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent "
 						onClick={handleCloseModal}
 					/>
-					<Button label="Save Changes" className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`} onClick={onSaveChange} />
+					<Button label="Save Changes" className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white `} onClick={onSaveChange} />
 				</div>
 			</div>
 

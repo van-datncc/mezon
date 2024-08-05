@@ -28,7 +28,7 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
   return (
     <div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
       <div className="dark:text-white text-black text-[15px] flex flex-col gap-4">
-        <h3 className="font-bold">Category</h3>
+        <h3 className="font-bold text-xl">Category</h3>
 
         <p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Channel name</p>
         <div className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded">{channel.channel_label}</div>
@@ -44,7 +44,7 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
           )}
           label=""
           placement="bottom-start"
-          className="dark:bg-black bg-white border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+          className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px]"
         >
           {
             listCategory.map((category) => {
