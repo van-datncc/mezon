@@ -45,6 +45,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
       debouncedSetClanName(value)
     } else {
       debouncedSetClanName.cancel();
+      setCheckValidate(EValidateListMessage.INVALID_NAME);
     }
   };
   const debouncedSetClanName = useDebouncedCallback(async (value: string) => {
