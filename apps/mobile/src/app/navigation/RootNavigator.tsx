@@ -20,7 +20,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
@@ -64,6 +64,7 @@ const NavigationMain = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
+	const previousClanIdRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -126,7 +127,10 @@ const NavigationMain = () => {
 	}, [isLoggedIn, hasInternet]);
 
 	useEffect(() => {
-		if (currentClanId) emojiLoader();
+		if (currentClanId && currentClanId !== previousClanIdRef?.current) {
+			previousClanIdRef.current = currentClanId;
+			emojiLoader();
+		}
 	}, [currentClanId]);
 
 	const refreshMessageInitApp = useCallback(async () => {

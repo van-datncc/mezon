@@ -111,9 +111,6 @@ export const ChatBoxBottomBar = memo(
 		const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
 		const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
-		const mentionList: IMentionOnMessage[] = [];
-		const hashtagList: IHashtagOnMessage[] = [];
-
 		const isShowCreateThread = useMemo(() => {
 			return !hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
 		}, [currentChannel?.channel_label, currentChannel?.parrent_id, hiddenIcon?.threadIcon]);
