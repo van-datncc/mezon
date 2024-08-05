@@ -141,11 +141,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return sortedList;
 	}, [listChannels]);
 
-	const totalsData = [...listMemSearch, ...listChannelSearch];
-	console.log('totalsData', totalsData);
-	console.log('listMemSearch', listMemSearch);
-	console.log('listChannelSearch', listChannelSearch);
-
 	const handleSelectMem = useCallback(
 		async (user: any) => {
 			if (user?.idDM) {
@@ -201,28 +196,28 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const isNoResult =
 		!listChannelSearch.filter((item) => item.name.indexOf(searchText) > -1).length &&
 		!listMemSearch.filter((item: any) => item.name.indexOf(searchText) > -1).length;
-	const [listDisplay, setListDisplay] = useState<SearchItemProps[]>([]);
+
+	const memSearchs = listMemSearch
+		.filter((item) => item.name && item.name.indexOf(searchText.startsWith('@') ? searchText.substring(1) : searchText) > -1)
+		.slice(0, searchText.startsWith('@') ? 25 : 7);
+
+	const channelSearchs = listChannelSearch
+		.filter((item) => item.name.indexOf(searchText.startsWith('#') ? searchText.substring(1) : searchText) > -1)
+		.slice(0, searchText.startsWith('#') ? 25 : 8);
 
 	const totalLists = useMemo(() => {
-		const memSearchs = listMemSearch
-			.filter((item) => item.name && item.name.indexOf(searchText.startsWith('@') ? searchText.substring(1) : searchText) > -1)
-			.slice(0, searchText.startsWith('@') ? 25 : 7);
-		const channelSearchs = listChannelSearch
-			.filter((item) => item.name.indexOf(searchText.startsWith('#') ? searchText.substring(1) : searchText) > -1)
-			.slice(0, searchText.startsWith('#') ? 25 : 8);
-
 		return sortFilteredList(memSearchs.concat(channelSearchs).slice(), searchText, false);
-	}, [listMemSearch, listChannelSearch, searchText]);
+	}, [memSearchs, channelSearchs, searchText]);
+
+	const memSearchListSorted = useMemo(() => {
+		return sortFilteredList(memSearchs, searchText, false);
+	}, [memSearchs, searchText]);
+
+	const channelSearchListSorted = useMemo(() => {
+		return sortFilteredList(channelSearchs, searchText, false);
+	}, [channelSearchs, searchText]);
 
 	useEffect(() => {
-		// const memSearchs = listMemSearch
-		// 	.filter((item: any) => item.name.indexOf(searchText.startsWith('@') ? searchText.substring(1) : searchText) > -1)
-		// 	.slice(0, searchText.startsWith('@') ? 25 : 7);
-		// const channelSearchs = listChannelSearch
-		// 	.filter((item) => item.name.indexOf(searchText.startsWith('#') ? searchText.substring(1) : searchText) > -1)
-		// 	.slice(0, searchText.startsWith('#') ? 25 : 8);
-		// const totalLists = sortFilteredList(memSearchs.concat(channelSearchs).slice(), searchText, false);
-
 		if (idActive === '') {
 			setIdActive(totalLists[0]?.id ?? '');
 		}
@@ -354,7 +349,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
 									<ListSearchModal
-										listSearch={listMemSearch}
+										listSearch={memSearchListSorted}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={searchText}
@@ -367,7 +362,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 									<ListSearchModal
-										listSearch={listChannelSearch}
+										listSearch={channelSearchListSorted}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={searchText.slice(1)}
