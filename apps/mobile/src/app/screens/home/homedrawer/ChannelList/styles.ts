@@ -56,7 +56,6 @@ export const style = (colors: Attributes) =>
 		},
 		placeholderSearchBox: {
 			color: colors.text,
-			fontWeight: '600',
-			fontSize: size.s_16,
+			fontSize: size.s_14,
 		},
 	});
