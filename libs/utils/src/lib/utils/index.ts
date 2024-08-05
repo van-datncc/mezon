@@ -10,7 +10,7 @@ import {
 	startOfDay,
 	subDays,
 } from 'date-fns';
-import { ApiMessageAttachment, ChannelUserListChannelUser } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
