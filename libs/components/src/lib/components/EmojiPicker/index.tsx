@@ -1,4 +1,4 @@
-import { useAppParams, useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import {useAppParams, useChatReaction, useClanRestriction, useEmojiSuggestion, useGifsStickersEmoji} from '@mezon/core';
 import {
   reactionActions, selectAllAccount,
   selectCurrentChannel, selectCurrentClan,
@@ -7,9 +7,9 @@ import {
   selectReactionPlaceActive, selectTheme,
   useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, IEmoji, ModeResponsive, SubPanelName } from '@mezon/utils';
+import {EmojiPlaces, EPermission, IEmoji, ModeResponsive, SubPanelName} from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Icons } from '@mezon/ui';
 
@@ -56,7 +56,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 	const categoryIcons = [
 		<Icons.ClockHistory defaultSize="w-7 h-7" />,
-    modeResponsive === ModeResponsive.MODE_CLAN ? <ClanLogo/> : <Icons.PenEdit defaultSize="w-7 h-7"/>,
+    modeResponsive === ModeResponsive.MODE_CLAN ? <ClanLogo/> : <Icons.PenEdit className={"w-7 h-7 text-colorNeutral"}/>,
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
 		<Icons.Bowl defaultSize="w-7 h-7" />,
@@ -240,6 +240,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 										onEmojiHover={handleOnHover}
 										categoryName={item.name}
                     onClickAddButton={props.onClickAddButton}
+                    showAddButton={modeResponsive === ModeResponsive.MODE_CLAN}
 									/>
 								</div>
 							);
@@ -260,10 +261,11 @@ type DisplayByCategoriesProps = {
 	readonly onEmojiHover: (item: any) => void;
 	readonly emojisData: any[];
   onClickAddButton?: () => void;
+  showAddButton?: boolean
   
 };
 
-function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover, onClickAddButton }: DisplayByCategoriesProps) {
+function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover, onClickAddButton, showAddButton }: DisplayByCategoriesProps) {
   const currentClan = useAppSelector(selectCurrentClan);
   const modeResponsive = useAppSelector(selectModeResponsive);
   
@@ -299,17 +301,30 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 					<Icons.ArrowRight />
 				</span>
 			</button>
-			{emojisPanel && <EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} categoryName={categoryName} onClickAddButton={onClickAddButton}/>}
+			{emojisPanel && (
+        <EmojisPanel
+          emojisData={emojisByCategoryName}
+          onEmojiSelect={onEmojiSelect}
+          onEmojiHover={onEmojiHover}
+          categoryName={categoryName}
+          onClickAddButton={onClickAddButton}
+          showAddButton={showAddButton}
+        />
+      )}
 		</div>
 	);
 }
 
-const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover, categoryName, onClickAddButton }) => {
+const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover, categoryName, onClickAddButton, showAddButton }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
   const appearanceTheme = useSelector (selectTheme);
-  const currentClan = useSelector(selectCurrentClan);
-  const userProfile = useSelector(selectAllAccount);
+  const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+  const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+  const hasClanManagementPermission = hasAdminPermission || isClanCreator || hasClanPermission;
+  const isShowAddButton = useMemo(() => {
+    return hasClanManagementPermission && showAddButton && categoryName === "Custom"
+  }, [hasClanManagementPermission, categoryName, showAddButton])
 
 	return (
 		<div
@@ -323,10 +338,10 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
           onClick={() => onEmojiSelect(item.shortname + ' ')}
           onMouseEnter={() => onEmojiHover(item)}
         >
-          <img draggable="false" src={item?.src}></img>
+          <img draggable="false" src={item?.src}/>
         </button>
       ))}
-      {(categoryName === 'Custom' && userProfile?.user?.id === currentClan?.creator_id) && (
+      {isShowAddButton && (
         <button
           className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
           onMouseEnter={() => onEmojiHover({
