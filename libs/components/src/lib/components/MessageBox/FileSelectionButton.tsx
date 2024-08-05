@@ -1,7 +1,7 @@
 import { useReference } from '@mezon/core';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { Icons } from '@mezon/ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
@@ -34,7 +34,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 	};
 
 	return (
-		<label>
+		<label className="pl-2">
 			<input
 				id="preview_img"
 				type="file"
@@ -46,7 +46,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 				multiple
 			/>
 			<div className="flex flex-row h-6 w-6 items-center justify-center ml-2 mb cursor-pointer">
-				<Icons.AddCircle />
+				<Icons.AddCircle className="w-6 h-6 dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
 			</div>
 		</label>
 	);

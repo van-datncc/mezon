@@ -32,9 +32,9 @@ export type LastSeenTimeStampChannelArgs = {
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
 
-export const fetchListNotification = createAsyncThunk('notification/fetchListNotification', async (_, thunkAPI) => {
+export const fetchListNotification = createAsyncThunk('notification/fetchListNotification', async (clanId: string, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listNotifications(mezon.session, 50);
+	const response = await mezon.client.listNotifications(mezon.session, clanId, 50);
 	if (!response.notifications) {
 		return [];
 	}
@@ -42,13 +42,13 @@ export const fetchListNotification = createAsyncThunk('notification/fetchListNot
 	return notifications;
 });
 
-export const deleteNotify = createAsyncThunk('notification/deleteNotify', async (ids: string[], thunkAPI) => {
+export const deleteNotify = createAsyncThunk('notification/deleteNotify', async ({ ids, clanId }: { ids: string[]; clanId: string }, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.deleteNotifications(mezon.session, ids);
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	thunkAPI.dispatch(notificationActions.fetchListNotification());
+	thunkAPI.dispatch(notificationActions.fetchListNotification(clanId));
 	return response;
 });
 

@@ -1,7 +1,6 @@
 import { useAppNavigation, useAppParams, useClanRestriction, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
 import { channelsActions, referencesActions, selectCloseMenu, selectCurrentClan, useAppDispatch, voiceActions } from '@mezon/store';
-import { ChannelStatusEnum, EPermission, IChannel, MouseButton, getVoiceChannelName } from '@mezon/utils';
-import { useMezonVoice } from '@mezon/voice';
+import { ChannelStatusEnum, EPermission, IChannel, MouseButton } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
@@ -42,7 +41,6 @@ export const classes = {
 
 function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadChannel, numberNotification, channelType }: ChannelLinkProps) {
 	const currentClan = useSelector(selectCurrentClan);
-	const voice = useMezonVoice();
 	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
@@ -91,12 +89,6 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 
 	const handleVoiceChannel = (id: string) => {
 		if (channel.status === StatusVoiceChannel.Active) {
-			const voiceChannelName = getVoiceChannelName(currentClan?.clan_name, channel.channel_label);
-			voice.setVoiceOptions((prev) => ({
-				...prev,
-				voiceChannelName: voiceChannelName,
-			}));
-
 			dispatch(channelsActions.setCurrentVoiceChannelId(id));
 			dispatch(voiceActions.setStatusCall(true));
 		}
@@ -180,7 +172,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				</Link>
 			)}
 
-			{(isShowSettingChannel) ? (
+			{isShowSettingChannel ? (
 				numberNotification !== 0 ? (
 					<>
 						<AddPerson

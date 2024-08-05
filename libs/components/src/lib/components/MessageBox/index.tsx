@@ -149,11 +149,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	return (
 		<div className="relative max-sm:-pb-2  ">
 			<div
-				className={`w-wrappBoxChatView sbm:max-w-wrappBoxChatView max-w-wrappBoxChatViewMobile
-				${attachmentDataRef.length > 0 || statusLoadingAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] border-[#42444B]' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+				className={`${attachmentDataRef.length > 0 || statusLoadingAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 			>
 				<div
-					className={`max-h-full flex gap-2 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+					className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'attachment-scroll-light' : ''}`}
 				>
 					{attachmentDataRef?.map((item: ApiMessageAttachment, index: number) => {
 						return (
