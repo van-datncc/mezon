@@ -83,14 +83,12 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 			{isEmojiOnChat && (
 				<div
 					style={{
-						position: 'fixed',
-						bottom: '76px',
 						right: setMarginleft,
 					}}
-          className={'z-10'}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
+					className="max-sbm:bottom-[60px] bottom-[76px] fixed z-10"
 				>
 					<GifStickerEmojiPopup />
 				</div>
@@ -104,7 +102,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 				currentClanId={clanId}
 				mode={mode}
 			/>
-			{isEmojiOnChat && (
+			{/* {isEmojiOnChat && (
 				<div
 					className={`relative h-[300px]  overflow-y-scroll w-full hidden max-sm:block animate-slideUp`}
 					onClick={(e) => {
@@ -113,7 +111,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 				>
 					<GifStickerEmojiPopup emojiAction={emojiAction} mode={mode} messageEmojiId={idMessageRefReaction} />
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 }
