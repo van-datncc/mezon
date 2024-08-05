@@ -1,4 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClan } from '@mezon/store-mobile';
@@ -13,7 +14,6 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../../../../../app/temp-ui';
-import { useUserPermission } from '../../../../../hooks/useUserPermission';
 import { style } from './styles';
 
 interface ICategoryMenuProps {

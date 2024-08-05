@@ -26,7 +26,7 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
     const [isLoading, setIsLoading] = useState(false);
     const { t } = useTranslation('message');
     const activeRoleOfUser = useMemo(() => {
-        return rolesClan.filter(role => user?.role_id?.includes(role?.id)) || [];
+        return rolesClan?.filter(role => user?.role_id?.includes(role?.id)) || [];
     }, [rolesClan, user?.role_id])
 
     const isClanOwner = useMemo(() => {
@@ -34,13 +34,13 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
     }, [currentClan?.creator_id, user?.user?.id])
 
     const addRole = async (roleId: string) => {
-        const activeRole = rolesClan.find((role) => role.id === roleId);
+        const activeRole = rolesClan?.find((role) => role.id === roleId);
         await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [user?.user?.id] || [], [], [], []);
         setIsLoading(false)
     };
 
     const deleteRole = async (roleId: string) => {
-        const activeRole = rolesClan.find((role) => role.id === roleId);
+        const activeRole = rolesClan?.find((role) => role.id === roleId);
         await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], [user?.user?.id] || [], []);
         setIsLoading(false)
     };

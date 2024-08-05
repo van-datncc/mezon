@@ -1,14 +1,44 @@
-import { useAuth } from "@mezon/core";
-import { selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from "@mezon/store-mobile";
+
+import { RolesClanEntity, selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from "@mezon/store-mobile";
+import { EPermission } from "@mezon/utils";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { getUserPermissionsStatus } from "../utils/helpers";
+import { useAuth } from "../../auth/hooks/useAuth";
 
-export const useUserPermission = () => {
+const getUserPermissionsStatus = (activeRoleIds: string[] = [], clanRoles: RolesClanEntity[] = []) => {
+  const result: { [key in EPermission]: boolean } = {
+    [EPermission.administrator]: false,
+    [EPermission.viewChannel]: false,
+    [EPermission.manageChannel]: false,
+    [EPermission.sendMessage]: false,
+    [EPermission.deleteMessage]: false,
+    [EPermission.manageThread]: false,
+    [EPermission.manageClan]: false,
+  };
+
+  clanRoles.forEach((role) => {
+    const activeRole = activeRoleIds.includes(role?.id);
+
+    if (activeRole) {
+      const listOfActivePermission = role?.permission_list?.permissions?.filter(p => p?.active) || [];
+      listOfActivePermission.forEach((permission) => {
+        if (permission?.slug) {
+          const permissionKey = permission?.slug as EPermission;
+          result[permissionKey] = true;
+        }
+      })
+    }
+  });
+
+  return result;
+}
+
+export function useUserPermission() {
   const { userId, userProfile } = useAuth();
   const userById = useSelector(selectMemberByUserId(userId || ''));
   const currentClan = useSelector(selectCurrentClan);
 	const rolesClan = useSelector(selectAllRolesClan);
+
 	const userPermissionsStatus = useMemo(() => {
 		return getUserPermissionsStatus(userById?.role_id, rolesClan)
 	}, [userById?.role_id, rolesClan])

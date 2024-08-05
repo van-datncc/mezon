@@ -1,10 +1,10 @@
+import { useUserPermission } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter } from 'react-native';
-import { useUserPermission } from '../../../hooks/useUserPermission';
 import { ActionMessageSelected } from './components/ChatBox/ActionMessageSelected';
 import { ChatBoxBottomBar } from './components/ChatBox/ChatBoxBottomBar';
 import { EMessageActionType } from './enums';

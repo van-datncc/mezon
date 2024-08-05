@@ -1,4 +1,4 @@
-import { useAuth, useChannelMembersActions } from '@mezon/core';
+import { useAuth, useChannelMembersActions, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { baseColor, Block, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, selectCurrentClanId } from '@mezon/store-mobile';
@@ -6,7 +6,6 @@ import React, { useMemo, useState } from 'react';
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonModal } from '../../../../../../../../app/temp-ui/MezonModal';
-import { useUserPermission } from '../../../../../../../hooks/useUserPermission';
 import KickUserClanModal from '../KickUserClanModal';
 import { ManageUserModal } from '../ManageUserModal';
 import { style } from './UserSettingProfile.style';

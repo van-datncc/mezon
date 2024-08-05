@@ -1,10 +1,9 @@
-import { useReference, useThreads } from '@mezon/core';
+import { useReference, useThreads, useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useUserPermission } from '../../../hooks/useUserPermission';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './EmptyThread.style';
 
