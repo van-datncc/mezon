@@ -1,8 +1,9 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberByUserId } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -20,6 +21,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 	const [channelLabel, setChannelLabel] = useState('');
 	const currentChannel = useSelector(selectCurrentChannel);
 	const direct = useSelector(selectDirectById(message.channel_id));
+	const currentClanId = useSelector(selectCurrentClanId);
 	useEffect(() => {
 		if (direct != undefined) {
 			setChannelLabel('');
@@ -31,7 +33,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		await reactionMessageDispatch(
 			id,
 			mode,
-			message.clan_id || '',
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '',
 			message.channel_id ?? '',
 			messageId,
 			emoji,

@@ -105,7 +105,7 @@ const useProcessMention = (text: string) => {
 				const role = roleList.find((role) => role.roleId === mention.userid);
 				return {
 					role_id: role?.roleId,
-					rolename: `@${role?.roleName}`,
+					rolename: role?.roleName,
 				};
 			} else {
 				return {
@@ -114,6 +114,7 @@ const useProcessMention = (text: string) => {
 				};
 			}
 		});
+
 		setSimplifiedMentionList(simplifiedList);
 	}, [text]);
 
