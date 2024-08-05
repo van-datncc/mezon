@@ -24,7 +24,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
   const { open, onClose } = props;
   const [urlImage, setUrlImage] = useState('');
   const [nameClan, setNameClan] = useState('');
-  const [checkvalidate, setCheckValidate] = useState(true);
+  const [checkvalidate, setCheckValidate] = useState<boolean | null>(true);
   const { sessionRef, clientRef } = useMezon();
   const { navigate, toClanPage } = useAppNavigation();
   const { createClans } = useClans();
@@ -38,13 +38,17 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
     debouncedSetClanName(value)
     const regex = ValidateSpecialCharacters();
     if (regex.test(value) && value !== '') {
-      setCheckValidate(false);
+      setCheckValidate(null);
+      debouncedSetClanName(e.target.value);
     } else {
+      debouncedSetClanName.cancel();
       setCheckValidate(true);
     }
   };
   const debouncedSetClanName = useDebouncedCallback(async (value) => {
-    const isDuplicate = await dispatch(checkDuplicateNameClan(value)).then(unwrapResult).then(result => result);
+    await dispatch(checkDuplicateNameClan(value)).then(unwrapResult).then(result => {
+      setCheckValidate(result ?? false)
+    });
   }, 700);
 
   const [openModalError, seOpenModalError] = useState<openModalErrorProps>({
@@ -102,7 +106,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
       title=""
       titleConfirm="Create"
       confirmButton={handleCreateClan}
-      disableButtonConfirm={!nameClan ? true : false || checkvalidate}
+      disableButtonConfirm={!nameClan ? true : false || checkvalidate || checkvalidate === null}
       classNameBox="h-full"
     >
       <div className="flex items-center flex-col justify-center ">
@@ -138,7 +142,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
           />
           {checkvalidate && (
             <p className="text-[#e44141] text-xs italic font-thin">
-              Please enter a valid clan name (max 64 characters, only words, numbers, _ or -).
+              {nameClan ? 'The clan name already exists. Please enter another name.' : 'Please enter a valid clan name (max 64 characters, only words, numbers, _ or -).'}
             </p>
           )}
           <span className="text-[14px] text-contentTertiary">
