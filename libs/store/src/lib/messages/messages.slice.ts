@@ -336,7 +336,6 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		if (!client || !session || !socket || !channelId) {
 			throw new Error('Client is not initialized');
 		}
-
 		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 
 		return res;
