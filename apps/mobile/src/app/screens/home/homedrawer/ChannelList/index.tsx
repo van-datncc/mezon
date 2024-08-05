@@ -12,10 +12,11 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 import { isEmpty } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
@@ -163,10 +164,11 @@ const ChannelList = React.memo((props: any) => {
 						</Text>
 					</TouchableOpacity>
 				</View>
-				{isLoading === 'loading' && !dataCategoryChannel?.length && <ChannelListSkeleton numberSkeleton={6} />}
-				<FlatList
+				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
+				<FlashList
 					data={dataCategoryChannel || []}
 					keyExtractor={(_, index) => index.toString()}
+					estimatedItemSize={40}
 					renderItem={({ item, index }) => (
 						<ChannelListSection
 							data={item}
