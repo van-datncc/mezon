@@ -106,7 +106,7 @@ const MentionUser = ({ tagName, mode, showOnchannelLayout, tagUserId }: ChannelH
 
 				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${showOnchannelLayout ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 					>
-						{foundUser?.user?.username ? tagName : 'here'}
+						{foundUser?.user?.username ? tagName : '@here'}
 					</Link>
 					{`${checkLastChar(username) ? `${username.charAt(username.length - 1)}` : ''}`}
 				</>

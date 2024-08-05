@@ -614,7 +614,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					data={handleSearchUserMention}
 					trigger="@"
 					displayTransform={(id: any, display: any) => {
-						return `@${display}`;
+						return display === '@here' ? `${display}` : `@${display}`;
 					}}
 					renderSuggestion={(suggestion: MentionDataProps) => {
 						return (
@@ -622,11 +622,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								valueHightLight={valueHighlight}
 								avatarUrl={suggestion.avatarUrl}
 								subText={
-									suggestion.display === 'here'
+									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: suggestion.username ?? ''
+										: (suggestion.username ?? '')
 								}
-								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
+								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
 								display={suggestion.display}
 							/>

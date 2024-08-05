@@ -25,7 +25,8 @@ const useProcessMention = (text: string) => {
 
 				// Extract username
 				const usernameEnd = text.indexOf(']', index);
-				const username = `@${text.substring(index, usernameEnd)}`;
+				const username =
+					text.substring(index, usernameEnd) === '@here' ? text.substring(index, usernameEnd) : `@${text.substring(index, usernameEnd)}`;
 				index = usernameEnd + 1;
 
 				// Extract userId
