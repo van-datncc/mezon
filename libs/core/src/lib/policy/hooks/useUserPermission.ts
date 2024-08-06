@@ -1,5 +1,5 @@
 
-import { RolesClanEntity, selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from "@mezon/store-mobile";
+import { RolesClanEntity, selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from "@mezon/store";
 import { EPermission } from "@mezon/utils";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";

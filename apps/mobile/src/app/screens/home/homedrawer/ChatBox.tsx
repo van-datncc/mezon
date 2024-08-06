@@ -2,7 +2,7 @@ import { useUserPermission } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter } from 'react-native';
 import { ActionMessageSelected } from './components/ChatBox/ActionMessageSelected';
@@ -25,6 +25,11 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	const { t } = useTranslation(['message'])
 	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
 	const { isCanSendMessage } = useUserPermission();
+
+	const isDM = useMemo(() => {
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(props?.mode)
+	}, [props?.mode])
+
 	useEffect(() => {
 		if (props?.channelId && messageActionNeedToResolve) {
 			setMessageActionNeedToResolve(null);
@@ -47,7 +52,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 
 	return (
 		<Block>
-			{isCanSendMessage ? (
+			{isCanSendMessage || isDM ? (
 				<Block backgroundColor={themeValue.secondary} borderTopWidth={1} borderTopColor={themeValue.border} flexDirection='column' justifyContent='space-between'>
 					{messageActionNeedToResolve && (
 						<ActionMessageSelected messageActionNeedToResolve={messageActionNeedToResolve} onClose={() => setMessageActionNeedToResolve(null)} />
