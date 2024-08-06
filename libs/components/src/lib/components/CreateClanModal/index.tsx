@@ -3,12 +3,13 @@ import { useAppNavigation, useClans } from '@mezon/core';
 import { checkDuplicateNameClan, selectAllAccount, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
-import { ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
+import { LIMIT_SIZE_UPLOAD_IMG, ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 import * as Icons from '../../../../../ui/src/lib/Icons';
+import { useTranslation } from 'react-i18next';
 
 export type ModalCreateClansProps = {
 	open: boolean;
@@ -39,6 +40,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
+	const { t } = useTranslation(['clan']);
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setNameClan(value);
@@ -82,7 +84,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 			e.target.value = null;
 			return;
 		}
-		if (sizeImage > 1000000) {
+		if (sizeImage > LIMIT_SIZE_UPLOAD_IMG) {
 			seOpenModalError((prev) => ({ ...prev, errorSize: true }));
 			e.target.value = null;
 			return;
