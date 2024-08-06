@@ -128,6 +128,7 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
 });
+
 export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan', async (clan_name: string, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -138,6 +139,7 @@ export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan'
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
 });
+
 export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: ChangeCurrentClanArgs, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
