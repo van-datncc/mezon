@@ -81,7 +81,7 @@ function MemberProfile({
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		// Stop the default context menu of the browser
+		// stop open popup default of web
 		window.oncontextmenu = (e) => {
 			e.preventDefault();
 		};
