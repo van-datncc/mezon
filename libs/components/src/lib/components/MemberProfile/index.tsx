@@ -11,6 +11,7 @@ import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import PanelMember from '../PanelMember';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
+import UserProfileModalInner from "../UserProfileModalInner";
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -70,6 +71,7 @@ function MemberProfile({
 		distanceToBottom: 0,
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
+	const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean> (false);
 
 	const { removeMemberClan } = useChannelMembersActions();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -147,6 +149,15 @@ function MemberProfile({
 
 	const subNameRef = useRef<HTMLInputElement>(null);
 	const minWidthNameMain = useMemo(() => subNameRef.current?.offsetWidth,[subNameRef?.current]);
+	
+	const handleOpenProfileModal = () => {
+		setIsOpenProfileModal(true);
+	}
+	
+	const handleCloseProfileModal = () => {
+		setIsOpenProfileModal(false);
+	}
+	
 	return (
 		<div className="relative group">
 			<div
@@ -244,9 +255,10 @@ function MemberProfile({
 					onRemoveMember={handleClickRemoveMember}
 					directMessageValue={directMessageValue}
 					name={name}
-					isMemberDMGroup={dataMemberCreate ? true : false}
+					isMemberDMGroup={!!dataMemberCreate}
 					dataMemberCreate={dataMemberCreate}
 					isMemberChannel={isMemberChannel}
+					onOpenProfile={handleOpenProfileModal}
 				/>
 			)}
 			{isShowUserProfile && listProfile ? (
@@ -267,6 +279,10 @@ function MemberProfile({
 					onClose={() => setOpenModalRemoveMember(false)}
 					onRemoveMember={handleRemoveMember}
 				/>
+			)}
+			
+			{isOpenProfileModal && (
+				<UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal}/>
 			)}
 		</div>
 	);

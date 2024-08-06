@@ -5,11 +5,11 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from "@mezon/store";
-import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from "mezon-js/api.gen";
-import { ChangeEvent, KeyboardEvent, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
-import { useClanRestriction } from "@mezon/core";
-import { EPermission } from "@mezon/utils";
+import {ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody} from "mezon-js/api.gen";
+import {ChangeEvent, KeyboardEvent, useMemo, useState} from "react";
+import {useSelector} from "react-redux";
+import {useClanRestriction} from "@mezon/core";
+import {EPermission} from "@mezon/utils";
 
 type SettingEmojiItemProp = {
   emoji: ApiClanEmojiListResponse,
@@ -23,11 +23,11 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 
   const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
 	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan])
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
-		if(hasAdminPermission || isClanCreator) return true;
-		return currentUserId === emoji.creator_id
-	}, [hasAdminPermission, currentUserId]) ;
+		return hasAdminPermission || isClanCreator || hasManageClanPermission || currentUserId === emoji.creator_id
+	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanCreator]) ;
 
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value.split(':').join(''));
