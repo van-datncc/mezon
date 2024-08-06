@@ -184,7 +184,6 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					<MezonAvatar
 						width={80}
 						height={80}
-						// avatarUrl={userById?.user?.avatar_url || user?.avatar_url || user?.avatarSm}
 						avatarUrl={user?.avatar_url || user?.avatarSm}
 						username={userById?.user?.username || user?.display_name}
 						userStatus={userStatus}

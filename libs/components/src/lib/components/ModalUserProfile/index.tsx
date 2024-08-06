@@ -46,6 +46,7 @@ const ModalUserProfile = ({
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
+	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '').status;
 	const userCustomStatus = useMemberCustomStatus(userID || '');
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 
@@ -129,7 +130,7 @@ const ModalUserProfile = ({
 				avatar={(isFooterProfile && userProfile?.user?.avatar_url) || message?.avatar || userById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
-				customStatus={userCustomStatus}
+				customStatus={userStatusProfile || userCustomStatus}
 				isAnonymous={checkAnonymous}
 			/>
 			<div className="px-[16px]">

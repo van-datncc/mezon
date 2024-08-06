@@ -62,11 +62,13 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 			await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
-				thunkAPI.dispatch(channelsActions.joinChat({ 
-					clanId: '0',
-					channelId: response.channel_id as string,
-					channelType: response.type as number,
-				}));
+				thunkAPI.dispatch(
+					channelsActions.joinChat({
+						clanId: '0',
+						channelId: response.channel_id as string,
+						channelType: response.type as number,
+					}),
+				);
 			}
 			return response;
 		} else {
@@ -115,47 +117,53 @@ type fetchDmGroupArgs = {
 	noCache?: boolean;
 };
 
-export const fetchDirectMessage = createAsyncThunk('direct/fetchDirectMessage', async ({ channelType = ChannelType.CHANNEL_TYPE_GROUP, noCache }: fetchDmGroupArgs, thunkAPI) => {
-	thunkAPI.dispatch(friendsActions.fetchListFriends({}));
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchChannelsCached.clear(mezon, 100, 1, '', channelType);
-	}
-	const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
+export const fetchDirectMessage = createAsyncThunk(
+	'direct/fetchDirectMessage',
+	async ({ channelType = ChannelType.CHANNEL_TYPE_GROUP, noCache }: fetchDmGroupArgs, thunkAPI) => {
+		thunkAPI.dispatch(friendsActions.fetchListFriends({}));
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchChannelsCached.clear(mezon, 100, 1, '', channelType);
+		}
+		const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
 
-	if (!response.channeldesc) {
-		return [];
-	}
-	if(Date.now() - response.time < 100) {
-		const listStatusUnreadDM = response.channeldesc.map((channel) => {
-			const status = getStatusUnread(Number(channel.last_seen_message?.timestamp ?? ''), Number(channel.last_sent_message?.timestamp ?? ''));
-			return { dmId: channel.channel_id ?? '', isUnread: status };
-		});
+		if (!response.channeldesc) {
+			return [];
+		}
+		if (Date.now() - response.time < 100) {
+			const listStatusUnreadDM = response.channeldesc.map((channel) => {
+				const status = getStatusUnread(
+					Number(channel.last_seen_message?.timestamp ?? ''),
+					Number(channel.last_sent_message?.timestamp ?? ''),
+				);
+				return { dmId: channel.channel_id ?? '', isUnread: status };
+			});
 			thunkAPI.dispatch(directActions.setAllStatusDMUnread(listStatusUnreadDM));
 		}
 
-	const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
-		if (
-			a === undefined ||
-			b === undefined ||
-			a.last_sent_message === undefined ||
-			a.last_seen_message?.id === undefined ||
-			b.last_sent_message === undefined ||
-			b.last_seen_message?.id === undefined
-		) {
-			return 0;
-		}
-		if (a.last_sent_message.id && b.last_sent_message.id && a.last_sent_message.id < b.last_sent_message.id) {
-			return 1;
-		}
+		const sorted = response.channeldesc.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
+			if (
+				a === undefined ||
+				b === undefined ||
+				a.last_sent_message === undefined ||
+				a.last_seen_message?.id === undefined ||
+				b.last_sent_message === undefined ||
+				b.last_seen_message?.id === undefined
+			) {
+				return 0;
+			}
+			if (a.last_sent_message.id && b.last_sent_message.id && a.last_sent_message.id < b.last_sent_message.id) {
+				return 1;
+			}
 
-		return -1;
-	});
-	const channels = sorted.map(mapDmGroupToEntity);
-	const meta = channels.map((ch) => extractDMMeta(ch));
-	thunkAPI.dispatch(directActions.updateBulkDirectMetadata(meta));
-	return channels;
-});
+			return -1;
+		});
+		const channels = sorted.map(mapDmGroupToEntity);
+		const meta = channels.map((ch) => extractDMMeta(ch));
+		thunkAPI.dispatch(directActions.updateBulkDirectMetadata(meta));
+		return channels;
+	},
+);
 
 interface JoinDirectMessagePayload {
 	directMessageId: string;
@@ -165,12 +173,12 @@ interface JoinDirectMessagePayload {
 	isFetchingLatestMessages?: boolean;
 }
 interface members {
-    id: string;
-    channelId: string | undefined;
-    userChannelId: string | undefined;
-    role_id?: string[] | undefined;
-    thread_id?: string | undefined;
-    user?: ApiUser | undefined;
+	id: string;
+	channelId: string | undefined;
+	userChannelId: string | undefined;
+	role_id?: string[] | undefined;
+	thread_id?: string | undefined;
+	user?: ApiUser | undefined;
 }
 
 export type StatusDMUnreadArgs = {
@@ -183,15 +191,20 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 	async ({ directMessageId, channelName, type, noCache = false, isFetchingLatestMessages = false }, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
-			thunkAPI.dispatch(directActions.setDmGroupCurrentType((type)?.toString() || ''));
+			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type?.toString() || ''));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache, isFetchingLatestMessages }));
 			const fetchChannelMembersResult = await thunkAPI.dispatch(
-				channelMembersActions.fetchChannelMembers({ clanId: '', channelId: directMessageId, channelType: ChannelType.CHANNEL_TYPE_TEXT, noCache }),
+				channelMembersActions.fetchChannelMembers({
+					clanId: '',
+					channelId: directMessageId,
+					channelType: ChannelType.CHANNEL_TYPE_TEXT,
+					noCache,
+				}),
 			);
 			const members = fetchChannelMembersResult.payload as members[];
 			const userIds = members.map((member: any) => member.user.id);
 			if (type === ChannelType.CHANNEL_TYPE_DM) {
-				thunkAPI.dispatch(directChannelVoidActions.fetchChannelVoids({userIds:userIds, directId: directMessageId}))
+				thunkAPI.dispatch(directChannelVoidActions.fetchChannelVoids({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
 			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId: '', channelId: directMessageId }));
@@ -203,13 +216,12 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 	},
 );
 
-
 export const initialDirectState: DirectState = directAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
 	error: null,
 	dmMetadata: dmMetaAdapter.getInitialState(),
-	statusDMChannelUnread: {}
+	statusDMChannelUnread: {},
 });
 
 export const directSlice = createSlice({
@@ -266,7 +278,7 @@ export const directSlice = createSlice({
 			const channel = state.dmMetadata.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSentTimestamp = action.payload.timestamp;
-				const status = getStatusUnread(channel.lastSeenTimestamp, action.payload.timestamp)
+				const status = getStatusUnread(channel.lastSeenTimestamp, action.payload.timestamp);
 				state.statusDMChannelUnread[action.payload.channelId] = status;
 			}
 		},
@@ -293,7 +305,7 @@ export const directSlice = createSlice({
 						count_mess_unread: 0,
 					},
 				});
-				const status = getStatusUnread(action.payload.timestamp, channel.lastSentTimestamp)
+				const status = getStatusUnread(action.payload.timestamp, channel.lastSentTimestamp);
 				state.statusDMChannelUnread[action.payload.channelId] = status;
 			}
 		},
@@ -333,10 +345,10 @@ export const directActions = {
 };
 
 const getStatusUnread = (lastSeenStamp: number, lastSentStamp: number) => {
-	if(lastSeenStamp && lastSentStamp) {
+	if (lastSeenStamp && lastSentStamp) {
 		return Number(lastSeenStamp) < Number(lastSentStamp);
 	}
-	return true
+	return true;
 };
 
 const { selectAll, selectEntities } = directAdapter.getSelectors();
@@ -374,7 +386,7 @@ export const selectDirectsUnreadlist = createSelector(selectAllDirectMessages, g
 
 export const selectListDMUnread = createSelector(selectAllDirectMessages, getDirectState, (directMessages, state) => {
 	return directMessages.filter((dm) => {
-		return state.statusDMChannelUnread[dm.channel_id??'']
+		return state.statusDMChannelUnread[dm.channel_id ?? ''];
 	});
 });
 

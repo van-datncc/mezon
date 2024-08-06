@@ -1,8 +1,8 @@
 import { useEmojiSuggestion } from '@mezon/core';
 import { selectAllChannels, selectAllDirectChannelVoids, selectMembersVoiceChannel } from '@mezon/store';
-import { getSrcEmoji } from '@mezon/utils';
+import { getSrcEmoji, normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Icons } from '../../../components';
@@ -11,38 +11,31 @@ import { AvatarImage } from '../../AvatarImage/AvatarImage';
 type SuggestItemProps = {
 	avatarUrl?: string;
 	symbol?: string;
-	name: string;
-	displayName?: string;
-	clanNickname?: string;
 	subText?: string;
 	valueHightLight?: string;
 	subTextStyle?: string;
 	showAvatar?: boolean;
 	channelId?: string | number;
 	isOpenSearchModal?: boolean;
-	isHashtag?: boolean;
 	wrapSuggestItemStyle?: string;
-	isEmoji?: boolean;
+	display?: string;
+	isHightLight?: boolean;
 };
 
 const SuggestItem = ({
 	isOpenSearchModal,
 	avatarUrl,
-	symbol,
-	name,
-	displayName,
-	clanNickname,
 	channelId,
 	subText,
 	subTextStyle,
 	valueHightLight,
 	showAvatar,
-	isHashtag,
 	wrapSuggestItemStyle,
-	isEmoji,
+	display,
+	isHightLight = true,
 }: SuggestItemProps) => {
 	const { emojis } = useEmojiSuggestion();
-	const urlEmoji = getSrcEmoji(name, emojis);
+	const urlEmoji = getSrcEmoji(display ?? '', emojis);
 	const allChannels = useSelector(selectAllChannels);
 	const { directId } = useParams();
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
@@ -96,25 +89,10 @@ const SuggestItem = ({
 				{specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.SpeakerLocked defaultSize="w-5 h-5" />
 				)}
-				{isHashtag && (
-					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">
-						{HighlightMatch(name ?? '', valueHightLight ?? '')}
-					</span>
-				)}
-				{isEmoji && (
-					<span className="text-[15px] font-thin dark:text-white text-textLightTheme">
-						{HighlightMatch(name ?? '', valueHightLight ?? '')}
-					</span>
-				)}
 
-				{clanNickname && (
+				{display && (
 					<span className="text-[15px] font-thin dark:text-white text-textLightTheme one-line">
-						{HighlightMatch(clanNickname ?? '', valueHightLight ?? '')}
-					</span>
-				)}
-				{displayName && (
-					<span className='text-[15px] font-thin dark:text-white text-textLightTheme one-line' >
-						{HighlightMatch(displayName, valueHightLight ?? '')}
+						{isHightLight ? HighlightMatch(display ?? '', valueHightLight ?? '') : display}
 					</span>
 				)}
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}
@@ -126,13 +104,17 @@ const SuggestItem = ({
 	);
 };
 
-export default SuggestItem;
+export default memo(SuggestItem);
 
 const HighlightMatch = (name: string, getUserName: string) => {
-	const index = name.toLowerCase().indexOf(getUserName.toLowerCase());
+	const normalizedSearchName = normalizeString(getUserName);
+	const normalizedItemName = normalizeString(name);
+
+	const index = normalizedItemName.indexOf(normalizedSearchName);
 	if (index === -1) {
 		return name;
 	}
+
 	const beforeMatch = name.slice(0, index);
 	const match = name.slice(index, index + getUserName.length);
 	const afterMatch = name.slice(index + getUserName.length);
