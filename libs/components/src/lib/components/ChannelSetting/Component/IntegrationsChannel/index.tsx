@@ -1,7 +1,5 @@
-import { selectAllWebhooks } from "@mezon/store";
-import { useSelector } from "react-redux";
-import Integrations from "../../../ClanSettings/Integrations";
 import { IChannel } from "@mezon/utils";
+import Integrations from "../../../ClanSettings/Integrations";
 
 interface IIntegrationsChannelProps{
 	currentChannel?: IChannel;

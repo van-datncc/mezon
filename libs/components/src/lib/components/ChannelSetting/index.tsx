@@ -34,6 +34,11 @@ const SettingChannel = (props: ModalSettingProps) => {
 		}
 	};
 
+	const dispatch = useAppDispatch();
+	useEffect(()=>{
+		dispatch(fetchWebhooksByChannelId({channelId: channel.channel_id as string}));
+	}, [channel.channel_id, dispatch])
+
 	const closeMenu = useSelector(selectCloseMenu);
 
 	return (
