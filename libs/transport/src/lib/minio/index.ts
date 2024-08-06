@@ -35,10 +35,8 @@ export async function handleUploadFile(
 				fileType = `text/${fileExtension}`;
 			}
 			
-			const ms = new Date().getTime();
-			if (filename.trim() === "") {
-				filename = ms + '.' + file.type;
-			}
+			const ms = new Date().getTime();			
+			filename = ms + filename;
 			filename = filename.replace(/-|\(|\)| /g, '_')
 			if (!currentClanId) {
 				currentClanId = "0";
