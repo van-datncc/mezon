@@ -35,18 +35,17 @@ export async function handleUploadFile(
 				fileType = `text/${fileExtension}`;
 			}
 			
-			const ms = new Date().getTime();
-			if (filename.trim() === "") {
-				filename = ms + '.' + file.type;
-			}
+			const ms = new Date().getMinutes();			
+			filename = ms + filename;
 			filename = filename.replace(/-|\(|\)| /g, '_')
 			if (!currentClanId) {
 				currentClanId = "0";
 			}
-			let fullfilename = currentClanId + '/' + currentChannelId + '/' + filename;
+			let fullfilename = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
 			if (path) {
-				fullfilename = (path + '/') + currentClanId + '/' + currentChannelId + '/' + filename;
+				fullfilename = (path + '/') + fullfilename;
 			}
+
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {
 				filename: fullfilename,

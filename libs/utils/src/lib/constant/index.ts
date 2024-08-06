@@ -12,9 +12,7 @@ export const threadError: ThreadError = {
 	message: 'Starter Message is required',
 };
 
-export const regexToDetectGifLink = /(^|\s)https?:\/\/\S+\.gif(?=\s|$)/g;
-
-export const MIN_THRESHOLD_CHARS = 4096;
+export const MIN_THRESHOLD_CHARS = 4000;
 
 export type ITypeConvert = {
 	type: string;
@@ -30,16 +28,3 @@ export const typeConverts: ITypeConvert[] = [
 export const fileTypeVideo = ['video/mp4', 'video/webm', 'video/mpeg', 'video/x-msvideo'];
 
 export const fileTypeImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-
-export const neverMatchingRegex = /($a)/;
-export const emojiRegex = /:[a-zA-Z0-9_]+:/g;
-
-export const linkRegex = /(?<![`]|```)\bhttps?:\/\/[^\s/$.?#].[^\s]*\b(?![`]|```)/gi;
-export const mentionRegex = /@\[(.*?)\]/g;
-export const hashtagRegex = /#\[(.*?)\]\((.*?)\)/g;
-
-const codeBlockRegex = /```([\s\S]*?)```/;
-const inlineCodeRegex = /`([^`]*)`/;
-const hyperLink = /\[([^\[]+)\]\((http[s]?:\/\/[^\)]+)\)/;
-
-export const markdownRegex = new RegExp([codeBlockRegex.source, inlineCodeRegex.source, hyperLink.source, linkRegex.source].join('|'), 'g');
