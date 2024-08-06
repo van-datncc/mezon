@@ -1,6 +1,6 @@
 import { Attributes, Colors, size, verticalScale } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
-export const  style = (colors: Attributes) => StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
 	wrapper: {
 		flexDirection: 'row',
 		backgroundColor: Colors.transparent,
@@ -27,7 +27,7 @@ export const  style = (colors: Attributes) => StyleSheet.create({
 		flex: 1,
 	},
 	listSearchIcon: {
-		backgroundColor: Colors.bgDarkCharcoal,
+		backgroundColor: colors.primary,
 		opacity: 0.7,
 		padding: size.s_10,
 		borderRadius: verticalScale(50),

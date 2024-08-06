@@ -47,7 +47,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 				<div key={friend.user?.id}>
 					<MemberProfile
 						avatar={friend?.user?.avatar_url ?? ''}
-						name={friend?.user?.display_name ?? ''}
+						name={(friend?.user?.display_name || friend?.user?.username)?? ''}
 						userNameAva={friend?.user?.username ?? ''}
 						status={userStatus}
 						isHideStatus={friend.state !== 0 ? true : false}

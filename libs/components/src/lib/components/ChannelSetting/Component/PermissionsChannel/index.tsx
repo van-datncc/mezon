@@ -62,7 +62,7 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 		<>
 			<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
 				<div className="dark:text-white text-[15px] text-black">
-					<HeaderModal name={channel.category_name}/>
+					<HeaderModal name={channel.category_name} />
 					<div className="rounded-md overflow-hidden mt-4">
 						<div className="dark:bg-black bg-white flex justify-between items-start p-4">
 							<div>
@@ -76,11 +76,11 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 							</div>
 							<input
 								className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
-               bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
-                after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
-                 hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
-                  focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
-                   disabled:bg-slate-200 disabled:after:bg-slate-300"
+							 bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
+								after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
+								 hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
+									focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
+									 disabled:bg-slate-200 disabled:after:bg-slate-300"
 								type="checkbox"
 								checked={!valueToggle}
 								id="id-c01"
@@ -139,10 +139,10 @@ type HeaderModalProps = {
 
 const HeaderModal = memo(
 	(props: HeaderModalProps) => {
-		const {name=''} = props;
+		const { name = '' } = props;
 		return (
 			<>
-				<h3 className="mb-4 font-bold">Channel Permissions</h3>
+				<h3 className="mb-4 font-bold text-xl">Channel Permissions</h3>
 				<p className="mb-3">Use permissions to customise who can do what in this channel.</p>
 				<div className="flex mt-4 p-4">
 					<Icons.SyncIcon defaultFill="#F0B033" defaultSize="mr-2" />
