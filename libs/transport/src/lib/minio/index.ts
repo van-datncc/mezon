@@ -1,4 +1,3 @@
-import { Snowflake } from '@theinternetfolks/snowflake';
 import { Buffer as BufferMobile } from 'buffer';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
