@@ -1,5 +1,5 @@
 import { setJumpToMessageId } from '@mezon/core';
-import { channelsActions, messagesActions } from '@mezon/store';
+import { channelsActions, fetchWebhooksByChannelId, messagesActions } from '@mezon/store';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -15,7 +15,7 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 		setJumpToMessageId(messageId);
 		dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
 	}
-
+	dispatch(fetchWebhooksByChannelId({ channelId: channelId as string }));
 	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	return null;
 };
