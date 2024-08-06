@@ -17,7 +17,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [dispatch]);
 
 	const setChannelDraftMessage = useCallback(
-		(channelId: string, message_id: string, draftContent: string) => {
+		(channelId: string, message_id: string, draftContent: IMessageSendPayload) => {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: channelId as string,
@@ -34,7 +34,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	const handleSend = useCallback(
 		(editMessage: IMessageSendPayload, messageId: string) => {
 			editSendMessage(editMessage, messageId);
-			setChannelDraftMessage(channelId, messageId, editMessage.t);
+			setChannelDraftMessage(channelId, messageId, editMessage);
 		},
 		[editSendMessage],
 	);

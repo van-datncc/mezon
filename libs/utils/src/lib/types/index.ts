@@ -164,9 +164,7 @@ export type IMessageMeta = {
 
 export type IMessage = ChannelMessage & {
 	id: string;
-	content: {
-		t?: string;
-	};
+	content: IMessageSendPayload;
 	date?: string;
 	creationTime?: Date;
 	creationTimeMs?: number;
@@ -187,7 +185,7 @@ export type IMessageWithUser = IMessage & {
 };
 
 export type IMessageSendPayload = {
-	t: string;
+	t?: string;
 	contentThread?: string;
 	mentions?: IMentionOnMessage[];
 	hashtags?: IHashtagOnMessage[];
@@ -195,7 +193,6 @@ export type IMessageSendPayload = {
 	links?: ILinkOnMessage[];
 	markdowns?: IMarkdownOnMessage[];
 	voicelinks?: ILinkVoiceRoomOnMessage[];
-	plaintext?: string;
 };
 
 export type IUser = {
@@ -399,7 +396,7 @@ export type SenderInfoOptionals = {
 
 export type ChannelDraftMessages = {
 	message_id: string;
-	draftContent: string;
+	draftContent: IMessageSendPayload;
 };
 
 export interface IGifCategory {
