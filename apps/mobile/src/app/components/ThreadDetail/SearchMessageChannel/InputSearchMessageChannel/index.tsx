@@ -28,12 +28,10 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom }: Inpu
 	const handleTextChange = (e) => {
 		onChangeText(e);
 		setTextInput(e);
-		setIsIconClear(true);
 	};
 	const clearTextInput = () => {
 		setTextInput('');
 		onChangeText('');
-		setIsIconClear(false);
 	};
 	return (
 		<View style={styles.wrapper}>
@@ -57,7 +55,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom }: Inpu
 					placeholder={t('search')}
 					autoFocus
 				></TextInput>
-				{isIconClear ? (
+				{!!textInput?.length ? (
 					<Pressable onPress={() => clearTextInput()}>
 						<CircleXIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>
@@ -75,7 +73,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom }: Inpu
 				onClose={() => setIsVisible(false)}
 			>
 				<TouchableOpacity activeOpacity={0.7} onPress={() => setIsVisible(true)} style={styles.listSearchIcon}>
-					<FilterSearchIcon width={20} height={20} color={Colors.textGray} />
+					<FilterSearchIcon width={20} height={20} color={themeValue.textStrong} />
 				</TouchableOpacity>
 			</Tooltip>
 		</View>

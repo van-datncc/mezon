@@ -1,16 +1,16 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Attributes, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const style = (colors: Attributes) => StyleSheet.create({
   optionSearchContainer: {
-    backgroundColor: Colors.bgCharcoal
+    backgroundColor: colors.primary
   },
   headerTitle: {
-    color: Colors.white,
+    color: colors.text,
     fontSize: size.label,
     fontWeight: '600',
     height: size.s_50,
-    borderBottomColor: Colors.borderPrimary,
+    borderBottomColor: colors.border,
     borderBottomWidth: 4,
     paddingHorizontal: size.s_10,
     paddingVertical: size.s_10

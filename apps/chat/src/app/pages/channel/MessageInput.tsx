@@ -1,7 +1,7 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectAllDirectChannelVoids, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, MentionDataProps, searchMentionsHashtag } from '@mezon/utils';
+import { IMessageWithUser, MentionDataProps, searchMentionsHashtag, ThemeApp } from '@mezon/utils';
 import useProcessMention from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
 import useProcessedContent from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessedContent';
 import { ChannelStreamMode } from 'mezon-js';
@@ -210,12 +210,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					onFocus={handleFocus}
 					inputRef={textareaRef}
 					value={channelDraftMessage.draftContent ?? '{}'}
-					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === 'light' && 'lightModeScrollBarMention'}`}
+					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
 					rows={channelDraftMessage.draftContent?.split('\n').length}
 					forceSuggestionsAboveCursor={true}
-					style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
+					style={appearanceTheme === ThemeApp.Light ? lightMentionsInputStyle : darkMentionsInputStyle}
 					customSuggestionsContainer={(children: React.ReactNode) => {
 						return <CustomModalMentions children={children} titleModalMention={titleMention} />;
 					}}
@@ -225,25 +225,21 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						data={handleSearchUserMention}
 						trigger="@"
 						displayTransform={(id: any, display: any) => {
-							return `@${display}`;
+							return display === '@here' ? `${display}` : `@${display}`;
 						}}
 						renderSuggestion={(suggestion: MentionDataProps) => {
-							const avatar = suggestion.clanAvatar ? suggestion.clanAvatar : suggestion.avatarUrl;
-
 							return (
 								<SuggestItem
 									valueHightLight={valueHighlight}
-									name={suggestion.display === 'here' ? '@here' : suggestion.display ?? ''}
-									displayName={suggestion.displayName}
-									clanNickname={suggestion.clanNick}
-									avatarUrl={avatar ?? ''}
+									avatarUrl={suggestion.avatarUrl}
 									subText={
-										suggestion.display === 'here'
+										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: suggestion.display ?? ''
+											: (suggestion.username ?? '')
 									}
-									subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
-									showAvatar={suggestion.display !== 'here'}
+									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
+									showAvatar={suggestion.display !== '@here'}
+									display={suggestion.display}
 								/>
 							);
 						}}
@@ -262,11 +258,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						renderSuggestion={(suggestion) => (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display ?? ''}
+								display={suggestion.display ?? ''}
 								symbol="#"
 								subText={(suggestion as ChannelsMentionProps).subText}
 								channelId={suggestion.id}
-								isHashtag={true}
 							/>
 						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -278,9 +273,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						renderSuggestion={(suggestion) => (
-							<SuggestItem name={suggestion.display ?? ''} isEmoji={true} symbol={(suggestion as any).emoji} />
-						)}
+						renderSuggestion={(suggestion) => <SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 						appendSpaceOnAdd={true}
 					/>

@@ -1,22 +1,26 @@
-import { useAppParams, useChatReaction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { useAppParams, useChatReaction, useClanRestriction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
 import {
-  reactionActions, selectAllAccount,
-  selectCurrentChannel, selectCurrentClan,
-  selectDirectById,
-  selectMessageByMessageId,
-  selectReactionPlaceActive, selectTheme,
-  useAppSelector
+	reactionActions,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectDirectById,
+	selectMessageByMessageId,
+	selectModeResponsive,
+	selectReactionPlaceActive,
+	selectTheme,
+	useAppSelector,
 } from '@mezon/store';
-import { EmojiPlaces, IEmoji, SubPanelName } from '@mezon/utils';
+import { Icons } from '@mezon/ui';
+import { EEmojiCategory, EPermission, EmojiPlaces, IEmoji, ModeResponsive, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Icons } from '../../components';
 
 export type EmojiCustomPanelOptions = {
 	messageEmojiId?: string | undefined;
 	mode?: number;
 	isReaction?: boolean;
+	onClickAddButton?: () => void;
 };
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
@@ -29,7 +33,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
-  const currentClan = useSelector(selectCurrentClan);
+	const currentClan = useSelector(selectCurrentClan);
+	const modeResponsive = useAppSelector(selectModeResponsive);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
 		return emojis.filter((emoji) => emoji?.shortname?.includes(searchTerm));
@@ -45,16 +50,18 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setEmojiSearch(result);
 		}
 	}, [valueInputToCheckHandleSearch]);
-  
-  const ClanLogo = () => {
-    return currentClan?.logo
-      ? <img src={currentClan?.logo} className={"w-7 h-7 rounded-full"}/>
-      : <div className={'dark:text-textDarkTheme text-textLightTheme'}>{currentClan?.clan_name?.charAt(0).toUpperCase()}</div>
-  }
+
+	const ClanLogo = () => {
+		return currentClan?.logo ? (
+			<img src={currentClan?.logo} className="w-7 h-7 rounded-full" />
+		) : (
+			<div className="dark:text-textDarkTheme text-textLightTheme">{currentClan?.clan_name?.charAt(0).toUpperCase()}</div>
+		);
+	};
 
 	const categoryIcons = [
 		<Icons.ClockHistory defaultSize="w-7 h-7" />,
-    <ClanLogo/>,
+		modeResponsive === ModeResponsive.MODE_CLAN ? <ClanLogo /> : <Icons.PenEdit className="w-7 h-7 text-colorNeutral" />,
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
 		<Icons.Bowl defaultSize="w-7 h-7" />,
@@ -190,13 +197,13 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 	return (
 		<div
-			className={`flex max-h-full max-sm:h-32 flex-row max-sm:flex-col w-full md:w-[500px] max-sm:ml-1 ${props.isReaction && 'border border-black rounded overflow-hidden'}`}
+			className={`flex max-h-full max-sm:h-32 max-sbm:h-full flex-row w-full md:w-[500px] max-sm:ml-1 ${props.isReaction && 'border border-black rounded overflow-hidden'}`}
 		>
 			<div
-				className={`w-[10%] max-sm:gap-x-1
-				flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1 
-				max-sm:w-full dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1
-				px-1 md:items-start h-[25rem] pb-1 rounded 
+				className={`w-11 max-sm:gap-x-1
+				flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1
+				max-sm:w-full max-sbm:w-11 dark:bg-bgTertiary bg-bgLightModeSecond pt-1
+				px-1 md:items-start h-[25rem] pb-1 rounded max-sbm:flex-col
 				${!props.isReaction && 'md:ml-2 mb-2'}`}
 			>
 				<div className="w-9 h-9 max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
@@ -216,7 +223,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				})}
 			</div>
 			{valueInputToCheckHandleSearch !== '' && emojisSearch ? (
-				<div className=" h-[400px]  w-full">
+				<div className=" h-[400px]  w-[90%] pr-2">
 					<div className="h-[352px]">
 						{' '}
 						<EmojisPanel emojisData={emojisSearch} onEmojiSelect={handleEmojiSelect} onEmojiHover={handleOnHover} />
@@ -224,7 +231,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					<EmojiHover emojiHoverSrc={emojiHoverSrc} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
 				</div>
 			) : (
-				<div className="flex flex-col">
+				<div className="flex flex-col w-[90%] pr-2">
 					<div
 						ref={containerRef}
 						className="w-full  max-h-[352px] overflow-y-scroll pt-0 overflow-x-hidden hide-scrollbar dark: bg-transparent bg-bgLightMode"
@@ -237,6 +244,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 										onEmojiSelect={handleEmojiSelect}
 										onEmojiHover={handleOnHover}
 										categoryName={item.name}
+										onClickAddButton={props.onClickAddButton}
+										showAddButton={modeResponsive === ModeResponsive.MODE_CLAN}
 									/>
 								</div>
 							);
@@ -256,11 +265,14 @@ type DisplayByCategoriesProps = {
 	readonly onEmojiSelect: (emoji: string) => void;
 	readonly onEmojiHover: (item: any) => void;
 	readonly emojisData: any[];
+	onClickAddButton?: () => void;
+	showAddButton?: boolean;
 };
 
-function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
-  const currentClan = useAppSelector(selectCurrentClan);
-  
+function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover, onClickAddButton, showAddButton }: DisplayByCategoriesProps) {
+	const currentClan = useAppSelector(selectCurrentClan);
+	const modeResponsive = useAppSelector(selectModeResponsive);
+
 	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		const filteredEmojis = emojis
 			.filter((emoji) => emoji?.category?.includes(categoryParam))
@@ -272,6 +284,14 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 	};
 	const emojisByCategoryName = getEmojisByCategories(emojisData, categoryName ?? '');
 
+	const displayCategoryName = (categoryName: string) => {
+		if (modeResponsive === ModeResponsive.MODE_DM) {
+			return categoryName;
+		}
+
+		return categoryName === EEmojiCategory.CUSTOM ? currentClan?.clan_name : categoryName;
+	};
+
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
 	return (
 		<div>
@@ -279,51 +299,74 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
 				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
 			>
-        <p className={'uppercase'}>{categoryName !== 'Custom' ? categoryName : currentClan?.clan_name}</p>
+				<p className={'uppercase text-left truncate'}>{displayCategoryName(categoryName || '')}</p>
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
 					{' '}
 					<Icons.ArrowRight />
 				</span>
 			</button>
-			{emojisPanel && <EmojisPanel emojisData={emojisByCategoryName} onEmojiSelect={onEmojiSelect} onEmojiHover={onEmojiHover} categoryName={categoryName}/>}
+			{emojisPanel && (
+				<EmojisPanel
+					emojisData={emojisByCategoryName}
+					onEmojiSelect={onEmojiSelect}
+					onEmojiHover={onEmojiHover}
+					categoryName={categoryName}
+					onClickAddButton={onClickAddButton}
+					showAddButton={showAddButton}
+				/>
+			)}
 		</div>
 	);
 }
 
-const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSelect, onEmojiHover, categoryName }) => {
+const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
+	emojisData,
+	onEmojiSelect,
+	onEmojiHover,
+	categoryName,
+	onClickAddButton,
+	showAddButton,
+}) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
-  const appearanceTheme = useSelector (selectTheme);
-  const currentClan = useSelector(selectCurrentClan);
-  const userProfile = useSelector(selectAllAccount);
+	const appearanceTheme = useSelector(selectTheme);
+	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const hasClanManagementPermission = hasAdminPermission || isClanCreator || hasClanPermission;
+	const isShowAddButton = useMemo(() => {
+		return hasClanManagementPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
+	}, [hasClanManagementPermission, categoryName, showAddButton]);
 
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
-      {emojisData.map((item, index) => (
-        <button
-          key={index}
-          className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
-          onClick={() => onEmojiSelect(item.shortname + ' ')}
-          onMouseEnter={() => onEmojiHover(item)}
-        >
-          <img draggable="false" src={item?.src}></img>
-        </button>
-      ))}
-      {(categoryName === 'Custom' && userProfile?.user?.id === currentClan?.creator_id) && (
-        <button
-          className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
-          onMouseEnter={() => onEmojiHover({
-            shortname: 'Upload a custom emoji',
-            src: ''
-          })}
-        >
-          <Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'}/>
-        </button>
-      )}
-			
+			{emojisData.map((item, index) => (
+				<button
+					key={index}
+					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
+					onClick={() => onEmojiSelect(item.shortname + ' ')}
+					onMouseEnter={() => onEmojiHover(item)}
+				>
+					<img draggable="false" src={item?.src} />
+				</button>
+			))}
+			{isShowAddButton && (
+				<button
+					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
+					onMouseEnter={() =>
+						onEmojiHover({
+							shortname: 'Upload a custom emoji',
+							src: '',
+						})
+					}
+				>
+					<div onClick={onClickAddButton}>
+						<Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'} />
+					</div>
+				</button>
+			)}
 		</div>
 	);
 };
@@ -334,14 +377,18 @@ type EmojiHoverProps = {
 	isReaction: boolean | undefined;
 };
 
-const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction}: EmojiHoverProps) => {
-  const appearanceTheme = useSelector (selectTheme);
-  
+const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction }: EmojiHoverProps) => {
+	const appearanceTheme = useSelector(selectTheme);
+
 	return (
 		<div
-			className={`w-full min-h-12 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2'}`}
+			className={`w-full min-h-12 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2 max-sbm:mb-0'}`}
 		>
-      {emojiHoverSrc ? <img draggable="false" className="w-10" src={emojiHoverSrc}/> : <Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'}/>}
+			{emojiHoverSrc ? (
+				<img draggable="false" className="w-10" src={emojiHoverSrc} />
+			) : (
+				<Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'} />
+			)}
 			{emojiHoverShortCode}
 		</div>
 	);

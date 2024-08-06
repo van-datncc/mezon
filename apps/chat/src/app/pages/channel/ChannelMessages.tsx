@@ -12,6 +12,7 @@ import {
 	useAppDispatch,
 	useAppSelector,
 } from '@mezon/store';
+import { ThemeApp } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
@@ -108,7 +109,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			bg-bgLightPrimary
       overflow-y-scroll
 			overflow-x-hidden h-full
-			${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+			${appearanceTheme === ThemeApp.Light ? 'customScrollLightMode' : ''}`}
 			id="scrollLoading"
 			ref={chatRef}
 		>

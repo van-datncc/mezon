@@ -27,7 +27,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startindex, endindex, channelid, channellabel, username, shortname, markdown, link, voicelink } = element;
+			const { startindex, endindex, channelid, channellabel, username, userid, shortname, markdown, link, voicelink } = element;
 
 			if (lastindex < startindex) {
 				formattedContent.push(
@@ -46,7 +46,13 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 			}
 			if (username) {
 				formattedContent.push(
-					<MentionUser showOnchannelLayout={showOnchannelLayout} key={`${index}${startindex}${username}`} tagName={username} mode={mode} />,
+					<MentionUser
+						showOnchannelLayout={showOnchannelLayout}
+						key={`${index}${startindex}${username}${userid}`}
+						tagName={username}
+						tagUserId={userid}
+						mode={mode}
+					/>,
 				);
 			}
 			if (shortname) {

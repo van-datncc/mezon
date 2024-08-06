@@ -1,7 +1,27 @@
 import { useAppNavigation, useAuth, useChannels, useDirect, useFriends } from '@mezon/core';
-import { directActions, DirectEntity, messagesActions, selectAllDirectMessages, selectAllUsesClan, selectTheme, useAppDispatch } from '@mezon/store';
+import {
+	DirectEntity,
+	IFriend,
+	directActions,
+	messagesActions,
+	selectAllChannelMembers,
+	selectAllDirectMessages,
+	selectAllUsesClan,
+	selectTheme,
+	useAppDispatch,
+} from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { removeDuplicatesById, TypeSearch } from '@mezon/utils';
+import {
+	SearchItemProps,
+	TypeSearch,
+	UsersClanEntity,
+	addAttributesSearchList,
+	filterListByName,
+	findDisplayNameByUserId,
+	normalizeString,
+	removeDuplicatesById,
+	sortFilteredList,
+} from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -23,12 +43,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3 && groupChat.channel_avatar);
 	const usersClan = useSelector(selectAllUsesClan);
+	const membersInClan = useSelector(selectAllChannelMembers);
+
 	const { friends } = useFriends();
 	const dispatch = useAppDispatch();
 	const [idActive, setIdActive] = useState('');
 	const boxRef = useRef<HTMLDivElement | null>(null);
 	const itemRef = useRef<HTMLDivElement | null>(null);
-
+	const ITEM_HEIGHT = 32;
 	const appearanceTheme = useSelector(selectTheme);
 
 	const listMemSearch = useMemo(() => {
@@ -39,7 +61,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemDM?.usernames ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
-						displayName: '',
+						displayName: findDisplayNameByUserId(itemDM?.user_id?.[0] ?? '', membersInClan),
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
 						typeChat: ChannelType.CHANNEL_TYPE_DM,
 						type: TypeSearch.Dm_Type,
@@ -59,42 +81,49 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					};
 				})
 			: [];
+
 		const listFriendsSearch = friends.length
-			? friends.map((itemFriend: any) => {
+			? friends.map((itemFriend: IFriend) => {
 					return {
 						id: itemFriend?.id ?? '',
-						name: itemFriend?.user.username ?? '',
-						avatarUser: itemFriend?.user.avatar_url ?? '',
-						displayName: itemFriend?.user.display_name ?? '',
+						name: itemFriend?.user?.username ?? '',
+						avatarUser: itemFriend?.user?.avatar_url ?? '',
+						displayName: itemFriend?.user?.display_name ?? '',
 						lastSentTimeStamp: '0',
 						idDM: '',
 						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
+
 		const listUserClanSearch = usersClan.length
-			? usersClan.map((itemUserClan: any) => {
+			? usersClan.map((itemUserClan: UsersClanEntity) => {
 					return {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
 						avatarUser: itemUserClan?.user?.avatar_url ?? '',
+						displayName: itemUserClan?.user?.display_name ?? '',
 						lastSentTimeStamp: '0',
 						idDM: '',
 						type: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
+
 		const friendsMap = new Map(listFriendsSearch.map((friend) => [friend.id, friend]));
 		const listSearch = [
 			...listDMSearch.map((itemDM) => {
 				const friend = friendsMap.get(itemDM.id);
-				return friend ? { ...itemDM, displayName: friend.displayName || itemDM.displayName } : itemDM;
+				return friend ? { ...itemDM, displayName: friend.displayName || itemDM?.displayName } : itemDM;
 			}),
 			...listGroupSearch,
 			...listUserClanSearch,
 		];
-		return removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
-	}, [accountId, friends, listDM, listGroup, usersClan]);
+		const removeDuplicate = removeDuplicatesById(listSearch.filter((item) => item?.id !== accountId));
+		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, membersInClan);
+
+		return addPropsIntoSearchList;
+	}, [accountId, friends, listDM, listGroup, membersInClan]);
 
 	const listChannelSearch = useMemo(() => {
 		const list = listChannels.map((item) => {
@@ -107,13 +136,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				channelId: item?.channel_id ?? '',
 				lastSentTimeStamp: Number(item?.last_sent_message?.timestamp || 0),
 				type: TypeSearch.Channel_Type,
+				prioritizeName: item?.channel_label ?? '',
 			};
 		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
 		return sortedList;
 	}, [listChannels]);
-
-	const totalsData = [...listMemSearch, ...listChannelSearch];
 
 	const handleSelectMem = useCallback(
 		async (user: any) => {
@@ -167,91 +195,82 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		}
 	};
 
+	const normalizeSearchText = useMemo(() => {
+		return normalizeString(searchText);
+	}, [searchText]);
+
+	const isSearchByUsername = useMemo(() => {
+		return searchText.startsWith('@');
+	}, [searchText]);
+
 	const isNoResult =
-		!listChannelSearch.filter((item) => item.name.indexOf(searchText) > -1).length &&
-		!listMemSearch.filter((item: any) => item.name.indexOf(searchText) > -1).length;
+		!listChannelSearch.filter((item) => item.prioritizeName.indexOf(normalizeSearchText) > -1 || item.name.indexOf(normalizeSearchText) > -1)
+			.length &&
+		!listMemSearch.filter((item: SearchItemProps) => item.prioritizeName && item.prioritizeName.indexOf(normalizeSearchText) > -1).length;
+
+	const totalLists = useMemo(() => {
+		return listMemSearch.concat(listChannelSearch);
+	}, [listMemSearch, listChannelSearch, normalizeSearchText]);
+
+	const totalListsFiltered = useMemo(() => {
+		return filterListByName(totalLists, normalizeSearchText, isSearchByUsername);
+	}, [totalLists, normalizeSearchText, isSearchByUsername]);
+
+	const totalListsSorted = useMemo(() => {
+		return sortFilteredList(totalListsFiltered, normalizeSearchText, isSearchByUsername);
+	}, [totalListsFiltered, normalizeSearchText, isSearchByUsername]);
+
+	const channelSearchSorted = useMemo(() => {
+		return totalListsSorted.filter((item) => item.type === TypeSearch.Channel_Type);
+	}, [totalListsSorted]);
+
+	const memSearchSorted = useMemo(() => {
+		return totalListsSorted.filter((item) => item.type === TypeSearch.Dm_Type);
+	}, [totalListsSorted]);
+
+	const [listToUse, setListToUse] = useState<SearchItemProps[]>([]);
+
+	// Define a function to get the list to use based on the search text
+	const getListToUse = (
+		normalizeSearchText: string,
+		memSearchSorted: SearchItemProps[],
+		channelSearchSorted: SearchItemProps[],
+		totalListsSorted: SearchItemProps[],
+	) => {
+		if (normalizeSearchText.startsWith('@')) {
+			return memSearchSorted;
+		} else if (normalizeSearchText.startsWith('#')) {
+			return channelSearchSorted;
+		}
+		return totalListsSorted;
+	};
 
 	useEffect(() => {
-		const memSearchs = listMemSearch
-			.filter((item: any) => item.name.indexOf(searchText.startsWith('@') ? searchText.substring(1) : searchText) > -1)
-			.slice(0, searchText.startsWith('@') ? 25 : 7);
-		const channelSearchs = listChannelSearch
-			.filter((item) => item.name.indexOf(searchText.startsWith('#') ? searchText.substring(1) : searchText) > -1)
-			.slice(0, searchText.startsWith('#') ? 25 : 8);
-		const totalLists = memSearchs.concat(channelSearchs);
+		const listToUseChecked = getListToUse(normalizeSearchText, memSearchSorted, channelSearchSorted, totalListsSorted);
+		setListToUse(listToUseChecked);
+		setIdActive('');
+	}, [normalizeSearchText]);
 
-		if (idActive === '') {
-			setIdActive(totalLists[0]?.id);
+	useEffect(() => {
+		if (idActive === '' && listToUse.length > 0) {
+			setIdActive(listToUse[0]?.id ?? '');
 		}
 
-		let maxHight = itemRef.current?.clientHeight ?? 0;
-
-		const boxHight = boxRef.current?.clientHeight ?? 0;
 		const handleKeyDown = (event: KeyboardEvent) => {
-			const nextIndex = (currentIndex: number, length: number) => (currentIndex === length - 1 ? 0 : currentIndex + 1);
-			const prevIndex = (currentIndex: number) => (currentIndex === 0 ? totalLists.length - 1 : currentIndex - 1);
-			const itemSelect = totalLists.find((item: any) => item.id === idActive);
+			const currentIndex = listToUse.findIndex((item) => item?.id === idActive);
+			if (currentIndex === -1) return;
 
 			switch (event.key) {
 				case 'ArrowDown':
-					if (itemRef && itemRef.current) {
-						maxHight =
-							itemRef.current.clientHeight *
-							(nextIndex(
-								totalLists.findIndex((item: any) => item.id === idActive),
-								totalLists.length,
-							) +
-								1);
-
-						if (maxHight > boxHight) {
-							boxRef.current?.scroll({
-								top: maxHight - boxHight + 46,
-								behavior: 'smooth',
-							});
-						}
-						if (maxHight === itemRef.current?.clientHeight) {
-							boxRef.current?.scroll({
-								top: 0,
-								behavior: 'smooth',
-							});
-						}
-					}
-					setIdActive(
-						totalLists[
-							nextIndex(
-								totalLists.findIndex((item: any) => item.id === idActive),
-								totalLists.length,
-							)
-						]?.id,
-					);
+					handleArrowDown(listToUse, currentIndex);
 					break;
+
 				case 'ArrowUp':
-					if (itemRef && itemRef.current) {
-						maxHight = itemRef.current.clientHeight * (prevIndex(totalLists.findIndex((item: any) => item.id === idActive)) + 1);
-
-						if (maxHight > boxHight) {
-							boxRef.current?.scroll({
-								top: maxHight - boxHight + 46,
-								behavior: 'smooth',
-							});
-						}
-						if (maxHight === itemRef.current?.clientHeight) {
-							boxRef.current?.scroll({
-								top: 0,
-								behavior: 'smooth',
-							});
-						}
-					}
-					setIdActive(totalLists[prevIndex(totalLists.findIndex((item: any) => item.id === idActive))]?.id);
+					handleArrowUp(listToUse, currentIndex);
 					break;
+
 				case 'Enter':
-					if (itemSelect.subText) {
-						event.preventDefault();
-						handleSelectChannel(totalLists.find((item: any) => item.id === idActive));
-						dispatch(messagesActions.setIsFocused(true));
-					} else {
-						handleSelectMem(totalLists.find((item: any) => item.id === idActive));
-					}
+					handleEnter(listToUse, idActive);
 					break;
 
 				default:
@@ -264,7 +283,58 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown);
 		};
-	}, [handleSelectChannel, handleSelectMem, idActive, listChannelSearch, listMemSearch, searchText]);
+	}, [idActive, listToUse]);
+
+	const handleArrowDown = (listToUse: SearchItemProps[], currentIndex: number) => {
+		const nextIndex = currentIndex === listToUse.length - 1 ? 0 : currentIndex + 1;
+		const newItem = listToUse[nextIndex];
+
+		if (!boxRef.current || !newItem) return;
+		const boxHeight = boxRef.current.clientHeight;
+		const newItemOffset = (ITEM_HEIGHT + 4) * nextIndex;
+		const newScrollTop = newItemOffset + ITEM_HEIGHT - boxHeight;
+		const totalItemsHeight = listToUse.length * ITEM_HEIGHT;
+		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
+
+		boxRef.current.scroll({
+			top: Math.min(newScrollTop, maxScrollTop),
+			behavior: 'smooth',
+		});
+
+		setIdActive(newItem.id ?? '');
+	};
+
+	const handleArrowUp = (listToUse: SearchItemProps[], currentIndex: number) => {
+		const prevIndex = currentIndex === 0 ? listToUse.length - 1 : currentIndex - 1;
+		const newItem = listToUse[prevIndex];
+
+		if (!boxRef.current || !newItem) return;
+
+		const boxHeight = boxRef.current.clientHeight;
+		const newItemOffset = (ITEM_HEIGHT + 4) * prevIndex;
+		const newScrollTop = newItemOffset - boxHeight + ITEM_HEIGHT;
+		const totalItemsHeight = listToUse.length * ITEM_HEIGHT;
+		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
+
+		boxRef.current.scroll({
+			top: Math.min(Math.max(newScrollTop, 0), maxScrollTop),
+			behavior: 'smooth',
+		});
+
+		setIdActive(newItem.id ?? '');
+	};
+
+	const handleEnter = (listToUse: SearchItemProps[], idActive: string) => {
+		const selectedItem = listToUse.find((item) => item.id === idActive);
+		if (!selectedItem) return;
+
+		if (selectedItem.subText) {
+			handleSelectChannel(selectedItem);
+			dispatch(messagesActions.setIsFocused(true));
+		} else {
+			handleSelectMem(selectedItem);
+		}
+	};
 
 	return (
 		<Modal
@@ -286,43 +356,48 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				</div>
 				<div
 					ref={boxRef}
-					className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px] py-[10px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+					className={`w-full max-h-[250px]  overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px]  ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 				>
-					{(!searchText.startsWith('@') && !searchText.startsWith('#')) ? (
+					{!normalizeSearchText.startsWith('@') && !normalizeSearchText.startsWith('#') ? (
 						<>
-							<ListSearchModal 
-								listSearch={totalsData}
+							<ListSearchModal
+								listSearch={totalListsSorted}
 								itemRef={itemRef}
 								handleSelect={handleSelect}
-								searchText={searchText}
+								searchText={normalizeSearchText}
 								idActive={idActive}
 								setIdActive={setIdActive}
 							/>
-							{isNoResult && <span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">Can't seem to find what you're looking for?</span>}
+							{isNoResult && (
+								<span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">
+									Can't seem to find what you're looking for?
+								</span>
+							)}
 						</>
 					) : (
 						<>
-							{searchText.startsWith('@') && (
+							{normalizeSearchText.startsWith('@') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
-									<ListSearchModal 
-										listSearch={listMemSearch}
+									<ListSearchModal
+										listSearch={memSearchSorted}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
-										searchText={searchText.slice(1)}
+										searchText={normalizeSearchText}
 										idActive={idActive}
 										setIdActive={setIdActive}
+										isSearchByUsername={isSearchByUsername}
 									/>
 								</>
 							)}
-							{searchText.startsWith('#') && (
+							{normalizeSearchText.startsWith('#') && (
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
-									<ListSearchModal 
-										listSearch={listChannelSearch}
+									<ListSearchModal
+										listSearch={channelSearchSorted}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
-										searchText={searchText.slice(1)}
+										searchText={normalizeSearchText.slice(1)}
 										idActive={idActive}
 										setIdActive={setIdActive}
 									/>
@@ -337,7 +412,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	);
 }
 
-export default SearchModal;
+export default memo(SearchModal);
 
 const FooterNoteModal = memo(() => {
 	return (
@@ -346,5 +421,5 @@ const FooterNoteModal = memo(() => {
 				<span className="text-[#2DC770] opacity-100 font-bold">PROTIP: </span>Start searches with @, # to narrow down results.
 			</span>
 		</div>
-	)
-})
+	);
+});
