@@ -255,7 +255,7 @@ function MemberProfile({
 					onRemoveMember={handleClickRemoveMember}
 					directMessageValue={directMessageValue}
 					name={name}
-					isMemberDMGroup={!!dataMemberCreate}
+					isMemberDMGroup={dataMemberCreate ? true : false}
 					dataMemberCreate={dataMemberCreate}
 					isMemberChannel={isMemberChannel}
 					onOpenProfile={handleOpenProfileModal}

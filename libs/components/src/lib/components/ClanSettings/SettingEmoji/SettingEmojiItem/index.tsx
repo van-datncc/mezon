@@ -5,11 +5,11 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from "@mezon/store";
-import {ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody} from "mezon-js/api.gen";
-import {ChangeEvent, KeyboardEvent, useMemo, useState} from "react";
-import {useSelector} from "react-redux";
-import {useClanRestriction} from "@mezon/core";
-import {EPermission} from "@mezon/utils";
+import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from "mezon-js/api.gen";
+import { ChangeEvent, KeyboardEvent, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { useClanRestriction } from "@mezon/core";
+import { EPermission } from "@mezon/utils";
 
 type SettingEmojiItemProp = {
   emoji: ApiClanEmojiListResponse,
