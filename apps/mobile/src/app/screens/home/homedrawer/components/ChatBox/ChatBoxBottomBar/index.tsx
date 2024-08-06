@@ -95,7 +95,7 @@ export const ChatBoxBottomBar = memo(
 		const { setOpenThreadMessageState } = useReference();
 		const { setValueThread } = useThreads();
 		const { sessionRef, clientRef } = useMezon();
-		const listMentions = UseMentionList(channelId || '');
+		const listMentions = UseMentionList(channelId || '', mode);
 		const { textInputProps, triggers } = useMentions({
 			value: mentionTextValue,
 			onChange: (newValue) => handleTextInputChange(newValue),
@@ -208,12 +208,12 @@ export const ChatBoxBottomBar = memo(
 
 				words.forEach((word) => {
 					if (word.startsWith('@')) {
-						const mention = listMentions.find((m) => `@${m.display}` === word);
+						const mention = listMentions.find((m) => `@${m?.username}` === word);
 						if (mention) {
 							const startindex = convertedHashtag.indexOf(word);
 							mentionList.push({
 								userid: mention.id?.toString() ?? '',
-								username: `@${mention.display}`,
+								username: `@${mention?.username}`,
 								startindex,
 								endindex: startindex + word.length,
 							});
@@ -419,6 +419,7 @@ export const ChatBoxBottomBar = memo(
 					messageActionNeedToResolve={messageActionNeedToResolve}
 					onAddMentionMessageAction={onAddMentionMessageAction}
 					mentionTextValue={mentionTextValue}
+          channelMode={mode}
 				/>
 				<HashtagSuggestions {...triggers.hashtag} />
 				<EmojiSuggestion {...triggers.emoji} />

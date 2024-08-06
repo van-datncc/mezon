@@ -1,8 +1,8 @@
 import { useChatSending, useDirectMessages, useEmojiSuggestion } from '@mezon/core';
-import { ActionEmitEvent, Icons, getAttachmentUnique } from '@mezon/mobile-components';
+import { ActionEmitEvent, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { referencesActions, selectAttachmentData } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -11,6 +11,7 @@ import {
 	IMarkdownOnMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
+	getRoleList,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -101,6 +102,8 @@ export const ChatMessageInput = memo(
 				mode,
 				directMessageId: channelId || '',
 			});
+			const rolesInClan = useSelector(selectAllRolesClan);
+			const roleList = getRoleList(rolesInClan);
 
 			const clearInputAfterSendMessage = useCallback(() => {
 				onSendSuccess();
@@ -176,16 +179,30 @@ export const ChatMessageInput = memo(
 				return !!attachmentDataRef?.length || text?.length > 0;
 			}, [attachmentDataRef?.length, text?.length]);
 
+			const doesIdRoleExist = (id: string, roles: IRoleMention[]): boolean => {
+				return roles?.some((role) => role?.roleId === id);
+			};
+
 			const handleSendMessage = async () => {
 				if (!isCanSendMessage) {
 					return;
 				}
 				clearInputAfterSendMessage();
-
-				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => ({
-					user_id: mention.userid,
-					username: mention.username,
-				}));
+				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => {
+					const isRole = doesIdRoleExist(mention?.userid ?? '', roleList ?? []);
+					if (isRole) {
+						const role = roleList?.find((role) => role.roleId === mention.userid);
+						return {
+							role_id: role?.roleId,
+							rolename: role?.roleName,
+						};
+					} else {
+						return {
+							user_id: mention.userid,
+							username: mention.username,
+						};
+					}
+				});
 
 				const payloadSendMessage: IMessageSendPayload = {
 					t: text,

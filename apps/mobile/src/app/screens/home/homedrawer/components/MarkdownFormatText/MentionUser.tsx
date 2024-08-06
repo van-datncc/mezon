@@ -1,5 +1,5 @@
 import { load } from '@mezon/mobile-components';
-import { ChannelMembersEntity, UsersClanEntity } from '@mezon/store';
+import { ChannelMembersEntity, RolesClanEntity, UsersClanEntity } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js/client';
 
 type IMentionUser = {
@@ -8,8 +8,9 @@ type IMentionUser = {
 	usersClan: any;
 	usersInChannel: any;
 	clansProfile: any;
+  rolesInClan: RolesClanEntity[];
 };
-export const MentionUser = ({ tagName, mode, usersClan, usersInChannel, clansProfile }: IMentionUser) => {
+export const MentionUser = ({ tagName, mode, usersClan, usersInChannel, clansProfile , rolesInClan}: IMentionUser) => {
 	const currentClanId = load('persist:clans').currentClanId;
 
 	const getUserMention = (nameMention: string, mode: number, usersInChannel: ChannelMembersEntity[], usersClan: UsersClanEntity[]) => {
@@ -22,8 +23,17 @@ export const MentionUser = ({ tagName, mode, usersClan, usersInChannel, clansPro
 
 	const userMention = getUserMention(tagName?.substring(1), mode, usersInChannel, usersClan);
 	const { user } = userMention || {};
+  const roleList = rolesInClan?.map((item) => ({
+    roleId: item.id ?? '',
+    roleName: item.title ?? '',
+  }));
 
 	const clanProfileByIdUser = clansProfile?.find((clanProfile) => clanProfile?.clan_id === currentClanId && clanProfile?.user_id === user?.id);
+
+  const roleMentionUser = roleList?.find((role) => `@${role.roleName}` === tagName);
+  if(roleMentionUser) {
+    return `[@${roleMentionUser?.roleName}](@role${roleMentionUser?.roleId})`;
+  }
 
 	if (tagName === '@here') {
 		return `[@here](@here)`;

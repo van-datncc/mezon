@@ -5,6 +5,7 @@ import {
 	ChannelsEntity,
 	selectAllChannelMembers,
 	selectAllEmojiSuggestion,
+	selectAllRolesClan,
 	selectAllUserClanProfile,
 	selectAllUsesClan,
 	selectChannelsEntities,
@@ -38,6 +39,7 @@ export const TYPE_MENTION = {
 	userMention: '@',
 	hashtag: '#',
 	voiceChannel: '##voice',
+  userRoleMention: '@role'
 };
 /**
  * custom style for markdown
@@ -139,6 +141,10 @@ export const markdownStyles = (colors: Attributes) =>
 			lineHeight: size.s_20,
 		},
 		unknownChannel: { fontStyle: 'italic' },
+    roleMention: {
+      color: colors.textRoleLink,
+      backgroundColor: colors.darkMossGreen
+    }
 	});
 
 const styleMessageReply = (colors: Attributes) =>
@@ -216,7 +222,7 @@ export const renderRulesCustom = {
 			return (
 				<Text
 					key={node.key}
-					style={[styles.mention, content.includes('# unknown') && styles.unknownChannel]}
+					style={[styles.mention, content.includes('# unknown') && styles.unknownChannel, payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention]}
 					onPress={() => openUrl(node.attributes.href, onLinkPress)}
 				>
 					{content}
@@ -325,11 +331,11 @@ export const RenderTextMarkdownContent = React.memo(
 		const clansProfile = useAppSelector(selectAllUserClanProfile);
 		const emojiListPNG = useAppSelector(selectAllEmojiSuggestion);
 		const channelsEntities = useAppSelector(selectChannelsEntities);
+    const rolesInClan = useAppSelector(selectAllRolesClan);
 
 		if (isMessageReply) {
 			customStyle = { ...styleMessageReply(themeValue) };
 		}
-
 		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [], voicelinks = [] } = content || {};
 		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns, ...voicelinks].sort((a, b) => a.startindex - b.startindex);
 		let lastIndex = 0;
@@ -348,7 +354,7 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += ChannelHashtag({ channelHashtagId: channelid, channelsEntities });
 				}
 				if (username) {
-					formattedContent += MentionUser({ tagName: username, mode, usersClan, usersInChannel, clansProfile });
+					formattedContent += MentionUser({ tagName: username, mode, usersClan, usersInChannel, clansProfile , rolesInClan});
 				}
 				if (shortname) {
 					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });

@@ -49,4 +49,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		color: colors.text,
 	},
 	emojiImage: { width: size.s_20, height: size.s_20 },
+  roleText: {
+    color: colors.textRoleLink
+  }
 });
