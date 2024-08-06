@@ -1,3 +1,4 @@
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { Buffer as BufferMobile } from 'buffer';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -35,10 +36,8 @@ export async function handleUploadFile(
 				fileType = `text/${fileExtension}`;
 			}
 			
-			const ms = new Date().getTime();
-			if (filename.trim() === "") {
-				filename = ms + '.' + file.type;
-			}
+			const ms = new Date().getTime();			
+			filename = ms + filename;
 			filename = filename.replace(/-|\(|\)| /g, '_')
 			if (!currentClanId) {
 				currentClanId = "0";
