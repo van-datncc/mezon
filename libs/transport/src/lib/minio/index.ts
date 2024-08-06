@@ -36,15 +36,15 @@ export async function handleUploadFile(
 				fileType = `text/${fileExtension}`;
 			}
 			
-			const ms = new Date().getTime();			
+			const ms = new Date().getMinutes();			
 			filename = ms + filename;
 			filename = filename.replace(/-|\(|\)| /g, '_')
 			if (!currentClanId) {
 				currentClanId = "0";
 			}
-			let fullfilename = currentClanId + '/' + currentChannelId + '/' + filename;
+			let fullfilename = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
 			if (path) {
-				fullfilename = (path + '/') + currentClanId + '/' + currentChannelId + '/' + filename;
+				fullfilename = (path + '/') + fullfilename;
 			}
 
 			console.log("fullfilename", fullfilename, fileType);
