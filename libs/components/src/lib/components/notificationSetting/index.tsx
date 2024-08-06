@@ -11,7 +11,7 @@ import {
 	selectnotificatonSelected,
 	useAppDispatch,
 } from '@mezon/store';
-import { NotificationType } from 'mezon-js';
+import { ThemeApp } from '@mezon/utils';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import Creatable from 'react-select/creatable';
@@ -232,14 +232,14 @@ const ModalNotificationSetting = (props: ModalParam) => {
 					<div className="text-sm font-normal dark:text-textSecondary text-textSecondary800 mb-2">
 						Add a channel to override its default notification settings
 					</div>
-					<div className={appearanceTheme === 'dark' ? '' : 'lightModeScrollBarMention'}>
+					<div className={appearanceTheme === ThemeApp.Dark ? '' : 'lightModeScrollBarMention'}>
 						<Creatable
 							isClearable
 							onChange={handleChange}
 							options={options}
 							value={selectedOption}
 							placeholder="Select or create an option..."
-							styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+							styles={appearanceTheme === ThemeApp.Dark ? customStyles : lightCustomStyles}
 						/>
 					</div>
 					<div className={`mt-4 overflow-visible ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''} `}>

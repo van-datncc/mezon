@@ -1187,7 +1187,7 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} dark:hover:text-white hover:text-black`}
 			onClick={handleClick}
 		>
 			<g id="Live area">

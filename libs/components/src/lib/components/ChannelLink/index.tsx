@@ -176,11 +176,11 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				numberNotification !== 0 ? (
 					<>
 						<AddPerson
-							className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block dark:text-white text-black ${currentURL === channelPath ? '' : ''}`}
+							className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block dark:text-white text-black `}
 							onClick={handleCreateLinkInvite}
 						/>
 						<SettingProfile
-							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block dark:text-white text-black ${currentURL === channelPath ? '' : ''}`}
+							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block dark:text-white text-black `}
 							onClick={handleOpenCreate}
 						/>
 						<div

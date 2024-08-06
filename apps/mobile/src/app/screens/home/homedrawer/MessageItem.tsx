@@ -211,6 +211,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		return message?.clan_nick || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
 	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, message?.display_name, isDM]);
 
+	const usernameMessage = useMemo(() => {
+		return isDM ? message?.display_name || message?.user?.username : message?.user?.username
+	}, [isDM, isDM, message?.display_name, message?.user?.username]);
+
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
 			inputRange: [-50, 0],
@@ -283,8 +287,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 					<AvatarMessage
 						onPress={onPressAvatar}
-						avatar={message?.isMe ? userProfile?.user?.avatar_url : message?.user?.avatarSm}
-						textAvatar={isDM ? message?.display_name || message?.user?.username : message?.user?.username}
+						id={message?.user?.id}
+						avatar={message?.avatar}
+						username={usernameMessage}
 						isShow={!isCombine || !!message?.references?.length || showUserInformation}
 					/>
 					<Pressable

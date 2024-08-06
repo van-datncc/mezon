@@ -1,11 +1,25 @@
-import { IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
+import { selectAllRolesClan } from '@mezon/store';
+import { getRoleList, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+interface IRoleMention {
+	roleId: string;
+	roleName: string;
+}
 
 const useProcessMention = (text: string) => {
 	const [mentionList, setMentionList] = useState<IMentionOnMessage[]>([]);
 	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
 	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
 	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
+
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = getRoleList(rolesInClan);
+
+	function doesIdExist(id: string, roles: IRoleMention[]): boolean {
+		return roles.some((role) => role.roleId === id);
+	}
 
 	useEffect(() => {
 		const mentions: IMentionOnMessage[] = [];
@@ -26,7 +40,8 @@ const useProcessMention = (text: string) => {
 
 				// Extract username
 				const usernameEnd = text.indexOf(']', index);
-				const username = `@${text.substring(index, usernameEnd)}`;
+				const username =
+					text.substring(index, usernameEnd) === '@here' ? text.substring(index, usernameEnd) : `@${text.substring(index, usernameEnd)}`;
 				index = usernameEnd + 1;
 
 				// Extract userId
@@ -85,10 +100,21 @@ const useProcessMention = (text: string) => {
 		setHashtagList(hashtags);
 		setEmojiList(emojis);
 
-		const simplifiedList = mentions.map((mention) => ({
-			user_id: mention.userid,
-			username: mention.username,
-		}));
+		const simplifiedList = mentions.map((mention) => {
+			const isRole = doesIdExist(mention.userid ?? '', roleList ?? []);
+			if (isRole) {
+				const role = roleList.find((role) => role.roleId === mention.userid);
+				return {
+					role_id: role?.roleId,
+					rolename: role?.roleName,
+				};
+			} else {
+				return {
+					user_id: mention.userid,
+					username: mention.username,
+				};
+			}
+		});
 
 		setSimplifiedMentionList(simplifiedList);
 	}, [text]);
