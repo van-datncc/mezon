@@ -1,12 +1,12 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectAllDirectChannelVoids, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, MentionDataProps, searchMentionsHashtag, ThemeApp } from '@mezon/utils';
+import { IMessageWithUser, MentionDataProps, ThemeApp, searchMentionsHashtag } from '@mezon/utils';
 import useProcessMention from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
 import useProcessedContent from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessedContent';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import ModalDeleteMess from './ModalDeleteMess';
@@ -40,8 +40,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
+	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
 
-	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(channelDraftMessage.draftContent ?? '');
+	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(channelDraftMessage.draftContent ?? '', mentionRaw);
+	console.log('emojiList-edit: ', emojiList);
+	console.log('hashtagList-edit: ', hashtagList);
+	console.log('simplifiedMentionList-edit: ', simplifiedMentionList);
+	console.log('mentionList-edit: ', mentionList);
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(channelDraftMessage.draftContent ?? '');
 
 	const combinedContent = useMemo(() => {
@@ -100,7 +105,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
-	const neverMatchingRegex = /($a)/;
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
 		const matches = emojis
@@ -163,6 +167,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		setMentionRaw(mentions);
+		console.log('Mention-Raw-EDIT-Message', mentions);
 		const value = event.target.value;
 		setChannelDraftMessage(channelId, messageId, value);
 		if (newPlainTextValue.endsWith('@')) {

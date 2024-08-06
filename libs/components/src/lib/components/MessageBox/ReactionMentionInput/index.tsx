@@ -58,7 +58,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
@@ -91,12 +91,6 @@ type ChannelsMentionProps = {
 	id: string;
 	display: string;
 	subText: string;
-};
-
-type EmojiData = {
-	id: string;
-	emoji: string;
-	display: string;
 };
 
 export type MentionReactInputProps = {
@@ -132,8 +126,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
-
-	const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
@@ -235,7 +227,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
-	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content);
+	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
+	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw);
+
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
@@ -274,7 +268,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						links: linkList,
 						markdowns: markdownList,
 						voicelinks: voiceLinkRoomList,
-						plaintext: plainTextMessage,
 					},
 
 					simplifiedMentionList,
@@ -317,7 +310,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							links: linkList,
 							markdowns: markdownList,
 							voicelinks: voiceLinkRoomList,
-							plaintext: plainTextMessage,
 						},
 						simplifiedMentionList,
 						attachmentDataRef,
@@ -400,6 +392,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [props.mode, commonChannelVoids]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		setMentionRaw(mentions);
 		dispatch(threadsActions.setMessageThreadError(''));
 		setValueTextInput(newValue, props.isThread);
 
@@ -407,8 +400,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onTyping();
 		}
 
-		setContent(newValue);
-		setPlainTextMessage(newPlainTextValue);
+		setContent(newPlainTextValue);
 
 		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(newValue);
@@ -450,12 +442,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const appearanceTheme = useSelector(selectTheme);
 
-	const handleSearchUserMention = (search: any, callback: any) => {
+	const handleSearchUserMention = (search: string, callback: any) => {
 		setValueHightlight(search);
 		callback(searchMentionsHashtag(search, props.listMentions ?? []));
 	};
 
-	const handleSearchHashtag = (search: any, callback: any) => {
+	const handleSearchHashtag = (search: string, callback: any) => {
 		setValueHightlight(search);
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
 			callback(searchMentionsHashtag(search, listChannelVoidsMention ?? []));
@@ -502,11 +494,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
-		if ((currentChannelId || currentDmGroupId) && valueTextInput) {
-			setContent(valueTextInput);
+		if (currentChannelId !== undefined || currentDmGroupId !== undefined) {
 			focusToElement(editorRef);
 		}
-	}, [currentChannelId, currentDmGroupId, valueTextInput]);
+	}, [currentChannelId, currentDmGroupId]);
 
 	useEffect(() => {
 		if (isFocused) {

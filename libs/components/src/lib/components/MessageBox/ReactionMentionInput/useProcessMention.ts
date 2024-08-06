@@ -1,6 +1,7 @@
 import { selectAllRolesClan } from '@mezon/store';
-import { getRoleList, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
+import { ETypeMEntion, getRoleList, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
 import { useEffect, useState } from 'react';
+import { MentionItem } from 'react-mentions';
 import { useSelector } from 'react-redux';
 
 interface IRoleMention {
@@ -8,7 +9,7 @@ interface IRoleMention {
 	roleName: string;
 }
 
-const useProcessMention = (text: string) => {
+const useProcessMention = (text: string, mentionsRaw: MentionItem[]) => {
 	const [mentionList, setMentionList] = useState<IMentionOnMessage[]>([]);
 	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
 	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
@@ -26,75 +27,36 @@ const useProcessMention = (text: string) => {
 		const hashtags: IHashtagOnMessage[] = [];
 		const emojis: IEmojiOnMessage[] = [];
 
-		const mentionPrefix = '@[';
-		const hashtagPrefix = '#[';
-		const emojiPrefix = '[:'; // Emoji prefix
-		const emojiSuffix = ']';
+		mentionsRaw.forEach((item) => {
+			const { id, display, plainTextIndex, childIndex } = item;
+			const startindex = plainTextIndex;
+			const endindex = plainTextIndex + display.length;
 
-		let index = 0;
-
-		while (index < text.length) {
-			if (text.startsWith(mentionPrefix, index)) {
-				let startindex = index;
-				index += mentionPrefix.length;
-
-				// Extract username
-				const usernameEnd = text.indexOf(']', index);
-				const username =
-					text.substring(index, usernameEnd) === '@here' ? text.substring(index, usernameEnd) : `@${text.substring(index, usernameEnd)}`;
-				index = usernameEnd + 1;
-
-				// Extract userId
-				const userIdStart = text.indexOf('(', index) + 1;
-				const userIdEnd = text.indexOf(')', userIdStart);
-				const userid = text.substring(userIdStart, userIdEnd);
-				index = userIdEnd + 1;
-
+			if (childIndex === ETypeMEntion.MENTION) {
+				// Mention
 				mentions.push({
-					userid,
-					username,
+					userid: id,
+					username: display,
 					startindex,
-					endindex: index,
+					endindex,
 				});
-			} else if (text.startsWith(hashtagPrefix, index)) {
-				let startindex = index;
-				index += hashtagPrefix.length;
-
-				// Extract channelLabel
-				const labelEnd = text.indexOf(']', index);
-				const channellabel = `#${text.substring(index, labelEnd)}`;
-				index = labelEnd + 1;
-
-				// Extract channelId
-				const channelIdStart = text.indexOf('(', index) + 1;
-				const channelIdEnd = text.indexOf(')', channelIdStart);
-				const channelid = text.substring(channelIdStart, channelIdEnd);
-				index = channelIdEnd + 1;
-
+			} else if (childIndex === ETypeMEntion.HASHTAG) {
+				// Hashtag
 				hashtags.push({
-					channelid,
-					channellabel,
+					channelid: id,
+					channellabel: display,
 					startindex,
-					endindex: index,
+					endindex,
 				});
-			} else if (text.startsWith(emojiPrefix, index)) {
-				let startindex = index;
-				index += emojiPrefix.length;
-
-				// Extract emoji
-				const emojiEnd = text.indexOf(emojiSuffix, index);
-				const shortname = text.substring(index, emojiEnd);
-				index = emojiEnd + emojiSuffix.length;
-
+			} else if (childIndex === ETypeMEntion.EMOJI) {
+				// Emoji
 				emojis.push({
-					shortname,
+					shortname: display,
 					startindex,
-					endindex: index,
+					endindex,
 				});
-			} else {
-				index++;
 			}
-		}
+		});
 
 		setMentionList(mentions);
 		setHashtagList(hashtags);

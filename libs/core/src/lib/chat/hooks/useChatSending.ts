@@ -39,6 +39,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			anonymous?: boolean,
 			mentionEveryone?: boolean,
 		) => {
+			console.log('content', content);
 			return dispatch(
 				messagesActions.sendMessage({
 					channelId: channelID,

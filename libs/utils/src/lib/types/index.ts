@@ -651,3 +651,9 @@ export type SearchItemProps = {
 export enum EEmojiCategory {
 	CUSTOM = 'Custom',
 }
+
+export enum ETypeMEntion {
+	MENTION = 0,
+	HASHTAG = 1,
+	EMOJI = 2,
+}
