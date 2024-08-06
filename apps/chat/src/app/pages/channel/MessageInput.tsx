@@ -1,7 +1,19 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
 import { selectAllDirectChannelVoids, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
-import { IMessageSendPayload, IMessageWithUser, MentionDataProps, ThemeApp, searchMentionsHashtag } from '@mezon/utils';
+import {
+	IEmojiOnMessage,
+	IHashtagOnMessage,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
+	IMarkdownOnMessage,
+	IMentionOnMessage,
+	IMessageSendPayload,
+	IMessageWithUser,
+	MentionDataProps,
+	ThemeApp,
+	searchMentionsHashtag,
+} from '@mezon/utils';
 import useProcessMention from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
 import useProcessedContent from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessedContent';
 import { ChannelStreamMode } from 'mezon-js';
@@ -45,19 +57,28 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [contentRaw, setContentRaw] = useState<IMessageSendPayload>(message.content as IMessageSendPayload);
 	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(contentRaw.t as string, mentionRaw);
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(contentRaw.t as string);
-	console.log('messsage', message);
-	const combinedContentRaw: IMessageSendPayload = useMemo(() => {
-		return {
-			mentions: message?.content.mentions,
-			hashtags: hashtagList,
-			emojis: emojiList,
-			links: linkList,
-			markdowns: markdownList,
-			voicelinks: voiceLinkRoomList,
-		};
-	}, [mentionList, hashtagList, emojiList, linkList, markdownList, voiceLinkRoomList]);
 
-	console.log('combinedContent', combinedContentRaw);
+	const processedContentPayload: IMessageSendPayload = useMemo(() => {
+		return {
+			t: message?.content.t,
+			mentions: message?.content.mentions,
+			hashtags: message?.content.hashtags,
+			emojis: message?.content.emojis,
+			links: message?.content.links,
+			markdowns: message?.content.markdowns,
+			voicelinks: message?.content.voicelinks,
+		};
+	}, [message.content, messageId]);
+
+	const formatPayloadContent = createFormattedString(processedContentPayload);
+
+	useEffect(() => {
+		if (processedContentPayload) {
+			console.log('processedContentPayload :', processedContentPayload);
+
+			setChannelDraftMessage(channelId, messageId, processedContentPayload);
+		}
+	}, [processedContentPayload]);
 
 	// const [convertedContent, setConvertedContent] = useState(combinedContent);
 
@@ -83,12 +104,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			return [];
 		}
 	}, [mode, listChannels]);
-
-	// useEffect(() => {
-	// 	if (channelDraftMessage.draftContent) {
-	// 		setChannelDraftMessage(channelId, messageId, channelDraftMessage.draftContent);
-	// 	}
-	// }, [channelDraftMessage.draftContent, listChannelsMention]);
 
 	useEffect(() => {
 		if (openEditMessageState && message.id === idMessageRefEdit) {
@@ -211,7 +226,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				<MentionsInput
 					onFocus={handleFocus}
 					inputRef={textareaRef}
-					// value={channelDraftMessage.draftContent ?? '{}'}
+					value={formatPayloadContent ?? '{}'}
 					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
 					// onKeyDown={onSend}
 					onChange={handleChange}
@@ -237,7 +252,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: (suggestion.username ?? '')
+											: suggestion.username ?? ''
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}
@@ -311,3 +326,72 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 };
 
 export default React.memo(MessageInput);
+
+type Element =
+	| (IMentionOnMessage & { type: 'mentions' })
+	| (IHashtagOnMessage & { type: 'hashtags' })
+	| (IEmojiOnMessage & { type: 'emojis' })
+	| (ILinkOnMessage & { type: 'links' })
+	| (IMarkdownOnMessage & { type: 'markdowns' })
+	| (ILinkVoiceRoomOnMessage & { type: 'voicelinks' });
+
+const createFormattedString = (data: IMessageSendPayload): string => {
+	let { t = '' } = data;
+	const elements: Element[] = [];
+
+	(Object.keys(data) as (keyof IMessageSendPayload)[]).forEach((key) => {
+		const itemArray = data[key];
+
+		if (Array.isArray(itemArray)) {
+			itemArray.forEach((item) => {
+				if (item) {
+					const typedItem: Element = { ...item, type: key as any }; // Casting key as any
+					elements.push(typedItem);
+				}
+			});
+		}
+	});
+
+	elements.sort((a, b) => {
+		const startA = a.startindex ?? 0;
+		const startB = b.startindex ?? 0;
+		return startA - startB;
+	});
+	let result = '';
+	let lastIndex: number = 0;
+
+	elements.forEach((element) => {
+		const startindex = element.startindex ?? lastIndex;
+		const endindex = element.endindex ?? startindex;
+
+		result += t.slice(lastIndex, startindex);
+
+		switch (element.type) {
+			case 'mentions':
+				result += `@[${element.username?.slice(1)}](${element.userid})`;
+				break;
+			case 'hashtags':
+				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
+				break;
+			case 'emojis':
+				result += `[${element.shortname}]`;
+				break;
+			case 'links':
+				result += `${element.link}`;
+				break;
+			case 'markdowns':
+				result += `${element.markdown}`;
+				break;
+			case 'voicelinks':
+				result += `${element.voicelink}`;
+				break;
+			default:
+				break;
+		}
+		lastIndex = endindex;
+	});
+
+	result += t.slice(lastIndex);
+
+	return result;
+};
