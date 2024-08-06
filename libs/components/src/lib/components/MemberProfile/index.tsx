@@ -79,18 +79,23 @@ function MemberProfile({
 	const userProfile = useSelector(selectAllAccount);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
-
+	
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		// stop open popup default of web
+		// Stop the default context menu of the browser
 		window.oncontextmenu = (e) => {
 			e.preventDefault();
 		};
+		
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
+		const windowWidth = window.innerWidth;
 		const windowHeight = window.innerHeight;
-
+		
 		const distanceToBottom = windowHeight - mouseY;
-
+		
+		// adjust mouseX if it is less than 200px(panel width) from the right edge of the browser
+		const adjustedMouseX = mouseX > windowWidth - 200 ? mouseX - 200 : mouseX;
+		
 		if (event.button === MouseButton.LEFT) {
 			setIsShowUserProfile(true);
 			const heightElementShortUserProfileMin = 313;
@@ -99,12 +104,14 @@ function MemberProfile({
 				setPositionTop(true);
 			}
 		}
+		
 		if (event.button === MouseButton.RIGHT) {
-			setCoords({ mouseX, mouseY, distanceToBottom });
+			setCoords({ mouseX: adjustedMouseX, mouseY, distanceToBottom });
 			setIsShowPanel(!isShowPanel);
 		}
 	};
-
+	
+	
 	const handleDefault = (e: any) => {
 		e.stopPropagation();
 	};
