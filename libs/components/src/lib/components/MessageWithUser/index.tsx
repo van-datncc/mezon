@@ -121,22 +121,9 @@ function MessageWithUser({
 					<div className={parentDivClass}>
 						{checkMessageHasReply && <MessageReply message={message} />}
 						<div className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}>
-							<MessageAvatar
-								currentUserId={currentUserId}
-								message={message}
-								isCombine={isCombine}
-								isEditing={isEditing}
-								isShowFull={isShowFull}
-								mode={mode}
-							/>
+							<MessageAvatar message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull} mode={mode} />
 							<div className="w-full relative h-full">
-								<MessageHead
-									currentUserId={currentUserId}
-									message={message}
-									isCombine={isCombine}
-									isShowFull={isShowFull}
-									mode={mode}
-								/>
+								<MessageHead message={message} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
 								<div id={message.id} className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										{isEditing && editor}
