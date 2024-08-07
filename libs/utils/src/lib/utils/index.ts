@@ -177,9 +177,9 @@ export const convertMarkdown = (markdown: string): string => {
 		.join('');
 };
 
-export const getSrcEmoji = (shortname: string, emojiListPNG: any[]) => {
-	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
-	return emoji ? emoji.src : undefined;
+export const getSrcEmoji = (id: string) => {
+	// const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
+	return process.env.NX_BASE_IMG_URL + 'emojis/' + id;
 };
 
 export const updateEmojiReactionData = (data: any[]) => {
