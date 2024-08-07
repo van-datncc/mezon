@@ -17,6 +17,7 @@ import {
 	referencesActions,
 	selectAllAccount,
 	selectAllDirectChannelVoids,
+	selectAllRolesClan,
 	selectAllUsesClan,
 	selectAttachmentData,
 	selectCloseMenu,
@@ -51,6 +52,7 @@ import {
 	ThreadValue,
 	UsersClanEntity,
 	focusToElement,
+	getRoleList,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
@@ -116,6 +118,8 @@ export type MentionReactInputProps = {
 };
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = getRoleList(rolesInClan);
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
@@ -228,7 +232,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
-	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw);
+	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw, roleList);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {

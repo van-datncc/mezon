@@ -654,3 +654,8 @@ export enum ETypeMEntion {
 	HASHTAG = 1,
 	EMOJI = 2,
 }
+
+export interface IRoleMention {
+	roleId: string;
+	roleName: string;
+}

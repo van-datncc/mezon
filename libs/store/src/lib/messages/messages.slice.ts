@@ -620,9 +620,7 @@ export const messagesSlice = createSlice({
 		setIsFocused(state, action) {
 			state.isFocused = action.payload;
 		},
-		setChannelDraftMessage(state, action) {
-			console.log('action :', action.payload);
-
+		setChannelDraftMessage(state, action: PayloadAction<{ channelId: string; channelDraftMessage: ChannelDraftMessages }>) {
 			state.channelDraftMessage[action.payload.channelId] = action.payload.channelDraftMessage;
 		},
 		deleteChannelDraftMessage(state, action: PayloadAction<{ channelId: string }>) {
