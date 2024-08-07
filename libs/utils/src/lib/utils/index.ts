@@ -399,7 +399,7 @@ export function findDisplayNameByUserId(userId: string, data: ChannelUserListCha
 export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ChannelUserListChannelUser[]): SearchItemProps[] {
 	return data.map((item) => {
 		const avatarClanFinding = findClanAvatarByUserId(item.id ?? '', dataUserClan);
-		const clanNickFinding = findClanNickByUserId(item.id ?? '', dataUserClan);
+		const clanNickFinding = item?.clanNick;
 		const prioritizeName = getNameForPrioritize(clanNickFinding ?? '', item.displayName ?? '', item.name ?? '');
 		return {
 			...item,
