@@ -1,17 +1,17 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useRoles } from '@mezon/core';
 import {
-	RolesClanEntity,
-	UsersClanEntity,
 	getNewAddMembers,
 	getSelectedRoleId,
+	RolesClanEntity,
 	selectAllUsesClan,
 	selectCurrentClan,
 	selectTheme,
 	setAddMemberRoles,
+	UsersClanEntity,
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { ThemeApp } from '@mezon/utils';
+import { getNameForPrioritize, ThemeApp } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -105,27 +105,16 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 						<div className="overflow-y-auto">
 							<ul className="flex flex-col gap-y-[5px] max-h-[200px] font-light text-sm ">
 								{searchResults.map((permission) => (
-									<li key={permission.id}>
-										<label htmlFor={permission.id} className="w-full inline-flex justify-between items-center">
-											<div className="inline-flex gap-x-2">
-												<AvatarImage 
-													alt={permission?.user?.username || ''}
-													userName={permission?.user?.username}
-													className="min-w-5 min-h-5 max-w-5 max-h-5"
-													src={permission?.user?.avatar_url}
-													classNameText='text-[9px] pt-[3px]'
-												/>
-												<p>{permission?.user?.display_name}</p>
-												<p className="text-contentTertiary">{permission?.user?.username}</p>
-											</div>
-											<input
-												id={permission.id}
-												type="checkbox"
-												checked={selectedUsers.includes(permission.id)}
-												onChange={() => handleUserToggle(permission.id)}
-											/>
-										</label>
-									</li>
+									<ItemMemberModal 
+										key={permission?.id}
+										id={permission?.id}
+										userName={permission?.user?.username}
+										displayName={permission?.user?.display_name}
+										clanName={permission?.clan_nick}
+										avatar={permission?.user?.avatar_url}
+										checked={selectedUsers.includes(permission.id)}
+										onHandle={() => handleUserToggle(permission.id)}
+									/>
 								))}
 							</ul>
 						</div>
@@ -154,3 +143,41 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 		)
 	);
 };
+
+type ItemMemberModalProps = {
+	id?: string;
+	userName?: string;
+	displayName?: string;
+	clanName?: string;
+	avatar?: string;
+	checked: boolean;
+	onHandle: () => void;
+}
+
+const ItemMemberModal = (props: ItemMemberModalProps) => {
+	const {id='', userName='', displayName='', clanName='', avatar='', checked, onHandle} = props;
+	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	return (
+		<li key={id}>
+			<label htmlFor={id} className="w-full inline-flex justify-between items-center">
+				<div className="inline-flex gap-x-2">
+					<AvatarImage 
+						alt={userName}
+						userName={userName}
+						className="min-w-5 min-h-5 max-w-5 max-h-5"
+						src={avatar}
+						classNameText='text-[9px] pt-[3px]'
+					/>
+					<p>{namePrioritize}</p>
+					<p className="text-contentTertiary">{userName}</p>
+				</div>
+				<input
+					id={id}
+					type="checkbox"
+					checked={checked}
+					onChange={onHandle}
+				/>
+			</label>
+		</li>
+	)
+}
