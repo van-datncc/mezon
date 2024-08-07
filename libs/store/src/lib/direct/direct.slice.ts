@@ -2,12 +2,10 @@ import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessageEvent, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser } from 'mezon-js/api.gen';
-import { attachmentActions } from '../attachment/attachments.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { directChannelVoidActions } from '../channels/directChannelVoid.slice';
 import { clansActions } from '../clans/clans.slice';
-import { friendsActions } from '../friends/friend.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { MessagesEntity, messagesActions } from '../messages/messages.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
@@ -259,7 +257,7 @@ export const directSlice = createSlice({
 				directAdapter.updateOne(state, {
 					id: payload.channel_id,
 					changes: {
-						active: 1,
+						active: ActiveDm.OPEN_DM,
 					},
 				});
 			}
