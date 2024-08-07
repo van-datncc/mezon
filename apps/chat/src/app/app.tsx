@@ -5,17 +5,17 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useMemo } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
+import WebFont from 'webfontloader';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { Routes } from './routes';
 
 if (typeof window !== 'undefined') {
-	// TODO: fix loading font
-	// WebFont.load({
-	// 	google: {
-	// 		families: ['gg sans'],
-	// 	}
-	// });
+	WebFont.load({
+		google: {
+			families: ['gg sans'],
+		}
+	});
 }
 
 const mezon: CreateMezonClientOptions = {
