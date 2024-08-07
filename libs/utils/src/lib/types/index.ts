@@ -112,6 +112,7 @@ export type IChannel = ApiChannelDescription & {
 	unread?: boolean;
 	description?: string;
 	usernames?: string;
+  isRoleUser?: boolean;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -165,9 +166,7 @@ export type IMessageMeta = {
 
 export type IMessage = ChannelMessage & {
 	id: string;
-	content: {
-		t?: string;
-	};
+	content: IMessageSendPayload;
 	date?: string;
 	creationTime?: Date;
 	creationTimeMs?: number;
@@ -189,7 +188,7 @@ export type IMessageWithUser = IMessage & {
 };
 
 export type IMessageSendPayload = {
-	t: string;
+	t?: string;
 	contentThread?: string;
 	mentions?: IMentionOnMessage[];
 	hashtags?: IHashtagOnMessage[];
@@ -197,7 +196,6 @@ export type IMessageSendPayload = {
 	links?: ILinkOnMessage[];
 	markdowns?: IMarkdownOnMessage[];
 	voicelinks?: ILinkVoiceRoomOnMessage[];
-	plaintext?: string;
 };
 
 export type IUser = {
@@ -401,7 +399,7 @@ export type SenderInfoOptionals = {
 
 export type ChannelDraftMessages = {
 	message_id: string;
-	draftContent: string;
+	draftContent: IMessageSendPayload;
 };
 
 export interface IGifCategory {
@@ -432,6 +430,7 @@ export type MentionDataProps = {
 	clanAvatar?: string | undefined;
 	user?: ApiUser;
 	username?: string | undefined;
+  isRoleUser?: boolean;
 };
 
 export type UserSearchDataProps = {
@@ -486,6 +485,7 @@ export interface UsersClanEntity extends IUsersClan {
 export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
 	name?: string;
+	clanNick?: string;
 }
 
 export type SortChannel = {
@@ -652,4 +652,19 @@ export type SearchItemProps = {
 
 export enum EEmojiCategory {
 	CUSTOM = 'Custom',
+}
+
+export enum ActiveDm {
+	OPEN_DM = 1,
+}
+
+export enum ETypeMEntion {
+	MENTION = 0,
+	HASHTAG = 1,
+	EMOJI = 2,
+}
+
+export interface IRoleMention {
+	roleId: string;
+	roleName: string;
 }
