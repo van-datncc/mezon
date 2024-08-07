@@ -113,7 +113,7 @@ export const themeColors: ThemeColor = {
         bgViolet: "#5a62f4",
         colorAvatarDefault: "#334155FF",
         colorActiveClan: "#d8e2f0",
-        textRoleLink: "#009c67",
-        darkMossGreen: "#3c4c43"
+        textRoleLink: "#00b098",
+        darkMossGreen: "#e2f1e5"
     }
 }
