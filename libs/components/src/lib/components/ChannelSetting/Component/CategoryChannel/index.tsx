@@ -4,7 +4,6 @@ import { IChannel } from "@mezon/utils";
 import { Dropdown } from "flowbite-react";
 import { ApiUpdateChannelDescRequest } from "mezon-js";
 import { useSelector } from "react-redux";
-import ItemPanel from "../../../PanelChannel/ItemPanel";
 
 export type CategoryChannelProps = {
   channel: IChannel;
@@ -44,12 +43,12 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
           )}
           label=""
           placement="bottom-start"
-          className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px] uppercase"
+          className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px] !uppercase"
         >
           {
             listCategory.map((category) => {
               if (category.id !== channel.category_id) {
-                return <ItemPanel key={category.id} children={category.category_name ?? ''} onClick={() => handleMoveChannelToNewCategory(category)} />
+                return <div key={category.id} className={'dark:text-[#B5BAC1] text-textSecondary800 rounded-sm hover:bg-bgSelectItem hover:text-[#fff] uppercase font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none textWhiteHoverImportant m-0 truncate'} onClick={() => handleMoveChannelToNewCategory(category)}>{category.category_name ?? ''}</div>
               }
             })
           }
