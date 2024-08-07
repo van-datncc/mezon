@@ -112,6 +112,7 @@ export type IChannel = ApiChannelDescription & {
 	unread?: boolean;
 	description?: string;
 	usernames?: string;
+  isRoleUser?: boolean;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -429,6 +430,7 @@ export type MentionDataProps = {
 	clanAvatar?: string | undefined;
 	user?: ApiUser;
 	username?: string | undefined;
+  isRoleUser?: boolean;
 };
 
 export type UserSearchDataProps = {
