@@ -54,6 +54,7 @@ export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, 
 	}
 	return response.emoji_list;
 });
+
 export const createEmojiSetting = createAsyncThunk(
 	'settingClanEmoji/createEmoji',
 	async (form: { request: ApiClanEmojiCreateRequest; clanId: string }, thunkAPI) => {
@@ -69,6 +70,7 @@ export const createEmojiSetting = createAsyncThunk(
 		}
 	},
 );
+
 export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji', async ({ request, emojiId }: UpdateEmojiRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -80,6 +82,7 @@ export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji
 		return thunkAPI.rejectWithValue({});
 	}
 });
+
 export const deleteEmojiSetting = createAsyncThunk('settingClanEmoji/deleteEmoji', async (emoji: ApiClanEmojiListResponse, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -91,6 +94,7 @@ export const deleteEmojiSetting = createAsyncThunk('settingClanEmoji/deleteEmoji
 		return thunkAPI.rejectWithValue({});
 	}
 });
+
 export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestionAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
