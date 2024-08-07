@@ -1,8 +1,8 @@
 import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
-import { Hashtag, ThreadIcon } from '../../../../../ui/src/lib/Icons';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 export type ChatWelComeProp = {
@@ -23,11 +23,11 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 			{mode === ChannelStreamMode.STREAM_MODE_CHANNEL &&
 				(currentChannel?.parrent_id !== ChannelIsNotThread.TRUE ? (
 					<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
-						<ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10" />
+						<Icons.ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10" />
 					</div>
 				) : (
 					<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
-						<Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
+						<Icons.Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
 					</div>
 				))}
 			{(mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP) && (
