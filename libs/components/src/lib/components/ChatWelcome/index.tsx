@@ -2,7 +2,6 @@ import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
 import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
-import { Hashtag, ThreadIcon } from '../../../../../ui/src/lib/Icons';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 export type ChatWelComeProp = {

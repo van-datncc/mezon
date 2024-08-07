@@ -442,11 +442,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const clickUpToEditMessage = () => {
 		const idRefMessage = lastMessageByUserId?.id;
 		if (idRefMessage && !valueTextInput) {
-			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+			dispatch(messagesActions.setIdMessageToJump(idRefMessage));
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
+			dispatch(messagesActions.setChannelDraftMessage({ channelId: currentChannelId as string, channelDraftMessage: { message_id: idRefMessage, draftContent: lastMessageByUserId?.content } }));
 		}
 	};
 
