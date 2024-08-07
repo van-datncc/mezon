@@ -21,11 +21,11 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
   const dataAuthor = useSelector(selectMemberClanByUserId(sticker.creator_id ?? ''));
   const dispatch = useAppDispatch();
 	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan])
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
-		if(hasAdminPermission || isClanCreator) return true;
-		return currentUserId === sticker.creator_id
-	}, [hasAdminPermission, currentUserId]) ;
+		return hasAdminPermission || isClanCreator || hasManageClanPermission || currentUserId === sticker.creator_id
+	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanCreator]) ;
 
   const handleUpdateSticker = () => {
     updateSticker(sticker);

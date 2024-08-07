@@ -231,7 +231,11 @@ export const ChatMessageInput = memo(
 					});
 					return;
 				}
-
+				dispatch(
+					referencesActions.resetDataAttachment({
+						channelId: channelId,
+					}),
+				);
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? [
@@ -276,11 +280,6 @@ export const ChatMessageInput = memo(
 								default:
 									break;
 							}
-							dispatch(
-								referencesActions.resetDataAttachment({
-									channelId: channelId,
-								}),
-							);
 						}
 					}
 

@@ -6,7 +6,6 @@ import {
 	selectAllChannelMembers,
 	selectAllEmojiSuggestion,
 	selectAllRolesClan,
-	selectAllUserClanProfile,
 	selectAllUsesClan,
 	selectChannelsEntities,
 } from '@mezon/store-mobile';
@@ -328,7 +327,6 @@ export const RenderTextMarkdownContent = React.memo(
 		const { themeValue } = useTheme();
 		const usersClan = useAppSelector(selectAllUsesClan);
 		const usersInChannel = useAppSelector(selectAllChannelMembers);
-		const clansProfile = useAppSelector(selectAllUserClanProfile);
 		const emojiListPNG = useAppSelector(selectAllEmojiSuggestion);
 		const channelsEntities = useAppSelector(selectChannelsEntities);
     const rolesInClan = useAppSelector(selectAllRolesClan);
@@ -344,7 +342,7 @@ export const RenderTextMarkdownContent = React.memo(
 			let formattedContent = '';
 
 			elements.forEach((element) => {
-				const { startindex, endindex, channelid, channellabel, username, shortname, markdown, link, voicelink } = element;
+				const { startindex, endindex, channelid, channellabel, username, userid, shortname, markdown, link, voicelink } = element;
 
 				if (lastIndex < startindex) {
 					formattedContent += t?.slice?.(lastIndex, startindex)?.toString();
@@ -354,7 +352,7 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += ChannelHashtag({ channelHashtagId: channelid, channelsEntities });
 				}
 				if (username) {
-					formattedContent += MentionUser({ tagName: username, mode, usersClan, usersInChannel, clansProfile , rolesInClan});
+					formattedContent += MentionUser({ tagName: username, tagUserId: userid, mode, usersClan, usersInChannel, rolesInClan });
 				}
 				if (shortname) {
 					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });

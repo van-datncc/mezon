@@ -108,7 +108,7 @@ const SettingRightUser = ({
 	const handleRemoveButtonClick = () => {
 		setFlagsRemoveAvartar(true);
 		setFlags(true);
-		setUrlImage('');
+		setUrlImage(process.env.NX_LOGO_MEZON || "");
 	};
 	const onchangeAboutUser = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setEditAboutUser(e.target.value);
@@ -217,7 +217,6 @@ const SettingRightUser = ({
 			) : null}
 
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
-
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 		</div>
 	);
