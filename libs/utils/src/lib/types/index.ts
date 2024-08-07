@@ -484,6 +484,7 @@ export interface UsersClanEntity extends IUsersClan {
 export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
 	name?: string;
+	clanNick?: string;
 }
 
 export type SortChannel = {

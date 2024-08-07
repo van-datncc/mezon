@@ -70,6 +70,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto">
 					{searchResults.map((member: UsersClanEntity) => (
 						<ItemMember
+							key={member?.user?.id}
 							id={member?.user?.id}
 							userName={member?.user?.username}
 							displayName={member?.user?.display_name}
