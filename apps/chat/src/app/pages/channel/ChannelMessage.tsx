@@ -6,7 +6,7 @@ import {
 	selectLastSeenMessage,
 	selectMessageEntityById,
 	selectOpenEditMessageState,
-	useAppSelector
+	useAppSelector,
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
