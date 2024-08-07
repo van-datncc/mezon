@@ -9,14 +9,7 @@ import {
 	save,
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
-import {
-	referencesActions,
-	selectAttachmentData,
-	selectChannelsEntities,
-	selectCurrentChannel,
-	selectHiddenBottomTabMobile,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { referencesActions, selectAttachmentData, selectChannelsEntities, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -87,8 +80,7 @@ export const ChatBoxBottomBar = memo(
 		const [text, setText] = useState<string>('');
 		const [mentionTextValue, setMentionTextValue] = useState('');
 		const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
-		const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
-		const [isFocus, setIsFocus] = useState<boolean>(hiddenBottomTab);
+		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 		const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 		const currentChannel = useSelector(selectCurrentChannel);

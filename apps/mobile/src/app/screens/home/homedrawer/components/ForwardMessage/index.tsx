@@ -197,7 +197,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 			hasBackdrop={false}
 			style={{ margin: 0, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_16 }}
 		>
-			<Block flex={1}>
+			<Block flex={1} marginTop={size.s_24}>
 				<Block flexDirection='row' justifyContent='center' marginBottom={size.s_18}>
 					<Block position='absolute' left={0}>
 						<TouchableOpacity onPress={() => onClose()}>
