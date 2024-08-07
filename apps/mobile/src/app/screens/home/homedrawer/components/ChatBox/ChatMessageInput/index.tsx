@@ -11,7 +11,6 @@ import {
 	IMarkdownOnMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
-	getRoleList,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -103,7 +102,12 @@ export const ChatMessageInput = memo(
 				directMessageId: channelId || '',
 			});
 			const rolesInClan = useSelector(selectAllRolesClan);
-			const roleList = getRoleList(rolesInClan);
+			const roleList = useMemo(() => {
+				return rolesInClan?.map((item) => ({
+					roleId: item.id ?? '',
+					roleName: item.title ?? '',
+				}));
+			}, [rolesInClan]);
 
 			const clearInputAfterSendMessage = useCallback(() => {
 				onSendSuccess();

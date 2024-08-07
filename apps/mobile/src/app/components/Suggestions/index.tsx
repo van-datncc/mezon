@@ -42,7 +42,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 
 			return listMentions.filter(filterMatchedMentions).map((item) => ({
 				...item,
-				name: item?.username,
+				name: item?.display,
 			}));
 		}, [keyword, listMentions]);
 
@@ -64,7 +64,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 							isDisplayDefaultAvatar={true}
 							name={item?.display ?? ''}
 							avatarUrl={item.avatarUrl}
-							subText=""
+							subText={item?.username}
 						/>
 					</Pressable>
 				)}

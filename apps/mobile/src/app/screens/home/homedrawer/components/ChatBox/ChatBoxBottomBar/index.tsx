@@ -20,6 +20,7 @@ import { DeviceEventEmitter, Keyboard, Platform, TextInput } from 'react-native'
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
+import { mentionHashtagPattern, mentionUserPattern } from '../../../../../../../app/utils/helpers';
 import { EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../../../../components/Suggestions';
 import UseMentionList from '../../../../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
@@ -192,6 +193,21 @@ export const ChatBoxBottomBar = memo(
 			}
 		};
 
+		const findMentionMarkers = (text) => {
+			const getMatches = (pattern) => {
+				let match;
+				const matches = [];
+				while ((match = pattern.exec(text)) !== null) {
+					matches.push({ start: match?.index, end: pattern?.lastIndex, content: match[0]?.slice(2, -1) });
+				}
+				return matches;
+			};
+
+			const mentionUsers = getMatches(mentionUserPattern);
+			const mentionHashtags = getMatches(mentionHashtagPattern);
+			return { mentionUsers, mentionHashtags };
+		};
+
 		const handleTextInputChange = async (text: string) => {
 			const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
 			if (isConvertToFileTxt) {
@@ -201,40 +217,35 @@ export const ChatBoxBottomBar = memo(
 			} else {
 				const convertedHashtag = convertMentionsToText(text);
 
-				const mentionList = [];
-				const hashtagList = [];
+				const { mentionUsers, mentionHashtags } = findMentionMarkers(convertedHashtag);
+				let mentionList = [];
+				let hashtagList = [];
 
-				const words = convertedHashtag.split(' ');
+				if (mentionUsers?.length) {
+					mentionList = mentionUsers.map((m) => {
+						const mention = listMentions.find((item) => `${item?.display}` === m?.content);
 
-				words.forEach((word) => {
-					if (word.startsWith('@')) {
-						const mention = listMentions.find((m) => `@${m?.username}` === word);
-						if (mention) {
-							const startindex = convertedHashtag.indexOf(word);
-							mentionList.push({
-								userid: mention.id?.toString() ?? '',
-								username: `@${mention?.username}`,
-								startindex,
-								endindex: startindex + word.length,
-							});
-						}
-					}
+						return {
+							userid: mention.id?.toString() ?? '',
+							username: `@${mention?.display}`,
+							startindex: m?.start,
+							endindex: m?.end,
+						};
+					});
+				}
 
-					if (word.startsWith('<#') && word.endsWith('>')) {
-						const channelId = word.slice(2, -1);
-						const channelInfo = getChannelById(channelId);
-						if (channelInfo) {
-							const startindex = convertedHashtag.indexOf(word);
-							hashtagList.push({
-								channelid: channelInfo.id.toString() ?? '',
-								channellabel: channelInfo.channel_label ?? '',
-								startindex,
-								endindex: startindex + word.length,
-							});
-						}
-					}
-				});
+				if (mentionHashtags?.length) {
+					hashtagList = mentionHashtags.map((m) => {
+						const channelInfo = getChannelById(m?.content);
 
+						return {
+							channelid: channelInfo.id.toString() ?? '',
+							channellabel: channelInfo.channel_label ?? '',
+							startindex: m.start,
+							endindex: m.end,
+						};
+					});
+				}
 				setHashtagsOnMessage(hashtagList);
 				setMentionsOnMessage(mentionList);
 				setMentionTextValue(text);
@@ -419,7 +430,7 @@ export const ChatBoxBottomBar = memo(
 					messageActionNeedToResolve={messageActionNeedToResolve}
 					onAddMentionMessageAction={onAddMentionMessageAction}
 					mentionTextValue={mentionTextValue}
-          channelMode={mode}
+					channelMode={mode}
 				/>
 				<HashtagSuggestions {...triggers.hashtag} />
 				<EmojiSuggestion {...triggers.emoji} />

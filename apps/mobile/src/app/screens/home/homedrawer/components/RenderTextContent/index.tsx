@@ -35,7 +35,7 @@ export const renderTextContent = (text: string, channelsEntities?: Record<string
 	const renderUserMention = (id: string) => {
 		return (
 			<Text>
-				<Text style={styles.contentMessageMention}>{id}</Text>
+				<Text style={styles.contentMessageMention}>{`@${id?.slice(2,-1)}`}</Text>
 			</Text>
 		);
 	};

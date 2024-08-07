@@ -32,9 +32,10 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		color: colors.text,
 	},
 	subText: {
-		fontSize: size.medium,
+		fontSize: size.s_12,
 		fontWeight: '500',
 		color: colors.textDisabled,
+    marginLeft: size.s_20
 	},
 	avatarMessageBoxDefault: {
 		width: 40,

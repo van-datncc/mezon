@@ -53,9 +53,10 @@ export const normalizeString = (str: string) => {
   return normalizedStr?.toLowerCase?.();
 }
 export const urlPattern = /((?:https?:\/\/|www\.)[^\s]+|(?<![.])\b[^\s]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2}\.[a-zA-Z]{2}))/g;
-export const mentionRegex = /(?<=(^|[^`]))(@\S+)(?=\s|$)|<#\d+>/g;
-
-export const mentionRegexSplit = /((?<=\s|^)(@|#)\S+(?=\s|$)|<#\d+>)/g;
+export const mentionRegex = /(?<=\s|^)(@\[[^\]]+\]|<#\d+>)(?=\s|$)/g;
+export const mentionUserPattern = /@\[[^\]]*\]/g;
+export const mentionHashtagPattern = /<#([^>]*)>/g;
+export const mentionRegexSplit = /(@\[[^\]]+\]|<#\d+>)/g;
 export const highlightEmojiRegex = /(:\b[^:\s]*\b:)/g;
 export const urlRegex = /(https?:\/\/[^\s]+)/g;
 export const markdownDefaultUrlRegex = /^\[.*?\]\(https?:\/\/[^\s]+\)$/;

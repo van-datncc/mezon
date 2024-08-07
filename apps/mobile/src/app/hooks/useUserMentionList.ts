@@ -4,11 +4,13 @@ import { ChannelMembersEntity, MentionDataProps } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 function UseMentionList(channelID: string, channelMode?: number): MentionDataProps[] {
 	const { members } = useChannelMembers({ channelId: channelID });
 	const rolesInClan = useSelector(selectAllRolesClan);
+  const { t } = useTranslation('clanRoles');
 
 	const newUserMentionList = useMemo(() => {
 		if (!members || members.length === 0) {
@@ -23,12 +25,12 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 					id: item?.user?.id ?? '',
 					display: item?.clan_nick || item?.user?.display_name || item?.user?.username || '',
 					avatarUrl: item?.user?.avatar_url ?? '',
-					username: item?.user?.username || '',
+          username: item?.user?.username
 				};
 			}) ?? [];
 		const hardcodedUser = {
 			id: '1775731111020111321',
-			display: '@here',
+			display: 'here',
 			avatarUrl: '',
 			user: {
 				id: '1775731111020111321',
@@ -36,7 +38,7 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 				username: 'here',
 				avatarUrl: '',
 			},
-			username: 'here',
+      username: t('notifyEveryone')
 		};
 		const sortedMentionList = [...mentionList].sort((a, b) => {
 			const displayA = a.display?.toLowerCase() || '';
@@ -54,7 +56,6 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 				avatarUrl: '',
 				clanNick: item.title,
 				isRoleUser: true,
-				username: item.title,
 			})) ?? [];
 
 		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {

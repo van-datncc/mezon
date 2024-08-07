@@ -31,7 +31,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar,
 						}}
 					/>
 				) : (
-					!name.startsWith('@here') &&
+					!name.startsWith('here') &&
 					!isRoleUser &&
 					isDisplayDefaultAvatar && (
 						<View style={styles.avatarMessageBoxDefault}>
@@ -41,7 +41,11 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar,
 				)}
 				{urlEmoji && <Image style={styles.emojiImage} source={{ uri: urlEmoji }} />}
 				{symbol && <Text style={styles.symbol}>{symbol}</Text>}
-				{isRoleUser ? <Text style={styles.roleText}>{`@${name}`}</Text> : <Text style={styles.title}>{name}</Text>}
+				{isRoleUser || name.startsWith('here') ? (
+					<Text style={[styles.roleText, name.startsWith('here') && styles.title]}>{`@${name}`}</Text>
+				) : (
+					<Text style={styles.title}>{name}</Text>
+				)}
 			</View>
 			<Text style={styles.subText}>{subText}</Text>
 		</View>
