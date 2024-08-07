@@ -16,7 +16,7 @@ const PendingFriend = (props: PendingFriendProps) => {
 			<p className="dark:text-[#AEAEAE] text-colorTextLightMode text-left text-sm">{user?.user?.username} sent you a friend request.</p>
 			<div className="flex gap-x-3 mt-2">
 				<button
-					className="rounded bg-bgSelectItem px-2 hover:bg-opacity-85 font-medium"
+					className="rounded bg-bgSelectItem px-2 hover:bg-opacity-85 font-medium text-white"
 					onClick={(e) => {
 						handleDefault(e);
 						if (user) {
@@ -27,7 +27,7 @@ const PendingFriend = (props: PendingFriendProps) => {
 					Accept
 				</button>
 				<button
-					className="rounded bg-bgModifierHover px-2 hover:bg-opacity-85 font-medium"
+					className="rounded bg-bgModifierHover px-2 hover:bg-opacity-85 font-medium text-white"
 					onClick={(e) => {
 						handleDefault(e);
 						if (user) {

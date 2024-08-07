@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     container: {
@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
         flexBasis: 500,
         overflow: "hidden"
     },
+    widthTab: { width: Dimensions.get('window').width }
 })
 
 export default styles;

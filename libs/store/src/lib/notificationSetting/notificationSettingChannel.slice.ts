@@ -51,7 +51,7 @@ export const getNotificationSetting = createAsyncThunk('notificationsetting/getN
 
 type SetNotificationPayload = {
 	channel_id?: string;
-	notification_type?: string;
+	notification_type?: number;
 	time_mute?: string;
 	clan_id: string;
 };
@@ -61,7 +61,7 @@ export const setNotificationSetting = createAsyncThunk(
 	async ({ channel_id, notification_type, time_mute, clan_id }: SetNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
-			channel_id: channel_id,
+			channel_category_id: channel_id,
 			notification_type: notification_type,
 			time_mute: time_mute,
 		};
@@ -77,7 +77,7 @@ export const setNotificationSetting = createAsyncThunk(
 
 type SetMuteNotificationPayload = {
 	channel_id?: string;
-	notification_type?: string;
+	notification_type?: number;
 	active: number;
 	clan_id: string;
 };

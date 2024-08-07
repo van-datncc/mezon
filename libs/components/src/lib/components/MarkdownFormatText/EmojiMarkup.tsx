@@ -2,14 +2,16 @@ import { useEmojiSuggestion } from '@mezon/core';
 import { getSrcEmoji, SHOW_POSITION } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMessageContextMenu } from '../ContextMenu';
+import PlainText from './PlainText';
 
 type EmojiMarkupOpt = {
 	emojiSyntax: string;
 	onlyEmoji: boolean;
 	posReply?: boolean;
+	showOnChannelLayOut?: boolean;
 };
 
-export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiSyntax, onlyEmoji, posReply }) => {
+export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiSyntax, onlyEmoji, posReply, showOnChannelLayOut }) => {
 	const { emojis } = useEmojiSuggestion();
 	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.5 m-0`);
 
@@ -30,8 +32,18 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiSyntax, onlyEmoji, 
 	}, [srcEmoji]);
 
 	return (
-		<span onContextMenu={handleContextMenu} style={{ userSelect: 'none' }}>
-			<img src={srcEmoji} alt={srcEmoji} className={className} onDragStart={(e) => e.preventDefault()} />
+		<span onContextMenu={handleContextMenu}>
+			{srcEmoji ? (
+				<img
+					id={`emoji-${emojiSyntax}`}
+					src={srcEmoji}
+					alt={`[:${emojiSyntax}]`}
+					className={className}
+					onDragStart={(e) => e.preventDefault()}
+				/>
+			) : (
+				<PlainText showOnchannelLayout={showOnChannelLayOut} text={emojiSyntax} />
+			)}
 		</span>
 	);
 };

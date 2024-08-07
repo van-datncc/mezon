@@ -1,6 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
-import { ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { memo } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -15,7 +15,8 @@ interface IChannelListSectionProps {
 	collapseItems: any;
 	onLongPressCategory: (channel: ICategoryChannel) => void;
 	onPressSortChannel: (channel: ICategoryChannel) => void;
-	onLongPressChannel: (channel: IChannel) => void;
+	onLongPressChannel: (channel: ChannelThreads) => void;
+	onLongPressThread: (thread: ChannelThreads) => void;
 }
 
 export const ChannelListSection = memo((props: IChannelListSectionProps) => {
@@ -48,6 +49,7 @@ export const ChannelListSection = memo((props: IChannelListSectionProps) => {
 							onLongPress={() => {
 								props?.onLongPressChannel(item);
 							}}
+							onLongPressThread={props?.onLongPressThread}
 						/>
 					);
 				})}

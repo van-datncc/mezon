@@ -1,4 +1,5 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
+import { autoUpdater, UpdateInfo } from 'electron-updater';
 import { machineId } from 'node-machine-id';
 import { join } from 'path';
 import { format } from 'url';
@@ -58,6 +59,63 @@ ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 		}
 		App.mainWindow.focus();
 	}
+});
+
+autoUpdater.autoDownload = false;
+
+autoUpdater.on('checking-for-update', () => {
+	// checking for update
+});
+
+autoUpdater.on('update-available', (info: UpdateInfo) => {
+	const window = App.BrowserWindow.getFocusedWindow();
+	dialog
+		.showMessageBox(window, {
+			type: 'info',
+			buttons: ['Download', 'Cancel'],
+			title: 'Updates available',
+			message: `There is a new update for the app ${info.version}!! Do you want to download??`,
+		})
+		.then((result) => {
+			if (result.response === 0) {
+				autoUpdater.downloadUpdate();
+			}
+		});
+});
+
+autoUpdater.on('update-not-available', () => {
+	new Notification({
+		title: 'No update',
+		body: 'The current version is the latest.',
+	}).show();
+});
+
+autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
+	const window = App.BrowserWindow.getFocusedWindow();
+	dialog
+		.showMessageBox(window, {
+			type: 'info',
+			buttons: ['Install now', 'Cancel'],
+			title: 'Mezon install',
+			message: `Install mezon version ${info.version} now.`,
+		})
+		.then((result) => {
+			if (result.response === 0) {
+				autoUpdater.quitAndInstall();
+			}
+		});
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+	let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
+	log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+	log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
+});
+
+autoUpdater.on('error', (error) => {
+	dialog.showMessageBox({
+		message: `Error: ${error.message} !!`,
+	});
 });
 
 // handle setup events as quickly as possible

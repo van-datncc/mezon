@@ -82,7 +82,7 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 
   return useMenuBuilderPlugin((builder) => {
     builder.when(userId === message.sender_id, (builder) => {
-      builder.addMenuItem('edit', 'edit', handleItemClick, <Icons.PenEdit />);
+      builder.addMenuItem('edit', 'edit', handleItemClick, <Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`}/>);
     });
   });
 }

@@ -1,11 +1,10 @@
 import {
-	ActionEmitEvent,
 	Icons,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	load,
-	save,
+	save
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
@@ -16,10 +15,11 @@ import {
 	selectNotificationMentionCountByChannelId,
 	selectVoiceChannelMembersByChannelId,
 } from '@mezon/store-mobile';
-import { ChannelStatusEnum, IChannel } from '@mezon/utils';
+import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useRef } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, Linking, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import ListChannelThread from '../ChannelListThread';
@@ -39,9 +39,10 @@ interface IChannelListItemProps {
 	isActive: boolean;
 	currentChanel: IChannel;
 	onLongPress: () => void;
+	onLongPressThread?: (thread: ChannelThreads) => void;
 }
 
-enum StatusVoiceChannel {
+export enum StatusVoiceChannel {
 	Active = 1,
 	No_Active = 0,
 }
@@ -53,6 +54,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const numberNotification = useChannelBadgeCount(props.data?.channel_id);
 	const timeoutRef = useRef<any>();
+	const navigation = useNavigation();
 
 	useEffect(() => {
 		return () => {
@@ -68,7 +70,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				return;
 			}
 		} else {
-			DeviceEventEmitter.emit(ActionEmitEvent.HOME_DRAWER, { isShowDrawer: false });
+			navigation.dispatch(DrawerActions.closeDrawer());
 			const store = await getStoreAsync();
 			const channelId = thread ? thread?.channel_id : props?.data?.channel_id;
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
@@ -125,7 +127,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			</TouchableOpacity>
 
 			{!!props?.data?.threads?.length && (
-				<ListChannelThread threads={props?.data?.threads} currentChanel={props.currentChanel} onPress={handleRouteData} />
+				<ListChannelThread threads={props?.data?.threads} currentChanel={props.currentChanel} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />
 			)}
 			{!!voiceChannelMember?.length && <UserListVoiceChannel userListVoice={voiceChannelMember} />}
 		</View>

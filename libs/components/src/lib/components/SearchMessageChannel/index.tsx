@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/components';
 import { useClans, useSearchMessages, useThreads } from '@mezon/core';
-import { appActions, searchMessagesActions, selectCurrentChannel, selectIsShowMemberList, useAppDispatch } from '@mezon/store';
-import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
+import { appActions, searchMessagesActions, selectCurrentChannel, selectCurrentClanId, selectIsShowMemberList, useAppDispatch } from '@mezon/store';
+import { SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -14,18 +14,17 @@ import { hasKeySearch, searchFieldName } from './constant';
 const SearchMessageChannel = () => {
 	const dispatch = useAppDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
-	const { isSearchMessage, currentPage, searchMessages } = useSearchMessages();
+	const { isSearchMessage, fetchSearchMessages, currentPage } = useSearchMessages();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
-
 	const { listUserSearch } = useClans();
 	const { setIsShowCreateThread } = useThreads();
-
 	const [expanded, setExpanded] = useState(false);
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
 	const [isShowSearchOptions, setIsShowSearchOptions] = useState('');
 	const [valueInputSearch, setValueInputSearch] = useState<string>('');
 	const [valueDisplay, setValueDisplay] = useState<string>('');
-	const [search, setSearch] = useState<ApiSearchMessageRequest | undefined>();
+	const [search, setSearch] = useState<any | undefined>();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const searchRef = useRef<HTMLInputElement | null>(null);
 
@@ -53,17 +52,22 @@ const SearchMessageChannel = () => {
 		setValueInputSearch(value);
 		setValueDisplay(newPlainTextValue);
 		const filter = [];
-
+		filter.push();
 		if (mentions.length === 0) {
-			filter.push({ field_name: 'content', field_value: value });
+			filter.push(
+				{
+					field_name: 'content',
+					field_value: value,
+				},
+				{ field_name: 'channel_id', field_value: currentChannel?.id },
+				{ field_name: 'clan_id', field_value: currentClanId },
+			);
 		}
-
 		for (const mention of mentions) {
 			const convertMemtion = mention.display.split(':');
 			filter.push({ field_name: searchFieldName[convertMemtion[0]], field_value: convertMemtion[1] });
 		}
-
-		setSearch({ ...search, filters: filter, from: 0, size: 25 });
+		setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
 	};
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => {
@@ -73,7 +77,7 @@ const SearchMessageChannel = () => {
 			setIsShowCreateThread(false, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
 			if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
 			if (search) {
-				searchMessages(search);
+				fetchSearchMessages(search);
 			}
 		}
 	};
@@ -98,7 +102,7 @@ const SearchMessageChannel = () => {
 
 	useEffect(() => {
 		if (search) {
-			searchMessages({ ...search, from: currentPage });
+			fetchSearchMessages({ ...search, from: currentPage });
 		}
 	}, [currentPage]);
 
@@ -112,8 +116,9 @@ const SearchMessageChannel = () => {
 	return (
 		<div className="relative" ref={inputRef}>
 			<div
-				className={`transition-all duration-300 ${expanded ? 'w-80' : 'w-40'
-					} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
+				className={`transition-all duration-300 ${
+					expanded ? 'w-80' : 'w-40'
+				} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
 			>
 				<MentionsInput
 					inputRef={searchRef}
@@ -194,7 +199,6 @@ const SearchMessageChannel = () => {
 					<Icons.Close defaultSize="w-4 h-4" />
 				</button>
 			</div>
-
 			{isShowSearchMessageModal && (
 				<SearchMessageChannelModal
 					hasKeySearch={hasKeySearch(valueInputSearch ?? '')}

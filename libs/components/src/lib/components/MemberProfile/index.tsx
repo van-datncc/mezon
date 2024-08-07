@@ -2,7 +2,7 @@ import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
@@ -11,6 +11,7 @@ import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import PanelMember from '../PanelMember';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
+import UserProfileModalInner from "../UserProfileModalInner";
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -70,6 +71,7 @@ function MemberProfile({
 		distanceToBottom: 0,
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
+	const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean> (false);
 
 	const { removeMemberClan } = useChannelMembersActions();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -77,18 +79,23 @@ function MemberProfile({
 	const userProfile = useSelector(selectAllAccount);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
-
+	
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		// stop open popup default of web
 		window.oncontextmenu = (e) => {
 			e.preventDefault();
 		};
+		
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
+		const windowWidth = window.innerWidth;
 		const windowHeight = window.innerHeight;
-
+		
 		const distanceToBottom = windowHeight - mouseY;
-
+		
+		// adjust mouseX if it is less than 200px(panel width) from the right edge of the browser
+		const adjustedMouseX = mouseX > windowWidth - 200 ? mouseX - 200 : mouseX;
+		
 		if (event.button === MouseButton.LEFT) {
 			setIsShowUserProfile(true);
 			const heightElementShortUserProfileMin = 313;
@@ -97,12 +104,14 @@ function MemberProfile({
 				setPositionTop(true);
 			}
 		}
+		
 		if (event.button === MouseButton.RIGHT) {
-			setCoords({ mouseX, mouseY, distanceToBottom });
+			setCoords({ mouseX: adjustedMouseX, mouseY, distanceToBottom });
 			setIsShowPanel(!isShowPanel);
 		}
 	};
-
+	
+	
 	const handleDefault = (e: any) => {
 		e.stopPropagation();
 	};
@@ -135,21 +144,40 @@ function MemberProfile({
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 
+	const isListFriend = useMemo(() => positionType === MemberProfileType.LIST_FRIENDS, [positionType]);
+
+	const isMemberDMGroup = useMemo(() => positionType === MemberProfileType.DM_MEMBER_GROUP, [positionType]);
+
+	const isMemberChannel = useMemo(() => positionType === MemberProfileType.MEMBER_LIST, [positionType]);
+
 	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, []);
 
 	const userName = useMemo(() => isFooter ? userProfile?.user?.username || '' : name || '', []);
+
+	const subNameRef = useRef<HTMLInputElement>(null);
+	const minWidthNameMain = useMemo(() => subNameRef.current?.offsetWidth,[subNameRef?.current]);
+	
+	const handleOpenProfileModal = () => {
+		setIsOpenProfileModal(true);
+	}
+	
+	const handleCloseProfileModal = () => {
+		setIsOpenProfileModal(false);
+	}
+	
 	return (
 		<div className="relative group">
 			<div
 				ref={panelRef}
 				onMouseDown={(event) => handleMouseClick(event)}
-				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${positionType === MemberProfileType.FOOTER_PROFILE ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
+				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${isFooter ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
 				<a className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
 					<AvatarImage
 						alt={userName}
 						userName={userNameAva ?? userName}
 						className="min-w-8 min-h-8 max-w-8 max-h-8"
+						classNameText='font-semibold'
 						src={avatar}
 						isAnonymous={isAnonymous}
 					/>
@@ -165,11 +193,12 @@ function MemberProfile({
 				</a>
 				<div className="flex flex-col items-start">
 					<div
-						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
+						ref={subNameRef}
+						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
-								{customStatus && positionType === MemberProfileType.FOOTER_PROFILE ? (
+								{customStatus && (isFooter || isListFriend) ? (
 									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode line-clamp-1`}>
 										{customStatus}
 									</span>
@@ -179,7 +208,7 @@ function MemberProfile({
 									</span>
 								)}
 
-								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode overflow-x-hidden whitespace-nowrap text-ellipsis w-full">
+								<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode overflow-x-hidden whitespace-nowrap text-ellipsis text-left w-full">
 									{userProfile?.user?.username}
 								</p>
 							</>
@@ -187,18 +216,23 @@ function MemberProfile({
 					</div>
 					{!isHideUserName && (
 						<div>
-							<div className="flex flex-row items-center w-full overflow-x-hidden">
+							<div 
+								className="flex flex-row items-center w-full overflow-x-hidden" 
+								style={{minWidth: `${minWidthNameMain}px`}}
+							>
 								<p
 									className={`text-base font-medium nameMemberProfile
+				  ${isListFriend ? ' inline-flex justify-start' : ''}
                   ${isFooter ? 'leading-[26px] max-w-[102px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
-                  ${positionType === MemberProfileType.MEMBER_LIST ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+                  ${isMemberChannel ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'}
                   ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
 							`}
 									title={name}
 								>
-									{!isHiddenAvatarPanel && name}
+									<span className={`one-line ${isListFriend ? 'dark:text-white text-black' : ''}`}>{!isHiddenAvatarPanel && name}</span>
+									{isListFriend && <span className='hidden group-hover/list_friends:inline'>&nbsp;{userNameAva}</span>}
 								</p>
 								{(dataMemberCreate?.createId || currentClan?.creator_id) &&
 									(dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id && (
@@ -207,7 +241,7 @@ function MemberProfile({
 										</button>
 									)}
 							</div>
-							{customStatus && (positionType === MemberProfileType.MEMBER_LIST || positionType === MemberProfileType.DM_MEMBER_GROUP) && (
+							{customStatus && (isMemberChannel || isMemberDMGroup) && (
 								<p className="dark:text-contentTertiary text-black w-full text-[12px] line-clamp-1 break-all" title={customStatus}>
 									{customStatus}
 								</p>
@@ -230,7 +264,8 @@ function MemberProfile({
 					name={name}
 					isMemberDMGroup={dataMemberCreate ? true : false}
 					dataMemberCreate={dataMemberCreate}
-					isMemberChannel={positionType === MemberProfileType.MEMBER_LIST}
+					isMemberChannel={isMemberChannel}
+					onOpenProfile={handleOpenProfileModal}
 				/>
 			)}
 			{isShowUserProfile && listProfile ? (
@@ -240,7 +275,7 @@ function MemberProfile({
 					onMouseDown={handleDefault}
 					onClick={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={user?.user?.id || ''} />
+					<ShortUserProfile userID={user?.user?.id || ''} mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined} />
 				</div>
 			) : null}
 
@@ -251,6 +286,10 @@ function MemberProfile({
 					onClose={() => setOpenModalRemoveMember(false)}
 					onRemoveMember={handleRemoveMember}
 				/>
+			)}
+			
+			{isOpenProfileModal && (
+				<UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal}/>
 			)}
 		</div>
 	);

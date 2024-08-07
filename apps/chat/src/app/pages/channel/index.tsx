@@ -1,16 +1,19 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
+import { useCheckAlonePermission, useClanRestriction, useDragAndDrop, useSearchMessages, useThreads, useVoice } from '@mezon/core';
 import {
 	channelsActions,
 	notificationActions,
+	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectIsMessageRead,
+	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectShowScreen,
 	selectStatusMenu,
 	useAppDispatch,
 } from '@mezon/store';
+import { EPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,16 +24,21 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const isMessageRead = useSelector(selectIsMessageRead);
-	const currentChannel = useSelector(selectCurrentChannel);
-
+	const currentChannel = useSelector(selectChannelById(channelId));
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
-		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + 3 }));
-		dispatch(notificationActions.setLastSeenTimeStampChannel({ channelId, lastSeenTimeStamp: timestamp + 3 }));
+		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(
+			notificationActions.setLastSeenTimeStampChannel({
+				channelId,
+				lastSeenTimeStamp: timestamp + TIME_OFFSET,
+				clanId: currentChannel?.clan_id ?? '',
+			}),
+		);
 		if (isMessageRead && channelId === currentChannel?.channel_id) {
 			dispatch(notificationActions.setIsMessageRead(false));
 		}
-	}, [channelId, currentChannel?.channel_id, dispatch, isMessageRead]);
+	}, [channelId, currentChannel, dispatch, isMessageRead]);
 }
 
 export default function ChannelMain() {
@@ -38,12 +46,13 @@ export default function ChannelMain() {
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	const isSearchMessage = useSelector(selectIsSearchMessage);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
-	const { isSearchMessage } = useSearchMessages();
-
+	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
+	const isAlone = useCheckAlonePermission();
 	useChannelSeen(currentChannel?.id || '');
 	const showScreen = useSelector(selectShowScreen);
 	const { statusCall } = useVoice();
@@ -84,7 +93,7 @@ export default function ChannelMain() {
 			>
 				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 					<div
-						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'}`}
+						className={`flex flex-col flex-1 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
 					>
 						<div
 							className={`overflow-y-auto dark:bg-bgPrimary max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
@@ -114,6 +123,11 @@ export default function ChannelMain() {
 							<div
 								className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}
 							>
+							{(hasViewChannelPermission && isAlone) ?
+								<div className='opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line'>
+									You do not have permission to send messages in this channel.
+								</div>:
+								<>
 								{currentChannel && <ChannelTyping channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
 								{currentChannel ? (
 									<ChannelMessageBox
@@ -124,6 +138,8 @@ export default function ChannelMain() {
 								) : (
 									<ChannelMessageBox.Skeleton />
 								)}
+								</>
+								}
 							</div>
 						)}
 					</div>
@@ -137,13 +153,17 @@ export default function ChannelMain() {
 							<MemberList />
 						</div>
 					)}
-
-					{isSearchMessage && <SearchMessageChannelRender />}
+					{isSearchMessage && <SearchMessageChannel />}
 				</div>
 			</div>
 		</>
 	);
 }
+
+const SearchMessageChannel = () => {
+	const { searchMessages, totalResult, currentPage } = useSearchMessages();
+	return <SearchMessageChannelRender searchMessages={searchMessages} currentPage={currentPage} totalResult={totalResult} />;
+};
 
 export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
 	return (

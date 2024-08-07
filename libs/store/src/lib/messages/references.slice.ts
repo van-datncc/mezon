@@ -1,6 +1,13 @@
-import { IMessage } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
+import {IMessage} from '@mezon/utils';
+import {
+	createAsyncThunk,
+	createEntityAdapter,
+	createSelector,
+	createSlice,
+	EntityState,
+	PayloadAction
+} from '@reduxjs/toolkit';
+import {ApiMessageAttachment, ApiMessageRef} from 'mezon-js/api.gen';
 
 export const REFERENCES_FEATURE_KEY = 'references';
 
@@ -18,7 +25,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageToJump: string;
 	openEditMessageState: boolean;
 	openReplyMessageState: boolean;
-	attachmentDataRef: ApiMessageAttachment[];
+	attachmentDataRef: Record<string, ApiMessageAttachment[]>;
 	idMessageRefReply: string;
 	idMessageRefReaction: string;
 	idMessageRefEdit: string;
@@ -39,7 +46,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageToJump: '',
 	openEditMessageState: false,
 	openReplyMessageState: false,
-	attachmentDataRef: [],
+	attachmentDataRef: {},
 	idMessageRefReply: '',
 	idMessageRefReaction: '',
 	idMessageRefEdit: '',
@@ -74,11 +81,23 @@ export const referencesSlice = createSlice({
 		setOpenReplyMessageState(state, action) {
 			state.openReplyMessageState = action.payload;
 		},
-		setAttachmentData(state, action) {
-			if (Array.isArray(action.payload)) {
-				state.attachmentDataRef = action.payload;
+		setAttachmentData(state, action: PayloadAction<{ channelId: string; attachments: ApiMessageAttachment[] }>) {
+			const { channelId, attachments } = action.payload;
+			if (!state.attachmentDataRef[channelId]) {
+				state.attachmentDataRef[channelId] = [];
+			}
+			if (attachments.length === 0) {
+				state.attachmentDataRef[channelId] = attachments;
 			} else {
-				state.attachmentDataRef.push(action.payload);
+				state.attachmentDataRef[channelId] = [...state.attachmentDataRef[channelId], ...attachments];
+			}
+		},
+		removeAttachment(state, action: PayloadAction<{ channelId: string; urlAttachment: string }>) {
+			const attachments = state.attachmentDataRef[action.payload.channelId];
+			if (attachments) {
+				state.attachmentDataRef[action.payload.channelId] = attachments.filter(
+					(attachment) => attachment.url !== action.payload.urlAttachment && attachment.filename !== action.payload.urlAttachment
+				);
 			}
 		},
 		setIdReferenceMessageReply(state, action) {
@@ -89,6 +108,9 @@ export const referencesSlice = createSlice({
 		},
 		setIdReferenceMessageEdit(state, action) {
 			state.idMessageRefEdit = action.payload;
+		},
+		resetDataAttachment(state, action: PayloadAction<{ channelId: string; }>) {
+			state.attachmentDataRef[action.payload.channelId] = [];
 		},
 	},
 	extraReducers: (builder) => {
@@ -125,8 +147,6 @@ export const selectOpenEditMessageState = createSelector(getReferencesState, (st
 
 export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
 
-export const selectAttachmentData = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentDataRef);
-
 export const selectIdMessageRefReply = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefReply);
 
 export const selectIdMessageRefReaction = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefReaction);
@@ -138,3 +158,8 @@ export const selectIdMessageRefEdit = createSelector(getReferencesState, (state:
 export const selectStatusLoadingAttachment = createSelector(getReferencesState, (state: ReferencesState) => state.statusLoadingAttachment);
 
 export const selectMessageMetionId = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageMention);
+
+export const selectAttachmentData = (channelId: string) =>
+	createSelector(getReferencesState, (state: ReferencesState) => {
+		return state.attachmentDataRef[channelId] || [];
+	});

@@ -1,4 +1,3 @@
-import { notificationActions } from '@mezon/store';
 import { ICategory, IChannel, LoadingStatus, ModeResponsive } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
@@ -8,10 +7,10 @@ import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannel
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
+import { notificationActions } from '../notification/notify.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
@@ -73,12 +72,28 @@ type fetchChannelMembersPayload = {
 	noFetchMembers?: boolean;
 };
 
+type JoinChatPayload = {
+	clanId: string;
+	channelId: string;
+	channelType: number;
+};
+
+export const joinChat = createAsyncThunk('channels/joinChat',
+	async ({ clanId, channelId, channelType }: JoinChatPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType);
+		return channel
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
 export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
 	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
-			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
@@ -105,7 +120,13 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
-			thunkAPI.dispatch(clansActions.joinClan({ clanId: body.clan_id as string }));
+			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				thunkAPI.dispatch(channelsActions.joinChat({
+					clanId: response.clan_id as string,
+					channelId: response.channel_id as string,
+					channelType: response.type as number
+				}));
+			}
 			if (response.parrent_id !== '0') {
 				await thunkAPI.dispatch(
 					threadsActions.setListThreadId({ channelId: response.parrent_id as string, threadId: response.channel_id as string }),
@@ -138,7 +159,7 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, body);
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
-			if (body.category_id === '') {
+			if (body.category_id === '0') {
 				thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			} else {
 				thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
@@ -208,20 +229,22 @@ export const fetchChannels = createAsyncThunk(
 	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_TEXT, noCache }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchChannelsCached.clear(mezon, 100, 1, clanId, channelType);
+			fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
 		}
-		const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
+		const response = await fetchChannelsCached(mezon, 500, 1, clanId, channelType);
 		if (!response.channeldesc) {
 			return [];
 		}
-		if (Date.now() - response.time < 100) {
+
+		if(Date.now() - response.time < 100) {
 			const lastSeenTimeStampInit = response.channeldesc
-				.filter((channel) => channel.type === 1)
+				.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_TEXT)
 				.map((channelText) => {
-					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) };
+					return { channelId: channelText.channel_id ?? '', lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0) , clanId: channelText.clan_id ?? ''};
 				});
 			thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
 		}
+
 		const channels = response.channeldesc.map(mapChannelToEntity);
 		const meta = channels.map((ch) => extractChannelMeta(ch));
 		thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
@@ -252,6 +275,9 @@ export const channelsSlice = createSlice({
 		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
+		removeByChannelID: (state, action: PayloadAction<string>) => {
+			channelsAdapter.removeOne(state, action.payload);
+		},
 		setModeResponsive: (state, action) => {
 			state.modeResponsive = action.payload;
 		},
@@ -434,6 +460,7 @@ export const channelsActions = {
 	...channelsSlice.actions,
 	fetchChannels,
 	joinChannel,
+	joinChat,
 	createNewChannel,
 	deleteChannel,
 	updateChannel,

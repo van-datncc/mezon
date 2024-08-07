@@ -1,26 +1,39 @@
-import { useCategory, useReference } from '@mezon/core';
-import { CloseIcon, PenIcon, STORAGE_CLAN_ID, SearchIcon, SendIcon, getAttachmentUnique, save } from '@mezon/mobile-components';
+import { useCategory } from '@mezon/core';
+import {
+	CHANNEL_ID_SHARING,
+	CloseIcon,
+	PenIcon,
+	STORAGE_CLAN_ID,
+	STORAGE_DATA_CATEGORY_CHANNEL,
+	SearchIcon,
+	SendIcon,
+	getAttachmentUnique,
+	load,
+	save,
+} from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	channelsActions,
-	clansActions,
 	directActions,
 	getStoreAsync,
+	referencesActions,
+	selectAttachmentData,
 	selectCurrentClan,
-	selectCurrentClanId,
 	selectDirectsOpenlist,
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
+import { ILinkOnMessage } from '@mezon/utils';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import { IFile } from '../../home/homedrawer/components/AttachmentPicker/Gallery';
 import { styles } from './styles';
@@ -38,24 +51,17 @@ export const Sharing = ({ data, onClose }) => {
 	const [channelSelected, setChannelSelected] = useState<any>();
 	const inputSearchRef = useRef<any>();
 	const dataMedia = useMemo(() => {
-		return data.filter((data: { contentUri: any }) => !!data?.contentUri);
+		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
-	const { attachmentDataRef, setAttachmentData } = useReference();
-	const { reconnect } = useMezon();
-	const currentClanId = useSelector(selectCurrentClanId);
+	const attachmentDataRef = useSelector(selectAttachmentData(CHANNEL_ID_SHARING || ''));
 
 	useEffect(() => {
-		reConnectSocket();
 		if (data) {
 			if (data?.length === 1 && data?.[0]?.weblink) {
 				setDataText(data?.[0]?.weblink);
 			}
 		}
 	}, [data]);
-
-	const reConnectSocket = async () => {
-		await reconnect(currentClanId);
-	};
 
 	useEffect(() => {
 		if (searchText) {
@@ -72,7 +78,9 @@ export const Sharing = ({ data, onClose }) => {
 	}, [dataMedia]);
 
 	function flattenData(categorizedChannels: any) {
-		return categorizedChannels.reduce((result: any, category: any) => {
+		const categoryChannel = categorizedChannels || JSON.parse(load(STORAGE_DATA_CATEGORY_CHANNEL) || '[]');
+
+		return categoryChannel.reduce((result: any, category: any) => {
 			const { category_id, category_name } = category;
 
 			category.channels.forEach((channel: any) => {
@@ -137,32 +145,52 @@ export const Sharing = ({ data, onClose }) => {
 		setChannelSelected(channel);
 	};
 
-	const sendToDM = async (dataSend: { text: any }) => {
+	const sendToDM = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
-		store.dispatch(clansActions.joinClan({ clanId: channelSelected?.clan_id }));
+		store.dispatch(
+			channelsActions.joinChat({
+				clanId: channelSelected?.clan_id,
+				channelId: channelSelected?.channel_id,
+				channelType: channelSelected?.type,
+			}),
+		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
-			'DM',
+			'0',
 			channelSelected.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
-			{ t: dataSend.text },
+			{
+				t: dataSend.text,
+				links: dataSend.links || [],
+				plainText: dataSend.text,
+			},
 			[],
 			getAttachmentUnique(attachmentDataRef) || [],
 			[],
 		);
 	};
 
-	const sendToGroup = async (dataSend: { text: any }) => {
+	const sendToGroup = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
-		store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
+		store.dispatch(
+			channelsActions.joinChat({
+				clanId: channelSelected.clan_id,
+				channelId: channelSelected.channel_id,
+				channelType: channelSelected.type,
+			}),
+		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,
 			channelSelected.channel_id,
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
-			{ t: dataSend.text },
+			{
+				t: dataSend.text,
+				links: dataSend.links || [],
+				plainText: dataSend.text,
+			},
 			[], //mentions
 			getAttachmentUnique(attachmentDataRef) || [], //attachments
 			[], //references
@@ -173,10 +201,38 @@ export const Sharing = ({ data, onClose }) => {
 		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: channelSelected.channel_id, timestamp }));
 	};
 
+	const processText = (inputString: string) => {
+		const links: ILinkOnMessage[] = [];
+		const httpPrefix = 'http';
+
+		let i = 0;
+		while (i < inputString.length) {
+			if (inputString.startsWith(httpPrefix, i)) {
+				// Link processing
+				const startIndex = i;
+				i += httpPrefix.length;
+				while (i < inputString.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
+					i++;
+				}
+				const endIndex = i;
+				links.push({
+					link: inputString.substring(startIndex, endIndex),
+					startindex: startIndex,
+					endindex: endIndex,
+				});
+			} else {
+				i++;
+			}
+		}
+
+		return { links };
+	};
 	const onSend = async () => {
 		setIsLoading(true);
+		const { links } = processText(dataText);
 		const dataSend = {
 			text: dataText,
+			links,
 		};
 		// Send to DM message
 		if (channelSelected.type === ChannelType.CHANNEL_TYPE_GROUP || channelSelected.type === ChannelType.CHANNEL_TYPE_DM) {
@@ -191,16 +247,23 @@ export const Sharing = ({ data, onClose }) => {
 	const convertFileFormat = async () => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
-				setAttachmentData({
-					url: media.contentUri,
-					filename: media?.fileName || media?.contentUri,
-					filetype: media?.mimeType,
-				});
-				const fileData = await RNFS.readFile(media.contentUri, 'base64');
+				dispatch(
+					referencesActions.setAttachmentData({
+						channelId: CHANNEL_ID_SHARING,
+						attachments: [
+							{
+								url: media?.contentUri || media?.filePath,
+								filename: media?.fileName || media?.contentUri || media?.filePath,
+								filetype: media?.mimeType,
+							},
+						],
+					}),
+				);
+				const fileData = await RNFS.readFile(media.contentUri || media?.filePath, 'base64');
 
 				return {
-					uri: media.contentUri,
-					name: media?.fileName || media?.contentUri,
+					uri: media.contentUri || media?.filePath,
+					name: media?.fileName || media?.contentUri || media?.filePath,
 					type: media?.mimeType,
 					fileData,
 				};
@@ -234,20 +297,23 @@ export const Sharing = ({ data, onClose }) => {
 
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
-			setAttachmentData(attachment);
+			dispatch(
+				referencesActions.setAttachmentData({
+					channelId: CHANNEL_ID_SHARING,
+					attachments: [attachment],
+				}),
+			);
 		},
-		[setAttachmentData],
+		[dispatch],
 	);
 
-	function removeAttachmentByUrl(urlToRemove: string, fileName: string) {
-		const removedAttachment = attachmentDataRef.filter((attachment) => {
-			if (attachment.url === urlToRemove) {
-				return false;
-			}
-			return !(fileName && attachment.filename === fileName);
-		});
-
-		setAttachmentData(removedAttachment);
+	function removeAttachmentByUrl(urlToRemove: string) {
+		dispatch(
+			referencesActions.removeAttachment({
+				channelId: CHANNEL_ID_SHARING,
+				urlAttachment: urlToRemove,
+			}),
+		);
 	}
 
 	return (
@@ -275,9 +341,17 @@ export const Sharing = ({ data, onClose }) => {
 					{!!getAttachmentUnique(attachmentDataRef)?.length && (
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
 							<ScrollView horizontal style={styles.wrapperMedia}>
-								{getAttachmentUnique(attachmentDataRef)?.map((media, index) => {
-									const isFile = !media.filetype.includes('video') && !media.filetype.includes('image');
-									const isUploaded = !!media?.size;
+								{getAttachmentUnique(attachmentDataRef)?.map((media: any, index) => {
+									let isFile;
+
+									if (Platform.OS === 'android') {
+										isFile = !media?.filetype?.includes?.('video') && !media?.filetype?.includes?.('image');
+									} else {
+										const checkIsImage = isImage(media?.url?.toLowerCase());
+										const checkIsVideo = isVideo(media?.url?.toLowerCase());
+										isFile = !checkIsImage && !checkIsVideo;
+									}
+									const isUploaded = !!media?.size || (!media?.size && media?.filetype?.includes?.('video')) || !!media?.url;
 
 									return (
 										<View
@@ -292,7 +366,7 @@ export const Sharing = ({ data, onClose }) => {
 											{isUploaded && (
 												<TouchableOpacity
 													style={styles.iconRemoveMedia}
-													onPress={() => removeAttachmentByUrl(media.url ?? '', media?.filename || '')}
+													onPress={() => removeAttachmentByUrl(media.url ?? '')}
 												>
 													<CloseIcon width={size.s_18} height={size.s_18} />
 												</TouchableOpacity>

@@ -1,7 +1,9 @@
 import {
+	channelMembers,
 	channelMembersActions,
 	channelsActions,
-	clansActions,
+	channelsSlice,
+	clansSlice,
 	directActions,
 	friendsActions,
 	mapMessageChannelToEntity,
@@ -12,7 +14,9 @@ import {
 	pinMessageActions,
 	reactionActions,
 	selectCurrentChannel,
+	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectDmGroupCurrentId,
 	toastActions,
 	useAppDispatch,
 	voiceActions,
@@ -24,6 +28,7 @@ import {
 	ChannelDeletedEvent,
 	ChannelMessageEvent,
 	ChannelPresenceEvent,
+	ChannelType,
 	ChannelUpdatedEvent,
 	CustomStatusEvent,
 	LastPinMessageEvent,
@@ -32,11 +37,15 @@ import {
 	Notification,
 	Socket,
 	StatusPresenceEvent,
+	UserChannelAddedEvent,
+	UserChannelRemovedEvent,
+	UserClanRemovedEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
 } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
@@ -59,6 +68,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { initWorker, unInitWorker } = useSeenMessagePool();
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentDirectId = useSelector(selectDmGroupCurrentId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -71,6 +83,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
 			if (voice) {
+				console.log('1', voice);
 				dispatch(
 					voiceActions.add({
 						...voice,
@@ -83,6 +96,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
+			console.log('2', voice);
 			dispatch(voiceActions.remove(voice.id));
 		},
 		[dispatch],
@@ -93,12 +107,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const senderId = message.sender_id;
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
-
 			mess.isMe = senderId === userId;
-			mess.isCurrentChannel = message.channel_id === directId;
-			if (directId === undefined) {
-				mess.isCurrentChannel = message.channel_id === channelId;
+			const isMobile = directId === undefined && channelId === undefined;
+
+			mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
+
+			if ((directId === undefined && !isMobile) || (isMobile && !currentDirectId)) {
+				const idToCompare = !isMobile ? channelId : currentChannelId;
+				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
+
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -107,7 +125,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
-		[dispatch, userId, channelId, directId],
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId],
 	);
 
 	const onchannelpresence = useCallback(
@@ -126,6 +144,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		async (notification: Notification) => {
+			console.log(notification);
 			if (currentChannel?.channel_id !== (notification as any).channel_id) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
@@ -156,6 +175,52 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[currentChannel?.channel_id, currentChannel?.clan_id, dispatch],
 	);
 
+	const onuserchannelremoved = useCallback(
+		(user: UserChannelRemovedEvent) => {
+			user.user_ids.forEach((userID: any) => {
+				if (userID === userId) {
+					if (channelId === user.channel_id) {
+						navigate(`/chat/clans/${clanId}`);
+					}
+					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
+				} else {
+					dispatch(channelMembers.actions.removeUserByUserIdAndChannelId({ userId: userID, channelId: user.channel_id }));
+				}
+			});
+		},
+		[channelId, userId],
+	);
+	const onuserclanremoved = useCallback(
+		(user: UserClanRemovedEvent) => {
+			const userID = user.user_ids.find((userID: any) => userID === userId);
+			if (userID) {
+				if (clanId === user.clan_id) {
+					navigate(`/chat/direct/friends`);
+				}
+				dispatch(clansSlice.actions.removeByClanID(user.clan_id));
+			}
+		},
+		[userId, clanId, navigate, dispatch],
+	);
+
+	const onuserchanneladded = useCallback(
+		(userAdds: UserChannelAddedEvent) => {
+			const user = userAdds.users.find((user: any) => user.user_id !== userId);
+			if (user) {
+				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
+				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+					dispatch(
+						channelsActions.joinChat({
+							clanId: userAdds.clan_id,
+							channelId: userAdds.channel_id,
+							channelType: userAdds.channel_type,
+						}),
+					);
+				}
+			}
+		},
+		[userId, dispatch],
+	);
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
 			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent.user_id, customStatus: statusEvent.status }));
@@ -198,9 +263,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
-			if (channelCreated) {
+			if (channelCreated && channelCreated.channel_private === 0) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
-				dispatch(clansActions.joinClan({ clanId: channelCreated.clan_id as string }));
+				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+					dispatch(
+						channelsActions.joinChat({
+							clanId: channelCreated.clan_id,
+							channelId: channelCreated.channel_id,
+							channelType: channelCreated.channel_type,
+						}),
+					);
+				}
 			}
 		},
 		[dispatch],
@@ -220,13 +293,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelUpdated) {
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
-					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					if (channelUpdated.creator_id !== userId) {
+						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 				}
 			}
 		},
-		[dispatch],
+		[dispatch, userId],
 	);
 
 	const setCallbackEventFn = React.useCallback(
@@ -250,6 +325,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onnotification = onnotification;
 
 			socket.onpinmessage = onpinmessage;
+
+			socket.onuserchannelremoved = onuserchannelremoved;
+
+			socket.onuserclanremoved = onuserclanremoved;
+
+			socket.onuserchanneladded = onuserchanneladded;
 
 			socket.oncustomstatus = oncustomstatus;
 
@@ -275,6 +356,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onmessagetyping,
 			onnotification,
 			onpinmessage,
+			onuserchannelremoved,
+			onuserclanremoved,
+			onuserchanneladded,
 			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
@@ -305,21 +389,27 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => { };
+			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onuserchannelremoved = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onuserclanremoved = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onuserchanneladded = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -329,6 +419,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onmessagereaction,
 		onnotification,
 		onpinmessage,
+		onuserchannelremoved,
+		onuserclanremoved,
+		onuserchanneladded,
 		oncustomstatus,
 		onstatuspresence,
 		socketRef,
@@ -363,4 +456,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-

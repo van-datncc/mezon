@@ -10,6 +10,7 @@ import {
 	selectCurrentClan,
 	setNameRoleNew,
 	setSelectedPermissions,
+	setSelectedRoleId
 } from '@mezon/store';
 import { useDispatch, useSelector } from 'react-redux';
 import SettingUserClanProfileSave from '../../SettingProfile/SettingRightClanProfile/settingUserClanProfileSave';
@@ -37,9 +38,10 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const dispatch = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const isChange = useSelector(getIsShow);
+	const isCreateNewRole = clickRole === 'New Role';
 
 	const handleClose = () => {
-		if (clickRole === 'New Role') {
+		if (isCreateNewRole) {
 			props.handleClose();
 		} else {
 			const activeRole = rolesClan.find((role) => role.id === clickRole);
@@ -52,10 +54,10 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	};
 	const handleSaveClose = () => {};
 
-	const handleUpdateUser = async (hasCloseModal?: boolean) => {
-		if (clickRole === 'New Role') {
-			if(!hasCloseModal) props.handleClose();
-			await createRole(currentClan?.id || '', currentClan?.id || '', nameRole, addUsers, addPermissions);
+	const handleUpdateUser = async (hasChangeRole?: boolean) => {
+		if (isCreateNewRole) {
+			const respond = await createRole(currentClan?.id || '', currentClan?.id || '', nameRole, addUsers, addPermissions);
+			if(!hasChangeRole) dispatch(setSelectedRoleId((respond as any).id));
 		} else {
 			await updateRole(currentClan?.id ?? '', clickRole, nameRole, [], addPermissions, [], removePermissions);
 		}
@@ -69,21 +71,21 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	};
 	return flagOption ? (
 		<>
-			<div className="absolute top-0 left-0 w-full h-full pl-2 overflow-y-auto flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary overflow-hidden sbm:pt-[-60px] pt-[10px]">
-				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} handleUpdateUser={() =>handleUpdateUser(true)}/>
+			<div className="absolute top-0 left-0 w-full h-full pl-2 flex flex-row flex-1 shrink bg-white dark:bg-bgPrimary overflow-hidden sbm:pt-[-60px] pt-[10px]">
+				<SettingListRole handleClose={props.handleClose} RolesClan={rolesClan} handleUpdateUser={() => handleUpdateUser(true)}/>
 				<div className="w-2/3">
 					<div className="font-semibold pl-3 dark:text-white text-black">
-						{clickRole === 'New Role' ? (
+						{isCreateNewRole ? (
 							<div className="tracking-wide text-base mb-4">NEW ROLE</div>
 						) : (
-							<div className="tracking-wide mb-4 text-base">EDIT ROLE</div>
+							<div className="tracking-wide mb-4 text-base uppercase">EDIT ROLE - {nameRole}</div>
 						)}
 						<SettingValueDisplayRole RolesClan={rolesClan} />
 					</div>
 				</div>
 				<SettingUserClanProfileSave PropsSave={saveProfile} />
 			</div>
-			<div className="border-l border-gray-200 dark:border-gray-500 h-screen absolute sbm:top-[-60px] top-[-10px] left-1/3"></div>
+			<div className="border-l border-gray-200 dark:border-gray-500 h-screen absolute sbm:top-[-60px] top-[-10px] left-1/3"/>
 		</>
 	) : null;
 };

@@ -1366,10 +1366,17 @@ export const ClockWarningIcon = ({ width = 24, height = 24, color = 'white', ...
 );
 
 export const ClockIcon = ({ width = 24, height = 24, color = 'white', ...props }: SvgProps) => (
-	<Svg viewBox="0 0 80 80" fill={color} width={width} height={height} {...props}>
+	<Svg
+		width={width} height={height}
+		viewBox="0 0 32 33"
+		fill="none"
+		{...props}
+	>
 		<Path
+			fillRule="evenodd"
 			clipRule="evenodd"
-			d="M36 69a33 33 0 100-66 33 33 0 000 66zm3-54a3 3 0 00-6 0v21c0 .81.3 1.56.9 2.1l9 9a3 3 0 004.2-4.2L39 34.74V15z"
+			d="M16 31.107a14.667 14.667 0 100-29.334 14.667 14.667 0 000 29.334zm1.333-24a1.334 1.334 0 00-2.666 0v9.333c0 .36.133.693.4.933l4 4a1.333 1.333 0 001.866-1.867l-3.6-3.626V7.107z"
+			fill={color}
 		/>
 	</Svg>
 );

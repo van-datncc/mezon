@@ -1,9 +1,11 @@
 import { ForwardMessageModal, ModalCreateClan, ModalListClans, NavLinkComponent, SearchModal } from '@mezon/components';
-import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { useAppNavigation, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	channelsActions,
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
+	selectCountNotifyByClanId,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDirectsUnreadlist,
@@ -11,8 +13,8 @@ import {
 	selectDmGroupCurrentType,
 	selectStatusMenu,
 	selectTheme,
-	selectTotalQuantityNotify,
-	toggleIsShowPopupForwardFalse
+	useAppDispatch,
+	usersClanActions
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { ModeResponsive } from '@mezon/utils';
@@ -22,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
+
 function MyApp() {
 	const elementHTML = document.documentElement;
 	const clans = useSelector(selectAllClans);
@@ -32,15 +35,11 @@ function MyApp() {
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
-	const numberOfNotifyClan = useSelector(selectTotalQuantityNotify());
-
+	const numberOfNotifyClan = useSelector(selectCountNotifyByClanId(currentClan?.clan_id ?? ''));
 	const handleChangeClan = (clanId: string) => {
 		navigate(toClanPage(clanId));
 	};
-
-	const { directId: currentDmGroupId } = useAppParams();
-	const listDirectMessage = useSelector(selectDirectsUnreadlist);
-	const dmGroupChatUnreadList = listDirectMessage.filter((directMessage) => directMessage.id !== currentDmGroupId);
+	const listUnreadDM = useSelector(selectDirectsUnreadlist);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { quantityPendingRequest } = useFriends();
 
@@ -113,9 +112,6 @@ function MyApp() {
 	}, [handleKeyDown]);
 
 	const openPopupForward = useSelector(getIsShowPopupForward);
-	const handleCloseModalForward = () => {
-		dispatch(toggleIsShowPopupForwardFalse());
-	};
 
 	const appearanceTheme = useSelector(selectTheme);
 	useEffect(() => {
@@ -155,9 +151,18 @@ function MyApp() {
 		return ``;
 	}, [clans, currentChannel?.id, currentClan?.id]);
 
+	const dispatchApp = useAppDispatch();
+	useEffect(() => {
+		const initClanId = localStorage.getItem('initClan');
+		if(initClanId) {
+			dispatchApp(channelsActions.fetchChannels({clanId: initClanId}));
+			dispatchApp(usersClanActions.fetchUsersClan({clanId: initClanId}));
+		}
+	},[]);
+
 	return (
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
-			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} onClose={handleCloseModalForward} />}
+			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
 				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-bgLightTertiary duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
@@ -184,7 +189,7 @@ function MyApp() {
 						</div>
 					</NavLinkComponent>
 				</NavLink>
-				{dmGroupChatUnreadList.map(
+				{listUnreadDM.map(
 					(dmGroupChatUnread) =>
 						dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
 							<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
@@ -228,7 +233,6 @@ function MyApp() {
 						setOpenListClans(!openListClans);
 					}}
 				>
-					{/* <Image src={`/assets/images/icon-create-clan.svg`} alt={'logoMezon'} width={48} height={48} className="cursor-pointer" /> */}
 					<div className="size-12 dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer hover:rounded-xl dark:hover:bg-slate-800 hover:bg-bgLightModeButton  transition-all duration-200 ">
 						<p className="text-2xl font-bold text-[#155EEF]">+</p>
 					</div>
@@ -245,7 +249,6 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
-			{/* <MessageContextMenuProvider>{openModalAttachment && <MessageModalImage />}</MessageContextMenuProvider> */}
 		</div>
 	);
 }

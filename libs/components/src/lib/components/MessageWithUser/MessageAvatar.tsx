@@ -1,8 +1,10 @@
 import { AvatarImage, ShortUserProfile } from '@mezon/components';
-import { useOnClickOutside } from '@mezon/core';
+import { useGetPriorityNameFromUserClan, useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
-import { useMemo, useRef, useState } from 'react';
+import { ChannelStreamMode } from 'mezon-js';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
+import usePendingNames from './usePendingNames';
 type IMessageAvatarProps = {
 	message: IMessageWithUser;
 	isCombine: boolean;
@@ -12,6 +14,22 @@ type IMessageAvatarProps = {
 };
 
 const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
+	const { senderId, username, avatarSender, userClanAvatar } = useMessageParser(message);
+	const { clanAvatar, generalAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
+	const { pendingUserAvatar, pendingClanAvatar } = usePendingNames(
+		message,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+		avatarSender,
+		generalAvatar,
+		clanAvatar,
+		userClanAvatar,
+	);
+
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -35,7 +53,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 		e.stopPropagation();
 	};
 
-	const isAnonymous = useMemo(() => message?.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+	const isAnonymous = useMemo(() => senderId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
 
 	if (message.references?.length === 0 && isCombine && !isShowFull) {
 		return (
@@ -53,10 +71,17 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 						e.preventDefault();
 						e.stopPropagation();
 					}}
-					alt={message.username || ''}
-					userName={message.username}
-					src={message.avatar}
+					alt={username ?? ''}
+					userName={username}
+					src={
+						mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+							? pendingClanAvatar
+								? pendingClanAvatar
+								: pendingUserAvatar
+							: pendingUserAvatar
+					}
 					className="min-w-10 min-h-10"
+					classNameText="font-semibold"
 					isAnonymous={isAnonymous}
 				/>
 			</div>
@@ -66,11 +91,11 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={message.sender_id || ''} message={message} mode={mode} />
+					<ShortUserProfile userID={senderId} message={message} mode={mode} />
 				</div>
 			) : null}
 		</div>
 	);
 };
 
-export default MessageAvatar;
+export default memo(MessageAvatar);

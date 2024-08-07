@@ -1,7 +1,6 @@
-import { useReference } from '@mezon/core';
-import { Icons, load, save, STORAGE_KEY_TEMPORARY_ATTACHMENT } from '@mezon/mobile-components';
+import { Icons, pushAttachmentToCache } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions } from '@mezon/store';
+import { appActions, referencesActions } from '@mezon/store';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { delay } from 'lodash';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -27,7 +26,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const styles = style(themeValue);
 	const { t } = useTranslation(['message']);
 	const { sessionRef, clientRef } = useMezon();
-	const { setAttachmentData } = useReference();
 	const timeRef = useRef<any>();
 	const dispatch = useDispatch();
 
@@ -36,22 +34,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 			timeRef?.current && clearTimeout(timeRef.current);
 		};
 	}, []);
-	
-	const getAllCachedAttachment = async () => {
-		const allCachedMessage = await load(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		return allCachedMessage;
-	};
-
-	const pushAttachmentToCache = async (attachment: any) => {
-		const allCachedAttachment = (await getAllCachedAttachment()) || {};
-		const currentAttachment = allCachedAttachment[currentChannelId] || [];
-		currentAttachment.push(attachment);
-
-		save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
-			...allCachedAttachment,
-			[currentChannelId]: currentAttachment,
-		});
-	};
 
 	const onPickFiles = async () => {
 		try {
@@ -67,8 +49,12 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				filename: file?.name || file?.uri,
 				filetype: file?.type,
 			};
-
-			setAttachmentData(attachment);
+			dispatch(
+				referencesActions.setAttachmentData({
+					channelId: currentChannelId,
+					attachments: [attachment],
+				}),
+			);
 			const fileData = await RNFS.readFile(file?.uri || file?.fileCopyUri, 'base64');
 
 			const fileFormat: IFile = {
@@ -115,10 +101,15 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
-			setAttachmentData(attachment);
-			pushAttachmentToCache(attachment);
+			dispatch(
+				referencesActions.setAttachmentData({
+					channelId: currentChannelId,
+					attachments: [attachment],
+				}),
+			);
+			pushAttachmentToCache(attachment, currentChannelId);
 		},
-		[setAttachmentData],
+		[currentChannelId, dispatch],
 	);
 
 	return (
@@ -133,7 +124,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					<Text style={styles.titleButtonHeader}>{t('message:actions.files')}</Text>
 				</TouchableOpacity>
 			</View>
-			<Gallery onPickGallery={handleFiles} />
+			<Gallery onPickGallery={handleFiles} currentChannelId={currentChannelId} />
 		</View>
 	);
 }

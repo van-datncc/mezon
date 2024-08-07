@@ -10,14 +10,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		borderTopRightRadius: 10,
 		overflow: 'hidden',
 	},
-
-	wrapperChatBox: {
-		backgroundColor: colors.secondary,
-		borderTopWidth: 1,
-		borderTopColor: colors.border,
-		flexDirection: 'column',
-		justifyContent: 'space-between',
-	},
 	btnIcon: {
 		width: size.s_40,
 		height: size.s_40,
@@ -279,14 +271,12 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		maxWidth: 200
 	},
 	inviteButton: {
-		paddingVertical: 8,
+		paddingVertical: 6,
 		paddingHorizontal: 12,
-		borderRadius: 15,
+		borderRadius: 50,
+		borderColor: colors.border,
 		minWidth: size.s_60,
-		backgroundColor: Colors.bgDarkSlate
-	},
-	invitedButton: {
-		borderRadius: 15
+		backgroundColor: colors.tertiary
 	},
 	threadItem: {
 		flexDirection: 'row',
@@ -342,44 +332,19 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		backgroundColor: Colors.gray48,
 		overflow: 'hidden',
 	},
-
-	newMessageLine: {
-		height: 1,
-		width: "100%",
-		backgroundColor: Colors.red,
-		marginVertical: Metrics.size.xl,
-		position: "relative"
-	},
-
-	newMessageContainer: {
-		position: "absolute",
-		top: -size.s_10,
-		left: 0,
-		display: "flex",
-		justifyContent: "center",
-		alignItems: "center",
-		width: "100%"
-	},
-
-	newMessageText: {
-		color: Colors.red,
-		backgroundColor: Colors.secondary,
-		paddingHorizontal: Metrics.size.s,
-	},
-
 	messageWrapper: {
 		flexDirection: 'column',
 		marginTop: size.s_10,
 	},
 	highlightMessageMention: {
-		backgroundColor: Colors.bgMessageHighlight,
-		borderLeftColor: Colors.borderMessageHighlight,
+		backgroundColor: colors.reactionBg,
+		borderLeftColor: Colors.textLink,
 		borderLeftWidth: 2,
 		paddingTop: size.s_2,
 	},
 	highlightMessageReply: {
-		backgroundColor: Colors.bgReply,
-		borderLeftColor: Colors.borderMessageReply,
+		backgroundColor: Colors.bgMessageHighlight,
+		borderLeftColor: Colors.borderMessageHighlight,
 		borderLeftWidth: 2,
 		paddingTop: size.s_2,
 	},

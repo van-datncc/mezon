@@ -12,13 +12,15 @@ import {
 	useAppDispatch,
 	useAppSelector,
 } from '@mezon/store';
+import { ThemeApp } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
-	type: string;
+	type: ChannelType;
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
@@ -108,12 +110,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			bg-bgLightPrimary
       overflow-y-scroll
 			overflow-x-hidden h-full
-			${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+			${appearanceTheme === ThemeApp.Light ? 'customScrollLightMode' : ''}`}
 			id="scrollLoading"
 			ref={chatRef}
 		>
 			<div className="flex flex-col min-h-full justify-end">
-				{firstMessageId && <ChatWelcome type={type} name={channelLabel} avatarDM={avatarDM} userName={userName} />}
+				{firstMessageId && <ChatWelcome name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 				{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
 				<MessageContextMenuProvider>
 					{messagesView}

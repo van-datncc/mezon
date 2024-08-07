@@ -1,29 +1,27 @@
-import { Text, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
+import { MezonAvatar } from 'apps/mobile/src/app/temp-ui';
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { style } from './styles';
 
 interface IProps {
 	onPress: () => void;
+	id: string;
 	avatar: string;
 	username: string;
 	isShow: boolean;
 }
-export const AvatarMessage = React.memo(({ isShow, onPress, avatar, username }: IProps) => {
+export const AvatarMessage = React.memo(({ isShow, onPress, id, username, avatar }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
 	if (isShow) {
 		return (
 			<Pressable onPress={onPress} style={styles.wrapperAvatar}>
-				{avatar ? (
-					<FastImage source={{ uri: avatar }} style={styles.logoUser} />
-				) : (
-					<View style={styles.avatarMessageBoxDefault}>
-						<Text style={styles.textAvatarMessageBoxDefault}>{username?.charAt(0)?.toUpperCase() || 'A'}</Text>
-					</View>
-				)}
+				<MezonAvatar
+					avatarUrl={avatar}
+					username={username}
+				/>
 			</Pressable>
 		);
 	}

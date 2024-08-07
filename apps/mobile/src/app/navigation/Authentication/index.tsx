@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { useAuth, useReference } from '@mezon/core';
-import { getAppInfo } from '@mezon/mobile-components';
+import { useAuth } from '@mezon/core';
+import { CHANNEL_ID_SHARING, getAppInfo } from '@mezon/mobile-components';
 import {
 	appActions,
 	fcmActions,
 	getStoreAsync,
+	referencesActions,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDmGroupCurrentId,
@@ -15,11 +16,12 @@ import {
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BackHandler } from 'react-native';
+import { Platform } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal';
+import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
 import {
 	checkNotificationPermission,
@@ -51,9 +53,9 @@ export const Authentication = () => {
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
 	const dispatch = useDispatch();
 	const [fileShared, setFileShared] = useState<any>();
-	const { setAttachmentData } = useReference();
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
+	useCheckUpdatedVersion();
 
 	useEffect(() => {
 		if (userProfile?.email) loadFRMConfig();
@@ -80,6 +82,7 @@ export const Authentication = () => {
 					type: 'info',
 					text1: remoteMessage.notification?.title,
 					text2: remoteMessage.notification?.body,
+					topOffset: Platform.OS === "ios" ? undefined : 10,
 					onPress: async () => {
 						Toast.hide();
 						const store = await getStoreAsync();
@@ -115,7 +118,7 @@ export const Authentication = () => {
 				(error: any) => {
 					console.log('Error receiving files:', error);
 				},
-				'com.mezon.mobile',
+				'mezon.mobile.sharing',
 			);
 		} catch (error) {
 			console.log('Error while receiving files:', error);
@@ -135,8 +138,12 @@ export const Authentication = () => {
 
 	const onCloseFileShare = () => {
 		setFileShared(undefined);
-		setAttachmentData([]);
-		BackHandler.exitApp();
+		dispatch(
+			referencesActions.resetDataAttachment({
+				channelId: CHANNEL_ID_SHARING,
+			}),
+		);
+		navigation.goBack();
 	};
 
 	return (

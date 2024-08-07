@@ -1,13 +1,15 @@
-import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, Tray, autoUpdater, nativeImage, screen, shell } from 'electron';
+import { BrowserWindow, screen, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import { format } from 'url';
 import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import { setup } from 'electron-push-receiver';
+import tray from '../Tray';
 
 let deeplinkingUrl;
-let isQuitting = false;
+const isQuitting = false;
 
 export default class App {
 	// Keep a global reference of the window object, if you don't, the window will
@@ -38,10 +40,11 @@ export default class App {
 	}
 
 	private static onReady() {
+		autoUpdater.checkForUpdates();
 		if (rendererAppName) {
 			App.initMainWindow();
 			App.loadMainWindow();
-			App.handleTray();
+			tray.init(isQuitting);
 		}
 
 		setup(App.mainWindow.webContents);
@@ -73,6 +76,7 @@ export default class App {
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
+
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
@@ -101,6 +105,7 @@ export default class App {
 			return;
 		}
 
+		//App.mainWindow.webContents.openDevTools();
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
 		}
@@ -125,6 +130,11 @@ export default class App {
 
 		// Emitted when the window is closed.
 		App.mainWindow.on('close', (event) => this.onClose(event));
+
+		App.application.on('before-quit', () => {
+			tray.destroy();
+			App.application.exit();
+		});
 	}
 	private static generateQueryString(params: Record<string, string>): string {
 		return Object.keys(params)
@@ -163,49 +173,8 @@ export default class App {
 		if (process.platform == 'win32' || process.platform == 'linux') {
 			// Keep only command line / deep linked arguments
 			deeplinkingUrl = process.argv.slice(1);
-			App.application.setAppUserModelId('Mezon');
+			App.application.setAppUserModelId('mezon.ai');
 		}
-	}
-	private static handleTray() {
-		let mezonTray = null;
-		App.application.whenReady().then(() => {
-			const trayIcon = nativeImage.createFromPath(join(__dirname, 'assets', 'desktop-tray-64x64.ico'));
-			mezonTray = new Tray(trayIcon);
-
-			const template: (MenuItem | MenuItemConstructorOptions)[] = [
-				{
-					label: 'Check for updates',
-					type: 'normal',
-					click: () => autoUpdater.checkForUpdates(),
-				},
-				{
-					label: 'Show Mezon',
-					type: 'normal',
-					click: function () {
-						if (App.mainWindow) {
-							App.mainWindow.show();
-						}
-					},
-				},
-				{
-					label: 'Quit Mezon',
-					type: 'normal',
-					click: function () {
-						isQuitting = true;
-						App.application.quit();
-					},
-				},
-			];
-			const contextMenu = Menu.buildFromTemplate(template);
-
-			mezonTray.setContextMenu(contextMenu);
-			mezonTray.setToolTip('Mezon');
-			mezonTray.on('click', () => {
-				if (App.mainWindow) {
-					App.mainWindow.show();
-				}
-			});
-		});
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {

@@ -10,16 +10,21 @@ interface IUserInformationBottomSheetProps {
 	userId?: string;
 	user?: User;
 	onClose: () => void;
+	showAction?: boolean;
+	showRole?: boolean;
 }
 
 export const UserInformationBottomSheet = React.memo((props: IUserInformationBottomSheetProps) => {
-	const { onClose, userId, user } = props;
+	const { onClose, userId, user, showAction = true, showRole = true } = props;
 	const bottomSheetRef = useRef(null);
 	const snapPoints = ['60%'];
 	useEffect(() => {
-		DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
+		const showUserInfoBottomSheetListener = DeviceEventEmitter.addListener(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, ({ isHiddenBottomSheet }) => {
 			isHiddenBottomSheet && bottomSheetRef.current?.close();
 		});
+		return () => {
+			showUserInfoBottomSheetListener.remove();
+		}
 	}, []);
 
 	useEffect(() => {
@@ -36,9 +41,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 			ref={bottomSheetRef}
 			snapPoints={snapPoints}
 			heightFitContent={true}
-			onDismiss={() => {
-				onClose();
-			}}
+			onDismiss={onClose}
 			style={styles.bottomSheet}
 			handleComponent={() => {
 				return (
@@ -48,7 +51,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 				);
 			}}
 		>
-			<UserProfile userId={userId} user={user} onClose={() => onClose()}></UserProfile>
+			<UserProfile userId={userId} user={user} onClose={onClose} showAction={showAction} showRole={showRole}></UserProfile>
 		</MezonBottomSheet>
 	);
 });

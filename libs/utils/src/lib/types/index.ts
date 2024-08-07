@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelType } from 'mezon-js';
+import { ChannelMessage, ChannelType, Notification } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -26,7 +26,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, IMentionOnMessage, ImarkdownOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -103,7 +103,7 @@ export type IRoleUsers = IRole & {
 };
 
 export type ChannelThreads = IChannel & {
-	threads: IChannel[];
+	threads?: IChannel[];
 };
 
 export type IChannel = ApiChannelDescription & {
@@ -193,8 +193,9 @@ export type IMessageSendPayload = {
 	hashtags?: IHashtagOnMessage[];
 	emojis?: IEmojiOnMessage[];
 	links?: ILinkOnMessage[];
-	markdowns?: ImarkdownOnMessage[];
-	plainText?: string;
+	markdowns?: IMarkdownOnMessage[];
+	voicelinks?: ILinkVoiceRoomOnMessage[];
+	plaintext?: string;
 };
 
 export type IUser = {
@@ -202,6 +203,10 @@ export type IUser = {
 	username: string;
 	id: string;
 	avatarSm: string;
+};
+
+export type MetaDateStatusUser = {
+	status: string;
 };
 
 export type IVoice = {
@@ -418,10 +423,13 @@ export interface IGif {
 
 export type MentionDataProps = {
 	id: string | number;
-	display?: string;
-	avatarUrl?: string;
-	displayName?: string;
+	display?: string | undefined;
+	avatarUrl?: string | undefined;
+	displayName?: string | undefined;
+	clanNick?: string | undefined;
+	clanAvatar?: string | undefined;
 	user?: ApiUser;
+	username?: string | undefined;
 };
 
 export type UserSearchDataProps = {
@@ -440,13 +448,11 @@ export type MentionsInputChangeEvent = {
 export type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: string, newPlainTextValue: string, mentions: any) => void;
 
 export type UserMentionsOpt = {
-	user_id: string | undefined;
-	username: string | undefined;
+	user_id?: string | undefined;
+	username?: string | undefined;
+	role_id?: string | undefined;
+	rolename?: string | undefined;
 };
-export enum ETypeMessage {
-	CHANNEL = 'CHANNEL',
-	THREAD = 'THREAD',
-}
 
 export type ThreadError = {
 	name: string;
@@ -586,4 +592,57 @@ export enum EMessageCode {
 export enum ModeResponsive {
 	MODE_CLAN = 'clan',
 	MODE_DM = 'dm',
+}
+
+export enum ThemeApp {
+	Light = 'light',
+	Dark = 'dark',
+	System = 'system',
+}
+
+export interface INotification extends Notification {
+	id: string;
+	content?: any;
+}
+export interface NotificationEntity extends INotification {
+	id: string;
+}
+
+export type TNotificationChannel = {
+	channel_id?: string;
+	clan_logo?: string;
+	channel_label?: string;
+	clan_id?: string;
+	clan_name?: string;
+	category_name?: string;
+	notifications: NotificationEntity[];
+};
+
+export enum SlugPermission {
+	Admin = 'administrator',
+}
+
+export enum TypeSearch {
+	Dm_Type = 1,
+	Channel_Type = 2,
+}
+
+export type SearchItemProps = {
+	typeChat?: number;
+	displayName?: string;
+	id?: string;
+	name?: string;
+	avatarUser?: string;
+	lastSentTimeStamp?: any;
+	idDM?: string;
+	type?: number;
+	clanAvatar?: string;
+	clanNick?: string;
+	prioritizeName?: string;
+	subText?: string;
+	icon?: string;
+	channelId?: string;
+};
+export enum EEmojiCategory {
+	CUSTOM = 'Custom',
 }

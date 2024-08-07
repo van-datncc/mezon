@@ -92,27 +92,29 @@ export default function FriendsPage() {
 		}
 	};
 
-	const listFriendFilter = filterStatus(friends).filter((obj) => obj.user?.username?.includes(textSearch));
+	const listFriendFilter = filterStatus(friends)
+		.filter((obj) => obj.user?.username?.includes(textSearch))
+		.sort((start, next) => {
+			const usernameStart = start.user?.display_name ?? '';
+			const usernameNext = next.user?.display_name ?? '';
+			return usernameStart.localeCompare(usernameNext);
+		});
 
 	const { setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
+	const closeMenuMobile = closeMenu && !statusMenu;
+
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">
 			<div className="flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader">
-				{closeMenu ? (
-					statusMenu ? (
-						<></>
-					) : (
-						<div onClick={() => setStatusMenu(true)}>
-							<Icons.OpenMenu defaultSize="w-6 h-6" />
-						</div>
-					)
-				) : (
-					<></>
-				)}
-				<div className={`gap-7 flex overflow-x-scroll hide-scrollbar ${closeMenu && !statusMenu ? 'ml-7' : ''}`}>
+				{(closeMenuMobile) && 
+					<div onClick={() => setStatusMenu(true)}>
+						<Icons.OpenMenu defaultSize="w-6 h-6" />
+					</div>
+				}
+				<div className={`gap-7 flex overflow-x-scroll hide-scrollbar ${closeMenuMobile ? 'ml-7' : ''}`}>
 					<div className="flex flex-row gap-2 items-center dark:text-white text-black">
 						<Icons.IconFriends />
 						Friend

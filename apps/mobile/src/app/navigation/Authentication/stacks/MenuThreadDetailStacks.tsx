@@ -16,6 +16,7 @@ import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm'
 import MenuThreadDetail from '../../../components/ThreadDetail/MenuThreadDetail';
 import ThreadAddButton from '../../../components/ThreadDetail/ThreadAddButton';
 import { APP_SCREEN } from '../../ScreenTypes';
+import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 
 export const MenuThreadDetailStacks = ({ }: any) => {
 	const { themeValue } = useTheme();
@@ -41,7 +42,9 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				headerShadowVisible: false,
 				gestureEnabled: true,
 				headerLeftLabelVisible: false,
+				headerBackTitleVisible: false,
 				gestureDirection: 'horizontal',
+				headerTintColor: themeValue.text,
 				transitionSpec: {
 					open: TransitionSpecs.TransitionIOSSpec,
 					close: TransitionSpecs.TransitionIOSSpec,
@@ -69,7 +72,6 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 				options={{
 					headerShown: true,
 					headerTitle: 'Threads',
-					headerTintColor: Colors.white,
 					headerRight: () => <ThreadAddButton />,
 					headerLeft: () => (
 						<TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 20 }}>
@@ -123,22 +125,8 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 			<Stack.Screen
 				name={APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL}
 				component={MuteThreadDetailModal}
-				options={{
-					headerShown: true,
-					headerTitle: () => (
-						<View>
-							<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>
-								{isChannel
-									? t('notifySettingThreadModal.headerTitleMuteChannel')
-									: t('notifySettingThreadModal.headerTitleMuteThread')}
-							</Text>
-							<Text style={{ color: themeValue.text, fontSize: size.medium, fontWeight: '400' }}>
-								{isChannel ? `#${currentChannel?.channel_label}` : `"${currentChannel?.channel_label}"`}
-							</Text>
-						</View>
-					)
-				}}
 			/>
+
 		</Stack.Navigator>
 	);
 };

@@ -32,6 +32,7 @@ module.exports = {
   bgSelectItem: '#505cdc',
   bgSelectItemHover: '#4752C4',
   bgModalDark: 'rgba(0, 0, 0, 0.7)',
+  bgAvatarDark: '#F7E4F0',
 
   /* background light*/
   bgLightPrimary: '#FFFFFF',
@@ -41,10 +42,12 @@ module.exports = {
   bgLightModeThird: 'rgb(235, 237, 239)',
   bgLightTertiary: '#E3E5E8',
   bgLightModeButton: '#155EEF1A',
+  bgLightSearchHover: '#F5F6F6',
   bgModifierHoverLight: '#DFE1E5',
   bgModalLight: 'rgba(0, 0, 0, 0.54)',
   bgTextarea: '#EBEBEB',
   bgInputDark: '#26262B',
+  bgAvatarLight: '#A612A2',
 
   /* text */
   channelTextarea: '#383A40',
@@ -66,12 +69,16 @@ module.exports = {
   borderDivider: '#3B3D44',
   borderDividerLight: '#80848E',
   borderClan: '#484C52',
+  borderLightTabs: '#D9DBDD',
 
   /* button */
   buttonProfile: '#4E5058',
   buttonProfileHover: '#41434A',
+  buttonMessageHover: '#6D6F78',
   buttonSearch: '#3B3C43',
   buttonSearchHover: '#2C2E32',
+  buttonMore: '#272120',
+  buttonMoreHover: '#1E1A19',
 
   primary: '#155EEF',
   hoverPrimary: '#124FC9',

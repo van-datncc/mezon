@@ -14,35 +14,31 @@ import {
 	messagesActions,
 	MessagesEntity,
 	selectAllAccount,
-	selectAllEmojiSuggestion,
 	selectAllUsesClan,
-	selectChannelsEntities,
 	selectIdMessageToJump,
 	selectMessageEntityById,
-	selectUserClanProfileByClanID,
 	useAppDispatch,
-	UserClanProfileEntity
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
+import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction } from './components';
-import { renderTextContent } from './constants';
+import { RenderTextMarkdownContent } from './constants';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
-import { Swipeable } from 'react-native-gesture-handler';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
+import { NewMessageRedLine } from './components/NewMessageRedLine';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
@@ -59,15 +55,10 @@ export type MessageItemProps = {
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;
 	currentClanId?: string;
-	clansProfile?: UserClanProfileEntity[];
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
 	showUserInformation?: boolean;
 	preventAction?: boolean;
-};
-
-const arePropsEqual = (prevProps, nextProps) => {
-	return prevProps.message === nextProps.message;
 };
 
 const MessageItem = React.memo((props: MessageItemProps) => {
@@ -77,8 +68,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		mode,
 		onOpenImage,
 		isNumberOfLine,
-		currentClanId,
-		clansProfile,
 		jumpToRepliedMessage,
 		onMessageAction,
 		setIsOnlyEmojiPicker,
@@ -89,34 +78,41 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { t } = useTranslation('message');
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message: MessagesEntity = props?.message ? props?.message : (selectedMessage as MessagesEntity);
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
-	const channelsEntities = useSelector(selectChannelsEntities);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const userProfile = useSelector(selectAllAccount);
-	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClanId as string, message?.user?.id as string));
+	const idMessageToJump = useSelector(selectIdMessageToJump);
+	const usersClan = useSelector(selectAllUsesClan);
+
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
 		return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
-	}, [message, userProfile]);
+	}, [message?.content?.t, userProfile]);
 	const messageReferences = useMemo(() => {
 		return message?.references?.[0] as ApiMessageRef;
 	}, [message?.references]);
 
 	const isCombine = !message?.isStartedMessageGroup;
 	const swipeableRef = React.useRef(null);
-	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const usersClan = useSelector(selectAllUsesClan);
+	const backgroundColor = React.useRef(new Animated.Value(0)).current;
+
 	const checkMessageTargetToMoved = useMemo(() => {
 		return idMessageToJump === message?.id;
 	}, [idMessageToJump, message?.id]);
 
-	const lines = useMemo(() => {
-		return message?.content?.t;
-	}, [message?.content?.t]);
-
 	const isMessageReplyDeleted = useMemo(() => {
 		return !messageReferences && message?.references && message?.references?.length;
 	}, [messageReferences, message.references]);
+
+	const isDM = useMemo(() => {
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+	}, [mode]);
+
+	const messageAvatar = useMemo(() => {
+		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			return message?.clan_avatar || message?.avatar;
+		}
+		return message?.avatar;
+	}, [message?.clan_avatar, message?.avatar, mode]);
 
 	useEffect(() => {
 		if (props?.messageId) {
@@ -215,11 +211,18 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			return updateDate > createDate;
 		}
 		return false;
-	}, [message]);
+	}, [message?.create_time, message?.update_time]);
 
 	const senderDisplayName = useMemo(() => {
-		return clanProfile?.nick_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
-	}, [checkAnonymous, clanProfile?.nick_name, message?.user?.username, message?.username]);
+		if (isDM) {
+			return message?.display_name || message?.username || '';
+		}
+		return message?.clan_nick || message?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
+	}, [checkAnonymous, message?.clan_nick, message?.user?.username, message?.username, message?.display_name, isDM]);
+
+	const usernameMessage = useMemo(() => {
+		return isDM ? message?.display_name || message?.user?.username : message?.user?.username;
+	}, [isDM, message?.display_name, message?.user?.username]);
 
 	const renderRightActions = (progress, dragX) => {
 		const scale = dragX.interpolate({
@@ -251,19 +254,38 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	if (message.isStartedMessageGroup && message.sender_id == "0")
-		return (
-			<WelcomeMessage channelTitle={props.channelName} />
-		)
+	if (message.isStartedMessageGroup && message.sender_id == '0') return <WelcomeMessage channelTitle={props.channelName} />;
+
+	const handlePressIn = () => {
+		Animated.timing(backgroundColor, {
+			toValue: 1,
+			duration: 500,
+			useNativeDriver: false,
+		}).start();
+	};
+
+	const handlePressOut = () => {
+		Animated.timing(backgroundColor, {
+			toValue: 0,
+			duration: 500,
+			useNativeDriver: false,
+		}).start();
+	};
+
+	const bgColor = backgroundColor.interpolate({
+		inputRange: [0, 1],
+		outputRange: ['transparent', themeValue.secondaryWeight],
+	});
 
 	return (
-		<Swipeable
+		<Animated.View style={[{ backgroundColor: bgColor }]}>
+			{/* <Swipeable
 			renderRightActions={renderRightActions}
 			ref={swipeableRef}
 			overshootRight={false}
 			onSwipeableOpen={handleSwipeableOpen}
-			hitSlop={{ left: -10 }}
-		>
+			hitSlop={{ left: -10 }
+		> */}
 			<View
 				style={[
 					styles.messageWrapper,
@@ -272,22 +294,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					checkMessageTargetToMoved && styles.highlightMessageReply,
 				]}
 			>
-				{/* NEW LINE MESSAGE - TO BE UPDATE CORRECT LOGIC*/}
-				{/*{lastSeen &&*/}
-				{/*	<View style={styles.newMessageLine}>*/}
-				{/*		<View style={styles.newMessageContainer}>*/}
-				{/*			<Text style={styles.newMessageText}>NEW MESSAGE</Text>*/}
-				{/*		</View>*/}
-				{/*	</View>}*/}
 				{!!messageReferences && (
 					<MessageReferences
 						messageReferences={messageReferences}
 						preventAction={preventAction}
+						isMessageReply={true}
 						jumpToRepliedMessage={jumpToRepliedMessage}
-						currentClanId={currentClanId}
-						channelsEntities={channelsEntities}
-						emojiListPNG={emojiListPNG}
-						clansProfile={clansProfile}
 						mode={mode}
 					/>
 				)}
@@ -305,12 +317,16 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				<View style={[styles.wrapperMessageBox, !isCombine && styles.wrapperMessageBoxCombine]}>
 					<AvatarMessage
 						onPress={onPressAvatar}
-						avatar={message?.isMe ? userProfile?.user?.avatar_url : message?.user?.avatarSm}
-						username={message?.user?.username}
+						id={message?.user?.id}
+						avatar={messageAvatar}
+						username={usernameMessage}
 						isShow={!isCombine || !!message?.references?.length || showUserInformation}
 					/>
 					<Pressable
 						style={[styles.rowMessageBox]}
+						delayLongPress={Platform.OS === 'ios' ? 300 : 100}
+						onPressIn={handlePressIn}
+						onPressOut={handlePressOut}
 						onLongPress={() => {
 							if (preventAction) return;
 							setIsOnlyEmojiPicker(false);
@@ -330,27 +346,22 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						/>
 						<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
 						<Block opacity={message.isError ? 0.6 : 1}>
-							{renderTextContent({
-								lines,
-								isEdited,
-								translate: t,
-								channelsEntities,
-								emojiListPNG,
-								onMention,
-								onChannelMention,
-								isNumberOfLine,
-								clansProfile,
-								currentClanId,
-								isMessageReply: false,
-								mode,
-							})}
+							<RenderTextMarkdownContent
+								content={message.content}
+								isEdited={isEdited}
+								translate={t}
+								onMention={onMention}
+								onChannelMention={onChannelMention}
+								isNumberOfLine={isNumberOfLine}
+								isMessageReply={false}
+								mode={mode}
+							/>
 						</Block>
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 						{!preventAction ? (
 							<MessageAction
 								message={message}
 								mode={mode}
-								emojiListPNG={emojiListPNG}
 								userProfile={userProfile}
 								preventAction={preventAction}
 								openEmojiPicker={() => {
@@ -366,8 +377,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 					</Pressable>
 				</View>
 			</View>
-		</Swipeable>
+			{/* </Swipeable> */}
+			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} />
+		</Animated.View>
 	);
-}, arePropsEqual);
+});
 
 export default MessageItem;

@@ -1,12 +1,18 @@
 import { useAuth, useChatMessages } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
-import { IChannelMember } from '@mezon/utils';
+import {
+	MessagesEntity,
+	selectCurrentChannelId,
+	selectCurrentUserId,
+	selectIdMessageRefReply,
+	selectIdMessageToJump,
+	selectOpenReplyMessageState,
+} from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import classNames from 'classnames';
 import React, { useMemo, useRef } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { useHover } from 'usehooks-ts';
-import * as Icons from '../../../../../ui/src/lib/Icons/index';
 import MessageAttachment from './MessageAttachment';
 import MessageAvatar from './MessageAvatar';
 import MessageContent from './MessageContent';
@@ -23,7 +29,6 @@ export type ReactedOutsideOptional = {
 
 export type MessageWithUserProps = {
 	message: MessagesEntity;
-	user?: IChannelMember | null;
 	isMessNotifyMention?: boolean;
 	mode: number;
 	isMention?: boolean;
@@ -33,11 +38,11 @@ export type MessageWithUserProps = {
 	editor?: JSX.Element;
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
 	popup?: JSX.Element;
+	isSearchMessage?: boolean;
 };
 
 function MessageWithUser({
 	message,
-	user,
 	isMessNotifyMention,
 	mode,
 	editor,
@@ -47,6 +52,7 @@ function MessageWithUser({
 	isHighlight,
 	popup,
 	isShowFull,
+	isSearchMessage,
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
@@ -56,13 +62,19 @@ function MessageWithUser({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
-
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
-	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
-	const checkReferences = message.references?.length !== 0;
+	const currentUserId = useSelector(selectCurrentUserId);
 
+	const hasIncludeMention = useMemo(() => {
+		const userMention = `@[${userLogin.userProfile?.user?.username}]`;
+		const includesHere = message.content.t?.includes('@[here]');
+		const includesUser = message.content.t?.includes(userMention);
+		return includesHere || includesUser;
+	}, [message.content.t, userLogin.userProfile?.user?.username]);
+
+	const checkReferences = message.references?.length !== 0;
 	const shouldShowDateDivider = useMemo(() => {
 		return message.isStartedMessageOfTheDay;
 	}, [message]);
@@ -108,11 +120,10 @@ function MessageWithUser({
 					<div className={childDivClass}></div>
 					<div className={parentDivClass}>
 						{checkMessageHasReply && <MessageReply message={message} />}
-						<div className="justify-start gap-4 inline-flex w-full relative h-fit overflow-visible pr-12">
+						<div className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}>
 							<MessageAvatar message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull} mode={mode} />
-
 							<div className="w-full relative h-full">
-								<MessageHead message={message} user={user} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
+								<MessageHead message={message} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
 								<div id={message.id} className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										{isEditing && editor}

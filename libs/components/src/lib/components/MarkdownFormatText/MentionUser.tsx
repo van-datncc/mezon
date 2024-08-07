@@ -1,26 +1,34 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectAllChannelMembers, selectAllUsesClan, selectCurrentChannel } from '@mezon/store';
-import { MouseButton, checkLastChar } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { selectAllChannelMembers, selectAllRolesClan, selectAllUsesClan } from '@mezon/store';
+import { MouseButton, checkLastChar, getRoleList } from '@mezon/utils';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 
 type ChannelHashtagProps = {
 	tagName: string;
+	tagUserId: string;
 	mode?: number;
+	showOnchannelLayout?: boolean;
 };
 
-const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
+const MentionUser = ({ tagName, mode, showOnchannelLayout, tagUserId }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const usersClan = useSelector(selectAllUsesClan);
 	const usersInChannel = useSelector(selectAllChannelMembers);
 	const [foundUser, setFoundUser] = useState<any>(null);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.stopPropagation();
 		e.preventDefault();
 	};
+
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = getRoleList(rolesInClan);
+
+	const matchingRole = useMemo(() => {
+		return roleList.find((role) => `@${role.roleName}` === tagName);
+	}, [tagName]);
 
 	const [userRemoveChar, setUserRemoveChar] = useState('');
 	const username = tagName.slice(1);
@@ -32,9 +40,9 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 		}
 		let user;
 		if (mode === 4 || mode === 3) {
-			user = usersInChannel.find((channelUsers) => channelUsers.user?.username === userRemoveChar);
+			user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
 		} else {
-			user = usersClan.find((userClan) => userClan.user?.username === userRemoveChar);
+			user = usersClan.find((userClan) => userClan.user?.id === tagUserId);
 		}
 
 		if (user) {
@@ -92,22 +100,26 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 					<ShortUserProfile userID={foundUser.user.id} mode={mode} />
 				</div>
 			)}
+
 			{foundUser !== null || tagName === '@here' ? (
 				<>
 					<Link
-						onMouseDown={(event) => handleMouseClick(event)}
+						onMouseDown={showOnchannelLayout ? (event) => handleMouseClick(event) : () => {}}
 						ref={panelRef}
-						onClick={(e) => dispatchUserIdToShowProfile(e)}
+						onClick={showOnchannelLayout ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
 						style={{ textDecoration: 'none' }}
 						to={''}
 						className={`font-medium px-0.1 rounded-sm 
-				${tagName === '@here' ? 'cursor-text' : 'cursor-pointer hover:!text-white'}
-				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF] hover:bg-[#5865F2]`}
+				${tagName === '@here' ? 'cursor-text' : showOnchannelLayout ? 'cursor-pointer hover:!text-white' : 'hover:none'}
+
+				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${showOnchannelLayout ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 					>
-						@{foundUser?.user?.username ? foundUser?.user?.username : 'here'}
+						{foundUser?.user?.username ? tagName : '@here'}
 					</Link>
 					{`${checkLastChar(username) ? `${username.charAt(username.length - 1)}` : ''}`}
 				</>
+			) : matchingRole ? (
+				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`@${matchingRole.roleName}`}</span>
 			) : (
 				<span>{tagName}</span>
 			)}
@@ -115,4 +127,4 @@ const MentionUser = ({ tagName, mode }: ChannelHashtagProps) => {
 	);
 };
 
-export default MentionUser;
+export default memo(MentionUser);

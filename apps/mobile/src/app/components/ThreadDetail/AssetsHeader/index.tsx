@@ -13,7 +13,10 @@ interface IPos {
 interface IProps {
 	pageID: number;
 	onChange?: (pageID: number) => void;
-	titles: string[];
+	tabList: {
+		title: string;
+		quantitySearch?: number;
+	}[];
 }
 
 const usePos = (): [IPos[], (event: LayoutChangeEvent, index: number) => void] => {
@@ -31,7 +34,7 @@ const usePos = (): [IPos[], (event: LayoutChangeEvent, index: number) => void] =
 	return [pos, onLayout];
 };
 
-export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IProps) {
+export default function AssetsHeader({ pageID = 0, onChange, tabList = [] }: IProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [pos, onLayout] = usePos();
@@ -48,9 +51,11 @@ export default function AssetsHeader({ pageID = 0, onChange, titles = [] }: IPro
 	return (
 		<>
 			<View style={styles.headerTab}>
-				{titles.map((title, index) => (
+				{tabList?.map((tab, index) => (
 					<Pressable key={index.toString()} onLayout={(e) => onLayout(e, index)} onPress={(e) => handlePress(e, index)}>
-						<Text style={{ color: index === selected ? baseColor.blurple : themeValue.text }}>{title}</Text>
+						<Text style={{ color: index === selected ? baseColor.blurple : themeValue.text }}>
+							{tab.title} {tab?.quantitySearch ? `(${tab?.quantitySearch})` : ''}
+						</Text>
 					</Pressable>
 				))}
 			</View>

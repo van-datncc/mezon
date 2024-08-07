@@ -101,6 +101,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					channelId: channel.id,
 					channelType: channel.type,
 					userIds: selectedUserIds,
+					clanId: currentClanId || "",
 				};
 				await dispatch(channelUsersActions.addChannelUsers(body));
 			}
@@ -130,7 +131,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 
 	const filterData = useCallback(
 		(input: string) => {
-			const inputData = input.trim();
+			const inputData = input.trim().toLowerCase();
 			if (inputData.startsWith('@')) {
 				const searchValue = inputData.substring(1);
 				const filteredMembers = listMembersNotInChannel.filter((item) => item?.display_name?.includes(searchValue));

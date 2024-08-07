@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useCategory } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { useCategory, useUserPermission } from '@mezon/core';
+import { EOpenSearchChannelFrom, Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -10,16 +10,18 @@ import {
 	selectCurrentClan,
 	useAppDispatch,
 } from '@mezon/store-mobile';
-import { ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 import { isEmpty } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
-import { MezonBottomSheet, MezonSearch } from '../../../../temp-ui';
+import { MezonBottomSheet } from '../../../../temp-ui';
 import { ChannelListContext } from '../Reusables';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
@@ -34,10 +36,11 @@ const ChannelList = React.memo((props: any) => {
 	const styles = style(themeValue);
 	const currentClan = useSelector(selectCurrentClan);
 	const { categorizedChannels } = useCategory();
+	const [dataCategoryChannel, setDataCategoryChannel] = useState<ICategoryChannel[]>(categorizedChannels || []);
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
+	const { t } = useTranslation(['searchMessageChannel']);
 
 	const allEventManagement = useSelector(selectAllEventManagement);
-	const prevFilteredChannelsRef = useRef<any>();
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
@@ -46,17 +49,23 @@ const ChannelList = React.memo((props: any) => {
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
-	const [currentPressedChannel, setCurrentPressedChannel] = useState<IChannel>(null);
-	const user = useAuth();
+	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const dispatch = useAppDispatch();
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+	const { isCanManageEvent } = useUserPermission();
 
 	useEffect(() => {
-		return () => {
-			prevFilteredChannelsRef.current = {};
-		};
-	}, []);
+		try {
+			const categoryChannel = categorizedChannels || JSON.parse(load(STORAGE_DATA_CATEGORY_CHANNEL) || '[]');
+			setDataCategoryChannel(categoryChannel);
+			if (categorizedChannels) {
+				save(STORAGE_DATA_CATEGORY_CHANNEL, JSON.stringify(categorizedChannels));
+			}
+		} catch (error) {
+			console.error('Error loading category channels:', error);
+		}
+	}, [categorizedChannels]);
 
 	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
 
@@ -77,10 +86,15 @@ const ChannelList = React.memo((props: any) => {
 		setCurrentPressedCategory(category);
 	}
 
-	function handleLongPressChannel(channel: IChannel) {
+	function handleLongPressChannel(channel: ChannelThreads) {
 		bottomSheetChannelMenuRef.current?.present();
 		setCurrentPressedChannel(channel);
 		setIsUnKnownChannel(!channel?.channel_id);
+	}
+
+	function handleLongPressThread(channel: ChannelThreads) {
+		bottomSheetChannelMenuRef.current?.present();
+		setCurrentPressedChannel(channel);
 	}
 
 	function handleOnPressSortChannel(channel: IChannel) {
@@ -107,13 +121,25 @@ const ChannelList = React.memo((props: any) => {
 	if (isEmpty(currentClan)) {
 		return <Block height={20} />;
 	}
+
+	const navigateToSearchPage = () => {
+		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+			params: {
+				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
+			}
+		});
+	};
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
 			<View style={styles.mainList}>
 				<ChannelListHeader onPress={handlePress} clan={currentClan} />
 
 				<View style={styles.channelListSearch}>
-					<MezonSearch hasBackground />
+					<TouchableOpacity onPress={() => navigateToSearchPage()} style={styles.searchBox}>
+						<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />
+						<Text style={styles.placeholderSearchBox}>{t('search')}</Text>
+					</TouchableOpacity>
 					<Pressable
 						style={styles.inviteIconWrapper}
 						onPress={() => {
@@ -138,9 +164,10 @@ const ChannelList = React.memo((props: any) => {
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
-				<FlatList
-					data={categorizedChannels || []}
+				<FlashList
+					data={dataCategoryChannel || []}
 					keyExtractor={(_, index) => index.toString()}
+					estimatedItemSize={40}
 					renderItem={({ item, index }) => (
 						<ChannelListSection
 							data={item}
@@ -150,20 +177,21 @@ const ChannelList = React.memo((props: any) => {
 							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
 							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
 							collapseItems={collapseChannelItems}
+							onLongPressThread={(channel) => handleLongPressThread(channel)}
 						/>
 					)}
 				/>
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
-				<ClanMenu clan={currentClan} inviteRef={bottomSheetInviteRef} />
+				<ClanMenu inviteRef={bottomSheetInviteRef} />
 			</MezonBottomSheet>
 
 			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} heightFitContent>
 				<CategoryMenu inviteRef={bottomSheetInviteRef} category={currentPressedCategory} />
 			</MezonBottomSheet>
 
-			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent>
+			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent onDismiss={() => setCurrentPressedChannel(null)}>
 				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedChannel} />
 			</MezonBottomSheet>
 
@@ -172,7 +200,7 @@ const ChannelList = React.memo((props: any) => {
 				ref={bottomSheetEventRef}
 				heightFitContent={allEventManagement?.length === 0}
 				headerRight={
-					currentClan?.creator_id === user?.userId && (
+					isCanManageEvent && (
 						<TouchableOpacity onPress={handlePressEventCreate}>
 							<Text style={{ color: baseColor.blurple, fontWeight: 'bold' }}>Create</Text>
 						</TouchableOpacity>

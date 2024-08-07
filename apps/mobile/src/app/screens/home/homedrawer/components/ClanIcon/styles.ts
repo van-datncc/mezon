@@ -14,13 +14,13 @@ export const style = (colors: Attributes) => StyleSheet.create({
         overflow: 'hidden',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.tertiary
+        backgroundColor: colors.black
     },
 
     textLogoClanIcon: {
-        color: colors.text,
+        color: colors.white,
         fontSize: size.s_22,
-        fontWeight: '600',
+        fontWeight: '400',
     },
 
     logoClan: {
@@ -33,7 +33,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
         backgroundColor: colors.secondary,
         borderRadius: verticalScale(15),
     },
-
     lineActiveClan: {
         backgroundColor: Colors.azureBlue,
         width: 4,

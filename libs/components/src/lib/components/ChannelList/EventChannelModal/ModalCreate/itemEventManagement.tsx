@@ -5,6 +5,7 @@ import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
+import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
 import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
 import ModalDelEvent from './modalDelEvent';
@@ -110,7 +111,13 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							animation="duration-500"
 							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 						>
-							<img src={userCreate?.user?.avatar_url} alt={userCreate?.user?.avatar_url} className="size-6 rounded-full" />
+							<AvatarImage 
+								alt={userCreate?.user?.username || ''}
+								userName={userCreate?.user?.username}
+								className="min-w-6 min-h-6 max-w-6 max-h-6"
+								src={userCreate?.user?.avatar_url}
+								classNameText='text-[9px] pt-[3px]'
+							/>
 						</Tooltip>
 					)}
 				</div>
@@ -167,7 +174,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 				<PanelEventItem
 					coords={coords}
 					onHandle={handleStopPropagation}
-					checkUserCreate={checkUserCreate || true}
+					checkUserCreate={checkUserCreate ?? true}
 					setOpenModalDelEvent={setOpenModalDelEvent}
 					onClose={() => setOpenPanel(false)}
 				/>

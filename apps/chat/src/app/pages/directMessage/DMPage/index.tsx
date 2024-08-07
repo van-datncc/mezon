@@ -15,7 +15,7 @@ import {
 	selectStatusMenu,
 	useAppDispatch,
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -28,7 +28,7 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (lastMessage) {
 			const timestamp = Date.now() / 1000;
-			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
+			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directActions.updateLastSeenTime(lastMessage));
 		}
 	}, [channelId, dispatch, lastMessage]);
@@ -106,7 +106,7 @@ export default function DirectMessage() {
 		}
 	}, [messagesContainerRef.current?.getBoundingClientRect()]);
 
-	const isDmChannel = useMemo(() => currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM,[currentDmGroup.type]);
+	const isDmChannel = useMemo(() => currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM, [currentDmGroup.type]);
 
 	return (
 		<>
@@ -120,22 +120,18 @@ export default function DirectMessage() {
 				{' '}
 				<DmTopbar dmGroupId={directId} />
 				<div className="flex flex-row h-full w-full">
-					<div className={`flex-col flex-1 w-full h-full max-h-messageViewChatDM ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}>
+					<div
+						className={`flex-col flex-1 h-full max-h-messageViewChatDM ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
+					>
 						<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink " ref={messagesContainerRef}>
 							{
 								<ChannelMessages
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}
 									userName={isDmChannel ? currentDmGroup?.usernames : undefined}
-									type={isDmChannel ? 'DM' : 'GROUP'}
-									mode={
-										isDmChannel ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
-									}
-									avatarDM={
-										isDmChannel
-											? currentDmGroup.channel_avatar?.at(0)
-											: 'assets/images/avatar-group.png'
-									}
+									type={isDmChannel ? ChannelType.CHANNEL_TYPE_DM : ChannelType.CHANNEL_TYPE_GROUP}
+									mode={isDmChannel ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
+									avatarDM={isDmChannel ? currentDmGroup.channel_avatar?.at(0) : 'assets/images/avatar-group.png'}
 								/>
 							}
 						</div>
@@ -211,7 +207,7 @@ export default function DirectMessage() {
 					)}
 					{Number(type) === ChannelType.CHANNEL_TYPE_DM && (
 						<div
-							className={`dark:bg-bgSecondary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[340px]'}`}
+							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-widthDmProfile'}`}
 						>
 							<ModalUserProfile
 								userID={Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id}
@@ -225,7 +221,6 @@ export default function DirectMessage() {
 					)}
 				</div>
 			</div>
-
 		</>
 	);
 }

@@ -1,5 +1,5 @@
 import { Buffer as BufferMobile } from 'buffer';
-import { ChannelStreamMode, Client, Session } from 'mezon-js';
+import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 
 export const isValidUrl = (urlString: string) => {
@@ -23,24 +23,33 @@ export async function handleUploadFile(
 	currentChannelId: string,
 	filename: string,
 	file: File,
-	mode?: number | null,
 	path?: string,
-	directId?: string,
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
-			const ms = new Date().getTime();
-			let fullfilename;
-			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-				fullfilename = (path ? path + '/' : '') + currentClanId + '/' + currentChannelId + '/' + ms + filename.replace(/-|\(|\)| /g, '_');
-			} else {
-				fullfilename = currentChannelId + '/' + (directId ? directId + '/' : '') + ms + filename.replace(/-|\(|\)| /g, '_');
+			let fileType = file.type;
+			if (!fileType) {
+				const fileNameParts = file.name.split('.');
+				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
+				fileType = `text/${fileExtension}`;
 			}
+			
+			const ms = new Date().getMinutes();			
+			filename = ms + filename;
+			filename = filename.replace(/-|\(|\)| /g, '_')
+			if (!currentClanId) {
+				currentClanId = "0";
+			}
+			let fullfilename = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
+			if (path) {
+				fullfilename = (path + '/') + fullfilename;
+			}
+
 			const buf = await file?.arrayBuffer();
 			const data = await client.uploadAttachmentFile(session, {
 				filename: fullfilename,
-				filetype: file.type,
+				filetype: fileType,
 				size: file.size,
 			});
 			if (!data?.url) {
@@ -55,7 +64,7 @@ export async function handleUploadFile(
 			resolve({
 				filename: file.name,
 				url: url,
-				filetype: file.type,
+				filetype: fileType,
 				size: file.size,
 				width: 0,
 				height: 0,
@@ -70,6 +79,12 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
+			let fileType = file.type;
+			if (!fileType) {
+				const fileNameParts = file.name.split('.');
+				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
+				fileType = `text/${fileExtension}`;
+			}
 			if (file?.uri) {
 				const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 				if (!arrayBuffer) {
@@ -78,7 +93,7 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 				}
 				const data = await client.uploadAttachmentFile(session, {
 					filename: fullfilename,
-					filetype: file.type,
+					filetype: fileType,
 					size: file.size,
 				});
 				if (!data?.url) {
@@ -90,7 +105,7 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 				const res = await fetch(data.url, {
 					method: 'PUT',
 					headers: {
-						'Content-Type': file.type,
+						'Content-Type': fileType,
 						'Content-Length': file?.size?.toString() || '1000',
 					},
 					body: buffer,
@@ -102,7 +117,7 @@ export async function handleUploadFileMobile(client: Client, session: Session, f
 				resolve({
 					filename: file.name,
 					url: url,
-					filetype: file.type,
+					filetype: fileType,
 					size: file.size,
 					width: 0,
 					height: 0,

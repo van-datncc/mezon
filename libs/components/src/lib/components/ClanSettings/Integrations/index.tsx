@@ -1,12 +1,20 @@
+import { selectAllWebhooks } from '@mezon/store';
+import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Icons } from '../../../components';
 import MainIntegrations from './MainIntegrations';
 import Webhooks from './Webhooks';
 
-const Integrations = () => {
+interface IIntegrationsProps {
+	currentChannel?: IChannel;
+}
+
+const Integrations = ({ currentChannel }: IIntegrationsProps) => {
 	const [isOpenWebhooks, setIsOpenWebhooks] = useState(false);
+	const allWebhooks = useSelector(selectAllWebhooks);
 	return (
-		<div className="sbm:mt-[60px] mt-[10px]">
+		<div className="max-sm:px-[30px] mt-[60px]">
 			<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme flex">
 				<div
 					onClick={() => setIsOpenWebhooks(false)}
@@ -24,7 +32,11 @@ const Integrations = () => {
 				)}
 			</h2>
 
-			{!isOpenWebhooks ? <MainIntegrations setIsOpenWebhooks={() => setIsOpenWebhooks(true)} /> : <Webhooks />}
+			{isOpenWebhooks ? (
+				<Webhooks allWebhooks={allWebhooks} currentChannel={currentChannel} />
+			) : (
+				<MainIntegrations allWebhooks={allWebhooks} setIsOpenWebhooks={() => setIsOpenWebhooks(true)} />
+			)}
 		</div>
 	);
 };

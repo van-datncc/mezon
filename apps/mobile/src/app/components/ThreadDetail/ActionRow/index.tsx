@@ -1,31 +1,51 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 
-import { Icons } from '@mezon/mobile-components';
+import { useUserPermission } from '@mezon/core';
+import { EOpenSearchChannelFrom, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { selectnotificatonSelected } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
+import { useSelector } from 'react-redux';
+import { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './style';
+enum EActionRow {
+	Search,
+	Threads,
+	Mute,
+	Settings,
+}
+
 
 export const ActionRow = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
-	const { statusMute } = useStatusMuteChannel();
+	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
+	const { isCanManageThread, isCanManageChannel } = useUserPermission();
+
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
 	}, [currentChannel]);
 	const actionList = [
 		{
 			title: 'Search',
-			action: () => { },
+			action: () => {
+				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+					screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+					params: {
+						openSearchChannelFrom: EOpenSearchChannelFrom.ActionMenu,
+					},
+				});
+			},
 			icon: <Icons.MagnifyingIcon width={22} height={22} color={themeValue.text} />,
-			hidden: true,
+			isShow: true,
+			type: EActionRow.Search,
 		},
 		{
 			title: 'Threads',
@@ -33,17 +53,19 @@ export const ActionRow = React.memo(() => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD });
 			},
 			icon: <Icons.ThreadIcon width={22} height={22} color={themeValue.text} />,
-			hidden: isChannel,
+			isShow: isChannel,
+			type: EActionRow.Threads,
 		},
 		{
 			title: 'Mute',
 			action: () => {
-				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL });
+				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+					screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL,
+					params: { currentChannel },
+				});
 			},
-			icon: statusMute === EActionMute.Mute
-				? <Icons.BellSlashIcon width={22} height={22} color={themeValue.text} />
-				: <Icons.BellIcon width={22} height={22} color={themeValue.text} />,
-			hidden: true,
+			isShow: true,
+			type: EActionRow.Mute,
 		},
 		{
 			title: 'Settings',
@@ -56,7 +78,8 @@ export const ActionRow = React.memo(() => {
 				});
 			},
 			icon: <Icons.SettingsIcon width={22} height={22} color={themeValue.text} />,
-			hidden: true,
+			isShow: isCanManageThread || isCanManageChannel,
+			type: EActionRow.Settings,
 		},
 	];
 
@@ -69,10 +92,20 @@ export const ActionRow = React.memo(() => {
 	return (
 		<View style={styles.container}>
 			{filteredActionList.map((action, index) =>
-				action?.hidden ? (
+				action?.isShow ? (
 					<Pressable key={index.toString()} onPress={action.action}>
 						<View style={styles.iconBtn}>
-							<View style={styles.iconWrapper}>{action.icon}</View>
+							<View style={styles.iconWrapper}>
+								{[EActionRow.Mute].includes(action.type) ? (
+									getNotificationChannelSelected?.active === EActionMute.Mute ? (
+										<Icons.BellIcon width={22} height={22} color={themeValue.text} />
+									) : (
+										<Icons.BellSlashIcon width={22} height={22} color={themeValue.text} />
+									)
+								) : (
+									action.icon
+								)}
+							</View>
 							<Text style={styles.optionText}>{action.title}</Text>
 						</View>
 					</Pressable>

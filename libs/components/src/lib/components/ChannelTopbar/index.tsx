@@ -1,11 +1,14 @@
-import { useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppParams, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
 import {
 	appActions,
+	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
 	selectCurrentChannelId,
+	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
+	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
@@ -13,14 +16,15 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	selectnotificatonSelected,
+	useAppDispatch,
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ChannelType } from 'mezon-js';
+import { ChannelType, NotificationType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -138,12 +142,23 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
-		if (getNotificationChannelSelected?.active === 1 && getNotificationChannelSelected?.notification_setting_type === 'NOTHING') {
+		if (
+			getNotificationChannelSelected?.active === 1 &&
+			getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+		) {
+			setIsMuteBell(true);
+		} else if (getNotificationChannelSelected?.id !== '0' && getNotificationChannelSelected?.active !== 1) {
 			setIsMuteBell(true);
 		} else if (getNotificationChannelSelected?.id === '0') {
-			if (defaultNotificationCategory?.notification_setting_type && defaultNotificationCategory?.notification_setting_type === 'NOTHING') {
+			if (
+				defaultNotificationCategory?.notification_setting_type &&
+				defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+			) {
 				setIsMuteBell(true);
-			} else if (defaultNotificationClan?.notification_setting_type && defaultNotificationClan?.notification_setting_type === 'NOTHING') {
+			} else if (
+				defaultNotificationClan?.notification_setting_type &&
+				defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+			) {
 				setIsMuteBell(true);
 			} else {
 				setIsMuteBell(false);
@@ -171,7 +186,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 				style={isLightMode ? 'light' : 'dark'}
 			>
 				<button className="focus-visible:outline-none" onClick={handleShowNotificationSetting} onContextMenu={(e) => e.preventDefault()}>
-					{isMuteBell ? <Icons.MuteBell /> : <Icons.UnMuteBell />}
+					{isMuteBell ? <Icons.MuteBell /> : <Icons.UnMuteBell defaultSize="size-6" />}
 				</button>
 			</Tooltip>
 			{isShowNotificationSetting && <NotificationSetting />}
@@ -214,10 +229,12 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 }
 
 export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
-	const dispatch = useDispatch();
-	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
+	const dispatch = useAppDispatch();
+	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const newNotificationStatus = useSelector(selectNewNotificationStatus);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const { directId: currentDmGroupId } = useAppParams();
 
 	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
 
@@ -243,15 +260,20 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	}, [newNotificationStatus]);
 
 	const handleShowInbox = () => {
-		setIsShowInbox(!isShowInbox);
+		dispatch(notificationActions.fetchListNotification({ clanId: currentDmGroupId ? '0' : currentClanId as string }));
+		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 
-	useOnClickOutside(inboxRef, () => setIsShowInbox(false));
-	useEscapeKey(() => setIsShowInbox(false));
+	const handleSetIsShowInbox = () => {
+		dispatch(notificationActions.setIsShowInbox(false));
+	};
+
+	useOnClickOutside(inboxRef, () => handleSetIsShowInbox());
+	useEscapeKey(() => handleSetIsShowInbox());
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<Tooltip content="Inboxs" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox />
 					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
@@ -266,7 +288,7 @@ function RedDot() {
 	return (
 		<div
 			className="absolute border-[1px] dark:border-bgPrimary border-[#ffffff]
-		 w-[12px] h-[12px] rounded-full bg-colorDanger 
+		 w-[12px] h-[12px] rounded-full bg-colorDanger
 		  font-bold text-[11px] flex items-center justify-center -bottom-1.5 -right-1"
 		></div>
 	);
