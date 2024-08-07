@@ -75,7 +75,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 	}, [dmGroupChatList, listChannels])
 
 	const filteredForwardObjects = useMemo(() => {
-		if (searchText.trim().charAt(0) === '#') {
+		if (searchText?.trim()?.charAt(0) === '#') {
 			return allForwardObject.filter(ob => ob.type === ChannelType.CHANNEL_TYPE_TEXT)
 		}
 		return allForwardObject.filter(ob => normalizeString(ob?.name).includes(normalizeString(searchText)));
