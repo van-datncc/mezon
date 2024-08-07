@@ -19,8 +19,8 @@ export type UpdateReactionMessageArgs = {
 	id: string;
 	channel_id?: string;
 	message_id?: string;
-	emoji_id?: string;
-	emoji?: string;
+	emoji_id: string;
+	emoji: string;
 	count?: number;
 	sender_id?: string;
 	action?: boolean;
@@ -60,9 +60,9 @@ export const reactionAdapter = createEntityAdapter({
 export const updateReactionMessage = createAsyncThunk(
 	'messages/updateReactionMessage',
 
-	async ({ id, channel_id, message_id, sender_id, emoji, count, action }: UpdateReactionMessageArgs, thunkAPI) => {
+	async ({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }: UpdateReactionMessageArgs, thunkAPI) => {
 		try {
-			await thunkAPI.dispatch(reactionActions.setReactionDataSocket({ id, channel_id, message_id, sender_id, emoji, count, action }));
+			await thunkAPI.dispatch(reactionActions.setReactionDataSocket({ id, channel_id, message_id, sender_id, emoji_id, emoji, count, action }));
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -256,7 +256,7 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 	const dataCombined: Record<string, EmojiDataOptionals> = {};
 
 	for (const reaction of reactions) {
-		const emojiId = reaction.emoji || ('' as string);
+		const emojiId = reaction.emoji_id || ('' as string);
 		const emoji = reaction.emoji || ('' as string);
 
 		if (reaction.count < 1) {

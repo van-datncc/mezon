@@ -26,7 +26,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const { reactionMessageDispatch } = useChatReaction();
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const emojiHover = useSelector(selectEmojiHover);
-	const getUrlItem = getSrcEmoji(emoji.id || '');
+	const getUrlItem = getSrcEmoji(emoji.emojiId || '');
 	const count = calculateTotalCount(emoji.senders);
 	const userSenderCount = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId.userId)?.count;
 	const emojiItemRef = useRef<HTMLDivElement | null>(null);
@@ -178,7 +178,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 					userSenderCount={userSenderCount ?? NaN}
 					onClickReactExist={() =>
 						reactOnExistEmoji(
-							emoji.id ?? '',
+							emoji.emojiId ?? '',
 							mode,
 							emoji.message_id ?? '',
 							emoji.emojiId ?? '',
@@ -193,23 +193,27 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 				/>
 			)}
 
-			{emojiHover?.emojiId === emoji.emojiId && userReactionPanelState && count > 0 && emojiHover?.message_id === message.id && (
-				<div
-					ref={userPanelRef}
-					className=" w-[18rem] flex flex-col items-center z-50 h-50"
-					style={{
-						position: 'fixed',
-						top: topUserPanel,
-						left: leftUserPanel,
-						right: rightUserPanel,
-						bottom: bottomUserPanel,
-					}}
-				>
-					<ArrowItem arrow={arrowTop} isRightLimit={isRightLimit} isLeftLimit={isLeftLimit} emojiCross={emoji} />
-					<UserReactionPanel message={message} emojiShowPanel={emojiHover!} mode={mode} />
-					<ArrowItem arrow={arrowBottom} isRightLimit={isRightLimit} isLeftLimit={isLeftLimit} emojiCross={emoji} />
-				</div>
-			)}
+			{emojiHover?.emojiId === emoji.emojiId &&
+				emojiHover?.emoji === emoji.emoji &&
+				userReactionPanelState &&
+				count > 0 &&
+				emojiHover?.message_id === message.id && (
+					<div
+						ref={userPanelRef}
+						className=" w-[18rem] flex flex-col items-center z-50 h-50"
+						style={{
+							position: 'fixed',
+							top: topUserPanel,
+							left: leftUserPanel,
+							right: rightUserPanel,
+							bottom: bottomUserPanel,
+						}}
+					>
+						<ArrowItem arrow={arrowTop} isRightLimit={isRightLimit} isLeftLimit={isLeftLimit} emojiCross={emoji} />
+						<UserReactionPanel message={message} emojiShowPanel={emojiHover!} mode={mode} />
+						<ArrowItem arrow={arrowBottom} isRightLimit={isRightLimit} isLeftLimit={isLeftLimit} emojiCross={emoji} />
+					</div>
+				)}
 		</>
 	);
 }

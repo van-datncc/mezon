@@ -177,7 +177,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		const matches = emojis
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
 			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
+			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
 
@@ -627,12 +627,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subText={
 									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.username ?? '')
+										: suggestion.username ?? ''
 								}
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
 								display={suggestion.display}
-								emojiId="" //TODO:
+								emojiId={suggestion.id as string}
 							/>
 						);
 					}}
@@ -668,7 +668,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						return `${display}`;
 					}}
 					renderSuggestion={(suggestion) => (
-						<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId="" />
+						<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId={suggestion.id as string} />
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}

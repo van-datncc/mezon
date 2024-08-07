@@ -177,8 +177,13 @@ export const convertMarkdown = (markdown: string): string => {
 		.join('');
 };
 
+export const getEmojiId = (shortname: string, emojiListPNG: any[]) => {
+	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
+	return emoji ? emoji.id : undefined;
+};
+
 export const getSrcEmoji = (id: string) => {
-	return process.env.NX_BASE_IMG_URL + 'emojis/' + id;
+	return process.env.NX_BASE_IMG_URL + 'emojis/' + id + '.webp';
 };
 
 export const convertReactionDataFromMessage = (message: IMessageWithUser) => {

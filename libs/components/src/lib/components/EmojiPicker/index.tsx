@@ -101,7 +101,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				currentChannel?.clan_id || '',
 				channelID ?? '',
 				props.messageEmojiId ?? '',
-				emojiId,
+				emojiId.trim(),
 				emojiPicked.trim(),
 				1,
 				messageEmoji?.sender_id ?? '',
@@ -347,7 +347,9 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 				<button
 					key={index}
 					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
-					onClick={() => onEmojiSelect(item.emoji_id, item.shortname + ' ')} // khong hieu
+					onClick={() => {
+						onEmojiSelect(item.id, item.shortname);
+					}}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
 					<img draggable="false" src={item?.src} />

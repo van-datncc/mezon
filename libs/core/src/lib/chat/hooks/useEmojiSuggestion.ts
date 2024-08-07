@@ -16,7 +16,8 @@ import { useAuth } from '../../auth/hooks/useAuth';
 const categoriesEmoji = ['Recent', 'Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 
 const filterEmojiData = (emojis: IEmoji[]) => {
-	return emojis.map(({ src, shortname, category }) => ({
+	return emojis.map(({ id, src, shortname, category }) => ({
+		id,
 		src,
 		category,
 		shortname,
