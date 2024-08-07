@@ -43,7 +43,7 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrol
 		fetching.current = false;
 	}, []);
 
-	const getCurrentScrollHeight = useCallback(() => targetRef.current.scrollHeight, [targetRef]);
+	const getCurrentScrollHeight = useCallback(() => targetRef.current?.scrollHeight, [targetRef]);
 
 	const getScrollTop = useCallback(() => targetRef.current.scrollTop, [targetRef]);
 

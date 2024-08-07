@@ -1,53 +1,53 @@
 import { useNotification } from '@mezon/core';
-import { INotification, notificationActions, selectTheme } from '@mezon/store';
-import { NotificationCode } from '@mezon/utils';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { notificationActions, selectTheme } from '@mezon/store';
+import { Icons } from '@mezon/ui';
+import { INotification, NotificationCode } from '@mezon/utils';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Icons from '../../../../../ui/src/lib/Icons';
+import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
-import NotifyMentionItem from './NotifyMentionItem';
 
 export type MemberListProps = { className?: string };
 
 export type NotificationProps = { unReadList?: string[] };
 
+const InboxType = {
+	INDIVIDUAL: 'individual',
+	UNREADS: 'unreads',
+	MENTIONS: 'mentions',
+};
+
 const tabDataNotify = [
-	{ title: 'For you', value: 'individual' },
-	{ title: 'Unreads', value: 'unreads' },
-	{ title: 'Mentions', value: 'mentions' },
+	{ title: 'For you', value: InboxType.INDIVIDUAL },
+	{ title: 'Unreads', value: InboxType.UNREADS },
+	{ title: 'Mentions', value: InboxType.MENTIONS },
 ];
 
 function NotificationList({ unReadList }: NotificationProps) {
 	const dispatch = useDispatch();
-	const tabUnreadRef = useRef<HTMLDivElement | null>(null);
-	const tabMentionRef = useRef<HTMLDivElement | null>(null);
-	const tabIndividualRef = useRef<HTMLDivElement | null>(null);
 
 	const { notification } = useNotification();
-	const [currentTabNotify, setCurrentTabNotify] = useState('individual');
+	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.INDIVIDUAL);
 	const handleChangeTab = (valueTab: string) => {
 		setCurrentTabNotify(valueTab);
 	};
 
-	const notificationItem = notification.filter(
+	const sortNotifications = useMemo(() => {
+		return notification.sort((a, b) => {
+			const dateA = new Date(a.create_time || '').getTime();
+			const dateB = new Date(b.create_time || '').getTime();
+			return dateB - dateA;
+		});
+	}, [notification]);
+
+	const notificationItem = sortNotifications.filter(
 		(item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED,
 	);
-	const notifyMentionItem = notification.filter(
+	const notifyMentionItem = sortNotifications.filter(
 		(item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED,
 	);
 
 	const appearanceTheme = useSelector(selectTheme);
-	useEffect(() => {
-		if (currentTabNotify === 'mentions' && tabMentionRef.current) {
-			tabMentionRef.current.scrollTop = -tabMentionRef.current.scrollHeight;
-		}
-		if (currentTabNotify === 'unreads' && tabUnreadRef.current) {
-			tabUnreadRef.current.scrollTop = -tabUnreadRef.current.scrollHeight;
-		}
-		if (currentTabNotify === 'individual' && tabIndividualRef.current) {
-			tabIndividualRef.current.scrollTop = -tabIndividualRef.current.scrollHeight;
-		}
-	}, [currentTabNotify, notifyMentionItem]);
 
 	const unreadListConverted = useMemo(() => {
 		return notifyMentionItem.filter((item) => unReadList?.includes(item.id));
@@ -59,9 +59,9 @@ function NotificationList({ unReadList }: NotificationProps) {
 	}, []);
 
 	return (
-		<div className="absolute top-8 right-0 shadow-lg z-[99999999]">
-			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black pt-1 text-[14px] rounded-lg mt-1 w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
-				<div className="py-2 px-3 dark:bg-bgTertiary bg-white">
+		<div className="absolute top-8 right-0 z-[99999999] rounded-lg shadow-shadowInbox w-[480px]">
+			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black text-[14px] rounded-lg w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
+				<div className="py-2 px-3 dark:bg-bgTertiary bg-bgLightTertiary">
 					<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
 						<InboxButton />
 						<div>Inbox </div>
@@ -82,7 +82,7 @@ function NotificationList({ unReadList }: NotificationProps) {
 								);
 							})}
 						</div>
-						{currentTabNotify === 'unreads' && unreadListConverted.length > 0 && (
+						{currentTabNotify === InboxType.UNREADS && unreadListConverted.length > 0 && (
 							<div className="w-[30%] flex flex-row justify-end items-center">
 								<button onClick={handleMarkAllAsRead} className="w-fit text-xs hover:underline">
 									Mark all as read
@@ -91,38 +91,24 @@ function NotificationList({ unReadList }: NotificationProps) {
 						)}
 					</div>
 				</div>
-				{currentTabNotify === 'individual' && (
-					<div
-						ref={tabIndividualRef}
-						className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto"
-					>
-						{notificationItem.map((notify: INotification, index: number) => (
-							<NotificationItem notify={notify} key={`individual-${notify.id}-${index}`} />
-						))}
-					</div>
-				)}
 
-				{currentTabNotify === 'unreads' && (
-					<div
-						ref={tabIndividualRef}
-						className="dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-y-auto"
-					>
-						{unreadListConverted.map((notify: INotification, index: number) => (
-							<NotifyMentionItem isUnreadTab={true} notify={notify} key={`mention-${notify.id}-${index}`} />
-						))}
-					</div>
-				)}
+				<div
+					className={`dark:bg-bgSecondary bg-bgLightSecondary flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+				>
+					{currentTabNotify === InboxType.INDIVIDUAL &&
+						notificationItem.map((notify: INotification, index: number) => {
+							return <NotificationItem notify={notify} key={`individual-${notify.id}-${index}`} />;
+						})}
 
-				{currentTabNotify === 'mentions' && (
-					<div
-						ref={tabMentionRef}
-						className={`dark:bg-bgSecondary bg-gray-100 flex flex-col-reverse max-w-[600px] max-h-heightInBox overflow-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-					>
-						{notifyMentionItem.map((notify: INotification, index: number) => (
-							<NotifyMentionItem isUnreadTab={false} notify={notify} key={`mention-${notify.id}-${index}`} />
+					{currentTabNotify === InboxType.UNREADS && unreadListConverted.length > 0 && (
+						<NotificationChannel isUnreadTab={true} unreadListConverted={unreadListConverted} />
+					)}
+
+					{currentTabNotify === InboxType.MENTIONS &&
+						notifyMentionItem.map((notification: INotification, index: number) => (
+							<NotificationChannel isUnreadTab={false} unreadListConverted={[]} notification={notification} />
 						))}
-					</div>
-				)}
+				</div>
 			</div>
 		</div>
 	);

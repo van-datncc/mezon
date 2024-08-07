@@ -129,7 +129,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 				showAction={true}
 			/>
 
-			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
+			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} showAction={false} />
 		</View>
 	);
 });

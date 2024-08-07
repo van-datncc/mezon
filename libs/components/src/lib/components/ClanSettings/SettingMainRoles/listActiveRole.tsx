@@ -1,6 +1,8 @@
 import { Icons } from '@mezon/components';
-import { RolesClanEntity, selectTheme } from '@mezon/store';
+import { useClanOwner } from '@mezon/core';
+import { RolesClanEntity, selectCurrentClan, selectTheme } from '@mezon/store';
 import { Tooltip } from 'flowbite-react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 type ListActiveRoleProps = {
@@ -12,10 +14,12 @@ type ListActiveRoleProps = {
 
 const ListActiveRole = (props: ListActiveRoleProps) => {
 	const { activeRoles, handleRoleClick, setShowModal, setOpenEdit } = props;
+	const isClanOwner = useClanOwner();
 	const appearanceTheme = useSelector(selectTheme);
 
-	return activeRoles.map((role) => (
-		<tr key={role.id} className="h-14 dark:text-white text-black group dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton">
+	return activeRoles.map((role) => {
+		const hasPermissionEdit = !isClanOwner && useBelongToClanOwner(role?.creator_id || '');
+		return <tr key={role.id} className="h-14 dark:text-white text-black group dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton">
 			<td>
 				<p
 					className="inline-flex gap-x-2 items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5"
@@ -42,13 +46,18 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 							setOpenEdit(true);
 						}}
 					>
+						{(!hasPermissionEdit) ?
 						<Tooltip content="Edit" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 							<Icons.PenEdit defaultSize="size-5" />
+						</Tooltip> :
+						<Tooltip content="View" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
+							<Icons.ViewRole defaultSize="size-5" />
 						</Tooltip>
+						}
 					</div>
 					<div
-						className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full"
-						onClick={() => {
+						className={`text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full ${hasPermissionEdit ? 'opacity-20' : 'opacity-100'}`}
+						onClick={hasPermissionEdit ? undefined : () => {
 							setShowModal(true);
 							handleRoleClick(role.id);
 						}}
@@ -60,7 +69,16 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 				</div>
 			</td>
 		</tr>
-	));
+});
 };
 
 export default ListActiveRole;
+
+export function useBelongToClanOwner(itemId: string) {
+	const currentClan = useSelector(selectCurrentClan);
+	const isBelongToClanOwner = useMemo(() => {
+		return currentClan?.creator_id === itemId;
+	}, [currentClan?.creator_id, itemId]);
+	
+	return isBelongToClanOwner;
+}

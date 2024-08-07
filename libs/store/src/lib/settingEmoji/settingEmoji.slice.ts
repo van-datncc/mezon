@@ -60,7 +60,6 @@ export const createEmoji = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const res = await mezon.client.createClanEmoji(mezon.session, form.request);
-			console.log(res);
 			if (res) {
 				thunkAPI.dispatch(fetchEmojisByClanId({ clanId: form.clanId, noCache: true }));
 			} else {

@@ -263,6 +263,9 @@ export const clansSlice = createSlice({
 				clan.showNumEvent = action.payload.status;
 			}
 		},
+		removeByClanID: (state, action: PayloadAction<string>) => {
+			clansAdapter.removeOne(state, action.payload);
+		},
 	},
 	extraReducers: (builder) => {
 		builder

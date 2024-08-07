@@ -6,7 +6,7 @@ import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
@@ -35,7 +35,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 				<Text
 					style={{
 						color: baseColor.blurple,
-						fontWeight: "bold",
+						fontWeight: 'bold',
 						paddingHorizontal: 20,
 						opacity: channelName?.trim()?.length > 0 ? 1 : 0.5,
 					}}
@@ -120,18 +120,20 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 	}
 
 	return (
-		<ScrollView contentContainerStyle={styles.container}>
-			<MezonInput
-				value={channelName}
-				onTextChange={setChannelName}
-				label={t('fields.channelName.title')}
-				errorMessage={t('fields.channelName.errorMessage')}
-				placeHolder={t('fields.channelName.placeholder')}
-			/>
+		<View style={styles.wrapper}>
+			<ScrollView contentContainerStyle={styles.container}>
+				<MezonInput
+					value={channelName}
+					onTextChange={setChannelName}
+					label={t('fields.channelName.title')}
+					errorMessage={t('fields.channelName.errorMessage')}
+					placeHolder={t('fields.channelName.placeholder')}
+				/>
 
-			<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} />
+				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} />
 
-			<MezonMenu menu={menuPrivate} />
-		</ScrollView>
+				<MezonMenu menu={menuPrivate} />
+			</ScrollView>
+		</View>
 	);
 }

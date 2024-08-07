@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelType } from 'mezon-js';
+import { ChannelMessage, ChannelType, Notification } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -27,7 +27,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, IMentionOnMessage, ImarkdownOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -104,7 +104,7 @@ export type IRoleUsers = IRole & {
 };
 
 export type ChannelThreads = IChannel & {
-	threads: IChannel[];
+	threads?: IChannel[];
 };
 
 export type IChannel = ApiChannelDescription & {
@@ -195,8 +195,9 @@ export type IMessageSendPayload = {
 	hashtags?: IHashtagOnMessage[];
 	emojis?: IEmojiOnMessage[];
 	links?: ILinkOnMessage[];
-	markdowns?: ImarkdownOnMessage[];
-	plainText?: string;
+	markdowns?: IMarkdownOnMessage[];
+	voicelinks?: ILinkVoiceRoomOnMessage[];
+	plaintext?: string;
 };
 
 export type IUser = {
@@ -423,6 +424,8 @@ export type MentionDataProps = {
 	display?: string;
 	avatarUrl?: string;
 	displayName?: string;
+	clanNick?: string;
+	clanAvatar?: string;
 	user?: ApiUser;
 };
 
@@ -593,3 +596,24 @@ export enum ModeResponsive {
 export type ApiChannelMessageHeaderWithChannel = ApiChannelMessageHeader & {
 	channel_id: string;
 };
+export interface INotification extends Notification {
+	id: string;
+	content?: any;
+}
+export interface NotificationEntity extends INotification {
+	id: string;
+}
+
+export type TNotificationChannel = {
+	channel_id?: string;
+	clan_logo?: string;
+	channel_label?: string;
+	clan_id?: string;
+	clan_name?: string;
+	category_name?: string;
+	notifications: NotificationEntity[];
+};
+
+export enum SlugPermission {
+	Admin = 'administrator',
+}

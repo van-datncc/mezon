@@ -16,8 +16,12 @@ const DrawerContent = React.memo(() => {
 	const [isEmptyClan, setIsEmptyClan] = useState<boolean>(false);
 
 	useEffect(() => {
-		setIsEmptyClan(clansLoadingStatus === 'loaded' && !clans?.length);
-	}, [clansLoadingStatus, clans]);
+		const timer = setTimeout(() => {
+			setIsEmptyClan(clansLoadingStatus === 'loaded' && !clans?.length);
+		}, 2000);
+		
+		return () => clearTimeout(timer);
+	}, [clansLoadingStatus, clans?.length]);
 	return (
 		<View style={[styles.containerDrawerContent, { backgroundColor: themeValue.primary }]}>
 			<ServerList />

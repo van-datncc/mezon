@@ -1,6 +1,5 @@
 import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
+import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
@@ -222,6 +221,14 @@ export const channelMembers = createSlice({
 			const channelId = action.payload;
 			const updatedMembers = Object.values(state.entities).filter((member) => {
 				return member.channelId !== channelId;
+			});
+			return channelMembersAdapter.setAll(state, updatedMembers);
+		},
+
+		removeUserByUserIdAndChannelId: (state, action: PayloadAction<{ userId: string; channelId: string }>) => {
+			const { userId, channelId } = action.payload;
+			const updatedMembers = Object.values(state.entities).filter((member) => {
+				return !(member?.user?.id === userId && member.channelId === channelId);
 			});
 			return channelMembersAdapter.setAll(state, updatedMembers);
 		},

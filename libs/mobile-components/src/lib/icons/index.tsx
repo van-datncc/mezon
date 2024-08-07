@@ -1261,3 +1261,38 @@ export function DisturbStatusIcon({ width = 20, height = 20, ...props }: SvgProp
   </Svg>
 	);
 }
+
+
+export function FilterSearchIcon({ width = 20, height = 20, color = 'white', ...props}: SvgProps) {
+	return (
+    <Svg
+    width={width}
+    height={height}
+    viewBox="0 0 32 32"
+    fill="none"
+    {...props}
+  >
+    <Path
+      d="M19.333 8c0-.46.063-.903.162-1.333H2.667v2.666h16.828A5.947 5.947 0 0119.333 8zM19.333 24c0-.46.063-.903.162-1.333H2.667v2.666h16.828A5.948 5.948 0 0119.333 24zM6 16c0-.46.063-.903.161-1.333H2.667v2.666H6.16A5.944 5.944 0 016 16zM17.839 14.667c.098.43.161.873.161 1.333 0 .46-.063.903-.161 1.333h11.494v-2.666H17.84zM25.333 12a4 4 0 100-8 4 4 0 000 8zM12 20a4 4 0 100-8 4 4 0 000 8zM25.333 28a4 4 0 100-8 4 4 0 000 8z"
+      fill={color}
+    />
+  </Svg>
+	);
+}
+
+export function AngleLeft({ width = 24, height = 24, color = 'white', ...props }: SvgProps) {
+	return (
+    <Svg
+    width={width}
+    height={height}
+    viewBox="0 0 17 28"
+    fill="none"
+    {...props}
+  >
+    <Path
+      d="M16.467 3.8L13.333.667 0 14l13.333 13.333 3.134-3.133L6.289 14 16.467 3.8z"
+      fill={color}
+    />
+  </Svg>
+	);
+}

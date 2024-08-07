@@ -1,17 +1,15 @@
-import { notificationActions } from '@mezon/store';
 import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
+import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
+import { notificationActions } from '../notification/notify.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
@@ -121,7 +119,15 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
-			thunkAPI.dispatch(clansActions.joinClan({ clanId: body.clan_id as string }));
+			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
+				thunkAPI.dispatch(
+					channelsActions.joinChat({
+						clanId: response.clan_id as string,
+						channelId: response.channel_id as string,
+						channelType: response.type as number,
+					}),
+				);
+			}
 			if (response.parrent_id !== '0') {
 				await thunkAPI.dispatch(
 					threadsActions.setListThreadId({ channelId: response.parrent_id as string, threadId: response.channel_id as string }),
@@ -224,9 +230,9 @@ export const fetchChannels = createAsyncThunk(
 	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_TEXT, noCache }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchChannelsCached.clear(mezon, 100, 1, clanId, channelType);
+			fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
 		}
-		const response = await fetchChannelsCached(mezon, 100, 1, clanId, channelType);
+		const response = await fetchChannelsCached(mezon, 500, 1, clanId, channelType);
 		if (!response.channeldesc) {
 			return [];
 		}
@@ -284,6 +290,9 @@ export const channelsSlice = createSlice({
 		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
+		removeByChannelID: (state, action: PayloadAction<string>) => {
+			channelsAdapter.removeOne(state, action.payload);
+		},
 		setModeResponsive: (state, action) => {
 			state.modeResponsive = action.payload;
 		},

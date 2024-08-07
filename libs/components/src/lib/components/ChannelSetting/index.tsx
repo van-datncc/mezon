@@ -3,6 +3,7 @@ import { IChannel } from '@mezon/utils';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
+import SettingCategoryChannel from './Component/CategoryChannel';
 import IntegrationsChannel from './Component/IntegrationsChannel';
 import InvitesChannel from './Component/InvitesChannel';
 import OverviewChannel from './Component/OverviewChannel';
@@ -14,10 +15,16 @@ export type ModalSettingProps = {
 	onClose: () => void;
 	channel: IChannel;
 };
-
+export enum EChannelSettingTab {
+	OVERVIEW = "Overview",
+	PREMISSIONS = "Permissions",
+	INVITES = "Invites",
+	INTERGRATIONS = "Integrations",
+	CATEGORY = "Category"
+}
 const SettingChannel = (props: ModalSettingProps) => {
 	const { onClose, channel } = props;
-	const [currentSetting, setCurrentSetting] = useState<string>('Overview');
+	const [currentSetting, setCurrentSetting] = useState<string>(EChannelSettingTab.OVERVIEW);
 	const [menu, setMenu] = useState(true);
 
 	const handleSettingItemClick = (settingName: string) => {
@@ -30,7 +37,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 	const closeMenu = useSelector(selectCloseMenu);
 
 	return (
-		<div className="flex fixed inset-0  w-screen z-10" onMouseDown={(event) => event.stopPropagation()} role="button">
+		<div className="flex fixed inset-0  w-screen z-10 cursor-default" onMouseDown={(event) => event.stopPropagation()} role="button">
 			<div className="flex text-gray- w-screen relative text-white">
 				<div className="h-fit absolute top-5 right-5 block sbm:hidden z-[1]">
 					<button
@@ -55,10 +62,12 @@ const SettingChannel = (props: ModalSettingProps) => {
 					stateClose={closeMenu}
 					stateMenu={menu}
 				/>
-				{currentSetting === 'Overview' && <OverviewChannel channel={channel} />}
-				{currentSetting === 'Permissions' && <PermissionsChannel channel={channel} />}
-				{currentSetting === 'Invites' && <InvitesChannel />}
-				{currentSetting === 'Integrations' && <IntegrationsChannel />}
+				{currentSetting === EChannelSettingTab.OVERVIEW && <OverviewChannel channel={channel} />}
+				{currentSetting === EChannelSettingTab.PREMISSIONS && <PermissionsChannel channel={channel} />}
+				{currentSetting === EChannelSettingTab.INVITES && <InvitesChannel />}
+				{currentSetting === EChannelSettingTab.INTERGRATIONS && <IntegrationsChannel />}
+				{currentSetting === EChannelSettingTab.CATEGORY && <SettingCategoryChannel channel={channel} />}
+
 				<ExitSetting onClose={onClose} />
 			</div>
 		</div>

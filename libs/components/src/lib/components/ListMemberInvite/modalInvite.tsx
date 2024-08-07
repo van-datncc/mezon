@@ -19,7 +19,7 @@ export type ModalParam = {
 };
 
 const ModalInvite = (props: ModalParam) => {
-	const [expire, setExpire] = useState('7 day');
+	const [expire, setExpire] = useState('7 days');
 	const [max, setMax] = useState('No limit');
 	const [modalEdit, setModalEdit] = useState(false);
 	const [urlInvite, setUrlInvite] = useState('');

@@ -4,9 +4,10 @@ import { InputField } from '@mezon/ui';
 import { UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { AddMembersModal } from '../AddMembersModal';
 
-const SettingManageMembers = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
+const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
 	const { updateRole } = useRoles();
 	const dispatchRole = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
@@ -44,7 +45,7 @@ const SettingManageMembers = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) =
 		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', [], [], userIDArray, []);
 	};
 	return (
-		<>
+		<div style={{pointerEvents: !hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex gap-x-3">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full py-1 px-2 font-normal border dark:border-bgTertiary border-bgLightModeThird rounded"
@@ -68,7 +69,12 @@ const SettingManageMembers = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) =
 					{searchResults.map((member: UsersClanEntity) => (
 						<li key={member?.user?.id} className="flex justify-between items-center group">
 							<div className="flex gap-x-2">
-								<img src={member?.user?.avatar_url} alt={member?.user?.display_name} className="size-6 rounded-full" />
+								<AvatarImage 
+									alt={member?.user?.username || ''}
+									userName={member?.user?.username}
+									className="min-w-6 min-h-6 max-w-6 max-h-6"
+									src={member?.user?.avatar_url}
+								/>
 								<span className="dark:text-white text-black">{member?.user?.display_name}</span>
 								<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">{member?.user?.username}</span>
 							</div>
@@ -88,7 +94,7 @@ const SettingManageMembers = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) =
 				</ul>
 			</div>
 			<AddMembersModal isOpen={openModal} onClose={handleCloseModal} RolesClan={RolesClan} />
-		</>
+		</div>
 	);
 };
 

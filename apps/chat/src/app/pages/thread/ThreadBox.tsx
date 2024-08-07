@@ -2,7 +2,7 @@ import { MentionReactInput, UserMentionList } from '@mezon/components';
 import { useThreadMessage, useThreads } from '@mezon/core';
 import {
 	RootState,
-	clansActions,
+	channelsActions,
 	createNewChannel,
 	selectCurrentChannel,
 	selectCurrentChannelId,
@@ -57,10 +57,16 @@ const ThreadBox = () => {
 		) => {
 			if (sessionUser) {
 				if (value?.nameValueThread) {
-					const thread = await createThread(value);
+					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
-						await dispatch(clansActions.joinClan({ clanId: currentClanId as string }));
-						await sendMessageThread(content, mentions, attachments, references, thread as ApiChannelDescription);
+						await dispatch(
+							channelsActions.joinChat({
+								clanId: currentClanId as string,
+								channelId: thread.channel_id as string,
+								channelType: thread.type as number,
+							}),
+						);
+						await sendMessageThread(content, mentions, attachments, references, thread);
 					}
 				}
 			} else {

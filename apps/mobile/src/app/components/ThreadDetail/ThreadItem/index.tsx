@@ -2,7 +2,7 @@ import { AngleRightIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, channelsActions, getStoreAsync, selectMemberByUserId } from '@mezon/store-mobile';
 import { IChannel, convertTimeMessage } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -23,6 +23,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const handleNavigateThread = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
 		navigation.navigate(APP_SCREEN.HOME as never);
+		navigation.dispatch(DrawerActions.closeDrawer());
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id;
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));

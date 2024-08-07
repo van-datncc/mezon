@@ -1,18 +1,37 @@
+import { useClanOwner } from '@mezon/core';
 import { RolesClanEntity, getSelectedRoleId, toggleIsShowFalse } from '@mezon/store';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useBelongToClanOwner } from '../../SettingMainRoles/listActiveRole';
 import SettingDisplayRole from '../SettingDisplayRole';
 import SettingManageMembers from '../SettingManageMembers';
 import SettingPermissions from '../SettingPermissions';
+import { TabsSelectRole } from './tabSelectRole';
 
-const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }) => {
+const SettingValueDisplayRole = ({ RolesClan}: { RolesClan: RolesClanEntity[]}) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>('Display');
 	const clickRole = useSelector(getSelectedRoleId);
 	const activeRole = useMemo(() => RolesClan.find((role) => role.id === clickRole), [RolesClan, clickRole]);
+	const isClanOwner = useClanOwner();
+	const hasBelongClanOwner = useBelongToClanOwner(activeRole?.creator_id || '');
+	const hasPermissionEdit = !isClanOwner && hasBelongClanOwner;
 	const dispatch = useDispatch();
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 	};
+
+	const renderContent = useCallback(() => {
+		switch (selectedButton) {
+			case TabsSelectRole.Tab_Display:
+				return <SettingDisplayRole RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit}/>;
+			case TabsSelectRole.Tab_Permissions:
+				return <SettingPermissions RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit} />;
+			case TabsSelectRole.Tab_Manage_Members:
+				return <SettingManageMembers RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit} />;
+			default:
+				return null;
+		}
+	  }, [selectedButton, RolesClan, hasPermissionEdit]);
 
 	const roleUsersCount = activeRole?.role_user_list?.role_users?.length || 0;
 	return (
@@ -56,9 +75,7 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 					/>
 				</button>
 			</div>
-			{selectedButton === 'Display' && <SettingDisplayRole RolesClan={RolesClan} />}
-			{selectedButton === 'Permissions' && <SettingPermissions RolesClan={RolesClan} />}
-			{selectedButton === 'Manage Members' && <SettingManageMembers RolesClan={RolesClan} />}
+			{renderContent()}
 		</>
 	);
 };

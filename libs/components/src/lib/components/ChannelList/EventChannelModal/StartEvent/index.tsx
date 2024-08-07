@@ -1,6 +1,7 @@
 import { Icons } from '@mezon/components';
-import { selectAllAccount, selectAllEventManagement, selectCurrentClan } from '@mezon/store';
-import { useMemo } from 'react';
+import { useClanRestriction } from '@mezon/core';
+import { selectAllEventManagement } from '@mezon/store';
+import { EPermission } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import ListEventManagement from './ListEventManagement';
 
@@ -13,10 +14,10 @@ type StartEventModalProps = {
 
 const StartEventModal = (props: StartEventModalProps) => {
 	const { onClose, onOpenCreate, onOpenDetailItem, numberEventManagement } = props;
-	const userProfile = useSelector(selectAllAccount);
-	const currentClan = useSelector(selectCurrentClan);
 	const allEventManagement = useSelector(selectAllEventManagement);
-	const checkUserCreate = useMemo(() => currentClan?.creator_id === userProfile?.user?.id, [currentClan, userProfile]);
+	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const isShowCreateEvent = hasAdminPermission || isClanCreator || hasClanPermission;
 	return (
 		<>
 			<div className="dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black flex justify-between items-center p-4">
@@ -29,7 +30,7 @@ const StartEventModal = (props: StartEventModalProps) => {
 							{numberEventManagement > 1 && `${numberEventManagement} Events`}
 						</h4>
 					</div>
-					{checkUserCreate && (
+					{(isShowCreateEvent) && (
 						<>
 							<div className="w-[0.1px] h-4 bg-gray-400"></div>
 							<div className="bg-primary px-2 py-1 rounded-md text-white font-medium" onClick={onOpenCreate}>
@@ -47,7 +48,7 @@ const StartEventModal = (props: StartEventModalProps) => {
 				<div className="dark:bg-[#313339] bg-white h-fit min-h-80 max-h-[80vh]  overflow-y-scroll hide-scrollbar p-4 gap-y-4 flex flex-col">
 					<ListEventManagement
 						allEventManagement={allEventManagement}
-						checkUserCreate={checkUserCreate}
+						checkUserCreate={isClanCreator}
 						onOpenDetailItem={onOpenDetailItem}
 					/>
 				</div>

@@ -1,5 +1,6 @@
-import { useCategory, useOnClickOutside } from '@mezon/core';
-import { categoriesActions, selectAllAccount, selectCurrentClan, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { useCategory, useClanRestriction, useOnClickOutside } from '@mezon/core';
+import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -24,8 +25,8 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { categorizedChannels } = useCategory();
-	const userProfile = useSelector(selectAllAccount);
-	const currentClan = useSelector(selectCurrentClan);
+	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));
@@ -78,6 +79,8 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
+	const isShow = hasAdminPermission || isClanCreator || hasClanPermission;
+
 	return (
 		<>
 			{type === 'direct' ? (
@@ -107,13 +110,13 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%]"
 							>
 								<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
-									<ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />
+									{(isShow) &&<ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
 									<ItemModal
 										onClick={handleShowInviteClanModal}
 										children="Invite People"
 										endIcon={<Icons.AddPerson className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>
-									{userProfile?.user?.id === currentClan?.creator_id && (
+									{(isShow) && (
 										<ItemModal
 											onClick={handleShowServerSettings}
 											children="Clan Settings"
@@ -122,7 +125,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 											}
 										/>
 									)}
-									{userProfile?.user?.id === currentClan?.creator_id && (
+									{(isShow) && (
 										<ItemModal
 											onClick={() => {
 												openNotiSettingModal();

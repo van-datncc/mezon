@@ -14,7 +14,7 @@ import AddStatusUserModal from '../../components/AddStatusUserModal';
 import CustomStatusUser from '../../components/CustomStatusUser';
 import { useMixImageColor } from '../../hooks/useMixImageColor';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { MezonButton } from '../../temp-ui';
+import { MezonAvatar, MezonButton } from '../../temp-ui';
 import { style } from './styles';
 
 export enum ETypeCustomUserStatus {
@@ -52,7 +52,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	};
 
 	const firstFriendImageList = useMemo(() => {
-		return friendList?.slice?.(0, 5)?.map((friend) => friend?.user?.avatar_url);
+		return friendList?.slice?.(0, 5)?.map((friend) => ({
+			avatarUrl: friend?.user?.avatar_url,
+			username: friend?.user?.username || friend?.user?.display_name
+		}));
 	}, [friendList]);
 
 	const memberSince = useMemo(() => {
@@ -87,8 +90,16 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					{user?.userProfile?.user?.avatar_url ? (
 						<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
 					) : (
-						<Block overflow={'hidden'} width={'100%'} height={'100%'} borderRadius={50}>
-							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)}</Text>
+						<Block
+							backgroundColor={themeValue.colorAvatarDefault}
+							overflow={'hidden'}
+							width={'100%'}
+							height={'100%'}
+							borderRadius={50}
+							alignItems={'center'}
+							justifyContent={'center'}
+						>
+							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
 						</Block>
 					)}
 					<View style={styles.dotOnline} />
@@ -146,15 +157,14 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 				<TouchableOpacity style={[styles.contentContainer, styles.imgList]} onPress={() => navigateToFriendScreen()}>
 					<Text style={styles.textTitle}>{t('yourFriend')}</Text>
-					<View style={styles.listImageFriend}>
-						{firstFriendImageList.map((imgUrl, idx) => {
-							return (
-								<View key={idx} style={[styles.imageContainer, { right: idx * 20 }]}>
-									<Image source={{ uri: imgUrl }} style={styles.imageFriend} />
-								</View>
-							);
-						})}
-					</View>
+
+					<MezonAvatar
+						avatarUrl=''
+						username=''
+						height={30}
+						width={30}
+						stacks={firstFriendImageList}
+					/>
 					<Icons.ChevronSmallRightIcon width={18} height={18} style={{ marginLeft: size.s_4 }} color={themeValue.textStrong} />
 				</TouchableOpacity>
 			</ScrollView>

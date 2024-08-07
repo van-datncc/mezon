@@ -6,9 +6,9 @@ import { Platform, ScrollView, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../ImageListModal';
-import EmptyMedia from './EmptyMedia';
 import { style } from './MediaChannel.styles';
 import MediaItem from './MediaItem';
+import EmptySearchPage from '../EmptySearchPage';
 
 const MediaChannel = () => {
 	const { themeValue } = useTheme();
@@ -86,7 +86,7 @@ const MediaChannel = () => {
 					{attachments?.length ? (
 						attachments?.map((item, index) => <MediaItem data={item} onPress={openImage} key={index} />)
 					) : (
-						<EmptyMedia />
+						<EmptySearchPage />
 					)}
 				</View>
 			</ScrollView>

@@ -96,7 +96,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						name={channelLabel}
 						avatarDM={avatarDM}
 						userName={userName}
-					/>
+						mode={0} />
 				)
 			}
 			return (

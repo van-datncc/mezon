@@ -20,6 +20,7 @@ import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingModal from '../../components/LoadingModal';
+import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
 import {
 	checkNotificationPermission,
@@ -54,6 +55,7 @@ export const Authentication = () => {
 	const { setAttachmentData } = useReference();
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
+	useCheckUpdatedVersion();
 
 	useEffect(() => {
 		if (userProfile?.email) loadFRMConfig();
@@ -115,7 +117,7 @@ export const Authentication = () => {
 				(error: any) => {
 					console.log('Error receiving files:', error);
 				},
-				'com.mezon.mobile',
+				'mezon.mobile.sharing',
 			);
 		} catch (error) {
 			console.log('Error while receiving files:', error);
@@ -136,7 +138,7 @@ export const Authentication = () => {
 	const onCloseFileShare = () => {
 		setFileShared(undefined);
 		setAttachmentData([]);
-		BackHandler.exitApp();
+		navigation.goBack();
 	};
 
 	return (

@@ -62,13 +62,20 @@ export const style = (colors: Attributes) => StyleSheet.create({
     whiteText: {
         color: colors.textStrong
     },
-    textAvatar: {
-        backgroundColor: Colors.bgGrayDark,
+    avatarWrapper: {
+        borderRadius: 50,
+        backgroundColor: colors.colorAvatarDefault,
+        height: size.s_40,
+        width: size.s_40,
+    },
+    wrapperTextAvatar: {
         width: size.s_40,
         height: size.s_40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textAvatar: {
         textAlign: 'center',
-        textAlignVertical: 'center',
-        borderRadius: 50,
         fontSize: size.h5,
         color: Colors.white
     },
@@ -79,4 +86,4 @@ export const style = (colors: Attributes) => StyleSheet.create({
         height: 20,
         width: 20,
     }
-}) 
+})

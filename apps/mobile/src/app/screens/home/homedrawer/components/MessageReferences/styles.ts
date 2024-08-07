@@ -35,7 +35,7 @@ export const style = (colors: Attributes) =>
 			width: '100%',
 			height: '100%',
 			borderRadius: size.s_50,
-			backgroundColor: Colors.titleReset,
+			backgroundColor: colors.colorAvatarDefault,
 			justifyContent: 'center',
 			alignItems: 'center',
 		},

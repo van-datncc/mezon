@@ -1,7 +1,7 @@
 import { useReference } from '@mezon/core';
-import { CameraIcon, CheckIcon, load, PlayIcon, save, STORAGE_KEY_TEMPORARY_ATTACHMENT } from '@mezon/mobile-components';
+import { CameraIcon, CheckIcon, PlayIcon, pushAttachmentToCache } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { appActions, selectCurrentChannelId } from '@mezon/store';
+import { appActions } from '@mezon/store';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { delay } from 'lodash';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -9,10 +9,11 @@ import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, To
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { style } from './styles';
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
+	currentChannelId: string;
 }
 
 export interface IFile {
@@ -22,7 +23,7 @@ export interface IFile {
 	size: string;
 	fileData: any;
 }
-const Gallery = ({ onPickGallery }: IProps) => {
+const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [photos, setPhotos] = useState([]);
@@ -31,34 +32,6 @@ const Gallery = ({ onPickGallery }: IProps) => {
 	const { attachmentDataRef, setAttachmentData } = useReference();
 	const dispatch = useDispatch();
 	const timerRef = useRef<any>();
-
-	const currentChannelId = useSelector(selectCurrentChannelId)
-
-	const getAllCachedAttachment = async () => {
-		const allCachedMessage = await load(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		return allCachedMessage;
-	};
-
-	const pushAttachmentToCache = async (attachment: any) => {
-		const allCachedAttachment = (await getAllCachedAttachment()) || {};
-
-		if (Array.isArray(attachment)) {
-			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
-				...allCachedAttachment,
-				[currentChannelId]: attachment,
-			});
-		} else {
-			const currentAttachment = allCachedAttachment[currentChannelId] || [];
-			currentAttachment.push(attachment);
-
-			save(STORAGE_KEY_TEMPORARY_ATTACHMENT, {
-				...allCachedAttachment,
-				[currentChannelId]: currentAttachment,
-			});
-		}
-	};
-
-
 
 	const attachmentsFileName = useMemo(() => {
 		if (!attachmentDataRef?.length) return [];
@@ -168,7 +141,7 @@ const Gallery = ({ onPickGallery }: IProps) => {
 		});
 
 		setAttachmentData(removedAttachment);
-		pushAttachmentToCache(removedAttachment)
+		pushAttachmentToCache(removedAttachment, currentChannelId);
 	}
 
 	const renderItem = ({ item }) => {
@@ -243,11 +216,14 @@ const Gallery = ({ onPickGallery }: IProps) => {
 				filename: image?.filename || image?.uri,
 				filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
 			});
-			pushAttachmentToCache({
-				url: filePath,
-				filename: image?.filename || image?.uri,
-				filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
-			})
+			pushAttachmentToCache(
+				{
+					url: filePath,
+					filename: image?.filename || image?.uri,
+					filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
+				},
+				currentChannelId,
+			);
 			onPickGallery([fileFormat]);
 		} catch (err) {
 			console.log('Error: ', err);
@@ -274,11 +250,14 @@ const Gallery = ({ onPickGallery }: IProps) => {
 					filetype: file?.type,
 				});
 
-				pushAttachmentToCache({
-					url: file?.uri,
-					filename: file?.fileName || file?.uri,
-					filetype: file?.type,
-				})
+				pushAttachmentToCache(
+					{
+						url: file?.uri,
+						filename: file?.fileName || file?.uri,
+						filetype: file?.type,
+					},
+					currentChannelId,
+				);
 
 				const fileBase64 = await RNFS.readFile(file?.uri, 'base64');
 				const fileFormat: IFile = {

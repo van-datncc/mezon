@@ -13,6 +13,7 @@ import {
 } from '@mezon/utils';
 import {
 	EntityState,
+	GetThunkAPI,
 	PayloadAction,
 	createAsyncThunk,
 	createEntityAdapter,
@@ -21,7 +22,6 @@ import {
 	createSlice,
 	weakMapMemoize,
 } from '@reduxjs/toolkit';
-import { GetThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -153,7 +153,6 @@ type fetchMessageChannelPayload = {
 	noCache?: boolean;
 	messageId?: string;
 	direction?: number;
-	lastSeenMess?: string;
 	isFetchingLatestMessages?: boolean;
 	isClearMessage?: boolean;
 };
@@ -161,7 +160,7 @@ type fetchMessageChannelPayload = {
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
 	async (
-		{ channelId, noCache, messageId, direction, lastSeenMess, isFetchingLatestMessages, isClearMessage }: fetchMessageChannelPayload,
+		{ channelId, noCache, messageId, direction, isFetchingLatestMessages, isClearMessage }: fetchMessageChannelPayload,
 		thunkAPI,
 	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));

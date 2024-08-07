@@ -4,12 +4,20 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { VoiceContextProvider } from '@mezon/voice';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import WebFont from 'webfontloader';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { Routes } from './routes';
+
+if (typeof window !== 'undefined') {
+	// TODO: fix loading font
+	// WebFont.load({
+	// 	google: {
+	// 		families: ['gg sans'],
+	// 	}
+	// });
+}
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,
@@ -40,14 +48,6 @@ export function App() {
 }
 
 function AppWrapper() {
-	useEffect(() => {
-		WebFont.load({
-			google: {
-				families: ['gg sans'],
-			},
-		});
-	}, []);
-
 	return (
 		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
 			<MezonContextProvider mezon={mezon} connect={true}>

@@ -45,7 +45,7 @@ function MessageWithUser({
 	isHighlight,
 	popup,
 	isShowFull,
-	isSearchMessage
+	isSearchMessage,
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
@@ -58,9 +58,17 @@ function MessageWithUser({
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
-	const hasIncludeMention = message.content.t?.includes('@here') || message.content.t?.includes(`@${userLogin.userProfile?.user?.username}`);
-	const checkReferences = message.references?.length !== 0;
 
+	const hasIncludeMention = useMemo(() => {
+		const userMention = `@[${userLogin.userProfile?.user?.username}]`;
+		const startIndexHere = message.content.t?.indexOf('@[here]');
+		const startIndexUser = message.content.t?.indexOf(userMention);
+		const includesHere = message.content.t?.includes('@[here]');
+		const includesUser = message.content.t?.includes(userMention);
+		return includesHere || includesUser;
+	}, [message.content.t, userLogin.userProfile?.user?.username]);
+
+	const checkReferences = message.references?.length !== 0;
 	const shouldShowDateDivider = useMemo(() => {
 		return message.isStartedMessageOfTheDay;
 	}, [message]);

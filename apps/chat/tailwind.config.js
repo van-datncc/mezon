@@ -64,6 +64,7 @@ module.exports = {
         widthSearchMessage: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${widthResultSearch})`,
         widthModalSearch: widthModalSearch,
         widthPinMess: `calc(100% - 16px)`,
+        widthInputViewChannelPermission: `calc(100% - 30px)`,
         450: '450px',
         "4/5": "80%",
         "9/10": "90%",
@@ -95,7 +96,7 @@ module.exports = {
         '9/10': "90%",
         heightInBox: `calc(100vh - 168px)`,
         messageViewChatDM: `calc(100vh - 60px)`,
-        "50vh" : "50vh"
+        "50vh": "50vh"
       },
 
       minHeight: {
@@ -105,7 +106,7 @@ module.exports = {
         heightRolesEditMobile: `calc(100% - 10px)`,
       },
 
-      minWidth:{
+      minWidth: {
         widthMenuMobile: `calc(100vw - ${clanWidth})`,
       },
 
@@ -138,7 +139,7 @@ module.exports = {
             transform: 'rotate3d(0, 1, 0, 360deg)',
           },
         },
-        faded_input:{
+        faded_input: {
           '0%': {
             opacity: 0.80,
           },
@@ -149,14 +150,15 @@ module.exports = {
       },
       boxShadow: {
         'emoji_item': '0 1px 0 0 #ededef',
-        'emoji_item_dark' : '0 1px 0px 0px #3e3e3ed4',
-        'emoji_item-delete' : '0px 0px 2.5px 0px #2f2f2f33'
+        'emoji_item_dark': '0 1px 0px 0px #3e3e3ed4',
+        'emoji_item-delete': '0px 0px 2.5px 0px #2f2f2f33',
+        'shadowInbox': '0 0 0 1px hsla(0, 0%, 0%, 0.08)'
       }
     },
     animation: {
       rotation: 'rotation 6s linear infinite',
       spin: 'spin 1s linear infinite',
-      faded_input : 'faded_input 0.05s ease-in-out forwards'
+      faded_input: 'faded_input 0.05s ease-in-out forwards'
     },
     screens: {
       ssm: "430px",
