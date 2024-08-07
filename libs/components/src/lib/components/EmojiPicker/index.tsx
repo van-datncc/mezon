@@ -330,9 +330,9 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
 	const appearanceTheme = useSelector(selectTheme);
-	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasClanManagementPermission = hasAdminPermission || isClanCreator || hasClanPermission;
+	const hasClanManagementPermission = hasAdminPermission || isClanOwner || hasClanPermission;
 	const isShowAddButton = useMemo(() => {
 		return hasClanManagementPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
 	}, [hasClanManagementPermission, categoryName, showAddButton]);
