@@ -37,14 +37,14 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
           trigger="click"
           dismissOnClick={false}
           renderTrigger={() => (
-            <div className="w-full h-12 rounded-md dark:bg-black bg-white flex flex-row px-3 justify-between items-center">
+            <div className="w-full h-12 rounded-md dark:bg-black bg-white flex flex-row px-3 justify-between items-center uppercase">
               <p>{channel.category_name}</p>
               <div><Icons.ArrowDownFill /></div>
             </div>
           )}
           label=""
           placement="bottom-start"
-          className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px]"
+          className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px] uppercase"
         >
           {
             listCategory.map((category) => {
