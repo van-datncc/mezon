@@ -146,7 +146,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const handleSelectMem = useCallback(
 		async (user: any) => {
 			if (user?.idDM) {
-				dispatch(directActions.openDirectMessage({ channel_id: user.idDM || '' }));
+				dispatch(directActions.openDirectMessage({ channelId: user.idDM || '', clanId: '0' }));
 				const result = await dispatch(
 					directActions.joinDirectMessage({
 						directMessageId: user.idDM,

@@ -653,6 +653,10 @@ export enum EEmojiCategory {
 	CUSTOM = 'Custom',
 }
 
+export enum ActiveDm {
+	OPEN_DM = 1,
+}
+
 export enum ETypeMEntion {
 	MENTION = 0,
 	HASHTAG = 1,
