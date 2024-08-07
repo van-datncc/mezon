@@ -19,6 +19,7 @@ export type UpdateReactionMessageArgs = {
 	id: string;
 	channel_id?: string;
 	message_id?: string;
+	emoji_id?: string;
 	emoji?: string;
 	count?: number;
 	sender_id?: string;
@@ -155,7 +156,7 @@ export const reactionSlice = createSlice({
 			};
 
 			const emojiLastest: EmojiStorage = {
-				emojiId: reactionDataSocket.emoji ?? '', // TODO
+				emojiId: reactionDataSocket.emoji_id ?? '',
 				emoji: reactionDataSocket.emoji ?? '',
 				messageId: reactionDataSocket.message_id ?? '',
 				senderId: reactionDataSocket.sender_id ?? '',

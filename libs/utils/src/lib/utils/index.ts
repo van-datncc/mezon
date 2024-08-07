@@ -190,7 +190,7 @@ export const convertReactionDataFromMessage = (message: IMessageWithUser) => {
 			emojiDataItems[key] = {
 				id: reaction.id,
 				emoji: reaction.emoji,
-				emojiId: reaction.emoji,
+				emojiId: reaction.emoji_id,
 				senders: [
 					{
 						sender_id: reaction.sender_id,
