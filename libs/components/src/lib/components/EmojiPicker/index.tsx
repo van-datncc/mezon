@@ -93,7 +93,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		}
 	}, [currentChannel, direct, directId]);
 
-	const handleEmojiSelect = async (emojiPicked: string) => {
+	const handleEmojiSelect = async (emojiId: string, emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
@@ -101,6 +101,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				currentChannel?.clan_id || '',
 				channelID ?? '',
 				props.messageEmojiId ?? '',
+				emojiId,
 				emojiPicked.trim(),
 				1,
 				messageEmoji?.sender_id ?? '',
@@ -262,7 +263,7 @@ export default EmojiCustomPanel;
 
 type DisplayByCategoriesProps = {
 	readonly categoryName?: string;
-	readonly onEmojiSelect: (emoji: string) => void;
+	readonly onEmojiSelect: (emoji_id: string, emoji: string) => void;
 	readonly onEmojiHover: (item: any) => void;
 	readonly emojisData: any[];
 	onClickAddButton?: () => void;
@@ -346,7 +347,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 				<button
 					key={index}
 					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
-					onClick={() => onEmojiSelect(item.shortname + ' ')}
+					onClick={() => onEmojiSelect(item.emoji_id, item.shortname + ' ')} // khong hieu
 					onMouseEnter={() => onEmojiHover(item)}
 				>
 					<img draggable="false" src={item?.src} />

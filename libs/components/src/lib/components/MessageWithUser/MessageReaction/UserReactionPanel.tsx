@@ -29,13 +29,21 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			setChannelLabel(currentChannel?.channel_label || '');
 		}
 	}, [message]);
-	const removeEmojiSender = async (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => {
+	const removeEmojiSender = async (
+		id: string,
+		messageId: string,
+		emoji_id: string,
+		emoji: string,
+		message_sender_id: string,
+		countRemoved: number,
+	) => {
 		await reactionMessageDispatch(
 			id,
 			mode,
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentClanId ?? '' : '',
 			message.channel_id ?? '',
 			messageId,
+			emoji_id,
 			emoji,
 			countRemoved,
 			message_sender_id,
@@ -118,7 +126,14 @@ type SenderItemProps = {
 	sender: any;
 	emojiShowPanel: any;
 	userId: any;
-	removeEmojiSender: (id: string, messageId: string, emoji: string, message_sender_id: string, countRemoved: number) => Promise<void>;
+	removeEmojiSender: (
+		id: string,
+		messageId: string,
+		emoji_id: string,
+		emoji: string,
+		message_sender_id: string,
+		countRemoved: number,
+	) => Promise<void>;
 	hideSenderOnPanel: (emojiData: any, senderId: string) => void;
 };
 
@@ -129,6 +144,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 		await removeEmojiSender(
 			emojiShowPanel.id ?? '',
 			emojiShowPanel.message_id ?? '',
+			emojiShowPanel.emoji_id ?? '',
 			emojiShowPanel.emoji ?? '',
 			sender.sender_id ?? '',
 			sender.count ?? 0,

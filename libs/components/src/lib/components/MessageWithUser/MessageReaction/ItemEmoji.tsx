@@ -49,6 +49,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		mode: number,
 		messageId: string,
 		emojiId: string,
+		emoji: string,
 		count: number,
 		message_sender_id: string,
 		action_delete: boolean,
@@ -60,6 +61,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			message.channel_id,
 			messageId ?? '',
 			emojiId ?? '',
+			emoji ?? '',
 			1,
 			message_sender_id ?? '',
 			false,
@@ -175,7 +177,16 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 					onLeave={onHoverLeave}
 					userSenderCount={userSenderCount ?? NaN}
 					onClickReactExist={() =>
-						reactOnExistEmoji(emoji.id ?? '', mode, emoji.message_id ?? '', emoji.emojiId ?? '', 1, userId.userId ?? '', false)
+						reactOnExistEmoji(
+							emoji.id ?? '',
+							mode,
+							emoji.message_id ?? '',
+							emoji.emojiId ?? '',
+							emoji.emoji ?? '',
+							1,
+							userId.userId ?? '',
+							false,
+						)
 					}
 					getUrlItem={getUrlItem}
 					totalCount={count}

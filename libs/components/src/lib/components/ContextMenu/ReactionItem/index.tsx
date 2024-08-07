@@ -38,12 +38,13 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			currentChannel?.clan_id || '',
 			channelID && channelID,
 			messageId,
+			emojiId,
 			emojiShortCode,
 			1,
 			userId.userId ?? '',
 			false,
 		);
-	}, [emojiShortCode, activeMode, messageId, channelID, currentChannel]);
+	}, [emojiId, emojiShortCode, activeMode, messageId, channelID, currentChannel]);
 
 	return (
 		<div
