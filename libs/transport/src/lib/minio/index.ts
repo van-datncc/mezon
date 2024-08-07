@@ -34,7 +34,7 @@ export async function handleUploadEmoticon(
 			
 			const buf = await file?.arrayBuffer();
 
-			return uploadFile(client, session, filename, fileType, file.size, Buffer.from(buf));			
+			resolve(uploadFile(client, session, filename, fileType, file.size, Buffer.from(buf)));
 		} catch (error) {
 			reject(new Error(`${error}`));
 		}
@@ -61,7 +61,7 @@ export async function handleUploadFile(
 			const fullfilename = createUploadFilePath(session, currentChannelId, currentChannelId, filename);
 			const buf = await file?.arrayBuffer();
 
-			return uploadFile(client, session, fullfilename, fileType, file.size, Buffer.from(buf));			
+			resolve(uploadFile(client, session, fullfilename, fileType, file.size, Buffer.from(buf)));
 		} catch (error) {
 			reject(new Error(`${error}`));
 		}
