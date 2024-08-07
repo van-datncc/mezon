@@ -378,7 +378,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				</View>
 			</View>
 			{/* </Swipeable> */}
-			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} />
+			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={isEdited} />
 		</Animated.View>
 	);
 });
