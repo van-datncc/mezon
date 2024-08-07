@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { useAuth, useChatReaction } from '@mezon/core';
 import {
 	reactionActions,
 	selectCurrentChannel,
@@ -26,8 +26,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const { reactionMessageDispatch } = useChatReaction();
 	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const emojiHover = useSelector(selectEmojiHover);
-	const { emojis } = useEmojiSuggestion();
-	const getUrlItem = getSrcEmoji(emoji.emoji ?? '', emojis);
+	const getUrlItem = getSrcEmoji(emoji.id || '');
 	const count = calculateTotalCount(emoji.senders);
 	const userSenderCount = emoji.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId.userId)?.count;
 	const emojiItemRef = useRef<HTMLDivElement | null>(null);
@@ -49,7 +48,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		id: string,
 		mode: number,
 		messageId: string,
-		emoji: string,
+		emojiId: string,
 		count: number,
 		message_sender_id: string,
 		action_delete: boolean,
@@ -60,7 +59,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : currentClanId || '',
 			message.channel_id,
 			messageId ?? '',
-			emoji ?? '',
+			emojiId ?? '',
 			1,
 			message_sender_id ?? '',
 			false,
@@ -176,14 +175,14 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 					onLeave={onHoverLeave}
 					userSenderCount={userSenderCount ?? NaN}
 					onClickReactExist={() =>
-						reactOnExistEmoji(emoji.id ?? '', mode, emoji.message_id ?? '', emoji.emoji ?? '', 1, userId.userId ?? '', false)
+						reactOnExistEmoji(emoji.id ?? '', mode, emoji.message_id ?? '', emoji.emojiId ?? '', 1, userId.userId ?? '', false)
 					}
 					getUrlItem={getUrlItem}
 					totalCount={count}
 				/>
 			)}
 
-			{emojiHover?.emoji === emoji.emoji && userReactionPanelState && count > 0 && emojiHover?.message_id === message.id && (
+			{emojiHover?.emojiId === emoji.emojiId && userReactionPanelState && count > 0 && emojiHover?.message_id === message.id && (
 				<div
 					ref={userPanelRef}
 					className=" w-[18rem] flex flex-col items-center z-50 h-50"

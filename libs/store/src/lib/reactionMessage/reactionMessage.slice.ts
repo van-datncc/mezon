@@ -155,6 +155,7 @@ export const reactionSlice = createSlice({
 			};
 
 			const emojiLastest: EmojiStorage = {
+				emojiId: reactionDataSocket.emoji ?? '', // TODO
 				emoji: reactionDataSocket.emoji ?? '',
 				messageId: reactionDataSocket.message_id ?? '',
 				senderId: reactionDataSocket.sender_id ?? '',
@@ -253,6 +254,7 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 	const dataCombined: Record<string, EmojiDataOptionals> = {};
 
 	for (const reaction of reactions) {
+		const emojiId = reaction.emoji || ('' as string);
 		const emoji = reaction.emoji || ('' as string);
 
 		if (reaction.count < 1) {
@@ -261,6 +263,7 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 
 		if (!dataCombined[emoji]) {
 			dataCombined[emoji] = {
+				emojiId,
 				emoji,
 				senders: [],
 				action: false,

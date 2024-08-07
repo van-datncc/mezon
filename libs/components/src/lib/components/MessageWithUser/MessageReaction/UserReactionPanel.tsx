@@ -33,7 +33,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		await reactionMessageDispatch(
 			id,
 			mode,
-			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '',
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentClanId ?? '' : '',
 			message.channel_id ?? '',
 			messageId,
 			emoji,
@@ -70,7 +70,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] shadow-md
 				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
-						<PanelHeader emoji={emojiShowPanel.emoji} emojiListPNG={emojis} count={count} />
+						<PanelHeader emojiId={emojiShowPanel.emojiId} emojiListPNG={emojis} count={count} />
 						{senderList.map((sender: SenderInfoOptionals, index: number) => {
 							if (sender.count && sender.count > 0) {
 								return (
@@ -97,16 +97,16 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 export default UserReactionPanel;
 
 type PanelHeaderProps = {
-	emoji: string | undefined;
+	emojiId: string | undefined;
 	emojiListPNG: any;
 	count: number;
 };
 
-const PanelHeader: React.FC<PanelHeaderProps> = ({ emoji, emojiListPNG, count }) => {
+const PanelHeader: React.FC<PanelHeaderProps> = ({ emojiId, emojiListPNG, count }) => {
 	return (
 		<div>
 			<div className="flex flex-row items-center m-2 dark:text-white text-black">
-				<img src={getSrcEmoji(emoji ?? '', emojiListPNG)} className="w-5 h-5 min-h-5 min-w-5" />
+				<img src={getSrcEmoji(emojiId ?? '')} className="w-5 h-5 min-h-5 min-w-5" />
 				<p className="text-sm ml-2">{count}</p>
 			</div>
 			<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none" />

@@ -62,6 +62,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 						key={`${index}${startindex}${shortname}`}
 						emojiSyntax={shortname}
 						onlyEmoji={false}
+						emojiId="" //TODO:
 					/>,
 				);
 			}
