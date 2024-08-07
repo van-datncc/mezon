@@ -149,7 +149,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		const { mentionList, hashtagList, emojiList, simplifiedMentionList } = useProcessMention(newPlainTextValue, mentions, roleList);
+		const { mentionList, hashtagList, emojiList } = useProcessMention(newPlainTextValue, mentions, roleList);
 		const { links, markdowns, voiceRooms } = processText(newPlainTextValue);
 
 		setChannelDraftMessage(channelId, messageId, {
@@ -233,10 +233,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: (suggestion.username ?? '')
+											: suggestion.username ?? ''
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}
+									emojiId="" // TODO:
 									display={suggestion.display}
 								/>
 							);
@@ -260,6 +261,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 								symbol="#"
 								subText={(suggestion as ChannelsMentionProps).subText}
 								channelId={suggestion.id}
+								emojiId="" // TODO:
 							/>
 						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -271,7 +273,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						renderSuggestion={(suggestion) => <SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
+						renderSuggestion={(suggestion) => (
+							<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId="" />
+						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 						appendSpaceOnAdd={true}
 					/>

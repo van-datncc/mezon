@@ -347,6 +347,7 @@ export type IReaction = ApiMessageReaction & {
 };
 
 export type IEmoji = {
+	id: string;
 	src: string;
 	category: string;
 	shortname: string;
@@ -386,6 +387,7 @@ export type IMetaDataEmojis = {
 export type EmojiDataOptionals = {
 	action?: boolean;
 	id: string | undefined;
+	emojiId: string | undefined;
 	emoji: string | undefined;
 	senders: SenderInfoOptionals[];
 	channel_id?: string;
@@ -551,6 +553,7 @@ export enum SHOW_POSITION {
 }
 
 export type EmojiStorage = {
+	emojiId: string;
 	emoji: string;
 	messageId: string;
 	senderId: string;

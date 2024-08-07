@@ -177,45 +177,13 @@ export const convertMarkdown = (markdown: string): string => {
 		.join('');
 };
 
-export const getSrcEmoji = (shortname: string, emojiListPNG: any[]) => {
+export const getEmojiId = (shortname: string, emojiListPNG: any[]) => {
 	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
-	return emoji ? emoji.src : undefined;
+	return emoji ? emoji.id : undefined;
 };
 
-export const updateEmojiReactionData = (data: any[]) => {
-	const dataItemReaction: Record<string, EmojiDataOptionals> = {};
-
-	data &&
-		data.forEach((item) => {
-			const key = `${item.emoji}_${item.channel_id}_${item.message_id}`;
-			if (!dataItemReaction[key]) {
-				dataItemReaction[key] = {
-					id: item.id,
-					emoji: item.emoji,
-					senders: [
-						{
-							sender_id: item.senders[0]?.sender_id ?? '',
-							count: item.senders[0]?.count ?? 0,
-						},
-					],
-					channel_id: item.channel_id,
-					message_id: item.message_id,
-				};
-			} else {
-				const existingItem = dataItemReaction[key];
-				const senderIndex = existingItem.senders.findIndex((sender) => sender.sender_id === item.senders[0]?.sender_id);
-
-				if (senderIndex !== -1) {
-					existingItem.senders[senderIndex].count += item.senders[0]?.count ?? 0;
-				} else {
-					existingItem.senders.push({
-						sender_id: item.senders[0]?.sender_id ?? '',
-						count: item.senders[0]?.count ?? 0,
-					});
-				}
-			}
-		});
-	return Object.values(dataItemReaction);
+export const getSrcEmoji = (id: string) => {
+	return process.env.NX_BASE_IMG_URL + 'emojis/' + id + '.webp';
 };
 
 export const convertReactionDataFromMessage = (message: IMessageWithUser) => {
@@ -227,6 +195,7 @@ export const convertReactionDataFromMessage = (message: IMessageWithUser) => {
 			emojiDataItems[key] = {
 				id: reaction.id,
 				emoji: reaction.emoji,
+				emojiId: reaction.emoji_id,
 				senders: [
 					{
 						sender_id: reaction.sender_id,

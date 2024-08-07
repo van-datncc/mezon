@@ -426,14 +426,14 @@ export const ChatBoxBottomBar = memo(
 
 		useEffect(() => {
 			if (mode) {
-				const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode)
+				const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 				const newTriggersConfig = { ...triggersConfig };
 				if (isDM) {
 					delete newTriggersConfig.hashtag;
 					setInputTriggersConfig(newTriggersConfig);
 				}
 			}
-		}, [mode])
+		}, [mode]);
 
 		return (
 			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>

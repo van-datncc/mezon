@@ -2,7 +2,7 @@ import { useChatSending, useDirectMessages, useEmojiSuggestion } from '@mezon/co
 import { ActionEmitEvent, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { messagesActions, referencesActions, selectAttachmentData, selectCurrentClanId } from '@mezon/store';
-import { useAppDispatch, selectAllRolesClan } from '@mezon/store-mobile';
+import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,

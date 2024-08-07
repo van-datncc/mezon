@@ -35,7 +35,7 @@ type ChannelMessagesProps = {
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
 	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
-	console.log('ChannelMessages', messages.map((id) => id));
+
 	const chatRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const idMessageNotifed = useSelector(selectMessageNotifed);

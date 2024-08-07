@@ -177,7 +177,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		const matches = emojis
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
 			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
+			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
 		callback(matches);
 	};
 
@@ -444,7 +444,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
-			dispatch(messagesActions.setChannelDraftMessage({ channelId: currentChannelId as string, channelDraftMessage: { message_id: idRefMessage, draftContent: lastMessageByUserId?.content } }));
+			dispatch(
+				messagesActions.setChannelDraftMessage({
+					channelId: currentChannelId as string,
+					channelDraftMessage: { message_id: idRefMessage, draftContent: lastMessageByUserId?.content },
+				}),
+			);
 		}
 	};
 
@@ -622,11 +627,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subText={
 									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.username ?? '')
+										: suggestion.username ?? ''
 								}
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
 								display={suggestion.display}
+								emojiId={suggestion.id as string}
 							/>
 						);
 					}}
@@ -649,6 +655,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
+							emojiId="" //TODO:
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
@@ -660,7 +667,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;
 					}}
-					renderSuggestion={(suggestion) => <SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
+					renderSuggestion={(suggestion) => (
+						<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId={suggestion.id as string} />
+					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}
 				/>
