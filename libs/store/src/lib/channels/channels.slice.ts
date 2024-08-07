@@ -78,7 +78,7 @@ type JoinChatPayload = {
 	channelType: number;
 };
 
-export const joinChat = createAsyncThunk('channels/joinChat', 
+export const joinChat = createAsyncThunk('channels/joinChat',
 	async ({ clanId, channelId, channelType }: JoinChatPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
@@ -94,7 +94,6 @@ export const joinChannel = createAsyncThunk(
 	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
-			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
@@ -122,7 +121,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
-				thunkAPI.dispatch(channelsActions.joinChat({ 
+				thunkAPI.dispatch(channelsActions.joinChat({
 					clanId: response.clan_id as string,
 					channelId: response.channel_id as string,
 					channelType: response.type as number
