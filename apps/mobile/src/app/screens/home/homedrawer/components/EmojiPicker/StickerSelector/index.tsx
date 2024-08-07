@@ -54,7 +54,7 @@ export default function StickerSelector({ onSelected, onScroll }: StickerSelecto
 			contentContainerStyle={{ paddingBottom: size.s_50 * 2 }}
 		>
 			<ScrollView horizontal contentContainerStyle={styles.btnWrap}>
-				{categoryLogo.map((item, index) => (
+				{categoryLogo?.map((item, index) => (
 					<TouchableOpacity
 						onPress={() => handlePressCategory(item.type)}
 						style={styles.btnEmo}
@@ -73,9 +73,9 @@ export default function StickerSelector({ onSelected, onScroll }: StickerSelecto
 				))}
 			</ScrollView>
 
-			{selectedType === ""
-				? categoryLogo.map((item, index) => (
-					<Sticker key={index.toString()} stickerList={stickers} onClickSticker={handleClickImage} categoryName={item.type} />
+			{!selectedType
+				? categoryLogo?.map((item, index) => (
+					<Sticker key={index.toString() + "_itemCate"} stickerList={stickers} onClickSticker={handleClickImage} categoryName={item.type} />
 				))
 				: <Sticker stickerList={stickers} onClickSticker={handleClickImage} categoryName={selectedType} />
 			}

@@ -20,7 +20,10 @@ export default memo(function Sticker({ stickerList, categoryName, onClickSticker
             <View style={styles.sessionContent}>
                 {stickersListByCategoryName.length > 0 && stickersListByCategoryName.map((sticker, index) => (
                     <TouchableOpacity
-                        onPress={() => onClickSticker(sticker.url)} style={styles.content} key={index.toString() + 'stickers'}>
+                        onPress={() => onClickSticker(sticker.url)}
+                        style={styles.content}
+                        key={index.toString() + 'stickers'}
+                    >
                         <FastImage
                             source={{
                                 uri: sticker.url,
