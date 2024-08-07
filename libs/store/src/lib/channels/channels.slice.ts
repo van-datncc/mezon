@@ -3,7 +3,6 @@ import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntity
 import memoize from 'memoizee';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { attachmentActions } from '../attachment/attachments.slice';
 import { fetchCategories } from '../categories/categories.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { directActions } from '../direct/direct.slice';
@@ -92,7 +91,6 @@ export const joinChannel = createAsyncThunk(
 	async ({ clanId, channelId, noFetchMembers }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
-			thunkAPI.dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
