@@ -22,6 +22,7 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
@@ -51,7 +52,6 @@ import {
 	ThreadValue,
 	UsersClanEntity,
 	focusToElement,
-	neverMatchingRegex,
 	searchMentionsHashtag,
 	threadError,
 	uniqueUsers,
@@ -126,7 +126,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { listChannels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
@@ -134,12 +133,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
-
+	const currentClanId = useSelector(selectCurrentClanId);
 	const [plainTextMessage, setPlainTextMessage] = useState<string>();
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
-	const attachmentDataRef = useSelector(selectAttachmentData);
 	const [content, setContent] = useState('');
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -154,6 +152,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const { isSearchMessage } = useSearchMessages();
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(
+		(props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || '',
+	);
+	const attachmentDataRef = useSelector(
+		selectAttachmentData((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
+	);
 
 	const userProfile = useSelector(selectAllAccount);
 
@@ -217,6 +221,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
 				userIds: userIds,
+				clanId: currentClanId || "",
 			};
 			if (userIds.length > 0) {
 				await dispatch(channelUsersActions.addChannelUsers(body));
@@ -231,9 +236,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
-	const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
-	const { mentionList, simplifiedMentionList, hashtagList } = useProcessMention(content);
-
+	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
+	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content);
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
@@ -308,7 +312,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				} else {
 					props.onSend(
 						{
-							t: content.trim(),
+							t: content,
 							mentions: mentionList,
 							hashtags: hashtagList,
 							emojis: emojiList,
@@ -432,13 +436,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (!emojiPicked || !input) {
 			return;
 		}
-		textFieldEdit.insert(input, emojiPicked);
+		textFieldEdit.insert(input, `[:${emojiPicked}]`);
 	}
 
 	const clickUpToEditMessage = () => {
 		const idRefMessage = lastMessageByUserId?.id;
 		if (idRefMessage && !valueTextInput) {
-			dispatch(referencesActions.setIdMessageToJump(idRefMessage));
+			dispatch(messagesActions.setIdMessageToJump(idRefMessage));
 			dispatch(referencesActions.setOpenEditMessageState(true));
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
@@ -612,25 +616,21 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					data={handleSearchUserMention}
 					trigger="@"
 					displayTransform={(id: any, display: any) => {
-						return `@${display}`;
+						return display === '@here' ? `${display}` : `@${display}`;
 					}}
 					renderSuggestion={(suggestion: MentionDataProps) => {
-						const avatar = suggestion.clanAvatar ? suggestion.clanAvatar : suggestion.avatarUrl;
-
 						return (
 							<SuggestItem
 								valueHightLight={valueHighlight}
-								name={suggestion.display === 'here' ? '@here' : suggestion.display ?? ''}
-								displayName={suggestion.displayName}
-								clanNickname={suggestion.clanNick}
-								avatarUrl={avatar ?? ''}
+								avatarUrl={suggestion.avatarUrl}
 								subText={
-									suggestion.display === 'here'
+									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: suggestion.display ?? ''
+										: suggestion.username ?? ''
 								}
-								subTextStyle={(suggestion.display === 'here' ? 'normal-case' : 'lowercase') + ' text-xs'}
-								showAvatar={suggestion.display !== 'here'}
+								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
+								showAvatar={suggestion.display !== '@here'}
+								display={suggestion.display}
 							/>
 						);
 					}}
@@ -649,21 +649,22 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					renderSuggestion={(suggestion) => (
 						<SuggestItem
 							valueHightLight={valueHighlight}
-							name={suggestion.display ?? ''}
+							display={suggestion?.display}
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
-							isHashtag={true}
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention
 					trigger=":"
-					markup="__id__"
-					regex={neverMatchingRegex}
+					markup="[:__display__]"
 					data={queryEmojis}
-					renderSuggestion={(suggestion) => <SuggestItem name={suggestion.display ?? ''} symbol={(suggestion as EmojiData).emoji} />}
+					displayTransform={(id: any, display: any) => {
+						return `${display}`;
+					}}
+					renderSuggestion={(suggestion) => <SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} />}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}
 				/>

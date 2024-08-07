@@ -2,7 +2,9 @@
   "userAction": {
     "sendMessage": "Gửi tin nhắn",
     "voiceCall": "Gọi thoại",
-    "videoCall": "Gọi video"
+    "videoCall": "Gọi video",
+    "addFriend": "Thêm bạn",
+    "pending": "Chờ đợi"
   },
   "aboutMe": {
     "headerTitle": "VỀ TÔI",
@@ -15,5 +17,16 @@
     "description": "Bạn có chắc chắn muốn đuổi {{userName}} khỏi bang hội không? Họ sẽ có thể tham gia lại với một lời mời mới.",
     "reasonKick": "LÝ DO ĐUỔI",
     "buttonName": "Đuổi"
-  }
+  },
+  "pendingContent": {
+    "block": "Chặn",
+    "reportUserProfile": "Báo cáo hồ sơ người dùng",
+    "acceptFriend": "Chấp nhận bạn bè",
+    "cancelFriendRequest": "Hủy yêu cầu kết bạn",
+    "copyUsername": "Sao chép tên người dùng",
+    "copiedUserName": "Đã sao chép '{{username}}'"
+  },
+  "incomingFriendRequest": "Yêu cầu kết bạn",
+  "accept": "Đồng ý",
+  "ignore": "Bỏ qua"
 }

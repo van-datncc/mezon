@@ -4,13 +4,13 @@ import { Dimensions, StyleSheet } from "react-native";
 export const style = (colors: Attributes) => StyleSheet.create({
   container: {
     width: Dimensions.get('screen').width,
-    paddingHorizontal: size.s_20,
+    paddingHorizontal: size.s_10,
     borderTopRightRadius: size.s_18,
     borderTopLeftRadius: size.s_18,
     overflow: 'hidden',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 5,
+    gap: size.s_6,
   },
   overlay: {
     position: 'absolute',
@@ -22,4 +22,5 @@ export const style = (colors: Attributes) => StyleSheet.create({
     height: '100%',
     backgroundColor: 'rgba(000,000,000,0.8)',
   },
+  wrapper: {height: '100%'}
 })

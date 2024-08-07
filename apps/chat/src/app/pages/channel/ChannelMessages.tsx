@@ -2,7 +2,6 @@ import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-
 import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import {
 	messagesActions,
-	referencesActions,
 	selectFirstMessageId,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
@@ -20,13 +19,14 @@ import {
 } from '@mezon/store';
 import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
+import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMessage, MemorizedChannelMessage } from './ChannelMessage';
 
 type ChannelMessagesProps = {
 	channelId: string;
-	type: string;
+	type: ChannelType;
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: number;
@@ -48,6 +48,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const isFetching = useSelector(selectMessageIsLoading);
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
+
+	console.log('hasMoreTop', hasMoreTop, 'hasMoreBottom', hasMoreBottom);
 
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -92,7 +94,6 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				return (
 					<ChatWelcome
 						key={messageId}
-						type={type}
 						name={channelLabel}
 						avatarDM={avatarDM}
 						userName={userName}
@@ -110,7 +111,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 				/>
 			);
 		});
-	}, [messages, firstMessageId, channelId, idMessageNotifed, mode, channelLabel, type, avatarDM, userName]);
+	}, [messages, firstMessageId, channelId, idMessageNotifed, mode, channelLabel, avatarDM, userName]);
 
 
 	useEffect(() => {
@@ -119,7 +120,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			chatScrollRef.scrollToMessage(`msg-${idMessageToJump}`)
 				.then((res) => {
 					if (res) {
-						dispatch(referencesActions.setIdMessageToJump(null));
+						dispatch(messagesActions.setIdMessageToJump(null));
 					}
 				});
 		}

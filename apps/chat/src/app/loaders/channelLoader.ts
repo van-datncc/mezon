@@ -13,7 +13,6 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 	if (messageId) {
 		dispatch(messagesActions.jumpToMessage({ messageId: messageId ?? '', channelId: channelId }));
 	}
-
 	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	return null;
 };

@@ -1,7 +1,7 @@
 import { useRoles } from '@mezon/core';
-import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import { RolesClanEntity, getNewAddMembers, getSelectedRoleId, selectAllUsesClan, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { UsersClanEntity } from '@mezon/utils';
+import { ThemeApp, UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -44,6 +44,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 		const userIDArray = userID?.split(',');
 		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', [], [], userIDArray, []);
 	};
+	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div style={{pointerEvents: !hasPermissionEdit ? undefined : 'none'}}>
 			<div className="w-full flex gap-x-3">
@@ -64,8 +65,8 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 				</button>
 			</div>
 			<br />
-			<div>
-				<ul className="flex flex-col gap-y-[5px]">
+			<div className={appearanceTheme === ThemeApp.Light ? 'lightModeScrollBarMention' : ''}>
+				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto">
 					{searchResults.map((member: UsersClanEntity) => (
 						<li key={member?.user?.id} className="flex justify-between items-center group">
 							<div className="flex gap-x-2">
@@ -75,8 +76,8 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 									className="min-w-6 min-h-6 max-w-6 max-h-6"
 									src={member?.user?.avatar_url}
 								/>
-								<span className="dark:text-white text-black">{member?.user?.display_name}</span>
-								<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">{member?.user?.username}</span>
+								<span className="dark:text-white text-black font-medium">{member?.user?.display_name}</span>
+								<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{member?.user?.username}</span>
 							</div>
 							{clickRole !== 'New Role' ? (
 								<div className="w-4 h-4 rounded-full flex justify-center items-center group-hover:bg-slate-800">

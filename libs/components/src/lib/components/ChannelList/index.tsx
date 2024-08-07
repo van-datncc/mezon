@@ -4,7 +4,7 @@ import {ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, Mous
 import { ChannelType } from 'mezon-js';
 import {useMemo, useRef, useState} from 'react';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../../../../ui/src/lib/Icons';
+import { Icons }  from "@mezon/ui";
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
@@ -19,7 +19,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	const { categorizedChannels } = useCategory();
 	const appearanceTheme = useSelector(selectTheme);
 	const currentClan = useSelector(selectCurrentClan);
-	const [hasManageChannelPermission, { isClanCreator }] = useClanRestriction([EPermission.manageChannel]);
+	const [hasManageChannelPermission, { isClanOwner }] = useClanRestriction([EPermission.manageChannel]);
 	const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
   const [isShowPanelCategory, setIsShowPanelCategory] = useState<boolean>(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -67,7 +67,7 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 		dispatch(channelsActions.getCurrentCategory(paramCategory));
 	};
 
-	const isShowCreateChannel = isClanCreator || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
+	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
 
 	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
   
@@ -129,7 +129,9 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
                     className="dark:text-[#AEAEAE] text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
                   >
                     {!categoriesState[category.id] ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
-                    {category.category_name}
+                    <span className='one-line'>
+                      {category.category_name}
+                    </span>
                   </button>
                   <button
                     onClick={() => handleSortByName(category.category_id ?? '')}

@@ -3,7 +3,6 @@ import { MezonContextValue } from '@mezon/transport';
 import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
-
 import { accountReducer } from './account/account.slice';
 import { appReducer } from './app/app.slice';
 import { authReducer } from './auth/auth.slice';
@@ -40,14 +39,13 @@ import { defaultNotificationClanReducer } from './notificationSetting/notificati
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
-import { settingClanEmojiReducer } from './settingEmoji/settingEmoji.slice';
+import { settingStickerReducer } from './settingSticker/settingSticker.slice';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { usersReducer } from './users/users.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -115,8 +113,8 @@ const reducer = {
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
-	settingEmoji: settingClanEmojiReducer,
 	integrationWebhook: integrationWebhookReducer,
+	settingSticker: settingStickerReducer
 };
 
 let storeInstance = configureStore({

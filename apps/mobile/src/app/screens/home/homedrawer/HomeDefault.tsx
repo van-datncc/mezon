@@ -1,5 +1,5 @@
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -18,7 +18,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
-import { EOpenThreadDetailFrom } from '../../../components/ThreadDetail/MenuThreadDetail';
 import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
@@ -223,9 +222,11 @@ const HomeDefaultHeader = React.memo(
 		}, [currentChannel?.parrent_id, channelsEntities]);
 
 		const navigateToSearchPage = () => {
-			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
-				screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET,
-				params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel },
+			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+        params: {
+          openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+        }
 			});
 		};
 		return (

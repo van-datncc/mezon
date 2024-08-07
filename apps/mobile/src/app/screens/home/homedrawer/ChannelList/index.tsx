@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useCategory } from '@mezon/core';
-import { Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
+import { useCategory, useUserPermission } from '@mezon/core';
+import { EOpenSearchChannelFrom, Icons, STORAGE_DATA_CATEGORY_CHANNEL, load, save } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -12,14 +12,14 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 import { isEmpty } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
-import { EOpenThreadDetailFrom } from '../../../../components/ThreadDetail/MenuThreadDetail';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../../../temp-ui';
 import { ChannelListContext } from '../Reusables';
@@ -50,10 +50,10 @@ const ChannelList = React.memo((props: any) => {
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
-	const user = useAuth();
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const dispatch = useAppDispatch();
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+	const { isCanManageEvent } = useUserPermission();
 
 	useEffect(() => {
 		try {
@@ -123,9 +123,11 @@ const ChannelList = React.memo((props: any) => {
 	}
 
 	const navigateToSearchPage = () => {
-		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
-			screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET,
-			params: { openThreadDetailFrom: EOpenThreadDetailFrom.SearchChannel },
+		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
+			params: {
+				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
+			}
 		});
 	};
 	return (
@@ -162,9 +164,10 @@ const ChannelList = React.memo((props: any) => {
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && <ChannelListSkeleton numberSkeleton={6} />}
-				<FlatList
+				<FlashList
 					data={dataCategoryChannel || []}
 					keyExtractor={(_, index) => index.toString()}
+					estimatedItemSize={40}
 					renderItem={({ item, index }) => (
 						<ChannelListSection
 							data={item}
@@ -181,7 +184,7 @@ const ChannelList = React.memo((props: any) => {
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
-				<ClanMenu clan={currentClan} inviteRef={bottomSheetInviteRef} />
+				<ClanMenu inviteRef={bottomSheetInviteRef} />
 			</MezonBottomSheet>
 
 			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} heightFitContent>
@@ -197,7 +200,7 @@ const ChannelList = React.memo((props: any) => {
 				ref={bottomSheetEventRef}
 				heightFitContent={allEventManagement?.length === 0}
 				headerRight={
-					currentClan?.creator_id === user?.userId && (
+					isCanManageEvent && (
 						<TouchableOpacity onPress={handlePressEventCreate}>
 							<Text style={{ color: baseColor.blurple, fontWeight: 'bold' }}>Create</Text>
 						</TouchableOpacity>

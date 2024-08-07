@@ -1,8 +1,10 @@
 import { ShortUserProfile } from '@mezon/components';
-import { useOnClickOutside } from '@mezon/core';
+import { useGetPriorityNameFromUserClan, useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { ChannelStreamMode } from 'mezon-js';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
+import usePendingNames from './usePendingNames';
 import useShowName from './useShowName';
 
 type IMessageHeadProps = {
@@ -14,7 +16,6 @@ type IMessageHeadProps = {
 
 const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps) => {
 	const { messageTime } = useMessageParser(message);
-
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const panelRefShort = useRef<HTMLDivElement>(null);
@@ -23,6 +24,18 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 	const [positionBottom, setPositionBottom] = useState(false);
 
 	const { userClanNickname, userDisplayName, username, senderId } = useMessageParser(message);
+	const { clanNick, displayName, usernameSender } = useGetPriorityNameFromUserClan(message.sender_id);
+	const { pendingClannick, pendingDisplayName, pendingUserName } = usePendingNames(
+		message,
+		clanNick ?? '',
+		displayName ?? '',
+		usernameSender ?? '',
+		userClanNickname ?? '',
+		userDisplayName ?? '',
+		username ?? '',
+	);
+
+	const nameShowed = useShowName(pendingClannick ?? '', pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
 
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === MouseButton.LEFT) {
@@ -69,8 +82,6 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 		};
 	}, [positionLeft]);
 
-	const nameShowed = useShowName(userClanNickname ?? '', userDisplayName ?? '', username ?? '', senderId ?? '');
-
 	if (isCombine && message.references?.length === 0 && !isShowFull) {
 		return <></>;
 	}
@@ -85,7 +96,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 					role="button"
 					style={{ letterSpacing: '-0.01rem' }}
 				>
-					{nameShowed}
+					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? nameShowed : userDisplayName ? userDisplayName : username}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>
@@ -108,4 +119,4 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 	);
 };
 
-export default MessageHead;
+export default memo(MessageHead);

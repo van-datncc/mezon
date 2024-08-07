@@ -11,10 +11,11 @@ interface IUserInformationBottomSheetProps {
 	user?: User;
 	onClose: () => void;
 	showAction?: boolean;
+	showRole?: boolean;
 }
 
 export const UserInformationBottomSheet = React.memo((props: IUserInformationBottomSheetProps) => {
-	const { onClose, userId, user } = props;
+	const { onClose, userId, user, showAction = true, showRole = true } = props;
 	const bottomSheetRef = useRef(null);
 	const snapPoints = ['60%'];
 	useEffect(() => {
@@ -40,9 +41,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 			ref={bottomSheetRef}
 			snapPoints={snapPoints}
 			heightFitContent={true}
-			onDismiss={() => {
-				onClose();
-			}}
+			onDismiss={onClose}
 			style={styles.bottomSheet}
 			handleComponent={() => {
 				return (
@@ -52,7 +51,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 				);
 			}}
 		>
-			<UserProfile userId={userId} user={user} onClose={() => onClose()} showAction={props.showAction}></UserProfile>
+			<UserProfile userId={userId} user={user} onClose={onClose} showAction={showAction} showRole={showRole}></UserProfile>
 		</MezonBottomSheet>
 	);
 });

@@ -55,6 +55,10 @@ export const AddFriendScreen = () => {
 		];
 	}, [t]);
 
+	const onClose = useCallback(() => {
+		setSelectedUser(null)
+	}, [])
+
 	return (
 		<View style={styles.addFriendContainer}>
 			<View style={styles.groupWrapper}>
@@ -80,7 +84,7 @@ export const AddFriendScreen = () => {
 			</View>
 
 			<AddFriendModal type={currentAddFriendType} onClose={() => setCurrentAddFriendType(null)} />
-			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} />
+			<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />
 		</View>
 	);
 };

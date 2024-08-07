@@ -27,7 +27,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startindex, endindex, channelid, channellabel, username, shortname, markdown, link, voicelink } = element;
+			const { startindex, endindex, channelid, channellabel, username, userid, shortname, markdown, link, voicelink } = element;
 
 			if (lastindex < startindex) {
 				formattedContent.push(
@@ -46,18 +46,31 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 			}
 			if (username) {
 				formattedContent.push(
-					<MentionUser showOnchannelLayout={showOnchannelLayout} key={`${index}${startindex}${username}`} tagName={username} mode={mode} />,
+					<MentionUser
+						showOnchannelLayout={showOnchannelLayout}
+						key={`${index}${startindex}${username}${userid}`}
+						tagName={username}
+						tagUserId={userid}
+						mode={mode}
+					/>,
 				);
 			}
 			if (shortname) {
-				formattedContent.push(<EmojiMarkup key={`${index}${startindex}${shortname}`} emojiSyntax={shortname} onlyEmoji={false} />);
+				formattedContent.push(
+					<EmojiMarkup
+						showOnChannelLayOut={showOnchannelLayout}
+						key={`${index}${startindex}${shortname}`}
+						emojiSyntax={shortname}
+						onlyEmoji={false}
+					/>,
+				);
 			}
 
-			if (link) {
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link}`} content={link} />);
+			if (link && typeof link === 'string') {
+				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link as string}`} content={link as string} />);
 			}
 
-			if (voicelink) {
+			if (voicelink && typeof voicelink === 'string') {
 				const meetingCode = voicelink?.split('/').pop();
 				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 				voiceChannelFound
@@ -68,12 +81,12 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 								channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
 							/>,
 						)
-					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink} />);
+					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink as string} />);
 			}
 
-			if (markdown) {
+			if (markdown && typeof markdown === 'string') {
 				const converted = markdown.startsWith('```') && markdown.endsWith('```') ? convertMarkdown(markdown) : markdown;
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={converted} />);
+				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={converted as string} />);
 			}
 			lastindex = endindex;
 		});

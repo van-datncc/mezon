@@ -108,7 +108,7 @@ const SettingRightUser = ({
 	const handleRemoveButtonClick = () => {
 		setFlagsRemoveAvartar(true);
 		setFlags(true);
-		setUrlImage('');
+		setUrlImage(process.env.NX_LOGO_MEZON || "");
 	};
 	const onchangeAboutUser = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setEditAboutUser(e.target.value);
@@ -191,7 +191,7 @@ const SettingRightUser = ({
 			(editAboutUser !== aboutMe && flags) ? (
 				<div className="flex flex-row gap-2  bg-gray-500 absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
 					<div className="flex-1 flex items-center text-nowrap">
-						<p className="text-[15px]">Carefull - you have unsaved changes!</p>
+						<p className="text-[15px]">Careful - you have unsaved changes!</p>
 					</div>
 					<div className="flex flex-row justify-end gap-3">
 						<button
@@ -217,7 +217,6 @@ const SettingRightUser = ({
 			) : null}
 
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
-
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 		</div>
 	);

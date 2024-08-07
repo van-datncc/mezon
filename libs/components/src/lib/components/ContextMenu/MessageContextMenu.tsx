@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
-import { useAuth, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
+import { useAuth, useCheckAlonePermission, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
 import {
 	directActions,
 	gifsStickerEmojiActions,
@@ -55,7 +55,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
-	const [checkAdmintrator, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
+	const [checkAdmintrator, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const checkSenderMessage = useMemo(() => {
 		return message?.sender_id === userId;
 	}, [message?.sender_id, userId]);
@@ -64,11 +64,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		return message?.content.t !== '';
 	}, [message?.content.t]);
 
-	const checkMessageInPinneList = listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
+	const checkMessageInPinnedList = listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
 	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
 	const [delMessage] = useClanRestriction([EPermission.manageChannel]);
 	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
 	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
+	const isAlone = useCheckAlonePermission();
 
 	const [createThread] = useClanRestriction([EPermission.manageChannel]);
 	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
@@ -87,7 +88,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const handleReplyMessage = () => {
 		dispatch(referencesActions.setOpenReplyMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
-		dispatch(referencesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	};
 
@@ -97,7 +98,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));
 		dispatch(messagesActions.setChannelDraftMessage({ channelId: message.channel_id, channelDraftMessage: { message_id: message.id, draftContent: message.content.t || '' } }));
-		dispatch(referencesActions.setIdMessageToJump(''));
+		dispatch(messagesActions.setIdMessageToJump(''));
 	};
 
 	const handleForwardMessage = () => {
@@ -163,18 +164,18 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const pinMessageStatus = useMemo(() => {
 		if (!checkPos) return undefined;
 
-		if (!checkMessageInPinneList) {
-			if (pinMessage || isClanCreator || checkAdmintrator) {
+		if (!checkMessageInPinnedList) {
+			if (pinMessage || isClanOwner || checkAdmintrator) {
 				return true;
 			}
-		} else if (checkMessageInPinneList) {
-			if (pinMessage || isClanCreator || checkAdmintrator) {
+		} else if (checkMessageInPinnedList) {
+			if (pinMessage || isClanOwner || checkAdmintrator) {
 				return false;
 			}
 		} else {
 			return undefined;
 		}
-	}, [pinMessage, isClanCreator, checkAdmintrator, checkMessageInPinneList, message, checkPos]);
+	}, [pinMessage, isClanOwner, checkAdmintrator, checkMessageInPinnedList, message, checkPos]);
 
 	const enableSpeakMessageItem = useMemo(() => {
 		if (!checkPos) return false;
@@ -183,28 +184,28 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const [enableRemoveOneReactionItem, enableRemoveAllReactionsItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
-		const enableOne = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
-		const enableAll = (isClanCreator || checkAdmintrator || removeReaction) && enableViewReactionItem;
+		const enableOne = (isClanOwner || checkAdmintrator || removeReaction) && enableViewReactionItem;
+		const enableAll = (isClanOwner || checkAdmintrator || removeReaction) && enableViewReactionItem;
 		return [enableOne, enableAll];
-	}, [isClanCreator, checkAdmintrator, enableViewReactionItem, removeReaction]);
+	}, [isClanOwner, checkAdmintrator, enableViewReactionItem, removeReaction]);
 
 	const enableCreateThreadItem = useMemo(() => {
 		if (!checkPos) return false;
 		if (activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP) {
 			return false;
 		} else {
-			return createThread || isAllowCreateThread || isClanCreator || checkAdmintrator;
+			return createThread || isAllowCreateThread || isClanOwner || checkAdmintrator;
 		}
-	}, [createThread, isAllowCreateThread, isClanCreator, checkAdmintrator, activeMode, checkPos]);
+	}, [createThread, isAllowCreateThread, isClanOwner, checkAdmintrator, activeMode, checkPos]);
 
 	const enableDelMessageItem = useMemo(() => {
 		if (!checkPos) return false;
 		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return delMessage || isAllowDelMessage || checkSenderMessage || isClanCreator || checkAdmintrator;
+			return delMessage || isAllowDelMessage || checkSenderMessage || isClanOwner || checkAdmintrator;
 		} else {
 			return checkSenderMessage;
 		}
-	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanCreator, checkAdmintrator, checkPos]);
+	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanOwner, checkAdmintrator, checkPos]);
 
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
@@ -292,7 +293,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when((checkPos && !hasViewChannelPermission), (builder) => {
+		builder.when((checkPos && !(hasViewChannelPermission && isAlone)), (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',

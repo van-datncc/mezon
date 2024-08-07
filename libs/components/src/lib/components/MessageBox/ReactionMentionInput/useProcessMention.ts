@@ -1,17 +1,35 @@
-import { IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
+import { selectAllRolesClan } from '@mezon/store';
+import { getRoleList, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, UserMentionsOpt } from '@mezon/utils';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+interface IRoleMention {
+	roleId: string;
+	roleName: string;
+}
 
 const useProcessMention = (text: string) => {
 	const [mentionList, setMentionList] = useState<IMentionOnMessage[]>([]);
 	const [hashtagList, setHashtagList] = useState<IHashtagOnMessage[]>([]);
+	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
 	const [simplifiedMentionList, setSimplifiedMentionList] = useState<UserMentionsOpt[]>([]);
+
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = getRoleList(rolesInClan);
+
+	function doesIdExist(id: string, roles: IRoleMention[]): boolean {
+		return roles.some((role) => role.roleId === id);
+	}
 
 	useEffect(() => {
 		const mentions: IMentionOnMessage[] = [];
 		const hashtags: IHashtagOnMessage[] = [];
+		const emojis: IEmojiOnMessage[] = [];
 
 		const mentionPrefix = '@[';
 		const hashtagPrefix = '#[';
+		const emojiPrefix = '[:'; // Emoji prefix
+		const emojiSuffix = ']';
 
 		let index = 0;
 
@@ -22,7 +40,8 @@ const useProcessMention = (text: string) => {
 
 				// Extract username
 				const usernameEnd = text.indexOf(']', index);
-				const username = `@${text.substring(index, usernameEnd)}`;
+				const username =
+					text.substring(index, usernameEnd) === '@here' ? text.substring(index, usernameEnd) : `@${text.substring(index, usernameEnd)}`;
 				index = usernameEnd + 1;
 
 				// Extract userId
@@ -58,6 +77,20 @@ const useProcessMention = (text: string) => {
 					startindex,
 					endindex: index,
 				});
+			} else if (text.startsWith(emojiPrefix, index)) {
+				let startindex = index;
+				index += emojiPrefix.length;
+
+				// Extract emoji
+				const emojiEnd = text.indexOf(emojiSuffix, index);
+				const shortname = text.substring(index, emojiEnd);
+				index = emojiEnd + emojiSuffix.length;
+
+				emojis.push({
+					shortname,
+					startindex,
+					endindex: index,
+				});
 			} else {
 				index++;
 			}
@@ -65,15 +98,28 @@ const useProcessMention = (text: string) => {
 
 		setMentionList(mentions);
 		setHashtagList(hashtags);
-		const simplifiedList = mentions.map((mention) => ({
-			user_id: mention.userid,
-			username: mention.username,
-		}));
+		setEmojiList(emojis);
+
+		const simplifiedList = mentions.map((mention) => {
+			const isRole = doesIdExist(mention.userid ?? '', roleList ?? []);
+			if (isRole) {
+				const role = roleList.find((role) => role.roleId === mention.userid);
+				return {
+					role_id: role?.roleId,
+					rolename: role?.roleName,
+				};
+			} else {
+				return {
+					user_id: mention.userid,
+					username: mention.username,
+				};
+			}
+		});
 
 		setSimplifiedMentionList(simplifiedList);
 	}, [text]);
 
-	return { mentionList, simplifiedMentionList, hashtagList };
+	return { mentionList, simplifiedMentionList, hashtagList, emojiList };
 };
 
 export default useProcessMention;

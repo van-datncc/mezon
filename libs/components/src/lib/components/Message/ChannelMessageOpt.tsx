@@ -56,7 +56,7 @@ function useMenuReplyMenuBuilder(message: IMessageWithUser) {
   const handleItemClick = useCallback(() => {
     dispatch(referencesActions.setOpenReplyMessageState(true));
     dispatch(referencesActions.setIdReferenceMessageReply(message.id));
-    dispatch(referencesActions.setIdMessageToJump(''));
+    dispatch(messagesActions.setIdMessageToJump(''));
     dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
   }, [dispatch, messageId]);
 
@@ -78,12 +78,12 @@ function useEditMenuBuilder(message: IMessageWithUser) {
     dispatch(referencesActions.setOpenEditMessageState(true));
     dispatch(referencesActions.setIdReferenceMessageEdit(messageId));
     dispatch(messagesActions.setChannelDraftMessage({ channelId: message.channel_id, channelDraftMessage: { message_id: messageId, draftContent: message.content } }));
-    dispatch(referencesActions.setIdMessageToJump(''));
+    dispatch(messagesActions.setIdMessageToJump(''));
   }, [dispatch, message, messageId]);
 
   return useMenuBuilderPlugin((builder) => {
     builder.when(userId === message.sender_id, (builder) => {
-      builder.addMenuItem('edit', 'edit', handleItemClick, <Icons.PenEdit />);
+      builder.addMenuItem('edit', 'edit', handleItemClick, <Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`} />);
     });
   });
 }

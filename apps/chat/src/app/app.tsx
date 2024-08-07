@@ -3,7 +3,6 @@ import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { VoiceContextProvider } from '@mezon/voice';
 import { useMemo } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import './app.module.scss';
@@ -51,9 +50,7 @@ function AppWrapper() {
 	return (
 		<GoogleOAuthProvider clientId={process.env.NX_CHAT_APP_GOOGLE_CLIENT_ID as string}>
 			<MezonContextProvider mezon={mezon} connect={true}>
-				<VoiceContextProvider>
-					<App />
-				</VoiceContextProvider>
+				<App />
 			</MezonContextProvider>
 		</GoogleOAuthProvider>
 	);

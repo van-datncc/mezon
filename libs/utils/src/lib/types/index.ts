@@ -207,6 +207,10 @@ export type IUser = {
 	avatarSm: string;
 };
 
+export type MetaDateStatusUser = {
+	status: string;
+};
+
 export type IVoice = {
 	user_id: string;
 	clan_id: string;
@@ -421,12 +425,13 @@ export interface IGif {
 
 export type MentionDataProps = {
 	id: string | number;
-	display?: string;
-	avatarUrl?: string;
-	displayName?: string;
-	clanNick?: string;
-	clanAvatar?: string;
+	display?: string | undefined;
+	avatarUrl?: string | undefined;
+	displayName?: string | undefined;
+	clanNick?: string | undefined;
+	clanAvatar?: string | undefined;
 	user?: ApiUser;
+	username?: string | undefined;
 };
 
 export type UserSearchDataProps = {
@@ -445,13 +450,11 @@ export type MentionsInputChangeEvent = {
 export type OnChangeHandlerFunc = (event: MentionsInputChangeEvent, newValue: string, newPlainTextValue: string, mentions: any) => void;
 
 export type UserMentionsOpt = {
-	user_id: string | undefined;
-	username: string | undefined;
+	user_id?: string | undefined;
+	username?: string | undefined;
+	role_id?: string | undefined;
+	rolename?: string | undefined;
 };
-export enum ETypeMessage {
-	CHANNEL = 'CHANNEL',
-	THREAD = 'THREAD',
-}
 
 export type ThreadError = {
 	name: string;
@@ -596,6 +599,13 @@ export enum ModeResponsive {
 export type ApiChannelMessageHeaderWithChannel = ApiChannelMessageHeader & {
 	channel_id: string;
 };
+
+export enum ThemeApp {
+	Light = 'light',
+	Dark = 'dark',
+	System = 'system',
+}
+
 export interface INotification extends Notification {
 	id: string;
 	content?: any;
@@ -616,4 +626,30 @@ export type TNotificationChannel = {
 
 export enum SlugPermission {
 	Admin = 'administrator',
+}
+
+export enum TypeSearch {
+	Dm_Type = 1,
+	Channel_Type = 2,
+}
+
+export type SearchItemProps = {
+	typeChat?: number;
+	displayName?: string;
+	id?: string;
+	name?: string;
+	avatarUser?: string;
+	lastSentTimeStamp?: any;
+	idDM?: string;
+	type?: number;
+	clanAvatar?: string;
+	clanNick?: string;
+	prioritizeName?: string;
+	subText?: string;
+	icon?: string;
+	channelId?: string;
+};
+
+export enum EEmojiCategory {
+	CUSTOM = 'Custom',
 }

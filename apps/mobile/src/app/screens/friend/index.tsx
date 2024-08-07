@@ -6,6 +6,7 @@ import { User } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TextInput, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
@@ -70,6 +71,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 			switch (action) {
 				case EFriendItemAction.Call:
 					console.log('handle phone call', friend);
+					Toast.show({ type: 'info', text1: 'Updating...' })
 					break;
 				case EFriendItemAction.MessageDetail:
 					directMessageWithUser(friend?.user?.id);
@@ -83,6 +85,10 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 		},
 		[directMessageWithUser],
 	);
+
+	const onClose = useCallback(() => {
+		setSelectedUser(null)
+	}, [])
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 
@@ -129,7 +135,7 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 				showAction={true}
 			/>
 
-			<UserInformationBottomSheet user={selectedUser} onClose={() => setSelectedUser(null)} showAction={false} />
+			<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />
 		</View>
 	);
 });

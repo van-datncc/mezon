@@ -29,7 +29,6 @@ import { channelsActions } from '../channels/channels.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
-import { referencesActions } from './references.slice';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -93,6 +92,7 @@ export interface MessagesState {
 	lastMessageByChannel: Record<string, ApiChannelMessageHeaderWithChannel>;
 	dataReactionGetFromLoadMessage: EmojiDataOptionals[];
 	isFocused: boolean;
+	idMessageToJump: string;
 	channelDraftMessage: Record<string, ChannelDraftMessages>;
 	isJumpingToPresent: boolean;
 	channelMessages: Record<
@@ -197,9 +197,10 @@ export const fetchMessages = createAsyncThunk(
 			};
 		}
 
+		console.log('fetchMessages', response);
+
 		const firstMessage = response.messages.find((item) => item.code === EMessageCode.FIRST_MESSAGE);
 
-		console.log('set first message', firstMessage);
 		if (firstMessage) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
 		}
@@ -240,14 +241,8 @@ export const fetchMessages = createAsyncThunk(
 
 		if (isFetchingLatestMessages) {
 			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent(true));
-			thunkAPI.dispatch(referencesActions.setIdMessageToJump(null));
+			thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 		}
-
-		console.log(
-			'messages api',
-			direction,
-			messages.map((item) => item.id),
-		);
 
 		return {
 			messages,
@@ -266,6 +261,17 @@ export const loadMoreMessage = createAsyncThunk(
 	'messages/loadMoreMessage',
 	async ({ channelId, direction = Direction_Mode.BEFORE_TIMESTAMP }: LoadMoreMessArgs, thunkAPI) => {
 		try {
+			const state = getMessagesState(getMessagesRootState(thunkAPI));
+
+			// ignore when:
+			// - jumping to present
+			// - loading
+			// - already have message to jump to
+			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
+			if (state.isJumpingToPresent || state.loadingStatus === 'loading' || state.idMessageToJump) {
+				return;
+			}
+
 			if (direction === Direction_Mode.BEFORE_TIMESTAMP) {
 				// scroll up
 				const lastScrollMessageId = selectLastLoadMessageIDByChannelId(channelId)(getMessagesRootState(thunkAPI));
@@ -346,7 +352,7 @@ export const jumpToMessage = createAsyncThunk(
 					}),
 				);
 			}
-			thunkAPI.dispatch(referencesActions.setIdMessageToJump(messageId));
+			thunkAPI.dispatch(messagesActions.setIdMessageToJump(messageId));
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
@@ -413,7 +419,6 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		if (!client || !session || !socket || !channelId) {
 			throw new Error('Client is not initialized');
 		}
-
 		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 
 		return res;
@@ -484,6 +489,7 @@ export const addNewMessage = createAsyncThunk('messages/addNewMessage', async (m
 	const state = getMessagesState(getMessagesRootState(thunkAPI));
 	const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[message.channel_id];
 	if (isViewingOlderMessages) {
+		thunkAPI.dispatch(messagesActions.setLastMessage(message));
 		return;
 	}
 	thunkAPI.dispatch(messagesActions.newMessage(message));
@@ -549,6 +555,7 @@ export const initialMessagesState: MessagesState = {
 	isFocused: false,
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
+	idMessageToJump: '',
 };
 
 export type SetCursorChannelArgs = {
@@ -571,6 +578,9 @@ export const messagesSlice = createSlice({
 		},
 		setFirstMessageId: (state, action: PayloadAction<{ channelId: string; firstMessageId: string }>) => {
 			state.firstMessageId[action.payload.channelId] = action.payload.firstMessageId;
+		},
+		setIdMessageToJump(state, action) {
+			state.idMessageToJump = action.payload;
 		},
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
@@ -926,12 +936,16 @@ export const selectHasMoreMessageByChannelId = (channelId: string) =>
 		return param?.[channelId]?.hasMore ?? true;
 	});
 
-// has more bottom when last message is not the channel's last message
+// has more bottom when last message is not the channel's messages
 export const selectHasMoreBottomByChannelId = (channelId: string) =>
 	createSelector(getMessagesState, (state) => {
 		const lastMessage = state.lastMessageByChannel[channelId];
-		const lastMessageId = state.channelMessages[channelId]?.ids.at(-1);
-		return lastMessageId !== lastMessage?.id;
+
+		if (!lastMessage || !lastMessage.id) return false;
+
+		const isLastMessageInChannel = state.channelMessages[channelId]?.ids.includes(lastMessage.id);
+
+		return !isLastMessageInChannel;
 	});
 
 export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
@@ -1044,6 +1058,8 @@ export const selectIsMessageIdExist = (channelId: string, messageId: string) =>
 	});
 
 export const selectIsJumpingToPresent = createSelector(getMessagesState, (state) => state.isJumpingToPresent);
+
+export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
 
 const handleRemoveManyMessages = (state: MessagesState, channelId?: string) => {
 	console.log('clearChannelMessages', channelId);

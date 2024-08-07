@@ -26,6 +26,11 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		padding: size.s_16,
 		borderRadius: 8,
 	},
+	roleGroup: {
+		backgroundColor: colors.secondary,
+		marginBottom: size.s_20,
+		borderRadius: 8,
+	},
 	userName: {
 		color: colors.textStrong,
 		fontSize: size.h6,
@@ -94,4 +99,18 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontSize: size.medium,
 		fontWeight: '400',
 	},
+	defaultText: {
+		color: colors.white,
+		textAlign: 'center'
+	},
+	button: {
+		flex: 1,
+		paddingVertical: size.s_6,
+		borderRadius: size.s_2
+	},
+	receivedFriendRequestTitle: {
+		color: colors.text,
+		fontSize: size.h7,
+		fontWeight: 'bold'
+	}
 });

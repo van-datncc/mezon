@@ -1,12 +1,12 @@
-import { Block, Colors, size } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { Keyboard, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
 import EmptySearchPage from '../EmptySearchPage';
 import MemberItem from '../MemberStatus/MemberItem';
 import { UserInformationBottomSheet } from '../UserInformationBottomSheet';
-import styles from './MembersSearchTab.styles';
+import style from './MembersSearchTab.styles';
 
 type MembersSearchTabProps = {
 	listMemberSearch: {
@@ -21,28 +21,35 @@ type MembersSearchTabProps = {
 };
 const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
-  const handleCloseUserInfoBS = () => {
-     setSelectedUser(null)
-  }
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const handleCloseUserInfoBS = () => {
+		setSelectedUser(null);
+	};
+
 	return (
-		<ScrollView contentContainerStyle={styles.container}>
-			{(listMemberSearch?.length > 0) ? (
-				<Block width={'100%'} marginTop={size.s_10} borderRadius={size.s_14} backgroundColor={Colors.secondary}>
-					{listMemberSearch?.map((user) => (
-						<MemberItem
-							onPress={(user) => {
-								setSelectedUser(user);
-							}}
-							user={user as any}
-							key={user?.user?.id}
-						/>
-					))}
-				</Block>
+		<View style={styles.container}>
+			{listMemberSearch?.length > 0 ? (
+				<ScrollView keyboardDismissMode={'on-drag'}  contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
+					{
+						<View style={styles.boxMembers}>
+							{listMemberSearch?.map((user) => (
+								<MemberItem
+									onPress={(user) => {
+										setSelectedUser(user);
+									}}
+									user={user as any}
+									key={user?.user?.id}
+								/>
+							))}
+						</View>
+					}
+				</ScrollView>
 			) : (
 				<EmptySearchPage />
 			)}
 			<UserInformationBottomSheet user={selectedUser?.user} userId={selectedUser?.user?.id} onClose={handleCloseUserInfoBS} />
-		</ScrollView>
+		</View>
 	);
 };
 

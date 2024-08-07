@@ -83,6 +83,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
 			if (voice) {
+				console.log('1', voice);
 				dispatch(
 					voiceActions.add({
 						...voice,
@@ -95,6 +96,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
+			console.log('2', voice);
 			dispatch(voiceActions.remove(voice.id));
 		},
 		[dispatch],
@@ -108,7 +110,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			mess.isMe = senderId === userId;
 			const isMobile = directId === undefined && channelId === undefined;
 
-			mess.isCurrentChannel = (message.channel_id === directId || (isMobile && message.channel_id === currentDirectId));
+			mess.isCurrentChannel = message.channel_id === directId || (isMobile && message.channel_id === currentDirectId);
 
 			if ((directId === undefined && !isMobile) || (isMobile && !currentDirectId)) {
 				const idToCompare = !isMobile ? channelId : currentChannelId;
@@ -144,6 +146,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		async (notification: Notification) => {
+			console.log(notification);
 			if (currentChannel?.channel_id !== (notification as any).channel_id) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
@@ -204,16 +207,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserchanneladded = useCallback(
 		(userAdds: UserChannelAddedEvent) => {
-			const user = userAdds.users.find((user: any) => user.user_id === userId);
+			const user = userAdds.users.find((user: any) => user.user_id !== userId);
 			if (user) {
 				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
-				dispatch(
-					channelsActions.joinChat({
-						clanId: userAdds.clan_id,
-						channelId: userAdds.channel_id,
-						channelType: userAdds.channel_type,
-					}),
-				);
+				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+					dispatch(
+						channelsActions.joinChat({
+							clanId: userAdds.clan_id,
+							channelId: userAdds.channel_id,
+							channelType: userAdds.channel_type,
+						}),
+					);
+				}
 			}
 		},
 		[userId, dispatch],
@@ -290,13 +295,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelUpdated) {
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
-					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					if (channelUpdated.creator_id !== userId) {
+						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 				}
 			}
 		},
-		[dispatch],
+		[dispatch, userId],
 	);
 
 	const setCallbackEventFn = React.useCallback(
@@ -384,27 +391,27 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => { };
+			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => { };
+			socket.onuserchannelremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => { };
+			socket.onuserclanremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => { };
+			socket.onuserchanneladded = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -451,4 +458,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-
