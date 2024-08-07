@@ -23,6 +23,7 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
@@ -130,6 +131,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { members } = useChannelMembers({ channelId: currentChannelId });
@@ -216,6 +218,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
 				userIds: userIds,
+				clanId: currentClanId || '',
 			};
 			if (userIds.length > 0) {
 				await dispatch(channelUsersActions.addChannelUsers(body));

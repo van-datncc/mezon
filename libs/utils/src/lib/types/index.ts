@@ -451,11 +451,6 @@ export type UserMentionsOpt = {
 	rolename?: string | undefined;
 };
 
-export enum ETypeMessage {
-	CHANNEL = 'CHANNEL',
-	THREAD = 'THREAD',
-}
-
 export type ThreadError = {
 	name: string;
 	message: string;
