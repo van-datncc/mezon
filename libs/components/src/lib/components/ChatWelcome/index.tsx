@@ -16,7 +16,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const user = useSelector(selectMemberByUserId(currentChannel?.creator_id as string));
 	const classNameSubtext = 'dark:text-zinc-400 text-colorTextLightMode text-sm';
-	const showName = <span className="font-medium">{name}</span>;
+	const showName = <span className="font-medium">{name || userName}</span>;
 
 	return (
 		<div className="space-y-2 px-4 mb-0 mt-[50px] flex-1 flex flex-col justify-end">
@@ -42,7 +42,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 
 			<div>
 				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
-					Welcome to #{name}
+					Welcome to #{name || userName}
 				</p>
 			</div>
 			<div className="text-base">
