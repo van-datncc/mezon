@@ -3,8 +3,9 @@ import { ChannelsEntity } from '@mezon/store-mobile';
 import { IEmoji } from '@mezon/utils';
 import React from 'react';
 import { Text } from 'react-native';
-import { channelIdRegex, highlightEmojiRegex, mentionRegex, mentionRegexSplit } from '../../../../../utils/helpers';
+import { channelIdRegex, highlightEmojiRegex} from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
+import { mentionRegex, mentionRegexSplit } from '@mezon/mobile-components';
 
 export const renderTextContent = (text: string, channelsEntities?: Record<string, ChannelsEntity>) => {
 	const getChannelById = (channelHashtagId: string) => {

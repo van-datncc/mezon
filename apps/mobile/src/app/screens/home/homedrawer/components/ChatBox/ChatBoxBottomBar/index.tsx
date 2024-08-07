@@ -6,6 +6,8 @@ import {
 	convertToPlainTextHashtag,
 	getAttachmentUnique,
 	load,
+	mentionHashtagPattern,
+	mentionUserPattern,
 	save,
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
@@ -20,7 +22,6 @@ import { DeviceEventEmitter, Keyboard, Platform, TextInput } from 'react-native'
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
-import { mentionHashtagPattern, mentionUserPattern } from '../../../../../../../app/utils/helpers';
 import { EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../../../../components/Suggestions';
 import UseMentionList from '../../../../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
