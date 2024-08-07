@@ -43,7 +43,7 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
           )}
           label=""
           placement="bottom-start"
-          className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px] !uppercase"
+          className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px]"
         >
           {
             listCategory.map((category) => {
