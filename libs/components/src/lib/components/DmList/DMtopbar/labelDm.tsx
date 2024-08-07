@@ -62,7 +62,7 @@ const LabelDm = (props: LabelDmProps) => {
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: dmGroupId || '',
 			channel_label: label,
-			category_id: '',
+			category_id: '0',
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
 	};

@@ -160,7 +160,7 @@ export const updateChannel = createAsyncThunk('channels/updateChannel', async (b
 		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, body);
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
-			if (body.category_id === '') {
+			if (body.category_id === '0') {
 				thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			} else {
 				thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));

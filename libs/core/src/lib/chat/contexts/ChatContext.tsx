@@ -205,16 +205,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserchanneladded = useCallback(
 		(userAdds: UserChannelAddedEvent) => {
-			const user = userAdds.users.find((user: any) => user.user_id === userId);
+			const user = userAdds.users.find((user: any) => user.user_id !== userId);
 			if (user) {
 				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
-				dispatch(
-					channelsActions.joinChat({
-						clanId: userAdds.clan_id,
-						channelId: userAdds.channel_id,
-						channelType: userAdds.channel_type,
-					}),
-				);
+				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+					dispatch(
+						channelsActions.joinChat({
+							clanId: userAdds.clan_id,
+							channelId: userAdds.channel_id,
+							channelType: userAdds.channel_type,
+						}),
+					);
+				}
 			}
 		},
 		[userId, dispatch],
@@ -291,13 +293,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelUpdated) {
 				if (channelUpdated.channel_label === '') {
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
-					dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					if (channelUpdated.creator_id !== userId) {
+						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 				}
 			}
 		},
-		[dispatch],
+		[dispatch, userId],
 	);
 
 	const setCallbackEventFn = React.useCallback(
