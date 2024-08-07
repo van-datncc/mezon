@@ -4,6 +4,7 @@ import {
 	ApiCategoryDesc,
 	ApiChannelAttachment,
 	ApiChannelDescription,
+	ApiChannelMessageHeader,
 	ApiClanDesc,
 	ApiClanProfile,
 	ApiDirectChannelVoice,
@@ -174,6 +175,7 @@ export type IMessage = ChannelMessage & {
 	isMe?: boolean;
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
+	isFirst?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -591,6 +593,10 @@ export enum ModeResponsive {
 	MODE_DM = 'dm',
 }
 
+export type ApiChannelMessageHeaderWithChannel = ApiChannelMessageHeader & {
+	channel_id: string;
+};
+
 export enum ThemeApp {
 	Light = 'light',
 	Dark = 'dark',
@@ -640,6 +646,7 @@ export type SearchItemProps = {
 	icon?: string;
 	channelId?: string;
 };
+
 export enum EEmojiCategory {
 	CUSTOM = 'Custom',
 }
