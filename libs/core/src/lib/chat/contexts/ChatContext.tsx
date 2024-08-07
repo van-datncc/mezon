@@ -117,6 +117,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
 
+			await dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
