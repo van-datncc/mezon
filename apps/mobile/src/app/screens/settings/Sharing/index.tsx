@@ -285,9 +285,7 @@ export const Sharing = ({ data, onClose }) => {
 		}
 
 		const promises = Array.from(files).map((file: IFile | any) => {
-			const ms = new Date().getTime();
-			const fullFilename = `${currentClan.id}/${channelSelected?.channel_id}/${ms}`.replace(/-/g, '_') + '/' + file.name;
-			return handleUploadFileMobile(client, session, fullFilename, file);
+			return handleUploadFileMobile(client, session, currentClan.id, channelSelected?.channel_id, file.name, file);
 		});
 
 		Promise.all(promises).then((attachments) => {
