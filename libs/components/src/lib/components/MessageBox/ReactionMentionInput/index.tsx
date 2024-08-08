@@ -6,7 +6,6 @@ import {
 	useGifsStickersEmoji,
 	useMessageValue,
 	useReference,
-	useSearchMessages,
 	useThreads,
 } from '@mezon/core';
 import {
@@ -28,6 +27,7 @@ import {
 	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
 	selectIsFocused,
+	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
@@ -147,8 +147,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
-	const { isSearchMessage } = useSearchMessages();
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const isSearchMessage = useSelector(
+		selectIsSearchMessage((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
+	);
 	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(
 		(props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || '',
 	);

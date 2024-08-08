@@ -260,7 +260,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	}, [newNotificationStatus]);
 
 	const handleShowInbox = () => {
-		dispatch(notificationActions.fetchListNotification({ clanId: currentDmGroupId ? '0' : currentClanId as string }));
+		dispatch(notificationActions.fetchListNotification({ clanId: currentDmGroupId ? '0' : (currentClanId as string) }));
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 
@@ -309,9 +309,10 @@ export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
 function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	const dispatch = useDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const handleClick = () => {
 		dispatch(appActions.setIsShowMemberList(!isActive));
-		dispatch(searchMessagesActions.setIsSearchMessage(false));
+		dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannelId as string, isSearchMessage: false }));
 	};
 	return (
 		<div className="relative leading-5 h-5">
