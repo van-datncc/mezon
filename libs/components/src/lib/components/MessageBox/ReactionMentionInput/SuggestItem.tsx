@@ -47,8 +47,6 @@ const SuggestItem = ({
 		return false;
 	}, [channelId, membersVoice, specificChannel?.type]);
 
-	console.log('emojiId', emojiId);
-
 	useEffect(() => {
 		if (directId && !isOpenSearchModal) {
 			commonChannelVoids.map((channel) => {
