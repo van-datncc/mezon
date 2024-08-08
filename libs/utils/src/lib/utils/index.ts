@@ -16,6 +16,7 @@ import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
+	ETokenMessage,
 	EmojiDataOptionals,
 	IEmojiOnMessage,
 	IExtendedMessage,
@@ -412,12 +413,12 @@ export const getRoleList = (rolesInClan: ApiRole[]) => {
 };
 
 type ElementToken =
-	| (IMentionOnMessage & { type: 'mentions' })
-	| (IHashtagOnMessage & { type: 'hg' })
-	| (IEmojiOnMessage & { type: 'ej' })
-	| (ILinkOnMessage & { type: 'lk' })
-	| (IMarkdownOnMessage & { type: 'mk' })
-	| (ILinkVoiceRoomOnMessage & { type: 'vk' });
+	| (IMentionOnMessage & { type: ETokenMessage.MENTIONS })
+	| (IHashtagOnMessage & { type: ETokenMessage.HASHTAGS })
+	| (IEmojiOnMessage & { type: ETokenMessage.EMOJIS })
+	| (ILinkOnMessage & { type: ETokenMessage.LINKS })
+	| (IMarkdownOnMessage & { type: ETokenMessage.MARKDOWNS })
+	| (ILinkVoiceRoomOnMessage & { type: ETokenMessage.VOICE_LINKS });
 
 export const createFormattedString = (data: IExtendedMessage): string => {
 	let { t = '' } = data;
@@ -451,22 +452,22 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 		result += t.slice(lastIndex, startindex);
 
 		switch (element.type) {
-			case 'mentions':
+			case ETokenMessage.MENTIONS:
 				result += `@[${element.username?.slice(1)}](${element.user_id})`;
 				break;
-			case 'hg':
+			case ETokenMessage.HASHTAGS:
 				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
 				break;
-			case 'ej':
+			case ETokenMessage.EMOJIS:
 				result += `[:${element.shortname}]`;
 				break;
-			case 'lk':
+			case ETokenMessage.LINKS:
 				result += `${element.lk}`;
 				break;
-			case 'mk':
+			case ETokenMessage.MARKDOWNS:
 				result += `${element.mk}`;
 				break;
-			case 'vk':
+			case ETokenMessage.VOICE_LINKS:
 				result += `${element.vk}`;
 				break;
 			default:

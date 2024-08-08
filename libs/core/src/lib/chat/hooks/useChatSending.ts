@@ -77,7 +77,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			}
 
 			const filteredContent = useFilteredContent(content);
-			console.log('mentions: Edit message ', mentions);
 
 			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, filteredContent, mentions);
 		},

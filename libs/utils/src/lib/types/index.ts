@@ -671,3 +671,12 @@ export interface IRoleMention {
 	roleId: string;
 	roleName: string;
 }
+
+export enum ETokenMessage {
+	MENTIONS = 'mentions',
+	EMOJIS = 'ej',
+	HASHTAGS = 'hg',
+	LINKS = 'lk',
+	VOICE_LINKS = 'vk',
+	MARKDOWNS = 'mk',
+}
