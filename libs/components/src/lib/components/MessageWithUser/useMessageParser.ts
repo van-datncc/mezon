@@ -1,8 +1,8 @@
 import {
-	IExtendedMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
 	IMessageWithUser,
+	addMention,
 	convertDateString,
 	convertTimeHour,
 	convertTimeString,
@@ -21,16 +21,6 @@ export function useMessageParser(message: IMessageWithUser) {
 	const content = useMemo(() => {
 		return message?.content as IMessageSendPayload;
 	}, [message]);
-
-	function addMention(obj: IMessageSendPayload, mentionValue: IMentionOnMessage[]): IExtendedMessage {
-		// Chuyển đổi obj thành IExtendedMessage nếu cần
-		const updatedObj: IExtendedMessage = {
-			...obj,
-			mentions: mentionValue, // Thêm trường mentions với giá trị mới
-		};
-
-		return updatedObj;
-	}
 
 	const contentUpdatedMention = addMention(content, mentions as any);
 

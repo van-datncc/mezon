@@ -18,6 +18,7 @@ import {
 	ChannelMembersEntity,
 	EmojiDataOptionals,
 	IEmojiOnMessage,
+	IExtendedMessage,
 	IHashtagOnMessage,
 	ILineMention,
 	ILinkOnMessage,
@@ -412,17 +413,17 @@ export const getRoleList = (rolesInClan: ApiRole[]) => {
 
 type ElementToken =
 	| (IMentionOnMessage & { type: 'mentions' })
-	| (IHashtagOnMessage & { type: 'hashtags' })
-	| (IEmojiOnMessage & { type: 'emojis' })
-	| (ILinkOnMessage & { type: 'links' })
-	| (IMarkdownOnMessage & { type: 'markdowns' })
-	| (ILinkVoiceRoomOnMessage & { type: 'voicelinks' });
+	| (IHashtagOnMessage & { type: 'hg' })
+	| (IEmojiOnMessage & { type: 'ej' })
+	| (ILinkOnMessage & { type: 'lk' })
+	| (IMarkdownOnMessage & { type: 'mk' })
+	| (ILinkVoiceRoomOnMessage & { type: 'vk' });
 
-export const createFormattedString = (data: IMessageSendPayload): string => {
+export const createFormattedString = (data: IExtendedMessage): string => {
 	let { t = '' } = data;
 	const elements: ElementToken[] = [];
 
-	(Object.keys(data) as (keyof IMessageSendPayload)[]).forEach((key) => {
+	(Object.keys(data) as (keyof IExtendedMessage)[]).forEach((key) => {
 		const itemArray = data[key];
 
 		if (Array.isArray(itemArray)) {
@@ -453,19 +454,19 @@ export const createFormattedString = (data: IMessageSendPayload): string => {
 			case 'mentions':
 				result += `@[${element.username?.slice(1)}](${element.user_id})`;
 				break;
-			case 'hashtags':
+			case 'hg':
 				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
 				break;
-			case 'emojis':
+			case 'ej':
 				result += `[:${element.shortname}]`;
 				break;
-			case 'links':
+			case 'lk':
 				result += `${element.lk}`;
 				break;
-			case 'markdowns':
+			case 'mk':
 				result += `${element.mk}`;
 				break;
-			case 'voicelinks':
+			case 'vk':
 				result += `${element.vk}`;
 				break;
 			default:
@@ -553,3 +554,12 @@ export const processText = (inputString: string) => {
 	}
 	return { links, markdowns, voiceRooms };
 };
+
+export function addMention(obj: IMessageSendPayload, mentionValue: IMentionOnMessage[]): IExtendedMessage {
+	const updatedObj: IExtendedMessage = {
+		...obj,
+		mentions: mentionValue,
+	};
+
+	return updatedObj;
+}

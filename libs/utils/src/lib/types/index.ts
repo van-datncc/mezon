@@ -401,6 +401,7 @@ export type SenderInfoOptionals = {
 export type ChannelDraftMessages = {
 	message_id: string;
 	draftContent: IMessageSendPayload;
+	draftMention: ApiMessageMention[];
 };
 
 export interface IGifCategory {

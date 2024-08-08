@@ -46,7 +46,6 @@ import {
 	ChannelMembersEntity,
 	EmojiPlaces,
 	ILineMention,
-	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -100,7 +99,7 @@ type ChannelsMentionProps = {
 export type MentionReactInputProps = {
 	readonly onSend: (
 		content: IMessageSendPayload,
-		mentions?: Array<IMentionOnMessage>,
+		mentions?: Array<ApiMessageMention>,
 		attachments?: Array<ApiMessageAttachment>,
 		references?: Array<ApiMessageRef>,
 		value?: ThreadValue,
@@ -445,7 +444,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: currentChannelId as string,
-					channelDraftMessage: { message_id: idRefMessage, draftContent: lastMessageByUserId?.content },
+					channelDraftMessage: {
+						message_id: idRefMessage,
+						draftContent: lastMessageByUserId?.content,
+						draftMention: lastMessageByUserId.mentions ?? [],
+					},
 				}),
 			);
 		}

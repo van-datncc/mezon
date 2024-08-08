@@ -44,7 +44,6 @@ const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILin
 // TODO: refactor component for message lines
 const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }: RenderContentProps) => {
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
-	console.log('data: ', data);
 	const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 	let lastindex = 0;
 	const content = useMemo(() => {
