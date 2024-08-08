@@ -192,16 +192,7 @@ function MyApp() {
 				<div className="relative flex flex-col gap-3">
 					{clans.map((clan: IClan) => {
 						return (
-							<Tooltip
-								content={<span style={{ whiteSpace: 'nowrap' }}>{"Herrre"}</span>}
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-								placement="right"
-							>
-
 								<SidebarClanItem key={clan.clan_id} linkClan={`/chat/clans/${clan.id}`} option={clan} />
-							</Tooltip>
 						)
 					})}
 
