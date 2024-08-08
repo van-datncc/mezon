@@ -237,7 +237,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}
-									emojiId="" // TODO:
+									emojiId={suggestion.id as string}
 									display={suggestion.display}
 								/>
 							);
@@ -261,7 +261,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 								symbol="#"
 								subText={(suggestion as ChannelsMentionProps).subText}
 								channelId={suggestion.id}
-								emojiId="" // TODO:
+								emojiId=""
 							/>
 						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
