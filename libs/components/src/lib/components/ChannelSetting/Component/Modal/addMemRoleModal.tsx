@@ -143,7 +143,10 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 				});
 				return;
 			}
-			const filteredMembers = listMembersNotInChannel.filter((item) => item?.display_name?.toLowerCase().includes(inputData));
+			const filteredMembers = listMembersNotInChannel.filter((item) => {
+				const nameToSearch = item?.display_name?.toLowerCase() || item?.username?.toLowerCase();
+				return nameToSearch.includes(inputData.toLowerCase());
+			});
 			const filteredRoles = listRolesNotAddChannel.filter((item) => item?.title?.toLowerCase().includes(inputData));
 			setFilterItem({
 				listMembersNotInChannel: filteredMembers,
