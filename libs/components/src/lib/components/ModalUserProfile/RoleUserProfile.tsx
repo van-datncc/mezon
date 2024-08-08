@@ -67,7 +67,6 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		setShowPopupAddRole(false);
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
-		console.log("🚀 ~ addRole ~ userIDArray:", userIDArray)
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', userIDArray || [], [], [], []);
 		await dispatch(channelMembersActions.addRoleIdUser({
 			id: roleId, 
