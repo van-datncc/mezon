@@ -205,7 +205,7 @@ export const fetchMessages = createAsyncThunk(
 
 		// no message id and direction is before timestamp means load latest messages
 		// then the last sent message will be the last message of response
-		if (!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) {
+		if ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages) {
 			lastSentMessage = response.messages[response.messages.length - 1];
 		}
 
