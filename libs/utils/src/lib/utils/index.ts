@@ -235,6 +235,11 @@ export const getNameForPrioritize = (clanNickname: string | undefined, displayNa
 	if (displayName === '' || displayName === username) return username;
 };
 
+export const getAvatarForPrioritize = (clanAvatar: string | undefined, userAvatar: string | undefined) => {
+	if (clanAvatar && clanAvatar !== userAvatar) return clanAvatar;
+	return userAvatar;
+};
+
 export function compareObjects(a: any, b: any, searchText: string, prioritizeProp: string, nameProp?: string) {
 	const normalizedSearchText = searchText.toUpperCase();
 
