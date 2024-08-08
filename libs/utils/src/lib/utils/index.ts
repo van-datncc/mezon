@@ -436,22 +436,22 @@ export const createFormattedString = (data: IMessageSendPayload): string => {
 	});
 
 	elements.sort((a, b) => {
-		const startA = a.startindex ?? 0;
-		const startB = b.startindex ?? 0;
+		const startA = a.s ?? 0;
+		const startB = b.s ?? 0;
 		return startA - startB;
 	});
 	let result = '';
 	let lastIndex: number = 0;
 
 	elements.forEach((element) => {
-		const startindex = element.startindex ?? lastIndex;
-		const endindex = element.endindex ?? startindex;
+		const startindex = element.s ?? lastIndex;
+		const endindex = element.e ?? startindex;
 
 		result += t.slice(lastIndex, startindex);
 
 		switch (element.type) {
 			case 'mentions':
-				result += `@[${element.username?.slice(1)}](${element.userid})`;
+				result += `@[${element.username?.slice(1)}](${element.user_id})`;
 				break;
 			case 'hashtags':
 				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
@@ -460,13 +460,13 @@ export const createFormattedString = (data: IMessageSendPayload): string => {
 				result += `[:${element.shortname}]`;
 				break;
 			case 'links':
-				result += `${element.link}`;
+				result += `${element.lk}`;
 				break;
 			case 'markdowns':
-				result += `${element.markdown}`;
+				result += `${element.mk}`;
 				break;
 			case 'voicelinks':
-				result += `${element.voicelink}`;
+				result += `${element.vk}`;
 				break;
 			default:
 				break;
@@ -503,15 +503,15 @@ export const processText = (inputString: string) => {
 
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
-					voicelink: link,
-					startindex,
-					endindex,
+					vk: link,
+					s: startindex,
+					e: endindex,
 				});
 			} else {
 				links.push({
-					link,
-					startindex,
-					endindex,
+					lk: link,
+					s: startindex,
+					e: endindex,
 				});
 			}
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
@@ -527,7 +527,7 @@ export const processText = (inputString: string) => {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
-					markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startindex, endindex });
+					markdowns.push({ type: 'triple', mk: `\`\`\`${markdown}\`\`\``, s: startindex, e: endindex });
 				}
 			}
 		} else if (inputString[i] === singleBacktick) {
@@ -543,7 +543,7 @@ export const processText = (inputString: string) => {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
-					markdowns.push({ type: 'single', markdown: `\`${markdown}\``, startindex, endindex });
+					markdowns.push({ type: 'single', mk: `\`${markdown}\``, s: startindex, e: endindex });
 				}
 				i++;
 			}

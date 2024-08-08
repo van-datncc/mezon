@@ -1,4 +1,12 @@
-import { IMessageWithUser, convertDateString, convertTimeHour, convertTimeString } from '@mezon/utils';
+import {
+	IExtendedMessage,
+	IMentionOnMessage,
+	IMessageSendPayload,
+	IMessageWithUser,
+	convertDateString,
+	convertTimeHour,
+	convertTimeString,
+} from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 
 export function useMessageParser(message: IMessageWithUser) {
@@ -7,13 +15,24 @@ export function useMessageParser(message: IMessageWithUser) {
 	}, [message?.attachments]);
 
 	const mentions = useMemo(() => {
-		return message?.mentions;
+		return message?.mentions as IMentionOnMessage;
 	}, [message?.mentions]);
 
 	const content = useMemo(() => {
-		const baseContent = message?.content || '';
-		return { baseContent, mentions };
-	}, [message?.content, mentions]);
+		return message?.content as IMessageSendPayload;
+	}, [message]);
+
+	function addMention(obj: IMessageSendPayload, mentionValue: IMentionOnMessage[]): IExtendedMessage {
+		// Chuyển đổi obj thành IExtendedMessage nếu cần
+		const updatedObj: IExtendedMessage = {
+			...obj,
+			mentions: mentionValue, // Thêm trường mentions với giá trị mới
+		};
+
+		return updatedObj;
+	}
+
+	const contentUpdatedMention = addMention(content, mentions as any);
 
 	const lines = useMemo(() => {
 		const values = message.content?.t;
@@ -136,5 +155,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		messageAvatarSenderRef,
 		messageClanNicknameSenderRef,
 		messageDisplayNameSenderRef,
+		contentUpdatedMention,
 	};
 }

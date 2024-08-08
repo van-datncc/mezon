@@ -8,21 +8,21 @@ export const useFilteredContent = (content: IMessageSendPayload) => {
 		if (content?.t?.trim() !== '') {
 			result.t = content.t;
 		}
-		if (content.emojis && content.emojis.length > 0) {
-			result.emojis = content.emojis;
+		if (content.ej && content.ej.length > 0) {
+			result.ej = content.ej;
 		}
-		if (content.hashtags && content.hashtags.length > 0) {
-			result.hashtags = content.hashtags;
+		if (content.hg && content.hg.length > 0) {
+			result.hg = content.hg;
 		}
-		if (content.links && content.links.length > 0) {
-			result.links = content.links;
+		if (content.lk && content.lk.length > 0) {
+			result.lk = content.lk;
 		}
-		if (content.markdowns && content.markdowns.length > 0) {
-			result.markdowns = content.markdowns;
+		if (content.mk && content.mk.length > 0) {
+			result.mk = content.mk;
 		}
 
-		if (content.voicelinks && content.voicelinks.length > 0) {
-			result.voicelinks = content.voicelinks;
+		if (content.vk && content.vk.length > 0) {
+			result.vk = content.vk;
 		}
 
 		// Return undefined if the result is empty

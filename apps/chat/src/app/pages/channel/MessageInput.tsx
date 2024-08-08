@@ -77,11 +77,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const processedContentDraft: IMessageSendPayload = useMemo(() => {
 		return {
 			t: channelDraftMessage.draftContent?.t,
-			hashtags: channelDraftMessage.draftContent?.hashtags,
-			emojis: channelDraftMessage.draftContent?.emojis,
-			links: channelDraftMessage.draftContent?.links,
-			markdowns: channelDraftMessage.draftContent?.markdowns,
-			voicelinks: channelDraftMessage.draftContent?.voicelinks,
+			hashtags: channelDraftMessage.draftContent?.hg,
+			emojis: channelDraftMessage.draftContent?.ej,
+			links: channelDraftMessage.draftContent?.lk,
+			markdowns: channelDraftMessage.draftContent?.mk,
+			voicelinks: channelDraftMessage.draftContent?.vk,
 		};
 	}, [channelDraftMessage.draftContent, messageId]);
 
@@ -148,16 +148,16 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		const { mentionList, hashtagList, emojiList } = useProcessMention(newPlainTextValue, mentions, roleList);
+		const { mentionList, hashtagList, emojiList } = useProcessMention(mentions, roleList);
 		const { links, markdowns, voiceRooms } = processText(newPlainTextValue);
 
 		setChannelDraftMessage(channelId, messageId, {
 			t: newPlainTextValue,
-			hashtags: hashtagList,
-			emojis: emojiList,
-			links: links,
-			markdowns: markdowns,
-			voicelinks: voiceRooms,
+			hg: hashtagList,
+			ej: emojiList,
+			lk: links,
+			mk: markdowns,
+			vk: voiceRooms,
 		});
 
 		if (newPlainTextValue.endsWith('@')) {

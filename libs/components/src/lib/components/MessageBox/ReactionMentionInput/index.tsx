@@ -236,7 +236,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
-	const { mentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw, roleList);
+	const { mentionList, hashtagList, emojiList } = useProcessMention(mentionRaw, roleList);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -270,13 +270,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					{
 						t: content,
-						hashtags: hashtagList,
-						emojis: emojiList,
-						links: linkList,
-						markdowns: markdownList,
-						voicelinks: voiceLinkRoomList,
+						hg: hashtagList,
+						ej: emojiList,
+						lk: linkList,
+						mk: markdownList,
+						vk: voiceLinkRoomList,
 					},
-
 					mentionList,
 					attachmentDataRef,
 					dataReferences,
@@ -311,11 +310,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					props.onSend(
 						{
 							t: content,
-							hashtags: hashtagList,
-							emojis: emojiList,
-							links: linkList,
-							markdowns: markdownList,
-							voicelinks: voiceLinkRoomList,
+							hg: hashtagList,
+							ej: emojiList,
+							lk: linkList,
+							mk: markdownList,
+							vk: voiceLinkRoomList,
 						},
 						mentionList,
 						attachmentDataRef,

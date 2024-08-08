@@ -187,15 +187,15 @@ export type IMessageWithUser = IMessage & {
 	user: IUser | null;
 };
 
-export type IMessageSendPayload = {
+export interface IMessageSendPayload {
 	t?: string;
 	contentThread?: string;
-	hashtags?: IHashtagOnMessage[];
-	emojis?: IEmojiOnMessage[];
-	links?: ILinkOnMessage[];
-	markdowns?: IMarkdownOnMessage[];
-	voicelinks?: ILinkVoiceRoomOnMessage[];
-};
+	hg?: IHashtagOnMessage[];
+	ej?: IEmojiOnMessage[];
+	lk?: ILinkOnMessage[];
+	mk?: IMarkdownOnMessage[];
+	vk?: ILinkVoiceRoomOnMessage[];
+}
 
 export type IUser = {
 	name: string;
