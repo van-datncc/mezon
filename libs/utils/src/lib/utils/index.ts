@@ -177,11 +177,6 @@ export const convertMarkdown = (markdown: string): string => {
 		.join('');
 };
 
-export const getEmojiId = (shortname: string, emojiListPNG: any[]) => {
-	const emoji = emojiListPNG.find((emoji) => emoji.shortname === shortname);
-	return emoji ? emoji.id : undefined;
-};
-
 export const getSrcEmoji = (id: string) => {
 	return process.env.NX_BASE_IMG_URL + 'emojis/' + id + '.webp';
 };
@@ -230,9 +225,14 @@ export const checkLastChar = (text: string) => {
 };
 
 export const getNameForPrioritize = (clanNickname: string | undefined, displayName: string | undefined, username: string | undefined) => {
-	if (clanNickname && clanNickname !== username) return clanNickname;
-	if (clanNickname === username || (clanNickname === '' && displayName && displayName !== username)) return displayName;
+	if (clanNickname) return clanNickname;
+	if (clanNickname === '' && displayName && displayName !== username) return displayName;
 	if (displayName === '' || displayName === username) return username;
+};
+
+export const getAvatarForPrioritize = (clanAvatar: string | undefined, userAvatar: string | undefined) => {
+	if (clanAvatar && clanAvatar !== userAvatar) return clanAvatar;
+	return userAvatar;
 };
 
 export function compareObjects(a: any, b: any, searchText: string, prioritizeProp: string, nameProp?: string) {
