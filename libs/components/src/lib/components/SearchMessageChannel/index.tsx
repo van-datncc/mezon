@@ -10,7 +10,7 @@ import {
 	selectValueInputSearchMessage,
 	useAppDispatch,
 } from '@mezon/store';
-import { SIZE_PAGE_SEARCH } from '@mezon/utils';
+import { SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -63,7 +63,7 @@ const SearchMessageChannel = () => {
 		const value = event.target.value;
 		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value }));
 		setValueDisplay(newPlainTextValue);
-		const filter = [];
+		const filter: SearchFilter[] = [];
 		filter.push();
 		if (mentions.length === 0) {
 			filter.push(
@@ -72,7 +72,7 @@ const SearchMessageChannel = () => {
 					field_value: value,
 				},
 				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId },
+				{ field_name: 'clan_id', field_value: currentClanId as string },
 			);
 		}
 		for (const mention of mentions) {
