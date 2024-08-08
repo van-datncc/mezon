@@ -18,6 +18,7 @@ import {
 	addAttributesSearchList,
 	filterListByName,
 	findDisplayNameByUserId,
+	getAvatarForPrioritize,
 	normalizeString,
 	removeDuplicatesById,
 	sortFilteredList,
@@ -101,7 +102,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					return {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
-						avatarUser: itemUserClan?.user?.avatar_url ?? '',
+						avatarUser: getAvatarForPrioritize(itemUserClan.clan_avatar, itemUserClan?.user?.avatar_url),
 						displayName: itemUserClan?.user?.display_name ?? '',
 						clanNick: itemUserClan?.clan_nick ?? '',
 						lastSentTimeStamp: '0',
@@ -110,12 +111,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					};
 				})
 			: [];
-
 		const usersClanMap = new Map(listUserClanSearch.map((user) => [user.id, user]));
 		const listSearch = [
 			...listDMSearch.map((itemDM) => {
 				const user = usersClanMap.get(itemDM.id);
-				return user ? { ...itemDM, clanNick: user.clanNick || '' } : itemDM;
+				return user ? { ...itemDM, clanNick: user.clanNick || '', avatarUser: user.avatarUser || '' } : itemDM;
 			}),
 			...listGroupSearch,
 			...listFriendsSearch,
