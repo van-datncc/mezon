@@ -5,7 +5,7 @@ import {
   selectDefaultNotificationCategory,
   selectDefaultNotificationClan,
   selectNotifiReactMessage,
-  selectnotificatonSelected,
+  selectCurrentChannelNotificatonSelected,
   useAppDispatch, notifiReactMessageActions,
 } from '@mezon/store';
 import { format } from 'date-fns';
@@ -17,7 +17,7 @@ import { notificationTypesList, notiLabels } from "../../../PanelChannel";
 import ItemPanel from "../../../PanelChannel/ItemPanel";
 
 const NotificationSetting = () => {
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
