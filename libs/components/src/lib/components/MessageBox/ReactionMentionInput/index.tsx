@@ -627,12 +627,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subText={
 									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.username ?? '')
+										: suggestion.username ?? ''
 								}
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
 								display={suggestion.display}
-								emojiId={suggestion.id as string}
+								emojiId=""
 							/>
 						);
 					}}
@@ -655,7 +655,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
-							emojiId="" //TODO:
+							emojiId=""
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
