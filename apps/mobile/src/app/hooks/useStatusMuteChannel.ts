@@ -1,4 +1,4 @@
-import { selectDefaultNotificationCategory, selectDefaultNotificationClan, selectnotificatonSelected } from '@mezon/store-mobile';
+import { selectDefaultNotificationCategory, selectDefaultNotificationClan, selectCurrentChannelNotificatonSelected } from '@mezon/store-mobile';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -10,7 +10,7 @@ export const enum EActionMute {
 const useStatusMuteChannel = () => {
 	const [statusMute, setStatusMute] = useState<EActionMute>(EActionMute.UnMute);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
 		const isChannelMuted =

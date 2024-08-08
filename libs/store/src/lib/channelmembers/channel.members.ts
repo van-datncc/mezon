@@ -267,6 +267,44 @@ export const channelMembers = createSlice({
 			const data = mapChannelMemberToEntity({ id: member.id + payload.channel_id, user: member }, payload.channel_id, payload.joins[0].user_id);
 			channelMembersAdapter.upsertOne(state, data);
 		},
+		addRoleIdUser: (state, action) => {
+			const { id, channelId, userId } = action.payload;
+			const idMember = channelId + userId;
+			const existingMember = state.entities[idMember];
+
+			if (existingMember) {
+				const roleIds = existingMember.role_id || [];
+				const updatedRoleIds= [...roleIds, id];
+
+				channelMembersAdapter.updateOne(state, {
+					id: idMember,
+					changes: {
+						role_id: updatedRoleIds,
+					},
+				});
+			}
+		},
+		removeRoleIdUser: (state, action) => {
+			const { id, channelId, userId } = action.payload;
+			const idMember = channelId + userId;
+			const existingMember = state.entities[idMember];
+
+			if (existingMember) {
+				const roleIds = existingMember.role_id || [];
+				const roleIndex = roleIds.indexOf(id);
+				let updatedRoleIds;
+				if (roleIndex > -1) {
+					updatedRoleIds = roleIds.filter(roleId => roleId !== id);
+				} 
+
+				channelMembersAdapter.updateOne(state, {
+					id: idMember,
+					changes: {
+						role_id: updatedRoleIds,
+					},
+				});
+			}
+		},
 	},
 	extraReducers: (builder) => {
 		builder

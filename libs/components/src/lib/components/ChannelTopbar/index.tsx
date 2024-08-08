@@ -15,7 +15,7 @@ import {
 	selectNewNotificationStatus,
 	selectStatusMenu,
 	selectTheme,
-	selectnotificatonSelected,
+	selectCurrentChannelNotificatonSelected,
 	useAppDispatch,
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -138,7 +138,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 
 function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isMuteBell, setIsMuteBell] = useState<boolean>(false);
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {

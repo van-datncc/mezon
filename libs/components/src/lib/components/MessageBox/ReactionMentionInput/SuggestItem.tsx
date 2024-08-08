@@ -1,5 +1,5 @@
 import { selectAllChannels, selectAllDirectChannelVoids, selectMembersVoiceChannel } from '@mezon/store';
-import { getSrcEmoji, normalizeString } from '@mezon/utils';
+import { normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -17,7 +17,7 @@ type SuggestItemProps = {
 	channelId?: string | number;
 	isOpenSearchModal?: boolean;
 	wrapSuggestItemStyle?: string;
-	emojiId: string;
+	emojiId?: string;
 	display?: string;
 	isHightLight?: boolean;
 };

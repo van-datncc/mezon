@@ -1,8 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
-import { getSrcEmoji } from '@mezon/utils';
 import { Image, Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { style } from './SuggestItem.styles';
 
 type SuggestItemProps = {
@@ -12,11 +9,10 @@ type SuggestItemProps = {
 	subText?: string;
 	isDisplayDefaultAvatar?: boolean;
 	isRoleUser?: boolean;
+	emojiSrc?: string;
 };
 
-const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar, isRoleUser }: SuggestItemProps) => {
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
-	const urlEmoji = getSrcEmoji(name, emojiListPNG);
+const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiSrc }: SuggestItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -39,7 +35,7 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar,
 						</View>
 					)
 				)}
-				{urlEmoji && <Image style={styles.emojiImage} source={{ uri: urlEmoji }} />}
+				{emojiSrc && <Image style={styles.emojiImage} source={{ uri: emojiSrc }} />}
 				{symbol && <Text style={styles.symbol}>{symbol}</Text>}
 				{isRoleUser || name.startsWith('here') ? (
 					<Text style={[styles.roleText, name.startsWith('here') && styles.title]}>{`@${name}`}</Text>
