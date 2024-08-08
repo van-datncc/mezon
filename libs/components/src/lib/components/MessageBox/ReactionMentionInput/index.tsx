@@ -661,14 +661,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				/>
 				<Mention
 					trigger=":"
-					markup="[:__display__]"
+					markup="[:__display__](__id__)"
 					data={queryEmojis}
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;
 					}}
-					renderSuggestion={(suggestion) => (
-						<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId={suggestion.id as string} />
-					)}
+					renderSuggestion={(suggestion) => {
+						return (
+							<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId={suggestion.id as string} />
+						);
+					}}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					appendSpaceOnAdd={true}
 				/>
