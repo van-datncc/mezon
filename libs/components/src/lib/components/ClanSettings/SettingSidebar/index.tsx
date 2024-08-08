@@ -4,7 +4,7 @@ import { EPermission } from '@mezon/utils';
 import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ItemObjProps, sideBarListItem, sideBarListItemClanPermission } from '../ItemObj';
+import { ItemObjProps, ItemSetting, sideBarListItem } from '../ItemObj';
 import SettingItem from '../SettingItem';
 
 type SettingSidebarProps = {
@@ -19,7 +19,20 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const currentClan = useSelector(selectCurrentClan);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
-	const itemsToRender = !hasAdminPermission && hasClanPermission ? sideBarListItemClanPermission : sideBarListItem;
+
+	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
+		const filteredListItem = sidebarItem.listItem.filter((item) => {
+			if(item.id === ItemSetting.ROLES || item.id === ItemSetting.OVERVIEW) {
+				return isClanOwner || hasClanPermission || hasAdminPermission;
+			}
+			return true;
+		});
+
+		return {
+			...sidebarItem,
+			listItem: filteredListItem,
+		};
+	});
 
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
@@ -40,7 +53,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 		<div className="flex flex-row flex-1 justify-end">
 			<div className="w-[220px] py-[60px] pl-5 pr-[6px]">
 				<p className="text-[#84ADFF] pl-[10px] pb-[6px] font-bold text-sm tracking-wider uppercase truncate">{currentClan?.clan_name}</p>
-				{itemsToRender.map((sidebarItem) => (
+				{sideBarListItemWithPermissions.map((sidebarItem) => (
 					<div key={sidebarItem.title} className={'mt-[5px] border-b-[0.08px] dark:border-borderDividerLight border-bgModifierHoverLight'}>
 						{sidebarItem.title && <p className='select-none font-semibold px-[10px] py-[4px] text-xs uppercase dark:text-textSecondary text-textSecondary'>{sidebarItem.title}</p>}
 						{

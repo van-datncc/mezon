@@ -102,7 +102,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					return {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
-						avatarUser: getAvatarForPrioritize( itemUserClan.clan_avatar ,itemUserClan?.user?.avatar_url),
+						avatarUser: getAvatarForPrioritize(itemUserClan.clan_avatar, itemUserClan?.user?.avatar_url),
 						displayName: itemUserClan?.user?.display_name ?? '',
 						clanNick: itemUserClan?.clan_nick ?? '',
 						lastSentTimeStamp: '0',
