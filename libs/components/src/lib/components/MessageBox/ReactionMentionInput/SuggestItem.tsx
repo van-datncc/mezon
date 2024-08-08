@@ -1,5 +1,5 @@
 import { selectAllChannels, selectAllDirectChannelVoids, selectMembersVoiceChannel } from '@mezon/store';
-import { normalizeString } from '@mezon/utils';
+import { getSrcEmoji, normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
