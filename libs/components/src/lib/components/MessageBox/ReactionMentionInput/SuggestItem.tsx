@@ -47,6 +47,8 @@ const SuggestItem = ({
 		return false;
 	}, [channelId, membersVoice, specificChannel?.type]);
 
+	console.log('emojiId', emojiId);
+
 	useEffect(() => {
 		if (directId && !isOpenSearchModal) {
 			commonChannelVoids.map((channel) => {
@@ -74,6 +76,9 @@ const SuggestItem = ({
 						className="size-4"
 						classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
 					/>
+				)}
+				{emojiId && (
+					<img src={getSrcEmoji(emojiId)} alt={getSrcEmoji(emojiId)} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />
 				)}
 				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 					<Icons.Hashtag defaultSize="w-5 h-5" />

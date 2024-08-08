@@ -113,7 +113,7 @@ const ModalUserProfile = ({
 	return (
 		<div className={classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[60px]'} ${!color && 'dark:bg-bgAvatarDark bg-bgAvatarLight'} flex justify-end gap-x-2 p-2 `}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[105px]'} ${!color && 'dark:bg-bgAvatarDark bg-bgAvatarLight'} flex justify-end gap-x-2 p-2 `}
 				style={{ backgroundColor: color }}
 			>
 				{!checkUser && !checkAnonymous && (
@@ -140,7 +140,7 @@ const ModalUserProfile = ({
 							{isFooterProfile
 								? userProfile?.user?.display_name
 								: userById
-									? userById.user?.display_name
+									? userById.clan_nick || userById.user?.display_name
 									: checkAnonymous
 										? 'Anonymous'
 										: message?.username}
@@ -170,7 +170,7 @@ const ModalUserProfile = ({
 							<input
 								type="text"
 								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] "
-								placeholder={`Message @${message?.username || userById?.user?.username}`}
+								placeholder={`Message @${message?.clan_nick || message?.display_name || userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}`}
 								value={content}
 								onKeyPress={(e) => {
 									if (e.key === 'Enter') {

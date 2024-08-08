@@ -112,7 +112,7 @@ export type IChannel = ApiChannelDescription & {
 	unread?: boolean;
 	description?: string;
 	usernames?: string;
-  isRoleUser?: boolean;
+	isRoleUser?: boolean;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -432,7 +432,7 @@ export type MentionDataProps = {
 	clanAvatar?: string | undefined;
 	user?: ApiUser;
 	username?: string | undefined;
-  isRoleUser?: boolean;
+	isRoleUser?: boolean;
 };
 
 export type UserSearchDataProps = {
@@ -671,3 +671,8 @@ export interface IRoleMention {
 	roleId: string;
 	roleName: string;
 }
+
+export type SearchFilter = {
+	field_name: string;
+	field_value?: string;
+};
