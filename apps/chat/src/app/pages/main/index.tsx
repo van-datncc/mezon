@@ -17,6 +17,7 @@ import {
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive } from '@mezon/utils';
+import { Tooltip } from 'flowbite-react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -156,7 +157,7 @@ function MyApp() {
 		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
-				className={`w-[72px] overflow-hidden py-4 px-3 space-y-2 dark:bg-bgTertiary bg-bgLightTertiary  overflow-y-auto scroll-smooth hide-scrollbar duration-100 scrollbar-hide  ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-bgLightTertiary duration-100 hide-scrollbar ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
@@ -191,7 +192,16 @@ function MyApp() {
 				<div className="relative flex flex-col gap-3">
 					{clans.map((clan: IClan) => {
 						return (
-							<SidebarClanItem key={clan.clan_id} linkClan={`/chat/clans/${clan.id}`} option={clan} />
+							<Tooltip
+								content={<span style={{ whiteSpace: 'nowrap' }}>{"Herrre"}</span>}
+								trigger="hover"
+								animation="duration-500"
+								style={appearanceTheme === 'light' ? 'light' : 'dark'}
+								placement="right"
+							>
+
+								<SidebarClanItem key={clan.clan_id} linkClan={`/chat/clans/${clan.id}`} option={clan} />
+							</Tooltip>
 						)
 					})}
 
