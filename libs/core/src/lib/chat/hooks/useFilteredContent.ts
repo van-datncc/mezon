@@ -20,9 +20,7 @@ export const useFilteredContent = (content: IMessageSendPayload) => {
 		if (content.markdowns && content.markdowns.length > 0) {
 			result.markdowns = content.markdowns;
 		}
-		if (content.mentions && content.mentions.length > 0) {
-			result.mentions = content.mentions;
-		}
+
 		if (content.voicelinks && content.voicelinks.length > 0) {
 			result.voicelinks = content.voicelinks;
 		}

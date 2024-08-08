@@ -77,7 +77,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const processedContentDraft: IMessageSendPayload = useMemo(() => {
 		return {
 			t: channelDraftMessage.draftContent?.t,
-			mentions: channelDraftMessage.draftContent?.mentions,
 			hashtags: channelDraftMessage.draftContent?.hashtags,
 			emojis: channelDraftMessage.draftContent?.emojis,
 			links: channelDraftMessage.draftContent?.links,
@@ -154,7 +153,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 		setChannelDraftMessage(channelId, messageId, {
 			t: newPlainTextValue,
-			mentions: mentionList,
 			hashtags: hashtagList,
 			emojis: emojiList,
 			links: links,
@@ -233,7 +231,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: suggestion.username ?? ''
+											: (suggestion.username ?? '')
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}

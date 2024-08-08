@@ -11,13 +11,14 @@ export function useMessageParser(message: IMessageWithUser) {
 	}, [message?.mentions]);
 
 	const content = useMemo(() => {
-		return message?.content;
-	}, [message?.content]);
+		const baseContent = message?.content || '';
+		return { baseContent, mentions };
+	}, [message?.content, mentions]);
 
 	const lines = useMemo(() => {
-		const values = content?.t;
+		const values = message.content?.t;
 		return values;
-	}, [content?.t]);
+	}, [message.content?.t]);
 
 	const messageTime = useMemo(() => {
 		return convertTimeString(message?.create_time as string);

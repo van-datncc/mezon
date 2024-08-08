@@ -39,27 +39,10 @@ const useProcessMention = (text: string, mentionsRaw: MentionItem[], roleList: I
 		}
 	});
 
-	const simplifiedList = mentions.map((mention) => {
-		const isRole = roleList.some((role) => role.roleId === mention.userid);
-		if (isRole) {
-			const role = roleList.find((role) => role.roleId === mention.userid);
-			return {
-				role_id: role?.roleId,
-				rolename: role?.roleName,
-			};
-		} else {
-			return {
-				user_id: mention.userid,
-				username: mention.username,
-			};
-		}
-	});
-
 	return {
 		mentionList: mentions,
 		hashtagList: hashtags,
 		emojiList: emojis,
-		simplifiedMentionList: simplifiedList,
 	};
 };
 

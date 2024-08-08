@@ -27,7 +27,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -112,7 +112,7 @@ export type IChannel = ApiChannelDescription & {
 	unread?: boolean;
 	description?: string;
 	usernames?: string;
-  isRoleUser?: boolean;
+	isRoleUser?: boolean;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -190,7 +190,6 @@ export type IMessageWithUser = IMessage & {
 export type IMessageSendPayload = {
 	t?: string;
 	contentThread?: string;
-	mentions?: IMentionOnMessage[];
 	hashtags?: IHashtagOnMessage[];
 	emojis?: IEmojiOnMessage[];
 	links?: ILinkOnMessage[];
@@ -432,7 +431,7 @@ export type MentionDataProps = {
 	clanAvatar?: string | undefined;
 	user?: ApiUser;
 	username?: string | undefined;
-  isRoleUser?: boolean;
+	isRoleUser?: boolean;
 };
 
 export type UserSearchDataProps = {

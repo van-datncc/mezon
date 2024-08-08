@@ -46,6 +46,7 @@ import {
 	ChannelMembersEntity,
 	EmojiPlaces,
 	ILineMention,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -99,7 +100,7 @@ type ChannelsMentionProps = {
 export type MentionReactInputProps = {
 	readonly onSend: (
 		content: IMessageSendPayload,
-		mentions?: Array<ApiMessageMention>,
+		mentions?: Array<IMentionOnMessage>,
 		attachments?: Array<ApiMessageAttachment>,
 		references?: Array<ApiMessageRef>,
 		value?: ThreadValue,
@@ -235,7 +236,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
-	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw, roleList);
+	const { mentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw, roleList);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -269,7 +270,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					{
 						t: content,
-						mentions: mentionList,
 						hashtags: hashtagList,
 						emojis: emojiList,
 						links: linkList,
@@ -277,7 +277,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						voicelinks: voiceLinkRoomList,
 					},
 
-					simplifiedMentionList,
+					mentionList,
 					attachmentDataRef,
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -311,14 +311,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					props.onSend(
 						{
 							t: content,
-							mentions: mentionList,
 							hashtags: hashtagList,
 							emojis: emojiList,
 							links: linkList,
 							markdowns: markdownList,
 							voicelinks: voiceLinkRoomList,
 						},
-						simplifiedMentionList,
+						mentionList,
 						attachmentDataRef,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -627,7 +626,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subText={
 									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: suggestion.username ?? ''
+										: (suggestion.username ?? '')
 								}
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
