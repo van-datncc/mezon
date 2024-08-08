@@ -12,7 +12,7 @@ import {
 } from '@mezon/mobile-components';
 import { Colors, Metrics, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, selectAllEmojiSuggestion } from '@mezon/store-mobile';
-import { IEmoji } from '@mezon/utils';
+import { getSrcEmoji, IEmoji } from '@mezon/utils';
 import { debounce } from 'lodash';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +68,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 			{emojisData.map((item, index) => {
 				return (
 					<TouchableOpacity style={styles.wrapperIconEmoji} key={index} onPress={() => onEmojiSelect(item.id, item.shortname)}>
-						<FastImage source={{ uri: item.src }} style={styles.iconEmoji} resizeMode={'contain'} />
+						<FastImage source={{ uri: getSrcEmoji(item?.id) }} style={styles.iconEmoji} resizeMode={'contain'} />
 					</TouchableOpacity>
 				);
 			})}

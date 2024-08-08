@@ -1,6 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { Image, Text, View } from 'react-native';
 import { style } from './SuggestItem.styles';
+import { getSrcEmoji } from '@mezon/utils';
 
 type SuggestItemProps = {
 	avatarUrl?: string;
@@ -9,13 +10,13 @@ type SuggestItemProps = {
 	subText?: string;
 	isDisplayDefaultAvatar?: boolean;
 	isRoleUser?: boolean;
-	emojiSrc?: string;
+	emojiId?: string;
 };
 
-const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiSrc }: SuggestItemProps) => {
+const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiId }: SuggestItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-
+	const emojiSrc = emojiId ? getSrcEmoji(emojiId) : '';
 	return (
 		<View style={styles.wrapperItem}>
 			<View style={styles.containerItem}>
