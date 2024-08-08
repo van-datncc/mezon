@@ -1,14 +1,16 @@
-import { ChannelsEntity, generateWebhook, useAppDispatch } from '@mezon/store';
+import { generateWebhook, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Image } from '@mezon/ui';
+import { IChannel } from '@mezon/utils';
 import { ApiWebhook, ApiWebhookCreateRequest } from 'mezon-js/api.gen';
+import { useSelector } from 'react-redux';
 import WebhookItemModal from './WebhookItemModal';
 
 interface IWebhooksProps {
 	allWebhooks?: ApiWebhook[] | undefined;
-	parentChannelsInClan: ChannelsEntity[];
+	currentChannel?: IChannel;
 }
 
-const Webhooks = ({ allWebhooks, parentChannelsInClan }: IWebhooksProps) => {
+const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 	const dispatch = useAppDispatch();
 	const webhookNames = ['Captain hook', 'Spidey bot', 'Komu Knight'];
 	const getRandomWebhookName = (): string => {
@@ -27,14 +29,14 @@ const Webhooks = ({ allWebhooks, parentChannelsInClan }: IWebhooksProps) => {
 		const randomIndex = Math.floor(Math.random() * webHookAvatars.length);
 		return webHookAvatars[randomIndex];
 	};
-
+	const clanId = useSelector(selectCurrentClanId) as string;
 	const handleAddWebhook = () => {
 		const newWebhookReq: ApiWebhookCreateRequest = {
-			channel_id: parentChannelsInClan[0].channel_id,
+			channel_id: currentChannel?.channel_id as string,
 			webhook_name: getRandomWebhookName(),
 			avatar: getRandomAvatar(),
 		};
-		dispatch(generateWebhook({ request: newWebhookReq, channelId: parentChannelsInClan[0].channel_id as string }));
+		dispatch(generateWebhook({ request: newWebhookReq, channelId: currentChannel?.channel_id as string, clanId: clanId }));
 	};
 
 	return (
@@ -55,7 +57,7 @@ const Webhooks = ({ allWebhooks, parentChannelsInClan }: IWebhooksProps) => {
 					</div>
 					{allWebhooks &&
 						allWebhooks.map((webhook) => (
-							<WebhookItemModal parentChannelsInClan={parentChannelsInClan} webhookItem={webhook} key={webhook.id} />
+							<WebhookItemModal webhookItem={webhook} key={webhook.id} />
 						))}
 				</>
 			) : (

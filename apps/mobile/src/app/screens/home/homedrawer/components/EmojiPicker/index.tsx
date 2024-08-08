@@ -3,7 +3,8 @@ import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
+import { selectCurrentClanId, settingClanStickerActions } from '@mezon/store';
+import { getStoreAsync, gifsActions, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
 import { debounce } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
@@ -45,6 +46,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const clanId = useSelector(selectCurrentClanId);
 	const currentDirectMessage = useSelector(selectDmGroupCurrent(directMessageId)); //Note: prioritize DM first
 	const { valueInputToCheckHandleSearch, setValueInputSearch } = useGifsStickersEmoji();
 	const [mode, setMode] = useState<ExpressionType>('emoji');
@@ -59,10 +61,35 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 		setChannelMode(ChannelStreamMode.STREAM_MODE_CHANNEL);
 	}, []);
 
+	useEffect(() => {
+		initLoader();
+	}, []);
+
+	useEffect(() => {
+		stickerLoader();
+	}, [clanId, currentDirectMessage?.channel_id]);
+
+	const initLoader = async () => {
+		const promises = [];
+		const store = await getStoreAsync();
+		promises.push(store.dispatch(gifsActions.fetchGifCategories()));
+		promises.push(store.dispatch(gifsActions.fetchGifCategoryFeatured()));
+		await Promise.all(promises);
+	};
+
+	const stickerLoader = useCallback(async () => {
+		const promises = [];
+		const store = await getStoreAsync();
+		promises.push(
+			store.dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentDirectMessage?.channel_id ? '0' : clanId || '0' })),
+		);
+		await Promise.all(promises);
+	}, [clanId, currentDirectMessage?.channel_id]);
+
 	const { sendMessage } = useChatSending({
 		channelId: currentDirectMessage?.channel_id || currentChannel?.id || '',
 		mode: dmMode || channelMode,
-		directMessageId: currentDirectMessage?.channel_id || ''
+		directMessageId: currentDirectMessage?.channel_id || '',
 	});
 
 	const handleSend = useCallback(
@@ -145,7 +172,13 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 
 						<View style={styles.textInputWrapper}>
 							<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
-							<TextInput placeholder='search' placeholderTextColor={themeValue.text} style={styles.textInput} onFocus={handleInputSearchFocus} onChangeText={debouncedSetSearchText} />
+							<TextInput
+								placeholder="search"
+								placeholderTextColor={themeValue.text}
+								style={styles.textInput}
+								onFocus={handleInputSearchFocus}
+								onChangeText={debouncedSetSearchText}
+							/>
 						</View>
 					</Block>
 				)}
@@ -161,7 +194,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 				) : mode === 'gif' ? (
 					<GifSelector onScroll={onScroll} onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
 				) : (
-					<StickerSelector onScroll={onScroll} onSelected={(url) => handleSelected('sticker', url)} searchText={searchText} />
+					<StickerSelector onScroll={onScroll} onSelected={(url) => handleSelected('sticker', url)} />
 				)}
 			</View>
 		</TouchableWithoutFeedback>

@@ -7,7 +7,7 @@ import {
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectNotifiReactMessage,
-	selectnotificatonSelected,
+	selectCurrentChannelNotificatonSelected,
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import React, { useEffect, useState } from 'react';
@@ -62,7 +62,7 @@ export default function NotificationSetting() {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const notifyReactMessage = useSelector(selectNotifiReactMessage);
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const [defaultNotifyName, setDefaultNotifyName] = useState('');

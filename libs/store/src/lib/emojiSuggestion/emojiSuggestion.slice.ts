@@ -14,6 +14,7 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	emojiPicked: string;
+	emojiObjPicked?: Record<string, string>;
 	emojiSuggestionListStatus: boolean;
 	keyCodeFromKeyBoardState: number;
 	textToSearchEmojiSuggestion: string;
@@ -35,6 +36,12 @@ type FetchEmojiArgs = {
 	noCache?: boolean;
 };
 
+type EmojiObjPickedArgs = {
+	shortName: string;
+	id: string;
+	isReset?: boolean;
+};
+
 const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.client.listClanEmoji(mezon.session, clanId), {
 	promise: true,
 	maxAge: LIST_EMOJI_CACHED_TIME,
@@ -54,6 +61,7 @@ export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, 
 	}
 	return response.emoji_list;
 });
+
 export const createEmojiSetting = createAsyncThunk(
 	'settingClanEmoji/createEmoji',
 	async (form: { request: ApiClanEmojiCreateRequest; clanId: string }, thunkAPI) => {
@@ -69,6 +77,7 @@ export const createEmojiSetting = createAsyncThunk(
 		}
 	},
 );
+
 export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji', async ({ request, emojiId }: UpdateEmojiRequest, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -80,21 +89,27 @@ export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji
 		return thunkAPI.rejectWithValue({});
 	}
 });
-export const deleteEmojiSetting = createAsyncThunk('settingClanEmoji/deleteEmoji', async (emoji: ApiClanEmojiListResponse, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const res = await mezon.client.deleteByIdClanEmoji(mezon.session, emoji.id || '');
-		if (res) {
-			return emoji;
+
+export const deleteEmojiSetting = createAsyncThunk(
+	'settingClanEmoji/deleteEmoji',
+	async (data: { emoji: ApiClanEmojiListResponse; clan_id: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const res = await mezon.client.deleteByIdClanEmoji(mezon.session, data.emoji.id || '', data.clan_id);
+			if (res) {
+				return data.emoji;
+			}
+		} catch (error) {
+			return thunkAPI.rejectWithValue({});
 		}
-	} catch (error) {
-		return thunkAPI.rejectWithValue({});
-	}
-});
+	},
+);
+
 export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestionAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
 	emojiPicked: '',
+	emojiObjPicked: {},
 	emojiSuggestionListStatus: false,
 	keyCodeFromKeyBoardState: 1000,
 	textToSearchEmojiSuggestion: '',
@@ -124,6 +139,16 @@ export const emojiSuggestionSlice = createSlice({
 		},
 		setShiftPressed: (state, action: PayloadAction<boolean>) => {
 			state.shiftPressed = action.payload;
+		},
+
+		setSuggestionEmojiObjPicked: (state, action: PayloadAction<EmojiObjPickedArgs>) => {
+			const { shortName, id, isReset } = action.payload;
+			if (!state.emojiObjPicked || isReset) {
+				state.emojiObjPicked = {};
+			}
+			if (!state.emojiObjPicked[shortName]) {
+				state.emojiObjPicked[shortName] = id;
+			}
 		},
 	},
 	extraReducers: (builder) => {
@@ -183,3 +208,5 @@ export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggesti
 export const selectAddEmojiState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.addEmojiAction);
 
 export const selectShiftPressedStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.shiftPressed);
+
+export const selectEmojiObjSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiObjPicked);

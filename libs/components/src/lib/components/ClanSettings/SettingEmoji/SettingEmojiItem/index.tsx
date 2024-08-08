@@ -1,15 +1,16 @@
+import { useClanRestriction } from "@mezon/core";
 import {
-	emojiSuggestionActions,
-	selectCurrentUserId,
-	selectMemberClanByUserId,
-	useAppDispatch,
-	useAppSelector
+  emojiSuggestionActions,
+  selectCurrentClanId,
+  selectCurrentUserId,
+  selectMemberClanByUserId,
+  useAppDispatch,
+  useAppSelector
 } from "@mezon/store";
+import { EPermission } from "@mezon/utils";
 import { ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from "mezon-js/api.gen";
 import { ChangeEvent, KeyboardEvent, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useClanRestriction } from "@mezon/core";
-import { EPermission } from "@mezon/utils";
 
 type SettingEmojiItemProp = {
   emoji: ApiClanEmojiListResponse,
@@ -20,14 +21,14 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const [focus, setFocus] = useState<boolean>(false);
   const dispatch = useAppDispatch()
-
+  const clanId = useSelector(selectCurrentClanId);
   const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
+	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan])
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
-		if(hasAdminPermission || isClanCreator) return true;
-		return currentUserId === emoji.creator_id
-	}, [hasAdminPermission, currentUserId]) ;
+		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === emoji.creator_id
+	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanOwner]) ;
 
   const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
     setNameEmoji(e.target.value.split(':').join(''));
@@ -45,7 +46,7 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
   }
 
   const handleDelete = () => {
-    dispatch(emojiSuggestionActions.deleteEmojiSetting(emoji));
+    dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: emoji, clan_id: clanId as string }));
   }
   const handleOnMouseLeave = () => {
     if (!focus) {
@@ -101,7 +102,7 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
         </div>
 
         <div className={'flex-1 flex gap-[6px]  select-none'}>
-          <div className={'w-6 h-6 flex rounded-[50%] overflow-hidden flex items-center justify-center'}>
+          <div className={'w-6 h-6 rounded-[50%] overflow-hidden flex items-center justify-center'}>
             <img className={'w-full h-auto object-cover'} src={dataAuthor?.user?.avatar_url} />
           </div>
           <p className={'text-sm h-auto leading-6'}>

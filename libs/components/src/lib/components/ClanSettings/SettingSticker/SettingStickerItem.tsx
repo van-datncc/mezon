@@ -1,16 +1,17 @@
+import { useClanRestriction } from "@mezon/core";
 import {
-	deleteSticker,
-	selectCurrentUserId,
-	selectMemberClanByUserId,
-	useAppDispatch,
-	useAppSelector
+  deleteSticker,
+  selectCurrentClanId,
+  selectCurrentUserId,
+  selectMemberClanByUserId,
+  useAppDispatch,
+  useAppSelector
 } from "@mezon/store";
+import { EPermission } from "@mezon/utils";
 import { ApiClanSticker } from "mezon-js/api.gen";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Icons } from "../../../components";
-import { useClanRestriction } from "@mezon/core";
-import { EPermission } from "@mezon/utils";
-import { useMemo } from "react";
 
 type SettingEmojiListProps = {
   updateSticker: (sticker: ApiClanSticker) => void;
@@ -20,19 +21,19 @@ type SettingEmojiListProps = {
 const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) => {
   const dataAuthor = useSelector(selectMemberClanByUserId(sticker.creator_id ?? ''));
   const dispatch = useAppDispatch();
-	const [hasAdminPermission, {isClanCreator}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
+	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan])
 	const currentUserId = useAppSelector(selectCurrentUserId);
 	const hasDeleteOrEditPermission = useMemo(() => {
-		if(hasAdminPermission || isClanCreator) return true;
-		return currentUserId === sticker.creator_id
-	}, [hasAdminPermission, currentUserId]) ;
-
+		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === sticker.creator_id
+	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanOwner]) ;
+  const clanId = useSelector(selectCurrentClanId);
   const handleUpdateSticker = () => {
     updateSticker(sticker);
   }
   const handleDeleteSticker = async () => {
     if (sticker.id) {
-      await dispatch(deleteSticker(sticker.id));
+      await dispatch(deleteSticker({ stickerId: sticker.id, clan_id: clanId as string }));
     }
   }
   return (

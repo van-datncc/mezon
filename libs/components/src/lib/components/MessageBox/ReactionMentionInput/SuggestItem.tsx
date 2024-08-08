@@ -1,6 +1,5 @@
-import { useEmojiSuggestion } from '@mezon/core';
 import { selectAllChannels, selectAllDirectChannelVoids, selectMembersVoiceChannel } from '@mezon/store';
-import { getSrcEmoji, normalizeString } from '@mezon/utils';
+import { normalizeString } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -18,6 +17,7 @@ type SuggestItemProps = {
 	channelId?: string | number;
 	isOpenSearchModal?: boolean;
 	wrapSuggestItemStyle?: string;
+	emojiId?: string;
 	display?: string;
 	isHightLight?: boolean;
 };
@@ -31,11 +31,10 @@ const SuggestItem = ({
 	valueHightLight,
 	showAvatar,
 	wrapSuggestItemStyle,
+	emojiId,
 	display,
 	isHightLight = true,
 }: SuggestItemProps) => {
-	const { emojis } = useEmojiSuggestion();
-	const urlEmoji = getSrcEmoji(display ?? '', emojis);
 	const allChannels = useSelector(selectAllChannels);
 	const { directId } = useParams();
 	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
@@ -76,7 +75,6 @@ const SuggestItem = ({
 						classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
 					/>
 				)}
-				{urlEmoji && <img src={urlEmoji} alt={urlEmoji} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />}
 				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 					<Icons.Hashtag defaultSize="w-5 h-5" />
 				)}

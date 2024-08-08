@@ -11,7 +11,7 @@ import {
 	useAppSelector,
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EEmojiCategory, EPermission, EmojiPlaces, IEmoji, ModeResponsive, SubPanelName } from '@mezon/utils';
+import { EEmojiCategory, EPermission, EmojiPlaces, IEmoji, ModeResponsive, SubPanelName, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -73,7 +73,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	];
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: categoryIcons[index] }));
 	const { reactionMessageDispatch } = useChatReaction();
-
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
 	const { setEmojiSuggestion } = useEmojiSuggestion();
 	const [emojiHoverSrc, setEmojiHoverSrc] = useState<string>('');
@@ -93,7 +92,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		}
 	}, [currentChannel, direct, directId]);
 
-	const handleEmojiSelect = async (emojiPicked: string) => {
+	const handleEmojiSelect = async (emojiId: string, emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
@@ -101,6 +100,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				currentChannel?.clan_id || '',
 				channelID ?? '',
 				props.messageEmojiId ?? '',
+				emojiId.trim(),
 				emojiPicked.trim(),
 				1,
 				messageEmoji?.sender_id ?? '',
@@ -262,7 +262,7 @@ export default EmojiCustomPanel;
 
 type DisplayByCategoriesProps = {
 	readonly categoryName?: string;
-	readonly onEmojiSelect: (emoji: string) => void;
+	readonly onEmojiSelect: (emoji_id: string, emoji: string) => void;
 	readonly onEmojiHover: (item: any) => void;
 	readonly emojisData: any[];
 	onClickAddButton?: () => void;
@@ -330,9 +330,9 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
 	const appearanceTheme = useSelector(selectTheme);
-	const [hasAdminPermission, { isClanCreator }] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasClanManagementPermission = hasAdminPermission || isClanCreator || hasClanPermission;
+	const hasClanManagementPermission = hasAdminPermission || isClanOwner || hasClanPermission;
 	const isShowAddButton = useMemo(() => {
 		return hasClanManagementPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
 	}, [hasClanManagementPermission, categoryName, showAddButton]);
@@ -345,16 +345,18 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
-					onClick={() => onEmojiSelect(item.shortname + ' ')}
+					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
+					onClick={() => {
+						onEmojiSelect(item.id, item.shortname);
+					}}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
-					<img draggable="false" src={item?.src} />
+					<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} />
 				</button>
 			))}
 			{isShowAddButton && (
 				<button
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md w-10  p-1 flex items-center justify-center w-full`}
+					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
 					onMouseEnter={() =>
 						onEmojiHover({
 							shortname: 'Upload a custom emoji',

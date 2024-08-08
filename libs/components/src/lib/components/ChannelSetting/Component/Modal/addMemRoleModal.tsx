@@ -15,6 +15,7 @@ import { ChannelType } from 'mezon-js';
 import { ApiUser } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import ListMembers from './listMembers';
 import ListRole from './listRoles';
@@ -64,7 +65,8 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 		const memberIds = rawMembers.filter((member) => member.userChannelId !== '0').map((member) => member.user?.id || '');
 		return usersClan.filter((user) => !memberIds.some((userId) => userId === user.id));
 	}, [usersClan, rawMembers, channel.channel_private, userProfile?.user?.id]);
-	const listMembersNotInChannel = useMemo(() => (listUserInvite ? listUserInvite.map((member) => member.user) : []), [listUserInvite]);
+	
+	const listMembersNotInChannel = useMemo(() => (listUserInvite ? listUserInvite.map((member: any) => ({...member.user, clanNick: member.clan_nick, clanAvatar: member.clan_avatar})) : []), [listUserInvite]);
 
 	const initFilter: filterItemProps = useMemo(
 		() => ({
@@ -101,6 +103,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					channelId: channel.id,
 					channelType: channel.type,
 					userIds: selectedUserIds,
+					clanId: currentClanId || "",
 				};
 				await dispatch(channelUsersActions.addChannelUsers(body));
 			}
@@ -140,7 +143,10 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 				});
 				return;
 			}
-			const filteredMembers = listMembersNotInChannel.filter((item) => item?.display_name?.toLowerCase().includes(inputData));
+			const filteredMembers = listMembersNotInChannel.filter((item) => {
+				const nameToSearch = item?.display_name?.toLowerCase() || item?.username?.toLowerCase();
+				return nameToSearch.includes(inputData.toLowerCase());
+			});
 			const filteredRoles = listRolesNotAddChannel.filter((item) => item?.title?.toLowerCase().includes(inputData));
 			setFilterItem({
 				listMembersNotInChannel: filteredMembers,
@@ -150,13 +156,13 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 		[listRolesNotAddChannel, listMembersNotInChannel],
 	);
 
-	useEffect(() => {
-		const timeoutId = setTimeout(() => {
-			filterData(valueSearch);
-		}, 500);
+	const debouncedSetValueSearch = useDebouncedCallback((value) => {
+		filterData(value);
+	}, 300);
 
-		return () => clearTimeout(timeoutId);
-	}, [filterData, valueSearch]);
+	useEffect(() => {
+		debouncedSetValueSearch(valueSearch);
+	}, [valueSearch]);
 
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50 text-white">

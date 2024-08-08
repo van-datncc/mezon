@@ -18,10 +18,12 @@ import {
 	getStoreAsync,
 	referencesActions,
 	selectAttachmentData,
+	selectCurrentChannelId,
 	selectCurrentClan,
+	selectCurrentClanId,
 	selectDirectsOpenlist,
 } from '@mezon/store-mobile';
-import { handleUploadFileMobile, useMezon } from '@mezon/transport';
+import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { ILinkOnMessage } from '@mezon/utils';
 import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -42,6 +44,7 @@ export const Sharing = ({ data, onClose }) => {
 	const listDM = useSelector(selectDirectsOpenlist);
 	const { categorizedChannels } = useCategory();
 	const currentClan = useSelector(selectCurrentClan);
+	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const mezon = useMezon();
 	const dispatch = useDispatch();
 	const [dataText, setDataText] = useState<string>('');
@@ -50,6 +53,8 @@ export const Sharing = ({ data, onClose }) => {
 	const [searchText, setSearchText] = useState<string>('');
 	const [channelSelected, setChannelSelected] = useState<any>();
 	const inputSearchRef = useRef<any>();
+	const session = mezon.sessionRef.current;
+
 	const dataMedia = useMemo(() => {
 		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
@@ -76,6 +81,13 @@ export const Sharing = ({ data, onClose }) => {
 			convertFileFormat();
 		}
 	}, [dataMedia]);
+
+	const getFullFileName = useCallback(
+		(fileName: string) => {
+			return createUploadFilePath(session, currentClan.id, currentChannelId, fileName);
+		},
+		[currentChannelId, currentClan.id, session],
+	);
 
 	function flattenData(categorizedChannels: any) {
 		const categoryChannel = categorizedChannels || JSON.parse(load(STORAGE_DATA_CATEGORY_CHANNEL) || '[]');
@@ -157,7 +169,7 @@ export const Sharing = ({ data, onClose }) => {
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
-			'DM',
+			'0',
 			channelSelected.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			{
@@ -247,13 +259,15 @@ export const Sharing = ({ data, onClose }) => {
 	const convertFileFormat = async () => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
+				console.log('Tom log  => media', media);
+				const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
 				dispatch(
 					referencesActions.setAttachmentData({
 						channelId: CHANNEL_ID_SHARING,
 						attachments: [
 							{
 								url: media?.contentUri || media?.filePath,
-								filename: media?.fileName || media?.contentUri || media?.filePath,
+								filename: fileName,
 								filetype: media?.mimeType,
 							},
 						],
@@ -285,9 +299,7 @@ export const Sharing = ({ data, onClose }) => {
 		}
 
 		const promises = Array.from(files).map((file: IFile | any) => {
-			const ms = new Date().getTime();
-			const fullFilename = `${currentClan.id}/${channelSelected?.channel_id}/${ms}`.replace(/-/g, '_') + '/' + file.name;
-			return handleUploadFileMobile(client, session, fullFilename, file);
+			return handleUploadFileMobile(client, session, currentClan.id, currentChannelId, file.name, file);
 		});
 
 		Promise.all(promises).then((attachments) => {

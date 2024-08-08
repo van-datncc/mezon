@@ -1,9 +1,10 @@
 import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { appActions, referencesActions, selectAttachmentData, useAppDispatch } from '@mezon/store-mobile';
+import { appActions, referencesActions, selectAttachmentData, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
+import { createUploadFilePath, useMezon } from '@mezon/transport';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { delay } from 'lodash';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
@@ -29,6 +30,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const [pageInfo, setPageInfo] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const attachmentDataRef = useSelector(selectAttachmentData(currentChannelId || ''));
+	const currentClanId = useSelector(selectCurrentClanId);
+	const { sessionRef } = useMezon();
+	const session = sessionRef.current;
 	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>();
 
@@ -44,6 +48,13 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			timerRef?.current && clearTimeout(timerRef.current);
 		};
 	}, []);
+
+	const getFullFileName = useCallback(
+		(fileName: string) => {
+			return createUploadFilePath(session, currentClanId, currentChannelId, fileName);
+		},
+		[currentChannelId, currentClanId, session],
+	);
 
 	const checkAndRequestPermissions = async () => {
 		const hasPermission = await requestPermission();
@@ -135,7 +146,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		dispatch(
 			referencesActions.removeAttachment({
 				channelId: currentChannelId,
-				urlAttachment: urlToRemove
+				urlAttachment: urlToRemove,
 			}),
 		);
 	}
@@ -150,14 +161,14 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 		const fileName = item?.node?.image?.filename || item?.node?.image?.uri;
 		const isVideo = item?.node?.type?.startsWith?.('video');
-		const isSelected = attachmentsFileName?.includes(fileName);
+		const isSelected = attachmentsFileName?.some((i) => i?.includes(getFullFileName(fileName)));
 
 		return (
 			<TouchableOpacity
 				style={styles.itemGallery}
 				onPress={() => {
 					if (isSelected) {
-						const infoAttachment = attachmentDataRef?.find?.((attachment) => attachment?.filename === fileName);
+						const infoAttachment = attachmentDataRef?.find?.((attachment) => attachment?.filename === getFullFileName(fileName));
 						removeAttachmentByUrl(infoAttachment?.filename || infoAttachment?.url || '');
 					} else {
 						handleGalleryPress(item);
@@ -184,15 +195,17 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		try {
 			const image = file?.node?.image;
 			const type = file?.node?.type;
-
+			const name = file?.node?.image?.filename || file?.node?.image?.uri;
 			let filePath = image?.uri;
+			const filename = getFullFileName(name);
+
 			dispatch(
 				referencesActions.setAttachmentData({
 					channelId: currentChannelId,
 					attachments: [
 						{
 							url: filePath,
-							filename: image?.filename,
+							filename,
 							filetype: type,
 						},
 					],

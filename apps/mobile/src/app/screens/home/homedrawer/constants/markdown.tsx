@@ -1,14 +1,7 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
-import {
-	ChannelsEntity,
-	selectAllChannelMembers,
-	selectAllEmojiSuggestion,
-	selectAllUserClanProfile,
-	selectAllUsesClan,
-	selectChannelsEntities,
-} from '@mezon/store-mobile';
+import { ChannelsEntity, selectAllChannelMembers, selectAllRolesClan, selectAllUsesClan, selectChannelsEntities } from '@mezon/store-mobile';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
@@ -38,6 +31,7 @@ export const TYPE_MENTION = {
 	userMention: '@',
 	hashtag: '#',
 	voiceChannel: '##voice',
+	userRoleMention: '@role',
 };
 /**
  * custom style for markdown
@@ -139,6 +133,10 @@ export const markdownStyles = (colors: Attributes) =>
 			lineHeight: size.s_20,
 		},
 		unknownChannel: { fontStyle: 'italic' },
+		roleMention: {
+			color: colors.textRoleLink,
+			backgroundColor: colors.darkMossGreen,
+		},
 	});
 
 const styleMessageReply = (colors: Attributes) =>
@@ -216,7 +214,11 @@ export const renderRulesCustom = {
 			return (
 				<Text
 					key={node.key}
-					style={[styles.mention, content.includes('# unknown') && styles.unknownChannel]}
+					style={[
+						styles.mention,
+						content.includes('# unknown') && styles.unknownChannel,
+						payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention,
+					]}
 					onPress={() => openUrl(node.attributes.href, onLinkPress)}
 				>
 					{content}
@@ -322,14 +324,12 @@ export const RenderTextMarkdownContent = React.memo(
 		const { themeValue } = useTheme();
 		const usersClan = useAppSelector(selectAllUsesClan);
 		const usersInChannel = useAppSelector(selectAllChannelMembers);
-		const clansProfile = useAppSelector(selectAllUserClanProfile);
-		const emojiListPNG = useAppSelector(selectAllEmojiSuggestion);
 		const channelsEntities = useAppSelector(selectChannelsEntities);
+		const rolesInClan = useAppSelector(selectAllRolesClan);
 
 		if (isMessageReply) {
 			customStyle = { ...styleMessageReply(themeValue) };
 		}
-
 		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [], voicelinks = [] } = content || {};
 		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns, ...voicelinks].sort((a, b) => a.startindex - b.startindex);
 		let lastIndex = 0;
@@ -338,8 +338,7 @@ export const RenderTextMarkdownContent = React.memo(
 			let formattedContent = '';
 
 			elements.forEach((element) => {
-				const { startindex, endindex, channelid, channellabel, username, userid, shortname, markdown, link, voicelink } = element;
-
+				const { startindex, endindex, channelid, channellabel, username, userid, shortname, emojiid, markdown, link, voicelink } = element;
 				if (lastIndex < startindex) {
 					formattedContent += t?.slice?.(lastIndex, startindex)?.toString();
 				}
@@ -348,10 +347,10 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += ChannelHashtag({ channelHashtagId: channelid, channelsEntities });
 				}
 				if (username) {
-					formattedContent += MentionUser({ tagName: username, tagUserId: userid, mode, usersClan, usersInChannel, clansProfile });
+					formattedContent += MentionUser({ tagName: username, tagUserId: userid, mode, usersClan, usersInChannel, rolesInClan });
 				}
-				if (shortname) {
-					formattedContent += EmojiMarkup({ shortname, isMessageReply: isMessageReply, emojiListPNG });
+				if (shortname || emojiid) {
+					formattedContent += EmojiMarkup({ shortname, emojiid, isMessageReply: isMessageReply });
 				}
 
 				if (markdown || link) {

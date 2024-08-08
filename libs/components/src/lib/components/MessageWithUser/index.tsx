@@ -1,5 +1,12 @@
 import { useAuth, useChatMessages } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
+import {
+	MessagesEntity,
+	selectCurrentChannelId,
+	selectCurrentUserId,
+	selectIdMessageRefReply,
+	selectIdMessageToJump,
+	selectOpenReplyMessageState,
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import classNames from 'classnames';
 import React, { useMemo, useRef } from 'react';
@@ -58,11 +65,10 @@ function MessageWithUser({
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
+	const currentUserId = useSelector(selectCurrentUserId);
 
 	const hasIncludeMention = useMemo(() => {
 		const userMention = `@[${userLogin.userProfile?.user?.username}]`;
-		const startIndexHere = message.content.t?.indexOf('@[here]');
-		const startIndexUser = message.content.t?.indexOf(userMention);
 		const includesHere = message.content.t?.includes('@[here]');
 		const includesUser = message.content.t?.includes(userMention);
 		return includesHere || includesUser;
@@ -109,7 +115,7 @@ function MessageWithUser({
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
-			<div className={containerClass} ref={containerRef} onContextMenu={onContextMenu}>
+			<div className={containerClass} ref={containerRef} onContextMenu={onContextMenu} id={`msg-${message.id}`}>
 				<div className="relative rounded-sm overflow-visible">
 					<div className={childDivClass}></div>
 					<div className={parentDivClass}>
@@ -118,7 +124,7 @@ function MessageWithUser({
 							<MessageAvatar message={message} isCombine={isCombine} isEditing={isEditing} isShowFull={isShowFull} mode={mode} />
 							<div className="w-full relative h-full">
 								<MessageHead message={message} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
-								<div id={message.id} className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
+								<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 									<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 										{isEditing && editor}
 										{!isEditing && (
