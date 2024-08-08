@@ -148,7 +148,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
-	const isSearchMessage = useSelector(selectIsSearchMessage(currentChannel?.channel_id || ''));
+	const isSearchMessage = useSelector(
+		selectIsSearchMessage((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
+	);
 	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(
 		(props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || '',
 	);
