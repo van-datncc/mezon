@@ -58,7 +58,7 @@ export async function handleUploadFile(
 				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
 				fileType = `text/${fileExtension}`;
 			}
-			const fullfilename = createUploadFilePath(session, currentChannelId, currentChannelId, filename);
+			const fullfilename = createUploadFilePath(session, currentClanId, currentChannelId, filename);
 			const buf = await file?.arrayBuffer();
 
 			resolve(uploadFile(client, session, fullfilename, fileType, file.size, Buffer.from(buf)));
@@ -68,47 +68,31 @@ export async function handleUploadFile(
 	});
 }
 
-export async function handleUploadFileMobile(client: Client, session: Session, fullfilename: string, file: any): Promise<ApiMessageAttachment> {
+export async function handleUploadFileMobile(
+	client: Client,
+	session: Session,
+	currentClanId: string,
+	currentChannelId: string,
+	filename: string,
+	file: any,
+): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
 		try {
+			let fileType = file.type;
+			if (!fileType) {
+				const fileNameParts = file.name.split('.');
+				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
+				fileType = `text/${fileExtension}`;
+			}
 			if (file?.uri) {
 				const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 				if (!arrayBuffer) {
 					console.log('Failed to read file data.');
 					return;
 				}
-				const data = await client.uploadAttachmentFile(session, {
-					filename: fullfilename,
-					filetype: file.type,
-					size: file.size,
-				});
-				if (!data?.url) {
-					console.log('Failed to upload file. URL not available.');
-					return;
-				}
-				const buffer = BufferMobile.from(arrayBuffer);
-				
-				const res = await fetch(data.url, {
-					method: 'PUT',
-					headers: {
-						'Content-Type': file.type,
-						'Content-Length': file?.size?.toString() || '1000',
-					},
-					body: buffer,
-				});
-				if (res.status !== 200) {
-					throw new Error('Failed to upload file to MinIO.');
-				}
-				const url = 'https://cdn.mezon.vn/' + fullfilename;
-				resolve({
-					filename: file.name,
-					url: url,
-					filetype: file.type,
-					size: file.size,
-					width: 0,
-					height: 0,
-				});
+				const fullfilename = createUploadFilePath(session, currentClanId, currentChannelId, filename);
+				resolve(uploadFile(client, session, fullfilename, fileType, file.size, arrayBuffer));
 			}
 		} catch (error) {
 			console.log('handleUploadFileMobile Error: ', error);

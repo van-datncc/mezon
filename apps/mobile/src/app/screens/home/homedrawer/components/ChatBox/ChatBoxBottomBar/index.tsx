@@ -337,7 +337,7 @@ export const ChatBoxBottomBar = memo(
 					if (!client || !session || !currentChannel.channel_id) {
 						console.log('Client is not initialized');
 					}
-					handleUploadFileMobile(client, session, fileTxtSaved.name, fileTxtSaved)
+					handleUploadFileMobile(client, session, currentChannel.clan_id, currentChannel.channel_id, fileTxtSaved.name, fileTxtSaved)
 						.then((attachment) => {
 							handleFinishUpload(attachment);
 							return 'handled';

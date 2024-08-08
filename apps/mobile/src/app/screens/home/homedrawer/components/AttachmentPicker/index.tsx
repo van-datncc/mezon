@@ -89,9 +89,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		}
 
 		const promises = Array.from(files).map((file: IFile | any) => {
-			const ms = new Date().getTime();
-			const fullFilename = `${currentClanId}/${currentChannelId}/${ms}`.replace(/-/g, '_') + '/' + file.name;
-			return handleUploadFileMobile(client, session, fullFilename, file);
+			return handleUploadFileMobile(client, session, currentClanId, currentChannelId, file.name, file);
 		});
 
 		Promise.all(promises).then((attachments) => {
