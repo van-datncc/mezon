@@ -1,4 +1,4 @@
-import { selectCountNotifyByClanId } from "@mezon/store";
+import { selectCountNotifyByClanId, selectCurrentClanId } from "@mezon/store";
 import { Image } from "@mezon/ui";
 import { IClan } from "@mezon/utils";
 import { useSelector } from "react-redux";
@@ -13,12 +13,13 @@ export type SidebarClanItemProps = {
 
 const SidebarClanItem = ({ option, linkClan }: SidebarClanItemProps) => {
   const numberOfNotifyClan = useSelector(selectCountNotifyByClanId(option.clan_id ?? ''));
+  const currentClanId = useSelector(selectCurrentClanId);
   return (
     <div className="relative">
 
-      <NavLink to={linkClan}>
-        {/* <NavLinkComponent active={!pathName.includes('direct')} clanName={currentClan?.clan_name || clans[0]?.clan_name || ''}> */}
-        <NavLinkComponent clanName={option.clan_name || ''}>
+      <NavLink to={linkClan} >
+
+        <NavLinkComponent active={currentClanId === option.clan_id} clanName={option.clan_name || ''}>
           {option.logo ? (
             <Image
               src={option.logo || ''}
