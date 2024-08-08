@@ -1,21 +1,24 @@
+import { selectEmojiObjSuggestion } from '@mezon/store';
 import { IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const useProcessedContent = (inputText: string) => {
 	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
 	const [linkList, setLinkList] = useState<ILinkOnMessage[]>([]);
 	const [markdownList, setMarkdownList] = useState<IMarkdownOnMessage[]>([]);
 	const [voiceLinkRoomList, setVoiceLinkRoomList] = useState<ILinkVoiceRoomOnMessage[]>([]);
-	
+	const emojiObjPicked = useSelector(selectEmojiObjSuggestion);
+
 	useEffect(() => {
 		const processInput = () => {
-			const { emojis, links, markdowns, voiceRooms } = processText(inputText);
+			const { emojis, links, markdowns, voiceRooms } = processText(inputText, emojiObjPicked);
 			setEmojiList(emojis);
 			setLinkList(links);
 			setMarkdownList(markdowns);
 			setVoiceLinkRoomList(voiceRooms);
 		};
-		
+
 		processInput();
 	}, [inputText]);
 	return { emojiList, linkList, markdownList, inputText, voiceLinkRoomList };
@@ -23,7 +26,7 @@ const useProcessedContent = (inputText: string) => {
 
 export default useProcessedContent;
 
-const processText = (inputString: string) => {
+const processText = (inputString: string, emojiObjPicked: any) => {
 	const emojis: IEmojiOnMessage[] = [];
 	const links: ILinkOnMessage[] = [];
 	const markdowns: IMarkdownOnMessage[] = [];
@@ -33,7 +36,7 @@ const processText = (inputString: string) => {
 	const tripleBacktick = '```';
 	const httpPrefix = 'http';
 	const googleMeetPrefix = 'https://meet.google.com/';
-	
+
 	let i = 0;
 	while (i < inputString.length) {
 		if (inputString[i] === ':') {
@@ -49,8 +52,9 @@ const processText = (inputString: string) => {
 				const endindex = i + 1;
 				const preCharFour = inputString.substring(startindex - 4, startindex);
 				const preCharFive = inputString.substring(startindex - 5, startindex);
-				if (preCharFour !== 'http' && preCharFive !== 'https') {
+				if (preCharFour !== 'http' && preCharFive !== 'https' && emojiObjPicked?.[`:${shortname}:`]) {
 					emojis.push({
+						emojiid: emojiObjPicked?.[`:${shortname}:`],
 						shortname: `:${shortname}:`,
 						startindex,
 						endindex,
@@ -67,7 +71,7 @@ const processText = (inputString: string) => {
 			}
 			const endindex = i;
 			const link = inputString.substring(startindex, endindex);
-			
+
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
 					voicelink: link,
@@ -118,6 +122,6 @@ const processText = (inputString: string) => {
 			i++;
 		}
 	}
-	
+
 	return { emojis, links, markdowns, voiceRooms };
 };
