@@ -6,7 +6,6 @@ import {
 	convertToPlainTextHashtag,
 	getAttachmentUnique,
 	load,
-	mentionHashtagPattern,
 	mentionUserPattern,
 	save,
 } from '@mezon/mobile-components';
@@ -221,8 +220,7 @@ export const ChatBoxBottomBar = memo(
 			};
 
 			const mentionUsers = getMatches(mentionUserPattern);
-			const mentionHashtags = getMatches(mentionHashtagPattern);
-			return { mentionUsers, mentionHashtags };
+			return { mentionUsers };
 		};
 
 		const handleTextInputChange = async (text: string) => {
@@ -233,37 +231,41 @@ export const ChatBoxBottomBar = memo(
 				await onConvertToFiles(text);
 			} else {
 				const convertedHashtag = convertMentionsToText(text);
-
-				const { mentionUsers, mentionHashtags } = findMentionMarkers(convertedHashtag);
+				const words = convertedHashtag.split(' ');
+				const { mentionUsers } = findMentionMarkers(convertedHashtag);
 				let mentionList = [];
-				let hashtagList = [];
+				const hashtagList = [];
 
 				if (mentionUsers?.length) {
 					mentionList = mentionUsers.map((m) => {
 						const mention = listMentions.find((item) => `${item?.display}` === m?.content);
 						if (mention) {
 							return {
-								userid: mention.id?.toString() ?? '',
+								user_id: mention.id?.toString() ?? '',
 								username: `@${mention?.display}`,
-								startindex: m?.start,
-								endindex: m?.end,
+								s: m?.start,
+								e: m?.end,
 							};
 						}
 					});
 				}
 
-				if (mentionHashtags?.length) {
-					hashtagList = mentionHashtags.map((m) => {
-						const channelInfo = getChannelById(m?.content);
+				words.forEach((word) => {
+					if (word.startsWith('<#') && word.endsWith('>')) {
+						const channelId = word.slice(2, -1);
+						const channelInfo = getChannelById(channelId);
+						if (channelInfo) {
+							const startindex = convertedHashtag.indexOf(word);
+							hashtagList.push({
+								channelid: channelInfo.id.toString() ?? '',
+								channellabel: channelInfo.channel_label ?? '',
+								s: startindex,
+								e: startindex + word.length,
+							});
+						}
+					}
+				});
 
-						return {
-							channelid: channelInfo.id.toString() ?? '',
-							channellabel: channelInfo.channel_label ?? '',
-							startindex: m.start,
-							endindex: m.end,
-						};
-					});
-				}
 				setHashtagsOnMessage(hashtagList);
 				setMentionsOnMessage(mentionList);
 				setMentionTextValue(text);
