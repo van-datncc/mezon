@@ -6,7 +6,6 @@ import {
 	useGifsStickersEmoji,
 	useMessageValue,
 	useReference,
-	useSearchMessages,
 	useThreads,
 } from '@mezon/core';
 import {
@@ -28,6 +27,7 @@ import {
 	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
 	selectIsFocused,
+	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
@@ -147,8 +147,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
-	const { isSearchMessage } = useSearchMessages();
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const isSearchMessage = useSelector(
+		selectIsSearchMessage((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
+	);
 	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(
 		(props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || '',
 	);
@@ -628,12 +630,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subText={
 									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.username ?? '')
+										: suggestion.username ?? ''
 								}
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
 								display={suggestion.display}
-								emojiId={suggestion.id as string}
+								emojiId=""
 							/>
 						);
 					}}
@@ -656,7 +658,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
-							emojiId="" //TODO:
+							emojiId=""
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"

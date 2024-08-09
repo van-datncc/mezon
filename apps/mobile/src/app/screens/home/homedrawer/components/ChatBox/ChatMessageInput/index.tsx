@@ -212,7 +212,6 @@ export const ChatMessageInput = memo(
 					emojis: emojisOnMessage,
 					links: linksOnMessage,
 					markdowns: markdownsOnMessage,
-					plaintext: plainTextMessage,
 					voicelinks: voiceLinkRoomOnMessage,
 				};
 
@@ -292,7 +291,7 @@ export const ChatMessageInput = memo(
 				InteractionManager.runAfterInteractions(() => {
 					setTimeout(() => {
 						sendMessageAsync().catch((error) => {
-							console.error('Error sending message:', error);
+							console.log('Error sending message:', error);
 						});
 					}, 0);
 				});

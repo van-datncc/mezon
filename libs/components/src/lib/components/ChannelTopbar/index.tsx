@@ -15,7 +15,7 @@ import {
 	selectNewNotificationStatus,
 	selectStatusMenu,
 	selectTheme,
-	selectnotificatonSelected,
+	selectCurrentChannelNotificatonSelected,
 	useAppDispatch,
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -138,7 +138,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 
 function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isMuteBell, setIsMuteBell] = useState<boolean>(false);
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
@@ -260,7 +260,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 	}, [newNotificationStatus]);
 
 	const handleShowInbox = () => {
-		dispatch(notificationActions.fetchListNotification({ clanId: currentDmGroupId ? '0' : currentClanId as string }));
+		dispatch(notificationActions.fetchListNotification({ clanId: currentDmGroupId ? '0' : (currentClanId as string) }));
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 
@@ -309,9 +309,10 @@ export function HelpButton({ isLightMode }: { isLightMode?: boolean }) {
 function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	const dispatch = useDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const handleClick = () => {
 		dispatch(appActions.setIsShowMemberList(!isActive));
-		dispatch(searchMessagesActions.setIsSearchMessage(false));
+		dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannelId as string, isSearchMessage: false }));
 	};
 	return (
 		<div className="relative leading-5 h-5">

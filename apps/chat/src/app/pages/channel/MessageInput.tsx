@@ -248,7 +248,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}
-									emojiId={suggestion.id as string}
+									emojiId=""
 									display={suggestion.display}
 								/>
 							);

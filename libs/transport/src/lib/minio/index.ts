@@ -16,6 +16,18 @@ export function uploadImageToMinIO(url: string, stream: Buffer, size: number) {
 	return fetch(url, { method: 'PUT', body: stream });
 }
 
+export function uploadImageToMinIOMobile(url: string, stream: Buffer, type: string, size: number) {
+	// Add header to upload success on mobile
+	return fetch(url, {
+		method: 'PUT',
+		body: stream,
+		headers: {
+			'Content-Type': type,
+			'Content-Length': size?.toString() || '1000',
+		},
+	});
+}
+
 export async function handleUploadEmoticon(
 	client: Client,
 	session: Session,
@@ -69,7 +81,7 @@ export async function handleUploadFile(
 }
 
 export async function handleUploadFileMobile(
-	client: Client, 
+	client: Client,
 	session: Session,
 	currentClanId: string,
 	currentChannelId: string,
@@ -85,15 +97,17 @@ export async function handleUploadFileMobile(
 				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
 				fileType = `text/${fileExtension}`;
 			}
-			if (file?.uri) {			
+			if (file?.uri) {
 				const arrayBuffer = BufferMobile.from(file.fileData, 'base64');
 				if (!arrayBuffer) {
-					reject(new Error('Failed to read file data.'));
+					console.log('Failed to read file data.');
+					return;
 				}
 				const fullfilename = createUploadFilePath(session, currentClanId, currentChannelId, filename);
-				resolve(uploadFile(client, session, fullfilename, fileType, file.size, arrayBuffer));
+				resolve(uploadFile(client, session, fullfilename, fileType, file.size, arrayBuffer, true));
 			}
 		} catch (error) {
+			console.log('handleUploadFileMobile Error: ', error);
 			reject(new Error(`${error}`));
 		}
 	});
@@ -105,7 +119,7 @@ export function createUploadFilePath(
 	currentChannelId: string,
 	filename: string,
 ): string {
-	const ms = new Date().getMinutes();			
+	const ms = new Date().getMinutes();
 	filename = ms + filename;
 	filename = filename.replace(/-|\(|\)| /g, '_')
 	if (!currentClanId) {
@@ -120,12 +134,13 @@ export async function uploadFile(
 	filename: string,
 	type: string,
 	size: number,
-	buf: Buffer
+	buf: Buffer,
+	isMobile?: boolean,
 
 ): Promise<ApiMessageAttachment> {
 	// eslint-disable-next-line no-async-promise-executor
 	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
-		try {			
+		try {
 			const data = await client.uploadAttachmentFile(session, {
 				filename: filename,
 				filetype: type,
@@ -135,7 +150,9 @@ export async function uploadFile(
 				reject(new Error('Failed to upload file. URL not available.'));
 				return;
 			}
-			const res = await uploadImageToMinIO(data.url || '', buf, size);
+			const res = await (isMobile
+				? uploadImageToMinIOMobile(data.url || '', buf, type, size)
+				: uploadImageToMinIO(data.url || '', buf, size));
 			if (res.status !== 200) {
 				throw new Error('Failed to upload file to MinIO.');
 			}

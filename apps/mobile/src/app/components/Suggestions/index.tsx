@@ -1,6 +1,8 @@
 import { useChannels } from '@mezon/core';
-import { selectAllEmojiSuggestion } from '@mezon/store';
+import { emojiSuggestionActions, selectAllEmojiSuggestion } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps } from '@mezon/utils';
+import { ApiClanEmojiListResponse } from 'mezon-js/api.gen';
 import { FC, memo, useEffect, useMemo } from 'react';
 import { FlatList, Pressable } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -127,42 +129,37 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 
 export interface IEmojiSuggestionProps {
 	keyword?: string;
-	onSelect: (emoji: IEmoji) => void;
+	onSelect: (emoji: any) => void;
 }
-
-export type IEmoji = {
-	src: string;
-	shortname: string;
-	category: string;
-	id: string;
-	name: string;
-};
 
 const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
+	const dispatch = useAppDispatch();
 
-	let emojiData = [];
 	if (!keyword) {
 		return;
 	}
-	emojiData = emojiListPNG?.map?.((emoji) => ({
-		...emoji,
-		name: emoji?.shortname,
-		id: emoji?.shortname,
-		display: emoji?.shortname,
-	}));
-
-	const handleEmojiSuggestionPress = (emoji: IEmoji) => {
-		onSelect(emoji);
+	const handleEmojiSuggestionPress = (emoji: ApiClanEmojiListResponse) => {
+		onSelect({
+			...emoji,
+			display: emoji.shortname,
+			name: emoji.shortname,
+		});
+		dispatch(
+			emojiSuggestionActions.setSuggestionEmojiObjPicked({
+				shortName: emoji.shortname,
+				id: emoji.id,
+			}),
+		);
 	};
 
 	return (
 		<FlatList
 			style={{ maxHeight: 200 }}
-			data={emojiData?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20)}
+			data={emojiListPNG?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20)}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleEmojiSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={false} name={item?.display ?? ''} />
+					<SuggestItem isDisplayDefaultAvatar={false} name={item?.shortname ?? ''} emojiSrc={item?.src} />
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}

@@ -680,3 +680,7 @@ export enum ETokenMessage {
 	VOICE_LINKS = 'vk',
 	MARKDOWNS = 'mk',
 }
+export type SearchFilter = {
+	field_name: string;
+	field_value?: string;
+};
