@@ -95,7 +95,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 			)}
 			{idMessageRefReply && <ReplyMessageBox idMessage={idMessageRefReply} />}
 			<MessageBox
-				listMentions={UserMentionList({ channelID: channelId })}
+				listMentions={UserMentionList({ channelID: channelId, channelMode: mode })}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}
