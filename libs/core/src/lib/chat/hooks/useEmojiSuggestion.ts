@@ -3,7 +3,7 @@ import {
 	selectAddEmojiState,
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
-	selectEmojiSuggestion,
+	selectEmojiObjSuggestion,
 	selectShiftPressedStatus,
 	selectTextToSearchEmojiSuggestion,
 	useAppDispatch,
@@ -51,15 +51,17 @@ export function useEmojiSuggestion() {
 	const emojiCombine = [...emojiMetadata, ...emojiConverted];
 	const emojis = useMemo(() => filterEmojiData(emojiCombine), [emojiCombine]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
-	const emojiPicked = useSelector(selectEmojiSuggestion);
+	const emojiPicked = useSelector(selectEmojiObjSuggestion);
+
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);
 	const addEmojiState = useSelector(selectAddEmojiState);
 	const shiftPressedState = useSelector(selectShiftPressedStatus);
 
 	const dispatch = useAppDispatch();
-	const setEmojiSuggestion = useCallback(
-		(emoji: string) => {
-			dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emoji));
+
+	const setSuggestionEmojiObjPicked = useCallback(
+		(emojId: string, emojiShortname: string) => {
+			dispatch(emojiSuggestionActions.setSuggestionEmojiObjPicked({ id: emojId, shortName: emojiShortname }));
 		},
 		[dispatch],
 	);
@@ -95,7 +97,6 @@ export function useEmojiSuggestion() {
 	return useMemo(
 		() => ({
 			emojiPicked,
-			setEmojiSuggestion,
 			setIsEmojiListShowed,
 			isEmojiListShowed,
 			textToSearchEmojiSuggestion,
@@ -107,10 +108,10 @@ export function useEmojiSuggestion() {
 			shiftPressedState,
 			emojis,
 			emojiConverted,
+			setSuggestionEmojiObjPicked,
 		}),
 		[
 			emojiPicked,
-			setEmojiSuggestion,
 			setIsEmojiListShowed,
 			isEmojiListShowed,
 			textToSearchEmojiSuggestion,
@@ -121,6 +122,7 @@ export function useEmojiSuggestion() {
 			shiftPressedState,
 			emojis,
 			emojiConverted,
+			setSuggestionEmojiObjPicked,
 		],
 	);
 }
