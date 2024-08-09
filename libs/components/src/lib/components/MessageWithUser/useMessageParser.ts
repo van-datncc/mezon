@@ -1,4 +1,12 @@
-import { IMessageWithUser, convertDateString, convertTimeHour, convertTimeString } from '@mezon/utils';
+import {
+	IMentionOnMessage,
+	IMessageSendPayload,
+	IMessageWithUser,
+	addMention,
+	convertDateString,
+	convertTimeHour,
+	convertTimeString,
+} from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 
 export function useMessageParser(message: IMessageWithUser) {
@@ -7,17 +15,19 @@ export function useMessageParser(message: IMessageWithUser) {
 	}, [message?.attachments]);
 
 	const mentions = useMemo(() => {
-		return message?.mentions;
+		return message?.mentions as IMentionOnMessage;
 	}, [message?.mentions]);
 
 	const content = useMemo(() => {
-		return message?.content;
-	}, [message?.content]);
+		return message?.content as IMessageSendPayload;
+	}, [message]);
+
+	const contentUpdatedMention = addMention(content, mentions as any);
 
 	const lines = useMemo(() => {
-		const values = content?.t;
+		const values = message.content?.t;
 		return values;
-	}, [content?.t]);
+	}, [message.content?.t]);
 
 	const messageTime = useMemo(() => {
 		return convertTimeString(message?.create_time as string);
@@ -135,5 +145,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		messageAvatarSenderRef,
 		messageClanNicknameSenderRef,
 		messageDisplayNameSenderRef,
+		contentUpdatedMention,
 	};
 }

@@ -111,7 +111,6 @@ function MessageWithUser({
 	);
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
-
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
