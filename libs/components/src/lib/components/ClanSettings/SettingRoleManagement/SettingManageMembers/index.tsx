@@ -29,7 +29,13 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 	};
 
 	useEffect(() => {
-		const results = commonUsers?.filter((member) => member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase()));
+		const results = commonUsers.filter((member) => {
+			const clanName = member?.clan_nick?.toLowerCase();
+			const displayName = member.user?.display_name?.toLowerCase();
+			const userName = member.user?.username?.toLowerCase();
+			const lowerCaseSearchTerm = searchTerm.toLowerCase();
+			return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
+		});
 		setSearchResults(results || []);
 	}, [searchTerm, addUsers, clickRole]);
 

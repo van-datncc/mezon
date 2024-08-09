@@ -63,10 +63,11 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 
 	useEffect(() => {
 		const results = membersNotInRoles.filter((member) => {
+			const clanName = member?.clan_nick?.toLowerCase();
 			const displayName = member.user?.display_name?.toLowerCase();
 			const userName = member.user?.username?.toLowerCase();
 			const lowerCaseSearchTerm = searchTerm.toLowerCase();
-			return displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
+			return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
 		});
 		setSearchResults(results);
 	}, [searchTerm]);
