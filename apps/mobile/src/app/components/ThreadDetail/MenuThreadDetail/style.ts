@@ -6,6 +6,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
     flex: 1,
     display: "flex",
     flexDirection: "column",
-    backgroundColor: colors.primary
+    backgroundColor: colors.secondary
   },
 });

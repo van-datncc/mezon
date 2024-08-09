@@ -19,7 +19,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     iconWrapper: {
-        backgroundColor: colors.secondary,
+        backgroundColor: colors.primary,
         padding: 15,
         borderRadius: 50
     },

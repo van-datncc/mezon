@@ -1,4 +1,4 @@
-import { selectCurrentChannelId } from '@mezon/store-mobile';
+import { attachmentActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useContext, useRef, useState } from 'react';
 import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
@@ -29,13 +29,19 @@ export const AssetsViewer = React.memo(() => {
 	const ref = useRef<ScrollView>();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannel = useContext(threadDetailContext);
-
+	const currentClanId = useSelector(selectCurrentClanId);
+	const dispatch = useAppDispatch();
+	
 	function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
 		const currentOffsetX = event.nativeEvent.contentOffset.x;
 		const windowWidth = Dimensions.get('window').width;
 
 		const pageID_ = Math.round(currentOffsetX / windowWidth);
 		if (pageID !== pageID_) {
+			
+			// Is tab media
+			if (pageID_ === 1)
+				dispatch(attachmentActions.fetchChannelAttachments({ clanId: currentClanId, channelId: currentChannelId }));
 			setPageID(pageID_);
 		}
 	}
@@ -49,7 +55,7 @@ export const AssetsViewer = React.memo(() => {
 		<>
 			<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
 			<View style={styles.container}>
-				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
+				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref} scrollEventThrottle={100}>
 					<MemberListStatus />
 					<MediaChannel />
 					<PinMessage
