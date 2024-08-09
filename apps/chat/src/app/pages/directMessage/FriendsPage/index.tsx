@@ -164,7 +164,7 @@ export default function FriendsPage() {
 							<span className="text-[14px] dark:text-contentSecondary text-black mb-4 font-bold px-[14px]">
 								{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 							</span>
-							<FriendList listFriendFilter={[...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter]} />
+							<FriendList listFriendFilter={listFriendFilter} />
 						</div>
 					)}
 					{openModalAddFriend && (

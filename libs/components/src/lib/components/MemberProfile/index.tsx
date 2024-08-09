@@ -194,7 +194,7 @@ function MemberProfile({
 				<div className="flex flex-col items-start">
 					<div
 						ref={subNameRef}
-						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
+						className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
