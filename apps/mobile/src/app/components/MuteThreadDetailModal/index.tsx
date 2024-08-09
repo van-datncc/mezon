@@ -1,7 +1,13 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AngleRight, Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, notificationSettingActions, selectCurrentClanId, selectnotificatonSelected, useAppDispatch } from '@mezon/store-mobile';
+import {
+	DirectEntity,
+	notificationSettingActions,
+	selectCurrentChannelNotificatonSelected,
+	selectCurrentClanId,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
@@ -114,7 +120,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 		),
 	});
 
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 

@@ -11,7 +11,7 @@ import {
 	setAddMemberRoles,
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { ThemeApp, getNameForPrioritize } from '@mezon/utils';
+import { ThemeApp, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -113,6 +113,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 										userName={permission?.user?.username}
 										displayName={permission?.user?.display_name}
 										clanName={permission?.clan_nick}
+										clanAvatar={permission.clan_avatar}
 										avatar={permission?.user?.avatar_url}
 										checked={selectedUsers.includes(permission.id)}
 										onHandle={() => handleUserToggle(permission.id)}
@@ -151,14 +152,16 @@ type ItemMemberModalProps = {
 	userName?: string;
 	displayName?: string;
 	clanName?: string;
+	clanAvatar?: string;
 	avatar?: string;
 	checked: boolean;
 	onHandle: () => void;
 };
 
 const ItemMemberModal = (props: ItemMemberModalProps) => {
-	const { id = '', userName = '', displayName = '', clanName = '', avatar = '', checked, onHandle } = props;
+	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar='', avatar = '', checked, onHandle } = props;
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
 		<li key={id}>
 			<label htmlFor={id} className="w-full inline-flex justify-between items-center">
@@ -167,10 +170,10 @@ const ItemMemberModal = (props: ItemMemberModalProps) => {
 						alt={userName}
 						userName={userName}
 						className="min-w-5 min-h-5 max-w-5 max-h-5"
-						src={avatar}
+						src={avatarPrioritize}
 						classNameText="text-[9px] pt-[3px]"
 					/>
-					<p>{namePrioritize}</p>
+					<p className='font-semibold'>{namePrioritize}</p>
 					<p className="text-contentTertiary">{userName}</p>
 				</div>
 				<input id={id} type="checkbox" checked={checked} onChange={onHandle} />

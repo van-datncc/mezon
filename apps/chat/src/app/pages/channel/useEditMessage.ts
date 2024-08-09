@@ -1,6 +1,7 @@
 import { useChatSending } from '@mezon/core';
 import { messagesActions, referencesActions, selectIdMessageRefEdit, selectOpenEditMessageState } from '@mezon/store';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
+import { ApiMessageMention } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -17,13 +18,14 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [channelId, dispatch]);
 
 	const setChannelDraftMessage = useCallback(
-		(channelId: string, message_id: string, draftContent: IMessageSendPayload) => {
+		(channelId: string, message_id: string, draftContent: IMessageSendPayload, draftMention: ApiMessageMention[]) => {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: channelId as string,
 					channelDraftMessage: {
 						message_id: message_id,
 						draftContent: draftContent,
+						draftMention: draftMention,
 					},
 				}),
 			);
@@ -32,9 +34,9 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	);
 
 	const handleSend = useCallback(
-		(editMessage: IMessageSendPayload, messageId: string) => {
-			editSendMessage(editMessage, messageId);
-			setChannelDraftMessage(channelId, messageId, editMessage);
+		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[]) => {
+			editSendMessage(editMessage, messageId, draftMention);
+			setChannelDraftMessage(channelId, messageId, editMessage, draftMention);
 		},
 		[editSendMessage],
 	);

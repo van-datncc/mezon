@@ -1,8 +1,9 @@
 import {
 	searchMessagesActions,
 	selectAllMessageSearch,
+	selectCurrentChannelId,
 	selectCurrentPage,
-	selectIsSearchMessage,
+	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage,
 	useAppDispatch,
 } from '@mezon/store';
@@ -11,11 +12,12 @@ import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useSearchMessages() {
-	const dispatch = useAppDispatch()
-	const isSearchMessage = useSelector(selectIsSearchMessage)
-	const searchMessages = useSelector(selectAllMessageSearch)
-	const totalResult = useSelector(selectTotalResultSearchMessage)
-	const currentPage =  useSelector(selectCurrentPage)
+	const dispatch = useAppDispatch();
+	const searchMessages = useSelector(selectAllMessageSearch);
+	const totalResult = useSelector(selectTotalResultSearchMessage);
+	const currentPage = useSelector(selectCurrentPage);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannelId as string));
 
 	const fetchSearchMessages = useCallback(
 		async ({ filters, from, size, sorts }: ApiSearchMessageRequest) => {
@@ -25,12 +27,12 @@ export function useSearchMessages() {
 	);
 	return useMemo(
 		() => ({
-			isSearchMessage,
 			fetchSearchMessages,
 			searchMessages,
+			messageSearchByChannelId,
 			totalResult,
-			currentPage
+			currentPage,
 		}),
-		[isSearchMessage, fetchSearchMessages, searchMessages,totalResult,currentPage],
+		[fetchSearchMessages, searchMessages, messageSearchByChannelId, totalResult, currentPage],
 	);
 }

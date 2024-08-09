@@ -30,7 +30,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 		setIsShowCreateThread(true, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
 		dispatch(threadsActions.setNameThreadError(''));
 		dispatch(threadsActions.setMessageThreadError(''));
-		dispatch(searchMessagesActions.setIsSearchMessage(false));
+		dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: false }));
 	};
 
 	return (

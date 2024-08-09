@@ -1,4 +1,4 @@
-import { Icons, pushAttachmentToCache } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions } from '@mezon/store';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -105,7 +105,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					attachments: [attachment],
 				}),
 			);
-			pushAttachmentToCache(attachment, currentChannelId);
 		},
 		[currentChannelId, dispatch],
 	);
