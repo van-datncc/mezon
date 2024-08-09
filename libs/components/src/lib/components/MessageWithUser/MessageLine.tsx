@@ -1,4 +1,3 @@
-import { useSearchMessages } from '@mezon/core';
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import {
 	IEmojiOnMessage,
@@ -20,13 +19,14 @@ type MessageLineProps = {
 	content?: IExtendedMessage;
 	showOnchannelLayout?: boolean;
 	onClickToMessage?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	isSearchMessage?: boolean;
 };
 interface RenderContentProps {
 	data: IExtendedMessage;
 	mode: number;
 	showOnchannelLayout?: boolean;
 	allChannelVoice?: ChannelsEntity[];
-	valueSearchMessage?: string[];
+	isSearchMessage?: boolean;
 }
 type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
 
@@ -44,7 +44,7 @@ const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILin
 	(element as ILinkVoiceRoomOnMessage).vk !== undefined;
 
 // TODO: refactor component for message lines
-const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, valueSearchMessage }: RenderContentProps) => {
+const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, isSearchMessage }: RenderContentProps) => {
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 	const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 	let lastindex = 0;
@@ -57,7 +57,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 			if (lastindex < s) {
 				formattedContent.push(
 					<PlainText
-						valueSearchMessage={valueSearchMessage}
+						isSearchMessage={isSearchMessage}
 						showOnchannelLayout={showOnchannelLayout}
 						key={`plain-${lastindex}`}
 						text={t?.slice(lastindex, s) ?? ''}
@@ -127,7 +127,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 		if (t && lastindex < t?.length) {
 			formattedContent.push(
 				<PlainText
-					valueSearchMessage={valueSearchMessage}
+					isSearchMessage={isSearchMessage}
 					showOnchannelLayout={showOnchannelLayout}
 					key={`plain-${lastindex}-end`}
 					text={t.slice(lastindex)}
@@ -140,14 +140,9 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 	return <div>{content}</div>;
 });
 
-const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: MessageLineProps) => {
+const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage, isSearchMessage }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
-	const { valueSearchMessage } = useSearchMessages();
-
-	const valueSearchMessageSplitted = useMemo(() => {
-		return valueSearchMessage?.trim()?.split(' ') || [];
-	}, [valueSearchMessage]);
 
 	return (
 		<div onClick={!showOnchannelLayout ? onClickToMessage : () => {}} className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}>
@@ -156,7 +151,7 @@ const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: M
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
 				showOnchannelLayout={showOnchannelLayout}
 				allChannelVoice={allChannelVoice}
-				valueSearchMessage={valueSearchMessageSplitted}
+				isSearchMessage={isSearchMessage}
 			/>
 		</div>
 	);
