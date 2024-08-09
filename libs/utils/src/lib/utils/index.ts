@@ -464,7 +464,7 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
 				break;
 			case ETokenMessage.EMOJIS:
-				result += `[:${element.shortname}]`;
+				result += `[${element.shortname}](${element.emojiid})`;
 				break;
 			case ETokenMessage.LINKS:
 				result += `${element.lk}`;

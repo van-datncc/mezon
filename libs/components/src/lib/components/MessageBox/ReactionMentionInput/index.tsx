@@ -142,6 +142,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const usersClan = useSelector(selectAllUsesClan);
 	const { emojis } = useEmojiSuggestion();
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
+
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
@@ -432,7 +433,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (!emojiPicked || !input) {
 			return;
 		}
-		textFieldEdit.insert(input, `[:${emojiPicked}]`);
+
+		for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
+			textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})`);
+		}
 	}
 
 	const clickUpToEditMessage = () => {
@@ -478,7 +482,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (closeMenu && statusMenu) {
 			return;
 		}
-		if ((getRefMessageReply !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
+		if (
+			(getRefMessageReply !== null && openReplyMessageState) ||
+			!openEditMessageState ||
+			(emojiPicked?.shortName !== '' && !reactionRightState)
+		) {
 			return focusToElement(editorRef);
 		}
 	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
@@ -630,7 +638,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subText={
 									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: suggestion.username ?? ''
+										: (suggestion.username ?? '')
 								}
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
@@ -665,7 +673,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				/>
 				<Mention
 					trigger=":"
-					markup="[:__display__](__id__)"
+					markup="[__display__](__id__)"
 					data={queryEmojis}
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;
