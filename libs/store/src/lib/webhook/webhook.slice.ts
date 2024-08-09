@@ -120,9 +120,6 @@ export const integrationWebhookSlice = createSlice({
 			.addCase(fetchWebhooks.rejected, (state) => {
 				state.loadingStatus = 'error';
 			})
-			// .addCase(deleteWebhookById.fulfilled, (state, action) => {
-			// 	state.webhookList = state.webhookList?.filter((webhook) => webhook.id !== action.payload?.id);
-			// });
 	},
 });
 
