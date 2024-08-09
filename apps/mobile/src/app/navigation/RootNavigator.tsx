@@ -53,7 +53,6 @@ import { toastConfig } from '../configs/toastConfig';
 const RootStack = createStackNavigator();
 
 // Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
@@ -118,6 +117,7 @@ const NavigationMain = () => {
 
 	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
+			refreshMessageInitApp();
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
@@ -127,6 +127,19 @@ const NavigationMain = () => {
 			switchClanLoader();
 		}
 	}, [currentClanId]);
+
+	const refreshMessageInitApp = useCallback(async () => {
+		const store = await getStoreAsync();
+		if (currentChannelId) {
+			store.dispatch(
+				messagesActions.fetchMessages({
+					channelId: currentChannelId,
+					noCache: true,
+					isFetchingLatestMessages: true,
+				}),
+			);
+		}
+	}, [currentChannelId]);
 
 	const initAppLoading = useCallback(async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);

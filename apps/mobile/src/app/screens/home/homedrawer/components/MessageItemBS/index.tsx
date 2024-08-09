@@ -22,6 +22,7 @@ import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
 import { style } from './styles';
+import { getSrcEmoji } from '@mezon/utils';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
@@ -400,7 +401,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 							>
 								<FastImage
 									source={{
-										uri: item.src,
+										uri: getSrcEmoji(item.id),
 									}}
 									resizeMode={'contain'}
 									style={{

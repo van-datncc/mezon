@@ -50,6 +50,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 
+	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
+		if (query.length === 0) return;
+		const matches = emojis
+			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.slice(0, 20)
+			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
+		callback(matches);
+	};
+
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
@@ -101,15 +110,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			const length = textareaRef.current.value.length;
 			textareaRef.current.setSelectionRange(length, length);
 		}
-	};
-
-	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
-		if (query.length === 0) return;
-		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
-			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
-		callback(matches);
 	};
 
 	useEscapeKey(handleCancelEdit);
@@ -279,14 +279,20 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					/>
 					<Mention
 						trigger=":"
-						markup="[:__display__]"
+						markup="[__display__](__id__)"
 						data={queryEmojis}
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						renderSuggestion={(suggestion) => (
-							<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId="" />
-						)}
+						renderSuggestion={(suggestion) => {
+							return (
+								<SuggestItem
+									display={suggestion.display ?? ''}
+									symbol={(suggestion as any).emoji}
+									emojiId={suggestion.id as string}
+								/>
+							);
+						}}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 						appendSpaceOnAdd={true}
 					/>
