@@ -5,8 +5,7 @@ import {
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
-	selectCurrentChannel,
-	selectCurrentClan,
+	selectCurrentClanId,
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
@@ -17,8 +16,7 @@ import {
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -28,13 +26,12 @@ import DirectUnreads from './directUnreads';
 function MyApp() {
 	const elementHTML = document.documentElement;
 	const clans = useSelector(selectAllClans);
-	const currentClan = useSelector(selectCurrentClan);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const { userId } = useAuth();
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const { quantityPendingRequest } = useFriends();
 
 	const { setCloseMenu, setStatusMenu } = useMenu();
@@ -129,27 +126,12 @@ function MyApp() {
 
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
-
-	const initClan = useMemo(() => {
-		if (currentChannel?.id && currentClan?.id) {
-			localStorage.setItem('initClan', currentClan?.id);
-			return `/chat/clans/${currentClan?.id}/channels/${currentChannel?.id}`;
-		} else if (currentClan?.id) {
-			localStorage.setItem('initClan', currentClan?.id);
-			return `/chat/clans/${currentClan?.id}`;
-		} else if (clans?.length > 0) {
-			localStorage.setItem('initClan', clans[0].id);
-			return `/chat/clans/${clans[0].id}`;
-		}
-		return ``;
-	}, [clans, currentChannel?.id, currentClan?.id]);
-
+	
 	const dispatchApp = useAppDispatch();
 	useEffect(() => {
-		const initClanId = localStorage.getItem('initClan');
-		if (initClanId) {
-			dispatchApp(channelsActions.fetchChannels({ clanId: initClanId }));
-			dispatchApp(usersClanActions.fetchUsersClan({ clanId: initClanId }));
+		if (currentClanId) {
+			dispatchApp(channelsActions.fetchChannels({ clanId: currentClanId }));
+			dispatchApp(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
 		}
 	}, []);
 
