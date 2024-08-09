@@ -1,15 +1,19 @@
-import { deleteWebhookById, useAppDispatch } from '@mezon/store';
+import { deleteWebhookById, selectCurrentClan, useAppDispatch } from '@mezon/store';
+import { IChannel } from '@mezon/utils';
 import { ApiWebhook } from 'mezon-js/api.gen';
+import { useSelector } from 'react-redux';
 
 interface IDeleteWebhookPopupProps {
 	toggleShowPopup: () => void;
 	webhookItem: ApiWebhook;
+	currentChannel?: IChannel;
 }
 
-const DeleteWebhookPopup = ({ toggleShowPopup, webhookItem }: IDeleteWebhookPopupProps) => {
+const DeleteWebhookPopup = ({ toggleShowPopup, webhookItem, currentChannel }: IDeleteWebhookPopupProps) => {
 	const dispatch = useAppDispatch();
+	const currentClan = useSelector(selectCurrentClan)
 	const handleDeleteWebhook = (webhook: ApiWebhook) => {
-		dispatch(deleteWebhookById(webhook));
+		dispatch(deleteWebhookById({webhook: webhook, channelId: currentChannel?.channel_id as string, clanId: currentClan?.clan_id as string}));
 	};
 
 	return (

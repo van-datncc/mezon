@@ -1,4 +1,4 @@
-import { fetchWebhooksByChannelId, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import {  fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -36,7 +36,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 	const clanId = useSelector(selectCurrentClanId) as string;
 	const dispatch = useAppDispatch();
 	useEffect(() => {
-		dispatch(fetchWebhooksByChannelId({ channelId: channel.channel_id as string, clanId: clanId }));
+		dispatch(fetchWebhooks({ channelId: channel.channel_id as string, clanId: clanId }));
 	}, [channel.channel_id, dispatch])
 
 	const closeMenu = useSelector(selectCloseMenu);

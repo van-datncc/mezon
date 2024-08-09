@@ -57,7 +57,7 @@ const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 					</div>
 					{allWebhooks &&
 						allWebhooks.map((webhook) => (
-							<WebhookItemModal webhookItem={webhook} key={webhook.id} />
+							<WebhookItemModal currentChannel={currentChannel} webhookItem={webhook} key={webhook.id} />
 						))}
 				</>
 			) : (

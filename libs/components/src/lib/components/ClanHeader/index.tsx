@@ -12,6 +12,7 @@ import SearchModal from '../SearchModal';
 import ModalNotificationSetting from '../notificationSetting';
 import ItemModal from './ItemModal';
 import ModalCreateCategory from './ModalCreateCategory';
+import LeaveClanPopup from './LeaveClanPopup';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -40,6 +41,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		<ModalNotificationSetting onClose={closeNotiSettingModal} open={true} channelID={channelId || ''} />
 	));
 	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
+
+	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
+	const toggleLeaveClanPopup = ()=>{
+		setIsShowLeaveClanPopup(!isShowLeaveClanPopup);
+		setIsShowModalPanelClan(false)
+	}
 
 	const onClose = () => {
 		setOpenCreateCate(false);
@@ -131,12 +138,27 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										children="Notification Settings"
 										endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>
+									{!isClanOwner && (
+										<button
+											onClick={toggleLeaveClanPopup}
+											className="flex items-center w-full justify-between rounded-sm hover:bg-red-600 text-red-600 hover:text-white group pr-2"
+										>
+											<li className="text-[14px]  font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
+												Leave clan
+											</li>
+											<div className="flex items-center justify-center h-[18px] w-[18px]">
+												<Icons.LeaveClanIcon className="text-red-600 group-hover:text-white" />
+											</div>
+										</button>
+									)}
 								</div>
 							</div>
 						)}
 					</div>
 				</div>
 			)}
+
+			{isShowLeaveClanPopup && <LeaveClanPopup toggleShowPopup={toggleLeaveClanPopup}/>}
 
 			{openServerSettings && (
 				<ClanSetting
