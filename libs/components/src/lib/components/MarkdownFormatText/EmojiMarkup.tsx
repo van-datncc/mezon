@@ -37,7 +37,7 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 				<img
 					id={`emoji-${emojiSyntax}`}
 					src={srcEmoji}
-					alt={`[${emojiSyntax}]`}
+					alt={`[${emojiSyntax}](${emojiId})`}
 					className={className}
 					onDragStart={(e) => e.preventDefault()}
 				/>
