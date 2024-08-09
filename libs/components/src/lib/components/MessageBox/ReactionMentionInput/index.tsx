@@ -237,7 +237,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
-	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw, roleList);
+	const { mentionList, hashtagList, emojiList } = useProcessMention(mentionRaw, roleList);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -271,15 +271,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					{
 						t: content,
-						mentions: mentionList,
-						hashtags: hashtagList,
-						emojis: emojiList,
-						links: linkList,
-						markdowns: markdownList,
-						voicelinks: voiceLinkRoomList,
+						hg: hashtagList,
+						ej: emojiList,
+						lk: linkList,
+						mk: markdownList,
+						vk: voiceLinkRoomList,
 					},
-
-					simplifiedMentionList,
+					mentionList,
 					attachmentDataRef,
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -313,14 +311,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					props.onSend(
 						{
 							t: content,
-							mentions: mentionList,
-							hashtags: hashtagList,
-							emojis: emojiList,
-							links: linkList,
-							markdowns: markdownList,
-							voicelinks: voiceLinkRoomList,
+							hg: hashtagList,
+							ej: emojiList,
+							lk: linkList,
+							mk: markdownList,
+							vk: voiceLinkRoomList,
 						},
-						simplifiedMentionList,
+						mentionList,
 						attachmentDataRef,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -449,7 +446,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: currentChannelId as string,
-					channelDraftMessage: { message_id: idRefMessage, draftContent: lastMessageByUserId?.content },
+					channelDraftMessage: {
+						message_id: idRefMessage,
+						draftContent: lastMessageByUserId?.content,
+						draftMention: lastMessageByUserId.mentions ?? [],
+					},
 				}),
 			);
 		}
