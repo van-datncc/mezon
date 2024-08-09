@@ -16,8 +16,10 @@ import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
+	ETokenMessage,
 	EmojiDataOptionals,
 	IEmojiOnMessage,
+	IExtendedMessage,
 	IHashtagOnMessage,
 	ILineMention,
 	ILinkOnMessage,
@@ -416,18 +418,18 @@ export const getRoleList = (rolesInClan: ApiRole[]) => {
 };
 
 type ElementToken =
-	| (IMentionOnMessage & { type: 'mentions' })
-	| (IHashtagOnMessage & { type: 'hashtags' })
-	| (IEmojiOnMessage & { type: 'emojis' })
-	| (ILinkOnMessage & { type: 'links' })
-	| (IMarkdownOnMessage & { type: 'markdowns' })
-	| (ILinkVoiceRoomOnMessage & { type: 'voicelinks' });
+	| (IMentionOnMessage & { type: ETokenMessage.MENTIONS })
+	| (IHashtagOnMessage & { type: ETokenMessage.HASHTAGS })
+	| (IEmojiOnMessage & { type: ETokenMessage.EMOJIS })
+	| (ILinkOnMessage & { type: ETokenMessage.LINKS })
+	| (IMarkdownOnMessage & { type: ETokenMessage.MARKDOWNS })
+	| (ILinkVoiceRoomOnMessage & { type: ETokenMessage.VOICE_LINKS });
 
-export const createFormattedString = (data: IMessageSendPayload): string => {
+export const createFormattedString = (data: IExtendedMessage): string => {
 	let { t = '' } = data;
 	const elements: ElementToken[] = [];
 
-	(Object.keys(data) as (keyof IMessageSendPayload)[]).forEach((key) => {
+	(Object.keys(data) as (keyof IExtendedMessage)[]).forEach((key) => {
 		const itemArray = data[key];
 
 		if (Array.isArray(itemArray)) {
@@ -441,37 +443,37 @@ export const createFormattedString = (data: IMessageSendPayload): string => {
 	});
 
 	elements.sort((a, b) => {
-		const startA = a.startindex ?? 0;
-		const startB = b.startindex ?? 0;
+		const startA = a.s ?? 0;
+		const startB = b.s ?? 0;
 		return startA - startB;
 	});
 	let result = '';
 	let lastIndex: number = 0;
 
 	elements.forEach((element) => {
-		const startindex = element.startindex ?? lastIndex;
-		const endindex = element.endindex ?? startindex;
+		const startindex = element.s ?? lastIndex;
+		const endindex = element.e ?? startindex;
 
 		result += t.slice(lastIndex, startindex);
 
 		switch (element.type) {
-			case 'mentions':
-				result += `@[${element.username?.slice(1)}](${element.userid})`;
+			case ETokenMessage.MENTIONS:
+				result += `@[${element.username?.slice(1)}](${element.user_id})`;
 				break;
-			case 'hashtags':
+			case ETokenMessage.HASHTAGS:
 				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
 				break;
-			case 'emojis':
-				result += `[:${element.shortname}]`;
+			case ETokenMessage.EMOJIS:
+				result += `[${element.shortname}](${element.emojiid})`;
 				break;
-			case 'links':
-				result += `${element.link}`;
+			case ETokenMessage.LINKS:
+				result += `${element.lk}`;
 				break;
-			case 'markdowns':
-				result += `${element.markdown}`;
+			case ETokenMessage.MARKDOWNS:
+				result += `${element.mk}`;
 				break;
-			case 'voicelinks':
-				result += `${element.voicelink}`;
+			case ETokenMessage.VOICE_LINKS:
+				result += `${element.vk}`;
 				break;
 			default:
 				break;
@@ -508,15 +510,15 @@ export const processText = (inputString: string) => {
 
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
-					voicelink: link,
-					startindex,
-					endindex,
+					vk: link,
+					s: startindex,
+					e: endindex,
 				});
 			} else {
 				links.push({
-					link,
-					startindex,
-					endindex,
+					lk: link,
+					s: startindex,
+					e: endindex,
 				});
 			}
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
@@ -532,7 +534,7 @@ export const processText = (inputString: string) => {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
-					markdowns.push({ type: 'triple', markdown: `\`\`\`${markdown}\`\`\``, startindex, endindex });
+					markdowns.push({ type: 'triple', mk: `\`\`\`${markdown}\`\`\``, s: startindex, e: endindex });
 				}
 			}
 		} else if (inputString[i] === singleBacktick) {
@@ -548,7 +550,7 @@ export const processText = (inputString: string) => {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
-					markdowns.push({ type: 'single', markdown: `\`${markdown}\``, startindex, endindex });
+					markdowns.push({ type: 'single', mk: `\`${markdown}\``, s: startindex, e: endindex });
 				}
 				i++;
 			}
@@ -558,3 +560,12 @@ export const processText = (inputString: string) => {
 	}
 	return { links, markdowns, voiceRooms };
 };
+
+export function addMention(obj: IMessageSendPayload, mentionValue: IMentionOnMessage[]): IExtendedMessage {
+	const updatedObj: IExtendedMessage = {
+		...obj,
+		mentions: mentionValue,
+	};
+
+	return updatedObj;
+}

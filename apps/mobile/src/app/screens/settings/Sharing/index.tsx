@@ -174,8 +174,7 @@ export const Sharing = ({ data, onClose }) => {
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			{
 				t: dataSend.text,
-				links: dataSend.links || [],
-				plainText: dataSend.text,
+				lk: dataSend.links || [],
 			},
 			[],
 			getAttachmentUnique(attachmentDataRef) || [],
@@ -200,8 +199,7 @@ export const Sharing = ({ data, onClose }) => {
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
 			{
 				t: dataSend.text,
-				links: dataSend.links || [],
-				plainText: dataSend.text,
+				lk: dataSend.links || [],
 			},
 			[], //mentions
 			getAttachmentUnique(attachmentDataRef) || [], //attachments
@@ -228,9 +226,9 @@ export const Sharing = ({ data, onClose }) => {
 				}
 				const endIndex = i;
 				links.push({
-					link: inputString.substring(startIndex, endIndex),
-					startindex: startIndex,
-					endindex: endIndex,
+					lk: inputString.substring(startIndex, endIndex),
+					s: startIndex,
+					e: endIndex,
 				});
 			} else {
 				i++;

@@ -23,6 +23,7 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 	const srcEmoji = useMemo(() => {
 		return getSrcEmoji(emojiId);
 	}, [emojiId]);
+
 	const { setImageURL, setPositionShow } = useMessageContextMenu();
 
 	const handleContextMenu = useCallback(() => {
@@ -36,7 +37,7 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 				<img
 					id={`emoji-${emojiSyntax}`}
 					src={srcEmoji}
-					alt={`[:${emojiSyntax}]`}
+					alt={`[${emojiSyntax}]`}
 					className={className}
 					onDragStart={(e) => e.preventDefault()}
 				/>
