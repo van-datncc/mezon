@@ -1,4 +1,4 @@
-import { ForwardMessageModal, ModalCreateClan, NavLinkComponent, SearchModal, SidebarClanItem } from '@mezon/components';
+import { ForwardMessageModal, ModalCreateClan, NavLinkComponent, SearchModal, SidebarClanItem, SidebarTooltip } from '@mezon/components';
 import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
 	channelsActions,
@@ -136,58 +136,67 @@ function MyApp() {
 	}, []);
 
 	return (
-		<div className="flex h-screen text-gray-100 overflow-hidden relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
+		<div className="flex h-screen overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
-				className={`w-[72px] overflow-visible py-4 px-3 space-y-2 dark:bg-bgTertiary bg-bgLightTertiary duration-100 hide-scrollbar ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`w-[72px] overflow-y-auto py-4 px-3 dark:bg-bgTertiary bg-bgLightTertiary duration-100 hide-scrollbar flex flex-col items-center ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
-				<NavLink
-					to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
-					onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
-				>
-					<NavLinkComponent active={pathName.includes('direct')} clanName="Direct Messages">
-						<div>
-							<Image
-								src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
-								alt={'logoMezon'}
-								width={48}
-								height={48}
-								className="clan w-full aspect-square object-cover"
-							/>
-							{quantityPendingRequest !== 0 && (
-								<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
-									{quantityPendingRequest}
+				<div className="flex flex-col gap-3 ">
+					<SidebarTooltip titleTooltip='Direct Message'>
+						<NavLink
+							to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
+							onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
+						>
+							<NavLinkComponent active={pathName.includes('direct')}>
+								<div>
+									<Image
+										src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
+										alt={'logoMezon'}
+										width={48}
+										height={48}
+										className="clan w-full aspect-square object-cover"
+									/>
+									{quantityPendingRequest !== 0 && (
+										<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
+											{quantityPendingRequest}
+										</div>
+									)}
 								</div>
-							)}
-						</div>
-					</NavLinkComponent>
-				</NavLink>
-				{listUnreadDM.map(
-					(dmGroupChatUnread) =>
-						dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-							<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
-						),
-				)}
-				<div className="py-1 border-t-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3 mx-auto my-2"></div>
-				<div className="relative flex flex-col gap-3">
+							</NavLinkComponent>
+						</NavLink>
+					</SidebarTooltip>
+					{listUnreadDM.map(
+						(dmGroupChatUnread) =>
+							dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
+								<SidebarTooltip titleTooltip={dmGroupChatUnread.channel_label}>
+									<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
+								</SidebarTooltip>
+							),
+					)}
+				</div>
+				<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
+				<div className="flex flex-col gap-3 ">
 					{clans.map((clan: IClan) => {
 						return (
-								<SidebarClanItem key={clan.clan_id} linkClan={`/chat/clans/${clan.id}`} option={clan} />
+							<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
+								<SidebarClanItem linkClan={`/chat/clans/${clan.id}`} option={clan} />
+							</SidebarTooltip>
 						)
 					})}
 
 				</div>
-				<NavLinkComponent clanName={"Add Clan"}>
-					<div className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group">
-						<button className="flex items-center" onClick={openCreateClanModal}>
+
+				<SidebarTooltip titleTooltip='Add Clan'>
+					<NavLinkComponent>
+						<div className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group" onClick={openCreateClanModal}>
 							<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
 								<p className="text-2xl font-bold text-[#155EEF]">+</p>
 							</div>
-						</button>
-					</div>
-				</NavLinkComponent>
+						</div>
+					</NavLinkComponent>
+				</SidebarTooltip>
 			</div>
 			<MainContent />
 		</div>

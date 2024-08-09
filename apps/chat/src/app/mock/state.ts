@@ -13,11 +13,7 @@ const preloadedState = {
 		entities: {},
 		ids: [],
 	},
-	users: {
-		loadingStatus: 'loaded',
-		entities: {},
-		ids: [],
-	},
 } as unknown as PreloadedRootState;
 
 export { preloadedState };
+

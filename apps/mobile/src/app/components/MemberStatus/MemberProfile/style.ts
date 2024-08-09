@@ -41,7 +41,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
         gap: size.s_12,
         paddingHorizontal: size.s_12,
         width: "100%",
-        // backgroundColor: colors.secondary
     },
 
     textName: {
