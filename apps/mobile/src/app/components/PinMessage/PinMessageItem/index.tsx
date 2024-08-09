@@ -5,11 +5,12 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/constants/markdown';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
 import { style } from './PinMessageItem.styles';
+import { IExtendedMessage } from '@mezon/utils';
 
 interface IPinMessageItemProps {
 	pinMessageItem: PinMessageEntity;
 	handleUnpinMessage: (pinMessageItem: PinMessageEntity) => void;
-	contentMessage: string;
+	contentMessage: IExtendedMessage;
 }
 
 const PinMessageItem = ({ pinMessageItem, handleUnpinMessage, contentMessage }: IPinMessageItemProps) => {

@@ -124,10 +124,6 @@ export const emojiSuggestionSlice = createSlice({
 		add: emojiSuggestionAdapter.addOne,
 		remove: emojiSuggestionAdapter.removeOne,
 
-		setSuggestionEmojiPicked: (state, action: PayloadAction<string>) => {
-			state.emojiPicked = action.payload;
-		},
-
 		setStatusSuggestionEmojiList: (state, action: PayloadAction<boolean>) => {
 			state.emojiSuggestionListStatus = action.payload;
 		},
@@ -198,8 +194,6 @@ export const getEmojiSuggestionState = (rootState: { [EMOJI_SUGGESTION_FEATURE_K
 export const selectAllEmojiSuggestion = createSelector(getEmojiSuggestionState, selectAll);
 
 export const selectEmojiSuggestionEntities = createSelector(getEmojiSuggestionState, selectEntities);
-
-export const selectEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiPicked);
 
 export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiSuggestionListStatus);
 

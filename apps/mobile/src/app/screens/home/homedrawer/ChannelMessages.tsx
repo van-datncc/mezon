@@ -56,7 +56,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
 
 	const loadMoreMessage = React.useCallback(async () => {
-		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
+		await dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
 	const [currentMessageActionType, setCurrentMessageActionType] = useState<EMessageActionType | null>(null);

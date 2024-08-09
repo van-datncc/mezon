@@ -25,7 +25,7 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 			userMentionRaw?.map((item: ChannelMembersEntity) => ({
 				id: item?.user?.id ?? '',
 				display: getNameForPrioritize(item.clan_nick ?? '', item.user?.display_name ?? '', item.user?.username ?? ''),
-				avatarUrl: item.clan_avatar ? item.clan_avatar : item?.user?.avatar_url ?? '',
+				avatarUrl: item.clan_avatar ? item.clan_avatar : (item?.user?.avatar_url ?? ''),
 				username: item.user?.username,
 			})) ?? [];
 		const hardcodedUser: MentionDataProps = {
@@ -51,9 +51,9 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 			})) ?? [];
 
 		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return [...sortedMentionList];
-		} else {
 			return [...sortedMentionList, ...roleMentions, hardcodedUser];
+		} else {
+			return [...sortedMentionList];
 		}
 	}, [channelMode, members]);
 

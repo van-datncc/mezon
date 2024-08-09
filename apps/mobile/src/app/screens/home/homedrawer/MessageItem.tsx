@@ -347,7 +347,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 						<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
 						<Block opacity={message.isError ? 0.6 : 1}>
 							<RenderTextMarkdownContent
-								content={message.content}
+								content={{
+									...(typeof message.content === 'object' ? message.content : {}),
+									mentions: message.mentions
+								}}
 								isEdited={isEdited}
 								translate={t}
 								onMention={onMention}

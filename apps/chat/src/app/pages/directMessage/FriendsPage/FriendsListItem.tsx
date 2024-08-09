@@ -44,7 +44,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 				onClick={() => directMessageWithUser(friend.user?.id ?? '')}
 				className=" py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-gray-800 hover:bg-white rounded-lg"
 			>
-				<div key={friend.user?.id}>
+				<div key={friend.user?.id} className={'flex-1'}>
 					<MemberProfile
 						avatar={friend?.user?.avatar_url ?? ''}
 						name={(friend?.user?.display_name || friend?.user?.username)?? ''}

@@ -146,10 +146,10 @@ export default function FriendsPage() {
 					</button>
 				</div>
 			</div>
-			<div className="flex-1 flex w-full">
+			<div className="flex-1 flex w-full h-full">
 				<div className="px-8 py-6 flex-1 dark:bg-bgPrimary bg-[#F0F0F0]">
 					{!openModalAddFriend && (
-						<div className="flex flex-col text-[#AEAEAE]">
+						<div className="flex flex-col text-[#AEAEAE] h-full">
 							<div className="relative">
 								<InputField
 									type="text"

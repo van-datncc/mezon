@@ -159,7 +159,7 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 			data={emojiListPNG?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20)}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleEmojiSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={false} name={item?.shortname ?? ''} emojiSrc={item?.src} />
+					<SuggestItem isDisplayDefaultAvatar={false} name={item?.shortname ?? ''} emojiId={item?.id} />
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}

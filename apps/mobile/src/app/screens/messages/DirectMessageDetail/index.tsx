@@ -9,6 +9,7 @@ import {
 	directActions,
 	getStoreAsync,
 	selectCurrentChannel,
+	selectCurrentClanId,
 	selectDmGroupCurrent,
 	useAppDispatch,
 } from '@mezon/store-mobile';
@@ -48,6 +49,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const dispatch = useAppDispatch();
 	useChannelSeen(directMessageId || '');
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
@@ -89,7 +91,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			]);
 		});
 	}, [currentChannel]);
-	
+
 	const directMessageLoader = useCallback(async () => {
 		requestAnimationFrame(async () => {
 			const store = await getStoreAsync();
@@ -103,7 +105,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						type: currentDmGroup?.type,
 						noCache: true,
 						isFetchingLatestMessages: true,
-					})
+					}),
 				),
 			]);
 			save(STORAGE_CLAN_ID, currentChannel?.clan_id);
@@ -222,6 +224,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						<View style={{ flex: 1 }}>
 							<ChannelMessages
 								channelId={currentDmGroup.id}
+								clanId={'0'}
 								channelLabel={currentDmGroup?.channel_label}
 								mode={Number(
 									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
@@ -256,7 +259,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 									directMessageId={currentDmGroup?.id || ''}
 								/>
 							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={directMessageId} currentClanId={currentChannel?.clan_id} />
+								<AttachmentPicker currentChannelId={directMessageId} currentClanId={currentClanId} />
 							) : (
 								<View />
 							)}
