@@ -170,8 +170,8 @@ export const ChatMessageInput = memo(
 			};
 
 			const onEditMessage = useCallback(
-				async (editMessage: IMessageSendPayload, messageId: string) => {
-					await editSendMessage(editMessage, messageId);
+				async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
+					await editSendMessage(editMessage, messageId, mentions);
 				},
 				[editSendMessage],
 			);
@@ -190,29 +190,32 @@ export const ChatMessageInput = memo(
 				}
 				clearInputAfterSendMessage();
 				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => {
-					const isRole = doesIdRoleExist(mention?.userid ?? '', roleList ?? []);
+					const isRole = doesIdRoleExist(mention?.user_id ?? '', roleList ?? []);
 					if (isRole) {
-						const role = roleList?.find((role) => role.roleId === mention.userid);
+						const role = roleList?.find((role) => role.roleId === mention.user_id);
 						return {
 							role_id: role?.roleId,
-							rolename: role?.roleName,
+							rolename: `@${role?.roleName}`,
+							s: mention.s,
+							e: mention.e,
 						};
 					} else {
 						return {
-							user_id: mention.userid,
+							user_id: mention.user_id,
 							username: mention.username,
+							s: mention.s,
+							e: mention.e,
 						};
 					}
 				});
 
 				const payloadSendMessage: IMessageSendPayload = {
 					t: text,
-					mentions: mentionsOnMessage,
-					hashtags: hashtagsOnMessage,
-					emojis: emojisOnMessage,
-					links: linksOnMessage,
-					markdowns: markdownsOnMessage,
-					voicelinks: voiceLinkRoomOnMessage,
+					hg: hashtagsOnMessage,
+					ej: emojisOnMessage,
+					lk: linksOnMessage,
+					mk: markdownsOnMessage,
+					vk: voiceLinkRoomOnMessage,
 				};
 
 				const payloadThreadSendMessage: IPayloadThreadSendMessage = {
@@ -258,7 +261,7 @@ export const ChatMessageInput = memo(
 
 				const sendMessageAsync = async () => {
 					if (type === EMessageActionType.EditMessage) {
-						await onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id);
+						await onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id, simplifiedMentionList || [],);
 					} else {
 						if (![EMessageActionType.CreateThread].includes(messageAction)) {
 							const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here');
