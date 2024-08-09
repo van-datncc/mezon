@@ -74,7 +74,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: categoryIcons[index] }));
 	const { reactionMessageDispatch } = useChatReaction();
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
-	const { setEmojiSuggestion } = useEmojiSuggestion();
+	const { setSuggestionEmojiObjPicked } = useEmojiSuggestion();
 	const [emojiHoverSrc, setEmojiHoverSrc] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -109,8 +109,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setAddEmojiActionChatbox(!addEmojiState);
-			setEmojiSuggestion(emojiPicked);
-
+			setSuggestionEmojiObjPicked(emojiId, emojiPicked);
 			if (!shiftPressedState) {
 				dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 				setSubPanelActive(SubPanelName.NONE);
