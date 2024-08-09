@@ -40,6 +40,5 @@ export * from './lib/settingSticker/settingSticker.slice';
 export * from './lib/store';
 export * from './lib/threads/threads.slice';
 export * from './lib/toasts/toasts.slice';
-export * from './lib/users/users.slice';
 export * from './lib/voice/voice.slice';
 export * from './lib/webhook/webhook.slice';

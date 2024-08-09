@@ -227,9 +227,9 @@ export const checkLastChar = (text: string) => {
 };
 
 export const getNameForPrioritize = (clanNickname: string | undefined, displayName: string | undefined, username: string | undefined) => {
-	if (clanNickname) return clanNickname;
-	if (clanNickname === '' && displayName && displayName !== username) return displayName;
-	if (displayName === '' || displayName === username) return username;
+	if (clanNickname && clanNickname !== username) return clanNickname;
+	if (displayName && displayName !== username) return displayName;
+	if (displayName === '' || displayName === username || clanNickname === username) return username;
 };
 
 export const getAvatarForPrioritize = (clanAvatar: string | undefined, userAvatar: string | undefined) => {
@@ -457,9 +457,14 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 		result += t.slice(lastIndex, startindex);
 
 		switch (element.type) {
-			case ETokenMessage.MENTIONS:
-				result += `@[${element.username?.slice(1)}](${element.user_id})`;
+			case ETokenMessage.MENTIONS: {
+				if (element.username) {
+					result += `@[${element.username.slice(1)}](${element.user_id})`;
+				} else if (element.rolename) {
+					result += `@[${element.rolename.slice(1)}](${element.role_id})`;
+				}
 				break;
+			}
 			case ETokenMessage.HASHTAGS:
 				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
 				break;

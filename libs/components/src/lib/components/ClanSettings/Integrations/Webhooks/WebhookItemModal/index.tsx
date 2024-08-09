@@ -10,7 +10,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { ChannelIsNotThread } from '@mezon/utils';
+import { ChannelIsNotThread, IChannel } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { Icons } from 'libs/components/src/lib/components';
 import { ApiMessageAttachment, ApiWebhook, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
@@ -21,6 +21,7 @@ import DeleteWebhookPopup from './DeleteWebhookPopup';
 
 interface IWebhookItemModalProps {
 	webhookItem: ApiWebhook;
+	currentChannel?: IChannel;
 }
 
 const convertDate = (isoDateString: string): string => {
@@ -33,7 +34,7 @@ const convertDate = (isoDateString: string): string => {
 	return date.toLocaleDateString('en-GB', options);
 };
 
-const WebhookItemModal = ({ webhookItem }: IWebhookItemModalProps) => {
+const WebhookItemModal = ({ webhookItem, currentChannel }: IWebhookItemModalProps) => {
 	const [isExpand, setIsExpand] = useState(false);
 	const webhookOwner = useSelector(selectMemberById(webhookItem.creator_id as string));
 	return (
@@ -58,13 +59,14 @@ const WebhookItemModal = ({ webhookItem }: IWebhookItemModalProps) => {
 					</div>
 				</div>
 			</div>
-			{isExpand && <ExpendedWebhookModal webhookItem={webhookItem} />}
+			{isExpand && <ExpendedWebhookModal currentChannel={currentChannel} webhookItem={webhookItem} />}
 		</div>
 	);
 };
 
 interface IExpendedWebhookModal {
 	webhookItem: ApiWebhook;
+	currentChannel?: IChannel;
 }
 
 interface IDataForUpdate {
@@ -73,7 +75,7 @@ interface IDataForUpdate {
 	webhookAvatarUrl: string | undefined;
 }
 
-const ExpendedWebhookModal = ({ webhookItem }: IExpendedWebhookModal) => {
+const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookModal) => {
 	const dispatch = useAppDispatch();
 	const [isShowPopup, setIsShowPopup] = useState(false);
 	const toggleShowPopup = () => {
@@ -84,7 +86,6 @@ const ExpendedWebhookModal = ({ webhookItem }: IExpendedWebhookModal) => {
 	};
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const avatarRef = useRef<HTMLInputElement>(null);
 
 	const webhookChannel = useSelector(selectChannelById(webhookItem.channel_id as string));
@@ -237,7 +238,7 @@ const ExpendedWebhookModal = ({ webhookItem }: IExpendedWebhookModal) => {
 				</div>
 			</div>
 			{hasChange && <ModalSaveChanges onSave={handleEditWebhook} onReset={handleResetChange} />}
-			{isShowPopup && <DeleteWebhookPopup webhookItem={webhookItem} toggleShowPopup={toggleShowPopup} />}
+			{isShowPopup && <DeleteWebhookPopup currentChannel={currentChannel} webhookItem={webhookItem} toggleShowPopup={toggleShowPopup} />}
 		</>
 	);
 };

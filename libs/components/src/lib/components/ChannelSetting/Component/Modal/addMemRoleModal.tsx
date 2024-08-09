@@ -143,9 +143,12 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 				});
 				return;
 			}
-			const filteredMembers = listMembersNotInChannel.filter((item) => {
-				const nameToSearch = item?.display_name?.toLowerCase() || item?.username?.toLowerCase();
-				return nameToSearch.includes(inputData.toLowerCase());
+			const filteredMembers = listMembersNotInChannel.filter((member) => {
+				const clanName = member?.clanNick?.toLowerCase();
+				const displayName = member?.display_name?.toLowerCase();
+				const userName = member?.username?.toLowerCase();
+				const lowerCaseSearchTerm = inputData.toLowerCase();
+				return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
 			});
 			const filteredRoles = listRolesNotAddChannel.filter((item) => item?.title?.toLowerCase().includes(inputData));
 			setFilterItem({

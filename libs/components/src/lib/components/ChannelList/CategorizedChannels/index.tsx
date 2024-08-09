@@ -38,7 +38,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 		const windowHeight = window.innerHeight;
 		
 		if (event.button === MouseButton.RIGHT) {
-			event.stopPropagation();
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelCategory(!isShowPanelCategory);
@@ -68,6 +67,8 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 		setIsShowCategoryChannels(true)
 		openModalCreateNewChannel(category);
 	}
+	
+	useOnClickOutside(panelRef, () => setIsShowPanelCategory(false));
 	
 	return (
 		<>
@@ -104,6 +105,18 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 								<Icons.Plus />
 							</button>
 						</UserRestrictionZone>
+						
+						{isShowPanelCategory && (
+							<PanelCategory
+								coords={coords}
+								setIsShowPanelChannel={setIsShowPanelCategory}
+								setOpenSetting={setIsShowCategorySetting}
+							/>
+						)}
+						
+						{isShowCategorySetting && (
+							<CategorySetting onClose={handleCloseCategorySetting} category={category}/>
+						)}
 					</div>
 				
 				)}
@@ -120,20 +133,8 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 					</div>
 				)}
 				
-				{isShowPanelCategory && (
-					<PanelCategory
-						coords={coords}
-						setIsShowPanelChannel={setIsShowPanelCategory}
-						setOpenSetting={setIsShowCategorySetting}
-					/>
-				)}
 				
-				{isShowCategorySetting && (
-					<CategorySetting onClose={handleCloseCategorySetting} category={category}/>
-				)}
 			</div>
-			
-			
 		</>
 	)
 }

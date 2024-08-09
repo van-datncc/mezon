@@ -30,11 +30,13 @@ interface RenderContentProps {
 }
 type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
 
-const isMentionOnMessage = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).username !== undefined;
+const isMentionOnMessageUser = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).user_id !== undefined;
+
+const isMentionOnMessageRole = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).role_id !== undefined;
 
 const isHashtagOnMessage = (element: MessageElementToken): element is IHashtagOnMessage => (element as IHashtagOnMessage).channelid !== undefined;
 
-const isEmojiOnMessage = (element: MessageElementToken): element is IEmojiOnMessage => (element as IEmojiOnMessage).shortname !== undefined;
+const isEmojiOnMessage = (element: MessageElementToken): element is IEmojiOnMessage => (element as IEmojiOnMessage).emojiid !== undefined;
 
 const isLinkOnMessage = (element: MessageElementToken): element is ILinkOnMessage => (element as ILinkOnMessage).lk !== undefined;
 
@@ -75,13 +77,25 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 				);
 			}
 
-			if (isMentionOnMessage(element)) {
+			if (isMentionOnMessageUser(element)) {
 				formattedContent.push(
 					<MentionUser
 						showOnchannelLayout={showOnchannelLayout}
-						key={`mention-${index}-${s}-${element.username}-${element.user_id}`}
+						key={`mentionUser-${index}-${s}-${element.username}-${element.user_id}`}
 						tagName={element.username ?? ''}
 						tagUserId={element.user_id ?? ''}
+						mode={mode}
+					/>,
+				);
+			}
+
+			if (isMentionOnMessageRole(element)) {
+				formattedContent.push(
+					<MentionUser
+						showOnchannelLayout={showOnchannelLayout}
+						key={`mentionRole-${index}-${s}-${element.rolename}-${element.role_id}`}
+						tagName={element.rolename ?? ''}
+						tagUserId={element.role_id ?? ''}
 						mode={mode}
 					/>,
 				);

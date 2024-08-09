@@ -99,6 +99,7 @@ const LabelDm = (props: LabelDmProps) => {
 					defaultValue={label}
 					onChange={handleChange}
 					onKeyDown={handleKeyDown}
+					maxLength={64}
 					className="w-full dark:text-white text-black outline-none border dark:border-white border-slate-200 bg-bgLightModeButton dark:bg-bgSecondary rounded"
 				/>
 			)}
