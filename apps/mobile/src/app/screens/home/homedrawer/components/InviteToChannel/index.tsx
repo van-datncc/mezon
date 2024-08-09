@@ -119,7 +119,7 @@ export const InviteToChannel = React.memo(
 				Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 				{
 					t: dataSend.text,
-					links: [
+					lk: [
 						{
 							e: dataSend.text.length,
 							lk: dataSend.text,
