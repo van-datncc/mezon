@@ -10,7 +10,7 @@ export interface UserClanProfileEntity extends IClanProfile {
 }
 
 export const mapUserClanProfileToEntity = (userClanProfileRes: ApiClanProfile) => {
-	const id = userClanProfileRes.clan_id as string;
+	const id = `${userClanProfileRes.clan_id}${userClanProfileRes.user_id}`;
 	return { ...userClanProfileRes, id };
 };
 
