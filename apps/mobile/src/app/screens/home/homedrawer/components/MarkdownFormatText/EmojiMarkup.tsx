@@ -3,10 +3,10 @@ import { getSrcEmoji } from '@mezon/utils';
 type IEmojiMarkup = {
 	isMessageReply: boolean;
 	shortname: string;
-	emojiListPNG: any;
+	emojiid: string;
 };
-export const EmojiMarkup = ({ isMessageReply, shortname, emojiListPNG }: IEmojiMarkup) => {
-	const srcEmoji = getSrcEmoji(shortname, emojiListPNG);
+export const EmojiMarkup = ({ isMessageReply, shortname, emojiid }: IEmojiMarkup) => {
+	const srcEmoji = getSrcEmoji(emojiid);
 
 	if (!srcEmoji) {
 		return shortname;

@@ -1,5 +1,12 @@
 import { useAppNavigation, useAppParams, useClanRestriction, useMenu, useOnClickOutside, useThreads } from '@mezon/core';
-import { channelsActions, referencesActions, selectCloseMenu, selectCurrentClan, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	channelsActions,
+	notificationSettingActions,
+	referencesActions,
+	selectCloseMenu, selectCurrentChannelId,
+	useAppDispatch, useAppSelector,
+	voiceActions
+} from '@mezon/store';
 import { ChannelStatusEnum, EPermission, IChannel, MouseButton } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -43,6 +50,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
+	const dispatch = useAppDispatch();
 
 	const [openSetting, setOpenSetting] = useState(false);
 	const [showModal, setShowModal] = useState(false);
@@ -53,6 +61,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		mouseY: 0,
 		distanceToBottom: 0,
 	});
+	const currentChannelId = useAppSelector(selectCurrentChannelId);
 
 	const handleOpenCreate = () => {
 		setOpenSetting(true);
@@ -71,12 +80,17 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		setIsShowPanelChannel(false);
 	};
 
-	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY + window.screenY;
 		const windowHeight = window.innerHeight;
 
 		if (event.button === MouseButton.RIGHT) {
+			await dispatch(notificationSettingActions.getNotificationSetting({
+				channelId: channel.channel_id || '',
+				noCache: false,
+				isCurrentChannel: channel.channel_id === currentChannelId
+			}));
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
@@ -84,7 +98,6 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	};
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-	const dispatch = useAppDispatch();
 
 	const handleVoiceChannel = (id: string) => {
 		if (channel.status === StatusVoiceChannel.Active) {

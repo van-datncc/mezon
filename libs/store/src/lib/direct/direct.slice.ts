@@ -203,8 +203,8 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				}),
 			);
 			const members = fetchChannelMembersResult.payload as members[];
-			const userIds = members.map((member: any) => member.user.id);
-			if (type === ChannelType.CHANNEL_TYPE_DM) {
+			if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
+				const userIds = members.map((member: any) => member.user.id);
 				thunkAPI.dispatch(directChannelVoidActions.fetchChannelVoids({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));

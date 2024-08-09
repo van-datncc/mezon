@@ -67,7 +67,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	// TODO: why "Edit" not "edit"?
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(
-		async (content: IMessageSendPayload, messageId: string) => {
+		async (content: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -78,7 +78,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 			const filteredContent = useFilteredContent(content);
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, filteredContent);
+			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, filteredContent, mentions);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);

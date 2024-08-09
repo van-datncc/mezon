@@ -1,5 +1,14 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
-import { convertMarkdown } from '@mezon/utils';
+import {
+	IEmojiOnMessage,
+	IExtendedMessage,
+	IHashtagOnMessage,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
+	IMarkdownOnMessage,
+	IMentionOnMessage,
+	convertMarkdown,
+} from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -7,92 +16,122 @@ import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } 
 
 type MessageLineProps = {
 	mode?: number;
-	content?: any;
+	content?: IExtendedMessage;
 	showOnchannelLayout?: boolean;
 	onClickToMessage?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 };
 interface RenderContentProps {
-	data: any;
+	data: IExtendedMessage;
 	mode: number;
 	showOnchannelLayout?: boolean;
 	allChannelVoice?: ChannelsEntity[];
 }
+type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
+
+const isMentionOnMessageUser = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).user_id !== undefined;
+
+const isMentionOnMessageRole = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).role_id !== undefined;
+
+const isHashtagOnMessage = (element: MessageElementToken): element is IHashtagOnMessage => (element as IHashtagOnMessage).channelid !== undefined;
+
+const isEmojiOnMessage = (element: MessageElementToken): element is IEmojiOnMessage => (element as IEmojiOnMessage).emojiid !== undefined;
+
+const isLinkOnMessage = (element: MessageElementToken): element is ILinkOnMessage => (element as ILinkOnMessage).lk !== undefined;
+
+const isMarkdownOnMessage = (element: MessageElementToken): element is IMarkdownOnMessage => (element as IMarkdownOnMessage).mk !== undefined;
+
+const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILinkVoiceRoomOnMessage =>
+	(element as ILinkVoiceRoomOnMessage).vk !== undefined;
 
 // TODO: refactor component for message lines
 const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }: RenderContentProps) => {
-	const { t, mentions = [], hashtags = [], emojis = [], markdowns = [], links = [], voicelinks = [] } = data;
-	const elements = [...mentions, ...hashtags, ...emojis, ...markdowns, ...links, ...voicelinks].sort((a, b) => a.startindex - b.endindex);
+	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
+	const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 	let lastindex = 0;
 	const content = useMemo(() => {
 		const formattedContent: React.ReactNode[] = [];
 
 		elements.forEach((element, index) => {
-			const { startindex, endindex, channelid, channellabel, username, userid, emojiid, shortname, markdown, link, voicelink } = element;
-
-			if (lastindex < startindex) {
+			const s = element.s ?? 0;
+			const e = element.e ?? 0;
+			if (lastindex < s) {
 				formattedContent.push(
-					<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}`} text={t.slice(lastindex, startindex)} />,
+					<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}`} text={t?.slice(lastindex, s) ?? ''} />,
 				);
 			}
 
-			if (channelid && channellabel) {
+			if (isHashtagOnMessage(element)) {
 				formattedContent.push(
 					<ChannelHashtag
 						showOnchannelLayout={showOnchannelLayout}
-						key={`${index}${startindex}${channelid}`}
-						channelHastagId={`<#${channelid}>`}
+						key={`hashtag-${index}-${s}-${element.channelid}`}
+						channelHastagId={`<#${element.channelid}>`}
 					/>,
 				);
 			}
-			if (username) {
+
+			if (isMentionOnMessageUser(element)) {
 				formattedContent.push(
 					<MentionUser
 						showOnchannelLayout={showOnchannelLayout}
-						key={`${index}${startindex}${username}${userid}`}
-						tagName={username}
-						tagUserId={userid}
+						key={`mentionUser-${index}-${s}-${element.username}-${element.user_id}`}
+						tagName={element.username ?? ''}
+						tagUserId={element.user_id ?? ''}
 						mode={mode}
 					/>,
 				);
 			}
-			if (shortname) {
+
+			if (isMentionOnMessageRole(element)) {
 				formattedContent.push(
-					<EmojiMarkup
-						showOnChannelLayOut={showOnchannelLayout}
-						key={`${index}${startindex}${shortname}`}
-						emojiSyntax={shortname}
-						onlyEmoji={false}
-						emojiId={emojiid}
+					<MentionUser
+						showOnchannelLayout={showOnchannelLayout}
+						key={`mentionRole-${index}-${s}-${element.rolename}-${element.role_id}`}
+						tagName={element.rolename ?? ''}
+						tagUserId={element.role_id ?? ''}
+						mode={mode}
 					/>,
 				);
 			}
 
-			if (link && typeof link === 'string') {
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link as string}`} content={link as string} />);
+			if (isEmojiOnMessage(element)) {
+				formattedContent.push(
+					<EmojiMarkup
+						showOnChannelLayOut={showOnchannelLayout}
+						key={`emoji-${index}-${s}-${element.emojiid}`}
+						emojiSyntax={element.shortname ?? ''}
+						onlyEmoji={false}
+						emojiId={element.emojiid ?? ''}
+					/>,
+				);
 			}
 
-			if (voicelink && typeof voicelink === 'string') {
-				const meetingCode = voicelink?.split('/').pop();
+			if (isLinkOnMessage(element)) {
+				formattedContent.push(<MarkdownContent key={`link-${index}-${s}-${element.lk}`} content={element.lk as string} />);
+			}
+
+			if (isLinkVoiceRoomOnMessage(element)) {
+				const meetingCode = element.vk?.split('/').pop();
 				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 				voiceChannelFound
 					? formattedContent.push(
 							<ChannelHashtag
 								showOnchannelLayout={showOnchannelLayout}
-								key={`${index}${startindex}${channelid}`}
+								key={`voicelink-${index}-${s}-${voiceChannelFound?.channel_id}`}
 								channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
 							/>,
 						)
-					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink as string} />);
+					: formattedContent.push(<MarkdownContent key={`voicelink-${index}-${s}-${element.vk}`} content={element.vk as string} />);
 			}
 
-			if (markdown && typeof markdown === 'string') {
-				const converted = markdown.startsWith('```') && markdown.endsWith('```') ? convertMarkdown(markdown) : markdown;
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={converted as string} />);
+			if (isMarkdownOnMessage(element)) {
+				const converted = element.mk?.startsWith('```') && element.mk?.endsWith('```') ? convertMarkdown(element.mk) : element.mk;
+				formattedContent.push(<MarkdownContent key={`markdown-${index}-${s}-${element.mk}`} content={converted as string} />);
 			}
-			lastindex = endindex;
+			lastindex = e;
 		});
 
-		if (lastindex < t?.length) {
+		if (t && lastindex < t?.length) {
 			formattedContent.push(<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />);
 		}
 
@@ -108,7 +147,7 @@ const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: M
 	return (
 		<div onClick={!showOnchannelLayout ? onClickToMessage : () => {}} className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}>
 			<RenderContent
-				data={content}
+				data={content as IExtendedMessage}
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
 				showOnchannelLayout={showOnchannelLayout}
 				allChannelVoice={allChannelVoice}

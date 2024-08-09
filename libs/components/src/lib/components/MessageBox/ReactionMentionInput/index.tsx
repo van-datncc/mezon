@@ -6,12 +6,12 @@ import {
 	useGifsStickersEmoji,
 	useMessageValue,
 	useReference,
-	useSearchMessages,
 	useThreads,
 } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelUsersActions,
+	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
 	referencesActions,
@@ -28,6 +28,7 @@ import {
 	selectDmGroupCurrentId,
 	selectIdMessageRefReply,
 	selectIsFocused,
+	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
@@ -142,13 +143,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const usersClan = useSelector(selectAllUsesClan);
 	const { emojis } = useEmojiSuggestion();
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
+
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
-	const { isSearchMessage } = useSearchMessages();
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const isSearchMessage = useSelector(
+		selectIsSearchMessage((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
+	);
 	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(
 		(props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || '',
 	);
@@ -235,7 +239,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
-	const { mentionList, simplifiedMentionList, hashtagList, emojiList } = useProcessMention(content, mentionRaw, roleList);
+	const { mentionList, hashtagList, emojiList } = useProcessMention(mentionRaw, roleList);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -269,15 +273,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					{
 						t: content,
-						mentions: mentionList,
-						hashtags: hashtagList,
-						emojis: emojiList,
-						links: linkList,
-						markdowns: markdownList,
-						voicelinks: voiceLinkRoomList,
+						hg: hashtagList,
+						ej: emojiList,
+						lk: linkList,
+						mk: markdownList,
+						vk: voiceLinkRoomList,
 					},
-
-					simplifiedMentionList,
+					mentionList,
 					attachmentDataRef,
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -311,14 +313,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					props.onSend(
 						{
 							t: content,
-							mentions: mentionList,
-							hashtags: hashtagList,
-							emojis: emojiList,
-							links: linkList,
-							markdowns: markdownList,
-							voicelinks: voiceLinkRoomList,
+							hg: hashtagList,
+							ej: emojiList,
+							lk: linkList,
+							mk: markdownList,
+							vk: voiceLinkRoomList,
 						},
-						simplifiedMentionList,
+						mentionList,
 						attachmentDataRef,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -338,6 +339,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
+			dispatch(
+				emojiSuggestionActions.setSuggestionEmojiObjPicked({
+					shortName: '',
+					id: '',
+					isReset: true,
+				}),
+			);
 		},
 		[
 			valueTextInput,
@@ -430,10 +438,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
-		if (!emojiPicked || !input) {
+		const isEmptyEmojiPicked = emojiPicked && Object.keys(emojiPicked).length === 1 && emojiPicked[''] === '';
+
+		if (isEmptyEmojiPicked || !input) {
 			return;
+		} else if (emojiPicked) {
+			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
+				textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})`);
+			}
 		}
-		textFieldEdit.insert(input, `[:${emojiPicked}]`);
 	}
 
 	const clickUpToEditMessage = () => {
@@ -447,7 +460,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: currentChannelId as string,
-					channelDraftMessage: { message_id: idRefMessage, draftContent: lastMessageByUserId?.content },
+					channelDraftMessage: {
+						message_id: idRefMessage,
+						draftContent: lastMessageByUserId?.content,
+						draftMention: lastMessageByUserId.mentions ?? [],
+					},
 				}),
 			);
 		}
@@ -475,7 +492,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (closeMenu && statusMenu) {
 			return;
 		}
-		if ((getRefMessageReply !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
+		if (
+			(getRefMessageReply !== null && openReplyMessageState) ||
+			!openEditMessageState ||
+			(emojiPicked?.shortName !== '' && !reactionRightState)
+		) {
 			return focusToElement(editorRef);
 		}
 	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
@@ -632,7 +653,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
 								display={suggestion.display}
-								emojiId={suggestion.id as string}
+								emojiId=""
 							/>
 						);
 					}}
@@ -655,14 +676,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							symbol="#"
 							subText={(suggestion as ChannelsMentionProps).subText}
 							channelId={suggestion.id}
-							emojiId="" //TODO:
+							emojiId=""
 						/>
 					)}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention
 					trigger=":"
-					markup="[:__display__](__id__)"
+					markup="[__display__](__id__)"
 					data={queryEmojis}
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;

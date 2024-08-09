@@ -14,6 +14,7 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
 	emojiPicked: string;
+	emojiObjPicked?: Record<string, string>;
 	emojiSuggestionListStatus: boolean;
 	keyCodeFromKeyBoardState: number;
 	textToSearchEmojiSuggestion: string;
@@ -33,6 +34,12 @@ export const emojiSuggestionAdapter = createEntityAdapter({
 type FetchEmojiArgs = {
 	clanId: string;
 	noCache?: boolean;
+};
+
+type EmojiObjPickedArgs = {
+	shortName: string;
+	id: string;
+	isReset?: boolean;
 };
 
 const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.client.listClanEmoji(mezon.session, clanId), {
@@ -102,6 +109,7 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	loadingStatus: 'not loaded',
 	error: null,
 	emojiPicked: '',
+	emojiObjPicked: {},
 	emojiSuggestionListStatus: false,
 	keyCodeFromKeyBoardState: 1000,
 	textToSearchEmojiSuggestion: '',
@@ -116,10 +124,6 @@ export const emojiSuggestionSlice = createSlice({
 		add: emojiSuggestionAdapter.addOne,
 		remove: emojiSuggestionAdapter.removeOne,
 
-		setSuggestionEmojiPicked: (state, action: PayloadAction<string>) => {
-			state.emojiPicked = action.payload;
-		},
-
 		setStatusSuggestionEmojiList: (state, action: PayloadAction<boolean>) => {
 			state.emojiSuggestionListStatus = action.payload;
 		},
@@ -131,6 +135,16 @@ export const emojiSuggestionSlice = createSlice({
 		},
 		setShiftPressed: (state, action: PayloadAction<boolean>) => {
 			state.shiftPressed = action.payload;
+		},
+
+		setSuggestionEmojiObjPicked: (state, action: PayloadAction<EmojiObjPickedArgs>) => {
+			const { shortName, id, isReset } = action.payload;
+			if (!state.emojiObjPicked || isReset) {
+				state.emojiObjPicked = {};
+			}
+			if (!state.emojiObjPicked[shortName]) {
+				state.emojiObjPicked[shortName] = id;
+			}
 		},
 	},
 	extraReducers: (builder) => {
@@ -181,8 +195,6 @@ export const selectAllEmojiSuggestion = createSelector(getEmojiSuggestionState, 
 
 export const selectEmojiSuggestionEntities = createSelector(getEmojiSuggestionState, selectEntities);
 
-export const selectEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiPicked);
-
 export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiSuggestionListStatus);
 
 export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.textToSearchEmojiSuggestion);
@@ -190,3 +202,5 @@ export const selectTextToSearchEmojiSuggestion = createSelector(getEmojiSuggesti
 export const selectAddEmojiState = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.addEmojiAction);
 
 export const selectShiftPressedStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.shiftPressed);
+
+export const selectEmojiObjSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiObjPicked);

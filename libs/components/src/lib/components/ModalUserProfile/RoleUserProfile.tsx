@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
-import { UserRestrictionZone, useClanRestriction, useRoles } from '@mezon/core';
-import { RolesClanEntity, selectAllAccount, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { useClanRestriction, useRoles, UserRestrictionZone } from '@mezon/core';
+import { channelMembersActions, RolesClanEntity, selectAllAccount, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme, useAppDispatch } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -61,17 +61,29 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 			return role.title?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
 	}, [activeRolesWithoutUserRoles, searchTerm]);
+
+	const dispatch = useAppDispatch();
 	const addRole = async (roleId: string) => {
 		setShowPopupAddRole(false);
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', userIDArray || [], [], [], []);
+		await dispatch(channelMembersActions.addRoleIdUser({
+			id: roleId, 
+			channelId: currentChannelId, 
+			userId: userById?.user?.id,
+		}));
 	};
 
 	const deleteRole = async (roleId: string) => {
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], userIDArray || [], []);
+		await dispatch(channelMembersActions.removeRoleIdUser({
+			id: roleId, 
+			channelId: currentChannelId, 
+			userId: userById?.user?.id,
+		}));
 	};
 	const appearanceTheme = useSelector(selectTheme);
 	return (

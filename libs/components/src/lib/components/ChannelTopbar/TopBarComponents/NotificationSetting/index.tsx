@@ -5,7 +5,7 @@ import {
   selectDefaultNotificationCategory,
   selectDefaultNotificationClan,
   selectNotifiReactMessage,
-  selectnotificatonSelected,
+  selectCurrentChannelNotificatonSelected,
   useAppDispatch, notifiReactMessageActions,
 } from '@mezon/store';
 import { format } from 'date-fns';
@@ -17,7 +17,7 @@ import { notificationTypesList, notiLabels } from "../../../PanelChannel";
 import ItemPanel from "../../../PanelChannel/ItemPanel";
 
 const NotificationSetting = () => {
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -131,7 +131,7 @@ const NotificationSetting = () => {
 								<div>
 									<ItemPanel
 										children={nameChildren}
-										muteTime={mutedUntil}
+										subText={mutedUntil}
 										dropdown="change here"
 										onClick={() => muteOrUnMuteChannel(0)}
 									/>
@@ -151,7 +151,7 @@ const NotificationSetting = () => {
 					) : (
 						<ItemPanel
 							children={nameChildren}
-							muteTime={mutedUntil}
+							subText={mutedUntil}
 							onClick={() => muteOrUnMuteChannel(1)}
 						/>
 					)}
@@ -171,7 +171,7 @@ const NotificationSetting = () => {
           name="NotificationSetting"
           defaultNotifi={true}
           checked={getNotificationChannelSelected?.notification_setting_type === undefined}
-          defaultNotifiName={defaultNotifiName}
+          subText={defaultNotifiName}
           onClick={() => setNotification(0)}
         />
         {notificationTypesList.map(notification => (
