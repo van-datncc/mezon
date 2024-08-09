@@ -21,6 +21,7 @@ const ReviewModal = (props: ReviewModalProps) => {
 				option={option}
 				logo={contentSubmit.logo}
 				start={time}
+				isReviewEvent
 			/>
 			<div className="mt-8">
 				<h3 className="text-center font-semibold text-xl">Here's a preview of your event.</h3>
