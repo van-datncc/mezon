@@ -11,6 +11,7 @@ import {
 import {
 	ChannelsEntity,
 	channelUsersActions,
+	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
 	referencesActions,
@@ -338,6 +339,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
+			dispatch(
+				emojiSuggestionActions.setSuggestionEmojiObjPicked({
+					shortName: '',
+					id: '',
+					isReset: true,
+				}),
+			);
 		},
 		[
 			valueTextInput,
@@ -430,12 +438,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
-		if (!emojiPicked || !input) {
-			return;
-		}
+		const isEmptyEmojiPicked = emojiPicked && Object.keys(emojiPicked).length === 1 && emojiPicked[''] === '';
 
-		for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
-			textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})`);
+		if (isEmptyEmojiPicked || !input) {
+			return;
+		} else if (emojiPicked) {
+			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
+				textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})`);
+			}
 		}
 	}
 
