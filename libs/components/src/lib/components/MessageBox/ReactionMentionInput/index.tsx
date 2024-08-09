@@ -433,7 +433,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (!emojiPicked || !input) {
 			return;
 		}
-		textFieldEdit.insert(input, `[:${Object.keys(emojiPicked)[0]}](${emojiPicked[Object.keys(emojiPicked)[0]]})`);
+
+		for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
+			textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})`);
+		}
 	}
 
 	const clickUpToEditMessage = () => {
@@ -670,7 +673,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				/>
 				<Mention
 					trigger=":"
-					markup="[:__display__](__id__)"
+					markup="[__display__](__id__)"
 					data={queryEmojis}
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;

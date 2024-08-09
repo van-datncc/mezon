@@ -84,7 +84,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 				formattedContent.push(
 					<EmojiMarkup
 						showOnChannelLayOut={showOnchannelLayout}
-						key={`emoji-${index}-${s}-${element.shortname}`}
+						key={`emoji-${index}-${s}-${element.emojiid}`}
 						emojiSyntax={element.shortname ?? ''}
 						onlyEmoji={false}
 						emojiId={element.emojiid ?? ''}
