@@ -225,9 +225,9 @@ export const checkLastChar = (text: string) => {
 };
 
 export const getNameForPrioritize = (clanNickname: string | undefined, displayName: string | undefined, username: string | undefined) => {
-	if (clanNickname) return clanNickname;
-	if (clanNickname === '' && displayName && displayName !== username) return displayName;
-	if (displayName === '' || displayName === username) return username;
+	if (clanNickname && clanNickname !== username) return clanNickname;
+	if (displayName && displayName !== username) return displayName;
+	if (displayName === '' || displayName === username || clanNickname === username) return username;
 };
 
 export const getAvatarForPrioritize = (clanAvatar: string | undefined, userAvatar: string | undefined) => {

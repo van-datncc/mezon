@@ -47,7 +47,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 	};
 	const appearanceTheme = useSelector(selectTheme);
 	return (
-		<div style={{pointerEvents: !hasPermissionEdit ? undefined : 'none'}}>
+		<div>
 			<div className="w-full flex gap-x-3">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full py-1 px-2 font-normal border dark:border-bgTertiary border-bgLightModeThird rounded"

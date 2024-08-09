@@ -6,7 +6,7 @@ import {
 	useGifsStickersEmoji,
 	useMessageValue,
 	useReference,
-	useThreads,
+	useThreads
 } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -509,7 +509,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
-		if (currentChannelId !== undefined || currentDmGroupId !== undefined) {
+		if ((currentChannelId !== undefined || currentDmGroupId !== undefined) && !closeMenu ) {
 			focusToElement(editorRef);
 		}
 	}, [currentChannelId, currentDmGroupId]);
