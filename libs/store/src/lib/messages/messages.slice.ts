@@ -644,6 +644,7 @@ export const messagesSlice = createSlice({
 						id: action.payload.id,
 						changes: {
 							content: action.payload.content,
+							mentions: action.payload.mentions,
 							update_time: action.payload.update_time,
 						},
 					});
