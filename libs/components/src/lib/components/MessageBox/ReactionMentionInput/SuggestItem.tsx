@@ -17,7 +17,7 @@ type SuggestItemProps = {
 	channelId?: string | number;
 	isOpenSearchModal?: boolean;
 	wrapSuggestItemStyle?: string;
-	emojiId: string;
+	emojiId?: string;
 	display?: string;
 	isHightLight?: boolean;
 };
@@ -74,6 +74,9 @@ const SuggestItem = ({
 						className="size-4"
 						classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
 					/>
+				)}
+				{emojiId && (
+					<img src={getSrcEmoji(emojiId)} alt={getSrcEmoji(emojiId)} style={{ width: '32px', height: '32px', objectFit: 'cover' }} />
 				)}
 				{!specificChannel?.channel_private && specificChannel?.type === ChannelType.CHANNEL_TYPE_TEXT && (
 					<Icons.Hashtag defaultSize="w-5 h-5" />

@@ -1,4 +1,4 @@
-import { LoadingStatus } from '@mezon/utils';
+import { LoadingStatus, SearchFilter } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiSearchMessageDocument } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -25,9 +25,10 @@ export const mapSearchMessageToEntity = (searchMessage: ApiSearchMessageDocument
 export interface SearchMessageState extends EntityState<SearchMessageEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	isSearchMessage: boolean;
+	isSearchMessage: Record<string, boolean>;
 	totalResult: number;
-	currentPage: number
+	currentPage: number;
+	valueInputSearch: Record<string, string>;
 }
 
 export const SearchMessageAdapter = createEntityAdapter<SearchMessageEntity>();
@@ -50,9 +51,10 @@ export const fetchListSearchMessage = createAsyncThunk(
 export const initialSearchMessageState: SearchMessageState = SearchMessageAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	isSearchMessage: false,
+	isSearchMessage: {},
 	totalResult: 0,
 	currentPage: 1,
+	valueInputSearch: {},
 });
 
 export const searchMessageSlice = createSlice({
@@ -64,11 +66,16 @@ export const searchMessageSlice = createSlice({
 		setTotalResults: (state, action: PayloadAction<number>) => {
 			state.totalResult = action.payload;
 		},
-		setIsSearchMessage: (state, action: PayloadAction<boolean>) => {
-			state.isSearchMessage = action.payload;
+		setIsSearchMessage: (state, action: PayloadAction<{ channelId: string; isSearchMessage: boolean }>) => {
+			const { channelId, isSearchMessage } = action.payload;
+			state.isSearchMessage[channelId] = isSearchMessage;
 		},
 		setCurrentPage: (state, action: PayloadAction<number>) => {
 			state.currentPage = action.payload;
+		},
+		setValueInputSearch: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
+			const { channelId, value } = action.payload;
+			state.valueInputSearch[channelId] = value;
 		},
 	},
 
@@ -77,10 +84,18 @@ export const searchMessageSlice = createSlice({
 			.addCase(fetchListSearchMessage.pending, (state: SearchMessageState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchListSearchMessage.fulfilled, (state: SearchMessageState, action: PayloadAction<ISearchMessage[]>) => {
-				SearchMessageAdapter.setAll(state, action.payload);
-				state.loadingStatus = 'loaded';
-			})
+			.addCase(
+				fetchListSearchMessage.fulfilled,
+				(state: SearchMessageState, action: PayloadAction<ISearchMessage[], string, { arg: { filters: SearchFilter[] } }>) => {
+					const channelId = action.meta.arg.filters[1].field_value;
+					const ids = Object.values(state.entities)
+						.filter((message) => message.channel_id === channelId)
+						.map((message) => message.id);
+					SearchMessageAdapter.removeMany(state, ids);
+					SearchMessageAdapter.upsertMany(state, action.payload);
+					state.loadingStatus = 'loaded';
+				},
+			)
 			.addCase(fetchListSearchMessage.rejected, (state: SearchMessageState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
@@ -100,8 +115,15 @@ const { selectAll } = SearchMessageAdapter.getSelectors();
 export const getSearchMessageState = (rootState: { [SEARCH_MESSAGES_FEATURE_KEY]: SearchMessageState }): SearchMessageState =>
 	rootState[SEARCH_MESSAGES_FEATURE_KEY];
 
-
 export const selectAllMessageSearch = createSelector(getSearchMessageState, selectAll);
-export const selectIsSearchMessage = createSelector(getSearchMessageState, (state) => state.isSearchMessage);
+
+export const selectMessageSearchByChannelId = (channelId: string) =>
+	createSelector(selectAllMessageSearch, (state) => state.filter((message) => message.channel_id === channelId));
+
 export const selectTotalResultSearchMessage = createSelector(getSearchMessageState, (state) => state.totalResult);
 export const selectCurrentPage = createSelector(getSearchMessageState, (state) => state.currentPage);
+
+export const selectIsSearchMessage = (channelId: string) => createSelector(getSearchMessageState, (state) => state.isSearchMessage[channelId]);
+
+export const selectValueInputSearchMessage = (channelId: string) =>
+	createSelector(getSearchMessageState, (state) => state.valueInputSearch[channelId]);

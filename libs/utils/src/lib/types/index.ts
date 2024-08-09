@@ -27,7 +27,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -112,7 +112,7 @@ export type IChannel = ApiChannelDescription & {
 	unread?: boolean;
 	description?: string;
 	usernames?: string;
-  isRoleUser?: boolean;
+	isRoleUser?: boolean;
 };
 
 export type IPinMessage = ApiPinMessage & {
@@ -187,16 +187,15 @@ export type IMessageWithUser = IMessage & {
 	user: IUser | null;
 };
 
-export type IMessageSendPayload = {
+export interface IMessageSendPayload {
 	t?: string;
 	contentThread?: string;
-	mentions?: IMentionOnMessage[];
-	hashtags?: IHashtagOnMessage[];
-	emojis?: IEmojiOnMessage[];
-	links?: ILinkOnMessage[];
-	markdowns?: IMarkdownOnMessage[];
-	voicelinks?: ILinkVoiceRoomOnMessage[];
-};
+	hg?: IHashtagOnMessage[];
+	ej?: IEmojiOnMessage[];
+	lk?: ILinkOnMessage[];
+	mk?: IMarkdownOnMessage[];
+	vk?: ILinkVoiceRoomOnMessage[];
+}
 
 export type IUser = {
 	name: string;
@@ -402,6 +401,7 @@ export type SenderInfoOptionals = {
 export type ChannelDraftMessages = {
 	message_id: string;
 	draftContent: IMessageSendPayload;
+	draftMention: ApiMessageMention[];
 };
 
 export interface IGifCategory {
@@ -432,7 +432,7 @@ export type MentionDataProps = {
 	clanAvatar?: string | undefined;
 	user?: ApiUser;
 	username?: string | undefined;
-  isRoleUser?: boolean;
+	isRoleUser?: boolean;
 };
 
 export type UserSearchDataProps = {
@@ -671,3 +671,16 @@ export interface IRoleMention {
 	roleId: string;
 	roleName: string;
 }
+
+export enum ETokenMessage {
+	MENTIONS = 'mentions',
+	EMOJIS = 'ej',
+	HASHTAGS = 'hg',
+	LINKS = 'lk',
+	VOICE_LINKS = 'vk',
+	MARKDOWNS = 'mk',
+}
+export type SearchFilter = {
+	field_name: string;
+	field_value?: string;
+};

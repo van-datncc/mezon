@@ -1,7 +1,7 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { selectAllEmojiSuggestion, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -23,7 +23,6 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { reactionMessageDispatch } = useChatReaction();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 
 	const userId = useMemo(() => userProfile?.user?.id, [userProfile?.user?.id]);
 
@@ -52,7 +51,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	};
 
 	const removeEmoji = async (emojiData: EmojiDataOptionals) => {
-		const { id, emoji, senders } = emojiData;
+		const { id, emoji, senders, emojiId } = emojiData;
 		const countToRemove = senders.find((sender) => sender.sender_id === userId)?.count;
 		await reactionMessageDispatch(
 			id,
@@ -60,6 +59,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			currentChannel?.clan_id ?? '',
 			currentChannel?.id ?? '',
 			message.id ?? '',
+			emojiId,
 			emoji,
 			countToRemove,
 			userId ?? '',
@@ -72,7 +72,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			?.filter?.((emoji: EmojiDataOptionals) => emoji.message_id === message.id && emoji.senders.some((sender) => sender.count > 0))
 			.map((emoji) => {
 				if (Number(emoji.id) === 0) {
-					const tempId = `${emoji.message_id}-${emoji.emoji}`;
+					const tempId = `${emoji.emojiId}`;
 					return { ...emoji, id: tempId };
 				}
 				return emoji;
@@ -88,7 +88,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 				if (calculateTotalCount(emojiItemData.senders) === 0) {
 					return null;
 				}
-
+				if (!emojiItemData?.emojiId) return null;
 				return (
 					<Pressable
 						onLongPress={() => !preventAction && setCurrentEmojiSelectedId(emojiItemData.id)}
@@ -98,17 +98,18 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 								emojiItemData.id ?? '',
 								ChannelStreamMode.STREAM_MODE_CHANNEL,
 								message.id ?? '',
+								emojiItemData.emojiId ?? '',
 								emojiItemData.emoji ?? '',
 								1,
 								userId ?? '',
 								false,
 							);
 						}}
-						key={index + emojiItemData.id}
+						key={index + emojiItemData.emojiId}
 						style={[styles.reactItem, isMyReaction ? styles.myReaction : styles.otherReaction]}
 					>
 						<FastImage
-							source={{ uri: getSrcEmoji(emojiItemData.emoji ?? '', emojiListPNG || []) }}
+							source={{ uri: getSrcEmoji(emojiItemData.emojiId ?? '') }}
 							style={styles.iconEmojiReaction}
 							resizeMode={'contain'}
 						/>
@@ -127,7 +128,6 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 				allReactionDataOnOneMessage={allReactionDataOnOneMessage}
 				emojiSelectedId={currentEmojiSelectedId}
 				onClose={() => setCurrentEmojiSelectedId(null)}
-				emojiListPNG={emojiListPNG}
 				removeEmoji={removeEmoji}
 				userId={userId}
 			/>
@@ -138,7 +138,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { emojiSelectedId, onClose, allReactionDataOnOneMessage, emojiListPNG, removeEmoji, userId } = props;
+	const { emojiSelectedId, onClose, allReactionDataOnOneMessage, removeEmoji, userId } = props;
 	const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 	const [showConfirmDeleteEmoji, setShowConfirmDeleteEmoji] = useState<boolean>(false);
@@ -155,7 +155,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 				>
 					<FastImage
 						source={{
-							uri: getSrcEmoji(emojiItem.emoji, emojiListPNG || []),
+							uri: getSrcEmoji(emojiItem.emojiId),
 						}}
 						resizeMode={'contain'}
 						style={styles.iconEmojiReactionDetail}

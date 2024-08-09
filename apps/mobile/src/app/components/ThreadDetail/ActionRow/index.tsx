@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import { useUserPermission } from '@mezon/core';
 import { EOpenSearchChannelFrom, Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectnotificatonSelected } from '@mezon/store-mobile';
+import { selectCurrentChannelNotificatonSelected } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -25,7 +25,7 @@ export const ActionRow = React.memo(() => {
 	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
 	const { isCanManageThread, isCanManageChannel } = useUserPermission();
 

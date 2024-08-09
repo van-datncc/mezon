@@ -37,7 +37,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							valueHightLight={searchText}
 							subTextStyle="uppercase"
 							isOpenSearchModal
-							emojiId={item.id as string}
+							emojiId=""
 						/>
 					) : (
 						<SuggestItem
@@ -49,7 +49,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							wrapSuggestItemStyle="gap-x-1"
 							subTextStyle="text-[13px]"
 							isHightLight={!isSearchByUsername}
-							emojiId={item.id as string}
+							emojiId=""
 						/>
 					)}
 				</div>
