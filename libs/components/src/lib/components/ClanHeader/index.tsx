@@ -45,6 +45,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
 	const toggleLeaveClanPopup = ()=>{
 		setIsShowLeaveClanPopup(!isShowLeaveClanPopup);
+		setIsShowModalPanelClan(false)
 	}
 
 	const onClose = () => {
