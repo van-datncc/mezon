@@ -101,9 +101,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		return channelDraftMessage.draftMention;
 	}, [channelDraftMessage.draftMention, messageId]);
 
-	const addMentionToContent = addMention(processedContentDraft, processedMentionDraft);
+	const addMentionToContent = useMemo(
+		() => addMention(processedContentDraft, processedMentionDraft),
+		[processedContentDraft, processedMentionDraft],
+	);
 
-	const formatContentDraft = createFormattedString(addMentionToContent);
+	const formatContentDraft = useMemo(() => createFormattedString(addMentionToContent), [addMentionToContent]);
 
 	const handleFocus = () => {
 		if (textareaRef.current) {

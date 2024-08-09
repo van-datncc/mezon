@@ -457,9 +457,14 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 		result += t.slice(lastIndex, startindex);
 
 		switch (element.type) {
-			case ETokenMessage.MENTIONS:
-				result += `@[${element.username?.slice(1)}](${element.user_id})`;
+			case ETokenMessage.MENTIONS: {
+				if (element.username) {
+					result += `@[${element.username.slice(1)}](${element.user_id})`;
+				} else if (element.rolename) {
+					result += `@[${element.rolename.slice(1)}](${element.role_id})`;
+				}
 				break;
+			}
 			case ETokenMessage.HASHTAGS:
 				result += `#[${element.channellabel?.slice(1)}](${element.channelid})`;
 				break;
