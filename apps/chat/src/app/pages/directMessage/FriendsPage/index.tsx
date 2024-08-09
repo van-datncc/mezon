@@ -146,10 +146,10 @@ export default function FriendsPage() {
 					</button>
 				</div>
 			</div>
-			<div className="flex-1 flex w-full">
+			<div className="flex-1 flex w-full h-full">
 				<div className="px-8 py-6 flex-1 dark:bg-bgPrimary bg-[#F0F0F0]">
 					{!openModalAddFriend && (
-						<div className="flex flex-col text-[#AEAEAE]">
+						<div className="flex flex-col text-[#AEAEAE] h-full">
 							<div className="relative">
 								<InputField
 									type="text"
@@ -164,7 +164,7 @@ export default function FriendsPage() {
 							<span className="text-[14px] dark:text-contentSecondary text-black mb-4 font-bold px-[14px]">
 								{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 							</span>
-							<FriendList listFriendFilter={listFriendFilter} />
+							<FriendList listFriendFilter={[...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter, ...listFriendFilter]} />
 						</div>
 					)}
 					{openModalAddFriend && (

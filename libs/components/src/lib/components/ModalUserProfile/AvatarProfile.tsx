@@ -12,7 +12,7 @@ type AvatarProfileProps = {
 
 const AvatarProfile = ({ customStatus, avatar, username, userToDisplay, isAnonymous, styleAvatar }: AvatarProfileProps) => {
 	return (
-		<div className="text-black flex flex-row gap-[6px] mt-[-50px] w-full px-[16px]">
+		<div className="text-black flex flex-1 flex-row gap-[6px] mt-[-50px] px-[16px]">
 			<AvatarImage
 				alt={username || ''}
 				userName={username}

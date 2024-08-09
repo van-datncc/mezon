@@ -33,9 +33,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
     setOpenSetting (true);
     setIsShowPanelChannel(false);
   }
-  
-  useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-  
+	
   return (
     <>
       <div
