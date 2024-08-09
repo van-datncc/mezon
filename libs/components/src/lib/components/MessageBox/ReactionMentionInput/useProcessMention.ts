@@ -1,59 +1,52 @@
 import { ETypeMEntion, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, IRoleMention } from '@mezon/utils';
 import { MentionItem } from 'react-mentions';
 
-const useProcessMention = (text: string, mentionsRaw: MentionItem[], roleList: IRoleMention[]) => {
+const useProcessMention = (mentionsRaw: MentionItem[], roleList: IRoleMention[]) => {
 	const mentions: IMentionOnMessage[] = [];
 	const hashtags: IHashtagOnMessage[] = [];
 	const emojis: IEmojiOnMessage[] = [];
-
 	mentionsRaw.forEach((item) => {
 		const { id, display, plainTextIndex, childIndex } = item;
-		const startindex = plainTextIndex;
-		const endindex = plainTextIndex + display.length;
+		const s = plainTextIndex;
+		const e = plainTextIndex + display.length;
+		const isRole = roleList.some((role) => role.roleId === id);
 
 		if (childIndex === ETypeMEntion.MENTION) {
-			mentions.push({
-				userid: id,
-				username: display,
-				startindex,
-				endindex,
-			});
+			if (isRole) {
+				mentions.push({
+					role_id: id,
+					rolename: display,
+					s,
+					e,
+				});
+			} else {
+				mentions.push({
+					user_id: id,
+					username: display,
+					s,
+					e,
+				});
+			}
 		} else if (childIndex === ETypeMEntion.HASHTAG) {
 			hashtags.push({
 				channelid: id,
 				channellabel: display,
-				startindex,
-				endindex,
+				s,
+				e,
 			});
 		} else if (childIndex === ETypeMEntion.EMOJI) {
 			emojis.push({
 				emojiid: id,
 				shortname: display,
-				startindex,
-				endindex,
+				s,
+				e,
 			});
-		}
-	});
-	const simplifiedList = mentions.map((mention) => {
-		const isRole = roleList.some((role) => role.roleId === mention.userid);
-		if (isRole) {
-			const role = roleList.find((role) => role.roleId === mention.userid);
-			return {
-				role_id: role?.roleId,
-				rolename: role?.roleName,
-			};
-		} else {
-			return {
-				user_id: mention.userid,
-				username: mention.username,
-			};
 		}
 	});
 	return {
 		mentionList: mentions,
 		hashtagList: hashtags,
 		emojiList: emojis,
-		simplifiedMentionList: simplifiedList,
 	};
 };
 

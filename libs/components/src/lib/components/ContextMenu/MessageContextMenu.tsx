@@ -100,7 +100,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(
 			messagesActions.setChannelDraftMessage({
 				channelId: message.channel_id,
-				channelDraftMessage: { message_id: message.id, draftContent: message.content },
+				channelDraftMessage: { message_id: message.id, draftContent: message.content, draftMention: message.mentions ?? [] },
 			}),
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));

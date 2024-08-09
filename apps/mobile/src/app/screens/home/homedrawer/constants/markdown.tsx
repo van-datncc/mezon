@@ -1,7 +1,20 @@
-import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
+import {
+	codeBlockRegex,
+	codeBlockRegexGlobal,
+	isEmojiOnMessage,
+	isHashtagOnMessage,
+	isLinkOnMessage,
+	isLinkVoiceRoomOnMessage,
+	isMarkdownOnMessage,
+	isMentionOnMessage,
+	markdownDefaultUrlRegex,
+	splitBlockCodeRegex,
+	urlRegex,
+} from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
-import { ChannelsEntity, selectAllChannelMembers, selectAllRolesClan, selectAllUsesClan, selectChannelsEntities } from '@mezon/store-mobile';
+import { ChannelsEntity, selectAllChannelMembers, selectAllUsesClan, selectChannelsEntities } from '@mezon/store-mobile';
+import { IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
@@ -159,7 +172,7 @@ const styleMessageReply = (colors: Attributes) =>
 	});
 
 export type IMarkdownProps = {
-	content: any;
+	content: IExtendedMessage;
 	isEdited?: boolean;
 	translate?: TFunction;
 	onMention?: (url: string) => void;
@@ -325,50 +338,59 @@ export const RenderTextMarkdownContent = React.memo(
 		const usersClan = useAppSelector(selectAllUsesClan);
 		const usersInChannel = useAppSelector(selectAllChannelMembers);
 		const channelsEntities = useAppSelector(selectChannelsEntities);
-		const rolesInClan = useAppSelector(selectAllRolesClan);
 
 		if (isMessageReply) {
 			customStyle = { ...styleMessageReply(themeValue) };
 		}
-		const { t = '', mentions = [], hashtags = [], emojis = [], links = [], markdowns = [], voicelinks = [] } = content || {};
-		const elements = [...mentions, ...hashtags, ...emojis, ...links, ...markdowns, ...voicelinks].sort((a, b) => a.startindex - b.startindex);
+		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = content || {};
+		const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 		let lastIndex = 0;
 
 		const contentRender = useMemo(() => {
 			let formattedContent = '';
 
 			elements.forEach((element) => {
-				const { startindex, endindex, channelid, channellabel, username, userid, shortname, emojiid, markdown, link, voicelink } = element;
-				if (lastIndex < startindex) {
-					formattedContent += t?.slice?.(lastIndex, startindex)?.toString();
+				const s = element.s ?? 0;
+				const e = element.e ?? 0;
+				if (lastIndex < s) {
+					formattedContent += t?.slice?.(lastIndex, s)?.toString();
+				}
+				if (isHashtagOnMessage(element)) {
+					formattedContent += ChannelHashtag({ channelHashtagId: element.channelid, channelsEntities });
+				}
+				if (isMentionOnMessage(element)) {
+					formattedContent += MentionUser({
+						tagName: element.username,
+						roleName: element.rolename || '',
+						roleId: element.role_id || '',
+						tagUserId: element.user_id,
+						mode,
+						usersClan,
+						usersInChannel,
+					});
+				}
+				if (isEmojiOnMessage(element)) {
+					formattedContent += EmojiMarkup({ shortname: element.shortname, emojiid: element.emojiid, isMessageReply: isMessageReply });
 				}
 
-				if (channelid && channellabel) {
-					formattedContent += ChannelHashtag({ channelHashtagId: channelid, channelsEntities });
-				}
-				if (username) {
-					formattedContent += MentionUser({ tagName: username, tagUserId: userid, mode, usersClan, usersInChannel, rolesInClan });
-				}
-				if (shortname || emojiid) {
-					formattedContent += EmojiMarkup({ shortname, emojiid, isMessageReply: isMessageReply });
+				if (isMarkdownOnMessage(element) || isLinkOnMessage(element)) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-expect-error
+					formattedContent += formatBlockCode(element.mk || element.lk);
 				}
 
-				if (markdown || link) {
-					formattedContent += formatBlockCode(markdown || link);
-				}
-
-				if (voicelink) {
-					const meetingCode = voicelink?.split('/').pop();
+				if (isLinkVoiceRoomOnMessage(element)) {
+					const meetingCode = element?.vk?.split('/').pop();
 					const allChannelVoice = Object.values(channelsEntities).flat();
 					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 
 					if (!voiceChannelFound) {
-						formattedContent += formatBlockCode(voicelink);
+						formattedContent += formatBlockCode(element.vk);
 					} else {
 						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities });
 					}
 				}
-				lastIndex = endindex;
+				lastIndex = e;
 			});
 
 			if (lastIndex < t?.length) {

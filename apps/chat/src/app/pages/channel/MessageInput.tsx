@@ -6,6 +6,7 @@ import {
 	IMessageWithUser,
 	MentionDataProps,
 	ThemeApp,
+	addMention,
 	createFormattedString,
 	getRoleList,
 	processText,
@@ -13,6 +14,7 @@ import {
 } from '@mezon/utils';
 import useProcessMention from 'libs/components/src/lib/components/MessageBox/ReactionMentionInput/useProcessMention';
 import { ChannelStreamMode } from 'mezon-js';
+import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -48,6 +50,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 
+	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
+		if (query.length === 0) return;
+		const matches = emojis
+			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.slice(0, 20)
+			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
+		callback(matches);
+	};
+
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
@@ -72,36 +83,33 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [openEditMessageState, message.id, idMessageRefEdit]);
 
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
+
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
 	const processedContentDraft: IMessageSendPayload = useMemo(() => {
 		return {
 			t: channelDraftMessage.draftContent?.t,
-			mentions: channelDraftMessage.draftContent?.mentions,
-			hashtags: channelDraftMessage.draftContent?.hashtags,
-			emojis: channelDraftMessage.draftContent?.emojis,
-			links: channelDraftMessage.draftContent?.links,
-			markdowns: channelDraftMessage.draftContent?.markdowns,
-			voicelinks: channelDraftMessage.draftContent?.voicelinks,
+			hg: channelDraftMessage.draftContent?.hg,
+			ej: channelDraftMessage.draftContent?.ej,
+			lk: channelDraftMessage.draftContent?.lk,
+			mk: channelDraftMessage.draftContent?.mk,
+			vk: channelDraftMessage.draftContent?.vk,
 		};
 	}, [channelDraftMessage.draftContent, messageId]);
 
-	const formatContentDraft = createFormattedString(processedContentDraft);
+	const processedMentionDraft: ApiMessageMention[] = useMemo(() => {
+		return channelDraftMessage.draftMention;
+	}, [channelDraftMessage.draftMention, messageId]);
+
+	const addMentionToContent = addMention(processedContentDraft, processedMentionDraft);
+
+	const formatContentDraft = createFormattedString(addMentionToContent);
 
 	const handleFocus = () => {
 		if (textareaRef.current) {
 			const length = textareaRef.current.value.length;
 			textareaRef.current.setSelectionRange(length, length);
 		}
-	};
-
-	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
-		if (query.length === 0) return;
-		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
-			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
-		callback(matches);
 	};
 
 	useEscapeKey(handleCancelEdit);
@@ -124,7 +132,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			} else if (draftContent === originalContent) {
 				handleCancelEdit();
 			} else {
-				handleSend(processedContentDraft, message.id);
+				handleSend(processedContentDraft, message.id, processedMentionDraft);
 				handleCancelEdit();
 			}
 		}
@@ -141,7 +149,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		} else if (draftContent !== '' && draftContent === originalContent) {
 			return handleCancelEdit();
 		} else {
-			handleSend(processedContentDraft, message.id);
+			handleSend(processedContentDraft, message.id, processedMentionDraft);
 		}
 		handleCancelEdit();
 	};
@@ -149,18 +157,21 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [titleMention, setTitleMention] = useState('');
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
-		const { mentionList, hashtagList, emojiList } = useProcessMention(newPlainTextValue, mentions, roleList);
+		const { mentionList, hashtagList, emojiList } = useProcessMention(mentions, roleList);
 		const { links, markdowns, voiceRooms } = processText(newPlainTextValue);
-
-		setChannelDraftMessage(channelId, messageId, {
-			t: newPlainTextValue,
-			mentions: mentionList,
-			hashtags: hashtagList,
-			emojis: emojiList,
-			links: links,
-			markdowns: markdowns,
-			voicelinks: voiceRooms,
-		});
+		setChannelDraftMessage(
+			channelId,
+			messageId,
+			{
+				t: newPlainTextValue,
+				hg: hashtagList,
+				ej: emojiList,
+				lk: links,
+				mk: markdowns,
+				vk: voiceRooms,
+			},
+			mentionList,
+		);
 
 		if (newPlainTextValue.endsWith('@')) {
 			setTitleMention('Members');
@@ -233,7 +244,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: suggestion.username ?? ''
+											: (suggestion.username ?? '')
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}
@@ -268,14 +279,20 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					/>
 					<Mention
 						trigger=":"
-						markup="[:__display__]"
+						markup="[__display__](__id__)"
 						data={queryEmojis}
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						renderSuggestion={(suggestion) => (
-							<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId="" />
-						)}
+						renderSuggestion={(suggestion) => {
+							return (
+								<SuggestItem
+									display={suggestion.display ?? ''}
+									symbol={(suggestion as any).emoji}
+									emojiId={suggestion.id as string}
+								/>
+							);
+						}}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 						appendSpaceOnAdd={true}
 					/>

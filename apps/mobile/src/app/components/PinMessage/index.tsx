@@ -1,12 +1,6 @@
 import { Metrics, size, useTheme } from '@mezon/mobile-ui';
-import {
-	AppDispatch,
-	PinMessageEntity,
-	pinMessageActions,
-	selectAllEmojiSuggestion,
-	selectChannelsEntities,
-	selectPinMessageByChannelId,
-} from '@mezon/store-mobile';
+import { AppDispatch, PinMessageEntity, pinMessageActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
+import { IExtendedMessage } from '@mezon/utils';
 import { Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
@@ -47,7 +41,7 @@ const PinMessage = ({ currentChannelId }: { currentChannelId: string }) => {
 						return (
 							<PinMessageItem
 								pinMessageItem={pinMessage}
-								contentMessage={contentString}
+								contentMessage={contentString as IExtendedMessage}
 								handleUnpinMessage={handleUnpinMessage}
 							/>
 						);
