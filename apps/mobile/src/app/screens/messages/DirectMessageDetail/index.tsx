@@ -224,6 +224,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						<View style={{ flex: 1 }}>
 							<ChannelMessages
 								channelId={currentDmGroup.id}
+								clanId={'0'}
 								channelLabel={currentDmGroup?.channel_label}
 								mode={Number(
 									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
