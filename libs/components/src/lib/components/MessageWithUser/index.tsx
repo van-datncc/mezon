@@ -1,12 +1,5 @@
 import { useAuth, useChatMessages } from '@mezon/core';
-import {
-	MessagesEntity,
-	selectCurrentChannelId,
-	selectCurrentUserId,
-	selectIdMessageRefReply,
-	selectIdMessageToJump,
-	selectOpenReplyMessageState,
-} from '@mezon/store';
+import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import classNames from 'classnames';
 import React, { useMemo, useRef } from 'react';
@@ -65,7 +58,6 @@ function MessageWithUser({
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
-	const currentUserId = useSelector(selectCurrentUserId);
 
 	const hasIncludeMention = useMemo(() => {
 		const userMention = `@[${userLogin.userProfile?.user?.username}]`;

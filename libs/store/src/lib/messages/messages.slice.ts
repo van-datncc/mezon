@@ -780,26 +780,26 @@ export const messagesSlice = createSlice({
 		updateUserMessage: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;
 			for (const channelId in state.channelMessages) {
-			const channel = state.channelMessages[channelId];
+				const channel = state.channelMessages[channelId];
 				if (channel) {
 					const updatedEntities = { ...channel.entities };
 					for (const messageId in updatedEntities) {
-					const message = updatedEntities[messageId];
-					if (message && message.sender_id === userId && message.clan_id === clanId) {
-						updatedEntities[messageId] = {
-						...message,
-						clan_avatar: clanAvt,
-						clan_nick: clanNick,
-						};
-					}
+						const message = updatedEntities[messageId];
+						if (message && message.sender_id === userId && message.clan_id === clanId) {
+							updatedEntities[messageId] = {
+								...message,
+								clan_avatar: clanAvt,
+								clan_nick: clanNick,
+							};
+						}
 					}
 					state.channelMessages[channelId] = {
-					...channel,
-					entities: updatedEntities,
+						...channel,
+						entities: updatedEntities,
 					};
 				}
 			}
-		}
+		},
 	},
 	extraReducers: (builder) => {
 		builder
