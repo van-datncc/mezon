@@ -47,9 +47,10 @@ const MessageText = ({
 
 const MessageContent = ({ message, mode }: IMessageContentProps) => {
 	const { lines, isEdited, contentUpdatedMention } = useMessageParser(message);
+
 	const isOnlyContainEmoji = useMemo(() => {
 		return isValidEmojiData(contentUpdatedMention);
-	}, [contentUpdatedMention]);
+	}, [contentUpdatedMention, message.content, message.mentions]);
 
 	const lineValue = useMemo(() => {
 		if (lines === undefined && typeof message.content === 'string') {
