@@ -125,6 +125,7 @@ function MessageWithUser({
 												isSending={message.isSending}
 												isError={message.isError}
 												mode={mode}
+												isSearchMessage={isSearchMessage}
 											/>
 										)}
 										<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
