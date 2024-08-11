@@ -1,5 +1,5 @@
 import { getSrcEmoji, SHOW_POSITION } from '@mezon/utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useMessageContextMenu } from '../ContextMenu';
 import PlainText from './PlainText';
 
@@ -7,18 +7,11 @@ type EmojiMarkupOpt = {
 	emojiId: string;
 	emojiSyntax: string;
 	onlyEmoji: boolean;
-	posReply?: boolean;
-	showOnChannelLayOut?: boolean;
+	isSingleLine: boolean;
 };
 
-export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, onlyEmoji, posReply, showOnChannelLayOut }) => {
-	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.5 m-0`);
-
-	useEffect(() => {
-		if (posReply) {
-			setClassName(`w-4 h-auto inline-block relative -top-0.5 m-0`);
-		}
-	}, [posReply]);
+export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, onlyEmoji, isSingleLine }) => {
+	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'}  h-auto inline-block relative -top-0.4 m-0`);
 
 	const srcEmoji = useMemo(() => {
 		return getSrcEmoji(emojiId);
@@ -42,9 +35,9 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 					onDragStart={(e) => e.preventDefault()}
 				/>
 			) : (
-				<PlainText isSingleLine={false} isJumMessageEnabled={false} showOnchannelLayout={showOnChannelLayOut} text={emojiSyntax} />
+				<PlainText isSingleLine={false} isJumMessageEnabled={false} text={emojiSyntax} />
 			)}
 		</span>
 	);
 };
-export default EmojiMarkup;
+export default memo(EmojiMarkup);

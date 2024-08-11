@@ -4,7 +4,6 @@ import React, { useMemo } from 'react';
 
 type PlainTextOpt = {
 	text: string;
-	showOnchannelLayout?: boolean;
 	isSearchMessage?: boolean;
 	isSingleLine: boolean;
 	isJumMessageEnabled: boolean;

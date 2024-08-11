@@ -575,6 +575,20 @@ export function addMention(obj: IMessageSendPayload, mentionValue: IMentionOnMes
 	return updatedObj;
 }
 
+export function isValidEmojiData(data: IExtendedMessage): boolean | undefined {
+	if (data?.mentions && data.mentions.length !== 0) {
+		return false;
+	}
+
+	const validShortnames = data?.ej?.map((emoji: IEmojiOnMessage) => emoji?.shortname);
+
+	const shortnamesInT = data?.t
+		?.split(' ')
+		?.map((shortname: string) => shortname.trim())
+		?.filter((shortname: string) => shortname);
+
+	return shortnamesInT?.every((name: string) => validShortnames?.includes(name)) && shortnamesInT.join(' ') === data?.t?.trim();
+}
 export const buildLPSArray = (pattern: string): number[] => {
 	const lps = Array(pattern.length).fill(0);
 	let len = 0;
