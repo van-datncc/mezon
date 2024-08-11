@@ -42,7 +42,7 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 					onDragStart={(e) => e.preventDefault()}
 				/>
 			) : (
-				<PlainText showOnchannelLayout={showOnChannelLayOut} text={emojiSyntax} />
+				<PlainText isSingleLine={false} isJumMessageEnabled={false} showOnchannelLayout={showOnChannelLayOut} text={emojiSyntax} />
 			)}
 		</span>
 	);

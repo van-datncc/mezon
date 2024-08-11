@@ -10,23 +10,61 @@ import {
 	convertMarkdown,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
 type MessageLineProps = {
 	mode?: number;
 	content?: IExtendedMessage;
-	showOnchannelLayout?: boolean;
 	onClickToMessage?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 	isSearchMessage?: boolean;
+
+	isJumMessageEnabled: boolean;
+	isSingleLine: boolean;
 };
+
+const MessageLine = ({ mode, content, isJumMessageEnabled, onClickToMessage, isSearchMessage, isSingleLine }: MessageLineProps) => {
+	const allChannels = useSelector(selectChannelsEntities);
+	const allChannelVoice = Object.values(allChannels).flat();
+	const [maxWidth, setMaxWidth] = useState(window.innerWidth - 600);
+
+	useEffect(() => {
+		const handleResize = () => {
+			setMaxWidth(window.innerWidth - 600);
+		};
+
+		window.addEventListener('resize', handleResize);
+
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
+	return (
+		<div onClick={!isJumMessageEnabled ? onClickToMessage : () => {}} className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'}`}>
+			<RenderContent
+				isJumMessageEnabled={isJumMessageEnabled}
+				isSingleLine={isSingleLine}
+				data={content as IExtendedMessage}
+				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
+				allChannelVoice={allChannelVoice}
+				isSearchMessage={isSearchMessage}
+				parentWidth={maxWidth}
+			/>
+		</div>
+	);
+};
+
+export default memo(MessageLine);
+
 interface RenderContentProps {
 	data: IExtendedMessage;
 	mode: number;
-	showOnchannelLayout?: boolean;
 	allChannelVoice?: ChannelsEntity[];
 	isSearchMessage?: boolean;
+	isSingleLine: boolean;
+	isJumMessageEnabled: boolean;
+	parentWidth?: number;
 }
 type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
 
@@ -46,7 +84,7 @@ const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILin
 	(element as ILinkVoiceRoomOnMessage).vk !== undefined;
 
 // TODO: refactor component for message lines
-const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, isSearchMessage }: RenderContentProps) => {
+const RenderContent = memo(({ data, mode, allChannelVoice, isSearchMessage, isSingleLine, isJumMessageEnabled, parentWidth }: RenderContentProps) => {
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 	const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 	let lastindex = 0;
@@ -59,8 +97,9 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 			if (lastindex < s) {
 				formattedContent.push(
 					<PlainText
+						isSingleLine={isSingleLine}
+						isJumMessageEnabled={isJumMessageEnabled}
 						isSearchMessage={isSearchMessage}
-						showOnchannelLayout={showOnchannelLayout}
 						key={`plain-${lastindex}`}
 						text={t?.slice(lastindex, s) ?? ''}
 					/>,
@@ -70,7 +109,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 			if (isHashtagOnMessage(element)) {
 				formattedContent.push(
 					<ChannelHashtag
-						showOnchannelLayout={showOnchannelLayout}
+						isSingleLine={isSingleLine}
 						key={`hashtag-${index}-${s}-${element.channelid}`}
 						channelHastagId={`<#${element.channelid}>`}
 					/>,
@@ -80,7 +119,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 			if (isMentionOnMessageUser(element)) {
 				formattedContent.push(
 					<MentionUser
-						showOnchannelLayout={showOnchannelLayout}
+						isSingleLine={isSingleLine}
 						key={`mentionUser-${index}-${s}-${element.username}-${element.user_id}`}
 						tagName={element.username ?? ''}
 						tagUserId={element.user_id ?? ''}
@@ -92,7 +131,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 			if (isMentionOnMessageRole(element)) {
 				formattedContent.push(
 					<MentionUser
-						showOnchannelLayout={showOnchannelLayout}
+						isSingleLine={isSingleLine}
 						key={`mentionRole-${index}-${s}-${element.rolename}-${element.role_id}`}
 						tagName={element.rolename ?? ''}
 						tagUserId={element.role_id ?? ''}
@@ -104,7 +143,6 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 			if (isEmojiOnMessage(element)) {
 				formattedContent.push(
 					<EmojiMarkup
-						showOnChannelLayOut={showOnchannelLayout}
 						key={`emoji-${index}-${s}-${element.emojiid}`}
 						emojiSyntax={element.shortname ?? ''}
 						onlyEmoji={false}
@@ -123,7 +161,8 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 				voiceChannelFound
 					? formattedContent.push(
 							<ChannelHashtag
-								showOnchannelLayout={showOnchannelLayout}
+								isSingleLine={isSingleLine}
+								// isTokenClickable={isTokenClickable}
 								key={`voicelink-${index}-${s}-${voiceChannelFound?.channel_id}`}
 								channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
 							/>,
@@ -141,8 +180,9 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 		if (t && lastindex < t?.length) {
 			formattedContent.push(
 				<PlainText
+					isSingleLine={isSingleLine}
+					isJumMessageEnabled={isJumMessageEnabled}
 					isSearchMessage={isSearchMessage}
-					showOnchannelLayout={showOnchannelLayout}
 					key={`plain-${lastindex}-end`}
 					text={t.slice(lastindex)}
 				/>,
@@ -151,24 +191,23 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, 
 
 		return formattedContent;
 	}, [elements, t, mode]);
-	return <div>{content}</div>;
-});
-
-const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage, isSearchMessage }: MessageLineProps) => {
-	const allChannels = useSelector(selectChannelsEntities);
-	const allChannelVoice = Object.values(allChannels).flat();
 
 	return (
-		<div onClick={!showOnchannelLayout ? onClickToMessage : () => {}} className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}>
-			<RenderContent
-				data={content as IExtendedMessage}
-				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
-				showOnchannelLayout={showOnchannelLayout}
-				allChannelVoice={allChannelVoice}
-				isSearchMessage={isSearchMessage}
-			/>
+		<div
+			style={
+				isSingleLine
+					? {
+							whiteSpace: 'nowrap',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							maxWidth: parentWidth,
+							color: isJumMessageEnabled ? '#B4BAC0' : 'white',
+						}
+					: undefined
+			}
+			className={`whitespace-pre-line hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057]`}
+		>
+			{content}
 		</div>
 	);
-};
-
-export default memo(MessageLine);
+});
