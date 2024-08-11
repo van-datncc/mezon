@@ -6,7 +6,7 @@ import {
 	useGifsStickersEmoji,
 	useMessageValue,
 	useReference,
-	useThreads
+	useThreads,
 } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -16,7 +16,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
-	selectAllDirectChannelVoids,
+	selectAllHashtagDmVoice,
 	selectAllRolesClan,
 	selectAllUsesClan,
 	selectAttachmentData,
@@ -129,7 +129,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
+	const commonChannelVoids = useSelector(selectAllHashtagDmVoice);
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -528,7 +528,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
-		if ((currentChannelId !== undefined || currentDmGroupId !== undefined) && !closeMenu ) {
+		if ((currentChannelId !== undefined || currentDmGroupId !== undefined) && !closeMenu) {
 			focusToElement(editorRef);
 		}
 	}, [currentChannelId, currentDmGroupId]);
@@ -648,7 +648,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subText={
 									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: (suggestion.username ?? '')
+										: suggestion.username ?? ''
 								}
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
