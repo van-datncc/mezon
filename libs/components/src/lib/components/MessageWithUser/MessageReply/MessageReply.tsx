@@ -66,12 +66,16 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 								<Icons.ImageThumbnail />
 							</div>
 						) : (
-							<MessageLine
-								isJumMessageEnabled={true}
-								isSingleLine={true}
-								onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
-								content={messageContentRef}
-							/>
+							<div>
+								{' '}
+								<MessageLine
+									isTokenClickAble={false}
+									isJumMessageEnabled={true}
+									isSingleLine={true}
+									onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
+									content={messageContentRef}
+								/>
+							</div>
 						)}
 					</div>
 				</div>

@@ -7,27 +7,17 @@ type PlainTextOpt = {
 	isSearchMessage?: boolean;
 	isSingleLine: boolean;
 	isJumMessageEnabled: boolean;
+	isHover: boolean;
 };
 
-export const PlainText: React.FC<PlainTextOpt> = ({ text, isSearchMessage, isJumMessageEnabled, isSingleLine }) => {
+export const PlainText: React.FC<PlainTextOpt> = ({ text, isSearchMessage, isJumMessageEnabled, isSingleLine, isHover }) => {
 	const { valueSearchMessage } = useSearchMessages();
 	const valueSearchMessageSplitted = useMemo(() => {
 		return valueSearchMessage?.trim()?.split(' ') || [];
 	}, [valueSearchMessage]);
 
 	return (
-		<span
-			style={
-				isSingleLine
-					? {
-							whiteSpace: 'nowrap',
-							overflow: 'hidden',
-							textOverflow: 'ellipsis',
-						}
-					: undefined
-			}
-			className={`whitespace-pre-line ${!isJumMessageEnabled ? 'dark:text-white ' : 'dark:text-[#B4BAC0] hover:dark:text-[#E6F3F5] hover:text-[#060607]'} text-[#4E5057] `}
-		>
+		<span className={` ${isHover && isSingleLine ? 'dark:text-white text-[#4E5057] ' : ''} `}>
 			{isSearchMessage ? HighlightMatch(text, valueSearchMessageSplitted) : text}
 		</span>
 	);

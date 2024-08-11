@@ -23,6 +23,7 @@ type MessageLineProps = {
 
 	isJumMessageEnabled: boolean;
 	isSingleLine: boolean;
+	isTokenClickAble: boolean;
 };
 
 const MessageLine = ({
@@ -33,6 +34,7 @@ const MessageLine = ({
 	isOnlyContainEmoji,
 	isSearchMessage,
 	isSingleLine,
+	isTokenClickAble,
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -49,12 +51,16 @@ const MessageLine = ({
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
+	const [isHover, setIsHover] = useState<boolean>(false);
 	return (
 		<div
+			onMouseEnter={() => setIsHover(true)}
+			onMouseLeave={() => setIsHover(false)}
 			onClick={isJumMessageEnabled ? onClickToMessage : () => {}}
-			className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} flex flex-row ${isSingleLine ? 'mt-1' : ''} items-center`}
+			className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}
 		>
 			<RenderContent
+				isTokenClickAble={isTokenClickAble}
 				isOnlyContainEmoji={isOnlyContainEmoji}
 				isJumMessageEnabled={isJumMessageEnabled}
 				isSingleLine={isSingleLine}
@@ -63,6 +69,7 @@ const MessageLine = ({
 				allChannelVoice={allChannelVoice}
 				isSearchMessage={isSearchMessage}
 				parentWidth={maxWidth}
+				isHover={isHover}
 			/>
 		</div>
 	);
@@ -76,9 +83,12 @@ interface RenderContentProps {
 	allChannelVoice?: ChannelsEntity[];
 	isOnlyContainEmoji?: boolean;
 	isSearchMessage?: boolean;
+
 	isSingleLine: boolean;
+	isTokenClickAble: boolean;
 	isJumMessageEnabled: boolean;
 	parentWidth?: number;
+	isHover: boolean;
 }
 type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
 
@@ -99,7 +109,18 @@ const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILin
 
 // TODO: refactor component for message lines
 const RenderContent = memo(
-	({ data, mode, allChannelVoice, isSearchMessage, isSingleLine, isJumMessageEnabled, parentWidth, isOnlyContainEmoji }: RenderContentProps) => {
+	({
+		data,
+		mode,
+		allChannelVoice,
+		isSearchMessage,
+		isSingleLine,
+		isJumMessageEnabled,
+		parentWidth,
+		isOnlyContainEmoji,
+		isTokenClickAble,
+		isHover,
+	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 		let lastindex = 0;
@@ -112,6 +133,7 @@ const RenderContent = memo(
 				if (lastindex < s) {
 					formattedContent.push(
 						<PlainText
+							isHover={isHover}
 							isSingleLine={isSingleLine}
 							isJumMessageEnabled={isJumMessageEnabled}
 							isSearchMessage={isSearchMessage}
@@ -124,6 +146,7 @@ const RenderContent = memo(
 				if (isHashtagOnMessage(element)) {
 					formattedContent.push(
 						<ChannelHashtag
+							isTokenClickAble={isTokenClickAble}
 							isSingleLine={isSingleLine}
 							key={`hashtag-${index}-${s}-${element.channelid}`}
 							channelHastagId={`<#${element.channelid}>`}
@@ -134,6 +157,7 @@ const RenderContent = memo(
 				if (isMentionOnMessageUser(element)) {
 					formattedContent.push(
 						<MentionUser
+							isTokenClickAble={isTokenClickAble}
 							isSingleLine={isSingleLine}
 							key={`mentionUser-${index}-${s}-${element.username}-${element.user_id}`}
 							tagName={element.username ?? ''}
@@ -146,6 +170,7 @@ const RenderContent = memo(
 				if (isMentionOnMessageRole(element)) {
 					formattedContent.push(
 						<MentionUser
+							isTokenClickAble={isTokenClickAble}
 							isSingleLine={isSingleLine}
 							key={`mentionRole-${index}-${s}-${element.rolename}-${element.role_id}`}
 							tagName={element.rolename ?? ''}
@@ -168,7 +193,14 @@ const RenderContent = memo(
 				}
 
 				if (isLinkOnMessage(element)) {
-					formattedContent.push(<MarkdownContent key={`link-${index}-${s}-${element.lk}`} content={element.lk as string} />);
+					formattedContent.push(
+						<MarkdownContent
+							isTokenClickAble={isTokenClickAble}
+							isSingleLine={isSingleLine}
+							key={`link-${index}-${s}-${element.lk}`}
+							content={element.lk as string}
+						/>,
+					);
 				}
 
 				if (isLinkVoiceRoomOnMessage(element)) {
@@ -177,18 +209,32 @@ const RenderContent = memo(
 					voiceChannelFound
 						? formattedContent.push(
 								<ChannelHashtag
+									isTokenClickAble={isTokenClickAble}
 									isSingleLine={isSingleLine}
-									// isTokenClickable={isTokenClickable}
 									key={`voicelink-${index}-${s}-${voiceChannelFound?.channel_id}`}
 									channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
 								/>,
 							)
-						: formattedContent.push(<MarkdownContent key={`voicelink-${index}-${s}-${element.vk}`} content={element.vk as string} />);
+						: formattedContent.push(
+								<MarkdownContent
+									isTokenClickAble={isTokenClickAble}
+									isSingleLine={isSingleLine}
+									key={`voicelink-${index}-${s}-${element.vk}`}
+									content={element.vk as string}
+								/>,
+							);
 				}
 
 				if (isMarkdownOnMessage(element)) {
 					const converted = element.mk?.startsWith('```') && element.mk?.endsWith('```') ? convertMarkdown(element.mk) : element.mk;
-					formattedContent.push(<MarkdownContent key={`markdown-${index}-${s}-${element.mk}`} content={converted as string} />);
+					formattedContent.push(
+						<MarkdownContent
+							isTokenClickAble={isTokenClickAble}
+							isSingleLine={isSingleLine}
+							key={`markdown-${index}-${s}-${element.mk}`}
+							content={converted as string}
+						/>,
+					);
 				}
 				lastindex = e;
 			});
@@ -196,6 +242,7 @@ const RenderContent = memo(
 			if (t && lastindex < t?.length) {
 				formattedContent.push(
 					<PlainText
+						isHover={isHover}
 						isSingleLine={isSingleLine}
 						isJumMessageEnabled={isJumMessageEnabled}
 						isSearchMessage={isSearchMessage}
@@ -217,13 +264,13 @@ const RenderContent = memo(
 								overflow: 'hidden',
 								textOverflow: 'ellipsis',
 								maxWidth: parentWidth,
-								color: isJumMessageEnabled ? '#B4BAC0' : 'white',
+								color: isSingleLine ? '#B4BAC0' : 'white',
 							}
 						: undefined
 				}
-				className={`whitespace-pre-line hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057]`}
+				className={`${isJumMessageEnabled ? 'whitespace-pre-line hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] flex items-center border' : ''}`}
 			>
-				{content}{' '}
+				{content}
 			</div>
 		);
 	},

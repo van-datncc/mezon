@@ -66,6 +66,7 @@ const MessageText = ({
 			<div className="flex w-full">
 				<div className="w-full">
 					<MessageLine
+						isTokenClickAble={true}
 						isSearchMessage={isSearchMessage}
 						isOnlyContainEmoji={isOnlyContainEmoji}
 						isJumMessageEnabled={false}

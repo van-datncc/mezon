@@ -11,9 +11,10 @@ type ChannelHashtagProps = {
 	tagUserId: string;
 	mode?: number;
 	isSingleLine: boolean;
+	isTokenClickAble: boolean;
 };
 
-const MentionUser = ({ tagName, mode, isSingleLine, tagUserId }: ChannelHashtagProps) => {
+const MentionUser = ({ tagName, mode, isSingleLine, isTokenClickAble, tagUserId }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const usersClan = useSelector(selectAllUsesClan);
 	const usersInChannel = useSelector(selectAllChannelMembers);
@@ -104,9 +105,9 @@ const MentionUser = ({ tagName, mode, isSingleLine, tagUserId }: ChannelHashtagP
 			{foundUser !== null || tagName === '@here' ? (
 				<>
 					<Link
-						onMouseDown={!isSingleLine ? (event) => handleMouseClick(event) : () => {}}
+						onMouseDown={!isSingleLine || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
 						ref={panelRef}
-						onClick={!isSingleLine ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
+						onClick={!isSingleLine || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
 						style={{ textDecoration: 'none' }}
 						to={''}
 						className={`font-medium px-0.1 rounded-sm 
