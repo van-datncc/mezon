@@ -268,7 +268,7 @@ const RenderContent = memo(
 							}
 						: undefined
 				}
-				className={`${isJumMessageEnabled ? 'whitespace-pre-line hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] flex items-center border' : ''}`}
+				className={`${isJumMessageEnabled ? 'whitespace-pre-line hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] flex items-center' : ''}`}
 			>
 				{content}
 			</div>
