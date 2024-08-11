@@ -51,7 +51,7 @@ const MessageLine = ({
 	}, []);
 	return (
 		<div
-			onClick={!isJumMessageEnabled ? onClickToMessage : () => {}}
+			onClick={isJumMessageEnabled ? onClickToMessage : () => {}}
 			className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} flex flex-row ${isSingleLine ? 'mt-1' : ''} items-center`}
 		>
 			<RenderContent
