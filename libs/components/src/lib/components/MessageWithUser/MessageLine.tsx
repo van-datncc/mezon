@@ -19,12 +19,16 @@ type MessageLineProps = {
 	content?: IExtendedMessage;
 	showOnchannelLayout?: boolean;
 	onClickToMessage?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	isOnlyContainEmoji?: boolean;
+	isSearchMessage?: boolean;
 };
 interface RenderContentProps {
 	data: IExtendedMessage;
 	mode: number;
 	showOnchannelLayout?: boolean;
 	allChannelVoice?: ChannelsEntity[];
+	isOnlyContainEmoji?: boolean;
+	isSearchMessage?: boolean;
 }
 type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
 
@@ -44,7 +48,7 @@ const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILin
 	(element as ILinkVoiceRoomOnMessage).vk !== undefined;
 
 // TODO: refactor component for message lines
-const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }: RenderContentProps) => {
+const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice, isSearchMessage, isOnlyContainEmoji }: RenderContentProps) => {
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 	const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 	let lastindex = 0;
@@ -56,7 +60,12 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 			const e = element.e ?? 0;
 			if (lastindex < s) {
 				formattedContent.push(
-					<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}`} text={t?.slice(lastindex, s) ?? ''} />,
+					<PlainText
+						isSearchMessage={isSearchMessage}
+						showOnchannelLayout={showOnchannelLayout}
+						key={`plain-${lastindex}`}
+						text={t?.slice(lastindex, s) ?? ''}
+					/>,
 				);
 			}
 
@@ -100,7 +109,7 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 						showOnChannelLayOut={showOnchannelLayout}
 						key={`emoji-${index}-${s}-${element.emojiid}`}
 						emojiSyntax={element.shortname ?? ''}
-						onlyEmoji={false}
+						onlyEmoji={isOnlyContainEmoji ?? false}
 						emojiId={element.emojiid ?? ''}
 					/>,
 				);
@@ -132,7 +141,14 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 		});
 
 		if (t && lastindex < t?.length) {
-			formattedContent.push(<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />);
+			formattedContent.push(
+				<PlainText
+					isSearchMessage={isSearchMessage}
+					showOnchannelLayout={showOnchannelLayout}
+					key={`plain-${lastindex}-end`}
+					text={t.slice(lastindex)}
+				/>,
+			);
 		}
 
 		return formattedContent;
@@ -140,17 +156,19 @@ const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }
 	return <div>{content}</div>;
 });
 
-const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: MessageLineProps) => {
+const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage, isOnlyContainEmoji, isSearchMessage }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
 
 	return (
 		<div onClick={!showOnchannelLayout ? onClickToMessage : () => {}} className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}>
 			<RenderContent
+				isOnlyContainEmoji={isOnlyContainEmoji}
 				data={content as IExtendedMessage}
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
 				showOnchannelLayout={showOnchannelLayout}
 				allChannelVoice={allChannelVoice}
+				isSearchMessage={isSearchMessage}
 			/>
 		</div>
 	);

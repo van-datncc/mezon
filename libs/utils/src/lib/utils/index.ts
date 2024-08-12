@@ -227,9 +227,9 @@ export const checkLastChar = (text: string) => {
 };
 
 export const getNameForPrioritize = (clanNickname: string | undefined, displayName: string | undefined, username: string | undefined) => {
-	if (clanNickname) return clanNickname;
-	if (clanNickname === '' && displayName && displayName !== username) return displayName;
-	if (displayName === '' || displayName === username) return username;
+	if (clanNickname && clanNickname !== username) return clanNickname;
+	if (displayName && displayName !== username) return displayName;
+	if (displayName === '' || displayName === username || clanNickname === username) return username;
 };
 
 export const getAvatarForPrioritize = (clanAvatar: string | undefined, userAvatar: string | undefined) => {
@@ -574,3 +574,66 @@ export function addMention(obj: IMessageSendPayload, mentionValue: IMentionOnMes
 
 	return updatedObj;
 }
+
+export function isValidEmojiData(data: IExtendedMessage): boolean | undefined {
+	if (data?.mentions && data.mentions.length !== 0) {
+		return false;
+	}
+
+	const validShortnames = data?.ej?.map((emoji: IEmojiOnMessage) => emoji?.shortname);
+
+	const shortnamesInT = data?.t
+		?.split(' ')
+		?.map((shortname: string) => shortname.trim())
+		?.filter((shortname: string) => shortname);
+
+	return shortnamesInT?.every((name: string) => validShortnames?.includes(name)) && shortnamesInT.join(' ') === data?.t?.trim();
+}
+export const buildLPSArray = (pattern: string): number[] => {
+	const lps = Array(pattern.length).fill(0);
+	let len = 0;
+	let i = 1;
+
+	while (i < pattern.length) {
+		if (pattern[i] === pattern[len]) {
+			len++;
+			lps[i] = len;
+			i++;
+		} else {
+			if (len !== 0) {
+				len = lps[len - 1];
+			} else {
+				lps[i] = 0;
+				i++;
+			}
+		}
+	}
+	return lps;
+};
+
+export const KMPHighlight = (text: string, pattern: string): number[] => {
+	const lps = buildLPSArray(pattern);
+	const matchPositions: number[] = [];
+	let i = 0;
+	let j = 0;
+
+	while (i < text.length) {
+		if (pattern[j] === text[i]) {
+			i++;
+			j++;
+		}
+
+		if (j === pattern.length) {
+			matchPositions.push(i - j);
+			j = lps[j - 1];
+		} else if (i < text.length && pattern[j] !== text[i]) {
+			if (j !== 0) {
+				j = lps[j - 1];
+			} else {
+				i++;
+			}
+		}
+	}
+
+	return matchPositions;
+};
