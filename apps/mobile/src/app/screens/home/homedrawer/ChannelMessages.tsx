@@ -1,7 +1,7 @@
 import { useDeleteMessage } from '@mezon/core';
 import { ActionEmitEvent, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import { useAppSelector } from '@mezon/store';
+import { Colors, useTheme } from '@mezon/mobile-ui';
+import { attachmentActions, useAppSelector } from '@mezon/store';
 import { messagesActions, RootState, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
@@ -10,7 +10,6 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
-import { Flow } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
@@ -29,12 +28,13 @@ const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_I
 
 type ChannelMessagesProps = {
 	channelId: string;
+	clanId: string;
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: ChannelStreamMode;
 };
 
-const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -56,14 +56,12 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
 
 	const loadMoreMessage = React.useCallback(async () => {
-		return await dispatch(messagesActions.loadMoreMessage({ channelId }));
+		await dispatch(messagesActions.loadMoreMessage({ channelId }));
 	}, [dispatch, channelId]);
 
 	const [currentMessageActionType, setCurrentMessageActionType] = useState<EMessageActionType | null>(null);
 
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
-	const [visibleImageModalOverlay, setVisibleImageModalOverlay] = useState<boolean>(false);
-	const [idxSelectedImageModal, setIdxSelectedImageModal] = useAnimatedState<number>(0);
 
 	useEffect(() => {
 		if (flatListRef.current) {
@@ -158,10 +156,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 	const onOpenImage = useCallback(
 		(image: ApiMessageAttachment) => {
 			setImageSelected(image);
-			setIdxSelectedImageModal(0);
 			setVisibleImageModal(true);
+			dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 		},
-		[setIdxSelectedImageModal, setVisibleImageModal],
+		[channelId, clanId, dispatch],
 	);
 
 	const dataReverse = useMemo(() => {
@@ -216,28 +214,6 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		[jumpToRepliedMessage, mode, channelId, channelLabel, onOpenImage, onMessageAction],
 	);
 
-	const onImageModalChange = useCallback(
-		(idx: number) => {
-			setIdxSelectedImageModal(idx);
-		},
-		[setIdxSelectedImageModal],
-	);
-
-	const onImageFooterChange = useCallback(
-		(idx: number) => {
-			setVisibleImageModal(false);
-			setVisibleImageModalOverlay(true);
-			setIdxSelectedImageModal(idx);
-			timeOutRef.current = setTimeout(() => {
-				setVisibleImageModal(true);
-			}, 50);
-			timeOutRef.current = setTimeout(() => {
-				setVisibleImageModalOverlay(false);
-			}, 500);
-		},
-		[setIdxSelectedImageModal, setVisibleImageModal, setVisibleImageModalOverlay],
-	);
-
 	const checkChannelCacheLoading = useMemo(() => {
 		let isCached = false;
 		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
@@ -250,6 +226,10 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 		}
 		return isCached;
 	}, [channelId]);
+
+	const onCloseModalImage = useCallback(() => {
+		setVisibleImageModal(false);
+	}, []);
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -284,22 +264,7 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode }: ChannelMe
 			</View>
 
 			<View>
-				{visibleImageModalOverlay && (
-					<View style={styles.overlay}>
-						<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
-					</View>
-				)}
-
-				{visibleImageModal ? (
-					<ImageListModal
-						visible={visibleImageModal}
-						idxSelected={idxSelectedImageModal}
-						onImageChange={onImageModalChange}
-						onClose={() => setVisibleImageModal(false)}
-						onImageChangeFooter={onImageFooterChange}
-						imageSelected={imageSelected}
-					/>
-				) : null}
+				{visibleImageModal && <ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />}
 
 				<MessageItemBS
 					mode={mode}

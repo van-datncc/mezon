@@ -1,5 +1,11 @@
 import { useAppNavigation, useDirect, useMemberCustomStatus, useOnClickOutside } from '@mezon/core';
-import { notificationActions, selectFriendStatus, selectMemberByUserId, useAppDispatch } from '@mezon/store';
+import {
+	notificationActions, selectCurrentUserId,
+	selectFriendStatus,
+	selectMemberByUserId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
@@ -13,6 +19,7 @@ import Activity from './Activity';
 import MutualFriends from './MutualFriends';
 import MutualServers from './MutualServers';
 import ProfileTabs, { typeTab } from './ProfileTabs';
+import ItemPanel from "../PanelChannel/ItemPanel";
 
 type UserProfileModalInnerProps = {
 	openModal: boolean;
@@ -37,7 +44,11 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	const [color, setColor] = useState<string>('');
 	const { createDirectMessageWithUser } = useDirect();
 	const { toDmGroupPageFromMainApp, navigate } = useAppNavigation();
-
+	const currentUserId = useAppSelector(selectCurrentUserId);
+	const isSelf = currentUserId === userId;
+	const [isOPenEditOption, setIsOPenEditOption] = useState (false);
+	const panelRef = useRef<HTMLDivElement | null>(null);
+	
 	const directMessageWithUser = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
@@ -70,6 +81,13 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	}, [userById?.user?.avatar_url]);
 
 	useOnClickOutside(userProfileRef, () => onClose?.());
+	
+	const handleOpenEditOption = () => {
+		setIsOPenEditOption(!isOPenEditOption)
+	}
+	
+	useOnClickOutside(panelRef, () => setIsOPenEditOption(false));
+	
 	return (
 		<div className="w-[100vw] h-[100vh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center dark:text-contentTertiary text-black">
 			<div
@@ -97,15 +115,36 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 							customStatus={userCustomStatus}
 							styleAvatar="w-[120px] h-[120px] rounded-full"
 						/>
-						<div className="flex items-end pr-4">
-							<button
-								onClick={() => directMessageWithUser(userId || '')}
-								className="flex items-center h-8 px-4 rounded-[3px] dark:bg-buttonProfile bg-buttonMessageHover dark:hover:bg-buttonMessageHover hover:bg-buttonProfile"
-							>
-								<Icons.MessageIcon className="text-bgLightPrimary" />
-								<span className="text-sm text-bgLightPrimary font-semibold">Message</span>
-							</button>
-						</div>
+						{isSelf ?
+							<div className="flex items-end pr-4">
+								<button
+									onClick={handleOpenEditOption}
+									className="relative flex items-center h-8 px-4 rounded-[3px] dark:bg-buttonProfile bg-buttonMessageHover dark:hover:bg-buttonMessageHover hover:bg-buttonProfile"
+								>
+									<Icons.PenEdit className="text-bgLightPrimary" />
+									<span className="text-sm text-bgLightPrimary font-semibold one-line">Edit Profile</span>
+									{isOPenEditOption && (
+										<div
+											ref={panelRef}
+											className={`absolute left-[calc(100%_+_10px)] top-0 dark:bg-bgSearchHover bg-gray-100 rounded-sm shadow w-[165px] p-2 z-[1] mr-2 w-fit shadow-lg`}
+										>
+											<ItemPanel children="Edit Clan Profile"/>
+											<ItemPanel children="Edit Main Profile"/>
+										</div>
+									)}
+								</button>
+							</div>
+							:
+							<div className="flex items-end pr-4">
+								<button
+									onClick={() => directMessageWithUser(userId || '')}
+									className="flex items-center h-8 px-4 rounded-[3px] dark:bg-buttonProfile bg-buttonMessageHover dark:hover:bg-buttonMessageHover hover:bg-buttonProfile"
+								>
+									<Icons.MessageIcon className="text-bgLightPrimary" />
+									<span className="text-sm text-bgLightPrimary font-semibold">Message</span>
+								</button>
+							</div>
+						}
 					</div>
 				</div>
 				<div className="dark:bg-bgProfileBody bg-bgLightPrimary pt-[60px] pb-4 px-4 rounded-b-md w-full flex-1">

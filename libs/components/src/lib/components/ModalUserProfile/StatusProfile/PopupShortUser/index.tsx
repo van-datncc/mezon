@@ -18,14 +18,23 @@ export const PopupFriend = ({ user, showPopupLeft }: { user: ChannelMembersEntit
 	);
 };
 
-export const PopupOption = ({ showPopupLeft }: { showPopupLeft?: boolean }) => {
+type PopupOptionProps = {
+	showPopupLeft?: boolean,
+	isSelf: boolean
+}
+
+export const PopupOption = ({ showPopupLeft, isSelf }: PopupOptionProps) => {
 	return (
 		<div
 			className={`absolute top-0 dark:bg-bgProfileBody bg-gray-100 rounded-sm shadow w-[165px] p-2 z-[1] ${showPopupLeft ? 'right-9' : 'sbm:left-9 right-9'}`}
 		>
 			{!showPopupLeft && <ItemPanel children="View Full Profile" />}
-			<ItemPanel children="Block" danger />
-			<ItemPanel children="Report User Profile" danger />
+			{!isSelf && (
+				<>
+					<ItemPanel children="Block" danger />
+					<ItemPanel children="Report User Profile" danger />
+				</>
+			)}
 		</div>
 	);
 };

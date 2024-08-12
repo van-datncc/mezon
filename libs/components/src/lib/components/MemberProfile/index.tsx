@@ -191,10 +191,10 @@ function MemberProfile({
 						<></>
 					)}
 				</a>
-				<div className="flex flex-col items-start">
+				<div className="flex flex-col items-start h-full">
 					<div
 						ref={subNameRef}
-						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
+						className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
@@ -215,7 +215,7 @@ function MemberProfile({
 						)}
 					</div>
 					{!isHideUserName && (
-						<div>
+						<div className={"h-full flex-col"}>
 							<div 
 								className="flex flex-row items-center w-full overflow-x-hidden" 
 								style={{minWidth: `${minWidthNameMain}px`}}

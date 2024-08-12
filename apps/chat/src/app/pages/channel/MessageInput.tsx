@@ -1,6 +1,6 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { selectAllDirectChannelVoids, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
+import { selectAllHashtagDmVoice, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
 import {
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -101,9 +101,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		return channelDraftMessage.draftMention;
 	}, [channelDraftMessage.draftMention, messageId]);
 
-	const addMentionToContent = addMention(processedContentDraft, processedMentionDraft);
+	const addMentionToContent = useMemo(
+		() => addMention(processedContentDraft, processedMentionDraft),
+		[processedContentDraft, processedMentionDraft],
+	);
 
-	const formatContentDraft = createFormattedString(addMentionToContent);
+	const formatContentDraft = useMemo(() => createFormattedString(addMentionToContent), [addMentionToContent]);
 
 	const handleFocus = () => {
 		if (textareaRef.current) {
@@ -182,7 +185,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
-	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
+	const commonChannelVoids = useSelector(selectAllHashtagDmVoice);
 
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const listChannelVoidsMention: ChannelsMentionProps[] = useMemo(() => {
@@ -244,7 +247,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: (suggestion.username ?? '')
+											: suggestion.username ?? ''
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}

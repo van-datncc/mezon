@@ -56,6 +56,7 @@ export * from './components/LoginForm';
 export * from './components/MessageBox/index';
 export { default as MessageVideo } from './components/MessageWithUser/MessageVideo';
 export { default as SidebarClanItem } from './components/ModalListClans';
+export { default as SidebarTooltip } from './components/ModalListClans/SidebarTooltip';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
 
