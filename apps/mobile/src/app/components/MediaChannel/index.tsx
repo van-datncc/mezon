@@ -1,9 +1,8 @@
-import { Block, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectAttachmentPhoto } from '@mezon/store-mobile';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { Platform, Dimensions, ScrollView, View } from 'react-native';
-import { Flow } from 'react-native-animated-spinkit';
+import { useCallback, useMemo, useState } from 'react';
+import { Dimensions, Platform, ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EmptySearchPage from '../EmptySearchPage';
 import { ImageListModal } from '../ImageListModal';
@@ -16,52 +15,25 @@ const MediaChannel = () => {
 	const attachments = useSelector(selectAttachmentPhoto());
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
-	const [idxSelectedImageModal, setIdxSelectedImageModal] = useAnimatedState<number>(0);
-	const [visibleImageModalOverlay, setVisibleImageModalOverlay] = useState<boolean>(false);
-	const timeOutRef = useRef(null);
 	const widthScreen = Dimensions.get('screen').width;
 	const widthImage = useMemo(() => {
-		return (widthScreen - (size.s_10 * 2 + size.s_6 * 2)) / 3.45;
+		return (widthScreen - (size.s_10 * 2 + size.s_6 * 2)) / (Platform.OS === 'ios' ? 3.45 : 2.9);
 	}, [widthScreen]);
 
 	const openImage = useCallback(
 		(image: ApiMessageAttachment) => {
 			setImageSelected(image);
-			setIdxSelectedImageModal(0);
 			setVisibleImageModal(true);
 		},
-		[setVisibleImageModal, setIdxSelectedImageModal],
+		[setVisibleImageModal],
 	);
 
-	const onImageModalChange = useCallback(
-		(idx: number) => {
-			setIdxSelectedImageModal(idx);
-		},
-		[setIdxSelectedImageModal],
-	);
-
-	const onImageFooterChange = useCallback(
-		(idx: number) => {
-			setVisibleImageModal(false);
-			setVisibleImageModalOverlay(true);
-			setIdxSelectedImageModal(idx);
-			timeOutRef.current = setTimeout(() => {
-				setVisibleImageModal(true);
-			}, 50);
-			timeOutRef.current = setTimeout(() => {
-				setVisibleImageModalOverlay(false);
-			}, 500);
-		},
-		[setIdxSelectedImageModal, setVisibleImageModal, setVisibleImageModalOverlay],
-	);
-
+	const onCloseModalImage = useCallback(() => {
+		setVisibleImageModal(false);
+	}, []);
 	return (
 		<View style={styles.wrapper}>
-			<ScrollView
-				style={{flex: 1}}
-				contentContainerStyle={{ paddingBottom: size.s_50 }}
-				showsVerticalScrollIndicator={false}
-			>
+			<ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: size.s_50 }} showsVerticalScrollIndicator={false}>
 				<View style={styles.container}>
 					{attachments?.length ? (
 						attachments?.map((item, index) => (
@@ -74,21 +46,7 @@ const MediaChannel = () => {
 					)}
 				</View>
 			</ScrollView>
-			{visibleImageModalOverlay && (
-				<View style={styles.overlay}>
-					<Flow size={size.s_34 * 2} color={Colors.bgViolet} />
-				</View>
-			)}
-			{visibleImageModal ? (
-				<ImageListModal
-					visible={visibleImageModal}
-					idxSelected={idxSelectedImageModal}
-					onImageChange={onImageModalChange}
-					onClose={() => setVisibleImageModal(false)}
-					onImageChangeFooter={onImageFooterChange}
-					imageSelected={imageSelected}
-				/>
-			) : null}
+			{visibleImageModal && <ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />}
 		</View>
 	);
 };
