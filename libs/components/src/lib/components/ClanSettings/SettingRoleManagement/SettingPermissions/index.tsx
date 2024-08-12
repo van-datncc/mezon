@@ -68,12 +68,12 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 
 	const isClanOwner = useClanOwner();
 	const hiddenPermissionAdmin = (slug: string) => {
-		return isClanOwner ? false : (slug === SlugPermission.Admin && !hasPermissionEdit);
+		return isClanOwner ? false : (slug === SlugPermission.Admin && hasPermissionEdit);
 	}
 
 
 	return (
-		<div style={{pointerEvents: !hasPermissionEdit ? undefined : 'none'}}>
+		<div>
 			<div className="w-full flex">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded-lg"
@@ -94,7 +94,7 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 									type="checkbox"
 									checked={selectedPermissions.includes(permission.id)}
 									onChange={() => handlePermissionToggle(permission.id)}
-									className="cursor-pointer"
+									className={hasPermissionEdit ? 'cursor-pointer' : 'cursor-not-allowed'}
 									disabled={hiddenPermissionAdmin(permission.slug)}
 								/>
 							</label>

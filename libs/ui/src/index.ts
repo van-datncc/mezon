@@ -1,6 +1,7 @@
 export { default as Button } from './lib/Button';
 export { default as Checkbox } from './lib/Checkbox';
 export * from './lib/GetInforUserFromId/index';
+export { default as HighlightMatch } from './lib/HightlightSearch';
 export * as Icons from './lib/Icons';
 export { default as Image } from './lib/Image';
 export { default as InputField } from './lib/Input';

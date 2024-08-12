@@ -24,11 +24,12 @@ export type ItemEventManagementProps = {
 	event?: EventManagementEntity;
 	createTime?: string;
 	checkUserCreate?: boolean;
+	isReviewEvent?: boolean;
 	setOpenModalDetail?: (status: boolean) => void;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
-	const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, createTime, checkUserCreate, setOpenModalDetail } =
+	const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, createTime, checkUserCreate, isReviewEvent, setOpenModalDetail } =
 		props;
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
@@ -75,7 +76,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		if (checkTimeVoice && checkOptionVoice) {
 			deleteEventManagement(event?.clan_id || '', event?.id || '');
 		}
-		if (checkTimeLocation && checkOptionLocation) {
+		if (checkTimeLocation && checkOptionLocation && !isReviewEvent) {
 			deleteEventManagement(event?.clan_id || '', event?.id || '');
 		}
 	}, []);
