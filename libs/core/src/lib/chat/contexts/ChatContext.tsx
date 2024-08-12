@@ -227,9 +227,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
-			console.log("ClanProfileUpdates: ", ClanProfileUpdates);
-			dispatch(channelMembersActions.updateUserChannel({userId: ClanProfileUpdates.user_id, clanId: ClanProfileUpdates.clan_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
-			dispatch(messagesActions.updateUserMessage({userId: ClanProfileUpdates.user_id, clanId: ClanProfileUpdates.clan_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
+			console.log('ClanProfileUpdates: ', ClanProfileUpdates);
+			dispatch(
+				channelMembersActions.updateUserChannel({
+					userId: ClanProfileUpdates.user_id,
+					clanId: ClanProfileUpdates.clan_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
+			dispatch(
+				messagesActions.updateUserMessage({
+					userId: ClanProfileUpdates.user_id,
+					clanId: ClanProfileUpdates.clan_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
 		},
 		[dispatch],
 	);
