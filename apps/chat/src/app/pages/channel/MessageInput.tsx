@@ -1,6 +1,6 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
 import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { selectAllDirectChannelVoids, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
+import { selectAllHashtagDmVoice, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
 import {
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -50,6 +50,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
 
+	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
+		if (query.length === 0) return;
+		const matches = emojis
+			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.slice(0, 20)
+			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
+		callback(matches);
+	};
+
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
 	const { listChannels } = useChannels();
@@ -92,24 +101,18 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		return channelDraftMessage.draftMention;
 	}, [channelDraftMessage.draftMention, messageId]);
 
-	const addMentionToContent = addMention(processedContentDraft, processedMentionDraft);
+	const addMentionToContent = useMemo(
+		() => addMention(processedContentDraft, processedMentionDraft),
+		[processedContentDraft, processedMentionDraft],
+	);
 
-	const formatContentDraft = createFormattedString(addMentionToContent);
+	const formatContentDraft = useMemo(() => createFormattedString(addMentionToContent), [addMentionToContent]);
 
 	const handleFocus = () => {
 		if (textareaRef.current) {
 			const length = textareaRef.current.value.length;
 			textareaRef.current.setSelectionRange(length, length);
 		}
-	};
-
-	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
-		if (query.length === 0) return;
-		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
-			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.shortname, display: emojiDisplay?.shortname }));
-		callback(matches);
 	};
 
 	useEscapeKey(handleCancelEdit);
@@ -182,7 +185,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
-	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
+	const commonChannelVoids = useSelector(selectAllHashtagDmVoice);
 
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const listChannelVoidsMention: ChannelsMentionProps[] = useMemo(() => {
@@ -244,7 +247,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									subText={
 										suggestion.display === '@here'
 											? 'Notify everyone who has permission to see this channel'
-											: (suggestion.username ?? '')
+											: suggestion.username ?? ''
 									}
 									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 									showAvatar={suggestion.display !== '@here'}
@@ -279,14 +282,20 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					/>
 					<Mention
 						trigger=":"
-						markup="[:__display__]"
+						markup="[__display__](__id__)"
 						data={queryEmojis}
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						renderSuggestion={(suggestion) => (
-							<SuggestItem display={suggestion.display ?? ''} symbol={(suggestion as any).emoji} emojiId="" />
-						)}
+						renderSuggestion={(suggestion) => {
+							return (
+								<SuggestItem
+									display={suggestion.display ?? ''}
+									symbol={(suggestion as any).emoji}
+									emojiId={suggestion.id as string}
+								/>
+							);
+						}}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 						appendSpaceOnAdd={true}
 					/>

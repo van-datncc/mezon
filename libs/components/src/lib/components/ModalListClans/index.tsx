@@ -19,7 +19,7 @@ const SidebarClanItem = ({ option, linkClan }: SidebarClanItemProps) => {
 
       <NavLink to={linkClan} >
 
-        <NavLinkComponent active={currentClanId === option.clan_id} clanName={option.clan_name || ''}>
+        <NavLinkComponent active={currentClanId === option.clan_id}>
           {option.logo ? (
             <Image
               src={option.logo || ''}

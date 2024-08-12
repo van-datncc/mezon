@@ -5,6 +5,7 @@ import {
 	selectCurrentPage,
 	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage,
+	selectValueInputSearchMessage,
 	useAppDispatch,
 } from '@mezon/store';
 import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
@@ -18,6 +19,7 @@ export function useSearchMessages() {
 	const currentPage = useSelector(selectCurrentPage);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannelId as string));
+	const valueSearchMessage = useSelector(selectValueInputSearchMessage(currentChannelId ?? ''));
 
 	const fetchSearchMessages = useCallback(
 		async ({ filters, from, size, sorts }: ApiSearchMessageRequest) => {
@@ -32,7 +34,8 @@ export function useSearchMessages() {
 			messageSearchByChannelId,
 			totalResult,
 			currentPage,
+			valueSearchMessage,
 		}),
-		[fetchSearchMessages, searchMessages, messageSearchByChannelId, totalResult, currentPage],
+		[fetchSearchMessages, searchMessages, messageSearchByChannelId, totalResult, currentPage, valueSearchMessage],
 	);
 }

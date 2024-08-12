@@ -2,6 +2,7 @@ import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-
 import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import {
 	messagesActions,
+	selectCurrentUserId,
 	selectFirstMessageId,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
@@ -9,6 +10,7 @@ import {
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
+	selectMessageByMessageId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotifed,
@@ -49,6 +51,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 
+	const lastMessage = useSelector(selectMessageByMessageId(messages[messages.length - 1]))
+	const currentAccountId = useSelector(selectCurrentUserId)
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
@@ -84,6 +88,12 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 		hasPreviousPage: hasMoreTop,
 	}, loadMoreMessage);
 
+	useEffect(() => {
+		if (lastMessage && lastMessage.sender_id === currentAccountId) {
+			dispatch(messagesActions.setIsJumpingToPresent(true));
+		}
+	}, [lastMessage])
+
 	const messagesView = useMemo(() => {
 		return messages.map((messageId) => {
 			if (firstMessageId === messageId) {
@@ -93,7 +103,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						name={channelLabel}
 						avatarDM={avatarDM}
 						userName={userName}
-						mode={0} />
+						mode={mode} 
+					/>
 				)
 			}
 			return (

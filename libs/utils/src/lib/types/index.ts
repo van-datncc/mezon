@@ -7,8 +7,8 @@ import {
 	ApiChannelMessageHeader,
 	ApiClanDesc,
 	ApiClanProfile,
-	ApiDirectChannelVoice,
 	ApiEventManagement,
+	ApiHashtagDmVoice,
 	ApiInviteUserRes,
 	ApiMessageAttachment,
 	ApiMessageMention,
@@ -25,7 +25,7 @@ import {
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
-	RoleUserListRoleUser,
+	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
@@ -80,7 +80,7 @@ export type IDefaultNotification = ApiNotificationSetting & {
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
 	id: string;
 };
-export type IDirectChannelVoid = ApiDirectChannelVoice & {
+export type IHashtagDmVoice = ApiHashtagDmVoice & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
