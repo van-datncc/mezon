@@ -264,7 +264,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 			</View>
 
 			<View>
-				<ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />
+				{visibleImageModal && <ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />}
 
 				<MessageItemBS
 					mode={mode}

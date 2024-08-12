@@ -46,7 +46,7 @@ const MediaChannel = () => {
 					)}
 				</View>
 			</ScrollView>
-			<ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />
+			{visibleImageModal && <ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />}
 		</View>
 	);
 };
