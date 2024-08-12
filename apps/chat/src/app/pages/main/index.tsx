@@ -5,6 +5,7 @@ import {
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
+	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
@@ -16,6 +17,7 @@ import {
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -128,10 +130,15 @@ function MyApp() {
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
 	
 	const dispatchApp = useAppDispatch();
+	const currentChannel = useSelector(selectCurrentChannel);
 	useEffect(() => {
 		if (currentClanId) {
 			dispatchApp(channelsActions.fetchChannels({ clanId: currentClanId }));
 			dispatchApp(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
+		}
+		if(currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE){
+			const urlVoice = `https://meet.google.com/${currentChannel.meeting_code}`;
+			window.open(urlVoice, '_blank', 'noreferrer');
 		}
 	}, []);
 

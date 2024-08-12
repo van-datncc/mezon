@@ -27,11 +27,6 @@ export default function ChannelIndex() {
 						<ChannelMessages.Skeleton />
 					</div>
 				</div>
-				(
-				{/* <div className="w-[245px] bg-bgSurface  lg:flex hidden text-[#84ADFF]">
-						<MemberList />
-					</div> */}
-				)
 			</div>
 		</div>
 	);

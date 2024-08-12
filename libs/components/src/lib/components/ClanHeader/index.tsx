@@ -7,12 +7,13 @@ import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import ClanSetting from '../ClanSettings';
+import { ItemSetting } from '../ClanSettings/ItemObj';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import SearchModal from '../SearchModal';
 import ModalNotificationSetting from '../notificationSetting';
 import ItemModal from './ItemModal';
-import ModalCreateCategory from './ModalCreateCategory';
 import LeaveClanPopup from './LeaveClanPopup';
+import ModalCreateCategory from './ModalCreateCategory';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -28,6 +29,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const { categorizedChannels } = useCategory();
 	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
 	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));
@@ -87,6 +89,8 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
 	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasChannelManagePermission;
+
+	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
 
 	return (
 		<>
@@ -165,6 +169,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 					onClose={() => {
 						setOpenServerSettings(false);
 					}}
+					initialSetting={hasPermissionChangeFull ? ItemSetting.OVERVIEW : ItemSetting.EMOJI}
 				/>
 			)}
 
