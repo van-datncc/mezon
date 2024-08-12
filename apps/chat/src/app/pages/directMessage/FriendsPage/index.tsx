@@ -1,15 +1,15 @@
 import { Icons } from '@mezon/components';
 import { useFriends, useMenu } from '@mezon/core';
 import {
-  FriendsEntity,
-  RootState,
-  channelsActions,
-  friendsActions,
-  requestAddFriendParam,
-  selectCloseMenu,
-  selectMemberStatus,
-  selectStatusMenu,
-  useAppDispatch,
+	FriendsEntity,
+	RootState,
+	channelsActions,
+	friendsActions,
+	requestAddFriendParam,
+	selectCloseMenu,
+	selectMemberStatus,
+	selectStatusMenu,
+	useAppDispatch,
 } from '@mezon/store';
 import { Button, InputField } from '@mezon/ui';
 import { useEffect, useState } from 'react';
@@ -147,7 +147,7 @@ export default function FriendsPage() {
 				</div>
 			</div>
 			<div className="flex-1 flex w-full h-full">
-				<div className=" flex-1 dark:bg-bgPrimary bg-[#F0F0F0]">
+				<div className=" flex-1 dark:bg-bgPrimary bg-[#F0F0F0] flex flex-col">
 					{!openModalAddFriend && (
 						<>
 							<div className="flex flex-col text-[#AEAEAE] px-8 pt-6">
@@ -166,7 +166,7 @@ export default function FriendsPage() {
 									{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 								</span>
 							</div>
-							<div className='pl-8 overflow-y-auto flex flex-1 pb-8'>
+							<div className='pl-8 overflow-hidden flex flex-1 pb-16'>
 								<FriendList listFriendFilter={listFriendFilter} />
 							</div>
 						</>
