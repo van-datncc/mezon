@@ -66,7 +66,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 		return usersClan.filter((user) => !memberIds.some((userId) => userId === user.id));
 	}, [usersClan, rawMembers, channel.channel_private, userProfile?.user?.id]);
 	
-	const listMembersNotInChannel = useMemo(() => (listUserInvite ? listUserInvite.map((member: any) => ({...member.user, clanNick: member.clan_nick})) : []), [listUserInvite]);
+	const listMembersNotInChannel = useMemo(() => (listUserInvite ? listUserInvite.map((member: any) => ({...member.user, clanNick: member.clan_nick, clanAvatar: member.clan_avatar})) : []), [listUserInvite]);
 
 	const initFilter: filterItemProps = useMemo(
 		() => ({
@@ -143,7 +143,13 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 				});
 				return;
 			}
-			const filteredMembers = listMembersNotInChannel.filter((item) => item?.display_name?.toLowerCase().includes(inputData));
+			const filteredMembers = listMembersNotInChannel.filter((member) => {
+				const clanName = member?.clanNick?.toLowerCase();
+				const displayName = member?.display_name?.toLowerCase();
+				const userName = member?.username?.toLowerCase();
+				const lowerCaseSearchTerm = inputData.toLowerCase();
+				return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
+			});
 			const filteredRoles = listRolesNotAddChannel.filter((item) => item?.title?.toLowerCase().includes(inputData));
 			setFilterItem({
 				listMembersNotInChannel: filteredMembers,

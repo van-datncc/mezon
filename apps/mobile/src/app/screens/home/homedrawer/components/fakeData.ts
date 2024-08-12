@@ -156,28 +156,23 @@ export const friendList: IUser[] = [
 
 export const emojiFakeData: IEmoji[] = [
   {
-    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056577/emojisSvg/People/100_pbdkjg.png",
     "shortname": ":100:",
-    "category": "People"
+    "id": "7227274405304181951"
   },
   {
-    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056577/emojisSvg/People/joy_lusszo.png",
     "shortname": ":joy:",
-    "category": "People"
+    "id": "7227274405302432668"
   },
   {
-    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056578/emojisSvg/People/like_scoptn.png",
     "shortname": ":like:",
-    "category": "People"
+    "id": "7227274405303613492"
   },
   {
-    "src": "https://res.cloudinary.com/drmhzprmb/image/upload/v1717056626/emojisSvg/Custom/da_wourle.png",
-    "shortname": ":da:",
-    "category": "Custom"
+    "shortname": ":laughing:",
+    "id": "7227274405305046042"
   },
   {
-    "src": "https://cdn.mezon.vn/emojis/Custom/pikachu.gif",
-    "shortname": ":pikachu:",
-    "category": "Custom"
+    "shortname": ":innocent:",
+    "id": "7227274405301971870"
   },
 ];

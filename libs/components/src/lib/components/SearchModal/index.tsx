@@ -17,10 +17,10 @@ import {
 	UsersClanEntity,
 	addAttributesSearchList,
 	filterListByName,
-	findDisplayNameByUserId,
+	getAvatarForPrioritize,
 	normalizeString,
 	removeDuplicatesById,
-	sortFilteredList,
+	sortFilteredList
 } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -61,7 +61,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemDM?.usernames ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
-						displayName: findDisplayNameByUserId(itemDM?.user_id?.[0] ?? '', membersInClan),
+						displayName: '',
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
 						typeChat: ChannelType.CHANNEL_TYPE_DM,
 						type: TypeSearch.Dm_Type,
@@ -101,7 +101,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					return {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
-						avatarUser: itemUserClan?.user?.avatar_url ?? '',
+						avatarUser: getAvatarForPrioritize(itemUserClan.clan_avatar, itemUserClan?.user?.avatar_url),
 						displayName: itemUserClan?.user?.display_name ?? '',
 						clanNick: itemUserClan?.clan_nick ?? '',
 						lastSentTimeStamp: '0',
@@ -110,12 +110,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					};
 				})
 			: [];
-
 		const usersClanMap = new Map(listUserClanSearch.map((user) => [user.id, user]));
 		const listSearch = [
 			...listDMSearch.map((itemDM) => {
 				const user = usersClanMap.get(itemDM.id);
-				return user ? { ...itemDM, clanNick: user.clanNick || '' } : itemDM;
+				return user ? { ...itemDM, clanNick: user.clanNick || '', displayName: user.displayName ,avatarUser: user.avatarUser || '' } : itemDM;
 			}),
 			...listGroupSearch,
 			...listFriendsSearch,

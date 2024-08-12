@@ -9,7 +9,7 @@ import {
 	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
-import { ChannelThreads, TypeSearch, UsersClanEntity, addAttributesSearchList, findDisplayNameByUserId, normalizeString, removeDuplicatesById } from '@mezon/utils';
+import { ChannelThreads, TypeSearch, UsersClanEntity, addAttributesSearchList, getAvatarForPrioritize, normalizeString, removeDuplicatesById } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -90,7 +90,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						idDM: itemDM?.id ?? '',
 						typeChat: ChannelType.CHANNEL_TYPE_DM,
 						userName: itemDM?.usernames,
-						displayName: findDisplayNameByUserId(itemDM?.user_id?.[0] ?? '', membersInClan),
+						displayName: '',
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
 						typeSearch: TypeSearch.Dm_Type,
 					};
@@ -117,7 +117,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					return {
 						id: itemUserClan?.id ?? '',
 						name: itemUserClan?.user?.username ?? '',
-						avatarUser: itemUserClan?.user?.avatar_url ?? '',
+						avatarUser: getAvatarForPrioritize(itemUserClan.clan_avatar, itemUserClan?.user?.avatar_url),
 						displayName: itemUserClan?.user?.display_name ?? '',
 						clanNick: itemUserClan?.clan_nick ?? '',
 						lastSentTimeStamp: '0',
@@ -131,7 +131,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		const listSearch = [
 			...listDMSearch.map((itemDM) => {
 				const user = usersClanMap.get(itemDM.id);
-				return user ? { ...itemDM, clanNick: user.clanNick || '' } : itemDM;
+				return user ? { ...itemDM, clanNick: user.clanNick || '', displayName: user.displayName, avatarUser: user.avatarUser || '' } : itemDM;
 			}),
 			...listGroupSearch
 		];

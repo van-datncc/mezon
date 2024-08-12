@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
     container: {
-        backgroundColor: colors.primary,
+        backgroundColor: colors.secondary,
         paddingHorizontal: size.s_18,
         width: Dimensions.get("screen").width,
         paddingBottom: size.s_60
@@ -14,7 +14,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     box: {
-        backgroundColor: colors.secondary,
+        backgroundColor: colors.primary,
         marginTop: 10,
         borderRadius: 15,
         width: "100%"
@@ -25,7 +25,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         padding: 10,
-        backgroundColor: colors.secondary,
+        backgroundColor: colors.primary,
         borderRadius: 15,
         marginBottom: 10
     },

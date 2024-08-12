@@ -19,5 +19,5 @@ export const searchOptions = [
 ];
 
 export const hasKeySearch = (value: string) => {
-	return searchOptions.map((item) => item.title).some((fieldName) => value.includes(fieldName));
+	return searchOptions.map((item) => item.title).some((fieldName) => value?.includes(fieldName));
 };

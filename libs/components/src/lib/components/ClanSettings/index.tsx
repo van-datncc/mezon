@@ -1,4 +1,4 @@
-import { selectCloseMenu, selectCurrentChannel } from '@mezon/store';
+import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import {useEffect, useMemo, useState} from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
@@ -50,7 +50,13 @@ const ClanSetting = (props: ModalSettingProps) => {
         return <SettingSticker />;
     }
   }
-  
+  	const dispatch = useAppDispatch();
+  	const currentClanId = useSelector(selectCurrentClanId) as string;
+	const currentChannelId = useSelector(selectCurrentChannelId) as string;
+	useEffect(()=>{
+		dispatch(fetchWebhooks({ channelId: currentChannelId, clanId: currentClanId }))
+	})
+
 	useEffect(() => {
 		if (currentSettingId === ItemSetting.DELETE_SERVER) {
 			setIsShowDeletePopup(true);

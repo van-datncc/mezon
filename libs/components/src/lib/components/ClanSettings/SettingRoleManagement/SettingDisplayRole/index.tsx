@@ -47,17 +47,17 @@ const SettingDisplayRole = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 	return (
 		<div 
 			className='w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800'
-			style={{pointerEvents: (!hasPermissionEdit) ? undefined : 'none'}}
 		>
 			<div className="text-xs font-bold uppercase mb-2">
 				Role name<b className="text-red-600">*</b>
 			</div>
 			<input
-				className="dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded outline-none"
+				className={`dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded outline-none ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}
 				type="text"
 				value={nameRole}
 				onChange={handleDisplayName}
 				maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
+				disabled={!hasPermissionEdit}
 			/>
 		</div>
 	);

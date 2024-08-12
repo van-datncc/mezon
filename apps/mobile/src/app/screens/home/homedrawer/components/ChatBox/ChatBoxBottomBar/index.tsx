@@ -1,4 +1,4 @@
-import { useEmojiSuggestion, useReference, useThreads } from '@mezon/core';
+import { useReference, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
@@ -6,12 +6,19 @@ import {
 	convertToPlainTextHashtag,
 	getAttachmentUnique,
 	load,
-	mentionHashtagPattern,
 	mentionUserPattern,
 	save,
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
-import { referencesActions, selectAttachmentData, selectChannelsEntities, selectCurrentChannel, useAppDispatch } from '@mezon/store-mobile';
+import {
+	emojiSuggestionActions,
+	referencesActions,
+	selectAttachmentData,
+	selectChannelsEntities,
+	selectCurrentChannel,
+	selectEmojiSuggestion,
+	useAppDispatch,
+} from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -91,7 +98,7 @@ export const ChatBoxBottomBar = memo(
 		const inputRef = useRef<TextInput>();
 		const cursorPositionRef = useRef(0);
 		const currentTextInput = useRef('');
-		const { emojiPicked } = useEmojiSuggestion();
+		const emojiPicked = useSelector(selectEmojiSuggestion);
 		const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 		const { setOpenThreadMessageState } = useReference();
@@ -171,7 +178,14 @@ export const ChatBoxBottomBar = memo(
 			setHashtagsOnMessage([]);
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
-		}, [onDeleteMessageActionNeedToResolve, resetCachedText]);
+			dispatch(
+				emojiSuggestionActions.setSuggestionEmojiObjPicked({
+					shortName: '',
+					id: '',
+					isReset: true,
+				}),
+			);
+		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText]);
 
 		const handleKeyboardBottomSheetMode = useCallback(
 			(mode: IModeKeyboardPicker) => {
@@ -206,8 +220,7 @@ export const ChatBoxBottomBar = memo(
 			};
 
 			const mentionUsers = getMatches(mentionUserPattern);
-			const mentionHashtags = getMatches(mentionHashtagPattern);
-			return { mentionUsers, mentionHashtags };
+			return { mentionUsers };
 		};
 
 		const handleTextInputChange = async (text: string) => {
@@ -218,36 +231,41 @@ export const ChatBoxBottomBar = memo(
 				await onConvertToFiles(text);
 			} else {
 				const convertedHashtag = convertMentionsToText(text);
-
-				const { mentionUsers, mentionHashtags } = findMentionMarkers(convertedHashtag);
+				const words = convertedHashtag.split(' ');
+				const { mentionUsers } = findMentionMarkers(convertedHashtag);
 				let mentionList = [];
-				let hashtagList = [];
+				const hashtagList = [];
 
 				if (mentionUsers?.length) {
 					mentionList = mentionUsers.map((m) => {
 						const mention = listMentions.find((item) => `${item?.display}` === m?.content);
-
-						return {
-							userid: mention.id?.toString() ?? '',
-							username: `@${mention?.display}`,
-							startindex: m?.start,
-							endindex: m?.end,
-						};
+						if (mention) {
+							return {
+								user_id: mention.id?.toString() ?? '',
+								username: `@${mention?.display}`,
+								s: m?.start,
+								e: m?.end,
+							};
+						}
 					});
 				}
 
-				if (mentionHashtags?.length) {
-					hashtagList = mentionHashtags.map((m) => {
-						const channelInfo = getChannelById(m?.content);
+				words.forEach((word) => {
+					if (word.startsWith('<#') && word.endsWith('>')) {
+						const channelId = word.slice(2, -1);
+						const channelInfo = getChannelById(channelId);
+						if (channelInfo) {
+							const startindex = convertedHashtag.indexOf(word);
+							hashtagList.push({
+								channelid: channelInfo.id.toString() ?? '',
+								channellabel: channelInfo.channel_label ?? '',
+								s: startindex,
+								e: startindex + word.length,
+							});
+						}
+					}
+				});
 
-						return {
-							channelid: channelInfo.id.toString() ?? '',
-							channellabel: channelInfo.channel_label ?? '',
-							startindex: m.start,
-							endindex: m.end,
-						};
-					});
-				}
 				setHashtagsOnMessage(hashtagList);
 				setMentionsOnMessage(mentionList);
 				setMentionTextValue(text);
@@ -321,7 +339,7 @@ export const ChatBoxBottomBar = memo(
 					if (!client || !session || !currentChannel.channel_id) {
 						console.log('Client is not initialized');
 					}
-					handleUploadFileMobile(client, session, fileTxtSaved.name, fileTxtSaved)
+					handleUploadFileMobile(client, session, currentChannel.clan_id, currentChannel.channel_id, fileTxtSaved.name, fileTxtSaved)
 						.then((attachment) => {
 							handleFinishUpload(attachment);
 							return 'handled';

@@ -1,4 +1,4 @@
-import { Icons, pushAttachmentToCache } from '@mezon/mobile-components';
+import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions } from '@mezon/store';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -89,9 +89,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		}
 
 		const promises = Array.from(files).map((file: IFile | any) => {
-			const ms = new Date().getTime();
-			const fullFilename = `${currentClanId}/${currentChannelId}/${ms}`.replace(/-/g, '_') + '/' + file.name;
-			return handleUploadFileMobile(client, session, fullFilename, file);
+			return handleUploadFileMobile(client, session, currentClanId, currentChannelId, file.name, file);
 		});
 
 		Promise.all(promises).then((attachments) => {
@@ -107,7 +105,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					attachments: [attachment],
 				}),
 			);
-			pushAttachmentToCache(attachment, currentChannelId);
 		},
 		[currentChannelId, dispatch],
 	);
