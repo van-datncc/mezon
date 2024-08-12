@@ -161,7 +161,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			try {
 				const tagName = mentionedUser?.slice(1);
 				const clanUser = usersClan?.find((userClan) => tagName === userClan?.user?.username);
-        const isRoleMention = rolesInClan?.some((role) => tagName === role?.title)
+        const isRoleMention = rolesInClan?.some((role) => tagName === role?.id)
 				if (!mentionedUser || tagName === 'here' || isRoleMention) return;
 				onMessageAction({
 					type: EMessageBSToShow.UserInformation,

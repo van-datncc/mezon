@@ -1,14 +1,13 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { selectnotificatonSelected } from '@mezon/store-mobile';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
-import { useSelector } from 'react-redux';
 import { IMezonMenuSectionProps, MezonMenu, reserve } from '../../../temp-ui';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import { style } from './MuteClanNotificationBS.styles';
+import { useState } from 'react';
 
 type MuteClanNotificationBSProps = {
 	onChangeScheduleMute?: (duration: number) => void;
@@ -20,7 +19,7 @@ const MuteClanNotificationBS = ({ onChangeScheduleMute, currentChannel, descript
 	const styles = style(themeValue);
 	const bottomSheetDetail = useRef<BottomSheetModal>(null);
 	const { t } = useTranslation(['notificationSetting','clanNotificationsSetting']);
-	const getNotificationChannelSelected = useSelector(selectnotificatonSelected);
+  const [isMute, setIsMute] = useState<boolean>(false);
 
 	const menu = useMemo(
 		() =>
@@ -80,7 +79,7 @@ const MuteClanNotificationBS = ({ onChangeScheduleMute, currentChannel, descript
 				<TouchableOpacity onPress={handleMuteChannel} style={styles.wrapperUnmuteBox}>
 					<Icons.BellSlashIcon width={20} height={20} style={{ marginRight: 20 }} color={themeValue.text} />
 					<Text style={styles.option}>
-						{`${getNotificationChannelSelected?.active === 1 ? 'Mute' : 'Unmute'} #${currentChannel?.channel_category_label || currentChannel?.label || ''}`}
+						{`${ isMute ? 'Mute' : 'Unmute'} #${currentChannel?.channel_category_label || currentChannel?.label || ''}`}
 					</Text>
 				</TouchableOpacity>
 			</Block>
