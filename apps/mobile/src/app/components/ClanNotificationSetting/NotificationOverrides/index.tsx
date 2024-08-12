@@ -70,7 +70,7 @@ const NotificationOverrides = () => {
 					</Block>
 				</Block>
 				<ScrollView>
-					{filteredOptions?.length
+					{(filteredOptions?.length > 0)
 						? filteredOptions?.map((item) => (
 								<CategoryChannelItem
 									categoryLabel={item?.label}

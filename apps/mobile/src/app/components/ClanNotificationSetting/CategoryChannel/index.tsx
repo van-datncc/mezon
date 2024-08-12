@@ -25,7 +25,7 @@ const CategoryChannel = React.memo(() => {
 
 	return (
 		<Block borderRadius={size.s_14} overflow="hidden">
-			{sortedChannelCategorySettings?.length
+			{(sortedChannelCategorySettings?.length > 0)
 				? sortedChannelCategorySettings?.map((item) => (
 						<CategoryChannelItem
 							categoryLabel={item?.channel_category_label}

@@ -10,6 +10,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './CategoryChannelItem.styles';
+import { useCallback } from 'react';
 
 
 const CategoryChannelItem = React.memo(
@@ -32,14 +33,14 @@ const CategoryChannelItem = React.memo(
 			return channelCategorySettings?.find((item) => item?.id === categoryChannelId);
 		}, [categoryChannelId, channelCategorySettings]);
 
-		const navigateToNotificationDetail = () => {
+		const navigateToNotificationDetail = useCallback(() => {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
 				screen: APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING_DETAIL,
 				params: {
 					notifyChannelCategorySetting: dataNotificationsSetting || data,
 				},
 			});
-		};
+		},[])
 
 		return (
 			<TouchableOpacity onPress={navigateToNotificationDetail} style={{ ...styles.categoryItem, ...stylesItem }}>
