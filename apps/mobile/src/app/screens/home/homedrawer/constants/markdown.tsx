@@ -391,6 +391,10 @@ export const RenderTextMarkdownContent = React.memo(
 				style={{ ...(themeValue ? (markdownStyles(themeValue) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
 				rules={renderRulesCustom}
 				onLinkPress={(url) => {
+          if (url.startsWith(TYPE_MENTION.userRoleMention)) {
+						onMention && onMention(url.replace('@role', '@'));
+						return false;
+					}
 					if (url.startsWith(TYPE_MENTION.userMention)) {
 						onMention && onMention(url);
 						return false;

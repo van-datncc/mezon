@@ -43,6 +43,10 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		dismiss();
 	};
 
+  const handelOpenNotifications = () => {
+    navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING });
+		dismiss();
+  }
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
@@ -172,7 +176,7 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 					<MezonButtonIcon
 						title={t('actions.notifications')}
 						icon={<Icons.BellIcon color={themeValue.textStrong} />}
-						onPress={() => reserve()}
+						onPress={handelOpenNotifications}
 					/>
 
 					{isClanOwner && (

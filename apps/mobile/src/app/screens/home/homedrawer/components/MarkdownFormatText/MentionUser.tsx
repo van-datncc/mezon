@@ -28,7 +28,7 @@ export const MentionUser = ({ tagName, tagUserId, mode, usersClan, usersInChanne
 
   const roleMentionUser = roleList?.find((role) => `@${role.roleName}` === tagName);
   if(roleMentionUser) {
-    return `[@${roleMentionUser?.roleName}](@role${roleMentionUser?.roleId})`;
+    return `[@${roleMentionUser?.roleName}](@role${roleMentionUser?.roleName})`;
   }
 
 	if (tagName === '@here') {
