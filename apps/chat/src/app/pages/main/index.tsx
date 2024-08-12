@@ -187,16 +187,17 @@ function MyApp() {
 					})}
 
 				</div>
-
-				<SidebarTooltip titleTooltip='Add Clan'>
-					<NavLinkComponent>
-						<div className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group" onClick={openCreateClanModal}>
-							<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-								<p className="text-2xl font-bold text-[#155EEF]">+</p>
+				<div className='mt-3'>
+					<SidebarTooltip titleTooltip='Add Clan'>
+						<NavLinkComponent>
+							<div className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group" onClick={openCreateClanModal}>
+								<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
+									<p className="text-2xl font-bold text-[#155EEF]">+</p>
+								</div>
 							</div>
-						</div>
-					</NavLinkComponent>
-				</SidebarTooltip>
+						</NavLinkComponent>
+					</SidebarTooltip>
+				</div>
 			</div>
 			<MainContent />
 		</div>
