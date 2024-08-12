@@ -181,7 +181,7 @@ function MyApp() {
 					{clans.map((clan: IClan) => {
 						return (
 							<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
-								<SidebarClanItem linkClan={`/chat/clans/${clan.id}`} option={clan} />
+								<SidebarClanItem linkClan={`/chat/clans/${clan.id}`} option={clan} active={!pathName.includes('direct') && currentClanId === clan.clan_id} />
 							</SidebarTooltip>
 						)
 					})}
