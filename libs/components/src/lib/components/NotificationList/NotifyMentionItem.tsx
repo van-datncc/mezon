@@ -8,7 +8,6 @@ import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageAttachment from '../MessageWithUser/MessageAttachment';
 import MessageHead from '../MessageWithUser/MessageHead';
 import MessageLine from '../MessageWithUser/MessageLine';
-import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
 import { useMessageParser } from '../MessageWithUser/useMessageParser';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
@@ -19,11 +18,11 @@ function convertContentToObject(notify: any) {
 		try {
 			const parsedContent = {
 				...notify.content,
-				content: JSON.parse(notify.content.content),
-				mentions: JSON.parse(notify.content.mentions),
-				reactions: JSON.parse(notify.content.reactions),
-				references: JSON.parse(notify.content.references),
-				attachments: JSON.parse(notify.content.attachments),
+				content: notify.content.content ? JSON.parse(notify.content.content) : null,
+				mentions: notify.content.mentions ? JSON.parse(notify.content.mentions) : null,
+				reactions: notify.content.reactions ? JSON.parse(notify.content.reactions) : null,
+				references: notify.content.references ? JSON.parse(notify.content.references) : null,
+				attachments: notify.content.attachments ? JSON.parse(notify.content.attachments) : null,
 			};
 
 			return {
@@ -87,7 +86,7 @@ interface IMentionTabContent {
 }
 
 function MentionTabContent({ message }: IMentionTabContent) {
-	const { username } = useMessageParser(message);
+	const { username, contentUpdatedMention } = useMessageParser(message);
 
 	const checkMessageHasReply = useMemo(() => {
 		return message.references && message.references?.length > 0;
@@ -97,7 +96,7 @@ function MentionTabContent({ message }: IMentionTabContent) {
 		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
 			{checkMessageHasReply && (
 				<div className="max-w-full overflow-hidden">
-					<MessageReply message={message} />
+					<MessageLine isTokenClickAble={false} content={contentUpdatedMention} isJumMessageEnabled={false} isSingleLine={true} />
 				</div>
 			)}
 
@@ -106,7 +105,7 @@ function MentionTabContent({ message }: IMentionTabContent) {
 
 				<div className="h-full">
 					<MessageHead message={message} isCombine={true} isShowFull={true} />
-					<MessageLine content={message.content} />
+					<MessageLine content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} isSingleLine={false} />
 					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
 				</div>
 			</div>
