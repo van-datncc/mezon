@@ -17,7 +17,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Direction_Mode } from '@mezon/utils';
+import { Direction_Mode, sleep } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -69,20 +69,27 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 			cb();
 		}
 
+
 		if (direction === ELoadMoreDirection.bottom) {
-			return dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
+			await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.AFTER_TIMESTAMP }));
 		}
 
-		return dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.BEFORE_TIMESTAMP }));
+		await dispatch(messagesActions.loadMoreMessage({ channelId, direction: Direction_Mode.BEFORE_TIMESTAMP }));
+
 	}, [dispatch, channelId, hasMoreTop, hasMoreBottom, isFetching]);
+
+
+	const chatRefData = useMemo(() => {
+		return {
+			data: messages,
+			hasNextPage: hasMoreBottom,
+			hasPreviousPage: hasMoreTop,
+		};
+	}, [messages, hasMoreBottom, hasMoreTop]);
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
-	const chatScrollRef = useChatScroll(chatRef, {
-		data: messages,
-		hasNextPage: hasMoreBottom,
-		hasPreviousPage: hasMoreTop,
-	}, loadMoreMessage);
+	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage, chatRefOptions);
 
 	const messagesView = useMemo(() => {
 		return messages.map((messageId) => {
