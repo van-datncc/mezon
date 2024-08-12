@@ -1,17 +1,16 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useReference, useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
 import { style } from './styles';
 
 interface IChannelMenuProps {
@@ -201,7 +200,11 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<View style={styles.avatarWrapper}>
-					<FastImage source={{ uri: currentClan?.logo }} style={{ width: '100%', height: '100%' }} />
+					<MezonClanAvatar
+						alt={currentClan?.clan_name}
+						image={currentClan?.logo}
+						defaultColor={baseColor.blurple}
+					/>
 				</View>
 				<Text style={styles.serverName}>{channel?.channel_label}</Text>
 			</View>
