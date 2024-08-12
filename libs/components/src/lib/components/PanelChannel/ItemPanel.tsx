@@ -12,11 +12,10 @@ type ItemPanelProps = {
   defaultChecked?: boolean;
   checked?: boolean;
   name?: string;
-  muteTime?: string;
-  defaultNotifiName?: string;
+	subText?: string;
 };
 
-const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, defaultNotifi, defaultChecked, checked, name, muteTime, defaultNotifiName}: ItemPanelProps) => {
+const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, defaultNotifi, defaultChecked, checked, name, subText}: ItemPanelProps) => {
 	return (
 		<button
 			onClick={onClick}
@@ -32,8 +31,7 @@ const ItemPanel = ({ children, dropdown, type, danger, onClick, notificationId, 
         {type === 'checkbox' && <Checkbox id="accept" checked={checked} defaultChecked={defaultChecked} readOnly/>}
         {type === 'radio' && <Radio className="" name={name} value="change here" checked={checked} readOnly/>}
       </div>
-      {defaultNotifi && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{defaultNotifiName}</div>}
-      {muteTime != '' && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{muteTime}</div>}
+      {subText && <div className="text-[12px] text-[#B5BAC1] ml-[10px]">{subText}</div>}
     </button>
 	);
 };

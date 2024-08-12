@@ -11,11 +11,12 @@ import {
 import {
 	ChannelsEntity,
 	channelUsersActions,
+	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
-	selectAllDirectChannelVoids,
+	selectAllHashtagDmVoice,
 	selectAllRolesClan,
 	selectAllUsesClan,
 	selectAttachmentData,
@@ -129,7 +130,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelVoids = useSelector(selectAllDirectChannelVoids);
+	const commonChannelVoids = useSelector(selectAllHashtagDmVoice);
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -143,6 +144,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const usersClan = useSelector(selectAllUsesClan);
 	const { emojis } = useEmojiSuggestion();
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
+
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isFocused = useSelector(selectIsFocused);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
@@ -338,6 +340,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
+			dispatch(
+				emojiSuggestionActions.setSuggestionEmojiObjPicked({
+					shortName: '',
+					id: '',
+					isReset: true,
+				}),
+			);
 		},
 		[
 			valueTextInput,
@@ -430,10 +439,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const input = document.querySelector('#editorReactMention') as HTMLElement;
 	function handleEventAfterEmojiPicked() {
-		if (!emojiPicked || !input) {
+		const isEmptyEmojiPicked = emojiPicked && Object.keys(emojiPicked).length === 1 && emojiPicked[''] === '';
+
+		if (isEmptyEmojiPicked || !input) {
 			return;
+		} else if (emojiPicked) {
+			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
+				textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})`);
+			}
 		}
-		textFieldEdit.insert(input, `[:${emojiPicked}]`);
 	}
 
 	const clickUpToEditMessage = () => {
@@ -479,7 +493,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (closeMenu && statusMenu) {
 			return;
 		}
-		if ((getRefMessageReply !== null && openReplyMessageState) || !openEditMessageState || (emojiPicked !== '' && !reactionRightState)) {
+		if (
+			(getRefMessageReply !== null && openReplyMessageState) ||
+			!openEditMessageState ||
+			(emojiPicked?.shortName !== '' && !reactionRightState)
+		) {
 			return focusToElement(editorRef);
 		}
 	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
@@ -511,7 +529,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
-		if (currentChannelId !== undefined || currentDmGroupId !== undefined) {
+		if ((currentChannelId !== undefined || currentDmGroupId !== undefined) && !closeMenu) {
 			focusToElement(editorRef);
 		}
 	}, [currentChannelId, currentDmGroupId]);
@@ -667,7 +685,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				/>
 				<Mention
 					trigger=":"
-					markup="[:__display__](__id__)"
+					markup="[__display__](__id__)"
 					data={queryEmojis}
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;

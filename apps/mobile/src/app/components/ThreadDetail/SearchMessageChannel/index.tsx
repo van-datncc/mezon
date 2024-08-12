@@ -170,7 +170,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 			<Block backgroundColor={themeValue.secondary} width={'100%'} height={'100%'}>
 				<InputSearchMessageChannel openSearchChannelFrom={openSearchChannelFrom} onChangeText={handleSearchText} />
 				<AssetsHeader pageID={pageID} onChange={handelHeaderTabChange} tabList={TabList} />
-				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref}>
+				<ScrollView horizontal pagingEnabled onScroll={handleScroll} ref={ref} scrollEventThrottle={100}>
 					<MembersSearchTab listMemberSearch={listMemberSearch} />
 					<ChannelsSearchTab listChannelSearch={listChannelSearch} />
 				</ScrollView>

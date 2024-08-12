@@ -148,6 +148,7 @@ const HomeDefault = React.memo((props: any) => {
 				<View style={styles.channelView}>
 					<ChannelMessages
 						channelId={currentChannel?.channel_id}
+						clanId={currentChannel?.clan_id}
 						channelLabel={currentChannel?.channel_label}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>

@@ -197,9 +197,9 @@ export const getEmojiSuggestionState = (rootState: { [EMOJI_SUGGESTION_FEATURE_K
 
 export const selectAllEmojiSuggestion = createSelector(getEmojiSuggestionState, selectAll);
 
-export const selectEmojiSuggestionEntities = createSelector(getEmojiSuggestionState, selectEntities);
-
 export const selectEmojiSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiPicked);
+
+export const selectEmojiSuggestionEntities = createSelector(getEmojiSuggestionState, selectEntities);
 
 export const selectEmojiListStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiSuggestionListStatus);
 

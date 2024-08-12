@@ -227,7 +227,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
               <ItemPanel
                 children={nameChildren}
                 onClick={() => muteOrUnMuteChannel(1)}
-                muteTime={mutedUntil}
+                subText={mutedUntil}
               />
             )}
 						
@@ -250,7 +250,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
                   name="NotificationSetting"
                   defaultNotifi={true}
                   checked={getNotificationChannelSelected?.notification_setting_type === undefined}
-                  defaultNotifiName={defaultNotifiName}
+                  subText={defaultNotifiName}
                   onClick={() => setNotification(0)}
                 />
                 {notificationTypesList.map(notification => (

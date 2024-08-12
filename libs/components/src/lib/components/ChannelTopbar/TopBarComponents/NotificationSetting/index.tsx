@@ -131,7 +131,7 @@ const NotificationSetting = () => {
 								<div>
 									<ItemPanel
 										children={nameChildren}
-										muteTime={mutedUntil}
+										subText={mutedUntil}
 										dropdown="change here"
 										onClick={() => muteOrUnMuteChannel(0)}
 									/>
@@ -151,7 +151,7 @@ const NotificationSetting = () => {
 					) : (
 						<ItemPanel
 							children={nameChildren}
-							muteTime={mutedUntil}
+							subText={mutedUntil}
 							onClick={() => muteOrUnMuteChannel(1)}
 						/>
 					)}
@@ -171,7 +171,7 @@ const NotificationSetting = () => {
           name="NotificationSetting"
           defaultNotifi={true}
           checked={getNotificationChannelSelected?.notification_setting_type === undefined}
-          defaultNotifiName={defaultNotifiName}
+          subText={defaultNotifiName}
           onClick={() => setNotification(0)}
         />
         {notificationTypesList.map(notification => (
