@@ -21,7 +21,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingl
 				window.open(url, '_blank');
 			}
 		},
-		[isSingleLine],
+		[isSingleLine, isTokenClickAble],
 	);
 
 	const classes = clx(
@@ -48,6 +48,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingl
 									color: 'rgb(59,130,246)',
 									cursor: isSingleLine || !isTokenClickAble ? 'text' : 'pointer',
 									wordBreak: 'break-word',
+									textDecoration: isSingleLine || !isTokenClickAble ? 'none' : 'underline',
 								}}
 								className="tagLink"
 							>
