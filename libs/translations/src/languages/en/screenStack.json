@@ -8,7 +8,8 @@
         "serverRoles": "Clan Roles"
     },
     "menuChannelStack": {
-        "channelSetting": "Channel Settings"
+        "channelSetting": "Channel Settings",
+        "threadSetting": "Thread Settings"
     },
     "settingStack": {
         "settings": "Settings",

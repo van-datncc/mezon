@@ -8,7 +8,8 @@
         "serverRoles": "Vai Trò Clan"
     },
     "menuChannelStack": {
-        "channelSetting": "Cài đặt Channel"
+        "channelSetting": "Cài đặt Channel",
+        "threadSetting": "Cài đặt Thread"
     },
     "settingStack": {
         "settings": "Cài đặt",

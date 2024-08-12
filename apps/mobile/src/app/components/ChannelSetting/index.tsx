@@ -24,8 +24,9 @@ type ScreenChannelSetting = typeof APP_SCREEN.MENU_CHANNEL.SETTINGS;
 export default function ChannelSetting({ navigation, route }: MenuChannelScreenProps<ScreenChannelSetting>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { channelId } = route.params;
+	const { channelId, isChannel } = route.params;
 	const { t } = useTranslation(['channelSetting']);
+	const { t: t1 } = useTranslation(['screenStack']);
 	const dispatch = useAppDispatch();
 	const channel = useSelector(selectChannelById(channelId || ''));
 	const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
@@ -42,6 +43,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 	}, [originSettingValue, currentSettingValue]);
 
 	navigation.setOptions({
+		headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
 		headerRight: () => (
 			<Pressable onPress={() => handleSaveChannelSetting()}>
 				<Text style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}>{t('confirm.save')}</Text>
@@ -85,9 +87,10 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 		() =>
 			[
 				{
-					title: t('fields.channelCategory.title'),
+					title: isChannel ? t('fields.channelCategory.title') : t('fields.ThreadCategory.title'),
 					expandable: true,
 					icon: <FolderPlusIcon color={themeValue.text} />,
+					isShow: isChannel
 				},
 			] satisfies IMezonMenuItemProps[],
 		[],
@@ -100,6 +103,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					title: t('fields.channelPermission.permission'),
 					expandable: true,
 					icon: <UserShieldIcon color={themeValue.text} />,
+					isShow: isChannel
 				},
 			] satisfies IMezonMenuItemProps[],
 		[],
@@ -134,6 +138,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					title: t('fields.channelWebhooks.webhook'),
 					expandable: true,
 					icon: <WebhookIcon color={themeValue.text} />,
+					isShow: isChannel
 				},
 			] satisfies IMezonMenuItemProps[],
 		[],
@@ -143,7 +148,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 		() =>
 			[
 				{
-					title: t('fields.channelDelete.delete'),
+					title: isChannel ? t('fields.channelDelete.delete') : t('fields.threadDelete.delete'),
 					textStyle: { color: 'red' },
 					onPress: () => handlePressDeleteChannel(),
 					icon: <TrashIcon color="red" />,
@@ -288,12 +293,12 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 					onTextChange={(text) => handleUpdateValue({ channelName: text })}
 				/>
 
-				<MezonInput
+				{isChannel && <MezonInput
 					label={t('fields.channelDescription.title')}
 					value={currentSettingValue.channelTopic}
 					onTextChange={(text) => handleUpdateValue({ channelTopic: text })}
 					textarea
-				/>
+				/>}
 			</View>
 
 			<MezonMenu menu={topMenu} />
