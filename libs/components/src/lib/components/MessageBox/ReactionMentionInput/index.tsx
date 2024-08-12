@@ -179,10 +179,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
+		const seenIds = new Set();
 		const matches = emojis
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.filter((emoji) => {
+				if (emoji.id && !seenIds.has(emoji.id)) {
+					seenIds.add(emoji.id);
+					return true;
+				}
+				return false;
+			})
 			.slice(0, 20)
 			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
+
 		callback(matches);
 	};
 
