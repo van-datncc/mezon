@@ -37,8 +37,9 @@ interface IMezonImagePickerProps {
 		left?: number;
 		right?: number;
 		bottom?: number;
-	},
+	};
 	noDefaultText?: boolean;
+	disabled?: boolean;
 }
 
 const scale = 5;
@@ -59,9 +60,10 @@ export default memo(function MezonImagePicker({
 		bottom: undefined,
 		top: -7,
 		left: undefined,
-		right: -7
+		right: -7,
 	},
-	noDefaultText
+	noDefaultText,
+	disabled
 }: IMezonImagePickerProps) {
 	const { themeValue } = useTheme();
 	const styles = _style(themeValue);
@@ -71,8 +73,8 @@ export default memo(function MezonImagePicker({
 	const timerRef = useRef<any>(null);
 
 	useEffect(() => {
-		setImage(defaultValue)
-	}, [defaultValue])
+		setImage(defaultValue);
+	}, [defaultValue]);
 
 	useEffect(() => {
 		return () => {
@@ -84,7 +86,7 @@ export default memo(function MezonImagePicker({
 		const response = await launchImageLibrary({
 			mediaType: 'photo',
 			includeBase64: true,
-			quality: 1
+			quality: 1,
 		});
 
 		if (response.didCancel) {
@@ -110,9 +112,7 @@ export default memo(function MezonImagePicker({
 		if (!file || !client || !session) {
 			throw new Error('Client is not initialized');
 		}
-		const ms = new Date().getTime();
-		const fullFilename = `${currentChannel?.clan_id}/${currentChannel?.channel_id}/${ms}`.replace(/-/g, '_') + '/' + file.name;
-		const res = await handleUploadFileMobile(client, session, fullFilename, file);
+		const res = await handleUploadFileMobile(client, session, currentChannel?.clan_id, currentChannel?.channel_id, file.name, file);
 		return res.url;
 	}
 
@@ -151,24 +151,26 @@ export default memo(function MezonImagePicker({
 	}
 
 	return (
-		<TouchableOpacity onPress={() => handleImage()}>
+		<TouchableOpacity onPress={() => handleImage()} disabled={disabled}>
 			<View style={styles.bannerContainer}>
 				<View style={[styles.bannerWrapper, { height, width }, rounded && { borderRadius: 999 }, style]}>
 					{image || !showHelpText ? (
-						<MezonClanAvatar
-							image={image}
-							alt={alt}
-							defaultColor={defaultColor}
-							noDefaultText={noDefaultText}
-						/>
+						<MezonClanAvatar image={image} alt={alt} defaultColor={defaultColor} noDefaultText={noDefaultText} />
 					) : (
 						<Text style={styles.textPlaceholder}>Choose an image</Text>
 					)}
 				</View>
 
-				<View style={[styles.btnWrapper, penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right }]}>
-					<Icons.PencilIcon height={12} width={12} color={themeValue.text} />
-				</View>
+				{!disabled && (
+					<View
+						style={[
+							styles.btnWrapper,
+							penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right },
+						]}
+					>
+						<Icons.PencilIcon height={12} width={12} color={themeValue.text} />
+					</View>
+				)}
 			</View>
 		</TouchableOpacity>
 	);

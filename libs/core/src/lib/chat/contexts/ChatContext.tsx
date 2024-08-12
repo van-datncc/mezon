@@ -30,6 +30,7 @@ import {
 	ChannelPresenceEvent,
 	ChannelType,
 	ChannelUpdatedEvent,
+	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	LastPinMessageEvent,
 	MessageReactionEvent,
@@ -194,7 +195,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 	const onuserclanremoved = useCallback(
 		(user: UserClanRemovedEvent) => {
-			const userID = user.user_ids.find((userID: any) => userID === userId);
+			const userID = user?.user_ids.find((userID: any) => userID === userId);
 			if (userID) {
 				if (clanId === user.clan_id) {
 					navigate(`/chat/direct/friends`);
@@ -223,6 +224,30 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[userId, dispatch],
 	);
+
+	const onclanprofileupdated = useCallback(
+		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
+			console.log('ClanProfileUpdates: ', ClanProfileUpdates);
+			dispatch(
+				channelMembersActions.updateUserChannel({
+					userId: ClanProfileUpdates.user_id,
+					clanId: ClanProfileUpdates.clan_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
+			dispatch(
+				messagesActions.updateUserMessage({
+					userId: ClanProfileUpdates.user_id,
+					clanId: ClanProfileUpdates.clan_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
+		},
+		[dispatch],
+	);
+
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
 			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent.user_id, customStatus: statusEvent.status }));
@@ -334,6 +359,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onuserchanneladded = onuserchanneladded;
 
+			socket.onclanprofileupdated = onclanprofileupdated;
+
 			socket.oncustomstatus = oncustomstatus;
 
 			socket.onstatuspresence = onstatuspresence;
@@ -361,6 +388,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onuserchannelremoved,
 			onuserclanremoved,
 			onuserchanneladded,
+			onclanprofileupdated,
 			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
@@ -412,6 +440,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserchanneladded = () => { };
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onclanprofileupdated = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -424,6 +454,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onuserchannelremoved,
 		onuserclanremoved,
 		onuserchanneladded,
+		onclanprofileupdated,
 		oncustomstatus,
 		onstatuspresence,
 		socketRef,

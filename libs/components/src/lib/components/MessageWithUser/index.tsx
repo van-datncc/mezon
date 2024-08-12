@@ -1,12 +1,5 @@
 import { useAuth, useChatMessages } from '@mezon/core';
-import {
-	MessagesEntity,
-	selectCurrentChannelId,
-	selectCurrentUserId,
-	selectIdMessageRefReply,
-	selectIdMessageToJump,
-	selectOpenReplyMessageState,
-} from '@mezon/store';
+import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import classNames from 'classnames';
 import React, { useMemo, useRef } from 'react';
@@ -65,14 +58,14 @@ function MessageWithUser({
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
-	const currentUserId = useSelector(selectCurrentUserId);
 
 	const hasIncludeMention = useMemo(() => {
-		const userMention = `@[${userLogin.userProfile?.user?.username}]`;
-		const includesHere = message.content.t?.includes('@[here]');
-		const includesUser = message.content.t?.includes(userMention);
+		const userIdMention = userLogin.userProfile?.user?.id;
+		const mentionOnMessage = message.mentions;
+		const includesHere = message.content.t?.includes('@here');
+		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
 		return includesHere || includesUser;
-	}, [message.content.t, userLogin.userProfile?.user?.username]);
+	}, [message.content.t, userLogin.userProfile?.user?.id, message.mentions]);
 
 	const checkReferences = message.references?.length !== 0;
 	const shouldShowDateDivider = useMemo(() => {
@@ -111,7 +104,6 @@ function MessageWithUser({
 	);
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
-
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -134,6 +126,7 @@ function MessageWithUser({
 												isSending={message.isSending}
 												isError={message.isError}
 												mode={mode}
+												isSearchMessage={isSearchMessage}
 											/>
 										)}
 										<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />

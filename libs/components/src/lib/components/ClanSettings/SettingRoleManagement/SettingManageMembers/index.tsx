@@ -1,7 +1,7 @@
 import { useRoles } from '@mezon/core';
 import { getNewAddMembers, getSelectedRoleId, RolesClanEntity, selectAllUsesClan, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { getNameForPrioritize, ThemeApp, UsersClanEntity } from '@mezon/utils';
+import { getAvatarForPrioritize, getNameForPrioritize, ThemeApp, UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -29,7 +29,13 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 	};
 
 	useEffect(() => {
-		const results = commonUsers?.filter((member) => member.user?.display_name?.toLowerCase().includes(searchTerm.toLowerCase()));
+		const results = commonUsers.filter((member) => {
+			const clanName = member?.clan_nick?.toLowerCase();
+			const displayName = member.user?.display_name?.toLowerCase();
+			const userName = member.user?.username?.toLowerCase();
+			const lowerCaseSearchTerm = searchTerm.toLowerCase();
+			return clanName?.includes(lowerCaseSearchTerm) || displayName?.includes(lowerCaseSearchTerm) || userName?.includes(lowerCaseSearchTerm);
+		});
 		setSearchResults(results || []);
 	}, [searchTerm, addUsers, clickRole]);
 
@@ -47,7 +53,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 	};
 	const appearanceTheme = useSelector(selectTheme);
 	return (
-		<div style={{pointerEvents: !hasPermissionEdit ? undefined : 'none'}}>
+		<div>
 			<div className="w-full flex gap-x-3">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full py-1 px-2 font-normal border dark:border-bgTertiary border-bgLightModeThird rounded"
@@ -75,6 +81,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 							userName={member?.user?.username}
 							displayName={member?.user?.display_name}
 							clanName={member?.clan_nick}
+							clanAvatar={member.clan_avatar}
 							avatar={member?.user?.avatar_url}
 							isNewRole={isNewRole}
 							onRemove={() => handleRemoveMember(member?.user?.id || '')}
@@ -94,14 +101,16 @@ type ItemMemberProps = {
 	userName?: string;
 	displayName?: string;
 	clanName?: string;
+	clanAvatar?: string;
 	avatar?: string;
 	isNewRole: boolean;
 	onRemove: () => void;
 }
 
 const ItemMember = (props: ItemMemberProps) => {
-	const {id='', userName='', displayName='', clanName='', avatar='', isNewRole, onRemove} = props;
+	const {id='', userName='', displayName='', clanName='', clanAvatar='', avatar='', isNewRole, onRemove} = props;
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
+	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
 		<li key={id} className="flex justify-between items-center group">
 			<div className="flex gap-x-2">
@@ -109,7 +118,7 @@ const ItemMember = (props: ItemMemberProps) => {
 					alt={userName}
 					userName={userName}
 					className="min-w-6 min-h-6 max-w-6 max-h-6"
-					src={avatar}
+					src={avatarPrioritize}
 				/>
 				<span className="dark:text-white text-black font-medium">{namePrioritize}</span>
 				<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{userName}</span>

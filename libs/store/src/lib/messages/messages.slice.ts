@@ -129,8 +129,8 @@ export const TYPING_TIMEOUT = 3000;
 
 export const fetchMessagesCached = memoize(
 	async (mezon: MezonValueContext, channelId: string, messageId?: string, direction?: number) => {
-		const respont = await mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE);
-		return { ...respont, time: Date.now() };
+		const response = await mezon.client.listChannelMessages(mezon.session, channelId, messageId, direction, LIMIT_MESSAGE);
+		return { ...response, time: Date.now() };
 	},
 	{
 		promise: true,
@@ -427,6 +427,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		if (!client || !session || !socket || !channelId) {
 			throw new Error('Client is not initialized');
 		}
+
 		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 
 		return res;
@@ -643,6 +644,7 @@ export const messagesSlice = createSlice({
 						id: action.payload.id,
 						changes: {
 							content: action.payload.content,
+							mentions: action.payload.mentions,
 							update_time: action.payload.update_time,
 						},
 					});
@@ -774,6 +776,29 @@ export const messagesSlice = createSlice({
 		},
 		setIsJumpingToPresent(state, action: PayloadAction<boolean>) {
 			state.isJumpingToPresent = action.payload;
+		},
+		updateUserMessage: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
+			const { userId, clanId, clanNick, clanAvt } = action.payload;
+			for (const channelId in state.channelMessages) {
+				const channel = state.channelMessages[channelId];
+				if (channel) {
+					const updatedEntities = { ...channel.entities };
+					for (const messageId in updatedEntities) {
+						const message = updatedEntities[messageId];
+						if (message && message.sender_id === userId && message.clan_id === clanId) {
+							updatedEntities[messageId] = {
+								...message,
+								clan_avatar: clanAvt,
+								clan_nick: clanNick,
+							};
+						}
+					}
+					state.channelMessages[channelId] = {
+						...channel,
+						entities: updatedEntities,
+					};
+				}
+			}
 		},
 	},
 	extraReducers: (builder) => {

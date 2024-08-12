@@ -1,120 +1,277 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
-import { convertMarkdown } from '@mezon/utils';
+import {
+	IEmojiOnMessage,
+	IExtendedMessage,
+	IHashtagOnMessage,
+	ILinkOnMessage,
+	ILinkVoiceRoomOnMessage,
+	IMarkdownOnMessage,
+	IMentionOnMessage,
+	convertMarkdown,
+} from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
 type MessageLineProps = {
 	mode?: number;
-	content?: any;
-	showOnchannelLayout?: boolean;
+	content?: IExtendedMessage;
 	onClickToMessage?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+	isOnlyContainEmoji?: boolean;
+	isSearchMessage?: boolean;
+
+	isJumMessageEnabled: boolean;
+	isSingleLine: boolean;
+	isTokenClickAble: boolean;
 };
-interface RenderContentProps {
-	data: any;
-	mode: number;
-	showOnchannelLayout?: boolean;
-	allChannelVoice?: ChannelsEntity[];
-}
 
-// TODO: refactor component for message lines
-const RenderContent = memo(({ data, mode, showOnchannelLayout, allChannelVoice }: RenderContentProps) => {
-	const { t, mentions = [], hashtags = [], emojis = [], markdowns = [], links = [], voicelinks = [] } = data;
-	const elements = [...mentions, ...hashtags, ...emojis, ...markdowns, ...links, ...voicelinks].sort((a, b) => a.startindex - b.endindex);
-	let lastindex = 0;
-	const content = useMemo(() => {
-		const formattedContent: React.ReactNode[] = [];
-
-		elements.forEach((element, index) => {
-			const { startindex, endindex, channelid, channellabel, username, userid, emojiid, shortname, markdown, link, voicelink } = element;
-
-			if (lastindex < startindex) {
-				formattedContent.push(
-					<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}`} text={t.slice(lastindex, startindex)} />,
-				);
-			}
-
-			if (channelid && channellabel) {
-				formattedContent.push(
-					<ChannelHashtag
-						showOnchannelLayout={showOnchannelLayout}
-						key={`${index}${startindex}${channelid}`}
-						channelHastagId={`<#${channelid}>`}
-					/>,
-				);
-			}
-			if (username) {
-				formattedContent.push(
-					<MentionUser
-						showOnchannelLayout={showOnchannelLayout}
-						key={`${index}${startindex}${username}${userid}`}
-						tagName={username}
-						tagUserId={userid}
-						mode={mode}
-					/>,
-				);
-			}
-			if (shortname) {
-				formattedContent.push(
-					<EmojiMarkup
-						showOnChannelLayOut={showOnchannelLayout}
-						key={`${index}${startindex}${shortname}`}
-						emojiSyntax={shortname}
-						onlyEmoji={false}
-						emojiId={emojiid}
-					/>,
-				);
-			}
-
-			if (link && typeof link === 'string') {
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${link as string}`} content={link as string} />);
-			}
-
-			if (voicelink && typeof voicelink === 'string') {
-				const meetingCode = voicelink?.split('/').pop();
-				const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
-				voiceChannelFound
-					? formattedContent.push(
-							<ChannelHashtag
-								showOnchannelLayout={showOnchannelLayout}
-								key={`${index}${startindex}${channelid}`}
-								channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
-							/>,
-						)
-					: formattedContent.push(<MarkdownContent key={`${index}${startindex}${voicelink}`} content={voicelink as string} />);
-			}
-
-			if (markdown && typeof markdown === 'string') {
-				const converted = markdown.startsWith('```') && markdown.endsWith('```') ? convertMarkdown(markdown) : markdown;
-				formattedContent.push(<MarkdownContent key={`${index}${startindex}${markdown}`} content={converted as string} />);
-			}
-			lastindex = endindex;
-		});
-
-		if (lastindex < t?.length) {
-			formattedContent.push(<PlainText showOnchannelLayout={showOnchannelLayout} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />);
-		}
-
-		return formattedContent;
-	}, [elements, t, mode]);
-	return <div>{content}</div>;
-});
-
-const MessageLine = ({ mode, content, showOnchannelLayout, onClickToMessage }: MessageLineProps) => {
+const MessageLine = ({
+	mode,
+	content,
+	isJumMessageEnabled,
+	onClickToMessage,
+	isOnlyContainEmoji,
+	isSearchMessage,
+	isSingleLine,
+	isTokenClickAble,
+}: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
+	const [maxWidth, setMaxWidth] = useState(window.innerWidth - 600);
 
+	useEffect(() => {
+		const handleResize = () => {
+			setMaxWidth(window.innerWidth - 600);
+		};
+
+		window.addEventListener('resize', handleResize);
+
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
+	const [isHover, setIsHover] = useState<boolean>(false);
 	return (
-		<div onClick={!showOnchannelLayout ? onClickToMessage : () => {}} className={`${showOnchannelLayout ? '' : 'cursor-pointer'}`}>
+		<div
+			onMouseEnter={() => setIsHover(true)}
+			onMouseLeave={() => setIsHover(false)}
+			onClick={isJumMessageEnabled ? onClickToMessage : () => {}}
+			className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}
+		>
 			<RenderContent
-				data={content}
+				isTokenClickAble={isTokenClickAble}
+				isOnlyContainEmoji={isOnlyContainEmoji}
+				isJumMessageEnabled={isJumMessageEnabled}
+				isSingleLine={isSingleLine}
+				data={content as IExtendedMessage}
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
-				showOnchannelLayout={showOnchannelLayout}
 				allChannelVoice={allChannelVoice}
+				isSearchMessage={isSearchMessage}
+				parentWidth={maxWidth}
+				isHover={isHover}
 			/>
 		</div>
 	);
 };
 
 export default memo(MessageLine);
+
+interface RenderContentProps {
+	data: IExtendedMessage;
+	mode: number;
+	allChannelVoice?: ChannelsEntity[];
+	isOnlyContainEmoji?: boolean;
+	isSearchMessage?: boolean;
+
+	isSingleLine: boolean;
+	isTokenClickAble: boolean;
+	isJumMessageEnabled: boolean;
+	parentWidth?: number;
+	isHover: boolean;
+}
+type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
+
+const isMentionOnMessageUser = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).user_id !== undefined;
+
+const isMentionOnMessageRole = (element: MessageElementToken): element is IMentionOnMessage => (element as IMentionOnMessage).role_id !== undefined;
+
+const isHashtagOnMessage = (element: MessageElementToken): element is IHashtagOnMessage => (element as IHashtagOnMessage).channelid !== undefined;
+
+const isEmojiOnMessage = (element: MessageElementToken): element is IEmojiOnMessage => (element as IEmojiOnMessage).emojiid !== undefined;
+
+const isLinkOnMessage = (element: MessageElementToken): element is ILinkOnMessage => (element as ILinkOnMessage).lk !== undefined;
+
+const isMarkdownOnMessage = (element: MessageElementToken): element is IMarkdownOnMessage => (element as IMarkdownOnMessage).mk !== undefined;
+
+const isLinkVoiceRoomOnMessage = (element: MessageElementToken): element is ILinkVoiceRoomOnMessage =>
+	(element as ILinkVoiceRoomOnMessage).vk !== undefined;
+
+// TODO: refactor component for message lines
+const RenderContent = memo(
+	({
+		data,
+		mode,
+		allChannelVoice,
+		isSearchMessage,
+		isSingleLine,
+		isJumMessageEnabled,
+		parentWidth,
+		isOnlyContainEmoji,
+		isTokenClickAble,
+		isHover,
+	}: RenderContentProps) => {
+		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
+		const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+		let lastindex = 0;
+		const content = useMemo(() => {
+			const formattedContent: React.ReactNode[] = [];
+
+			elements.forEach((element, index) => {
+				const s = element.s ?? 0;
+				const e = element.e ?? 0;
+				if (lastindex < s) {
+					formattedContent.push(
+						<PlainText
+							isHover={isHover}
+							isSingleLine={isSingleLine}
+							isJumMessageEnabled={isJumMessageEnabled}
+							isSearchMessage={isSearchMessage}
+							key={`plain-${lastindex}`}
+							text={t?.slice(lastindex, s) ?? ''}
+						/>,
+					);
+				}
+
+				if (isHashtagOnMessage(element)) {
+					formattedContent.push(
+						<ChannelHashtag
+							isTokenClickAble={isTokenClickAble}
+							isSingleLine={isSingleLine}
+							key={`hashtag-${index}-${s}-${element.channelid}`}
+							channelHastagId={`<#${element.channelid}>`}
+						/>,
+					);
+				}
+
+				if (isMentionOnMessageUser(element)) {
+					formattedContent.push(
+						<MentionUser
+							isTokenClickAble={isTokenClickAble}
+							isSingleLine={isSingleLine}
+							key={`mentionUser-${index}-${s}-${element.username}-${element.user_id}`}
+							tagName={element.username ?? ''}
+							tagUserId={element.user_id ?? ''}
+							mode={mode}
+						/>,
+					);
+				}
+
+				if (isMentionOnMessageRole(element)) {
+					formattedContent.push(
+						<MentionUser
+							isTokenClickAble={isTokenClickAble}
+							isSingleLine={isSingleLine}
+							key={`mentionRole-${index}-${s}-${element.rolename}-${element.role_id}`}
+							tagName={element.rolename ?? ''}
+							tagUserId={element.role_id ?? ''}
+							mode={mode}
+						/>,
+					);
+				}
+
+				if (isEmojiOnMessage(element)) {
+					formattedContent.push(
+						<EmojiMarkup
+							isSingleLine={isSingleLine}
+							key={`emoji-${index}-${s}-${element.emojiid}`}
+							emojiSyntax={element.shortname ?? ''}
+							onlyEmoji={isOnlyContainEmoji ?? false}
+							emojiId={element.emojiid ?? ''}
+						/>,
+					);
+				}
+
+				if (isLinkOnMessage(element)) {
+					formattedContent.push(
+						<MarkdownContent
+							isTokenClickAble={isTokenClickAble}
+							isSingleLine={isSingleLine}
+							key={`link-${index}-${s}-${element.lk}`}
+							content={element.lk as string}
+						/>,
+					);
+				}
+
+				if (isLinkVoiceRoomOnMessage(element)) {
+					const meetingCode = element.vk?.split('/').pop();
+					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
+					voiceChannelFound
+						? formattedContent.push(
+								<ChannelHashtag
+									isTokenClickAble={isTokenClickAble}
+									isSingleLine={isSingleLine}
+									key={`voicelink-${index}-${s}-${voiceChannelFound?.channel_id}`}
+									channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
+								/>,
+							)
+						: formattedContent.push(
+								<MarkdownContent
+									isTokenClickAble={isTokenClickAble}
+									isSingleLine={isSingleLine}
+									key={`voicelink-${index}-${s}-${element.vk}`}
+									content={element.vk as string}
+								/>,
+							);
+				}
+
+				if (isMarkdownOnMessage(element)) {
+					const converted = element.mk?.startsWith('```') && element.mk?.endsWith('```') ? convertMarkdown(element.mk) : element.mk;
+					formattedContent.push(
+						<MarkdownContent
+							isTokenClickAble={isTokenClickAble}
+							isSingleLine={isSingleLine}
+							key={`markdown-${index}-${s}-${element.mk}`}
+							content={converted as string}
+						/>,
+					);
+				}
+				lastindex = e;
+			});
+
+			if (t && lastindex < t?.length) {
+				formattedContent.push(
+					<PlainText
+						isHover={isHover}
+						isSingleLine={isSingleLine}
+						isJumMessageEnabled={isJumMessageEnabled}
+						isSearchMessage={isSearchMessage}
+						key={`plain-${lastindex}-end`}
+						text={t.slice(lastindex)}
+					/>,
+				);
+			}
+
+			return formattedContent;
+		}, [elements, t, mode]);
+
+		return (
+			<div
+				style={
+					isSingleLine
+						? {
+								whiteSpace: 'nowrap',
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+								maxWidth: parentWidth,
+								color: isSingleLine ? '#B4BAC0' : 'white',
+							}
+						: undefined
+				}
+				className={`${isJumMessageEnabled ? 'whitespace-pre-line hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] flex items-center  cursor-pointer' : ''}`}
+			>
+				{content}
+			</div>
+		);
+	},
+);

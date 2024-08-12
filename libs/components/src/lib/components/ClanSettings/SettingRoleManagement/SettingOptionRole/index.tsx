@@ -2,7 +2,7 @@ import { useClanOwner } from '@mezon/core';
 import { RolesClanEntity, getSelectedRoleId, toggleIsShowFalse } from '@mezon/store';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useBelongToClanOwner } from '../../SettingMainRoles/listActiveRole';
+import { useCheckHasAdministrator } from '../../SettingMainRoles/listActiveRole';
 import SettingDisplayRole from '../SettingDisplayRole';
 import SettingManageMembers from '../SettingManageMembers';
 import SettingPermissions from '../SettingPermissions';
@@ -13,8 +13,8 @@ const SettingValueDisplayRole = ({ RolesClan}: { RolesClan: RolesClanEntity[]}) 
 	const clickRole = useSelector(getSelectedRoleId);
 	const activeRole = useMemo(() => RolesClan.find((role) => role.id === clickRole), [RolesClan, clickRole]);
 	const isClanOwner = useClanOwner();
-	const hasBelongClanOwner = useBelongToClanOwner(activeRole?.creator_id || '');
-	const hasPermissionEdit = !isClanOwner && hasBelongClanOwner;
+	const hasPermissionAdmin = useCheckHasAdministrator(activeRole?.permission_list?.permissions);
+	const hasPermissionEdit = isClanOwner || !hasPermissionAdmin;
 	const dispatch = useDispatch();
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);

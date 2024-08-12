@@ -53,8 +53,10 @@ function getChannelMemberRootState(thunkAPI: GetThunkAPI<unknown>): ChannelMembe
 export const channelMembersAdapter = createEntityAdapter<ChannelMembersEntity>();
 
 const fetchChannelMembersCached = memoize(
-	(mezon: MezonValueContext, clanId: string, channelId: string, channelType: ChannelType) =>
-		mezon.client.listChannelUsers(mezon.session, clanId, channelId, channelType, 1, 100, ''),
+	async (mezon: MezonValueContext, clanId: string, channelId: string, channelType: ChannelType) => {
+		const response = await mezon.client.listChannelUsers(mezon.session, clanId, channelId, channelType, 1, 100, '');
+		return { ...response, time: Date.now() };
+	},
 	{
 		promise: true,
 		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
@@ -82,25 +84,28 @@ export const fetchChannelMembers = createAsyncThunk(
 		}
 
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
-		if (!response.channel_users) {
-			return [];
+		if (Date.now() - response.time < 100) {
+			if (!response.channel_users) {
+				return [];
+			}
+			if (repace) {
+				thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
+			}
+	
+			const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
+			thunkAPI.dispatch(channelMembersActions.addMany(members));
+			const userIds = members.map((member) => member.user?.id || '');
+			const customStatusInit = members.map((member) => {
+				const status = (member?.user?.metadata as any)?.status ?? '';
+				return { userId: member.user?.id ?? '', customStatus: status };
+			});
+			thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
+			thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
+			thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
+			thunkAPI.dispatch(channelMembersActions.followUserStatus());
+			return members;
 		}
-		if (repace) {
-			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
-		}
-
-		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
-		thunkAPI.dispatch(channelMembersActions.addMany(members));
-		const userIds = members.map((member) => member.user?.id || '');
-		const customStatusInit = members.map((member) => {
-			const status = (member?.user?.metadata as any)?.status ?? '';
-			return { userId: member.user?.id ?? '', customStatus: status };
-		});
-		thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
-		thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
-		thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
-		thunkAPI.dispatch(channelMembersActions.followUserStatus());
-		return members;
+		return null
 	},
 );
 
@@ -267,15 +272,75 @@ export const channelMembers = createSlice({
 			const data = mapChannelMemberToEntity({ id: member.id + payload.channel_id, user: member }, payload.channel_id, payload.joins[0].user_id);
 			channelMembersAdapter.upsertOne(state, data);
 		},
+		addRoleIdUser: (state, action) => {
+			const { id, channelId, userId } = action.payload;
+			const idMember = channelId + userId;
+			const existingMember = state.entities[idMember];
+
+			if (existingMember) {
+				const roleIds = existingMember.role_id || [];
+				const updatedRoleIds= [...roleIds, id];
+
+				channelMembersAdapter.updateOne(state, {
+					id: idMember,
+					changes: {
+						role_id: updatedRoleIds,
+					},
+				});
+			}
+		},
+		removeRoleIdUser: (state, action) => {
+			const { id, channelId, userId } = action.payload;
+			const idMember = channelId + userId;
+			const existingMember = state.entities[idMember];
+
+			if (existingMember) {
+				const roleIds = existingMember.role_id || [];
+				const roleIndex = roleIds.indexOf(id);
+				let updatedRoleIds;
+				if (roleIndex > -1) {
+					updatedRoleIds = roleIds.filter(roleId => roleId !== id);
+				} 
+
+				channelMembersAdapter.updateOne(state, {
+					id: idMember,
+					changes: {
+						role_id: updatedRoleIds,
+					},
+				});
+			}
+		},
+		updateUserChannel: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
+			const { userId, clanId, clanNick, clanAvt } = action.payload;
+			const channelsToUpdate = Object.values(state.entities).filter(
+				(channel) => channel?.clan_id === clanId && channel?.user?.id === userId
+			);
+			channelsToUpdate.forEach((channel) => {
+				if (channel) {
+					console.log("channel: ", channel.id);
+					channelMembersAdapter.updateOne(state, {
+						id: channel.id,
+						changes: {
+							clan_nick: clanNick,
+							clan_avatar: clanAvt
+						},
+					});
+				}
+			});
+		  },
 	},
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchChannelMembers.pending, (state: ChannelMembersState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[]>) => {
-				channelMembersAdapter.setAll(state, action.payload);
-				state.loadingStatus = 'loaded';
+			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[] | null>) => {
+				if (action.payload !== null) {
+					channelMembersAdapter.setMany(state, action.payload);
+					state.loadingStatus = 'loaded';
+				} else {
+					state.loadingStatus = "not loaded";
+				}
 			})
 			.addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
 				state.loadingStatus = 'error';

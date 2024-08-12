@@ -29,7 +29,7 @@ import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { AppState, DeviceEventEmitter, StatusBar, View } from 'react-native';
+import { AppState, DeviceEventEmitter, Platform, StatusBar, View } from 'react-native';
 import NetInfoComp from '../components/NetworkInfo';
 // import SplashScreen from '../components/SplashScreen';
 import {
@@ -45,15 +45,14 @@ import {
 	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
 import notifee from '@notifee/react-native';
-import * as SplashScreen from 'expo-splash-screen';
 import { delay } from 'lodash';
+import BootSplash from 'react-native-bootsplash';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
 
 const RootStack = createStackNavigator();
 
 // Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
@@ -78,12 +77,15 @@ const NavigationMain = () => {
 	}, [isLoggedIn]);
 
 	useEffect(() => {
-		const timer = setTimeout(async () => {
-			await SplashScreen.hideAsync();
-			await notifee.cancelAllNotifications();
-			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		}, 800);
+		const timer = setTimeout(
+			async () => {
+				await BootSplash.hide({ fade: true });
+				await notifee.cancelAllNotifications();
+				await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+				await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+			},
+			850,
+		);
 
 		return () => {
 			clearTimeout(timer);
@@ -118,6 +120,7 @@ const NavigationMain = () => {
 
 	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
+			refreshMessageInitApp();
 			authLoader();
 		}
 	}, [isLoggedIn, hasInternet]);
@@ -127,6 +130,19 @@ const NavigationMain = () => {
 			switchClanLoader();
 		}
 	}, [currentClanId]);
+
+	const refreshMessageInitApp = useCallback(async () => {
+		const store = await getStoreAsync();
+		if (currentChannelId) {
+			store.dispatch(
+				messagesActions.fetchMessages({
+					channelId: currentChannelId,
+					noCache: true,
+					isFetchingLatestMessages: true,
+				}),
+			);
+		}
+	}, [currentChannelId]);
 
 	const initAppLoading = useCallback(async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);

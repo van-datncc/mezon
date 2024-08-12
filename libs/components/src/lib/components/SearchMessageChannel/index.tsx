@@ -1,7 +1,16 @@
 import { Icons } from '@mezon/components';
 import { useClans, useSearchMessages, useThreads } from '@mezon/core';
-import { appActions, searchMessagesActions, selectCurrentChannel, selectCurrentClanId, selectIsShowMemberList, useAppDispatch } from '@mezon/store';
-import { SIZE_PAGE_SEARCH } from '@mezon/utils';
+import {
+	appActions,
+	searchMessagesActions,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectIsSearchMessage,
+	selectIsShowMemberList,
+	selectValueInputSearchMessage,
+	useAppDispatch,
+} from '@mezon/store';
+import { SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
@@ -14,15 +23,16 @@ import { hasKeySearch, searchFieldName } from './constant';
 const SearchMessageChannel = () => {
 	const dispatch = useAppDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
-	const { isSearchMessage, fetchSearchMessages, currentPage } = useSearchMessages();
+	const { fetchSearchMessages, currentPage } = useSearchMessages();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const valueInputSearch = useSelector(selectValueInputSearchMessage(currentChannel?.channel_id as string));
+	const isSearchMessage = useSelector(selectIsSearchMessage(currentChannel?.channel_id as string));
 	const { listUserSearch } = useClans();
 	const { setIsShowCreateThread } = useThreads();
 	const [expanded, setExpanded] = useState(false);
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
 	const [isShowSearchOptions, setIsShowSearchOptions] = useState('');
-	const [valueInputSearch, setValueInputSearch] = useState<string>('');
 	const [valueDisplay, setValueDisplay] = useState<string>('');
 	const [search, setSearch] = useState<any | undefined>();
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -41,17 +51,19 @@ const SearchMessageChannel = () => {
 		if (targetIsOutside && !valueInputSearch) {
 			setExpanded(false);
 			setIsShowSearchMessageModal(false);
+			dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: false }));
 		}
 		if (targetIsOutside && valueInputSearch) {
+			setExpanded(true);
 			setIsShowSearchMessageModal(false);
 		}
 	};
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		const value = event.target.value;
-		setValueInputSearch(value);
+		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value }));
 		setValueDisplay(newPlainTextValue);
-		const filter = [];
+		const filter: SearchFilter[] = [];
 		filter.push();
 		if (mentions.length === 0) {
 			filter.push(
@@ -60,7 +72,7 @@ const SearchMessageChannel = () => {
 					field_value: value,
 				},
 				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId },
+				{ field_name: 'clan_id', field_value: currentClanId as string },
 			);
 		}
 		for (const mention of mentions) {
@@ -73,7 +85,7 @@ const SearchMessageChannel = () => {
 	const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => {
 		if (valueInputSearch && event.key === 'Enter') {
 			setIsShowSearchMessageModal(false);
-			dispatch(searchMessagesActions.setIsSearchMessage(true));
+			dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: true }));
 			setIsShowCreateThread(false, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
 			if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
 			if (search) {
@@ -88,15 +100,15 @@ const SearchMessageChannel = () => {
 	};
 
 	const handleClose = () => {
-		setValueInputSearch('');
+		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value: '' }));
 		setValueDisplay('');
-		dispatch(searchMessagesActions.setIsSearchMessage(false));
-		if (isSearchMessage) dispatch(appActions.setIsShowMemberList(!isActive));
+		dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: false }));
+		if (!isSearchMessage) dispatch(appActions.setIsShowMemberList(!isActive));
 		searchRef.current?.focus();
 	};
 
 	const handleClickSearchOptions = (value: string) => {
-		setValueInputSearch(valueInputSearch + value);
+		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value: valueInputSearch + value }));
 		searchRef.current?.focus();
 	};
 

@@ -1,11 +1,15 @@
+import { IMessageSendPayload } from '.';
+
 export interface IStartEndIndex {
-	startindex?: number | undefined;
-	endindex?: number | undefined;
+	s?: number | undefined;
+	e?: number | undefined;
 }
 
 export interface IMention {
-	userid: string | undefined;
-	username: string | undefined;
+	user_id?: string | undefined;
+	username?: string | undefined;
+	role_id?: string | undefined;
+	rolename?: string | undefined;
 }
 
 export interface IHashtag {
@@ -17,18 +21,21 @@ export interface IEmoji {
 	shortname: string | undefined;
 }
 export interface ILink {
-	link: string | undefined;
+	lk: string | undefined;
 }
 export interface IMarkdown {
 	type?: string;
-	markdown: string | undefined;
+	mk: string | undefined;
 }
 
 export interface ILinkVoiceRoom {
-	voicelink: string | undefined;
+	vk: string | undefined;
 }
 
 export interface IMentionOnMessage extends IMention, IStartEndIndex {}
+export interface IExtendedMessage extends IMessageSendPayload {
+	mentions?: IMentionOnMessage[];
+}
 export interface IHashtagOnMessage extends IHashtag, IStartEndIndex {}
 export interface IEmojiOnMessage extends IEmoji, IStartEndIndex {}
 export interface ILinkOnMessage extends ILink, IStartEndIndex {}

@@ -12,6 +12,7 @@ import SearchModal from '../SearchModal';
 import ModalNotificationSetting from '../notificationSetting';
 import ItemModal from './ItemModal';
 import ModalCreateCategory from './ModalCreateCategory';
+import LeaveClanPopup from './LeaveClanPopup';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -26,7 +27,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { categorizedChannels } = useCategory();
 	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));
@@ -40,6 +41,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		<ModalNotificationSetting onClose={closeNotiSettingModal} open={true} channelID={channelId || ''} />
 	));
 	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
+
+	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
+	const toggleLeaveClanPopup = ()=>{
+		setIsShowLeaveClanPopup(!isShowLeaveClanPopup);
+		setIsShowModalPanelClan(false)
+	}
 
 	const onClose = () => {
 		setOpenCreateCate(false);
@@ -79,7 +86,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
-	const isShow = hasAdminPermission || isClanOwner || hasClanPermission;
+	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasChannelManagePermission;
 
 	return (
 		<>
@@ -110,21 +117,19 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%]"
 							>
 								<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
-									{(isShow) &&<ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
+									{(hasPermissionCreateCategory) &&<ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
 									<ItemModal
 										onClick={handleShowInviteClanModal}
 										children="Invite People"
 										endIcon={<Icons.AddPerson className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>
-									{(isShow) && (
-										<ItemModal
-											onClick={handleShowServerSettings}
-											children="Clan Settings"
-											endIcon={
-												<Icons.SettingProfile className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />
-											}
-										/>
-									)}
+									<ItemModal
+										onClick={handleShowServerSettings}
+										children="Clan Settings"
+										endIcon={
+											<Icons.SettingProfile className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />
+										}
+									/>
 									<ItemModal
 										onClick={() => {
 											openNotiSettingModal();
@@ -133,12 +138,27 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 										children="Notification Settings"
 										endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
 									/>
+									{!isClanOwner && (
+										<button
+											onClick={toggleLeaveClanPopup}
+											className="flex items-center w-full justify-between rounded-sm hover:bg-red-600 text-red-600 hover:text-white group pr-2"
+										>
+											<li className="text-[14px]  font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
+												Leave clan
+											</li>
+											<div className="flex items-center justify-center h-[18px] w-[18px]">
+												<Icons.LeaveClanIcon className="text-red-600 group-hover:text-white" />
+											</div>
+										</button>
+									)}
 								</div>
 							</div>
 						)}
 					</div>
 				</div>
 			)}
+
+			{isShowLeaveClanPopup && <LeaveClanPopup toggleShowPopup={toggleLeaveClanPopup}/>}
 
 			{openServerSettings && (
 				<ClanSetting

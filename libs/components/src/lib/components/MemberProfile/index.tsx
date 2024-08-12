@@ -97,7 +97,7 @@ function MemberProfile({
 		const adjustedMouseX = mouseX > windowWidth - 200 ? mouseX - 200 : mouseX;
 		
 		if (event.button === MouseButton.LEFT) {
-			setIsShowUserProfile(true);
+			setIsShowUserProfile(!isShowUserProfile);
 			const heightElementShortUserProfileMin = 313;
 			setTop(mouseY - 50);
 			if (distanceToBottom < heightElementShortUserProfileMin) {
@@ -169,7 +169,7 @@ function MemberProfile({
 		<div className="relative group">
 			<div
 				ref={panelRef}
-				onMouseDown={(event) => handleMouseClick(event)}
+				onMouseDown={handleMouseClick}
 				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${isFooter ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
 				<a className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
@@ -191,10 +191,10 @@ function MemberProfile({
 						<></>
 					)}
 				</a>
-				<div className="flex flex-col items-start">
+				<div className="flex flex-col items-start h-full">
 					<div
 						ref={subNameRef}
-						className={`absolute top-[22px] max-w-[102px] overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
+						className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
@@ -215,7 +215,7 @@ function MemberProfile({
 						)}
 					</div>
 					{!isHideUserName && (
-						<div>
+						<div className={"h-full flex-col"}>
 							<div 
 								className="flex flex-row items-center w-full overflow-x-hidden" 
 								style={{minWidth: `${minWidthNameMain}px`}}
@@ -231,7 +231,7 @@ function MemberProfile({
 							`}
 									title={name}
 								>
-									<span className={`one-line ${isListFriend ? 'dark:text-white text-black' : ''}`}>{!isHiddenAvatarPanel && name}</span>
+									<span className={`truncate ${isListFriend ? 'dark:text-white text-black' : ''}`}>{!isHiddenAvatarPanel && name}</span>
 									{isListFriend && <span className='hidden group-hover/list_friends:inline'>&nbsp;{userNameAva}</span>}
 								</p>
 								{(dataMemberCreate?.createId || currentClan?.creator_id) &&

@@ -11,7 +11,7 @@ import {
 	useAppSelector,
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EEmojiCategory, EPermission, EmojiPlaces, IEmoji, ModeResponsive, SubPanelName } from '@mezon/utils';
+import { EEmojiCategory, EPermission, EmojiPlaces, IEmoji, ModeResponsive, SubPanelName, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -73,9 +73,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	];
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: categoryIcons[index] }));
 	const { reactionMessageDispatch } = useChatReaction();
-
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
-	const { setEmojiSuggestion } = useEmojiSuggestion();
+	const { setSuggestionEmojiObjPicked } = useEmojiSuggestion();
 	const [emojiHoverSrc, setEmojiHoverSrc] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -110,8 +109,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSubPanelActive(SubPanelName.NONE);
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setAddEmojiActionChatbox(!addEmojiState);
-			setEmojiSuggestion(emojiPicked);
-
+			setSuggestionEmojiObjPicked(emojiId, emojiPicked);
 			if (!shiftPressedState) {
 				dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 				setSubPanelActive(SubPanelName.NONE);
@@ -343,18 +341,20 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
 			{' '}
-			{emojisData.map((item, index) => (
-				<button
-					key={index}
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
-					onClick={() => {
-						onEmojiSelect(item.id, item.shortname);
-					}}
-					onMouseEnter={() => onEmojiHover(item)}
-				>
-					<img draggable="false" src={item?.src} />
-				</button>
-			))}
+			{emojisData
+				.filter((item) => !!item.id)
+				.map((item, index) => (
+					<button
+						key={index}
+						className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
+						onClick={() => {
+							onEmojiSelect(item.id, item.shortname);
+						}}
+						onMouseEnter={() => onEmojiHover(item)}
+					>
+						<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} />
+					</button>
+				))}
 			{isShowAddButton && (
 				<button
 					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}

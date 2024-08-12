@@ -1,34 +1,27 @@
-import { Metrics } from '@mezon/mobile-ui';
+import { ImageGallery } from '@georstat/react-native-image-gallery';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { selectAttachmentPhoto } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
-import ImageView from 'react-native-image-view';
 import { useSelector } from 'react-redux';
+import { ImageItem } from './ImageItem';
 import { RenderFooterModal } from './RenderFooterModal';
+import { RenderHeaderModal } from './RenderHeaderModal';
 
 interface IImageListModalProps {
 	visible?: boolean;
-	idxSelected?: number;
-	onImageChange?: (idx: number) => void;
-	onImageChangeFooter?: (idx: number) => void;
 	onClose?: () => void;
 	imageSelected?: ApiMessageAttachment;
 }
 
 export const ImageListModal = React.memo((props: IImageListModalProps) => {
-	const { visible, idxSelected, onClose, onImageChange, onImageChangeFooter, imageSelected } = props;
-	const attachments = useSelector(selectAttachmentPhoto());
+	const { visible, onClose, imageSelected } = props;
+	const { themeValue } = useTheme();
 
+	const attachments = useSelector(selectAttachmentPhoto());
 	const createAttachmentObject = (attachment: any) => ({
-		source: {
-			uri: attachment.url,
-		},
-		filename: attachment.filename,
-		title: attachment.filename,
-		width: Metrics.screenWidth,
-		height: Metrics.screenHeight - 150,
+		id: `${attachment.create_time}_${attachment.url}`,
 		url: attachment.url,
-		uri: attachment.url,
 		uploader: attachment.uploader,
 		create_time: attachment.create_time,
 	});
@@ -40,24 +33,20 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	}, [attachments, imageSelected]);
 
 	return (
-		<ImageView
-			animationType={'fade'}
-			images={formatAttachments || []}
-			imageIndex={idxSelected}
-			isVisible={visible}
-			isSwipeCloseEnabled={true}
-			onImageChange={(idx: number) => {
-				onImageChange(idx);
+		<ImageGallery
+			close={onClose}
+			isOpen={visible}
+			thumbSize={size.s_24 * 3}
+			disableSwipe
+			images={formatAttachments}
+			renderCustomImage={(item, index) => {
+				return <ImageItem uri={item.url} key={`${index}_${item.url}_ImageModal`} onClose={onClose} />;
 			}}
-			controls={{
-				next: true,
-				prev: true,
-				close: true,
+			thumbColor={themeValue.bgViolet}
+			renderFooterComponent={(item, currentIndex) => {
+				return <RenderFooterModal item={item} key={`${currentIndex}_${item.url}_RenderFooterModal`} />;
 			}}
-			onClose={onClose}
-			renderFooter={() => (
-				<RenderFooterModal data={formatAttachments || []} idxSelected={idxSelected} onImageChangeFooter={onImageChangeFooter} />
-			)}
+			renderHeaderComponent={() => <RenderHeaderModal onClose={onClose} />}
 		/>
 	);
 });

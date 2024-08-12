@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
-import { UserRestrictionZone, useClanRestriction, useRoles } from '@mezon/core';
-import { RolesClanEntity, selectAllAccount, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { useClanRestriction, useRoles, UserRestrictionZone } from '@mezon/core';
+import { channelMembersActions, RolesClanEntity, selectAllAccount, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme, useAppDispatch } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -30,6 +30,8 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const hasPermissionEditRole = isClanOwner || hasAdminPermission || hasClanPermission;
 	const activeRolesWithoutUserRoles = activeRoles.filter((role) => {
 		const isRoleInUserRoles = userRolesClan.some((userRole) => userRole.id === role.id);
 		return !isRoleInUserRoles;
@@ -61,17 +63,29 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 			return role.title?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
 	}, [activeRolesWithoutUserRoles, searchTerm]);
+
+	const dispatch = useAppDispatch();
 	const addRole = async (roleId: string) => {
 		setShowPopupAddRole(false);
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', userIDArray || [], [], [], []);
+		await dispatch(channelMembersActions.addRoleIdUser({
+			id: roleId, 
+			channelId: currentChannelId, 
+			userId: userById?.user?.id,
+		}));
 	};
 
 	const deleteRole = async (roleId: string) => {
 		const activeRole = RolesClan.find((role) => role.id === roleId);
 		const userIDArray = userById?.user?.id?.split(',');
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', [], [], userIDArray || [], []);
+		await dispatch(channelMembersActions.removeRoleIdUser({
+			id: roleId, 
+			channelId: currentChannelId, 
+			userId: userById?.user?.id,
+		}));
 	};
 	const appearanceTheme = useSelector(selectTheme);
 	return (
@@ -84,7 +98,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant"
 					>
 						<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
-							{ isClanOwner || (hasAdminPermission && !checkAdminPermission(role, userProfile?.user?.id || '')) ? 
+							{ hasPermissionEditRole ? 
 							<Tooltip
 								content="Remove role"
 								trigger="hover"
@@ -102,7 +116,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						</span>
 					</span>
 				)}
-				<UserRestrictionZone policy={isClanOwner || hasAdminPermission}>
+				<UserRestrictionZone policy={hasPermissionEditRole}>
 					<div className="relative" onClick={handModalAddRole}>
 						<Tooltip
 							content="Add roles"

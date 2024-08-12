@@ -1,9 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectAllEmojiSuggestion } from '@mezon/store-mobile';
-import { getSrcEmoji } from '@mezon/utils';
 import { Image, Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { style } from './SuggestItem.styles';
+import { getSrcEmoji } from '@mezon/utils';
 
 type SuggestItemProps = {
 	avatarUrl?: string;
@@ -12,14 +10,13 @@ type SuggestItemProps = {
 	subText?: string;
 	isDisplayDefaultAvatar?: boolean;
 	isRoleUser?: boolean;
+	emojiId?: string;
 };
 
-const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar, isRoleUser }: SuggestItemProps) => {
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
-	const urlEmoji = getSrcEmoji(name, emojiListPNG);
+const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiId }: SuggestItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-
+	const emojiSrc = emojiId ? getSrcEmoji(emojiId) : '';
 	return (
 		<View style={styles.wrapperItem}>
 			<View style={styles.containerItem}>
@@ -39,10 +36,10 @@ const SuggestItem = ({ avatarUrl, symbol, name, subText, isDisplayDefaultAvatar,
 						</View>
 					)
 				)}
-				{urlEmoji && <Image style={styles.emojiImage} source={{ uri: urlEmoji }} />}
+				{emojiSrc && <Image style={styles.emojiImage} source={{ uri: emojiSrc }} />}
 				{symbol && <Text style={styles.symbol}>{symbol}</Text>}
 				{isRoleUser || name.startsWith('here') ? (
-					<Text style={[styles.roleText, name.startsWith('here') && styles.title]}>{`@${name}`}</Text>
+					<Text style={[styles.roleText, name.startsWith('here') && styles.textHere]}>{`@${name}`}</Text>
 				) : (
 					<Text style={styles.title}>{name}</Text>
 				)}
