@@ -5,6 +5,7 @@ export const style = (colors: Attributes) =>
 StyleSheet.create({
     container: {
         maxHeight: '34%',
+        alignItems: 'center'
     },
     listDMBadge: {
         maxHeight: '100%',
@@ -38,8 +39,8 @@ StyleSheet.create({
         fontWeight: 'bold',
         fontSize: size.small
     },
-    mb10: {
-        marginBottom: size.s_10,
+    mt10: {
+       marginTop: size.s_10,
     },
     avatarWrapper: {
         borderRadius: 50,

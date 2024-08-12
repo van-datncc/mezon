@@ -6,10 +6,7 @@ export const style = (colors: Attributes)=> StyleSheet.create({
 		height: '100%',
 		paddingTop: size.s_20,
 		width: '18%',
-		justifyContent: 'flex-start',
 		backgroundColor: colors.primary,
-		alignItems: 'center',
-		gap: size.s_10
 	},
 
     badge: {
@@ -23,7 +20,7 @@ export const style = (colors: Attributes)=> StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		bottom: -3,
-		right: -5
+		right: -3
 	},
 
     badgeText: {
@@ -31,7 +28,6 @@ export const style = (colors: Attributes)=> StyleSheet.create({
 		fontWeight: 'bold',
 		fontSize: size.small
 	},
-
     wrapperPlusClan: {
 		marginTop: verticalScale(5),
 		height: verticalScale(50),
@@ -42,4 +38,6 @@ export const style = (colors: Attributes)=> StyleSheet.create({
 		justifyContent: 'center',
 		backgroundColor: colors.secondary,
 	},
+  contentScroll: { alignItems: 'center', paddingBottom: size.s_20},
+  separatorLine: {width: '60%', marginTop: size.s_10}
 })
