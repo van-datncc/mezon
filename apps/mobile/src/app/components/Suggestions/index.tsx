@@ -2,7 +2,6 @@ import { useChannels } from '@mezon/core';
 import { emojiSuggestionActions, selectAllEmojiSuggestion } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps } from '@mezon/utils';
-import { ApiClanEmojiListResponse } from 'mezon-js/api.gen';
 import { FC, memo, useEffect, useMemo } from 'react';
 import { FlatList, Pressable } from 'react-native';
 import { useSelector } from 'react-redux';
