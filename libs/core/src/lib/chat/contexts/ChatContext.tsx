@@ -19,6 +19,7 @@ import {
 	selectDmGroupCurrentId,
 	toastActions,
 	useAppDispatch,
+	usersClanActions,
 	voiceActions,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -227,23 +228,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
-			console.log('ClanProfileUpdates: ', ClanProfileUpdates);
-			dispatch(
-				channelMembersActions.updateUserChannel({
-					userId: ClanProfileUpdates.user_id,
-					clanId: ClanProfileUpdates.clan_id,
-					clanNick: ClanProfileUpdates.clan_nick,
-					clanAvt: ClanProfileUpdates.clan_avatar,
-				}),
-			);
-			dispatch(
-				messagesActions.updateUserMessage({
-					userId: ClanProfileUpdates.user_id,
-					clanId: ClanProfileUpdates.clan_id,
-					clanNick: ClanProfileUpdates.clan_nick,
-					clanAvt: ClanProfileUpdates.clan_avatar,
-				}),
-			);
+			dispatch(channelMembersActions.updateUserChannel({userId: ClanProfileUpdates.user_id, clanId: ClanProfileUpdates.clan_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
+			dispatch(messagesActions.updateUserMessage({userId: ClanProfileUpdates.user_id, clanId: ClanProfileUpdates.clan_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
+			dispatch(usersClanActions.updateUserClan({userId: ClanProfileUpdates.user_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
 		},
 		[dispatch],
 	);

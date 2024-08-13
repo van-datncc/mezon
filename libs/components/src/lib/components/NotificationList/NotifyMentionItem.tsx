@@ -1,4 +1,4 @@
-import { useJumpToMessage } from '@mezon/core';
+import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
 import { messagesActions, notificationActions } from '@mezon/store';
 import { IMessageWithUser, INotification } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -86,8 +86,8 @@ interface IMentionTabContent {
 }
 
 function MentionTabContent({ message }: IMentionTabContent) {
-	const { username, contentUpdatedMention } = useMessageParser(message);
-
+	const { username, contentUpdatedMention} = useMessageParser(message);
+	const { priorityAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
 	const checkMessageHasReply = useMemo(() => {
 		return message.references && message.references?.length > 0;
 	}, [message.references]);
@@ -96,16 +96,17 @@ function MentionTabContent({ message }: IMentionTabContent) {
 		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
 			{checkMessageHasReply && (
 				<div className="max-w-full overflow-hidden">
-					<MessageLine isTokenClickAble={false} content={contentUpdatedMention} isJumMessageEnabled={false} isSingleLine={true} />
+					<MessageLine isRenderImage={false} isTokenClickAble={false} content={contentUpdatedMention} isJumMessageEnabled={false} />
 				</div>
 			)}
 
 			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
-				<AvatarImage alt="user avatar" className="w-10 h-10 min-w-10" userName={username} src={message.avatar} />
+				<AvatarImage alt="user avatar" className="w-10 h-10 min-w-10" userName={username} 
+					src={priorityAvatar? priorityAvatar : message.avatar} />
 
 				<div className="h-full">
-					<MessageHead message={message} isCombine={true} isShowFull={true} />
-					<MessageLine content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} isSingleLine={false} />
+					<MessageHead message={message} isCombine={true} isShowFull={true} mode={ChannelStreamMode.STREAM_MODE_CHANNEL}/>
+					<MessageLine isRenderImage={false} content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} />
 					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
 				</div>
 			</div>

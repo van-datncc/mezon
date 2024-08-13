@@ -3,16 +3,17 @@ import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Button, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
-import { ApiClanSticker, ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
+import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
+import { ClanSticker } from 'mezon-js';
 
 type ModalEditStickerProps = {
   handleCloseModal: () => void;
-  editSticker: ApiClanSticker | null;
+  editSticker: ClanSticker | null;
 };
-type EdittingSticker = Pick<ApiClanSticker, 'source' | 'shortname'> & {
+type EdittingSticker = Pick<ClanSticker, 'source' | 'shortname'> & {
   fileName: string | null;
 };
 const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) => {

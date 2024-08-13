@@ -306,7 +306,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	}, [message])
 
-	if (message.isStartedMessageGroup && message.sender_id == '0') return <WelcomeMessage channelTitle={props.channelName} />;
+	if (message.isStartedMessageGroup && message.sender_id == '0')
+		return (
+			<WelcomeMessage channelId={props.channelId} />
+		)
 
 	const handlePressIn = () => {
 		Animated.timing(backgroundColor, {
