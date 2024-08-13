@@ -35,9 +35,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
     lineActiveClan: {
         backgroundColor: Colors.azureBlue,
-        width: 4,
+        width: size.s_6,
         height: '80%',
-        top: '10%',
+        top: '20%',
         left: -13,
         borderTopRightRadius: 10,
         borderBottomEndRadius: 10,

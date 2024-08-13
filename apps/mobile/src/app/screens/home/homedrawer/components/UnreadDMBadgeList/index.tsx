@@ -1,6 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { UserGroupIcon } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, selectDirectById, selectDirectsUnreadlist } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { APP_SCREEN } from 'apps/mobile/src/app/navigation/ScreenTypes';
@@ -46,16 +46,16 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 		}
 	};
 
-	const navigateToDirectMessageMDetail = (channel_id) => {
+	const navigateToDirectMessageMDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-			params: { directMessageId: channel_id, from: APP_SCREEN.HOME },
+			params: { directMessageId: dm?.channel_id, from: APP_SCREEN.HOME },
 		});
 	};
 
 	return (
-		<TouchableOpacity onPress={() => navigateToDirectMessageMDetail(dm?.channel_id)} style={[styles.mb10]}>
-			<View style={{ paddingHorizontal: size.s_10 }}>{getBadge(dm)}</View>
+		<TouchableOpacity onPress={navigateToDirectMessageMDetail} style={[styles.mt10]}>
+			<View>{getBadge(dm)}</View>
 		</TouchableOpacity>
 	);
 });
@@ -68,12 +68,10 @@ export const UnreadDMBadgeList = React.memo(() => {
 	const styles = style(themeValue);
 	return (
 		<View style={styles.container}>
-			<ScrollView style={styles.listDMBadge} showsVerticalScrollIndicator={false}>
 				{!!unReadDM?.length &&
 					unReadDM?.map((dm: DirectEntity, index) => {
 						return <UnreadDMBadgeItem key={dm?.id} dm={dm} />;
 					})}
-			</ScrollView>
 		</View>
 	);
 });
