@@ -52,7 +52,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 
 	return (
 		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
-			<div className="lineText contents dark:text-white text-colorTextLightMode whitespace-nowrap">
+			<div className={`lineText contents dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
 				{isImage && imageUrl && isRenderImage ? (
 					<MessageImage attachmentData={{ url: imageUrl }} />
 				) : (
