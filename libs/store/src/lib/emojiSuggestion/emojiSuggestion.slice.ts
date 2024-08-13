@@ -1,7 +1,8 @@
 import { IEmoji } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiClanEmojiCreateRequest, ApiClanEmojiListResponse, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
+import { ClanEmoji } from 'mezon-js';
+import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 const LIST_EMOJI_CACHED_TIME = 1000 * 60 * 3;
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
@@ -92,7 +93,7 @@ export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji
 
 export const deleteEmojiSetting = createAsyncThunk(
 	'settingClanEmoji/deleteEmoji',
-	async (data: { emoji: ApiClanEmojiListResponse; clan_id: string }, thunkAPI) => {
+	async (data: { emoji: ClanEmoji; clan_id: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const res = await mezon.client.deleteByIdClanEmoji(mezon.session, data.emoji.id || '', data.clan_id);
