@@ -15,7 +15,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	wrapperCreateClanModal: {
 		width: '100%',
 		height: '100%',
-		paddingHorizontal: size.s_20,
 	},
 	headerTitle: {
 		fontSize: size.h5,

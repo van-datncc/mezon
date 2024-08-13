@@ -6,7 +6,7 @@ type ListFriendsProps = {
 };
 const FriendList = ({ listFriendFilter }: ListFriendsProps) => {
 	return (
-		<div className={'flex flex-1 overflow-y-auto flex-col pr-3'}>
+		<div className={'flex h-full flex-col pr-8 overflow-y-auto w-full'}>
 			{listFriendFilter.map((friend: FriendsEntity) => (
 				<FriendsListItem friend={friend} key={friend.id} />
 			))}

@@ -190,6 +190,7 @@ export const fetchMessages = createAsyncThunk(
 					}),
 				);
 			}
+
 			return {
 				messages: [],
 			};
@@ -275,7 +276,6 @@ export const loadMoreMessage = createAsyncThunk(
 	async ({ channelId, direction = Direction_Mode.BEFORE_TIMESTAMP }: LoadMoreMessArgs, thunkAPI) => {
 		try {
 			const state = getMessagesState(getMessagesRootState(thunkAPI));
-
 			// ignore when:
 			// - jumping to present
 			// - loading

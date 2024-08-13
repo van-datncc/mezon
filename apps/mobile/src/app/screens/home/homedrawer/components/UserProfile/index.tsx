@@ -1,7 +1,7 @@
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectDirectsOpenlist, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectDirectsOpenlist, selectMemberById } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -31,7 +31,7 @@ export enum EFriendState {
 	Friend,
 	SentRequestFriend,
 	ReceivedRequestFriend,
-	Block
+	Block,
 }
 
 const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true }: userProfileProps) => {
@@ -39,7 +39,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const styles = style(themeValue);
 	const { userProfile } = useAuth();
 	const { t } = useTranslation(['userProfile']);
-	const userById = useSelector(selectMemberByUserId(userId || user?.id || ''));
+	const userById = useSelector(selectMemberById(userId || user?.id || ''));
 	const userStatus = useMemberStatus(userId || user?.id);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const { color } = useMixImageColor(userById?.user?.avatar_url || user?.avatarSm || userProfile?.user?.avatar_url);
@@ -50,8 +50,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 	const [isShowPendingContent, setIsShowPendingContent] = useState(false);
 	const targetUser = useMemo(() => {
-		return allUser.find(targetUser => [user?.id, userId].includes(targetUser?.user?.id))
-	}, [user?.id, userId, allUser])
+		return allUser.find((targetUser) => [user?.id, userId].includes(targetUser?.user?.id));
+	}, [user?.id, userId, allUser]);
 
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
@@ -104,7 +104,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			icon: <Icons.PhoneCallIcon color={themeValue.text} />,
 			action: () => {
 				//TODO
-				Toast.show({ type: 'info', text1: 'Updating...' })
+				Toast.show({ type: 'info', text1: 'Updating...' });
 			},
 			isShow: true,
 		},
@@ -114,7 +114,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			icon: <Icons.VideoIcon color={themeValue.text} />,
 			action: () => {
 				//TODO
-				Toast.show({ type: 'info', text1: 'Updating...' })
+				Toast.show({ type: 'info', text1: 'Updating...' });
 			},
 			isShow: true,
 		},
@@ -133,49 +133,46 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			},
 			isShow: !targetUser,
 			textStyles: {
-				color: Colors.green
-			}
+				color: Colors.green,
+			},
 		},
 		{
 			id: 5,
 			text: t('userAction.pending'),
 			icon: <Icons.ClockIcon color={Colors.goldenrodYellow} />,
 			action: () => {
-				setIsShowPendingContent(true)
+				setIsShowPendingContent(true);
 			},
 			isShow: !!targetUser && [EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state),
 			textStyles: {
-				color: Colors.goldenrodYellow
-			}
-		}
+				color: Colors.goldenrodYellow,
+			},
+		},
 	];
 
 	const handleAcceptFriend = () => {
 		acceptFriend(targetUser?.user?.username, targetUser?.user?.id);
-	}
+	};
 
 	const handleIgnoreFriend = () => {
 		deleteFriend(targetUser?.user?.username, targetUser?.user?.id);
-	}
+	};
 
 	const isShowUserContent = useMemo(() => {
-		return !!userById?.user?.about_me || (showRole && userRolesClan?.length) || showAction
-	}, [userById?.user?.about_me, showAction, showRole, userRolesClan])
+		return !!userById?.user?.about_me || (showRole && userRolesClan?.length) || showAction;
+	}, [userById?.user?.about_me, showAction, showRole, userRolesClan]);
 
 	if (isShowPendingContent) {
 		return (
 			<View style={[styles.wrapper]}>
 				<PendingContent targetUser={targetUser} onClose={() => setIsShowPendingContent(false)} />
 			</View>
-		)
+		);
 	}
 
 	return (
 		<View style={[styles.wrapper]}>
-			<View style={[
-				styles.backdrop,
-				{ backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }
-			]}>
+			<View style={[styles.backdrop, { backgroundColor: user?.avatar_url || user?.avatarSm ? color : Colors.titleReset }]}>
 				<View style={[styles.userAvatar]}>
 					<MezonAvatar
 						width={80}
@@ -190,7 +187,9 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			<View style={[styles.container]}>
 				<View style={[styles.userInfo]}>
 					<Text style={[styles.userName]}>
-						{userById ? userById?.user?.display_name : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
+						{userById
+							? userById.clan_nick || userById?.user?.display_name || userById?.user?.username
+							: user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
 					</Text>
 					<Text style={[styles.subUserName]}>
 						{userById ? userById?.user?.username : user?.username || (checkAnonymous ? 'Anonymous' : message?.username)}
@@ -199,7 +198,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 					{checkOwner(userById?.user?.google_id || userById?.user?.id) && <EditUserProfileBtn user={userById || (user as any)} />}
 					{!checkOwner(userById?.user?.google_id || userById?.user?.id) && (
 						<View style={[styles.userAction]}>
-							{actionList.map(actionItem => {
+							{actionList.map((actionItem) => {
 								const { action, icon, id, isShow, text, textStyles } = actionItem;
 								if (!isShow) return null;
 								return (
@@ -207,18 +206,21 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 										{icon}
 										<Text style={[styles.actionText, textStyles && textStyles]}>{text}</Text>
 									</TouchableOpacity>
-								)
+								);
 							})}
 						</View>
 					)}
 					{EFriendState.ReceivedRequestFriend === targetUser?.state && (
 						<Block marginTop={size.s_16}>
 							<Text style={styles.receivedFriendRequestTitle}>{t('incomingFriendRequest')}</Text>
-							<Block flexDirection='row' gap={size.s_10} marginTop={size.s_10}>
+							<Block flexDirection="row" gap={size.s_10} marginTop={size.s_10}>
 								<TouchableOpacity onPress={() => handleAcceptFriend()} style={[styles.button, { backgroundColor: Colors.green }]}>
 									<Text style={styles.defaultText}>{t('accept')}</Text>
-								</TouchableOpacity >
-								<TouchableOpacity onPress={() => handleIgnoreFriend()} style={[styles.button, { backgroundColor: Colors.bgGrayDark }]}>
+								</TouchableOpacity>
+								<TouchableOpacity
+									onPress={() => handleIgnoreFriend()}
+									style={[styles.button, { backgroundColor: Colors.bgGrayDark }]}
+								>
 									<Text style={styles.defaultText}>{t('ignore')}</Text>
 								</TouchableOpacity>
 							</Block>
@@ -249,14 +251,9 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 							</Block>
 						) : null}
 
-						{showAction && (
-							<UserSettingProfile
-								user={userById || (user as any)}
-							/>
-						)}
+						{showAction && <UserSettingProfile user={userById || (user as any)} />}
 					</View>
 				)}
-
 			</View>
 		</View>
 	);

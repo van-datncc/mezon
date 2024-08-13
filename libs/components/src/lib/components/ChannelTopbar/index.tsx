@@ -272,7 +272,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	}, [newNotificationStatus]);
 
 	const handleShowInbox = () => {
-		dispatch(notificationActions.fetchListNotification({ clanId: currentDmGroupId ? '0' : (currentClanId as string) }));
+		dispatch(notificationActions.fetchListNotification({ clanId: currentClanId as string }));
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 
