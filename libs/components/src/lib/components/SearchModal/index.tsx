@@ -20,7 +20,7 @@ import {
 	getAvatarForPrioritize,
 	normalizeString,
 	removeDuplicatesById,
-	sortFilteredList
+	sortFilteredList,
 } from '@mezon/utils';
 import { Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -114,7 +114,14 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const listSearch = [
 			...listDMSearch.map((itemDM) => {
 				const user = usersClanMap.get(itemDM.id);
-				return user ? { ...itemDM, clanNick: user.clanNick || '', displayName: user.displayName || itemDM.displayName, avatarUser: user.avatarUser || '' } : itemDM;
+				return user
+					? {
+							...itemDM,
+							clanNick: user.clanNick || '',
+							displayName: user.displayName || itemDM.displayName,
+							avatarUser: user.avatarUser || '',
+						}
+					: itemDM;
 			}),
 			...listGroupSearch,
 			...listFriendsSearch,
@@ -270,6 +277,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					break;
 
 				case 'Enter':
+					event.preventDefault();
 					handleEnter(listToUse, idActive);
 					break;
 
