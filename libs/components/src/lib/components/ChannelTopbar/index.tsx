@@ -35,76 +35,88 @@ import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 
 export type ChannelTopbarProps = {
 	readonly channel?: Readonly<IChannel> | null;
+	isChannelVoice?: boolean;
 };
 
 function ChannelTopbar({ channel }: ChannelTopbarProps) {
-	const checkChannelType = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
-	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
-	));
-	const appearanceTheme = useSelector(selectTheme);
-	const { setTurnOffThreadMessage } = useThreads();
+	const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
 	return (
 		<div
-			className={`flex h-heightTopBar p-3 min-w-0 items-cente flex-shrink ${checkChannelType ? 'bg-bgPrimary' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen z-[1]'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
+			className={`flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen z-[1]'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
-			{checkChannelType ? (
-				<>
-					<div className="justify-start items-center gap-1 hidden group-hover:flex">
-						<ChannelLabel channel={channel} />
-					</div>
-					<div className="items-center h-full ml-auto hidden group-hover:flex">
-						<div className="justify-end items-center gap-2 flex">
-							<div className="">
-								<div className="justify-start items-center gap-[15px] flex iconHover">
-									<div className="relative" onClick={openInviteChannelModal} role="button">
-										<Icons.AddMemberCall />
-									</div>
-									<InboxButton />
-									<Icons.ThreeDot />
-									<Icons.BoxChatIcon />
-								</div>
-							</div>
-						</div>
-					</div>
-				</>
+			{isChannelVoice ? (
+				<TopBarChannelVoice channel={channel} />
 			) : (
-				<>
-					<div className="justify-start items-center gap-1 flex">
-						<ChannelLabel channel={channel} />
-					</div>
-					<div className="items-center h-full ml-auto flex">
-						<div className="justify-end items-center gap-2 flex">
-							<div className="hidden sbm:flex">
-								<div className="relative justify-start items-center gap-[15px] flex mr-4">
-									<ThreadButton isLightMode={appearanceTheme === 'light'} />
-									<MuteButton isLightMode={appearanceTheme === 'light'} />
-									<PinButton isLightMode={appearanceTheme === 'light'} />
-									<div onClick={() => setTurnOffThreadMessage()}>
-										<ChannelListButton isLightMode={appearanceTheme === 'light'} />
-									</div>
-								</div>
-								<SearchMessageChannel />
-							</div>
-							<div
-								className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${checkChannelType ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
-								id="inBox"
-							>
-								<InboxButton isLightMode={appearanceTheme === 'light'} />
-								<HelpButton isLightMode={appearanceTheme === 'light'} />
-							</div>
-							<div className="sbm:hidden mr-5">
-								<ChannelListButton />
-							</div>
-						</div>
-					</div>
-				</>
+				<TopBarChannelText channel={channel} />
 			)}
 		</div>
 	);
+}
+
+function TopBarChannelVoice({channel}: ChannelTopbarProps){
+	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
+		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />
+	));
+	return (
+		<>
+			<div className="justify-start items-center gap-1 flex">
+				<ChannelLabel channel={channel} />
+			</div>
+			<div className="items-center h-full ml-auto flex">
+				<div className="justify-end items-center gap-2 flex">
+					<div className="">
+						<div className="justify-start items-center gap-[15px] flex iconHover">
+							<div className="relative" onClick={openInviteChannelModal} role="button">
+								<Icons.AddMemberCall />
+							</div>
+							<InboxButton isVoiceChannel />
+						</div>
+					</div>
+				</div>
+			</div>
+		</>
+	)
+}
+
+function TopBarChannelText({channel, isChannelVoice}: ChannelTopbarProps) {
+	const { setTurnOffThreadMessage } = useThreads();
+	const appearanceTheme = useSelector(selectTheme);
+
+	return(
+		<>
+			<div className="justify-start items-center gap-1 flex">
+				<ChannelLabel channel={channel} />
+			</div>
+			<div className="items-center h-full ml-auto flex">
+				<div className="justify-end items-center gap-2 flex">
+					<div className="hidden sbm:flex">
+						<div className="relative justify-start items-center gap-[15px] flex mr-4">
+							<ThreadButton isLightMode={appearanceTheme === 'light'} />
+							<MuteButton isLightMode={appearanceTheme === 'light'} />
+							<PinButton isLightMode={appearanceTheme === 'light'} />
+							<div onClick={() => setTurnOffThreadMessage()}>
+								<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+							</div>
+						</div>
+						<SearchMessageChannel />
+					</div>
+					<div
+						className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
+						id="inBox"
+					>
+						<InboxButton isLightMode={appearanceTheme === 'light'} />
+						<HelpButton isLightMode={appearanceTheme === 'light'} />
+					</div>
+					<div className="sbm:hidden mr-5">
+						<ChannelListButton />
+					</div>
+				</div>
+			</div>
+		</>
+	)
 }
 
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
@@ -228,7 +240,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	);
 }
 
-export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
+export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boolean, isVoiceChannel?: boolean }) {
 	const dispatch = useAppDispatch();
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
@@ -275,7 +287,7 @@ export function InboxButton({ isLightMode }: { isLightMode?: boolean }) {
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.Inbox />
+					<Icons.Inbox defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''}/>
 					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>

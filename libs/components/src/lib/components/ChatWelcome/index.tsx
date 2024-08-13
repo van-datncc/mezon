@@ -135,7 +135,15 @@ const WelComeDm = (props: WelComeDmProps) => {
 			</div>
 			{!isDmGroup &&<p className='font-medium text-2xl'>{userName}</p>}
 			<div className="text-base">
-				<p className={classNameSubtext}>This is the beginning of your direct message history with {showName}</p>
+			<p className={classNameSubtext}>
+				{isDmGroup ? 
+					(
+						<>Welcome to the beginning of the {showName} group.</>
+					) : (
+						<>This is the beginning of your direct message history with {showName}</>
+					)
+				}
+			</p>
 			</div>
 		</>
 	)
