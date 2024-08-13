@@ -809,7 +809,6 @@ export const messagesSlice = createSlice({
 			.addCase(
 				fetchMessages.fulfilled,
 				(state: MessagesState, action: PayloadAction<FetchMessagesPayloadAction, string, FetchMessagesMeta>) => {
-					console.log('fetchMessages.fulfilled', action.payload);
 					const channelId = action?.meta?.arg?.channelId;
 					const isFetchingLatestMessages = action.payload.isFetchingLatestMessages || false;
 					const isClearMessage = action.payload.isClearMessage || false;
@@ -1213,8 +1212,6 @@ const handleLimitMessage = (
 
 	const startSlicePosition = direction === Direction_Mode.AFTER_TIMESTAMP ? length - limit : 0;
 	const idToRemove = direction === Direction_Mode.AFTER_TIMESTAMP ? ids.slice(0, startSlicePosition) : ids.slice(limit, length);
-
-	console.log('handleLimitMessage', idToRemove);
 
 	return channelMessagesAdapter.removeMany(channelEntity, idToRemove);
 };
