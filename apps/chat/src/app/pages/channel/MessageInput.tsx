@@ -79,7 +79,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	useEffect(() => {
 		if (openEditMessageState && message.id === idMessageRefEdit) {
-			console.log('no-focus');
 			textareaRef.current?.focus();
 		}
 	}, [openEditMessageState, message.id, idMessageRefEdit]);
