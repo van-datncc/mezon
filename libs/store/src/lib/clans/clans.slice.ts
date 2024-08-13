@@ -6,7 +6,6 @@ import { getUserProfile } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
-import { userClanProfileActions } from '../clanProfile/clanProfile.slice';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
 import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
@@ -14,8 +13,6 @@ import { defaultNotificationActions } from '../notificationSetting/notificationS
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
-
-import { directActions } from '../direct/direct.slice';
 
 export const CLANS_FEATURE_KEY = 'clans';
 
@@ -73,7 +70,6 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId, noCache }));
 		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId, noCache }));
 		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache }));
-		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache }));
 		thunkAPI.dispatch(
 			voiceActions.fetchVoiceChannelMembers({
 				clanId: clanId ?? '',
