@@ -19,7 +19,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Direction_Mode, sleep } from '@mezon/utils';
+import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -93,7 +93,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
-	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage, chatRefOptions);
+	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage);
 
 	useEffect(() => {
 		if (lastMessage && lastMessage.sender_id === currentAccountId) {
@@ -110,7 +110,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 						name={channelLabel}
 						avatarDM={avatarDM}
 						userName={userName}
-						mode={mode} 
+						mode={mode}
 					/>
 				)
 			}
