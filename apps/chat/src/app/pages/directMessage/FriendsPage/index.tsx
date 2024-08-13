@@ -109,7 +109,7 @@ export default function FriendsPage() {
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">
 			<div className="flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader">
-				{(closeMenuMobile) && 
+				{(closeMenuMobile) &&
 					<div onClick={() => setStatusMenu(true)}>
 						<Icons.OpenMenu defaultSize="w-6 h-6" />
 					</div>
@@ -147,25 +147,29 @@ export default function FriendsPage() {
 				</div>
 			</div>
 			<div className="flex-1 flex w-full h-full">
-				<div className="px-8 py-6 flex-1 dark:bg-bgPrimary bg-[#F0F0F0]">
+				<div className=" flex-1 dark:bg-bgPrimary bg-[#F0F0F0] flex flex-col">
 					{!openModalAddFriend && (
-						<div className="flex flex-col text-[#AEAEAE] h-full">
-							<div className="relative">
-								<InputField
-									type="text"
-									onChange={(e) => setTextSearch(e.target.value)}
-									placeholder="Search"
-									className="mb-6 py-[10px] dark:bg-bgTertiary bg-white text-[16px] font-normal h-[44px] dark:text-textDarkTheme text-textLightTheme placeholder-textPrimary"
-								/>
-								<div className="absolute top-3 right-5">
-									<Icons.Search />
+						<>
+							<div className="flex flex-col text-[#AEAEAE] px-8 pt-6">
+								<div className="relative">
+									<InputField
+										type="text"
+										onChange={(e) => setTextSearch(e.target.value)}
+										placeholder="Search"
+										className="mb-6 py-[10px] dark:bg-bgTertiary bg-white text-[16px] font-normal h-[44px] dark:text-textDarkTheme text-textLightTheme placeholder-textPrimary"
+									/>
+									<div className="absolute top-3 right-5">
+										<Icons.Search />
+									</div>
 								</div>
+								<span className="text-[14px] dark:text-contentSecondary text-black mb-4 font-bold px-[14px]">
+									{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
+								</span>
 							</div>
-							<span className="text-[14px] dark:text-contentSecondary text-black mb-4 font-bold px-[14px]">
-								{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
-							</span>
-							<FriendList listFriendFilter={listFriendFilter} />
-						</div>
+							<div className='pl-8 overflow-hidden flex flex-1 pb-16'>
+								<FriendList listFriendFilter={listFriendFilter} />
+							</div>
+						</>
 					)}
 					{openModalAddFriend && (
 						<div className="w-full flex flex-col gap-3">
