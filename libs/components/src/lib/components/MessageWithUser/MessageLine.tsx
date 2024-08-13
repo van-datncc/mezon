@@ -7,7 +7,6 @@ import {
 	ILinkVoiceRoomOnMessage,
 	IMarkdownOnMessage,
 	IMentionOnMessage,
-	convertMarkdown,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -22,7 +21,6 @@ type MessageLineProps = {
 	isSearchMessage?: boolean;
 
 	isJumMessageEnabled: boolean;
-	isSingleLine: boolean;
 	isTokenClickAble: boolean;
 	isRenderImage: boolean;
 };
@@ -34,7 +32,6 @@ const MessageLine = ({
 	onClickToMessage,
 	isOnlyContainEmoji,
 	isSearchMessage,
-	isSingleLine,
 	isTokenClickAble,
 	isRenderImage,
 }: MessageLineProps) => {
@@ -60,7 +57,6 @@ const MessageLine = ({
 				isTokenClickAble={isTokenClickAble}
 				isOnlyContainEmoji={isOnlyContainEmoji}
 				isJumMessageEnabled={isJumMessageEnabled}
-				isSingleLine={isSingleLine}
 				data={content as IExtendedMessage}
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
 				allChannelVoice={allChannelVoice}
@@ -80,7 +76,6 @@ interface RenderContentProps {
 	isOnlyContainEmoji?: boolean;
 	isSearchMessage?: boolean;
 
-	isSingleLine: boolean;
 	isTokenClickAble: boolean;
 	isJumMessageEnabled: boolean;
 	parentWidth?: number;
@@ -110,7 +105,6 @@ const RenderContent = memo(
 		mode,
 		allChannelVoice,
 		isSearchMessage,
-		isSingleLine,
 		isJumMessageEnabled,
 		parentWidth,
 		isOnlyContainEmoji,
@@ -136,7 +130,7 @@ const RenderContent = memo(
 					formattedContent.push(
 						<ChannelHashtag
 							isTokenClickAble={isTokenClickAble}
-							isSingleLine={isSingleLine}
+							isJumMessageEnabled={isJumMessageEnabled}
 							key={`hashtag-${index}-${s}-${element.channelid}`}
 							channelHastagId={`<#${element.channelid}>`}
 						/>,
@@ -147,7 +141,7 @@ const RenderContent = memo(
 					formattedContent.push(
 						<MentionUser
 							isTokenClickAble={isTokenClickAble}
-							isSingleLine={isSingleLine}
+							isJumMessageEnabled={isJumMessageEnabled}
 							key={`mentionUser-${index}-${s}-${element.username}-${element.user_id}`}
 							tagName={element.username ?? ''}
 							tagUserId={element.user_id ?? ''}
@@ -160,7 +154,7 @@ const RenderContent = memo(
 					formattedContent.push(
 						<MentionUser
 							isTokenClickAble={isTokenClickAble}
-							isSingleLine={isSingleLine}
+							isJumMessageEnabled={isJumMessageEnabled}
 							key={`mentionRole-${index}-${s}-${element.rolename}-${element.role_id}`}
 							tagName={element.rolename ?? ''}
 							tagUserId={element.role_id ?? ''}
@@ -172,7 +166,6 @@ const RenderContent = memo(
 				if (isEmojiOnMessage(element)) {
 					formattedContent.push(
 						<EmojiMarkup
-							isSingleLine={isSingleLine}
 							key={`emoji-${index}-${s}-${element.emojiid}`}
 							emojiSyntax={element.shortname ?? ''}
 							onlyEmoji={isOnlyContainEmoji ?? false}
@@ -186,7 +179,7 @@ const RenderContent = memo(
 						<MarkdownContent
 							isRenderImage={isRenderImage}
 							isTokenClickAble={isTokenClickAble}
-							isSingleLine={isSingleLine}
+							isJumMessageEnabled={isJumMessageEnabled}
 							key={`link-${index}-${s}-${element.lk}`}
 							content={element.lk as string}
 						/>,
@@ -200,7 +193,7 @@ const RenderContent = memo(
 						? formattedContent.push(
 								<ChannelHashtag
 									isTokenClickAble={isTokenClickAble}
-									isSingleLine={isSingleLine}
+									isJumMessageEnabled={isJumMessageEnabled}
 									key={`voicelink-${index}-${s}-${voiceChannelFound?.channel_id}`}
 									channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
 								/>,
@@ -209,7 +202,7 @@ const RenderContent = memo(
 								<MarkdownContent
 									isRenderImage={isRenderImage}
 									isTokenClickAble={isTokenClickAble}
-									isSingleLine={isSingleLine}
+									isJumMessageEnabled={isJumMessageEnabled}
 									key={`voicelink-${index}-${s}-${element.vk}`}
 									content={element.vk as string}
 								/>,
@@ -217,17 +210,27 @@ const RenderContent = memo(
 				}
 
 				if (isMarkdownOnMessage(element)) {
-					const converted = element.mk?.startsWith('```') && element.mk?.endsWith('```') ? convertMarkdown(element.mk) : element.mk;
+					let markdownContent = element.mk || '';
+
+					if (isJumMessageEnabled) {
+						let replacement;
+						while (markdownContent.includes('```')) {
+							replacement = markdownContent.indexOf('```');
+							markdownContent = markdownContent.slice(0, replacement) + '`' + markdownContent.slice(replacement + 3);
+						}
+					}
+
 					formattedContent.push(
 						<MarkdownContent
 							isRenderImage={isRenderImage}
 							isTokenClickAble={isTokenClickAble}
-							isSingleLine={isSingleLine}
+							isJumMessageEnabled={isJumMessageEnabled}
 							key={`markdown-${index}-${s}-${element.mk}`}
-							content={converted as string}
+							content={markdownContent as string}
 						/>,
 					);
 				}
+
 				lastindex = e;
 			});
 
@@ -241,7 +244,7 @@ const RenderContent = memo(
 		return (
 			<div
 				style={
-					isSingleLine
+					isJumMessageEnabled
 						? {
 								whiteSpace: 'nowrap',
 								overflow: 'hidden',

@@ -72,7 +72,6 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 									isRenderImage={false}
 									isTokenClickAble={false}
 									isJumMessageEnabled={true}
-									isSingleLine={true}
 									onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
 									content={messageContentRef}
 								/>

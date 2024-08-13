@@ -71,7 +71,6 @@ const MessageText = ({
 						isSearchMessage={isSearchMessage}
 						isOnlyContainEmoji={isOnlyContainEmoji}
 						isJumMessageEnabled={false}
-						isSingleLine={false}
 						content={content}
 						mode={mode}
 					/>

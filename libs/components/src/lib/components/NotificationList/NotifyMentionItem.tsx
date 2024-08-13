@@ -96,13 +96,7 @@ function MentionTabContent({ message }: IMentionTabContent) {
 		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
 			{checkMessageHasReply && (
 				<div className="max-w-full overflow-hidden">
-					<MessageLine
-						isRenderImage={false}
-						isTokenClickAble={false}
-						content={contentUpdatedMention}
-						isJumMessageEnabled={false}
-						isSingleLine={true}
-					/>
+					<MessageLine isRenderImage={false} isTokenClickAble={false} content={contentUpdatedMention} isJumMessageEnabled={false} />
 				</div>
 			)}
 
@@ -111,13 +105,7 @@ function MentionTabContent({ message }: IMentionTabContent) {
 
 				<div className="h-full">
 					<MessageHead message={message} isCombine={true} isShowFull={true} />
-					<MessageLine
-						isRenderImage={false}
-						content={contentUpdatedMention}
-						isTokenClickAble={false}
-						isJumMessageEnabled={false}
-						isSingleLine={false}
-					/>
+					<MessageLine isRenderImage={false} content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} />
 					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
 				</div>
 			</div>

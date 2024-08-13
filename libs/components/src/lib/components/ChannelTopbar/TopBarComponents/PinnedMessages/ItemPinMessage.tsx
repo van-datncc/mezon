@@ -36,7 +36,6 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 							isRenderImage={false}
 							content={JSON.parse(pinMessage.content || '')}
 							isJumMessageEnabled={false}
-							isSingleLine={false}
 							isTokenClickAble={false}
 						/>
 					</div>

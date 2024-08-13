@@ -10,12 +10,12 @@ import { MessageImage, PreClass } from '../../components';
 
 type MarkdownContentOpt = {
 	content?: string;
-	isSingleLine: boolean;
+	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
 	isRenderImage: boolean;
 };
 
-export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingleLine, isTokenClickAble, isRenderImage }) => {
+export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isRenderImage }) => {
 	const appearanceTheme = useSelector(selectTheme);
 
 	const [isImage, setIsImage] = useState<boolean>(false);
@@ -36,11 +36,11 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingl
 
 	const onClickLink = useCallback(
 		(url: string) => {
-			if (!isSingleLine || isTokenClickAble) {
+			if (!isJumMessageEnabled || isTokenClickAble) {
 				window.open(url, '_blank');
 			}
 		},
-		[isSingleLine, isTokenClickAble],
+		[isJumMessageEnabled, isTokenClickAble],
 	);
 
 	const classes = clx(
@@ -68,9 +68,9 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingl
 									rel="noopener noreferrer"
 									style={{
 										color: 'rgb(59,130,246)',
-										cursor: isSingleLine || !isTokenClickAble ? 'text' : 'pointer',
+										cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
 										wordBreak: 'break-word',
-										textDecoration: isSingleLine || !isTokenClickAble ? 'none' : 'underline',
+										textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline',
 									}}
 									className="tagLink"
 								>
