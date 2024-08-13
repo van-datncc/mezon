@@ -29,7 +29,7 @@ export const initialSettingClanStickerState: SettingClanStickerState = stickerAd
 	loadingStatus: 'not loaded',
 	error: null,
 });
-const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.client.listClanStickersByClanId(mezon.session, clanId), {
+const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.socketRef.current?.listClanStickersByClanId(clanId), {
 	promise: true,
 	maxAge: LIST_STICKER_CACHED_TIME,
 	normalizer: (args) => {
