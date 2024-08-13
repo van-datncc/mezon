@@ -24,11 +24,12 @@ type ScreenChannelSetting = typeof APP_SCREEN.MENU_CHANNEL.SETTINGS;
 export default function ChannelSetting({ navigation, route }: MenuChannelScreenProps<ScreenChannelSetting>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { channelId, isChannel = true } = route.params;
+	const { channelId } = route.params;
 	const { t } = useTranslation(['channelSetting']);
 	const { t: t1 } = useTranslation(['screenStack']);
 	const dispatch = useAppDispatch();
 	const channel = useSelector(selectChannelById(channelId || ''));
+	const isChannel = useMemo(() => channel.parrent_id === "0", [channel.parrent_id])
 	const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
 	const [originSettingValue, setOriginSettingValue] = useState<IChannelSettingValue>({
 		channelName: '',
