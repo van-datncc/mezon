@@ -35,8 +35,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 		username ?? '',
 	);
 
-	const nameShowed = useShowName(pendingClannick ?? '', pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
-
+	const nameShowed = useShowName(clanNick ? clanNick : pendingClannick ?? '', pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === MouseButton.LEFT) {
 			setIsShowPanelChannel(true);
