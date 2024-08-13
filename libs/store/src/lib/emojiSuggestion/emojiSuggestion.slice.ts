@@ -42,7 +42,7 @@ type EmojiObjPickedArgs = {
 	isReset?: boolean;
 };
 
-const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.client.listClanEmoji(mezon.session, clanId), {
+const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.socketRef.current?.listClanEmojiByClanId(clanId), {
 	promise: true,
 	maxAge: LIST_EMOJI_CACHED_TIME,
 	normalizer: (args) => {
@@ -56,7 +56,7 @@ export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, 
 		fetchEmojiCached.clear(mezon, clanId);
 	}
 	const response = await fetchEmojiCached(mezon, clanId);
-	if (!response.emoji_list) {
+	if (!response?.emoji_list) {
 		throw new Error('Emoji list is undefined or null');
 	}
 	return response.emoji_list;
