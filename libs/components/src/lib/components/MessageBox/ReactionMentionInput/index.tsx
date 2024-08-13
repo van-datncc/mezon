@@ -26,6 +26,7 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
+	selectIdMessageRefEdit,
 	selectIdMessageRefReply,
 	selectIsFocused,
 	selectIsSearchMessage,
@@ -151,6 +152,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+
+	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const isSearchMessage = useSelector(
 		selectIsSearchMessage((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
 	);
@@ -244,6 +247,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
+
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
@@ -391,7 +395,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	);
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
-		if (props.mode !== 3 && props.mode !== 4) {
+		if (props.mode !== ChannelStreamMode.STREAM_MODE_GROUP && props.mode !== ChannelStreamMode.STREAM_MODE_DM) {
 			return listChannels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
@@ -469,7 +473,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
 			dispatch(
 				messagesActions.setChannelDraftMessage({
-					channelId: currentChannelId as string,
+					channelId: props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannelId as string) : (currentDmId as string),
 					channelDraftMessage: {
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
@@ -499,17 +503,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 
 	useEffect(() => {
-		if (closeMenu && statusMenu) {
+		if ((closeMenu && statusMenu) || openEditMessageState) {
 			return;
 		}
 		if (
 			(getRefMessageReply !== null && openReplyMessageState) ||
-			!openEditMessageState ||
-			(emojiPicked?.shortName !== '' && !reactionRightState)
+			(emojiPicked?.shortName !== '' && !reactionRightState) ||
+			(!openEditMessageState && !idMessageRefEdit)
 		) {
 			return focusToElement(editorRef);
 		}
-	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
+	}, [getRefMessageReply, openReplyMessageState, emojiPicked, openEditMessageState, idMessageRefEdit]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
