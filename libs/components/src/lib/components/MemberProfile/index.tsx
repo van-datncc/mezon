@@ -35,6 +35,7 @@ export type MemberProfileProps = {
 	dataMemberCreate?: DataMemberCreate;
 	isHiddenAvatarPanel?: boolean;
 	userNameAva?: string;
+  hideLongName?:boolean;
 };
 
 function MemberProfile({
@@ -60,6 +61,7 @@ function MemberProfile({
 	dataMemberCreate,
 	isHiddenAvatarPanel,
 	userNameAva,
+  hideLongName
 }: MemberProfileProps) {
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanel, setIsShowPanel] = useState<boolean>(false);
@@ -231,7 +233,7 @@ function MemberProfile({
 							`}
 									title={name}
 								>
-									<span className={`truncate ${isListFriend ? 'dark:text-white text-black' : ''}`}>{!isHiddenAvatarPanel && name}</span>
+									<span className={`one-line ${hideLongName && 'truncate !block'} ${isListFriend ? 'dark:text-white text-black' : ''}`}>{!isHiddenAvatarPanel && name}</span>
 									{isListFriend && <span className='hidden group-hover/list_friends:inline'>&nbsp;{userNameAva}</span>}
 								</p>
 								{(dataMemberCreate?.createId || currentClan?.creator_id) &&

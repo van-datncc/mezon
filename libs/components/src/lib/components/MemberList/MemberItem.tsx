@@ -35,6 +35,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			isOffline={isOffline}
 			positionType={positionType}
 			dataMemberCreate={dataMemberCreate}
+      hideLongName={true}
 		/>
 	);
 }

@@ -1,14 +1,12 @@
-import { ChannelVoice, ChannelVoiceOff } from '@mezon/components';
 import { ChannelsEntity } from '@mezon/store-mobile';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import ChannelMessages from './ChannelMessages';
 
 type ChannelMediaProps = {
 	currentChannel: ChannelsEntity | null;
-	statusCall: boolean;
 };
 
-export const ChannelMedia = ({ currentChannel, statusCall }: ChannelMediaProps) => {
+export const ChannelMedia = ({ currentChannel }: ChannelMediaProps) => {
 	if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
 		return (
 			<ChannelMessages
@@ -18,9 +16,6 @@ export const ChannelMedia = ({ currentChannel, statusCall }: ChannelMediaProps) 
 				mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 			/>
 		);
-	}
-	if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-		return statusCall ? <ChannelVoice channelId={currentChannel.channel_id || ''} /> : <ChannelVoiceOff />;
 	}
 	return <ChannelMessages.Skeleton />;
 };

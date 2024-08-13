@@ -61,7 +61,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemDM?.usernames ?? '',
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
-						displayName: '',
+						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
 						typeChat: ChannelType.CHANNEL_TYPE_DM,
 						type: TypeSearch.Dm_Type,
@@ -114,7 +114,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		const listSearch = [
 			...listDMSearch.map((itemDM) => {
 				const user = usersClanMap.get(itemDM.id);
-				return user ? { ...itemDM, clanNick: user.clanNick || '', displayName: user.displayName ,avatarUser: user.avatarUser || '' } : itemDM;
+				return user ? { ...itemDM, clanNick: user.clanNick || '', displayName: user.displayName || itemDM.displayName, avatarUser: user.avatarUser || '' } : itemDM;
 			}),
 			...listGroupSearch,
 			...listFriendsSearch,

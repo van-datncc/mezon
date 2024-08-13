@@ -26,6 +26,7 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
+	selectIdMessageRefEdit,
 	selectIdMessageRefReply,
 	selectIsFocused,
 	selectIsSearchMessage,
@@ -68,6 +69,7 @@ import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 import { useMessageLine } from '../../MessageWithUser/useMessageLine';
+import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
 import {
@@ -150,6 +152,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+
+	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const isSearchMessage = useSelector(
 		selectIsSearchMessage((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
 	);
@@ -178,10 +182,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
+		const seenIds = new Set();
 		const matches = emojis
 			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.filter((emoji) => {
+				if (emoji.id && !seenIds.has(emoji.id)) {
+					seenIds.add(emoji.id);
+					return true;
+				}
+				return false;
+			})
 			.slice(0, 20)
 			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
+
 		callback(matches);
 	};
 
@@ -234,6 +247,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
+
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
@@ -381,7 +395,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	);
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
-		if (props.mode !== 3 && props.mode !== 4) {
+		if (props.mode !== ChannelStreamMode.STREAM_MODE_GROUP && props.mode !== ChannelStreamMode.STREAM_MODE_DM) {
 			return listChannels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
@@ -459,7 +473,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
 			dispatch(
 				messagesActions.setChannelDraftMessage({
-					channelId: currentChannelId as string,
+					channelId: props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannelId as string) : (currentDmId as string),
 					channelDraftMessage: {
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
@@ -489,17 +503,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	useClickUpToEdit(editorRef, valueTextInput, clickUpToEditMessage);
 
 	useEffect(() => {
-		if (closeMenu && statusMenu) {
+		if ((closeMenu && statusMenu) || openEditMessageState) {
 			return;
 		}
 		if (
 			(getRefMessageReply !== null && openReplyMessageState) ||
-			!openEditMessageState ||
-			(emojiPicked?.shortName !== '' && !reactionRightState)
+			(emojiPicked?.shortName !== '' && !reactionRightState) ||
+			(!openEditMessageState && !idMessageRefEdit)
 		) {
 			return focusToElement(editorRef);
 		}
-	}, [getRefMessageReply, openReplyMessageState, openEditMessageState, emojiPicked]);
+	}, [getRefMessageReply, openReplyMessageState, emojiPicked, openEditMessageState, idMessageRefEdit]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -623,7 +637,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						...(appearanceTheme === 'light' ? lightMentionsInputStyle.control : darkMentionsInputStyle.control),
 						maxWidth: `${!closeMenu ? chatBoxMaxWidth : '75vw'}`,
 					},
-					maxWidth: `${!closeMenu ? chatBoxMaxWidth : '75vw'}`,
+					maxWidth: '100%',
+					maxHeight: '350px',
 				}}
 				className={`dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-md ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'}`}
 				allowSpaceInQuery={true}
@@ -648,7 +663,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 								subText={
 									suggestion.display === '@here'
 										? 'Notify everyone who has permission to see this channel'
-										: suggestion.username ?? ''
+										: (suggestion.username ?? '')
 								}
 								subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
 								showAvatar={suggestion.display !== '@here'}
@@ -697,6 +712,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
+			<GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />
 		</div>
 	);
 }

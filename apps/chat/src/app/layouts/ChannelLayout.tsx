@@ -1,4 +1,4 @@
-import { GifStickerEmojiPopup } from '@mezon/components';
+import { GifStickerEmojiPopup, Icons } from '@mezon/components';
 import { useApp, useGifsStickersEmoji, useThreads } from '@mezon/core';
 import {
 	selectCloseMenu,
@@ -15,6 +15,7 @@ import { Outlet } from 'react-router-dom';
 
 const ChannelLayout = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isChannelVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 	const reactionTopState = useSelector(selectReactionTopState);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -40,12 +41,10 @@ const ChannelLayout = () => {
 
 	return (
 		<div
-			className={` flex flex-col
-			 flex-1 shrink min-w-0 bg-transparent
-			  h-[100%] overflow-visible 
-			   
-			   ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
+			className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible"
 		>
+			{isChannelVoice ? <ChannelLayoutVoice /> :
+			<>
 			<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 				<Outlet />
 			</div>
@@ -84,8 +83,22 @@ const ChannelLayout = () => {
 					</div>
 				</div>
 			)}
+			</>}
 		</div>
 	);
 };
 
 export default ChannelLayout;
+
+const ChannelLayoutVoice = () =>{
+	return(
+		<div className="bg-black h-full flex flex-col font-semibold">
+			<p className='flex-1 flex justify-center items-center'>You've popped out the player to another tab.</p>
+			<div className="relative justify-center items-center gap-x-5 w-full bottom-5 flex h-[50px]">
+				<button className="size-[50px] rounded-full bg-red-500 hover:bg-red-950">
+					<Icons.PhoneOff defaultSize="rotate-[138deg] m-auto" />
+				</button>
+			</div>
+		</div>
+	)
+}
