@@ -1,19 +1,16 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useReference, useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
 import { style } from './styles';
 
 interface IChannelMenuProps {
@@ -57,22 +54,23 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 			},
 			icon: <Icons.GroupPlusIcon color={themeValue.textStrong} />,
 		},
-		{
-			title: t('menu.inviteMenu.favorite'),
-			onPress: () => {
-				inviteRef?.current?.present();
-				dismiss();
-			},
-			icon: <Icons.StarIcon color={themeValue.textStrong} />,
-		},
-		{
-			title: t('menu.inviteMenu.copyLink'),
-			onPress: () => {
-				inviteRef?.current?.present();
-				dismiss();
-			},
-			icon: <Icons.LinkIcon color={themeValue.textStrong} />,
-		},
+		//TODO: update later
+		// {
+		// 	title: t('menu.inviteMenu.favorite'),
+		// 	onPress: () => {
+		// 		inviteRef?.current?.present();
+		// 		dismiss();
+		// 	},
+		// 	icon: <Icons.StarIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	title: t('menu.inviteMenu.copyLink'),
+		// 	onPress: () => {
+		// 		inviteRef?.current?.present();
+		// 		dismiss();
+		// 	},
+		// 	icon: <Icons.LinkIcon color={themeValue.textStrong} />,
+		// },
 	];
 
 	const notificationMenu: IMezonMenuItemProps[] = [
@@ -164,20 +162,6 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		},
 	];
 
-	const devMenu: IMezonMenuItemProps[] = [
-		{
-			title: t('menu.devMode.copyChannelID'),
-			icon: <Icons.IDIcon color={themeValue.textStrong} />,
-			onPress: () => {
-				Clipboard.setString(channel?.channel_id);
-				Toast.show({
-					type: 'info',
-					text1: t('notify.serverIDCopied'),
-				});
-			},
-		},
-	];
-
 	const mainChannelMenu: IMezonMenuSectionProps[] = [
 		{
 			items: watchMenu,
@@ -194,9 +178,6 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		{
 			items: organizationMenu,
 		},
-		{
-			items: devMenu
-		}
 	]
 
 	const mainThreadMenu: IMezonMenuSectionProps[] = [
@@ -221,7 +202,11 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<View style={styles.avatarWrapper}>
-					<FastImage source={{ uri: currentClan?.logo }} style={{ width: '100%', height: '100%' }} />
+					<MezonClanAvatar
+						alt={currentClan?.clan_name}
+						image={currentClan?.logo}
+						defaultColor={baseColor.blurple}
+					/>
 				</View>
 				<Text style={styles.serverName}>{channel?.channel_label}</Text>
 			</View>

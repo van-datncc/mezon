@@ -1,7 +1,7 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClan } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -9,11 +9,10 @@ import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../../../../../app/temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, reserve } from '../../../../../../app/temp-ui';
 import { style } from './styles';
 
 interface ICategoryMenuProps {
@@ -123,7 +122,11 @@ export default function CategoryMenu({ category, inviteRef }: ICategoryMenuProps
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<View style={styles.avatarWrapper}>
-					<FastImage source={{ uri: currentClan?.logo }} style={{ width: '100%', height: '100%' }} />
+					<MezonClanAvatar
+						defaultColor={baseColor.blurple}
+						alt={currentClan?.clan_name}
+						image={currentClan?.logo}
+					/>
 				</View>
 				<Text style={styles.serverName}>{category?.category_name}</Text>
 			</View>

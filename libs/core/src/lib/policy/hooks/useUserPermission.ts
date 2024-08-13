@@ -1,5 +1,10 @@
 
-import { RolesClanEntity, selectAllRolesClan, selectCurrentClan, selectMemberByUserId } from "@mezon/store";
+import {
+  RolesClanEntity,
+  selectAllRolesClan,
+  selectCurrentClan,
+  selectMemberById,
+} from '@mezon/store';
 import { EPermission } from "@mezon/utils";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -35,10 +40,9 @@ const getUserPermissionsStatus = (activeRoleIds: string[] = [], clanRoles: Roles
 
 export function useUserPermission() {
   const { userId, userProfile } = useAuth();
-  const userById = useSelector(selectMemberByUserId(userId || ''));
+  const userById = useSelector(selectMemberById(userId || ''));
   const currentClan = useSelector(selectCurrentClan);
 	const rolesClan = useSelector(selectAllRolesClan);
-
 	const userPermissionsStatus = useMemo(() => {
 		return getUserPermissionsStatus(userById?.role_id, rolesClan)
 	}, [userById?.role_id, rolesClan])
@@ -54,7 +58,9 @@ export function useUserPermission() {
     isCanManageChannel: userPermissionsStatus["manage-channel"] || userPermissionsStatus.administrator || isClanOwner,
     isCanManageClan: userPermissionsStatus["manage-clan"] || userPermissionsStatus.administrator || isClanOwner,
     isCanDeleteMessage: userPermissionsStatus["delete-message"] || userPermissionsStatus.administrator || isClanOwner,
-    isCanSendMessage: userPermissionsStatus["send-message"] || userPermissionsStatus.administrator || isClanOwner,
-    isCanManageEvent: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus["manage-clan"]
+    isCanSendMessage: userPermissionsStatus["send-message"] ||userPermissionsStatus.administrator || isClanOwner || userPermissionsStatus["manage-channel"] || userPermissionsStatus["manage-clan"] || userPermissionsStatus["manage-thread"],
+    isCanViewChannel: userPermissionsStatus["send-message"]|| userPermissionsStatus["view-channel"]||userPermissionsStatus.administrator || isClanOwner || userPermissionsStatus["manage-channel"] || userPermissionsStatus["manage-clan"] || userPermissionsStatus["manage-thread"],
+    isCanManageEvent: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus["manage-clan"],
+    isCanEditRole: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus["manage-clan"],
   }
 }

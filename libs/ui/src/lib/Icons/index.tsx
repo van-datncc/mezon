@@ -1226,7 +1226,7 @@ export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} ${defaultFill ? defaultFill : ''}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -1296,7 +1296,7 @@ export function Speaker({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }: Ic
 			viewBox="0 0 18 17"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} dark:text-[#AEAEAE] text-colorTextLightMode`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 		>
 			<g id="Live area" clipPath="url(#clip0_2155_1604)">
 				<g id="Vector">
@@ -2021,7 +2021,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} dark:text-[#AEAEAE] text-colorTextLightMode`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-[#AEAEAE] text-colorTextLightMode'}`}
 		>
 			<path
 				d="M11.5512 1.57323C11.9214 1.75834 12.1065 2.12856 12.1065 2.40622V19.0659C12.1065 19.4361 11.9214 19.7138 11.5512 19.8989C11.2735 20.084 10.8107 19.9915 10.5331 19.8064L4.88727 15.3638H1.92554C1.37022 15.3638 1 14.9936 1 14.4382V7.03392C1 6.47859 1.37022 6.10838 1.92554 6.10838H4.97982L10.6256 1.66579C10.9033 1.48068 11.2735 1.48068 11.5512 1.57323Z"
@@ -3270,8 +3270,19 @@ export function LeaveClanIcon(props: React.HTMLAttributes<SVGElement>) {
 export const IconLock = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) => {
 	return(
 		<svg className={defaultSize} aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
-			<path fill="currentColor" fill-rule="evenodd" d="M6 9h1V6a5 5 0 0 1 10 0v3h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3Zm9-3v3H9V6a3 3 0 1 1 6 0Zm-1 8a2 2 0 0 1-1 1.73V18a1 1 0 1 1-2 0v-2.27A2 2 0 1 1 14 14Z" clip-rule="evenodd">
+			<path fill="currentColor" fillRule="evenodd" d="M6 9h1V6a5 5 0 0 1 10 0v3h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3Zm9-3v3H9V6a3 3 0 1 1 6 0Zm-1 8a2 2 0 0 1-1 1.73V18a1 1 0 1 1-2 0v-2.27A2 2 0 1 1 14 14Z" clipRule="evenodd">
 			</path>
 		</svg>
 	);
 }
+
+export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" className={defaultSize}>
+			<path
+				d="M16.5562 12.9062L16.1007 13.359C16.1007 13.359 15.0181 14.4355 12.0631 11.4972C9.10812 8.55901 10.1907 7.48257 10.1907 7.48257L10.4775 7.19738C11.1841 6.49484 11.2507 5.36691 10.6342 4.54348L9.37326 2.85908C8.61028 1.83992 7.13596 1.70529 6.26145 2.57483L4.69185 4.13552C4.25823 4.56668 3.96765 5.12559 4.00289 5.74561C4.09304 7.33182 4.81071 10.7447 8.81536 14.7266C13.0621 18.9492 17.0468 19.117 18.6763 18.9651C19.1917 18.9171 19.6399 18.6546 20.0011 18.2954L21.4217 16.883C22.3806 15.9295 22.1102 14.2949 20.8833 13.628L18.9728 12.5894C18.1672 12.1515 17.1858 12.2801 16.5562 12.9062Z"
+				fill={defaultFill}
+			/>
+		</svg>
+	);
+};

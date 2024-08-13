@@ -90,7 +90,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						idDM: itemDM?.id ?? '',
 						typeChat: ChannelType.CHANNEL_TYPE_DM,
 						userName: itemDM?.usernames,
-						displayName: '',
+						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
 						typeSearch: TypeSearch.Dm_Type,
 					};
@@ -131,7 +131,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		const listSearch = [
 			...listDMSearch.map((itemDM) => {
 				const user = usersClanMap.get(itemDM.id);
-				return user ? { ...itemDM, clanNick: user.clanNick || '', displayName: user.displayName, avatarUser: user.avatarUser || '' } : itemDM;
+				return user ? { ...itemDM, clanNick: user.clanNick || '', displayName: user.displayName || itemDM.displayName, avatarUser: user.avatarUser || '' } : itemDM;
 			}),
 			...listGroupSearch
 		];

@@ -1,10 +1,19 @@
-import { ForwardMessageModal, ModalCreateClan, NavLinkComponent, SearchModal, SidebarClanItem, SidebarTooltip } from '@mezon/components';
+import {
+	FirstJoinPopup,
+	ForwardMessageModal,
+	ModalCreateClan,
+	NavLinkComponent,
+	SearchModal,
+	SidebarClanItem,
+	SidebarTooltip,
+} from '@mezon/components';
 import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
 	channelsActions,
 	getIsShowPopupForward,
 	selectAllClans,
 	selectCloseMenu,
+	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
@@ -12,11 +21,12 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch,
-	usersClanActions
+	usersClanActions,
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive } from '@mezon/utils';
-import { useCallback, useEffect } from 'react';
+import { IClan, ModeResponsive, TIME_OF_SHOWING_FIRST_POPUP } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
+import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -37,6 +47,12 @@ function MyApp() {
 	const { setCloseMenu, setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
+
+	const { userProfile } = useAuth();
+	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
+	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
+	const [isShowFirstJoinPopup, setIsShowFirstJoinPopup] = useState(isNewGuy);
+
 	useEffect(() => {
 		const handleSizeWidth = () => {
 			if (window.innerWidth < 480) {
@@ -126,12 +142,17 @@ function MyApp() {
 
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
-	
+
 	const dispatchApp = useAppDispatch();
+	const currentChannel = useSelector(selectCurrentChannel);
 	useEffect(() => {
 		if (currentClanId) {
 			dispatchApp(channelsActions.fetchChannels({ clanId: currentClanId }));
 			dispatchApp(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
+		}
+		if(currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE){
+			const urlVoice = `https://meet.google.com/${currentChannel.meeting_code}`;
+			window.open(urlVoice, '_blank', 'noreferrer');
 		}
 	}, []);
 
@@ -144,7 +165,7 @@ function MyApp() {
 				id="menu"
 			>
 				<div className="flex flex-col gap-3 ">
-					<SidebarTooltip titleTooltip='Direct Message'>
+					<SidebarTooltip titleTooltip="Direct Message">
 						<NavLink
 							to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
 							onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
@@ -170,7 +191,7 @@ function MyApp() {
 					{listUnreadDM.map(
 						(dmGroupChatUnread) =>
 							dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-								<SidebarTooltip titleTooltip={dmGroupChatUnread.channel_label}>
+								<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
 									<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
 								</SidebarTooltip>
 							),
@@ -181,24 +202,25 @@ function MyApp() {
 					{clans.map((clan: IClan) => {
 						return (
 							<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
-								<SidebarClanItem linkClan={`/chat/clans/${clan.id}`} option={clan} />
+								<SidebarClanItem linkClan={`/chat/clans/${clan.id}`} option={clan} active={!pathName.includes('direct') && currentClanId === clan.clan_id} />
 							</SidebarTooltip>
-						)
+						);
 					})}
-
 				</div>
-
-				<SidebarTooltip titleTooltip='Add Clan'>
-					<NavLinkComponent>
-						<div className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group" onClick={openCreateClanModal}>
-							<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-								<p className="text-2xl font-bold text-[#155EEF]">+</p>
+				<div className='mt-3'>
+					<SidebarTooltip titleTooltip='Add Clan'>
+						<NavLinkComponent>
+							<div className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group" onClick={openCreateClanModal}>
+								<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
+									<p className="text-2xl font-bold text-[#155EEF]">+</p>
+								</div>
 							</div>
-						</div>
-					</NavLinkComponent>
-				</SidebarTooltip>
+						</NavLinkComponent>
+					</SidebarTooltip>
+				</div>
 			</div>
 			<MainContent />
+			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 		</div>
 	);
 }

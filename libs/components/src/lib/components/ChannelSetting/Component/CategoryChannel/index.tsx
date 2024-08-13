@@ -1,3 +1,4 @@
+import { useAppNavigation } from "@mezon/core";
 import { CategoriesEntity, channelsActions, selectAllCategories, useAppDispatch } from "@mezon/store";
 import { Icons } from "@mezon/ui";
 import { IChannel } from "@mezon/utils";
@@ -14,14 +15,17 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
   const channelID = channel.channel_id;
   const channelLabel = channel.channel_label;
   const dispatch = useAppDispatch();
-
+  const navigator = useAppNavigation();
   const handleMoveChannelToNewCategory = async (category: CategoriesEntity) => {
     const updateChannel: ApiUpdateChannelDescRequest = {
       category_id: category.id,
       channel_id: channelID ?? '',
       channel_label: channelLabel
     }
-    await dispatch(channelsActions.updateChannel(updateChannel))
+    await dispatch(channelsActions.updateChannel(updateChannel)).then(() => {
+      const channelLink = navigator.toChannelPage(channelID ?? '', channel.clan_id ?? '');
+      navigator.navigate(channelLink);
+    })
   }
 
   return (
