@@ -46,15 +46,15 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 		}
 	};
 
-	const navigateToDirectMessageMDetail = (channel_id) => {
+	const navigateToDirectMessageMDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-			params: { directMessageId: channel_id, from: APP_SCREEN.HOME },
+			params: { directMessageId: dm?.channel_id, from: APP_SCREEN.HOME },
 		});
 	};
 
 	return (
-		<TouchableOpacity onPress={() => navigateToDirectMessageMDetail(dm?.channel_id)} style={[styles.mt10]}>
+		<TouchableOpacity onPress={navigateToDirectMessageMDetail} style={[styles.mt10]}>
 			<View>{getBadge(dm)}</View>
 		</TouchableOpacity>
 	);
