@@ -12,9 +12,10 @@ type MarkdownContentOpt = {
 	content?: string;
 	isSingleLine: boolean;
 	isTokenClickAble: boolean;
+	isRenderImage: boolean;
 };
 
-export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingleLine, isTokenClickAble }) => {
+export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingleLine, isTokenClickAble, isRenderImage }) => {
 	const appearanceTheme = useSelector(selectTheme);
 
 	const [isImage, setIsImage] = useState<boolean>(false);
@@ -51,8 +52,8 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isSingl
 
 	return (
 		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
-			<div className="lineText contents dark:text-white text-colorTextLightMode">
-				{isImage && imageUrl ? (
+			<div className="lineText contents dark:text-white text-colorTextLightMode whitespace-nowrap">
+				{isImage && imageUrl && isRenderImage ? (
 					<MessageImage attachmentData={{ url: imageUrl }} />
 				) : (
 					<Markdown

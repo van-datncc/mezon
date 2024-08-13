@@ -24,6 +24,7 @@ type MessageLineProps = {
 	isJumMessageEnabled: boolean;
 	isSingleLine: boolean;
 	isTokenClickAble: boolean;
+	isRenderImage: boolean;
 };
 
 const MessageLine = ({
@@ -35,6 +36,7 @@ const MessageLine = ({
 	isSearchMessage,
 	isSingleLine,
 	isTokenClickAble,
+	isRenderImage,
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -51,15 +53,10 @@ const MessageLine = ({
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
-	const [isHover, setIsHover] = useState<boolean>(false);
 	return (
-		<div
-			onMouseEnter={() => setIsHover(true)}
-			onMouseLeave={() => setIsHover(false)}
-			onClick={isJumMessageEnabled ? onClickToMessage : () => {}}
-			className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}
-		>
+		<div onClick={isJumMessageEnabled ? onClickToMessage : () => {}} className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}>
 			<RenderContent
+				isRenderImage={isRenderImage}
 				isTokenClickAble={isTokenClickAble}
 				isOnlyContainEmoji={isOnlyContainEmoji}
 				isJumMessageEnabled={isJumMessageEnabled}
@@ -69,7 +66,6 @@ const MessageLine = ({
 				allChannelVoice={allChannelVoice}
 				isSearchMessage={isSearchMessage}
 				parentWidth={maxWidth}
-				isHover={isHover}
 			/>
 		</div>
 	);
@@ -88,7 +84,7 @@ interface RenderContentProps {
 	isTokenClickAble: boolean;
 	isJumMessageEnabled: boolean;
 	parentWidth?: number;
-	isHover: boolean;
+	isRenderImage: boolean;
 }
 type MessageElementToken = IMentionOnMessage | IHashtagOnMessage | IEmojiOnMessage | ILinkOnMessage | IMarkdownOnMessage | ILinkVoiceRoomOnMessage;
 
@@ -119,7 +115,7 @@ const RenderContent = memo(
 		parentWidth,
 		isOnlyContainEmoji,
 		isTokenClickAble,
-		isHover,
+		isRenderImage,
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
@@ -132,14 +128,7 @@ const RenderContent = memo(
 				const e = element.e ?? 0;
 				if (lastindex < s) {
 					formattedContent.push(
-						<PlainText
-							isHover={isHover}
-							isSingleLine={isSingleLine}
-							isJumMessageEnabled={isJumMessageEnabled}
-							isSearchMessage={isSearchMessage}
-							key={`plain-${lastindex}`}
-							text={t?.slice(lastindex, s) ?? ''}
-						/>,
+						<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}`} text={t?.slice(lastindex, s) ?? ''} />,
 					);
 				}
 
@@ -195,6 +184,7 @@ const RenderContent = memo(
 				if (isLinkOnMessage(element)) {
 					formattedContent.push(
 						<MarkdownContent
+							isRenderImage={isRenderImage}
 							isTokenClickAble={isTokenClickAble}
 							isSingleLine={isSingleLine}
 							key={`link-${index}-${s}-${element.lk}`}
@@ -217,6 +207,7 @@ const RenderContent = memo(
 							)
 						: formattedContent.push(
 								<MarkdownContent
+									isRenderImage={isRenderImage}
 									isTokenClickAble={isTokenClickAble}
 									isSingleLine={isSingleLine}
 									key={`voicelink-${index}-${s}-${element.vk}`}
@@ -229,6 +220,7 @@ const RenderContent = memo(
 					const converted = element.mk?.startsWith('```') && element.mk?.endsWith('```') ? convertMarkdown(element.mk) : element.mk;
 					formattedContent.push(
 						<MarkdownContent
+							isRenderImage={isRenderImage}
 							isTokenClickAble={isTokenClickAble}
 							isSingleLine={isSingleLine}
 							key={`markdown-${index}-${s}-${element.mk}`}
@@ -240,16 +232,7 @@ const RenderContent = memo(
 			});
 
 			if (t && lastindex < t?.length) {
-				formattedContent.push(
-					<PlainText
-						isHover={isHover}
-						isSingleLine={isSingleLine}
-						isJumMessageEnabled={isJumMessageEnabled}
-						isSearchMessage={isSearchMessage}
-						key={`plain-${lastindex}-end`}
-						text={t.slice(lastindex)}
-					/>,
-				);
+				formattedContent.push(<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />);
 			}
 
 			return formattedContent;
@@ -264,11 +247,10 @@ const RenderContent = memo(
 								overflow: 'hidden',
 								textOverflow: 'ellipsis',
 								maxWidth: parentWidth,
-								color: isSingleLine ? '#B4BAC0' : 'white',
 							}
 						: undefined
 				}
-				className={`${isJumMessageEnabled ? 'whitespace-pre-line hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] flex items-center  cursor-pointer' : ''}`}
+				className={`${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}
 			>
 				{content}
 			</div>

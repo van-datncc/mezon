@@ -54,7 +54,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 					</div>
 
 					<div className="gap-1 flex flex-row items-center w-full">
-						<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide">{nameShowed}</span>
+						<span className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide whitespace-nowrap">{nameShowed}</span>
 						{hasAttachmentInMessageRef ? (
 							<div className=" flex flex-row items-center">
 								<div
@@ -69,6 +69,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 							<div>
 								{' '}
 								<MessageLine
+									isRenderImage={false}
 									isTokenClickAble={false}
 									isJumMessageEnabled={true}
 									isSingleLine={true}

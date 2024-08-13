@@ -33,6 +33,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					</div>
 					<div className="leading-6">
 						<MessageLine
+							isRenderImage={false}
 							content={JSON.parse(pinMessage.content || '')}
 							isJumMessageEnabled={false}
 							isSingleLine={false}
