@@ -128,7 +128,7 @@ type MenuThreadStackParamList = {
 type MenuChannelStackParamList = {
   [APP_SCREEN.MENU_CHANNEL.SETTINGS]: {
     channelId: string;
-    isChannel: boolean;
+    isChannel?: boolean;
   };
   [APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL]: {
     openSearchChannelFrom: EOpenSearchChannelFrom;
