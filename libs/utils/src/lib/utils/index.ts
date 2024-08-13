@@ -13,11 +13,11 @@ import {
 import { ApiMessageAttachment, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
-import { TIME_COMBINE } from '../constant';
+import { fileTypeImage, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
-	ETokenMessage,
 	EmojiDataOptionals,
+	ETokenMessage,
 	IEmojiOnMessage,
 	IExtendedMessage,
 	IHashtagOnMessage,
@@ -637,3 +637,18 @@ export const KMPHighlight = (text: string, pattern: string): number[] => {
 
 	return matchPositions;
 };
+
+export const checkImageFromLink = async (url: string) => {
+  if (!url) return false;
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    const contentType = response.headers.get('Content-Type');
+    
+    if (contentType && fileTypeImage.includes(contentType)) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.log('Error fetching image:', error);
+  }
+}

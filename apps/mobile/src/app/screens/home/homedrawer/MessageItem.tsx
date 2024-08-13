@@ -24,7 +24,7 @@ import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { checkImageFromLink, linkGoogleMeet } from '../../../utils/helpers';
+import { linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction } from './components';
 import { RenderTextMarkdownContent } from './constants';
 import { EMessageActionType, EMessageBSToShow } from './enums';
@@ -32,7 +32,7 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ILinkOnMessage } from '@mezon/utils';
+import { checkImageFromLink, ILinkOnMessage } from '@mezon/utils';
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
@@ -269,39 +269,39 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
+	const handleFormatImageLink = useCallback(async () => {
+		const allLink = message?.content?.lk || [];
+		const promises = allLink.map(async (link) => {
+			const isImageLink = await checkImageFromLink(link?.lk);
+			return {
+				url: link?.lk,
+				isImageLink
+			}
+		})
+
+		const result = await Promise.all(promises);
+		const imageLinkList = result?.filter(link => link.isImageLink)?.map(link => link?.url);
+		let text = message?.content?.t || '';
+		let link = message?.content?.lk;
+
+		if (imageLinkList.length === 1) {
+			//handle remove link text, only show image
+			text = text.replace(imageLinkList[0], '');
+			link = [];
+		}
+
+		const uniqueImageLinks = Array.from(new Set(imageLinkList));
+		setLinkContentObject({
+			imageLinkList: uniqueImageLinks,
+			content: {
+				lk: link,
+				t: text
+			}
+		});
+	}, [message])
+
 	useEffect(() => {
 		if (message?.content?.lk?.length) {
-			const handleFormatImageLink = async () => {
-				const allLink = message?.content?.lk || [];
-				const promises = allLink.map(async (link) => {
-					const isImageLink = await checkImageFromLink(link?.lk);
-					return {
-						url: link?.lk,
-						isImageLink
-					}
-				})
-
-				const result = await Promise.all(promises);
-				const imageLinkList = result?.filter(link => link.isImageLink)?.map(link => link?.url);
-				let text = message?.content?.t || '';
-				let link = message?.content?.lk;
-
-				if (imageLinkList.length === 1) {
-					//handle remove link text, only show image
-					text = text.replace(imageLinkList[0], '');
-					link = [];
-				}
-
-				const uniqueImageLinks = Array.from(new Set(imageLinkList));
-				setLinkContentObject({
-					imageLinkList: uniqueImageLinks,
-					content: {
-						lk: link,
-						t: text
-					}
-				});
-			}
-
 			handleFormatImageLink();
 		}
 	}, [message])

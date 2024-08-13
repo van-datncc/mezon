@@ -1,10 +1,10 @@
 import { ImageGallery } from '@georstat/react-native-image-gallery';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectAllAttachment } from '@mezon/store';
+import { fileTypeImage } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ALLOWED_IMAGE_TYPES } from '../../screens/home/homedrawer/constants';
 import { ImageItem } from './ImageItem';
 import { RenderFooterModal } from './RenderFooterModal';
 import { RenderHeaderModal } from './RenderHeaderModal';
@@ -21,7 +21,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const allAttachment = useSelector(selectAllAttachment);
 	const allImageList = useMemo(() => {
 		if (!allAttachment || allAttachment?.length === 0) return [];
-		return allAttachment.filter((file) => ALLOWED_IMAGE_TYPES.includes(file?.filetype))
+		return allAttachment.filter((file) => fileTypeImage.includes(file?.filetype))
 	}, [allAttachment]);
 
 	const createAttachmentObject = (attachment: any) => ({

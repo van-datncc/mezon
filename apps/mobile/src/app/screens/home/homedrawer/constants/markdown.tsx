@@ -25,18 +25,6 @@ import { ChannelHashtag } from '../components/MarkdownFormatText/ChannelHashtag'
 import { EmojiMarkup } from '../components/MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../components/MarkdownFormatText/MentionUser';
 
-//TODO: move to constant in libs folder
-export const ALLOWED_IMAGE_TYPES = [
-	'image/png',
-	'image/jpeg',
-	'image/webp',
-	'image/gif',
-	'image/jpg',
-	'image/heif',
-	'image/bmp',
-	'image/tiff',
-];
-
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
 		const result = customCallback(url);
@@ -420,7 +408,7 @@ export const RenderTextMarkdownContent = React.memo(
 				style={{ ...(themeValue ? (markdownStyles(themeValue) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
 				rules={renderRulesCustom}
 				onLinkPress={(url) => {
-          if (url.startsWith(TYPE_MENTION.userRoleMention)) {
+					if (url.startsWith(TYPE_MENTION.userRoleMention)) {
 						onMention && onMention(url.replace('@role', '@'));
 						return false;
 					}

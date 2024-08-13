@@ -23,7 +23,7 @@ export const ImageModal = memo((props: IImageModalProps) => {
             position: 'absolute',
             top: size.s_4,
             left: size.s_4,
-          }} onPress={() => onClose()}>
+          }} onPress={onClose}>
             <Icons.CloseLargeIcon />
           </TouchableOpacity>
           <ImageItem uri={singleImageSelected} onClose={onClose} />
