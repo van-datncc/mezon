@@ -2,7 +2,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import { useState } from 'react';
-import { Keyboard, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import EmptySearchPage from '../EmptySearchPage';
 import MemberItem from '../MemberStatus/MemberItem';
 import { UserInformationBottomSheet } from '../UserInformationBottomSheet';
