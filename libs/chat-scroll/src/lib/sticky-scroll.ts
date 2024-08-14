@@ -67,7 +67,10 @@ export const useStickyScroll = (
 		// try to move scroll to bottom multiple times to ensure it is at the bottom
 		// that is because sometimes the message is not yet rendered
 		// and scroll is not at the bottom
-		animationRef.current = brushForceCall(moveScroll, 500);
+		// animationRef.current = brushForceCall(moveScroll, 500);
+
+		// temporary fix for the stuck scroll issue
+		moveScroll();
 		return true;
 	}, [targetRef, animationRef]);
 
@@ -140,7 +143,10 @@ export const useStickyScroll = (
 
 		// try to move scroll to message multiple times to ensure it is at the message
 		// that is because sometimes the message is not yet rendered
-		animationRef.current = brushForceCall(moveScroll, 500);
+		// animationRef.current = brushForceCall(moveScroll, 500);
+
+		// temporary fix for the stuck scroll issue
+		moveScroll();
 		return true;
 	};
 
