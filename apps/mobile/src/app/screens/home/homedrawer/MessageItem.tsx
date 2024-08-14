@@ -98,7 +98,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const usersClan = useSelector(selectAllUsesClan);
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const [linkContentObject, setLinkContentObject] = useState<ILinkContentObject | null>(null);
-	const isExistingImageLink = !!linkContentObject?.imageLinkList.length;
 
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
@@ -107,6 +106,9 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageReferences = useMemo(() => {
 		return message?.references?.[0] as ApiMessageRef;
 	}, [message?.references]);
+	const isExistingLink = useMemo(() => {
+		return message?.content?.lk?.length;
+	}, [message])
 
 	const isCombine = !message?.isStartedMessageGroup;
 	const swipeableRef = React.useRef(null);
@@ -309,13 +311,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		formatImageMessageContent(imageLinkList);
 	}, [message, formatImageMessageContent])
 
-	const isExistingLink = useMemo(() => {
-		return message?.content?.lk?.length;
-	}, [message])
-
 	useEffect(() => {
 		if (isExistingLink) {
 			handleCheckImageLink();
+		} else {
+			if (linkContentObject) {
+				setLinkContentObject(null)
+			}
 		}
 	}, [isExistingLink])
 
@@ -429,7 +431,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								mode={mode}
 							/>
 						</Block>
-						{isExistingImageLink && (
+						{linkContentObject && (
 							<LinkImageList imageLinks={linkContentObject?.imageLinkList} onOpenLinkImage={onOpenLinkImage} onLongPressImage={onLongPressImage} />
 						)}
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
