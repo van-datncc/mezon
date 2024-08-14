@@ -1,13 +1,13 @@
-import { createSticker, selectCurrentChannelId, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
+import { createSticker, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Button, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
+import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
-import { ClanSticker } from 'mezon-js';
 
 type ModalEditStickerProps = {
   handleCloseModal: () => void;
@@ -25,7 +25,6 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
   const [openModal, setOpenModal] = useState(false);
   const [openModalType, setOpenModalType] = useState(false);
   const currentClanId = useSelector(selectCurrentClanId) || '';
-  const currentChannelId = useSelector(selectCurrentChannelId) || '';
   const dispatch = useAppDispatch();
   const { sessionRef, clientRef } = useMezon();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -85,7 +84,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
     // TODO: check category
     const category = 'Among Us';
     const id = Snowflake.generate();
-    const path = 'stickers/' + id;
+    const path = 'stickers/' + id + '.webp';
     handleUploadEmoticon(client, session, path, file).then(async (attachment: ApiMessageAttachment) => {
       const request: ApiClanStickerAddRequest = {
         id: id,
