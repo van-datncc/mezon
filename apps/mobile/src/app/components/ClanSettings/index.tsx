@@ -1,7 +1,7 @@
 import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { fetchStickerByClanId, selectCurrentClan, useAppDispatch, useAppSelector } from '@mezon/store';
+import { selectCurrentClan, settingClanStickerActions, useAppDispatch, useAppSelector } from '@mezon/store';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView } from 'react-native';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
@@ -72,8 +72,8 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 		},
 		{
 			title: t('menu.settings.sticker	'),
-			onPress: () => {
-				dispatch(fetchStickerByClanId({ clanId: currentClan?.id, noCache: false }));
+			onPress: async () => {
+				await dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClan?.id || '0' }))
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STICKER_SETTING);
 			},
 			expandable: true,

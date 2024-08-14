@@ -95,12 +95,6 @@ export default function StickerSetting() {
                         type: croppedFile.mime,
                     });
 
-                    setEditingSticker({
-                        ...editingSticker,
-                        source: url,
-                        fileName: croppedFile.filename,
-                    });
-
                     const request: ApiClanStickerAddRequest = {
                         id: id,
                         category: category,
@@ -132,8 +126,6 @@ export default function StickerSetting() {
                 <Text style={[styles.text, styles.textTitle]}>Upload Requirements</Text>
                 <Text style={styles.text}>- Can be static (PNG) or animated (APNG, GIF).</Text>
                 <Text style={styles.text}>- Must be exactly 320 x 320 pixels.</Text>
-                <Text style={styles.text}>- Must be exactly 320 x 320 pixels.</Text>
-                <Text style={styles.text}>- No larger than 512KB.</Text>
                 <Text style={styles.text}>- No larger than 512KB.</Text>
             </View>
 
