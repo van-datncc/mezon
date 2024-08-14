@@ -36,7 +36,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 
 	const handleSend = useCallback(
 		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[]) => {
-			// editSendMessage(editMessage, messageId, draftMention);
+			editSendMessage(editMessage, messageId, draftMention);
 			setChannelDraftMessage(channelId, messageId, editMessage, draftMention);
 			dispatch(referencesActions.setOpenEditMessageState(false));
 		},

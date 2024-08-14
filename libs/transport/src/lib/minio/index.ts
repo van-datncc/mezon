@@ -181,8 +181,8 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 								url: url,
 								filetype: contentType,
 								size: Number(contentSize),
-								width: 200,
-								height: 200,
+								width: 0,
+								height: 0,
 							});
 						}
 					} else {

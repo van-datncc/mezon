@@ -1,6 +1,6 @@
 import { selectTheme } from '@mezon/store';
 import clx from 'classnames';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
 import { useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
@@ -15,22 +15,6 @@ type MarkdownContentOpt = {
 
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isRenderImage }) => {
 	const appearanceTheme = useSelector(selectTheme);
-
-	const [isImage, setIsImage] = useState<boolean>(false);
-	const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-	// useEffect(() => {
-	// 	if (content && isValidUrl(content)) {
-	// 		handleUrlInput(content).then((result) => {
-	// 			if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
-	// 				setTimeout(() => {
-	// 					setIsImage(true);
-	// 					setImageUrl(content);
-	// 				}, 1000);
-	// 			}
-	// 		});
-	// 	}
-	// }, [content]);
 
 	const onClickLink = useCallback(
 		(url: string) => {
@@ -51,33 +35,6 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 	return (
 		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
 			<div className={`lineText contents dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
-				{/* {isImage && imageUrl && isRenderImage ? (
-					<MessageImage attachmentData={{ url: imageUrl }} />
-				) : (
-					<Markdown
-						children={content}
-						remarkPlugins={[remarkGfm]}
-						components={{
-							pre: PreClass,
-							p: 'span',
-							a: (props) => (
-								<span
-									onClick={() => onClickLink(props.href ?? '')}
-									rel="noopener noreferrer"
-									style={{
-										color: 'rgb(59,130,246)',
-										cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
-										wordBreak: 'break-word',
-										textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline',
-									}}
-									className="tagLink"
-								>
-									{props.children}
-								</span>
-							),
-						}}
-					/>
-				)} */}
 				<Markdown
 					children={content}
 					remarkPlugins={[remarkGfm]}
