@@ -69,6 +69,14 @@ const persistedAppReducer = persistReducer(
 	appReducer,
 );
 
+const persistedEmojiSuggestionReducer = persistReducer(
+	{
+		key: 'suggestionEmoji',
+		storage,
+	},
+	emojiSuggestionReducer,
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -104,7 +112,7 @@ const reducer = {
 	voice: voiceReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
-	suggestionEmoji: emojiSuggestionReducer,
+	suggestionEmoji: persistedEmojiSuggestionReducer,
 	gifs: gifsReducer,
 	stickers: stickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,
