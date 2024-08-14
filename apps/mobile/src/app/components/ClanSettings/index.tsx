@@ -71,13 +71,13 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			icon: <Icons.ReactionIcon color={themeValue.text} />,
 		},
 		{
-			title: t('menu.settings.sticker	'),
+			title: t('menu.settings.sticker'),
 			onPress: async () => {
 				await dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClan?.id || '0' }))
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STICKER_SETTING);
 			},
 			expandable: true,
-			icon: <Icons.ReactionIcon color={themeValue.text} />,
+			icon: <Icons.Sticker color={themeValue.text} />,
 		},
 		{
 			title: t('menu.settings.webhooks'),

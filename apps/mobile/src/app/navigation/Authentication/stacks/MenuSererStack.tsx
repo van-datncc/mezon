@@ -110,7 +110,7 @@ export const MenuClanStacks = ({ }: any) => {
 				name={APP_SCREEN.MENU_CLAN.STICKER_SETTING}
 				component={StickerSetting}
 				options={{
-					headerTitle: t('menuClanStack.clanOverviewSetting'),
+					headerTitle: t('menuClanStack.sticker'),
 				}}
 			/>
 

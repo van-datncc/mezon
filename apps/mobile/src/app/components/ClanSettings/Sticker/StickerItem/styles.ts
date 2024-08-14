@@ -18,5 +18,12 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     text: {
         color: colors.textStrong
+    },
+
+    close: {
+        height: "100%",
+        padding: size.s_10,
+        justifyContent: "center",
+        alignItems: "center"
     }
 })
