@@ -170,7 +170,7 @@ function MemberProfile({
 	}
 	
 	return (
-		<div className="relative group" onClick={() => console.log(directMessageValue)}>
+		<div className="relative group">
 			<div
 				ref={panelRef}
 				onMouseDown={handleMouseClick}
