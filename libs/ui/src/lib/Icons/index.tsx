@@ -1932,6 +1932,24 @@ export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
+export const IconOr: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" className={defaultSize}>
+			<path fill="currentColor" fillRule="evenodd" d="M19.12 2a.5.5 0 0 1 .43.76L8.22 21.64a.75.75 0 0 1-.64.36h-2.7a.5.5 0 0 1-.43-.76L15.78 2.36a.75.75 0 0 1 .64-.36h2.7Z" clipRule="evenodd">
+			</path>
+		</svg>
+	)
+}
+
+export const IconTick: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
+			<path fill="currentColor" d="M21.7 5.3a1 1 0 0 1 0 1.4l-12 12a1 1 0 0 1-1.4 0l-6-6a1 1 0 1 1 1.4-1.4L9 16.58l11.3-11.3a1 1 0 0 1 1.4 0Z">
+			</path>
+		</svg>
+	)
+}
+
 export const Forum: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
@@ -2247,6 +2265,17 @@ export const LockIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 				fillRule="evenodd"
 				d="M6 9h1V6a5 5 0 0 1 10 0v3h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3Zm9-3v3H9V6a3 3 0 1 1 6 0Zm-1 8a2 2 0 0 1-1 1.73V18a1 1 0 1 1-2 0v-2.27A2 2 0 1 1 14 14Z"
 			></path>
+		</svg>
+	);
+};
+
+export const PlusIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" className={defaultSize}>
+			<g fill="none" fillRule="evenodd">
+				<path d="m0 0h16v16h-16z"/>
+				<path d="m8 13.5c-3.032 0-5.5-2.468-5.5-5.5s2.468-5.5 5.5-5.5 5.5 2.468 5.5 5.5-2.468 5.5-5.5 5.5zm-7-5.5c0 1.857.737 3.637 2.05 4.95s3.093 2.05 4.95 2.05 3.637-.737 4.95-2.05 2.05-3.093 2.05-4.95-.737-3.637-2.05-4.95-3.093-2.05-4.95-2.05c-3.866 0-7 3.134-7 7zm8-3h-2v2h-2v2h2v2h2v-2h2v-2h-2z" fill="currentColor"/>
+			</g>
 		</svg>
 	);
 };
@@ -3296,6 +3325,22 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 				d="M16.5562 12.9062L16.1007 13.359C16.1007 13.359 15.0181 14.4355 12.0631 11.4972C9.10812 8.55901 10.1907 7.48257 10.1907 7.48257L10.4775 7.19738C11.1841 6.49484 11.2507 5.36691 10.6342 4.54348L9.37326 2.85908C8.61028 1.83992 7.13596 1.70529 6.26145 2.57483L4.69185 4.13552C4.25823 4.56668 3.96765 5.12559 4.00289 5.74561C4.09304 7.33182 4.81071 10.7447 8.81536 14.7266C13.0621 18.9492 17.0468 19.117 18.6763 18.9651C19.1917 18.9171 19.6399 18.6546 20.0011 18.2954L21.4217 16.883C22.3806 15.9295 22.1102 14.2949 20.8833 13.628L18.9728 12.5894C18.1672 12.1515 17.1858 12.2801 16.5562 12.9062Z"
 				fill={defaultFill}
 			/>
+		</svg>
+	);
+};
+
+export const IconLoadingTyping = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" className={defaultSize}>
+			<circle cx="18" cy="12" r="0" fill="currentColor">
+				<animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/>
+			</circle>
+			<circle cx="12" cy="12" r="0" fill="currentColor">
+				<animate attributeName="r" begin=".33" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/>
+			</circle>
+			<circle cx="6" cy="12" r="0" fill="currentColor">
+				<animate attributeName="r" begin="0" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/>
+			</circle>
 		</svg>
 	);
 };
