@@ -13,11 +13,11 @@ import {
 import { ApiMessageAttachment, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
-import { TIME_COMBINE } from '../constant';
+import { fileTypeImage, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
-	ETokenMessage,
 	EmojiDataOptionals,
+	ETokenMessage,
 	IEmojiOnMessage,
 	IExtendedMessage,
 	IHashtagOnMessage,
@@ -227,9 +227,13 @@ export const checkLastChar = (text: string) => {
 };
 
 export const getNameForPrioritize = (clanNickname: string | undefined, displayName: string | undefined, username: string | undefined) => {
-	if (clanNickname && clanNickname !== username) return clanNickname;
-	if (displayName && displayName !== username) return displayName;
-	if (displayName === '' || displayName === username || clanNickname === username) return username;
+	if (clanNickname && clanNickname !== '') {
+		return clanNickname;
+	} else if (displayName && displayName !== '') {
+		return displayName;
+	} else {
+		return username;
+	}
 };
 
 export const getAvatarForPrioritize = (clanAvatar: string | undefined, userAvatar: string | undefined) => {
@@ -637,3 +641,18 @@ export const KMPHighlight = (text: string, pattern: string): number[] => {
 
 	return matchPositions;
 };
+
+export const checkImageFromLink = async (url: string) => {
+  if (!url) return false;
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    const contentType = response.headers.get('Content-Type');
+    
+    if (contentType && fileTypeImage.includes(contentType)) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.log('Error fetching image:', error);
+  }
+}
