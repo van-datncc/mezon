@@ -1,6 +1,7 @@
 import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
+import { fetchStickerByClanId, selectCurrentClan, useAppDispatch, useAppSelector } from '@mezon/store';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView } from 'react-native';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
@@ -15,6 +16,8 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 	const styles = style(themeValue);
 	const { t } = useTranslation(['clanSetting']);
 	const { isCanEditRole } = useUserPermission();
+	const dispatch = useAppDispatch();
+	const currentClan = useAppSelector(selectCurrentClan);
 
 	navigation.setOptions({
 		headerLeft: () => (
@@ -64,6 +67,15 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 		{
 			title: t('menu.settings.emoji'),
 			onPress: () => reserve(),
+			expandable: true,
+			icon: <Icons.ReactionIcon color={themeValue.text} />,
+		},
+		{
+			title: t('menu.settings.sticker	'),
+			onPress: () => {
+				dispatch(fetchStickerByClanId({ clanId: currentClan?.id, noCache: false }));
+				navigation.navigate(APP_SCREEN.MENU_CLAN.STICKER_SETTING);
+			},
 			expandable: true,
 			icon: <Icons.ReactionIcon color={themeValue.text} />,
 		},

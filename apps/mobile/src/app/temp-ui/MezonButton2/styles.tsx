@@ -17,6 +17,10 @@ export const style = (colors: Attributes) =>
 			borderColor: colors.border,
 		},
 
+		rounded: {
+			borderRadius: size.s_20,
+		},
+
 		containerSuccess: {
 			backgroundColor: Colors.green,
 		},
@@ -34,7 +38,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		containerMd: {
-			padding: size.s_16,
+			padding: size.s_12,
 		},
 
 		containerLg: {
