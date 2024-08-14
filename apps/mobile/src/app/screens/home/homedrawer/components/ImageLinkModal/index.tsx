@@ -9,7 +9,7 @@ interface ILinkImageListProps {
 }
 
 export const LinkImageList = memo((props: ILinkImageListProps) => {
-  const { imageLinks, onLongPressImage, onOpenLinkImage } = props;
+  const { imageLinks = [], onLongPressImage, onOpenLinkImage } = props;
 
   const onPressImage = ({ url }: { url: string }) => {
     onOpenLinkImage(url);

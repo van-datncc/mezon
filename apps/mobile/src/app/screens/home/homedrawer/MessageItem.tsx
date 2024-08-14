@@ -20,6 +20,8 @@ import {
 	selectMessageEntityById,
 	useAppDispatch,
 } from '@mezon/store-mobile';
+import { handleUrlInput } from '@mezon/transport';
+import { ETypeLinkMedia, ILinkOnMessage } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
@@ -32,7 +34,6 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { checkImageFromLink, ILinkOnMessage } from '@mezon/utils';
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
@@ -89,7 +90,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	} = props;
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('message');
-	const [linkContentObject, setLinkContentObject] = useState<ILinkContentObject | null>(null);
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message: MessagesEntity = props?.message ? props?.message : (selectedMessage as MessagesEntity);
 	const { markMessageAsSeen } = useSeenMessagePool();
@@ -97,6 +97,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
 	const rolesInClan = useSelector(selectAllRolesClan);
+	const [linkContentObject, setLinkContentObject] = useState<ILinkContentObject | null>(null);
+	const isExistingImageLink = !!linkContentObject?.imageLinkList.length;
 
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
@@ -269,18 +271,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	const handleFormatImageLink = useCallback(async () => {
-		const allLink = message?.content?.lk || [];
-		const promises = allLink.map(async (link) => {
-			const isImageLink = await checkImageFromLink(link?.lk);
-			return {
-				url: link?.lk,
-				isImageLink
-			}
-		})
-
-		const result = await Promise.all(promises);
-		const imageLinkList = result?.filter(link => link.isImageLink)?.map(link => link?.url);
+	const formatImageMessageContent = useCallback((imageLinkList: string[]) => {
 		let text = message?.content?.t || '';
 		let link = message?.content?.lk;
 
@@ -298,13 +289,35 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				t: text
 			}
 		});
+	}, [message?.content?.lk, message?.content?.t])
+
+	const handleCheckImageLink = useCallback(async () => {
+		const allLink = message?.content?.lk || [];
+
+		const promises = allLink.map(async (link) => {
+			const result = await handleUrlInput(link?.lk, true);
+			const { url, filetype } = result;
+			return {
+				url,
+				isImageLink: filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)
+			}
+		})
+
+		const result = await Promise.all(promises);
+		const imageLinkList = result?.filter(link => link.isImageLink)?.map(link => link?.url);
+
+		formatImageMessageContent(imageLinkList);
+	}, [message, formatImageMessageContent])
+
+	const isExistingLink = useMemo(() => {
+		return message?.content?.lk?.length;
 	}, [message])
 
 	useEffect(() => {
-		if (message?.content?.lk?.length) {
-			handleFormatImageLink();
+		if (isExistingLink) {
+			handleCheckImageLink();
 		}
-	}, [message])
+	}, [isExistingLink])
 
 	if (message.isStartedMessageGroup && message.sender_id == '0')
 		return (
@@ -416,7 +429,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								mode={mode}
 							/>
 						</Block>
-						{!!linkContentObject?.imageLinkList.length && (
+						{isExistingImageLink && (
 							<LinkImageList imageLinks={linkContentObject?.imageLinkList} onOpenLinkImage={onOpenLinkImage} onLongPressImage={onLongPressImage} />
 						)}
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
