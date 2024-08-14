@@ -194,6 +194,7 @@ const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
 								listFriends={listFriends}
 								idActive={idActive}
 								selectedFriends={selectedFriends}
+								setIdActive={setIdActive}
 								handleCheckboxChange={handleCheckboxChange}
 							/>
 						}
