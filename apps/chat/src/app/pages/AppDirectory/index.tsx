@@ -1,5 +1,6 @@
+import { AppDirectoryList } from '@mezon/components';
 import { selectTheme } from '@mezon/store';
-import { Icons, Image } from '@mezon/ui';
+import { Button, Icons, Image } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -58,7 +59,7 @@ const AppDirectory = () => {
 	return (
 		<div className="dark:text-textAppDirectory text-textLightTheme flex justify-center dark:bg-[#313338] bg-bgLightMode">
 			<ExitBtn />
-			<div className="w-[1024px] max-lg:w-full max-xl:p-6 py-[32px]">
+			<div className="w-[1024px] max-lg:w-full max-xl:p-6 py-[32px] flex flex-col gap-8">
 				<div className="top-part flex flex-col gap-[32px]">
 					<div className="block1 flex gap-[48px] relative flex-1 max-lg:gap-0">
 						<div className="block1-left flex-1 flex flex-col gap-[30px]">
@@ -142,6 +143,21 @@ const AppDirectory = () => {
 							/>
 						</div>
 					</div>
+				</div>
+				<div className={"w-full max-w-screen-lg flex flex-col gap-8"}>
+					<AppDirectoryList />
+				</div>
+				<div className={'w-full dark:bg-[#2b2d31] bg-bgLightModeThird flex h-[76px] overflow-hidden rounded-md'}>
+					<div className='px-4 pt-3 h-16'>
+						<Icons.AppDirectoryFooterRobot />
+					</div>
+					<div className='flex flex-col justify-center flex-1'>
+						<p className='text-base font-semibold'>New too apps ?</p>
+						<p className='text-sm'>Check out our starter guide to get familiar with all the cool things apps can do!</p>
+					</div>
+          <div className='px-8 items-center flex'>
+            <Button label='Learn More' className='h-10'/>
+          </div>
 				</div>
 			</div>
 		</div>
