@@ -69,18 +69,59 @@ const persistedAppReducer = persistReducer(
 	appReducer,
 );
 
+const persistedEmojiSuggestionReducer = persistReducer(
+	{
+		key: 'suggestionEmoji',
+		storage,
+	},
+	emojiSuggestionReducer,
+);
+
+const persistedMessageReducer = persistReducer(
+	{
+		key: 'messages',
+		storage,
+		blacklist: ['typingUsers', 'isSending'],
+	},
+	messagesReducer,
+);
+
+const persistedCatReducer = persistReducer(
+	{
+		key: 'categories',
+		storage,
+	},
+	categoriesReducer,
+);
+
+const persistedChannelReducer = persistReducer(
+	{
+		key: 'channels',
+		storage,
+	},
+	channelsReducer,
+);
+
+const persistedThreadReducer = persistReducer(
+	{
+		key: 'threads',
+		storage,
+	},
+	threadsReducer,
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
-	channels: channelsReducer,
+	channels: persistedChannelReducer,
 	channelMembers: channelMembersReducer,
-	threads: threadsReducer,
+	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
-	messages: messagesReducer,
-	categories: categoriesReducer,
+	messages: persistedMessageReducer,
+	categories: persistedCatReducer,
 	rolesclan: RolesClanReducer,
 	eventmanagement: eventManagementReducer,
 	usersClan: usersClanReducer,
@@ -104,7 +145,7 @@ const reducer = {
 	voice: voiceReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
-	suggestionEmoji: emojiSuggestionReducer,
+	suggestionEmoji: persistedEmojiSuggestionReducer,
 	gifs: gifsReducer,
 	stickers: stickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,
