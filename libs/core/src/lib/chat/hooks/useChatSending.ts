@@ -1,7 +1,15 @@
 import { useFilteredContent } from '@mezon/core';
-import { messagesActions, selectChannelById, selectCurrentClanId, selectCurrentUserId, selectDirectById, useAppDispatch } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import {
+	messagesActions,
+	selectChannelById,
+	selectCurrentClanId,
+	selectCurrentUserId,
+	selectDirectById,
+	selectNewIdMessageResponse,
+	useAppDispatch,
+} from '@mezon/store';
+import { handleUrlInput, useMezon } from '@mezon/transport';
+import { ETypeLinkMedia, IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -18,6 +26,8 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
+	const idNewMessageResponse = useSelector(selectNewIdMessageResponse);
+	console.log('idNewMessageResponse: ', idNewMessageResponse);
 
 	const dispatch = useAppDispatch();
 	// TODO: if direct is the same as channel use one slice
@@ -31,6 +41,8 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		channelID = direct.id;
 		clanID = '0';
 	}
+	const [filteredResults, setFilteredResults] = React.useState<ApiMessageAttachment[]>([]);
+
 	const sendMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -42,7 +54,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		) => {
 			const filteredContent = useFilteredContent(content);
 
-			return dispatch(
+			dispatch(
 				messagesActions.sendMessage({
 					channelId: channelID,
 					clanId: clanID || '',
@@ -56,9 +68,35 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 					senderId: currentUserId,
 				}),
 			);
+
+			const resultPromises = (content.lk ?? []).map(async (item) => {
+				const result = await handleUrlInput(item.lk as string);
+				if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
+					return result as ApiMessageAttachment;
+				}
+				return null;
+			});
+			const results = await Promise.all(resultPromises);
+			const filteredResults = results.filter((result): result is ApiMessageAttachment => result !== null) as ApiMessageAttachment[];
+			setFilteredResults(filteredResults);
+
+			// Clean up function to clear the interval
 		},
-		[dispatch, channelID, clanID, mode, currentUserId],
+		[dispatch, channelID, clanID, mode, currentUserId, idNewMessageResponse],
 	);
+
+	React.useEffect(() => {
+		if (!idNewMessageResponse) return;
+
+		const intervalId = setInterval(() => {
+			console.log('idNewMessageResponse: ', idNewMessageResponse);
+			editSendMessage({ t: 'gggg' }, idNewMessageResponse, [], filteredResults);
+			clearInterval(intervalId); // Clear interval once the message is edited
+		}, 1000); // Check every 1 second
+
+		// Cleanup function to clear the interval
+		return () => clearInterval(intervalId);
+	}, [idNewMessageResponse, filteredResults]); // Dependencies
 
 	const sendMessageTyping = React.useCallback(async () => {
 		dispatch(messagesActions.sendTypingUser({ clanId: clanID || '', channelId, mode }));
@@ -67,7 +105,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	// TODO: why "Edit" not "edit"?
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(
-		async (content: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
+		async (content: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[], attachments?: ApiMessageAttachment[]) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -78,7 +116,14 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 			const filteredContent = useFilteredContent(content);
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, filteredContent, mentions);
+			console.log('clanID: ', clanID);
+			console.log('channelId: ', channelId);
+			console.log('mode: ', mode);
+			console.log('messageId: ', messageId);
+			console.log('filteredContent: ', filteredContent);
+			console.log('mentions: ', mentions);
+			console.log('attachments: ', attachments);
+			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
