@@ -712,7 +712,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
-			<GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />
+			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
 		</div>
 	);
 }
