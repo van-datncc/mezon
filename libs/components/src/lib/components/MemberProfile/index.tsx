@@ -1,6 +1,6 @@
 import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
 import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId, selectTypingUserIds } from '@mezon/store';
+import { ChannelMembersEntity, selectAllAccount, selectCurrentChannelId, selectCurrentClan, selectCurrentClanId, selectDmGroupCurrentId, selectTypingUserIds, selectTypingUserIdsByChannelId } from '@mezon/store';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useMemo, useRef, useState } from 'react';
@@ -170,7 +170,7 @@ function MemberProfile({
 	}
 	
 	return (
-		<div className="relative group">
+		<div className="relative group" onClick={() => console.log(directMessageValue)}>
 			<div
 				ref={panelRef}
 				onMouseDown={handleMouseClick}
@@ -316,17 +316,22 @@ type StatusUserProps = {
 const StatusUser = memo((props: StatusUserProps) =>{
 	const {status, isMemberChannel, isMemberDMGroup, isListDm, directMessageValue, userId =''} = props;
 	const typingUserIds = useSelector(selectTypingUserIds);
+	const currentDMChannelID = useSelector(selectDmGroupCurrentId);
+	const currentChannelID = useSelector(selectCurrentChannelId);
+	const typingListMemberDMIds = useSelector(selectTypingUserIdsByChannelId(currentDMChannelID || ''));
+	const typingListMemberChannelIds = useSelector(selectTypingUserIdsByChannelId(currentChannelID || ''));
+	const typingListDMIds = useSelector(selectTypingUserIdsByChannelId(directMessageValue?.dmID || ''));
 
 	const checkTypingUser = useMemo(() => {
 		switch (true) {
 			case isMemberDMGroup:
-				return typingUserIds?.includes(userId);
+				return typingListMemberDMIds?.includes(userId);
 			case isMemberChannel:
-				return typingUserIds?.includes(userId);
+				return typingListMemberChannelIds?.includes(userId);
 
 			case isListDm:
 				return Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM && 
-					typingUserIds?.includes(directMessageValue?.userId[0] || '');
+				typingListDMIds?.includes(directMessageValue?.userId[0] || '');
 
 			default:
 				return false;
