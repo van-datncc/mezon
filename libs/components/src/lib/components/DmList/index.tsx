@@ -6,7 +6,7 @@ import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import CreateMessageGroup from './ModalCreateDmGroup/CreateMessageGroup';
+import CreateMessageGroup from './CreateMessageGroup';
 import ListDMChannel from './listDMChannel';
 
 export type ChannelListProps = { className?: string };
