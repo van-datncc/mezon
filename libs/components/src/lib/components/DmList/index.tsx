@@ -1,12 +1,11 @@
 import { useEscapeKey } from '@mezon/core';
 import { selectDirectsOpenlist, selectTheme } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
-import { IconFriends } from '../../../../../ui/src/lib/Icons';
 import { ModalCreateDM } from './ModalCreateDmGroup/index';
 import ListDMChannel from './listDMChannel';
 
@@ -15,8 +14,8 @@ export type CategoriesState = Record<string, boolean>;
 
 const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
 	return notSortedArr.slice().sort((a, b) => {
-		const timestampA = parseFloat(a.last_sent_message?.timestamp || '0');
-		const timestampB = parseFloat(b.last_sent_message?.timestamp || '0');
+		const timestampA = parseFloat(a.last_sent_message?.timestamp || a.create_time_ms?.toString() || '0');
+		const timestampB = parseFloat(b.last_sent_message?.timestamp || b.create_time_ms?.toString() || '0');
 		return timestampB - timestampA;
 	});
 };
@@ -36,7 +35,7 @@ function DirectMessageList() {
 
 	const sortedFilteredDataDM = useMemo(() => {
 		return sortDMItem(filterDmGroupsByChannelLabel(dmGroupChatList));
-	}, [dmGroupChatList])
+	}, [dmGroupChatList]);
 
 	useEffect(() => {
 		if (sortedFilteredDataDM.length === 0) {
@@ -65,7 +64,7 @@ function DirectMessageList() {
 							navigate('/chat/direct/friends');
 						}}
 					>
-						<IconFriends />
+						<Icons.IconFriends />
 						Friends
 					</button>
 				</div>

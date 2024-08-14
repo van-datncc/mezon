@@ -61,6 +61,7 @@ module.exports = {
   textDarkTheme: "#ffffff",
   textLightUserName: '#17AC86',
   textThreadPrimary: '#B5BAC1',
+  textAppDirectory: '#dbdee1',
 
   /* border */
   borderDefault: '#1E1E1E',
