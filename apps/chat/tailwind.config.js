@@ -155,7 +155,8 @@ module.exports = {
         'emoji_item': '0 1px 0 0 #ededef',
         'emoji_item_dark': '0 1px 0px 0px #3e3e3ed4',
         'emoji_item-delete': '0px 0px 2.5px 0px #2f2f2f33',
-        'shadowInbox': '0 0 0 1px hsla(0, 0%, 0%, 0.08)'
+        'shadowInbox': '0 0 0 1px hsla(0, 0%, 0%, 0.08)',
+        'shadowBorder': '0 0 0 1px hsla(0, 0%, 100%, 0.08)'
       }
     },
     animation: {
