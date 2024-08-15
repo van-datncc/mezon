@@ -44,7 +44,8 @@ export const baseColor = {
     red: "#e67b7c",
     purple: "#fc74fc",
     green: "#42a869",
-    gray: "#949AA4"
+    gray: "#949AA4",
+    flamingo: "#f23f43",
 } satisfies Colors;
 
 export const brandColors = {
