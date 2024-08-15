@@ -19,7 +19,7 @@ const PinnedMessages = ({ onClose }: PinnedMessagesProps) => {
 				<div
 					className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
 				>
-					<ListPinMessage />
+					<ListPinMessage onClose={onClose}/>
 				</div>
 			</div>
 		</div>

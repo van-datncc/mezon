@@ -44,7 +44,7 @@ const ChannelLayout = () => {
 		<div
 			className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible"
 		>
-			{isChannelVoice ? <ChannelLayoutVoice channelLabel={currentChannel.channel_label}/> :
+			{isChannelVoice ? <ChannelLayoutVoice channelLabel={currentChannel.channel_label} meetingCode={currentChannel.meeting_code}/> :
 			<>
 			<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 				<Outlet />
@@ -91,9 +91,15 @@ const ChannelLayout = () => {
 
 export default ChannelLayout;
 
-const ChannelLayoutVoice = ({channelLabel=''}:{channelLabel?: string}) =>{
-	const [statusCall, setStatusCall] = useState(false);
-	const handleStatusCall = () => setStatusCall(!statusCall);
+const ChannelLayoutVoice = ({channelLabel='', meetingCode=''}:{channelLabel?: string, meetingCode?: string}) =>{
+	const [statusCall, setStatusCall] = useState(true);
+	const handleStatusCall = () => {
+		setStatusCall(!statusCall);
+		if(!statusCall) {
+			const urlVoice = `https://meet.google.com/${meetingCode}`;
+			window.open(urlVoice, '_blank', 'noreferrer');
+		}
+	};
 	return(
 		<div className="bg-black h-full flex flex-col font-semibold">
 			{statusCall ?

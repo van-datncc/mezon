@@ -530,7 +530,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						message_sender_id: getRefMessageReply.sender_id,
 						content: JSON.stringify(getRefMessageReply.content),
 						message_sender_username: getRefMessageReply.username,
-						mesages_sender_avatar: getRefMessageReply.avatar,
+						mesages_sender_avatar: getRefMessageReply.clan_avatar ? getRefMessageReply.clan_avatar : getRefMessageReply.avatar,
 						message_sender_clan_nick: getRefMessageReply.clan_nick,
 						message_sender_display_name: getRefMessageReply.display_name,
 						has_attachment: getRefMessageReply.attachments?.length > 0,
@@ -712,7 +712,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
-			<GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />
+			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
 		</div>
 	);
 }
