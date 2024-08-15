@@ -1,7 +1,6 @@
 import { useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
-import { ChannelType } from 'mezon-js';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import MemberProfile from '../MemberProfile';
 export type MemberItemProps = {
@@ -17,8 +16,6 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 	const userStatus = useMemberStatus(user.user?.id || '');
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '');
 
-	const directMessageValue = {dmID: directMessageId || '', userId: [], type: (ChannelType.CHANNEL_TYPE_GROUP).toString()};
-
 	return (
 		<MemberProfile
 			numberCharacterCollapse={30}
@@ -30,7 +27,6 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			}
 			userNameAva={user?.user?.username}
 			status={userStatus}
-			directMessageValue={directMessageValue}
 			customStatus={userCustomStatus}
 			isHideStatus={true}
 			isHideIconStatus={userStatus ? false : true}
