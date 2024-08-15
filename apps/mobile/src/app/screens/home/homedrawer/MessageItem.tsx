@@ -20,10 +20,8 @@ import {
 	selectMessageEntityById,
 	useAppDispatch,
 } from '@mezon/store-mobile';
-import { handleUrlInput } from '@mezon/transport';
-import { ETypeLinkMedia, ILinkOnMessage } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
@@ -38,7 +36,6 @@ import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMes
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { AvatarMessage } from './components/AvatarMessage';
-import { LinkImageList } from './components/ImageLinkModal';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
@@ -66,14 +63,6 @@ export type MessageItemProps = {
 	preventAction?: boolean;
 };
 
-interface ILinkContentObject {
-	content: {
-		t: string;
-		lk: ILinkOnMessage[];
-	}
-	imageLinkList: string[];
-}
-
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -92,12 +81,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { t } = useTranslation('message');
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message: MessagesEntity = props?.message ? props?.message : (selectedMessage as MessagesEntity);
+	console.log('message:', message);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const usersClan = useSelector(selectAllUsesClan);
 	const rolesInClan = useSelector(selectAllRolesClan);
-	const [linkContentObject, setLinkContentObject] = useState<ILinkContentObject | null>(null);
 
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const hasIncludeMention = useMemo(() => {
@@ -106,9 +95,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageReferences = useMemo(() => {
 		return message?.references?.[0] as ApiMessageRef;
 	}, [message?.references]);
-	const isExistingLink = useMemo(() => {
-		return message?.content?.lk?.length;
-	}, [message])
 
 	const isCombine = !message?.isStartedMessageGroup;
 	const swipeableRef = React.useRef(null);
@@ -273,54 +259,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	const formatImageMessageContent = useCallback((imageLinkList: string[]) => {
-		let text = message?.content?.t || '';
-		let link = message?.content?.lk;
-
-		if (imageLinkList.length === 1) {
-			//handle remove link text, only show image
-			text = text.replace(imageLinkList[0], '');
-			link = [];
-		}
-
-		const uniqueImageLinks = Array.from(new Set(imageLinkList));
-		setLinkContentObject({
-			imageLinkList: uniqueImageLinks,
-			content: {
-				lk: link,
-				t: text
-			}
-		});
-	}, [message?.content?.lk, message?.content?.t])
-
-	const handleCheckImageLink = useCallback(async () => {
-		const allLink = message?.content?.lk || [];
-
-		const promises = allLink.map(async (link) => {
-			const result = await handleUrlInput(link?.lk, true);
-			const { url, filetype } = result;
-			return {
-				url,
-				isImageLink: filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)
-			}
-		})
-
-		const result = await Promise.all(promises);
-		const imageLinkList = result?.filter(link => link.isImageLink)?.map(link => link?.url);
-
-		formatImageMessageContent(imageLinkList);
-	}, [message, formatImageMessageContent])
-
-	useEffect(() => {
-		if (isExistingLink) {
-			handleCheckImageLink();
-		} else {
-			if (linkContentObject) {
-				setLinkContentObject(null)
-			}
-		}
-	}, [isExistingLink])
-
 	if (message.isStartedMessageGroup && message.sender_id == '0')
 		return (
 			<WelcomeMessage channelId={props.channelId} />
@@ -420,7 +358,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								content={{
 									...(typeof message.content === 'object' ? message.content : {}),
 									mentions: message.mentions,
-									...(message.content?.lk?.length && linkContentObject?.content ? linkContentObject?.content : {})
 								}}
 								isEdited={isEdited}
 								translate={t}
@@ -431,9 +368,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								mode={mode}
 							/>
 						</Block>
-						{linkContentObject && (
-							<LinkImageList imageLinks={linkContentObject?.imageLinkList} onOpenLinkImage={onOpenLinkImage} onLongPressImage={onLongPressImage} />
-						)}
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 						{!preventAction ? (
 							<MessageAction
