@@ -331,7 +331,7 @@ const StatusUser = memo((props: StatusUserProps) =>{
 
 			case isListDm:
 				return Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM && 
-				typingListDMIds?.includes(directMessageValue?.userId[0] || '');
+				typingListDMIds?.includes(directMessageValue?.userId?.[0] ?? '');
 
 			default:
 				return false;

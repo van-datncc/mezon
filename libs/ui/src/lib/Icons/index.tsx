@@ -1288,7 +1288,7 @@ export const Emoji: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export function Speaker({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }: IconProps) {
+export function Speaker({ defaultFill = 'text-contentTertiary', defaultSize = 'w-5 h-5' }: IconProps) {
 	return (
 		<svg
 			width="18"
