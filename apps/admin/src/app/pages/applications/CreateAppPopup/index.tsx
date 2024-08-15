@@ -13,11 +13,11 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 	const handleSubmit = () => {
 		if (!inputValue) {
 			setNotification(
-				<div className="p-3 bg-[#fbc5c6] border border-red-500 rounded-md">A name is required to create your new application.</div>,
+				<div className="p-3 dark:bg-[#6b373b] bg-[#fbc5c6] border border-red-500 rounded-md">A name is required to create your new application.</div>,
 			);
 		} else if (inputValue && !isChecked) {
 			return setNotification(
-				<div className="p-3 bg-[#fbc5c6] border border-red-500 rounded-md">
+				<div className="p-3 dark:bg-[#6b373b] bg-[#fbc5c6] border border-red-500 rounded-md">
 					The <span className="font-semibold hover:underline">Terms of Service</span> must be accepted.
 				</div>,
 			);
@@ -46,7 +46,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 						<input onChange={handleInputOnchange} type="text" className="bg-bgLightModeThird dark:bg-[#1e1f22] outline-primary p-[10px] rounded-sm" />
 					</div>
 					<div className="flex gap-2">
-						<input checked={isChecked} onClick={handleToggleCheckBox} type="checkbox" className="w-6" />
+						<input checked={isChecked} onChange={handleToggleCheckBox} type="checkbox" className="w-6" />
 						<div className="flex-1">
 							By clicking Create, you agree to the Mezon{' '}
 							<span className="text-blue-500 hover:underline">Developer Terms of Service</span> and{' '}
