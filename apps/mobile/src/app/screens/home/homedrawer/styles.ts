@@ -482,12 +482,12 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontWeight: '600',
 	},
 	subTitleWelcomeMessage: {
-		fontSize: size.s_14,
+		fontSize: size.s_12,
 		color: colors.text,
 		marginBottom: size.s_10,
 	},
 	subTitleWelcomeMessageCenter: {
-		fontSize: size.s_14,
+		fontSize: size.s_12,
 		color: colors.text,
 		marginBottom: size.s_10,
 		textAlign: "center"
@@ -499,7 +499,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 
 	subTitleWelcomeMessageWithHighlight: {
-		fontSize: size.s_14,
+		fontSize: size.s_12,
 		color: baseColor.blurple,
 		fontWeight: "bold",
 		marginBottom: size.s_10

@@ -25,7 +25,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
@@ -154,7 +154,7 @@ export default function CreateThreadForm() {
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 	return (
-		<View style={styles.createChannelContainer}>
+		<KeyboardAvoidingView style={styles.createChannelContainer}>
 			<ScrollView contentContainerStyle={{ flex: 1 }}>
 				<Formik
 					validate={(values) => {
@@ -162,7 +162,7 @@ export default function CreateThreadForm() {
 					}}
 					innerRef={formikRef}
 					initialValues={{ nameValueThread: null, isPrivate: false }}
-					onSubmit={() => {}}
+					onSubmit={() => { }}
 				>
 					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values, touched, errors }) => (
 						<View style={styles.createChannelContent}>
@@ -252,6 +252,6 @@ export default function CreateThreadForm() {
 					)}
 				</Formik>
 			</ScrollView>
-		</View>
+		</KeyboardAvoidingView>
 	);
 }
