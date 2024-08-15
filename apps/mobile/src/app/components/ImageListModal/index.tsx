@@ -25,7 +25,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	}, [allAttachment]);
 
 	const createAttachmentObject = (attachment: any) => ({
-		id: `${attachment.create_time}_${attachment.url}`,
+		id: `${attachment.create_time}_${attachment.uploader}`,
 		url: attachment.url,
 		uploader: attachment.uploader,
 		create_time: attachment.create_time,

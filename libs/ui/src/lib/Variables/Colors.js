@@ -80,6 +80,7 @@ module.exports = {
   buttonSearchHover: '#2C2E32',
   buttonMore: '#272120',
   buttonMoreHover: '#1E1A19',
+  buttonPrimary: '#5865F2',
 
   primary: '#155EEF',
   hoverPrimary: '#124FC9',
