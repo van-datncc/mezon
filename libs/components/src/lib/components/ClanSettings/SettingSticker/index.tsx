@@ -1,16 +1,18 @@
-import {selectAllStickerSuggestion} from '@mezon/store';
-import {Button, Modal} from '@mezon/ui';
-import {ClanSticker} from 'mezon-js';
-import {useState} from 'react';
-import {useSelector} from 'react-redux';
-import {Icons} from '../../../components';
-import ModalSticker, {EGraphicType} from './ModalEditSticker';
+import { selectAllStickerSuggestion, selectCurrentClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
+import { Button, Modal } from '@mezon/ui';
+import { ClanSticker } from 'mezon-js';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Icons } from '../../../components';
+import ModalSticker from './ModalEditSticker';
 import SettingStickerItem from './SettingStickerItem';
 
 const SettingSticker = () => {
 	const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
 	const [editSticker, setEditSticker] = useState<ClanSticker | null>(null);
 	const listSticker = useSelector(selectAllStickerSuggestion);
+	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const dispatch = useAppDispatch();
 	const handleUpdateSticker = (sticker: ClanSticker) => {
 		setEditSticker(sticker);
 		setShowModalSticker(true);
@@ -22,7 +24,9 @@ const SettingSticker = () => {
 	const handleOpenModalUpload = () => {
 		setShowModalSticker(true);
 	};
-
+	useEffect(() => {
+		dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId }))
+	},[])
 	return (
 		<>
 			<div className="flex flex-col gap-6 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">

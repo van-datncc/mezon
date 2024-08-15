@@ -68,9 +68,14 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 					defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
 					defaultFill="#3297FF"
 				/>
-			) : (
+			) : channel.parrent_id === '0' ? (
 				<Icons.Hashtag defaultSize={`inline-block mt-[-0.5rem] w-4 h-4 ${isJumMessageEnabled ? 'mx-[-0.5rem]' : ''}`} defaultFill="#3297FF" />
-			)}
+			) : channel.parrent_id !== '0' ? (
+				<Icons.ThreadIcon
+					defaultSize={`inline-block -mt-[0.2rem] w-4 h-4 ${isJumMessageEnabled ? 'mx-[-0.5rem]' : ''}`}
+					defaultFill="#3297FF"
+				/>
+			) : null}
 			{channel.channel_label}
 		</Link>
 	) : (
