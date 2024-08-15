@@ -14,10 +14,6 @@ type MarkdownContentOpt = {
 	isRenderImage: boolean;
 };
 
-const defaultLinkProduct = process.env.NX_CHAT_APP_REDIRECT_URI + "/invite/";
-const defaultLinkDev = process.env.NX_CHAT_APP_REDIRECT_URI_DEV + "/invite/";
-const defaultLinkLocal = process.env.NX_CHAT_APP_REDIRECT_URI_LOCAL + "/invite/";
-
 const navigateToChannel = async (url: string, navigate: any, toChannelPage: any, dispatch: any) => {
 	const regex = /\/invite\/(\d+)/;
 	const match = url.match(regex);
@@ -32,16 +28,12 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate, toChannelPage } = useAppNavigation();
 	const dispatch = useAppDispatch();
-
+	const origin = window.location.origin + "/invite/";
 
 	const onClickLink = useCallback(
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
-				if (
-					url.startsWith(defaultLinkProduct) ||
-					url.startsWith(defaultLinkDev) ||
-					url.startsWith(defaultLinkLocal)
-				) {
+				if (url.startsWith(origin)) {
 					navigateToChannel(url, navigate, toChannelPage, dispatch);
 				} else {
 					window.open(url, '_blank');
