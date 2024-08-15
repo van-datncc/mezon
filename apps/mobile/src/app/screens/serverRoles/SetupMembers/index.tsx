@@ -5,13 +5,13 @@ import { selectAllRolesClan, selectAllUsesClan, UsersClanEntity } from '@mezon/s
 import { isEqual } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Image, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { FlatList, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { MezonInput } from '../../../temp-ui';
+import { MezonAvatar, MezonInput } from '../../../temp-ui';
 import { normalizeString } from '../../../utils/helpers';
 import { checkCanEditPermission } from '../helper';
 
@@ -204,31 +204,10 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 												gap={size.s_10}
 											>
 												<Block flex={1} flexDirection="row" gap={size.s_10} alignItems="center">
-													{item?.user?.avatar_url ? (
-														<Image
-															source={{ uri: item?.user?.avatar_url }}
-															style={{
-																width: size.s_40,
-																height: size.s_40,
-																borderRadius: 50,
-															}}
-														/>
-													) : (
-														<Text
-															style={{
-																backgroundColor: themeValue.colorAvatarDefault,
-																width: size.s_40,
-																height: size.s_40,
-																textAlign: 'center',
-																textAlignVertical: 'center',
-																borderRadius: 50,
-																fontSize: size.h5,
-																color: Colors.white,
-															}}
-														>
-															{item?.user?.username?.charAt?.(0)?.toUpperCase()}
-														</Text>
-													)}
+													<MezonAvatar
+														avatarUrl={item?.user?.avatar_url}
+														username={item?.user?.username}
+													/>
 													<Block>
 														{item?.user?.display_name ? (
 															<Text color={themeValue.white}>{item?.user?.display_name}</Text>
