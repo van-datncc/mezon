@@ -1,10 +1,10 @@
-import { selectAllStickerSuggestion } from '@mezon/store';
-import { Button, Modal } from '@mezon/ui';
-import { ClanSticker } from 'mezon-js';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
-import ModalSticker from './ModalEditSticker';
+import {selectAllStickerSuggestion} from '@mezon/store';
+import {Button, Modal} from '@mezon/ui';
+import {ClanSticker} from 'mezon-js';
+import {useState} from 'react';
+import {useSelector} from 'react-redux';
+import {Icons} from '../../../components';
+import ModalSticker, {EGraphicType} from './ModalEditSticker';
 import SettingStickerItem from './SettingStickerItem';
 
 const SettingSticker = () => {
@@ -59,7 +59,7 @@ const SettingSticker = () => {
 				showModal={showModalSticker}
 				onClose={handleCloseModal}
 				classNameBox={'max-w-[600px]'}
-				children={<ModalSticker key={editSticker?.id} editSticker={editSticker} handleCloseModal={handleCloseModal} />}
+				children={<ModalSticker key={editSticker?.id} graphic={editSticker} handleCloseModal={handleCloseModal} type={EGraphicType.STICKER}/>}
 			/>
 		</>
 	);

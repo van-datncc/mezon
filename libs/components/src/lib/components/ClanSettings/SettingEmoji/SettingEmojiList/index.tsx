@@ -4,9 +4,10 @@ import SettingEmojiItem from '../SettingEmojiItem';
 type SettingEmojiListProps = {
 	title: string;
 	emojiList: ClanEmoji[];
+	onUpdateEmoji: (emoji: ClanEmoji) => void;
 };
 
-const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
+const SettingEmojiList = ({ title, emojiList, onUpdateEmoji }: SettingEmojiListProps) => {
 	return (
 		<div className={'flex flex-col gap-3 dark:text-textDarkTheme text-textLightTheme pb-[60px]'}>
 			<h2 className="text-base font-bold">
@@ -19,7 +20,7 @@ const SettingEmojiList = ({ title, emojiList }: SettingEmojiListProps) => {
 			</div>
 			<div className={'flex flex-col w-full'}>
 				{emojiList.map((emoji) => (
-					<SettingEmojiItem emoji={emoji} key={emoji.id} />
+					<SettingEmojiItem emoji={emoji} key={emoji.id} onUpdateEmoji={onUpdateEmoji} />
 				))}
 			</div>
 		</div>

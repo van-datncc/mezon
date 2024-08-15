@@ -7,18 +7,20 @@ import {
 	useAppDispatch,
 	useAppSelector,
 } from '@mezon/store';
-import { EPermission, getSrcEmoji } from '@mezon/utils';
+import {EPermission, getSrcEmoji, MAX_FILE_NAME_EMOJI} from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Icons } from '@mezon/ui'
 
 type SettingEmojiItemProp = {
 	emoji: ClanEmoji;
+	onUpdateEmoji: (emoji: ClanEmoji) => void;
 };
 
-const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
-	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname?.slice(1, -1) || '');
+const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
+	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
 	const [showEdit, setShowEdit] = useState<boolean>(false);
 	const [focus, setFocus] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
@@ -51,7 +53,6 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 	};
 	const handleOnMouseLeave = () => {
 		if (!focus) {
-			setNameEmoji(emoji.shortname?.slice(1, -1) ?? '');
 			setShowEdit(false);
 		}
 	};
@@ -89,17 +90,6 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 					>
 						<p className={`max-w-[172px] truncate overflow-hidden inline-block select-none`}>{nameEmoji}</p>
 					</div>
-
-					{showEdit && (
-						<input
-							className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`}
-							value={nameEmoji}
-							onChange={handleChangeEmojiName}
-							onKeyDown={handleKeyDown}
-							onFocus={() => setFocus(true)}
-							onBlurCapture={() => setFocus(false)}
-						/>
-					)}
 				</div>
 
 				<div className={'flex-1 flex gap-[6px]  select-none'}>
@@ -110,12 +100,20 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 				</div>
 
 				{showEdit && (
-					<button
-						onClick={handleDelete}
-						className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete absolute text-xs font-bold w-6 h-6 top-[-12px] right-[-12px] flex items-center justify-center rounded-[50%]"
-					>
-						X
-					</button>
+					<div className={"absolute text-xs font-bold w-6 top-[-12px] right-[-12px]"}>
+						<button
+							onClick={handleDelete}
+							className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete  text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[50%]"
+						>
+							X
+						</button>
+						<button
+							onClick={() => onUpdateEmoji(emoji)}
+							className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent shadow-emoji_item-delete  text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[50%] mt-2"
+						>
+							<Icons.PenEdit className={`w-3 h-3 dark:text-textSecondary text-colorTextLightMode`}/>
+						</button>
+					</div>
 				)}
 			</div>
 		</div>

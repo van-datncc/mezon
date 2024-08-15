@@ -346,13 +346,13 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 				.map((item, index) => (
 					<button
 						key={index}
-						className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
+						className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full aspect-square`}
 						onClick={() => {
 							onEmojiSelect(item.id, item.shortname);
 						}}
 						onMouseEnter={() => onEmojiHover(item)}
 					>
-						<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} />
+						<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} className={'max-h-full max-w-full'}/>
 					</button>
 				))}
 			{isShowAddButton && (
@@ -385,10 +385,10 @@ const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction }: EmojiHov
 
 	return (
 		<div
-			className={`w-full min-h-12 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2 max-sbm:mb-0'}`}
+			className={`w-full min-h-12 flex-1 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2 max-sbm:mb-0'}`}
 		>
 			{emojiHoverSrc ? (
-				<img draggable="false" className="w-10" src={emojiHoverSrc} />
+				<img draggable="false" className="max-w-10 max-h-full" src={emojiHoverSrc} />
 			) : (
 				<Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'} />
 			)}

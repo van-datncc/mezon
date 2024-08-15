@@ -51,7 +51,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 
 	return (
 		<div
-			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
+			className={`flex h-heightTopBar p-3 min-w-0 items-center dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
 		>
 			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full" >
 				<div className="flex flex-row gap-1 items-center flex-1">

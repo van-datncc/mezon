@@ -119,7 +119,7 @@ export default function DirectMessage() {
 			>
 				{' '}
 				<DmTopbar dmGroupId={directId} />
-				<div className="flex flex-row h-full w-full">
+				<div className="flex flex-row flex-1 w-full">
 					<div
 						className={`flex-col flex-1 h-full max-h-messageViewChatDM ${isUseProfileDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>

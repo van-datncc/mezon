@@ -1,55 +1,38 @@
-import { createEmojiSetting, selectAllEmojiSuggestion, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { handleUploadEmoticon, useMezon } from '@mezon/transport';
-import { EEmojiCategory, LIMIT_SIZE_UPLOAD_IMG, MAX_FILE_NAME_EMOJI } from '@mezon/utils';
-import { Snowflake } from '@theinternetfolks/snowflake';
-import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
-import { ChangeEvent, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
+import {createEmojiSetting, selectAllEmojiSuggestion, selectCurrentClanId, useAppDispatch} from '@mezon/store';
+import {handleUploadEmoticon, useMezon} from '@mezon/transport';
+import {EEmojiCategory, LIMIT_SIZE_UPLOAD_IMG, MAX_FILE_NAME_EMOJI, resizeFileImage} from '@mezon/utils';
+import {Snowflake} from '@theinternetfolks/snowflake';
+import {ApiClanEmojiCreateRequest, ApiMessageAttachment} from 'mezon-js/api.gen';
+import {ChangeEvent, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {ModalErrorTypeUpload, ModalOverData} from '../../ModalError';
 import SettingEmojiList from './SettingEmojiList';
+import ModalSticker, {EGraphicType} from "../SettingSticker/ModalEditSticker";
+import {ClanEmoji} from "mezon-js";
+import {Modal} from "@mezon/ui";
 
 const SettingEmoji = () => {
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
-	const dispatch = useAppDispatch();
-	const currentClanId = useSelector(selectCurrentClanId) || '';
-	const { sessionRef, clientRef } = useMezon();
-	const emojiList = useSelector(selectAllEmojiSuggestion).filter((emoji) => emoji.category === EEmojiCategory.CUSTOM);
-	const handleSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
-		if (!e.target.files) {
-			return;
-		}
-		const session = sessionRef.current;
-		const client = clientRef.current;
-		if (!client || !session) {
-			throw new Error('Client or file is not initialized');
-		}
-		const file = e.target.files[0];
-		if (file.size > LIMIT_SIZE_UPLOAD_IMG) {
-			setOpenModal(true);
-			return;
-		}
-		const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-		if (!allowedTypes.includes(file.type)) {
-			setOpenModalType(true);
-			return;
-		}
-		const fileNameParts = file.name.split('.');
-		const shortname = fileNameParts.slice(0, -1).join('.').slice(0, MAX_FILE_NAME_EMOJI);
-		const category = 'Custom';
-		const id = Snowflake.generate();
-		const path = 'emojis/' + id + '.webp';
-		handleUploadEmoticon(client, session, path, file).then(async (attachment: ApiMessageAttachment) => {
-			const request: ApiClanEmojiCreateRequest = {
-				id: id,
-				category: category,
-				clan_id: currentClanId,
-				shortname: ':' + shortname + ':',
-				source: attachment.url,
-			};
-			dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
-		});
-	};
+	const emojiList = useSelector(selectAllEmojiSuggestion).filter((emoji) => emoji.category === EEmojiCategory.CUSTOM && emoji?.src);
+	const [selectedEmoji, setSelectedEmoji] = useState<ClanEmoji | null> (null);
+	const [isOpenEditModal, setIsOpenEditModal] = useState<boolean> (false);
+	
+	const handleOpenUpdateEmojiModal = (emoji: ClanEmoji) => {
+		console.log ('open modal here')
+		setSelectedEmoji(emoji);
+		setIsOpenEditModal(true);
+	}
+	
+	const handleCreateEmoji = () => {
+		setSelectedEmoji(null);
+		setIsOpenEditModal(true);
+	}
+	
+	const handleCloseModal = () => {
+		setIsOpenEditModal(false);
+	}
+	
 	return (
 		<>
 			<div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
@@ -65,23 +48,27 @@ const SettingEmoji = () => {
 						<li>Naming: Emoji names must be at least 2 characters long and can only contain alphanumeric characters and underscores</li>
 					</ul>
 				</div>
-				<div className="h-[38px] font-semibold rounded bg-[#3297ff] text-[#ffffff] w-28 relative flex flex-row items-center justify-center hover:bg-[#2b80d7]">
+				<div
+					onClick={handleCreateEmoji}
+					className="h-[38px] font-semibold rounded bg-[#3297ff] text-[#ffffff] w-28 relative flex flex-row items-center justify-center hover:bg-[#2b80d7]"
+				>
 					Upload emoji
-					<input
-						className="absolute w-full h-full cursor-pointer z-10 opacity-0 file:cursor-pointer"
-						type="file"
-						title=" "
-						tabIndex={0}
-						accept=".jpg,.jpeg,.png,.gif"
-						onChange={handleSelectFile}
-					></input>
 				</div>
 			</div>
 
-			<SettingEmojiList title={'Emoji'} emojiList={emojiList} />
+			<SettingEmojiList title={'Emoji'} emojiList={emojiList} onUpdateEmoji={handleOpenUpdateEmojiModal}/>
 
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
+			
+			{isOpenEditModal && (
+				<Modal
+	        showModal={isOpenEditModal}
+	        onClose={handleCloseModal}
+	        classNameBox={'max-w-[600px]'}
+	        children={<ModalSticker graphic={selectedEmoji} handleCloseModal={handleCloseModal} type={EGraphicType.EMOJI}/>}
+				/>
+			)}
 		</>
 	);
 };
