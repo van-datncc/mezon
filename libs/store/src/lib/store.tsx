@@ -45,6 +45,7 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
+import { listchannelsByUserReducer } from './channels/channelUser.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -117,6 +118,14 @@ const persistedChannelMembersReducer = persistReducer(
 		blacklist: ['onlineStatusUser'],
 	},
 	channelMembersReducer,
+);
+
+const persistedListchannelsByUserReducer = persistReducer(
+	{
+		key: 'listchannelbyusers',
+		storage,
+	},
+	listchannelsByUserReducer,
 );
 
 const persistedRolesClanReducer = persistReducer(
@@ -198,6 +207,7 @@ const reducer = {
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
+	listchannelbyusers: persistedListchannelsByUserReducer,
 	channelMembers: persistedChannelMembersReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
