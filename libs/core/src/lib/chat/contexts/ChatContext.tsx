@@ -126,6 +126,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 
 			dispatch(messagesActions.addNewMessage(mess));
+			dispatch(messagesActions.setIdNewMessageResponse(message.id));
 
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
@@ -228,9 +229,29 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
-			dispatch(channelMembersActions.updateUserChannel({userId: ClanProfileUpdates.user_id, clanId: ClanProfileUpdates.clan_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
-			dispatch(messagesActions.updateUserMessage({userId: ClanProfileUpdates.user_id, clanId: ClanProfileUpdates.clan_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
-			dispatch(usersClanActions.updateUserClan({userId: ClanProfileUpdates.user_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
+			dispatch(
+				channelMembersActions.updateUserChannel({
+					userId: ClanProfileUpdates.user_id,
+					clanId: ClanProfileUpdates.clan_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
+			dispatch(
+				messagesActions.updateUserMessage({
+					userId: ClanProfileUpdates.user_id,
+					clanId: ClanProfileUpdates.clan_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
+			dispatch(
+				usersClanActions.updateUserClan({
+					userId: ClanProfileUpdates.user_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
 		},
 		[dispatch],
 	);
@@ -406,29 +427,29 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => { };
+			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => { };
+			socket.onuserchannelremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => { };
+			socket.onuserclanremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => { };
+			socket.onuserchanneladded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => { };
+			socket.onclanprofileupdated = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -476,4 +497,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-
