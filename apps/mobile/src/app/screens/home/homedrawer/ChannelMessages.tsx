@@ -12,7 +12,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ImageListModal } from '../../../components/ImageListModal';
-import { ImageModal } from '../../../components/ImageModal';
 import MessageItemSkeleton from '../../../components/Skeletons/MessageItemSkeleton';
 import { MessageItemBS } from './components';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
@@ -53,7 +52,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<ApiMessageAttachment>();
-	const [singleImageSelected, setSingleImageSelected] = useState<string>('');
 
 	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
 
@@ -164,10 +162,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 		[channelId, clanId, dispatch],
 	);
 
-	const onOpenLinkImage = useCallback((url: string) => {
-		setSingleImageSelected(url);
-	}, [])
-
 	const dataReverse = useMemo(() => {
 		const data = cloneDeep(messages);
 		return data.reverse();
@@ -212,13 +206,12 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 					channelId={channelId}
 					channelName={channelLabel}
 					onOpenImage={onOpenImage}
-					onOpenLinkImage={onOpenLinkImage}
 					onMessageAction={onMessageAction}
 					setIsOnlyEmojiPicker={setIsOnlyEmojiPicker}
 				/>
 			);
 		},
-		[jumpToRepliedMessage, mode, channelId, channelLabel, onOpenImage, onOpenLinkImage, onMessageAction],
+		[jumpToRepliedMessage, mode, channelId, channelLabel, onOpenImage, onMessageAction],
 	);
 
 	const checkChannelCacheLoading = useMemo(() => {
@@ -236,10 +229,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 
 	const onCloseModalImage = useCallback(() => {
 		setVisibleImageModal(false);
-	}, []);
-
-	const onCloseSingleImageModal = useCallback(() => {
-		setSingleImageSelected('');
 	}, []);
 
 	return (
@@ -276,7 +265,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 
 			<View>
 				{visibleImageModal && <ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />}
-				{!!singleImageSelected && <ImageModal visible={!!singleImageSelected} onClose={onCloseSingleImageModal} singleImageSelected={singleImageSelected} />}
 
 				<MessageItemBS
 					mode={mode}

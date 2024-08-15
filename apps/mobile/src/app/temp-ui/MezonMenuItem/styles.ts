@@ -46,7 +46,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		disable: {
-			opacity: 0.8,
+			opacity: 0.5,
 		},
 
 		previewValue: {
