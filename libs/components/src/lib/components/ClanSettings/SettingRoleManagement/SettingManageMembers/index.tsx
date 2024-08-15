@@ -1,7 +1,7 @@
 import { useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId, RolesClanEntity, selectAllUsesClan, selectCurrentClan, selectTheme, setAddMemberRoles } from '@mezon/store';
+import { getNewAddMembers, getSelectedRoleId, RolesClanEntity, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
-import { getAvatarForPrioritize, getNameForPrioritize, ThemeApp, UsersClanEntity } from '@mezon/utils';
+import { getAvatarForPrioritize, getNameForPrioritize, UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -51,7 +51,6 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 		const userIDArray = userID?.split(',');
 		await updateRole(currentClan?.id ?? '', clickRole, activeRole?.title ?? '', [], [], userIDArray, []);
 	};
-	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div>
 			<div className="w-full flex gap-x-3">
@@ -72,8 +71,8 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 				</button>
 			</div>
 			<br />
-			<div className={appearanceTheme === ThemeApp.Light ? 'lightModeScrollBarMention' : ''}>
-				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto">
+			<div>
+				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto hide-scrollbar">
 					{searchResults.map((member: UsersClanEntity) => (
 						<ItemMember
 							key={member?.user?.id}
@@ -112,7 +111,7 @@ const ItemMember = (props: ItemMemberProps) => {
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
-		<li key={id} className="flex justify-between items-center group">
+		<li key={id} className="flex justify-between items-center group/itemAddMember">
 			<div className="flex gap-x-2">
 				<AvatarImage 
 					alt={userName}
@@ -126,7 +125,7 @@ const ItemMember = (props: ItemMemberProps) => {
 			{!isNewRole ? (
 				<div 
 					onClick={onRemove}
-					className="w-4 h-4 rounded-full flex justify-center items-center dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton"
+					className="w-4 h-4 rounded-full flex justify-center items-center dark:bg-slate-800 bg-bgLightModeButton opacity-0 group-hover/itemAddMember:opacity-100"
 				>
 					<Icons.Close defaultSize="size-2 dark:text-white text-black"/>
 				</div>
