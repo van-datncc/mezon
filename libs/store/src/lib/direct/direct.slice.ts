@@ -254,7 +254,7 @@ export const directSlice = createSlice({
 				},
 			});
 
-			if (payload.clan_id === '0' && dmChannel.active !== ActiveDm.OPEN_DM) {
+			if (payload.clan_id === '0' && dmChannel?.active !== ActiveDm.OPEN_DM) {
 				directAdapter.updateOne(state, {
 					id: payload.channel_id,
 					changes: {
