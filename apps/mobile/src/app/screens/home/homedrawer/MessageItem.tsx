@@ -81,7 +81,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const { t } = useTranslation('message');
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message: MessagesEntity = props?.message ? props?.message : (selectedMessage as MessagesEntity);
-	console.log('message:', message);
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
