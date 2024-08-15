@@ -32,7 +32,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontWeight: '700'
 	},
 	groupAvatar: {
-		backgroundColor: baseColor.blurple,
+		backgroundColor: Colors.orange,
 		borderRadius: 50,
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -68,6 +68,12 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		zIndex: 1000,
 		position: 'absolute',
 		left: size.s_2,
+		top: size.s_10,
+		padding: size.s_10,
+	},
+  iconMenuHeader: {
+		position: 'absolute',
+		right: size.s_2,
 		top: size.s_10,
 		padding: size.s_10,
 	},
