@@ -9,7 +9,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUrlInput, useMezon } from '@mezon/transport';
-import { ETypeLinkMedia, IMessageSendPayload } from '@mezon/utils';
+import { ETypeLinkMedia, IMentionOnMessage, IMessageSendPayload } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -40,8 +40,10 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		clanID = '0';
 	}
 
-	const [filteredResults, setFilteredResults] = React.useState<ApiMessageAttachment[]>([]);
+	const [filteredLinkResults, setFilteredLinkResults] = React.useState<ApiMessageAttachment[]>([]);
 	const [filteredContent, setFilterContent] = useState<IMessageSendPayload>({});
+	const [filteredMention, setFilterMention] = useState<IMentionOnMessage[]>([]);
+
 	const sendMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -53,6 +55,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		) => {
 			const filteredContent = useFilteredContent(content);
 			setFilterContent(filteredContent ?? {});
+			setFilterMention(mentions ?? []);
 			return dispatch(
 				messagesActions.sendMessage({
 					channelId: channelID,
@@ -82,25 +85,24 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				return null;
 			});
 			const results = await Promise.all(resultPromises);
-			const filteredResults = results.filter((result): result is ApiMessageAttachment => result !== null) as ApiMessageAttachment[];
-			setFilteredResults(filteredResults);
+			const filteredLinkProcess = results.filter((result): result is ApiMessageAttachment => result !== null) as ApiMessageAttachment[];
+			setFilteredLinkResults(filteredLinkProcess);
 		};
 		processUrls();
 	}, [filteredContent.lk]);
 
 	useEffect(() => {
-		if (!idNewMessageResponse || filteredResults.length === 0) return;
-
-		const result = checkContentContainsOnlyUrls(filteredContent.t ?? '', filteredResults);
-
+		if (!idNewMessageResponse || filteredLinkResults.length === 0) return;
+		const result = checkContentContainsOnlyUrls(filteredContent.t ?? '', filteredLinkResults);
 		const intervalId = setInterval(() => {
-			editSendMessage(result ? {} : filteredContent, idNewMessageResponse, [], filteredResults);
+			editSendMessage(result ? {} : filteredContent, idNewMessageResponse, filteredMention, filteredLinkResults);
 			setFilterContent({});
-			setFilteredResults([]);
+			setFilteredLinkResults([]);
+			setFilterMention([]);
 			clearInterval(intervalId);
 		}, 1000);
 		return () => clearInterval(intervalId);
-	}, [idNewMessageResponse, filteredResults]);
+	}, [idNewMessageResponse, filteredLinkResults]);
 
 	function checkContentContainsOnlyUrls(content: string, urls: ApiMessageAttachment[]) {
 		const urlsToCheck = urls.map((item) => item.url);
