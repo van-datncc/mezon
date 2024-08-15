@@ -1,4 +1,5 @@
 import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
+import log from 'electron-log/main';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 import { machineId } from 'node-machine-id';
 import { join } from 'path';
@@ -18,6 +19,7 @@ export default class Main {
 	}
 
 	static bootstrapApp() {
+		log.initialize();
 		App.main(app, BrowserWindow);
 	}
 
@@ -62,6 +64,7 @@ ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
 });
 
 autoUpdater.autoDownload = false;
+autoUpdater.logger = log;
 
 autoUpdater.on('checking-for-update', () => {
 	// checking for update
@@ -78,15 +81,15 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 		})
 		.then((result) => {
 			if (result.response === 0) {
-				autoUpdater.downloadUpdate();
+				autoUpdater.downloadUpdate();	
 			}
 		});
 });
 
-autoUpdater.on('update-not-available', () => {
+autoUpdater.on('update-not-available', (info: UpdateInfo) => {
 	new Notification({
 		title: 'No update',
-		body: 'The current version is the latest.',
+		body: 'The current version is the latest. ' + info.version,
 	}).show();
 });
 
@@ -110,6 +113,7 @@ autoUpdater.on('download-progress', (progressObj) => {
 	let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
 	log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
 	log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
+	log.info("downloading...", log_message)
 });
 
 autoUpdater.on('error', (error) => {
