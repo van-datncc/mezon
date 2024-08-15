@@ -385,7 +385,7 @@ const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction }: EmojiHov
 
 	return (
 		<div
-			className={`w-full min-h-12 flex-1 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2 max-sbm:mb-0'}`}
+			className={`w-full max-h-12 flex-1 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2 max-sbm:mb-0'} py-1`}
 		>
 			{emojiHoverSrc ? (
 				<img draggable="false" className="max-w-10 max-h-full" src={emojiHoverSrc} />

@@ -78,7 +78,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 			<div className="w-full h-full flex flex-row shadow-emoji_item dark:shadow-emoji_item_dark items-center">
 				<div className={'w-14 h-8'}>
 					<div className={'w-8 h-8 overflow-hidden flex items-center justify-center select-none '}>
-						<img className={'w-full h-auto object-cover'} src={getSrcEmoji(emoji.id as string)} alt={emoji.shortname} />
+						<img className={'w-auto max-h-full object-cover'} src={getSrcEmoji(emoji.id as string)} alt={emoji.shortname} />
 					</div>
 				</div>
 
