@@ -110,6 +110,86 @@ const persistedThreadReducer = persistReducer(
 	threadsReducer,
 );
 
+const persistedChannelMembersReducer = persistReducer(
+	{
+		key: 'channelMembers',
+		storage,
+	},
+	channelMembersReducer,
+);
+
+const persistedRolesClanReducer = persistReducer(
+	{
+		key: 'rolesclan',
+		storage,
+	},
+	RolesClanReducer,
+);
+
+const persistedEventMngtReducer = persistReducer(
+	{
+		key: 'eventmanagement',
+		storage,
+	},
+	eventManagementReducer,
+);
+
+const persistedChannelCatSettingReducer = persistReducer(
+	{
+		key: 'notichannelcategorysetting',
+		storage,
+	},
+	channelCategorySettingReducer,
+);
+
+const persistedPinMsgReducer = persistReducer(
+	{
+		key: 'pinmessages',
+		storage,
+	},
+	pinMessageReducer,
+);
+
+const persistedDefaultNotiClanReducer = persistReducer(
+	{
+		key: 'defaultnotificationclan',
+		storage,
+	},
+	defaultNotificationClanReducer,
+);
+
+const persistedDefaultNotiCatReducer = persistReducer(
+	{
+		key: 'defaultnotificationcategory',
+		storage,
+	},
+	defaultNotificationCategoryReducer,
+);
+
+const persistedHashTagDmReducer = persistReducer(
+	{
+		key: 'hashtagdmvoice',
+		storage,
+	},
+	hashtagDmVoiceReducer,
+);
+
+const persistedNotiReactMsgReducer = persistReducer(
+	{
+		key: 'notifireactmessage',
+		storage,
+	},
+	notifiReactMessageReducer,
+);
+
+const persistedStickersReducer = persistReducer(
+	{
+		key: 'stickers',
+		storage,
+	},
+	stickersReducer,
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -117,13 +197,13 @@ const reducer = {
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
-	channelMembers: channelMembersReducer,
+	channelMembers: persistedChannelMembersReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
 	messages: persistedMessageReducer,
 	categories: persistedCatReducer,
-	rolesclan: RolesClanReducer,
-	eventmanagement: eventManagementReducer,
+	rolesclan: persistedRolesClanReducer,
+	eventmanagement: persistedEventMngtReducer,
 	usersClan: usersClanReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
@@ -132,12 +212,12 @@ const reducer = {
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
 	notificationsetting: notificationSettingReducer,
-	pinmessages: pinMessageReducer,
-	defaultnotificationclan: defaultNotificationClanReducer,
-	defaultnotificationcategory: defaultNotificationCategoryReducer,
-	notichannelcategorysetting: channelCategorySettingReducer,
-	hashtagdmvoice: hashtagDmVoiceReducer,
-	notifireactmessage: notifiReactMessageReducer,
+	pinmessages: persistedPinMsgReducer,
+	defaultnotificationclan: persistedDefaultNotiClanReducer,
+	defaultnotificationcategory: persistedDefaultNotiCatReducer,
+	notichannelcategorysetting: persistedChannelCatSettingReducer,
+	hashtagdmvoice: persistedHashTagDmReducer,
+	notifireactmessage: persistedNotiReactMsgReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
@@ -147,7 +227,7 @@ const reducer = {
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
 	gifs: gifsReducer,
-	stickers: stickersReducer,
+	stickers: persistedStickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
