@@ -1,10 +1,13 @@
 import {
 	channelMembers,
 	channelMembersActions,
+	channelUsersActions,
 	channelsActions,
 	channelsSlice,
 	clansSlice,
 	directActions,
+	fetchChannelMembers,
+	fetchDirectMessage,
 	friendsActions,
 	mapMessageChannelToEntity,
 	mapNotificationToEntity,
@@ -210,6 +213,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onuserchanneladded = useCallback(
 		(userAdds: UserChannelAddedEvent) => {
 			const user = userAdds.users.find((user: any) => user.user_id !== userId);
+			if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
+				dispatch(fetchDirectMessage({noCache : true}));
+			}
 			if (user) {
 				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {

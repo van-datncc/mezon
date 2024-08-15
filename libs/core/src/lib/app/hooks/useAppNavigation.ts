@@ -41,7 +41,7 @@ export function useAppNavigation() {
 	}, []);
 
 	const toDmGroupPage = useCallback((directId: string, type: number) => {
-		return `message/${directId}/${type}`;
+		return `/chat/direct/message/${directId}/${type}`;
 	}, []);
 
 	const toDmGroupPageFromFriendPage = useCallback((directId: string, type: number) => {
