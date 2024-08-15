@@ -1,4 +1,5 @@
-import { selectTheme } from '@mezon/store';
+import { useAppNavigation } from '@mezon/core';
+import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import clx from 'classnames';
 import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
@@ -13,17 +14,42 @@ type MarkdownContentOpt = {
 	isRenderImage: boolean;
 };
 
+const defaultLinkProduct = process.env.NX_CHAT_APP_REDIRECT_URI + "/invite/";
+const defaultLinkDev = process.env.NX_CHAT_APP_REDIRECT_URI_DEV + "/invite/";
+const defaultLinkLocal = process.env.NX_CHAT_APP_REDIRECT_URI_LOCAL + "/invite/";
+
+const navigateToChannel = async (url: string, navigate: any, toChannelPage: any, dispatch: any) => {
+	const regex = /\/invite\/(\d+)/;
+	const match = url.match(regex);
+	if (match) {
+		const [_, inviteId] = match;
+		const respond = await dispatch(inviteActions.getLinkInvite({ inviteId }));
+		navigate(toChannelPage(respond.payload.channel_id, respond.payload.clan_id));
+	}
+};
+
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isRenderImage }) => {
 	const appearanceTheme = useSelector(selectTheme);
+	const { navigate, toChannelPage } = useAppNavigation();
+	const dispatch = useAppDispatch();
+
 
 	const onClickLink = useCallback(
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
-				window.open(url, '_blank');
+				if (
+					url.startsWith(defaultLinkProduct) ||
+					url.startsWith(defaultLinkDev) ||
+					url.startsWith(defaultLinkLocal)
+				) {
+					navigateToChannel(url, navigate, toChannelPage, dispatch);
+				} else {
+					window.open(url, '_blank');
+				}
 			}
-		},
-		[isJumMessageEnabled, isTokenClickAble],
+		},[isJumMessageEnabled, isTokenClickAble],
 	);
+	
 
 	const classes = clx(
 		'prose-code:text-sm inline prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',
