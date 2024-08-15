@@ -36,7 +36,7 @@
           "packElevateHelper": false,
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": ["-ext", "WixUtilExtension"],

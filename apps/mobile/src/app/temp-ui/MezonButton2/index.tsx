@@ -1,6 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { useMemo } from 'react';
-import { Pressable, StyleProp, Text, TextStyle } from 'react-native';
+import { Pressable, StyleProp, Text, TextStyle, ViewStyle } from 'react-native';
 import { style } from './styles';
 
 export enum EMezonButtonTheme {
@@ -18,14 +18,16 @@ interface IMezonButton {
 	icon?: any;
 	title?: string;
 	titleStyle?: StyleProp<TextStyle>;
+	containerStyle?: StyleProp<ViewStyle>;
 	fluid?: boolean;
 	border?: boolean;
 	type?: EMezonButtonTheme
 	size?: EMezonButtonSize
 	onPress?: () => void;
+	rounded?: boolean;
 }
 
-export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress, size = EMezonButtonSize.MD }: IMezonButton) {
+export default function MezonButton({ icon, title, titleStyle, fluid, border, type, onPress, size = EMezonButtonSize.MD, rounded = false, containerStyle }: IMezonButton) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
@@ -60,8 +62,11 @@ export default function MezonButton({ icon, title, titleStyle, fluid, border, ty
 			styles.container,
 			fluid && styles.fluid,
 			border && styles.border,
+			rounded && styles.rounded,
 			renderContainerStyle,
-			renderContainerSize]
+			renderContainerSize,
+			containerStyle
+		]
 		} onPress={onPress}>
 			{icon}
 			{title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
