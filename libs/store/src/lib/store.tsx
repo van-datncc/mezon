@@ -120,6 +120,14 @@ const persistedChannelMembersReducer = persistReducer(
 	channelMembersReducer,
 );
 
+const persistedListchannelsByUserReducer = persistReducer(
+	{
+		key: 'listchannelbyusers',
+		storage,
+	},
+	listchannelsByUserReducer,
+);
+
 const persistedRolesClanReducer = persistReducer(
 	{
 		key: 'rolesclan',
@@ -199,7 +207,7 @@ const reducer = {
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
-	listchannelbyusers: listchannelsByUserReducer,
+	listchannelbyusers: persistedListchannelsByUserReducer,
 	channelMembers: persistedChannelMembersReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
