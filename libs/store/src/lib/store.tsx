@@ -46,6 +46,7 @@ import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
+import { adminApplicationReducer } from './application/applications.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -245,6 +246,7 @@ const reducer = {
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
 	settingSticker: settingStickerReducer,
+	adminApplication: adminApplicationReducer,
 };
 
 let storeInstance = configureStore({
