@@ -124,7 +124,7 @@ export type MentionReactInputProps = {
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
-	const { listChannels } = useChannels();
+	const { channels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
 	const dataReferences = useSelector(selectDataReferences);
@@ -396,7 +396,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const listChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode !== ChannelStreamMode.STREAM_MODE_GROUP && props.mode !== ChannelStreamMode.STREAM_MODE_DM) {
-			return listChannels.map((item) => {
+			return channels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
@@ -405,7 +405,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			}) as ChannelsMentionProps[];
 		}
 		return [];
-	}, [props.mode, listChannels]);
+	}, [props.mode, channels]);
 
 	const listChannelVoidsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
@@ -712,7 +712,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					appendSpaceOnAdd={true}
 				/>
 			</MentionsInput>
-			<GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />
+			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
 		</div>
 	);
 }

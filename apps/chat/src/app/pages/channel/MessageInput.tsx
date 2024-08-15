@@ -61,11 +61,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
 
-	const { listChannels } = useChannels();
+	const { channels } = useChannels();
 
 	const listChannelsMention = useMemo(() => {
 		if (mode !== ChannelStreamMode.STREAM_MODE_GROUP && mode !== ChannelStreamMode.STREAM_MODE_DM) {
-			return listChannels.map((item) => {
+			return channels.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
@@ -75,7 +75,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		} else {
 			return [];
 		}
-	}, [mode, listChannels]);
+	}, [mode, channels]);
 
 	useEffect(() => {
 		if (openEditMessageState && message.id === idMessageRefEdit) {
