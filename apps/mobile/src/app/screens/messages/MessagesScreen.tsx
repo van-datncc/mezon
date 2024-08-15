@@ -1,8 +1,16 @@
 import { useMemberStatus } from '@mezon/core';
-import { Icons, PaperclipIcon } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, selectAllClans, selectAllEmojiSuggestion, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { Icons, PaperclipIcon, TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '@mezon/mobile-components';
+import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
+import {
+	DirectEntity,
+	RootState,
+	selectAllClans,
+	selectAllEmojiSuggestion,
+	selectDirectsOpenlist,
+	selectTypingUserIdsByChannelId,
+} from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
+import LottieView from 'lottie-react-native';
 import moment from 'moment';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +20,8 @@ import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { emojiRegex, normalizeString } from '../../utils/helpers';
-import { removeBlockCode } from '../home/homedrawer/constants';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
+import { removeBlockCode } from '../home/homedrawer/constants';
 import { style } from './styles';
 
 const SeparatorListFriend = () => {
@@ -21,9 +29,10 @@ const SeparatorListFriend = () => {
 };
 
 const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any }) => {
-	const { themeValue } = useTheme();
+	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { directMessage, navigation } = props;
+	const hasUserTyping = useSelector(selectTypingUserIdsByChannelId(directMessage?.channel_id.toString()));
 	const { t } = useTranslation('message');
 	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
@@ -104,7 +113,18 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 							<Text style={styles.textAvatar}>{directMessage?.channel_label?.charAt?.(0)}</Text>
 						</View>
 					)}
-					<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+					{hasUserTyping?.length > 0 ? (
+						<View style={[styles.statusTyping, userStatus ? styles.online : styles.offline]}>
+							<LottieView
+								source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}
+								autoPlay
+								loop
+								style={styles.lottie}
+							/>
+						</View>
+					) : (
+						<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+					)}
 				</View>
 			)}
 
@@ -183,20 +203,22 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
 			</View>
-			{
-				clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ?
-					<UserEmptyMessage onPress={() => { navigateToAddFriendScreen() }} /> :
-					(
-						<FlatList
-							data={filteredDataDM}
-							style={styles.dmMessageListContainer}
-							showsVerticalScrollIndicator={false}
-							keyExtractor={(dm) => dm.id.toString()}
-							ItemSeparatorComponent={SeparatorListFriend}
-							renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} />}
-						/>
-					)
-			}
+			{clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ? (
+				<UserEmptyMessage
+					onPress={() => {
+						navigateToAddFriendScreen();
+					}}
+				/>
+			) : (
+				<FlatList
+					data={filteredDataDM}
+					style={styles.dmMessageListContainer}
+					showsVerticalScrollIndicator={false}
+					keyExtractor={(dm) => dm.id.toString()}
+					ItemSeparatorComponent={SeparatorListFriend}
+					renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} />}
+				/>
+			)}
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
 				<Icons.MessagePlusIcon width={22} height={22} />

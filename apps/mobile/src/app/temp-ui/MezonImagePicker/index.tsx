@@ -1,4 +1,4 @@
-import { Icons } from '@mezon/mobile-components';
+import { Icons, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -95,7 +95,7 @@ export default memo(function MezonImagePicker({
 			console.log('Camera Error: ', response.errorMessage);
 		} else {
 			const file = response.assets[0];
-			return {
+      return {
 				uri: file?.uri,
 				name: file?.fileName,
 				type: file?.type,
@@ -125,7 +125,7 @@ export default memo(function MezonImagePicker({
 						path: file.uri,
 						mediaType: 'photo',
 						includeBase64: true,
-						compressImageQuality: 1,
+						compressImageQuality: QUALITY_IMAGE_UPLOAD,
 						...(typeof width === 'number' && { width: width * scale }),
 						...(typeof height === 'number' && { height: height * scale }),
 					});
