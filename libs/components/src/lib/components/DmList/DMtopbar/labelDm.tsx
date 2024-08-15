@@ -1,8 +1,8 @@
 import {useEscapeKey, useOnClickOutside} from '@mezon/core';
 import { channelsActions, DirectEntity, useAppDispatch } from '@mezon/store';
-import { MouseButton } from '@mezon/utils';
+import {MouseButton, ValidateSpecialCharacters} from '@mezon/utils';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import { Coords } from '../../ChannelLink';
 import PanelMember from '../../PanelMember';
 
@@ -24,6 +24,10 @@ const LabelDm = (props: LabelDmProps) => {
 		mouseY: 0,
 		distanceToBottom: 0,
 	});
+	const isValidGroupName = useMemo(() => {
+		return ValidateSpecialCharacters().test(label)
+	}, [label])
+	
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		// stop open popup default of web
 		window.oncontextmenu = (e) => {
@@ -108,9 +112,10 @@ const LabelDm = (props: LabelDmProps) => {
 						maxLength={64}
 						className="w-full dark:text-white text-black outline-none border dark:border-white border-slate-200 bg-bgLightModeButton dark:bg-bgSecondary rounded"
 					/>
-					<p className={'text-colorDanger text-xs absolute top-7 italic w-full truncate'}>Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</p>
+					{!isValidGroupName && (
+						<p className={'text-colorDanger text-xs absolute top-7 italic w-full truncate'}>Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).</p>
+					)}
 				</div>
-				
 			)}
 			{isShowPanel && (
 				<PanelMember
