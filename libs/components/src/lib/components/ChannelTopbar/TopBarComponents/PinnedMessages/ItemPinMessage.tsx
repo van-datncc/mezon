@@ -1,5 +1,5 @@
 import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
-import { messagesActions, PinMessageEntity, selectCurrentClanId } from '@mezon/store';
+import { messagesActions, pinMessageActions, PinMessageEntity, selectCurrentClanId } from '@mezon/store';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import MemberProfile from '../../../MemberProfile';
@@ -10,10 +10,11 @@ type ItemPinMessageProps = {
 	pinMessage: PinMessageEntity;
 	contentString: string | undefined;
 	handleUnPinMessage: (value: string) => void;
+	onClose: () => void;
 };
 
 const ItemPinMessage = (props: ItemPinMessageProps) => {
-	const { pinMessage, contentString, handleUnPinMessage } = props;
+	const { pinMessage, contentString, handleUnPinMessage, onClose } = props;
 	const [openModalDelPin, setOpenModalDelPin] = useState(false);
 	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || "");
 
@@ -21,6 +22,8 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const dispatch = useDispatch();
 	const { directToMessageById } = useJumpToMessage({ channelId: pinMessage?.channel_id || '', messageID: pinMessage.message_id || '', clanId: currentClanID || '' });
 	const handleJumpMess = () => {
+		dispatch(pinMessageActions.setJumpPinMessageId(pinMessage.message_id));
+		onClose();
 		dispatch(messagesActions.setIdMessageToJump(pinMessage.message_id));
 		directToMessageById();
 	}
