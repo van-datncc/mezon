@@ -46,7 +46,6 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
     });
 
     const handleDeleteSticker = useCallback(async () => {
-        console.log("start");
         if (data.id) {
             const result = await dispatch(deleteSticker({ stickerId: data.id, clan_id: clanID }));
             // @ts-ignore
@@ -57,12 +56,10 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
                 })
             }
         }
-        console.log("end");
     }, [])
 
     const handleSaveChange = useCallback(async () => {
         if (sticker && sticker.id && stickerName !== sticker.shortname) {
-            console.log("start");
             const stickerChange: MezonUpdateClanStickerByIdBody = {
                 source: sticker?.source,
                 category: sticker?.category,
@@ -82,10 +79,9 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
                     text1: t('toast.errorUpdating')
                 })
             }
-            console.log("done");
             return;
         }
-    }, []);
+    }, [sticker, stickerName]);
 
     return (
         <View style={{ backgroundColor: "red" }}>

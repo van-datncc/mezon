@@ -131,7 +131,7 @@ export default function StickerSetting() {
                         <StickerSettingItem
                             data={item}
                             clanID={currentClanId}
-                            key={"sticker_" + index.toString()}
+                            key={"sticker_" + item.id}
                         />
                     ))}
                 </ScrollView>
