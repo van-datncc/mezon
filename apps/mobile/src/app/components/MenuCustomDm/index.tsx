@@ -11,7 +11,7 @@ import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonBottomSheet, MezonMen
 import CustomGroupDm from './CustomGroupDm';
 import style from './MenuCustomDm.styles';
 
-const MenuCustomDm = ({ currentChannel }: { currentChannel: IChannel | DirectEntity }) => {
+const MenuCustomDm = ({ currentChannel, channelLabel }: { currentChannel: IChannel | DirectEntity, channelLabel: string }) => {
 	const { t } = useTranslation(['menuCustomDM']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -68,7 +68,7 @@ const MenuCustomDm = ({ currentChannel }: { currentChannel: IChannel | DirectEnt
 		<Block paddingVertical={size.s_10} paddingHorizontal={size.s_20}>
 			{[ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel.type) ? <MezonMenu menu={generalMenu} /> : <MezonMenu menu={closeDm} />}
 			<MezonBottomSheet snapPoints={['40%']} ref={bottomSheetCustomGroup}>
-				<CustomGroupDm dmGroupId={currentChannel?.id} channelLabel={currentChannel?.channel_label} />
+				<CustomGroupDm dmGroupId={currentChannel?.id} channelLabel={channelLabel} />
 			</MezonBottomSheet>
 		</Block>
 	);

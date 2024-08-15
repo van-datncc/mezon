@@ -31,6 +31,9 @@ export const ThreadHeader = memo(() => {
 	const openMenu = () => {
 		bottomSheetMenuCustom.current?.present();
 	};
+	const channelLabel = useMemo(() => {
+		return currentDmGroup?.channel_label || currentChannel?.channel_label || currentChannel?.usernames;
+	}, [currentDmGroup?.channel_label, currentChannel?.channel_label, currentChannel?.usernames]);
 	return (
 		<View style={styles.channelLabelWrapper}>
 			<TouchableOpacity style={styles.iconBackHeader} onPress={() => navigation.goBack()}>
@@ -53,7 +56,7 @@ export const ThreadHeader = memo(() => {
 						)}
 					</View>
 					<Text numberOfLines={5} style={styles.dmLabel}>
-						{currentDmGroup?.channel_label || currentChannel?.channel_label || currentChannel?.usernames}
+						{channelLabel}
 					</Text>
 				</View>
 			) : (
@@ -74,7 +77,7 @@ export const ThreadHeader = memo(() => {
 				</TouchableOpacity>
 			)}
 			<MezonBottomSheet snapPoints={snapPointsMenuCustom} ref={bottomSheetMenuCustom}>
-				<MenuCustomDm currentChannel={currentChannel}></MenuCustomDm>
+				<MenuCustomDm currentChannel={currentChannel} channelLabel={channelLabel}></MenuCustomDm>
 			</MezonBottomSheet>
 		</View>
 	);
