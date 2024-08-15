@@ -6,6 +6,7 @@ import {
 	clansSlice,
 	directActions,
 	friendsActions,
+	listChannelsByUserActions,
 	mapMessageChannelToEntity,
 	mapNotificationToEntity,
 	mapReactionToEntity,
@@ -309,6 +310,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
 						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+						dispatch(listChannelsByUserActions.fetchListChannelsByUser({noCache: true}))
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
