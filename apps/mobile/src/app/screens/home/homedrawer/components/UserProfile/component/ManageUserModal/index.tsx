@@ -1,11 +1,12 @@
 import { useRoles } from "@mezon/core";
 import { CheckIcon, CloseIcon, Icons } from "@mezon/mobile-components";
-import { baseColor, Block, Colors, size, Text, useTheme } from "@mezon/mobile-ui";
+import { baseColor, Block, Colors, size, Text, useTheme, verticalScale } from "@mezon/mobile-ui";
 import { ChannelMembersEntity, selectAllRolesClan, selectCurrentClan } from "@mezon/store-mobile";
 import { toastConfig } from "apps/mobile/src/app/configs/toastConfig";
+import { IMezonMenuSectionProps, MezonAvatar, MezonMenu } from "apps/mobile/src/app/temp-ui";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Image, Modal, ScrollView, TouchableOpacity } from "react-native";
+import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Toast from "react-native-toast-message";
 import { useSelector } from "react-redux";
@@ -94,6 +95,19 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
         return !editMode ? activeRoleOfUser : rolesClan
     }, [editMode, activeRoleOfUser, rolesClan])
 
+    const menuActions = useMemo(() => (
+        profileSetting
+            .filter(item => item.value !== EActionSettingUserProfile.Manage)
+            .map(item => ({
+                items: [{
+                    title: `${item.label} '${user?.user?.username}'`,
+                    disabled: !item.isShow,
+                    textStyle: { color: baseColor.redStrong, fontSize: verticalScale(14) },
+                    onPress: () => item?.action(item?.value)
+                }]
+            }))
+    ) satisfies IMezonMenuSectionProps[], [profileSetting, user])
+
     return (
         <Modal visible={visible} animationType={'slide'} statusBarTranslucent={true}>
             <Block flex={1} backgroundColor={themeValue?.charcoal} paddingTop={size.s_40}>
@@ -129,29 +143,10 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
                         borderRadius={size.s_14}
                     >
                         <Block flex={1} flexDirection="row" gap={size.s_10} alignItems="center">
-                            {user?.user?.avatar_url ? (
-                                <Image
-                                    source={{ uri: user?.user?.avatar_url }}
-                                    style={{
-                                        width: size.s_40,
-                                        height: size.s_40,
-                                        borderRadius: 50
-                                    }}
-                                />
-                            ) : (
-                                <Text
-                                    style={{
-                                        backgroundColor: themeValue.colorAvatarDefault,
-                                        width: size.s_40,
-                                        height: size.s_40,
-                                        textAlign: 'center',
-                                        textAlignVertical: 'center',
-                                        borderRadius: 50,
-                                        fontSize: size.h5,
-                                        color: Colors.white
-                                    }}
-                                >{user?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
-                            )}
+                            <MezonAvatar
+                                avatarUrl={user?.user?.avatar_url}
+                                username={user?.user?.username}
+                            />
                             <Block>
                                 {user?.user?.display_name ? (
                                     <Text color={themeValue.white}>{user?.user?.display_name}</Text>
@@ -220,32 +215,11 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
                         </Block>
                     </Block>
 
-                    {!isClanOwner && (
-                        <Block marginTop={size.s_16}>
-                            {profileSetting?.map(item => {
-                                if (item?.isShow && (EActionSettingUserProfile.Manage !== item?.value)) {
-                                    return (
-                                        <TouchableOpacity
-                                            key={item?.value}
-                                            onPress={() => item?.action(item?.value)}
-                                            disabled={isLoading}
-                                            style={{
-                                                marginBottom: size.s_14,
-                                                borderRadius: size.s_14,
-                                                backgroundColor: themeValue.secondary,
-                                                padding: size.s_14,
-                                                marginHorizontal: size.s_14
-                                            }}
-                                        >
-                                            <Text color={isLoading ? Colors.textGray : Colors.textRed} h4 bold>
-                                                {item?.label} '{user?.user?.username}'
-                                            </Text>
-                                        </TouchableOpacity>
-                                    )
-                                }
-                            })}
-                        </Block>
-                    )}
+                    <View style={{ padding: 15 }}>
+                        <MezonMenu
+                            menu={menuActions}
+                        />
+                    </View>
                 </ScrollView>
             </Block>
             <Toast config={toastConfig} />
