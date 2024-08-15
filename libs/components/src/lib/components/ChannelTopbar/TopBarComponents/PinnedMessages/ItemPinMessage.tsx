@@ -1,9 +1,10 @@
-import { PinMessageEntity } from '@mezon/store';
+import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
+import { messagesActions, PinMessageEntity, selectCurrentClanId } from '@mezon/store';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import MemberProfile from '../../../MemberProfile';
 import MessageLine from '../../../MessageWithUser/MessageLine';
 import { ModalDeletePinMess } from './DeletePinMessPopup';
-import { useGetPriorityNameFromUserClan } from '@mezon/core';
 
 type ItemPinMessageProps = {
 	pinMessage: PinMessageEntity;
@@ -15,6 +16,15 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const { pinMessage, contentString, handleUnPinMessage } = props;
 	const [openModalDelPin, setOpenModalDelPin] = useState(false);
 	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || "");
+
+	const currentClanID = useSelector(selectCurrentClanId);
+	const dispatch = useDispatch();
+	const { directToMessageById } = useJumpToMessage({ channelId: pinMessage?.channel_id || '', messageID: pinMessage.message_id || '', clanId: currentClanID || '' });
+	const handleJumpMess = () => {
+		dispatch(messagesActions.setIdMessageToJump(pinMessage.message_id));
+		directToMessageById();
+	}
+
 	return (
 		<div
 			key={pinMessage.id}
@@ -45,14 +55,22 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					</div>
 				</div>
 			</div>
-			<button
-				className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 items-center justify-center text-[10px] px-3 py-2 flex opacity-0 group-hover/item-pinMess:opacity-100"
-				onClick={() => {
-					setOpenModalDelPin(true);
-				}}
-			>
-				✕
-			</button>
+			<div className="h-fit flex gap-x-2 items-center opacity-0 group-hover/item-pinMess:opacity-100">
+				<p 
+					onClick={handleJumpMess}
+					className="text-xs dark:bg-bgTertiary bg-bgLightModeButton rounded p-1 h-fit dark:text-white text-colorTextLightMode"
+				>
+					Jump
+				</p>
+				<button
+					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 items-center justify-center text-[10px] px-3 py-2 flex"
+					onClick={() => {
+						setOpenModalDelPin(true);
+					}}
+				>
+					✕
+				</button>
+			</div>
 			{openModalDelPin && (
 				<ModalDeletePinMess
 					pinMessage={pinMessage}
