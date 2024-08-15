@@ -114,6 +114,7 @@ const persistedChannelMembersReducer = persistReducer(
 	{
 		key: 'channelMembers',
 		storage,
+		blacklist: ['onlineStatusUser'],
 	},
 	channelMembersReducer,
 );
