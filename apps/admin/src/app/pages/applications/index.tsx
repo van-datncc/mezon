@@ -5,12 +5,18 @@ import { Dropdown } from 'flowbite-react';
 import isElectron from 'is-electron';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import CreateAppPopup from './CreateAppPopup';
 
 function ApplicationsPage() {
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
 	const isLogin = useSelector(selectIsLogin);
 	const deepLinkUrl = JSON.parse(localStorage.getItem('deepLinkUrl') as string);
+
+	const [isShowCreatePopup, setIsShowCreatePopup] = useState(false);
+	const toggleCreatePopup = () => {
+		setIsShowCreatePopup(!isShowCreatePopup);
+	};
 
 	useEffect(() => {
 		if (deepLinkUrl && isElectron()) {
@@ -27,21 +33,27 @@ function ApplicationsPage() {
 	}, [isLogin, navigate]);
 
 	return (
-		<div>
-			<div className="mb-[40px]">
-				<div className="flex flex-row justify-between w-full">
-					<div className="text-[24px] font-medium">Applications</div>
-					<div className="text-[15px] py-[10px] px-[16px] text-white bg-[#5865F2] hover:bg-[#4752c4] cursor-pointer rounded-sm">
-						New Application
+		<>
+			<div>
+				<div className="mb-[40px]">
+					<div className="flex flex-row justify-between w-full">
+						<div className="text-[24px] font-medium">Applications</div>
+						<div
+							onClick={toggleCreatePopup}
+							className="text-[15px] py-[10px] px-[16px] text-white bg-[#5865F2] hover:bg-[#4752c4] cursor-pointer rounded-sm"
+						>
+							New Application
+						</div>
+					</div>
+					<div className="text-[20px]">
+						Develop <span className="text-blue-600 hover:underline cursor-pointer">apps</span> to customize and extend Discord for
+						millions of users.
 					</div>
 				</div>
-				<div className="text-[20px]">
-					Develop <span className="text-blue-600 hover:underline cursor-pointer">apps</span> to customize and extend Discord for millions of
-					users.
-				</div>
+				<AppPageBottom />
 			</div>
-			<AppPageBottom />
-		</div>
+			{isShowCreatePopup && <CreateAppPopup togglePopup={toggleCreatePopup}/>}
+		</>
 	);
 }
 
@@ -115,12 +127,12 @@ const AppPageBottom = () => {
 					</div>
 				</div>
 			</div>
-			<AllApplications isSmallSizeSort={isSmallSizeSort}/>
+			<AllApplications isSmallSizeSort={isSmallSizeSort} />
 		</div>
 	);
 };
 
-const AllApplications = ({isSmallSizeSort} : {isSmallSizeSort: boolean}) => {
+const AllApplications = ({ isSmallSizeSort }: { isSmallSizeSort: boolean }) => {
 	const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 	return (
 		<div className="flex flex-col gap-5">
@@ -129,9 +141,13 @@ const AllApplications = ({isSmallSizeSort} : {isSmallSizeSort: boolean}) => {
 				{arr.map((value, index) => (
 					<div
 						key={index}
-						className="dark:bg-[#2b2d31] bg-bgLightModeSecond p-[10px] w-fit rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl"
+						className="dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] w-fit rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl"
 					>
-						<div className={`dark:bg-[#111214] bg-white  aspect-square flex justify-center items-center rounded-md ${isSmallSizeSort ? "w-[118px]" : "w-[196px]"}`}>K</div>
+						<div
+							className={`dark:bg-[#111214] bg-white aspect-square flex justify-center items-center rounded-md ${isSmallSizeSort ? 'w-[118px]' : 'w-[196px]'}`}
+						>
+							K
+						</div>
 						<div className="w-full text-center">Komu bot</div>
 					</div>
 				))}
