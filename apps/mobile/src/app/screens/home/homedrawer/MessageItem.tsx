@@ -21,7 +21,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
@@ -32,12 +32,10 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { checkImageFromLink, ILinkOnMessage } from '@mezon/utils';
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { AvatarMessage } from './components/AvatarMessage';
-import { LinkImageList } from './components/ImageLinkModal';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
@@ -55,7 +53,6 @@ export type MessageItemProps = {
 	channelId?: string;
 	channelName?: string;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
-	onOpenLinkImage?: (url: string) => void;
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;
 	currentClanId?: string;
@@ -65,21 +62,12 @@ export type MessageItemProps = {
 	preventAction?: boolean;
 };
 
-interface ILinkContentObject {
-	content: {
-		t: string;
-		lk: ILinkOnMessage[];
-	}
-	imageLinkList: string[];
-}
-
 const MessageItem = React.memo((props: MessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const {
 		mode,
 		onOpenImage,
-		onOpenLinkImage,
 		isNumberOfLine,
 		jumpToRepliedMessage,
 		onMessageAction,
@@ -89,7 +77,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	} = props;
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('message');
-	const [linkContentObject, setLinkContentObject] = useState<ILinkContentObject | null>(null);
 	const selectedMessage = useSelector((state) => selectMessageEntityById(state, props.channelId, props.messageId));
 	const message: MessagesEntity = props?.message ? props?.message : (selectedMessage as MessagesEntity);
 	const { markMessageAsSeen } = useSeenMessagePool();
@@ -269,43 +256,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	};
 
-	const handleFormatImageLink = useCallback(async () => {
-		const allLink = message?.content?.lk || [];
-		const promises = allLink.map(async (link) => {
-			const isImageLink = await checkImageFromLink(link?.lk);
-			return {
-				url: link?.lk,
-				isImageLink
-			}
-		})
-
-		const result = await Promise.all(promises);
-		const imageLinkList = result?.filter(link => link.isImageLink)?.map(link => link?.url);
-		let text = message?.content?.t || '';
-		let link = message?.content?.lk;
-
-		if (imageLinkList.length === 1) {
-			//handle remove link text, only show image
-			text = text.replace(imageLinkList[0], '');
-			link = [];
-		}
-
-		const uniqueImageLinks = Array.from(new Set(imageLinkList));
-		setLinkContentObject({
-			imageLinkList: uniqueImageLinks,
-			content: {
-				lk: link,
-				t: text
-			}
-		});
-	}, [message])
-
-	useEffect(() => {
-		if (message?.content?.lk?.length) {
-			handleFormatImageLink();
-		}
-	}, [message])
-
 	if (message.isStartedMessageGroup && message.sender_id == '0')
 		return (
 			<WelcomeMessage channelId={props.channelId} />
@@ -405,7 +355,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								content={{
 									...(typeof message.content === 'object' ? message.content : {}),
 									mentions: message.mentions,
-									...(message.content?.lk?.length && linkContentObject?.content ? linkContentObject?.content : {})
 								}}
 								isEdited={isEdited}
 								translate={t}
@@ -416,9 +365,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								mode={mode}
 							/>
 						</Block>
-						{!!linkContentObject?.imageLinkList.length && (
-							<LinkImageList imageLinks={linkContentObject?.imageLinkList} onOpenLinkImage={onOpenLinkImage} onLongPressImage={onLongPressImage} />
-						)}
 						{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 						{!preventAction ? (
 							<MessageAction

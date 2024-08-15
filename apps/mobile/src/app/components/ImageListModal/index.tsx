@@ -2,6 +2,7 @@ import { ImageGallery } from '@georstat/react-native-image-gallery';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectAllAttachment } from '@mezon/store';
 import { fileTypeImage } from '@mezon/utils';
+import { uniqueId } from 'lodash';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -25,7 +26,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	}, [allAttachment]);
 
 	const createAttachmentObject = (attachment: any) => ({
-		id: `${attachment.create_time}_${attachment.uploader}`,
+		id: `${uniqueId()}`,
 		url: attachment.url,
 		uploader: attachment.uploader,
 		create_time: attachment.create_time,
@@ -45,11 +46,11 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 			disableSwipe
 			images={formatAttachments}
 			renderCustomImage={(item, index) => {
-				return <ImageItem uri={item.url} key={`${index}_${item.url}_ImageModal`} onClose={onClose} />;
+				return <ImageItem uri={item.url} key={`${index}_${item?.id}`} onClose={onClose} />;
 			}}
 			thumbColor={themeValue.bgViolet}
 			renderFooterComponent={(item, currentIndex) => {
-				return <RenderFooterModal item={item} key={`${currentIndex}_${item.url}_RenderFooterModal`} />;
+				return <RenderFooterModal item={item} key={`${currentIndex}_${item?.id}`} />;
 			}}
 			renderHeaderComponent={() => <RenderHeaderModal onClose={onClose} />}
 		/>

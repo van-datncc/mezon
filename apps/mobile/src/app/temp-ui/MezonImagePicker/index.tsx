@@ -16,7 +16,7 @@ export interface IFile {
 	uri: string;
 	name: string;
 	type: string;
-	size: string;
+	size: number | string;
 	fileData: any;
 }
 
@@ -42,7 +42,31 @@ interface IMezonImagePickerProps {
 	disabled?: boolean;
 }
 
-const scale = 5;
+const SCALE = 5;
+
+export async function handleSelectImage() {
+	const response = await launchImageLibrary({
+		mediaType: 'photo',
+		includeBase64: true,
+		quality: 1
+	});
+
+	if (response.didCancel) {
+		console.log('User cancelled camera');
+	} else if (response.errorCode) {
+		console.log('Camera Error: ', response.errorMessage);
+	} else {
+		const file = response.assets[0];
+		return {
+			uri: file?.uri,
+			name: file?.fileName,
+			type: file?.type,
+			size: file?.fileSize,
+			fileData: file?.base64,
+		} as IFile;
+	}
+}
+
 
 export default memo(function MezonImagePicker({
 	onChange,
@@ -126,8 +150,8 @@ export default memo(function MezonImagePicker({
 						mediaType: 'photo',
 						includeBase64: true,
 						compressImageQuality: QUALITY_IMAGE_UPLOAD,
-						...(typeof width === 'number' && { width: width * scale }),
-						...(typeof height === 'number' && { height: height * scale }),
+						...(typeof width === 'number' && { width: width * SCALE }),
+						...(typeof height === 'number' && { height: height * SCALE }),
 					});
 					setImage(croppedFile.path);
 					onChange && onChange(croppedFile);
@@ -136,7 +160,7 @@ export default memo(function MezonImagePicker({
 							fileData: croppedFile?.data,
 							name: file.name,
 							uri: croppedFile.path,
-							size: croppedFile.size.toString(),
+							size: croppedFile.size,
 							type: croppedFile.mime,
 						} as IFile;
 						const url = await handleUploadImage(uploadImagePayload);

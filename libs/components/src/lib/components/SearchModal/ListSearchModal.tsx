@@ -19,7 +19,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 	return (
 		listSearch.length > 0 &&
 		listSearch.map((item: SearchItemProps) => {
-			const isTypeChannel = item.type === TypeSearch.Channel_Type;
+			const isTypeChannel = item.typeChat === TypeSearch.Channel_Type;
 			return (
 				<div
 					ref={itemRef}
@@ -39,6 +39,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							subTextStyle="uppercase"
 							isOpenSearchModal
 							emojiId=""
+							channel= {item}
 						/>
 					) : (
 						<SuggestItem
@@ -46,7 +47,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							avatarUrl={item?.avatarUser}
 							showAvatar
 							valueHightLight={isSearchByUsername ? searchText.slice(1) : searchText}
-							subText={item.typeChat ===  ChannelType.CHANNEL_TYPE_DM ? item?.name : ''}
+							subText={item.type ===  ChannelType.CHANNEL_TYPE_DM ? item?.name : ''}
 							wrapSuggestItemStyle="gap-x-1"
 							subTextStyle="text-[13px]"
 							isHightLight={!isSearchByUsername}

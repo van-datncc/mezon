@@ -6,11 +6,11 @@ export const style = (colors: Attributes) =>
 		btn: {
 			borderRadius: size.s_4,
 			flex: 1,
-			backgroundColor: colors.textDisabled,
+			backgroundColor: colors.tertiary,
 			paddingVertical: size.s_8,
 		},
 		textBtn: {
-			color: colors.white,
+			color: colors.text,
 			fontSize: size.medium,
 			fontWeight: '600',
 			textAlign: 'center',
