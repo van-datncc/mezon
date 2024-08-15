@@ -1,5 +1,5 @@
 import * as Icons from "./lib/icons2";
-export * from "./lib/lottie";
+export * from "./lib/lottie"
 
 export * from "./lib/constant";
 export * from "./lib/helper";
