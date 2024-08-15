@@ -146,6 +146,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				channel_private: item.channel_private,
 				type: item.type,
 				parrent_id: item.parrent_id,
+				meeting_code: item.meeting_code
 			};
 		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
@@ -180,8 +181,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const handleSelectChannel = useCallback(
 		async (channel: any) => {
-			const directChannel = toChannelPage(channel.id, channel.clanId);
-			navigate(directChannel);
+			if (channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				const directChannel = toChannelPage(channel.id, channel.clanId);
+				navigate(directChannel);
+			} else {
+				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
+				window.open(urlVoice, '_blank', 'noreferrer');
+			}
 			onClose();
 		},
 		[navigate, onClose, toChannelPage],
