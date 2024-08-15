@@ -53,7 +53,6 @@ export type MessageItemProps = {
 	channelId?: string;
 	channelName?: string;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
-	onOpenLinkImage?: (url: string) => void;
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;
 	currentClanId?: string;
@@ -69,7 +68,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const {
 		mode,
 		onOpenImage,
-		onOpenLinkImage,
 		isNumberOfLine,
 		jumpToRepliedMessage,
 		onMessageAction,
