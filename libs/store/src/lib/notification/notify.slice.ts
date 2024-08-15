@@ -68,7 +68,7 @@ export const fetchListNotification = createAsyncThunk(
 			const notifications = response.notifications.map(mapNotificationToEntity);
 			return notifications;
 		}
-		return null
+		return null;
 	},
 );
 
@@ -137,8 +137,10 @@ export const notificationSlice = createSlice({
 		setNotiListUnread(state, action) {
 			const storedIds = localStorage.getItem('notiUnread');
 			const ids = storedIds ? JSON.parse(storedIds) : [];
-			ids.push(action.payload.id);
-			localStorage.setItem('notiUnread', JSON.stringify(ids));
+			if (action.payload.clan_id !== '0') {
+				ids.push(action.payload.id);
+				localStorage.setItem('notiUnread', JSON.stringify(ids));
+			}
 		},
 
 		setStatusNoti(state) {
@@ -187,7 +189,7 @@ export const notificationSlice = createSlice({
 					notificationAdapter.setAll(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {
-					state.loadingStatus = "not loaded";
+					state.loadingStatus = 'not loaded';
 				}
 			})
 			.addCase(fetchListNotification.rejected, (state: NotificationState, action) => {
