@@ -248,7 +248,7 @@ export default ModalSticker;
 
 const PreviewStickerBox = ({ preview }: { preview: string }) => {
   return (
-    <div className={'m-auto absolute w-40 aspect-square overflow-hidden flex items-center justify-end'}>
+    <div className={'m-auto absolute w-40 aspect-square overflow-hidden flex items-center justify-center'}>
       <img className="h-full w-auto object-cover" src={preview} />
     </div>
   );
