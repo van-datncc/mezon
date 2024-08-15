@@ -1,11 +1,13 @@
 import { handleUploadEmoticonMobile } from "@mezon/mobile-components";
 import { useTheme } from "@mezon/mobile-ui";
-import { createSticker, selectAllStickerSuggestion, useAppDispatch } from "@mezon/store";
+import { createSticker, selectAllStickerSuggestion, settingClanStickerActions, useAppDispatch } from "@mezon/store";
 import { selectCurrentClanId, useAppSelector } from "@mezon/store-mobile";
 import { useMezon } from "@mezon/transport";
+import { LIMIT_SIZE_UPLOAD_IMG } from "@mezon/utils";
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiClanStickerAddRequest } from "mezon-js/api.gen";
-import { useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Keyboard, Platform, ScrollView, Text, TouchableWithoutFeedback, View } from "react-native";
 import { openCropper } from "react-native-image-crop-picker";
 import Toast from "react-native-toast-message";
@@ -24,14 +26,17 @@ export default function StickerSetting() {
     const { sessionRef, clientRef } = useMezon();
     const currentClanId = useSelector(selectCurrentClanId) || '';
     const dispatch = useAppDispatch();
+    const { t } = useTranslation(["clanStickerSetting"]);
 
-    const LIMIT_SIZE_UPLOAD_IMG = 512 * 1024;
+    const loadSticker = useCallback(async () => {
+        await dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId || '0' }));
+    }, [])
 
-    const handleUploadImage = async (file: IFile) => {
+    const handleUploadImage = useCallback(async (file: IFile) => {
         if (file.size > LIMIT_SIZE_UPLOAD_IMG) {
             Toast.show({
                 type: "error",
-                text1: "Vượt quá kích thước cho phép"
+                text1: t("toast.errorSizeLimit")
             });
             return;
         }
@@ -50,9 +55,9 @@ export default function StickerSetting() {
             id,
             url: attachment.url
         }
-    };
+    }, []);
 
-    async function handleUploadSticker() {
+    const handleUploadSticker = useCallback(async () => {
         const file = await handleSelectImage();
 
         if (file) {
@@ -91,7 +96,11 @@ export default function StickerSetting() {
                 Platform.OS === 'ios' ? 500 : 0,
             );
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        loadSticker();
+    }, []);
 
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -100,7 +109,7 @@ export default function StickerSetting() {
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ backgroundColor: themeValue.primary }}>
                     <MezonButton
-                        title="Upload Sticker"
+                        title={t("btn.upload")}
                         type={EMezonButtonTheme.SUCCESS}
                         size={EMezonButtonSize.MD}
                         rounded={true}
@@ -108,13 +117,15 @@ export default function StickerSetting() {
                         onPress={handleUploadSticker}
                     />
 
-                    <Text style={styles.text}>Add upto 250 custom stickers that anyone can use in this server.</Text>
-                    <Text style={[styles.text, styles.textTitle]}>Upload Requirements</Text>
-                    <Text style={styles.text}>- Can be static (PNG) or animated (APNG, GIF).</Text>
-                    <Text style={styles.text}>- Must be exactly 320 x 320 pixels.</Text>
-                    <Text style={styles.text}>- No larger than 512KB.</Text>
+                    <Text style={styles.text}>{t("content.description")}</Text>
+                    <Text style={[styles.text, styles.textTitle]}>{t("content.requirements")}</Text>
+                    <Text style={styles.text}>{t("content.reqType")}</Text>
+                    <Text style={styles.text}>{t("content.reqDim")}</Text>
+                    <Text style={styles.text}>{t("content.reqSize")}</Text>
 
-                    <Text style={[styles.text, styles.textTitle]}>{`Sticker - ${availableLeft} SLOTS AVAILABLE`}</Text>
+                    <Text style={[styles.text, styles.textTitle]}>
+                        {t("content.available", { left: availableLeft })}
+                    </Text>
 
                     {listSticker?.map((item, index) => (
                         <StickerSettingItem

@@ -7,11 +7,14 @@ import { default as channelCreator, default as channelMenu } from './channelCrea
 import channelSetting from './channelSetting.json';
 import clan from './clan.json';
 import clanMenu from './clanMenu.json';
+import clanNotificationsSetting from './clanNotificationsSetting.json';
 import clanOverviewSetting from './clanOverviewSetting.json';
 import clanRoles from './clanRoles.json';
 import clanSetting from './clanSetting.json';
+import clanStickerSettings from "./clanStickerSetting.json";
 import common from './common.json';
 import createThread from './createThread.json';
+import customUserStatus from './customUserStatus.json';
 import deleteClan from './deleteClan.json';
 import dmMessage from './dmMessage.json';
 import eventCreator from './eventCreator.json';
@@ -27,12 +30,10 @@ import profile from './profile.json';
 import profileSetting from './profileSetting.json';
 import screen from './screen.json';
 import screenStack from './screenStack.json';
-import setting from './setting.json';
-import userProfile from './userProfile.json';
-import userEmptyClan from './userEmptyClan.json';
-import customUserStatus from './customUserStatus.json';
 import searchMessageChannel from './searchMessageChannel.json';
-import clanNotificationsSetting from './clanNotificationsSetting.json';
+import setting from './setting.json';
+import userEmptyClan from './userEmptyClan.json';
+import userProfile from './userProfile.json';
 
 export default {
 	inviteToChannel,
@@ -67,8 +68,9 @@ export default {
 	deleteClan,
 	media,
 	clanRoles,
-  userEmptyClan,
-  customUserStatus,
-  searchMessageChannel,
-  clanNotificationsSetting
+	userEmptyClan,
+	customUserStatus,
+	searchMessageChannel,
+	clanNotificationsSetting,
+	clanStickerSettings
 };

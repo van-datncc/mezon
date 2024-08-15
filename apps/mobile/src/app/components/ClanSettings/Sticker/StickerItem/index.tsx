@@ -5,7 +5,8 @@ import { selectMemberClanByUserId, useAppSelector } from "@mezon/store-mobile";
 import { MezonAvatar } from "apps/mobile/src/app/temp-ui";
 import { ClanSticker } from "mezon-js";
 import { MezonUpdateClanStickerByIdBody } from "mezon-js/api.gen";
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import { TextInput } from "react-native-gesture-handler";
@@ -35,6 +36,7 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
     const user = useAppSelector(selectMemberClanByUserId(data.creator_id));
     const [stickerName, setStickerName] = useState<string>(data.shortname);
     const dispatch = useAppDispatch();
+    const { t } = useTranslation(["clanStickerSetting"])
 
     const [sticker, setSticker] = useState({
         shortname: data.shortname ?? '',
@@ -43,7 +45,7 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
         category: data.category ?? '',
     });
 
-    const handleDeleteSticker = async () => {
+    const handleDeleteSticker = useCallback(async () => {
         console.log("start");
         if (data.id) {
             const result = await dispatch(deleteSticker({ stickerId: data.id, clan_id: clanID }));
@@ -51,14 +53,14 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
             if (!!result?.error) {
                 Toast.show({
                     type: "error",
-                    text1: "Error updating"
+                    text1: t('toast.errorUpdating')
                 })
             }
         }
         console.log("end");
-    };
+    }, [])
 
-    const handleSaveChange = async () => {
+    const handleSaveChange = useCallback(async () => {
         if (sticker && sticker.id && stickerName !== sticker.shortname) {
             console.log("start");
             const stickerChange: MezonUpdateClanStickerByIdBody = {
@@ -77,13 +79,13 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
             if (!!result?.error) {
                 Toast.show({
                     type: "error",
-                    text1: "Error updating"
+                    text1: t('toast.errorUpdating')
                 })
             }
             console.log("done");
             return;
         }
-    };
+    }, []);
 
     return (
         <View style={{ backgroundColor: "red" }}>
