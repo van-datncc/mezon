@@ -41,8 +41,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const { createDirectMessageWithUser } = useDirect();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listChannels = useSelector(selectAllChannelsByUser);
-	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2 && groupChat.active === 1);
-	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3 && groupChat.channel_avatar && groupChat.active === 1);
+	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1);
+	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1);
 	const usersClan = useSelector(selectAllUsesClan);
 	const membersInClan = useSelector(selectAllChannelMembers);
 
