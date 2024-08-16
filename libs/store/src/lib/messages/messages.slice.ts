@@ -8,6 +8,7 @@ import {
 	IMessageWithUser,
 	LIMIT_MESSAGE,
 	LoadingStatus,
+	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
 	checkSameDayByCreateTime,
 } from '@mezon/utils';
@@ -41,13 +42,11 @@ export const MESSAGES_FEATURE_KEY = 'messages';
 
 export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenId?: string): IMessageWithUser => {
 	const creationTime = new Date(channelMess.create_time || '');
-	const creationTimeMs = creationTime.getTime() / 1000;
 	const isAnonymous = channelMess?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	return {
 		...channelMess,
 		isFirst: channelMess.code === EMessageCode.FIRST_MESSAGE,
 		creationTime,
-		creationTimeMs,
 		id: channelMess.id || '',
 		date: new Date().toLocaleString(),
 		isAnonymous,
@@ -58,7 +57,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 			avatarSm: channelMess.avatar || '',
 		},
 		lastSeen: lastSeenId === channelMess.id,
-		create_time_ms: channelMess.create_time_ms || creationTimeMs,
+		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
 	};
 };
 
@@ -103,7 +102,7 @@ export interface MessagesState {
 		}
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
-	idNewMessageResponse: string;
+	newMesssageUpdateImage: MessageTypeUpdateLink;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -406,7 +405,6 @@ type SendMessagePayload = {
 	clanId: string;
 	channelId: string;
 	content: IMessageSendPayload;
-	avatar: string;
 	mentions?: Array<ApiMessageMention>;
 	attachments?: Array<ApiMessageAttachment>;
 	references?: Array<ApiMessageRef>;
@@ -417,7 +415,7 @@ type SendMessagePayload = {
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
-	const { content, avatar, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
+	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
 	const id = Date.now().toString();
 
 	async function doSend() {
@@ -431,7 +429,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			throw new Error('Client is not initialized');
 		}
 
-		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone, avatar);
+		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 
 		return res;
 	}
@@ -568,7 +566,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
-	idNewMessageResponse: '',
+	newMesssageUpdateImage: { id: '' },
 };
 
 export type SetCursorChannelArgs = {
@@ -595,9 +593,11 @@ export const messagesSlice = createSlice({
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
 		},
-		setIdNewMessageResponse(state, action) {
-			state.idNewMessageResponse = action.payload;
+
+		setNewMessageToUpdateImage(state, action) {
+			state.newMesssageUpdateImage = action.payload;
 		},
+
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
 
@@ -652,7 +652,10 @@ export const messagesSlice = createSlice({
 						changes: {
 							content: action.payload.content,
 							mentions: action.payload.mentions,
-							update_time: action.payload.update_time,
+							update_time:
+								action.payload.attachments && action.payload.attachments?.length > 0
+									? action.payload.create_time
+									: action.payload.update_time,
 							attachments: action.payload.attachments,
 						},
 					});
@@ -1101,7 +1104,7 @@ export const selectIsMessageIdExist = (channelId: string, messageId: string) =>
 export const selectIsJumpingToPresent = createSelector(getMessagesState, (state) => state.isJumpingToPresent);
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
-export const selectNewIdMessageResponse = createSelector(getMessagesState, (state: MessagesState) => state.idNewMessageResponse);
+export const selectNewMesssageUpdateImage = createSelector(getMessagesState, (state: MessagesState) => state.newMesssageUpdateImage);
 
 const handleRemoveManyMessages = (state: MessagesState, channelId?: string) => {
 	if (!channelId) return state;
