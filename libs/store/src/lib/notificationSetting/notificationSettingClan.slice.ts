@@ -24,7 +24,7 @@ export const fetchNotificationClanSetting = memoize(
 		promise: true,
 		maxAge: LIST_NOTIFI_CLAN_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1];
+			return args[1] + args[0].session.username;
 		},
 	},
 );
@@ -34,22 +34,33 @@ type fetchNotificationClanSettingsArgs = {
 	noCache?: boolean;
 };
 
-export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationclan/getDefaultNotificationClan',
+export const getDefaultNotificationClan = createAsyncThunk(
+	'defaultnotificationclan/getDefaultNotificationClan',
 	async ({ clanId, noCache }: fetchNotificationClanSettingsArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchNotificationClanSetting.clear(mezon, clanId);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			if (noCache) {
+				fetchNotificationClanSetting.clear(mezon, clanId);
+			}
+
+			const response = await fetchNotificationClanSetting(mezon, clanId);
+
+			if (!response) {
+				return thunkAPI.rejectWithValue('Invalid session');
+			}
+
+			const clanNotificationConfig: ApiNotificationSetting = {
+				id: response.notification_setting?.id,
+				notification_setting_type: response.notification_setting?.notification_setting_type,
+			};
+
+			return clanNotificationConfig;
+		} catch (error) {
+			return thunkAPI.rejectWithValue(error || 'Failed to fetch notification clan settings');
 		}
-		const response = await fetchNotificationClanSetting(mezon, clanId);
-		if (!response) {
-			return thunkAPI.rejectWithValue('Invalid session');
-		}
-		const mapper: ApiNotificationSetting = {
-			id: response.notification_setting?.id,
-			notification_setting_type: response.notification_setting?.notification_setting_type,
-		}
-		return mapper;
-	});
+	}
+);
 
 type SetDefaultNotificationPayload = {
 	clan_id?: string;

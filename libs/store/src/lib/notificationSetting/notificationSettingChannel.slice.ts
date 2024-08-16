@@ -43,30 +43,42 @@ type GetNotificationSettingResponse = {
 	isCurrentChannel: boolean | undefined,
 }
 
-export const getNotificationSetting = createAsyncThunk('notificationsetting/getNotificationSetting',
+export const getNotificationSetting = createAsyncThunk(
+	'notificationsetting/getNotificationSetting',
 	async ({ channelId, noCache, isCurrentChannel = true }: FetchNotificationSettingsArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchNotificationSetting.clear(mezon, channelId);
-		}
-		const response = await fetchNotificationSetting(mezon, channelId);
-		if (!response) {
-			return thunkAPI.rejectWithValue('Invalid session');
-		}
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const apiNotificationUserChannel: ApiNotificationUserChannel = {
-			active: response.notification_user_channel?.active,
-			id: response.notification_user_channel?.id,
-			notification_setting_type: response.notification_user_channel?.notification_setting_type,
-			time_mute: response.notification_user_channel?.time_mute,
-		};
-		const payload: GetNotificationSettingResponse = {
-			notificationSetting: apiNotificationUserChannel,
-			isCurrentChannel: isCurrentChannel,
-		}
+			if (noCache) {
+				fetchNotificationSetting.clear(mezon, channelId);
+			}
 
-		return payload;
-	});
+			const response = await fetchNotificationSetting(mezon, channelId);
+
+			if (!response) {
+				return thunkAPI.rejectWithValue('Invalid session');
+			}
+
+			const apiNotificationUserChannel: ApiNotificationUserChannel = {
+				active: response.notification_user_channel?.active,
+				id: response.notification_user_channel?.id,
+				notification_setting_type: response.notification_user_channel?.notification_setting_type,
+				time_mute: response.notification_user_channel?.time_mute,
+			};
+
+			const payload: GetNotificationSettingResponse = {
+				notificationSetting: apiNotificationUserChannel,
+				isCurrentChannel: isCurrentChannel,
+			};
+
+			console.log(payload);
+			return payload;
+		} catch (error) {
+			return thunkAPI.rejectWithValue(error || 'Failed to fetch notification settings');
+		}
+	}
+);
+
 
 export type SetNotificationPayload = {
 	channel_id?: string;

@@ -22,19 +22,31 @@ type fetchNotificationCategorySettingsArgs = {
 	noCache?: boolean;
 };
 
-export const getDefaultNotificationCategory = createAsyncThunk('defaultnotificationcategory/getDefaultNotificationCategory',
+export const getDefaultNotificationCategory = createAsyncThunk(
+	'defaultnotificationcategory/getDefaultNotificationCategory',
 	async ({ categoryId, noCache }: fetchNotificationCategorySettingsArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchNotificationCategorySetting.clear(mezon, categoryId);
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			if (noCache) {
+				fetchNotificationCategorySetting.clear(mezon, categoryId);
+			}
+
+			const response = await fetchNotificationCategorySetting(mezon, categoryId);
+
+			if (!response) {
+				return thunkAPI.rejectWithValue('Invalid session');
+			}
+
+			const apiNotificationSetting = mapToApiNotificationSetting(response);
+			return apiNotificationSetting;
+
+		} catch (error) {
+			return thunkAPI.rejectWithValue(error || 'Failed to fetch default notification category');
 		}
-		const response = await fetchNotificationCategorySetting(mezon, categoryId);
-		if (!response) {
-			return thunkAPI.rejectWithValue('Invalid session');
-		}
-		const apiNotificationSetting = mapToApiNotificationSetting(response);
-		return apiNotificationSetting;
-	});
+	}
+);
+
 
 type SetDefaultNotificationPayload = {
 	category_id?: string;

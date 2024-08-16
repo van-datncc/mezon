@@ -24,7 +24,7 @@ export const fetchNotiReactMess = memoize(
 		promise: true,
 		maxAge: LIST_NOTIFI_REACT_MESS_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1];
+			return args[1] + args[0].session.username;
 		},
 	},
 );
@@ -34,22 +34,34 @@ type fetchNotifiReactMessArgs = {
 	noCache?: boolean;
 };
 
-export const getNotifiReactMessage = createAsyncThunk('notifireactmessage/getNotifiReactMessage', async ({ channelId, noCache }: fetchNotifiReactMessArgs, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchNotiReactMess.clear(mezon, channelId);
+export const getNotifiReactMessage = createAsyncThunk(
+	'notifireactmessage/getNotifiReactMessage',
+	async ({ channelId, noCache }: fetchNotifiReactMessArgs, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			if (noCache) {
+				fetchNotiReactMess.clear(mezon, channelId);
+			}
+
+			const response = await fetchNotiReactMess(mezon, channelId);
+
+			if (!response) {
+				return thunkAPI.rejectWithValue('Invalid session');
+			}
+
+			const apiResponse: ApiNotifiReactMessage = {
+				channel_id: response.notifi_react_message?.channel_id_req,
+				id: response.notifi_react_message?.id,
+				user_id: response.notifi_react_message?.user_id,
+			};
+
+			return apiResponse;
+		} catch (error) {
+			return thunkAPI.rejectWithValue(error || 'Failed to fetch notification react message');
+		}
 	}
-	const response = await fetchNotiReactMess(mezon, channelId);
-	if (!response) {
-		return thunkAPI.rejectWithValue('Invalid session');
-	}
-	const apiResponse: ApiNotifiReactMessage = {
-		channel_id: response.notifi_react_message?.channel_id_req,
-		id: response.notifi_react_message?.id,
-		user_id: response.notifi_react_message?.user_id
-	};
-	return apiResponse;
-});
+);
 
 type SetNotifiReactMessagePayload = {
 	channel_id?: string;
