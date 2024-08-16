@@ -1,8 +1,8 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useReference, useUserPermission } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { useCategory, useReference, useUserPermission } from '@mezon/core';
+import { getUpdateOrAddClanChannelCache, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
 import { baseColor, Colors, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useMemo, useState } from 'react';
@@ -28,6 +28,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useAppDispatch();
 	const { isCanManageThread, isCanManageChannel } = useUserPermission();
+	const { categorizedChannels } = useCategory();
 
 	const isChannel = useMemo(() => {
 		return Array.isArray(channel?.threads);
@@ -192,10 +193,28 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		}
 	]
 
+	const handleFocusDefaultChannel = async () => {
+		const firstTextChannel = categorizedChannels[0]?.channels?.filter(channel => channel?.type === 1)?.[0];
+		if (!firstTextChannel) return;
+		const { clan_id: clanId, channel_id: channelId } = firstTextChannel;
+		const store = await getStoreAsync();
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		await Promise.all([
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
+		]);
+
+		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+		if (!channelsCache?.includes(channelId)) {
+			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+		}
+	}
+
 	const handleConfirmDeleteChannel = async () => {
 		await dispatch(channelsActions.deleteChannel({ channelId: channel?.channel_id || '', clanId: channel?.clan_id || '' }));
 		setIsShowModalConfirm(false);
 		dismiss();
+		handleFocusDefaultChannel();
 	}
 
 	return (
