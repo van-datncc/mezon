@@ -58,7 +58,7 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
         }
     }, [])
 
-    const handleSaveChange = useCallback(async () => {
+    const handleUpdateSticker = useCallback(async () => {
         if (sticker && sticker.id && stickerName !== sticker.shortname) {
             const stickerChange: MezonUpdateClanStickerByIdBody = {
                 source: sticker?.source,
@@ -71,7 +71,13 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
                 shortname: stickerName
             });
 
-            const result = await dispatch(updateSticker({ stickerId: sticker?.id ?? '', request: stickerChange }));
+            const result = await dispatch(updateSticker({
+                stickerId: sticker?.id ?? '',
+                request: {
+                    ...sticker,
+                    shortname: stickerName
+                }
+            }));
             // @ts-ignore
             if (!!result?.error) {
                 Toast.show({
@@ -101,7 +107,7 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
                             value={stickerName}
                             style={{ color: themeValue.text }}
                             onChangeText={setStickerName}
-                            onBlur={handleSaveChange}
+                            onBlur={handleUpdateSticker}
                         />
                     </View>
 
