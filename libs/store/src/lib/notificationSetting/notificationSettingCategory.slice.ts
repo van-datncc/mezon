@@ -1,7 +1,6 @@
 import { IChannelCategorySetting, IDefaultNotificationCategory, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
-import { NotificationCategorySettingEvent } from 'mezon-js';
 import { ApiNotificationChannelCategoySetting, ApiNotificationSetting } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 export const DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY = 'defaultnotificationcategory';
@@ -22,18 +21,8 @@ type fetchNotificationCategorySettingsArgs = {
 	noCache?: boolean;
 };
 
-function mapToApiNotificationSetting(event: NotificationCategorySettingEvent): ApiNotificationSetting {
-	if (event.notification_user_channel) {
-		return {
-			id: event.notification_user_channel.id,
-			notification_setting_type: event.notification_user_channel.notification_setting_type,
-		};
-	} else {
-		return {};
-	}
-}
-
-export const getDefaultNotificationCategory = createAsyncThunk('defaultnotificationcategory/getDefaultNotificationCategory',
+export const getDefaultNotificationCategory = createAsyncThunk(
+	'defaultnotificationcategory/getDefaultNotificationCategory',
 	async ({ categoryId, noCache }: fetchNotificationCategorySettingsArgs, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
@@ -43,9 +32,17 @@ export const getDefaultNotificationCategory = createAsyncThunk('defaultnotificat
 		if (!response) {
 			return thunkAPI.rejectWithValue('Invalid session');
 		}
-		const apiNotificationSetting = mapToApiNotificationSetting(response);
+
+		const apiNotificationSetting = response.notification_user_channel
+			? {
+				id: response.notification_user_channel.id,
+				notification_setting_type: response.notification_user_channel.notification_setting_type,
+			}
+			: {};
+
 		return apiNotificationSetting;
-	});
+	}
+);
 
 type SetDefaultNotificationPayload = {
 	category_id?: string;
