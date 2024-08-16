@@ -230,10 +230,10 @@ function MemberProfile({
 								<p
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
-                  ${isFooter ? 'leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
+                  ${isFooter ? 'top-[-7px] leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
                   ${isMemberChannel ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
-                  ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'}
+                  ${classParent == '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
                   ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
 							`}
 									title={name}
