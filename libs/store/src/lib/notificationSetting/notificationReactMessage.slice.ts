@@ -48,7 +48,6 @@ export const getNotifiReactMessage = createAsyncThunk('notifireactmessage/getNot
 		id: response.notifi_react_message?.id,
 		user_id: response.notifi_react_message?.user_id
 	};
-	console.log(response);
 	return apiResponse;
 });
 
