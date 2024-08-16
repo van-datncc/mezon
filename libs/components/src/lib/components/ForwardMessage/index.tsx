@@ -9,7 +9,7 @@ import {
 	selectTheme,
 	useAppDispatch,
 	getIsFowardAll,
-	selectCurrentChannelId, selectMessageByChannelId, MessagesEntity,
+	selectCurrentChannelId, selectMessageByChannelId, MessagesEntity, selectDmGroupCurrentId, selectModeResponsive,
 } from '@mezon/store';
 import {
 	ChannelThreads,
@@ -19,7 +19,7 @@ import {
 	getAvatarForPrioritize,
 	normalizeString,
 	removeDuplicatesById,
-	IMessageWithUser
+	IMessageWithUser, ModeResponsive
 } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -49,10 +49,12 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const { userProfile } = useAuth();
 	const selectedMessage = useSelector(getSelectedMessage);
 	const accountId = userProfile?.user?.id ?? '';
-	const currentChannelId = useSelector(selectCurrentChannelId)
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const modeResponsive = useSelector(selectModeResponsive);
 	const membersInClan = useSelector(selectAllChannelMembers);
 	const isForwardAll = useSelector(getIsFowardAll);
-	const allMessages = useSelector(selectMessageByChannelId(currentChannelId));
+	const allMessages = useSelector(selectMessageByChannelId(modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId));
 	const allMessagesBySenderId = Object.values(allMessages[1]).filter((message: any) => {
 		return message.sender_id === selectedMessage?.user?.id
 	}) as MessagesEntity[];
