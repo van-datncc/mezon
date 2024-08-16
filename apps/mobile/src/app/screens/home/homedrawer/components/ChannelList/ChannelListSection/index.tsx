@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { memo } from 'react';
@@ -11,8 +11,6 @@ import { style } from './styles';
 interface IChannelListSectionProps {
 	data: ICategoryChannel;
 	index: number;
-	onPressHeader: any;
-	collapseItems: any;
 	onLongPressCategory: (channel: ICategoryChannel) => void;
 	onPressSortChannel: (channel: ICategoryChannel) => void;
 	onLongPressChannel: (channel: ChannelThreads) => void;
@@ -21,7 +19,7 @@ interface IChannelListSectionProps {
 
 export const ChannelListSection = memo((props: IChannelListSectionProps) => {
 	const styles = style(useTheme().themeValue);
-	const isCollapsed = props?.collapseItems?.includes?.(props?.index?.toString?.());
+	const [isCollapsed, setIsCollapsed] = useAnimatedState(false);
 	const currentChanel = useSelector(selectCurrentChannel);
 	if (!props?.data?.category_name?.trim()) {
 		return;
@@ -30,7 +28,7 @@ export const ChannelListSection = memo((props: IChannelListSectionProps) => {
 		<View key={Math.floor(Math.random() * 9999999).toString()} style={styles.channelListSection}>
 			<ChannelListSectionHeader
 				title={props.data.category_name}
-				onPress={() => props?.onPressHeader?.(props?.index?.toString?.())}
+				onPress={() => setIsCollapsed(!isCollapsed)}
 				onLongPress={() => props?.onLongPressCategory(props.data)}
 				onPressSortChannel={() => props?.onPressSortChannel(props?.data)}
 				isCollapsed={isCollapsed}
