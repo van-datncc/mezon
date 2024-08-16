@@ -1,5 +1,5 @@
-import { NOTIFICATION_PROGRESS_BAR } from "@mezon/mobile-components";
 import { Block, Text, useTheme } from "@mezon/mobile-ui";
+import { NOTIFICATION_PROGRESS_BAR } from "apps/mobile/src/assets/lottie";
 import LottieView from 'lottie-react-native';
 import { memo, useEffect, useMemo, useRef } from "react";
 import { Pressable } from "react-native";
