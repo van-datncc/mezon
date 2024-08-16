@@ -5,7 +5,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
   container: {
 		height: size.s_50,
 		width: '80%',
-		backgroundColor: colors.tertiary,
+		backgroundColor: colors.primary,
 		borderRadius: size.s_40,
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -26,7 +26,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		width: '90%',
 		height: 'auto',
 		flex: 1,
-		backgroundColor: colors.tertiary,
+		backgroundColor: colors.primary,
 		borderRadius: size.s_16,
 		overflow: 'hidden',
 		shadowOffset: { width: 0, height: 0 },
