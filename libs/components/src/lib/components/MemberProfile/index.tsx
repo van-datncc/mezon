@@ -1,17 +1,27 @@
-import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
-import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
-import { ChannelMembersEntity, selectAllAccount, selectCurrentChannelId, selectCurrentClan, selectCurrentClanId, selectDmGroupCurrentId, selectTypingUserIds, selectTypingUserIdsByChannelId } from '@mezon/store';
-import { MemberProfileType, MouseButton } from '@mezon/utils';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { memo, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
-import { Coords } from '../ChannelLink';
-import { directMessageValueProps } from '../DmList/DMListItem';
-import { DataMemberCreate } from '../DmList/MemberListGroupChat';
+import {AvatarImage, Icons, ShortUserProfile} from '@mezon/components';
+import {useChannelMembersActions, useOnClickOutside} from '@mezon/core';
+import {
+	ChannelMembersEntity,
+	selectAllAccount,
+	selectCurrentChannelId,
+	selectCurrentClan,
+	selectCurrentClanId,
+	selectDmGroupCurrentId,
+	selectTypingUserIds,
+	selectTypingUserIdsByChannelId
+} from '@mezon/store';
+import {MemberProfileType, MouseButton} from '@mezon/utils';
+import {ChannelStreamMode, ChannelType} from 'mezon-js';
+import {memo, useMemo, useRef, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {OfflineStatus, OnlineStatus} from '../../../../../ui/src/lib/Icons';
+import {Coords} from '../ChannelLink';
+import {directMessageValueProps} from '../DmList/DMListItem';
+import {DataMemberCreate} from '../DmList/MemberListGroupChat';
 import PanelMember from '../PanelMember';
 import UserProfileModalInner from "../UserProfileModalInner";
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
+
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
@@ -231,7 +241,7 @@ function MemberProfile({
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
                   ${isFooter ? 'leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
-                  ${isMemberChannel ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
+                  ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? 'max-w-[140px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${classParent == '' ? 'bg-transparent' : 'relative top-[-7px] dark:bg-transparent bg-channelTextareaLight'}
                   ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}

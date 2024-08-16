@@ -7,18 +7,19 @@ import {
 	useAppDispatch,
 	useAppSelector,
 } from '@mezon/store';
-import { EPermission, getSrcEmoji } from '@mezon/utils';
+import {EPermission, getSrcEmoji, MAX_FILE_NAME_EMOJI} from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Icons } from '@mezon/ui'
 
 type SettingEmojiItemProp = {
 	emoji: ClanEmoji;
+	onUpdateEmoji: (emoji: ClanEmoji) => void;
 };
 
-const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
-	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname?.slice(1, -1) || '');
+const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 	const [showEdit, setShowEdit] = useState<boolean>(false);
 	const [focus, setFocus] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
@@ -31,33 +32,12 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === emoji.creator_id;
 	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanOwner]);
 
-	const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
-		setNameEmoji(e.target.value.split(':').join(''));
-	};
-
-	const handleUpdateEmoji = async () => {
-		if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
-			const request: MezonUpdateClanEmojiByIdBody = {
-				source: getSrcEmoji(emoji.id as string),
-				shortname: ':' + nameEmoji + ':',
-				category: emoji.category,
-			};
-			await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }));
-		}
-	};
-
 	const handleDelete = () => {
 		dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: emoji, clan_id: clanId as string }));
 	};
 	const handleOnMouseLeave = () => {
 		if (!focus) {
-			setNameEmoji(emoji.shortname?.slice(1, -1) ?? '');
 			setShowEdit(false);
-		}
-	};
-	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-		if (event.key === 'Enter') {
-			handleUpdateEmoji();
 		}
 	};
 
@@ -77,7 +57,7 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 			<div className="w-full h-full flex flex-row shadow-emoji_item dark:shadow-emoji_item_dark items-center">
 				<div className={'w-14 h-8'}>
 					<div className={'w-8 h-8 overflow-hidden flex items-center justify-center select-none '}>
-						<img className={'w-full h-auto object-cover'} src={getSrcEmoji(emoji.id as string)} alt={emoji.shortname} />
+						<img className={'w-auto max-h-full object-cover'} src={getSrcEmoji(emoji.id as string)} alt={emoji.shortname} />
 					</div>
 				</div>
 
@@ -87,19 +67,8 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 							'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'
 						}
 					>
-						<p className={`max-w-[172px] truncate overflow-hidden inline-block select-none`}>{nameEmoji}</p>
+						<p className={`max-w-[172px] truncate overflow-hidden inline-block select-none`}>{emoji.shortname}</p>
 					</div>
-
-					{showEdit && (
-						<input
-							className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`}
-							value={nameEmoji}
-							onChange={handleChangeEmojiName}
-							onKeyDown={handleKeyDown}
-							onFocus={() => setFocus(true)}
-							onBlurCapture={() => setFocus(false)}
-						/>
-					)}
 				</div>
 
 				<div className={'flex-1 flex gap-[6px]  select-none'}>
@@ -110,12 +79,20 @@ const SettingEmojiItem = ({ emoji }: SettingEmojiItemProp) => {
 				</div>
 
 				{showEdit && (
-					<button
-						onClick={handleDelete}
-						className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete absolute text-xs font-bold w-6 h-6 top-[-12px] right-[-12px] flex items-center justify-center rounded-[50%]"
-					>
-						X
-					</button>
+					<div className={"absolute text-xs font-bold w-6 top-[-12px] right-[-12px]"}>
+						<button
+							onClick={handleDelete}
+							className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete  text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[50%]"
+						>
+							X
+						</button>
+						<button
+							onClick={() => onUpdateEmoji(emoji)}
+							className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent shadow-emoji_item-delete  text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[50%] mt-2"
+						>
+							<Icons.PenEdit className={`w-3 h-3 dark:text-textSecondary text-colorTextLightMode`}/>
+						</button>
+					</div>
 				)}
 			</div>
 		</div>

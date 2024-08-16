@@ -55,7 +55,7 @@ const OverviewSetting: React.FC<IOverViewSettingProps> = ({category}) => {
             type="text"
             value={categoryName}
             onChange={(e) => handleChangeCategoryName(e.target.value)}
-            className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
+            className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeSecond text-base rounded placeholder:text-sm"
             placeholder="Support has arrived!"
             maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
           />
