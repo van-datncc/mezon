@@ -1,5 +1,6 @@
 import { useEscapeKey, useMemberStatus, useMenu, useOnClickOutside } from '@mezon/core';
 import {
+	DirectEntity,
 	appActions,
 	selectCloseMenu,
 	selectDmGroupCurrent,
@@ -19,6 +20,7 @@ import { HelpButton, InboxButton } from '../../ChannelTopbar';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
+import CreateMessageGroup from '../CreateMessageGroup';
 import LabelDm from './labelDm';
 
 export type ChannelTopbarProps = {
@@ -101,16 +103,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							<div>
 								<PinButton isLightMode={appearanceTheme === 'light'} />
 							</div>
-							<button>
-								<Tooltip
-									content="Add friends to DM"
-									trigger="hover"
-									animation="duration-500"
-									style={appearanceTheme === 'light' ? 'light' : 'dark'}
-								>
-									<Icons.IconAddFriendDM />
-								</Tooltip>
-							</button>
+							<AddMemberToGroupDm currentDmGroup={currentDmGroup} appearanceTheme={appearanceTheme} />
 							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
 								<button onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
 									<Tooltip
@@ -201,6 +194,32 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 			{isShowPinMessage && <PinnedMessages />}
 		</div>
 	);
+}
+
+const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }:{currentDmGroup:DirectEntity, appearanceTheme:string}) => {
+	const [openAddToGroup, setOpenAddToGroup] = useState<boolean>(false);
+	const handleOpenAddToGroupModal = () => {
+		setOpenAddToGroup(!openAddToGroup);
+	}
+	const modalAddMemRef = useRef<HTMLDivElement | null>(null);
+	useOnClickOutside(modalAddMemRef, () => setOpenAddToGroup(false));
+	return (
+		<div onClick={handleOpenAddToGroupModal} ref={modalAddMemRef}>
+			{openAddToGroup &&
+				<div className='relative top-4 cursor-pointer'>
+					<CreateMessageGroup currentDM={currentDmGroup} isOpen={openAddToGroup} onClose={handleOpenAddToGroupModal} classNames='right-0 left-auto' />
+				</div>
+			}
+			<Tooltip
+				content="Add friends to DM"
+				trigger="hover"
+				animation="duration-500"
+				style={appearanceTheme === 'light' ? 'light' : 'dark'}
+			>
+				<Icons.IconAddFriendDM />
+			</Tooltip>
+		</div>
+	)
 }
 
 DmTopbar.Skeleton = () => {

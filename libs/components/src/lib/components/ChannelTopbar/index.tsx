@@ -216,9 +216,9 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const lastSeenPinMessageChannel = useSelector(selectLastSeenPinMessageChannelById(currentChannelId));
 	const lastPinMessage = useSelector(selectLastPinMessageByChannelId(currentChannelId));
 	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
-	useEscapeKey(() => setIsShowPinMessage(false));
 	const shouldShowPinIndicator = lastPinMessage && (!lastSeenPinMessageChannel || lastPinMessage !== lastSeenPinMessageChannel);
-
+	const handleClose = () => setIsShowPinMessage(false);
+	useEscapeKey(handleClose);
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip
@@ -235,7 +235,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 					)}
 				</button>
 			</Tooltip>
-			{isShowPinMessage && <PinnedMessages />}
+			{isShowPinMessage && <PinnedMessages onClose={handleClose}/>}
 		</div>
 	);
 }

@@ -1,7 +1,14 @@
 import { useMemberStatus } from '@mezon/core';
-import { Icons, PaperclipIcon } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, selectAllClans, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { Icons, PaperclipIcon, TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '@mezon/mobile-components';
+import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
+import {
+	DirectEntity,
+	RootState,
+	selectAllClans,
+	selectDirectsOpenlist,
+	selectTypingUserIdsByChannelId,
+} from '@mezon/store-mobile';
+import LottieView from 'lottie-react-native';
 import moment from 'moment';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,9 +26,10 @@ const SeparatorListFriend = () => {
 };
 
 const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any }) => {
-	const { themeValue } = useTheme();
+	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { directMessage, navigation } = props;
+	const hasUserTyping = useSelector(selectTypingUserIdsByChannelId(directMessage?.channel_id.toString()));
 	const { t } = useTranslation('message');
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
 	const redirectToMessageDetail = () => {
@@ -89,7 +97,18 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 							<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>
 						</View>
 					)}
-					<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+					{hasUserTyping?.length > 0 ? (
+						<View style={[styles.statusTyping, userStatus ? styles.online : styles.offline]}>
+							<LottieView
+								source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}
+								autoPlay
+								loop
+								style={styles.lottie}
+							/>
+						</View>
+					) : (
+						<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+					)}
 				</View>
 			)}
 
