@@ -179,8 +179,6 @@ function MemberProfile({
 		setIsOpenProfileModal(false);
 	}
 	
-	console.log ('check: ', positionType)
-	
 	return (
 		<div className="relative group">
 			<div

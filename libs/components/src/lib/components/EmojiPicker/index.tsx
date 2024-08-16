@@ -75,7 +75,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { reactionMessageDispatch } = useChatReaction();
 	const { setSubPanelActive, setPlaceHolderInput } = useGifsStickersEmoji();
 	const { setSuggestionEmojiObjPicked } = useEmojiSuggestion();
-	const [emojiHoverSrc, setEmojiHoverSrc] = useState<string>('');
+	const [emojiId, setEmojiId] = useState<string>('');
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const { setShiftPressed } = useEmojiSuggestion();
@@ -118,7 +118,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	};
 
 	const handleOnHover = (emojiHover: any) => {
-		setEmojiHoverSrc(emojiHover.src);
+		setEmojiId(emojiHover.id);
 		setEmojiHoverShortCode(emojiHover.shortname);
 		setPlaceHolderInput(emojiHover.shortname);
 	};
@@ -227,7 +227,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						{' '}
 						<EmojisPanel emojisData={emojisSearch} onEmojiSelect={handleEmojiSelect} onEmojiHover={handleOnHover} />
 					</div>
-					<EmojiHover emojiHoverSrc={emojiHoverSrc} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
+					<EmojiHover emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} emojiId={emojiId}/>
 				</div>
 			) : (
 				<div className="flex flex-col w-[90%] pr-2">
@@ -250,7 +250,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 							);
 						})}
 					</div>
-					<EmojiHover emojiHoverSrc={emojiHoverSrc} emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} />
+					<EmojiHover emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} emojiId={emojiId}/>
 				</div>
 			)}
 		</div>
@@ -375,20 +375,20 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 };
 
 type EmojiHoverProps = {
-	emojiHoverSrc: string;
 	emojiHoverShortCode: string;
 	isReaction: boolean | undefined;
+	emojiId: string;
 };
 
-const EmojiHover = ({ emojiHoverSrc, emojiHoverShortCode, isReaction }: EmojiHoverProps) => {
+const EmojiHover = ({ emojiHoverShortCode, isReaction, emojiId }: EmojiHoverProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 
 	return (
 		<div
 			className={`w-full max-h-12 flex-1 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2 max-sbm:mb-0'} py-1`}
 		>
-			{emojiHoverSrc ? (
-				<img draggable="false" className="max-w-10 max-h-full" src={emojiHoverSrc} />
+			{emojiId ? (
+				<img draggable="false" className="max-w-10 max-h-full" src={getSrcEmoji(emojiId)} />
 			) : (
 				<Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'} />
 			)}

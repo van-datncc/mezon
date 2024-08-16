@@ -20,7 +20,6 @@ type SettingEmojiItemProp = {
 };
 
 const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
-	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
 	const [showEdit, setShowEdit] = useState<boolean>(false);
 	const [focus, setFocus] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
@@ -33,32 +32,12 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === emoji.creator_id;
 	}, [hasAdminPermission, hasManageClanPermission, currentUserId, isClanOwner]);
 
-	const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
-		setNameEmoji(e.target.value.split(':').join(''));
-	};
-
-	const handleUpdateEmoji = async () => {
-		if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
-			const request: MezonUpdateClanEmojiByIdBody = {
-				source: getSrcEmoji(emoji.id as string),
-				shortname: ':' + nameEmoji + ':',
-				category: emoji.category,
-			};
-			await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }));
-		}
-	};
-
 	const handleDelete = () => {
 		dispatch(emojiSuggestionActions.deleteEmojiSetting({ emoji: emoji, clan_id: clanId as string }));
 	};
 	const handleOnMouseLeave = () => {
 		if (!focus) {
 			setShowEdit(false);
-		}
-	};
-	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-		if (event.key === 'Enter') {
-			handleUpdateEmoji();
 		}
 	};
 
@@ -88,7 +67,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 							'h-[26px] px-1 w-fit relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'
 						}
 					>
-						<p className={`max-w-[172px] truncate overflow-hidden inline-block select-none`}>{nameEmoji}</p>
+						<p className={`max-w-[172px] truncate overflow-hidden inline-block select-none`}>{emoji.shortname}</p>
 					</div>
 				</div>
 

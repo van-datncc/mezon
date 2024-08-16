@@ -1,15 +1,12 @@
-import {createEmojiSetting, selectAllEmojiSuggestion, selectCurrentClanId, useAppDispatch} from '@mezon/store';
-import {handleUploadEmoticon, useMezon} from '@mezon/transport';
-import {EEmojiCategory, LIMIT_SIZE_UPLOAD_IMG, MAX_FILE_NAME_EMOJI, resizeFileImage} from '@mezon/utils';
-import {Snowflake} from '@theinternetfolks/snowflake';
-import {ApiClanEmojiCreateRequest, ApiMessageAttachment} from 'mezon-js/api.gen';
-import {ChangeEvent, useState} from 'react';
-import {useSelector} from 'react-redux';
-import {ModalErrorTypeUpload, ModalOverData} from '../../ModalError';
+import { selectAllEmojiSuggestion } from '@mezon/store';
+import { EEmojiCategory } from '@mezon/utils';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingEmojiList from './SettingEmojiList';
 import ModalSticker, {EGraphicType} from "../SettingSticker/ModalEditSticker";
-import {ClanEmoji} from "mezon-js";
-import {Modal} from "@mezon/ui";
+import { ClanEmoji } from "mezon-js";
+import { Modal } from "@mezon/ui";
 
 const SettingEmoji = () => {
 	const [openModal, setOpenModal] = useState(false);
@@ -19,7 +16,6 @@ const SettingEmoji = () => {
 	const [isOpenEditModal, setIsOpenEditModal] = useState<boolean> (false);
 	
 	const handleOpenUpdateEmojiModal = (emoji: ClanEmoji) => {
-		console.log ('open modal here')
 		setSelectedEmoji(emoji);
 		setIsOpenEditModal(true);
 	}
