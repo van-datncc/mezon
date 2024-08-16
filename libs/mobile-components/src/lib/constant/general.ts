@@ -1,2 +1,3 @@
 export const AVATAR_DEFAULT_URL = 'https://res.cloudinary.com/drmhzprmb/image/upload/v1717383284/ava_hqf28d.jpg';
 export const CHANNEL_ID_SHARING = '41238213123123';
+export const QUALITY_IMAGE_UPLOAD = 0.6;

@@ -1,7 +1,10 @@
 export const convertMentionsToText = (text: string) => {
+	if (!text) {
+		return '';
+	}
 	const mentionPattern = /{@}\[([^\]]+)\]\(\d+\)|{#}\[([^\]]+)\]\((\d+)\)|\{\:\}\[([^\]]+)\]\(([^\)]+)\)/g;
 
-	return text.replace(mentionPattern, (match, userMention, hashtagMention, hashtagId, tagValue) => {
+	return text?.replace(mentionPattern, (match, userMention, hashtagMention, hashtagId, tagValue) => {
 		if (userMention) {
 			return `@[${userMention}]`;
 		} else if (hashtagMention && hashtagId) {
