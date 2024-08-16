@@ -1,5 +1,5 @@
 import { useAppNavigation } from '@mezon/core';
-import { selectTheme } from '@mezon/store';
+import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import clx from 'classnames';
 import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
@@ -28,12 +28,14 @@ const navigateToChannel = async (url: string, navigate: any) => {
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isRenderImage }) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
+	const dispatch = useAppDispatch();
 	const origin = window.location.origin + "/invite/";
 
 	const onClickLink = useCallback(
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
 				if (url.startsWith(origin)) {
+					dispatch(inviteActions.setIsClickInvite(true));
 					navigateToChannel(url, navigate);
 				} else {
 					window.open(url, '_blank');

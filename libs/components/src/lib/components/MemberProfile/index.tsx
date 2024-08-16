@@ -352,7 +352,7 @@ const StatusUser = memo((props: StatusUserProps) => {
     <span
       className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${(status && checkTypingUser) ? 'rounded-lg -right-3' : 'rounded-full right-[-4px]'}`}
     >
-      {status ? (checkTypingUser ? <Icons.IconLoadingTyping defaultSize='bg-colorSuccess w-5 rounded-lg' /> : <OnlineStatus />) : <OfflineStatus />}
+      {status ? (checkTypingUser ? <Icons.IconLoadingTyping defaultSize='bg-colorSuccess w-5 h-2.5 rounded-lg' /> : <OnlineStatus />) : <OfflineStatus />}
     </span>
   );
 })
