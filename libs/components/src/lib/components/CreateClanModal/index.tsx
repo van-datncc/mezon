@@ -114,7 +114,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
       title=""
       titleConfirm="Create"
       confirmButton={handleCreateClan}
-      // disableButtonConfirm={checkvalidate !== EValidateListMessage.VALIDATED}
+      disableButtonConfirm={checkvalidate !== EValidateListMessage.VALIDATED}
       classNameBox="h-full"
     >
       <div className="flex items-center flex-col justify-center ">
