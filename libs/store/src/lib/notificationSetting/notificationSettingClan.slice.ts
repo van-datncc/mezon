@@ -44,7 +44,6 @@ export const getDefaultNotificationClan = createAsyncThunk('defaultnotificationc
 		if (!response) {
 			return thunkAPI.rejectWithValue('Invalid session');
 		}
-		console.log(response);
 		const mapper: ApiNotificationSetting = {
 			id: response.notification_setting?.id,
 			notification_setting_type: response.notification_setting?.notification_setting_type,

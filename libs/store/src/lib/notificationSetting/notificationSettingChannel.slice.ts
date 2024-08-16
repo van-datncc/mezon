@@ -60,7 +60,6 @@ export const getNotificationSetting = createAsyncThunk('notificationsetting/getN
 			notification_setting_type: response.notification_user_channel?.notification_setting_type,
 			time_mute: response.notification_user_channel?.time_mute,
 		};
-		console.log(response);
 		const payload: GetNotificationSettingResponse = {
 			notificationSetting: apiNotificationUserChannel,
 			isCurrentChannel: isCurrentChannel,

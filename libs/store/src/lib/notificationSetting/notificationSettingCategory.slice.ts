@@ -32,7 +32,6 @@ export const getDefaultNotificationCategory = createAsyncThunk('defaultnotificat
 		if (!response) {
 			return thunkAPI.rejectWithValue('Invalid session');
 		}
-		console.log(response);
 		const apiNotificationSetting = mapToApiNotificationSetting(response);
 		return apiNotificationSetting;
 	});
