@@ -7,6 +7,7 @@ import {
 	selectDirectById,
 	selectNewIdMessageResponse,
 	selectNewMesssageUpdateImage,
+	selectUserClanProfileByClanID,
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUrlInput, useMezon } from '@mezon/transport';
@@ -27,6 +28,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
+	const currentProfile = useSelector(selectUserClanProfileByClanID(currentClanId || '0', currentUserId));
 	const idNewMessageResponse = useSelector(selectNewIdMessageResponse);
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 	console.log('newMessageUpdateImage :', newMessageUpdateImage);
@@ -72,10 +74,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 					anonymous,
 					mentionEveryone,
 					senderId: currentUserId,
+					avatar: currentProfile?.avartar || '',
 				}),
 			);
 		},
-		[dispatch, channelID, clanID, mode, currentUserId],
+		[dispatch, channelID, clanID, mode, currentUserId, currentProfile?.avartar],
 	);
 	type LinkQueueItem = {
 		messageId: string;

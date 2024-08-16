@@ -312,6 +312,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					);
 				}
 			}
+
+			if (
+				(channelCreated && channelCreated.channel_private === 1 && channelCreated.channel_type === ChannelType.CHANNEL_TYPE_DM) ||
+				channelCreated.channel_type === ChannelType.CHANNEL_TYPE_GROUP
+			) {
+				dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			}
 		},
 		[dispatch],
 	);

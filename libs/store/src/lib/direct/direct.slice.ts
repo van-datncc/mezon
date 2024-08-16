@@ -61,7 +61,6 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
-			await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 				thunkAPI.dispatch(
@@ -254,7 +253,7 @@ export const directSlice = createSlice({
 				},
 			});
 
-			if (payload.clan_id === '0' && dmChannel.active !== ActiveDm.OPEN_DM) {
+			if (payload.clan_id === '0' && dmChannel?.active !== ActiveDm.OPEN_DM) {
 				directAdapter.updateOne(state, {
 					id: payload.channel_id,
 					changes: {

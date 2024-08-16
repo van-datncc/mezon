@@ -33,6 +33,7 @@ module.exports = {
   bgSelectItemHover: '#4752C4',
   bgModalDark: 'rgba(0, 0, 0, 0.7)',
   bgAvatarDark: '#F7E4F0',
+  bgIconDark: '#949BA4',
 
   /* background light*/
   bgLightPrimary: '#FFFFFF',
@@ -48,6 +49,7 @@ module.exports = {
   bgTextarea: '#EBEBEB',
   bgInputDark: '#26262B',
   bgAvatarLight: '#A612A2',
+  bgIconLight: '#5C5E66',
 
   /* text */
   channelTextarea: '#383A40',
@@ -62,6 +64,7 @@ module.exports = {
   textLightUserName: '#17AC86',
   textThreadPrimary: '#B5BAC1',
   textAppDirectory: '#dbdee1',
+  textPro: '#2DC770',
 
   /* border */
   borderDefault: '#1E1E1E',

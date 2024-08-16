@@ -174,8 +174,8 @@ const ItemMemberModal = (props: ItemMemberModalProps) => {
 						src={avatarPrioritize}
 						classNameText="text-[9px] pt-[3px]"
 					/>
-					<p className='font-semibold'>{namePrioritize}</p>
-					<p className="text-contentTertiary">{userName}</p>
+					<p className='font-semibold one-line'>{namePrioritize}</p>
+					<p className="text-contentTertiary one-line">{userName}</p>
 				</div>
 				<input id={id} type="checkbox" checked={checked} onChange={onHandle} />
 			</label>

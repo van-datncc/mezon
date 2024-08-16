@@ -16,6 +16,7 @@ export interface PinMessageEntity extends IPinMessage {
 export interface PinMessageState extends EntityState<PinMessageEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	jumpPinMessageId: string;
 }
 
 export const pinMessageAdapter = createEntityAdapter<PinMessageEntity>();
@@ -128,6 +129,7 @@ export const updateLastSeenPin = createAsyncThunk(
 export const initialPinMessageState: PinMessageState = pinMessageAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
+	jumpPinMessageId: '', 
 });
 
 export const pinMessageSlice = createSlice({
@@ -137,6 +139,9 @@ export const pinMessageSlice = createSlice({
 		add: pinMessageAdapter.addOne,
 		addMany: pinMessageAdapter.addMany,
 		remove: pinMessageAdapter.removeOne,
+		setJumpPinMessageId: (state, action) => {
+			state.jumpPinMessageId = action.payload;
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -213,3 +218,5 @@ export const selectLastPinMessageByChannelId = (channelId?: string | null) =>
 	createSelector(selectPinMessageByChannelId(channelId), (filteredMessages) => {
 		return filteredMessages[filteredMessages.length - 1]?.id || null;
 	});
+
+export const selectJumpPinMessageId = createSelector(getPinMessageState, (state) => state.jumpPinMessageId);
