@@ -8,12 +8,11 @@ import {
 } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../temp-ui';
-import MezonMenuItem from '../../temp-ui/MezonMenuItem';
 import MezonSearch from '../../temp-ui/MezonSearch';
 import { style } from './styles';
 
@@ -51,7 +50,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		);
 	};
 
-	const AccountMenu: IMezonMenuItemProps[] = [
+	const AccountMenu = useMemo(() => [
 		{
 			onPress: () => reserve(),
 			expandable: true,
@@ -116,9 +115,9 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('accountSettings.QRScan'),
 			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
 
-	const PaymentMenu: IMezonMenuItemProps[] = [
+	const PaymentMenu = useMemo(() => [
 		{
 			onPress: () => reserve(),
 			expandable: true,
@@ -137,9 +136,9 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('paymentSettings.restoreSubscription'),
 			icon: <Icons.NitroWheelIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
 
-	const AppMenu: IMezonMenuItemProps[] = [
+	const AppMenu = useMemo(() => [
 		{
 			onPress: () => reserve(),
 			expandable: true,
@@ -203,9 +202,9 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('appSettings.advanced'),
 			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
 
-	const SupportMenu: IMezonMenuItemProps[] = [
+	const SupportMenu = useMemo(() => [
 		{
 			onPress: () => reserve(),
 			expandable: true,
@@ -224,16 +223,25 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('supportSettings.acknowledgement'),
 			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
 
-	const WhatsNew: IMezonMenuItemProps[] = [
+	const WhatsNew = useMemo(() => [
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('whatsNew.whatsNew'),
 			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
+
+	const LogOut = useMemo(() => [
+		{
+			onPress: () => confirmLogout(),
+			title: t('logOut'),
+			textStyle: { color: baseColor.redStrong },
+			icon: <Icons.DoorExitIcon color={baseColor.redStrong} />
+		}
+	] satisfies IMezonMenuItemProps[], []);
 
 	const menu: IMezonMenuSectionProps[] = [
 		{
@@ -256,6 +264,9 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('whatsNew.title'),
 			items: WhatsNew,
 		},
+		{
+			items: LogOut,
+		}
 	];
 
 	return (
@@ -264,14 +275,6 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				<MezonSearch />
 
 				<MezonMenu menu={menu} />
-
-				<MezonMenuItem
-					isLast
-					onPress={() => confirmLogout()}
-					title={t('logOut')}
-					textStyle={{ color: baseColor.red }}
-					icon={<Icons.DoorExitIcon color={baseColor.red} />}
-				/>
 			</ScrollView>
 		</View>
 	);

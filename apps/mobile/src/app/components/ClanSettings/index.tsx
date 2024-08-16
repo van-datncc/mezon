@@ -110,7 +110,9 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 	const userManagementMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.userManagement.members'),
-			onPress: () => reserve(),
+			onPress: async () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.MEMBER_SETTING);
+			},
 			expandable: true,
 			icon: <Icons.GroupIcon color={themeValue.text} />,
 		},

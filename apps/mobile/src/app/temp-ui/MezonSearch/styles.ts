@@ -8,9 +8,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: Metrics.size.m,
-		flexBasis: 50,
-		flexGrow: 1,
+		gap: Metrics.size.m
 	},
 
 	input: {
