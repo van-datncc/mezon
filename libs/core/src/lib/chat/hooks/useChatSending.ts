@@ -29,8 +29,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 
 	const dispatch = useAppDispatch();
-	// TODO: if direct is the same as channel use one slice
-	// If not, using 2 hooks for direct and channel
 	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectChannelById(channelId));
