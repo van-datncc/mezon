@@ -53,7 +53,7 @@ const ModalSticker = ({ editSticker, handleCloseModal }: ModalEditStickerProps) 
         category: editSticker?.category,
         shortname: editingSticker.shortname,
       };
-      await dispatch(updateSticker({ stickerId: editSticker?.id ?? '', request: stickerChange }));
+      await dispatch(updateSticker({ stickerId: editSticker?.id ?? '', request: stickerChange ,clan_id:currentClanId}));
       handleCloseModal();
       return;
     }
