@@ -21,6 +21,7 @@ import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage'
 import { RenderTextMarkdownContent } from '../home/homedrawer/constants';
 import { style } from './styles';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
+import { IExtendedMessage } from '@mezon/utils';
 
 const SeparatorListFriend = () => {
 	return <View style={{ height: size.s_8 }} />;
@@ -32,25 +33,25 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 	const { directMessage, navigation } = props;
 	const hasUserTyping = useSelector(selectTypingUserIdsByChannelId(directMessage?.channel_id.toString()));
 	const { t } = useTranslation('message');
-	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id[0] : '');
+	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id?.[0] : '');
 	const redirectToMessageDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-			params: { directMessageId: directMessage?.id },
+			params: { directMessageId: directMessage?.id }
 		});
 	};
-
+	
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
 		const usernameList = (directMessage?.channel_label || directMessage?.usernames)?.split?.(',') || [];
-
-		return usernameList.map((username, index) => ({
-			userId: userIdList[index],
-			username: username,
+		
+		return usernameList?.map((username, index) => ({
+			userId: userIdList?.[index],
+			username: username
 		}));
 	}, [directMessage]);
-
-	const getLastMessageContent = (content) => {
+	
+	const getLastMessageContent = (content: string | IExtendedMessage) => {
 		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
 		const lastMessageSender = otherMemberList.find((it) => it.userId === directMessage?.last_sent_message?.sender_id);
 
@@ -70,7 +71,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 				<Text style={[styles.defaultText, styles.lastMessage]}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
-				{content && <RenderTextMarkdownContent content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />}
+				{!!content && <RenderTextMarkdownContent content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />}
 			</View>
 		);
 	};
