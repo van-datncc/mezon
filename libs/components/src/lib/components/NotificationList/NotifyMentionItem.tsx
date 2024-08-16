@@ -70,7 +70,7 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	return (
 		<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
 			<button
-				className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightModeButton top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+				className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightTertiary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
 				onClick={handleClickJump}
 			>
 				Jump

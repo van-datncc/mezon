@@ -1,25 +1,25 @@
 import { useAppNavigation, useFriends } from '@mezon/core';
-import { FriendsEntity, IFriend, directActions, selectAllFriends, useAppDispatch } from '@mezon/store';
+import { DirectEntity, FriendsEntity, IFriend, channelUsersActions, directActions, selectAllFriends, useAppDispatch } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import EmptySearchFriends from './EmptySearchFriends';
 
 type CreateMessageGroupProps = {
 	isOpen: boolean;
 	onClose: () => void;
+	classNames?: string;
+	currentDM?: DirectEntity;
 };
 
 const ITEM_HEIGHT = 40;
 
-const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
+const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGroupProps) => {
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
-	const { toDmGroupPage } = useAppNavigation();
+	const { navigate, toDmGroupPage } = useAppNavigation();
 	const friends = useSelector(selectAllFriends);
 
 	const [searchTerm, setSearchTerm] = useState<string>('');
@@ -27,9 +27,9 @@ const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
 	const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 	const boxRef = useRef<HTMLDivElement | null>(null);
 
-	const { filteredFriends } = useFriends();
+	const { filteredFriends, filterListFriendsNotInGroup } = useFriends();
 
-	const listFriends = filteredFriends(searchTerm.trim().toUpperCase());
+	const listFriends = (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM) ? filterListFriendsNotInGroup() : filteredFriends(searchTerm.trim().toUpperCase());
 
 	const handleSelectFriends = (idFriend: string) => {
 		setSelectedFriends((prevSelectedFriends) => {
@@ -50,14 +50,30 @@ const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
 		setSelectedFriends([]);
 		onClose();
 	};
+	const handleAddMemberToGroupChat = async (listAdd: ApiCreateChannelDescRequest) => {
+		await dispatch(channelUsersActions.addChannelUsers({
+			channelId: currentDM?.channel_id as string,
+      clanId : currentDM?.clan_id as string,
+      userIds : listAdd.user_ids ?? [],
+      channelType : currentDM?.type
+		}));
+		onClose();
+	}
 
 	const handleCreateDM = async () => {
+		const listGroupDM = selectedFriends;
+		if (currentDM?.type === ChannelType.CHANNEL_TYPE_DM) {
+			listGroupDM.push(currentDM.creator_id as string);
+		}
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: selectedFriends.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
-			user_ids: selectedFriends,
+			user_ids: listGroupDM,
 		};
-
+		if (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP) {
+			handleAddMemberToGroupChat(bodyCreateDmGroup);
+			return;
+		}
 		const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
 		const resPayload = response.payload as ApiCreateChannelDescRequest;
 		if (resPayload.channel_id) {
@@ -168,7 +184,7 @@ const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
 	return (
 		<div
 			onMouseDown={(e) => e.stopPropagation()}
-			className="absolute top-[20px] left-0 dark:bg-bgPrimary bg-bgLightPrimary z-10 w-[440px] border border-slate-300 dark:border-none rounded shadow shadow-neutral-800"
+			className={`absolute top-[20px] left-0 dark:bg-bgPrimary bg-bgLightPrimary z-10 w-[440px] border border-slate-300 dark:border-none rounded shadow shadow-neutral-800 ${classNames}`}
 			onClick={(e) => {
 				e.stopPropagation();
 			}}
@@ -234,7 +250,11 @@ const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
 						onClick={handleCreateDM}
 						className="h-[38px] w-full text-sm text-white dark:bg-buttonPrimary dark:hover:bg-bgSelectItemHover rounded"
 					>
-						{selectedFriends.length === 0 ? 'Create DM or Group Chat' : selectedFriends.length === 1 ? 'Create DM' : 'Create Group Chat'}
+						{currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP ?
+							"Add to Group Chat"
+							:
+							selectedFriends.length === 0 ? 'Create DM or Group Chat' : selectedFriends.length === 1 ? 'Create DM' : 'Create Group Chat'
+						}
 					</button>
 				</div>
 			</div>
