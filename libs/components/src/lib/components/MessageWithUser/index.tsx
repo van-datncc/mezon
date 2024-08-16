@@ -1,5 +1,5 @@
 import { useAuth, useChatMessages } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectOpenReplyMessageState } from '@mezon/store';
+import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectJumpPinMessageId, selectOpenReplyMessageState } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import classNames from 'classnames';
 import React, { useMemo, useRef } from 'react';
@@ -73,12 +73,17 @@ function MessageWithUser({
 	}, [message]);
 
 	const checkMessageHasReply = useMemo(() => {
-		return message.references && message.references?.length > 0;
+		return message.references && message.references?.length !== 0;
 	}, [message.references]);
 
 	const checkMessageIncludeMention = useMemo(() => {
 		return hasIncludeMention;
 	}, [hasIncludeMention]);
+
+	const jumpPinMessageId = useSelector(selectJumpPinMessageId);
+	const checkJumpPinMessage = useMemo(() => {
+		return jumpPinMessageId === message.id;
+	},[jumpPinMessageId, message.id])
 
 	const containerClass = classNames('relative', 'message-container', {
 		'mt-3': !isCombine || checkReferences,
@@ -92,7 +97,7 @@ function MessageWithUser({
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
 		{ 'dark:bg-[#383B47]': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38]': checkMessageIncludeMention },
+		{ 'dark:bg-[#403D38]': checkMessageIncludeMention || checkJumpPinMessage },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
 	);
 

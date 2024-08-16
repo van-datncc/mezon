@@ -13,7 +13,7 @@ import {
 import { ApiMessageAttachment, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
-import { fileTypeImage, TIME_COMBINE } from '../constant';
+import { TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
 	EmojiDataOptionals,
@@ -310,7 +310,7 @@ export const checkSameDayByCreateTimeMs = (unixTime1: number, unixTime2: number)
 };
 
 export const checkContinuousMessagesByCreateTimeMs = (unixTime1: number, unixTime2: number) => {
-	return Math.abs(unixTime1 - unixTime2) <= TIME_COMBINE * 1000;
+	return Math.abs(unixTime1 - unixTime2) <= TIME_COMBINE;
 };
 
 export const checkSameDayByCreateTime = (createTime1: string | Date, createTime2: string | Date) => {
@@ -641,18 +641,3 @@ export const KMPHighlight = (text: string, pattern: string): number[] => {
 
 	return matchPositions;
 };
-
-export const checkImageFromLink = async (url: string) => {
-  if (!url) return false;
-  try {
-    const response = await fetch(url, { method: 'HEAD' });
-    const contentType = response.headers.get('Content-Type');
-    
-    if (contentType && fileTypeImage.includes(contentType)) {
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.log('Error fetching image:', error);
-  }
-}

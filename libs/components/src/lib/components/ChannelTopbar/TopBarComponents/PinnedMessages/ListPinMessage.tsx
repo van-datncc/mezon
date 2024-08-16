@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import EmptyPinMess from './EmptyPinMess';
 import ItemPinMessage from './ItemPinMessage';
 
-const ListPinMessage = () => {
+const ListPinMessage = ({onClose=()=>{}}:{onClose?: () => void}) => {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -66,7 +66,13 @@ const ListPinMessage = () => {
 							}
 
 							return (
-								<ItemPinMessage pinMessage={pinMessage} contentString={contentString} handleUnPinMessage={handleUnPinMessage} key={pinMessage.id} />
+								<ItemPinMessage 
+									pinMessage={pinMessage} 
+									contentString={contentString} 
+									handleUnPinMessage={handleUnPinMessage} 
+									key={pinMessage.id} 
+									onClose={onClose}
+								/>
 							);
 						})}
 					</div>

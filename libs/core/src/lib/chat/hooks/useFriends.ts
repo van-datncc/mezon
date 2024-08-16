@@ -1,9 +1,10 @@
-import { friendsActions, requestAddFriendParam, selectAllFriends, useAppDispatch } from '@mezon/store';
+import { friendsActions, requestAddFriendParam, selectAllFriends, selectMemberChannels, useAppDispatch } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useFriends() {
 	const friends = useSelector(selectAllFriends);
+	const groupDmMember = useSelector(selectMemberChannels);
 	const dispatch = useAppDispatch();
 
 	const quantityPendingRequest = useMemo(() => {
@@ -61,6 +62,23 @@ export function useFriends() {
 		[dispatch],
 	);
 
+	const filteredFriends = useCallback(
+		(searchTerm: string) => {
+			return friends.filter(
+				(friend) =>
+					friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm),
+			);
+		},
+		[friends],
+	);
+
+	const filterListFriendsNotInGroup = useCallback(() => {
+		return friends.filter((friend) => {
+			if (!groupDmMember?.some((user) => user.user?.id === friend.id)) {
+				return friend;
+			}
+		});
+	}, []);
 	return useMemo(
 		() => ({
 			friends,
@@ -70,7 +88,9 @@ export function useFriends() {
 			deleteFriend,
 			blockFriend,
 			unBlockFriend,
+			filteredFriends,
+			filterListFriendsNotInGroup,
 		}),
-		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend],
+		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends],
 	);
 }

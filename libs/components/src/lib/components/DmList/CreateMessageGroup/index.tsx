@@ -1,56 +1,79 @@
-import { useAppNavigation } from '@mezon/core';
-import { directActions, IFriend, selectAllFriends, useAppDispatch } from '@mezon/store';
+import { useAppNavigation, useFriends } from '@mezon/core';
+import { DirectEntity, FriendsEntity, IFriend, channelUsersActions, directActions, selectAllFriends, useAppDispatch } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
+import EmptySearchFriends from './EmptySearchFriends';
 
 type CreateMessageGroupProps = {
 	isOpen: boolean;
 	onClose: () => void;
+	classNames?: string;
+	currentDM?: DirectEntity;
 };
 
-const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
+const ITEM_HEIGHT = 40;
+
+const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGroupProps) => {
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
-	const { toDmGroupPage } = useAppNavigation();
+	const { navigate, toDmGroupPage } = useAppNavigation();
 	const friends = useSelector(selectAllFriends);
-	const itemRef = useRef<HTMLDivElement | null>(null);
+
 	const [searchTerm, setSearchTerm] = useState<string>('');
-
-	const [idActive, setIdActive] = useState(0);
+	const [idActive, setIdActive] = useState<string>('');
 	const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
-	const [length, setLength] = useState<number>(selectedFriends.length);
+	const boxRef = useRef<HTMLDivElement | null>(null);
 
-	const filteredFriends = friends.filter((friend: IFriend) => friend.user?.username?.toLowerCase().includes(searchTerm.toLowerCase()));
+	const { filteredFriends, filterListFriendsNotInGroup } = useFriends();
 
-	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
+	const listFriends = (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM) ? filterListFriendsNotInGroup() : filteredFriends(searchTerm.trim().toUpperCase());
 
+	const handleSelectFriends = (idFriend: string) => {
 		setSelectedFriends((prevSelectedFriends) => {
-			if (prevSelectedFriends.includes(value)) {
-				return prevSelectedFriends.filter((friend) => friend !== value);
+			if (prevSelectedFriends.includes(idFriend)) {
+				return prevSelectedFriends.filter((friend) => friend !== idFriend);
 			} else {
-				return [...prevSelectedFriends, value];
+				return [...prevSelectedFriends, idFriend];
 			}
 		});
+	};
+
+	const handleCheckboxChange = (e?: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e?.target.value ?? '';
+		handleSelectFriends(value);
 	};
 
 	const resetAndCloseModal = () => {
 		setSelectedFriends([]);
 		onClose();
 	};
+	const handleAddMemberToGroupChat = async (listAdd: ApiCreateChannelDescRequest) => {
+		await dispatch(channelUsersActions.addChannelUsers({
+			channelId: currentDM?.channel_id as string,
+      clanId : currentDM?.clan_id as string,
+      userIds : listAdd.user_ids ?? [],
+      channelType : currentDM?.type
+		}));
+		onClose();
+	}
 
 	const handleCreateDM = async () => {
+		const listGroupDM = selectedFriends;
+		if (currentDM?.type === ChannelType.CHANNEL_TYPE_DM) {
+			listGroupDM.push(currentDM.creator_id as string);
+		}
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
-			type: length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
+			type: selectedFriends.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
-			user_ids: selectedFriends,
+			user_ids: listGroupDM,
 		};
-
+		if (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP) {
+			handleAddMemberToGroupChat(bodyCreateDmGroup);
+			return;
+		}
 		const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
 		const resPayload = response.payload as ApiCreateChannelDescRequest;
 		if (resPayload.channel_id) {
@@ -68,13 +91,100 @@ const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
 	};
 
 	useEffect(() => {
-		setLength(selectedFriends.length);
-	}, [selectedFriends]);
+		if (idActive === '' && listFriends.length > 0) {
+			setIdActive(listFriends[0]?.id ?? '');
+		}
+
+		const handleKeyDown = (event: KeyboardEvent) => {
+			const currentIndex = listFriends.findIndex((item) => item?.id === idActive);
+			if (currentIndex === -1) return;
+
+			switch (event.key) {
+				case 'ArrowDown':
+					event.preventDefault();
+					handleArrowDown(listFriends, currentIndex);
+					break;
+
+				case 'ArrowUp':
+					event.preventDefault();
+					handleArrowUp(listFriends, currentIndex);
+					break;
+
+				case 'Enter':
+					event.preventDefault();
+					handleEnter(listFriends, idActive);
+					break;
+
+				default:
+					break;
+			}
+		};
+
+		document.addEventListener('keydown', handleKeyDown);
+
+		return () => {
+			document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [idActive, listFriends]);
+
+	const handleArrowDown = (listFriends: FriendsEntity[], currentIndex: number) => {
+		const nextIndex = currentIndex === listFriends.length - 1 ? 0 : currentIndex + 1;
+		const newItem = listFriends[nextIndex];
+
+		if (!boxRef.current || !newItem) return;
+		const boxHeight = boxRef.current.clientHeight;
+		const newItemOffset = (ITEM_HEIGHT + 4) * nextIndex;
+		const newScrollTop = newItemOffset + ITEM_HEIGHT - boxHeight;
+		const totalItemsHeight = listFriends.length * ITEM_HEIGHT;
+		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
+
+		boxRef.current.scroll({
+			top: Math.min(newScrollTop, maxScrollTop),
+			behavior: 'smooth',
+		});
+
+		setIdActive(newItem.id ?? '');
+	};
+
+	const handleArrowUp = (listFriends: FriendsEntity[], currentIndex: number) => {
+		const prevIndex = currentIndex === 0 ? listFriends.length - 1 : currentIndex - 1;
+		const newItem = listFriends[prevIndex];
+
+		if (!boxRef.current || !newItem) return;
+
+		const boxHeight = boxRef.current.clientHeight;
+		const newItemOffset = (ITEM_HEIGHT + 4) * prevIndex;
+		const newScrollTop = newItemOffset - boxHeight + ITEM_HEIGHT;
+		const totalItemsHeight = listFriends.length * ITEM_HEIGHT;
+		const maxScrollTop = Math.max(totalItemsHeight - boxHeight, 0);
+
+		boxRef.current.scroll({
+			top: Math.min(Math.max(newScrollTop, 0), maxScrollTop),
+			behavior: 'smooth',
+		});
+
+		setIdActive(newItem.id ?? '');
+	};
+
+	const handleEnter = (listFriends: FriendsEntity[], idActive: string) => {
+		const selectedItem = listFriends.find((item) => item.id === idActive);
+		if (!selectedItem) return;
+
+		if (selectedItem.id === idActive) {
+			handleSelectFriends(selectedItem.id);
+		}
+	};
+
+	useEffect(() => {
+		if (listFriends.length > 0) {
+			setIdActive(listFriends[0].id);
+		}
+	}, [searchTerm]);
 
 	return (
 		<div
 			onMouseDown={(e) => e.stopPropagation()}
-			className="absolute top-[20px] left-0 dark:bg-bgPrimary bg-bgLightPrimary z-10 w-[440px] border border-slate-300 dark:border-none rounded shadow shadow-neutral-800"
+			className={`absolute top-[20px] left-0 dark:bg-bgPrimary bg-bgLightPrimary z-10 w-[440px] border border-slate-300 dark:border-none rounded shadow shadow-neutral-800 ${classNames}`}
 			onClick={(e) => {
 				e.stopPropagation();
 			}}
@@ -89,51 +199,62 @@ const CreateMessageGroup = ({ onClose }: CreateMessageGroupProps) => {
 						className="h-[34px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-[20px]"
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
+						autoFocus={true}
 					/>
 				</div>
-				<div className="w-full h-[190px] overflow-y-auto overflow-x-hidden thread-scroll">
-					{filteredFriends.map((friend: IFriend, index) => (
-						<div
-							key={friend.id}
-							ref={itemRef}
-							className={`${idActive === index ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} flex items-center h-10 px-2 ml-3 mr-2 py-[8px] rounded-[6px] cursor-pointer`}
-						>
-							<label className="flex flex-row items-center justify-between w-full gap-2 py-[3px]">
-								<div className="flex flex-row items-center gap-2">
-									<AvatarImage
-										alt={''}
-										userName={friend.user?.username}
-										src={friend.user?.avatar_url}
-										className="size-8"
-										classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
-									/>
-									<span className={`text-base font-medium dark:text-white text-textLightTheme one-line`}>
-										{friend.user?.display_name}
-									</span>
-									<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">{friend.user?.username}</span>
-								</div>
-								<div className="relative flex flex-row justify-center">
-									<input
-										id={`checkbox-item-${index}`}
-										type="checkbox"
-										value={friend.id}
-										checked={selectedFriends.includes(friend?.id || '')}
-										onChange={handleCheckboxChange}
-										className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
-									/>
-									<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
-								</div>
-							</label>
-						</div>
-					))}
-				</div>
+				{listFriends.length > 0 ? (
+					<div ref={boxRef} className="w-full h-[190px] overflow-y-auto overflow-x-hidden thread-scroll">
+						{listFriends.map((friend: IFriend, index) => (
+							<div
+								key={friend.id}
+								onMouseEnter={() => setIdActive(friend.id ?? '')}
+								onMouseLeave={() => setIdActive(friend.id ?? '')}
+								className={`${idActive === friend.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} flex items-center h-10 px-2 ml-3 mr-2 py-[8px] rounded-[6px] cursor-pointer`}
+							>
+								<label className="flex flex-row items-center justify-between w-full gap-2 py-[3px] cursor-pointer">
+									<div className="flex flex-row items-center gap-2">
+										<AvatarImage
+											alt={''}
+											userName={friend.user?.username}
+											src={friend.user?.avatar_url}
+											className="size-8"
+											classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
+										/>
+										<span className={`text-base font-medium dark:text-white text-textLightTheme one-line`}>
+											{friend.user?.display_name}
+										</span>
+										<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">{friend.user?.username}</span>
+									</div>
+									<div className="relative flex flex-row justify-center">
+										<input
+											id={`checkbox-item-${index}`}
+											type="checkbox"
+											value={friend.id}
+											checked={selectedFriends.includes(friend?.id || '')}
+											onChange={handleCheckboxChange}
+											className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
+										/>
+										<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
+									</div>
+								</label>
+							</div>
+						))}
+					</div>
+				) : (
+					<EmptySearchFriends />
+				)}
+
 				<div className="p-[20px]">
 					<button
-						disabled={length === 0}
+						disabled={selectedFriends.length === 0}
 						onClick={handleCreateDM}
 						className="h-[38px] w-full text-sm text-white dark:bg-buttonPrimary dark:hover:bg-bgSelectItemHover rounded"
 					>
-						{selectedFriends.length === 0 ? 'Create DM or Group Chat' : selectedFriends.length === 1 ? 'Create DM' : 'Create Group Chat'}
+						{currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP ?
+							"Add to Group Chat"
+							:
+							selectedFriends.length === 0 ? 'Create DM or Group Chat' : selectedFriends.length === 1 ? 'Create DM' : 'Create Group Chat'
+						}
 					</button>
 				</div>
 			</div>

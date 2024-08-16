@@ -1,10 +1,11 @@
-import { useAppNavigation, useAuth, useChannels, useDirect, useFriends } from '@mezon/core';
+import { useAppNavigation, useAuth, useDirect, useFriends } from '@mezon/core';
 import {
 	DirectEntity,
 	IFriend,
 	directActions,
 	messagesActions,
 	selectAllChannelMembers,
+	selectAllChannelsByUser,
 	selectAllDirectMessages,
 	selectAllUsesClan,
 	selectTheme,
@@ -39,9 +40,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const { toDmGroupPageFromMainApp, toChannelPage, navigate } = useAppNavigation();
 	const { createDirectMessageWithUser } = useDirect();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
-	const { listChannels } = useChannels();
-	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
-	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3 && groupChat.channel_avatar);
+	const listChannels = useSelector(selectAllChannelsByUser);
+	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1);
+	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1);
 	const usersClan = useSelector(selectAllUsesClan);
 	const membersInClan = useSelector(selectAllChannelMembers);
 
@@ -63,8 +64,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						idDM: itemDM?.id ?? '',
 						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
-						typeChat: ChannelType.CHANNEL_TYPE_DM,
-						type: TypeSearch.Dm_Type,
+						typeChat: TypeSearch.Dm_Type,
+						type: ChannelType.CHANNEL_TYPE_DM,
 					};
 				})
 			: [];
@@ -76,8 +77,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						avatarUser: 'assets/images/avatar-group.png' ?? '',
 						idDM: itemGr?.id ?? '',
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp,
-						typeChat: ChannelType.CHANNEL_TYPE_GROUP,
-						type: TypeSearch.Dm_Type,
+						type: ChannelType.CHANNEL_TYPE_GROUP,
+						typeChat: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -91,7 +92,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						displayName: itemFriend?.user?.display_name ?? '',
 						lastSentTimeStamp: '0',
 						idDM: '',
-						type: TypeSearch.Dm_Type,
+						typeChat: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -106,7 +107,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						clanNick: itemUserClan?.clan_nick ?? '',
 						lastSentTimeStamp: '0',
 						idDM: '',
-						type: TypeSearch.Dm_Type,
+						typeChat: TypeSearch.Dm_Type,
 					};
 				})
 			: [];
@@ -128,22 +129,24 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		];
 		const removeDuplicate = removeDuplicatesById(listSearch.filter((item) => item?.id !== accountId));
 		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, membersInClan);
-
 		return addPropsIntoSearchList;
 	}, [accountId, friends, listDM, listGroup, membersInClan, usersClan]);
-
 	const listChannelSearch = useMemo(() => {
 		const list = listChannels.map((item) => {
 			return {
 				id: item?.channel_id ?? '',
 				name: item?.channel_label ?? '',
-				subText: item?.category_name ?? '',
+				subText: item?.clan_name ?? '',
 				icon: '#',
 				clanId: item?.clan_id ?? '',
 				channelId: item?.channel_id ?? '',
-				lastSentTimeStamp: Number(item?.last_sent_message?.timestamp || 0),
-				type: TypeSearch.Channel_Type,
+				lastSentTimeStamp: 0,
+				typeChat: TypeSearch.Channel_Type,
 				prioritizeName: item?.channel_label ?? '',
+				channel_private: item.channel_private,
+				type: item.type,
+				parrent_id: item.parrent_id,
+				meeting_code: item.meeting_code
 			};
 		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
@@ -178,8 +181,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const handleSelectChannel = useCallback(
 		async (channel: any) => {
-			const directChannel = toChannelPage(channel.id, channel.clanId);
-			navigate(directChannel);
+			if (channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				const directChannel = toChannelPage(channel.id, channel.clanId);
+				navigate(directChannel);
+			} else {
+				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
+				window.open(urlVoice, '_blank', 'noreferrer');
+			}
 			onClose();
 		},
 		[navigate, onClose, toChannelPage],
@@ -228,11 +236,11 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	}, [totalListsFiltered, normalizeSearchText, isSearchByUsername]);
 
 	const channelSearchSorted = useMemo(() => {
-		return totalListsSorted.filter((item) => item.type === TypeSearch.Channel_Type);
+		return totalListsSorted.filter((item) => item.typeChat === TypeSearch.Channel_Type);
 	}, [totalListsSorted]);
 
 	const memSearchSorted = useMemo(() => {
-		return totalListsSorted.filter((item) => item.type === TypeSearch.Dm_Type);
+		return totalListsSorted.filter((item) => item.typeChat === TypeSearch.Dm_Type);
 	}, [totalListsSorted]);
 
 	const [listToUse, setListToUse] = useState<SearchItemProps[]>([]);
@@ -369,7 +377,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					{!normalizeSearchText.startsWith('@') && !normalizeSearchText.startsWith('#') ? (
 						<>
 							<ListSearchModal
-								listSearch={totalListsSorted}
+								listSearch={totalListsSorted.slice(0,50)}
 								itemRef={itemRef}
 								handleSelect={handleSelect}
 								searchText={normalizeSearchText}
@@ -388,7 +396,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
 									<ListSearchModal
-										listSearch={memSearchSorted}
+										listSearch={memSearchSorted.slice(0,50)}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={normalizeSearchText}
@@ -402,7 +410,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 									<ListSearchModal
-										listSearch={channelSearchSorted}
+										listSearch={channelSearchSorted.slice(0,50)}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={normalizeSearchText.slice(1)}

@@ -1,11 +1,15 @@
 import {
 	channelMembers,
 	channelMembersActions,
+	channelUsersActions,
 	channelsActions,
 	channelsSlice,
 	clansSlice,
 	directActions,
+	fetchChannelMembers,
+	fetchDirectMessage,
 	friendsActions,
+	listChannelsByUserActions,
 	mapMessageChannelToEntity,
 	mapNotificationToEntity,
 	mapReactionToEntity,
@@ -126,6 +130,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 
 			dispatch(messagesActions.addNewMessage(mess));
+			dispatch(messagesActions.setIdNewMessageResponse(message.id));
 
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
@@ -210,6 +215,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onuserchanneladded = useCallback(
 		(userAdds: UserChannelAddedEvent) => {
 			const user = userAdds.users.find((user: any) => user.user_id !== userId);
+			if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
+				dispatch(fetchDirectMessage({noCache : true}));
+			}
 			if (user) {
 				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
@@ -228,9 +236,29 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
-			dispatch(channelMembersActions.updateUserChannel({userId: ClanProfileUpdates.user_id, clanId: ClanProfileUpdates.clan_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
-			dispatch(messagesActions.updateUserMessage({userId: ClanProfileUpdates.user_id, clanId: ClanProfileUpdates.clan_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
-			dispatch(usersClanActions.updateUserClan({userId: ClanProfileUpdates.user_id, clanNick: ClanProfileUpdates.clan_nick, clanAvt: ClanProfileUpdates.clan_avatar}))
+			dispatch(
+				channelMembersActions.updateUserChannel({
+					userId: ClanProfileUpdates.user_id,
+					clanId: ClanProfileUpdates.clan_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
+			dispatch(
+				messagesActions.updateUserMessage({
+					userId: ClanProfileUpdates.user_id,
+					clanId: ClanProfileUpdates.clan_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
+			dispatch(
+				usersClanActions.updateUserClan({
+					userId: ClanProfileUpdates.user_id,
+					clanNick: ClanProfileUpdates.clan_nick,
+					clanAvt: ClanProfileUpdates.clan_avatar,
+				}),
+			);
 		},
 		[dispatch],
 	);
@@ -289,6 +317,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					);
 				}
 			}
+
+			if (
+				(channelCreated && channelCreated.channel_private === 1 && channelCreated.channel_type === ChannelType.CHANNEL_TYPE_DM) ||
+				channelCreated.channel_type === ChannelType.CHANNEL_TYPE_GROUP
+			) {
+				dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			}
 		},
 		[dispatch],
 	);
@@ -309,6 +344,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
 						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+						dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
@@ -406,29 +442,29 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => { };
+			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => { };
+			socket.onuserchannelremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => { };
+			socket.onuserclanremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => { };
+			socket.onuserchanneladded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => { };
+			socket.onclanprofileupdated = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -476,4 +512,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-
