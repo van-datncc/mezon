@@ -5,7 +5,7 @@ import { useMezon } from '@mezon/transport';
 import { EEmojiCategory, MAX_FILE_NAME_EMOJI } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import { openCropper } from 'react-native-image-crop-picker';
@@ -32,13 +32,18 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const { sessionRef, clientRef } = useMezon();
 	const { t } = useTranslation(['clanEmojiSetting']);
-	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-	const emojiList = useSelector(selectAllEmojiSuggestion).filter((emoji) => emoji.category === EEmojiCategory.CUSTOM);
+	const emojiList = useSelector(selectAllEmojiSuggestion);
+	const emojiCustomList = useMemo(() => {
+		return emojiList.filter((emoji) => emoji.category === EEmojiCategory.CUSTOM);
+	}, [emojiList]);
 	const timerRef = useRef<any>(null);
+	const buttonRef = useRef<any>(null);
 
-	navigation.setOptions({
-		headerBackTitleVisible: false,
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerBackTitleVisible: false,
+		});
+	}, [navigation]);
 
 	useEffect(() => {
 		return () => {
@@ -47,8 +52,7 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 	}, []);
 
 	const handleSelectImage = async () => {
-		if (isButtonDisabled) return;
-		setIsButtonDisabled(true);
+		buttonRef.current.disabled = true;
 		const response = await launchImageLibrary({
 			mediaType: 'photo',
 			includeBase64: true,
@@ -63,9 +67,7 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 			const file = response.assets[0];
 			return file;
 		}
-		setTimeout(() => {
-			setIsButtonDisabled(false);
-		}, 1000);
+		buttonRef.current.disabled = false;
 	};
 
 	const handleAddEmoji = async () => {
@@ -104,8 +106,11 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 						};
 						dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
 					})
-					.then(() => {
+					.finally(() => {
 						dispatch(appActions.setLoadingMainMobile(false));
+					})
+					.catch((error) => {
+						console.log('Upload error: ', error);
 					});
 			});
 		}
@@ -114,13 +119,13 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 	return (
 		<View style={styles.container}>
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
-				<Pressable style={styles.addEmojiButton} onPress={handleAddEmoji}>
+				<Pressable ref={buttonRef} style={styles.addEmojiButton} onPress={handleAddEmoji}>
 					<Text style={styles.buttonText}>{t('button.upload')}</Text>
 				</Pressable>
 				<Text style={styles.title}>{t('description.descriptions')}</Text>
 				<Text style={styles.lightTitle}>{t('description.requirements')}</Text>
 				<Text style={styles.requireTitle}>{t('description.requireList')}</Text>
-				<EmojiList emojiList={emojiList} />
+				<EmojiList emojiList={emojiCustomList} />
 			</ScrollView>
 		</View>
 	);

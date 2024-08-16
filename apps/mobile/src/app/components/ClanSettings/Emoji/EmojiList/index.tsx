@@ -1,4 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
+import { DEFAULT_MAX_EMOJI_SLOTS } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +18,7 @@ const EmojiList = ({ emojiList }: EmojiListProps) => {
 	const row: Array<any> = [];
 	let prevOpenedRow: { close: () => void };
 	const slots: number = useMemo(() => {
-		return 250 - emojiList.length;
+		return DEFAULT_MAX_EMOJI_SLOTS - emojiList.length;
 	}, [emojiList]);
 
 	const closeRow = (id: string) => {
