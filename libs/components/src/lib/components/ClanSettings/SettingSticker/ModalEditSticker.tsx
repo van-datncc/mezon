@@ -113,7 +113,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 			setOpenModalType(true);
 			return;
 		}
-		if (file.size > LIMIT_SIZE_UPLOAD_IMG) {
+		if (file.size > LIMIT_SIZE_UPLOAD_IMG / 2) {
 			setOpenModal(true);
 			return;
 		}
