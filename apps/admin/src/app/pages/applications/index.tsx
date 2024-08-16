@@ -112,7 +112,7 @@ const AppPageBottom = () => {
 						onClick={() => setIsSmallSizeSort(true)}
 					>
 						<div className={`w-5`}>
-							<Icons.SortBySizeBtn />
+							<Icons.SortBySmallSizeBtn  className='w-full h-fit'/>
 						</div>
 						<div>Small</div>
 					</div>
@@ -121,7 +121,7 @@ const AppPageBottom = () => {
 						onClick={() => setIsSmallSizeSort(false)}
 					>
 						<div className="w-5">
-							<Icons.SortBySizeBtn />
+							<Icons.SortByBigSizeBtn />
 						</div>
 						<div>Large</div>
 					</div>
