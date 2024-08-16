@@ -25,6 +25,7 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
+import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { hashtagDmVoiceReducer } from './channels/hashtagDmVoice.slice';
@@ -46,7 +47,6 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import { adminApplicationReducer } from './application/applications.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
