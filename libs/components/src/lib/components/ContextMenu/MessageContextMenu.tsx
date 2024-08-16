@@ -12,13 +12,13 @@ import {
 	selectAllDirectMessages,
 	selectCurrentChannel,
 	selectCurrentClanId, selectDmGroupCurrentId,
-	selectIsMessageHasReaction, selectMessageByChannelId,
-	selectMessageByMessageId, selectModeResponsive,
+	selectIsMessageHasReaction,
+	selectMessageByMessageId, selectMessageEntitiesByChannelId, selectModeResponsive,
 	selectPinMessageByChannelId, setIsForwardAll,
 	setSelectedMessage,
 	threadsActions,
 	toggleIsShowPopupForwardTrue,
-	useAppDispatch,
+	useAppDispatch, useAppSelector,
 } from '@mezon/store';
 import {
 	ContextMenuItem,
@@ -52,6 +52,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const modeResponsive = useSelector(selectModeResponsive);
+	const allMessagesEntities = useAppSelector(state => selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || ''))
+	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : []
+	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
@@ -78,15 +83,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
-	const currentDmId = useSelector(selectDmGroupCurrentId);
-	const modeResponsive = useSelector(selectModeResponsive);
-	const allMessages = useSelector(selectMessageByChannelId(modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId));
-	const allMessagesEntities: MessagesEntity[] = Object.values(allMessages[1])
-	const messagePosition = allMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	
 	const isShowForwardAll = () => {
 		if(messagePosition === -1) return false;
-		return message.isStartedMessageGroup && messagePosition < allMessagesEntities.length - 1 && !allMessagesEntities[messagePosition + 1].isStartedMessageGroup;
+		return message.isStartedMessageGroup && messagePosition < convertedAllMessagesEntities.length - 1 && !convertedAllMessagesEntities[messagePosition + 1].isStartedMessageGroup;
 	}
 
 	// add action
