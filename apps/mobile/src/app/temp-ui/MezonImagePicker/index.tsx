@@ -119,11 +119,11 @@ export default memo(function MezonImagePicker({
 			console.log('Camera Error: ', response.errorMessage);
 		} else {
 			const file = response.assets[0];
-      return {
+			return {
 				uri: file?.uri,
 				name: file?.fileName,
 				type: file?.type,
-				size: file?.fileSize?.toString(),
+				size: file?.fileSize,
 				fileData: file?.base64,
 			} as IFile;
 		}
