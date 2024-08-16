@@ -12,7 +12,7 @@ import {
 } from '@mezon/store';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../../ui/src/lib/Icons/index';
@@ -20,8 +20,8 @@ import { HelpButton, InboxButton } from '../../ChannelTopbar';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 import MemberProfile from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
-import LabelDm from './labelDm';
 import CreateMessageGroup from '../CreateMessageGroup';
+import LabelDm from './labelDm';
 
 export type ChannelTopbarProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -195,16 +195,16 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 		</div>
 	);
 }
+
 const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }:{currentDmGroup:DirectEntity, appearanceTheme:string}) => {
 	const [openAddToGroup, setOpenAddToGroup] = useState<boolean>(false);
 	const handleOpenAddToGroupModal = () => {
 		setOpenAddToGroup(!openAddToGroup);
 	}
-  useEffect(()=>{
-    setOpenAddToGroup(false);
-  },[currentDmGroup])
+	const modalAddMemRef = useRef<HTMLDivElement | null>(null);
+	useOnClickOutside(modalAddMemRef, () => setOpenAddToGroup(false));
 	return (
-		<div onClick={handleOpenAddToGroupModal}>
+		<div onClick={handleOpenAddToGroupModal} ref={modalAddMemRef}>
 			{openAddToGroup &&
 				<div className='relative top-4 cursor-pointer'>
 					<CreateMessageGroup currentDM={currentDmGroup} isOpen={openAddToGroup} onClose={handleOpenAddToGroupModal} classNames='right-0 left-auto' />
@@ -221,6 +221,7 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }:{currentDmGroup:
 		</div>
 	)
 }
+
 DmTopbar.Skeleton = () => {
 	return (
 		<div className="flex  h-heightTopBar min-w-0 items-center bg-bgSecondary border-b border-black px-3 pt-4 pb-6 flex-shrink">
