@@ -1,5 +1,7 @@
-import { Text, useTheme } from '@mezon/mobile-ui';
+import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '@mezon/mobile-components';
+import { Block, Text, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { selectChannelMemberByUserIds, selectTypingUserIdsByChannelId } from '@mezon/store';
+import LottieView from 'lottie-react-native';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
@@ -9,7 +11,7 @@ interface IProps {
 }
 
 export const MessageUserTyping = React.memo(({ channelId }: IProps) => {
-	const { themeValue } = useTheme();
+	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
 	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds || []));
@@ -26,5 +28,15 @@ export const MessageUserTyping = React.memo(({ channelId }: IProps) => {
 	if (!typingLabel) {
 		return null;
 	}
-	return <Text style={styles.typingLabel}>{typingLabel}</Text>;
+	return (
+		<Block flexDirection="row" alignItems="center">
+			<LottieView
+				source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}
+				autoPlay
+				loop
+				style={styles.threeDot}
+			/>
+			<Text style={styles.typingLabel}>{typingLabel}</Text>
+		</Block>
+	);
 });

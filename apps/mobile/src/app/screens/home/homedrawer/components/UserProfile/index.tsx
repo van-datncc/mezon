@@ -49,6 +49,11 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const userCustomStatus = useMemberCustomStatus(userId || user?.id || '');
 	const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 	const [isShowPendingContent, setIsShowPendingContent] = useState(false);
+
+	const isKicked = useMemo(() => {
+		return !userById;
+	}, [userById]);
+
 	const targetUser = useMemo(() => {
 		return allUser.find((targetUser) => [user?.id, userId].includes(targetUser?.user?.id));
 	}, [user?.id, userId, allUser]);
@@ -251,7 +256,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 							</Block>
 						) : null}
 
-						{showAction && <UserSettingProfile user={userById || (user as any)} />}
+						{showAction && !isKicked && <UserSettingProfile user={userById || (user as any)} />}
 					</View>
 				)}
 			</View>

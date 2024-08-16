@@ -1,4 +1,4 @@
-import { Icons } from '@mezon/mobile-components';
+import { Icons, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -16,7 +16,7 @@ export interface IFile {
 	uri: string;
 	name: string;
 	type: string;
-	size: number;
+	size: number | string;
 	fileData: any;
 }
 
@@ -106,6 +106,29 @@ export default memo(function MezonImagePicker({
 		};
 	}, []);
 
+	async function handleSelectImage() {
+		const response = await launchImageLibrary({
+			mediaType: 'photo',
+			includeBase64: true,
+			quality: 1,
+		});
+
+		if (response.didCancel) {
+			console.log('User cancelled camera');
+		} else if (response.errorCode) {
+			console.log('Camera Error: ', response.errorMessage);
+		} else {
+			const file = response.assets[0];
+      return {
+				uri: file?.uri,
+				name: file?.fileName,
+				type: file?.type,
+				size: file?.fileSize?.toString(),
+				fileData: file?.base64,
+			} as IFile;
+		}
+	}
+
 	async function handleUploadImage(file: IFile) {
 		const session = sessionRef.current;
 		const client = clientRef.current;
@@ -126,7 +149,7 @@ export default memo(function MezonImagePicker({
 						path: file.uri,
 						mediaType: 'photo',
 						includeBase64: true,
-						compressImageQuality: 1,
+						compressImageQuality: QUALITY_IMAGE_UPLOAD,
 						...(typeof width === 'number' && { width: width * SCALE }),
 						...(typeof height === 'number' && { height: height * SCALE }),
 					});
