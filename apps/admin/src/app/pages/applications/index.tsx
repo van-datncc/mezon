@@ -3,7 +3,7 @@ import { authActions, fetchApplications, selectAllApps, selectIsLogin, selectThe
 import { Icons } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
 import isElectron from 'is-electron';
-import { ApiApp, ApiAppList } from 'mezon-js/api.gen';
+import { ApiApp } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import CreateAppPopup from './CreateAppPopup';
@@ -37,7 +37,6 @@ function ApplicationsPage() {
 		dispatch(fetchApplications({}));
 	}, [dispatch]);
 
-	const allApplications = useSelector(selectAllApps);
 	return (
 		<>
 			<div>
@@ -56,28 +55,53 @@ function ApplicationsPage() {
 						millions of users.
 					</div>
 				</div>
-				<AppPageBottom allApplications={allApplications} />
+				<AppPageBottom />
 			</div>
 			{isShowCreatePopup && <CreateAppPopup togglePopup={toggleCreatePopup} />}
 		</>
 	);
 }
 
-interface IAppPageBottomProps {
-	allApplications: ApiAppList;
-}
-
-const AppPageBottom = ({ allApplications }: IAppPageBottomProps) => {
+const AppPageBottom = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	const [dropdownValue, setDropdownValue] = useState('Date of Creation');
-	const handleDropdownValue = (text: string) => {
-		setDropdownValue(text);
-	};
 	const selectedDropdownClass = 'dark:bg-[#313338] bg-[#f2f3f5]';
 
+	const allApplications = useSelector(selectAllApps);
+	const [appListForDisplaying, setAppListForDisplaying] = useState<ApiApp[] | undefined>(allApplications.apps);
+
+	const alphabetSort = (arr: Array<ApiApp> | undefined) => {
+		if (arr) {
+			const arrCopy = [...arr];
+			return arrCopy.sort((a, b) => {
+				const isANum = /^\d/.test(a.appname ?? '');
+				const isBNum = /^\d/.test(b.appname ?? '');
+				if (isANum && !isBNum) {
+					return -1;
+				} else if (!isANum && isBNum) {
+					return 1;
+				} else {
+					return (a.appname ?? '').localeCompare(b.appname ?? '');
+				}
+			});
+		}
+		return [];
+	};
 	const isChooseAZ = useMemo(() => {
 		return dropdownValue === 'A-Z';
 	}, [dropdownValue]);
+
+	useEffect(() => {
+		if (isChooseAZ) {
+			setAppListForDisplaying(alphabetSort(allApplications.apps));
+		} else {
+			setAppListForDisplaying(allApplications.apps);
+		}
+	}, [allApplications, isChooseAZ]);
+
+	const handleDropdownValue = (text: string) => {
+		setDropdownValue(text);
+	};
 
 	const [isSmallSizeSort, setIsSmallSizeSort] = useState(true);
 
@@ -137,23 +161,23 @@ const AppPageBottom = ({ allApplications }: IAppPageBottomProps) => {
 					</div>
 				</div>
 			</div>
-			<ApplicationsList isSmallSizeSort={isSmallSizeSort} allApplications={allApplications} />
+			<ApplicationsList isSmallSizeSort={isSmallSizeSort} appListForDisplaying={appListForDisplaying} />
 		</div>
 	);
 };
 
 interface IApplicationsListProps {
 	isSmallSizeSort: boolean;
-	allApplications: ApiAppList;
+	appListForDisplaying: ApiApp[] | undefined;
 }
 
-const ApplicationsList = ({ isSmallSizeSort, allApplications }: IApplicationsListProps) => {
+const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicationsListProps) => {
 	return (
 		<div className="flex flex-col gap-5">
 			<div className="text-[20px]">My Applications</div>
 			<div className="flex flex-wrap gap-4 gap-x-4">
-				{allApplications.apps &&
-					allApplications.apps.map((value, index) => (
+				{appListForDisplaying &&
+					appListForDisplaying.map((value, index) => (
 						<div
 							key={index}
 							className={`dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] ${isSmallSizeSort ? 'w-[128px]' : 'w-[206px]'} rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl`}
