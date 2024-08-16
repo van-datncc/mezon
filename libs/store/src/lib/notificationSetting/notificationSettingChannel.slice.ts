@@ -71,7 +71,6 @@ export const getNotificationSetting = createAsyncThunk(
 				isCurrentChannel: isCurrentChannel,
 			};
 
-			console.log(payload);
 			return payload;
 		} catch (error) {
 			return thunkAPI.rejectWithValue(error || 'Failed to fetch notification settings');
