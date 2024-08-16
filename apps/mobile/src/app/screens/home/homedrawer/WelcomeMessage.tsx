@@ -80,7 +80,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 					{!isDMGroup && <Text style={styles.subTitleUsername}>{currenChannel?.usernames}</Text>}
 					{currenChannel?.user_id?.length > 1
 						? <Text style={styles.subTitleWelcomeMessageCenter}>{"Welcome to your new group! Invite friends whenever you're ready"}</Text>
-						: <Text style={styles.subTitleWelcomeMessage}>{"This is the very beginning of your legendary conservation with " + currenChannel?.usernames}</Text>
+						: <Text style={styles.subTitleWelcomeMessage}>{"This is the very beginning of your legendary conversation with " + currenChannel?.usernames}</Text>
 					}
 
 					{/* TODO: Mutual server */}
