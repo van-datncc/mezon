@@ -4,7 +4,6 @@ import { deleteSticker, updateSticker, useAppDispatch } from "@mezon/store";
 import { selectMemberClanByUserId, useAppSelector } from "@mezon/store-mobile";
 import { MezonAvatar } from "apps/mobile/src/app/temp-ui";
 import { ClanSticker } from "mezon-js";
-import { MezonUpdateClanStickerByIdBody } from "mezon-js/api.gen";
 import { memo, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
@@ -60,12 +59,6 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
 
     const handleUpdateSticker = useCallback(async () => {
         if (sticker && sticker.id && stickerName !== sticker.shortname) {
-            const stickerChange: MezonUpdateClanStickerByIdBody = {
-                source: sticker?.source,
-                category: sticker?.category,
-                shortname: stickerName,
-            };
-
             setSticker({
                 ...sticker,
                 shortname: stickerName

@@ -29,8 +29,8 @@ export default function StickerSetting() {
     const { t } = useTranslation(["clanStickerSetting"]);
 
     const loadSticker = useCallback(async () => {
-        await dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId || '0' }));
-    }, [])
+        await dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId || '0', noCache: true }));
+    }, [currentClanId])
 
     const handleUploadImage = useCallback(async (file: IFile) => {
         if (file.size > LIMIT_SIZE_UPLOAD_IMG) {
