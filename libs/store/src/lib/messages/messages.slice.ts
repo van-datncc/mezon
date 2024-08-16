@@ -406,7 +406,6 @@ type SendMessagePayload = {
 	clanId: string;
 	channelId: string;
 	content: IMessageSendPayload;
-	avatar: string;
 	mentions?: Array<ApiMessageMention>;
 	attachments?: Array<ApiMessageAttachment>;
 	references?: Array<ApiMessageRef>;
@@ -417,7 +416,7 @@ type SendMessagePayload = {
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
-	const { content, avatar, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
+	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
 	const id = Date.now().toString();
 
 	async function doSend() {
@@ -431,7 +430,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			throw new Error('Client is not initialized');
 		}
 
-		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone, avatar);
+		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
 
 		return res;
 	}
