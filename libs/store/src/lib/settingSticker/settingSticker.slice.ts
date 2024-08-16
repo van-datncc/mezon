@@ -21,6 +21,7 @@ export interface FetchStickerArgs {
 export interface UpdateStickerArgs {
 	request: MezonUpdateClanStickerByIdBody;
 	stickerId: string;
+  clan_id: string;
 }
 export const stickerAdapter = createEntityAdapter({
 	selectId: (sticker: ClanSticker) => sticker.id || '',
@@ -72,28 +73,31 @@ export const createSticker = createAsyncThunk(
 		}
 	},
 );
-export const updateSticker = createAsyncThunk('settingClanSticker/updateSticker', async ({ request, stickerId }: UpdateStickerArgs, thunkAPI) => {
+
+export const updateSticker = createAsyncThunk('settingClanSticker/updateSticker', async ({ request, stickerId, clan_id }: UpdateStickerArgs, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
 		if (res) {
-			return { request, stickerId };
+      thunkAPI.dispatch(fetchStickerByClanId({ clanId: clan_id, noCache: true }));
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue({});
 	}
 });
+
 export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker', async (data: { stickerId: string; clan_id: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const res = await mezon.client.deleteClanStickerById(mezon.session, data.stickerId, data.clan_id);
 		if (res) {
-			return data.stickerId;
+      thunkAPI.dispatch(fetchStickerByClanId({ clanId: data.clan_id, noCache: true }));
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue({});
 	}
 });
+
 export const settingClanStickerSlice = createSlice({
 	name: SETTING_CLAN_STICKER,
 	initialState: initialSettingClanStickerState,
@@ -111,24 +115,9 @@ export const settingClanStickerSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-		builder
-			.addCase(updateSticker.fulfilled, (state: SettingClanStickerState, action) => {
-				if (action.payload) {
-					stickerAdapter.updateOne(state, {
-						id: action.payload.stickerId,
-						changes: {
-							shortname: action.payload.request.shortname,
-						},
-					});
-				}
-			})
-			.addCase(deleteSticker.fulfilled, (state, action) => {
-				if (action.payload) {
-					stickerAdapter.removeOne(state, action.payload);
-				}
-			});
 	},
 });
+
 export const stickerSettingActions = {
 	...stickersSlice.actions,
 	fetchStickerByClanId,
