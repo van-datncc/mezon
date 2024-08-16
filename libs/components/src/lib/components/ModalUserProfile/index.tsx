@@ -1,5 +1,5 @@
 import { useAppNavigation, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
-import { selectAllAccount, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
+import { selectAllAccount, selectFriendStatus, selectMemberById, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
@@ -25,6 +25,8 @@ type ModalUserProfileProps = {
 	message?: IMessageWithUser;
 	showPopupLeft?: boolean;
 	mode?: number;
+	avatar?: string;
+	positionType?: string;
 };
 
 export type OpenModalProps = {
@@ -42,6 +44,8 @@ const ModalUserProfile = ({
 	message,
 	showPopupLeft,
 	mode,
+	avatar,
+	positionType,
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
@@ -49,6 +53,7 @@ const ModalUserProfile = ({
 	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '').status;
 	const userCustomStatus = useMemberCustomStatus(userID || '');
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
+	const memberById = useSelector(selectMemberById(userID ?? ''));
 
 	const [content, setContent] = useState<string>('');
 
@@ -128,7 +133,7 @@ const ModalUserProfile = ({
 				)}
 			</div>
 			<AvatarProfile
-				avatar={(isFooterProfile && userProfile?.user?.avatar_url) || message?.avatar || userById?.user?.avatar_url}
+				avatar={avatar || memberById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={userCustomStatus || (isFooterProfile && userStatusProfile)}

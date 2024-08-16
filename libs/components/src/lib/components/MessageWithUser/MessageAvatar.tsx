@@ -91,7 +91,7 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={senderId} message={message} mode={mode} />
+					<ShortUserProfile userID={senderId} message={message} mode={mode} avatar={userClanAvatar || pendingUserAvatar} />
 				</div>
 			) : null}
 		</div>

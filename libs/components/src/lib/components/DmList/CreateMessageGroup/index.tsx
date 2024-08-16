@@ -29,7 +29,10 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 
 	const { filteredFriends, filterListFriendsNotInGroup } = useFriends();
 
-	const listFriends = (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM) ? filterListFriendsNotInGroup() : filteredFriends(searchTerm.trim().toUpperCase());
+	const listFriends =
+		currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM
+			? filterListFriendsNotInGroup()
+			: filteredFriends(searchTerm.trim().toUpperCase());
 
 	const handleSelectFriends = (idFriend: string) => {
 		setSelectedFriends((prevSelectedFriends) => {
@@ -51,14 +54,16 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 		onClose();
 	};
 	const handleAddMemberToGroupChat = async (listAdd: ApiCreateChannelDescRequest) => {
-		await dispatch(channelUsersActions.addChannelUsers({
-			channelId: currentDM?.channel_id as string,
-      clanId : currentDM?.clan_id as string,
-      userIds : listAdd.user_ids ?? [],
-      channelType : currentDM?.type
-		}));
+		await dispatch(
+			channelUsersActions.addChannelUsers({
+				channelId: currentDM?.channel_id as string,
+				clanId: currentDM?.clan_id as string,
+				userIds: listAdd.user_ids ?? [],
+				channelType: currentDM?.type,
+			}),
+		);
 		onClose();
-	}
+	};
 
 	const handleCreateDM = async () => {
 		const listGroupDM = selectedFriends;
@@ -248,13 +253,15 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 					<button
 						disabled={selectedFriends.length === 0}
 						onClick={handleCreateDM}
-						className="h-[38px] w-full text-sm text-white dark:bg-buttonPrimary dark:hover:bg-bgSelectItemHover rounded"
+						className="h-[38px] w-full text-sm text-white dark:bg-buttonPrimary bg-buttonPrimary dark:hover:bg-bgSelectItemHover hover:bg-bgSelectItemHover rounded"
 					>
-						{currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP ?
-							"Add to Group Chat"
-							:
-							selectedFriends.length === 0 ? 'Create DM or Group Chat' : selectedFriends.length === 1 ? 'Create DM' : 'Create Group Chat'
-						}
+						{currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP
+							? 'Add to Group Chat'
+							: selectedFriends.length === 0
+								? 'Create DM or Group Chat'
+								: selectedFriends.length === 1
+									? 'Create DM'
+									: 'Create Group Chat'}
 					</button>
 				</div>
 			</div>

@@ -17,6 +17,7 @@ type ChannelHashtagProps = {
 const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const usersClan = useSelector(selectAllUsesClan);
+
 	const usersInChannel = useSelector(selectAllChannelMembers);
 	const [foundUser, setFoundUser] = useState<any>(null);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -86,6 +87,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 		}
 	};
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
+
 	return (
 		<>
 			{showProfileUser && (
@@ -98,7 +100,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 					}}
 					onMouseDown={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={foundUser.user.id} mode={mode} />
+					<ShortUserProfile userID={foundUser.user.id} mode={mode} avatar={foundUser?.clan_avatar} />
 				</div>
 			)}
 
@@ -110,7 +112,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 						onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
 						style={{ textDecoration: 'none' }}
 						to={''}
-						className={`font-medium px-0.1 rounded-sm 
+						className={`font-medium px-0.1 rounded-sm
 				${tagName === '@here' ? 'cursor-text' : isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
 
 				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
