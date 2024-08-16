@@ -16,8 +16,8 @@ import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
-	EmojiDataOptionals,
 	ETokenMessage,
+	EmojiDataOptionals,
 	IEmojiOnMessage,
 	IExtendedMessage,
 	IHashtagOnMessage,
@@ -641,3 +641,11 @@ export const KMPHighlight = (text: string, pattern: string): number[] => {
 
 	return matchPositions;
 };
+
+export function filterEmptyArrays<T extends Record<string, any>>(payload: T): T {
+	return Object.entries(payload)
+		.filter(([_, value]) => !(Array.isArray(value) && value.length === 0))
+		.reduce((acc, [key, value]) => {
+			return { ...acc, [key]: value };
+		}, {} as T);
+}

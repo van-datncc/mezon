@@ -8,6 +8,7 @@ import {
 	IMessageWithUser,
 	LIMIT_MESSAGE,
 	LoadingStatus,
+	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
 	checkSameDayByCreateTime,
 } from '@mezon/utils';
@@ -103,8 +104,7 @@ export interface MessagesState {
 		}
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
-	idNewMessageResponse: string;
-	newMesssageUpdateImage: any;
+	newMesssageUpdateImage: MessageTypeUpdateLink;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -432,7 +432,18 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			throw new Error('Client is not initialized');
 		}
 
-		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone, avatar);
+		const res = await socket.writeChatMessage(
+			clanId,
+			channelId,
+			mode,
+			content,
+			mentions,
+			attachments,
+			references,
+			anonymous,
+			mentionEveryone,
+			avatar,
+		);
 
 		return res;
 	}
@@ -569,8 +580,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
-	idNewMessageResponse: '',
-	newMesssageUpdateImage: {},
+	newMesssageUpdateImage: { id: '' },
 };
 
 export type SetCursorChannelArgs = {
@@ -597,9 +607,7 @@ export const messagesSlice = createSlice({
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
 		},
-		setIdNewMessageResponse(state, action) {
-			state.idNewMessageResponse = action.payload;
-		},
+
 		setNewMessageToUpdateImage(state, action) {
 			state.newMesssageUpdateImage = action.payload;
 		},
@@ -658,7 +666,10 @@ export const messagesSlice = createSlice({
 						changes: {
 							content: action.payload.content,
 							mentions: action.payload.mentions,
-							update_time: action.payload.update_time,
+							update_time:
+								action.payload.attachments && action.payload.attachments?.length > 0
+									? action.payload.create_time
+									: action.payload.update_time,
 							attachments: action.payload.attachments,
 						},
 					});
@@ -1107,7 +1118,6 @@ export const selectIsMessageIdExist = (channelId: string, messageId: string) =>
 export const selectIsJumpingToPresent = createSelector(getMessagesState, (state) => state.isJumpingToPresent);
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
-export const selectNewIdMessageResponse = createSelector(getMessagesState, (state: MessagesState) => state.idNewMessageResponse);
 export const selectNewMesssageUpdateImage = createSelector(getMessagesState, (state: MessagesState) => state.newMesssageUpdateImage);
 
 const handleRemoveManyMessages = (state: MessagesState, channelId?: string) => {

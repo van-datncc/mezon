@@ -26,7 +26,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -351,9 +351,9 @@ export type IEmoji = {
 	shortname: string;
 };
 
-export type IChannelUser =  ChannelDescription & {
-	id: string
-}
+export type IChannelUser = ChannelDescription & {
+	id: string;
+};
 
 export type IEmoticons = {
 	[key: string]: string;
@@ -654,7 +654,7 @@ export type SearchItemProps = {
 	subText?: string;
 	icon?: string;
 	channelId?: string;
-	channel_private?: number
+	channel_private?: number;
 };
 
 export enum EEmojiCategory {
@@ -692,3 +692,14 @@ export type SearchFilter = {
 export enum ETypeLinkMedia {
 	IMAGE_PREFIX = 'image',
 }
+
+export type MessageTypeUpdateLink = {
+	channel_id?: string;
+	code?: number;
+	create_time?: string;
+	id: string;
+	content?: IMessageSendPayload;
+	mentions?: IMentionOnMessage[];
+	attachments?: ApiMessageAttachment[];
+	references?: ApiMessageRef[];
+};
