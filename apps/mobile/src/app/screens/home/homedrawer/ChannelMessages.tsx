@@ -154,10 +154,10 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 		);
 	};
 	const onOpenImage = useCallback(
-		(image: ApiMessageAttachment) => {
+		async (image: ApiMessageAttachment) => {
+			await dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 			setImageSelected(image);
 			setVisibleImageModal(true);
-			dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 		},
 		[channelId, clanId, dispatch],
 	);

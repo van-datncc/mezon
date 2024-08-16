@@ -1,4 +1,4 @@
-import { IChannelAttachment, LoadingStatus } from '@mezon/utils';
+import { ETypeLinkMedia, IChannelAttachment, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ChannelStreamMode } from 'mezon-js';
@@ -165,4 +165,4 @@ export const selectModeAttachment = createSelector(getAttachmentState, (state: A
 export const selectMessageIdAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.messageId);
 
 export const selectAttachmentPhoto = () =>
-	createSelector(selectAllAttachment, (attachments) => attachments.filter((att) => att.filetype == 'image/png' || att.filetype == 'image/jpeg'));
+	createSelector(selectAllAttachment, (attachments) => (attachments || []).filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)));
