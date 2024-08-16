@@ -104,7 +104,17 @@ export const ChatBoxBottomBar = memo(
 		const { setValueThread } = useThreads();
 		const { sessionRef, clientRef } = useMezon();
 		const listMentions = UseMentionList(channelId || '', mode);
-		const [inputTriggersConfig, setInputTriggersConfig] = useState(triggersConfig);
+		const inputTriggersConfig = useMemo(() => {
+			const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+
+			if (isDM) {
+				const newTriggersConfig = { ...triggersConfig };
+				delete newTriggersConfig.hashtag;
+				return newTriggersConfig;
+			}
+			return triggersConfig;
+		}, [mode]);
+
 		const { textInputProps, triggers } = useMentions({
 			value: mentionTextValue,
 			onChange: (newValue) => handleTextInputChange(newValue),
@@ -438,17 +448,6 @@ export const ChatBoxBottomBar = memo(
 				clearTextInputListener.remove();
 			};
 		}, []);
-
-		useEffect(() => {
-			if (mode) {
-				const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
-				const newTriggersConfig = { ...triggersConfig };
-				if (isDM) {
-					delete newTriggersConfig.hashtag;
-					setInputTriggersConfig(newTriggersConfig);
-				}
-			}
-		}, [mode]);
 
 		return (
 			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
