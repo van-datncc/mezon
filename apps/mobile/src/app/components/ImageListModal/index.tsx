@@ -2,7 +2,7 @@ import { ImageGallery } from '@georstat/react-native-image-gallery';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectAllAttachment } from '@mezon/store';
 import { fileTypeImage } from '@mezon/utils';
-import { uniqueId } from 'lodash';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -26,7 +26,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	}, [allAttachment]);
 
 	const createAttachmentObject = (attachment: any) => ({
-		id: `${uniqueId()}`,
+		id: `${Snowflake.generate()}`,
 		url: attachment.url,
 		uploader: attachment.uploader,
 		create_time: attachment.create_time,

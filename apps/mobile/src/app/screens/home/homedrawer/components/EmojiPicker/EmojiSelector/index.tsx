@@ -1,6 +1,7 @@
 import {
 	BicycleIcon,
 	BowlIcon,
+	debounce,
 	GameControllerIcon,
 	HeartIcon,
 	Icons,
@@ -8,12 +9,11 @@ import {
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
-	SmilingFaceIcon,
+	SmilingFaceIcon
 } from '@mezon/mobile-components';
 import { Colors, Metrics, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, selectAllEmojiSuggestion } from '@mezon/store-mobile';
 import { getSrcEmoji, IEmoji } from '@mezon/utils';
-import { debounce } from 'lodash';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';

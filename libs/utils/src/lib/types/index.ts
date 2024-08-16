@@ -168,7 +168,6 @@ export type IMessage = ChannelMessage & {
 	content: IMessageSendPayload;
 	date?: string;
 	creationTime?: Date;
-	creationTimeMs?: number;
 	lastSeen?: boolean;
 	isSending?: boolean;
 	isError?: boolean;

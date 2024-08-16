@@ -27,7 +27,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
-	const currentProfile = useSelector(selectUserClanProfileByClanID(currentClanId || '0', currentUserId));
 	const idNewMessageResponse = useSelector(selectNewIdMessageResponse);
 	const dispatch = useAppDispatch();
 	// TODO: if direct is the same as channel use one slice
@@ -70,11 +69,10 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 					anonymous,
 					mentionEveryone,
 					senderId: currentUserId,
-					avatar: currentProfile?.avartar || '',
 				}),
 			);
 		},
-		[dispatch, channelID, clanID, mode, currentUserId, currentProfile?.avartar],
+		[dispatch, channelID, clanID, mode, currentUserId],
 	);
 
 	useEffect(() => {
