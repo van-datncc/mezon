@@ -13,7 +13,7 @@ import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
+import {ELimitSize, ModalErrorTypeUpload, ModalOverData} from '../../ModalError';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
 
 export enum EGraphicType {
@@ -42,7 +42,8 @@ const EMOJI_DIMENSION = {
 }
 
 const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps) => {
-	const graphicSource = type === EGraphicType.STICKER ? (graphic as ClanSticker)?.source : (graphic as ClanEmoji)?.src
+	const isSticker = type === EGraphicType.STICKER;
+	const graphicSource = isSticker ? (graphic as ClanSticker)?.source : (graphic as ClanEmoji)?.src;
 	const [editingGraphic, setEditingGraphic] = useState<EditingGraphic>({
 		fileName: graphicSource?.split('/').pop() ?? null,
 		shortname: graphic?.shortname ?? '',
@@ -55,9 +56,11 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 	const { sessionRef, clientRef } = useMezon();
 	const fileRef = useRef<HTMLInputElement>(null);
 	const dimension = {
-		maxHeight: type === EGraphicType.STICKER ? STICKER_DIMENSION.MAX_HEIGHT : EMOJI_DIMENSION.MAX_HEIGHT,
-		maxWidth: type === EGraphicType.STICKER ? STICKER_DIMENSION.MAX_WIDTH : EMOJI_DIMENSION.MAX_WIDTH,
+		maxHeight: isSticker ? STICKER_DIMENSION.MAX_HEIGHT : EMOJI_DIMENSION.MAX_HEIGHT,
+		maxWidth: isSticker ? STICKER_DIMENSION.MAX_WIDTH : EMOJI_DIMENSION.MAX_WIDTH,
 	}
+	const limitSizeDisplay = isSticker ? ELimitSize.KB_512 : ELimitSize.KB_256;
+	const limitSize = isSticker ? (LIMIT_SIZE_UPLOAD_IMG / 2) : (LIMIT_SIZE_UPLOAD_IMG / 4);
 	
 	const handleChooseFile = (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
@@ -86,7 +89,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				category: graphic?.category,
 				shortname: editingGraphic.shortname,
 			};
-			type === EGraphicType.STICKER
+			isSticker
 				? await dispatch(updateSticker({ stickerId: graphic.id, request: updateData }))
 			: await dispatch(emojiSuggestionActions.updateEmojiSetting({request: updateData, emojiId: graphic.id}));
 			handleCloseModal();
@@ -113,13 +116,13 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 			setOpenModalType(true);
 			return;
 		}
-		if (file.size > LIMIT_SIZE_UPLOAD_IMG / 2) {
+		if (file.size > limitSize) {
 			setOpenModal(true);
 			return;
 		}
-		const category = type === EGraphicType.STICKER ? 'Among Us' : 'Custom';
+		const category = isSticker ? 'Among Us' : 'Custom';
 		const id = Snowflake.generate();
-		const path = (type === EGraphicType.STICKER ? 'stickers/' : 'emojis/') + id + '.webp';
+		const path = (isSticker ? 'stickers/' : 'emojis/') + id + '.webp';
 		
 		const resizeFile = (await resizeFileImage(file, dimension.maxWidth, dimension.maxHeight, 'file')) as File;
 		
@@ -131,7 +134,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				shortname: editingGraphic.shortname,
 				source: attachment.url,
 			};
-			type === EGraphicType.STICKER ?
+			isSticker ?
 			dispatch(createSticker({ request: request, clanId: currentClanId })) :
 				dispatch(emojiSuggestionActions.createEmojiSetting({request: request, clanId: currentClanId}));
 		});
@@ -238,7 +241,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				</div>
 			</div>
 			
-			<ModalOverData openModal={openModal} handleClose={handleCloseOverModal} />
+			<ModalOverData openModal={openModal} handleClose={handleCloseOverModal} sizeLimit={limitSizeDisplay}/>
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={handleCloseTypeModal} />
 		</>
 	);
