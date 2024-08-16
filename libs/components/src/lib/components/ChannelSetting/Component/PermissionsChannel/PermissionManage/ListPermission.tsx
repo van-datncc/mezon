@@ -42,7 +42,7 @@ const ItemPermission = (props: ItemPermissionProps) => {
     };
 
     const className = {
-        wrapperClass: 'h-[26px] flex rounded-md overflow-hidden border dark:border-gray-700 border-gray-300',
+        wrapperClass: 'h-[26px] flex rounded-md overflow-hidden border dark:border-gray-700 border-gray-300 dark:bg-transparent bg-white',
         buttonClass: 'w-8 flex justify-center items-center border dark:border-gray-700 border-gray-300',
     }
     return(
@@ -57,7 +57,7 @@ const ItemPermission = (props: ItemPermissionProps) => {
                 </button>
                 <button 
                     onClick={() => handleSelect(TypeChoose.Or)}
-                    className={`${className.buttonClass} ${choose === TypeChoose.Or ? 'bg-bgModifierHover' : ''}`}
+                    className={`${className.buttonClass} ${choose === TypeChoose.Or ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
                 >
                     <Icons.IconOr defaultSize='size-4'/>
                 </button>

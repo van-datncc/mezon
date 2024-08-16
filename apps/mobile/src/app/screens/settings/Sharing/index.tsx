@@ -7,6 +7,8 @@ import {
 	STORAGE_DATA_CATEGORY_CHANNEL,
 	SearchIcon,
 	SendIcon,
+	cloneDeep,
+	debounce,
 	getAttachmentUnique,
 	load,
 	save,
@@ -20,12 +22,10 @@ import {
 	selectAttachmentData,
 	selectCurrentChannelId,
 	selectCurrentClan,
-	selectCurrentClanId,
 	selectDirectsOpenlist,
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { ILinkOnMessage } from '@mezon/utils';
-import { cloneDeep, debounce } from 'lodash';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';

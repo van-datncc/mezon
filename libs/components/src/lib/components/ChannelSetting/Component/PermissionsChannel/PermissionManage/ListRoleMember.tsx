@@ -54,7 +54,7 @@ const HeaderAddRoleMember = memo((props: HeaderAddRoleMemberProps) => {
             <Icons.PlusIcon defaultSize="size-4 text-contentTertiary cursor-pointer"/>
             {showPopup &&
                 <div className="absolute bottom-5 w-64 rounded-lg overflow-hidden dark:text-contentTertiary text-colorTextLightMode border dark:border-gray-700 border-gray-300">
-                    <div className="bg-bgTertiary flex gap-x-1 p-4 text-sm">
+                    <div className="dark:bg-bgTertiary bg-bgLightModeSecond flex gap-x-1 p-4 text-sm">
                         <p className="font-bold">ADD:</p>
                         <input 
                             type="text" 
@@ -62,7 +62,7 @@ const HeaderAddRoleMember = memo((props: HeaderAddRoleMemberProps) => {
                             placeholder="Role/Member"
                         />
                     </div>
-                    <div className="bg-bgSecondary p-2 h-64 overflow-y-scroll hide-scrollbar">
+                    <div className="dark:bg-bgSecondary bg-white p-2 h-64 overflow-y-scroll hide-scrollbar">
                         {Boolean(listManageNotInChannel.length) &&
                             <div>
                                 <p className="px-3 py-2 uppercase text-[11px] font-bold">Role</p>

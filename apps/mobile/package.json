@@ -32,7 +32,7 @@
 		"expo": "^50.0.0",
 		"expo-av": "~13.10.6",
 		"formik": "^2.4.5",
-		"lodash": "^4.17.21",
+		"lottie-react-native": "^6.7.2",
 		"metro-config": "^0.80.9",
 		"moment": "^2.30.1",
 		"patch-package": "^8.0.0",
@@ -79,8 +79,5 @@
 		"redux-thunk": "^3.1.0",
 		"rn-fetch-blob": "^0.12.0",
 		"yup": "^1.4.0"
-	},
-	"devDependencies": {
-		"@types/lodash": "^4.17.4"
 	}
 }

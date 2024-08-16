@@ -4,6 +4,7 @@ import { Icons } from '@mezon/ui';
 import { INotification, NotificationCode } from '@mezon/utils';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
 
@@ -62,7 +63,7 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 	}, []);
 
 	return (
-		<div className="absolute top-8 right-0 z-[99999999] rounded-lg shadow-shadowInbox w-[480px]">
+		<div className="absolute top-8 right-0 z-[99999999] rounded-lg shadow-shadowBorder w-[480px]">
 			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black text-[14px] rounded-lg w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
 				<div className="py-2 px-3 dark:bg-bgTertiary bg-bgLightTertiary">
 					<div className="flex flex-row gap-2 items-center font-bold text-[16px]">
@@ -98,24 +99,44 @@ function NotificationList({ unReadList, onClose }: NotificationProps) {
 				<div
 					className={`dark:bg-bgSecondary bg-bgLightSecondary flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 				>
-					{currentTabNotify === InboxType.INDIVIDUAL &&
-						notificationItem.map((notify: INotification, index: number) => {
-							return <NotificationItem notify={notify} key={`individual-${notify?.id}-${index}`} />;
-						})}
-
-					{currentTabNotify === InboxType.UNREADS && unreadListConverted.length > 0 && (
-						<NotificationChannel isUnreadTab={true} unreadListConverted={unreadListConverted} />
+					{currentTabNotify === InboxType.INDIVIDUAL && (
+						<div>
+							{notificationItem.length > 0 ? (
+								notificationItem.map((notify, index) => (
+									<NotificationItem notify={notify} key={`individual-${notify?.id}-${index}`} />
+								))
+							) : (
+								<EmptyNotification isEmptyForYou />
+							)}
+						</div>
 					)}
 
-					{currentTabNotify === InboxType.MENTIONS &&
-						notifyMentionItem.map((notification: INotification, index: number) => (
-							<NotificationChannel
-								key={`mention-${notification?.id}-${index}`}
-								isUnreadTab={false}
-								unreadListConverted={[]}
-								notification={notification}
-							/>
-						))}
+					{currentTabNotify === InboxType.UNREADS && (
+						<div>
+							{unreadListConverted.length > 0 ? (
+								<NotificationChannel isUnreadTab={true} unreadListConverted={unreadListConverted} />
+							) : (
+								<EmptyNotification isEmptyUnread />
+							)}
+						</div>
+					)}
+
+					{currentTabNotify === InboxType.MENTIONS && (
+						<div>
+							{notifyMentionItem.length > 0 ? (
+								notifyMentionItem.map((notification: INotification, index: number) => (
+									<NotificationChannel
+										key={`mention-${notification?.id}-${index}`}
+										isUnreadTab={false}
+										unreadListConverted={[]}
+										notification={notification}
+									/>
+								))
+							) : (
+								<EmptyNotification isEmptyMentions />
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

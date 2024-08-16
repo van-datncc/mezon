@@ -1,5 +1,5 @@
 import { useClans } from '@mezon/core';
-import { AddIcon, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
+import { AddIcon, QUALITY_IMAGE_UPLOAD, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -59,6 +59,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 		const options = {
 			durationLimit: 10000,
 			mediaType: 'photo',
+      quality: QUALITY_IMAGE_UPLOAD
 		};
 
 		ImagePicker.launchImageLibrary(options as CameraOptions, async (response) => {

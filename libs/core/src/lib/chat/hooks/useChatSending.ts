@@ -6,6 +6,7 @@ import {
 	selectCurrentUserId,
 	selectDirectById,
 	selectNewIdMessageResponse,
+	selectUserClanProfileByClanID,
 	useAppDispatch,
 } from '@mezon/store';
 import { handleUrlInput, useMezon } from '@mezon/transport';

@@ -12,7 +12,6 @@ import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
-import { delay } from 'lodash';
 import { Alert, Linking, Platform } from 'react-native';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
@@ -182,7 +181,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 			}
 			store.dispatch(appActions.setLoadingMainMobile(false));
-			delay(() => {
+			setTimeout(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 			}, 4000);
@@ -213,13 +212,13 @@ export const navigateToNotification = async (store: any, notification: any, navi
 					};
 					await joinChangeFetchAndSetLoader(store, clanIdCache);
 				}
-				delay(() => {
+				setTimeout(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
 			} else {
 				store.dispatch(appActions.setLoadingMainMobile(false));
-				delay(() => {
+				setTimeout(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
@@ -227,7 +226,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		}
 	} else {
 		store.dispatch(appActions.setLoadingMainMobile(false));
-		delay(() => {
+		setTimeout(() => {
 			store.dispatch(appActions.setIsFromFCMMobile(false));
 			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 		}, 4000);

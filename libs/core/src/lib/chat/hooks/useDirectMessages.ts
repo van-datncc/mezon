@@ -36,7 +36,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				console.log(client, session, socket, channel);
 				throw new Error('Client is not initialized');
 			}
-			await socket.writeChatMessage('0', channel.id, mode, filteredContent, mentions, attachments, references);
+			await socket.writeChatMessage('0', channel.id, mode, filteredContent, mentions, attachments, references, false, false);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
 			if (lastMessage) {

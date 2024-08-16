@@ -3,7 +3,6 @@ import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions, selectAttachmentData, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { createUploadFilePath, useMezon } from '@mezon/transport';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
-import { delay } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
@@ -84,7 +83,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				return true;
 			}
 			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
-			timerRef.current = delay(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
+			timerRef.current = setTimeout(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
 			if (granted === 'never_ask_again') {
 				Alert.alert('Photo Permission', 'App needs access to your photo library', [
 					{
@@ -104,7 +103,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		} else if (Platform.OS === 'ios') {
 			dispatch(appActions.setIsFromFCMMobile(true));
 			const result = await iosReadGalleryPermission('addOnly');
-			timerRef.current = delay(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
+			timerRef.current = setTimeout(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
 			if (result === 'not-determined') {
 				const requestResult = await iosRequestReadWriteGalleryPermission();
 				return requestResult === 'granted' || requestResult === 'limited';

@@ -1,4 +1,4 @@
-import { ChannelMessage, ChannelType, Notification } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -8,7 +8,6 @@ import {
 	ApiClanDesc,
 	ApiClanProfile,
 	ApiEventManagement,
-	ApiHashtagDmVoice,
 	ApiInviteUserRes,
 	ApiMessageAttachment,
 	ApiMessageMention,
@@ -80,7 +79,7 @@ export type IDefaultNotification = ApiNotificationSetting & {
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
 	id: string;
 };
-export type IHashtagDmVoice = ApiHashtagDmVoice & {
+export type IHashtagDmVoice = HashtagDm & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
@@ -169,7 +168,6 @@ export type IMessage = ChannelMessage & {
 	content: IMessageSendPayload;
 	date?: string;
 	creationTime?: Date;
-	creationTimeMs?: number;
 	lastSeen?: boolean;
 	isSending?: boolean;
 	isError?: boolean;
@@ -351,6 +349,10 @@ export type IEmoji = {
 	category: string;
 	shortname: string;
 };
+
+export type IChannelUser =  ChannelDescription & {
+	id: string
+}
 
 export type IEmoticons = {
 	[key: string]: string;
@@ -651,6 +653,7 @@ export type SearchItemProps = {
 	subText?: string;
 	icon?: string;
 	channelId?: string;
+	channel_private?: number
 };
 
 export enum EEmojiCategory {

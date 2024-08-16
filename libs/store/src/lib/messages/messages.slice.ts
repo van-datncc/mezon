@@ -41,13 +41,11 @@ export const MESSAGES_FEATURE_KEY = 'messages';
 
 export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenId?: string): IMessageWithUser => {
 	const creationTime = new Date(channelMess.create_time || '');
-	const creationTimeMs = creationTime.getTime();
 	const isAnonymous = channelMess?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	return {
 		...channelMess,
 		isFirst: channelMess.code === EMessageCode.FIRST_MESSAGE,
 		creationTime,
-		creationTimeMs,
 		id: channelMess.id || '',
 		date: new Date().toLocaleString(),
 		isAnonymous,
@@ -58,6 +56,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 			avatarSm: channelMess.avatar || '',
 		},
 		lastSeen: lastSeenId === channelMess.id,
+		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
 	};
 };
 
@@ -248,7 +247,7 @@ export const fetchMessages = createAsyncThunk(
 					channelId: lastMessage.channel_id || '',
 					channelLabel: lastMessage.channel_label,
 					messageId: lastMessage.id,
-					messageCreatedAt: lastMessage.creationTimeMs ? +lastMessage.creationTimeMs : 0,
+					messageCreatedAt: lastMessage.create_time_ms ? +lastMessage.create_time_ms : 0,
 					messageSeenAt: 0,
 				});
 			}
@@ -892,15 +891,15 @@ export const selectAllMessages = createSelector(getMessagesState, (messageState)
 });
 
 export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
-	if (a.creationTimeMs && b.creationTimeMs) {
-		return +b.creationTimeMs - +a.creationTimeMs;
+	if (a.create_time_ms && b.create_time_ms) {
+		return +b.create_time_ms - +a.create_time_ms;
 	}
 	return 0;
 }
 
 export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEntity) {
-	if (a.creationTimeMs && b.creationTimeMs) {
-		return +a.creationTimeMs - +b.creationTimeMs;
+	if (a.create_time_ms && b.create_time_ms) {
+		return +a.create_time_ms - +b.create_time_ms;
 	}
 	return 0;
 }
@@ -1150,7 +1149,7 @@ const handleUpdateIsCombineMessage = (
 	const firstMessage = entities[messageIds[0]];
 	let prevMessageSenderId = firstMessage.sender_id || '';
 	let prevMessageCreateTime = firstMessage.create_time || '';
-	let prevMessageCreationTimeMs = firstMessage.creationTimeMs || 0;
+	let prevMessageCreationTimeMs = firstMessage.create_time_ms || 0;
 
 	if (needUpdateFirstMessage) {
 		firstMessage.isStartedMessageGroup = true;
@@ -1158,9 +1157,9 @@ const handleUpdateIsCombineMessage = (
 	}
 
 	messageIds.slice(1, messageIds.length).forEach((id) => {
-		const { sender_id, creationTimeMs, create_time } = entities[id];
+		const { sender_id, create_time_ms, create_time } = entities[id];
 		const isSameDay = checkSameDayByCreateTime(create_time, prevMessageCreateTime);
-		const isContinuousMessages = checkContinuousMessagesByCreateTimeMs(creationTimeMs || 0, prevMessageCreationTimeMs);
+		const isContinuousMessages = checkContinuousMessagesByCreateTimeMs(create_time_ms || 0, prevMessageCreationTimeMs);
 
 		const isStartedMessageGroup = Boolean(sender_id !== prevMessageSenderId || !isSameDay || !isContinuousMessages);
 
@@ -1169,7 +1168,7 @@ const handleUpdateIsCombineMessage = (
 
 		prevMessageSenderId = sender_id;
 		prevMessageCreateTime = create_time;
-		prevMessageCreationTimeMs = creationTimeMs || 0;
+		prevMessageCreationTimeMs = create_time_ms || 0;
 	});
 
 	return channelEntity;

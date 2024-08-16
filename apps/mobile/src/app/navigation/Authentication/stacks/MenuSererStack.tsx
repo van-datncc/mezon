@@ -8,6 +8,7 @@ import NotificationOverrides from '../../../components/ClanNotificationSetting/N
 import NotificationSettingDetail from '../../../components/ClanNotificationSetting/NotificationSettingDetail';
 import ClanSetting from '../../../components/ClanSettings';
 import ClanOverviewSetting from '../../../components/ClanSettings/Overview';
+import StickerSetting from '../../../components/ClanSettings/Sticker';
 import EventCreatorDetails from '../../../components/EventCreator/EventCreatorDetails';
 import EventCreatorPreview from '../../../components/EventCreator/EventCreatorPreview';
 import EventCreatorType from '../../../components/EventCreator/EventCreatorType';
@@ -102,6 +103,14 @@ export const MenuClanStacks = ({ }: any) => {
 				component={ClanOverviewSetting}
 				options={{
 					headerTitle: t('menuClanStack.clanOverviewSetting'),
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.STICKER_SETTING}
+				component={StickerSetting}
+				options={{
+					headerTitle: t('menuClanStack.sticker'),
 				}}
 			/>
 

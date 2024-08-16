@@ -1,8 +1,7 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions } from '@mezon/store';
-import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { delay } from 'lodash';
+import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,9 +34,17 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		};
 	}, []);
 
+	const getFullFileName = useCallback(
+		(fileName: string) => {
+			const session = sessionRef.current;
+			return createUploadFilePath(session, currentClanId, currentChannelId, fileName);
+		},
+		[currentChannelId, currentClanId, sessionRef],
+	);
+
 	const onPickFiles = async () => {
 		try {
-			timeRef.current = delay(() => {
+			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(true));
 			}, 500);
 			const res = await DocumentPicker.pick({
@@ -46,7 +53,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 			const file = res?.[0];
 			const attachment = {
 				url: file?.uri || file?.fileCopyUri,
-				filename: file?.name || file?.uri,
+				filename: getFullFileName(file?.name || file?.uri),
 				filetype: file?.type,
 			};
 			dispatch(
@@ -61,15 +68,15 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				uri: file?.uri || file?.fileCopyUri,
 				name: file?.name,
 				type: file?.type,
-				size: file?.size?.toString(),
-				fileData,
+				size: file?.size,
+				fileData
 			};
-			timeRef.current = delay(() => {
+			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(false));
 			}, 2000);
 			handleFiles([fileFormat]);
 		} catch (err) {
-			timeRef.current = delay(() => {
+			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(false));
 			}, 2000);
 			if (DocumentPicker.isCancel(err)) {

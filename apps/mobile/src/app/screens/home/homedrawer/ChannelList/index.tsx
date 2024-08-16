@@ -9,7 +9,8 @@ import {
 	getUpdateOrAddClanChannelCache,
 	hasNonEmptyChannels,
 	load,
-	save
+	save,
+	isEmpty
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -26,7 +27,6 @@ import {
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { isEmpty } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
@@ -86,16 +86,6 @@ const ChannelList = React.memo((props: any) => {
 			console.error('Error loading category channels:', error);
 		}
 	}, [categorizedChannels]);
-
-	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
-
-	const toggleCollapseChannel = (index: string) => {
-		if (collapseChannelItems.includes(index)) {
-			setCollapseChannelItems(collapseChannelItems.filter((item) => item !== index)); // Collapse if already Collapse
-		} else {
-			setCollapseChannelItems([...collapseChannelItems, index]); // Expand if not Collapse
-		}
-	};
 
 	function handlePress() {
 		bottomSheetMenuRef.current?.present();
@@ -209,11 +199,9 @@ const ChannelList = React.memo((props: any) => {
 						<ChannelListSection
 							data={item}
 							index={index}
-							onPressHeader={toggleCollapseChannel}
 							onLongPressCategory={(category) => handleLongPressCategory(category)}
 							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
 							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
-							collapseItems={collapseChannelItems}
 							onLongPressThread={(channel) => handleLongPressThread(channel)}
 						/>
 					)}
