@@ -5,7 +5,6 @@ import {
 	selectCurrentUserId,
 	selectDirectById,
 	selectNewMesssageUpdateImage,
-	selectUserClanProfileByClanID,
 	useAppDispatch,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -27,7 +26,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
-	const currentProfile = useSelector(selectUserClanProfileByClanID(currentClanId || '0', currentUserId));
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 
 	const dispatch = useAppDispatch();
@@ -64,11 +62,10 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 					anonymous,
 					mentionEveryone,
 					senderId: currentUserId,
-					avatar: currentProfile?.avartar || '',
 				}),
 			);
 		},
-		[dispatch, channelID, clanID, mode, currentUserId, currentProfile?.avartar],
+		[dispatch, channelID, clanID, mode, currentUserId],
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
