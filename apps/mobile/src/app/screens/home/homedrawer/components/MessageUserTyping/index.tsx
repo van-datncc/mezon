@@ -1,10 +1,10 @@
-import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '@mezon/mobile-components';
 import { Block, Text, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { selectChannelMemberByUserIds, selectTypingUserIdsByChannelId } from '@mezon/store';
 import LottieView from 'lottie-react-native';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
+import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../../../../assets/lottie';
 
 interface IProps {
 	channelId: string;

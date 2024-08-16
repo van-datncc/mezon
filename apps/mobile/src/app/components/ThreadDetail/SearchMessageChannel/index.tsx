@@ -1,10 +1,9 @@
 import { useAuth, useChannels, useFriends } from '@mezon/core';
-import { EOpenSearchChannelFrom } from '@mezon/mobile-components';
+import { debounce, EOpenSearchChannelFrom } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { selectAllDirectMessages, selectAllUsesClan } from '@mezon/store-mobile';
 import { removeDuplicatesById } from '@mezon/utils';
 import { RouteProp } from '@react-navigation/native';
-import { debounce } from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native';

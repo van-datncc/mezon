@@ -1,47 +1,49 @@
-import { PlusAltIcon } from '@mezon/mobile-components';
+import { PlusAltIcon, remove, save, setDefaultChannelLoader, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { ClansEntity, selectCurrentClan } from '@mezon/store-mobile';
-import React, { useState } from 'react';
+import { channelsActions, clansActions, getStoreAsync, selectAllClans } from '@mezon/store-mobile';
+import React, { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ClanIcon } from '../ClanIcon';
 import CreateClanModal from '../CreateClanModal';
 import { style } from './styles';
 
-interface ListClanPopupProps {
-	clans: ClansEntity[];
-	handleChangeClan: (clan_id: string) => void;
-}
-
-const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, handleChangeClan }) => {
+export const ListClanPopup = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const currentClan = useSelector(selectCurrentClan);
+	const clans = useSelector(selectAllClans);
 	const [isVisibleCreateClanModal, setIsVisibleCreateClanModal] = useState<boolean>(false);
 
-	const visibleCreateClanModal = (value) => {
+	const visibleCreateClanModal = useCallback((value: boolean) => {
 		setIsVisibleCreateClanModal(value);
-	};
+	}, []);
+
+	const handleChangeClan = useCallback(async (clanId: string) => {
+		const store = await getStoreAsync();
+		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+		save(STORAGE_CLAN_ID, clanId);
+
+		const promises = [];
+		promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
+		promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
+		promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
+		const results = await Promise.all(promises);
+
+		const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
+		if (channelResp) {
+			await setDefaultChannelLoader(channelResp.payload, clanId);
+		}
+	}, []);
 
 	return (
 		<View style={styles.clansBox}>
-			{clans?.length > 0
-				? clans?.map((clan) => (
-						<ClanIcon
-							data={clan}
-              clanIconStyle={styles.mt10}
-							onPress={handleChangeClan}
-							isActive={currentClan?.clan_id === clan?.clan_id}
-						/>
-					))
-				: null}
+			{clans?.length > 0 ? (
+				clans?.map((clan, index) => <ClanIcon data={clan} onPress={handleChangeClan} key={`${index}_${clan?.id}_clan_item`} />)
+			) : (
+				<View />
+			)}
 
-			<Pressable
-				style={styles.createClan}
-				onPress={() => {
-					setIsVisibleCreateClanModal(!isVisibleCreateClanModal);
-				}}
-			>
+			<Pressable style={styles.createClan} onPress={() => visibleCreateClanModal(!isVisibleCreateClanModal)}>
 				<View style={styles.wrapperPlusClan}>
 					<PlusAltIcon width={size.s_14} height={size.s_14} />
 				</View>
@@ -50,5 +52,3 @@ const ListClanPopupProps: React.FC<ListClanPopupProps> = React.memo(({ clans, ha
 		</View>
 	);
 });
-
-export default ListClanPopupProps;

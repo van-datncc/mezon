@@ -1,12 +1,11 @@
 import { TouchableOpacity, TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { debounce, Icons } from '@mezon/mobile-components';
 import { Block, Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId, settingClanStickerActions } from '@mezon/store';
 import { getStoreAsync, gifsActions, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
-import { debounce } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';

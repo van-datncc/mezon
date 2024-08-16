@@ -1,12 +1,10 @@
 import {
 	channelMembers,
 	channelMembersActions,
-	channelUsersActions,
 	channelsActions,
 	channelsSlice,
 	clansSlice,
 	directActions,
-	fetchChannelMembers,
 	fetchDirectMessage,
 	friendsActions,
 	listChannelsByUserActions,
@@ -130,7 +128,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 
 			dispatch(messagesActions.addNewMessage(mess));
-			dispatch(messagesActions.setIdNewMessageResponse(message.id));
+			dispatch(messagesActions.setNewMessageToUpdateImage(message));
 
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
@@ -216,7 +214,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(userAdds: UserChannelAddedEvent) => {
 			const user = userAdds.users.find((user: any) => user.user_id !== userId);
 			if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-				dispatch(fetchDirectMessage({noCache : true}));
+				dispatch(fetchDirectMessage({ noCache: true }));
 			}
 			if (user) {
 				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
