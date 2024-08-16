@@ -5,6 +5,7 @@ import {
 	authActions,
 	channelsActions,
 	clansActions,
+	directActions,
 	emojiSuggestionActions,
 	friendsActions,
 	getStoreAsync,
@@ -226,7 +227,7 @@ const NavigationMain = () => {
 
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
-
+				promises.push(store.dispatch(directActions.fetchDirectMessage({})));
 				const results = await Promise.all(promises);
 
 				if (!isFromFCM) {

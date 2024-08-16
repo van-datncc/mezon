@@ -1,22 +1,23 @@
 import { useTheme } from '@mezon/mobile-ui';
+import { selectCurrentClanId } from '@mezon/store';
 import { memo } from 'react';
-import { Image, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { useSelector } from 'react-redux';
 import { style } from './styles';
 
 interface IClanIconProps {
-	icon?: any;
 	data: any;
 	onPress?: any;
-	isActive?: boolean;
-	clanIconStyle?: ViewStyle;
-  clanNameStyle?: TextStyle;
 }
 export const ClanIcon = memo((props: IClanIconProps) => {
-	const styles = style(useTheme().themeValue);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const currentClanId = useSelector(selectCurrentClanId);
+
+	const isActive = currentClanId === props?.data?.clan_id;
 	return (
-		<TouchableOpacity
-			activeOpacity={props?.onPress ? 0.7 : 1}
-			key={Math.floor(Math.random() * 9999999).toString() + props?.data?.clan_id}
+		<Pressable
 			style={[styles.wrapperClanIcon]}
 			onPress={() => {
 				if (props?.onPress && props?.data?.clan_id) {
@@ -24,16 +25,14 @@ export const ClanIcon = memo((props: IClanIconProps) => {
 				}
 			}}
 		>
-			<View style={[styles.clanIcon, props?.isActive && styles.clanIconActive, props?.clanIconStyle]}>
-				{props.icon ? (
-					props.icon
-				) : props?.data?.logo ? (
-					<Image source={{ uri: props.data.logo }} style={styles.logoClan} />
-				) : (
-					<Text style={{...styles.textLogoClanIcon, ...(props?.clanNameStyle && props?.clanNameStyle)}}>{props?.data?.clan_name.charAt(0).toUpperCase()}</Text>
-				)}
-			</View>
-			{props?.isActive && <View style={styles.lineActiveClan} />}
-		</TouchableOpacity>
+			{props?.data?.logo ? (
+				<FastImage source={{ uri: props?.data?.logo || '' }} style={[styles.logoClan, isActive && styles.logoClanActive]} />
+			) : (
+				<View style={[styles.clanIcon, isActive && styles.logoClanActive]}>
+					<Text style={styles.textLogoClanIcon}>{props?.data?.clan_name?.charAt(0)?.toUpperCase()}</Text>
+				</View>
+			)}
+			{!!isActive && <View style={styles.lineActiveClan} />}
+		</Pressable>
 	);
 });

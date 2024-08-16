@@ -87,16 +87,6 @@ const ChannelList = React.memo((props: any) => {
 		}
 	}, [categorizedChannels]);
 
-	const [collapseChannelItems, setCollapseChannelItems] = useState([]);
-
-	const toggleCollapseChannel = (index: string) => {
-		if (collapseChannelItems.includes(index)) {
-			setCollapseChannelItems(collapseChannelItems.filter((item) => item !== index)); // Collapse if already Collapse
-		} else {
-			setCollapseChannelItems([...collapseChannelItems, index]); // Expand if not Collapse
-		}
-	};
-
 	function handlePress() {
 		bottomSheetMenuRef.current?.present();
 	}
@@ -209,11 +199,9 @@ const ChannelList = React.memo((props: any) => {
 						<ChannelListSection
 							data={item}
 							index={index}
-							onPressHeader={toggleCollapseChannel}
 							onLongPressCategory={(category) => handleLongPressCategory(category)}
 							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
 							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
-							collapseItems={collapseChannelItems}
 							onLongPressThread={(channel) => handleLongPressThread(channel)}
 						/>
 					)}
