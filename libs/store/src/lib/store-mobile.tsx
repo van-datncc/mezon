@@ -103,6 +103,30 @@ const persistedThreadReducer = persistReducer(
 	threadsReducer,
 );
 
+
+const persistedChannelMembberReducer = persistReducer(
+	{
+		key: 'channelsMember',
+		storage,
+	},
+	channelMembersReducer,
+);
+
+const persistedUserClanReducer = persistReducer(
+	{
+		key: 'usersClan',
+		storage,
+	},
+	usersClanReducer,
+);
+const persistedEmojiSuggestionReducer = persistReducer(
+	{
+		key: 'emojiSuggestion',
+		storage,
+	},
+	emojiSuggestionReducer,
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -110,14 +134,14 @@ const reducer = {
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
-	channelMembers: channelMembersReducer,
+	channelMembers: persistedChannelMembberReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
 	messages: persistedMessageReducer,
 	categories: persistedCatReducer,
 	rolesclan: RolesClanReducer,
 	eventmanagement: eventManagementReducer,
-	usersClan: usersClanReducer,
+	usersClan: persistedUserClanReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
@@ -138,7 +162,7 @@ const reducer = {
 	voice: voiceReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
-	suggestionEmoji: emojiSuggestionReducer,
+	suggestionEmoji: persistedEmojiSuggestionReducer,
 	gifs: gifsReducer,
 	stickers: stickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,

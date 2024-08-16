@@ -1,10 +1,13 @@
 import {
 	channelMembers,
 	channelMembersActions,
+	channelUsersActions,
 	channelsActions,
 	channelsSlice,
 	clansSlice,
 	directActions,
+	fetchChannelMembers,
+	fetchDirectMessage,
 	friendsActions,
 	listChannelsByUserActions,
 	mapMessageChannelToEntity,
@@ -212,6 +215,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onuserchanneladded = useCallback(
 		(userAdds: UserChannelAddedEvent) => {
 			const user = userAdds.users.find((user: any) => user.user_id !== userId);
+			if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
+				dispatch(fetchDirectMessage({noCache : true}));
+			}
 			if (user) {
 				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
@@ -311,6 +317,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					);
 				}
 			}
+
+			if (
+				(channelCreated && channelCreated.channel_private === 1 && channelCreated.channel_type === ChannelType.CHANNEL_TYPE_DM) ||
+				channelCreated.channel_type === ChannelType.CHANNEL_TYPE_GROUP
+			) {
+				dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			}
 		},
 		[dispatch],
 	);
@@ -331,7 +344,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
 						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
-						dispatch(listChannelsByUserActions.fetchListChannelsByUser({noCache: true}))
+						dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));

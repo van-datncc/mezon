@@ -1,3 +1,4 @@
+import { useAppNavigation } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
 import clx from 'classnames';
 import { memo, useCallback } from 'react';
@@ -13,17 +14,34 @@ type MarkdownContentOpt = {
 	isRenderImage: boolean;
 };
 
+const navigateToChannel = async (url: string, navigate: any) => {
+	const regex = /\/invite\/(\d+)/;
+	const match = url.match(regex);
+	if (match) {
+		const [_, inviteId] = match;
+		if(inviteId){
+			navigate("/invite/" + inviteId);
+		}
+	}
+};
+
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isRenderImage }) => {
 	const appearanceTheme = useSelector(selectTheme);
+	const { navigate } = useAppNavigation();
+	const origin = window.location.origin + "/invite/";
 
 	const onClickLink = useCallback(
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
-				window.open(url, '_blank');
+				if (url.startsWith(origin)) {
+					navigateToChannel(url, navigate);
+				} else {
+					window.open(url, '_blank');
+				}
 			}
-		},
-		[isJumMessageEnabled, isTokenClickAble],
+		},[isJumMessageEnabled, isTokenClickAble],
 	);
+	
 
 	const classes = clx(
 		'prose-code:text-sm inline prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',

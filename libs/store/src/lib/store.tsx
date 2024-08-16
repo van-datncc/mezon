@@ -26,6 +26,7 @@ import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from '.
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { attachmentReducer } from './attachment/attachments.slice';
+import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { hashtagDmVoiceReducer } from './channels/hashtagDmVoice.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
@@ -45,7 +46,7 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import { listchannelsByUserReducer } from './channels/channelUser.slice';
+import { adminApplicationReducer } from './application/applications.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -200,6 +201,14 @@ const persistedStickersReducer = persistReducer(
 	stickersReducer,
 );
 
+const persistedGifsStickerEmojiReducer = persistReducer(
+	{
+		key: 'gifsStickersEmojis',
+		storage,
+	},
+	gifsStickerEmojiReducer,
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -239,12 +248,13 @@ const reducer = {
 	suggestionEmoji: persistedEmojiSuggestionReducer,
 	gifs: gifsReducer,
 	stickers: persistedStickersReducer,
-	gifsStickersEmojis: gifsStickerEmojiReducer,
+	gifsStickersEmojis: persistedGifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
 	settingSticker: settingStickerReducer,
+	adminApplication: adminApplicationReducer,
 };
 
 let storeInstance = configureStore({

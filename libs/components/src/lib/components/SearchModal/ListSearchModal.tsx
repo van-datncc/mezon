@@ -47,7 +47,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							avatarUrl={item?.avatarUser}
 							showAvatar
 							valueHightLight={isSearchByUsername ? searchText.slice(1) : searchText}
-							subText={item.typeChat ===  ChannelType.CHANNEL_TYPE_DM ? item?.name : ''}
+							subText={item.type ===  ChannelType.CHANNEL_TYPE_DM ? item?.name : ''}
 							wrapSuggestItemStyle="gap-x-1"
 							subTextStyle="text-[13px]"
 							isHightLight={!isSearchByUsername}

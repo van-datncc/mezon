@@ -1,10 +1,9 @@
 import { Icons } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
-import React, { memo, useCallback, useEffect, useMemo } from 'react';
+import { useTheme } from '@mezon/mobile-ui';
+import React, { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../../temp-ui';
-import MezonToggleButton from '../../../temp-ui/MezonToggleButton';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonSwitch, reserve } from '../../../temp-ui';
 import { style } from './NotificationOption.styles';
 interface INotificationOptionProps {
 	selectedTabs: { mention: boolean; individual: boolean };
@@ -20,16 +19,10 @@ const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOpt
 	};
 	const Btn = useCallback(
 		({ val }: { val: 'individual' | 'mention' }) => (
-			<MezonToggleButton
-				onChange={(isSelected) => handleTabChange(val, isSelected)}
-				height={30}
-				width={60}
-				toggleOnColor={Colors.white}
+			<MezonSwitch
 				value={selectedTabs[val]}
-				toggleBgOffColor={Colors.gray48}
-				toggleBgOnColor={Colors.bgButton}
-				toggleOffColor={Colors.gray72}
-			></MezonToggleButton>
+				onChange={(isSelected) => handleTabChange(val, isSelected)}
+			/>
 		),
 		[],
 	);

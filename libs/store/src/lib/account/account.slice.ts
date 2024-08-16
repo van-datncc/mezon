@@ -79,3 +79,5 @@ export const getAccountState = (rootState: { [ACCOUNT_FEATURE_KEY]: AccountState
 export const selectAllAccount = createSelector(getAccountState, (state: AccountState) => state.userProfile);
 
 export const selectCurrentUserId = createSelector(getAccountState, (state: AccountState) => state?.userProfile?.user?.id || '');
+
+export const selectCurrentUser = createSelector(getAccountState, (state: AccountState) => state?.userProfile?.user);
