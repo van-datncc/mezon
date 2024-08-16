@@ -13,31 +13,36 @@ type EditSendMessage = (
 export function useProcessLinks(newMessageUpdateImage: MessageTypeUpdateLink, editSendMessage: EditSendMessage) {
 	useEffect(() => {
 		const linksOnMessage = newMessageUpdateImage?.content?.lk;
-		if (!linksOnMessage || linksOnMessage.length === 0) return;
 
-		const resultPromises = linksOnMessage.map((item) => {
-			return handleUrlInput(item.lk as string).then((result) => {
-				if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
-					return result as ApiMessageAttachment;
-				}
-				return null;
+		if (!linksOnMessage || linksOnMessage.length === 0) {
+			return;
+		} else {
+			const resultPromises = linksOnMessage.map((item) => {
+				return handleUrlInput(item.lk as string).then((result) => {
+					if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
+						return result as ApiMessageAttachment;
+					}
+					return null;
+				});
 			});
-		});
+			console.log('a');
+			Promise.all(resultPromises)
+				.then((results) => {
+					const filteredImageAttachments = results.filter((result): result is ApiMessageAttachment => result !== null);
+					if (filteredImageAttachments.length > 0) {
+						dispatch(messagesActions.setNewMessageToUpdateImage(message));
 
-		Promise.all(resultPromises)
-			.then((results) => {
-				const filteredImageAttachments = results.filter((result): result is ApiMessageAttachment => result !== null);
-				if (filteredImageAttachments.length > 0) {
-					editSendMessage(
-						{ ...newMessageUpdateImage.content },
-						newMessageUpdateImage.id ?? '',
-						newMessageUpdateImage.mentions ?? [],
-						filteredImageAttachments,
-					);
-				}
-			})
-			.catch((error) => {
-				console.error('Error processing URLs:', error);
-			});
+						editSendMessage(
+							{ ...newMessageUpdateImage.content },
+							newMessageUpdateImage.id ?? '',
+							newMessageUpdateImage.mentions ?? [],
+							filteredImageAttachments,
+						);
+					}
+				})
+				.catch((error) => {
+					console.error('Error processing URLs:', error);
+				});
+		}
 	}, [newMessageUpdateImage.id]);
 }
