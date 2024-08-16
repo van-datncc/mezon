@@ -72,7 +72,7 @@ export function useFriends() {
 		[friends],
 	);
 
-	const addToDmGroupFriends = useCallback(() => {
+	const filterListFriendsNotInGroup = useCallback(() => {
 		return friends.filter((friend) => {
 			if (!groupDmMember?.some((user) => user.user?.id === friend.id)) {
 				return friend;
@@ -89,7 +89,7 @@ export function useFriends() {
 			blockFriend,
 			unBlockFriend,
 			filteredFriends,
-			addToDmGroupFriends,
+			filterListFriendsNotInGroup,
 		}),
 		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends],
 	);

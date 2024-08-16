@@ -1,11 +1,10 @@
 import { useAppNavigation, useFriends } from '@mezon/core';
-import { DirectEntity, FriendsEntity, IFriend, channelUsersActions, directActions, selectAllFriends, selectDmGroupCurrentId, useAppDispatch } from '@mezon/store';
+import { DirectEntity, FriendsEntity, IFriend, channelUsersActions, directActions, selectAllFriends, useAppDispatch } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import EmptySearchFriends from './EmptySearchFriends';
 
@@ -28,9 +27,9 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 	const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 	const boxRef = useRef<HTMLDivElement | null>(null);
 
-	const { filteredFriends, addToDmGroupFriends } = useFriends();
+	const { filteredFriends, filterListFriendsNotInGroup } = useFriends();
 
-	const listFriends = (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM) ? addToDmGroupFriends() : filteredFriends(searchTerm.trim().toUpperCase());
+	const listFriends = (currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM) ? filterListFriendsNotInGroup() : filteredFriends(searchTerm.trim().toUpperCase());
 
 	const handleSelectFriends = (idFriend: string) => {
 		setSelectedFriends((prevSelectedFriends) => {
@@ -56,10 +55,11 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 			channelId: currentDM?.channel_id as string,
       clanId : currentDM?.clan_id as string,
       userIds : listAdd.user_ids ?? [],
-      channelType : currentDM?.type 
+      channelType : currentDM?.type
 		}));
 		onClose();
 	}
+
 	const handleCreateDM = async () => {
 		const listGroupDM = selectedFriends;
 		if (currentDM?.type === ChannelType.CHANNEL_TYPE_DM) {
