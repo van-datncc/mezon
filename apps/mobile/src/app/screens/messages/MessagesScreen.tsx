@@ -1,5 +1,5 @@
 import { useMemberStatus } from '@mezon/core';
-import { Icons, PaperclipIcon, TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '@mezon/mobile-components';
+import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
@@ -20,6 +20,7 @@ import { normalizeString } from '../../utils/helpers';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
 import { RenderTextMarkdownContent } from '../home/homedrawer/constants';
 import { style } from './styles';
+import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 
 const SeparatorListFriend = () => {
 	return <View style={{ height: size.s_8 }} />;
