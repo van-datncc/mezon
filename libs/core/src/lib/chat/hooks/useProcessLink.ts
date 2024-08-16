@@ -39,5 +39,5 @@ export function useProcessLinks(newMessageUpdateImage: MessageTypeUpdateLink, ed
 			.catch((error) => {
 				console.error('Error processing URLs:', error);
 			});
-	}, [newMessageUpdateImage.id]);
+	}, [editSendMessage, newMessageUpdateImage.content, newMessageUpdateImage.id, newMessageUpdateImage.mentions]);
 }

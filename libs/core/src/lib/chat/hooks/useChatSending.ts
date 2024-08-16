@@ -13,7 +13,6 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppParams } from '../../app/hooks/useAppParams';
-import { useProcessLinks } from './useProcessLink';
 
 export type UseChatSendingOptions = {
 	channelId: string;
@@ -85,7 +84,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
-	useProcessLinks(newMessageUpdateImage, editSendMessage);
+	//useProcessLinks(newMessageUpdateImage, editSendMessage);
 
 	return useMemo(
 		() => ({
