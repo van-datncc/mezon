@@ -41,13 +41,11 @@ export const MESSAGES_FEATURE_KEY = 'messages';
 
 export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenId?: string): IMessageWithUser => {
 	const creationTime = new Date(channelMess.create_time || '');
-	const creationTimeMs = creationTime.getTime() / 1000;
 	const isAnonymous = channelMess?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	return {
 		...channelMess,
 		isFirst: channelMess.code === EMessageCode.FIRST_MESSAGE,
 		creationTime,
-		creationTimeMs,
 		id: channelMess.id || '',
 		date: new Date().toLocaleString(),
 		isAnonymous,
@@ -58,7 +56,7 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 			avatarSm: channelMess.avatar || '',
 		},
 		lastSeen: lastSeenId === channelMess.id,
-		create_time_ms: channelMess.create_time_ms || creationTimeMs,
+		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
 	};
 };
 
