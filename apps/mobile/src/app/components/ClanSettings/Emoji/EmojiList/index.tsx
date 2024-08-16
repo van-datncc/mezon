@@ -1,5 +1,5 @@
+import { DEFAULT_MAX_EMOJI_SLOTS } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { DEFAULT_MAX_EMOJI_SLOTS } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,9 +31,10 @@ const EmojiList = ({ emojiList }: EmojiListProps) => {
 	return (
 		<View>
 			<Text style={styles.emojiSlotsTitle}>{t('emojiList.slotsDetails', { slots })}</Text>
-			{emojiList.map((item) => (
-				<EmojiDetail item={item} key={item.id} ref={(ref) => (row[parseInt(item.id)] = ref)} onSwipeOpen={() => closeRow(item.id)} />
-			))}
+			{emojiList.length > 0 &&
+				emojiList.map((item) => (
+					<EmojiDetail item={item} key={item.id} ref={(ref) => (row[parseInt(item.id)] = ref)} onSwipeOpen={() => closeRow(item.id)} />
+				))}
 		</View>
 	);
 };

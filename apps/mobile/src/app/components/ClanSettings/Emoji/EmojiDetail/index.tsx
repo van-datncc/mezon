@@ -29,7 +29,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 	const clanId = useSelector(selectCurrentClanId);
 	const emojiSrc = item.id ? getSrcEmoji(item.id) : '';
 	const dataAuthor = useSelector(selectMemberClanByUserId(item.creator_id ?? ''));
-	const [emojiName, setEmojiName] = useState(item.shortname.split(':').join(''));
+	const [emojiName, setEmojiName] = useState(item.shortname?.split(':')?.join(''));
 	const [isFocused, setIsFocused] = useState(false);
 	const textInputRef = useRef<TextInput>(null);
 
@@ -59,14 +59,14 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 	const handleBlur = () => {
 		setIsFocused(false);
 		if (!emojiName) {
-			setEmojiName(item.shortname.split(':').join(''));
-		} else if (myUser.userId !== item.creator_id && emojiName !== item.shortname.split(':').join('')) {
-			setEmojiName(item.shortname.split(':').join(''));
+			setEmojiName(item.shortname?.split(':')?.join(''));
+		} else if (myUser.userId !== item.creator_id && emojiName !== item.shortname?.split(':')?.join('')) {
+			setEmojiName(item.shortname?.split(':')?.join(''));
 			Toast.show({
 				type: 'info',
 				text1: t('toast.reject'),
 			});
-		} else if (emojiName !== item.shortname.split(':').join('')) {
+		} else if (emojiName !== item.shortname?.split(':')?.join('')) {
 			handleUpdateEmoji();
 		}
 	};
@@ -79,7 +79,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 		return (
 			<View style={styles.rightItem}>
 				<TouchableOpacity style={styles.deleteButton} onPress={handleDeleteEmoji}>
-					<Icons.TrashIcon width={size.s_20} height={size.s_20} color={baseColor.white}></Icons.TrashIcon>
+					<Icons.TrashIcon width={size.s_20} height={size.s_20} color={baseColor.white}/>
 					<Text style={styles.whiteText}>{t('emojiList.delete')}</Text>
 				</TouchableOpacity>
 			</View>
@@ -112,7 +112,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 							{dataAuthor?.user?.username}
 						</Text>
 						{dataAuthor?.user?.avatar_url ? (
-							<Image source={{ uri: dataAuthor?.user?.avatar_url }} style={styles.imgWrapper} />
+							<FastImage source={{ uri: dataAuthor?.user?.avatar_url }} style={styles.imgWrapper} />
 						) : (
 							<Block
 								backgroundColor={themeValue.colorAvatarDefault}
