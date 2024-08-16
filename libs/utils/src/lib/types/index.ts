@@ -26,7 +26,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -79,7 +79,7 @@ export type IDefaultNotification = ApiNotificationSetting & {
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
 	id: string;
 };
-export type IHashtagDmVoice = HashtagDm & {
+export type IHashtagDm = HashtagDm & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
@@ -168,7 +168,6 @@ export type IMessage = ChannelMessage & {
 	content: IMessageSendPayload;
 	date?: string;
 	creationTime?: Date;
-	creationTimeMs?: number;
 	lastSeen?: boolean;
 	isSending?: boolean;
 	isError?: boolean;
@@ -351,9 +350,9 @@ export type IEmoji = {
 	shortname: string;
 };
 
-export type IChannelUser =  ChannelDescription & {
-	id: string
-}
+export type IChannelUser = ChannelDescription & {
+	id: string;
+};
 
 export type IEmoticons = {
 	[key: string]: string;
@@ -654,7 +653,7 @@ export type SearchItemProps = {
 	subText?: string;
 	icon?: string;
 	channelId?: string;
-	channel_private?: number
+	channel_private?: number;
 };
 
 export enum EEmojiCategory {
@@ -692,3 +691,14 @@ export type SearchFilter = {
 export enum ETypeLinkMedia {
 	IMAGE_PREFIX = 'image',
 }
+
+export type MessageTypeUpdateLink = {
+	channel_id?: string;
+	code?: number;
+	create_time?: string;
+	id: string;
+	content?: IMessageSendPayload;
+	mentions?: IMentionOnMessage[];
+	attachments?: ApiMessageAttachment[];
+	references?: ApiMessageRef[];
+};
