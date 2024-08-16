@@ -9,7 +9,8 @@ import {
 	getUpdateOrAddClanChannelCache,
 	hasNonEmptyChannels,
 	load,
-	save
+	save,
+	isEmpty
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -26,7 +27,6 @@ import {
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { isEmpty } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';

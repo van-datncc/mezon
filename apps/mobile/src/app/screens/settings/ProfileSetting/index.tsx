@@ -1,5 +1,5 @@
 import { useAccount, useAuth, useClanProfileSetting } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { Icons, isEqual } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	ClansEntity,
@@ -11,7 +11,6 @@ import {
 	useAppDispatch,
 } from '@mezon/store-mobile';
 import { RouteProp } from '@react-navigation/native';
-import { isEqual } from 'lodash';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
