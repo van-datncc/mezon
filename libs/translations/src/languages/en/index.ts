@@ -35,6 +35,7 @@ import searchMessageChannel from './searchMessageChannel.json';
 import setting from './setting.json';
 import userEmptyClan from './userEmptyClan.json';
 import userProfile from './userProfile.json';
+import menuCustomDM from './menuCustomDM.json';
 
 export default {
 	inviteToChannel,
@@ -73,5 +74,6 @@ export default {
 	customUserStatus,
 	searchMessageChannel,
 	clanNotificationsSetting,
-	clanStickerSetting
+	clanStickerSetting,
+  menuCustomDM
 };

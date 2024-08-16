@@ -8,6 +8,7 @@ import {
 	IMessageWithUser,
 	LIMIT_MESSAGE,
 	LoadingStatus,
+	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
 	checkSameDayByCreateTime,
 } from '@mezon/utils';
@@ -101,7 +102,7 @@ export interface MessagesState {
 		}
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
-	idNewMessageResponse: string;
+	newMesssageUpdateImage: MessageTypeUpdateLink;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -565,7 +566,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
-	idNewMessageResponse: '',
+	newMesssageUpdateImage: { id: '' },
 };
 
 export type SetCursorChannelArgs = {
@@ -592,9 +593,11 @@ export const messagesSlice = createSlice({
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
 		},
-		setIdNewMessageResponse(state, action) {
-			state.idNewMessageResponse = action.payload;
+
+		setNewMessageToUpdateImage(state, action) {
+			state.newMesssageUpdateImage = action.payload;
 		},
+
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
 
@@ -649,7 +652,10 @@ export const messagesSlice = createSlice({
 						changes: {
 							content: action.payload.content,
 							mentions: action.payload.mentions,
-							update_time: action.payload.update_time,
+							update_time:
+								action.payload.attachments && action.payload.attachments?.length > 0
+									? action.payload.create_time
+									: action.payload.update_time,
 							attachments: action.payload.attachments,
 						},
 					});
@@ -1098,7 +1104,7 @@ export const selectIsMessageIdExist = (channelId: string, messageId: string) =>
 export const selectIsJumpingToPresent = createSelector(getMessagesState, (state) => state.isJumpingToPresent);
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
-export const selectNewIdMessageResponse = createSelector(getMessagesState, (state: MessagesState) => state.idNewMessageResponse);
+export const selectNewMesssageUpdateImage = createSelector(getMessagesState, (state: MessagesState) => state.newMesssageUpdateImage);
 
 const handleRemoveManyMessages = (state: MessagesState, channelId?: string) => {
 	if (!channelId) return state;

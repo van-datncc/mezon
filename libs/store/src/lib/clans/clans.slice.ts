@@ -129,7 +129,7 @@ export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan'
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateClanName(clan_name);
-		return isDuplicateName?.clan_name;
+		return isDuplicateName?.exist;
 	} catch (error: any) {
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);

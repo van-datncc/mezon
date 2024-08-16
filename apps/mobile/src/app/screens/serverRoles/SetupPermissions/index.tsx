@@ -1,9 +1,8 @@
 import { useRoles, useUserPermission } from '@mezon/core';
-import { CheckIcon, CloseIcon, Icons } from '@mezon/mobile-components';
+import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllRolesClan } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
-import { isEqual } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';

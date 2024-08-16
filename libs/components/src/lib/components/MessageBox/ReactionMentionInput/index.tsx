@@ -54,6 +54,7 @@ import {
 	SubPanelName,
 	ThreadValue,
 	UsersClanEntity,
+	filterEmptyArrays,
 	focusToElement,
 	getRoleList,
 	searchMentionsHashtag,
@@ -259,6 +260,15 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
+			const payload = {
+				t: content,
+				hg: hashtagList,
+				ej: emojiList,
+				lk: linkList,
+				mk: markdownList,
+				vk: voiceLinkRoomList,
+			};
+
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
 				return;
 			}
@@ -287,14 +297,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0 && openReplyMessageState) {
 				props.onSend(
-					{
-						t: content,
-						hg: hashtagList,
-						ej: emojiList,
-						lk: linkList,
-						mk: markdownList,
-						vk: voiceLinkRoomList,
-					},
+					filterEmptyArrays(payload),
 					mentionList,
 					attachmentDataRef,
 					dataReferences,
@@ -327,14 +330,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					setOpenThreadMessageState(false);
 				} else {
 					props.onSend(
-						{
-							t: content,
-							hg: hashtagList,
-							ej: emojiList,
-							lk: linkList,
-							mk: markdownList,
-							vk: voiceLinkRoomList,
-						},
+						filterEmptyArrays(payload),
 						mentionList,
 						attachmentDataRef,
 						undefined,
