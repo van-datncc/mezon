@@ -56,7 +56,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	}, [channelId, dispatch, mode]);
 
 	const { editSendMessage } = useChatSending({ channelId: channelId, mode: mode });
-	useProcessLinks(newMessageUpdateImage, editSendMessage);
+	//useProcessLinks(newMessageUpdateImage, editSendMessage);
 
 	return useMemo(
 		() => ({
