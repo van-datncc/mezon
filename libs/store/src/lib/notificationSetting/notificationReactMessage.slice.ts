@@ -19,7 +19,7 @@ export const initialNotifiReactMessageState: NotifiReactMessageState = {
 const LIST_NOTIFI_REACT_MESS_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotiReactMess = memoize(
 	(mezon: MezonValueContext, channelID: string) =>
-		mezon.client.getNotificationReactMessage(mezon.session, channelID),
+		mezon.socketRef.current?.getNotificationReactMessage(channelID),
 	{
 		promise: true,
 		maxAge: LIST_NOTIFI_REACT_MESS_CACHED_TIME,
@@ -34,7 +34,7 @@ type fetchNotifiReactMessArgs = {
 	noCache?: boolean;
 };
 
-export const getNotifiReactMessage = createAsyncThunk('notifireactmessage/getNotifiReactMessage', async ({channelId, noCache}:fetchNotifiReactMessArgs, thunkAPI) => {
+export const getNotifiReactMessage = createAsyncThunk('notifireactmessage/getNotifiReactMessage', async ({ channelId, noCache }: fetchNotifiReactMessArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
 		fetchNotiReactMess.clear(mezon, channelId);
@@ -43,7 +43,13 @@ export const getNotifiReactMessage = createAsyncThunk('notifireactmessage/getNot
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
-	return response;
+	const apiResponse: ApiNotifiReactMessage = {
+		channel_id: response.notifi_react_message?.channel_id_req,
+		id: response.notifi_react_message?.id,
+		user_id: response.notifi_react_message?.user_id
+	};
+	console.log(response);
+	return apiResponse;
 });
 
 type SetNotifiReactMessagePayload = {
@@ -58,7 +64,7 @@ export const setNotifiReactMessage = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getNotifiReactMessage({channelId:channel_id || '', noCache: true}));
+		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
 		return response;
 	},
 );
@@ -75,7 +81,7 @@ export const deleteNotifiReactMessage = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getNotifiReactMessage({channelId: channel_id || '', noCache: true}));
+		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
 		return response;
 	},
 );
