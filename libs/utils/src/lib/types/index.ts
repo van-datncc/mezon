@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -13,7 +13,6 @@ import {
 	ApiMessageMention,
 	ApiMessageReaction,
 	ApiMessageRef,
-	ApiNotifiReactMessage,
 	ApiNotificationChannelCategoySetting,
 	ApiNotificationSetting,
 	ApiNotificationUserChannel,
@@ -24,7 +23,7 @@ import {
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
-	RoleUserListRoleUser,
+	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
 
@@ -67,7 +66,7 @@ export type IRolesClan = ApiRole & {
 
 export type INotificationSetting = ApiNotificationUserChannel;
 
-export type INotifiReactMessage = ApiNotifiReactMessage;
+export type INotifiReactMessage = NotifiReactMessage;
 
 export type IDefaultNotificationClan = ApiNotificationSetting;
 

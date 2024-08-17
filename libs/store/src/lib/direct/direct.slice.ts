@@ -1,6 +1,6 @@
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelMessageEvent, ChannelType } from 'mezon-js';
+import { ChannelMessage, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser } from 'mezon-js/api.gen';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
@@ -236,7 +236,7 @@ export const directSlice = createSlice({
 		setDmGroupCurrentType: (state, action: PayloadAction<string>) => {
 			state.currentDirectMessageType = action.payload;
 		},
-		updateDMSocket: (state, action: PayloadAction<ChannelMessageEvent>) => {
+		updateDMSocket: (state, action: PayloadAction<ChannelMessage>) => {
 			const payload = action.payload;
 			const timestamp = (Date.now() / 1000).toString();
 			const dmChannel = directAdapter.getSelectors().selectById(state, payload.channel_id);
