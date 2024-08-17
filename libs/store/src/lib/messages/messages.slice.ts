@@ -47,16 +47,16 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 		...channelMess,
 		isFirst: channelMess.code === EMessageCode.FIRST_MESSAGE,
 		creationTime,
-		id: channelMess.id || '',
+		id: channelMess.id || channelMess.message_id || '',
 		date: new Date().toLocaleString(),
 		isAnonymous,
 		user: {
 			name: channelMess.username || '',
 			username: channelMess.username || '',
-			id: channelMess.sender_id || 'idUser',
+			id: channelMess.sender_id || '',
 			avatarSm: channelMess.avatar || '',
 		},
-		lastSeen: lastSeenId === channelMess.id,
+		lastSeen: lastSeenId === (channelMess.id || channelMess.message_id),
 		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
 	};
 };
