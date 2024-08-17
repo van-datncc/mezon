@@ -79,7 +79,7 @@ export type IDefaultNotification = ApiNotificationSetting & {
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
 	id: string;
 };
-export type IHashtagDmVoice = HashtagDm & {
+export type IHashtagDm = HashtagDm & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
@@ -701,4 +701,6 @@ export type MessageTypeUpdateLink = {
 	mentions?: IMentionOnMessage[];
 	attachments?: ApiMessageAttachment[];
 	references?: ApiMessageRef[];
+	clan_id?: string;
+	mode?: string;
 };
