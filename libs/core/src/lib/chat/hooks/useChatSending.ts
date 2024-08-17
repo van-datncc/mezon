@@ -57,7 +57,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			setMentionPayload(mentions);
 			setAttachmentPayload(attachments);
 
-			return dispatch(
+			await dispatch(
 				messagesActions.sendMessage({
 					channelId: channelID,
 					clanId: clanID || '',
@@ -131,6 +131,9 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				newMessageIdUpdateImage.message_id,
 			);
 		}
+		setContentPayload({});
+		setMentionPayload([]);
+		setAttachmentPayload([]);
 	}, [newMessageIdUpdateImage.message_id]);
 
 	return useMemo(

@@ -78,6 +78,9 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				newMessageIdUpdateImage.message_id,
 			);
 		}
+		setContentPayload({});
+		setMentionPayload([]);
+		setAttachmentPayload([]);
 	}, [newMessageIdUpdateImage.message_id]);
 	return useMemo(
 		() => ({
