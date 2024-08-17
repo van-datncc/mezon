@@ -40,7 +40,6 @@ export const getNotifiReactMessage = createAsyncThunk('notifireactmessage/getNot
 		fetchNotiReactMess.clear(mezon, channelId);
 	}	
 	const response = await fetchNotiReactMess(mezon, channelId);
-	console.log("channel", response);
 	if (!response) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
