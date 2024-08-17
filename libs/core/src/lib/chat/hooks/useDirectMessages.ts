@@ -41,9 +41,9 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 			const socket = socketRef.current;
 
 			if (!client || !session || !socket || !channel) {
-				console.log(client, session, socket, channel);
 				throw new Error('Client is not initialized');
 			}
+
 			await socket.writeChatMessage('0', channel.id, mode, content, mentions, attachments, references, false, false);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
@@ -67,18 +67,18 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
-		if (newMessageIdUpdateImage.clan_id === '0' || !newMessageIdUpdateImage.clan_id) {
+		if (newMessageIdUpdateImage.clan_id === '0') {
 			processLink(
-				newMessageIdUpdateImage.clan_id ?? '',
-				newMessageIdUpdateImage.channel_id ?? '',
-				mode,
+				newMessageIdUpdateImage.clan_id!,
+				newMessageIdUpdateImage.channel_id!,
+				newMessageIdUpdateImage.mode!,
 				contentPayload,
 				mentionPayload,
 				attachmentPayload,
-				newMessageIdUpdateImage.id,
+				newMessageIdUpdateImage.message_id,
 			);
 		}
-	}, [newMessageIdUpdateImage.id]);
+	}, [newMessageIdUpdateImage.message_id]);
 	return useMemo(
 		() => ({
 			client,

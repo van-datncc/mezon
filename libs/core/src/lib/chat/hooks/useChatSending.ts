@@ -9,6 +9,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -98,7 +99,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		async (
 			clanId: string,
 			channelId: string,
-			mode: number,
+			mode: ChannelStreamMode,
 			content: IMessageSendPayload,
 			messageId: string,
 			mentions: ApiMessageMention[],
@@ -114,23 +115,23 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 			await socket.updateChatMessage(clanId, channelId, mode, messageId, content, mentions, attachments);
 		},
-		[sessionRef, clientRef, socketRef],
+		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
 		if (newMessageIdUpdateImage.clan_id !== '0') {
 			processLink(
-				newMessageIdUpdateImage.clan_id ?? '',
-				newMessageIdUpdateImage.channel_id ?? '',
-				mode,
+				newMessageIdUpdateImage.clan_id!,
+				newMessageIdUpdateImage.channel_id!,
+				newMessageIdUpdateImage.mode!,
 				contentPayload,
 				mentionPayload,
 				attachmentPayload,
-				newMessageIdUpdateImage.id,
+				newMessageIdUpdateImage.message_id,
 			);
 		}
-	}, [newMessageIdUpdateImage.id]);
+	}, [newMessageIdUpdateImage.message_id]);
 
 	return useMemo(
 		() => ({

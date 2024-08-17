@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -23,9 +23,9 @@ import {
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
-	RoleUserListRoleUser
+	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -692,14 +692,9 @@ export enum ETypeLinkMedia {
 }
 
 export type MessageTypeUpdateLink = {
+	id?: string;
 	channel_id?: string;
-	code?: number;
-	create_time?: string;
-	id: string;
-	content?: IMessageSendPayload;
-	mentions?: IMentionOnMessage[];
-	attachments?: ApiMessageAttachment[];
-	references?: ApiMessageRef[];
+	message_id?: string;
 	clan_id?: string;
-	mode?: string;
+	mode?: ChannelStreamMode;
 };

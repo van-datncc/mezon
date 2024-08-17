@@ -17,7 +17,7 @@ type UseProcessLinkOptions = {
 
 export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions) {
 	const processLink = useCallback(
-		async (
+		(
 			clanId: string,
 			channelId: string,
 			mode: number,
@@ -26,38 +26,38 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 			attachmentPayload?: ApiMessageAttachment[],
 			newMessageIdUpdateImage?: string,
 		) => {
-			console.log('clanId :', clanId);
-			console.log('channelId :', channelId);
-			console.log('mode :', mode);
 			if (!contentPayload?.lk) return;
 
-			try {
-				const resultPromises = contentPayload.lk.map((item) =>
-					handleUrlInput(item.lk as string).then((result) => {
-						if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
-							return result as ApiMessageAttachment;
-						}
-						return null;
-					}),
-				);
+			const resultPromises = contentPayload.lk.map((item) =>
+				handleUrlInput(item.lk as string).then((result) => {
+					if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
+						return result as ApiMessageAttachment;
+					}
+					return null;
+				}),
+			);
 
-				const results = await Promise.all(resultPromises);
-				const filteredImageAttachments = results.filter((result): result is ApiMessageAttachment => result !== null);
+			Promise.all(resultPromises)
+				.then((results) => {
+					const filteredImageAttachments = results.filter((result): result is ApiMessageAttachment => result !== null);
 
-				if (filteredImageAttachments.length > 0) {
-					await updateImageLinkMessage(
-						clanId,
-						channelId,
-						mode,
-						contentPayload,
-						newMessageIdUpdateImage ?? '',
-						mentionPayload ?? [],
-						filteredImageAttachments,
-					);
-				}
-			} catch (error) {
-				console.error('Error processing content payload:', error);
-			}
+					const combinedAttachments = [...(attachmentPayload ?? []), ...filteredImageAttachments];
+
+					if (combinedAttachments.length > 0) {
+						updateImageLinkMessage(
+							clanId,
+							channelId,
+							mode,
+							contentPayload,
+							newMessageIdUpdateImage ?? '',
+							mentionPayload ?? [],
+							combinedAttachments,
+						);
+					}
+				})
+				.catch((error) => {
+					console.error('Error processing content payload:', error);
+				});
 		},
 		[updateImageLinkMessage],
 	);
