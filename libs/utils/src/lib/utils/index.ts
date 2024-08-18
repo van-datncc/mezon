@@ -518,13 +518,11 @@ export const processText = (inputString: string) => {
 
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
-					// vk: link,
 					s: startindex,
 					e: endindex,
 				});
 			} else {
 				links.push({
-					// lk: link,
 					s: startindex,
 					e: endindex,
 				});
