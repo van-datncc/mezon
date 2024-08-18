@@ -3,6 +3,7 @@ import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntity
 import memoize from 'memoizee';
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
+import { fetchDirectMessage } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
@@ -166,15 +167,21 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 
 export const removeMemberChannel = createAsyncThunk(
 	'channelMembers/removeChannelUser',
-	async ({ channelId, userIds }: RemoveChannelUsers, thunkAPI) => {
+	async ({ channelId, userIds, kickMember = true }: RemoveChannelUsers & { kickMember?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.removeChannelUsers(mezon.session, channelId, userIds);
-			if (response) {
-				await thunkAPI.dispatch(
-					fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
-				);
+			if (!response) {
+        return;
 			}
+      if (kickMember) {
+        await thunkAPI.dispatch(
+          fetchChannelMembers({ clanId: '', channelId: channelId, noCache: true, channelType: ChannelType.CHANNEL_TYPE_TEXT }),
+        );
+        return;
+      }
+
+      return true;
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}

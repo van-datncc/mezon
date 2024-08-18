@@ -1,11 +1,25 @@
 import { Dropdown } from 'flowbite-react';
 import ItemPanelMember from './ItemPanelMember';
+import { useAppNavigation, useAppParams } from '@mezon/core';
+import { fetchDirectMessage, removeMemberChannel, selectCurrentUserId, useAppDispatch, useAppSelector } from '@mezon/store';
 
 interface PanelGroupDMPProps {
 	isDmGroupOwner: boolean;
+	dmGroupId?: string;
 }
 
-const PanelGroupDM = ({ isDmGroupOwner }: PanelGroupDMPProps) => {
+const PanelGroupDM = ({ isDmGroupOwner, dmGroupId }: PanelGroupDMPProps) => {
+	const dispatch = useAppDispatch();
+	const { directId } = useAppParams();
+	const currentUserId = useAppSelector(selectCurrentUserId)
+	const { navigate } = useAppNavigation();
+	const handleLeaveDmGroup = async () => {
+		const isLeaveGroup = await dispatch(removeMemberChannel({ channelId: dmGroupId || "", userIds: [currentUserId], kickMember: false }));
+    if (isLeaveGroup && directId === dmGroupId) {
+			navigate("/chat/direct/friends");
+		}
+    await dispatch(fetchDirectMessage({ noCache: true }));
+	}
 	return (
 		<>
 			<div className="border-b dark:border-[#2e2f34]">
@@ -36,7 +50,7 @@ const PanelGroupDM = ({ isDmGroupOwner }: PanelGroupDMPProps) => {
 					<ItemPanelMember children="Until I turn it back on" />
 				</Dropdown>
 			</div>
-			<ItemPanelMember children="Leave Group" danger />
+			<ItemPanelMember children="Leave Group" danger onClick={handleLeaveDmGroup} />
 		</>
 	);
 };
