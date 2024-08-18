@@ -11,10 +11,9 @@ type MessageLineProps = {
 	onClickToMessage?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 	isOnlyContainEmoji?: boolean;
 	isSearchMessage?: boolean;
-
+	isHideLinkOneImage?: boolean;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
-	isRenderImage: boolean;
 };
 
 const MessageLine = ({
@@ -25,7 +24,7 @@ const MessageLine = ({
 	isOnlyContainEmoji,
 	isSearchMessage,
 	isTokenClickAble,
-	isRenderImage,
+	isHideLinkOneImage,
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -45,7 +44,7 @@ const MessageLine = ({
 	return (
 		<div onClick={isJumMessageEnabled ? onClickToMessage : () => {}} className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}>
 			<RenderContent
-				isRenderImage={isRenderImage}
+				isHideLinkOneImage={isHideLinkOneImage}
 				isTokenClickAble={isTokenClickAble}
 				isOnlyContainEmoji={isOnlyContainEmoji}
 				isJumMessageEnabled={isJumMessageEnabled}
@@ -67,11 +66,10 @@ interface RenderContentProps {
 	allChannelVoice?: ChannelsEntity[];
 	isOnlyContainEmoji?: boolean;
 	isSearchMessage?: boolean;
-
+	isHideLinkOneImage?: boolean;
 	isTokenClickAble: boolean;
 	isJumMessageEnabled: boolean;
 	parentWidth?: number;
-	isRenderImage: boolean;
 }
 
 interface ElementToken {
@@ -94,7 +92,7 @@ const RenderContent = memo(
 		parentWidth,
 		isOnlyContainEmoji,
 		isTokenClickAble,
-		isRenderImage,
+		isHideLinkOneImage,
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const elements: ElementToken[] = [
@@ -157,10 +155,9 @@ const RenderContent = memo(
 					);
 				}
 
-				if (element.kindOf === ETokenMessage.LINKS) {
+				if (element.kindOf === ETokenMessage.LINKS && !isHideLinkOneImage) {
 					formattedContent.push(
 						<MarkdownContent
-							isRenderImage={isRenderImage}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`link-${index}-${s}-${contentInElement}`}
@@ -183,7 +180,6 @@ const RenderContent = memo(
 							)
 						: formattedContent.push(
 								<MarkdownContent
-									isRenderImage={isRenderImage}
 									isTokenClickAble={isTokenClickAble}
 									isJumMessageEnabled={isJumMessageEnabled}
 									key={`voicelink-${index}-${s}-${contentInElement}`}
@@ -203,7 +199,6 @@ const RenderContent = memo(
 
 					formattedContent.push(
 						<MarkdownContent
-							isRenderImage={isRenderImage}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`markdown-${index}-${s}-${contentInElement}`}
