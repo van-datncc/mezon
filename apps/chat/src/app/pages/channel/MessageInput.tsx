@@ -185,7 +185,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 	const { directId } = useAppParams();
-	const commonChannels = useSelector(selectHashtagDMByDirectId(directId || ""));
+	const commonChannels = useSelector(selectHashtagDMByDirectId(directId || ''));
 
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const commonChannelsMention: ChannelsMentionProps[] = useMemo(() => {
