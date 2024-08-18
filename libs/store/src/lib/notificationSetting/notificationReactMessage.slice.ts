@@ -18,8 +18,7 @@ export const initialNotifiReactMessageState: NotifiReactMessageState = {
 
 const LIST_NOTIFI_REACT_MESS_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotiReactMess = memoize(
-	(mezon: MezonValueContext, channelID: string) =>
-		mezon.socketRef.current?.getNotificationReactMessage(channelID),
+	(mezon: MezonValueContext, channelID: string) => mezon.socketRef.current?.getNotificationReactMessage(channelID),
 	{
 		promise: true,
 		maxAge: LIST_NOTIFI_REACT_MESS_CACHED_TIME,
@@ -34,17 +33,20 @@ type fetchNotifiReactMessArgs = {
 	noCache?: boolean;
 };
 
-export const getNotifiReactMessage = createAsyncThunk('notifireactmessage/getNotifiReactMessage', async ({ channelId, noCache }: fetchNotifiReactMessArgs, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchNotiReactMess.clear(mezon, channelId);
-	}	
-	const response = await fetchNotiReactMess(mezon, channelId);
-	if (!response) {
-		return thunkAPI.rejectWithValue('Invalid session');
-	}
-	return response;
-});
+export const getNotifiReactMessage = createAsyncThunk(
+	'notifireactmessage/getNotifiReactMessage',
+	async ({ channelId, noCache }: fetchNotifiReactMessArgs, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchNotiReactMess.clear(mezon, channelId);
+		}
+		const response = await fetchNotiReactMess(mezon, channelId);
+		if (!response) {
+			return thunkAPI.rejectWithValue('Invalid session');
+		}
+		return response;
+	},
+);
 
 type SetNotifiReactMessagePayload = {
 	channel_id?: string;
