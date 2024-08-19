@@ -250,7 +250,6 @@ export const ChatBoxBottomBar = memo(
 						if (mention) {
 							return {
 								user_id: mention.id?.toString() ?? '',
-								username: `@${mention?.display}`,
 								s: m?.start,
 								e: m?.end,
 							};
@@ -266,7 +265,6 @@ export const ChatBoxBottomBar = memo(
 							const startindex = convertedHashtag.indexOf(word);
 							hashtagList.push({
 								channelid: channelInfo.id.toString() ?? '',
-								channellabel: channelInfo.channel_label ?? '',
 								s: startindex,
 								e: startindex + word.length,
 							});
