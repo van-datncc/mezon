@@ -97,11 +97,20 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 					</Block>
 				);
 			},
-		headerLeft: () => (
-			<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
-				<Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.textStrong} />
-			</Pressable>
-		),
+		headerLeft: () => {
+			if (isEditRoleMode) {
+				return (
+					<Pressable style={{ padding: 20 }} onPress={() => navigation.goBack()}>
+						<Icons.ArrowLargeLeftIcon height={20} width={20} color={themeValue.textStrong} />
+					</Pressable>
+				);
+			}
+			return (
+				<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
+					<Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.textStrong} />
+				</Pressable>
+			)
+		},
 		headerRight: () => {
 			if (!isEditRoleMode || (isEditRoleMode && isNotChange)) return null;
 			return (
