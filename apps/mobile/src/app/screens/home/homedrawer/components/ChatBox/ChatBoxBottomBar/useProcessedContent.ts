@@ -1,5 +1,5 @@
 import { selectEmojiObjSuggestion } from '@mezon/store';
-import { IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
+import { EMarkdownType, IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -55,7 +55,6 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				if (preCharFour !== 'http' && preCharFive !== 'https' && emojiObjPicked?.[`:${shortname}:`]) {
 					emojis.push({
 						emojiid: emojiObjPicked?.[`:${shortname}:`],
-						shortname: `:${shortname}:`,
 						s: startindex,
 						e: endindex,
 					});
@@ -74,13 +73,11 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
-					vk: link,
 					s: startindex,
 					e: endindex,
 				});
 			} else {
 				links.push({
-					lk: link,
 					s: startindex,
 					e: endindex,
 				});
@@ -98,7 +95,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
-					markdowns.push({ type: 'triple', mk: `\`\`\`${markdown}\`\`\``, s: startindex, e: endindex });
+					markdowns.push({ type: EMarkdownType.TRIPLE, s: startindex, e: endindex });
 				}
 			}
 		} else if (inputString[i] === singleBacktick) {
@@ -114,7 +111,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
-					markdowns.push({ type: 'single', mk: `\`${markdown}\``, s: startindex, e: endindex });
+					markdowns.push({ type: EMarkdownType.SINGLE, s: startindex, e: endindex });
 				}
 				i++;
 			}
