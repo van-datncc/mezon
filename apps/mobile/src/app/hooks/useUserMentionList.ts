@@ -6,6 +6,7 @@ import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { ID_MENTION_HERE } from '@mezon/mobile-components';
 
 function UseMentionList(channelID: string, channelMode?: number): MentionDataProps[] {
 	const { members } = useChannelMembers({ channelId: channelID });
@@ -29,11 +30,11 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 				};
 			}) ?? [];
 		const hardcodedUser = {
-			id: '1775731111020111321',
+			id: ID_MENTION_HERE,
 			display: 'here',
 			avatarUrl: '',
 			user: {
-				id: '1775731111020111321',
+				id: ID_MENTION_HERE,
 				display_name: 'here',
 				username: 'here',
 				avatarUrl: '',
