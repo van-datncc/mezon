@@ -3,16 +3,15 @@ import { ChannelStreamMode } from 'mezon-js/client';
 
 type IMentionUser = {
 	tagName: string;
-	roleName: string;
 	roleId: string;
 	tagUserId: string;
 	mode: number;
 	usersClan: any;
 	usersInChannel: any;
 };
-export const MentionUser = ({ tagName, roleName, tagUserId, roleId, mode, usersClan, usersInChannel }: IMentionUser) => {
-	if (roleName) {
-		return `[${roleName}](@role${roleId})`;
+export const MentionUser = ({ tagName, tagUserId, roleId, mode, usersClan, usersInChannel }: IMentionUser) => {
+	if (roleId) {
+		return `[${tagName}](@role${roleId})`;
 	}
 
 	if (tagName === '@here') {
