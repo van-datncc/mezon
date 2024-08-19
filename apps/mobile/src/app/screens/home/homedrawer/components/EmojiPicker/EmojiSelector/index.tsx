@@ -1,20 +1,21 @@
-import { useEmojiSuggestion } from '@mezon/core';
 import {
 	BicycleIcon,
 	BowlIcon,
 	debounce,
 	GameControllerIcon,
+	getEmojis,
 	HeartIcon,
 	Icons,
 	LeafIcon,
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
+	setRecentEmoji,
 	SmilingFaceIcon
 } from '@mezon/mobile-components';
 import { baseColor, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
-import { emojiSuggestionActions, selectCurrentClan } from '@mezon/store-mobile';
+import { emojiSuggestionActions, selectCurrentChannelId, selectCurrentClan } from '@mezon/store-mobile';
 import { getSrcEmoji, IEmoji } from '@mezon/utils';
 import { MezonClanAvatar } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -36,7 +37,7 @@ type EmojiSelectorProps = {
 
 type DisplayByCategoriesProps = {
 	readonly categoryName?: string;
-	readonly onEmojiSelect: (emojiId: string, emoji: string) => void;
+	readonly onEmojiSelect: (emoji: IEmoji) => void;
 	readonly onEmojiHover?: (item: any) => void;
 	readonly emojisData: any[];
 };
@@ -61,7 +62,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 		<View style={styles.emojisPanel}>
 			{emojisData.map((item, index) => {
 				return (
-					<TouchableOpacity style={styles.wrapperIconEmoji} key={index} onPress={() => onEmojiSelect(item.id, item.shortname)}>
+					<TouchableOpacity style={styles.wrapperIconEmoji} key={index} onPress={() => onEmojiSelect(item)}>
 						<FastImage source={{ uri: getSrcEmoji(item?.id) }} style={styles.iconEmoji} resizeMode={'contain'} />
 					</TouchableOpacity>
 				);
@@ -77,11 +78,9 @@ export default function EmojiSelector({
 	handleBottomSheetExpand,
 	handleBottomSheetCollapse,
 }: EmojiSelectorProps) {
-	const { categoriesEmoji, emojis } = useEmojiSuggestion();
+	const currentChannelID = useAppSelector(selectCurrentChannelId);
+	const { categoriesEmoji, emojis } = getEmojis(currentChannelID);
 	const currentClan = useAppSelector(selectCurrentClan);
-	console.log(categoriesEmoji);
-
-
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
@@ -133,15 +132,16 @@ export default function EmojiSelector({
 	);
 
 	const handleEmojiSelect = useCallback(
-		async (emojiId: string, emojiPicked: string) => {
-			onSelected(emojiId, emojiPicked);
+		async (emoji: IEmoji) => {
+			onSelected(emoji.id, emoji.shortname);
+			setRecentEmoji(emoji, currentChannelID);
 			handleBottomSheetCollapse?.();
 			if (!isReactMessage) {
-				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emojiPicked));
+				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emoji.shortname));
 				dispatch(
 					emojiSuggestionActions.setSuggestionEmojiObjPicked({
-						shortName: emojiPicked,
-						id: emojiId,
+						shortName: emoji.shortname,
+						id: emoji.id,
 					}),
 				);
 			}

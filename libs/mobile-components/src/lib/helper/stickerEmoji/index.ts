@@ -1,7 +1,11 @@
+import { useEmojiSuggestion } from '@mezon/core';
 import { uploadFile } from "@mezon/transport";
+import { IEmoji } from '@mezon/utils';
 import { Buffer as BufferMobile } from 'buffer';
 import { Client, Session } from "mezon-js";
 import { ApiMessageAttachment } from "mezon-js/api.gen";
+import { STORAGE_RECENT_EMOJI } from '../../constant';
+import { load, save } from '../storage';
 
 interface IFile {
     uri: string;
@@ -9,6 +13,10 @@ interface IFile {
     type: string;
     size: number;
     fileData: any;
+}
+
+interface IEmojiWithChannel {
+    [key: string]: IEmoji[]
 }
 
 export async function handleUploadEmoticonMobile(client: Client, session: Session, filename: string, file: IFile): Promise<ApiMessageAttachment> {
@@ -34,4 +42,23 @@ export async function handleUploadEmoticonMobile(client: Client, session: Sessio
             reject(new Error(`${error}`));
         }
     });
+}
+
+export function getEmojis(channel_id: string) {
+    const { categoriesEmoji, emojis } = useEmojiSuggestion();
+    const recentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
+
+    const recentChannelEmojis = recentEmojis[channel_id] || [];
+    return {
+        categoriesEmoji,
+        emojis: [...recentChannelEmojis, ...emojis],
+    }
+}
+
+export async function setRecentEmoji(emoji: IEmoji, channel_id: string) {
+    const oldRecentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
+    const oldRecentChannelEmojis: IEmoji[] = oldRecentEmojis[channel_id] || [];
+    const currentRecentChannelEmojis: IEmoji[] = [{ ...emoji, category: "Recent" }, ...oldRecentChannelEmojis];
+    const currentEmoji = { ...oldRecentEmojis, [channel_id]: currentRecentChannelEmojis }
+    save(STORAGE_RECENT_EMOJI, currentEmoji);
 }

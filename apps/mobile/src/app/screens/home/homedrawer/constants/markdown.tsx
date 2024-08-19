@@ -227,7 +227,7 @@ export const renderRulesCustom = {
 					key={node.key}
 					style={[
 						styles.mention,
-						content.includes('# unknown') && styles.unknownChannel,
+						content?.includes('# unknown') && styles.unknownChannel,
 						payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention,
 					]}
 					onPress={() => openUrl(node.attributes.href, onLinkPress)}
