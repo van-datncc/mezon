@@ -109,11 +109,11 @@ export default function FriendsPage() {
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">
 			<div className="flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader">
-				{(closeMenuMobile) &&
+				{closeMenuMobile && (
 					<div onClick={() => setStatusMenu(true)}>
 						<Icons.OpenMenu defaultSize="w-6 h-6" />
 					</div>
-				}
+				)}
 				<div className={`gap-7 flex overflow-x-scroll hide-scrollbar ${closeMenuMobile ? 'ml-7' : ''}`}>
 					<div className="flex flex-row gap-2 items-center dark:text-white text-black">
 						<Icons.IconFriends />
@@ -166,7 +166,7 @@ export default function FriendsPage() {
 									{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 								</span>
 							</div>
-							<div className='pl-8 overflow-hidden flex flex-1 pb-16'>
+							<div className="pl-8 overflow-hidden flex flex-1 pb-16">
 								<FriendList listFriendFilter={listFriendFilter} />
 							</div>
 						</>
@@ -196,7 +196,7 @@ export default function FriendsPage() {
 						</div>
 					)}
 				</div>
-				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-[#F7F7F7] lg:flex hidden"></div>
+				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-bgLightMode lg:flex hidden"></div>
 			</div>
 		</div>
 	);

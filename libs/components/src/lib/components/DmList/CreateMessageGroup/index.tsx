@@ -196,8 +196,8 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 		>
 			<div className="cursor-default text-start">
 				<div className="p-4">
-					<h3 className="text-xl text-white">Select Friends</h3>
-					<p className="text-textThreadPrimary pt-1">{`You can add ${friends.length} more friends.`}</p>
+					<h3 className="text-xl dark:text-white text-textLightTheme">Select Friends</h3>
+					<p className="dark:text-textThreadPrimary text-textPrimaryLight pt-1">{`You can add ${friends.length} more friends.`}</p>
 					<InputField
 						type="text"
 						placeholder="Type the username of a friend"
