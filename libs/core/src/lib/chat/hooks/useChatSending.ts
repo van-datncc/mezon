@@ -119,6 +119,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
+
 			await socket.updateChatMessage(clanId ?? '', channelId ?? '', mode ?? 0, messageId ?? '', content, mentions, attachments, hideEditted);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],

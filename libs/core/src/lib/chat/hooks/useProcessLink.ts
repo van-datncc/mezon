@@ -28,7 +28,6 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 			attachmentPayload?: ApiMessageAttachment[],
 			newMessageIdUpdateImage?: string,
 			messageEdit?: IMessageWithUser,
-			hideEditted?: boolean,
 		) => {
 			if (!contentPayload?.lk) {
 				const filteredAttachments =
@@ -50,7 +49,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 						mentionPayload ?? [],
 						finalAttachments,
 						undefined,
-						false,
+						true,
 					);
 				}
 			} else if (contentPayload?.lk) {
@@ -79,7 +78,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 								mentionPayload ?? [],
 								combinedAttachments,
 								undefined,
-								true,
+								!messageEdit ? false : true,
 							);
 						}
 					})
