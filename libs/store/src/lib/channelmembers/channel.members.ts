@@ -343,7 +343,7 @@ export const channelMembers = createSlice({
 			})
 			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[] | null>) => {
 				if (action.payload !== null) {
-					channelMembersAdapter.setMany(state, action.payload);
+					channelMembersAdapter.setAll(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {
 					state.loadingStatus = "not loaded";
