@@ -110,12 +110,12 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		// 	title: t('accountSettings.friendRequests'),
 		// 	icon: <Icons.FriendIcon color={themeValue.textStrong} />,
 		// },
-		// {
-		// 	onPress: () => reserve(),
-		// 	expandable: true,
-		// 	title: t('accountSettings.QRScan'),
-		// 	icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} />,
-		// },
+		{
+			onPress: () => reserve(),
+			expandable: true,
+			title: t('accountSettings.QRScan'),
+			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} />,
+		},
 	];
 
 	const PaymentMenu: IMezonMenuItemProps[] = [
