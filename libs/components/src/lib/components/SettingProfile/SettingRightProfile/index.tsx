@@ -5,11 +5,12 @@ import SettingRightUser from '../SettingRightUserProfile';
 
 interface SettingRightProfileProps {
 	menuIsOpen: boolean;
+	isUserProfile?: boolean
 }
 
-const SettingRightProfile = ({ menuIsOpen }: SettingRightProfileProps) => {
+const SettingRightProfile = ({ menuIsOpen, isUserProfile = true }: SettingRightProfileProps) => {
 	const { userProfile } = useAuth();
-	const [isUserSettings, setIsUserSettings] = useState(true);
+	const [isUserSettings, setIsUserSettings] = useState(isUserProfile);
 
 	const handleClanProfileClick = () => {
 		setIsUserSettings(false);
