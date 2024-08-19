@@ -66,6 +66,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
@@ -93,7 +94,6 @@ import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
 import useProcessMention from './useProcessMention';
 import useProcessedContent from './useProcessedContent';
-import { useParams } from 'react-router-dom';
 
 type ChannelsMentionProps = {
 	id: string;
@@ -134,7 +134,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directId || ""));
+	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directId || ''));
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -427,7 +427,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onTyping();
 		}
 
-		setContent(newPlainTextValue);
+		setContent(newPlainTextValue.trim());
 
 		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(newValue);
