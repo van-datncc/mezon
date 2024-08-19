@@ -79,10 +79,11 @@ export const Authentication = () => {
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
 			if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
 				Toast.show({
-					type: 'info',
-					text1: remoteMessage.notification?.title,
-					text2: remoteMessage.notification?.body,
+					type: 'notification',
 					topOffset: Platform.OS === "ios" ? undefined : 10,
+					props: remoteMessage.notification,
+					swipeable: true,
+					visibilityTime: 5000,
 					onPress: async () => {
 						Toast.hide();
 						const store = await getStoreAsync();
@@ -124,7 +125,7 @@ export const Authentication = () => {
 			console.log('Error while receiving files:', error);
 		}
 	};
-	
+
 	const loadFRMConfig = async () => {
 		try {
 			const [fcmtoken, appInfo] = await Promise.all([handleFCMToken(), getAppInfo()]);

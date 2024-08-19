@@ -67,7 +67,7 @@ const MenuCustomDm = ({ currentChannel, channelLabel }: { currentChannel: IChann
 	return (
 		<Block paddingVertical={size.s_10} paddingHorizontal={size.s_20}>
 			{[ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel.type) ? <MezonMenu menu={generalMenu} /> : <MezonMenu menu={closeDm} />}
-			<MezonBottomSheet snapPoints={['40%']} ref={bottomSheetCustomGroup}>
+			<MezonBottomSheet snapPoints={['70%']} ref={bottomSheetCustomGroup}>
 				<CustomGroupDm dmGroupId={currentChannel?.id} channelLabel={channelLabel} />
 			</MezonBottomSheet>
 		</Block>
