@@ -1,10 +1,9 @@
 import { Icons } from '@mezon/components';
 import { useClanOwner } from '@mezon/core';
-import { RolesClanEntity, selectCurrentClan, selectTheme } from '@mezon/store';
-import { SlugPermission } from '@mezon/utils';
+import { RolesClanEntity, selectTheme } from '@mezon/store';
+import { RoleEveryOne, SlugPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ApiPermission } from 'mezon-js/api.gen';
-import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 type ListActiveRoleProps = {
@@ -19,7 +18,8 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 	const isClanOwner = useClanOwner();
 	const appearanceTheme = useSelector(selectTheme);
 
-	return activeRoles.map((role) => {
+	return activeRoles.filter((role) => role.creator_id !== RoleEveryOne.TRUE)
+		.map((role) => {
 		const hasPermissionEdit = isClanOwner || !useCheckHasAdministrator(role?.permission_list?.permissions);
 		return (
 			<tr key={role.id} className="h-14 dark:text-white text-black group dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton">
@@ -92,15 +92,6 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 };
 
 export default ListActiveRole;
-
-export function useBelongToClanOwner(itemId: string) {
-	const currentClan = useSelector(selectCurrentClan);
-	const isBelongToClanOwner = useMemo(() => {
-		return currentClan?.creator_id === itemId;
-	}, [currentClan?.creator_id, itemId]);
-
-	return isBelongToClanOwner;
-}
 
 export function useCheckHasAdministrator(permissions?: ApiPermission[]) {
 	return permissions?.some(permission => permission.slug === SlugPermission.Admin && permission.active === 1);

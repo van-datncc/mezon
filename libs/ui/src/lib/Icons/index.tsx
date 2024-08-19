@@ -3349,40 +3349,14 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 
 export const IconLoadingTyping = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" className={defaultSize}>
-			<circle cx="18" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin=".67"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
-			<circle cx="12" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin=".33"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
-			<circle cx="6" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin="0"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
+		<svg className={defaultSize} id="dots" width="20" height="8" viewBox="0 0 132 58" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+			<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+				<g id="dots" fill="white">
+					<circle id="dot1" cx="25" cy="30" r="13"></circle>
+					<circle id="dot2" cx="65" cy="30" r="13"></circle>
+					<circle id="dot3" cx="105" cy="30" r="13"></circle>
+				</g>
+			</g>
 		</svg>
 	);
 };

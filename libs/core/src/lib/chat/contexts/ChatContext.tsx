@@ -277,10 +277,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
-			if (e && e.sender_id === userId) {
-				return;
-			}
-
 			dispatch(
 				messagesActions.updateTypingUsers({
 					channelId: e.channel_id,
@@ -510,3 +506,4 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+
