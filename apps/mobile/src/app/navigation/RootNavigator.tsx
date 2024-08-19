@@ -16,6 +16,7 @@ import {
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
+	voiceActions,
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
@@ -46,7 +47,7 @@ import {
 	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
 import notifee from '@notifee/react-native';
-import { delay } from 'lodash';
+import { ChannelType } from 'mezon-js';
 import BootSplash from 'react-native-bootsplash';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../configs/toastConfig';
@@ -91,9 +92,12 @@ const NavigationMain = () => {
 	}, []);
 
 	useEffect(() => {
-		let timeout: string | number | NodeJS.Timeout;
+		let timeout;
 		const appStateSubscription = AppState.addEventListener('change', (state) => {
-			if (isLoggedIn) timeout = delay(handleAppStateChange, 200, state);
+			if (isLoggedIn)
+				timeout = setTimeout(async () => {
+					await handleAppStateChange(state);
+				}, 200);
 		});
 		return () => {
 			appStateSubscription.remove();
@@ -169,13 +173,23 @@ const NavigationMain = () => {
 			}
 			const store = await getStoreAsync();
 			store.dispatch(appActions.setLoadingMainMobile(false));
-			store.dispatch(
-				messagesActions.fetchMessages({
-					channelId: currentChannelId,
-					noCache: true,
-					isFetchingLatestMessages: true,
-				}),
-			);
+			const promise = [
+				store.dispatch(
+					messagesActions.fetchMessages({
+						channelId: currentChannelId,
+						noCache: true,
+						isFetchingLatestMessages: true,
+					})
+				),
+				store.dispatch(
+					voiceActions.fetchVoiceChannelMembers({
+						clanId: currentClanId ?? '',
+						channelId: '',
+						channelType: ChannelType.CHANNEL_TYPE_VOICE,
+					})
+				),
+			];
+			await Promise.all(promise);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			return null;
 		} catch (error) {

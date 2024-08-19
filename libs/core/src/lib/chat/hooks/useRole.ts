@@ -1,11 +1,12 @@
-import { channelMembersActions, rolesClanActions, useAppDispatch } from '@mezon/store';
-import { ChannelType } from 'mezon-js';
+import { rolesClanActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 export function useRoles() {
 	const dispatch = useAppDispatch();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const deleteRole = React.useCallback(
 		async (roleId: string) => {
-			await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
+			await dispatch(rolesClanActions.fetchDeleteRole({ roleId, clanId: currentClanId || ""}));
 		},
 		[dispatch],
 	);
@@ -30,7 +31,7 @@ export function useRoles() {
 			remove_permission_ids: string[],
 		) => {
 			const response = await dispatch(
-				rolesClanActions.fetchUpdateRole({ role_id, title, add_user_ids, active_permission_ids, remove_user_ids, remove_permission_ids }),
+				rolesClanActions.fetchUpdateRole({ role_id, title, add_user_ids, active_permission_ids, remove_user_ids, remove_permission_ids, clanId }),
 			);
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
 			return response?.payload;

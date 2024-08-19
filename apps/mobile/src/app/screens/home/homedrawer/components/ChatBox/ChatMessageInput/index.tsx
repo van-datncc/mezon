@@ -1,5 +1,5 @@
 import { useChatSending, useDirectMessages } from '@mezon/core';
-import { ActionEmitEvent, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
+import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
@@ -11,6 +11,7 @@ import {
 	IMarkdownOnMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
+	filterEmptyArrays,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -134,7 +135,7 @@ export const ChatMessageInput = memo(
 			);
 
 			const handleDirectMessageTyping = useCallback(async () => {
-				dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode }));
+				await Promise.all([dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode }))]);
 			}, [channelId, dispatch, mode]);
 
 			const handleDirectMessageTypingDebounced = useThrottledCallback(handleDirectMessageTyping, 1000);
@@ -193,14 +194,12 @@ export const ChatMessageInput = memo(
 						const role = roleList?.find((role) => role.roleId === mention.user_id);
 						return {
 							role_id: role?.roleId,
-							rolename: `@${role?.roleName}`,
 							s: mention.s,
 							e: mention.e,
 						};
 					} else {
 						return {
 							user_id: mention.user_id,
-							username: mention.username,
 							s: mention.s,
 							e: mention.e,
 						};
@@ -239,7 +238,7 @@ export const ChatMessageInput = memo(
 				);
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
-					? [
+					? ([
 							{
 								message_id: '',
 								message_ref_id: targetMessage.id,
@@ -252,16 +251,20 @@ export const ChatMessageInput = memo(
 								content: JSON.stringify(targetMessage.content),
 								has_attachment: Boolean(targetMessage?.attachments?.length),
 							},
-						]
+						] as Array<ApiMessageRef>)
 					: undefined;
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 
 				const sendMessageAsync = async () => {
 					if (type === EMessageActionType.EditMessage) {
-						await onEditMessage(payloadSendMessage, messageActionNeedToResolve?.targetMessage?.id, simplifiedMentionList || []);
+						await onEditMessage(
+							filterEmptyArrays(payloadSendMessage),
+							messageActionNeedToResolve?.targetMessage?.id,
+							simplifiedMentionList || [],
+						);
 					} else {
 						if (![EMessageActionType.CreateThread].includes(messageAction)) {
-							const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.username === '@here');
+							const isMentionEveryOne = mentionsOnMessage.some((mention) => mention.user_id === ID_MENTION_HERE);
 							switch (mode) {
 								case ChannelStreamMode.STREAM_MODE_CHANNEL:
 									await sendMessage(
@@ -275,7 +278,12 @@ export const ChatMessageInput = memo(
 									break;
 								case ChannelStreamMode.STREAM_MODE_DM:
 								case ChannelStreamMode.STREAM_MODE_GROUP:
-									await handleSendDM(payloadSendMessage, simplifiedMentionList, attachmentDataUnique || [], reference);
+									await handleSendDM(
+										filterEmptyArrays(payloadSendMessage),
+										simplifiedMentionList,
+										attachmentDataUnique || [],
+										reference,
+									);
 									break;
 								default:
 									break;
