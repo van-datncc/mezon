@@ -403,6 +403,7 @@ export type ChannelDraftMessages = {
 	message_id: string;
 	draftContent: IMessageSendPayload;
 	draftMention: ApiMessageMention[];
+	draftAttachment: ApiMessageAttachment[];
 };
 
 export interface IGifCategory {

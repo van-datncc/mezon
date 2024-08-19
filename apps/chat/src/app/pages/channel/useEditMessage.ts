@@ -1,14 +1,21 @@
 import { useChatSending } from '@mezon/core';
 import { messagesActions, referencesActions, selectIdMessageRefEdit, selectOpenEditMessageState } from '@mezon/store';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
-import { ApiMessageMention } from 'mezon-js/api.gen';
-import { useCallback } from 'react';
+import { useProcessLink } from 'libs/core/src/lib/chat/hooks/useProcessLink';
+import { ApiMessageAttachment, ApiMessageMention } from 'mezon-js/api.gen';
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const useEditMessage = (channelId: string, channelLabel: string, mode: number, message: IMessageWithUser) => {
-	const dispatch = useDispatch();
-	const { editSendMessage } = useChatSending({ channelId: channelId || '', mode });
+	const clanIdInMes = useMemo(() => {
+		return message.clan_id;
+	}, [message.clan_id]);
+	const attachmentsOnMessage = useMemo(() => {
+		return message.attachments;
+	}, [message.id, message.attachments]);
 
+	const dispatch = useDispatch();
+	const { editSendMessage, updateImageLinkMessage } = useChatSending({ channelId: channelId || '', mode });
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 
@@ -19,7 +26,13 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [channelId, dispatch]);
 
 	const setChannelDraftMessage = useCallback(
-		(channelId: string, message_id: string, draftContent: IMessageSendPayload, draftMention: ApiMessageMention[]) => {
+		(
+			channelId: string,
+			message_id: string,
+			draftContent: IMessageSendPayload,
+			draftMention: ApiMessageMention[],
+			attachmentsOnMessage: ApiMessageAttachment[],
+		) => {
 			dispatch(
 				messagesActions.setChannelDraftMessage({
 					channelId: channelId as string,
@@ -27,6 +40,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 						message_id: message_id,
 						draftContent: draftContent,
 						draftMention: draftMention,
+						draftAttachment: attachmentsOnMessage,
 					},
 				}),
 			);
@@ -34,13 +48,16 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 		[dispatch],
 	);
 
+	const { processLink } = useProcessLink({ updateImageLinkMessage });
+
 	const handleSend = useCallback(
 		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[]) => {
-			editSendMessage(editMessage, messageId, draftMention);
-			setChannelDraftMessage(channelId, messageId, editMessage, draftMention);
+			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage);
+			setChannelDraftMessage(channelId, messageId, editMessage, draftMention, attachmentsOnMessage ?? []);
 			dispatch(referencesActions.setOpenEditMessageState(false));
+			processLink(clanIdInMes ?? '', channelId ?? '', mode ?? 0, editMessage, draftMention, attachmentsOnMessage, messageId, message);
 		},
-		[editSendMessage],
+		[editSendMessage, setChannelDraftMessage, dispatch, processLink, clanIdInMes, channelId, mode],
 	);
 
 	return {

@@ -88,7 +88,12 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 		dispatch(
 			messagesActions.setChannelDraftMessage({
 				channelId: message.channel_id,
-				channelDraftMessage: { message_id: messageId, draftContent: message.content, draftMention: message.mentions ?? [] },
+				channelDraftMessage: {
+					message_id: messageId,
+					draftContent: message.content,
+					draftMention: message.mentions ?? [],
+					draftAttachment: message.attachments ?? [],
+				},
 			}),
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));

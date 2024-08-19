@@ -8,6 +8,7 @@ import {
 	ThemeApp,
 	addMention,
 	createFormattedString,
+	filterEmptyArrays,
 	getRoleList,
 	processText,
 	searchMentionsHashtag,
@@ -17,7 +18,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import ModalDeleteMess from './ModalDeleteMess';
 import darkMentionsInputStyle from './RmentionInputStyle';
@@ -39,6 +40,7 @@ type ChannelsMentionProps = {
 };
 
 const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode, channelLabel, message }) => {
+	const dispatch = useDispatch();
 	const { openEditMessageState, idMessageRefEdit, handleCancelEdit, handleSend, setChannelDraftMessage } = useEditMessage(
 		channelId,
 		channelLabel,
@@ -49,6 +51,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
+
+	const attachmentsOnMessage = useMemo(() => {
+		return message.attachments;
+	}, [message.attachments]);
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
@@ -106,6 +112,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		[processedContentDraft, processedMentionDraft],
 	);
 
+	const attachmentOnMessage = useMemo(() => {
+		return message.attachments;
+	}, [message.attachments]);
+
 	const formatContentDraft = useMemo(() => createFormattedString(addMentionToContent), [addMentionToContent]);
 
 	const handleFocus = () => {
@@ -135,7 +145,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			} else if (draftContent === originalContent) {
 				handleCancelEdit();
 			} else {
-				handleSend(processedContentDraft, message.id, processedMentionDraft);
+				handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft);
 				handleCancelEdit();
 			}
 		}
@@ -152,7 +162,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		} else if (draftContent !== '' && draftContent === originalContent) {
 			return handleCancelEdit();
 		} else {
-			handleSend(processedContentDraft, message.id, processedMentionDraft);
+			handleSend(filterEmptyArrays(processedContentDraft), message.id, processedMentionDraft);
 		}
 		handleCancelEdit();
 	};
@@ -174,6 +184,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				vk: voiceRooms,
 			},
 			mentionList,
+			attachmentOnMessage ?? [],
 		);
 
 		if (newPlainTextValue.endsWith('@')) {
@@ -216,7 +227,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	};
 
 	return (
-		<div className="inputEdit w-full flex ">
+		<div className="inputEdit w-full flex flex-col">
 			<div className="w-full">
 				<MentionsInput
 					onFocus={handleFocus}
