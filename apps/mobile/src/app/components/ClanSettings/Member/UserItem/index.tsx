@@ -18,13 +18,13 @@ export default function UserItem({ userID, hasBorder }: IUserItem) {
     const rolesClan = useAppSelector(selectAllRolesClan);
 
     const userRolesClan = useMemo(() => {
-        return rolesClan.filter((role) => {
+        return rolesClan?.filter((role) => {
             if (role.role_user_list?.role_users) {
                 const list = role.role_user_list.role_users.filter(user => user.id === userID);
                 return list.length;
             }
             return false;
-        });
+        }) || [];
     }, [userID, rolesClan]);
 
     return (

@@ -1,6 +1,6 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Icons } from "@mezon/mobile-components";
-import { baseColor, useTheme } from "@mezon/mobile-ui";
+import { baseColor, size, useTheme } from "@mezon/mobile-ui";
 import { selectAllUsesClan, useAppSelector } from "@mezon/store-mobile";
 import { useMemo, useRef } from "react";
 import { KeyboardAvoidingView, ScrollView, Text, TouchableWithoutFeedback, View } from "react-native";
@@ -38,8 +38,8 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
             <MezonMenuContext
                 icon={<Icons.MoreHorizontalIcon
                     color={themeValue.text}
-                    height={20} width={20}
-                    style={{ marginRight: 20 }}
+                    height={size.s_20} width={size.s_20}
+                    style={{ marginRight: size.s_20 }}
                 />}
                 menu={menuContext}
             />
@@ -56,7 +56,7 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
                             <UserItem
                                 key={item.id}
                                 userID={item.id}
-                                hasBorder={index != usersClan.length - 1}
+                                hasBorder={index != (usersClan?.length || 0) - 1}
                             />
                         ))}
                     </ScrollView>
