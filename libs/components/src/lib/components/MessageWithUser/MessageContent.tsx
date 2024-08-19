@@ -73,6 +73,8 @@ const MessageText = ({
 		);
 	}, [attachmentOnMessage, contentTonMessage]);
 
+	console.log('message.hideEditted', message.hideEditted);
+
 	return (
 		<>
 			{' '}
@@ -89,11 +91,12 @@ const MessageText = ({
 							mode={mode}
 						/>
 					</div>
-					{message.hideEditted && (
-						<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
-							(edited)
-						</p>
-					)}
+					{!message.hideEditted ||
+						(message.hideEditted !== undefined && (
+							<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
+								(edited)
+							</p>
+						))}
 				</div>
 			) : null}
 		</>

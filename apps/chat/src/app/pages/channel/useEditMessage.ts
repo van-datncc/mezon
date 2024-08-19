@@ -52,10 +52,10 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 
 	const handleSend = useCallback(
 		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[]) => {
-			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage);
+			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage, false);
 			setChannelDraftMessage(channelId, messageId, editMessage, draftMention, attachmentsOnMessage ?? []);
 			dispatch(referencesActions.setOpenEditMessageState(false));
-			processLink(clanIdInMes ?? '', channelId ?? '', mode ?? 0, editMessage, draftMention, attachmentsOnMessage, messageId, message);
+			// processLink(clanIdInMes ?? '', channelId ?? '', mode ?? 0, editMessage, draftMention, attachmentsOnMessage, messageId, message, true);
 		},
 		[editSendMessage, setChannelDraftMessage, dispatch, processLink, clanIdInMes, channelId, mode],
 	);

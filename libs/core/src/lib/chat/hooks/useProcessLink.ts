@@ -5,15 +5,15 @@ import { useCallback, useMemo } from 'react';
 
 type UseProcessLinkOptions = {
 	updateImageLinkMessage: (
-		clanId: string,
-		channelId: string,
-		mode: number,
-		content: IMessageSendPayload,
-		messageId: string,
-		mentions: ApiMessageMention[],
+		clanId?: string,
+		channelId?: string,
+		mode?: number,
+		content?: IMessageSendPayload,
+		messageId?: string,
+		mentions?: ApiMessageMention[],
 		attachments?: ApiMessageAttachment[],
 		messageEdit?: IMessageWithUser,
-		// hideEditted?: boolean,
+		hideEditted?: boolean,
 	) => Promise<void>;
 };
 
@@ -28,6 +28,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 			attachmentPayload?: ApiMessageAttachment[],
 			newMessageIdUpdateImage?: string,
 			messageEdit?: IMessageWithUser,
+			hideEditted?: boolean,
 		) => {
 			if (!contentPayload?.lk) {
 				const filteredAttachments =
@@ -48,6 +49,8 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 						newMessageIdUpdateImage ?? '',
 						mentionPayload ?? [],
 						finalAttachments,
+						undefined,
+						false,
 					);
 				}
 			} else if (contentPayload?.lk) {
@@ -75,6 +78,8 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 								newMessageIdUpdateImage ?? '',
 								mentionPayload ?? [],
 								combinedAttachments,
+								undefined,
+								true,
 							);
 						}
 					})

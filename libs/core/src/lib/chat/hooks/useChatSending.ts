@@ -8,7 +8,7 @@ import {
 	useAppDispatch,
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -43,7 +43,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
 	const [mentionPayload, setMentionPayload] = useState<ApiMessageMention[]>();
 	const [attachmentPayload, setAttachmentPayload] = useState<ApiMessageAttachment[]>();
-	const [hideEditted, setHideEditted] = useState<boolean>();
 
 	const sendMessage = React.useCallback(
 		async (
@@ -82,7 +81,13 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(
-		async (content: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[], attachments?: ApiMessageAttachment[]) => {
+		async (
+			content: IMessageSendPayload,
+			messageId: string,
+			mentions: ApiMessageMention[],
+			attachments?: ApiMessageAttachment[],
+			hideEditted?: boolean,
+		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -90,20 +95,22 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments, true);
+			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments, hideEditted);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
 
 	const updateImageLinkMessage = React.useCallback(
 		async (
-			clanId: string,
-			channelId: string,
-			mode: ChannelStreamMode,
-			content: IMessageSendPayload,
-			messageId: string,
-			mentions: ApiMessageMention[],
+			clanId?: string,
+			channelId?: string,
+			mode?: ChannelStreamMode,
+			content?: IMessageSendPayload,
+			messageId?: string,
+			mentions?: ApiMessageMention[],
 			attachments?: ApiMessageAttachment[],
+			messageEdit?: IMessageWithUser,
+			hideEditted?: boolean,
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -112,7 +119,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.updateChatMessage(clanId, channelId, mode, messageId, content, mentions, attachments, false);
+			await socket.updateChatMessage(clanId ?? '', channelId ?? '', mode ?? 0, messageId ?? '', content, mentions, attachments, hideEditted);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
