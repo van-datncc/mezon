@@ -698,3 +698,26 @@ export type MessageTypeUpdateLink = {
 	clan_id?: string;
 	mode?: ChannelStreamMode;
 };
+
+export enum EUserSettings {
+	ACCOUNT = "Account",
+	PROFILES = "Profiles",
+	PRIVACY_SAFETY = "Privacy & Safety",
+	FAMILY_CENTER = "Family Center",
+	AUTHORIZED_APPS = "Authorized Apps",
+	DEVICES = "Devices",
+	CONNECTIONS = "Connections",
+	CLIPS = "Clips",
+	FRIEND_REQUESTS = "Friend Requests",
+	APP_SETTINGS = "APP SETTINGS",
+	APPEARANCE = "Appearance",
+	ACCESSIBILITY = "Accessibility",
+	VOICE_VIDEO = "Voice & Video",
+	TEXT_IMAGE = "Text & Image",
+	NOTIFICATIONS = "Notifications",
+	KEYBINDS = "Keybinds",
+	LANGUAGE = "Language",
+	STREAMER_MODE = "Streamer Mode",
+	ADVANCED = "Advanced",
+	LOG_OUT = "Log Out",
+}
