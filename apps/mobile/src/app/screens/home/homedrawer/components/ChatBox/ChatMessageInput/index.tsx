@@ -105,6 +105,12 @@ export const ChatMessageInput = memo(
 					roleName: item.title ?? '',
 				}));
 			}, [rolesInClan]);
+			
+			const removeTags = (text: string) => {
+				if (!text)
+					return '';
+				return text?.replace?.(/@\[(.*?)\]/g, '@$1');
+			}
 
 			const clearInputAfterSendMessage = useCallback(() => {
 				onSendSuccess();
@@ -207,7 +213,7 @@ export const ChatMessageInput = memo(
 				});
 
 				const payloadSendMessage: IMessageSendPayload = {
-					t: text,
+					t: removeTags(text),
 					hg: hashtagsOnMessage,
 					ej: emojisOnMessage,
 					lk: linksOnMessage,
