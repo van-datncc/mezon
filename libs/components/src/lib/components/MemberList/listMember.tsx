@@ -10,7 +10,14 @@ type ListMemberProps = {
 const ListMember = (props: ListMemberProps) => {
 	const { lisMembers, isOffline } = props;
 	return lisMembers.map((user) => (
-		<MemberItem user={user} key={user?.user?.id} listProfile={true} isOffline={isOffline} positionType={MemberProfileType.MEMBER_LIST} />
+		<MemberItem
+			name={user.clan_nick || user?.user?.display_name || user?.user?.username}
+			user={user}
+			key={user?.user?.id}
+			listProfile={true}
+			isOffline={isOffline}
+			positionType={MemberProfileType.MEMBER_LIST}
+		/>
 	));
 };
 

@@ -99,7 +99,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 							customStatus={userCustomStatus || userStatusProfile}
 						/>
 					</div>
-					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} avatar={avatar} />}
+					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} avatar={avatar} name={name} />}
 				</div>
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />

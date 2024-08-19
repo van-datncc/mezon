@@ -10,9 +10,10 @@ export type MemberItemProps = {
 	positionType?: MemberProfileType;
 	dataMemberCreate?: DataMemberCreate;
 	directMessageId?: string;
+	name?: string;
 };
 
-function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId }: MemberItemProps) {
+function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name }: MemberItemProps) {
 	const userStatus = useMemberStatus(user.user?.id || '');
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '');
 
@@ -20,11 +21,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 		<MemberProfile
 			numberCharacterCollapse={30}
 			avatar={user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '')}
-			name={
-				positionType === MemberProfileType.DM_MEMBER_GROUP
-					? user?.user?.display_name || ''
-					: user.clan_nick || user?.user?.display_name || user?.user?.username || ''
-			}
+			name={name || ''}
 			userNameAva={user?.user?.username}
 			status={userStatus}
 			customStatus={userCustomStatus}
@@ -36,7 +33,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			isOffline={isOffline}
 			positionType={positionType}
 			dataMemberCreate={dataMemberCreate}
-      hideLongName={true}
+			hideLongName={true}
 		/>
 	);
 }

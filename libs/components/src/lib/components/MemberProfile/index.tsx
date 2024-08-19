@@ -241,7 +241,7 @@ function MemberProfile({
                   ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
                   ${classParent == '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
                   ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
-							`}
+							    `}
 									title={name}
 								>
 									<span
@@ -296,6 +296,7 @@ function MemberProfile({
 						userID={user?.user?.id || ''}
 						mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
 						avatar={avatar}
+						name={name}
 					/>
 				</div>
 			) : null}

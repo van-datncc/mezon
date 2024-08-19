@@ -14,7 +14,7 @@ type IMessageAvatarProps = {
 };
 
 const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMessageAvatarProps) => {
-	const { senderId, username, avatarSender, userClanAvatar } = useMessageParser(message);
+	const { senderId, username, avatarSender, userClanAvatar, userClanNickname, userDisplayName } = useMessageParser(message);
 	const { clanAvatar, generalAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
 	const { pendingUserAvatar, pendingClanAvatar } = usePendingNames(
 		message,
@@ -91,7 +91,13 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode }: IMes
 					style={{ top: positionBottom ? '' : `${positionTop + 'px'}`, bottom: positionBottom ? '64px' : '' }}
 					onMouseDown={handleDefault}
 				>
-					<ShortUserProfile userID={senderId} message={message} mode={mode} avatar={userClanAvatar || pendingUserAvatar} />
+					<ShortUserProfile
+						userID={senderId}
+						message={message}
+						mode={mode}
+						avatar={userClanAvatar || pendingUserAvatar}
+						name={userClanNickname || userDisplayName || username}
+					/>
 				</div>
 			) : null}
 		</div>

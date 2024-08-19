@@ -111,7 +111,13 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={senderId} message={message} mode={mode} avatar={userClanAvatar} />
+					<ShortUserProfile
+						userID={senderId}
+						message={message}
+						mode={mode}
+						avatar={userClanAvatar}
+						name={userClanNickname || userDisplayName || username}
+					/>
 				</div>
 			)}
 		</div>

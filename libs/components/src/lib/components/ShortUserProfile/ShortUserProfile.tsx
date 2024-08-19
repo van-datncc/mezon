@@ -7,9 +7,10 @@ type ShortUserProfilePopup = {
 	mode?: number;
 	avatar?: string;
 	positionType?: string;
+	name?: string;
 };
 
-const ShortUserProfile = ({ userID, message, mode, positionType, avatar }: ShortUserProfilePopup) => {
+const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name }: ShortUserProfilePopup) => {
 	const [showPopupAddRole, setShowPopupAddRole] = useState(false);
 	const handleClickOutside = () => {
 		if (showPopupAddRole) {
@@ -26,6 +27,7 @@ const ShortUserProfile = ({ userID, message, mode, positionType, avatar }: Short
 					mode={mode}
 					positionType={positionType}
 					avatar={avatar}
+					name={name}
 				/>
 			</div>
 		</div>

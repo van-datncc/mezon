@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectAllChannelMembers, selectAllRolesClan, selectAllUsesClan } from '@mezon/store';
+import { selectAllChannelMembers, selectAllRolesClan, selectMemberChannels } from '@mezon/store';
 import { MouseButton, checkLastChar, getRoleList } from '@mezon/utils';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,7 +16,7 @@ type ChannelHashtagProps = {
 
 const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
-	const usersClan = useSelector(selectAllUsesClan);
+	const memberChannels = useSelector(selectMemberChannels);
 
 	const usersInChannel = useSelector(selectAllChannelMembers);
 	const [foundUser, setFoundUser] = useState<any>(null);
@@ -44,7 +44,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 		if (mode === 4 || mode === 3) {
 			user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
 		} else {
-			user = usersClan.find((userClan) => userClan.user?.id === tagUserId);
+			user = memberChannels?.find((userChannel) => userChannel.user?.id === tagUserId);
 		}
 
 		if (user) {
@@ -52,7 +52,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 		} else {
 			setFoundUser(null);
 		}
-	}, [tagName, userRemoveChar, mode, usersInChannel, usersClan]);
+	}, [tagName, userRemoveChar, mode, usersInChannel, memberChannels]);
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 	const [positionBottom, setPositionBottom] = useState(false);
@@ -100,7 +100,12 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 					}}
 					onMouseDown={(e) => e.stopPropagation()}
 				>
-					<ShortUserProfile userID={foundUser.user.id} mode={mode} avatar={foundUser?.clan_avatar} />
+					<ShortUserProfile
+						userID={foundUser.user.id}
+						mode={mode}
+						avatar={foundUser?.clan_avatar}
+						name={foundUser?.clan_nick || foundUser?.user?.display_name || foundUser?.user?.username}
+					/>
 				</div>
 			)}
 
