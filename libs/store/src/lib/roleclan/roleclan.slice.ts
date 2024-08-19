@@ -56,6 +56,7 @@ type FetchReturnMembersRole ={
 
 type FetchMembersRolePayload = {
 	roleId: string;
+	clanId: string
 };
 export const fetchMembersRole = createAsyncThunk(
 	'MembersRole/fetchMembersRole',
@@ -75,10 +76,10 @@ export const fetchDeleteRole = createAsyncThunk(
 
 	'DeleteRole/fetchDeleteRole',
 
-	async ({ roleId }: FetchMembersRolePayload, thunkAPI) => {
+	async ({ roleId, clanId }: FetchMembersRolePayload, thunkAPI) => {
 		try{
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.updateRoleDelete(mezon.session,roleId,{});
+			const response = await mezon.client.updateRoleDelete(mezon.session,roleId,{clan_id: clanId});
 			thunkAPI.dispatch(rolesClanActions.remove(roleId))
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
@@ -127,11 +128,12 @@ type UpdateRolePayload = {
     active_permission_ids: string[];
     remove_user_ids: string[];
     remove_permission_ids: string[];
+	clanId: string;
 };
 
 export const fetchUpdateRole = createAsyncThunk(
 	'UpdateRole/fetchUpdateRole',
-	async ({ role_id, title, add_user_ids, active_permission_ids,remove_user_ids, remove_permission_ids}: UpdateRolePayload, thunkAPI) => {
+	async ({ role_id, title, add_user_ids, active_permission_ids,remove_user_ids, remove_permission_ids, clanId}: UpdateRolePayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			role_id: role_id,
@@ -145,6 +147,7 @@ export const fetchUpdateRole = createAsyncThunk(
 			active_permission_ids: active_permission_ids || [],
 			remove_user_ids: remove_user_ids || [],
 			remove_permission_ids: remove_permission_ids || [],
+			clan_id: clanId
 		}
 		const response = await mezon.client.updateRole(mezon.session, role_id, body);
 		if (!response) {
