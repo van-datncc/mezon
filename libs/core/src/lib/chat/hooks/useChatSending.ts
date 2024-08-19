@@ -43,6 +43,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
 	const [mentionPayload, setMentionPayload] = useState<ApiMessageMention[]>();
 	const [attachmentPayload, setAttachmentPayload] = useState<ApiMessageAttachment[]>();
+	const [hideEditted, setHideEditted] = useState<boolean>();
 
 	const sendMessage = React.useCallback(
 		async (
@@ -85,12 +86,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
-
 			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments);
+			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments, true);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
@@ -112,8 +112,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			if (!client || !session || !socket || (!channel && !direct)) {
 				throw new Error('Client is not initialized');
 			}
-
-			await socket.updateChatMessage(clanId, channelId, mode, messageId, content, mentions, attachments);
+			await socket.updateChatMessage(clanId, channelId, mode, messageId, content, mentions, attachments, false);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);

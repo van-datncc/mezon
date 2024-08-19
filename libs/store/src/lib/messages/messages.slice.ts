@@ -66,6 +66,7 @@ export interface MessagesEntity extends IMessageWithUser {
 	channel_id: string;
 	isStartedMessageGroup?: boolean;
 	isStartedMessageOfTheDay?: boolean;
+	hideEditted?: boolean;
 }
 
 export type UserTypingState = {
@@ -658,11 +659,8 @@ export const messagesSlice = createSlice({
 						changes: {
 							content: action.payload.content,
 							mentions: action.payload.mentions,
-							update_time:
-								action.payload.attachments && action.payload.attachments?.length > 0
-									? action.payload.create_time
-									: action.payload.update_time,
 							attachments: action.payload.attachments,
+							hideEditted: action.payload.hideEditted,
 						},
 					});
 					break;

@@ -13,6 +13,7 @@ type UseProcessLinkOptions = {
 		mentions: ApiMessageMention[],
 		attachments?: ApiMessageAttachment[],
 		messageEdit?: IMessageWithUser,
+		// hideEditted?: boolean,
 	) => Promise<void>;
 };
 
