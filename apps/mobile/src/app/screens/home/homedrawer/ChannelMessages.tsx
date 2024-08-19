@@ -1,11 +1,10 @@
 import { useDeleteMessage } from '@mezon/core';
-import { ActionEmitEvent, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
+import { ActionEmitEvent, cloneDeep, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { attachmentActions, useAppSelector } from '@mezon/store';
 import { messagesActions, RootState, selectHasMoreMessageByChannelId, selectMessageIdsByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
-import { cloneDeep } from 'lodash';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
