@@ -3134,7 +3134,7 @@ export function MenuClose(props: React.HTMLAttributes<SVGElement>) {
 			version="1.1"
 			xmlns="http://www.w3.org/2000/svg"
 			xmlnsXlink="http://www.w3.org/1999/xlink"
-			fill="#000000"
+			fill="currentColor"
 			className=""
 			{...props}
 		>
@@ -3143,7 +3143,7 @@ export function MenuClose(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_iconCarrier">
 				<title>close [#1511]</title> <desc>Created with Sketch.</desc> <defs> </defs>
 				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-					<g id="Dribbble-Light-Preview" transform="translate(-419.000000, -240.000000)" fill="#000000">
+					<g id="Dribbble-Light-Preview" transform="translate(-419.000000, -240.000000)" fill="currentColor">
 						<g id="icons" transform="translate(56.000000, 160.000000)">
 							<polygon
 								id="close-[#1511]"
@@ -3862,7 +3862,7 @@ export function SortBySmallSizeBtn(props: React.HTMLAttributes<SVGElement>) {
 			xmlnsXlink="http://www.w3.org/1999/xlink"
 			viewBox="0 0 490.2 490.2"
 			xmlSpace="preserve"
-			className=''
+			className=""
 			{...props}
 		>
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -3877,6 +3877,17 @@ export function SortBySmallSizeBtn(props: React.HTMLAttributes<SVGElement>) {
 					</g>{' '}
 				</g>{' '}
 			</g>
+		</svg>
+	);
+}
+
+export function MenuBarIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16" {...props}>
+			<path
+				fill="currentColor"
+				d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+			/>
 		</svg>
 	);
 }

@@ -107,7 +107,7 @@ const AppPageBottom = () => {
 
 	return (
 		<div>
-			<div className="flex justify-between mb-[32px]">
+			<div className="flex justify-between mb-[32px] max-md:block">
 				<div className="flex gap-4 w-fit items-center">
 					<div>Sort by:</div>
 					<Dropdown
@@ -140,9 +140,9 @@ const AppPageBottom = () => {
 						/>
 					</Dropdown>
 				</div>
-				<div className="flex w-fit gap-4">
+				<div className="flex w-fit gap-4 max-md:mt-4">
 					<div
-						className={`cursor-pointer flex items-center gap-3 px-3 rounded-md ${isSmallSizeSort ? 'bg-[#e6e6e8] dark:bg-[#3f4147]' : ''}`}
+						className={`cursor-pointer flex items-center gap-3 px-3 max-md:p-3 rounded-md ${isSmallSizeSort ? 'bg-[#e6e6e8] dark:bg-[#3f4147]' : ''}`}
 						onClick={() => setIsSmallSizeSort(true)}
 					>
 						<div className={`w-5`}>
@@ -151,7 +151,7 @@ const AppPageBottom = () => {
 						<div>Small</div>
 					</div>
 					<div
-						className={`cursor-pointer flex items-center gap-3 px-3 rounded-md ${!isSmallSizeSort ? 'bg-[#e6e6e8] dark:bg-[#3f4147]' : ''}`}
+						className={`cursor-pointer flex items-center gap-3 px-3 max-md:p-3 rounded-md ${!isSmallSizeSort ? 'bg-[#e6e6e8] dark:bg-[#3f4147]' : ''}`}
 						onClick={() => setIsSmallSizeSort(false)}
 					>
 						<div className="w-5">
@@ -177,7 +177,7 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 	return (
 		<div className="flex flex-col gap-5">
 			<div className="text-[20px]">My Applications</div>
-			<div className="flex flex-wrap gap-4 gap-x-4">
+			<div className="flex flex-wrap gap-4 gap-x-4 justify-evenly">
 				{appListForDisplaying &&
 					appListForDisplaying.map((value, index) => (
 						<div
