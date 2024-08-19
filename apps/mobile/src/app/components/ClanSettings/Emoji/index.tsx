@@ -1,4 +1,4 @@
-import { handleUploadEmoticonMobile } from '@mezon/mobile-components';
+import { handleUploadEmoticonMobile, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, createEmojiSetting, selectAllEmojiSuggestion, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -7,7 +7,7 @@ import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
+import { Dimensions, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { openCropper } from 'react-native-image-crop-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
@@ -72,7 +72,6 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 
 	const handleAddEmoji = async () => {
 		const file = await handleSelectImage();
-		dispatch(appActions.setLoadingMainMobile(true));
 		try {
 			if (file) {
 				timerRef.current = setTimeout(async () => {
@@ -80,7 +79,7 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 						path: file.uri,
 						mediaType: 'photo',
 						includeBase64: true,
-						compressImageQuality: 1,
+						compressImageQuality: QUALITY_IMAGE_UPLOAD,
 						...(typeof width === 'number' && { width: width, height: width }),
 					});
 					const uploadImagePayload = {
@@ -90,6 +89,8 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 						uri: croppedFile.path,
 						fileData: croppedFile.data,
 					} as IFile;
+					dispatch(appActions.setLoadingMainMobile(true));
+					
 					const session = sessionRef.current;
 					const client = clientRef.current;
 					const fileNameParts = file.fileName?.split('.');
@@ -99,6 +100,8 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 
 					handleUploadEmoticonMobile(client, session, path, uploadImagePayload)
 						.then(async (attachment: ApiMessageAttachment) => {
+							console.log('Tom log  => attachment', attachment);
+							
 							const request: ApiClanEmojiCreateRequest = {
 								id: id,
 								category: 'Custom',
@@ -111,7 +114,7 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 						.finally(() => {
 							dispatch(appActions.setLoadingMainMobile(false));
 						});
-				});
+				}, Platform.OS === 'ios' ? 500 : 0);
 			}
 		} catch (e) {
 			dispatch(appActions.setLoadingMainMobile(false));
