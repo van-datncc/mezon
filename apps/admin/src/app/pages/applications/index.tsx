@@ -161,14 +161,16 @@ const AppPageBottom = () => {
 					</div>
 				</div>
 			</div>
-			<ApplicationsList isSmallSizeSort={isSmallSizeSort} appListForDisplaying={appListForDisplaying} />
+			{appListForDisplaying && appListForDisplaying.length > 0 && (
+				<ApplicationsList isSmallSizeSort={isSmallSizeSort} appListForDisplaying={appListForDisplaying} />
+			)}
 		</div>
 	);
 };
 
 interface IApplicationsListProps {
 	isSmallSizeSort: boolean;
-	appListForDisplaying: ApiApp[] | undefined;
+	appListForDisplaying: ApiApp[];
 }
 
 const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicationsListProps) => {
