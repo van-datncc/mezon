@@ -1,12 +1,10 @@
 import {
 	channelMembers,
 	channelMembersActions,
-	channelUsersActions,
 	channelsActions,
 	channelsSlice,
 	clansSlice,
 	directActions,
-	fetchChannelMembers,
 	fetchDirectMessage,
 	friendsActions,
 	listChannelsByUserActions,
@@ -31,14 +29,13 @@ import { NotificationCode } from '@mezon/utils';
 import {
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
-	ChannelMessageEvent,
+	ChannelMessage,
 	ChannelPresenceEvent,
 	ChannelType,
 	ChannelUpdatedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	LastPinMessageEvent,
-	MessageReactionEvent,
 	MessageTypingEvent,
 	Notification,
 	Socket,
@@ -49,6 +46,7 @@ import {
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
 } from 'mezon-js';
+import { ApiMessageReaction } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -109,7 +107,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onchannelmessage = useCallback(
-		async (message: ChannelMessageEvent) => {
+		async (message: ChannelMessage) => {
 			const senderId = message.sender_id;
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
@@ -130,7 +128,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 
 			dispatch(messagesActions.addNewMessage(mess));
-			dispatch(messagesActions.setIdNewMessageResponse(message.id));
+			dispatch(messagesActions.setNewMessageToUpdateImage(message));
 
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
@@ -216,7 +214,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(userAdds: UserChannelAddedEvent) => {
 			const user = userAdds.users.find((user: any) => user.user_id !== userId);
 			if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
-				dispatch(fetchDirectMessage({noCache : true}));
+				dispatch(fetchDirectMessage({ noCache: true }));
 			}
 			if (user) {
 				dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
@@ -295,7 +293,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onmessagereaction = useCallback(
-		(e: MessageReactionEvent) => {
+		(e: ApiMessageReaction) => {
 			if (e.count > 0) {
 				dispatch(reactionActions.setReactionDataSocket(mapReactionToEntity(e)));
 			}

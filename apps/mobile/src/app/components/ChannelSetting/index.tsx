@@ -1,8 +1,7 @@
-import { CheckIcon } from '@mezon/mobile-components';
+import { CheckIcon, isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectChannelById, useAppDispatch } from '@mezon/store-mobile';
 import { BellIcon, FolderPlusIcon, LinkIcon, PinIcon, TrashIcon, UserShieldIcon, WebhookIcon } from 'libs/mobile-components/src/lib/icons2';
-import { isEqual } from 'lodash';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

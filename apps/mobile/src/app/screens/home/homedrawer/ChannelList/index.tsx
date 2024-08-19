@@ -3,11 +3,9 @@ import { useCategory, useUserPermission } from '@mezon/core';
 import {
 	EOpenSearchChannelFrom,
 	Icons,
-	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CATEGORY_CHANNEL,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
 	hasNonEmptyChannels,
+	isEmpty,
 	load,
 	save
 } from '@mezon/mobile-components';
@@ -15,18 +13,14 @@ import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
 	categoriesActions,
-	channelsActions,
-	getStoreAsync,
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
-	selectCurrentChannel,
 	selectCurrentClan,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { isEmpty } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
@@ -67,13 +61,6 @@ const ChannelList = React.memo((props: any) => {
 	const dispatch = useAppDispatch();
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { isCanManageEvent } = useUserPermission();
-	const currentChannel = useSelector(selectCurrentChannel);
-
-	useEffect(() => {
-		if (!currentChannel) {
-			handleFocusDefaultChannel()
-		}
-	}, [currentChannel])
 
 	useEffect(() => {
 		try {
@@ -126,23 +113,6 @@ const ChannelList = React.memo((props: any) => {
 				},
 			},
 		});
-	}
-
-	const handleFocusDefaultChannel = async () => {
-		const firstTextChannel = categorizedChannels[0]?.channels?.filter(channel => channel?.type === 1)?.[0];
-		if (!firstTextChannel) return;
-		const { clan_id: clanId, channel_id: channelId } = firstTextChannel;
-		const store = await getStoreAsync();
-		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		await Promise.all([
-			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
-		]);
-
-		const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-		if (!channelsCache?.includes(channelId)) {
-			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-		}
 	}
 
 	if (isEmpty(currentClan)) {

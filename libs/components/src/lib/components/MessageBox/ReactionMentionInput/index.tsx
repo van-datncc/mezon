@@ -16,7 +16,6 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
-	selectAllHashtagDmVoice,
 	selectAllRolesClan,
 	selectAllUsesClan,
 	selectAttachmentData,
@@ -26,6 +25,7 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
+	selectHashtagDMByDirectId,
 	selectIdMessageRefEdit,
 	selectIdMessageRefReply,
 	selectIsFocused,
@@ -54,6 +54,7 @@ import {
 	SubPanelName,
 	ThreadValue,
 	UsersClanEntity,
+	filterEmptyArrays,
 	focusToElement,
 	getRoleList,
 	searchMentionsHashtag,
@@ -65,6 +66,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
@@ -122,6 +124,7 @@ export type MentionReactInputProps = {
 };
 
 function MentionReactInput(props: MentionReactInputProps): ReactElement {
+	const { directId } = useParams();
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
 	const { channels } = useChannels();
@@ -131,7 +134,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelVoids = useSelector(selectAllHashtagDmVoice);
+	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directId || ''));
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -252,11 +255,21 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(content);
+
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
 	const { mentionList, hashtagList, emojiList } = useProcessMention(mentionRaw, roleList);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
+			const payload = {
+				t: content,
+				hg: hashtagList,
+				ej: emojiList,
+				lk: linkList,
+				mk: markdownList,
+				vk: voiceLinkRoomList,
+			};
+
 			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
 				return;
 			}
@@ -285,14 +298,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0 && openReplyMessageState) {
 				props.onSend(
-					{
-						t: content,
-						hg: hashtagList,
-						ej: emojiList,
-						lk: linkList,
-						mk: markdownList,
-						vk: voiceLinkRoomList,
-					},
+					filterEmptyArrays(payload),
 					mentionList,
 					attachmentDataRef,
 					dataReferences,
@@ -325,14 +331,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					setOpenThreadMessageState(false);
 				} else {
 					props.onSend(
-						{
-							t: content,
-							hg: hashtagList,
-							ej: emojiList,
-							lk: linkList,
-							mk: markdownList,
-							vk: voiceLinkRoomList,
-						},
+						filterEmptyArrays(payload),
 						mentionList,
 						attachmentDataRef,
 						undefined,
@@ -407,9 +406,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		return [];
 	}, [props.mode, channels]);
 
-	const listChannelVoidsMention: ChannelsMentionProps[] = useMemo(() => {
+	const commonChannelsMention: ChannelsMentionProps[] = useMemo(() => {
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
-			return commonChannelVoids.map((item) => {
+			return commonChannelDms.map((item) => {
 				return {
 					id: item?.channel_id ?? '',
 					display: item?.channel_label ?? '',
@@ -418,7 +417,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			}) as ChannelsMentionProps[];
 		}
 		return [];
-	}, [props.mode, commonChannelVoids]);
+	}, [props.mode, commonChannelDms]);
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		setMentionRaw(mentions);
@@ -494,7 +493,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleSearchHashtag = (search: string, callback: any) => {
 		setValueHightlight(search);
 		if (props.mode === ChannelStreamMode.STREAM_MODE_DM) {
-			callback(searchMentionsHashtag(search, listChannelVoidsMention ?? []));
+			callback(searchMentionsHashtag(search, commonChannelsMention ?? []));
 		} else {
 			callback(searchMentionsHashtag(search, listChannelsMention ?? []));
 		}
