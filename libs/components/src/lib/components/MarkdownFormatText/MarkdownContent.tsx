@@ -11,7 +11,6 @@ type MarkdownContentOpt = {
 	content?: string;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
-	isRenderImage: boolean;
 };
 
 const navigateToChannel = async (url: string, navigate: any) => {
@@ -19,17 +18,17 @@ const navigateToChannel = async (url: string, navigate: any) => {
 	const match = url.match(regex);
 	if (match) {
 		const [_, inviteId] = match;
-		if(inviteId){
-			navigate("/invite/" + inviteId);
+		if (inviteId) {
+			navigate('/invite/' + inviteId);
 		}
 	}
 };
 
-export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isRenderImage }) => {
+export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble }) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
-	const origin = window.location.origin + "/invite/";
+	const origin = window.location.origin + '/invite/';
 
 	const onClickLink = useCallback(
 		(url: string) => {
@@ -41,9 +40,9 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 					window.open(url, '_blank');
 				}
 			}
-		},[isJumMessageEnabled, isTokenClickAble],
+		},
+		[isJumMessageEnabled, isTokenClickAble],
 	);
-	
 
 	const classes = clx(
 		'prose-code:text-sm inline prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',
