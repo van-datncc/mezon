@@ -5,7 +5,6 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ID_MENTION_HERE } from '@mezon/mobile-components';
 
 interface UserMentionListProps {
 	channelID: string;
@@ -30,7 +29,7 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 				username: item.user?.username,
 			})) ?? [];
 		const hardcodedUser: MentionDataProps = {
-			id: ID_MENTION_HERE,
+			id: '1775731111020111321',
 			display: '@here',
 			avatarUrl: '',
 			username: '@here',
