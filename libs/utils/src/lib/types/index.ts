@@ -335,6 +335,7 @@ export enum MemberProfileType {
 	DM_LIST = 'dm_list_friends',
 	DM_MEMBER_GROUP = 'dm_member_group',
 	LIST_FRIENDS = 'list_friends',
+	MESSAGE = 'message',
 }
 
 export type IReaction = ApiMessageReaction & {
