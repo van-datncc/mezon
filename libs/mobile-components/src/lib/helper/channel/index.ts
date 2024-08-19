@@ -1,7 +1,7 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
+import { STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
 import { load, save } from '../storage';
 
 type ClanChannelPair = {
