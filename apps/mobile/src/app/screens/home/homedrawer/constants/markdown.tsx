@@ -104,7 +104,7 @@ export const markdownStyles = (colors: Attributes) =>
 		link: {
 			color: colors.textLink,
 			textDecorationLine: 'none',
-			lineHeight: size.s_20,
+			lineHeight: size.s_17,
 		},
 		iconEmojiInMessage: {
 			width: size.s_20,
