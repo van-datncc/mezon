@@ -2,6 +2,7 @@ import { Icons } from '@mezon/components';
 import {
 	rolesClanActions,
 	selectAllRolesClan,
+	selectCurrentClanId,
 	selectTheme,
 	setAddMemberRoles,
 	setAddPermissions,
@@ -32,7 +33,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	const roles = useMemo(() => rolesClan.filter((role) => role.active === 1), [rolesClan]);
 	const [activeRoles, setActiveRoles] = useState(roles);
 	const numRoles = useMemo(() => activeRoles.length, [activeRoles]);
-
+	const currentClanId = useSelector(selectCurrentClanId);
 	const handleRoleClick = (roleId: string) => {
 		setSelectedRoleID(roleId);
 		const activeRole = rolesClan.find((role) => role.id === roleId);
@@ -49,7 +50,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	};
 
 	const handleDeleteRole = async (roleId: string) => {
-		await dispatch(rolesClanActions.fetchDeleteRole({ roleId }));
+		await dispatch(rolesClanActions.fetchDeleteRole({ roleId, clanId: currentClanId || "" }));
 	};
 	const appearanceTheme = useSelector(selectTheme);
 
