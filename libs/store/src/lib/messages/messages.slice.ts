@@ -566,7 +566,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
-	newMesssageUpdateImage: { id: '' },
+	newMesssageUpdateImage: { message_id: '' },
 };
 
 export type SetCursorChannelArgs = {
@@ -594,8 +594,14 @@ export const messagesSlice = createSlice({
 			state.idMessageToJump = action.payload;
 		},
 
-		setNewMessageToUpdateImage(state, action) {
-			state.newMesssageUpdateImage = action.payload;
+		setNewMessageToUpdateImage(state, action: PayloadAction<ChannelMessage>) {
+			const data = action.payload;
+			state.newMesssageUpdateImage = {
+				channel_id: data.channel_id,
+				message_id: data.message_id,
+				clan_id: data.clan_id,
+				mode: data.mode,
+			};
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
