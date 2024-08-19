@@ -274,7 +274,7 @@ export const ChatMessageInput = memo(
 							switch (mode) {
 								case ChannelStreamMode.STREAM_MODE_CHANNEL:
 									await sendMessage(
-										payloadSendMessage,
+										filterEmptyArrays(payloadSendMessage),
 										simplifiedMentionList || [],
 										attachmentDataUnique || [],
 										reference,
