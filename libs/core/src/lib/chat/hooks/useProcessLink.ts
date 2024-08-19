@@ -29,7 +29,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 			if (!contentPayload?.lk) return;
 
 			const resultPromises = contentPayload.lk.map((item) =>
-				handleUrlInput(item.lk as string).then((result) => {
+				handleUrlInput(contentPayload.t?.substring(item.s ?? 0, item.e) as string).then((result) => {
 					if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
 						return result as ApiMessageAttachment;
 					}
