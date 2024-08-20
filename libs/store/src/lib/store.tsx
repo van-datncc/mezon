@@ -47,6 +47,7 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
+import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -127,6 +128,14 @@ const persistedListchannelsByUserReducer = persistReducer(
 		storage,
 	},
 	listchannelsByUserReducer,
+);
+
+const persistedPermissionRoleChannelReducer = persistReducer(
+	{
+		key: 'listpermissionroleschannel',
+		storage,
+	},
+	permissionRoleChannelReducer,
 );
 
 const persistedRolesClanReducer = persistReducer(
@@ -217,6 +226,7 @@ const reducer = {
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
 	listchannelbyusers: persistedListchannelsByUserReducer,
+	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
 	channelMembers: persistedChannelMembersReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
