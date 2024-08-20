@@ -7,13 +7,13 @@ import { useParams } from 'react-router-dom';
 
 const GeneralInformation = () => {
 	const appId = useParams().applicationId;
+	const appDetail = useSelector(selectAppDetail);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		dispatch(getApplicationDetail({ appId: appId as string }));
 	}, [appId, dispatch]);
 
-	const appDetail = useSelector(selectAppDetail);
 	return (
 		<div className="flex flex-col gap-10">
 			<div className="flex flex-col gap-4">
@@ -30,7 +30,7 @@ const GeneralInformation = () => {
 			<div className="flex gap-5">
 				<div className="flex flex-col gap-2 w-fit">
 					<div className="text-[12px] uppercase font-semibold">App Icon</div>
-					<div className="w-fit flex flex-col items-center p-5 gap-4 bg-[#f2f3f5] border rounded-md">
+					<div className="w-fit flex flex-col items-center p-5 gap-4 bg-[#f2f3f5] dark:bg-[#2b2d31] border dark:border-[#4d4f52] rounded-md">
 						<div className="relative w-[144px]">
 							<img
 								className="aspect-square w-full"
@@ -46,7 +46,7 @@ const GeneralInformation = () => {
 						<div className="text-blue-600 cursor-pointer">Remove</div>
 					</div>
 				</div>
-				<AppDetailRight appDetail={appDetail} appId={appId as string} />
+				{appDetail.token && <AppDetailRight appDetail={appDetail} appId={appId as string} />}
 			</div>
 		</div>
 	);
@@ -65,14 +65,15 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 	const handleAppNameFieldOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAppNameField(e.target.value);
 	};
+
 	return (
-		<div className="flex-1 flex flex-col gap-5">
+		<div className="flex-1 flex flex-col gap-7">
 			<div className="w-full flex flex-col gap-2">
 				<div className="text-[12px] uppercase font-semibold">Name</div>
 				<input
 					value={appNameField}
 					onChange={handleAppNameFieldOnchange}
-					className="w-full bg-bgLightModeThird rounded-sm border p-[10px] outline-primary"
+					className="w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] p-[10px] outline-primary dark:bg-[#1e1f22]"
 					type="text"
 				/>
 			</div>
@@ -80,7 +81,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 				<div className="text-[12px] uppercase font-semibold">Description (maximum 400 characters)</div>
 				<div className="text-[14px]">Your description will appear in the About Me section of your bot's profile.</div>
 				<textarea
-					className="w-full bg-bgLightModeThird rounded-sm border min-h-[120px] max-h-[120px] p-[10px] outline-primary"
+					className="w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] min-h-[120px] max-h-[120px] p-[10px] outline-primary dark:bg-[#1e1f22]"
 					name=""
 					id=""
 				></textarea>
@@ -88,7 +89,10 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 			<div className="flex flex-col gap-2">
 				<div className="text-[12px] uppercase font-semibold">Tags (maximum 5)</div>
 				<div className="text-[14px]">Add up to 5 tags to describe the content and functionality of your application.</div>
-				<input className="w-full bg-bgLightModeThird rounded-sm border p-[10px] outline-primary" type="text" />
+				<input
+					className="w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] p-[10px] outline-primary dark:bg-[#1e1f22]"
+					type="text"
+				/>
 			</div>
 			<div className="text-[12px] font-semibold flex flex-col gap-2">
 				<div className="uppercase">Application ID</div>
