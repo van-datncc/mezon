@@ -40,6 +40,7 @@ import {
 	Notification,
 	Socket,
 	StatusPresenceEvent,
+	StreamPresenceEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -139,6 +140,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelpresence = useCallback(
 		(channelPresence: ChannelPresenceEvent) => {
 			dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
+		},
+		[dispatch],
+	);
+
+	const onstreampresence = useCallback(
+		(channelPresence: StreamPresenceEvent) => {
+			console.log('online/offline', channelPresence);
+			//dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
 		},
 		[dispatch],
 	);
@@ -358,6 +367,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onchannelpresence = onchannelpresence;
 
+			socket.onstreampresence = onstreampresence;
+
 			socket.ondisconnect = ondisconnect;
 
 			socket.onerror = onerror;
@@ -506,4 +517,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-
