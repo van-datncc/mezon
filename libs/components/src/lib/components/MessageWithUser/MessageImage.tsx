@@ -1,6 +1,7 @@
 import { useAppParams, useAttachments } from '@mezon/core';
 import { attachmentActions, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { SHOW_POSITION, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useState } from 'react';
@@ -12,9 +13,10 @@ export type MessageImage = {
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	mode?: ChannelStreamMode;
 	messageId?: string;
+	readonly uploadingAttachment?: boolean;
 };
 
-const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: MessageImage) => {
+const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId, uploadingAttachment }: MessageImage) => {
 	const dispatch = useAppDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
@@ -66,21 +68,21 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		return null;
 	}
 	return (
-		<div className="break-all">
-			{attachmentData.url ? (
-				<img
-					onContextMenu={handleContextMenu}
-					className={
-						'max-w-[100%] max-h-[30vh] object-cover my-2 rounded ' +
-						(!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default')
-					}
-					src={attachmentData.url?.toString()}
-					alt={attachmentData.url}
-					onClick={() => handleClick(attachmentData.url || '')}
-					style={imgStyle}
-					onError={handleImageError}
-				/>
-			) : null}
+		<div className="relative inline-block">
+			{uploadingAttachment && (
+				<div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+					<Spinner aria-label="Loading spinner" />
+				</div>
+			)}
+			<img
+				onContextMenu={handleContextMenu}
+				className={`max-w-[100%] max-h-[30vh] object-cover my-2 rounded ${!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default'}`}
+				src={attachmentData.url?.toString()}
+				alt={attachmentData.url}
+				onClick={() => handleClick(attachmentData.url || '')}
+				style={imgStyle}
+				onError={handleImageError}
+			/>
 		</div>
 	);
 });

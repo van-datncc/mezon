@@ -11,7 +11,7 @@ import {
 	subDays,
 } from 'date-fns';
 import { ApiMessageAttachment, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
-import { RefObject } from 'react';
+import { ChangeEvent, RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
 import {
@@ -645,4 +645,103 @@ export function filterEmptyArrays<T extends Record<string, any>>(payload: T): T 
 		.reduce((acc, [key, value]) => {
 			return { ...acc, [key]: value };
 		}, {} as T);
+}
+
+export const handleFiles = (e: ChangeEvent<HTMLInputElement>, setAttachmentPreview: (attachments: ApiMessageAttachment[]) => void) => {
+	const files = e.target.files;
+
+	if (!files) {
+		throw new Error('Client or files are not initialized');
+	}
+
+	const fileArray = Array.from(files);
+
+	// Process files
+	const filePromises = fileArray.map((file) => {
+		if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+			return processFile(file)
+				.then((fileDetails) => {
+					return {
+						filename: fileDetails.filename,
+						filetype: fileDetails.filetype,
+						size: fileDetails.size,
+						url: fileDetails.url,
+					} as ApiMessageAttachment;
+				})
+				.catch((error) => {
+					console.error('Error processing file:', error);
+					return null;
+				});
+		} else {
+			const url = `${file.name};${file.type};${file.lastModified}`;
+			return Promise.resolve({
+				filename: file.name,
+				filetype: file.type,
+				size: file.size,
+				url: url,
+			} as ApiMessageAttachment);
+		}
+	});
+
+	Promise.all(filePromises)
+		.then((attachments) => {
+			const validAttachments: ApiMessageAttachment[] = attachments.filter(
+				(attachment): attachment is ApiMessageAttachment => attachment !== null,
+			);
+			setAttachmentPreview(validAttachments);
+		})
+		.catch((error) => {
+			console.error('Error processing files:', error);
+		});
+};
+
+export function base64ToBlob(base64: string, contentType: string, sliceSize = 512): Blob {
+	const byteCharacters = atob(base64);
+	const byteArrays: Uint8Array[] = [];
+
+	for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+		const slice = byteCharacters.slice(offset, offset + sliceSize);
+		const byteNumbers = new Array(slice.length);
+
+		for (let i = 0; i < slice.length; i++) {
+			byteNumbers[i] = slice.charCodeAt(i);
+		}
+
+		byteArrays.push(new Uint8Array(byteNumbers));
+	}
+
+	return new Blob(byteArrays, { type: contentType });
+}
+
+export function processFile(file: File): Promise<{ filename: string; filetype: string; size: number; url: string }> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+
+		reader.onload = () => {
+			try {
+				const base64StringWithPrefix = reader.result as string;
+				const base64String = base64StringWithPrefix.split(',')[1];
+
+				const contentType = file.type;
+
+				const blob = base64ToBlob(base64String, contentType);
+				const blobUrl = URL.createObjectURL(blob);
+
+				resolve({
+					filename: file.name,
+					filetype: file.type,
+					size: blob.size,
+					url: blobUrl,
+				});
+			} catch (error) {
+				reject(error);
+			}
+		};
+
+		reader.onerror = () => {
+			reject(new Error('Failed to read file'));
+		};
+
+		reader.readAsDataURL(file);
+	});
 }

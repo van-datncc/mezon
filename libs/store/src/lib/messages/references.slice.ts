@@ -23,6 +23,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageRefEdit: string;
 	statusLoadingAttachment: boolean;
 	idMessageMention: string;
+	spinnerLoadingStatus: boolean;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -44,6 +45,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefEdit: '',
 	statusLoadingAttachment: false,
 	idMessageMention: '',
+	spinnerLoadingStatus: false,
 });
 
 export const referencesSlice = createSlice({
@@ -52,6 +54,10 @@ export const referencesSlice = createSlice({
 	reducers: {
 		add: referencesAdapter.addOne,
 		remove: referencesAdapter.removeOne,
+
+		setSpinnerStatus(state, action) {
+			state.spinnerLoadingStatus = action.payload;
+		},
 
 		setMessageMentionId(state, action) {
 			state.idMessageMention = action.payload;
@@ -148,6 +154,8 @@ export const selectIdMessageRefEdit = createSelector(getReferencesState, (state:
 export const selectStatusLoadingAttachment = createSelector(getReferencesState, (state: ReferencesState) => state.statusLoadingAttachment);
 
 export const selectMessageMetionId = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageMention);
+
+export const selectSpinnerLoadingStatus = createSelector(getReferencesState, (state: ReferencesState) => state.spinnerLoadingStatus);
 
 export const selectAttachmentData = (channelId: string) =>
 	createSelector(getReferencesState, (state: ReferencesState) => {

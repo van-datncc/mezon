@@ -359,6 +359,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					isReset: true,
 				}),
 			);
+			dispatch(messagesActions.setSendingMessageActionStatus(true));
 		},
 		[
 			valueTextInput,

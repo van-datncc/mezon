@@ -104,6 +104,7 @@ export interface MessagesState {
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
+	sendingMessageActionStatus: boolean;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -225,13 +226,11 @@ export const fetchMessages = createAsyncThunk(
 		});
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
-		
-		const lastLoadMessageId = messages[messages.length - 1].id
-		const hasMore = firstMessage?.id === lastLoadMessageId
+
+		const lastLoadMessageId = messages[messages.length - 1].id;
+		const hasMore = firstMessage?.id === lastLoadMessageId;
 		if (messages.length > 0) {
-			thunkAPI.dispatch(
-				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessageId, hasMore } }),
-			);
+			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessageId, hasMore } }));
 		}
 
 		if (response.last_seen_message?.id) {
@@ -568,6 +567,7 @@ export const initialMessagesState: MessagesState = {
 	isJumpingToPresent: false,
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' },
+	sendingMessageActionStatus: false,
 };
 
 export type SetCursorChannelArgs = {
@@ -595,14 +595,21 @@ export const messagesSlice = createSlice({
 			state.idMessageToJump = action.payload;
 		},
 
-		setNewMessageToUpdateImage(state, action: PayloadAction<ChannelMessage>) {
+		setNewMessageToUpdateImage(state, action) {
 			const data = action.payload;
+			console.log(action.payload);
 			state.newMesssageUpdateImage = {
 				channel_id: data.channel_id,
 				message_id: data.message_id,
 				clan_id: data.clan_id,
 				mode: data.mode,
+				mentions: data.mentions,
+				content: data.content,
 			};
+		},
+
+		setSendingMessageActionStatus(state, action: PayloadAction<boolean>) {
+			state.sendingMessageActionStatus = action.payload;
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
@@ -1007,6 +1014,8 @@ export const selectMessageByMessageId = (messageId: string) =>
 	});
 
 export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);
+
+export const selectSendingMessageActionStatus = createSelector(getMessagesState, (state) => state.sendingMessageActionStatus);
 
 // V2
 
