@@ -242,16 +242,15 @@ function MemberProfile({
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
                   ${isFooter ? 'top-[-7px] leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
-                  ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
-                  ${positionType === MemberProfileType.DM_LIST ? 'max-w-[176px] whitespace-nowrap overflow-x-hidden text-ellipsis' : ''}
-									${isOwnerClanOrGroup ? 'max-w-[140px]' : ''}
+                  ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
+                  ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${classParent == '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
                   ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
 							    `}
 									title={name}
 								>
 									<span
-										className={`one-line ${hideLongName && 'truncate !block'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
+										className={`one-line ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
 									>
 										{!isHiddenAvatarPanel && name}
 									</span>
@@ -264,7 +263,7 @@ function MemberProfile({
 									)}
 							</div>
 							{customStatus && (isMemberChannel || isMemberDMGroup) && (
-								<p className="dark:text-contentTertiary text-black w-full text-[12px] line-clamp-1 break-all" title={customStatus}>
+								<p className="dark:text-contentTertiary text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] " title={customStatus}>
 									{customStatus}
 								</p>
 							)}
