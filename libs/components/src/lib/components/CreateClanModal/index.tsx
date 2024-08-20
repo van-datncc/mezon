@@ -1,5 +1,5 @@
 import { ModalErrorTypeUpload, ModalOverData } from '@mezon/components';
-import { useAppNavigation, useClans } from '@mezon/core';
+import {useAppNavigation, useClans, useEscapeKey} from '@mezon/core';
 import { checkDuplicateNameClan, selectAllAccount, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
@@ -106,6 +106,8 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
     setUrlImage('');
     setNameClan('');
   };
+	
+	useEscapeKey(handleClose)
 
   return (
     <Modal

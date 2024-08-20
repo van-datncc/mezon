@@ -1,5 +1,5 @@
 import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
-import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
+import {useChannelMembersActions, useEscapeKey, useOnClickOutside} from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	selectAllAccount,
@@ -152,6 +152,11 @@ function MemberProfile({
 	};
 
 	useOnClickOutside(panelRef, handleClickOutSide);
+	
+	useEscapeKey(() => {
+		setIsShowUserProfile(false);
+		setIsShowPanel(false);
+	})
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 

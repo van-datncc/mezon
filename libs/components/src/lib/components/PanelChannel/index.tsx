@@ -1,4 +1,4 @@
-import { useClanRestriction } from '@mezon/core';
+import {useClanRestriction, useEscapeKey} from '@mezon/core';
 import {
 	notificationSettingActions,
 	selectCurrentChannelId,
@@ -177,6 +177,8 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 
   const isShowManageChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasManageChannelPermission;
   const isShowManageThread = isClanOwner || hasAdminPermission || hasThreadPermission;
+	
+	useEscapeKey(() => setIsShowPanelChannel(false))
 
   return (
 		<div
