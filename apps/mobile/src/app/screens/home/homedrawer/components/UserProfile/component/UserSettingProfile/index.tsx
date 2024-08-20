@@ -53,7 +53,6 @@ const UserSettingProfile = ({
 	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 
 	useEffect(() => {
-		console.log(showKickUserModal);
 		setVisibleKickUserModal(showKickUserModal);
 	}, [showKickUserModal]);
 

@@ -74,7 +74,6 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
                 // @ts-ignore
                 user={selectedUser}
                 showManagementUserModal={isShowManagementUserModal}
-                // showKickUserModal={false}
                 showActionOutside={false}
                 onShowManagementUserModalChange={(value) => setShowManagementUserModal(value)}
             />
