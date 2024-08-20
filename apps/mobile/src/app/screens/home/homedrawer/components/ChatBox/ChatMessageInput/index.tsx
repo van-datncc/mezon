@@ -105,6 +105,12 @@ export const ChatMessageInput = memo(
 					roleName: item.title ?? '',
 				}));
 			}, [rolesInClan]);
+			
+			const removeTags = (text: string) => {
+				if (!text)
+					return '';
+				return text?.replace?.(/@\[(.*?)\]/g, '@$1');
+			}
 
 			const clearInputAfterSendMessage = useCallback(() => {
 				onSendSuccess();
@@ -207,7 +213,7 @@ export const ChatMessageInput = memo(
 				});
 
 				const payloadSendMessage: IMessageSendPayload = {
-					t: text,
+					t: removeTags(text),
 					hg: hashtagsOnMessage,
 					ej: emojisOnMessage,
 					lk: linksOnMessage,
@@ -268,7 +274,7 @@ export const ChatMessageInput = memo(
 							switch (mode) {
 								case ChannelStreamMode.STREAM_MODE_CHANNEL:
 									await sendMessage(
-										payloadSendMessage,
+										filterEmptyArrays(payloadSendMessage),
 										simplifiedMentionList || [],
 										attachmentDataUnique || [],
 										reference,

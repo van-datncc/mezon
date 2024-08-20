@@ -21,13 +21,14 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		paddingVertical: Metrics.size.l,
-		paddingHorizontal: size.s_10,
 		backgroundColor: colors.secondary,
 	},
 	headerContent: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
+		flexBasis: 10,
+		flexGrow: 1
 	},
 	textTitle: {
 		color: colors.textStrong,
@@ -35,7 +36,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	confirm: {
 		color: colors.textStrong,
-		fontSize: 18,
-		marginLeft: 10,
+		fontSize: 18
 	},
 });

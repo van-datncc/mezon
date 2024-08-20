@@ -108,30 +108,30 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 			onPress: () => reserve(),
 			disabled: disabled
 		},
-		{
-			title: t('menu.systemMessage.sendRandomWelcome'),
-			component: <MezonSwitch disabled={disabled} />,
-			onPress: () => reserve(),
-			disabled: disabled
-		},
-		{
-			title: t('menu.systemMessage.promptMembersReply'),
-			component: <MezonSwitch disabled={disabled} />,
-			onPress: () => reserve(),
-			disabled: disabled
-		},
-		{
-			title: t('menu.systemMessage.sendMessageBoost'),
-			component: <MezonSwitch disabled={disabled} />,
-			onPress: () => reserve(),
-			disabled: disabled
-		},
-		{
-			title: t('menu.systemMessage.sendHelpfulTips'),
-			component: <MezonSwitch disabled={disabled} />,
-			onPress: () => reserve(),
-			disabled: disabled
-		},
+		// {
+		// 	title: t('menu.systemMessage.sendRandomWelcome'),
+		// 	component: <MezonSwitch disabled={disabled} />,
+		// 	onPress: () => reserve(),
+		// 	disabled: disabled
+		// },
+		// {
+		// 	title: t('menu.systemMessage.promptMembersReply'),
+		// 	component: <MezonSwitch disabled={disabled} />,
+		// 	onPress: () => reserve(),
+		// 	disabled: disabled
+		// },
+		// {
+		// 	title: t('menu.systemMessage.sendMessageBoost'),
+		// 	component: <MezonSwitch disabled={disabled} />,
+		// 	onPress: () => reserve(),
+		// 	disabled: disabled
+		// },
+		// {
+		// 	title: t('menu.systemMessage.sendHelpfulTips'),
+		// 	component: <MezonSwitch disabled={disabled} />,
+		// 	onPress: () => reserve(),
+		// 	disabled: disabled
+		// },
 	];
 
 	const deleteMenu: IMezonMenuItemProps[] = [

@@ -1,4 +1,5 @@
 import {
+	debounce,
 	Icons,
 	remove,
 	STORAGE_CHANNEL_CURRENT_CACHE,
@@ -8,12 +9,11 @@ import {
 } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../temp-ui';
-import MezonMenuItem from '../../temp-ui/MezonMenuItem';
 import MezonSearch from '../../temp-ui/MezonSearch';
 import { style } from './styles';
 
@@ -54,13 +54,13 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		);
 	};
 
-	const AccountMenu: IMezonMenuItemProps[] = [
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('accountSettings.getNitro'),
-			icon: <Icons.NitroWheelIcon color={themeValue.textStrong} />,
-		},
+	const AccountMenu = useMemo(() => [
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('accountSettings.getNitro'),
+		// 	icon: <Icons.NitroWheelIcon color={themeValue.textStrong} />,
+		// },
 		{
 			onPress: () => {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
@@ -71,57 +71,57 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('accountSettings.account'),
 			icon: <Icons.UserCircleIcon color={themeValue.textStrong} />,
 		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('accountSettings.privacySafety'),
-			icon: <Icons.ShieldIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('accountSettings.familyCenter'),
-			icon: <Icons.GroupIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('accountSettings.authorizedApp'),
-			icon: <Icons.KeyIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('accountSettings.device'),
-			icon: <Icons.LaptopPhoneIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('accountSettings.connection'),
-			icon: <Icons.PuzzlePieceIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('accountSettings.clip'),
-			icon: <Icons.ClipIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('accountSettings.friendRequests'),
-			icon: <Icons.FriendIcon color={themeValue.textStrong} />,
-		},
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('accountSettings.privacySafety'),
+		// 	icon: <Icons.ShieldIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('accountSettings.familyCenter'),
+		// 	icon: <Icons.GroupIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('accountSettings.authorizedApp'),
+		// 	icon: <Icons.KeyIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('accountSettings.device'),
+		// 	icon: <Icons.LaptopPhoneIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('accountSettings.connection'),
+		// 	icon: <Icons.PuzzlePieceIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('accountSettings.clip'),
+		// 	icon: <Icons.ClipIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('accountSettings.friendRequests'),
+		// 	icon: <Icons.FriendIcon color={themeValue.textStrong} />,
+		// },
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('accountSettings.QRScan'),
 			icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
 
-	const PaymentMenu: IMezonMenuItemProps[] = [
+	const PaymentMenu = useMemo(() => [
 		{
 			onPress: () => reserve(),
 			expandable: true,
@@ -140,15 +140,15 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('paymentSettings.restoreSubscription'),
 			icon: <Icons.NitroWheelIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
 
-	const AppMenu: IMezonMenuItemProps[] = [
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('appSettings.voice'),
-			icon: <Icons.MicrophoneIcon color={themeValue.textStrong} />,
-		},
+	const AppMenu = useMemo(() => [
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('appSettings.voice'),
+		// 	icon: <Icons.MicrophoneIcon color={themeValue.textStrong} />,
+		// },
 		{
 			onPress: () => {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
@@ -159,12 +159,12 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('appSettings.appearance'),
 			icon: <Icons.PaintPaletteIcon color={themeValue.textStrong} />,
 		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('appSettings.accessibility'),
-			icon: <Icons.AccessibilityIcon color={themeValue.textStrong} />,
-		},
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('appSettings.accessibility'),
+		// 	icon: <Icons.AccessibilityIcon color={themeValue.textStrong} />,
+		// },
 		{
 			onPress: () => {
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
@@ -176,39 +176,39 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			previewValue: i18n.language,
 			icon: <Icons.LanguageIcon color={themeValue.textStrong} />,
 		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('appSettings.chat'),
-			icon: <Icons.ImageTextIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('appSettings.webBrowser'),
-			icon: <Icons.GlobeEarthIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('appSettings.notifications'),
-			icon: <Icons.BellIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('appSettings.appIcon'),
-			icon: <Icons.BrandDiscordIcon color={themeValue.textStrong} />,
-		},
-		{
-			onPress: () => reserve(),
-			expandable: true,
-			title: t('appSettings.advanced'),
-			icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
-		},
-	];
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('appSettings.chat'),
+		// 	icon: <Icons.ImageTextIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('appSettings.webBrowser'),
+		// 	icon: <Icons.GlobeEarthIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('appSettings.notifications'),
+		// 	icon: <Icons.BellIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('appSettings.appIcon'),
+		// 	icon: <Icons.BrandDiscordIcon color={themeValue.textStrong} />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	title: t('appSettings.advanced'),
+		// 	icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
+		// },
+	] satisfies IMezonMenuItemProps[], []);
 
-	const SupportMenu: IMezonMenuItemProps[] = [
+	const SupportMenu = useMemo(() => [
 		{
 			onPress: () => reserve(),
 			expandable: true,
@@ -227,38 +227,50 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			title: t('supportSettings.acknowledgement'),
 			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
 
-	const WhatsNew: IMezonMenuItemProps[] = [
+	const WhatsNew = useMemo(() => [
 		{
 			onPress: () => reserve(),
 			expandable: true,
 			title: t('whatsNew.whatsNew'),
 			icon: <Icons.CircleInformationIcon color={themeValue.textStrong} />,
 		},
-	];
+	] satisfies IMezonMenuItemProps[], []);
+
+	const LogOut = useMemo(() => [
+		{
+			onPress: () => confirmLogout(),
+			title: t('logOut'),
+			textStyle: { color: baseColor.redStrong },
+			icon: <Icons.DoorExitIcon color={baseColor.redStrong} />
+		}
+	] satisfies IMezonMenuItemProps[], []);
 
 	const menu: IMezonMenuSectionProps[] = [
 		{
 			title: t('accountSettings.title'),
 			items: AccountMenu,
 		},
-		{
-			title: t('paymentSettings.title'),
-			items: PaymentMenu,
-		},
+		// {
+		// 	title: t('paymentSettings.title'),
+		// 	items: PaymentMenu,
+		// },
 		{
 			title: t('appSettings.title'),
 			items: AppMenu,
 		},
+		// {
+		// 	title: t('supportSettings.title'),
+		// 	items: SupportMenu,
+		// },
+		// {
+		// 	title: t('whatsNew.title'),
+		// 	items: WhatsNew,
+		// },
 		{
-			title: t('supportSettings.title'),
-			items: SupportMenu,
-		},
-		{
-			title: t('whatsNew.title'),
-			items: WhatsNew,
-		},
+			items: LogOut,
+		}
 	];
 
 	const renderedMenu = useMemo(() => {
@@ -266,25 +278,33 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		  return menu;
 		}
 		return filteredMenu;
-	}, [searchText, filteredMenu]);
+	}, [filteredMenu]);
 
-	const handleSearchChange = (text: string) => {
+	const debouncedHandleSearchChange = useCallback(
+		debounce((text) =>{ 
+			const results: IMezonMenuItemProps[] = [];
+			menu.forEach(section => {
+				if(!!section.title) {
+					const matchedItems = section.items.filter(item =>
+						item.title.toLowerCase().includes(text.toLowerCase())
+					);
+					results.push(...matchedItems);
+				}
+			});
+
+			setFilteredMenu([
+				{
+					title:'',
+					items: results
+				}
+			])
+		}, 300),
+		[],
+	);
+
+	const handleSearchChange =(text: string) => {
 		setSearchText(text)
-
-		const results: IMezonMenuItemProps[] = [];
-		menu.forEach(section => {
-		  const matchedItems = section.items.filter(item =>
-			item.title.toLowerCase().includes(text.toLowerCase())
-		  );
-		  results.push(...matchedItems);
-		});
-
-		setFilteredMenu([
-			{
-				title:'',
-				items: results
-			}
-		])
+		debouncedHandleSearchChange(text)
 	}
 
 	return (
@@ -293,16 +313,6 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				<MezonSearch value={searchText} onChangeText={handleSearchChange}/>
 
 				<MezonMenu menu={renderedMenu} />
-				
-				{!searchText?.trim().length  && !!filteredMenu?.length &&
-					<MezonMenuItem
-						isLast
-						onPress={() => confirmLogout()}
-						title={t('logOut')}
-						textStyle={{ color: baseColor.red }}
-						icon={<Icons.DoorExitIcon color={baseColor.red} />}
-					/>
-				}
 			</ScrollView>
 		</View>
 	);

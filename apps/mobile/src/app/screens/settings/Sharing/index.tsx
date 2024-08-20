@@ -226,7 +226,6 @@ export const Sharing = ({ data, onClose }) => {
 				}
 				const endIndex = i;
 				links.push({
-					lk: inputString.substring(startIndex, endIndex),
 					s: startIndex,
 					e: endIndex,
 				});

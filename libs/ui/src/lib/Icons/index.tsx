@@ -1899,24 +1899,24 @@ export const Sent: React.FC<IconProps> = () => {
 	);
 };
 
-export const Plus: React.FC<IconProps> = () => {
+export function Plus(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
-			viewBox="0 0 20 20"
-			fill="none"
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
 			xmlns="http://www.w3.org/2000/svg"
-			className="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode dark:hover:text-white hover:text-black"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
 		>
-			<g id="Live area">
-				<path
-					id="Vector"
-					d="M11 4C11 3.44772 10.5523 3 10 3C9.44772 3 9 3.44772 9 4V9H4C3.44771 9 3 9.44771 3 10C3 10.5523 3.44771 11 4 11H9V16C9 16.5523 9.44772 17 10 17C10.5523 17 11 16.5523 11 16V11H16C16.5523 11 17 10.5523 17 10C17 9.44772 16.5523 9 16 9H11V4Z"
-					fill="currentColor"
-				/>
-			</g>
+			<path fill="currentColor" d="M13 6a1 1 0 1 0-2 0v5H6a1 1 0 1 0 0 2h5v5a1 1 0 1 0 2 0v-5h5a1 1 0 1 0 0-2h-5V6Z"></path>
 		</svg>
 	);
-};
+}
 
 export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
@@ -3349,40 +3349,14 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 
 export const IconLoadingTyping = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" className={defaultSize}>
-			<circle cx="18" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin=".67"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
-			<circle cx="12" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin=".33"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
-			<circle cx="6" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin="0"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
+		<svg className={defaultSize} id="dots" width="20" height="8" viewBox="0 0 132 58" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+			<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+				<g id="dots" fill="white">
+					<circle id="dot1" cx="25" cy="30" r="13"></circle>
+					<circle id="dot2" cx="65" cy="30" r="13"></circle>
+					<circle id="dot3" cx="105" cy="30" r="13"></circle>
+				</g>
+			</g>
 		</svg>
 	);
 };
@@ -3862,7 +3836,7 @@ export function SortBySmallSizeBtn(props: React.HTMLAttributes<SVGElement>) {
 			xmlnsXlink="http://www.w3.org/1999/xlink"
 			viewBox="0 0 490.2 490.2"
 			xmlSpace="preserve"
-			className=''
+			className=""
 			{...props}
 		>
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>

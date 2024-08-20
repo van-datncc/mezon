@@ -9,6 +9,7 @@ import clan from './clan.json';
 import clanMenu from './clanMenu.json';
 import clanNotificationsSetting from './clanNotificationsSetting.json';
 import clanOverviewSetting from './clanOverviewSetting.json';
+import clanEmojiSetting from './clanEmojiSetting.json';
 import clanRoles from './clanRoles.json';
 import clanSetting from './clanSetting.json';
 import clanStickerSettings from "./clanStickerSetting.json";
@@ -57,6 +58,7 @@ export default {
 	pinMessage,
 	clanSetting,
 	clanOverviewSetting,
+	clanEmojiSetting,
 	categoryMenu,
 	channelCreator,
 	eventMenu,
