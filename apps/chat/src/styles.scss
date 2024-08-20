@@ -700,3 +700,27 @@ input:-webkit-autofill:active {
 		color: #5865f2;
 	}
 }
+.up-and-down-animated{
+  animation: upAnDown 1.5s infinite linear ;
+}
+
+@keyframes upAnDown{
+  0%{
+    transform: translateY(0);
+  }
+  25%{
+    transform: translateY(-3px);
+  }
+  50%{
+    transform: translateY(0);
+
+  }
+  75%{
+    transform: translateY(3px);
+
+  }
+  100%{
+    transform: translateY(0);
+  }
+
+}
