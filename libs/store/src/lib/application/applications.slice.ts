@@ -28,7 +28,7 @@ export interface IFetchAppsArg {
 	noCache?: boolean;
 }
 
-const fetchApplicationsCached = memoizee((mezon: MezonValueContext) => mezon.client.listApp(mezon.session), {
+const fetchApplicationsCached = memoizee((mezon: MezonValueContext) => mezon.client.listApps(mezon.session), {
 	promise: true,
 	maxAge: FETCH_CACHED_TIME,
 	normalizer: (args) => {
