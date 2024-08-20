@@ -10,9 +10,10 @@ interface IBannerAvatarProps {
 	avatar: string;
 	onLoad?: (url: string) => void;
 	alt?: string;
+	defaultAvatar?: string;
 }
 
-export default function BannerAvatar({ avatar, onLoad, alt }: IBannerAvatarProps) {
+export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBannerAvatarProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { color } = useMixImageColor(avatar);
@@ -29,7 +30,7 @@ export default function BannerAvatar({ avatar, onLoad, alt }: IBannerAvatarProps
 	}
 
 	const removeAvatar = () => {
-		onLoad && onLoad(process.env.NX_LOGO_MEZON || "");
+		onLoad && onLoad(defaultAvatar || "");
 		avatarBSRef?.current?.dismiss();
 	}
 

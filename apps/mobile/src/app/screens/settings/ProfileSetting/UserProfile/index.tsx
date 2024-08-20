@@ -40,6 +40,7 @@ export default function UserProfile({ userProfileValue, setCurrentUserProfileVal
 				avatar={userProfileValue?.imgUrl}
 				alt={userProfileValue?.username}
 				onLoad={handleAvatarChange}
+				defaultAvatar={process.env.NX_LOGO_MEZON || ""}
 			/>
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => handleHashtagPress()} style={styles.btnIcon}>

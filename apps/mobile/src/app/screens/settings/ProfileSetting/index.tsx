@@ -270,7 +270,10 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 				pageIndex={tab}
 				onChange={handleTabChange}
 				views={[
-					<UserProfile userProfileValue={currentUserProfileValue} setCurrentUserProfileValue={setCurrentUserProfileValue} />,
+					<UserProfile
+						userProfileValue={currentUserProfileValue}
+						setCurrentUserProfileValue={setCurrentUserProfileValue}
+					/>,
 					<ServerProfile
 						clanProfileValue={currentClanProfileValue}
 						isClanProfileNotChanged={isClanProfileNotChanged}
