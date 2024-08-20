@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { Icons } from '../../../components';
 import ModalSticker, {EGraphicType} from './ModalEditSticker';
 import SettingStickerItem from './SettingStickerItem';
+import {useEscapeKey} from "@mezon/core";
 
 const SettingSticker = () => {
 	const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
@@ -27,6 +28,9 @@ const SettingSticker = () => {
 	useEffect(() => {
 		dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentClanId }))
 	},[])
+	
+	useEscapeKey(handleCloseModal);
+	
 	return (
 		<>
 			<div className="flex flex-col gap-6 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">

@@ -18,6 +18,7 @@ const DocsPage = loadable(() => import('../pages/docs'));
 const EmbedsPage = loadable(() => import('../pages/embeds'));
 const GeneralInformation = loadable(() => import('../pages/AppGeneralInformation'));
 const Installation = loadable(() => import('../pages/installation'));
+const Install = loadable(() => import('../pages/install'));
 
 export const Routes = () => {
 	const dispatch = useAppDispatch();
@@ -99,6 +100,11 @@ export const Routes = () => {
 									element: <DocsPage />,
 								},
 							],
+						},
+						{
+							path: 'install/:applicationId',
+							loader: loaderWithStore(authLoader),
+							element: <Install />,
 						},
 					],
 				},

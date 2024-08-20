@@ -56,7 +56,7 @@ const LabelDm = (props: LabelDmProps) => {
 	};
 
 	const handleKeyDown = (event: any) => {
-		if (event.key === 'Enter') {
+		if (event.key === 'Enter' && isValidGroupName) {
 			setOpenEditName(false);
 			handleSave();
 		}

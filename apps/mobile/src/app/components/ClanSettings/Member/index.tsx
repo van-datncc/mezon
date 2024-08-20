@@ -1,11 +1,12 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { Icons } from "@mezon/mobile-components";
-import { baseColor, size, useTheme } from "@mezon/mobile-ui";
+import { baseColor, useTheme } from "@mezon/mobile-ui";
 import { selectAllUsesClan, useAppSelector } from "@mezon/store-mobile";
-import { useMemo, useRef } from "react";
-import { KeyboardAvoidingView, ScrollView, Text, TouchableWithoutFeedback, View } from "react-native";
+import { UsersClanEntity } from "@mezon/utils";
+import { useMemo, useRef, useState } from "react";
+import { KeyboardAvoidingView, ScrollView, Text, View } from "react-native";
 import { APP_SCREEN, MenuClanScreenProps } from "../../../navigation/ScreenTypes";
-import { IMezonMenuContextItemProps, MezonBottomSheet, MezonMenuContext, MezonSearch } from "../../../temp-ui";
+import UserSettingProfile from "../../../screens/home/homedrawer/components/UserProfile/component/UserSettingProfile";
+import { IMezonMenuContextItemProps, MezonBottomSheet, MezonSearch } from "../../../temp-ui";
 import { style } from "./styles";
 import UserItem from "./UserItem";
 
@@ -16,6 +17,8 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
     const usersClan = useAppSelector(selectAllUsesClan);
     const memberPruneBSRef = useRef<BottomSheetModal>();
     const memberFilterBSRef = useRef<BottomSheetModal>();
+    const [selectedUser, setSelectedUser] = useState<UsersClanEntity>();
+    const [isShowManagementUserModal, setShowManagementUserModal] = useState(false);
 
     const menuContext = useMemo(() => [
         {
@@ -34,34 +37,46 @@ export default function MemberSetting({ navigation }: MenuClanScreenProps<Member
     ] satisfies IMezonMenuContextItemProps[], [])
 
     navigation.setOptions({
-        headerRight: () => (
-            <MezonMenuContext
-                icon={<Icons.MoreHorizontalIcon
-                    color={themeValue.text}
-                    height={size.s_20} width={size.s_20}
-                    style={{ marginRight: size.s_20 }}
-                />}
-                menu={menuContext}
-            />
-        )
+        // headerRight: () => (
+        // <MezonMenuContext
+        //     icon={<Icons.MoreHorizontalIcon
+        //         color={themeValue.text}
+        //         height={size.s_20} width={size.s_20}
+        //         style={{ marginRight: size.s_20 }}
+        //     />}
+        //     menu={menuContext}
+        // />
+        // )
     })
+
+    function handlePressUser(user: UsersClanEntity) {
+        setSelectedUser(user);
+        setShowManagementUserModal(true)
+    }
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }}>
-            <TouchableWithoutFeedback>
-                <View style={styles.container}>
-                    <MezonSearch />
-                    <ScrollView contentContainerStyle={styles.userList}>
-                        {usersClan?.map((item, index) => (
-                            <UserItem
-                                key={item.id}
-                                userID={item.id}
-                                hasBorder={index != (usersClan?.length || 0) - 1}
-                            />
-                        ))}
-                    </ScrollView>
-                </View>
-            </TouchableWithoutFeedback>
+            <View style={styles.container}>
+                <MezonSearch />
+                <ScrollView contentContainerStyle={styles.userList}>
+                    {usersClan?.map((item, index) => (
+                        <UserItem
+                            key={item.id}
+                            userID={item.id}
+                            hasBorder={index != (usersClan?.length || 0) - 1}
+                            onPress={() => handlePressUser(item)}
+                        />
+                    ))}
+                </ScrollView>
+            </View>
+
+            <UserSettingProfile
+                // @ts-ignore
+                user={selectedUser}
+                showManagementUserModal={isShowManagementUserModal}
+                showActionOutside={false}
+                onShowManagementUserModalChange={(value) => setShowManagementUserModal(value)}
+            />
 
             <MezonBottomSheet
                 heightFitContent

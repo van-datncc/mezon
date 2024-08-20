@@ -111,3 +111,6 @@ export const getApplicationState = (rootState: { [ADMIN_APPLICATIONS]: IApplicat
 export const selectAllApps = createSelector(getApplicationState, (state) => state.appsData || []);
 export const selectAppDetail = createSelector(getApplicationState, (state) => state.appDetail);
 export const adminApplicationReducer = adminApplicationSlice.reducer;
+
+export const selectAppById = (appId: string) => 
+	createSelector(selectAllApps, allApp => allApp.apps?.find(app => app.id === appId) || null);
