@@ -53,7 +53,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 	};
 	return (
 		<div>
-			<div className="w-full flex gap-x-3">
+			<div className="w-full flex gap-x-3 pr-5">
 				<InputField
 					className="flex-grow dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full py-1 px-2 font-normal border dark:border-bgTertiary border-bgLightModeThird rounded"
 					type="text"
@@ -72,7 +72,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 			</div>
 			<br />
 			<div>
-				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto hide-scrollbar">
+				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto">
 					{searchResults.map((member: UsersClanEntity) => (
 						<ItemMember
 							key={member?.user?.id}
@@ -111,7 +111,7 @@ const ItemMember = (props: ItemMemberProps) => {
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
-		<li key={id} className="flex justify-between items-center group/itemAddMember">
+		<li key={id} className="flex justify-between items-center">
 			<div className="flex gap-x-2">
 				<AvatarImage 
 					alt={userName}
@@ -125,7 +125,7 @@ const ItemMember = (props: ItemMemberProps) => {
 			{!isNewRole ? (
 				<div 
 					onClick={onRemove}
-					className="w-4 h-4 rounded-full flex justify-center items-center dark:bg-slate-800 bg-bgLightModeButton opacity-0 group-hover/itemAddMember:opacity-100"
+					className="w-4 h-4 rounded-full flex justify-center items-center dark:bg-slate-800 bg-bgLightModeButton mr-5 cursor-pointer"
 				>
 					<Icons.Close defaultSize="size-2 dark:text-white text-black"/>
 				</div>

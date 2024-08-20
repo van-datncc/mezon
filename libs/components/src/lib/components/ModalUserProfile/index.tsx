@@ -1,5 +1,5 @@
 import { useAppNavigation, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
-import { selectAllAccount, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
+import { selectAllAccount, selectFriendStatus, selectMemberById, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
@@ -25,6 +25,9 @@ type ModalUserProfileProps = {
 	message?: IMessageWithUser;
 	showPopupLeft?: boolean;
 	mode?: number;
+	avatar?: string;
+	positionType?: string;
+	name?: string;
 };
 
 export type OpenModalProps = {
@@ -42,6 +45,9 @@ const ModalUserProfile = ({
 	message,
 	showPopupLeft,
 	mode,
+	avatar,
+	positionType,
+	name,
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
@@ -49,6 +55,7 @@ const ModalUserProfile = ({
 	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '').status;
 	const userCustomStatus = useMemberCustomStatus(userID || '');
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
+	const memberById = useSelector(selectMemberById(userID ?? ''));
 
 	const [content, setContent] = useState<string>('');
 
@@ -128,7 +135,7 @@ const ModalUserProfile = ({
 				)}
 			</div>
 			<AvatarProfile
-				avatar={(isFooterProfile && userProfile?.user?.avatar_url) || message?.avatar || userById?.user?.avatar_url}
+				avatar={avatar || memberById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={userCustomStatus || (isFooterProfile && userStatusProfile)}
@@ -137,15 +144,7 @@ const ModalUserProfile = ({
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
-						<p className="font-semibold tracking-wider text-xl one-line my-0">
-							{isFooterProfile
-								? userProfile?.user?.display_name
-								: userById
-									? userById.clan_nick || userById.user?.display_name
-									: checkAnonymous
-										? 'Anonymous'
-										: message?.username}
-						</p>
+						<p className="font-semibold tracking-wider text-xl one-line my-0">{name}</p>
 						<p className="font-medium tracking-wide text-sm my-0">
 							{isFooterProfile
 								? userProfile?.user?.username

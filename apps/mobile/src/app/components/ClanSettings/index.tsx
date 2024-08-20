@@ -37,33 +37,35 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			expandable: true,
 			icon: <Icons.CircleInformationIcon color={themeValue.text} />,
 		},
-		{
-			title: t('menu.settings.moderation'),
-			onPress: () => reserve(),
-			expandable: true,
-			icon: <Icons.ModerationIcon color={themeValue.text} />,
-		},
-		{
-			title: t('menu.settings.auditLog'),
-			onPress: () => reserve(),
-			expandable: true,
-			icon: <Icons.ClipboardListIcon color={themeValue.text} />,
-		},
-		{
-			title: t('menu.settings.channels'),
-			onPress: () => reserve(),
-			expandable: true,
-			icon: <Icons.ChannelListIcon color={themeValue.text} />,
-		},
-		{
-			title: t('menu.settings.integrations'),
-			onPress: () => reserve(),
-			expandable: true,
-			icon: <Icons.GameControllerIcon color={themeValue.text} />,
-		},
+		// {
+		// 	title: t('menu.settings.moderation'),
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	icon: <Icons.ModerationIcon color={themeValue.text} />,
+		// },
+		// {
+		// 	title: t('menu.settings.auditLog'),
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	icon: <Icons.ClipboardListIcon color={themeValue.text} />,
+		// },
+		// {
+		// 	title: t('menu.settings.channels'),
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	icon: <Icons.ChannelListIcon color={themeValue.text} />,
+		// },
+		// {
+		// 	title: t('menu.settings.integrations'),
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	icon: <Icons.GameControllerIcon color={themeValue.text} />,
+		// },
 		{
 			title: t('menu.settings.emoji'),
-			onPress: () => reserve(),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.EMOJI_SETTING);
+			},
 			expandable: true,
 			icon: <Icons.ReactionIcon color={themeValue.text} />,
 		},
@@ -81,12 +83,12 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			expandable: true,
 			icon: <Icons.WebhookIcon color={themeValue.text} />,
 		},
-		{
-			title: t('menu.settings.security'),
-			onPress: () => reserve(),
-			expandable: true,
-			icon: <Icons.ShieldUserIcon color={themeValue.text} />,
-		},
+		// {
+		// 	title: t('menu.settings.security'),
+		// 	onPress: () => reserve(),
+		// 	expandable: true,
+		// 	icon: <Icons.ShieldUserIcon color={themeValue.text} />,
+		// },
 	];
 
 	const communityMenu: IMezonMenuItemProps[] = [
@@ -110,7 +112,9 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 	const userManagementMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.userManagement.members'),
-			onPress: () => reserve(),
+			onPress: async () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.MEMBER_SETTING);
+			},
 			expandable: true,
 			icon: <Icons.GroupIcon color={themeValue.text} />,
 		},
@@ -142,14 +146,14 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 			title: t('menu.settings.title'),
 			items: settingsMenu,
 		},
-		{
-			title: t('menu.community.title'),
-			items: communityMenu,
-		},
-		{
-			title: t('menu.subscriptions.title'),
-			items: subscriptionMenu,
-		},
+		// {
+		// 	title: t('menu.community.title'),
+		// 	items: communityMenu,
+		// },
+		// {
+		// 	title: t('menu.subscriptions.title'),
+		// 	items: subscriptionMenu,
+		// },
 		{
 			title: t('menu.userManagement.title'),
 			items: userManagementMenu,

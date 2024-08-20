@@ -150,7 +150,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 													className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center dark:text-white text-colorTextLightMode"
 													onClick={() => addRole(role.id)}
 												>
-													<div className="size-3 dark:bg-white bg-bgLightModeButton rounded-full"></div>
+													<div className="size-3 min-w-3 dark:bg-white bg-bgLightModeButton rounded-full"></div>
 													{role.title}
 												</div>
 											))
