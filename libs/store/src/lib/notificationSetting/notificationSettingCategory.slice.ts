@@ -29,6 +29,7 @@ export const getDefaultNotificationCategory = createAsyncThunk(
 			fetchNotificationCategorySetting.clear(mezon, categoryId);
 		}
 		const response = await fetchNotificationCategorySetting(mezon, categoryId);
+
 		if (!response) {
 			return thunkAPI.rejectWithValue('Invalid session');
 		}
@@ -37,6 +38,8 @@ export const getDefaultNotificationCategory = createAsyncThunk(
 			? {
 				id: response.notification_user_channel.id,
 				notification_setting_type: response.notification_user_channel.notification_setting_type,
+				active: response.notification_user_channel.active,
+				time_mute: response.notification_user_channel.time_mute
 			}
 			: {};
 
@@ -44,11 +47,12 @@ export const getDefaultNotificationCategory = createAsyncThunk(
 	}
 );
 
-type SetDefaultNotificationPayload = {
+export type SetDefaultNotificationPayload = {
 	category_id?: string;
 	notification_type?: number;
-	time_mute?: number;
+	time_mute?: string;
 	clan_id: string;
+	active?: number
 };
 const LIST_NOTIFI_CATEGORY_CACHED_TIME = 1000 * 60 * 3;
 export const fetchNotificationCategorySetting = memoize(
@@ -65,12 +69,13 @@ export const fetchNotificationCategorySetting = memoize(
 
 export const setDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/setDefaultNotificationCategory',
-	async ({ category_id, notification_type, time_mute, clan_id }: SetDefaultNotificationPayload, thunkAPI) => {
+	async ({ category_id, notification_type, time_mute, clan_id, active }: SetDefaultNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			channel_category_id: category_id,
 			notification_type: notification_type,
 			time_mute: time_mute,
+			active: active,
 		}
 		const response = await mezon.client.setNotificationCategory(mezon.session, body);
 		if (!response) {

@@ -6,7 +6,13 @@ import { Icons } from "@mezon/ui"
 import PanelCategory from "../../PanelCategory";
 import CategorySetting from "../../CategorySetting";
 import {Coords} from "../../ChannelLink";
-import {categoriesActions, channelsActions, selectCategoryIdSortChannel, useAppDispatch} from "@mezon/store";
+import {
+	categoriesActions,
+	channelsActions,
+	defaultNotificationCategoryActions,
+	selectCategoryIdSortChannel,
+	useAppDispatch
+} from "@mezon/store";
 import {useSelector} from "react-redux";
 
 
@@ -32,12 +38,13 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 	
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
 	
-	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY + window.screenY;
 		const windowHeight = window.innerHeight;
 		
 		if (event.button === MouseButton.RIGHT) {
+			await dispatch(defaultNotificationCategoryActions.getDefaultNotificationCategory({categoryId: category?.id ?? '', noCache: false}));
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelCategory(!isShowPanelCategory);
@@ -111,6 +118,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 								coords={coords}
 								setIsShowPanelChannel={setIsShowPanelCategory}
 								setOpenSetting={setIsShowCategorySetting}
+								category={category}
 							/>
 						)}
 						
