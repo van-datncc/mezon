@@ -186,7 +186,7 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 	return (
 		<div className="flex flex-col gap-5">
 			<div className="text-[20px]">My Applications</div>
-			<div className="flex flex-wrap gap-4 gap-x-4">
+			<div className="flex flex-wrap gap-4 gap-x-4 max-md:justify-evenly">
 				{appListForDisplaying &&
 					appListForDisplaying.map((value, index) => (
 						<div
