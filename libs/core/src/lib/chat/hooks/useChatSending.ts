@@ -1,20 +1,20 @@
-import { useFilteredContent } from '@mezon/core';
 import {
 	messagesActions,
 	selectChannelById,
 	selectCurrentClanId,
 	selectCurrentUserId,
 	selectDirectById,
-	selectNewIdMessageResponse,
-	selectUserClanProfileByClanID,
+	selectNewMesssageUpdateImage,
 	useAppDispatch,
 } from '@mezon/store';
-import { handleUrlInput, useMezon } from '@mezon/transport';
-import { ETypeLinkMedia, IMentionOnMessage, IMessageSendPayload } from '@mezon/utils';
+import { useMezon } from '@mezon/transport';
+import { IMessageSendPayload } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppParams } from '../../app/hooks/useAppParams';
+import { useProcessLink } from './useProcessLink';
 
 export type UseChatSendingOptions = {
 	channelId: string;
@@ -27,10 +27,9 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
-	const idNewMessageResponse = useSelector(selectNewIdMessageResponse);
+	const newMessageIdUpdateImage = useSelector(selectNewMesssageUpdateImage);
+
 	const dispatch = useAppDispatch();
-	// TODO: if direct is the same as channel use one slice
-	// If not, using 2 hooks for direct and channel
 	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectChannelById(channelId));
@@ -41,9 +40,9 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		clanID = '0';
 	}
 
-	const [filteredLinkResults, setFilteredLinkResults] = React.useState<ApiMessageAttachment[]>([]);
-	const [filteredContent, setFilterContent] = useState<IMessageSendPayload>({});
-	const [filteredMention, setFilterMention] = useState<IMentionOnMessage[]>([]);
+	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
+	const [mentionPayload, setMentionPayload] = useState<ApiMessageMention[]>();
+	const [attachmentPayload, setAttachmentPayload] = useState<ApiMessageAttachment[]>();
 
 	const sendMessage = React.useCallback(
 		async (
@@ -54,15 +53,16 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			anonymous?: boolean,
 			mentionEveryone?: boolean,
 		) => {
-			const filteredContent = useFilteredContent(content);
-			setFilterContent(filteredContent ?? {});
-			setFilterMention(mentions ?? []);
-			return dispatch(
+			setContentPayload(content);
+			setMentionPayload(mentions);
+			setAttachmentPayload(attachments);
+
+			await dispatch(
 				messagesActions.sendMessage({
 					channelId: channelID,
 					clanId: clanID || '',
 					mode,
-					content: filteredContent ?? {},
+					content,
 					mentions,
 					attachments,
 					references,
@@ -74,43 +74,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		},
 		[dispatch, channelID, clanID, mode, currentUserId],
 	);
-
-	useEffect(() => {
-		if (!filteredContent.lk) return;
-		const processUrls = async () => {
-			const resultPromises = (filteredContent.lk ?? []).map(async (item) => {
-				const result = await handleUrlInput(item.lk as string);
-				if (result.filetype && result.filetype.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) {
-					return result as ApiMessageAttachment;
-				}
-				return null;
-			});
-			const results = await Promise.all(resultPromises);
-			const filteredLinkProcess = results.filter((result): result is ApiMessageAttachment => result !== null) as ApiMessageAttachment[];
-			setFilteredLinkResults(filteredLinkProcess);
-		};
-		processUrls();
-	}, [filteredContent.lk]);
-
-	useEffect(() => {
-		if (!idNewMessageResponse || filteredLinkResults.length === 0) return;
-		const result = checkContentContainsOnlyUrls(filteredContent.t ?? '', filteredLinkResults);
-		const intervalId = setInterval(() => {
-			editSendMessage(result ? {} : filteredContent, idNewMessageResponse, filteredMention, filteredLinkResults);
-			setFilterContent({});
-			setFilteredLinkResults([]);
-			setFilterMention([]);
-			clearInterval(intervalId);
-		}, 1000);
-		return () => clearInterval(intervalId);
-	}, [idNewMessageResponse, filteredLinkResults]);
-
-	function checkContentContainsOnlyUrls(content: string, urls: ApiMessageAttachment[]) {
-		const urlsToCheck = urls.map((item) => item.url);
-		const lines = content.split('\n').filter((line) => line.trim() !== '');
-		const urlsInContent = lines.filter((line) => urlsToCheck.includes(line.trim()));
-		return urlsInContent.length === 1 && urlsInContent[0] === urlsToCheck[0];
-	}
 
 	const sendMessageTyping = React.useCallback(async () => {
 		dispatch(messagesActions.sendTypingUser({ clanId: clanID || '', channelId, mode }));
@@ -127,19 +90,59 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			const filteredContent = useFilteredContent(content);
-
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, filteredContent, mentions, attachments);
+			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
 
+	const updateImageLinkMessage = React.useCallback(
+		async (
+			clanId: string,
+			channelId: string,
+			mode: ChannelStreamMode,
+			content: IMessageSendPayload,
+			messageId: string,
+			mentions: ApiMessageMention[],
+			attachments?: ApiMessageAttachment[],
+		) => {
+			const session = sessionRef.current;
+			const client = clientRef.current;
+			const socket = socketRef.current;
+
+			if (!client || !session || !socket || (!channel && !direct)) {
+				throw new Error('Client is not initialized');
+			}
+
+			await socket.updateChatMessage(clanId, channelId, mode, messageId, content, mentions, attachments);
+		},
+		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
+	);
+	const { processLink } = useProcessLink({ updateImageLinkMessage });
+
+	useEffect(() => {
+		if (newMessageIdUpdateImage.clan_id !== '0') {
+			processLink(
+				newMessageIdUpdateImage.clan_id!,
+				newMessageIdUpdateImage.channel_id!,
+				newMessageIdUpdateImage.mode!,
+				contentPayload,
+				mentionPayload,
+				attachmentPayload,
+				newMessageIdUpdateImage.message_id,
+			);
+		}
+		setContentPayload({});
+		setMentionPayload([]);
+		setAttachmentPayload([]);
+	}, [newMessageIdUpdateImage.message_id]);
+
 	return useMemo(
 		() => ({
+			updateImageLinkMessage,
 			sendMessage,
 			sendMessageTyping,
 			editSendMessage,
 		}),
-		[sendMessage, sendMessageTyping, editSendMessage],
+		[updateImageLinkMessage, sendMessage, sendMessageTyping, editSendMessage],
 	);
 }

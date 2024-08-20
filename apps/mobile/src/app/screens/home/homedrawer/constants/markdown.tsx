@@ -1,20 +1,8 @@
-import {
-	codeBlockRegex,
-	codeBlockRegexGlobal,
-	isEmojiOnMessage,
-	isHashtagOnMessage,
-	isLinkOnMessage,
-	isLinkVoiceRoomOnMessage,
-	isMarkdownOnMessage,
-	isMentionOnMessage,
-	markdownDefaultUrlRegex,
-	splitBlockCodeRegex,
-	urlRegex,
-} from '@mezon/mobile-components';
+import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUsesClan, selectChannelsEntities } from '@mezon/store-mobile';
-import { IExtendedMessage } from '@mezon/utils';
+import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
@@ -24,6 +12,16 @@ import FontAwesome from 'react-native-vector-icons/Feather';
 import { ChannelHashtag } from '../components/MarkdownFormatText/ChannelHashtag';
 import { EmojiMarkup } from '../components/MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../components/MarkdownFormatText/MentionUser';
+
+interface ElementToken {
+	s?: number;
+	e?: number;
+	kindOf: ETokenMessage;
+	user_id?: string;
+	role_id?: string;
+	channelid?: string;
+	emojiid?: string;
+}
 
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
@@ -106,7 +104,7 @@ export const markdownStyles = (colors: Attributes) =>
 		link: {
 			color: colors.textLink,
 			textDecorationLine: 'none',
-			lineHeight: size.s_20,
+			lineHeight: size.s_17,
 		},
 		iconEmojiInMessage: {
 			width: size.s_20,
@@ -229,7 +227,7 @@ export const renderRulesCustom = {
 					key={node.key}
 					style={[
 						styles.mention,
-						content.includes('# unknown') && styles.unknownChannel,
+						content?.includes?.('# unknown') && styles.unknownChannel,
 						payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention,
 					]}
 					onPress={() => openUrl(node.attributes.href, onLinkPress)}
@@ -343,7 +341,15 @@ export const RenderTextMarkdownContent = React.memo(
 			customStyle = { ...styleMessageReply(themeValue) };
 		}
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = content || {};
-		const elements = [...mentions, ...hg, ...ej, ...mk, ...lk, ...vk].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+		const elements: ElementToken[] = [
+			...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })),
+			...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
+			...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })),
+			...mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })),
+			...lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })),
+			...vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })),
+		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+
 		let lastIndex = 0;
 
 		const contentRender = useMemo(() => {
@@ -352,16 +358,18 @@ export const RenderTextMarkdownContent = React.memo(
 			elements.forEach((element) => {
 				const s = element.s ?? 0;
 				const e = element.e ?? 0;
+
+				const contentInElement = t?.substring(s, e);
+
 				if (lastIndex < s) {
-					formattedContent += t?.slice?.(lastIndex, s)?.toString();
+					formattedContent += t?.slice?.(lastIndex, s)?.toString() ?? '';
 				}
-				if (isHashtagOnMessage(element)) {
+				if (element.kindOf === ETokenMessage.HASHTAGS) {
 					formattedContent += ChannelHashtag({ channelHashtagId: element.channelid, channelsEntities });
 				}
-				if (isMentionOnMessage(element)) {
+				if (element.kindOf === ETokenMessage.MENTIONS) {
 					formattedContent += MentionUser({
-						tagName: element.username,
-						roleName: element.rolename || '',
+						tagName: contentInElement,
 						roleId: element.role_id || '',
 						tagUserId: element.user_id,
 						mode,
@@ -369,23 +377,21 @@ export const RenderTextMarkdownContent = React.memo(
 						usersInChannel,
 					});
 				}
-				if (isEmojiOnMessage(element)) {
-					formattedContent += EmojiMarkup({ shortname: element.shortname, emojiid: element.emojiid, isMessageReply: isMessageReply });
+				if (element.kindOf === ETokenMessage.EMOJIS) {
+					formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: element.emojiid, isMessageReply: isMessageReply });
 				}
 
-				if (isMarkdownOnMessage(element) || isLinkOnMessage(element)) {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-expect-error
-					formattedContent += formatBlockCode(element.mk || element.lk);
+				if (element.kindOf === ETokenMessage.MARKDOWNS || element.kindOf === ETokenMessage.LINKS) {
+					formattedContent += formatBlockCode(contentInElement);
 				}
 
-				if (isLinkVoiceRoomOnMessage(element)) {
-					const meetingCode = element?.vk?.split('/').pop();
+				if (element.kindOf === ETokenMessage.VOICE_LINKS) {
+					const meetingCode = contentInElement?.split('/').pop();
 					const allChannelVoice = Object.values(channelsEntities).flat();
 					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 
 					if (!voiceChannelFound) {
-						formattedContent += formatBlockCode(element.vk);
+						formattedContent += formatBlockCode(contentInElement);
 					} else {
 						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities });
 					}

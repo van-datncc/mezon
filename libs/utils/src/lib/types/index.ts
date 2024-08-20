@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -13,7 +13,6 @@ import {
 	ApiMessageMention,
 	ApiMessageReaction,
 	ApiMessageRef,
-	ApiNotifiReactMessage,
 	ApiNotificationChannelCategoySetting,
 	ApiNotificationSetting,
 	ApiNotificationUserChannel,
@@ -67,7 +66,7 @@ export type IRolesClan = ApiRole & {
 
 export type INotificationSetting = ApiNotificationUserChannel;
 
-export type INotifiReactMessage = ApiNotifiReactMessage;
+export type INotifiReactMessage = NotifiReactMessage;
 
 export type IDefaultNotificationClan = ApiNotificationSetting;
 
@@ -79,7 +78,7 @@ export type IDefaultNotification = ApiNotificationSetting & {
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
 	id: string;
 };
-export type IHashtagDmVoice = HashtagDm & {
+export type IHashtagDm = HashtagDm & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
@@ -350,9 +349,9 @@ export type IEmoji = {
 	shortname: string;
 };
 
-export type IChannelUser =  ChannelDescription & {
-	id: string
-}
+export type IChannelUser = ChannelDescription & {
+	id: string;
+};
 
 export type IEmoticons = {
 	[key: string]: string;
@@ -653,7 +652,7 @@ export type SearchItemProps = {
 	subText?: string;
 	icon?: string;
 	channelId?: string;
-	channel_private?: number
+	channel_private?: number;
 };
 
 export enum EEmojiCategory {
@@ -691,3 +690,11 @@ export type SearchFilter = {
 export enum ETypeLinkMedia {
 	IMAGE_PREFIX = 'image',
 }
+
+export type MessageTypeUpdateLink = {
+	id?: string;
+	channel_id?: string;
+	message_id?: string;
+	clan_id?: string;
+	mode?: ChannelStreamMode;
+};

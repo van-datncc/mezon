@@ -2,7 +2,6 @@ import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions } from '@mezon/store';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { delay } from 'lodash';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +44,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 
 	const onPickFiles = async () => {
 		try {
-			timeRef.current = delay(() => {
+			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(true));
 			}, 500);
 			const res = await DocumentPicker.pick({
@@ -72,12 +71,12 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				size: file?.size,
 				fileData
 			};
-			timeRef.current = delay(() => {
+			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(false));
 			}, 2000);
 			handleFiles([fileFormat]);
 		} catch (err) {
-			timeRef.current = delay(() => {
+			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(false));
 			}, 2000);
 			if (DocumentPicker.isCancel(err)) {
