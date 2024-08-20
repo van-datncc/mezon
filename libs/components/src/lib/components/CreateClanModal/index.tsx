@@ -51,7 +51,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
   const debouncedSetClanName = useDebouncedCallback(async (value: string) => {
     const regex = ValidateSpecialCharacters();
     if (regex.test(value)) {
-      await dispatch(checkDuplicateNameClan(value)).then(unwrapResult).then(result => {
+      await dispatch(checkDuplicateNameClan(value.trim())).then(unwrapResult).then(result => {
         if (result) {
           setCheckValidate(EValidateListMessage.DUPLICATE_NAME)
           return;
