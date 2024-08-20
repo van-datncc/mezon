@@ -324,7 +324,6 @@ export const channelMembers = createSlice({
 			})
 			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[] | null>) => {
 				if (action.payload !== null) {
-					// console.log("🚀 ~ .addCase ~ action.payload:", action.payload)
 					channelMembersAdapter.setMany(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {

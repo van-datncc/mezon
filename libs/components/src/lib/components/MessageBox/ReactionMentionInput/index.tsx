@@ -4,6 +4,7 @@ import {
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
+	useHandlePopupQuickMess,
 	useMessageValue,
 	useReference,
 	useThreads,
@@ -42,7 +43,7 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import {
 	ChannelMembersEntity,
@@ -201,6 +202,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		callback(matches);
 	};
 
+
+	const { trackEnterPress } = useEnterPressTracker();
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { key, ctrlKey, shiftKey } = event;
 		const isEnterKey = key === 'Enter';
@@ -217,6 +220,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		switch (key) {
 			case 'Enter': {
+				trackEnterPress();
 				if (shiftKey) {
 					return;
 				} else {
@@ -717,3 +721,40 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 }
 
 export default MentionReactInput;
+
+
+const useEnterPressTracker = () => {
+    const [enterCount, setEnterCount] = useState(0);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
+	const {handleOpenPopupQuickMess, handleClosePopupQuickMess} = useHandlePopupQuickMess();
+
+    const resetEnterCount = () => {
+        setEnterCount(0);
+		handleClosePopupQuickMess();
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+    };
+
+    const trackEnterPress = () => {
+        setEnterCount((prev) => {
+            const newCount = prev + 1;
+
+            if (newCount >= 8) {
+                resetEnterCount(); 
+				handleOpenPopupQuickMess();
+                return 0; 
+            }
+
+            return newCount;
+        });
+
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+        }
+        timerRef.current = setTimeout(resetEnterCount, 1000); 
+    };
+
+    return { trackEnterPress };
+}
