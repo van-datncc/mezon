@@ -6,9 +6,10 @@ interface ICollapseSideBarProps {
 	isShow: boolean;
 	toggleSideBar: () => void;
 	tabs: ITabs[];
+	currentAppId?: string;
 }
 
-const CollapseSideBar = ({ isShow, toggleSideBar, tabs }: ICollapseSideBarProps) => {
+const CollapseSideBar = ({ isShow, toggleSideBar, tabs, currentAppId }: ICollapseSideBarProps) => {
 	const collapseSideBarHeight = 'calc(100vh - 65px)';
 	return (
 		<div>
@@ -28,8 +29,8 @@ const CollapseSideBar = ({ isShow, toggleSideBar, tabs }: ICollapseSideBarProps)
 					aria-controls="drawer-navigation"
 					className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 right-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white"
 				>
-					<div className='dark:text-textDarkTheme text-textLightTheme w-6'>
-						<Icons.MenuClose className='w-full'/>
+					<div className="dark:text-textDarkTheme text-textLightTheme w-6">
+						<Icons.MenuClose className="w-full" />
 					</div>
 					<span className="sr-only">Close menu</span>
 				</button>
@@ -38,7 +39,7 @@ const CollapseSideBar = ({ isShow, toggleSideBar, tabs }: ICollapseSideBarProps)
 						{tabs.map((tab, index) => (
 							<NavLink
 								key={index}
-								to={tab.routerLink}
+								to={currentAppId ? `/admin/applications/${currentAppId}/${tab.routerLink}` : tab.routerLink}
 								className={({ isActive }) =>
 									isActive
 										? 'sidebar-tab flex gap-1 items-center py-2 px-4 dark:bg-[#3C4370] bg-bgLightModeButton text-[#5865F3] dark:text-[#C9CDFB] rounded-[4px]'

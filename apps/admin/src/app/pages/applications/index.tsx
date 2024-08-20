@@ -6,6 +6,7 @@ import isElectron from 'is-electron';
 import { ApiApp } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import CreateAppPopup from './CreateAppPopup';
 
 function ApplicationsPage() {
@@ -180,7 +181,8 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 			<div className="flex flex-wrap gap-4 gap-x-4 justify-evenly">
 				{appListForDisplaying &&
 					appListForDisplaying.map((value, index) => (
-						<div
+						<Link
+							to={`${value.id}`}
 							key={index}
 							className={`dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] ${isSmallSizeSort ? 'w-[128px]' : 'w-[206px]'} rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl`}
 						>
@@ -188,7 +190,7 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 								{value.appname?.charAt(0).toUpperCase()}
 							</div>
 							<div className="w-full text-center truncate">{value.appname}</div>
-						</div>
+						</Link>
 					))}
 			</div>
 		</div>

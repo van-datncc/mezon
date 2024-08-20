@@ -3,6 +3,7 @@ export interface ITabs {
     routerLink: string;
     imgSrc?: string
     isButton?: boolean;
+    icon?: React.JSX.Element;
 }
 
 export const tabs: ITabs[] = [

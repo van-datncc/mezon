@@ -1,7 +1,8 @@
 import { selectIsLogin } from '@mezon/store';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate, Outlet, useLoaderData } from 'react-router-dom';
+import { Navigate, Outlet, useLoaderData, useParams } from 'react-router-dom';
+import { appDetailTabs } from '../common/constants/appDetailTabs';
 import { tabs } from '../common/constants/tabSideBar';
 import CollapseSideBar from '../components/CollapseSideBar';
 import Header from '../components/Header';
@@ -20,6 +21,14 @@ const RootLayout: React.FC = () => {
 		setShowCollapseSideBar(!showCollapseSideBar);
 	};
 
+	const param = useParams();
+	const menuItems = useMemo(() => {
+		if (param.applicationId) {
+			return appDetailTabs;
+		}
+		return tabs;
+	}, [param]);
+
 	if (!isLogin) {
 		return <Navigate to={redirect || '/login'} replace />;
 	}
@@ -28,9 +37,14 @@ const RootLayout: React.FC = () => {
 		<div className="dark:bg-bgPrimary bg-bgLightPrimary flex flex-col h-screen dark:text-textDarkTheme text-textLightTheme">
 			<Header toggleSideBar={toggleCollapseSideBar} />
 			<div className="flex flex-1 overflow-hidden">
-				<CollapseSideBar tabs={tabs} isShow={showCollapseSideBar} toggleSideBar={toggleCollapseSideBar} />
+				<CollapseSideBar
+					currentAppId={param.applicationId}
+					tabs={menuItems}
+					isShow={showCollapseSideBar}
+					toggleSideBar={toggleCollapseSideBar}
+				/>
 				<div className="min-w-[350px] px-[32px] pt-[16px] pb-[32px] h-full overflow-y-auto max-lg:hidden">
-					<SideBar tabs={tabs} />
+					<SideBar currentAppId={param.applicationId} tabs={menuItems} />
 				</div>
 				<div className={`w-full h-full overflow-y-auto overflow-x-hidden px-[32px] py-[16px] ${isDarkMode ? '' : 'customScrollLightMode'}`}>
 					<Outlet />
