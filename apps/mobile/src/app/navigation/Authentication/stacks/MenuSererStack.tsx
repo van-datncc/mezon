@@ -7,6 +7,7 @@ import ClanNotificationSetting from '../../../components/ClanNotificationSetting
 import NotificationOverrides from '../../../components/ClanNotificationSetting/NotificationOverrides';
 import NotificationSettingDetail from '../../../components/ClanNotificationSetting/NotificationSettingDetail';
 import ClanSetting from '../../../components/ClanSettings';
+import ClanEmojiSetting from '../../../components/ClanSettings/Emoji';
 import MemberSetting from '../../../components/ClanSettings/Member';
 import ClanOverviewSetting from '../../../components/ClanSettings/Overview';
 import StickerSetting from '../../../components/ClanSettings/Sticker';
@@ -107,6 +108,13 @@ export const MenuClanStacks = ({ }: any) => {
 				}}
 			/>
 
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.EMOJI_SETTING}
+				component={ClanEmojiSetting}
+				options={{
+					headerTitle: t('menuClanStack.clanEmojiSetting'),
+				}}
+			/>
 			<Stack.Screen
 				name={APP_SCREEN.MENU_CLAN.STICKER_SETTING}
 				component={StickerSetting}

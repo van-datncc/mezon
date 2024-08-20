@@ -63,7 +63,9 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 		// },
 		{
 			title: t('menu.settings.emoji'),
-			onPress: () => reserve(),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.EMOJI_SETTING);
+			},
 			expandable: true,
 			icon: <Icons.ReactionIcon color={themeValue.text} />,
 		},

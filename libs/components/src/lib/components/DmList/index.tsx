@@ -79,10 +79,10 @@ function DirectMessageList() {
 					<div
 						ref={buttonPlusRef}
 						onClick={onClickOpenModal}
-						className="relative cursor-pointer flex flex-row justify-end  ml-0 hover:bg-bgSecondary rounded-full iconHover"
+						className="relative cursor-pointer flex flex-row justify-end  ml-0 dark:hover:bg-bgSecondary hover:bg-bgLightMode rounded-full"
 					>
 						<Tooltip content="Create DM" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
-							<Icons.Plus />
+							<Icons.Plus className="w-4 h-4" />
 						</Tooltip>
 						{isOpen && <CreateMessageGroup onClose={() => setIsOpen(false)} isOpen={isOpen} />}
 					</div>
