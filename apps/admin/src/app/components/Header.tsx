@@ -1,12 +1,16 @@
 import { useAuth } from '@mezon/core';
 import { authActions, useAppDispatch } from '@mezon/store';
-import { Image } from '@mezon/ui';
+import { Icons, Image } from '@mezon/ui';
 import { useEffect, useRef, useState } from 'react';
 import IconDarkMode from '../../assets/icons/IconDarkMode.png';
 import IconLightMode from '../../assets/icons/IconLightMode.png';
 import { useAppearance } from '../context/AppearanceContext';
 
-const Header = () => {
+interface IHeaderProps{
+	toggleSideBar: ()=> void
+}
+
+const Header = ({toggleSideBar}: IHeaderProps) => {
 	const { userProfile } = useAuth();
 	const [showMenu, setShowMenu] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -37,16 +41,21 @@ const Header = () => {
 
 	return (
 		<div
-			className={`fixed z-10 w-full px-[42px] py-[12px] flex flex-row items-center justify-between border-b-[1px] border-solid ${isDarkMode ? 'dark:border-borderDividerLight' : 'border-bgModifierHoverLight'}`}
+			className={`sticky dark:bg-bgPrimary bg-bgLightPrimary z-40 w-full px-[42px] py-[12px] flex flex-row items-center justify-between border-b-[1px] border-solid ${isDarkMode ? 'dark:border-borderDividerLight' : 'border-bgModifierHoverLight'}`}
 		>
-			<div className="flex flex-row items-center justify-center gap-[4px]">
-				<Image
-					src={`${isDarkMode ? 'assets/images/mezon-logo-black.svg' : 'assets/images/mezon-logo-white.svg'}`}
-					alt={'logoMezon'}
-					width={28}
-					height={28}
-				/>
-				<span className="text-[12px] font-bold">MEZON</span>
+			<div className='flex items-center gap-3'>
+				<div onClick={toggleSideBar} className='w-8 hidden max-lg:block'>
+					<Icons.MenuBarIcon className='w-full'/>
+				</div>
+				<div className="flex flex-row items-center justify-center gap-[4px]">
+					<Image
+						src={`${isDarkMode ? 'assets/images/mezon-logo-black.svg' : 'assets/images/mezon-logo-white.svg'}`}
+						alt={'logoMezon'}
+						width={28}
+						height={28}
+					/>
+					<span className="text-[12px] font-bold">MEZON</span>
+				</div>
 			</div>
 			<div className="flex flex-row items-center justify-center relative">
 				<button onClick={toggleDarkMode} className="mr-4">
