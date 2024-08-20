@@ -174,6 +174,7 @@ export type IMessage = ChannelMessage & {
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
 	isFirst?: boolean;
+	hideEditted?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -404,6 +405,7 @@ export type ChannelDraftMessages = {
 	message_id: string;
 	draftContent: IMessageSendPayload;
 	draftMention: ApiMessageMention[];
+	draftAttachment: ApiMessageAttachment[];
 };
 
 export interface IGifCategory {
