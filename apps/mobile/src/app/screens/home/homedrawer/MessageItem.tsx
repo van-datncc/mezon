@@ -32,6 +32,7 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
+import { ETypeLinkMedia } from '@mezon/utils';
 import { setSelectedMessage } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
@@ -115,6 +116,14 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 		return message?.avatar;
 	}, [message?.clan_avatar, message?.avatar, mode]);
+
+	const checkOneLinkImage = useMemo(() => {
+		return (
+			message?.attachments?.length === 1 &&
+			message?.attachments[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
+			message?.attachments[0].url === message?.content?.t?.trim()
+		);
+	}, [message?.attachments, message?.content?.t]);
 
 	useEffect(() => {
 		if (props?.messageId) {
@@ -355,6 +364,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 								content={{
 									...(typeof message.content === 'object' ? message.content : {}),
 									mentions: message.mentions,
+									...(checkOneLinkImage ? { t: '' } : {})
 								}}
 								isEdited={isEdited}
 								translate={t}
