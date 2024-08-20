@@ -63,7 +63,9 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 		// },
 		{
 			title: t('menu.settings.emoji'),
-			onPress: () => reserve(),
+			onPress: () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.EMOJI_SETTING);
+			},
 			expandable: true,
 			icon: <Icons.ReactionIcon color={themeValue.text} />,
 		},
@@ -110,7 +112,9 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 	const userManagementMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.userManagement.members'),
-			onPress: () => reserve(),
+			onPress: async () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.MEMBER_SETTING);
+			},
 			expandable: true,
 			icon: <Icons.GroupIcon color={themeValue.text} />,
 		},

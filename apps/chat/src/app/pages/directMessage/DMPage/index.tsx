@@ -216,6 +216,7 @@ export default function DirectMessage() {
 								hiddenRole={true}
 								showNote={true}
 								showPopupLeft={true}
+								avatar={currentDmGroup.channel_avatar?.[0]}
 							/>
 						</div>
 					)}

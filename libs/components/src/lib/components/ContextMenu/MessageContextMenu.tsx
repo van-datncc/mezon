@@ -3,33 +3,40 @@ import { useMemo, useState } from 'react';
 import { Icons } from '@mezon/components';
 import { useAuth, useCheckAlonePermission, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
 import {
+	MessagesEntity,
 	directActions,
 	gifsStickerEmojiActions,
-	messagesActions, MessagesEntity,
+	messagesActions,
 	pinMessageActions,
 	reactionActions,
 	referencesActions,
 	selectAllDirectMessages,
 	selectCurrentChannel,
-	selectCurrentClanId, selectDmGroupCurrentId,
+	selectCurrentClanId,
+	selectDmGroupCurrentId,
 	selectIsMessageHasReaction,
-	selectMessageByMessageId, selectMessageEntitiesByChannelId, selectModeResponsive,
-	selectPinMessageByChannelId, setIsForwardAll,
+	selectMessageByMessageId,
+	selectMessageEntitiesByChannelId,
+	selectModeResponsive,
+	selectPinMessageByChannelId,
+	setIsForwardAll,
 	setSelectedMessage,
 	threadsActions,
 	toggleIsShowPopupForwardTrue,
-	useAppDispatch, useAppSelector,
+	useAppDispatch,
+	useAppSelector,
 } from '@mezon/store';
 import {
 	ContextMenuItem,
 	EPermission,
 	MenuBuilder,
+	ModeResponsive,
 	SHOW_POSITION,
 	SubPanelName,
 	handleCopyImage,
 	handleCopyLink,
 	handleOpenLink,
-	handleSaveImage, ModeResponsive
+	handleSaveImage,
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
@@ -54,8 +61,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const message = useSelector(selectMessageByMessageId(messageId));
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
-	const allMessagesEntities = useAppSelector(state => selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || ''))
-	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : []
+	const allMessagesEntities = useAppSelector((state) =>
+		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || ''),
+	);
+	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
@@ -83,11 +92,15 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
-	
+
 	const isShowForwardAll = () => {
-		if(messagePosition === -1) return false;
-		return message.isStartedMessageGroup && messagePosition < convertedAllMessagesEntities.length - 1 && !convertedAllMessagesEntities[messagePosition + 1].isStartedMessageGroup;
-	}
+		if (messagePosition === -1) return false;
+		return (
+			message.isStartedMessageGroup &&
+			messagePosition < convertedAllMessagesEntities.length - 1 &&
+			!convertedAllMessagesEntities[messagePosition + 1].isStartedMessageGroup
+		);
+	};
 
 	// add action
 	const { deleteSendMessage } = useDeleteMessage({
@@ -110,7 +123,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(
 			messagesActions.setChannelDraftMessage({
 				channelId: message.channel_id,
-				channelDraftMessage: { message_id: message.id, draftContent: message.content, draftMention: message.mentions ?? [] },
+				channelDraftMessage: {
+					message_id: message.id,
+					draftContent: message.content,
+					draftMention: message.mentions ?? [],
+					draftAttachment: message.attachments ?? [],
+				},
 			}),
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));
@@ -124,7 +142,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(setSelectedMessage(message));
 		dispatch(setIsForwardAll(false));
 	};
-	
+
 	const handleForwardAllMessage = () => {
 		if (dmGroupChatList.length === 0) {
 			dispatch(directActions.fetchDirectMessage({}));
@@ -132,7 +150,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(toggleIsShowPopupForwardTrue());
 		dispatch(setSelectedMessage(message));
 		dispatch(setIsForwardAll(true));
-	}
+	};
 
 	const [openModalAddPin, setOpenModalAddPin] = useState(false);
 	const handlePinMessage = async () => {
@@ -362,12 +380,18 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		builder.when(checkPos, (builder) => {
 			builder.addMenuItem('forwardMessage', 'Forward Message', () => handleForwardMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />);
 		});
-		
-		{isShowForwardAll() &&
-			builder.when(checkPos, (builder) => {
-				builder.addMenuItem('forwardAll', 'Forward All Message', () => handleForwardAllMessage(), <Icons.ForwardRightClick defaultSize="w-4 h-4" />)})
+
+		{
+			isShowForwardAll() &&
+				builder.when(checkPos, (builder) => {
+					builder.addMenuItem(
+						'forwardAll',
+						'Forward All Message',
+						() => handleForwardAllMessage(),
+						<Icons.ForwardRightClick defaultSize="w-4 h-4" />,
+					);
+				});
 		}
-		
 
 		builder.when(enableSpeakMessageItem, (builder) => {
 			builder.addMenuItem(
