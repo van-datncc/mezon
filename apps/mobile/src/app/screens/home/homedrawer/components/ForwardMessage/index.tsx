@@ -297,7 +297,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 					<Block paddingTop={size.s_10}>
 						<TouchableOpacity 
 							style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]} 
-							onPress={() => handleForward()}
+							onPress={handleForward}
 						>
 							<Text style={styles.btnText}>{'Send'}{count}</Text>
 						</TouchableOpacity>

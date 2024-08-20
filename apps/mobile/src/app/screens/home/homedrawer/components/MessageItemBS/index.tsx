@@ -50,8 +50,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		return convertedAllMessagesEntities?.findIndex(
 		  (value: MessagesEntity) => value.id === message?.id
 		);
-	  }, [convertedAllMessagesEntities, message]);
-	  
+	  }, [convertedAllMessagesEntities, message?.id]);
+
 	const isShowForwardAll = () => {
 		if (messagePosition === -1) return false;
 		return (
