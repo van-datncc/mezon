@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import IconDarkMode from '../../assets/icons/IconDarkMode.png';
 import IconLightMode from '../../assets/icons/IconLightMode.png';
 import { useAppearance } from '../context/AppearanceContext';
+import { Link } from 'react-router-dom';
 
 interface IHeaderProps{
 	toggleSideBar: ()=> void
@@ -47,7 +48,7 @@ const Header = ({toggleSideBar}: IHeaderProps) => {
 				<div onClick={toggleSideBar} className='w-8 hidden max-lg:block'>
 					<Icons.MenuBarIcon className='w-full'/>
 				</div>
-				<div className="flex flex-row items-center justify-center gap-[4px]">
+				<Link to="/" className="flex flex-row items-center justify-center gap-[4px]">
 					<Image
 						src={`${isDarkMode ? 'assets/images/mezon-logo-black.svg' : 'assets/images/mezon-logo-white.svg'}`}
 						alt={'logoMezon'}
@@ -55,7 +56,7 @@ const Header = ({toggleSideBar}: IHeaderProps) => {
 						height={28}
 					/>
 					<span className="text-[12px] font-bold">MEZON</span>
-				</div>
+				</Link>
 			</div>
 			<div className="flex flex-row items-center justify-center relative">
 				<button onClick={toggleDarkMode} className="mr-4">

@@ -9,6 +9,7 @@ import Header from '../components/Header';
 import SideBar from '../components/SideBar';
 import { useAppearance } from '../context/AppearanceContext';
 import { IAuthLoaderData } from '../loader/authLoader';
+import AppDetailLeftMenu from '../components/AppDetailLeftMenu';
 
 const RootLayout: React.FC = () => {
 	const { isLogin: isLoginLoader, redirect } = useLoaderData() as IAuthLoaderData;
@@ -44,7 +45,11 @@ const RootLayout: React.FC = () => {
 					toggleSideBar={toggleCollapseSideBar}
 				/>
 				<div className="min-w-[350px] px-[32px] pt-[16px] pb-[32px] h-full overflow-y-auto max-lg:hidden">
-					<SideBar currentAppId={param.applicationId} tabs={menuItems} />
+					{param.applicationId ? (
+						<AppDetailLeftMenu currentAppId={param.applicationId} tabs={menuItems} />
+					) : (
+						<SideBar tabs={menuItems} />
+					)}
 				</div>
 				<div className={`w-full h-full overflow-y-auto overflow-x-hidden px-[32px] py-[16px] ${isDarkMode ? '' : 'customScrollLightMode'}`}>
 					<Outlet />
