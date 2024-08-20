@@ -199,7 +199,6 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const firstMessage = response.messages.find((item) => item.code === EMessageCode.FIRST_MESSAGE);
-
 		if (firstMessage) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
 		}
@@ -226,11 +225,12 @@ export const fetchMessages = createAsyncThunk(
 		});
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
-
-		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
+		
+		const lastLoadMessageId = messages[messages.length - 1].id
+		const hasMore = firstMessage?.id === lastLoadMessageId
 		if (messages.length > 0) {
 			thunkAPI.dispatch(
-				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }),
+				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessageId, hasMore } }),
 			);
 		}
 
