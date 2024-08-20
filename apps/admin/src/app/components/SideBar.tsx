@@ -5,17 +5,16 @@ import { ITabs } from '../common/constants/tabSideBar';
 interface ISideBarProps {
 	tabs: ITabs[];
 	mode?: string;
-	currentAppId?: string;
 }
 
-const SideBar: React.FC<ISideBarProps> = ({ tabs, mode = 'root', currentAppId }) => {
+const SideBar: React.FC<ISideBarProps> = ({ tabs, mode = 'root' }) => {
 	return (
 		<div className="flex flex-col items-center w-full">
 			<div className="flex flex-col w-full gap-[10px]">
 				{tabs.map((tab, index) => (
 					<NavLink
 						key={index}
-						to={currentAppId ? `/admin/applications/${currentAppId}/${tab.routerLink}` : tab.routerLink}
+						to={tab.routerLink}
 						className={({ isActive }) =>
 							isActive
 								? 'sidebar-tab flex gap-1 items-center py-2 px-4 dark:bg-[#3C4370] bg-bgLightModeButton text-[#5865F3] dark:text-[#C9CDFB] rounded-[4px]'
