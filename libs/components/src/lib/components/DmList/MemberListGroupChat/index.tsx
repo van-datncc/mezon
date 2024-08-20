@@ -28,6 +28,7 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 							<div key={user.id}>
 								<MemberItem
 									user={user}
+									name={user.user?.display_name || user.user?.username}
 									positionType={MemberProfileType.DM_MEMBER_GROUP}
 									listProfile={true}
 									dataMemberCreate={dataMemberCreate}

@@ -7,6 +7,7 @@ export const APP_FEATURE_KEY = 'app';
 interface showSettingFooterProps {
 	status: boolean;
 	initTab: string;
+	isUserProfile?: boolean;
 }
 
 export interface AppState {
@@ -41,7 +42,7 @@ export const initialAppState: AppState = {
 	hasInternetMobile: false,
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
-	isShowSettingFooter: { status: false, initTab: 'Account' },
+	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile : true },
 };
 
 export const appSlice = createSlice({
@@ -99,6 +100,12 @@ export const appSlice = createSlice({
 				initTab: action.payload,
 			};
 		},
+		setIsUserProfile: (state, action) => {
+			state.isShowSettingFooter = {
+				...state.isShowSettingFooter,
+				isUserProfile: action.payload,
+			}
+		}
 	},
 });
 

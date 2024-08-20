@@ -5,9 +5,12 @@ type ShortUserProfilePopup = {
 	userID?: string;
 	message?: IMessageWithUser;
 	mode?: number;
+	avatar?: string;
+	positionType?: string;
+	name?: string;
 };
 
-const ShortUserProfile = ({ userID, message, mode }: ShortUserProfilePopup) => {
+const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name }: ShortUserProfilePopup) => {
 	const [showPopupAddRole, setShowPopupAddRole] = useState(false);
 	const handleClickOutside = () => {
 		if (showPopupAddRole) {
@@ -17,7 +20,15 @@ const ShortUserProfile = ({ userID, message, mode }: ShortUserProfilePopup) => {
 	return (
 		<div className="relative">
 			<div onClick={handleClickOutside} className="text-white w-full" role="button">
-				<ModalUserProfile userID={userID} classBanner="rounded-tl-lg rounded-tr-lg h-[105px]" message={message} mode={mode} />
+				<ModalUserProfile
+					userID={userID}
+					classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
+					message={message}
+					mode={mode}
+					positionType={positionType}
+					avatar={avatar}
+					name={name}
+				/>
 			</div>
 		</div>
 	);
