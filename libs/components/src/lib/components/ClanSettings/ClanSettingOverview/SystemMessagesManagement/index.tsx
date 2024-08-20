@@ -17,8 +17,6 @@ const SystemMessagesManagement = () => {
 		<div className={'border-t dark:border-borderDivider border-borderDividerLight mt-10 pt-10 flex flex-col dark:text-textSecondary text-textSecondary800'}>
 			<h3 className="text-sm font-bold uppercase mb-2">System Messages Channel</h3>
 			<Dropdown
-				trigger={"click"}
-				dismissOnClick={false}
 				placement={'bottom-start'}
 				label={''}
 				renderTrigger={() => (

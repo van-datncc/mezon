@@ -1,4 +1,4 @@
-import { useAppNavigation } from '@mezon/core';
+import {useAppNavigation, useEscapeKey} from '@mezon/core';
 import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
 import { ChannelType } from 'mezon-js';
@@ -107,6 +107,8 @@ export const CreateNewChannelModal = () => {
 		const isValid = InputRef.current?.checkInput();
 		setIsInputError(isValid ?? false);
 	}, []);
+	
+	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
 	return (
 		isOpenModal && (
