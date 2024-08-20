@@ -594,6 +594,10 @@ export enum ChannelIsNotThread {
 	TRUE = '0',
 }
 
+export enum RoleEveryOne {
+	TRUE = '0',
+}
+
 export enum EMessageCode {
 	FIRST_MESSAGE = 11,
 }

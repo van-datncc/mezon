@@ -46,7 +46,7 @@ const SettingDisplayRole = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 
 	return (
 		<div 
-			className='w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800'
+			className='w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800 pr-5'
 		>
 			<div className="text-xs font-bold uppercase mb-2">
 				Role name<b className="text-red-600">*</b>

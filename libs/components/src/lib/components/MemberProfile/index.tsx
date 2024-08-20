@@ -179,7 +179,7 @@ function MemberProfile({
 	};
 
 	return (
-		<div className="relative group">
+		<div className="relative group" >
 			<div
 				ref={panelRef}
 				onMouseDown={handleMouseClick}
@@ -194,7 +194,7 @@ function MemberProfile({
 						src={avatar}
 						isAnonymous={isAnonymous}
 					/>
-					{!isHideIconStatus && avatar !== 'assets/images/avatar-group.png' ? (
+					{!isHideIconStatus ? (
 						<StatusUser
 							isListDm={isListDm}
 							isMemberChannel={isMemberChannel}
@@ -334,6 +334,7 @@ const StatusUser = memo((props: StatusUserProps) => {
 	const typingListMemberDMIds = useSelector(selectTypingUserIdsByChannelId(currentDMChannelID || ''));
 	const typingListMemberChannelIds = useSelector(selectTypingUserIdsByChannelId(currentChannelID || ''));
 	const typingListDMIds = useSelector(selectTypingUserIdsByChannelId(directMessageValue?.dmID || ''));
+	const checkDmGroup = Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP;
 
 	const checkTypingUser = useMemo(() => {
 		switch (true) {
@@ -342,11 +343,8 @@ const StatusUser = memo((props: StatusUserProps) => {
 			case isMemberChannel:
 				return typingListMemberChannelIds?.includes(userId);
 
-			case isListDm:
-				return (
-					Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_DM &&
-					typingListDMIds?.includes(directMessageValue?.userId?.[0] ?? '')
-				);
+			case isListDm: 
+				return typingListDMIds?.some(id => directMessageValue?.userId?.includes(id));
 
 			default:
 				return false;
@@ -354,18 +352,12 @@ const StatusUser = memo((props: StatusUserProps) => {
 	}, [isMemberDMGroup, isMemberChannel, isListDm, typingUserIds]);
 
 	return (
-		<span
-			className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${status && checkTypingUser ? 'rounded-lg -right-3' : 'rounded-full right-[-4px]'}`}
-		>
-			{status ? (
-				checkTypingUser ? (
-					<Icons.IconLoadingTyping defaultSize="bg-colorSuccess w-5 rounded-lg" />
-				) : (
-					<OnlineStatus />
-				)
-			) : (
-				<OfflineStatus />
-			)}
-		</span>
-	);
-});
+    <span
+		className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${(checkTypingUser) ? 'rounded-lg -right-3' : 'rounded-full right-[-4px]'}`}
+    >
+		{checkTypingUser ? <Icons.IconLoadingTyping defaultSize='bg-colorSuccess w-5 h-2.5 rounded-lg' /> : 
+        	(!checkDmGroup && (status ? <OnlineStatus /> : <OfflineStatus />))
+		}
+    </span>
+  );
+})

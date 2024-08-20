@@ -1,7 +1,7 @@
 import { Block, size } from '@mezon/mobile-ui';
 import Toast from 'react-native-toast-message';
-import { IMezonMenuItemProps } from '../MezonMenuItem';
-import MezonMenuSection, { IMezonMenuSectionProps } from '../MezonMenuSection';
+import { IMezonMenuItemProps } from './MezonMenuItem';
+import MezonMenuSection, { IMezonMenuSectionProps } from './MezonMenuSection';
 
 interface IMezonMenu {
 	menu: IMezonMenuSectionProps[];

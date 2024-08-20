@@ -76,9 +76,9 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 				<div className="w-2/3">
 					<div className="font-semibold pl-3 dark:text-white text-black">
 						{isCreateNewRole ? (
-							<div className="tracking-wide text-base mb-4">NEW ROLE</div>
+							<div className="tracking-wide text-base mb-4 pr-5">NEW ROLE</div>
 						) : (
-							<div className="tracking-wide mb-4 text-base uppercase">EDIT ROLE - {nameRole}</div>
+							<div className="tracking-wide mb-4 text-base uppercase pr-5">EDIT ROLE - {nameRole}</div>
 						)}
 						<SettingValueDisplayRole RolesClan={rolesClan} />
 					</div>
