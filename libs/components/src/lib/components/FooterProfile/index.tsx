@@ -1,7 +1,7 @@
 import { useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
 import {
-	channelMembersActions,
 	ChannelsEntity,
+	channelMembersActions,
 	selectAllAccount,
 	selectCurrentClanId,
 	selectShowModalCustomStatus,
@@ -11,12 +11,12 @@ import {
 	userClanProfileActions,
 	voiceActions,
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { HeadPhoneICon, MicIcon, SettingProfile } from '../../../../../ui/src/lib/Icons';
 import MemberProfile from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalFooterProfile from './ModalFooterProfile';
@@ -68,9 +68,9 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 	};
 
 	const handleSaveCustomStatus = () => {
-		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }))
-		handleCloseModalCustomStatus()
-	}
+		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }));
+		handleCloseModalCustomStatus();
+	};
 
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
 
@@ -99,20 +99,29 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent }: FooterP
 							customStatus={userCustomStatus || userStatusProfile}
 						/>
 					</div>
-					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} />}
+					{showModalFooterProfile && <ModalFooterProfile userId={userId ?? ''} avatar={avatar} name={name} />}
 				</div>
 				<div className="flex items-center gap-2">
-					<MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
-					<HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
+					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
+					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Tooltip content="Settings" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
-						<SettingProfile
+						<Icons.SettingProfile
 							className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton"
 							onClick={openSetting}
 						/>
 					</Tooltip>
 				</div>
 			</button>
-			{showModalCustomStatus && <ModalCustomStatus setCustomStatus={setCustomStatus} customStatus={userCustomStatus || userStatusProfile } handleSaveCustomStatus={handleSaveCustomStatus} name={name} openModal={showModalCustomStatus} onClose={handleCloseModalCustomStatus} />}
+			{showModalCustomStatus && (
+				<ModalCustomStatus
+					setCustomStatus={setCustomStatus}
+					customStatus={userCustomStatus || userStatusProfile}
+					handleSaveCustomStatus={handleSaveCustomStatus}
+					name={name}
+					openModal={showModalCustomStatus}
+					onClose={handleCloseModalCustomStatus}
+				/>
+			)}
 		</>
 	);
 }

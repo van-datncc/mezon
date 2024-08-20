@@ -428,7 +428,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props.onTyping();
 		}
 
-		setContent(newPlainTextValue);
+		setContent(newPlainTextValue.trim());
 
 		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(newValue);
