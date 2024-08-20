@@ -27,16 +27,28 @@ export default function UserItem({ userID, hasBorder }: IUserItem) {
         });
     }, [userID, rolesClan]);
 
+    const userName = useMemo(() => {
+        return user?.user?.username;
+    }, [user?.user?.username]);
+
+    const userAvatar = useMemo(() => {
+        return user?.user?.avatar_url;
+    }, [user?.user?.avatar_url])
+
+    const userDisplay = useMemo(() => {
+        return user?.user?.display_name;
+    }, [user?.user?.display_name])
+
     return (
         <View style={styles.container}>
             <MezonAvatar
-                avatarUrl={user?.user?.avatar_url}
-                username={user?.user?.username}
+                avatarUrl={userAvatar}
+                username={userName}
             />
             <View style={[styles.rightContent, hasBorder && styles.border]}>
                 <View style={styles.content}>
-                    <Text style={styles.displayName}>{user?.user?.display_name}</Text>
-                    <Text style={styles.username}>{user?.user?.username}</Text>
+                    <Text style={styles.displayName}>{userDisplay}</Text>
+                    <Text style={styles.username}>{userName}</Text>
 
                     <View style={styles.roleWrapper}>
                         {userRolesClan?.length > 0 && userRolesClan.map(role => (
