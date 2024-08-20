@@ -16,7 +16,7 @@ const ApplicationsPage = loadable(() => import('../pages/applications'));
 const TeamsPage = loadable(() => import('../pages/teams'));
 const DocsPage = loadable(() => import('../pages/docs'));
 const EmbedsPage = loadable(() => import('../pages/embeds'));
-const GeneralInformation = loadable(() => import('../pages/generalInformation'));
+const GeneralInformation = loadable(() => import('../pages/AppGeneralInformation'));
 const Installation = loadable(() => import('../pages/installation'));
 
 export const Routes = () => {

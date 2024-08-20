@@ -1,5 +1,5 @@
 import { useAppNavigation } from '@mezon/core';
-import { authActions, fetchApplications, selectAllApps, selectIsLogin, selectTheme, useAppDispatch } from '@mezon/store';
+import { authActions, fetchApplications, getApplicationDetail, selectAllApps, selectIsLogin, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
 import isElectron from 'is-electron';

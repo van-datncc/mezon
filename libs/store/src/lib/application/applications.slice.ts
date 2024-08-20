@@ -65,7 +65,6 @@ export const getApplicationDetail = createAsyncThunk('adminApplication/getApplic
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.getApp(mezon.session, appId);
-		console.log('response', response);
 		return response;
 	} catch (err) {
 		return thunkAPI.rejectWithValue({ err });
@@ -110,4 +109,5 @@ export const adminApplicationSlice = createSlice({
 
 export const getApplicationState = (rootState: { [ADMIN_APPLICATIONS]: IApplicationState }): IApplicationState => rootState[ADMIN_APPLICATIONS];
 export const selectAllApps = createSelector(getApplicationState, (state) => state.appsData || []);
+export const selectAppDetail = createSelector(getApplicationState, (state) => state.appDetail);
 export const adminApplicationReducer = adminApplicationSlice.reducer;

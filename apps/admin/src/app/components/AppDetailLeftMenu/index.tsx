@@ -17,10 +17,9 @@ const AppDetailLeftMenu = ({ tabs, mode = 'root', currentAppId }: ISideBarProps)
 			</Link>
 			<div className='w-full'>
 				<div className='text-[12px] font-semibold'>SELECT APP</div>
-				<div>currentAppId</div>
 			</div>
 			<div className='w-full'>
-				<div className='text-[12px] font-semibold'>SETTINGS</div>
+				<div className='text-[12px] font-semibold mb-2'>SETTINGS</div>
 				<div className="flex flex-col w-full gap-[10px]">
 					{tabs.map((tab, index) => (
 						<NavLink
