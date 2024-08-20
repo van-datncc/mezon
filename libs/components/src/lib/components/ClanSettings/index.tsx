@@ -101,7 +101,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 								) : (
 									''
 								)}
-                				{currentSettingPage()}
+								{currentSettingPage()}
 							</div>
 						</div>
 						{isShowDeletePopup && <DeleteClanModal onClose={() => setIsShowDeletePopup(false)} />}

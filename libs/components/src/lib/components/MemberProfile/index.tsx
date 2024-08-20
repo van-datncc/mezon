@@ -343,8 +343,8 @@ const StatusUser = memo((props: StatusUserProps) => {
 			case isMemberChannel:
 				return typingListMemberChannelIds?.includes(userId);
 
-      		case isListDm:
-        		return typingListDMIds?.some(id => directMessageValue?.userId?.includes(id));
+			case isListDm: 
+				return typingListDMIds?.some(id => directMessageValue?.userId?.includes(id));
 
 			default:
 				return false;
