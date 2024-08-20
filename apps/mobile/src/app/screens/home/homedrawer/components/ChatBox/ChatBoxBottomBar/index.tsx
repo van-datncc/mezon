@@ -222,7 +222,11 @@ export const ChatBoxBottomBar = memo(
 				let match;
 				const matches = [];
 				while ((match = pattern.exec(text)) !== null) {
-					matches.push({ start: match?.index, end: pattern?.lastIndex, content: match[0]?.slice(2, -1) });
+					matches.push({
+						start: matches.length ? match?.index - matches.length * 2 : match?.index,
+						end: pattern?.lastIndex - (matches.length + 1) * 2,
+						content: match[0]?.slice(2, -1),
+					});
 				}
 				return matches;
 			};
@@ -243,6 +247,8 @@ export const ChatBoxBottomBar = memo(
 				const { mentionUsers } = findMentionMarkers(convertedHashtag);
 				let mentionList = [];
 				const hashtagList = [];
+				let mentionBeforeCount = 0;
+				let indexOfLastHashtag = 0;
 
 				if (mentionUsers?.length) {
 					mentionList = mentionUsers.map((m) => {
@@ -258,15 +264,20 @@ export const ChatBoxBottomBar = memo(
 				}
 
 				words.forEach((word) => {
+					if (word.startsWith('@[')) {
+						mentionBeforeCount++;
+						return;
+					}
 					if (word.startsWith('<#') && word.endsWith('>')) {
 						const channelId = word.slice(2, -1);
 						const channelInfo = getChannelById(channelId);
 						if (channelInfo) {
-							const startindex = convertedHashtag.indexOf(word);
+							const startindex = convertedHashtag.indexOf(word, indexOfLastHashtag);
+							indexOfLastHashtag = startindex + 1;
 							hashtagList.push({
 								channelid: channelInfo.id.toString() ?? '',
-								s: startindex,
-								e: startindex + word.length,
+								s: mentionUsers?.length ? startindex - 2 * mentionBeforeCount : startindex,
+								e: startindex + word.length - 2 * mentionBeforeCount,
 							});
 						}
 					}
