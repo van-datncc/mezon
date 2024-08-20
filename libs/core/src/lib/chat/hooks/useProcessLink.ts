@@ -29,7 +29,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 			newMessageIdUpdateImage?: string,
 			messageEdit?: IMessageWithUser,
 		) => {
-			if (!contentPayload?.lk) {
+			if (!contentPayload?.lk && messageEdit?.attachments && messageEdit?.attachments?.length > 0) {
 				const filteredAttachments =
 					messageEdit?.attachments?.filter(
 						(attachment) =>
