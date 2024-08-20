@@ -122,7 +122,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		lines,
 		messageDate,
 		hasAttachments,
-		// isEdited,
 		userClanNickname,
 		userClanAvatar,
 		userDisplayName,
