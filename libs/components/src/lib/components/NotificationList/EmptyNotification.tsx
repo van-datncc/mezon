@@ -21,7 +21,7 @@ export default EmptyNotification;
 const EmptyForYou = () => {
 	return (
 		<>
-			<img className="mx-auto mb-4" src="/assets/images/empty-for-you.svg" alt="empty-for-you" />
+			<img className="mx-auto mb-4" src="assets/images/empty-for-you.svg" alt="empty-for-you" />
 			<h1 className="text-center dark:text-white text-textLightTheme text-lg font-bold mb-2">Nothing here yet</h1>
 			<div className="text-center text-base font-medium dark:text-textThreadPrimary text-textSecondary800">
 				Come back for notifications on events, streams, and more.

@@ -145,9 +145,19 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onstreampresence = useCallback(
-		(channelPresence: StreamPresenceEvent) => {
-			console.log('online/offline', channelPresence);
-			//dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
+		(channelStreamPresence: StreamPresenceEvent) => {
+			if (channelStreamPresence.joins.length > 0) {
+				const onlineStatus = channelStreamPresence.joins.map((join) => {
+					return { userId: join.user_id, status: true };
+				});
+				dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+			}
+			if (channelStreamPresence.leaves.length > 0) {
+				const onlineStatus = channelStreamPresence.leaves.map((leave) => {
+					return { userId: leave.user_id, status: false };
+				});
+				dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+			}
 		},
 		[dispatch],
 	);
