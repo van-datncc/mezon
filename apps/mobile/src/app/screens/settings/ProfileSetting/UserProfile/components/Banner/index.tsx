@@ -1,5 +1,7 @@
-import { useTheme } from '@mezon/mobile-ui';
-import { MezonImagePicker } from 'apps/mobile/src/app/temp-ui';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { IMezonImagePickerHandler, IMezonMenuSectionProps, MezonBottomSheet, MezonImagePicker, MezonMenu } from 'apps/mobile/src/app/temp-ui';
+import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { useMixImageColor } from '../../../../../../../app/hooks/useMixImageColor';
 import { style } from './styles';
@@ -12,13 +14,43 @@ interface IBannerAvatarProps {
 
 export default function BannerAvatar({ avatar, onLoad, alt }: IBannerAvatarProps) {
 	const { themeValue } = useTheme();
-	const { color } = useMixImageColor(avatar);
-
 	const styles = style(themeValue);
+	const { color } = useMixImageColor(avatar);
+	const avatarBSRef = useRef<BottomSheetModal>();
+	const avatarPickerRef = useRef<IMezonImagePickerHandler>();
 
-	const handleOnload = async (url) => {
+	const handleOnload = async (url: string) => {
+		console.log(url);
 		onLoad && onLoad(url);
 	};
+
+	const openAvatarBS = () => {
+		avatarBSRef?.current?.present();
+	}
+
+	const removeAvatar = () => {
+		onLoad && onLoad(process.env.NX_LOGO_MEZON || "");
+		avatarBSRef?.current?.dismiss();
+	}
+
+	const pickAvatar = () => {
+		avatarPickerRef?.current?.openSelector();
+		avatarBSRef?.current?.dismiss();
+	}
+
+	const menu = useMemo(() => ({
+		items: [
+			{
+				title: 'Change Avatar',
+				onPress: () => pickAvatar()
+			},
+			{
+				title: 'Remove Avatar',
+				textStyle: { color: baseColor.redStrong },
+				onPress: () => removeAvatar()
+			}
+		]
+	}) satisfies IMezonMenuSectionProps, [])
 
 	return (
 		<View>
@@ -36,6 +68,7 @@ export default function BannerAvatar({ avatar, onLoad, alt }: IBannerAvatarProps
 
 			<View style={styles.avatarContainer}>
 				<MezonImagePicker
+					ref={avatarPickerRef}
 					width={100}
 					height={100}
 					defaultValue={avatar || ''}
@@ -45,10 +78,21 @@ export default function BannerAvatar({ avatar, onLoad, alt }: IBannerAvatarProps
 					onLoad={handleOnload}
 					autoUpload
 					penPosition={{ right: 5, top: 5 }}
+					onPressAvatar={openAvatarBS}
 				/>
 
 				<View style={[styles.onLineStatus]}></View>
 			</View>
+
+			<MezonBottomSheet
+				heightFitContent
+				title='Avatar'
+				ref={avatarBSRef}
+			>
+				<View style={{ padding: size.s_20 }}>
+					<MezonMenu menu={[menu]} />
+				</View>
+			</MezonBottomSheet>
 		</View>
 	);
 }

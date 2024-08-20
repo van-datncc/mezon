@@ -64,8 +64,6 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const { updateUserClanProfile } = useClanProfileSetting({ clanId: selectedClan?.id });
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(selectedClan?.id, userProfile?.user?.id ?? ''));
-  console.log('fasdf');
-
 
 	const [originUserProfileValue, setOriginUserProfileValue] = useState<IUserProfileValue>({
 		username: '',
