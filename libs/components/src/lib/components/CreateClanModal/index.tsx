@@ -95,7 +95,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 
 
   const handleCreateClan = () => {
-    createClans(nameClan, urlImage).then((res) => {
+    createClans(nameClan.trim(), urlImage).then((res) => {
       if (res && res.clan_id) {
         navigate(toClanPage(res.clan_id || ''));
       }
