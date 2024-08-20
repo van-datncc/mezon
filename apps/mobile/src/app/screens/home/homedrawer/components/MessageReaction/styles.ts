@@ -8,6 +8,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		gap: size.s_6,
 		flexWrap: 'wrap',
 		alignItems: 'center',
+		marginBottom: size.s_6
 	},
 	myReaction: {
 		borderWidth: 1,
