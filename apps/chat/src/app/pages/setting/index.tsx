@@ -3,10 +3,11 @@ import { useSettingFooter } from '@mezon/core';
 import { selectIsShowSettingFooter } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { EUserSettings } from "@mezon/utils";
 
 const Setting = () => {
 	const isShowSettingFooter = useSelector(selectIsShowSettingFooter);
-	const [currentSetting, setCurrentSetting] = useState<string>(isShowSettingFooter?.initTab || 'Account');
+	const [currentSetting, setCurrentSetting] = useState<string>(isShowSettingFooter?.initTab || EUserSettings.ACCOUNT);
 	const handleSettingItemClick = (settingName: string) => {
 		setCurrentSetting(settingName);
 	};
@@ -14,10 +15,11 @@ const Setting = () => {
 	const handleMenuBtn = () => {
 		setMenuIsOpen(!menuIsOpen);
 	};
-	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab } = useSettingFooter();
+	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
 	const closeSetting = () => {
 		setIsShowSettingFooterStatus(false);
 		setIsShowSettingFooterInitTab('Account');
+		setIsUserProfile(true);
 	};
 
 	useEffect(() => {
@@ -31,9 +33,9 @@ const Setting = () => {
 						<div className={`${!menuIsOpen ? 'hidden' : 'flex'} text-gray- w-1/6 xl:w-1/4 min-w-56 relative`}>
 							<SettingItem onItemClick={handleSettingItemClick} initSetting={currentSetting} />
 						</div>
-						{currentSetting === 'Account' && <SettingAccount menuIsOpen={menuIsOpen} onSettingProfile={handleSettingItemClick} />}
-						{currentSetting === 'Profiles' && <SettingRightProfile menuIsOpen={menuIsOpen} />}
-						{currentSetting === 'Appearance' && <SettingAppearance menuIsOpen={menuIsOpen} />}
+						{currentSetting === EUserSettings.ACCOUNT && <SettingAccount menuIsOpen={menuIsOpen} onSettingProfile={handleSettingItemClick} />}
+						{currentSetting === EUserSettings.PROFILES && <SettingRightProfile menuIsOpen={menuIsOpen} isUserProfile={isShowSettingFooter?.isUserProfile}/>}
+						{currentSetting === EUserSettings.APPEARANCE && <SettingAppearance menuIsOpen={menuIsOpen} />}
 						<ExitSetting onClose={closeSetting} />
 
 						{menuIsOpen ? (

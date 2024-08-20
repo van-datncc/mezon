@@ -10,9 +10,10 @@ export type MemberItemProps = {
 	positionType?: MemberProfileType;
 	dataMemberCreate?: DataMemberCreate;
 	directMessageId?: string;
+	name?: string;
 };
 
-function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId }: MemberItemProps) {
+function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name }: MemberItemProps) {
 	const userStatus = useMemberStatus(user.user?.id || '');
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '');
 	const name = getNameForPrioritize(user.clan_nick, user.user?.display_name, user.user?.username);
@@ -33,7 +34,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			isOffline={isOffline}
 			positionType={positionType}
 			dataMemberCreate={dataMemberCreate}
-      hideLongName={true}
+			hideLongName={true}
 		/>
 	);
 }

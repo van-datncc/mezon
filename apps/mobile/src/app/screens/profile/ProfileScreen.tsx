@@ -8,7 +8,6 @@ import moment from 'moment';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import AddStatusUserModal from '../../components/AddStatusUserModal';
 import CustomStatusUser from '../../components/CustomStatusUser';
@@ -54,7 +53,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const firstFriendImageList = useMemo(() => {
 		return friendList?.slice?.(0, 5)?.map((friend) => ({
 			avatarUrl: friend?.user?.avatar_url,
-			username: friend?.user?.username || friend?.user?.display_name
+			username: friend?.user?.username || friend?.user?.display_name,
 		}));
 	}, [friendList]);
 
@@ -108,7 +107,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 			<ScrollView style={styles.contentWrapper}>
 				<View style={styles.contentContainer}>
-					<TouchableOpacity style={styles.viewInfo} onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })}>
+					<TouchableOpacity
+						style={styles.viewInfo}
+						onPress={() => {
+							userStatusBottomSheetRef?.current?.present();
+						}}
+					>
 						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
 						<Icons.ChevronSmallDownIcon height={18} width={18} color={themeValue.text} />
 					</TouchableOpacity>
@@ -158,13 +162,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 				<TouchableOpacity style={[styles.contentContainer, styles.imgList]} onPress={() => navigateToFriendScreen()}>
 					<Text style={styles.textTitle}>{t('yourFriend')}</Text>
 
-					<MezonAvatar
-						avatarUrl=''
-						username=''
-						height={30}
-						width={30}
-						stacks={firstFriendImageList}
-					/>
+					<MezonAvatar avatarUrl="" username="" height={30} width={30} stacks={firstFriendImageList} />
 					<Icons.ChevronSmallRightIcon width={18} height={18} style={{ marginLeft: size.s_4 }} color={themeValue.textStrong} />
 				</TouchableOpacity>
 			</ScrollView>

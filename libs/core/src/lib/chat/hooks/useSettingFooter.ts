@@ -9,20 +9,31 @@ export function useSettingFooter() {
 		},
 		[dispatch],
 	);
+	
 	const setIsShowSettingFooterInitTab = useCallback(
 		(value: string) => {
 			dispatch(appActions.setIsShowSettingFooterInitTab(value));
 		},
 		[dispatch],
 	);
+	
+	const setIsUserProfile = useCallback(
+		(isUserProfile: boolean) => {
+			dispatch(appActions.setIsUserProfile(isUserProfile));
+		},
+		[dispatch]
+	)
+	
     return useMemo(
 		() => ({
 			setIsShowSettingFooterStatus,
 			setIsShowSettingFooterInitTab,
+			setIsUserProfile
 		}),
 		[ 
             setIsShowSettingFooterStatus,
 			setIsShowSettingFooterInitTab,
+			setIsUserProfile
         ],
 	);
 }
