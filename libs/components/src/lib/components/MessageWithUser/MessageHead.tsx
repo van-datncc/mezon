@@ -1,11 +1,11 @@
 import { ShortUserProfile } from '@mezon/components';
 import { useGetPriorityNameFromUserClan, useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
+import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
-import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 
 type IMessageHeadProps = {
 	message: IMessageWithUser;
@@ -23,7 +23,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 	const [positionTop, setPositionTop] = useState(0);
 	const [positionBottom, setPositionBottom] = useState(false);
 
-	const { userClanNickname, userDisplayName, username, senderId } = useMessageParser(message);
+	const { userClanNickname, userDisplayName, username, senderId, userClanAvatar, avatarSender } = useMessageParser(message);
 	const { clanNick, displayName, usernameSender } = useGetPriorityNameFromUserClan(message.sender_id);
 	const { pendingClannick, pendingDisplayName, pendingUserName } = usePendingNames(
 		message,
@@ -35,7 +35,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 		username ?? '',
 	);
 
-	const nameShowed = useShowName(clanNick ? clanNick : pendingClannick ?? '', pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
+	const nameShowed = useShowName(clanNick ? clanNick : (pendingClannick ?? ''), pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
 	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (event.button === MouseButton.LEFT) {
 			setIsShowPanelChannel(!isShowPanelChannel);
@@ -111,7 +111,13 @@ const MessageHead = ({ message, isCombine, isShowFull, mode }: IMessageHeadProps
 					role="button"
 					ref={panelRefShort}
 				>
-					<ShortUserProfile userID={senderId} message={message} mode={mode} />
+					<ShortUserProfile
+						userID={senderId}
+						message={message}
+						mode={mode}
+						avatar={userClanAvatar}
+						name={userClanNickname || userDisplayName || username}
+					/>
 				</div>
 			)}
 		</div>

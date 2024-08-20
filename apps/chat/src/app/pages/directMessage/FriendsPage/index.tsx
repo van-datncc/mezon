@@ -217,7 +217,7 @@ export default function FriendsPage() {
 						</div>
 					)}
 				</div>
-				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-[#F7F7F7] lg:flex hidden"></div>
+				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-bgLightMode lg:flex hidden"></div>
 			</div>
 		</div>
 	);
