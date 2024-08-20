@@ -99,10 +99,14 @@ export const fetchChannelMembers = createAsyncThunk(
 				const status = (member?.user?.metadata as any)?.status ?? '';
 				return { userId: member.user?.id ?? '', customStatus: status };
 			});
+			const onlineStatus = response.channel_users.map((item) => {
+				return { userId: item.user?.id ?? '', status: item.user?.online ?? false };
+			});
 			thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
 			thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
 			thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
 			thunkAPI.dispatch(channelMembersActions.followUserStatus());
+			thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
 			return members;
 		}
 		return null;
@@ -119,9 +123,7 @@ export const followUserStatus = createAsyncThunk('channelMembers/followUserStatu
 			return { userId: item.user_id, status: true };
 		});
 		thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
-		if (mezon.sessionRef.current?.user_id) {
-			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId: mezon.sessionRef.current?.user_id, status: true }));
-		}
+
 		thunkAPI.dispatch(channelMembersActions.setFollowingUserIds(listUserIds));
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
@@ -309,7 +311,6 @@ export const channelMembers = createSlice({
 			const channelsToUpdate = Object.values(state.entities).filter((channel) => channel?.clan_id === clanId && channel?.user?.id === userId);
 			channelsToUpdate.forEach((channel) => {
 				if (channel) {
-					console.log('channel: ', channel.id);
 					channelMembersAdapter.updateOne(state, {
 						id: channel.id,
 						changes: {
@@ -430,6 +431,7 @@ export const selectMembersMap = (channelId?: string | null) =>
 
 		return retval;
 	});
+
 export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser);
 
 export const selectCustomUserStatus = createSelector(getChannelMembersState, (state) => state.customStatusUser);
