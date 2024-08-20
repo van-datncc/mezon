@@ -700,6 +700,34 @@ input:-webkit-autofill:active {
 		color: #5865f2;
 	}
 }
+
+/* LoadingTyping.css */
+#dots #dot1 {
+    animation: load 1s infinite;
+}
+
+#dots #dot2 {
+    animation: load 1s infinite;
+    animation-delay: 0.2s;
+}
+
+#dots #dot3 {
+    animation: load 1s infinite;
+    animation-delay: 0.4s;
+}
+
+@keyframes load {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
 .up-and-down-animated{
   animation: upAnDown 1.5s infinite linear ;
 }
@@ -722,5 +750,3 @@ input:-webkit-autofill:active {
   100%{
     transform: translateY(0);
   }
-
-}

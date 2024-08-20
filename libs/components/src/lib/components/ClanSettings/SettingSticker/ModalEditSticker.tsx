@@ -10,7 +10,7 @@ import { Button, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
-import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
+import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanEmojiByIdBody, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ELimitSize, ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
@@ -83,10 +83,11 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 
   const onSaveChange = async () => {
     if (graphic && graphic.id && graphic.shortname !== editingGraphic.shortname) {
-      const updateData: MezonUpdateClanStickerByIdBody = {
+      const updateData: MezonUpdateClanEmojiByIdBody = {
         source: graphicSource,
         category: graphic?.category,
         shortname: editingGraphic.shortname,
+        clan_id: currentClanId || "",
       };
       isSticker
         ? await dispatch(updateSticker({ stickerId: graphic.id, request: updateData ,clan_id: currentClanId}))

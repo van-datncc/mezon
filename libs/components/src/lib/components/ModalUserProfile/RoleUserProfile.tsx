@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useClanRestriction, useRoles, UserRestrictionZone } from '@mezon/core';
-import { channelMembersActions, RolesClanEntity, selectAllAccount, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberByUserId, selectTheme, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, RolesClanEntity, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberChannelById, selectTheme, useAppDispatch } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -17,11 +17,10 @@ const checkAdminPermission = (role: RolesClanEntity, userId: string) => {
 
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const userById = useSelector(selectMemberByUserId(userID ?? ''));
+	const userById = useSelector(selectMemberChannelById(userID || '', currentChannelId || ''));
 	const { updateRole } = useRoles();
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
-	const userProfile = useSelector(selectAllAccount);
 
 	const [searchTerm, setSearchTerm] = useState('');
 	const activeRoles = RolesClan.filter((role) => role.active === 1);
@@ -151,7 +150,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 													className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center dark:text-white text-colorTextLightMode"
 													onClick={() => addRole(role.id)}
 												>
-													<div className="size-3 dark:bg-white bg-bgLightModeButton rounded-full"></div>
+													<div className="size-3 min-w-3 dark:bg-white bg-bgLightModeButton rounded-full"></div>
 													{role.title}
 												</div>
 											))

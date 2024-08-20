@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelType, HashtagDm, Notification } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -13,7 +13,6 @@ import {
 	ApiMessageMention,
 	ApiMessageReaction,
 	ApiMessageRef,
-	ApiNotifiReactMessage,
 	ApiNotificationChannelCategoySetting,
 	ApiNotificationSetting,
 	ApiNotificationUserChannel,
@@ -26,7 +25,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
-import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from './messageLine';
+import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
 export * from './permissions';
@@ -67,7 +66,7 @@ export type IRolesClan = ApiRole & {
 
 export type INotificationSetting = ApiNotificationUserChannel;
 
-export type INotifiReactMessage = ApiNotifiReactMessage;
+export type INotifiReactMessage = NotifiReactMessage;
 
 export type IDefaultNotificationClan = ApiNotificationSetting;
 
@@ -79,7 +78,7 @@ export type IDefaultNotification = ApiNotificationSetting & {
 export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
 	id: string;
 };
-export type IHashtagDmVoice = HashtagDm & {
+export type IHashtagDm = HashtagDm & {
 	id: string;
 };
 export type IEventManagement = ApiEventManagement & {
@@ -175,6 +174,7 @@ export type IMessage = ChannelMessage & {
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
 	isFirst?: boolean;
+	hideEditted?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -336,6 +336,7 @@ export enum MemberProfileType {
 	DM_LIST = 'dm_list_friends',
 	DM_MEMBER_GROUP = 'dm_member_group',
 	LIST_FRIENDS = 'list_friends',
+	MESSAGE = 'message',
 }
 
 export type IReaction = ApiMessageReaction & {
@@ -404,6 +405,7 @@ export type ChannelDraftMessages = {
 	message_id: string;
 	draftContent: IMessageSendPayload;
 	draftMention: ApiMessageMention[];
+	draftAttachment: ApiMessageAttachment[];
 };
 
 export interface IGifCategory {
@@ -592,6 +594,10 @@ export enum ChannelIsNotThread {
 	TRUE = '0',
 }
 
+export enum RoleEveryOne {
+	TRUE = '0',
+}
+
 export enum EMessageCode {
 	FIRST_MESSAGE = 11,
 }
@@ -693,12 +699,32 @@ export enum ETypeLinkMedia {
 }
 
 export type MessageTypeUpdateLink = {
+	id?: string;
 	channel_id?: string;
-	code?: number;
-	create_time?: string;
-	id: string;
-	content?: IMessageSendPayload;
-	mentions?: IMentionOnMessage[];
-	attachments?: ApiMessageAttachment[];
-	references?: ApiMessageRef[];
+	message_id?: string;
+	clan_id?: string;
+	mode?: ChannelStreamMode;
 };
+
+export enum EUserSettings {
+	ACCOUNT = "Account",
+	PROFILES = "Profiles",
+	PRIVACY_SAFETY = "Privacy & Safety",
+	FAMILY_CENTER = "Family Center",
+	AUTHORIZED_APPS = "Authorized Apps",
+	DEVICES = "Devices",
+	CONNECTIONS = "Connections",
+	CLIPS = "Clips",
+	FRIEND_REQUESTS = "Friend Requests",
+	APP_SETTINGS = "APP SETTINGS",
+	APPEARANCE = "Appearance",
+	ACCESSIBILITY = "Accessibility",
+	VOICE_VIDEO = "Voice & Video",
+	TEXT_IMAGE = "Text & Image",
+	NOTIFICATIONS = "Notifications",
+	KEYBINDS = "Keybinds",
+	LANGUAGE = "Language",
+	STREAMER_MODE = "Streamer Mode",
+	ADVANCED = "Advanced",
+	LOG_OUT = "Log Out",
+}

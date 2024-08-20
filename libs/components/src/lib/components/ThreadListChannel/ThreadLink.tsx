@@ -32,7 +32,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const { setIsShowCreateThread } = useThreads();
 
-	const panelRef = useRef<HTMLAnchorElement | null>(null);
+	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [openSetting, setOpenSetting] = useState(false);
 	const [showModal, setShowModal] = useState(false);
 	const [coords, setCoords] = useState<Coords>({
@@ -47,7 +47,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 
 	const state = active ? 'active' : thread?.unread ? 'inactiveUnread' : 'inactiveRead';
 
-	const handleMouseClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY + window.screenY;
 		const windowHeight = window.innerHeight;
@@ -82,7 +82,12 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	};
 
 	return (
-		<div className="flex flex-row items-center h-[34px] relative ">
+		<div
+			className="flex flex-row items-center h-[34px] relative "
+			ref={panelRef}
+			role={'button'}
+			onMouseDown={(event) => handleMouseClick(event)}
+		>
 			{isFirstThread ? (
 				<span className="absolute top-2 left-0">
 					<Icons.ShortCorner />
@@ -97,40 +102,41 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 				to={channelPath}
 				key={thread.channel_id}
 				className={`${classes[state]} ml-5 w-full leading-[24px] rounded font-medium dark:hover:text-white hover:text-black text-[16px] max-w-full one-line ${active || isUnReadChannel ? 'dark:font-medium font-semibold dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'} ${active ? 'dark:bg-[#36373D] bg-bgLightModeButton' : ''}`}
-				ref={panelRef}
-				onMouseDown={(event) => handleMouseClick(event)}
-				onClick={() => {
+				onClick={(e) => {
 					handleClick(thread);
 					setTurnOffThreadMessage();
 				}}
 			>
 				{thread.channel_label}
-				{isShowPanelChannel && (
-					<PanelChannel
-						onDeleteChannel={handleDeleteChannel}
-						channel={thread}
-						coords={coords}
-						setOpenSetting={setOpenSetting}
-						setIsShowPanelChannel={setIsShowPanelChannel}
-					/>
-				)}
-				{openSetting && (
-					<SettingChannel
-						onClose={() => {
-							setOpenSetting(false);
-						}}
-						channel={thread}
-					/>
-				)}
-
-				{showModal && (
-					<DeleteModal
-						onClose={() => setShowModal(false)}
-						channelLabel={thread.channel_label || ''}
-						channelId={thread.channel_id as string}
-					/>
-				)}
 			</Link>
+			
+			{isShowPanelChannel && (
+				<PanelChannel
+					onDeleteChannel={handleDeleteChannel}
+					channel={thread}
+					coords={coords}
+					setOpenSetting={setOpenSetting}
+					setIsShowPanelChannel={setIsShowPanelChannel}
+				/>
+			)}
+			
+			{openSetting && (
+				<SettingChannel
+					onClose={() => {
+						setOpenSetting(false);
+					}}
+					channel={thread}
+				/>
+			)}
+			
+			{showModal && (
+				<DeleteModal
+					onClose={() => setShowModal(false)}
+					channelLabel={thread.channel_label || ''}
+					channelId={thread.channel_id as string}
+				/>
+			)}
+			
 			{numberNotification !== 0 && (
 				<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs font-medium">
 					{numberNotification}

@@ -29,24 +29,25 @@ import { NotificationCode } from '@mezon/utils';
 import {
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
-	ChannelMessageEvent,
+	ChannelMessage,
 	ChannelPresenceEvent,
 	ChannelType,
 	ChannelUpdatedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	LastPinMessageEvent,
-	MessageReactionEvent,
 	MessageTypingEvent,
 	Notification,
 	Socket,
 	StatusPresenceEvent,
+	StreamPresenceEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
 } from 'mezon-js';
+import { ApiMessageReaction } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -107,7 +108,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onchannelmessage = useCallback(
-		async (message: ChannelMessageEvent) => {
+		async (message: ChannelMessage) => {
 			const senderId = message.sender_id;
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
@@ -139,6 +140,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelpresence = useCallback(
 		(channelPresence: ChannelPresenceEvent) => {
 			dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
+		},
+		[dispatch],
+	);
+
+	const onstreampresence = useCallback(
+		(channelPresence: StreamPresenceEvent) => {
+			console.log('online/offline', channelPresence);
+			//dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
 		},
 		[dispatch],
 	);
@@ -277,10 +286,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagetyping = useCallback(
 		(e: MessageTypingEvent) => {
-			if (e && e.sender_id === userId) {
-				return;
-			}
-
 			dispatch(
 				messagesActions.updateTypingUsers({
 					channelId: e.channel_id,
@@ -293,7 +298,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onmessagereaction = useCallback(
-		(e: MessageReactionEvent) => {
+		(e: ApiMessageReaction) => {
 			if (e.count > 0) {
 				dispatch(reactionActions.setReactionDataSocket(mapReactionToEntity(e)));
 			}
@@ -361,6 +366,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onchannelmessage = onchannelmessage;
 
 			socket.onchannelpresence = onchannelpresence;
+
+			socket.onstreampresence = onstreampresence;
 
 			socket.ondisconnect = ondisconnect;
 
