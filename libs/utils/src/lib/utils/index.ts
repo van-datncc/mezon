@@ -648,16 +648,12 @@ export function filterEmptyArrays<T extends Record<string, any>>(payload: T): T 
 }
 
 export const handleFiles = (files: File[], setAttachmentPreview: (attachments: ApiMessageAttachment[]) => void) => {
-	// const files = e.target.files;
-
 	if (!files) {
 		throw new Error('Client or files are not initialized');
 	}
 
-	const fileArray = Array.from(files);
-
 	// Process files
-	const filePromises = fileArray.map((file) => {
+	const filePromises = files.map((file) => {
 		if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
 			return processFile(file)
 				.then((fileDetails) => {
@@ -673,12 +669,11 @@ export const handleFiles = (files: File[], setAttachmentPreview: (attachments: A
 					return null;
 				});
 		} else {
-			const url = `${file.name};${file.type};${file.lastModified};${file.size}`;
 			return Promise.resolve({
 				filename: file.name,
 				filetype: file.type,
 				size: 0,
-				url: url,
+				url: file.name,
 			} as ApiMessageAttachment);
 		}
 	});

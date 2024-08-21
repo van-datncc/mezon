@@ -15,7 +15,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useProcessLink } from './useProcessLink';
-import { useReference } from './useReference';
 
 export type UseChatSendingOptions = {
 	channelId: string;
@@ -100,7 +99,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);
-	const { setStatusLoadingAttachment } = useReference();
 
 	const updateImageLinkMessage = React.useCallback(
 		async (
