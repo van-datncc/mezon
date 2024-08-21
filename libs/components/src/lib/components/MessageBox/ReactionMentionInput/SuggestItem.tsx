@@ -41,13 +41,13 @@ const SuggestItem = ({
 	const { directId } = useParams();
 	const commonChannels = useSelector(selectHashtagDMByDirectId(directId || ""));
 	const [specificChannel, setSpecificChannel] = useState<any>(null);
-	const membersVoice = useSelector(selectNumberMemberVoiceChannel(channelId as string));
+	const numberMembersVoice = useSelector(selectNumberMemberVoiceChannel(channelId as string));
 	const checkVoiceStatus = useMemo(() => {
-		if (channelId !== undefined && membersVoice && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			return membersVoice >= 2;
+		if (channelId !== undefined && numberMembersVoice && specificChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			return numberMembersVoice >= 2;
 		}
 		return false;
-	}, [channelId, membersVoice, specificChannel?.type]);
+	}, [channelId, numberMembersVoice, specificChannel?.type]);
 
 	useEffect(() => {
 		if (channel) {
