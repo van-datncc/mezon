@@ -106,7 +106,7 @@ export default function DirectMessage() {
 		}
 	}, [messagesContainerRef.current?.getBoundingClientRect()]);
 
-	const isDmChannel = useMemo(() => currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM, [currentDmGroup?.type]);
+	const isDmChannel = useMemo(() => currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM, [currentDmGroup?.type]);
 
 	return (
 		<>
@@ -216,6 +216,7 @@ export default function DirectMessage() {
 								hiddenRole={true}
 								showNote={true}
 								showPopupLeft={true}
+								avatar={currentDmGroup.channel_avatar?.[0]}
 							/>
 						</div>
 					)}

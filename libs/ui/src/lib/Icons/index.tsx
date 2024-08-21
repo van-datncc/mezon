@@ -1899,24 +1899,24 @@ export const Sent: React.FC<IconProps> = () => {
 	);
 };
 
-export const Plus: React.FC<IconProps> = () => {
+export function Plus(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg
-			viewBox="0 0 20 20"
-			fill="none"
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
 			xmlns="http://www.w3.org/2000/svg"
-			className="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode dark:hover:text-white hover:text-black"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
 		>
-			<g id="Live area">
-				<path
-					id="Vector"
-					d="M11 4C11 3.44772 10.5523 3 10 3C9.44772 3 9 3.44772 9 4V9H4C3.44771 9 3 9.44771 3 10C3 10.5523 3.44771 11 4 11H9V16C9 16.5523 9.44772 17 10 17C10.5523 17 11 16.5523 11 16V11H16C16.5523 11 17 10.5523 17 10C17 9.44772 16.5523 9 16 9H11V4Z"
-					fill="currentColor"
-				/>
-			</g>
+			<path fill="currentColor" d="M13 6a1 1 0 1 0-2 0v5H6a1 1 0 1 0 0 2h5v5a1 1 0 1 0 2 0v-5h5a1 1 0 1 0 0-2h-5V6Z"></path>
 		</svg>
 	);
-};
+}
 
 export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
@@ -3134,7 +3134,7 @@ export function MenuClose(props: React.HTMLAttributes<SVGElement>) {
 			version="1.1"
 			xmlns="http://www.w3.org/2000/svg"
 			xmlnsXlink="http://www.w3.org/1999/xlink"
-			fill="#000000"
+			fill="currentColor"
 			className=""
 			{...props}
 		>
@@ -3143,7 +3143,7 @@ export function MenuClose(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_iconCarrier">
 				<title>close [#1511]</title> <desc>Created with Sketch.</desc> <defs> </defs>
 				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-					<g id="Dribbble-Light-Preview" transform="translate(-419.000000, -240.000000)" fill="#000000">
+					<g id="Dribbble-Light-Preview" transform="translate(-419.000000, -240.000000)" fill="currentColor">
 						<g id="icons" transform="translate(56.000000, 160.000000)">
 							<polygon
 								id="close-[#1511]"
@@ -3349,40 +3349,23 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 
 export const IconLoadingTyping = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" className={defaultSize}>
-			<circle cx="18" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin=".67"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
-			<circle cx="12" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin=".33"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
-			<circle cx="6" cy="12" r="0" fill="currentColor">
-				<animate
-					attributeName="r"
-					begin="0"
-					calcMode="spline"
-					dur="1.5s"
-					keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-					repeatCount="indefinite"
-					values="0;2;0;0"
-				/>
-			</circle>
+		<svg
+			className={defaultSize}
+			id="dots"
+			width="20"
+			height="8"
+			viewBox="0 0 132 58"
+			version="1.1"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+		>
+			<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+				<g id="dots" fill="white">
+					<circle id="dot1" cx="25" cy="30" r="13"></circle>
+					<circle id="dot2" cx="65" cy="30" r="13"></circle>
+					<circle id="dot3" cx="105" cy="30" r="13"></circle>
+				</g>
+			</g>
 		</svg>
 	);
 };
@@ -3862,7 +3845,7 @@ export function SortBySmallSizeBtn(props: React.HTMLAttributes<SVGElement>) {
 			xmlnsXlink="http://www.w3.org/1999/xlink"
 			viewBox="0 0 490.2 490.2"
 			xmlSpace="preserve"
-			className=''
+			className=""
 			{...props}
 		>
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -3877,6 +3860,85 @@ export function SortBySmallSizeBtn(props: React.HTMLAttributes<SVGElement>) {
 					</g>{' '}
 				</g>{' '}
 			</g>
+		</svg>
+	);
+}
+
+export function MenuBarIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16" {...props}>
+			<path
+				fill="currentColor"
+				d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+			/>
+		</svg>
+	);
+}
+
+export function AdminHomeIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="icon-1qHBsr"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				d="m2.4 8.4 8.38-6.46a2 2 0 0 1 2.44 0l8.39 6.45a2 2 0 0 1-.79 3.54l-.32.07-.82 8.2a2 2 0 0 1-1.99 1.8H16a1 1 0 0 1-1-1v-5a3 3 0 0 0-6 0v5a1 1 0 0 1-1 1H6.31a2 2 0 0 1-1.99-1.8L3.5 12l-.32-.07a2 2 0 0 1-.79-3.54Z"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function AdminSettingIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="icon-1qHBsr"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M10.56 1.1c-.46.05-.7.53-.64.98.18 1.16-.19 2.2-.98 2.53-.8.33-1.79-.15-2.49-1.1-.27-.36-.78-.52-1.14-.24-.77.59-1.45 1.27-2.04 2.04-.28.36-.12.87.24 1.14.96.7 1.43 1.7 1.1 2.49-.33.8-1.37 1.16-2.53.98-.45-.07-.93.18-.99.64a11.1 11.1 0 0 0 0 2.88c.06.46.54.7.99.64 1.16-.18 2.2.19 2.53.98.33.8-.14 1.79-1.1 2.49-.36.27-.52.78-.24 1.14.59.77 1.27 1.45 2.04 2.04.36.28.87.12 1.14-.24.7-.95 1.7-1.43 2.49-1.1.8.33 1.16 1.37.98 2.53-.07.45.18.93.64.99a11.1 11.1 0 0 0 2.88 0c.46-.06.7-.54.64-.99-.18-1.16.19-2.2.98-2.53.8-.33 1.79.14 2.49 1.1.27.36.78.52 1.14.24.77-.59 1.45-1.27 2.04-2.04.28-.36.12-.87-.24-1.14-.96-.7-1.43-1.7-1.1-2.49.33-.8 1.37-1.16 2.53-.98.45.07.93-.18.99-.64a11.1 11.1 0 0 0 0-2.88c-.06-.46-.54-.7-.99-.64-1.16.18-2.2-.19-2.53-.98-.33-.8.14-1.79 1.1-2.49.36-.27.52-.78.24-1.14a11.07 11.07 0 0 0-2.04-2.04c-.36-.28-.87-.12-1.14.24-.7.96-1.7 1.43-2.49 1.1-.8-.33-1.16-1.37-.98-2.53.07-.45-.18-.93-.64-.99a11.1 11.1 0 0 0-2.88 0ZM16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
+				clipRule="evenodd"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function LeftArrowIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="arrow-1BANee"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			fill="currentColor"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				d="M3.3 11.3a1 1 0 0 0 0 1.4l8 8a1 1 0 1 0 1.4-1.4L6.42 13H20a1 1 0 1 0 0-2H6.41l6.3-6.3a1 1 0 0 0-1.42-1.4l-8 8Z"
+				className=""
+			></path>
 		</svg>
 	);
 }

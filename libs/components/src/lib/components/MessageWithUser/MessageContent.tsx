@@ -15,7 +15,7 @@ type IMessageContentProps = {
 };
 
 const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps) => {
-	const { lines, isEdited, contentUpdatedMention } = useMessageParser(message);
+	const { lines, contentUpdatedMention } = useMessageParser(message);
 
 	const isOnlyContainEmoji = useMemo(() => {
 		return isValidEmojiData(contentUpdatedMention);
@@ -35,7 +35,6 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 			content={contentUpdatedMention}
 			message={message}
 			lines={lineValue as string}
-			isEdited={isEdited}
 			mode={mode}
 		/>
 	);
@@ -46,7 +45,6 @@ export default MessageContent;
 const MessageText = ({
 	message,
 	lines,
-	isEdited,
 	mode,
 	content,
 	isOnlyContainEmoji,
@@ -54,7 +52,6 @@ const MessageText = ({
 }: {
 	message: IMessageWithUser;
 	lines: string;
-	isEdited?: boolean;
 	mode?: number;
 	content?: IExtendedMessage;
 	isSearchMessage?: boolean;
@@ -76,6 +73,9 @@ const MessageText = ({
 		);
 	}, [attachmentOnMessage, contentTonMessage]);
 
+	const showEditted = useMemo(() => {
+		return !message.hideEditted;
+	}, [message.hideEditted]);
 	return (
 		<>
 			{' '}
@@ -92,7 +92,7 @@ const MessageText = ({
 							mode={mode}
 						/>
 					</div>
-					{isEdited && (
+					{!showEditted && (
 						<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
 							(edited)
 						</p>

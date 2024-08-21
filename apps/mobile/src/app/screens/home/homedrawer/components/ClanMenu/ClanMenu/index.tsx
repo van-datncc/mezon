@@ -58,10 +58,10 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 	];
 
 	const organizationMenu: IMezonMenuItemProps[] = [
-		{
-			onPress: () => reserve(),
-			title: t('menu.organizationMenu.createChannel'),
-		},
+		// {
+		// 	onPress: () => reserve(),
+		// 	title: t('menu.organizationMenu.createChannel'),
+		// },
 		{
 			onPress: () => {
 				dismiss();
@@ -86,33 +86,33 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 			},
 			title: t('menu.optionsMenu.editServerProfile'),
 		},
-		{
-			title: t('menu.optionsMenu.showAllChannels'),
-			component: <MezonSwitch />,
-		},
-		{
-			title: t('menu.optionsMenu.hideMutedChannels'),
-			component: <MezonSwitch />,
-		},
-		{
-			title: t('menu.optionsMenu.allowDirectMessage'),
-			component: <MezonSwitch />,
-		},
-		{
-			title: t('menu.optionsMenu.allowMessageRequest'),
+		// {
+		// 	title: t('menu.optionsMenu.showAllChannels'),
+		// 	component: <MezonSwitch />,
+		// },
+		// {
+		// 	title: t('menu.optionsMenu.hideMutedChannels'),
+		// 	component: <MezonSwitch />,
+		// },
+		// {
+		// 	title: t('menu.optionsMenu.allowDirectMessage'),
+		// 	component: <MezonSwitch />,
+		// },
+		// {
+		// 	title: t('menu.optionsMenu.allowMessageRequest'),
 
-			component: <MezonSwitch />,
-		},
-		{
-			onPress: () => reserve(),
-			title: t('menu.optionsMenu.reportServer'),
-		},
-		{
-			onPress: () => reserve(),
-			isShow: !isClanOwner,
-			title: t('menu.optionsMenu.leaveServer'),
-			textStyle: { color: 'red' },
-		},
+		// 	component: <MezonSwitch />,
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	title: t('menu.optionsMenu.reportServer'),
+		// },
+		// {
+		// 	onPress: () => reserve(),
+		// 	isShow: !isClanOwner,
+		// 	title: t('menu.optionsMenu.leaveServer'),
+		// 	textStyle: { color: 'red' },
+		// },
 		{
 			onPress: () => {
 				setIsVisibleDeleteModal(true);
@@ -124,9 +124,9 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 	];
 
 	const menu: IMezonMenuSectionProps[] = [
-		{
-			items: watchMenu,
-		},
+		// {
+		// 	items: watchMenu,
+		// },
 		{
 			items: organizationMenu,
 		},

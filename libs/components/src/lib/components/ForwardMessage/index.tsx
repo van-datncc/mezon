@@ -1,29 +1,30 @@
 import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
 import {
 	DirectEntity,
+	MessagesEntity,
 	RootState,
 	channelsActions,
+	getIsFowardAll,
 	selectAllChannelMembers,
 	selectAllDirectMessages,
 	selectAllUsesClan,
+	selectCurrentChannelId,
+	selectDmGroupCurrentId,
+	selectMessageEntitiesByChannelId,
+	selectModeResponsive,
 	selectTheme,
 	useAppDispatch,
-	getIsFowardAll,
-	selectCurrentChannelId,
-	MessagesEntity,
-	selectDmGroupCurrentId,
-	selectModeResponsive,
-	useAppSelector, selectMessageEntitiesByChannelId,
+	useAppSelector,
 } from '@mezon/store';
 import {
 	ChannelThreads,
+	ModeResponsive,
 	TypeSearch,
 	UsersClanEntity,
 	addAttributesSearchList,
 	getAvatarForPrioritize,
 	normalizeString,
-	removeDuplicatesById,
-	ModeResponsive, IMessageWithUser
+	removeDuplicatesById
 } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -47,8 +48,8 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const { listChannels } = useChannels();
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
-	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === 2);
-	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3);
+	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP);
+	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
 	const { sendForwardMessage } = useSendForwardMessage();
 	const { userProfile } = useAuth();
 	const selectedMessage = useSelector(getSelectedMessage);
@@ -276,11 +277,11 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 							<>
 								{normalizedSearchText.startsWith('@') && (
 									<>
-										<span className="text-textPrimary text-left opacity-60 text-[11px] pb-1 uppercase">
+										<span className="dark:text-textPrimary text-colorTextLightMode text-left opacity-60 text-[11px] pb-1 uppercase">
 											Search friend and users
 										</span>
 										<ListSearchForwardMessage
-											listSearch={listMemSearch}
+											listSearch={addPropsIntoListMember}
 											searchText={searchText.slice(1)}
 											selectedObjectIdSends={selectedObjectIdSends}
 											handleToggle={handleToggle}
@@ -289,7 +290,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 								)}
 								{normalizedSearchText.startsWith('#') && (
 									<>
-										<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
+										<span className="dark:text-textPrimary text-colorTextLightMode text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 										<ListSearchForwardMessage
 											listSearch={listChannelSearch}
 											searchText={normalizedSearchText.slice(1)}

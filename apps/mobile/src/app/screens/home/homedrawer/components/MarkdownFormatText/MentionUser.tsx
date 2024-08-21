@@ -14,7 +14,7 @@ export const MentionUser = ({ tagName, tagUserId, roleId, mode, usersClan, users
 		return `[${tagName}](@role${roleId})`;
 	}
 
-	if (tagName === '@here') {
+	if (tagName?.includes('here')) {
 		return `[@here](@here)`;
 	}
 

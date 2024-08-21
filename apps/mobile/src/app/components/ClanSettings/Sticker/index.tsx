@@ -1,4 +1,4 @@
-import { handleUploadEmoticonMobile } from "@mezon/mobile-components";
+import { handleUploadEmoticonMobile, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
 import { useTheme } from "@mezon/mobile-ui";
 import { createSticker, selectAllStickerSuggestion, settingClanStickerActions, useAppDispatch } from "@mezon/store";
 import { selectCurrentClanId, useAppSelector } from "@mezon/store-mobile";
@@ -67,7 +67,7 @@ export default function StickerSetting() {
                         path: file.uri,
                         mediaType: 'photo',
                         includeBase64: true,
-                        compressImageQuality: 1,
+                        compressImageQuality: QUALITY_IMAGE_UPLOAD,
                         width: 320,
                         height: 320
                     });

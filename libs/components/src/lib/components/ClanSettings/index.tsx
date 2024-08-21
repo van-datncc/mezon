@@ -1,5 +1,5 @@
 import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import {useEffect, useMemo, useState} from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import DeleteClanModal from '../DeleteClanModal';
@@ -92,7 +92,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 
 				<div className="flex-3 bg-white dark:bg-bgPrimary overflow-y-auto hide-scrollbar">
 					<div className="flex flex-row flex-1 justify-start h-full">
-						<div className="w-[740px] sbm:px-10">
+						<div className="w-[740px] sbm:pl-10 pr-7">
 							<div className="relative max-h-full sbm:min-h-heightRolesEdit min-h-heightRolesEditMobile">
 								{!(currentSetting?.id === ItemSetting.INTEGRATIONS) ? (
 									<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme sbm:mt-[60px] mt-[10px]">
@@ -101,7 +101,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 								) : (
 									''
 								)}
-                {currentSettingPage()}
+								{currentSettingPage()}
 							</div>
 						</div>
 						{isShowDeletePopup && <DeleteClanModal onClose={() => setIsShowDeletePopup(false)} />}

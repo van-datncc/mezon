@@ -7,6 +7,7 @@ export const APP_FEATURE_KEY = 'app';
 interface showSettingFooterProps {
 	status: boolean;
 	initTab: string;
+	isUserProfile?: boolean;
 }
 
 export interface AppState {
@@ -25,6 +26,7 @@ export interface AppState {
 	loadingMainMobile: boolean;
 	isFromFcmMobile: boolean;
 	isShowSettingFooter: showSettingFooterProps;
+	isShowPopupQuickMess: boolean;
 }
 
 export const initialAppState: AppState = {
@@ -41,7 +43,8 @@ export const initialAppState: AppState = {
 	hasInternetMobile: false,
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
-	isShowSettingFooter: { status: false, initTab: 'Account' },
+	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile : true },
+	isShowPopupQuickMess: false,
 };
 
 export const appSlice = createSlice({
@@ -99,6 +102,15 @@ export const appSlice = createSlice({
 				initTab: action.payload,
 			};
 		},
+		setIsUserProfile: (state, action) => {
+			state.isShowSettingFooter = {
+				...state.isShowSettingFooter,
+				isUserProfile: action.payload,
+			}
+		},
+		setIsShowPopupQuickMess: (state, action) => {
+			state.isShowPopupQuickMess = action.payload;
+		}
 	},
 });
 
@@ -140,3 +152,5 @@ export const selectLoadingMainMobile = createSelector(getAppState, (state: AppSt
 export const selectIsFromFCMMobile = createSelector(getAppState, (state: AppState) => state.isFromFcmMobile);
 
 export const selectIsShowSettingFooter = createSelector(getAppState, (state: AppState) => state.isShowSettingFooter);
+
+export const selectIsShowPopupQuickMess = createSelector(getAppState, (state: AppState) => state.isShowPopupQuickMess);

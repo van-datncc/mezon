@@ -77,6 +77,8 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 	
 	useOnClickOutside(panelRef, () => setIsShowPanelCategory(false));
 	
+	useEscapeKey(() => setIsShowPanelCategory(false))
+	
 	return (
 		<>
 			<div>

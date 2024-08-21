@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage, PermissionRoleChannel } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -177,6 +177,7 @@ export type IMessage = ChannelMessage & {
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
 	isFirst?: boolean;
+	hideEditted?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -338,6 +339,7 @@ export enum MemberProfileType {
 	DM_LIST = 'dm_list_friends',
 	DM_MEMBER_GROUP = 'dm_member_group',
 	LIST_FRIENDS = 'list_friends',
+	MESSAGE = 'message',
 }
 
 export type IReaction = ApiMessageReaction & {
@@ -355,6 +357,10 @@ export type IEmoji = {
 export type IChannelUser = ChannelDescription & {
 	id: string;
 };
+
+export type IPermissionRoleChannel =  PermissionRoleChannel & {
+	id: string
+}
 
 export type IEmoticons = {
 	[key: string]: string;
@@ -406,6 +412,7 @@ export type ChannelDraftMessages = {
 	message_id: string;
 	draftContent: IMessageSendPayload;
 	draftMention: ApiMessageMention[];
+	draftAttachment: ApiMessageAttachment[];
 };
 
 export interface IGifCategory {
@@ -594,6 +601,10 @@ export enum ChannelIsNotThread {
 	TRUE = '0',
 }
 
+export enum RoleEveryOne {
+	TRUE = '0',
+}
+
 export enum EMessageCode {
 	FIRST_MESSAGE = 11,
 }
@@ -701,3 +712,26 @@ export type MessageTypeUpdateLink = {
 	clan_id?: string;
 	mode?: ChannelStreamMode;
 };
+
+export enum EUserSettings {
+	ACCOUNT = "Account",
+	PROFILES = "Profiles",
+	PRIVACY_SAFETY = "Privacy & Safety",
+	FAMILY_CENTER = "Family Center",
+	AUTHORIZED_APPS = "Authorized Apps",
+	DEVICES = "Devices",
+	CONNECTIONS = "Connections",
+	CLIPS = "Clips",
+	FRIEND_REQUESTS = "Friend Requests",
+	APP_SETTINGS = "APP SETTINGS",
+	APPEARANCE = "Appearance",
+	ACCESSIBILITY = "Accessibility",
+	VOICE_VIDEO = "Voice & Video",
+	TEXT_IMAGE = "Text & Image",
+	NOTIFICATIONS = "Notifications",
+	KEYBINDS = "Keybinds",
+	LANGUAGE = "Language",
+	STREAMER_MODE = "Streamer Mode",
+	ADVANCED = "Advanced",
+	LOG_OUT = "Log Out",
+}

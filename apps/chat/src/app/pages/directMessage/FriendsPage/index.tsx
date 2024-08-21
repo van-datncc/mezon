@@ -9,10 +9,11 @@ import {
 	selectCloseMenu,
 	selectMemberStatus,
 	selectStatusMenu,
+	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
-import { Button, InputField } from '@mezon/ui';
-import { useEffect, useState } from 'react';
+import { Button, Image, InputField } from '@mezon/ui';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import FriendList from './FriendsList';
 
@@ -105,15 +106,23 @@ export default function FriendsPage() {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	const closeMenuMobile = closeMenu && !statusMenu;
+	
+	const appearanceTheme = useSelector(selectTheme);
+	const addFriendImg = useMemo(() => {
+		if (appearanceTheme === 'light') {
+			return 'add-fr-img-light.svg';
+		}
+		return 'add-fr-img-dark.svg';
+	}, [appearanceTheme]);
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">
 			<div className="flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader">
-				{(closeMenuMobile) &&
+				{closeMenuMobile && (
 					<div onClick={() => setStatusMenu(true)}>
 						<Icons.OpenMenu defaultSize="w-6 h-6" />
 					</div>
-				}
+				)}
 				<div className={`gap-7 flex overflow-x-scroll hide-scrollbar ${closeMenuMobile ? 'ml-7' : ''}`}>
 					<div className="flex flex-row gap-2 items-center dark:text-white text-black">
 						<Icons.IconFriends />
@@ -166,37 +175,49 @@ export default function FriendsPage() {
 									{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 								</span>
 							</div>
-							<div className='pl-8 overflow-hidden flex flex-1 pb-16'>
+							<div className="pl-8 overflow-hidden flex flex-1 pb-16">
 								<FriendList listFriendFilter={listFriendFilter} />
 							</div>
 						</>
 					)}
 					{openModalAddFriend && (
-						<div className="w-full flex flex-col gap-3">
-							<span className="font-[700] dark:text-white text-black">ADD FRIEND</span>
-							<span className="font-[400] text-[14px] dark:text-contentTertiary text-black">
-								You can add friends with their Mezon usernames
-							</span>
+						<div className="p-8">
+							<div className="w-full flex flex-col gap-3 border-b dark:border-[#3f4147]">
+								<span className="font-[700] dark:text-white text-black">ADD FRIEND</span>
+								<span className="font-[400] text-[14px] dark:text-contentTertiary text-black">
+									You can add friends with their Mezon usernames
+								</span>
 
-							<div className="relative">
-								<InputField
-									onChange={(e) => handleChange('username', e.target.value)}
-									type="text"
-									className="dark:bg-bgSurface bg-bgLightMode mb-2 mt-1 py-3"
-									value={requestAddFriend.usernames}
-									placeholder="Usernames"
+								<div className="relative">
+									<InputField
+										onChange={(e) => handleChange('username', e.target.value)}
+										type="text"
+										className="dark:bg-bgSurface bg-bgLightMode mb-2 mt-1 py-3"
+										value={requestAddFriend.usernames}
+										placeholder="Usernames"
+									/>
+									<Button
+										label={'Send Friend Request'}
+										className="absolute top-3 right-2 text-[14px] py-[5px]"
+										disable={!requestAddFriend.usernames?.length}
+										onClick={handleAddFriend}
+									/>
+								</div>
+							</div>
+							<div className="flex flex-col items-center gap-7">
+								<Image
+									src={`assets/images/${addFriendImg}`}
+									alt={'logoMezon'}
+									width={48}
+									height={48}
+									className="object-cover w-[376px]"
 								/>
-								<Button
-									label={'Send Friend Request'}
-									className="absolute top-3 right-2 text-[14px] py-[5px]"
-									disable={!requestAddFriend.usernames?.length}
-									onClick={handleAddFriend}
-								/>
+								<div className='dark:text-contentTertiary text-textLightTheme'>Komuu is waiting on friends. You don't have to, though!</div>
 							</div>
 						</div>
 					)}
 				</div>
-				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-[#F7F7F7] lg:flex hidden"></div>
+				<div className="w-[416px] max-w-2/5 dark:bg-bgTertiary bg-bgLightMode lg:flex hidden"></div>
 			</div>
 		</div>
 	);

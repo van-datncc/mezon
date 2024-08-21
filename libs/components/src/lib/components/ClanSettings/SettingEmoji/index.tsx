@@ -7,6 +7,7 @@ import SettingEmojiList from './SettingEmojiList';
 import ModalSticker, {EGraphicType} from "../SettingSticker/ModalEditSticker";
 import { ClanEmoji } from "mezon-js";
 import { Modal } from "@mezon/ui";
+import {useEscapeKey} from "@mezon/core";
 
 const SettingEmoji = () => {
 	const [openModal, setOpenModal] = useState(false);
@@ -28,6 +29,8 @@ const SettingEmoji = () => {
 	const handleCloseModal = () => {
 		setIsOpenEditModal(false);
 	}
+	
+	useEscapeKey(handleCloseModal);
 	
 	return (
 		<>
