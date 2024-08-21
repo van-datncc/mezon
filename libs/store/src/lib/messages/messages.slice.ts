@@ -1021,8 +1021,6 @@ export const selectMessageByMessageId = (messageId: string) =>
 
 export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);
 
-// export const selectSendingMessageActionStatus = createSelector(getMessagesState, (state) => state.sendingMessageActionStatus);
-
 // V2
 
 const emptyObject = {};
