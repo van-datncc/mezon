@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage, PermissionRoleChannel } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -174,6 +174,7 @@ export type IMessage = ChannelMessage & {
 	isAnonymous?: boolean;
 	isCurrentChannel?: boolean;
 	isFirst?: boolean;
+	hideEditted?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {
@@ -354,6 +355,10 @@ export type IChannelUser = ChannelDescription & {
 	id: string;
 };
 
+export type IPermissionRoleChannel =  PermissionRoleChannel & {
+	id: string
+}
+
 export type IEmoticons = {
 	[key: string]: string;
 };
@@ -404,6 +409,7 @@ export type ChannelDraftMessages = {
 	message_id: string;
 	draftContent: IMessageSendPayload;
 	draftMention: ApiMessageMention[];
+	draftAttachment: ApiMessageAttachment[];
 };
 
 export interface IGifCategory {

@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import ClanBannerBackground from './ClanBannerBackground';
 import ClanLogoName from './ClanLogoName';
 import ModalSaveChanges from './ModalSaveChanges';
+import SystemMessagesManagement from "./SystemMessagesManagement";
 
 const ClanSettingOverview = () => {
 	const { updateClan } = useClans();
@@ -52,6 +53,7 @@ const ClanSettingOverview = () => {
 				onUpload={handleUploadBackground}
 				onHasChanges={(hasChanges) => setHasChanges(hasChanges)}
 			/>
+			<SystemMessagesManagement/>
 			{hasChanges && <ModalSaveChanges onSave={handleSave} onReset={handleReset} />}
 		</div>
 	);

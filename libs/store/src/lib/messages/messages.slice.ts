@@ -66,6 +66,7 @@ export interface MessagesEntity extends IMessageWithUser {
 	channel_id: string;
 	isStartedMessageGroup?: boolean;
 	isStartedMessageOfTheDay?: boolean;
+	hideEditted?: boolean;
 }
 
 export type UserTypingState = {
@@ -198,7 +199,6 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		const firstMessage = response.messages.find((item) => item.code === EMessageCode.FIRST_MESSAGE);
-
 		if (firstMessage) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
 		}
@@ -225,11 +225,12 @@ export const fetchMessages = createAsyncThunk(
 		});
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
-
-		const hasMore = Number(response.messages.length) >= LIMIT_MESSAGE;
+		
+		const lastLoadMessageId = messages[messages.length - 1].id
+		const hasMore = firstMessage?.id === lastLoadMessageId
 		if (messages.length > 0) {
 			thunkAPI.dispatch(
-				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: messages[messages.length - 1].id, hasMore } }),
+				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessageId, hasMore } }),
 			);
 		}
 
@@ -658,11 +659,8 @@ export const messagesSlice = createSlice({
 						changes: {
 							content: action.payload.content,
 							mentions: action.payload.mentions,
-							update_time:
-								action.payload.attachments && action.payload.attachments?.length > 0
-									? action.payload.create_time
-									: action.payload.update_time,
 							attachments: action.payload.attachments,
+							hideEditted: action.payload.hideEditted,
 						},
 					});
 					break;
@@ -982,8 +980,15 @@ export const selectParamByChannelId = (channelId: string) =>
 	});
 
 export const selectHasMoreMessageByChannelId = (channelId: string) =>
-	createSelector(selectMessageParams, (param) => {
-		return param?.[channelId]?.hasMore ?? true;
+	createSelector(getMessagesState, (state) => {
+		const firstMessageId = state.firstMessageId[channelId];
+
+		if (!firstMessageId) return true;
+
+		const isFirstMessageInChannel = state.channelMessages[channelId]?.entities[firstMessageId];
+
+		// if the first message is not in the channel's messages, then there are more messages
+		return !isFirstMessageInChannel;
 	});
 
 // has more bottom when last message is not the channel's messages

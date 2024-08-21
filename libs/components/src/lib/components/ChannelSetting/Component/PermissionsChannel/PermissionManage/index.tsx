@@ -3,7 +3,7 @@ import { memo, useState } from "react";
 import MainPermissionManage from "./MainPermissionManage";
 
 const PermissionManage = ({channelID}:{channelID: string}) => {
-    const [showRole, setShowRole] = useState(false);
+    const [showRole, setShowRole] = useState(true);
     return (
         <div>
             <HeaderPermissionManage showRole={showRole} setShowRole={setShowRole}/>

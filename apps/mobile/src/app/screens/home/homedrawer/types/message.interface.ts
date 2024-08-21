@@ -1,9 +1,10 @@
+import { MessagesEntity } from '@mezon/store-mobile';
 import { EmojiDataOptionals, IEmoji, IMessageSendPayload, IMessageWithUser, IUserAccount } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiUser } from 'mezon-js/api.gen';
 import { EMessageActionType, EMessageBSToShow } from '../enums';
 
 export interface IReplyBottomSheet {
-	message: IMessageWithUser;
+	message: MessagesEntity;
 	onClose: () => void;
 	type: EMessageBSToShow | null;
 	onConfirmAction: (payload: IConfirmActionPayload) => void;

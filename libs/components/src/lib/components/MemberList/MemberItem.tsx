@@ -1,6 +1,6 @@
 import { useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
-import { getNameForPrioritize, MemberProfileType } from '@mezon/utils';
+import { MemberProfileType } from '@mezon/utils';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import MemberProfile from '../MemberProfile';
 export type MemberItemProps = {
@@ -16,7 +16,6 @@ export type MemberItemProps = {
 function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId }: MemberItemProps) {
 	const userStatus = useMemberStatus(user.user?.id || '');
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '');
-	const name = getNameForPrioritize(user.clan_nick, user.user?.display_name, user.user?.username);
 
 	return (
 		<MemberProfile

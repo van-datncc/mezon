@@ -6,6 +6,7 @@ export enum EMessageBSToShow {
 export enum EMessageActionType {
 	EditMessage,
 	ForwardMessage,
+	ForwardAllMessages,
 	Reply,
 	CreateThread,
 	CopyText,

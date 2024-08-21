@@ -162,7 +162,9 @@ export default function ClanSetting({ navigation }: MenuClanScreenProps<ClanSett
 
 	return (
 		<Block flex={1} backgroundColor={themeValue.secondary}>
-			<ScrollView contentContainerStyle={styles.container}>
+			<ScrollView
+				contentContainerStyle={styles.container}
+				style={{ flex: 1, backgroundColor: themeValue.primary }}>
 				<LogoClanSelector />
 				<MezonMenu menu={menu} />
 			</ScrollView>

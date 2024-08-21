@@ -40,6 +40,7 @@ import {
 	Notification,
 	Socket,
 	StatusPresenceEvent,
+	StreamPresenceEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -143,6 +144,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch],
 	);
 
+	const onstreampresence = useCallback(
+		(channelStreamPresence: StreamPresenceEvent) => {
+			if (channelStreamPresence.joins.length > 0) {
+				const onlineStatus = channelStreamPresence.joins.map((join) => {
+					return { userId: join.user_id, status: true };
+				});
+				dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+			}
+			if (channelStreamPresence.leaves.length > 0) {
+				const onlineStatus = channelStreamPresence.leaves.map((leave) => {
+					return { userId: leave.user_id, status: false };
+				});
+				dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+			}
+		},
+		[dispatch],
+	);
+
 	const onstatuspresence = useCallback(
 		(statusPresence: StatusPresenceEvent) => {
 			dispatch(channelMembersActions.updateStatusUser(statusPresence));
@@ -152,7 +171,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onnotification = useCallback(
 		async (notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id) {
+			if (currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
 				dispatch(notificationActions.setStatusNoti());
@@ -317,6 +336,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				channelCreated.channel_type === ChannelType.CHANNEL_TYPE_GROUP
 			) {
 				dispatch(directActions.fetchDirectMessage({ noCache: true }));
+				dispatch(
+					channelsActions.joinChat({
+						clanId: channelCreated.clan_id,
+						channelId: channelCreated.channel_id,
+						channelType: channelCreated.channel_type,
+					}),
+				);
 			}
 		},
 		[dispatch],
@@ -357,6 +383,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onchannelmessage = onchannelmessage;
 
 			socket.onchannelpresence = onchannelpresence;
+
+			socket.onstreampresence = onstreampresence;
 
 			socket.ondisconnect = ondisconnect;
 
@@ -506,4 +534,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-

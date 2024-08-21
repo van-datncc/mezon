@@ -461,7 +461,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		} else if (emojiPicked) {
 			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
-				textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})`);
+				textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})${' '}`);
 			}
 		}
 	}
@@ -481,6 +481,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						message_id: idRefMessage,
 						draftContent: lastMessageByUserId?.content,
 						draftMention: lastMessageByUserId.mentions ?? [],
+						draftAttachment: lastMessageByUserId.attachments ?? [],
 					},
 				}),
 			);

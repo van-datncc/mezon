@@ -145,7 +145,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 			}}
 		>
 			{directMessageValue && checkDmGroup ? (
-				<PanelGroupDM isDmGroupOwner={isDmGroupOwner} />
+				<PanelGroupDM isDmGroupOwner={isDmGroupOwner} dmGroupId={directMessageValue.dmID}/>
 			) : (
 				<>
 					<GroupPanelMember>

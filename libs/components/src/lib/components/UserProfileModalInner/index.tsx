@@ -97,7 +97,13 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	
 	useOnClickOutside(panelRef, () => setIsOPenEditOption(false));
 	
-	useEscapeKey(() => setIsOPenEditOption(false));
+	useEscapeKey(() => {
+		if(isOPenEditOption) {
+			setIsOPenEditOption(false)
+		} else if (onClose) {
+			onClose();
+		}
+	});
 	
 	const handleOpenUserProfileSetting = () => {
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
