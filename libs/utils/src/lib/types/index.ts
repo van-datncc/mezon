@@ -69,7 +69,10 @@ export type INotifiReactMessage = NotifiReactMessage;
 
 export type IDefaultNotificationClan = ApiNotificationSetting;
 
-export type IDefaultNotificationCategory = ApiNotificationSetting;
+export type IDefaultNotificationCategory = ApiNotificationSetting & {
+	active?: number,
+	time_mute?: string,
+};
 
 export type IDefaultNotification = ApiNotificationSetting & {
 	id: string;
