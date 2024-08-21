@@ -3,7 +3,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
-import { memo, useEffect, useRef, useState } from 'react';
+import { forwardRef, memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { DimensionValue, Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { openCropper } from 'react-native-image-crop-picker';
@@ -40,6 +40,11 @@ interface IMezonImagePickerProps {
 	};
 	noDefaultText?: boolean;
 	disabled?: boolean;
+	onPressAvatar?: () => void;
+}
+
+export interface IMezonImagePickerHandler {
+	openSelector: () => void;
 }
 
 const SCALE = 5;
@@ -68,7 +73,7 @@ export async function handleSelectImage() {
 }
 
 
-export default memo(function MezonImagePicker({
+export default memo(forwardRef(function MezonImagePicker({
 	onChange,
 	onLoad,
 	defaultValue,
@@ -87,8 +92,9 @@ export default memo(function MezonImagePicker({
 		right: -7,
 	},
 	noDefaultText,
-	disabled
-}: IMezonImagePickerProps) {
+	disabled,
+	onPressAvatar
+}: IMezonImagePickerProps, ref) {
 	const { themeValue } = useTheme();
 	const styles = _style(themeValue);
 	const [image, setImage] = useState<string>(defaultValue);
@@ -105,29 +111,6 @@ export default memo(function MezonImagePicker({
 			timerRef?.current && clearTimeout(timerRef.current);
 		};
 	}, []);
-
-	async function handleSelectImage() {
-		const response = await launchImageLibrary({
-			mediaType: 'photo',
-			includeBase64: true,
-			quality: 1,
-		});
-
-		if (response.didCancel) {
-			console.log('User cancelled camera');
-		} else if (response.errorCode) {
-			console.log('Camera Error: ', response.errorMessage);
-		} else {
-			const file = response.assets[0];
-			return {
-				uri: file?.uri,
-				name: file?.fileName,
-				type: file?.type,
-				size: file?.fileSize,
-				fileData: file?.base64,
-			} as IFile;
-		}
-	}
 
 	async function handleUploadImage(file: IFile) {
 		const session = sessionRef.current;
@@ -174,8 +157,19 @@ export default memo(function MezonImagePicker({
 		}
 	}
 
+	function handlePress() {
+		if (onPressAvatar) onPressAvatar();
+		else handleImage();
+	}
+
+	useImperativeHandle(ref, () => ({
+		openSelector() {
+			handleImage();
+		}
+	}));
+
 	return (
-		<TouchableOpacity onPress={() => handleImage()} disabled={disabled}>
+		<TouchableOpacity onPress={handlePress} disabled={disabled}>
 			<View style={styles.bannerContainer}>
 				<View style={[styles.bannerWrapper, { height, width }, rounded && { borderRadius: 999 }, style]}>
 					{image || !showHelpText ? (
@@ -198,4 +192,4 @@ export default memo(function MezonImagePicker({
 			</View>
 		</TouchableOpacity>
 	);
-});
+}));

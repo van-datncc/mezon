@@ -244,12 +244,17 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 					keyboardShouldPersistTaps={'handled'}
 					contentContainerStyle={styles.listChannels}
 					renderItem={renderItem}
-					removeClippedSubviews={true}
+					removeClippedSubviews={false}
 					keyExtractor={(item) => `${item}`}
 					estimatedItemSize={ITEM_HEIGHT}
 					onEndReached={messages?.length ? onLoadMore : undefined}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}
+					viewabilityConfig={{
+						waitForInteraction: true,
+						itemVisiblePercentThreshold: 50,
+						minimumViewTime: 1000,
+					}}
 					ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 				/>
 

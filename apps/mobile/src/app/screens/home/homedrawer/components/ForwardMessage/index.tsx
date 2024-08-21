@@ -1,8 +1,8 @@
 import { useChannels, useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, Icons, UserGroupIcon } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, getIsFowardAll, getSelectedMessage, MessagesEntity, selectCurrentChannelId, selectDirectsOpenlist, selectDmGroupCurrentId, selectMessageEntitiesByChannelId, selectModeResponsive, useAppSelector } from '@mezon/store-mobile';
-import { ChannelThreads, IMessageWithUser, ModeResponsive } from '@mezon/utils';
+import { DirectEntity, getIsFowardAll, getSelectedMessage, MessagesEntity, selectCurrentChannelId, selectDirectsOpenlist, selectDmGroupCurrentId, selectMessageEntitiesByChannelId, useAppSelector } from '@mezon/store-mobile';
+import { ChannelThreads, IMessageWithUser } from '@mezon/utils';
 import { SeparatorWithLine } from 'apps/mobile/src/app/components/Common';
 import { MezonInput } from 'apps/mobile/src/app/temp-ui';
 import { normalizeString } from 'apps/mobile/src/app/utils/helpers';
@@ -43,16 +43,18 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 	
 	const isForwardAll = useSelector(getIsFowardAll)
 	const currentDmId = useSelector(selectDmGroupCurrentId);
-	const modeResponsive = useSelector(selectModeResponsive);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const selectedMessage = useSelector(getSelectedMessage);
 
-	const allMessagesEntities = useAppSelector(state => selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || ''))
+	const allMessagesEntities = useAppSelector(state => selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || ''))
 	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : []
-	const allMessagesBySenderId = convertedAllMessagesEntities.filter(message => message.sender_id === selectedMessage?.user?.id);
+	const allMessagesBySenderId = useMemo(() => {
+		return convertedAllMessagesEntities?.filter(message => message.sender_id === selectedMessage?.user?.id);
+	}, [allMessagesEntities, selectedMessage?.user?.id]);
+
 	const startIndex = useMemo(() => {
-		return allMessagesBySenderId.findIndex(message => message.id === selectedMessage.id)
-	}, [allMessagesEntities, selectedMessage]);
+		return allMessagesBySenderId.findIndex(message => message.id === selectedMessage?.id)
+	}, [allMessagesEntities, selectedMessage?.id]);
 
 	const mapDirectMessageToForwardObject = (dm: DirectEntity): IForwardIObject => {
 		return {
@@ -131,7 +133,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 						break;
 					case ChannelType.CHANNEL_TYPE_TEXT:
 						for(const message of combineMessages) {
-							sendForwardMessage ('', channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+							sendForwardMessage (clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
 						}
 						break;
 					default:

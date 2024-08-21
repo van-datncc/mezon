@@ -359,7 +359,7 @@ export const RenderTextMarkdownContent = React.memo(
 				const s = element.s ?? 0;
 				const e = element.e ?? 0;
 
-				const contentInElement = t?.substring(s, e);
+				const contentInElement = t?.substring?.(s, e);
 
 				if (lastIndex < s) {
 					formattedContent += t?.slice?.(lastIndex, s)?.toString() ?? '';
