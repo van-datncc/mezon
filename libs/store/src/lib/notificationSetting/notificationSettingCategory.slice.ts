@@ -69,13 +69,12 @@ export const fetchNotificationCategorySetting = memoize(
 
 export const setDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/setDefaultNotificationCategory',
-	async ({ category_id, notification_type, time_mute, clan_id, active }: SetDefaultNotificationPayload, thunkAPI) => {
+	async ({ category_id, notification_type, time_mute, clan_id }: SetDefaultNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
 			channel_category_id: category_id,
 			notification_type: notification_type,
 			time_mute: time_mute,
-			active: active,
 		}
 		const response = await mezon.client.setNotificationCategory(mezon.session, body);
 		if (!response) {
@@ -108,6 +107,23 @@ export const deleteDefaultNotificationCategory = createAsyncThunk(
 	},
 );
 
+export const setMuteCategory = createAsyncThunk(
+	'defaultnotificationcategory/setMuteCategory',
+	async({category_id, notification_type, active, clan_id}: SetDefaultNotificationPayload, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.setMuteNotificationCategory (mezon.session, {
+			active: active,
+			notification_type: notification_type,
+			id: category_id
+		});
+		if (!response) {
+			return thunkAPI.rejectWithValue ([]);
+		}
+		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "", noCache: true }))
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "", noCache: true }));
+		return response
+	}
+)
 
 export const defaultNotificationCategorySlice = createSlice({
 	name: DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY,
@@ -207,7 +223,14 @@ export const channelCategorySettingSlice = createSlice({
 export const channelCategorySettingReducer = channelCategorySettingSlice.reducer;
 export const defaultNotificationCategoryReducer = defaultNotificationCategorySlice.reducer;
 
-export const defaultNotificationCategoryActions = { ...defaultNotificationCategorySlice.actions, getDefaultNotificationCategory, setDefaultNotificationCategory, deleteDefaultNotificationCategory, fetchChannelCategorySetting };
+export const defaultNotificationCategoryActions = {
+	...defaultNotificationCategorySlice.actions,
+	getDefaultNotificationCategory,
+	setDefaultNotificationCategory,
+	deleteDefaultNotificationCategory,
+	fetchChannelCategorySetting,
+	setMuteCategory
+};
 
 export const getDefaultNotificationCategoryState = (rootState: { [DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY]: DefaultNotificationCategoryState }): DefaultNotificationCategoryState => rootState[DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY];
 

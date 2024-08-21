@@ -38,7 +38,7 @@ export const notiLabels: Record<number, string> = {
 };
 
 export const notificationTypesList = [
-  {
+	{
     label: 'All',
     value: NotificationType.ALL_MESSAGE
   },
@@ -251,7 +251,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
                   type="radio"
                   name="NotificationSetting"
                   defaultNotifi={true}
-                  checked={getNotificationChannelSelected?.notification_setting_type === undefined}
+                  checked={getNotificationChannelSelected?.notification_setting_type === 0}
                   subText={defaultNotifiName}
                   onClick={() => setNotification(0)}
                 />
