@@ -95,7 +95,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 							}}
 							className="dark:text-[#AEAEAE] text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
 						>
-							{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
+							{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 							<span className='one-line'>
 								{category.category_name}
 							</span>
