@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 import { style } from './styles';
@@ -17,14 +17,21 @@ export default function MezonSearch({ onChangeText, hasBackground, size = 'mediu
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const inputRef = useRef(null);
+	const timeoutRef = useRef(null);
 	const { t } = useTranslation(['searchMessageChannel']);
 
 	const clearTextInput = () => {
 		onChangeText('');
-		setTimeout(() => {
+		timeoutRef.current = setTimeout(() => {
 			inputRef.current?.focus();
 		}, 100);	
 	};
+
+	useEffect(() => {
+		return () => {
+			timeoutRef.current && clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	return (
 		<View style={[styles.inputWrapper, { backgroundColor: hasBackground ? themeValue.primary : themeValue.secondary }]}>
