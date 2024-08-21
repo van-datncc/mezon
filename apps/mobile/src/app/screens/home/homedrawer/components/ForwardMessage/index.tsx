@@ -1,8 +1,8 @@
 import { useChannels, useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, Icons, UserGroupIcon } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, selectDirectsOpenlist } from '@mezon/store-mobile';
-import { ChannelThreads, IMessageWithUser } from '@mezon/utils';
+import { DirectEntity, getIsFowardAll, getSelectedMessage, MessagesEntity, selectCurrentChannelId, selectDirectsOpenlist, selectDmGroupCurrentId, selectMessageEntitiesByChannelId, selectModeResponsive, useAppSelector } from '@mezon/store-mobile';
+import { ChannelThreads, IMessageWithUser, ModeResponsive } from '@mezon/utils';
 import { SeparatorWithLine } from 'apps/mobile/src/app/components/Common';
 import { MezonInput } from 'apps/mobile/src/app/temp-ui';
 import { normalizeString } from 'apps/mobile/src/app/utils/helpers';
@@ -40,6 +40,19 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 	const { sendForwardMessage } = useSendForwardMessage();
 	const { t } = useTranslation('message');
 	const { themeValue } = useTheme();
+	
+	const isForwardAll = useSelector(getIsFowardAll)
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const modeResponsive = useSelector(selectModeResponsive);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const selectedMessage = useSelector(getSelectedMessage);
+
+	const allMessagesEntities = useAppSelector(state => selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || ''))
+	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : []
+	const allMessagesBySenderId = convertedAllMessagesEntities.filter(message => message.sender_id === selectedMessage?.user?.id);
+	const startIndex = useMemo(() => {
+		return allMessagesBySenderId.findIndex(message => message.id === selectedMessage.id)
+	}, [allMessagesEntities, selectedMessage]);
 
 	const mapDirectMessageToForwardObject = (dm: DirectEntity): IForwardIObject => {
 		return {
@@ -86,6 +99,58 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 		const existingIndex = selectedForwardObjects.findIndex((item) => item.channelId === channelId && item.type === type);
 		return existingIndex !== -1;
 	};
+
+	const handleForward = () => {
+		return isForwardAll ? handleForwardAllMessage() : sentToMessage();
+	};
+
+	const handleForwardAllMessage = async () => {
+		if (!selectedForwardObjects.length) return;
+		try {
+			const combineMessages: MessagesEntity[] = [];
+			combineMessages.push(selectedMessage);
+
+			let index = startIndex + 1;
+			while (index < allMessagesBySenderId.length && !allMessagesBySenderId[index].isStartedMessageGroup && allMessagesBySenderId[index].sender_id === selectedMessage?.user?.id) {
+				combineMessages.push(allMessagesBySenderId[index]);
+				index++
+			}
+
+			for (const selectedObjectSend of selectedForwardObjects) {
+				const { type, channelId, clanId = '' } = selectedObjectSend;
+				switch (type) {
+					case ChannelType.CHANNEL_TYPE_DM:
+						for(const message of combineMessages) {
+							sendForwardMessage ('', channelId, ChannelStreamMode.STREAM_MODE_DM, message);
+						}
+						break;
+					case ChannelType.CHANNEL_TYPE_GROUP:
+						for(const message of combineMessages) {
+							sendForwardMessage ('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, message);
+						}
+						break;
+					case ChannelType.CHANNEL_TYPE_TEXT:
+						for(const message of combineMessages) {
+							sendForwardMessage ('', channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+						}
+						break;
+					default:
+						break;
+				}
+			}
+			
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: t('forwardMessagesSuccessfully'),
+					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />,
+				},
+			});
+		} catch (error) {
+			console.log('Forward all messages log => error', error);
+		}
+		onClose && onClose();
+	}
 
 	const sentToMessage = async () => {
 		if (!selectedForwardObjects.length) return;
@@ -230,7 +295,10 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 					</Block>
 
 					<Block paddingTop={size.s_10}>
-						<TouchableOpacity style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]} onPress={() => sentToMessage()}>
+						<TouchableOpacity 
+							style={[styles.btn, !selectedForwardObjects.length && { backgroundColor: themeValue.charcoal }]} 
+							onPress={handleForward}
+						>
 							<Text style={styles.btnText}>{'Send'}{count}</Text>
 						</TouchableOpacity>
 					</Block>

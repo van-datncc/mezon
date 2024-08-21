@@ -7,10 +7,10 @@ import {
 	useAppDispatch,
 	useAppSelector,
 } from '@mezon/store';
-import {EPermission, getSrcEmoji, MAX_FILE_NAME_EMOJI} from '@mezon/utils';
+import { EPermission, getSrcEmoji, MAX_FILE_NAME_EMOJI } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
-import { ChangeEvent, KeyboardEvent, useMemo, useState } from 'react';
+import { ChangeEvent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Icons } from '@mezon/ui'
 
@@ -24,6 +24,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 	const [focus, setFocus] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 	const clanId = useSelector(selectCurrentClanId);
+	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
 	const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
@@ -46,7 +47,20 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 			setShowEdit(true);
 		}
 	};
+	const handleChangeEmojiName = (e: ChangeEvent<HTMLInputElement>) => {
+		setNameEmoji(e.target.value);
+	}
 
+	const handleUpdateEmoji = async () => {
+		if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
+			const request: MezonUpdateClanEmojiByIdBody = {
+				source: emoji.src,
+				shortname: nameEmoji,
+				category: emoji.category,
+			}
+			await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }))
+		}
+	}
 	return (
 		<div
 			className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'}
@@ -69,6 +83,15 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 					>
 						<p className={`max-w-[172px] truncate overflow-hidden inline-block select-none`}>{emoji.shortname}</p>
 					</div>
+					{
+						showEdit &&
+						<input
+							className={` dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 ml-[2px] outline-none pl-2 absolute rounded-[3px]`}
+							value={nameEmoji}
+							onChange={(e) => handleChangeEmojiName(e)}
+							onKeyDown={(e) => { e.key === 'Enter' && handleUpdateEmoji() }}
+						/>
+					}
 				</div>
 
 				<div className={'flex-1 flex gap-[6px]  select-none'}>
