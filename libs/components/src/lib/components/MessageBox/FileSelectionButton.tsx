@@ -37,6 +37,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 	}, [attachmentPreview]);
 
 	useEffect(() => {
+		console.log(attachmentAfterUpload);
 		if (client && session && attachmentAfterUpload.length > 0) {
 			const promises = attachmentAfterUpload.map((file) => handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file));
 

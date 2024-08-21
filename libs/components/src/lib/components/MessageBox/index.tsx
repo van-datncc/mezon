@@ -79,8 +79,14 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		[currentChannelId],
 	);
 
-	const removeAttachmentByUrl = (urlToRemove: string) => {
-		dispatch(referencesActions.removeAttachment({ channelId: currentChannelId || '', urlAttachment: urlToRemove }));
+	const removeAttachmentByUrl = (urlToRemove: string, indexItem: number) => {
+		dispatch(
+			referencesActions.removeAttachment({
+				channelId: currentChannelId || '',
+				urlAttachment: urlToRemove,
+				index: indexItem,
+			}),
+		);
 	};
 
 	const onPastedFiles = useCallback(
@@ -156,7 +162,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					{attachmentDataRef?.map((item: ApiMessageAttachment, index: number) => {
 						return (
 							<Fragment key={index}>
-								<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} />
+								<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} indexOfItem={index} />
 							</Fragment>
 						);
 					})}

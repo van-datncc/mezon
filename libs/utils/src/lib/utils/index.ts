@@ -747,26 +747,3 @@ export function processFile(file: File): Promise<{ filename: string; filetype: s
 }
 
 // Function to parse the URL string
-export const parseUrlAttachment = (url: string) => {
-	// Split the URL by the delimiter `;`
-	const parts = url.split(';');
-
-	// Check if the parts array has the correct length
-	if (parts.length !== 4) {
-		throw new Error('Invalid URL format');
-	}
-
-	// Destructure the parts into individual variables
-	const [name, type, lastModified, size] = parts;
-
-	// Convert lastModified and size to numbers
-	const lastModifiedDate = parseInt(lastModified, 10);
-	const fileSize = parseInt(size, 10);
-
-	return {
-		name,
-		type,
-		lastModified: lastModifiedDate,
-		size: fileSize,
-	};
-};

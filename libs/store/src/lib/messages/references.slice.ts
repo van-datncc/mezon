@@ -1,4 +1,4 @@
-import { IMessage, parseUrlAttachment } from '@mezon/utils';
+import { IMessage } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 
@@ -92,24 +92,17 @@ export const referencesSlice = createSlice({
 			}
 		},
 
-		removeAttachment(state, action: PayloadAction<{ channelId: string; urlAttachment: string }>) {
+		removeAttachment(state, action: PayloadAction<{ channelId: string; urlAttachment: string; index: number }>) {
+			console.log('index', action.payload.index);
 			const attachments = state.attachmentDataRef[action.payload.channelId];
 			if (attachments) {
 				state.attachmentDataRef[action.payload.channelId] = attachments.filter(
 					(attachment) => attachment.url !== action.payload.urlAttachment && attachment.filename !== action.payload.urlAttachment,
 				);
 			}
-			const fileDetails = parseUrlAttachment(action.payload.urlAttachment);
-			if (state.attachmentAfterUpload) {
-				state.attachmentAfterUpload = state.attachmentAfterUpload.filter(
-					(file) =>
-						!(
-							file.name === fileDetails.name &&
-							file.type === fileDetails.type &&
-							file.lastModified === fileDetails.lastModified &&
-							file.size === fileDetails.size
-						),
-				);
+
+			if (state.attachmentAfterUpload && action.payload.index >= 0 && action.payload.index < state.attachmentAfterUpload.length) {
+				state.attachmentAfterUpload.splice(action.payload.index, 1);
 			}
 		},
 
