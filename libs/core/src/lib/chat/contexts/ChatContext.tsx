@@ -153,10 +153,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
 			}
 			if (channelStreamPresence.leaves.length > 0) {
-				const onlineStatus = channelStreamPresence.leaves.map((leave) => {
+				const offlineStatus = channelStreamPresence.leaves.map((leave) => {
 					return { userId: leave.user_id, status: false };
 				});
-				dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+				dispatch(channelMembersActions.setManyStatusUser(offlineStatus));
 			}
 		},
 		[dispatch],
