@@ -2,7 +2,7 @@ import loadable from '@loadable/component';
 import { selectInitialPath, useAppDispatch } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { createBrowserRouter, LoaderFunctionArgs, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, LoaderFunctionArgs, Navigate, Outlet, RouterProvider } from 'react-router-dom';
 // Layouts
 import AppLayout from '../layouts/AppLayout';
 import RootLayout from '../layouts/RootLayout';
@@ -16,6 +16,9 @@ const ApplicationsPage = loadable(() => import('../pages/applications'));
 const TeamsPage = loadable(() => import('../pages/teams'));
 const DocsPage = loadable(() => import('../pages/docs'));
 const EmbedsPage = loadable(() => import('../pages/embeds'));
+const GeneralInformation = loadable(() => import('../pages/AppGeneralInformation'));
+const Installation = loadable(() => import('../pages/installation'));
+const Install = loadable(() => import('../pages/install'));
 
 export const Routes = () => {
 	const dispatch = useAppDispatch();
@@ -63,6 +66,28 @@ export const Routes = () => {
 									element: <ApplicationsPage />,
 								},
 								{
+									path: 'applications/:applicationId',
+									element: <div><Outlet /></div>,
+									children: [
+										{
+											path: "*",
+											element: <Navigate to="information" />
+										},
+										{
+											path: "",
+											element: <Navigate to="information" />
+										},
+										{
+											path: 'information',
+											element: <GeneralInformation />,
+										},
+										{
+											path: 'installation',
+											element: <Installation />,
+										},
+									],
+								},
+								{
 									path: 'teams',
 									element: <TeamsPage />,
 								},
@@ -75,6 +100,11 @@ export const Routes = () => {
 									element: <DocsPage />,
 								},
 							],
+						},
+						{
+							path: 'install/:applicationId',
+							loader: loaderWithStore(authLoader),
+							element: <Install />,
 						},
 					],
 				},

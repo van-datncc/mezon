@@ -986,8 +986,15 @@ export const selectParamByChannelId = (channelId: string) =>
 	});
 
 export const selectHasMoreMessageByChannelId = (channelId: string) =>
-	createSelector(selectMessageParams, (param) => {
-		return param?.[channelId]?.hasMore ?? true;
+	createSelector(getMessagesState, (state) => {
+		const firstMessageId = state.firstMessageId[channelId];
+
+		if (!firstMessageId) return true;
+
+		const isFirstMessageInChannel = state.channelMessages[channelId]?.entities[firstMessageId];
+
+		// if the first message is not in the channel's messages, then there are more messages
+		return !isFirstMessageInChannel;
 	});
 
 // has more bottom when last message is not the channel's messages

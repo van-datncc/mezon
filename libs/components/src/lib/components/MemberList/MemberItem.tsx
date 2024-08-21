@@ -23,7 +23,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			avatar={user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '')}
 			name={name || ''}
 			userNameAva={user?.user?.username}
-			status={userStatus}
+			status={user.user?.online}
 			customStatus={userCustomStatus}
 			isHideStatus={true}
 			isHideIconStatus={false}

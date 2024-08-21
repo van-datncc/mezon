@@ -20,7 +20,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 
 	const currentClanID = useSelector(selectCurrentClanId);
 	const dispatch = useDispatch();
-	const { directToMessageById } = useJumpToMessage({
+	const { jumpToMessage } = useJumpToMessage({
 		channelId: pinMessage?.channel_id || '',
 		messageID: pinMessage.message_id || '',
 		clanId: currentClanID || '',
@@ -29,7 +29,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 		dispatch(pinMessageActions.setJumpPinMessageId(pinMessage.message_id));
 		onClose();
 		dispatch(messagesActions.setIdMessageToJump(pinMessage.message_id));
-		directToMessageById();
+		jumpToMessage();
 	};
 
 	return (

@@ -1,4 +1,4 @@
-import { useAppNavigation } from '@mezon/core';
+import {useAppNavigation, useEscapeKey} from '@mezon/core';
 import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { AlertTitleTextWarning } from 'libs/ui/src/lib/Alert';
 import { ChannelType } from 'mezon-js';
@@ -107,11 +107,13 @@ export const CreateNewChannelModal = () => {
 		const isValid = InputRef.current?.checkInput();
 		setIsInputError(isValid ?? false);
 	}, []);
+	
+	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
 	return (
 		isOpenModal && (
 			<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
-				<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex">
+				<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative">
 					<div className="self-stretch md:h-96 flex-col justify-start items-start flex">
 						<div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">
 							<div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
@@ -164,10 +166,12 @@ export const CreateNewChannelModal = () => {
 								error={isErrorName}
 								onHandleChangeValue={handleChangeValue}
 							/>
-							<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
-							<CreateChannelButton onClickCancel={handleCloseModal} onClickCreate={handleSubmit} checkInputError={isInputError} />
+							{channelType !== ChannelType.CHANNEL_TYPE_VOICE && (
+								<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
+							)}
 						</div>
 					</div>
+					<CreateChannelButton onClickCancel={handleCloseModal} onClickCreate={handleSubmit} checkInputError={isInputError} />
 				</div>
 				{isErrorType !== '' && <AlertTitleTextWarning description={isErrorType} />}
 				{isErrorName !== '' && <AlertTitleTextWarning description={isErrorName} />}

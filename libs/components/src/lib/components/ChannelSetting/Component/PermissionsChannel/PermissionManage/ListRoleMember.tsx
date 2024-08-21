@@ -1,7 +1,7 @@
-import { RolesClanEntity, UsersClanEntity } from "@mezon/store";
+import { permissionRoleChannelActions, RolesClanEntity, useAppDispatch, UsersClanEntity } from "@mezon/store";
 import { Icons } from "@mezon/ui";
 import { getAvatarForPrioritize, getNameForPrioritize } from "@mezon/utils";
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { AvatarImage } from "../../../../AvatarImage/AvatarImage";
 
 type ListRoleMemberProps = {
@@ -9,29 +9,53 @@ type ListRoleMemberProps = {
     listManageInChannel: RolesClanEntity[];
     usersClan: UsersClanEntity[];
     setListManage?: React.Dispatch<React.SetStateAction<RolesClanEntity[]>>;
+    channelId: string
+    onSelect: (id: string) => void;
+    canChange: boolean
 }
 
 const ListRoleMember = memo((props: ListRoleMemberProps) => {
-    const {listManageInChannel, usersClan} = props;
-    return(
+    const { listManageInChannel, usersClan, channelId, onSelect, canChange } = props;
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        if (listManageInChannel.length > 0) {
+            setSelectedItemId(listManageInChannel[0].id);
+            onSelect(listManageInChannel[0].id)
+            dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: listManageInChannel[0].id}));
+        }
+    }, [channelId]);
+
+    const handleItemClick = (item: any) => {
+        if (canChange) {
+            setSelectedItemId(item.id);
+            onSelect(item.id)
+            dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: item.id}));
+        }
+    };
+
+    return (
         <div className="basis-1/3">
-            <HeaderAddRoleMember listManageNotInChannel={listManageInChannel} usersClan={usersClan}/>
+            <HeaderAddRoleMember listManageNotInChannel={listManageInChannel} usersClan={usersClan} />
             <div className="mt-2">
-                {listManageInChannel.map(item =>
-                    <div 
+                {listManageInChannel.map(item => (
+                    <div
                         key={item.id}
-                        className="w-full py-1.5 px-[10px] text-[15px] bg-transparent dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton font-medium inline-flex gap-x-2 items-center rounded dark:text-textDarkTheme text-textLightTheme"
+                        onClick={() => handleItemClick(item)}
+                        className={`w-full py-1.5 px-[10px] text-[15px] bg-transparent hover:bg-bgLightModeButton font-medium inline-flex gap-x-2 items-center rounded ${
+                            selectedItemId === item.id
+                                ? 'dark:bg-bgModifierHover bg-bgLightModeButton'
+                                : 'dark:text-textDarkTheme text-textLightTheme'
+                        }`}
                     >
                         {item.title}
                     </div>
-                )}
-                <div className="w-full py-1.5 px-[10px] text-[15px] bg-transparent dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton font-medium inline-flex gap-x-2 items-center rounded dark:text-textDarkTheme text-textLightTheme">
-                    <p>@everyone</p>
-                </div>
+                ))}
             </div>
         </div>
-    )
-})
+    );
+});
+
 
 export default ListRoleMember;
 

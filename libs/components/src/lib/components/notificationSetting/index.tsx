@@ -1,4 +1,4 @@
-import { useCategory } from '@mezon/core';
+import {useCategory, useEscapeKey} from '@mezon/core';
 import {
 	defaultNotificationActions,
 	defaultNotificationCategoryActions,
@@ -193,6 +193,9 @@ const ModalNotificationSetting = (props: ModalParam) => {
 			dispatch(notificationSettingActions.deleteNotiChannelSetting({ channel_id: id, clan_id: currentClanId || '' }));
 		}
 	};
+	
+	useEscapeKey(onCloseModal)
+	
 	return (
 		<Modal
 			title="Notification Setting"

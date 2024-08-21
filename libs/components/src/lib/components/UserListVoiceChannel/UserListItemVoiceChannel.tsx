@@ -1,8 +1,7 @@
-import { useMembersVoiceChannel } from '@mezon/core';
+
 import { selectMemberClanByGoogleId } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { getAvatarForPrioritize, getNameForPrioritize, IChannelMember } from '@mezon/utils';
-import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage, Icons } from '../../components';
 
@@ -10,11 +9,7 @@ function UserListItem({ user, channelID }: { user: IChannelMember; channelID: st
 	const member = useSelector(selectMemberClanByGoogleId(user.user_id ?? ''));
 	const name = getNameForPrioritize(member?.clan_nick, member?.user?.display_name, member?.user?.username);
 	const avatar = getAvatarForPrioritize(member?.clan_avatar, member?.user?.avatar_url);
-	const { setMembersVoiceChannel } = useMembersVoiceChannel();
 
-	useEffect(() => {
-		setMembersVoiceChannel(channelID, user.id);
-	}, [setMembersVoiceChannel, channelID, user.id]);
 
 	return (
 		<div className="dark:hover:bg-[#36373D] hover:bg-bgLightModeButton w-[90%] flex p-1 ml-5 items-center gap-3 cursor-pointer rounded-sm">

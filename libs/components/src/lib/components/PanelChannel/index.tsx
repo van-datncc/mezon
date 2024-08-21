@@ -1,4 +1,4 @@
-import { useClanRestriction } from '@mezon/core';
+import {useClanRestriction, useEscapeKey} from '@mezon/core';
 import {
 	notificationSettingActions,
 	selectCurrentChannelId,
@@ -38,7 +38,7 @@ export const notiLabels: Record<number, string> = {
 };
 
 export const notificationTypesList = [
-  {
+	{
     label: 'All',
     value: NotificationType.ALL_MESSAGE
   },
@@ -177,6 +177,8 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 
   const isShowManageChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasManageChannelPermission;
   const isShowManageThread = isClanOwner || hasAdminPermission || hasThreadPermission;
+	
+	useEscapeKey(() => setIsShowPanelChannel(false))
 
   return (
 		<div
@@ -249,7 +251,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
                   type="radio"
                   name="NotificationSetting"
                   defaultNotifi={true}
-                  checked={getNotificationChannelSelected?.notification_setting_type === undefined}
+                  checked={getNotificationChannelSelected?.notification_setting_type === 0}
                   subText={defaultNotifiName}
                   onClick={() => setNotification(0)}
                 />

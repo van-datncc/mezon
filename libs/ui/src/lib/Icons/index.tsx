@@ -301,6 +301,17 @@ export function AddPerson(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export function AddServe(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" {...props}>
+			<path fill="currentColor" d="M10.55 4.4c.13-.24.1-.54-.12-.71L8.6 2.24a1 1 0 0 0-1.24 0l-4 3.15a1 1 0 0 0-.38.79v4.03c0 .43.5.66.82.39l2.28-1.9a3 3 0 0 1 3.84 0c.03.02.08 0 .08-.04V6.42a4 4 0 0 1 .55-2.02ZM7.36 10.23a1 1 0 0 1 1.28 0l1.18.99 2.98 2.48 1.84 1.53a1 1 0 0 1-.67 1.77.1.1 0 0 0-.1.09l-.23 3.06a2 2 0 0 1-2 1.85H4.36a2 2 0 0 1-2-1.85l-.24-3.16a1 1 0 0 1-.76-1.76l6-5Z" >
+			</path>
+			<path fill="currentColor" d="M12 10.2c0 .14.07.28.18.38l3.74 3.12a3 3 0 0 1 .03 4.58.55.55 0 0 0-.2.37l-.12 1.65a4 4 0 0 1-.17.9c-.12.38.13.8.52.8H20a2 2 0 0 0 2-2V3.61a1.5 1.5 0 0 0-2-1.41l-6.66 2.33A2 2 0 0 0 12 6.42">
+			</path>
+		</svg>
+	);
+}
+
 export function PendingFriend(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" {...props}>
@@ -1827,9 +1838,9 @@ export function EyeOpen(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const ArrowRight: React.FC<IconProps> = () => {
+export const ArrowRight: React.FC<IconProps> = ({ defaultSize = 'w-4 h-4 min-w-4' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 min-w-4">
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
 				<path
 					id="Vector"
@@ -3134,7 +3145,7 @@ export function MenuClose(props: React.HTMLAttributes<SVGElement>) {
 			version="1.1"
 			xmlns="http://www.w3.org/2000/svg"
 			xmlnsXlink="http://www.w3.org/1999/xlink"
-			fill="#000000"
+			fill="currentColor"
 			className=""
 			{...props}
 		>
@@ -3143,7 +3154,7 @@ export function MenuClose(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_iconCarrier">
 				<title>close [#1511]</title> <desc>Created with Sketch.</desc> <defs> </defs>
 				<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-					<g id="Dribbble-Light-Preview" transform="translate(-419.000000, -240.000000)" fill="#000000">
+					<g id="Dribbble-Light-Preview" transform="translate(-419.000000, -240.000000)" fill="currentColor">
 						<g id="icons" transform="translate(56.000000, 160.000000)">
 							<polygon
 								id="close-[#1511]"
@@ -3336,6 +3347,66 @@ export const IconLock = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) =
 	);
 };
 
+export const IconClock = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) => {
+	return (
+		<svg className={defaultSize} aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+			<path fill="currentColor" fillRule="evenodd" d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm1-18a1 1 0 1 0-2 0v7c0 .27.1.52.3.7l3 3a1 1 0 0 0 1.4-1.4L13 11.58V5Z" clipRule="evenodd" >
+			</path>
+		</svg>
+	);
+};
+
+export const IconProtected = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) => {
+	return (
+		<svg className={defaultSize} aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+			<path fill="currentColor" fillRule="evenodd" d="M4.27 5.22A2.66 2.66 0 0 0 3 7.5v2.3c0 5.6 3.3 10.68 8.42 12.95.37.17.79.17 1.16 0A14.18 14.18 0 0 0 21 9.78V7.5c0-.93-.48-1.78-1.27-2.27l-6.17-3.76a3 3 0 0 0-3.12 0L4.27 5.22ZM6 7.68l6-3.66V12H6.22C6.08 11.28 6 10.54 6 9.78v-2.1Zm6 12.01V12h5.78A11.19 11.19 0 0 1 12 19.7Z" clipRule="evenodd" >
+			</path>
+		</svg>
+	);
+};
+
+export const PicSuccessModal = ({ defaultFill = '#AEAEAE', defaultSize = '' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" height="130" width="158" className={defaultSize}>
+			<defs>
+				<rect id="a" height="80" rx="40" width="80"/>
+			</defs>
+			<g fill="none" fill-rule="evenodd">
+				<g stroke-linecap="round" stroke-width="2.252">
+					<path d="m151.113 82.556a4.556 4.556 0 1 1 -9.113 0 4.556 4.556 0 0 1 9.113 0zm-45.113-63a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-78 16a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-5 76a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0zm-21-29a4.556 4.556 0 1 0 9.113 0 4.556 4.556 0 0 0 -9.113 0z" stroke="#595d63"/>
+					<path d="m42.927 43.17 1.235 1.234m6.266 6.266 1.235 1.235m-8.736.001 1.235-1.235m6.266-6.266 1.235-1.235" stroke="#494c51"/>
+					<path d="m124 60h3.341m3.659 0h3.341m-5.341-2.913v-1.087m0 8.087v-1.087" stroke="#494c51"/>
+					<path d="m131.532 112.483v-3.341m0-4.507v-3.34m-2.836 5.594h-1.087m7.847 0h-1.087" stroke="#595d63"/>
+					<path d="m40.468 128.753v-3.341m0-4.507v-3.34m2.836 5.594h1.087m-7.847 0h1.087" stroke="#595d63"/>
+					<g stroke="#494c51">
+						<path d="m140.662 53.228v-3.341m0-4.507v-3.34m-2.837 5.594h-1.087m7.848 0h-1.087"/>
+						<path d="m95.662 13.228v-3.341m0-4.507v-3.34m-2.837 5.594h-1.087m7.848 0h-1.087"/>
+						<path d="m121.338 125.958v-3.341m0-4.507v-3.34m2.837 5.594h1.087m-7.848 0h1.087"/>
+						<path d="m48.152 11.155v3.34m0 4.508v3.34m2.837-5.593h1.087m-7.848 0h1.087"/>
+						<path d="m156.841 94.36-1.235 1.234m-6.266 6.266-1.234 1.235m8.735 0-1.235-1.235m-6.266-6.266-1.234-1.234"/>
+					</g>
+				</g>
+				<path d="m151.353 98.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
+				<path d="m127.841 33.36-1.234 1.234m-6.267 6.266-1.234 1.235m8.735 0-1.234-1.235m-6.267-6.266-1.234-1.235" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
+				<path d="m122.353 37.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
+				<path d="m34.842 77.36-1.235 1.234m-6.267 6.266-1.234 1.235m8.736 0-1.235-1.235m-6.267-6.266-1.234-1.234" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
+				<path d="m29.353 81.727a1.12 1.12 0 1 0 2.24 0 1.12 1.12 0 0 0 -2.24 0" fill="#494c51"/>
+				<path d="m85 17v1.747m0 8.253v1.747m-6-5.747h1.747m9.253 0h1.747" stroke="#595d63" stroke-linecap="round" stroke-width="2.252"/>
+				<path d="m85.912 23.913a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51"/>
+				<path d="m147.729 118.365a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m-130.729-19a1.365 1.365 0 1 0 2.73 0 1.365 1.365 0 0 0 -2.73 0" fill="#494c51"/>
+				<path d="m61.729 29.365a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m6-17a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m21 35a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m22-6a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m42 28a1.365 1.365 0 1 1 -2.73 0 1.365 1.365 0 0 1 2.73 0m-137.729 53a1.365 1.365 0 1 0 2.73 0 1.365 1.365 0 0 0 -2.73 0" fill="#595d63"/>
+				<path d="m19.54 50.917v2.128m0 8.861v1.747m-6.177-6.178h1.747m8.86 0h1.748" stroke="#494c51" stroke-linecap="round" stroke-width="2.252"/>
+				<path d="m20.333 58.268a1.119 1.119 0 1 1 -1.584-1.584 1.119 1.119 0 1 1 1.584 1.584" fill="#494c51"/>
+				<g transform="translate(40 43)">
+					<use stroke="#fff" stroke-opacity=".2" stroke-width="6" xlinkHref="#a"/>
+					<use xlinkHref="#a"/>
+				</g>
+				<path d="m62.77 81.24-5.17 5.28 13.785 14.08 31.015-29.92-5.17-5.28-25.845 24.64-8.616-8.8z" fill="#3ba55c"/>
+			</g>
+		</svg>
+	);
+};
+
 export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" className={defaultSize}>
@@ -3349,7 +3420,16 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 
 export const IconLoadingTyping = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg className={defaultSize} id="dots" width="20" height="8" viewBox="0 0 132 58" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+		<svg
+			className={defaultSize}
+			id="dots"
+			width="20"
+			height="8"
+			viewBox="0 0 132 58"
+			version="1.1"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+		>
 			<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
 				<g id="dots" fill="white">
 					<circle id="dot1" cx="25" cy="30" r="13"></circle>
@@ -3851,6 +3931,85 @@ export function SortBySmallSizeBtn(props: React.HTMLAttributes<SVGElement>) {
 					</g>{' '}
 				</g>{' '}
 			</g>
+		</svg>
+	);
+}
+
+export function MenuBarIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16" {...props}>
+			<path
+				fill="currentColor"
+				d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+			/>
+		</svg>
+	);
+}
+
+export function AdminHomeIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="icon-1qHBsr"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				d="m2.4 8.4 8.38-6.46a2 2 0 0 1 2.44 0l8.39 6.45a2 2 0 0 1-.79 3.54l-.32.07-.82 8.2a2 2 0 0 1-1.99 1.8H16a1 1 0 0 1-1-1v-5a3 3 0 0 0-6 0v5a1 1 0 0 1-1 1H6.31a2 2 0 0 1-1.99-1.8L3.5 12l-.32-.07a2 2 0 0 1-.79-3.54Z"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function AdminSettingIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="icon-1qHBsr"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M10.56 1.1c-.46.05-.7.53-.64.98.18 1.16-.19 2.2-.98 2.53-.8.33-1.79-.15-2.49-1.1-.27-.36-.78-.52-1.14-.24-.77.59-1.45 1.27-2.04 2.04-.28.36-.12.87.24 1.14.96.7 1.43 1.7 1.1 2.49-.33.8-1.37 1.16-2.53.98-.45-.07-.93.18-.99.64a11.1 11.1 0 0 0 0 2.88c.06.46.54.7.99.64 1.16-.18 2.2.19 2.53.98.33.8-.14 1.79-1.1 2.49-.36.27-.52.78-.24 1.14.59.77 1.27 1.45 2.04 2.04.36.28.87.12 1.14-.24.7-.95 1.7-1.43 2.49-1.1.8.33 1.16 1.37.98 2.53-.07.45.18.93.64.99a11.1 11.1 0 0 0 2.88 0c.46-.06.7-.54.64-.99-.18-1.16.19-2.2.98-2.53.8-.33 1.79.14 2.49 1.1.27.36.78.52 1.14.24.77-.59 1.45-1.27 2.04-2.04.28-.36.12-.87-.24-1.14-.96-.7-1.43-1.7-1.1-2.49.33-.8 1.37-1.16 2.53-.98.45.07.93-.18.99-.64a11.1 11.1 0 0 0 0-2.88c-.06-.46-.54-.7-.99-.64-1.16.18-2.2-.19-2.53-.98-.33-.8.14-1.79 1.1-2.49.36-.27.52-.78.24-1.14a11.07 11.07 0 0 0-2.04-2.04c-.36-.28-.87-.12-1.14.24-.7.96-1.7 1.43-2.49 1.1-.8-.33-1.16-1.37-.98-2.53.07-.45-.18-.93-.64-.99a11.1 11.1 0 0 0-2.88 0ZM16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
+				clipRule="evenodd"
+				className=""
+			></path>
+		</svg>
+	);
+}
+
+export function LeftArrowIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className="arrow-1BANee"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			fill="currentColor"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				d="M3.3 11.3a1 1 0 0 0 0 1.4l8 8a1 1 0 1 0 1.4-1.4L6.42 13H20a1 1 0 1 0 0-2H6.41l6.3-6.3a1 1 0 0 0-1.42-1.4l-8 8Z"
+				className=""
+			></path>
 		</svg>
 	);
 }

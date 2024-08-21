@@ -1,9 +1,10 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
-import { Colors, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { appActions, selectPinMessageByChannelId } from '@mezon/store-mobile';
+import { appActions, MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectMessageEntitiesByChannelId, selectPinMessageByChannelId, setIsForwardAll, useAppSelector } from '@mezon/store-mobile';
+import { getSrcEmoji } from '@mezon/utils';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
@@ -22,7 +23,6 @@ import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import UserProfile from '../UserProfile';
 import { emojiFakeData } from '../fakeData';
 import { style } from './styles';
-import { getSrcEmoji } from '@mezon/utils';
 
 export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
@@ -35,8 +35,30 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { t } = useTranslation(['message']);
 	const { reactionMessageDispatch } = useChatReaction();
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useAnimatedState(false);
+
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentDmId = useSelector(selectDmGroupCurrentId);
+
 	const { isCanDeleteMessage, isCanManageThread } = useUserPermission();
+	const allMessagesEntities = useAppSelector((state) =>
+		selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || ''),
+	);
+	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
+	const messagePosition = useMemo(() => {
+		return convertedAllMessagesEntities?.findIndex(
+		  (value: MessagesEntity) => value.id === message?.id
+		);
+	}, [convertedAllMessagesEntities, message?.id]);
+
+	const isShowForwardAll = () => {
+		if (messagePosition === -1) return false;
+		return (
+			message.isStartedMessageGroup &&
+			messagePosition < convertedAllMessagesEntities.length - 1 &&
+			!convertedAllMessagesEntities[messagePosition + 1].isStartedMessageGroup
+		);
+	};
 
 	const handleActionEditMessage = () => {
 		onClose();
@@ -224,6 +246,21 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 	const handleForwardMessage = () => {
 		onClose();
+		dispatch(setIsForwardAll(false));
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.ForwardMessage,
+					message,
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0,
+		);
+	};
+
+	const handleForwardAllMessages = () => {
+		onClose();
+		dispatch(setIsForwardAll(true));
 		timeoutRef.current = setTimeout(
 			() => {
 				onConfirmAction({
@@ -279,6 +316,9 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.ForwardMessage:
 				handleForwardMessage();
 				break;
+			case EMessageActionType.ForwardAllMessages:
+				handleForwardAllMessages();
+				break;
 			default:
 				break;
 		}
@@ -291,6 +331,8 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.Reply:
 				return <Icons.ArrowAngleLeftUpIcon color={themeValue.text} />;
 			case EMessageActionType.ForwardMessage:
+				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} />;
+			case EMessageActionType.ForwardAllMessages:
 				return <Icons.ArrowAngleRightUpIcon color={themeValue.text} />;
 			case EMessageActionType.CreateThread:
 				return <Icons.ThreadIcon color={themeValue.text} />;
@@ -330,6 +372,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
+			!isShowForwardAll() && EMessageActionType.ForwardAllMessages,
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 		];

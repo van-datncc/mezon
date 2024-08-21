@@ -1,11 +1,21 @@
 import {Coords} from "../ChannelLink";
 import {EPermission, ICategory} from "@mezon/utils";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import GroupPanels from "../PanelChannel/GroupPanels";
 import ItemPanel from "../PanelChannel/ItemPanel";
 import {Dropdown} from "flowbite-react";
 import {notificationTypesList} from "../PanelChannel";
-import {useClanRestriction, useOnClickOutside, UserRestrictionZone} from "@mezon/core";
+import {useClanRestriction, UserRestrictionZone} from "@mezon/core";
+import {
+	defaultNotificationCategoryActions,
+	selectCurrentClanId,
+	selectDefaultNotificationCategory, selectDefaultNotificationClan,
+	SetDefaultNotificationPayload,
+	useAppDispatch,
+	useAppSelector
+} from "@mezon/store";
+import {NotificationType} from "mezon-js";
+import {format} from "date-fns";
 
 interface IPanelCategoryProps {
   coords: Coords,
@@ -21,6 +31,10 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
   const [hasManageChannelPermission, { isClanOwner }] = useClanRestriction([EPermission.manageChannel]);
   const [hasAdminPermission] = useClanRestriction([EPermission.administrator]);
   const hasManageCategoryPermission = isClanOwner || hasAdminPermission || hasManageChannelPermission;
+	const dispatch = useAppDispatch();
+	const defaultCategoryNotificationSetting = useAppSelector(selectDefaultNotificationCategory);
+	const currentClanId = useAppSelector(selectCurrentClanId);
+	const [muteUntil, setMuteUntil] = useState ('');
   
   useEffect(() => {
     const heightPanel = panelRef.current?.clientHeight;
@@ -33,6 +47,71 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
     setOpenSetting (true);
     setIsShowPanelChannel(false);
   }
+	
+	const handleChangeSettingType = (notificationType: number) => {
+		const payload: SetDefaultNotificationPayload = {
+			category_id: category?.id,
+			notification_type: notificationType,
+			clan_id: currentClanId || ''
+		};
+		dispatch(defaultNotificationCategoryActions.setDefaultNotificationCategory(payload));
+	}
+	
+	const handleScheduleMute = (duration: number) => {
+		if(duration !== Infinity) {
+			const now = new Date();
+			const muteTime = new Date(now.getTime() + duration);
+			const muteTimeISO = muteTime.toISOString();
+			const payload: SetDefaultNotificationPayload = {
+				category_id: category?.id,
+				notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
+				time_mute: muteTimeISO,
+				clan_id: currentClanId || ''
+			};
+			dispatch(defaultNotificationCategoryActions.setDefaultNotificationCategory(payload));
+		} else {
+			const payload: SetDefaultNotificationPayload = {
+				category_id: category?.id,
+				notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
+				clan_id: currentClanId || '',
+				active: 0,
+			};
+			dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
+		}
+	}
+	
+	const handleMuteCategory = (active: number) => {
+		const payload: SetDefaultNotificationPayload = {
+			category_id: category?.id,
+			notification_type: defaultCategoryNotificationSetting?.notification_setting_type,
+			clan_id: currentClanId || '',
+			active: active,
+		};
+		dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
+	}
+	
+	useEffect (() => {
+		if(defaultCategoryNotificationSetting?.active) {
+			setMuteUntil('')
+		} else if(defaultCategoryNotificationSetting?.time_mute) {
+			const muteTime = new Date(defaultCategoryNotificationSetting.time_mute);
+			const now = new Date();
+			if(muteTime > now) {
+				const timeDifference = muteTime.getTime() - now.getTime();
+				const formattedTimeDifference = format(muteTime, 'dd/MM, HH:mm');
+				setMuteUntil(`Muted until ${formattedTimeDifference}`);
+				setTimeout(() => {
+					const payload: SetDefaultNotificationPayload = {
+						category_id: category?.id,
+						notification_type: defaultCategoryNotificationSetting?.notification_setting_type ?? NotificationType.ALL_MESSAGE,
+						clan_id: currentClanId || '',
+						active: 1,
+					};
+					dispatch(defaultNotificationCategoryActions.setMuteCategory(payload));
+				}, timeDifference)
+			}
+		}
+	}, [defaultCategoryNotificationSetting]);
 	
   return (
     <>
@@ -50,28 +129,33 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
           <ItemPanel children="Collapse All Categories" />
         </GroupPanels>
         <GroupPanels>
-          <Dropdown
-            trigger="hover"
-            dismissOnClick={false}
-            renderTrigger={() => (
-              <div>
-                <ItemPanel
-                  children={'Mute Category'}
-                  dropdown="change here"
-                />
-              </div>
-            )}
-            label=""
-            placement="right-start"
-            className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
-          >
-            <ItemPanel children="For 15 Minutes"/>
-            <ItemPanel children="For 1 Hour"/>
-            <ItemPanel children="For 3 Hour"/>
-            <ItemPanel children="For 8 Hour"/>
-            <ItemPanel children="For 24 Hour"/>
-            <ItemPanel children="Until I turn it back on"/>
-          </Dropdown>
+	        {(defaultCategoryNotificationSetting?.active === 1 || defaultCategoryNotificationSetting?.id === '0') ? (
+		        <Dropdown
+			        trigger="hover"
+			        dismissOnClick={false}
+			        renderTrigger={() => (
+				        <div>
+					        <ItemPanel
+						        children={'Mute Category'}
+						        dropdown="change here"
+						        onClick={() => handleMuteCategory(0)}
+					        />
+				        </div>
+			        )}
+			        label=""
+			        placement="right-start"
+			        className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+		        >
+			        <ItemPanel children="For 15 Minutes"  onClick={() => handleScheduleMute(15 * 60 * 1000)}/>
+			        <ItemPanel children="For 1 Hour"  onClick={() => handleScheduleMute(60 * 60 * 1000)}/>
+			        <ItemPanel children="For 3 Hour"  onClick={() => handleScheduleMute(3 * 60 * 60 * 1000)}/>
+			        <ItemPanel children="For 8 Hour"  onClick={() => handleScheduleMute(8 * 60 * 60 * 1000)}/>
+			        <ItemPanel children="For 24 Hour"  onClick={() => handleScheduleMute(24 * 60 * 60 * 1000)}/>
+			        <ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)}/>
+		        </Dropdown>
+	        ) : (
+						<ItemPanel children={'Unmute Category'} onClick={() => handleMuteCategory(1)} subText={muteUntil}/>)}
+          
           <Dropdown
             trigger="hover"
             dismissOnClick={false}
@@ -85,10 +169,12 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
             className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
           >
             <ItemPanel
-              children="Use Category Default"
+              children="Use Clan Default"
               type="radio"
               name="NotificationSetting"
               defaultNotifi={true}
+              onClick={() => handleChangeSettingType(0)}
+              checked={defaultCategoryNotificationSetting?.notification_setting_type === 0}
             />
             {notificationTypesList.map(notification => (
               <ItemPanel
@@ -97,6 +183,8 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
                 type="radio"
                 name="NotificationSetting"
                 key={notification.value}
+                onClick={() => handleChangeSettingType(notification.value)}
+                checked={defaultCategoryNotificationSetting?.notification_setting_type === notification.value}
               />
             ))}
           </Dropdown>

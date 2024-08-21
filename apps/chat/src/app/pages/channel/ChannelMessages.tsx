@@ -2,6 +2,7 @@ import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-
 import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import {
 	messagesActions,
+	selectCurrentUserId,
 	selectFirstMessageId,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
@@ -9,6 +10,7 @@ import {
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
+	selectLatestMessage,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotifed,
@@ -44,10 +46,11 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent);
 	const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump));
 	const isViewingOlderMessages = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
-
 	const isFetching = useSelector(selectMessageIsLoading);
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
+  const currentAccountId = useSelector(selectCurrentUserId);
+  const lastMessage = useAppSelector((state)=>selectLatestMessage(state,channelId));
 
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -132,7 +135,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	useEffect(() => {
 		chatScrollRef.updateLoadMoreCb(loadMoreMessage);
 	}, [loadMoreMessage, chatScrollRef]);
-
+  useEffect(()=>{
+    if(lastMessage.sender_id === currentAccountId){
+      chatScrollRef.scrollToBottom().then(() => {
+				dispatch(messagesActions.setIsJumpingToPresent(false));
+			});
+    }
+  },[lastMessage.id])
 	useEffect(() => {
 		if (isViewingOlderMessages) {
 			chatScrollRef.disableStickyScroll();
