@@ -1,4 +1,3 @@
-import { useMembersVoiceChannel } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectMemberByGoogleId } from '@mezon/store-mobile';
 import { IChannelMember } from '@mezon/utils';
@@ -15,11 +14,6 @@ interface IUserVoiceProps {
 const UserVoiceItem = React.memo(({ userVoice, channelID }: IUserVoiceProps) => {
 	const styles = style(useTheme().themeValue);
 	const member = useSelector(selectMemberByGoogleId(userVoice.user_id ?? ''));
-	const { setMembersVoiceChannel } = useMembersVoiceChannel();
-
-	useEffect(() => {
-		setMembersVoiceChannel(channelID, userVoice.id);
-	}, [setMembersVoiceChannel, channelID, userVoice.id]);
 	return (
 		<View style={styles.userVoiceWrapper}>
 			<MezonAvatar

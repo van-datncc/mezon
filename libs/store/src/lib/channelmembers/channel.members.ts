@@ -199,7 +199,10 @@ export const updateCustomStatus = createAsyncThunk(
 	async ({ clanId, customStatus }: UpdateCustomStatus, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			await mezon.socketRef.current?.writeCustomStatus(clanId, customStatus);
+			const response = await mezon.socketRef.current?.writeCustomStatus(clanId, customStatus);
+      if(response){
+        return response;
+      }
 		} catch (e) {
 			console.error('Error updating custom status user', e);
 		}
@@ -359,7 +362,12 @@ export const channelMembers = createSlice({
 			.addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			});
+			})
+      .addCase(updateCustomStatus.fulfilled, (state:ChannelMembersState, action)=>{
+        if(action.payload){
+          state.customStatusUser[action.payload?.user_id] = action.payload.status;
+        }
+      })
 	},
 });
 

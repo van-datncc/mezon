@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage, PermissionRoleChannel } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotificationChannelCategorySetting, NotifiReactMessage, PermissionRoleChannel } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -13,7 +13,6 @@ import {
 	ApiMessageMention,
 	ApiMessageReaction,
 	ApiMessageRef,
-	ApiNotificationChannelCategoySetting,
 	ApiNotificationSetting,
 	ApiNotificationUserChannel,
 	ApiPermission,
@@ -70,12 +69,15 @@ export type INotifiReactMessage = NotifiReactMessage;
 
 export type IDefaultNotificationClan = ApiNotificationSetting;
 
-export type IDefaultNotificationCategory = ApiNotificationSetting;
+export type IDefaultNotificationCategory = ApiNotificationSetting & {
+	active?: number,
+	time_mute?: string,
+};
 
 export type IDefaultNotification = ApiNotificationSetting & {
 	id: string;
 };
-export type IChannelCategorySetting = ApiNotificationChannelCategoySetting & {
+export type IChannelCategorySetting = NotificationChannelCategorySetting & {
 	id: string;
 };
 export type IHashtagDm = HashtagDm & {
