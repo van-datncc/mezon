@@ -100,8 +100,6 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 
 					handleUploadEmoticonMobile(client, session, path, uploadImagePayload)
 						.then(async (attachment: ApiMessageAttachment) => {
-							console.log('Tom log  => attachment', attachment);
-							
 							const request: ApiClanEmojiCreateRequest = {
 								id: id,
 								category: 'Custom',

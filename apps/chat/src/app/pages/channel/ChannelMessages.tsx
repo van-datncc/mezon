@@ -125,17 +125,23 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	}, [dispatch, idMessageToJump, isMessageExist, chatScrollRef]);
 
 	useEffect(() => {
-		if (isJumpingToPresent || lastMessage.sender_id === currentAccountId) {
+		if (isJumpingToPresent) {
 			chatScrollRef.scrollToBottom().then(() => {
 				dispatch(messagesActions.setIsJumpingToPresent(false));
 			});
 		}
-	}, [dispatch, isJumpingToPresent, chatScrollRef, lastMessage]);
+	}, [dispatch, isJumpingToPresent, chatScrollRef]);
 
 	useEffect(() => {
 		chatScrollRef.updateLoadMoreCb(loadMoreMessage);
 	}, [loadMoreMessage, chatScrollRef]);
-
+  useEffect(()=>{
+    if(lastMessage.sender_id === currentAccountId){
+      chatScrollRef.scrollToBottom().then(() => {
+				dispatch(messagesActions.setIsJumpingToPresent(false));
+			});
+    }
+  },[lastMessage.id])
 	useEffect(() => {
 		if (isViewingOlderMessages) {
 			chatScrollRef.disableStickyScroll();

@@ -3,8 +3,8 @@ import { useAuth, useChatReaction, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { baseColor, Colors, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { appActions, MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectMessageEntitiesByChannelId, selectModeResponsive, selectPinMessageByChannelId, setIsForwardAll, useAppSelector } from '@mezon/store-mobile';
-import { getSrcEmoji, ModeResponsive } from '@mezon/utils';
+import { appActions, MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectMessageEntitiesByChannelId, selectPinMessageByChannelId, setIsForwardAll, useAppSelector } from '@mezon/store-mobile';
+import { getSrcEmoji } from '@mezon/utils';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
@@ -39,18 +39,17 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
-	const modeResponsive = useSelector(selectModeResponsive);
 
 	const { isCanDeleteMessage, isCanManageThread } = useUserPermission();
 	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || ''),
+		selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || ''),
 	);
 	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const messagePosition = useMemo(() => {
 		return convertedAllMessagesEntities?.findIndex(
 		  (value: MessagesEntity) => value.id === message?.id
 		);
-	  }, [convertedAllMessagesEntities, message?.id]);
+	}, [convertedAllMessagesEntities, message?.id]);
 
 	const isShowForwardAll = () => {
 		if (messagePosition === -1) return false;

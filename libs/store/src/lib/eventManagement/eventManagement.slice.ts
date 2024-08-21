@@ -96,7 +96,7 @@ type fetchDeleteEventManagementPayload = {
 export const fetchDeleteEventManagement = createAsyncThunk('deleteEventManagement/fetchDeleteEventManagement', async (body: fetchDeleteEventManagementPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteEvent(mezon.session, body.eventID);
+		const response = await mezon.client.deleteEvent(mezon.session, body.eventID, body.clanId);
 		if (response) {
 			thunkAPI.dispatch(fetchEventManagement({ clanId: body.clanId, noCache: true}));
 		}
