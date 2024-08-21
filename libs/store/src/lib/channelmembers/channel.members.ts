@@ -254,9 +254,30 @@ export const channelMembers = createSlice({
 			}
 		},
 		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
-			for (const i of action.payload) {
-				state.onlineStatusUser[i.userId] = i.status;
-			}
+			const allMemberChannels = channelMembersAdapter.getSelectors().selectAll(state);
+
+			channelMembersAdapter.updateMany(
+				state,
+				allMemberChannels.map((member) => {
+					const memberUpdate = action.payload.find((memberUpdate) => memberUpdate.userId === member.user?.id);
+					if (member.user?.id === memberUpdate?.userId) {
+						return {
+							id: member.id,
+							changes: {
+								...member,
+								user: {
+									...member.user,
+									online: memberUpdate?.status,
+								},
+							},
+						};
+					}
+					return {
+						id: member.id,
+						changes: { ...member },
+					};
+				}),
+			);
 		},
 		addMany: channelMembersAdapter.addMany,
 		setFollowingUserIds: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
@@ -332,7 +353,7 @@ export const channelMembers = createSlice({
 			})
 			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[] | null>) => {
 				if (action.payload !== null) {
-					channelMembersAdapter.setAll(state, action.payload);
+					channelMembersAdapter.setMany(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {
 					state.loadingStatus = 'not loaded';
@@ -401,11 +422,11 @@ export const getChannelMembersState = (rootState: { [CHANNEL_MEMBERS_FEATURE_KEY
 
 export const selectAllChannelMembers = createSelector(getChannelMembersState, selectAll);
 
-export const selectChannelMembesEntities = createSelector(getChannelMembersState, selectEntities);
+export const selectChannelMembersEntities = createSelector(getChannelMembersState, selectEntities);
 
 export const selectFollowingUserIds = createSelector(getChannelMembersState, (state) => state.followingUserIds);
 
-export const selectAllUserIds = createSelector(selectChannelMembesEntities, (entities) => {
+export const selectAllUserIds = createSelector(selectChannelMembersEntities, (entities) => {
 	const members = Object.values(entities);
 	return members.filter((item) => item.user?.id).map((member) => member.user?.id as string);
 });
@@ -415,7 +436,7 @@ export const selectAllUserIdsToFollow = createSelector(getChannelMembersState, (
 });
 
 export const selectMembersByChannelId = (channelId?: string | null) =>
-	createSelector(selectChannelMembesEntities, (entities) => {
+	createSelector(selectChannelMembersEntities, (entities) => {
 		const members = Object.values(entities);
 		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
 	});
@@ -426,7 +447,7 @@ export const selectMemberByGoogleId = (googleId: string) =>
 	});
 
 export const selectMembersMap = (channelId?: string | null) =>
-	createSelector(selectChannelMembesEntities, (entities) => {
+	createSelector(selectChannelMembersEntities, (entities) => {
 		const retval = new Map<string, ChannelMemberAvatar>();
 		const members = Object.values(entities);
 
@@ -452,8 +473,10 @@ export const selectMemberChannelById = (userID: string, channelID: string) =>
 	});
 
 export const selectMemberOnlineStatusById = (userId: string) =>
-	createSelector(selectMemberStatus, (status) => {
-		return status?.[userId] || false;
+	createSelector(selectChannelMembersEntities, (entities) => {
+		const entitiesArray = Object.values(entities);
+		const member = entitiesArray.find((member) => member?.user?.id === userId);
+		return member?.user?.online || false;
 	});
 
 export const selectMemberCustomStatusById = (userId: string) =>
@@ -462,7 +485,7 @@ export const selectMemberCustomStatusById = (userId: string) =>
 	});
 
 export const selectChannelMemberByUserIds = (channelId: string, userIds: string[]) =>
-	createSelector(selectChannelMembesEntities, (entities) => {
+	createSelector(selectChannelMembersEntities, (entities) => {
 		const members = Object.values(entities);
 		return members.filter((member) => userIds && member?.user?.id && member.channelId === channelId && userIds.includes(member?.user?.id));
 	});
