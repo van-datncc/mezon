@@ -7,7 +7,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		flexDirection: 'row',
 		gap: size.s_6,
 		flexWrap: 'wrap',
-		alignItems: 'center',
+		alignItems: 'center'
+	},
+	reactionSpace: {
 		marginBottom: size.s_6
 	},
 	myReaction: {
