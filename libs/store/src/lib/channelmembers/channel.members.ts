@@ -344,8 +344,6 @@ export const channelMembers = createSlice({
 			})
       .addCase(updateCustomStatus.fulfilled, (state:ChannelMembersState,action)=>{
         if(action.payload){
-          console.log("Current Statuts",state.customStatusUser[action.payload?.user_id])
-          console.log("New Statuts",action.payload.status);
           state.customStatusUser[action.payload?.user_id] = action.payload.status;
         }
       })
