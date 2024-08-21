@@ -8,5 +8,6 @@
   "addClan": "Add Clan",
   "errorMessage": "Please enter a valid clan name (max 64 characters, only words, numbers, _ or -).",
   "duplicateNameMessage" : "The clan name already exists. Please enter another name.",
-  "commutityGuide" : "Community Guidelines."
+  "commutityGuide" : "Community Guidelines.",
+  "busy": "busy"
 }

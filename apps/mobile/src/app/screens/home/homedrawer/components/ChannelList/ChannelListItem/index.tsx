@@ -19,6 +19,7 @@ import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
@@ -55,6 +56,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const numberNotification = useChannelBadgeCount(props.data?.channel_id);
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
+	const { t } = useTranslation(['clan']);
 
 	useEffect(() => {
 		return () => {
@@ -124,8 +126,8 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					</Text>
 
 					{checkVoiceStatus && (
-						<Text  style={styles.channelBusyText}>
-							(busy)
+						<Text style={styles.channelBusyText}>
+							({t('busy')})
 						</Text>
 					)}
 				</View>
