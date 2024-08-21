@@ -34,6 +34,11 @@ type MuteThreadDetailModalProps = {
 	route: MuteThreadDetailRouteProp;
 };
 
+enum ENotificationActive {
+	ON = 1,
+	OFF = 0
+}
+
 const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -130,9 +135,9 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 
 	useEffect(() => {
 		let idTimeOut;
-		if (getNotificationChannelSelected?.active === 1) {
+		if (getNotificationChannelSelected?.active === ENotificationActive.ON) {
 			setMutedUntil('');
-		} else if (getNotificationChannelSelected?.active !== 1) {
+		} else if (getNotificationChannelSelected?.active !== ENotificationActive.ON) {
 			if (getNotificationChannelSelected?.time_mute) {
 				const timeMute = new Date(getNotificationChannelSelected.time_mute);
 				const currentTime = new Date();
@@ -145,7 +150,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 							channel_id: currentChannel?.channel_id || '',
 							notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 							clan_id: currentClanId || '',
-							active: 1,
+							active: ENotificationActive.ON,
 						};
 						dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 						clearTimeout(idTimeOut);
@@ -155,12 +160,12 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 		}
 	}, [getNotificationChannelSelected, dispatch, currentChannel?.channel_id, currentClanId]);
 
-	const muteOrUnMuteChannel = (active: number) => {
+	const muteOrUnMuteChannel = (active: ENotificationActive) => {
 		const body = {
 			channel_id: currentChannel?.channel_id || '',
 			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 			clan_id: currentClanId || '',
-			active: active,
+			active,
 		};
 		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 		navigateToThreadDetail();
@@ -188,7 +193,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 				channel_id: currentChannel?.channel_id || '',
 				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 				clan_id: currentClanId || '',
-				active: 0,
+				active: ENotificationActive.OFF,
 			};
 			dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 		}
@@ -197,7 +202,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 
 	return (
 		<View style={styles.wrapper}>
-			{getNotificationChannelSelected?.active === 1 ||
+			{getNotificationChannelSelected?.active === ENotificationActive.ON ||
 				getNotificationChannelSelected.id == "0" ? (
 				<MezonMenu menu={menu} />
 			) : (
