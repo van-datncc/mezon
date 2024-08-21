@@ -3,25 +3,28 @@ import {
 	BowlIcon,
 	debounce,
 	GameControllerIcon,
+	getEmojis,
 	HeartIcon,
 	Icons,
 	LeafIcon,
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
+	setRecentEmoji,
 	SmilingFaceIcon
 } from '@mezon/mobile-components';
-import { Colors, Metrics, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, selectAllEmojiSuggestion } from '@mezon/store-mobile';
+import { baseColor, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { useAppSelector } from '@mezon/store';
+import { emojiSuggestionActions, selectCurrentClan } from '@mezon/store-mobile';
 import { getSrcEmoji, IEmoji } from '@mezon/utils';
+import { MezonClanAvatar } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { style } from './styles';
-const categoriesEmoji = ['Recent', 'Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 
 type EmojiSelectorProps = {
 	onSelected: (emojiId: string, shortname: string) => void;
@@ -34,7 +37,7 @@ type EmojiSelectorProps = {
 
 type DisplayByCategoriesProps = {
 	readonly categoryName?: string;
-	readonly onEmojiSelect: (emojiId: string, emoji: string) => void;
+	readonly onEmojiSelect: (emoji: IEmoji) => void;
 	readonly onEmojiHover?: (item: any) => void;
 	readonly emojisData: any[];
 };
@@ -42,15 +45,7 @@ type DisplayByCategoriesProps = {
 function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover }: DisplayByCategoriesProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
-		return emojis
-			.filter((emoji) => emoji.category.includes(categoryParam))
-			.map((emoji) => ({
-				...emoji,
-				category: emoji.category,
-			}));
-	};
-	const emojisByCategoryName = getEmojisByCategories(emojisData, categoryName ?? '');
+	const emojisByCategoryName = emojisData;
 
 	return (
 		<View style={styles.displayByCategories}>
@@ -67,7 +62,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({ emojisData, onEmojiSe
 		<View style={styles.emojisPanel}>
 			{emojisData.map((item, index) => {
 				return (
-					<TouchableOpacity style={styles.wrapperIconEmoji} key={index} onPress={() => onEmojiSelect(item.id, item.shortname)}>
+					<TouchableOpacity style={styles.wrapperIconEmoji} key={index} onPress={() => onEmojiSelect(item)}>
 						<FastImage source={{ uri: getSrcEmoji(item?.id) }} style={styles.iconEmoji} resizeMode={'contain'} />
 					</TouchableOpacity>
 				);
@@ -83,18 +78,28 @@ export default function EmojiSelector({
 	handleBottomSheetExpand,
 	handleBottomSheetCollapse,
 }: EmojiSelectorProps) {
+	const currentClan = useAppSelector(selectCurrentClan);
+	const { categoriesEmoji, emojis } = getEmojis(currentClan?.clan_id || "0");
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
-	const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const refScrollView = useRef<ScrollView>(null);
 	const { t } = useTranslation('message');
 	const dispatch = useDispatch();
+
 	const cateIcon = useMemo(
 		() => [
-			<PenIcon color={themeValue.textStrong} />,
+			<Icons.ClockIcon color={themeValue.textStrong} />,
+			!!currentClan?.logo
+				? <View style={{ height: 24, width: 24, borderRadius: 12, overflow: "hidden" }}>
+					<MezonClanAvatar
+						alt={currentClan?.clan_name}
+						image={currentClan?.logo}
+					/>
+				</View>
+				: <PenIcon color={themeValue.textStrong} />,
 			<SmilingFaceIcon height={24} width={24} color={themeValue.textStrong} />,
 			<LeafIcon color={themeValue.textStrong} />,
 			<BowlIcon color={themeValue.textStrong} />,
@@ -106,7 +111,18 @@ export default function EmojiSelector({
 		],
 		[themeValue],
 	);
-	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: cateIcon[index] }));
+
+	const categoriesWithIcons = useMemo(() => categoriesEmoji.map((category, index) => ({
+		displayName: category === "Custom" && currentClan?.clan_name ? currentClan?.clan_name : category,
+		name: category,
+		icon: cateIcon[index],
+		emojis: emojis.filter((emoji) => emoji.category.includes(category))
+			.map((emoji) => ({
+				...emoji,
+				category: category,
+			}))
+	})), [categoriesEmoji, emojis, currentClan])
+
 	const categoryRefs = useRef(
 		categoriesEmoji.reduce((refs, item) => {
 			refs[item] = { position: 0 };
@@ -115,15 +131,16 @@ export default function EmojiSelector({
 	);
 
 	const handleEmojiSelect = useCallback(
-		async (emojiId: string, emojiPicked: string) => {
-			onSelected(emojiId, emojiPicked);
+		async (emoji: IEmoji) => {
+			onSelected(emoji.id, emoji.shortname);
+			setRecentEmoji(emoji, currentClan?.id || "0");
 			handleBottomSheetCollapse?.();
 			if (!isReactMessage) {
-				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emojiPicked));
+				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emoji.shortname));
 				dispatch(
 					emojiSuggestionActions.setSuggestionEmojiObjPicked({
-						shortName: emojiPicked,
-						id: emojiId,
+						shortName: emoji.shortname,
+						id: emoji.id,
 					}),
 				);
 			}
@@ -137,7 +154,7 @@ export default function EmojiSelector({
 
 	const onSearchEmoji = async (keyword: string) => {
 		setKeywordSearch(keyword);
-		const result = searchEmojis(emojiListPNG, keyword);
+		const result = searchEmojis(emojis, keyword);
 		setEmojiSearch(result);
 	};
 
@@ -207,9 +224,9 @@ export default function EmojiSelector({
 						>
 							<DisplayByCategories
 								key={index + item.name?.toString()}
-								emojisData={emojiListPNG}
+								emojisData={item.emojis}
 								onEmojiSelect={handleEmojiSelect}
-								categoryName={item.name}
+								categoryName={item.displayName}
 							/>
 						</View>
 					);
