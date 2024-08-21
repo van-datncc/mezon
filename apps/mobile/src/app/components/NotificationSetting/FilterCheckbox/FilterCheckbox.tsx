@@ -1,3 +1,4 @@
+import { capitalizeFirstLetter } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
@@ -22,17 +23,20 @@ const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(
 		const handleCheckboxPress = () => {
 			onCheckboxPress(!isChecked, id);
 		};
+
 		return (
 			<TouchableOpacity activeOpacity={0.6} onPress={handleCheckboxPress} style={[styles.option, customStyles]}>
-				<View >
+				<View>
 					<Block style={[leftIcon ? styles.leftIcon : {}]}>
-						{leftIcon && <Block width={20} height={20} marginRight={size.s_10} flexDirection='row' alignItems='center'>{leftIcon}</Block>}
+						{leftIcon && (
+							<Block width={20} height={20} marginRight={size.s_10} flexDirection="row" alignItems="center">
+								{leftIcon}
+							</Block>
+						)}
 						<Text style={styles.labelOption}>{label}</Text>
 					</Block>
-					{[ENotificationType.CATEGORY_DEFAULT].includes(label as ENotificationType) && (
-						<Text style={styles.defaultNotifyName}>
-							{defaultNotifyName?.charAt(0)?.toUpperCase() + defaultNotifyName?.slice(1)?.toLowerCase()}
-						</Text>
+					{[ENotificationType.CATEGORY_DEFAULT]?.includes?.(label as ENotificationType) && (
+						<Text style={styles.defaultNotifyName}>{capitalizeFirstLetter(defaultNotifyName)}</Text>
 					)}
 				</View>
 

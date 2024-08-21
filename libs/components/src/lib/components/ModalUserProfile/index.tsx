@@ -1,5 +1,5 @@
 import { useAppNavigation, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
-import { selectAllAccount, selectFriendStatus, selectMemberById, selectMemberByUserId } from '@mezon/store';
+import { selectAllAccount, selectCurrentUserId, selectFriendStatus, selectMemberById, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
@@ -52,7 +52,6 @@ const ModalUserProfile = ({
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
-	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '').status;
 	const userCustomStatus = useMemberCustomStatus(userID || '');
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 	const memberById = useSelector(selectMemberById(userID ?? ''));
@@ -138,7 +137,7 @@ const ModalUserProfile = ({
 				avatar={avatar || memberById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
-				customStatus={userCustomStatus || (isFooterProfile && userStatusProfile)}
+				customStatus={userCustomStatus}
 				isAnonymous={checkAnonymous}
 			/>
 			<div className="px-[16px]">

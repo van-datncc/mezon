@@ -1,14 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCategory, useUserPermission } from '@mezon/core';
-import {
-	EOpenSearchChannelFrom,
-	Icons,
-	STORAGE_DATA_CATEGORY_CHANNEL,
-	hasNonEmptyChannels,
-	isEmpty,
-	load,
-	save
-} from '@mezon/mobile-components';
+import { useUserPermission } from '@mezon/core';
+import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels, isEmpty } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
@@ -16,12 +8,12 @@ import {
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
 	selectCurrentClan,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -33,20 +25,21 @@ import { ChannelListContext } from '../Reusables';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
-import { ChannelListSection } from '../components/ChannelList/ChannelListSection';
+import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
 
-const ChannelList = React.memo((props: any) => {
+const ChannelList = React.memo(({ data }: { data: any }) => {
+	const categorizedChannels = useMemo(() => {
+		return !!data && typeof data === 'string' ? JSON.parse(data) : [];
+	}, [data]);
+
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentClan = useSelector(selectCurrentClan);
-	const { categorizedChannels } = useCategory();
-	const [dataCategoryChannel, setDataCategoryChannel] = useState<ICategoryChannel[]>(categorizedChannels || []);
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
 	const { t } = useTranslation(['searchMessageChannel']);
-
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const bottomSheetMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetCategoryMenuRef = useRef<BottomSheetModal>(null);
@@ -62,46 +55,52 @@ const ChannelList = React.memo((props: any) => {
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { isCanManageEvent } = useUserPermission();
 
-	useEffect(() => {
-		try {
-			const categoryChannel = categorizedChannels || JSON.parse(load(STORAGE_DATA_CATEGORY_CHANNEL) || '[]');
-			setDataCategoryChannel(categoryChannel);
-			if (categorizedChannels) {
-				save(STORAGE_DATA_CATEGORY_CHANNEL, JSON.stringify(categorizedChannels));
-			}
-		} catch (error) {
-			console.error('Error loading category channels:', error);
-		}
-	}, [categorizedChannels]);
-
-	function handlePress() {
+	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
-	}
+	}, []);
 
-	function handleLongPressCategory(category: ICategoryChannel) {
+	const handleLongPressCategory = useCallback((category: ICategoryChannel) => {
 		bottomSheetCategoryMenuRef.current?.present();
 		setCurrentPressedCategory(category);
-	}
+	}, []);
 
-	function handleLongPressChannel(channel: ChannelThreads) {
+	const handleLongPressChannel = useCallback((channel: ChannelThreads) => {
 		bottomSheetChannelMenuRef.current?.present();
 		setCurrentPressedChannel(channel);
 		setIsUnKnownChannel(!channel?.channel_id);
-	}
+	}, []);
 
-	function handleLongPressThread(channel: ChannelThreads) {
+	const handleLongPressThread = useCallback((channel: ChannelThreads) => {
 		bottomSheetChannelMenuRef.current?.present();
 		setCurrentPressedChannel(channel);
-	}
+	}, []);
 
-	function handleOnPressSortChannel(channel: IChannel) {
-		dispatch(
-			categoriesActions.setCategoryIdSortChannel({
-				isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id],
-				categoryId: channel?.category_id,
-			}),
-		);
-	}
+	const handleOnPressSortChannel = useCallback(
+		(channel: IChannel) => {
+			dispatch(
+				categoriesActions.setCategoryIdSortChannel({
+					isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id],
+					categoryId: channel?.category_id,
+				}),
+			);
+		},
+		[categoryIdSortChannel, dispatch],
+	);
+
+	const renderItemChannelList = useCallback(
+		({ item }) => {
+			return (
+				<ChannelListSection
+					data={item}
+					onLongPressCategory={handleLongPressCategory}
+					onLongPressChannel={handleLongPressChannel}
+					onPressSortChannel={handleOnPressSortChannel}
+					onLongPressThread={handleLongPressThread}
+				/>
+			);
+		},
+		[handleLongPressCategory, handleLongPressChannel, handleOnPressSortChannel, handleLongPressThread],
+	);
 
 	function handlePressEventCreate() {
 		bottomSheetEventRef?.current?.dismiss();
@@ -123,8 +122,8 @@ const ChannelList = React.memo((props: any) => {
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 			params: {
-				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
-			}
+				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList,
+			},
 		});
 	};
 	return (
@@ -160,21 +159,12 @@ const ChannelList = React.memo((props: any) => {
 						</Text>
 					</TouchableOpacity>
 				</View>
-				{isLoading === 'loading' && !hasNonEmptyChannels(dataCategoryChannel || []) && <ChannelListSkeleton numberSkeleton={6} />}
+				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlashList
-					data={dataCategoryChannel || []}
-					keyExtractor={(_, index) => index.toString()}
+					data={categorizedChannels || []}
+					keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
 					estimatedItemSize={40}
-					renderItem={({ item, index }) => (
-						<ChannelListSection
-							data={item}
-							index={index}
-							onLongPressCategory={(category) => handleLongPressCategory(category)}
-							onLongPressChannel={(channel) => handleLongPressChannel(channel)}
-							onPressSortChannel={(channel) => handleOnPressSortChannel(channel)}
-							onLongPressThread={(channel) => handleLongPressThread(channel)}
-						/>
-					)}
+					renderItem={renderItemChannelList}
 				/>
 			</View>
 

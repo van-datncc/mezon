@@ -8,13 +8,13 @@ import {
 	selectAllClans,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
@@ -61,7 +61,7 @@ const HomeDefault = React.memo((props: any) => {
 	}, [clans, clansLoadingStatus]);
 
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const snapPoints = ['50%'];
+	const snapPoints = useMemo(() => ['50%'], []);
 	const [isShowSettingNotifyBottomSheet, setIsShowSettingNotifyBottomSheet] = useState<boolean>(false);
 
 	const openBottomSheet = () => {
@@ -225,9 +225,9 @@ const HomeDefaultHeader = React.memo(
 		const navigateToSearchPage = () => {
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
-        params: {
-          openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
-        }
+				params: {
+					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault,
+				},
 			});
 		};
 		return (
@@ -242,7 +242,7 @@ const HomeDefaultHeader = React.memo(
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 									<Icons.ThreadPlusIcon width={20} height={20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
-									currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
+								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 									<Icons.TextLockIcon width={20} height={20} color={themeValue.textStrong} />
 								) : (
 									<Icons.TextIcon width={20} height={20} color={themeValue.textStrong} />
