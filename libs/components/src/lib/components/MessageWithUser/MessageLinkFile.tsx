@@ -1,11 +1,10 @@
 import { Spinner } from 'flowbite-react';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Icons } from '../../components';
 import { RenderAttachmentThumbnail } from '../ThumnailAttachmentRender';
 
 export type MessageImage = {
-	readonly uploadingAttachment: boolean;
 	readonly attachmentData: ApiMessageAttachment;
 };
 function formatFileSize(bytes: number) {
@@ -18,7 +17,7 @@ function formatFileSize(bytes: number) {
 	}
 }
 
-function MessageLinkFile({ attachmentData, uploadingAttachment }: MessageImage) {
+function MessageLinkFile({ attachmentData }: MessageImage) {
 	const handleDownload = () => {
 		window.open(attachmentData.url);
 	};
@@ -35,14 +34,18 @@ function MessageLinkFile({ attachmentData, uploadingAttachment }: MessageImage) 
 		setHoverShowOptButtonStatus(true);
 	};
 
+	const isUploadSuccessfully = useMemo(() => {
+		return attachmentData.size && attachmentData.size > 0;
+	}, [attachmentData.size]);
+
 	return (
 		<div
-			onMouseEnter={!uploadingAttachment ? hoverOptButton : () => {}}
+			onMouseEnter={isUploadSuccessfully ? hoverOptButton : () => {}}
 			onMouseLeave={() => setHoverShowOptButtonStatus(false)}
 			className={`break-all w-[430px] cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded max-w-full ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
 			role="button"
 		>
-			{uploadingAttachment && (
+			{!isUploadSuccessfully && (
 				<div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
 					<Spinner aria-label="Loading spinner" />
 				</div>

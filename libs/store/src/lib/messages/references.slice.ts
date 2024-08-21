@@ -1,5 +1,5 @@
-import { IMessage } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { IMessage, parseUrlAttachment } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 
 export const REFERENCES_FEATURE_KEY = 'references';
@@ -23,7 +23,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageRefEdit: string;
 	statusLoadingAttachment: boolean;
 	idMessageMention: string;
-	spinnerLoadingStatus: boolean;
+	attachmentAfterUpload: File[];
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -45,7 +45,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefEdit: '',
 	statusLoadingAttachment: false,
 	idMessageMention: '',
-	spinnerLoadingStatus: false,
+	attachmentAfterUpload: [],
 });
 
 export const referencesSlice = createSlice({
@@ -54,10 +54,6 @@ export const referencesSlice = createSlice({
 	reducers: {
 		add: referencesAdapter.addOne,
 		remove: referencesAdapter.removeOne,
-
-		setSpinnerStatus(state, action) {
-			state.spinnerLoadingStatus = action.payload;
-		},
 
 		setMessageMentionId(state, action) {
 			state.idMessageMention = action.payload;
@@ -77,6 +73,13 @@ export const referencesSlice = createSlice({
 		setOpenReplyMessageState(state, action) {
 			state.openReplyMessageState = action.payload;
 		},
+		setAtachmentAfterUpload(state, action) {
+			state.attachmentAfterUpload = [...state.attachmentAfterUpload, ...action.payload];
+		},
+		removeAttachmentAfterUpload(state, action) {
+			state.attachmentAfterUpload = [];
+		},
+
 		setAttachmentData(state, action: PayloadAction<{ channelId: string; attachments: ApiMessageAttachment[] }>) {
 			const { channelId, attachments } = action.payload;
 			if (!state.attachmentDataRef[channelId]) {
@@ -88,6 +91,7 @@ export const referencesSlice = createSlice({
 				state.attachmentDataRef[channelId] = [...state.attachmentDataRef[channelId], ...attachments];
 			}
 		},
+
 		removeAttachment(state, action: PayloadAction<{ channelId: string; urlAttachment: string }>) {
 			const attachments = state.attachmentDataRef[action.payload.channelId];
 			if (attachments) {
@@ -95,7 +99,20 @@ export const referencesSlice = createSlice({
 					(attachment) => attachment.url !== action.payload.urlAttachment && attachment.filename !== action.payload.urlAttachment,
 				);
 			}
+			const fileDetails = parseUrlAttachment(action.payload.urlAttachment);
+			if (state.attachmentAfterUpload) {
+				state.attachmentAfterUpload = state.attachmentAfterUpload.filter(
+					(file) =>
+						!(
+							file.name === fileDetails.name &&
+							file.type === fileDetails.type &&
+							file.lastModified === fileDetails.lastModified &&
+							file.size === fileDetails.size
+						),
+				);
+			}
 		},
+
 		setIdReferenceMessageReply(state, action) {
 			state.idMessageRefReply = action.payload;
 		},
@@ -155,7 +172,7 @@ export const selectStatusLoadingAttachment = createSelector(getReferencesState, 
 
 export const selectMessageMetionId = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageMention);
 
-export const selectSpinnerLoadingStatus = createSelector(getReferencesState, (state: ReferencesState) => state.spinnerLoadingStatus);
+export const selectAttachmentAfterUpload = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentAfterUpload);
 
 export const selectAttachmentData = (channelId: string) =>
 	createSelector(getReferencesState, (state: ReferencesState) => {

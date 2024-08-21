@@ -1,6 +1,5 @@
 import {
 	messagesActions,
-	referencesActions,
 	selectChannelById,
 	selectCurrentClanId,
 	selectCurrentUserId,
@@ -124,10 +123,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			}
 
 			await socket.updateChatMessage(clanId ?? '', channelId ?? '', mode ?? 0, messageId ?? '', content, mentions, attachments, hideEditted);
-
-			setStatusLoadingAttachment(false);
-			dispatch(referencesActions.setSpinnerStatus(false));
-			dispatch(messagesActions.setSendingMessageActionStatus(false));
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
 	);

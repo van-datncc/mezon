@@ -1,9 +1,7 @@
-import { selectNewMesssageUpdateImage, selectSpinnerLoadingStatus } from '@mezon/store';
 import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
 import MessageVideo from './MessageVideo';
@@ -39,12 +37,6 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 	mode,
 }) => {
 	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments), [attachments]);
-	const spinnerStatus = useSelector(selectSpinnerLoadingStatus);
-	const newMessage = useSelector(selectNewMesssageUpdateImage);
-
-	const uploadingAttachment = useMemo(() => {
-		return newMessage.message_id === messageId && spinnerStatus;
-	}, [newMessage, spinnerStatus]);
 
 	return (
 		<>
@@ -52,7 +44,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 				<div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
 					{videos.map((video, index) => (
 						<div key={`${video.url}_${index}`} className="w-fit gap-y-2">
-							<MessageVideo uploadingAttachment={uploadingAttachment} attachmentData={video} />
+							<MessageVideo attachmentData={video} />
 						</div>
 					))}
 				</div>
@@ -64,13 +56,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
 						return (
 							<div key={`${index}_${image.url}`} className={`${checkImage ? '' : 'w-48 h-auto'}  `}>
-								<MessageImage
-									uploadingAttachment={uploadingAttachment}
-									messageId={messageId}
-									mode={mode}
-									attachmentData={image}
-									onContextMenu={onContextMenu}
-								/>
+								<MessageImage messageId={messageId} mode={mode} attachmentData={image} onContextMenu={onContextMenu} />
 							</div>
 						);
 					})}
@@ -78,9 +64,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 			)}
 
 			{documents.length > 0 &&
-				documents.map((document, index) => (
-					<MessageLinkFile uploadingAttachment={uploadingAttachment} key={`${index}_${document.url}`} attachmentData={document} />
-				))}
+				documents.map((document, index) => <MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} />)}
 		</>
 	);
 };

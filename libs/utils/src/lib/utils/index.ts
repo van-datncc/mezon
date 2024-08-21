@@ -11,7 +11,7 @@ import {
 	subDays,
 } from 'date-fns';
 import { ApiMessageAttachment, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
-import { ChangeEvent, RefObject } from 'react';
+import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
 import {
@@ -647,8 +647,8 @@ export function filterEmptyArrays<T extends Record<string, any>>(payload: T): T 
 		}, {} as T);
 }
 
-export const handleFiles = (e: ChangeEvent<HTMLInputElement>, setAttachmentPreview: (attachments: ApiMessageAttachment[]) => void) => {
-	const files = e.target.files;
+export const handleFiles = (files: File[], setAttachmentPreview: (attachments: ApiMessageAttachment[]) => void) => {
+	// const files = e.target.files;
 
 	if (!files) {
 		throw new Error('Client or files are not initialized');
@@ -664,7 +664,7 @@ export const handleFiles = (e: ChangeEvent<HTMLInputElement>, setAttachmentPrevi
 					return {
 						filename: fileDetails.filename,
 						filetype: fileDetails.filetype,
-						size: fileDetails.size,
+						size: 0,
 						url: fileDetails.url,
 					} as ApiMessageAttachment;
 				})
@@ -673,11 +673,11 @@ export const handleFiles = (e: ChangeEvent<HTMLInputElement>, setAttachmentPrevi
 					return null;
 				});
 		} else {
-			const url = `${file.name};${file.type};${file.lastModified}`;
+			const url = `${file.name};${file.type};${file.lastModified};${file.size}`;
 			return Promise.resolve({
 				filename: file.name,
 				filetype: file.type,
-				size: file.size,
+				size: 0,
 				url: url,
 			} as ApiMessageAttachment);
 		}
@@ -730,7 +730,7 @@ export function processFile(file: File): Promise<{ filename: string; filetype: s
 				resolve({
 					filename: file.name,
 					filetype: file.type,
-					size: blob.size,
+					size: 0,
 					url: blobUrl,
 				});
 			} catch (error) {
@@ -745,3 +745,28 @@ export function processFile(file: File): Promise<{ filename: string; filetype: s
 		reader.readAsDataURL(file);
 	});
 }
+
+// Function to parse the URL string
+export const parseUrlAttachment = (url: string) => {
+	// Split the URL by the delimiter `;`
+	const parts = url.split(';');
+
+	// Check if the parts array has the correct length
+	if (parts.length !== 4) {
+		throw new Error('Invalid URL format');
+	}
+
+	// Destructure the parts into individual variables
+	const [name, type, lastModified, size] = parts;
+
+	// Convert lastModified and size to numbers
+	const lastModifiedDate = parseInt(lastModified, 10);
+	const fileSize = parseInt(size, 10);
+
+	return {
+		name,
+		type,
+		lastModified: lastModifiedDate,
+		size: fileSize,
+	};
+};

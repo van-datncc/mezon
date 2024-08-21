@@ -109,7 +109,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
-			console.log('message: ', message);
 			const senderId = message.sender_id;
 			const timestamp = Date.now() / 1000;
 			const mess = mapMessageChannelToEntity(message);
@@ -130,7 +129,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 
 			dispatch(messagesActions.addNewMessage(mess));
-			dispatch(messagesActions.setNewMessageToUpdateImage(message));
+			if (mess.code === 0) {
+				dispatch(messagesActions.setNewMessageToUpdateImage(message));
+			}
 
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
@@ -147,7 +148,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstreampresence = useCallback(
 		(channelPresence: StreamPresenceEvent) => {
-			console.log('online/offline', channelPresence);
+			// console.log('online/offline', channelPresence);
 			//dispatch(channelMembersActions.fetchChannelMembersPresence(channelPresence));
 		},
 		[dispatch],

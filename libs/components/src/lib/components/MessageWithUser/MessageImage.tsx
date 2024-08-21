@@ -4,7 +4,7 @@ import { SHOW_POSITION, notImplementForGifOrStickerSendFromPanel } from '@mezon/
 import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from '../ContextMenu';
 
@@ -13,10 +13,9 @@ export type MessageImage = {
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	mode?: ChannelStreamMode;
 	messageId?: string;
-	readonly uploadingAttachment?: boolean;
 };
 
-const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId, uploadingAttachment }: MessageImage) => {
+const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: MessageImage) => {
 	const dispatch = useAppDispatch();
 	const { setOpenModalAttachment, setAttachment } = useAttachments();
 	const isDimensionsValid = attachmentData.height && attachmentData.width && attachmentData.height > 0 && attachmentData.width > 0;
@@ -25,6 +24,10 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId, upl
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { directId: currentDmGroupId } = useAppParams();
+
+	const isUploadSuccessfully = useMemo(() => {
+		return attachmentData.size && attachmentData.size > 0;
+	}, [attachmentData.size]);
 
 	const handleClick = (url: string) => {
 		if (isDimensionsValid || checkImage) return;
@@ -69,7 +72,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId, upl
 	}
 	return (
 		<div className="relative inline-block">
-			{uploadingAttachment && (
+			{!isUploadSuccessfully && (
 				<div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
 					<Spinner aria-label="Loading spinner" />
 				</div>

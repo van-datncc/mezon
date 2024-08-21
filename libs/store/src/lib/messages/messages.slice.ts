@@ -597,7 +597,6 @@ export const messagesSlice = createSlice({
 
 		setNewMessageToUpdateImage(state, action) {
 			const data = action.payload;
-			console.log(action.payload);
 			state.newMesssageUpdateImage = {
 				channel_id: data.channel_id,
 				message_id: data.message_id,
@@ -1015,7 +1014,7 @@ export const selectMessageByMessageId = (messageId: string) =>
 
 export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);
 
-export const selectSendingMessageActionStatus = createSelector(getMessagesState, (state) => state.sendingMessageActionStatus);
+// export const selectSendingMessageActionStatus = createSelector(getMessagesState, (state) => state.sendingMessageActionStatus);
 
 // V2
 
