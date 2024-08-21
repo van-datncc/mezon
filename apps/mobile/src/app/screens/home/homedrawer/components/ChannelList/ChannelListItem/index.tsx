@@ -4,17 +4,10 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	load,
-	save
+	save,
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	getStoreAsync,
-	selectIsUnreadChannelById,
-	selectLastChannelTimestamp,
-	selectNotificationMentionCountByChannelId,
-	selectVoiceChannelMembersByChannelId,
-} from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, selectIsUnreadChannelById, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -22,22 +15,15 @@ import React, { useEffect, useRef } from 'react';
 import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
+import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import ListChannelThread from '../ChannelListThread';
 import UserListVoiceChannel from '../ChannelListUserVoice';
 import { style } from './styles';
-
-function useChannelBadgeCount(channelId: string) {
-	const lastChannelTimestamp = useSelector(selectLastChannelTimestamp(channelId));
-	const numberNotification = useSelector(selectNotificationMentionCountByChannelId(channelId, lastChannelTimestamp));
-
-	return numberNotification;
-}
 
 interface IChannelListItemProps {
 	data: any;
 	image?: string;
 	isActive: boolean;
-	currentChanel: IChannel;
 	onLongPress: () => void;
 	onLongPressThread?: (thread: ChannelThreads) => void;
 }
@@ -52,7 +38,6 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const styles = style(themeValue);
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
-	const numberNotification = useChannelBadgeCount(props.data?.channel_id);
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
 
@@ -75,12 +60,12 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			const store = await getStoreAsync();
-			
+
 			await Promise.all([
 				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave),
 			]);
-			
+
 			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 			if (!channelsCache?.includes(channelId)) {
 				save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
@@ -120,15 +105,11 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					<ActivityIndicator color={themeValue.white} />
 				)}
 
-				{numberNotification > 0 && (
-					<View style={styles.channelDotWrapper}>
-						<Text style={styles.channelDot}>{numberNotification}</Text>
-					</View>
-				)}
+				<ChannelBadgeUnread channelId={props.data?.channel_id} />
 			</TouchableOpacity>
 
 			{!!props?.data?.threads?.length && (
-				<ListChannelThread threads={props?.data?.threads} currentChanel={props.currentChanel} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />
+				<ListChannelThread threads={props?.data?.threads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />
 			)}
 			{!!voiceChannelMember?.length && <UserListVoiceChannel userListVoice={voiceChannelMember} />}
 		</View>

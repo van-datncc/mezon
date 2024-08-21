@@ -83,3 +83,20 @@ export const jumpToChannel = async (channelId: string, clanId: string) => {
 export const hasNonEmptyChannels = (data: any) => {
 	return data.some((item: any) => item?.channels && item?.channels?.length > 0);
 };
+
+export const cleanChannelData = (channels: any[]) => {
+	return channels.map((channel) => {
+		return {
+			...channel,
+			last_sent_message: undefined,
+			last_seen_message: undefined,
+			threads: channel.threads.map((thread: any) => {
+				return {
+					...thread,
+					last_sent_message: undefined,
+					last_seen_message: undefined,
+				};
+			}),
+		};
+	});
+};
