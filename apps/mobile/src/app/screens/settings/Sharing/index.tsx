@@ -256,7 +256,6 @@ export const Sharing = ({ data, onClose }) => {
 	const convertFileFormat = async () => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
-				console.log('Tom log  => media', media);
 				const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
 				dispatch(
 					referencesActions.setAttachmentData({

@@ -250,7 +250,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 					onEndReached={messages?.length ? onLoadMore : undefined}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}
-					disableAutoLayout={true}
 					viewabilityConfig={{
 						waitForInteraction: true,
 						itemVisiblePercentThreshold: 50,

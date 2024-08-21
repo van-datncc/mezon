@@ -1,57 +1,72 @@
 import { useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { selectCurrentChannelId } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ChannelListItem } from '../ChannelListItem';
-import { ChannelListSectionHeader } from '../ChannelListSectionHeader';
+import ChannelListSectionHeader from '../ChannelListSectionHeader';
 import { style } from './styles';
 
 interface IChannelListSectionProps {
 	data: ICategoryChannel;
-	index: number;
 	onLongPressCategory: (channel: ICategoryChannel) => void;
 	onPressSortChannel: (channel: ICategoryChannel) => void;
 	onLongPressChannel: (channel: ChannelThreads) => void;
 	onLongPressThread: (thread: ChannelThreads) => void;
 }
 
-export const ChannelListSection = memo((props: IChannelListSectionProps) => {
-	const styles = style(useTheme().themeValue);
-	const [isCollapsed, setIsCollapsed] = useAnimatedState(false);
-	const currentChanel = useSelector(selectCurrentChannel);
-	if (!props?.data?.category_name?.trim()) {
-		return;
-	}
-	return (
-		<View key={Math.floor(Math.random() * 9999999).toString()} style={styles.channelListSection}>
-			<ChannelListSectionHeader
-				title={props.data.category_name}
-				onPress={() => setIsCollapsed(!isCollapsed)}
-				onLongPress={() => props?.onLongPressCategory(props.data)}
-				onPressSortChannel={() => props?.onPressSortChannel(props?.data)}
-				isCollapsed={isCollapsed}
-			/>
+const ChannelListSection = memo(
+	({ data, onLongPressCategory, onLongPressChannel, onPressSortChannel, onLongPressThread }: IChannelListSectionProps) => {
+		const styles = style(useTheme().themeValue);
+		const [isCollapsed, setIsCollapsed] = useAnimatedState(false);
+		const currentChanelId = useSelector(selectCurrentChannelId);
 
-			<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
-				{props.data.channels?.map((item: any, index: number) => {
-					const isActive = currentChanel?.id === item.id;
+		const toggleCollapse = useCallback(() => {
+			setIsCollapsed(!isCollapsed);
+		}, [isCollapsed, setIsCollapsed]);
 
-					return (
-						<ChannelListItem
-							data={item}
-							key={Math.floor(Math.random() * 9999999).toString() + index}
-							isActive={isActive}
-							currentChanel={currentChanel}
-							onLongPress={() => {
-								props?.onLongPressChannel(item);
-							}}
-							onLongPressThread={props?.onLongPressThread}
-						/>
-					);
-				})}
+		const onLongPressHeader = useCallback(() => {
+			onLongPressCategory(data);
+		}, [data, onLongPressCategory]);
+
+		const onSortChannel = useCallback(() => {
+			onPressSortChannel(data);
+		}, [data, onPressSortChannel]);
+
+		if (!data?.category_name?.trim()) {
+			return;
+		}
+
+		return (
+			<View style={styles.channelListSection}>
+				<ChannelListSectionHeader
+					title={data.category_name}
+					onPress={toggleCollapse}
+					onLongPress={onLongPressHeader}
+					onPressSortChannel={onSortChannel}
+					isCollapsed={isCollapsed}
+				/>
+
+				<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
+					{data.channels?.map((item: any, index: number) => {
+						const isActive = currentChanelId === item.id;
+
+						return (
+							<ChannelListItem
+								data={item}
+								key={`${item.id}_channel_item` + index}
+								isActive={isActive}
+								onLongPress={() => {
+									onLongPressChannel(item);
+								}}
+								onLongPressThread={onLongPressThread}
+							/>
+						);
+					})}
+				</View>
 			</View>
-		</View>
-	);
-});
+		);
+	},
+);
+export default ChannelListSection;

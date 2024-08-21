@@ -1,7 +1,7 @@
 import { BottomSheetModalProps, BottomSheetScrollView, BottomSheetModal as OriginalBottomSheet } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useTheme } from '@mezon/mobile-ui';
-import { ReactNode, Ref, forwardRef } from 'react';
+import React, { ReactNode, Ref, forwardRef, useCallback, useMemo } from 'react';
 import { Text, View } from 'react-native';
 import Backdrop from './backdrop';
 import { style } from './styles';
@@ -16,9 +16,24 @@ export interface IMezonBottomSheetProps extends BottomSheetModalProps {
 	snapPoints?: string[];
 }
 
-export default forwardRef(function MezonBottomSheet(props: IMezonBottomSheetProps, ref: Ref<BottomSheetModalMethods>) {
+const MezonBottomSheet = forwardRef(function MezonBottomSheet(props: IMezonBottomSheetProps, ref: Ref<BottomSheetModalMethods>) {
 	const { children, title, headerLeft, headerRight, heightFitContent, snapPoints = ['90%'], titleSize = 'sm' } = props;
-	const styles = style(useTheme().themeValue);
+	const themeValue = useTheme().themeValue;
+	const styles = useMemo(() => style(themeValue), [themeValue]);
+	
+	const renderHeader = useCallback(() => {
+		if (title || headerLeft || headerRight) {
+			return (
+				<View style={styles.header}>
+					<View style={[styles.section, styles.sectionLeft]}>{headerLeft}</View>
+					<Text style={[styles.section, styles.sectionTitle, titleSize === 'md' ? styles.titleMD : {}]}>{title}</Text>
+					<View style={[styles.section, styles.sectionRight]}>{headerRight}</View>
+				</View>
+			);
+		}
+		return null;
+	}, [title, headerLeft, headerRight, styles, titleSize]);
+	
 	return (
 		<OriginalBottomSheet
 			{...props}
@@ -32,16 +47,11 @@ export default forwardRef(function MezonBottomSheet(props: IMezonBottomSheetProp
 			handleIndicatorStyle={styles.handleIndicator}
 		>
 			<BottomSheetScrollView>
-				{(title || headerLeft || headerRight) && (
-					<View style={styles.header}>
-						<View style={[styles.section, styles.sectionLeft]}>{headerLeft}</View>
-						<Text style={[styles.section, styles.sectionTitle, titleSize == 'md' ? styles.titleMD : {}]}>{title}</Text>
-						<View style={[styles.section, styles.sectionRight]}>{headerRight}</View>
-					</View>
-				)}
-
+				{renderHeader()}
 				{children}
 			</BottomSheetScrollView>
 		</OriginalBottomSheet>
 	);
 });
+
+export default MezonBottomSheet;
