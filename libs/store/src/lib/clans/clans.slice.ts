@@ -385,3 +385,5 @@ export const selectShowNumEvent = (clanId: string) =>
 		const clan = state.clanMetadata.entities[clanId];
 		return clan?.showNumEvent || false;
 	});
+
+export const selectClanByUserId = (userId: string) => createSelector(selectAllClans, (clans) => clans.filter(clan => clan.creator_id === userId))

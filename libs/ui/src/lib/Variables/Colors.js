@@ -14,6 +14,7 @@ module.exports = {
   colorNeutral: '#AEAEAE',
   colorTextLightMode: '#535353',
   colorTextError: '#FA787C',
+  colorWhiteSecond: '#D6D9DC',
 
   /* background dark*/
   bgPrimary: '#313338',

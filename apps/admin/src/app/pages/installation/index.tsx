@@ -22,7 +22,7 @@ const Installation = () => {
                     <p className="text-base">Use our provided install link or register a custom one. If you choose a custom link, users who add your app will be redirected to your URL instead of the Add App flow in Discord.</p>
                 </div>
                 <select 
-                    name="clan" 
+                    name="link" 
                     className="block w-full mt-1 dark:bg-black bg-bgLightTertiary rounded p-2 font-normal text-base tracking-wide outline-none"
                 >
                     <option>Discord Provided Link</option>
