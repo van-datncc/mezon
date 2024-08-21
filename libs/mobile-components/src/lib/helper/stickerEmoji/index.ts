@@ -48,18 +48,18 @@ export function getEmojis(clan_id: string) {
     const { categoriesEmoji, emojis } = useEmojiSuggestion();
     const recentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
 
-    const recentChannelEmojis = recentEmojis[clan_id] || [];
+    const recentClanEmojis = recentEmojis?.[clan_id] || [];
     return {
         categoriesEmoji,
-        emojis: [...recentChannelEmojis, ...emojis],
+        emojis: [...recentClanEmojis, ...emojis],
     }
 }
 
 export async function setRecentEmoji(emoji: IEmoji, clan_id: string) {
     const oldRecentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
-    const oldRecentChannelEmojis: IEmoji[] = oldRecentEmojis[clan_id] || [];
-    if (oldRecentChannelEmojis.every(e => e.id !== emoji.id)) {
-        const currentRecentChannelEmojis: IEmoji[] = [{ ...emoji, category: "Recent" }, ...oldRecentChannelEmojis];
+    const oldRecentClanEmojis: IEmoji[] = oldRecentEmojis?.[clan_id] || [];
+    if (oldRecentClanEmojis.every(e => e.id !== emoji.id)) {
+        const currentRecentChannelEmojis: IEmoji[] = [{ ...emoji, category: "Recent" }, ...oldRecentClanEmojis];
         const currentEmoji = { ...oldRecentEmojis, [clan_id]: currentRecentChannelEmojis }
         save(STORAGE_RECENT_EMOJI, currentEmoji);
     }
