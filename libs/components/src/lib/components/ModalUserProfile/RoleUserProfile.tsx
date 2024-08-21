@@ -110,7 +110,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 							<div className="size-2 bg-white rounded-full"></div>
 							}
 						</button>
-						<span className="text-xs font-medium" style={{ lineHeight: '15px' }}>
+						<span className="text-xs font-medium">
 							{role.title}
 						</span>
 					</span>
@@ -124,8 +124,8 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 							className="dark:text-white text-black"
 						>
-							<button className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-700 bg-slate-300">
-								<Icons.Plus />
+							<button className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-700 bg-slate-300 items-center">
+								<Icons.Plus className="size-5"/>
 								<p className="text-xs m-0 font-medium">Add Role</p>
 							</button>
 						</Tooltip>

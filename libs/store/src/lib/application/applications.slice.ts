@@ -1,7 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
-import { ApiAddAppRequest, ApiAppList } from 'mezon-js/api.gen';
+import { ApiAddAppRequest, ApiApp, ApiAppList } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const ADMIN_APPLICATIONS = 'adminApplication';
@@ -10,6 +10,7 @@ export interface IApplicationState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	appsData: ApiAppList;
+	appDetail: ApiApp;
 }
 
 export const applicationInitialState: IApplicationState = {
@@ -19,6 +20,16 @@ export const applicationInitialState: IApplicationState = {
 		apps: [],
 		next_cursor: undefined,
 		total_count: undefined,
+	},
+	appDetail: {
+		id: '',
+		applogo: undefined,
+		appname: undefined,
+		creator_id: undefined,
+		disable_time: undefined,
+		is_shadow: undefined,
+		role: undefined,
+		token: undefined,
 	},
 };
 
@@ -50,6 +61,16 @@ export const fetchApplications = createAsyncThunk('adminApplication/fetchApplica
 	}
 });
 
+export const getApplicationDetail = createAsyncThunk('adminApplication/getApplicationDetail', async ({appId}: {appId: string}, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.getApp(mezon.session, appId);
+		return response;
+	} catch (err) {
+		return thunkAPI.rejectWithValue({ err });
+	}
+});
+
 export const createApplication = createAsyncThunk('adminApplication/createApplication', async (data: { request: ApiAddAppRequest }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -77,12 +98,19 @@ export const adminApplicationSlice = createSlice({
 			state.appsData = action.payload;
 			state.loadingStatus = 'loaded';
 		});
-		builder.addCase(fetchApplications.rejected, (state, action) => {
+		builder.addCase(fetchApplications.rejected, (state) => {
 			state.loadingStatus = 'not loaded';
+		});
+		builder.addCase(getApplicationDetail.fulfilled, (state, action) => {
+			state.appDetail = action.payload;
 		});
 	},
 });
 
 export const getApplicationState = (rootState: { [ADMIN_APPLICATIONS]: IApplicationState }): IApplicationState => rootState[ADMIN_APPLICATIONS];
 export const selectAllApps = createSelector(getApplicationState, (state) => state.appsData || []);
+export const selectAppDetail = createSelector(getApplicationState, (state) => state.appDetail);
 export const adminApplicationReducer = adminApplicationSlice.reducer;
+
+export const selectAppById = (appId: string) => 
+	createSelector(selectAllApps, allApp => allApp.apps?.find(app => app.id === appId) || null);

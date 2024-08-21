@@ -137,10 +137,8 @@ export const notificationSlice = createSlice({
 		setNotiListUnread(state, action) {
 			const storedIds = localStorage.getItem('notiUnread');
 			const ids = storedIds ? JSON.parse(storedIds) : [];
-			if (action.payload.clan_id !== '0') {
-				ids.push(action.payload.id);
-				localStorage.setItem('notiUnread', JSON.stringify(ids));
-			}
+			ids.push(action.payload.id);
+			localStorage.setItem('notiUnread', JSON.stringify(ids));
 		},
 
 		setStatusNoti(state) {

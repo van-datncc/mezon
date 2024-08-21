@@ -17,8 +17,9 @@ import {
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectIsShowPopupQuickMess,
 	selectStatusMenu,
-	selectTheme,
+	selectTheme
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, TIME_OF_SHOWING_FIRST_POPUP } from '@mezon/utils';
@@ -27,8 +28,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
-import { MainContent } from './MainContent';
 import DirectUnreads from './directUnreads';
+import { MainContent } from './MainContent';
+import PopupQuickMess from './PopupQuickMess';
 
 function MyApp() {
 	const elementHTML = document.documentElement;
@@ -148,6 +150,8 @@ function MyApp() {
 		}
 	}, []);
 
+	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
+
 	return (
 		<div className="flex h-screen overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
@@ -220,6 +224,7 @@ function MyApp() {
 			</div>
 			<MainContent />
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
+			{isShowPopupQuickMess && <PopupQuickMess />}
 		</div>
 	);
 }

@@ -1,4 +1,4 @@
-import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage } from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotifiReactMessage, PermissionRoleChannel } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -354,6 +354,10 @@ export type IEmoji = {
 export type IChannelUser = ChannelDescription & {
 	id: string;
 };
+
+export type IPermissionRoleChannel =  PermissionRoleChannel & {
+	id: string
+}
 
 export type IEmoticons = {
 	[key: string]: string;

@@ -277,7 +277,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 							<>
 								{normalizedSearchText.startsWith('@') && (
 									<>
-										<span className="text-textPrimary text-left opacity-60 text-[11px] pb-1 uppercase">
+										<span className="dark:text-textPrimary text-colorTextLightMode text-left opacity-60 text-[11px] pb-1 uppercase">
 											Search friend and users
 										</span>
 										<ListSearchForwardMessage
@@ -290,7 +290,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 								)}
 								{normalizedSearchText.startsWith('#') && (
 									<>
-										<span className="text-textPrimary text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
+										<span className="dark:text-textPrimary text-colorTextLightMode text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 										<ListSearchForwardMessage
 											listSearch={listChannelSearch}
 											searchText={normalizedSearchText.slice(1)}

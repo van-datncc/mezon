@@ -1,5 +1,5 @@
 import { ModalErrorTypeUpload, ModalOverData } from '@mezon/components';
-import { useAppNavigation, useClans } from '@mezon/core';
+import {useAppNavigation, useClans, useEscapeKey} from '@mezon/core';
 import { checkDuplicateNameClan, selectAllAccount, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField, Modal } from '@mezon/ui';
@@ -51,7 +51,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
   const debouncedSetClanName = useDebouncedCallback(async (value: string) => {
     const regex = ValidateSpecialCharacters();
     if (regex.test(value)) {
-      await dispatch(checkDuplicateNameClan(value)).then(unwrapResult).then(result => {
+      await dispatch(checkDuplicateNameClan(value.trim())).then(unwrapResult).then(result => {
         if (result) {
           setCheckValidate(EValidateListMessage.DUPLICATE_NAME)
           return;
@@ -95,7 +95,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 
 
   const handleCreateClan = () => {
-    createClans(nameClan, urlImage).then((res) => {
+    createClans(nameClan.trim(), urlImage).then((res) => {
       if (res && res.clan_id) {
         navigate(toClanPage(res.clan_id || ''));
       }
@@ -106,6 +106,8 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
     setUrlImage('');
     setNameClan('');
   };
+	
+	useEscapeKey(handleClose)
 
   return (
     <Modal

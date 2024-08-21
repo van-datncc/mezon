@@ -134,3 +134,7 @@ export const selectAllPermissionsUserKey = createSelector(selectAllPermissionsUs
 	return permissionsUser.map((permissionUser) => permissionUser.slug);
 });
 
+export const selectPermissionChannel = createSelector(selectAllPermissionsDefault, (permissions) =>{
+	return permissions.filter((permission)=>permission.scope === 1)
+})
+
