@@ -143,7 +143,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 					idTimeOut = setTimeout(() => {
 						const body = {
 							channel_id: currentChannel?.channel_id || '',
-							notification_type: getNotificationChannelSelected?.notification_setting_type || '',
+							notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 							clan_id: currentClanId || '',
 							active: 1,
 						};
@@ -158,7 +158,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	const muteOrUnMuteChannel = (active: number) => {
 		const body = {
 			channel_id: currentChannel?.channel_id || '',
-			notification_type: getNotificationChannelSelected?.notification_setting_type || '',
+			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 			clan_id: currentClanId || '',
 			active: active,
 		};
@@ -178,7 +178,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 
 			const body = {
 				channel_id: currentChannel?.channel_id || '',
-				notification_type: getNotificationChannelSelected?.notification_setting_type || '',
+				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 				clan_id: currentClanId || '',
 				time_mute: unmuteTimeISO,
 			};
@@ -186,7 +186,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 		} else {
 			const body = {
 				channel_id: currentChannel?.channel_id || '',
-				notification_type: getNotificationChannelSelected?.notification_setting_type || '',
+				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 				clan_id: currentClanId || '',
 				active: 0,
 			};
@@ -197,7 +197,8 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 
 	return (
 		<View style={styles.wrapper}>
-			{getNotificationChannelSelected?.active === 1 ? (
+			{getNotificationChannelSelected?.active === 1 ||
+				getNotificationChannelSelected.id == "0" ? (
 				<MezonMenu menu={menu} />
 			) : (
 				<View style={styles.optionsBox}>
