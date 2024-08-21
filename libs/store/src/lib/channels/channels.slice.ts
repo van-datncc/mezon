@@ -50,7 +50,6 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	currentVoiceChannelId: string;
 	valueTextInput: Record<string, string>;
 	idChannelSelected: Record<string, string>;
-	membersVoiceChannel: Record<string, string[]>;
 	modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 }
 
@@ -282,7 +281,6 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	currentVoiceChannelId: '',
 	valueTextInput: {},
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
-	membersVoiceChannel: {},
 	modeResponsive: ModeResponsive.MODE_DM,
 	quantityNotifyChannels: {},
 });
@@ -390,13 +388,6 @@ export const channelsSlice = createSlice({
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
 			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
-		},
-		setMembersVoiceChannel: (state, action: PayloadAction<{ channelId: string; member: string }>) => {
-			const { channelId, member } = action.payload;
-			if (!state.membersVoiceChannel[channelId]) {
-				state.membersVoiceChannel[channelId] = [];
-			}
-			state.membersVoiceChannel[channelId].push(member);
 		},
 	},
 	extraReducers: (builder) => {
@@ -516,8 +507,6 @@ export const selectChannelById = (id: string) => createSelector(selectChannelsEn
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 
 export const selectModeResponsive = createSelector(getChannelsState, (state) => state.modeResponsive);
-
-export const selectMembersVoiceChannel = createSelector(getChannelsState, (state) => state.membersVoiceChannel);
 
 export const selectCurrentVoiceChannelId = createSelector(getChannelsState, (state) => state.currentVoiceChannelId);
 
