@@ -12,25 +12,20 @@ interface IChannelListSectionHeaderProps {
 	onPressSortChannel: () => void;
 }
 
-export const ChannelListSectionHeader = memo((props: IChannelListSectionHeaderProps) => {
+const ChannelListSectionHeader = ({ onPress, title, onLongPress, onPressSortChannel, isCollapsed }: IChannelListSectionHeaderProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	return (
-		<TouchableOpacity
-			activeOpacity={0.8}
-			onPress={props?.onPress}
-			onLongPress={props?.onLongPress}
-			key={Math.floor(Math.random() * 9999999).toString()}
-			style={styles.channelListHeader}
-		>
+		<TouchableOpacity activeOpacity={0.8} onPress={onPress} onLongPress={onLongPress} style={styles.channelListHeader}>
 			<View style={styles.channelListHeaderItem}>
-				<Icons.ChevronSmallDownIcon width={20} height={20} style={[props?.isCollapsed && { transform: [{ rotate: '-90deg' }] }]} />
-				<Text style={styles.channelListHeaderItemTitle}>{props.title}</Text>
+				<Icons.ChevronSmallDownIcon width={20} height={20} style={[isCollapsed && { transform: [{ rotate: '-90deg' }] }]} />
+				<Text style={styles.channelListHeaderItemTitle}>{title}</Text>
 
-				<TouchableOpacity onPress={props?.onPressSortChannel} style={styles.sortButton}>
+				<TouchableOpacity onPress={onPressSortChannel} style={styles.sortButton}>
 					<SortIcon width={20} height={20} color={themeValue.text} />
 				</TouchableOpacity>
 			</View>
 		</TouchableOpacity>
 	);
-});
+};
+export default memo(ChannelListSectionHeader);

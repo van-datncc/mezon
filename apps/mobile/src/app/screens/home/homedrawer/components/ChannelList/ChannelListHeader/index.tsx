@@ -1,15 +1,17 @@
 import { MenuHorizontalIcon, VerifyIcon } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity } from '@mezon/store-mobile';
+import React, { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { style } from './styles';
+
 interface IProps {
 	onPress: () => void;
 	clan: ClansEntity;
 }
 
-export default function ChannelListHeader({ onPress, clan }: IProps) {
+const ChannelListHeader = ({ onPress, clan }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	function handlePress() {
@@ -34,4 +36,6 @@ export default function ChannelListHeader({ onPress, clan }: IProps) {
 			</TouchableOpacity>
 		</View>
 	);
-}
+};
+
+export default memo(ChannelListHeader);

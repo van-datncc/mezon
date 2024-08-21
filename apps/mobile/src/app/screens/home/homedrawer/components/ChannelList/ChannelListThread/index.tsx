@@ -1,26 +1,26 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity } from '@mezon/store-mobile';
+import { selectCurrentChannelId } from '@mezon/store-mobile';
 import { ChannelThreads, IChannel } from '@mezon/utils';
 import React from 'react';
 import { View } from 'react-native';
+import { useSelector } from 'react-redux';
 import ChannelListThreadItem from '../ChannelListThreadItem';
 import { style } from './styles';
 
 type IListChannelThreadProps = {
 	threads: IChannel[];
-	currentChanel: ChannelsEntity;
 	onPress: (thread: IChannel) => void;
 	onLongPress?: (thread: ChannelThreads) => void;
 };
 
-const ListChannelThread = React.memo(({ threads, currentChanel, onPress, onLongPress }: IListChannelThreadProps) => {
+const ListChannelThread = React.memo(({ threads, onPress, onLongPress }: IListChannelThreadProps) => {
 	const styles = style(useTheme().themeValue);
-
+	const currentChanelId = useSelector(selectCurrentChannelId);
 	return (
 		<View style={styles.containerThreadList}>
 			{threads.map((thread, index) => {
 				const isFirstThread = threads.indexOf(thread) === 0;
-				const isActive = currentChanel?.channel_id === thread.channel_id;
+				const isActive = currentChanelId === thread.channel_id;
 
 				return (
 					<ChannelListThreadItem

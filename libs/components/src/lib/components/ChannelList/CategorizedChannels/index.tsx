@@ -6,7 +6,13 @@ import { Icons } from "@mezon/ui"
 import PanelCategory from "../../PanelCategory";
 import CategorySetting from "../../CategorySetting";
 import {Coords} from "../../ChannelLink";
-import {categoriesActions, channelsActions, selectCategoryIdSortChannel, useAppDispatch} from "@mezon/store";
+import {
+	categoriesActions,
+	channelsActions,
+	defaultNotificationCategoryActions,
+	selectCategoryIdSortChannel,
+	useAppDispatch
+} from "@mezon/store";
 import {useSelector} from "react-redux";
 
 
@@ -32,12 +38,13 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 	
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
 	
-	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY + window.screenY;
 		const windowHeight = window.innerHeight;
 		
 		if (event.button === MouseButton.RIGHT) {
+			await dispatch(defaultNotificationCategoryActions.getDefaultNotificationCategory({categoryId: category?.id ?? '', noCache: false}));
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelCategory(!isShowPanelCategory);
@@ -88,7 +95,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 							}}
 							className="dark:text-[#AEAEAE] text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
 						>
-							{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight defaultSize="text-[16px]" />}
+							{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 							<span className='one-line'>
 								{category.category_name}
 							</span>
@@ -113,6 +120,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 								coords={coords}
 								setIsShowPanelChannel={setIsShowPanelCategory}
 								setOpenSetting={setIsShowCategorySetting}
+								category={category}
 							/>
 						)}
 						

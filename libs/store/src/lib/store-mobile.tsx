@@ -57,6 +57,7 @@ const persistedClansReducer = persistReducer(
 	{
 		key: 'clans',
 		storage,
+		blacklist: ['loadingStatus'],
 	},
 	clansReducer,
 );
@@ -91,6 +92,7 @@ const persistedChannelReducer = persistReducer(
 	{
 		key: 'channels',
 		storage,
+		blacklist: ['loadingStatus'],
 	},
 	channelsReducer,
 );

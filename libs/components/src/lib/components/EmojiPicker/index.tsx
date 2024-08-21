@@ -227,7 +227,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 						{' '}
 						<EmojisPanel emojisData={emojisSearch} onEmojiSelect={handleEmojiSelect} onEmojiHover={handleOnHover} />
 					</div>
-					<EmojiHover emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} emojiId={emojiId}/>
+					<EmojiHover emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} emojiId={emojiId} />
 				</div>
 			) : (
 				<div className="flex flex-col w-[90%] pr-2">
@@ -250,7 +250,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 							);
 						})}
 					</div>
-					<EmojiHover emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} emojiId={emojiId}/>
+					<EmojiHover emojiHoverShortCode={emojiHoverShortCode} isReaction={props.isReaction} emojiId={emojiId} />
 				</div>
 			)}
 		</div>
@@ -352,7 +352,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 						}}
 						onMouseEnter={() => onEmojiHover(item)}
 					>
-						<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} className={'max-h-full max-w-full'}/>
+						<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} className={'max-h-full max-w-full'} />
 					</button>
 				))}
 			{isShowAddButton && (

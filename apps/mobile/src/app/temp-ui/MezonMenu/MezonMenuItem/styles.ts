@@ -19,7 +19,7 @@ export const style = (colors: Attributes) =>
 
 		btnTitle: {
 			color: colors.text,
-			fontSize: Fonts.size.h85,
+			fontSize: Fonts.size.h7,
 			fontWeight: '600',
 		},
 
