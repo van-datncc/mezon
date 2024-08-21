@@ -80,7 +80,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	}, [messageReactions, message]);
 
 	return (
-		<View style={styles.reactionWrapper}>
+		<View style={[styles.reactionWrapper, allReactionDataOnOneMessage.length > 0 && styles.reactionSpace]}>
 			{allReactionDataOnOneMessage?.map((emojiItemData: EmojiDataOptionals, index) => {
 				const userSender = emojiItemData.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
 				const isMyReaction = userSender?.count && userSender.count > 0;
