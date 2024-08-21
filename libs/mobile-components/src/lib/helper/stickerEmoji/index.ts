@@ -59,8 +59,8 @@ export async function setRecentEmoji(emoji: IEmoji, clan_id: string) {
     const oldRecentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
     const oldRecentClanEmojis: IEmoji[] = oldRecentEmojis?.[clan_id] || [];
     if (oldRecentClanEmojis.every(e => e.id !== emoji.id)) {
-        const currentRecentChannelEmojis: IEmoji[] = [{ ...emoji, category: "Recent" }, ...oldRecentClanEmojis];
-        const currentEmoji = { ...oldRecentEmojis, [clan_id]: currentRecentChannelEmojis }
+        const currentRecentClanEmojis: IEmoji[] = [{ ...emoji, category: "Recent" }, ...oldRecentClanEmojis];
+        const currentEmoji = { ...oldRecentEmojis, [clan_id]: currentRecentClanEmojis }
         save(STORAGE_RECENT_EMOJI, currentEmoji);
     }
 }

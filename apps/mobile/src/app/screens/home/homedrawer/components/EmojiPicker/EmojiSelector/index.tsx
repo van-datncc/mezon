@@ -15,7 +15,7 @@ import {
 } from '@mezon/mobile-components';
 import { baseColor, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
-import { emojiSuggestionActions, selectCurrentChannelId, selectCurrentClan } from '@mezon/store-mobile';
+import { emojiSuggestionActions, selectCurrentClan } from '@mezon/store-mobile';
 import { getSrcEmoji, IEmoji } from '@mezon/utils';
 import { MezonClanAvatar } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -78,9 +78,8 @@ export default function EmojiSelector({
 	handleBottomSheetExpand,
 	handleBottomSheetCollapse,
 }: EmojiSelectorProps) {
-	const currentChannelID = useAppSelector(selectCurrentChannelId);
-	const { categoriesEmoji, emojis } = getEmojis(currentChannelID);
 	const currentClan = useAppSelector(selectCurrentClan);
+	const { categoriesEmoji, emojis } = getEmojis(currentClan?.clan_id || "0");
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
