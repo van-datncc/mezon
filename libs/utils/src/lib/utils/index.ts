@@ -740,5 +740,3 @@ export function processFile(file: File): Promise<{ filename: string; filetype: s
 		reader.readAsDataURL(file);
 	});
 }
-
-// Function to parse the URL string
