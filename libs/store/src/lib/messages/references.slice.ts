@@ -23,7 +23,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageRefEdit: string;
 	statusLoadingAttachment: boolean;
 	idMessageMention: string;
-	attachmentAfterUpload: File[];
+	attachmentAfterUpload: Record<string, File[]>;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -45,7 +45,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefEdit: '',
 	statusLoadingAttachment: false,
 	idMessageMention: '',
-	attachmentAfterUpload: [],
+	attachmentAfterUpload: {},
 });
 
 export const referencesSlice = createSlice({
@@ -73,11 +73,17 @@ export const referencesSlice = createSlice({
 		setOpenReplyMessageState(state, action) {
 			state.openReplyMessageState = action.payload;
 		},
-		setAtachmentAfterUpload(state, action) {
-			state.attachmentAfterUpload = [...state.attachmentAfterUpload, ...action.payload];
+		setAtachmentAfterUpload(state, action: PayloadAction<{ channelId: string; files: File[] }>) {
+			const { channelId, files } = action.payload;
+
+			if (!state.attachmentAfterUpload[channelId]) {
+				state.attachmentAfterUpload[channelId] = [];
+			}
+
+			state.attachmentAfterUpload[channelId] = [...state.attachmentAfterUpload[channelId], ...files];
 		},
 		removeAttachmentAfterUpload(state, action) {
-			state.attachmentAfterUpload = [];
+			state.attachmentAfterUpload = {};
 		},
 
 		setAttachmentData(state, action: PayloadAction<{ channelId: string; attachments: ApiMessageAttachment[] }>) {
@@ -92,17 +98,18 @@ export const referencesSlice = createSlice({
 			}
 		},
 
-		removeAttachment(state, action: PayloadAction<{ channelId: string; urlAttachment: string; index: number }>) {
-			console.log('index', action.payload.index);
+		removeAttachment(state, action: PayloadAction<{ channelId: string; index: number }>) {
 			const attachments = state.attachmentDataRef[action.payload.channelId];
-			if (attachments) {
-				state.attachmentDataRef[action.payload.channelId] = attachments.filter(
-					(attachment) => attachment.url !== action.payload.urlAttachment && attachment.filename !== action.payload.urlAttachment,
-				);
+			if (attachments && action.payload.index >= 0 && action.payload.index < attachments.length) {
+				state.attachmentDataRef[action.payload.channelId].splice(action.payload.index, 1);
 			}
 
-			if (state.attachmentAfterUpload && action.payload.index >= 0 && action.payload.index < state.attachmentAfterUpload.length) {
-				state.attachmentAfterUpload.splice(action.payload.index, 1);
+			if (
+				state.attachmentAfterUpload[action.payload.channelId] &&
+				action.payload.index >= 0 &&
+				action.payload.index < state.attachmentAfterUpload[action.payload.channelId].length
+			) {
+				state.attachmentAfterUpload[action.payload.channelId].splice(action.payload.index, 1);
 			}
 		},
 

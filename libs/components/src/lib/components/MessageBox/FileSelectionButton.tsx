@@ -20,7 +20,6 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 	const session = sessionRef.current;
 	const client = clientRef.current;
 	const attachmentAfterUpload = useSelector(selectAttachmentAfterUpload);
-	console.log('attachmentAfterUpload: ', attachmentAfterUpload);
 	const [attachmentPreview, setAttachmentPreview] = useState<ApiMessageAttachment[]>([]);
 	const newMessage = useSelector(selectNewMesssageUpdateImage);
 	const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0 });
@@ -37,9 +36,10 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 	}, [attachmentPreview]);
 
 	useEffect(() => {
-		console.log(attachmentAfterUpload);
-		if (client && session && attachmentAfterUpload.length > 0) {
-			const promises = attachmentAfterUpload.map((file) => handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file));
+		if (client && session && attachmentAfterUpload[currentChannelId]?.length > 0) {
+			const promises = attachmentAfterUpload[currentChannelId]?.map((file) =>
+				handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file),
+			);
 
 			Promise.all(promises)
 				.then((results) => {
@@ -65,7 +65,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
 			handleFiles(Array.from(e.target.files), setAttachmentPreview);
-			dispatch(referencesActions.setAtachmentAfterUpload(Array.from(e.target.files)));
+			dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, files: Array.from(e.target.files) }));
 			e.target.value = '';
 		}
 	};

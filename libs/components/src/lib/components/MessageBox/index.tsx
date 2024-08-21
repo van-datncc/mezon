@@ -79,11 +79,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		[currentChannelId],
 	);
 
-	const removeAttachmentByUrl = (urlToRemove: string, indexItem: number) => {
+	const removeAttachmentByUrl = (indexItem: number) => {
 		dispatch(
 			referencesActions.removeAttachment({
 				channelId: currentChannelId || '',
-				urlAttachment: urlToRemove,
 				index: indexItem,
 			}),
 		);

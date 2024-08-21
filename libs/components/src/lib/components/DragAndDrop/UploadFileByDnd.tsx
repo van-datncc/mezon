@@ -37,7 +37,7 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 		const files = e.dataTransfer.files;
 		const filesArray = Array.from(files);
 		handleFiles(filesArray, setAttachmentData);
-		dispatch(referencesActions.setAtachmentAfterUpload(filesArray));
+		dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentId, files: filesArray }));
 	};
 	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;
 }
