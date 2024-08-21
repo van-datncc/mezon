@@ -342,7 +342,7 @@ export const channelMembers = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			})
-      .addCase(updateCustomStatus.fulfilled, (state:ChannelMembersState,action)=>{
+      .addCase(updateCustomStatus.fulfilled, (state:ChannelMembersState, action)=>{
         if(action.payload){
           state.customStatusUser[action.payload?.user_id] = action.payload.status;
         }
