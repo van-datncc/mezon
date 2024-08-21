@@ -18,7 +18,7 @@ import {
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
@@ -88,6 +88,13 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		}
 	};
 
+	const checkVoiceStatus = useMemo(() => {
+		if (props?.data?.channel_id !== undefined && voiceChannelMember && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			return voiceChannelMember.length >= 2;
+		}
+		return false;
+	}, [voiceChannelMember, props?.data?.channel_id, props?.data?.type]);
+
 	return (
 		<View>
 			<TouchableOpacity
@@ -115,6 +122,12 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
 						{props.data.channel_label}
 					</Text>
+
+					{checkVoiceStatus && (
+						<Text  style={styles.channelBusyText}>
+							(busy)
+						</Text>
+					)}
 				</View>
 				{props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === StatusVoiceChannel.No_Active && (
 					<ActivityIndicator color={themeValue.white} />
