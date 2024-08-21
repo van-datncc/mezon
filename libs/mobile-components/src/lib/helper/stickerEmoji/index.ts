@@ -44,23 +44,23 @@ export async function handleUploadEmoticonMobile(client: Client, session: Sessio
     });
 }
 
-export function getEmojis(channel_id: string) {
+export function getEmojis(clan_id: string) {
     const { categoriesEmoji, emojis } = useEmojiSuggestion();
     const recentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
 
-    const recentChannelEmojis = recentEmojis[channel_id] || [];
+    const recentChannelEmojis = recentEmojis[clan_id] || [];
     return {
         categoriesEmoji,
         emojis: [...recentChannelEmojis, ...emojis],
     }
 }
 
-export async function setRecentEmoji(emoji: IEmoji, channel_id: string) {
+export async function setRecentEmoji(emoji: IEmoji, clan_id: string) {
     const oldRecentEmojis: IEmojiWithChannel = load(STORAGE_RECENT_EMOJI) || {};
-    const oldRecentChannelEmojis: IEmoji[] = oldRecentEmojis[channel_id] || [];
+    const oldRecentChannelEmojis: IEmoji[] = oldRecentEmojis[clan_id] || [];
     if (oldRecentChannelEmojis.every(e => e.id !== emoji.id)) {
         const currentRecentChannelEmojis: IEmoji[] = [{ ...emoji, category: "Recent" }, ...oldRecentChannelEmojis];
-        const currentEmoji = { ...oldRecentEmojis, [channel_id]: currentRecentChannelEmojis }
+        const currentEmoji = { ...oldRecentEmojis, [clan_id]: currentRecentChannelEmojis }
         save(STORAGE_RECENT_EMOJI, currentEmoji);
     }
 }

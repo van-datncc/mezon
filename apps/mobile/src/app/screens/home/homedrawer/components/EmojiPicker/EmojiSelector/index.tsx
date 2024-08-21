@@ -134,7 +134,7 @@ export default function EmojiSelector({
 	const handleEmojiSelect = useCallback(
 		async (emoji: IEmoji) => {
 			onSelected(emoji.id, emoji.shortname);
-			setRecentEmoji(emoji, currentChannelID);
+			setRecentEmoji(emoji, currentClan?.id || "0");
 			handleBottomSheetCollapse?.();
 			if (!isReactMessage) {
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emoji.shortname));
