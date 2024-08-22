@@ -198,8 +198,8 @@ export const fetchMessages = createAsyncThunk(
 			};
 		}
 
-		const firstMessage = response.messages.find((item) => item.code === EMessageCode.FIRST_MESSAGE);
-		if (firstMessage) {
+		const firstMessage = response.messages[response.messages.length - 1];
+		if (firstMessage.code === EMessageCode.FIRST_MESSAGE) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
 		}
 
@@ -226,10 +226,10 @@ export const fetchMessages = createAsyncThunk(
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 
-		const lastLoadMessageId = messages[messages.length - 1].id;
-		const hasMore = firstMessage?.id === lastLoadMessageId;
+		const lastLoadMessage = messages[messages.length - 1];
+		const hasMore = lastLoadMessage.isFirst === false ? false : true;
 		if (messages.length > 0) {
-			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessageId, hasMore } }));
+			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
 		}
 
 		if (response.last_seen_message?.id) {
