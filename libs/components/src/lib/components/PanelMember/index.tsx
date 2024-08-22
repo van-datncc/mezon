@@ -4,10 +4,10 @@ import {
 	useAuth,
 	useChannelMembersActions,
 	useClanRestriction, useDirect,
-	useFriends, useMessageValue
+	useFriends, useMessageValue, useSettingFooter
 } from '@mezon/core';
 import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDmGroupCurrent, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
-import { ChannelMembersEntity, EPermission } from '@mezon/utils';
+import {ChannelMembersEntity, EPermission, EUserSettings} from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -103,6 +103,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 		return member?.user?.display_name ?? member?.user?.username;
 	}, [member])
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageValue?.dmID ?? ''));
+	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
 	
 	const handleOpenProfile = () => {
 		if (onOpenProfile) {
@@ -127,7 +128,9 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 			setValueTextInput(mention);
 		}
 	}
-
+	
+	const isShowManageMember = (isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel;
+	
 	useEffect(() => {
 		if (userProfile?.user?.id === currentDmGroup?.creator_id) {
 			setIsDmGroupOwner(true);
