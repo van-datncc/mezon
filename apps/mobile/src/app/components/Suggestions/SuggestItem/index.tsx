@@ -26,7 +26,7 @@ const SuggestItem = ({ channelId, avatarUrl, symbol, name, subText, isDisplayDef
 	const { t } = useTranslation(['clan']);
 
 	const checkVoiceStatus = useMemo(() => {
-		if (channelId !== undefined && voiceChannelMember) {
+		if (!!channelId && voiceChannelMember) {
 			return voiceChannelMember.length >= 2;
 		}
 		return false;
