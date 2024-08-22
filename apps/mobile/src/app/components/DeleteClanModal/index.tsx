@@ -3,7 +3,7 @@ import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaul
 import { useTheme } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TextInput } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -36,7 +36,6 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange }: { isVisibleModal: bo
 			store.dispatch(clansActions.changeCurrentClan({ clanId: clans[0]?.clan_id }));
 			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clans[0]?.clan_id, noCache: true }));
 			await setDefaultChannelLoader(respChannel.payload, clans[0]?.clan_id);
-			visibleChange(false)
 		} else {
 			setInputValueIsMatchClanName(false)
 		}
@@ -46,9 +45,9 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange }: { isVisibleModal: bo
 		setInputValue(text)
 	}
 
-	const handleCancel = () => {
-		visibleChange(false)
-	}
+	const handleCancel = useCallback(() => {
+		visibleChange(false);
+	}, [visibleChange]);
 
 	return (
 		<MezonConfirm
