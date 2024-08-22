@@ -22,8 +22,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 8,
-        borderRadius: 5,
-        gap: size.s_8
+        borderRadius: 5
     },
 
     dotIsNew: {
@@ -60,10 +59,4 @@ export const style = (colors: Attributes) => StyleSheet.create({
         color: baseColor.white,
         fontSize: Fonts.size.h8,
     },
-
-    channelBusyText: {
-        color: baseColor.redStrong,
-        fontStyle: "italic",
-        fontSize: Fonts.size.h7
-    }
 });
