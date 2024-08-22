@@ -159,23 +159,19 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		[currentChannel?.channel_id, currentDmId, props.mode],
 	);
 
+	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentDmOrChannelId || ''));
-
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
-
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
-	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(currentDmOrChannelId || '');
-
 	const attachmentDataRef = useSelector(selectAttachmentData(currentDmOrChannelId || ''));
-
-	const userProfile = useSelector(selectAllAccount);
-
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
+	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(currentDmOrChannelId || '');
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
+
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
 
