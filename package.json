@@ -13,6 +13,7 @@
     "format": "nx format:check",
     "format:fix": "nx format:write",
     "build:chat": "nx build chat --prod --baseHref=/",
+    "build:admin": "nx build admin --prod --baseHref=/",
     "build-stats:chat": "nx run chat:build --statsJson",
     "bundle-analyzer:chat": "webpack-bundle-analyzer ./dist/apps/chat/stats.json",
     "analyze:chat": "yarn build-stats:chat && yarn bundle-analyzer:chat",
