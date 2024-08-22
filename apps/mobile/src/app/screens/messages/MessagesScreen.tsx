@@ -8,6 +8,7 @@ import {
 	selectDirectsOpenlist,
 	selectTypingUserIdsByChannelId,
 } from '@mezon/store-mobile';
+import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
 import React, { useMemo, useState } from 'react';
@@ -15,13 +16,12 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
+import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { normalizeString } from '../../utils/helpers';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
 import { RenderTextMarkdownContent } from '../home/homedrawer/constants';
 import { style } from './styles';
-import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
-import { IExtendedMessage } from '@mezon/utils';
 
 const SeparatorListFriend = () => {
 	return <View style={{ height: size.s_8 }} />;
@@ -40,17 +40,17 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 			params: { directMessageId: directMessage?.id }
 		});
 	};
-	
+
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
 		const usernameList = (directMessage?.channel_label || directMessage?.usernames)?.split?.(',') || [];
-		
+
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
 			username: username
 		}));
 	}, [directMessage]);
-	
+
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
 		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
 		const lastMessageSender = otherMemberList.find((it) => it.userId === directMessage?.last_sent_message?.sender_id);
@@ -67,7 +67,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 		}
 
 		return (
-			<View style={{ flex: 1, maxHeight: size.s_18, flexDirection: 'row', flexWrap: 'nowrap', overflow: 'hidden' }}>
+			<View style={styles.contentMessage}>
 				<Text style={[styles.defaultText, styles.lastMessage]}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
