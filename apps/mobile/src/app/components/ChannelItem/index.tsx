@@ -25,15 +25,15 @@ const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
 					{!!channelData?.channel_label && !!Number(channelData?.parrent_id)
 						? channelData?.channel_private
 							? (
-								<Icons.ThreadLockIcon width={20} height={20} color={Colors.textGray} />
+								<Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 							) : (
-								<Icons.ThreadIcon width={20} height={20} color={Colors.textGray} />
+								<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 							)
 						: channelData?.channel_private
 							? (
-								<Icons.TextLockIcon width={20} height={20} color={Colors.textGray} />
+								<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 							) : (
-								<Icons.TextIcon width={20} height={20} color={Colors.textGray} />
+								<Icons.TextIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 							)}
 					<Block>
 						<Block flexDirection="row" alignItems="center" gap={size.s_6} marginBottom={size.s_6}>
@@ -48,10 +48,10 @@ const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
 					<Block flexDirection="row" gap={size.s_10} alignItems="center">
 						{channelData?.channel_private
 							? (
-								<Icons.VoiceNormalIcon width={20} height={20} color={Colors.textGray} />
+								<Icons.VoiceNormalIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 							)
 							: (
-								<Icons.VoiceLockIcon width={20} height={20} color={Colors.textGray} />
+								<Icons.VoiceLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 							)}
 						<Block>
 							<Block flexDirection="row" alignItems="center" gap={size.s_6} marginBottom={size.s_6}>
@@ -62,7 +62,7 @@ const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
 						</Block>
 					</Block>
 					<Block style={styles.joinChannelBtn}>
-						<Icons.VoiceNormalIcon width={20} height={20} color={Colors.textGray} />
+						<Icons.VoiceNormalIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
 						<Text style={styles.joinChannelBtnText}>{t('joinChannel')}</Text>
 					</Block>
 				</Block>
