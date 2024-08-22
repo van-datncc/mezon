@@ -3,8 +3,8 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
 	content: {
-		height: (Metrics.screenWidth - 7 * size.s_10) / 5,
-		width: (Metrics.screenWidth - 7 * size.s_10) / 5,
+		height: (Metrics.screenWidth - size.s_6 * size.s_10) / 5,
+		width: (Metrics.screenWidth - size.s_6 * size.s_10) / 5,
 		borderRadius: 10,
 		overflow: 'hidden',
 		backgroundColor: Colors.black,
