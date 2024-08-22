@@ -100,7 +100,7 @@ const LabelDm = (props: LabelDmProps) => {
 					className="shrink-1 dark:text-white text-black text-ellipsis one-line"
 					onClick={handleOpenEditName}
 				>
-					{label || `${currentDmGroup.creator_name}'s Group`}
+					{label || `${currentDmGroup?.creator_name}'s Group`}
 				</h2>
 			) : (
 				<div className={'flex flex-col w-full relative'}>
