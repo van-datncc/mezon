@@ -1,5 +1,5 @@
 import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-scroll';
-import { ChatWelcome, MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
+import { MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import {
 	messagesActions,
 	selectCurrentUserId,
@@ -17,7 +17,7 @@ import {
 	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
-	useAppSelector
+	useAppSelector,
 } from '@mezon/store';
 import { Direction_Mode } from '@mezon/utils';
 import classNames from 'classnames';
@@ -49,8 +49,8 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const isFetching = useSelector(selectMessageIsLoading);
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
-  const currentAccountId = useSelector(selectCurrentUserId);
-  const lastMessage = useAppSelector((state)=>selectLatestMessage(state,channelId));
+	const currentAccountId = useSelector(selectCurrentUserId);
+	const lastMessage = useAppSelector((state) => selectLatestMessage(state, channelId));
 
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -98,11 +98,10 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	const messagesView = useMemo(() => {
 		return messages.map((messageId) => {
-			if (firstMessageId === messageId) {
-				return <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />;
-			}
 			return (
 				<MemorizedChannelMessage
+					avatarDM={avatarDM}
+					userName={userName}
 					key={messageId}
 					messageId={messageId}
 					channelId={channelId}
@@ -135,13 +134,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	useEffect(() => {
 		chatScrollRef.updateLoadMoreCb(loadMoreMessage);
 	}, [loadMoreMessage, chatScrollRef]);
-  useEffect(()=>{
-    if(lastMessage.sender_id === currentAccountId){
-      chatScrollRef.scrollToBottom().then(() => {
+	useEffect(() => {
+		if (lastMessage.sender_id === currentAccountId) {
+			chatScrollRef.scrollToBottom().then(() => {
 				dispatch(messagesActions.setIsJumpingToPresent(false));
 			});
-    }
-  },[lastMessage.id])
+		}
+	}, [lastMessage.id]);
 	useEffect(() => {
 		if (isViewingOlderMessages) {
 			chatScrollRef.disableStickyScroll();

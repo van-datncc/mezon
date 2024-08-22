@@ -1,21 +1,27 @@
 import { Dropdown } from 'flowbite-react';
 import ItemPanelMember from './ItemPanelMember';
 import { useAppNavigation, useAppParams } from '@mezon/core';
-import { fetchDirectMessage, removeMemberChannel, selectCurrentUserId, useAppDispatch, useAppSelector } from '@mezon/store';
+import { deleteChannel, fetchDirectMessage, removeMemberChannel, selectCurrentUserId, useAppDispatch, useAppSelector } from '@mezon/store';
 
 interface PanelGroupDMPProps {
 	isDmGroupOwner: boolean;
 	dmGroupId?: string;
+	lastOne: boolean;
 }
 
-const PanelGroupDM = ({ isDmGroupOwner, dmGroupId }: PanelGroupDMPProps) => {
+const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps) => {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentUserId = useAppSelector(selectCurrentUserId)
 	const { navigate } = useAppNavigation();
 	const handleLeaveDmGroup = async () => {
-		const isLeaveGroup = await dispatch(removeMemberChannel({ channelId: dmGroupId || "", userIds: [currentUserId], kickMember: false }));
-    if (isLeaveGroup && directId === dmGroupId) {
+		const isLeaveOrDeleteGroup = lastOne 
+    ? await dispatch(deleteChannel({ clanId: "", channelId: dmGroupId ?? '', isDmGroup:true})) 
+    : await dispatch(removeMemberChannel({ channelId: dmGroupId || "", userIds: [currentUserId], kickMember: false }));
+    if(!isLeaveOrDeleteGroup){
+      return;
+    }
+    if (directId === dmGroupId) {
 			navigate("/chat/direct/friends");
 		}
     await dispatch(fetchDirectMessage({ noCache: true }));
@@ -50,7 +56,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId }: PanelGroupDMPProps) => {
 					<ItemPanelMember children="Until I turn it back on" />
 				</Dropdown>
 			</div>
-			<ItemPanelMember children="Leave Group" danger onClick={handleLeaveDmGroup} />
+			<ItemPanelMember children={lastOne ? "Delete Group" : "Leave Group"} danger onClick={handleLeaveDmGroup} />
 		</>
 	);
 };

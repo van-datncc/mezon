@@ -1,4 +1,11 @@
-import { ChannelMessageOpt, MessageContextMenuProps, MessageWithUser, UnreadMessageBreak, useMessageContextMenu } from '@mezon/components';
+import {
+	ChannelMessageOpt,
+	ChatWelcome,
+	MessageContextMenuProps,
+	MessageWithUser,
+	UnreadMessageBreak,
+	useMessageContextMenu,
+} from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
 	selectChannelDraftMessage,
@@ -21,9 +28,11 @@ type MessageProps = {
 	mode: number;
 	isHighlight?: boolean;
 	channelLabel: string;
+	avatarDM?: string;
+	userName?: string;
 };
 
-export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHighlight }: Readonly<MessageProps>) {
+export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
 	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
@@ -73,9 +82,10 @@ export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHig
 	useEffect(() => {
 		preloadMessageContextMenu(messageId);
 	}, [preloadMessageContextMenu, messageId]);
-
 	return (
 		<>
+			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
+
 			<div className="fullBoxText relative group ">
 				<MessageWithUser
 					message={mess as IMessageWithUser}

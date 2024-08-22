@@ -141,11 +141,11 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 	};
 
-	function removeAttachmentByUrl(urlToRemove: string) {
+	function removeAttachmentByUrl(indexOfItem) {
 		dispatch(
 			referencesActions.removeAttachment({
 				channelId: currentChannelId,
-				urlAttachment: urlToRemove,
+				index: indexOfItem,
 			}),
 		);
 	}
@@ -168,7 +168,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				onPress={() => {
 					if (isSelected) {
 						const infoAttachment = attachmentDataRef?.find?.((attachment) => attachment?.filename === getFullFileName(fileName));
-						removeAttachmentByUrl(infoAttachment?.filename || infoAttachment?.url || '');
+						removeAttachmentByUrl(attachmentDataRef.indexOf(infoAttachment));
 					} else {
 						handleGalleryPress(item);
 					}
