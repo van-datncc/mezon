@@ -345,6 +345,7 @@ export const channelMembers = createSlice({
 				}
 			});
 		},
+		
 		removeUserByUserIdAndClanId: (state, action: PayloadAction<{ userId: string; clanId: string;}>) => {
 			const { userId, clanId } = action.payload;
 			const ids = Object.values(state.entities)

@@ -275,6 +275,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[userId, dispatch],
 	);
 // TODO add user clan
+// @an.hoangbui
 	const onuserclanadded = useCallback(
 		(userAdds: AddClanUserEvent) => {
 			console.log("userAddsuserAdds: ", userAdds);
