@@ -57,6 +57,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 				source: emoji.src,
 				shortname: nameEmoji,
 				category: emoji.category,
+        clan_id: clanId as string
 			}
 			await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }))
 		}

@@ -124,7 +124,7 @@ const LabelDm = (props: LabelDmProps) => {
 					onClose={() => setIsShowPanel(false)}
 					isMemberDMGroup={false}
 					directMessageValue={{
-						type: currentDmGroup?.type?.toString() || '',
+						type: currentDmGroup?.type,
 						userId: currentDmGroup?.user_id || [],
 						dmID: currentDmGroup?.channel_id || '',
 					}}
