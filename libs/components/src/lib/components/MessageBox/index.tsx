@@ -1,4 +1,5 @@
 import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
+import { useReference } from '@mezon/core';
 import {
 	messagesActions,
 	referencesActions,
@@ -41,6 +42,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const attachmentDataRef = useSelector(selectAttachmentData(currentChannelId || ''));
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
 	const appearanceTheme = useSelector(selectTheme);
+	const { removeAttachmentByIndex } = useReference();
 
 	const onConvertToFiles = useCallback((content: string) => {
 		if (content.length > MIN_THRESHOLD_CHARS) {
@@ -78,15 +80,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 		},
 		[currentChannelId],
 	);
-
-	const removeAttachmentByUrl = (indexItem: number) => {
-		dispatch(
-			referencesActions.removeAttachment({
-				channelId: currentChannelId || '',
-				index: indexItem,
-			}),
-		);
-	};
 
 	const onPastedFiles = useCallback(
 		(event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -161,7 +154,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					{attachmentDataRef?.map((item: ApiMessageAttachment, index: number) => {
 						return (
 							<Fragment key={index}>
-								<AttachmentPreviewThumbnail attachment={item} onRemove={removeAttachmentByUrl} indexOfItem={index} />
+								<AttachmentPreviewThumbnail
+									attachment={item}
+									channelId={currentChannelId ?? ''}
+									onRemove={removeAttachmentByIndex}
+									indexOfItem={index}
+								/>
 							</Fragment>
 						);
 					})}

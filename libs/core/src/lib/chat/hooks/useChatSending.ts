@@ -27,7 +27,8 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { directId } = useAppParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentUserId = useSelector(selectCurrentUserId);
-	const newMessageIdUpdateImage = useSelector(selectNewMesssageUpdateImage);
+
+	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 
 	const dispatch = useAppDispatch();
 	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
@@ -127,21 +128,22 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
-		if (newMessageIdUpdateImage.clan_id !== '0') {
+		if (newMessageUpdateImage.clan_id !== '0') {
 			processLink(
-				newMessageIdUpdateImage.clan_id!,
-				newMessageIdUpdateImage.channel_id!,
-				newMessageIdUpdateImage.mode!,
+				newMessageUpdateImage.clan_id!,
+				newMessageUpdateImage.channel_id!,
+				newMessageUpdateImage.mode!,
 				contentPayload,
 				mentionPayload,
 				attachmentPayload,
-				newMessageIdUpdateImage.message_id,
+				newMessageUpdateImage.message_id,
 			);
 		}
+
 		setContentPayload({});
 		setMentionPayload([]);
 		setAttachmentPayload([]);
-	}, [newMessageIdUpdateImage.message_id]);
+	}, [newMessageUpdateImage.message_id]);
 
 	return useMemo(
 		() => ({

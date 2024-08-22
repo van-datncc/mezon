@@ -75,15 +75,15 @@ export const referencesSlice = createSlice({
 		},
 		setAtachmentAfterUpload(state, action: PayloadAction<{ channelId: string; files: File[] }>) {
 			const { channelId, files } = action.payload;
+			if (channelId === '' && files.length === 0) {
+				state.attachmentAfterUpload = {};
+			}
 
 			if (!state.attachmentAfterUpload[channelId]) {
 				state.attachmentAfterUpload[channelId] = [];
 			}
 
 			state.attachmentAfterUpload[channelId] = [...state.attachmentAfterUpload[channelId], ...files];
-		},
-		removeAttachmentAfterUpload(state, action) {
-			state.attachmentAfterUpload = {};
 		},
 
 		setAttachmentData(state, action: PayloadAction<{ channelId: string; attachments: ApiMessageAttachment[] }>) {

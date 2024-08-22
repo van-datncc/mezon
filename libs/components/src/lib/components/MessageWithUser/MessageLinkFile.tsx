@@ -2,7 +2,7 @@ import { Spinner } from 'flowbite-react';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo, useState } from 'react';
 import { Icons } from '../../components';
-import { RenderAttachmentThumbnail } from '../ThumnailAttachmentRender';
+import { RenderAttachmentThumbnail } from '../ThumbnailAttachmentRender';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;

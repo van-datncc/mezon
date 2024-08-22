@@ -104,7 +104,6 @@ export interface MessagesState {
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
-	sendingMessageActionStatus: boolean;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -567,7 +566,6 @@ export const initialMessagesState: MessagesState = {
 	isJumpingToPresent: false,
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' },
-	sendingMessageActionStatus: false,
 };
 
 export type SetCursorChannelArgs = {
@@ -605,10 +603,6 @@ export const messagesSlice = createSlice({
 				mentions: data.mentions,
 				content: data.content,
 			};
-		},
-
-		setSendingMessageActionStatus(state, action: PayloadAction<boolean>) {
-			state.sendingMessageActionStatus = action.payload;
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {

@@ -59,7 +59,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 					console.error('Error uploading files:', error);
 				});
 		}
-		dispatch(referencesActions.removeAttachmentAfterUpload([]));
+		dispatch(referencesActions.setAtachmentAfterUpload({ channelId: '', files: [] }));
 	}, [newMessage]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

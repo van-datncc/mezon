@@ -690,53 +690,19 @@ export const handleFiles = (files: File[], setAttachmentPreview: (attachments: A
 		});
 };
 
-export function base64ToBlob(base64: string, contentType: string, sliceSize = 512): Blob {
-	const byteCharacters = atob(base64);
-	const byteArrays: Uint8Array[] = [];
-
-	for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-		const slice = byteCharacters.slice(offset, offset + sliceSize);
-		const byteNumbers = new Array(slice.length);
-
-		for (let i = 0; i < slice.length; i++) {
-			byteNumbers[i] = slice.charCodeAt(i);
-		}
-
-		byteArrays.push(new Uint8Array(byteNumbers));
-	}
-
-	return new Blob(byteArrays, { type: contentType });
-}
-
 export function processFile(file: File): Promise<{ filename: string; filetype: string; size: number; url: string }> {
 	return new Promise((resolve, reject) => {
-		const reader = new FileReader();
+		try {
+			const blobUrl = URL.createObjectURL(file);
 
-		reader.onload = () => {
-			try {
-				const base64StringWithPrefix = reader.result as string;
-				const base64String = base64StringWithPrefix.split(',')[1];
-
-				const contentType = file.type;
-
-				const blob = base64ToBlob(base64String, contentType);
-				const blobUrl = URL.createObjectURL(blob);
-
-				resolve({
-					filename: file.name,
-					filetype: file.type,
-					size: 0,
-					url: blobUrl,
-				});
-			} catch (error) {
-				reject(error);
-			}
-		};
-
-		reader.onerror = () => {
-			reject(new Error('Failed to read file'));
-		};
-
-		reader.readAsDataURL(file);
+			resolve({
+				filename: file.name,
+				filetype: file.type,
+				size: file.size,
+				url: blobUrl,
+			});
+		} catch (error) {
+			reject(error);
+		}
 	});
 }
