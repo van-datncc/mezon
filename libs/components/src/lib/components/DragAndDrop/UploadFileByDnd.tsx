@@ -1,8 +1,7 @@
 import { useDragAndDrop, useReference } from '@mezon/core';
-import { selectCurrentClanId } from '@mezon/store';
-import { handleUploadFile, useMezon } from '@mezon/transport';
+import { referencesActions, useAppDispatch } from '@mezon/store';
+import { handleFiles } from '@mezon/utils';
 import { DragEvent } from 'react';
-import { useSelector } from 'react-redux';
 import DragAndDropUI from './DragAndDropUI';
 
 type FileUploadByDnDOpt = {
@@ -10,10 +9,9 @@ type FileUploadByDnDOpt = {
 };
 
 function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
+	const dispatch = useAppDispatch();
 	const { setDraggingState } = useDragAndDrop();
-	const { setStatusLoadingAttachment, setAttachmentData } = useReference(currentId);
-	const { sessionRef, clientRef } = useMezon();
-	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const { setAttachmentData } = useReference(currentId);
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -36,26 +34,11 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 		e.preventDefault();
 		e.stopPropagation();
 		setDraggingState(false);
-		setStatusLoadingAttachment(true);
 		const files = e.dataTransfer.files;
-		const session = sessionRef.current;
-		const client = clientRef.current;
-		if (!files || !client || !session || !currentId) {
-			throw new Error('Client or files are not initialized');
-		}
-
-		const promises = Array.from(files).map((file) => {
-			return handleUploadFile(client, session, currentClanId, currentId, file.name, file);
-		});
-		Promise.all(promises)
-			.then((attachments) => {
-				attachments.forEach((attachment) => setAttachmentData([attachment]));
-			})
-			.then(() => {
-				setStatusLoadingAttachment(false);
-			});
+		const filesArray = Array.from(files);
+		handleFiles(filesArray, setAttachmentData);
+		dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentId, files: filesArray }));
 	};
-
 	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;
 }
 
