@@ -307,7 +307,7 @@ export const channelMembers = createSlice({
 		addRoleIdUser: (state, action) => {
 			const { id, channelId, userId } = action.payload;
 			const idMember = channelId + userId;
-			const existingMember = state.memberChannels?.find((member) => member.id === idMember);
+			const existingMember = state.entities[idMember];
 
 			if (existingMember) {
 				const roleIds = existingMember.role_id || [];
@@ -318,7 +318,7 @@ export const channelMembers = createSlice({
 		removeRoleIdUser: (state, action) => {
 			const { id, channelId, userId } = action.payload;
 			const idMember = channelId + userId;
-			const existingMember = state.memberChannels?.find((member) => member.id === idMember);
+			const existingMember = state.entities[idMember];
 
 			if (existingMember) {
 				const roleIds = existingMember?.role_id || [];
@@ -441,6 +441,11 @@ export const selectMembersByChannelId = (channelId?: string | null) =>
 		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
 	});
 
+export const selectUserChannelById = (userID: string, channelID: string) => 
+	createSelector(selectMembersByChannelId(channelID), (members) => {
+		return members.find(member => member.id === channelID + userID) || null;
+	})
+
 export const selectMemberByGoogleId = (googleId: string) =>
 	createSelector(selectAllChannelMembers, (members) => {
 		return members.find((member) => member.user?.google_id === googleId);
@@ -466,11 +471,6 @@ export const selectMemberStatus = createSelector(getChannelMembersState, (state)
 export const selectCustomUserStatus = createSelector(getChannelMembersState, (state) => state.customStatusUser);
 
 export const selectMemberChannels = createSelector(getChannelMembersState, (state) => state.memberChannels);
-
-export const selectMemberChannelById = (userID: string, channelID: string) =>
-	createSelector(selectMemberChannels, (users) => {
-		return users?.find((user) => user.id === channelID + userID) || null;
-	});
 
 export const selectMemberOnlineStatusById = (userId: string) =>
 	createSelector(selectChannelMembersEntities, (entities) => {
