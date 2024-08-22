@@ -40,17 +40,18 @@ export const style = (colors: Attributes) =>
 			backgroundColor: 'rgba(0,0,0,0.5)',
 		},
 		messageBoxTop: {
-			gap: size.s_6,
+			gap: size.s_2,
+			justifyContent:'center'
 		},
 		userNameMessageBox: {
 			fontSize: size.medium,
 			marginRight: size.s_10,
 			fontWeight: '600',
-			color: colors.textStrong,
+			color: Colors.white,
 		},
 		dateMessageBox: {
 			fontSize: size.small,
-			color: colors.text,
+			color: Colors.white,
 		},
 		logoUser: {
 			width: '100%',
@@ -79,5 +80,21 @@ export const style = (colors: Attributes) =>
 			backgroundColor: 'rgba(0,0,0,0.5)',
 			alignItems: 'center',
 			justifyContent: 'center',
+		},
+		imageWrapper: {
+			width: size.s_40,
+			height: size.s_60,
+			alignItems: 'center',
+			justifyContent: 'center',
+			marginHorizontal: size.s_2
+		},
+		imageSelected: {
+			borderWidth: 2,
+			borderColor: Colors.azureBlue,
+		},
+		image: {
+			width: '100%',
+			height: '100%',
+			borderRadius: 3,
 		},
 	});

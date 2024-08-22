@@ -38,6 +38,7 @@
 		"patch-package": "^8.0.0",
 		"react-native": "0.73.2",
 		"react-native-animated-spinkit": "^1.5.2",
+		"react-native-awesome-gallery": "^0.4.2",
 		"react-native-bootsplash": "^6.1.1",
 		"react-native-bouncy-checkbox": "^4.0.1",
 		"react-native-controlled-mentions": "^3.0.0-alpha.4",

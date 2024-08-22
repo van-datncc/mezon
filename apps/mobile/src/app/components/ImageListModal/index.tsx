@@ -1,89 +1,122 @@
-import { ImageGallery, ImageObject } from '@georstat/react-native-image-gallery';
-import { Block, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import { selectAttachmentPhoto } from '@mezon/store';
-import { Snowflake } from '@theinternetfolks/snowflake';
+import { Block, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React, { useCallback, useMemo } from 'react';
-import { Pressable } from 'react-native';
+import React, { useMemo, useRef, useState } from 'react';
+import { Modal, StyleSheet } from 'react-native';
+import Gallery, { GalleryRef, RenderItemInfo } from 'react-native-awesome-gallery';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
-import { ImageItem } from './ImageItem';
 import { RenderFooterModal } from './RenderFooterModal';
 import { RenderHeaderModal } from './RenderHeaderModal';
 
 interface IImageListModalProps {
 	visible?: boolean;
 	onClose?: () => void;
-	imageSelected?: ApiMessageAttachment & { id?: string };
+	imageSelected?: AttachmentEntity;
 }
+
+interface IVisibleToolbarConfig {
+	showHeader: boolean;
+	showFooter: boolean;
+}
+const originScale = 1;
 
 export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const { visible, onClose, imageSelected } = props;
 	const { themeValue } = useTheme();
+	const [currentImage, setCurrentImage] = useState<AttachmentEntity | null>(null);
+	const [visibleToolbarConfig, setVisibleToolbarConfig] = useAnimatedState<IVisibleToolbarConfig>({ showHeader: true, showFooter: false });
 	const allImageList = useSelector(selectAttachmentPhoto());
-	const [onlyView, setOnlyView] = useAnimatedState(false);
+	const ref = useRef<GalleryRef>(null);
 
-	const formatImages: any[] = useMemo(() => {
-		if (!imageSelected.id) {
-			imageSelected['id'] = Snowflake.generate()
+	const initialIndex = useMemo(() => {
+		const imageIndexSelected = allImageList.findIndex(file => file?.filename === imageSelected?.filename);
+		return imageIndexSelected === -1 ? 0 : imageIndexSelected;
+	}, [allImageList, imageSelected])
+
+	const updateToolbarConfig = (newValue: Partial<IVisibleToolbarConfig>) => {
+		setVisibleToolbarConfig({ ...visibleToolbarConfig, ...newValue })
+	}
+
+	const onIndexChange = (newIndex: number) => {
+		if (allImageList[newIndex]?.id !== currentImage?.id) {
+			setCurrentImage(allImageList[newIndex]);
+			ref.current?.reset();
+			//TODO
 		}
-		const uniqueImages = allImageList.filter((image, index, self) => {
-			return index === self.findIndex(i => i.url === image.url)
+	}
+
+	const onTap = () => {
+		updateToolbarConfig({
+			showHeader: !visibleToolbarConfig.showHeader,
 		})
-		return [imageSelected, ...uniqueImages.filter(x => x.url !== imageSelected.url)]
-	}, [allImageList, imageSelected]);
+	}
 
-	const onImagePress = useCallback(() => {
-		setOnlyView(!onlyView);
-	}, [onlyView])
+	const onDoubleTap = (toScale: number) => {
+		if (toScale > originScale) {
+			updateToolbarConfig({ showHeader: false });
+		}
+	}
 
-	const renderCustomImage = (item: ImageObject, index: number) => {
+	const onImageSelectedChange = (image: AttachmentEntity) => {
+		const imageIndexSelected = allImageList?.findIndex(i => i?.id === image?.id);
+		if (imageIndexSelected > -1) {
+			setCurrentImage(image);
+			ref.current?.setIndex(imageIndexSelected);
+			ref.current?.reset();
+		}
+	}
+
+	const renderItem = ({
+		item,
+		setImageDimensions,
+	}: RenderItemInfo<ApiMessageAttachment>) => {
 		return (
-			<Pressable>
-				<ImageItem uri={item.url} key={`${index}_${item?.id}`} onClose={onClose} onImagePress={onImagePress} />
-			</Pressable>
+			<FastImage
+				source={{ uri: item?.url }}
+				style={StyleSheet.absoluteFillObject}
+				resizeMode='contain'
+				onLoad={(e) => {
+					const { width, height } = e.nativeEvent;
+					setImageDimensions({ width, height });
+				}}
+			/>
 		);
-	}
-
-	const renderHeaderComponent = () => {
-		if (onlyView) return null;
-		return (<RenderHeaderModal onClose={onClose} />)
-	}
-
-	const renderFooterComponent = (item: ImageObject, currentIndex: number) => {
-		return <RenderFooterModal item={item} key={`${currentIndex}_${item?.id}`} />;
-	}
-
-	const renderCustomThumb = (item: ImageObject, _: number, isSelected: boolean) => {
-		return (
-			<Block height={onlyView ? 0 : 'auto'} marginRight={size.s_10}>
-				<FastImage
-					source={{ uri: item.url }}
-					style={{
-						height: 70,
-						width: 70,
-						borderRadius: 15,
-						borderWidth: 2,
-						borderColor: isSelected ? 'yellow' : 'transparent'
-					}}
-					resizeMode='cover'
-				/>
-			</Block>
-		)
-	}
+	};
 
 	return (
-		<ImageGallery
-			close={onClose}
-			isOpen={visible}
-			thumbSize={size.s_24 * 3}
-			disableSwipe={false}
-			images={formatImages}
-			thumbColor={themeValue.bgViolet}
-			renderCustomImage={renderCustomImage}
-			renderHeaderComponent={renderHeaderComponent}
-			renderFooterComponent={renderFooterComponent}
-			renderCustomThumb={renderCustomThumb}
-		/>
-	);
+		<Modal visible={visible}>
+			<Block flex={1}>
+				{visibleToolbarConfig.showHeader && (
+					<RenderHeaderModal onClose={onClose} imageSelected={currentImage} />
+				)}
+				<Gallery
+					ref={ref}
+					initialIndex={initialIndex}
+					data={allImageList}
+					keyExtractor={(item, index) => `${item?.filename}_${index}`}
+					onSwipeToClose={onClose}
+					onIndexChange={onIndexChange}
+					renderItem={renderItem}
+					onDoubleTap={onDoubleTap}
+					onTap={onTap}
+					onPanStart={() => {
+						if (!visibleToolbarConfig.showFooter) {
+							updateToolbarConfig({
+								showFooter: true,
+							})
+							setTimeout(() => {
+								updateToolbarConfig({
+									showFooter: false,
+								})
+							}, 3000)
+						}
+					}}
+				/>
+				{visibleToolbarConfig.showFooter && (
+					<RenderFooterModal imageSelected={currentImage} onImageSelectedChange={onImageSelectedChange} />
+				)}
+			</Block>
+		</Modal>
+	)
 });
