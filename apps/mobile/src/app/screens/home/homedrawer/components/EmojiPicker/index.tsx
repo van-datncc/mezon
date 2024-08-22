@@ -9,6 +9,7 @@ import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Keyboard, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EmojiSelector from './EmojiSelector';
@@ -51,6 +52,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 	const [mode, setMode] = useState<ExpressionType>('emoji');
 	const [channelMode, setChannelMode] = useState(0);
 	const [searchText, setSearchText] = useState<string>('');
+	const { t } = useTranslation('message');
 
 	const dmMode = currentDirectMessage
 		? Number(currentDirectMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)
@@ -172,7 +174,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 						<View style={styles.textInputWrapper}>
 							<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
 							<TextInput
-								placeholder="search"
+								placeholder={mode === 'sticker' ? t('findThePerfectSticker') :"search"}
 								placeholderTextColor={themeValue.text}
 								style={styles.textInput}
 								onFocus={handleInputSearchFocus}
