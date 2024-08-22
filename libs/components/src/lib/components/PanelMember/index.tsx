@@ -132,7 +132,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	}, [currentDmGroup, userProfile]);
 
 	const isShowManageMember = (isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel;
-  console.log("Check :",directMessageValue?.userId)
+
 	return (
 		<div
 			ref={panelRef}
