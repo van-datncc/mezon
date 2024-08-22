@@ -23,12 +23,12 @@ const SystemMessagesManagement = () => {
 					<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-xs dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
 						<div className={'dark:text-textPrimary text-textPrimary400 flex flex-row items-center'}>
 							<p># {selectedChannel.channel_label}</p>
-							<p className={'uppercase dark:text-textThreadPrimary ml-10'}>{selectedChannel.category_name}</p>
+							<p className={'uppercase dark:text-textThreadPrimary ml-5'}>{selectedChannel.category_name}</p>
 						</div>
 						<div><Icons.ArrowDownFill /></div>
 					</div>
 				)}
-				className={'h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2'}
+				className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2'}
 			>
 					{
 						channelsListWithoutVoiceChannel.map((channel) => {
@@ -36,7 +36,7 @@ const SystemMessagesManagement = () => {
 								return (
 									<div
 										key={channel.id}
-										className={'flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark hover:text-textDarkTheme text-sm w-full py-1 px-4 text-left cursor-pointer'}
+										className={'flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark text-sm w-full py-1 px-4 text-left cursor-pointer'}
 										onClick={() => handleSelectChannel(channel)}
 									>
 										<p># {channel.channel_label ?? ''}</p>
