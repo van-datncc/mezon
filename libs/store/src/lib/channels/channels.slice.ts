@@ -68,6 +68,7 @@ type fetchChannelMembersPayload = {
 	channelId: string;
 	noFetchMembers?: boolean;
 	messageId?: string;
+  isDmGroup?: boolean;
 };
 
 type JoinChatPayload = {
@@ -151,6 +152,9 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteChannelDesc(mezon.session, body.channelId);
 		if (response) {
+      if(body.isDmGroup){
+        return true;
+      }
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId, noCache: true }));
 		}
 	} catch (error) {

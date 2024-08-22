@@ -148,7 +148,7 @@ export default function DirectMessage() {
 									<GifStickerEmojiPopup
 										messageEmojiId={idMessageRefReaction}
 										mode={
-											currentDmGroup?.user_id?.length === 1
+											currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 												? ChannelStreamMode.STREAM_MODE_DM
 												: ChannelStreamMode.STREAM_MODE_GROUP
 										}
@@ -173,7 +173,7 @@ export default function DirectMessage() {
 									<GifStickerEmojiPopup
 										messageEmojiId={idMessageRefReaction}
 										mode={
-											currentDmGroup?.user_id?.length === 1
+											currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 												? ChannelStreamMode.STREAM_MODE_DM
 												: ChannelStreamMode.STREAM_MODE_GROUP
 										}
@@ -188,13 +188,13 @@ export default function DirectMessage() {
 								<ChannelTyping
 									channelId={directId}
 									mode={
-										currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
+										currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 									}
 								/>
 							)}
 							<DirectMessageBox
 								directParamId={directId ?? ''}
-								mode={currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
+								mode={currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
 							/>
 						</div>
 					</div>

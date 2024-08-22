@@ -5,15 +5,17 @@ import { RenderAttachmentThumbnail } from '../../components';
 
 interface ThumbnailProps {
 	attachment: ApiMessageAttachment;
-	onRemove?: (value: string) => void;
+	onRemove?: (channelId: string, index: number) => void;
+	indexOfItem: number;
+	channelId: string;
 }
 
-const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove }) => {
+const Thumbnail: React.FC<ThumbnailProps> = ({ attachment, onRemove, indexOfItem, channelId }) => {
 	const [isHideAttachment, setIsHideAttachment] = useState(false);
 
 	const handleRemove = () => {
 		if (onRemove) {
-			onRemove(attachment.url ?? '');
+			onRemove(channelId, indexOfItem);
 		}
 	};
 	const filename = attachment.filename;
