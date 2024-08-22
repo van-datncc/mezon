@@ -129,13 +129,14 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 		}
 	}
 	
-	const isShowManageMember = (isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel;
-	
 	useEffect(() => {
 		if (userProfile?.user?.id === currentDmGroup?.creator_id) {
 			setIsDmGroupOwner(true);
 		}
 	}, [currentDmGroup, userProfile]);
+	
+	const isShowManageMember = (isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel;
+	
 	
 	const handleOpenClanProfileSetting = () => {
 		setIsUserProfile(false);
