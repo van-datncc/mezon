@@ -41,7 +41,7 @@ const ClanSettingOverview = () => {
 	};
 
 	return (
-		<div className="h-full">
+		<div className="h-full pb-10">
 			<ClanLogoName
 				hasChanges={hasChanges}
 				onUpload={handleUploadLogo}

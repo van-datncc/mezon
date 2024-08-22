@@ -6,7 +6,7 @@ import {ChannelType} from "mezon-js";
 
 const SystemMessagesManagement = () => {
 	const channelsList = useAppSelector(selectAllChannels);
-	const channelsListWithoutVoiceChannel = channelsList.filter(channel => channel.type !== ChannelType.CHANNEL_TYPE_VOICE)
+	const channelsListWithoutVoiceChannel = channelsList.filter(channel => channel.type !== ChannelType.CHANNEL_TYPE_VOICE && channel.parrent_id === '0')
 	const [selectedChannel, setSelectedChannel] = useState (channelsList[0]);
 	
 	const handleSelectChannel = (channel: ChannelsEntity) => {
@@ -20,29 +20,32 @@ const SystemMessagesManagement = () => {
 				placement={'bottom-start'}
 				label={''}
 				renderTrigger={() => (
-					<div className="w-full h-10 rounded-md flex flex-row px-3 justify-between items-center uppercase text-xs dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
-						<p>{selectedChannel.channel_label}</p>
+					<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-xs dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
+						<div className={'dark:text-textPrimary text-textPrimary400 flex flex-row items-center'}>
+							<p># {selectedChannel.channel_label}</p>
+							<p className={'uppercase dark:text-textThreadPrimary ml-10'}>{selectedChannel.category_name}</p>
+						</div>
 						<div><Icons.ArrowDownFill /></div>
 					</div>
 				)}
+				className={'h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2'}
 			>
-				<div className={'h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode'}>
 					{
 						channelsListWithoutVoiceChannel.map((channel) => {
 							if (channel.channel_id !== selectedChannel.channel_id) {
 								return (
 									<div
 										key={channel.id}
-										className={'dark:text-textSecondary text-textSecondary800 rounded-sm dark:hover:bg-bgHover hover:bg-bgIconDark hover:text-textDarkTheme uppercase font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none textWhiteHoverImportant m-0 truncate'}
+										className={'flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark hover:text-textDarkTheme text-sm w-full py-1 px-4 text-left cursor-pointer'}
 										onClick={() => handleSelectChannel(channel)}
 									>
-										{channel.channel_label ?? ''}
+										<p># {channel.channel_label ?? ''}</p>
+										<p className={'uppercase dark:text-textSecondary text-textSecondary800 ml-5'}>{channel.category_name}</p>
 									</div>
 								)
 							}
 						})
 					}
-				</div>
 			</Dropdown>
 			<p className={'text-xs dark:text-textPrimary text-textPrimaryLight py-2'}>This is the channel we send system event messages to. These can be turned off at any time</p>
 			<ToggleItem label={"Send a random welcome message when someone joins this server."} value={true} />
@@ -64,7 +67,7 @@ type ToggleItemProps = {
 
 const ToggleItem: React.FC<ToggleItemProps> = ({label, value, handleToggle}) => {
 	return (
-		<div className="Frame347 self-stretch justify-start items-center gap-3 inline-flex text-sm">
+		<div className="Frame347 self-stretch justify-start items-center gap-3 inline-flex text-sm py-1">
 			<div className="Frame409 grow shrink basis-0 h-6 justify-start items-center gap-1 flex">
 				<p>{label}</p>
 			</div>

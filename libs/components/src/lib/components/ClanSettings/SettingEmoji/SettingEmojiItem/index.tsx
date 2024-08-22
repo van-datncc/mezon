@@ -57,6 +57,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 				source: emoji.src,
 				shortname: nameEmoji,
 				category: emoji.category,
+				clan_id: clanId || ''
 			}
 			await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: emoji.id || '' }))
 		}
@@ -90,6 +91,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 							value={nameEmoji}
 							onChange={(e) => handleChangeEmojiName(e)}
 							onKeyDown={(e) => { e.key === 'Enter' && handleUpdateEmoji() }}
+							maxLength={MAX_FILE_NAME_EMOJI}
 						/>
 					}
 				</div>
