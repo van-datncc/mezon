@@ -21,7 +21,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const messageBox = useRef<HTMLDivElement>(null);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply(directParamId));
 
 	const setMarginleft = useMemo(() => {
 		if (messageBox?.current?.getBoundingClientRect()) {
@@ -97,7 +97,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					<GifStickerEmojiPopup />
 				</div>
 			)}
-			{idMessageRefReply && <ReplyMessageBox idMessage={idMessageRefReply} />}
+			{idMessageRefReply && <ReplyMessageBox channelId={directParamId} idMessage={idMessageRefReply} />}
 			<MessageBox
 				onSend={handleSend}
 				currentChannelId={directParamId}

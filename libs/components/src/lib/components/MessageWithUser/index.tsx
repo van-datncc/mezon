@@ -1,5 +1,5 @@
 import { useAuth, useChatMessages } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectJumpPinMessageId, selectOpenReplyMessageState } from '@mezon/store';
+import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectJumpPinMessageId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import classNames from 'classnames';
 import React, { useMemo, useRef } from 'react';
@@ -48,15 +48,14 @@ function MessageWithUser({
 	isSearchMessage,
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
 	const isCombine = !message.isStartedMessageGroup;
-	const checkReplied = idMessageRefReply === message.id && openReplyMessageState && message.id !== lastMessageId;
+	const checkReplied = idMessageRefReply === message.id && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 
 	const hasIncludeMention = useMemo(() => {
@@ -83,7 +82,7 @@ function MessageWithUser({
 	const jumpPinMessageId = useSelector(selectJumpPinMessageId);
 	const checkJumpPinMessage = useMemo(() => {
 		return jumpPinMessageId === message.id;
-	},[jumpPinMessageId, message.id])
+	}, [jumpPinMessageId, message.id]);
 
 	const containerClass = classNames('relative', 'message-container', {
 		'mt-3': !isCombine || checkReferences,

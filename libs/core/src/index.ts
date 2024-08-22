@@ -53,6 +53,7 @@ export * from './lib/chat/hooks/useSeenMessagePool';
 export * from './lib/chat/hooks/useSendForwardMessage';
 export * from './lib/chat/hooks/useSendInviteMessage';
 export * from './lib/chat/hooks/useSettingFooter';
+export * from './lib/chat/hooks/useShowName';
 export * from './lib/chat/hooks/useSilentSendMess';
 export * from './lib/chat/hooks/useThreadMessage';
 export * from './lib/chat/hooks/useThreads';
