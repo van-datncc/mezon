@@ -255,7 +255,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			const payload = {
-				t: valueTextInput.trim(),
+				t: content,
 				hg: hashtagList,
 				ej: emojiList,
 				lk: linkList,
