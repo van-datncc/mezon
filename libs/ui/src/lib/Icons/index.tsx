@@ -3418,26 +3418,14 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 	);
 };
 
-export const IconLoadingTyping = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
+export const IconLoadingTyping = ({ defaultFill = 'dark:text-textDarkTheme', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			className={defaultSize}
-			id="dots"
-			width="20"
-			height="8"
-			viewBox="0 0 132 58"
-			version="1.1"
-			xmlns="http://www.w3.org/2000/svg"
-			xmlnsXlink="http://www.w3.org/1999/xlink"
-		>
-			<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-				<g id="dots" fill="white">
-					<circle id="dot1" cx="25" cy="30" r="13"></circle>
-					<circle id="dot2" cx="65" cy="30" r="13"></circle>
-					<circle id="dot3" cx="105" cy="30" r="13"></circle>
-				</g>
-			</g>
-		</svg>
+    <svg id="dots" width="18" height="8" viewBox="0 0 110 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+    <circle id="dot1" cx="13" cy="30" r="13" fill={defaultFill}></circle>
+    <circle id="dot2" cx="50" cy="30" r="13" fill={defaultFill}></circle>
+    <circle id="dot3" cx="86" cy="30" r="13" fill={defaultFill}></circle>
+</svg>
+
 	);
 };
 

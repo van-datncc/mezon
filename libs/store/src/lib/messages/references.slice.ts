@@ -16,9 +16,8 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	error?: string | null;
 	dataReferences: ApiMessageRef[];
 	openEditMessageState: boolean;
-	openReplyMessageState: boolean;
 	attachmentDataRef: Record<string, ApiMessageAttachment[]>;
-	idMessageRefReply: string;
+	idMessageRefReply: Record<string, string>;
 	idMessageRefReaction: string;
 	idMessageRefEdit: string;
 	statusLoadingAttachment: boolean;
@@ -40,7 +39,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	openEditMessageState: false,
 	openReplyMessageState: false,
 	attachmentDataRef: {},
-	idMessageRefReply: '',
+	idMessageRefReply: {},
 	idMessageRefReaction: '',
 	idMessageRefEdit: '',
 	statusLoadingAttachment: false,
@@ -69,9 +68,6 @@ export const referencesSlice = createSlice({
 
 		setOpenEditMessageState(state, action) {
 			state.openEditMessageState = action.payload;
-		},
-		setOpenReplyMessageState(state, action) {
-			state.openReplyMessageState = action.payload;
 		},
 		setAtachmentAfterUpload(state, action: PayloadAction<{ channelId: string; files: File[] }>) {
 			const { channelId, files } = action.payload;
@@ -112,9 +108,8 @@ export const referencesSlice = createSlice({
 				state.attachmentAfterUpload[action.payload.channelId].splice(action.payload.index, 1);
 			}
 		},
-
-		setIdReferenceMessageReply(state, action) {
-			state.idMessageRefReply = action.payload;
+		setIdReferenceMessageReply(state, action: PayloadAction<{ channelId: string; idMessageRefReply: string }>) {
+			state.idMessageRefReply[action.payload.channelId] = action.payload.idMessageRefReply;
 		},
 		setIdReferenceMessageReaction(state, action) {
 			state.idMessageRefReaction = action.payload;
@@ -160,10 +155,6 @@ export const selectDataReferences = createSelector(getReferencesState, (state: R
 
 export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
 
-export const selectOpenReplyMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openReplyMessageState);
-
-export const selectIdMessageRefReply = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefReply);
-
 export const selectIdMessageRefReaction = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefReaction);
 
 export const selectIdMessageRefEdit = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefEdit);
@@ -177,4 +168,9 @@ export const selectAttachmentAfterUpload = createSelector(getReferencesState, (s
 export const selectAttachmentData = (channelId: string) =>
 	createSelector(getReferencesState, (state: ReferencesState) => {
 		return state.attachmentDataRef[channelId] || [];
+	});
+
+export const selectIdMessageRefReply = (channelId: string) =>
+	createSelector(getReferencesState, (state: ReferencesState) => {
+		return state.idMessageRefReply[channelId] || '';
 	});

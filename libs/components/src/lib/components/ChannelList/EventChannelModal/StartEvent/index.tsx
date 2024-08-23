@@ -17,7 +17,6 @@ const StartEventModal = (props: StartEventModalProps) => {
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const isShowCreateEvent = hasAdminPermission || isClanOwner || hasClanPermission;
 	return (
 		<>
 			<div className="dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black flex justify-between items-center p-4">
@@ -30,14 +29,10 @@ const StartEventModal = (props: StartEventModalProps) => {
 							{numberEventManagement > 1 && `${numberEventManagement} Events`}
 						</h4>
 					</div>
-					{(isShowCreateEvent) && (
-						<>
-							<div className="w-[0.1px] h-4 bg-gray-400"></div>
-							<div className="bg-primary px-2 py-1 rounded-md text-white font-medium" onClick={onOpenCreate}>
-								Create Event
-							</div>
-						</>
-					)}
+					<div className="w-[0.1px] h-4 bg-gray-400"></div>
+					<div className="bg-primary px-2 py-1 rounded-md text-white font-medium" onClick={onOpenCreate}>
+						Create Event
+					</div>
 				</div>
 				<span className="text-5xl leading-3 dark:hover:text-white hover:text-black" onClick={onClose}>
 					×
