@@ -227,6 +227,7 @@ export const fetchMessages = createAsyncThunk(
 
 		const lastLoadMessage = messages[messages.length - 1];
 		const hasMore = lastLoadMessage.isFirst === false ? false : true;
+
 		if (messages.length > 0) {
 			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
 		}
@@ -826,15 +827,23 @@ export const messagesSlice = createSlice({
 					const channelId = action?.meta?.arg?.channelId;
 					const isFetchingLatestMessages = action.payload.isFetchingLatestMessages || false;
 					const isClearMessage = action.payload.isClearMessage || false;
+					const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId];
 					state.loadingStatus = 'loaded';
 
 					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
 					if (!isNew || !channelId) return state;
 					const reversedMessages = action.payload.messages.reverse();
 
-					if (isFetchingLatestMessages || isClearMessage) {
+					// remove all messages if clear message is true
+					if (isClearMessage) {
 						handleRemoveManyMessages(state, channelId);
 					}
+
+					// remove all messages if ís fetching latest messages and is viewing older messages
+					if (isFetchingLatestMessages && isViewingOlderMessages) {
+						handleRemoveManyMessages(state, channelId);
+					}
+
 					const direction = action.meta.arg.direction || Direction_Mode.BEFORE_TIMESTAMP;
 
 					handleSetManyMessages({
@@ -1142,7 +1151,7 @@ const handleSetManyMessages = ({
 
 	state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
 
-	state.channelMessages[channelId] = handleLimitMessage(state.channelMessages[channelId], 100, direction);
+	state.channelMessages[channelId] = handleLimitMessage(state.channelMessages[channelId], 200, direction);
 
 	// update is viewing older messages
 	state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
