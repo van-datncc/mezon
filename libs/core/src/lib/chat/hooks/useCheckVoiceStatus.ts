@@ -1,4 +1,4 @@
-import { selectNumberMemberVoiceChannel } from '@mezon/store-mobile';
+import { selectNumberMemberVoiceChannel } from '@mezon/store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
