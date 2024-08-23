@@ -54,7 +54,6 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 			name: channelMess.username || '',
 			username: channelMess.username || '',
 			id: channelMess.sender_id || '',
-			avatarSm: channelMess.avatar || '',
 		},
 		lastSeen: lastSeenId === (channelMess.id || channelMess.message_id),
 		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
