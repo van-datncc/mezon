@@ -22,7 +22,7 @@ const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
 		<TouchableOpacity onPress={handleOnPress} style={{ marginBottom: size.s_20 }}>
 			{channelData?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 				<Block flexDirection="row" gap={size.s_10} alignItems="center">
-					{!!channelData?.channel_label && !!Number(channelData?.parrent_id)
+					{channelData?.channel_label && Number(channelData?.parrent_id)
 						? channelData?.channel_private
 							? (
 								<Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
