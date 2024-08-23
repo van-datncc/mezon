@@ -23,6 +23,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	statusLoadingAttachment: boolean;
 	idMessageMention: string;
 	attachmentAfterUpload: Record<string, File[]>;
+	displayPreviewAttachmentsPanel: Record<string, boolean>;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -45,6 +46,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	statusLoadingAttachment: false,
 	idMessageMention: '',
 	attachmentAfterUpload: {},
+	displayPreviewAttachmentsPanel: {},
 });
 
 export const referencesSlice = createSlice({
@@ -56,6 +58,12 @@ export const referencesSlice = createSlice({
 
 		setMessageMentionId(state, action) {
 			state.idMessageMention = action.payload;
+		},
+
+		setPreviewAttachemtsPanel(state, action: PayloadAction<{ channelId: string; isDisplay: boolean }>) {
+			const { channelId, isDisplay } = action.payload;
+			console.log(action.payload);
+			state.displayPreviewAttachmentsPanel[channelId] = isDisplay;
 		},
 
 		setDataReferences(state, action) {
@@ -71,8 +79,10 @@ export const referencesSlice = createSlice({
 		},
 		setAtachmentAfterUpload(state, action: PayloadAction<{ channelId: string; files: File[] }>) {
 			const { channelId, files } = action.payload;
-			if (channelId === '' && files.length === 0) {
+
+			if (channelId === '' && files?.length === 0) {
 				state.attachmentAfterUpload = {};
+				return;
 			}
 
 			if (!state.attachmentAfterUpload[channelId]) {
@@ -87,7 +97,7 @@ export const referencesSlice = createSlice({
 			if (!state.attachmentDataRef[channelId]) {
 				state.attachmentDataRef[channelId] = [];
 			}
-			if (attachments.length === 0) {
+			if (attachments?.length === 0) {
 				state.attachmentDataRef[channelId] = attachments;
 			} else {
 				state.attachmentDataRef[channelId] = [...state.attachmentDataRef[channelId], ...attachments];
@@ -174,3 +184,21 @@ export const selectIdMessageRefReply = (channelId: string) =>
 	createSelector(getReferencesState, (state: ReferencesState) => {
 		return state.idMessageRefReply[channelId] || '';
 	});
+export const selectDisplayPreviewAttachmentsPanel = (channelId: string) =>
+	createSelector(getReferencesState, (state: ReferencesState) => {
+		return state.displayPreviewAttachmentsPanel[channelId] || [];
+	});
+
+// {
+// 	"filename": "7stickers.zip",
+// 	"filetype": "application/x-zip-compressed",
+// 	"size": 0,
+// 	"url": "7stickers.zip"
+// }
+// 0:File
+// lastModified:1724148491821
+// lastModifiedDate: Tue Aug 20 2024 17:08:11 GMT+0700 (Indochina Time) {}
+// name:"7stickers.zip"
+// size:47563707
+// type:"application/x-zip-compressed"
+// webkitRelativePath:""

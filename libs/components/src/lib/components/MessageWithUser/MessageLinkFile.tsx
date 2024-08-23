@@ -1,8 +1,9 @@
+import { selectAttachmentAfterUpload } from '@mezon/store';
 import { Spinner } from 'flowbite-react';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Icons } from '../../components';
-import { RenderAttachmentThumbnail } from '../ThumbnailAttachmentRender';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
@@ -21,7 +22,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 	const handleDownload = () => {
 		window.open(attachmentData.url);
 	};
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
+	// const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
 
 	const hideTheInformationFile =
 		attachmentData.filetype !== 'image/gif' &&
@@ -38,6 +39,8 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 		return attachmentData.size && attachmentData.size > 0;
 	}, [attachmentData.size]);
 
+	const attachmentAfterUpload = useSelector(selectAttachmentAfterUpload);
+
 	return (
 		<div
 			onMouseEnter={isUploadSuccessfully ? hoverOptButton : () => {}}
@@ -50,7 +53,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 					<Spinner aria-label="Loading spinner" />
 				</div>
 			)}{' '}
-			<div className="flex items-center">{thumbnailAttachment}</div>
+			{/* <div className="flex items-center">{thumbnailAttachment}</div> */}
 			{hideTheInformationFile && (
 				<div className=" cursor-pointer " onClick={handleDownload} onKeyDown={handleDownload}>
 					<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>

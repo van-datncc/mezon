@@ -1,8 +1,10 @@
 import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useReference } from '@mezon/core';
 import {
+	ReferencesState,
 	messagesActions,
 	referencesActions,
+	selectAttachmentAfterUpload,
 	selectAttachmentData,
 	selectCloseMenu,
 	selectStatusLoadingAttachment,
@@ -13,7 +15,7 @@ import {
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue, typeConverts } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { Fragment, ReactElement, useCallback } from 'react';
+import { Fragment, ReactElement, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import FileSelectionButton from './FileSelectionButton';
@@ -142,34 +144,45 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const handleChildContextMenu = (event: React.MouseEvent) => {
 		event.stopPropagation();
 	};
+	const attachmentAfterUpload = useSelector(selectAttachmentAfterUpload);
+	const atts = attachmentAfterUpload[currentChannelId ?? ''];
+	const displayPreviewAttachmentsPanel = useSelector((state: ReferencesState) => state.displayPreviewAttachmentsPanel);
+
+	const getStatusPreviewAttachmentPanel = useMemo(
+		() => displayPreviewAttachmentsPanel?.[currentChannelId ?? ''] ?? false,
+		[displayPreviewAttachmentsPanel, currentChannelId],
+	);
+	console.log('getStatusPreviewAttachmentPanel', getStatusPreviewAttachmentPanel);
 
 	return (
 		<div className="relative max-sm:-pb-2  ">
-			<div
-				className={`${attachmentDataRef.length > 0 || statusLoadingAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
-			>
+			{getStatusPreviewAttachmentPanel && (
 				<div
-					className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'attachment-scroll-light' : ''}`}
+					className={`${atts?.length > 0 ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 				>
-					{attachmentDataRef?.map((item: ApiMessageAttachment, index: number) => {
-						return (
-							<Fragment key={index}>
-								<AttachmentPreviewThumbnail
-									attachment={item}
-									channelId={currentChannelId ?? ''}
-									onRemove={removeAttachmentByIndex}
-									indexOfItem={index}
-								/>
-							</Fragment>
-						);
-					})}
-					{statusLoadingAttachment && <AttachmentLoading />}
+					<div
+						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'attachment-scroll-light' : ''}`}
+					>
+						{atts?.map((item: File, index: number) => {
+							return (
+								<Fragment key={index}>
+									<AttachmentPreviewThumbnail
+										attachment={item}
+										channelId={currentChannelId ?? ''}
+										onRemove={removeAttachmentByIndex}
+										indexOfItem={index}
+									/>
+								</Fragment>
+							);
+						})}
+						{statusLoadingAttachment && <AttachmentLoading />}
+					</div>
 				</div>
-			</div>
+			)}
 
 			<div
 				className={`flex flex-inline items-start gap-2 box-content mb-4 max-sm:mb-0
-				 dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${attachmentDataRef.length > 0 ? 'rounded-t-none' : 'rounded-t-lg'}
+				 dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${attachmentDataRef?.length > 0 ? 'rounded-t-none' : 'rounded-t-lg'}
 				  ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
 			>
 				<FileSelectionButton

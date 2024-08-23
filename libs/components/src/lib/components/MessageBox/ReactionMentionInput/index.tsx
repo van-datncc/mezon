@@ -255,7 +255,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			const payload = {
-				t: valueTextInput.trim(),
+				t: content,
 				hg: hashtagList,
 				ej: emojiList,
 				lk: linkList,
@@ -348,6 +348,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					shortName: '',
 					id: '',
 					isReset: true,
+				}),
+			);
+			dispatch(
+				referencesActions.setPreviewAttachemtsPanel({
+					channelId: currentChannelId ?? '',
+					isDisplay: false,
 				}),
 			);
 		},
