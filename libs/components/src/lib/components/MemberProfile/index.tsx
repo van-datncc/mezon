@@ -319,7 +319,9 @@ function MemberProfile({
 				/>
 			)}
 
-			{isOpenProfileModal && <UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal} />}
+			{isOpenProfileModal && (
+				<UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal} />
+			)}
 		</div>
 	);
 }
