@@ -1,11 +1,13 @@
-import { Block, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { Block, Colors, size, Text } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, StyleSheet } from 'react-native';
 import Gallery, { GalleryRef, RenderItemInfo } from 'react-native-awesome-gallery';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
+import { useThrottledCallback } from 'use-debounce';
 import { RenderFooterModal } from './RenderFooterModal';
 import { RenderHeaderModal } from './RenderHeaderModal';
 
@@ -19,15 +21,19 @@ interface IVisibleToolbarConfig {
 	showHeader: boolean;
 	showFooter: boolean;
 }
-const originScale = 1;
+const ORIGIN_SCALE = 1;
 
 export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const { visible, onClose, imageSelected } = props;
-	const { themeValue } = useTheme();
+	const { t } = useTranslation('common');
 	const [currentImage, setCurrentImage] = useState<AttachmentEntity | null>(null);
-	const [visibleToolbarConfig, setVisibleToolbarConfig] = useAnimatedState<IVisibleToolbarConfig>({ showHeader: true, showFooter: false });
+	const [visibleToolbarConfig, setVisibleToolbarConfig] = useState<IVisibleToolbarConfig>({ showHeader: true, showFooter: false });
+	const [currentScale, setCurrentScale] = useState(1);
+	const [showSavedImage, setShowSavedImage] = useState(false);
 	const allImageList = useSelector(selectAttachmentPhoto());
 	const ref = useRef<GalleryRef>(null);
+	const footerTimeoutRef = useRef<NodeJS.Timeout>(null);
+	const imageSavedTimeoutRef = useRef<NodeJS.Timeout>(null);
 
 	const initialIndex = useMemo(() => {
 		const imageIndexSelected = allImageList.findIndex(file => file?.filename === imageSelected?.filename);
@@ -41,29 +47,55 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const onIndexChange = (newIndex: number) => {
 		if (allImageList[newIndex]?.id !== currentImage?.id) {
 			setCurrentImage(allImageList[newIndex]);
-			ref.current?.reset();
-			//TODO
+			ref.current?.reset(); //Note: reset scale
 		}
 	}
 
 	const onTap = () => {
 		updateToolbarConfig({
 			showHeader: !visibleToolbarConfig.showHeader,
+			showFooter: !visibleToolbarConfig.showHeader,
 		})
 	}
 
-	const onDoubleTap = (toScale: number) => {
-		if (toScale > originScale) {
-			updateToolbarConfig({ showHeader: false });
+	const clearTimeoutFooter = () => {
+		footerTimeoutRef.current && clearTimeout(footerTimeoutRef.current);
+	}
+
+	const onPanStart = () => {
+		clearTimeoutFooter();
+		if (visibleToolbarConfig.showFooter) {
+			setTimeoutHideFooter();
+			return;
+		}
+		if (!visibleToolbarConfig.showFooter && currentScale === 1) {
+			updateToolbarConfig({ showFooter: true })
+			setTimeoutHideFooter();
+			return;
 		}
 	}
 
-	const onImageSelectedChange = (image: AttachmentEntity) => {
+	const onDoubleTap = (toScale: number) => {
+		if (toScale > ORIGIN_SCALE) {
+			clearTimeoutFooter();
+			updateToolbarConfig({
+				showHeader: false,
+				showFooter: false
+			});
+		}
+	}
+
+	const onImageThumbnailChange = (image: AttachmentEntity) => {
 		const imageIndexSelected = allImageList?.findIndex(i => i?.id === image?.id);
 		if (imageIndexSelected > -1) {
 			setCurrentImage(image);
 			ref.current?.setIndex(imageIndexSelected);
 			ref.current?.reset();
+
+			if (visibleToolbarConfig.showFooter) {
+				clearTimeoutFooter();
+				setTimeoutHideFooter();
+			}
 		}
 	}
 
@@ -84,11 +116,42 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		);
 	};
 
+	const setTimeoutHideFooter = () => {
+		footerTimeoutRef.current = setTimeout(() => {
+			updateToolbarConfig({
+				showFooter: false
+			})
+		}, 5000)
+	}
+
+	const onImageSaved = useCallback(() => {
+		setShowSavedImage(true);
+		imageSavedTimeoutRef.current = setTimeout(() => {
+			setShowSavedImage(false);
+		}, 3000)
+	}, [])
+
+	useEffect(() => {
+		if (visibleToolbarConfig.showFooter) {
+			clearTimeout(footerTimeoutRef.current);
+			setTimeoutHideFooter();
+		}
+	}, [visibleToolbarConfig.showFooter, currentImage?.id])
+
+	useEffect(() => {
+		return () => {
+			clearTimeout(footerTimeoutRef.current);
+			clearTimeout(imageSavedTimeoutRef.current);
+		}
+	}, [])
+
+	const setScaleDebounced = useThrottledCallback(setCurrentScale, 300);
+
 	return (
 		<Modal visible={visible}>
 			<Block flex={1}>
 				{visibleToolbarConfig.showHeader && (
-					<RenderHeaderModal onClose={onClose} imageSelected={currentImage} />
+					<RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} />
 				)}
 				<Gallery
 					ref={ref}
@@ -100,21 +163,25 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 					renderItem={renderItem}
 					onDoubleTap={onDoubleTap}
 					onTap={onTap}
-					onPanStart={() => {
-						if (!visibleToolbarConfig.showFooter) {
-							updateToolbarConfig({
-								showFooter: true,
-							})
-							setTimeout(() => {
-								updateToolbarConfig({
-									showFooter: false,
-								})
-							}, 3000)
-						}
-					}}
+					onPanStart={onPanStart}
+					onScaleChange={setScaleDebounced}
 				/>
-				{visibleToolbarConfig.showFooter && (
-					<RenderFooterModal imageSelected={currentImage} onImageSelectedChange={onImageSelectedChange} />
+				<RenderFooterModal
+					visible={visibleToolbarConfig.showFooter}
+					imageSelected={currentImage}
+					onImageThumbnailChange={onImageThumbnailChange}
+				/>
+				{showSavedImage && (
+					<Block
+						position='absolute'
+						top={'50%'}
+						width={'100%'}
+						alignItems='center'
+					>
+						<Block backgroundColor={Colors.bgDarkSlate} padding={size.s_10} borderRadius={size.s_10}>
+							<Text color={Colors.white}>{t('savedSuccessfully')}</Text>
+						</Block>
+					</Block>
 				)}
 			</Block>
 		</Modal>

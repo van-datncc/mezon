@@ -5,22 +5,38 @@ import { convertTimeString } from '@mezon/utils';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useImage } from '../../hooks/useImage';
 import { MezonClanAvatar } from '../../temp-ui';
 import { style } from './styles';
 
 interface IRenderFooterModalProps {
 	onClose?: () => void;
 	imageSelected?: AttachmentEntity;
+	onImageSaved?: () => void;
 }
 
-export const RenderHeaderModal = React.memo(({ onClose, imageSelected }: IRenderFooterModalProps) => {
+export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved }: IRenderFooterModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const uploader = useSelector(selectMemberByUserId(imageSelected?.uploader || ''));
-
-	const handleDownloadImage = () => {
-		//TODO: handle download image
+	const { downloadImage, saveImageToCameraRoll } = useImage();
+	const handleDownloadImage = async () => {
+		if (!imageSelected?.url) {
+			return;
+		}
+		try {
+			const { url, filetype } = imageSelected;
+			const filetypeParts = filetype.split('/');
+			const filePath = await downloadImage(url, filetypeParts[1]);
+			if (filePath) {
+				await saveImageToCameraRoll('file://' + filePath, filetypeParts[0]);
+			}
+			onImageSaved();
+		} catch (error) {
+			console.log('download image error', error)
+		}
 	}
+
 	return (
 		<Block
 			position='absolute'

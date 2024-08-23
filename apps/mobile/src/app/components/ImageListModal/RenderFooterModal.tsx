@@ -8,11 +8,12 @@ import { useSelector } from 'react-redux';
 import { style } from './styles';
 interface IRenderFooterModalProps {
 	imageSelected?: AttachmentEntity;
-	onImageSelectedChange: (image: AttachmentEntity) => void;
+	onImageThumbnailChange: (image: AttachmentEntity) => void;
+	visible?: boolean;
 }
 
 export const RenderFooterModal = memo((props: IRenderFooterModalProps) => {
-	const { imageSelected, onImageSelectedChange } = props;
+	const { imageSelected, onImageThumbnailChange, visible } = props;
 	const { themeValue } = useTheme();
 	const allImageList = useSelector(selectAttachmentPhoto());
 	const styles = style(themeValue);
@@ -36,7 +37,7 @@ export const RenderFooterModal = memo((props: IRenderFooterModalProps) => {
 
 	const handlePress = (imageFile: AttachmentEntity) => {
 		if (imageFile?.id !== imageSelected?.id) {
-			onImageSelectedChange(imageFile);
+			onImageThumbnailChange(imageFile);
 		}
 	};
 
@@ -60,7 +61,7 @@ export const RenderFooterModal = memo((props: IRenderFooterModalProps) => {
 			flexDirection='row'
 			backgroundColor='rgba(0, 0, 0, 0.4)'
 			width='100%'
-			height={size.s_100}
+			height={visible ? size.s_100 : 0}
 			alignItems='center'
 		>
 			<Block>
