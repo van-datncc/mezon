@@ -1,17 +1,17 @@
 import { useAppNavigation, useAppParams, useMemberStatus, useMenu } from '@mezon/core';
 import { directActions, selectCloseMenu, selectIsUnreadDMById, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { MemberProfileType } from '@mezon/utils';
+import { IChannel, MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import MemberProfile from '../../MemberProfile';
 export type DirectMessProp = {
-	readonly directMessage: Readonly<any>;
+	readonly directMessage: Readonly<IChannel>;
 };
 
 export type directMessageValueProps = {
-	type: string;
+	type?: number;
 	userId: string[];
 	dmID: string;
 };
@@ -54,7 +54,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 
 	const directMessageValue: directMessageValueProps = {
 		type: directMessage.type,
-		userId: directMessage.user_id,
+		userId: directMessage.user_id ?? [],
 		dmID: directMessage.id,
 	};
 
@@ -64,7 +64,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 		<div
 			key={directMessage.channel_id}
 			className={`group/itemListDm relative text-[#AEAEAE] hover:text-white h-fit pl-2 rounded-[6px] dark:hover:bg-black hover:bg-[#E1E1E1] py-2 w-full dark:focus:bg-bgTertiary focus:bg-[#c7c7c7] ${directMessage.channel_id === currentDmGroupId && !pathname.includes('friends') ? 'dark:bg-[#1E1E1E] bg-[#c7c7c7] dark:text-white text-black' : ''}`}
-			onClick={() => joinToChatAndNavigate(directMessage.channel_id, directMessage.type)}
+			onClick={() => joinToChatAndNavigate(directMessage.channel_id as string, directMessage.type as number)}
 		>
 			<MemberProfile
 				avatar={
@@ -72,7 +72,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 						? 'assets/images/avatar-group.png'
 						: directMessage?.channel_avatar?.at(0) ?? ''
 				}
-				name={(directMessage?.channel_label || directMessage?.usernames) ?? ''}
+				name={(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
 				userNameAva={directMessage?.usernames}
 				status={userStatus}
 				isHideStatus={true}
@@ -86,7 +86,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 			/>
 			<button
 				className={`group-hover/itemListDm:opacity-100 opacity-0 absolute right-2 text-gray-500 hover:text-red-500 ${isTypeDMGroup ? 'top-[22px]' : 'top-[18px]'}`}
-				onClick={(e) => handleCloseClick(e, directMessage.channel_id)}
+				onClick={(e) => handleCloseClick(e, directMessage.channel_id as string)}
 			>
 				<Icons.Close defaultSize='size-3'/>
 			</button>

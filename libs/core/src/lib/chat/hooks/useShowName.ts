@@ -1,7 +1,7 @@
 import { getNameForPrioritize } from '@mezon/utils';
 import { useMemo } from 'react';
 
-const useShowName = (clanNickname: string, displayName: string, username: string, senderId: string) => {
+export function useShowName(clanNickname: string, displayName: string, username: string, senderId: string) {
 	const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
 	const checkAnonymous = useMemo(() => senderId === NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
@@ -12,6 +12,4 @@ const useShowName = (clanNickname: string, displayName: string, username: string
 	}, [checkAnonymous, clanNickname, displayName, username]);
 
 	return checkName;
-};
-
-export default useShowName;
+}
