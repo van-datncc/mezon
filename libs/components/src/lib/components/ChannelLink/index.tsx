@@ -89,7 +89,6 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 			await dispatch(
 				notificationSettingActions.getNotificationSetting({
 					channelId: channel.channel_id || '',
-					noCache: false,
 					isCurrentChannel: channel.channel_id === currentChannelId,
 				}),
 			);

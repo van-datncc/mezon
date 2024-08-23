@@ -99,7 +99,7 @@ export const joinChannel = createAsyncThunk(
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ channelId, messageId }));
 			} else {
-				thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+				thunkAPI.dispatch(messagesActions.fetchMessages({ channelId, isFetchingLatestMessages: true }));
 			}
 
 			if (!noFetchMembers) {
@@ -490,6 +490,7 @@ export const channelsActions = {
  * import { useSelector } from 'react-redux';
 import { channel } from 'process';
 import { mess } from '@mezon/store';
+import { remove } from '@mezon/mobile-components';
  *
  * // ...
  *

@@ -116,7 +116,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 			data={listChannelsMention?.filter((item) => item?.name?.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={false} name={item?.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText.toUpperCase()} />
+					<SuggestItem channelId={item?.id} isDisplayDefaultAvatar={false} name={item?.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText.toUpperCase()} />
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}
@@ -169,3 +169,4 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 };
 
 export { EmojiSuggestion, HashtagSuggestions, Suggestions };
+

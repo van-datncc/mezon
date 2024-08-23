@@ -1,8 +1,7 @@
 import { INotifiReactMessage, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
 import { ApiNotifiReactMessage } from 'mezon-js/api.gen';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 export const NOTIFI_REACT_MESSAGE_FEATURE_KEY = 'notifireactmessage';
 
 export interface NotifiReactMessageState {
@@ -16,31 +15,15 @@ export const initialNotifiReactMessageState: NotifiReactMessageState = {
 	notifiReactMessage: null,
 };
 
-const LIST_NOTIFI_REACT_MESS_CACHED_TIME = 1000 * 60 * 3;
-export const fetchNotiReactMess = memoize(
-	(mezon: MezonValueContext, channelID: string) => mezon.socketRef.current?.getNotificationReactMessage(channelID),
-	{
-		promise: true,
-		maxAge: LIST_NOTIFI_REACT_MESS_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1];
-		},
-	},
-);
-
 type fetchNotifiReactMessArgs = {
 	channelId: string;
-	noCache?: boolean;
 };
 
 export const getNotifiReactMessage = createAsyncThunk(
 	'notifireactmessage/getNotifiReactMessage',
-	async ({ channelId, noCache }: fetchNotifiReactMessArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchNotiReactMess.clear(mezon, channelId);
-		}
-		const response = await fetchNotiReactMess(mezon, channelId);
+	async ({ channelId }: fetchNotifiReactMessArgs, thunkAPI) => {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const response = await mezon.socketRef.current?.getNotificationReactMessage(channelId);
 		if (!response) {
 			return thunkAPI.rejectWithValue('Invalid session');
 		}
@@ -60,7 +43,7 @@ export const setNotifiReactMessage = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
+		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '' }));
 		return response;
 	},
 );
@@ -77,7 +60,7 @@ export const deleteNotifiReactMessage = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
+		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '' }));
 		return response;
 	},
 );
