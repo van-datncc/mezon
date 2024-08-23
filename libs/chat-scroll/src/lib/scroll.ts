@@ -17,18 +17,6 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrol
 		setHandlerId((prev) => prev + 1);
 	}, []);
 
-	useEffect(() => {
-		const handler = scrollEventHandlerRef.current;
-		const el = targetRef.current;
-
-		handler({} as Event);
-		el.addEventListener('scroll', handler);
-
-		return () => {
-			el.removeEventListener('scroll', handler);
-		};
-	}, [handlerId, targetRef]);
-
 	const fetching = useRef<boolean>(false);
 	const storedScrollHeight = useRef<number>(0);
 	const storedScrollTop = useRef<number>(0);
@@ -67,6 +55,18 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrol
 	}, [targetRef]);
 
 	const getClientHeight = useCallback(() => targetRef.current.clientHeight, [targetRef]);
+
+	useEffect(() => {
+		const handler = scrollEventHandlerRef.current;
+		const el = targetRef.current;
+
+		handler({} as Event);
+		el.addEventListener('scroll', handler);
+
+		return () => {
+			el.removeEventListener('scroll', handler);
+		};
+	}, [handlerId, targetRef]);
 
 	return {
 		isFetching,
