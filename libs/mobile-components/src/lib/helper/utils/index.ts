@@ -62,13 +62,3 @@ export function cloneDeep<T>(value: T): T {
 	
 	return JSON.parse(JSON.stringify(value)) as T;
 }
-
-export const capitalizeFirstLetter = (str: string | null | undefined): string => {
-	try {
-		if (!str) return '';
-		return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-	} catch (error) {
-		console.error('Error in capitalizeFirstLetter:', error);
-		return '';
-	}
-};
