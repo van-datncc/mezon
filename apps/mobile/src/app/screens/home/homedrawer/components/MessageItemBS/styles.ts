@@ -30,20 +30,19 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	actionItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: 20,
 		paddingHorizontal: size.s_16,
 		paddingVertical: size.s_12,
 		backgroundColor: colors.secondary,
 	},
 	icon: {
-		width: size.s_20,
+		width: size.s_40,
 		height: size.s_20,
 	},
 	warningIcon: {
-		padding: size.s_6,
+		padding: size.s_8,
 		backgroundColor: colors.tertiary,
 		borderRadius: 50,
-
+		marginRight: size.s_10
 	},
 	favouriteIconItem: {
 		backgroundColor: colors.secondary,

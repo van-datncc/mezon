@@ -646,3 +646,63 @@ export function filterEmptyArrays<T extends Record<string, any>>(payload: T): T 
 			return { ...acc, [key]: value };
 		}, {} as T);
 }
+
+export const handleFiles = (files: File[], setAttachmentPreview: (attachments: ApiMessageAttachment[]) => void) => {
+	if (!files) {
+		throw new Error('Client or files are not initialized');
+	}
+
+	// Process files
+	const filePromises = files.map((file) => {
+		if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+			return processFile(file)
+				.then((fileDetails) => {
+					return {
+						filename: fileDetails.filename,
+						filetype: fileDetails.filetype,
+						size: 0,
+						url: fileDetails.url,
+					} as ApiMessageAttachment;
+				})
+				.catch((error) => {
+					console.error('Error processing file:', error);
+					return null;
+				});
+		} else {
+			return Promise.resolve({
+				filename: file.name,
+				filetype: file.type,
+				size: 0,
+				url: file.name,
+			} as ApiMessageAttachment);
+		}
+	});
+
+	Promise.all(filePromises)
+		.then((attachments) => {
+			const validAttachments: ApiMessageAttachment[] = attachments.filter(
+				(attachment): attachment is ApiMessageAttachment => attachment !== null,
+			);
+			setAttachmentPreview(validAttachments);
+		})
+		.catch((error) => {
+			console.error('Error processing files:', error);
+		});
+};
+
+export function processFile(file: File): Promise<{ filename: string; filetype: string; size: number; url: string }> {
+	return new Promise((resolve, reject) => {
+		try {
+			const blobUrl = URL.createObjectURL(file);
+
+			resolve({
+				filename: file.name,
+				filetype: file.type,
+				size: file.size,
+				url: blobUrl,
+			});
+		} catch (error) {
+			reject(error);
+		}
+	});
+}

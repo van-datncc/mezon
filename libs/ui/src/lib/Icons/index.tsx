@@ -1299,7 +1299,7 @@ export const Emoji: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export function Speaker({ defaultFill = 'text-contentTertiary', defaultSize = 'w-5 h-5' }: IconProps) {
+export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 	return (
 		<svg
 			width="18"
@@ -1307,7 +1307,7 @@ export function Speaker({ defaultFill = 'text-contentTertiary', defaultSize = 'w
 			viewBox="0 0 18 17"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-contentTertiary text-colorTextLightMode'}`}
 		>
 			<g id="Live area" clipPath="url(#clip0_2155_1604)">
 				<g id="Vector">
@@ -2057,7 +2057,7 @@ export const Private: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 	);
 };
 
-export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill, defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
 			width="20"
@@ -2065,7 +2065,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-contentTertiary text-colorTextLightMode'}`}
 		>
 			<path
 				d="M11.5512 1.57323C11.9214 1.75834 12.1065 2.12856 12.1065 2.40622V19.0659C12.1065 19.4361 11.9214 19.7138 11.5512 19.8989C11.2735 20.084 10.8107 19.9915 10.5331 19.8064L4.88727 15.3638H1.92554C1.37022 15.3638 1 14.9936 1 14.4382V7.03392C1 6.47859 1.37022 6.10838 1.92554 6.10838H4.97982L10.6256 1.66579C10.9033 1.48068 11.2735 1.48068 11.5512 1.57323Z"
@@ -3418,26 +3418,14 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 	);
 };
 
-export const IconLoadingTyping = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => {
+export const IconLoadingTyping = ({ defaultFill = 'dark:text-textDarkTheme', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			className={defaultSize}
-			id="dots"
-			width="20"
-			height="8"
-			viewBox="0 0 132 58"
-			version="1.1"
-			xmlns="http://www.w3.org/2000/svg"
-			xmlnsXlink="http://www.w3.org/1999/xlink"
-		>
-			<g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-				<g id="dots" fill="white">
-					<circle id="dot1" cx="25" cy="30" r="13"></circle>
-					<circle id="dot2" cx="65" cy="30" r="13"></circle>
-					<circle id="dot3" cx="105" cy="30" r="13"></circle>
-				</g>
-			</g>
-		</svg>
+    <svg id="dots" width="18" height="8" viewBox="0 0 110 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+    <circle id="dot1" cx="13" cy="30" r="13" fill={defaultFill}></circle>
+    <circle id="dot2" cx="50" cy="30" r="13" fill={defaultFill}></circle>
+    <circle id="dot3" cx="86" cy="30" r="13" fill={defaultFill}></circle>
+</svg>
+
 	);
 };
 

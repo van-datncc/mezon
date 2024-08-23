@@ -15,7 +15,7 @@ export type UseDirectMessagesOptions = {
 
 export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions) {
 	const { clientRef, sessionRef, socketRef } = useMezon();
-	const newMessageIdUpdateImage = useSelector(selectNewMesssageUpdateImage);
+	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
@@ -67,21 +67,21 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
-		if (newMessageIdUpdateImage.clan_id === '0') {
+		if (newMessageUpdateImage.clan_id === '0') {
 			processLink(
-				newMessageIdUpdateImage.clan_id!,
-				newMessageIdUpdateImage.channel_id!,
-				newMessageIdUpdateImage.mode!,
+				newMessageUpdateImage.clan_id!,
+				newMessageUpdateImage.channel_id!,
+				newMessageUpdateImage.mode!,
 				contentPayload,
 				mentionPayload,
 				attachmentPayload,
-				newMessageIdUpdateImage.message_id,
+				newMessageUpdateImage.message_id,
 			);
 		}
 		setContentPayload({});
 		setMentionPayload([]);
 		setAttachmentPayload([]);
-	}, [newMessageIdUpdateImage.message_id]);
+	}, [newMessageUpdateImage.message_id]);
 	return useMemo(
 		() => ({
 			client,

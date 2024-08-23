@@ -62,8 +62,7 @@ function useMenuReplyMenuBuilder(message: IMessageWithUser) {
 	const messageId = message.id;
 
 	const handleItemClick = useCallback(() => {
-		dispatch(referencesActions.setOpenReplyMessageState(true));
-		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
+		dispatch(referencesActions.setIdReferenceMessageReply({ channelId: message.channel_id, idMessageRefReply: messageId }));
 		dispatch(messagesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [dispatch, messageId]);
@@ -81,7 +80,6 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 	const messageId = message.id;
 
 	const handleItemClick = useCallback(() => {
-		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageEdit(messageId));

@@ -38,6 +38,7 @@ import { notifiReactMessageReducer } from './notificationSetting/notificationRea
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
@@ -47,7 +48,6 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
-import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -101,6 +101,7 @@ const persistedChannelReducer = persistReducer(
 	{
 		key: 'channels',
 		storage,
+		blacklist: ['valueTextInput'],
 	},
 	channelsReducer,
 );

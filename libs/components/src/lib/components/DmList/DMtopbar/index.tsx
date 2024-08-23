@@ -63,11 +63,11 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 					<MemberProfile
 						numberCharacterCollapse={22}
 						avatar={
-							Number(currentDmGroup.type) === ChannelType.CHANNEL_TYPE_GROUP
+							Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP
 								? 'assets/images/avatar-group.png'
 								: currentDmGroup?.channel_avatar?.at(0) ?? ''
 						}
-						name={currentDmGroup?.usernames || `${currentDmGroup.creator_name}'s Group`}
+						name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
 						status={userStatus}
 						isHideStatus={true}
 						isHideIconStatus={false}

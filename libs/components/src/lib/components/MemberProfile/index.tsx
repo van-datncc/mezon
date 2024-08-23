@@ -319,7 +319,9 @@ function MemberProfile({
 				/>
 			)}
 
-			{isOpenProfileModal && <UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal} />}
+			{isOpenProfileModal && (
+				<UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal} />
+			)}
 		</div>
 	);
 }
@@ -364,7 +366,11 @@ const StatusUser = memo((props: StatusUserProps) => {
     <span
 		className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${(checkTypingUser) ? 'rounded-lg -right-3' : 'rounded-full right-[-4px]'}`}
     >
-		{checkTypingUser ? <Icons.IconLoadingTyping defaultSize='bg-colorSuccess w-5 h-2.5 rounded-lg' /> : 
+		{checkTypingUser ?
+    <span className='bg-colorSuccess rounded-lg flex items-center justify-center px-[2px] py-[1px]'>
+      <Icons.IconLoadingTyping />
+    </span>
+    : 
         	(!checkDmGroup && (status ? <OnlineStatus /> : <OfflineStatus />))
 		}
     </span>
