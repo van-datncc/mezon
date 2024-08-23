@@ -1,8 +1,10 @@
 {
   "deleteClanModal": {
-    "title": "Delete clans",
+    "title": "Delete clan",
     "description": "Are you sure you want to delete {{currentClan}} ? This action cannot be undone.",
     "confirm": "Yes",
-    "cancel": "No"
+    "cancel": "No",
+    "inputClanName": "Enter clan name",
+    "inputError": "You didn't enter the clan name correctly"
   }
 }

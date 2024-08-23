@@ -3,6 +3,8 @@
     "title": "Xóa clan",
     "description": "Bạn có chắc chắn muốn xóa {{currentClan}} không? Hành động này không thể hoàn tác.",
     "confirm": "Có",
-    "cancel": "Không"
+    "cancel": "Không",
+    "inputClanName": "Nhập vào tên clan",
+    "inputError": "Bạn đã nhập sai tên clan"
   }
 }
