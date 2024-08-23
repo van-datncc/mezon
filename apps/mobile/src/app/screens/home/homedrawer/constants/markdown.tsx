@@ -305,7 +305,7 @@ export const formatUrls = (text: string) => {
 		.join('');
 };
 
-export const formatBlockCode = (text: string) => {
+export const formatBlockCode = (text: string, isMessageReply: boolean) => {
 	const matchesUrls = text?.match?.(urlRegex); //Note: ["https://www.npmjs.com", "https://github.com/orgs"]
 
 	if (matchesUrls) {
@@ -313,11 +313,16 @@ export const formatBlockCode = (text: string) => {
 	}
 
 	const addNewlinesToCodeBlock = (block) => {
-		if (!block.startsWith('```\n')) {
-			block = block.replace(/^```/, '```\n');
-		}
-		if (!block.endsWith('\n```')) {
-			block = block.replace(/```$/, '\n```');
+		if (isMessageReply) {
+			block = block.replace(/```|\n/g, '').trim();
+			block = '`' + block + '`';
+		} else {
+			if (!block.startsWith('```\n')) {
+				block = block.replace(/^```/, '```\n');
+			}
+			if (!block.endsWith('\n```')) {
+				block = block.replace(/```$/, '\n```');
+			}
 		}
 		return '\n' + block + '\n';
 	};
@@ -382,7 +387,7 @@ export const RenderTextMarkdownContent = React.memo(
 				}
 
 				if (element.kindOf === ETokenMessage.MARKDOWNS || element.kindOf === ETokenMessage.LINKS) {
-					formattedContent += formatBlockCode(contentInElement);
+					formattedContent += formatBlockCode(contentInElement,isMessageReply);
 				}
 
 				if (element.kindOf === ETokenMessage.VOICE_LINKS) {
@@ -391,7 +396,7 @@ export const RenderTextMarkdownContent = React.memo(
 					const voiceChannelFound = allChannelVoice?.find((channel) => channel.meeting_code === meetingCode) || null;
 
 					if (!voiceChannelFound) {
-						formattedContent += formatBlockCode(contentInElement);
+						formattedContent += formatBlockCode(contentInElement, isMessageReply);
 					} else {
 						formattedContent += ChannelHashtag({ channelHashtagId: voiceChannelFound?.channel_id, channelsEntities });
 					}
