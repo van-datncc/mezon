@@ -82,13 +82,6 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 		const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
 		const resPayload = response.payload as ApiCreateChannelDescRequest;
 		if (resPayload.channel_id) {
-			await dispatch(
-				directActions.joinDirectMessage({
-					directMessageId: resPayload.channel_id,
-					channelName: resPayload.channel_label,
-					type: Number(resPayload.type),
-				}),
-			);
 			const directChat = toDmGroupPage(resPayload.channel_id, Number(resPayload.type));
 			navigate(directChat);
 		}
