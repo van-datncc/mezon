@@ -29,7 +29,7 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 	socketStatus: LoadingStatus;
 	error?: string | null;
 	currentDirectMessageId?: string | null;
-	currentDirectMessageType?: string | null;
+	currentDirectMessageType?: number;
 	dmMetadata: EntityState<DMMeta, string>;
 	statusDMChannelUnread: Record<string, boolean>;
 }
@@ -62,6 +62,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
 		if (response) {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
+			thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type?? 0));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -189,10 +190,10 @@ export type StatusDMUnreadArgs = {
 
 export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload>(
 	'direct/joinDirectMessage',
-	async ({ directMessageId, channelName, type, noCache = false, isFetchingLatestMessages = false }, thunkAPI) => {
+	async ({ directMessageId, type, noCache = false, isFetchingLatestMessages = false }, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
-			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type?.toString() || ''));
+			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type??ChannelType.CHANNEL_TYPE_DM));
 			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache, isFetchingLatestMessages }));
 			const fetchChannelMembersResult = await thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
@@ -233,7 +234,7 @@ export const directSlice = createSlice({
 		setDmGroupCurrentId: (state, action: PayloadAction<string>) => {
 			state.currentDirectMessageId = action.payload;
 		},
-		setDmGroupCurrentType: (state, action: PayloadAction<string>) => {
+		setDmGroupCurrentType: (state, action: PayloadAction<number>) => {
 			state.currentDirectMessageType = action.payload;
 		},
 		updateDMSocket: (state, action: PayloadAction<ChannelMessage>) => {
