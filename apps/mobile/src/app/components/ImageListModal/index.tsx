@@ -22,6 +22,8 @@ interface IVisibleToolbarConfig {
 	showFooter: boolean;
 }
 const ORIGIN_SCALE = 1;
+const TIME_TO_HIDE_THUMBNAIL = 5000;
+const TIME_TO_SHOW_SAVE_IMAGE_SUCCESS = 3000;
 
 export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const { visible, onClose, imageSelected } = props;
@@ -40,9 +42,9 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		return imageIndexSelected === -1 ? 0 : imageIndexSelected;
 	}, [allImageList, imageSelected])
 
-	const updateToolbarConfig = (newValue: Partial<IVisibleToolbarConfig>) => {
+	const updateToolbarConfig = useCallback((newValue: Partial<IVisibleToolbarConfig>) => {
 		setVisibleToolbarConfig({ ...visibleToolbarConfig, ...newValue })
-	}
+	}, [visibleToolbarConfig])
 
 	const onIndexChange = (newIndex: number) => {
 		if (allImageList[newIndex]?.id !== currentImage?.id) {
@@ -50,6 +52,14 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 			ref.current?.reset(); //Note: reset scale
 		}
 	}
+
+	const setTimeoutHideFooter = useCallback(() => {
+		footerTimeoutRef.current = setTimeout(() => {
+			updateToolbarConfig({
+				showFooter: false
+			})
+		}, TIME_TO_HIDE_THUMBNAIL)
+	}, [updateToolbarConfig])
 
 	const onTap = () => {
 		updateToolbarConfig({
@@ -85,7 +95,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		}
 	}
 
-	const onImageThumbnailChange = (image: AttachmentEntity) => {
+	const onImageThumbnailChange = useCallback((image: AttachmentEntity) => {
 		const imageIndexSelected = allImageList?.findIndex(i => i?.id === image?.id);
 		if (imageIndexSelected > -1) {
 			setCurrentImage(image);
@@ -97,7 +107,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 				setTimeoutHideFooter();
 			}
 		}
-	}
+	}, [allImageList, setTimeoutHideFooter, visibleToolbarConfig.showFooter])
 
 	const renderItem = ({
 		item,
@@ -116,19 +126,11 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		);
 	};
 
-	const setTimeoutHideFooter = () => {
-		footerTimeoutRef.current = setTimeout(() => {
-			updateToolbarConfig({
-				showFooter: false
-			})
-		}, 5000)
-	}
-
 	const onImageSaved = useCallback(() => {
 		setShowSavedImage(true);
 		imageSavedTimeoutRef.current = setTimeout(() => {
 			setShowSavedImage(false);
-		}, 3000)
+		}, TIME_TO_SHOW_SAVE_IMAGE_SUCCESS)
 	}, [])
 
 	useEffect(() => {
@@ -140,8 +142,8 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 
 	useEffect(() => {
 		return () => {
-			clearTimeout(footerTimeoutRef.current);
-			clearTimeout(imageSavedTimeoutRef.current);
+			footerTimeoutRef.current && clearTimeout(footerTimeoutRef.current);
+			imageSavedTimeoutRef.current && clearTimeout(imageSavedTimeoutRef.current);
 		}
 	}, [])
 

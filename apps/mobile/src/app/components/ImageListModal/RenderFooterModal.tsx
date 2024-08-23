@@ -26,14 +26,16 @@ export const RenderFooterModal = memo((props: IRenderFooterModalProps) => {
 	const flatListRef = useRef<Animated.FlatList<AttachmentEntity>>(null);
 
 	useEffect(() => {
-		const index = allImageList.findIndex(file => file?.id === imageSelected?.id);
-		if (index !== -1 && flatListRef.current) {
-			flatListRef.current.scrollToOffset({
-				offset: (index - 3) * (size.s_40),
-				animated: true,
-			});
+		if (imageSelected?.id) {
+			const index = allImageList.findIndex(file => file?.id === imageSelected?.id);
+			if (index !== -1 && flatListRef.current) {
+				flatListRef.current.scrollToOffset({
+					offset: (index - 3) * (size.s_40),
+					animated: true,
+				});
+			}
 		}
-	}, [imageSelected]);
+	}, [imageSelected?.id]);
 
 	const handlePress = (imageFile: AttachmentEntity) => {
 		if (imageFile?.id !== imageSelected?.id) {
