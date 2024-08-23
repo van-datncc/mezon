@@ -1,9 +1,8 @@
 import { IChannelCategorySetting, IDefaultNotificationCategory, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
-import { ApiNotificationSetting } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { NotificationChannelCategorySetting } from 'mezon-js';
+import { ApiNotificationSetting } from 'mezon-js/api.gen';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 export const DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY = 'defaultnotificationcategory';
 
 export interface DefaultNotificationCategoryState {
@@ -19,17 +18,13 @@ export const initialDefaultNotificationCategoryState: DefaultNotificationCategor
 
 type fetchNotificationCategorySettingsArgs = {
 	categoryId: string;
-	noCache?: boolean;
 };
 
 export const getDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/getDefaultNotificationCategory',
-	async ({ categoryId, noCache }: fetchNotificationCategorySettingsArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchNotificationCategorySetting.clear(mezon, categoryId);
-		}
-		const response = await fetchNotificationCategorySetting(mezon, categoryId);
+	async ({ categoryId }: fetchNotificationCategorySettingsArgs, thunkAPI) => {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const response = await mezon.socketRef.current?.getNotificationCategorySetting(categoryId);
 
 		if (!response) {
 			return thunkAPI.rejectWithValue('Invalid session');
@@ -55,18 +50,6 @@ export type SetDefaultNotificationPayload = {
 	clan_id: string;
 	active?: number
 };
-const LIST_NOTIFI_CATEGORY_CACHED_TIME = 1000 * 60 * 3;
-export const fetchNotificationCategorySetting = memoize(
-	(mezon: MezonValueContext, categoryId: string) =>
-		mezon.socketRef.current?.getNotificationCategorySetting(categoryId),
-	{
-		promise: true,
-		maxAge: LIST_NOTIFI_CATEGORY_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1];
-		},
-	},
-);
 
 export const setDefaultNotificationCategory = createAsyncThunk(
 	'defaultnotificationcategory/setDefaultNotificationCategory',
@@ -82,8 +65,8 @@ export const setDefaultNotificationCategory = createAsyncThunk(
 
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "", noCache: true }))
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "", noCache: true }));
+		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "" }))
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "" }));
 		return response;
 	},
 );
@@ -102,8 +85,8 @@ export const deleteDefaultNotificationCategory = createAsyncThunk(
 
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "", noCache: true }))
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "", noCache: true }));
+		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "" }))
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "" }));
 		return response;
 	},
 );
@@ -120,8 +103,8 @@ export const setMuteCategory = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue ([]);
 		}
-		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "", noCache: true }))
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "", noCache: true }));
+		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || "" }))
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || "" }));
 		return response
 	}
 )
@@ -166,34 +149,17 @@ export const channelCategorySettingAdapter = createEntityAdapter<NotiChannelCate
 
 type fetchChannelCategorySettingPayload = {
 	clanId: string;
-	noCache?: boolean
 };
 export const fetchChannelCategorySetting = createAsyncThunk('channelCategorySetting/fetchChannelCategorySetting',
-	async ({ clanId, noCache }: fetchChannelCategorySettingPayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchChannelCategorySettingCache.clear(mezon, clanId);
-		}
-		const response = await fetchChannelCategorySettingCache(mezon, clanId);
+	async ({ clanId }: fetchChannelCategorySettingPayload, thunkAPI) => {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const response = await mezon.socketRef.current?.getNotificationChannelCategorySetting(clanId);
 
 		if (!response?.notification_channel_category_settings_list) {
 			return [];
 		}
 		return response.notification_channel_category_settings_list.map(mapChannelCategorySettingToEntity);
 	});
-
-const LIST_NOTIFI_CHANEL_CATEGORY_CACHED_TIME = 1000 * 60 * 3;
-export const fetchChannelCategorySettingCache = memoize(
-	(mezon: MezonValueContext, channelID: string) =>
-		mezon.socketRef.current?.getNotificationChannelCategorySetting(channelID),
-	{
-		promise: true,
-		maxAge: LIST_NOTIFI_CHANEL_CATEGORY_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1];
-		},
-	},
-);
 
 export const initialChannelCategorySettingState: ChannelCategorySettingState = channelCategorySettingAdapter.getInitialState({
 	loadingStatus: 'not loaded',
