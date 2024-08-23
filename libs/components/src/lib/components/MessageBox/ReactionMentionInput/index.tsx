@@ -37,13 +37,12 @@ import {
 	selectLassSendMessageEntityBySenderId,
 	selectMessageByMessageId,
 	selectOpenEditMessageState,
-	selectOpenReplyMessageState,
 	selectOpenThreadMessageState,
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store';
 import {
 	ChannelMembersEntity,
@@ -133,10 +132,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply);
 	const { setSubPanelActive } = useGifsStickersEmoji();
 	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directId || ''));
-	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
 
@@ -157,30 +154,24 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 
-	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const isSearchMessage = useSelector(
-		selectIsSearchMessage((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
-	);
-	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(
-		(props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || '',
-	);
-	const attachmentDataRef = useSelector(
-		selectAttachmentData((props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId) || ''),
+	const currentDmOrChannelId = useMemo(
+		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
+		[currentChannel?.channel_id, currentDmId, props.mode],
 	);
 
 	const userProfile = useSelector(selectAllAccount);
+	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
+	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentDmOrChannelId || ''));
+	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
+	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
+	const attachmentDataRef = useSelector(selectAttachmentData(currentDmOrChannelId || ''));
+	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
-	const lastMessageByUserId = useSelector((state) =>
-		selectLassSendMessageEntityBySenderId(
-			state,
-			props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId,
-			userProfile?.user?.id,
-		),
-	);
-
+	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(currentDmOrChannelId || '');
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
+
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
 
@@ -201,7 +192,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		callback(matches);
 	};
-
 
 	const { trackEnterPress } = useEnterPressTracker();
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
@@ -252,7 +242,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	);
 
 	const editorRef = useRef<HTMLInputElement | null>(null);
-	const openReplyMessageState = useSelector(selectOpenReplyMessageState);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 
 	const closeMenu = useSelector(selectCloseMenu);
@@ -266,7 +255,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			const payload = {
-				t: content,
+				t: valueTextInput.trim(),
 				hg: hashtagList,
 				ej: emojiList,
 				lk: linkList,
@@ -300,7 +289,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0 && openReplyMessageState) {
+			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0) {
 				props.onSend(
 					filterEmptyArrays(payload),
 					mentionList,
@@ -313,8 +302,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setValueTextInput('', props.isThread);
 				setAttachmentData([]);
-				dispatch(referencesActions.setIdReferenceMessageReply(''));
-				dispatch(referencesActions.setOpenReplyMessageState(false));
+				dispatch(referencesActions.setIdReferenceMessageReply({ channelId: currentDmOrChannelId as string, idMessageRefReply: '' }));
 				setMentionEveryone(false);
 				setDataReferences([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
@@ -353,7 +341,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 			}
-			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(reactionActions.setReactionPlaceActive(EmojiPlaces.EMOJI_REACTION_NONE));
 			setSubPanelActive(SubPanelName.NONE);
 			dispatch(
@@ -374,7 +361,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			openThreadMessageState,
 			getRefMessageReply,
 			dataReferences,
-			openReplyMessageState,
 			dispatch,
 			setSubPanelActive,
 			content,
@@ -471,7 +457,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if (idRefMessage && !valueTextInput) {
 			dispatch(messagesActions.setIdMessageToJump(idRefMessage));
 			dispatch(referencesActions.setOpenEditMessageState(true));
-			dispatch(referencesActions.setOpenReplyMessageState(false));
 			dispatch(referencesActions.setIdReferenceMessageEdit(lastMessageByUserId));
 			dispatch(referencesActions.setIdReferenceMessageEdit(idRefMessage));
 			dispatch(
@@ -510,14 +495,10 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if ((closeMenu && statusMenu) || openEditMessageState) {
 			return;
 		}
-		if (
-			(getRefMessageReply !== null && openReplyMessageState) ||
-			(emojiPicked?.shortName !== '' && !reactionRightState) ||
-			(!openEditMessageState && !idMessageRefEdit)
-		) {
+		if (getRefMessageReply !== null || (emojiPicked?.shortName !== '' && !reactionRightState) || (!openEditMessageState && !idMessageRefEdit)) {
 			return focusToElement(editorRef);
 		}
-	}, [getRefMessageReply, openReplyMessageState, emojiPicked, openEditMessageState, idMessageRefEdit]);
+	}, [getRefMessageReply, emojiPicked, openEditMessageState, idMessageRefEdit]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -723,39 +704,38 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 export default MentionReactInput;
 
-
 const useEnterPressTracker = () => {
-    const [enterCount, setEnterCount] = useState(0);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
-	const {handleOpenPopupQuickMess, handleClosePopupQuickMess} = useHandlePopupQuickMess();
+	const [enterCount, setEnterCount] = useState(0);
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
+	const { handleOpenPopupQuickMess, handleClosePopupQuickMess } = useHandlePopupQuickMess();
 
-    const resetEnterCount = () => {
-        setEnterCount(0);
+	const resetEnterCount = () => {
+		setEnterCount(0);
 		handleClosePopupQuickMess();
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
-        }
-    };
+		if (timerRef.current) {
+			clearTimeout(timerRef.current);
+			timerRef.current = null;
+		}
+	};
 
-    const trackEnterPress = () => {
-        setEnterCount((prev) => {
-            const newCount = prev + 1;
+	const trackEnterPress = () => {
+		setEnterCount((prev) => {
+			const newCount = prev + 1;
 
-            if (newCount >= 8) {
-                resetEnterCount(); 
+			if (newCount >= 8) {
+				resetEnterCount();
 				handleOpenPopupQuickMess();
-                return 0; 
-            }
+				return 0;
+			}
 
-            return newCount;
-        });
+			return newCount;
+		});
 
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-        }
-        timerRef.current = setTimeout(resetEnterCount, 1000); 
-    };
+		if (timerRef.current) {
+			clearTimeout(timerRef.current);
+		}
+		timerRef.current = setTimeout(resetEnterCount, 1000);
+	};
 
-    return { trackEnterPress };
-}
+	return { trackEnterPress };
+};
