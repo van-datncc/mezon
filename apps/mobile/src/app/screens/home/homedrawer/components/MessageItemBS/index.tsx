@@ -355,7 +355,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.CopyMessageLink:
 				return <Icons.LinkIcon color={themeValue.text} />;
 			case EMessageActionType.Report:
-				return <Icons.FlagIcon color={baseColor.red} height={20} width={20} />;
+				return <Icons.FlagIcon color={baseColor.red} height={14} width={14} />;
 			default:
 				return <View />;
 		}
