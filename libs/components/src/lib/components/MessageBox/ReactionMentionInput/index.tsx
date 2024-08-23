@@ -210,11 +210,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		switch (key) {
 			case 'Enter': {
-				trackEnterPress();
 				if (shiftKey) {
 					return;
 				} else {
 					event.preventDefault();
+					trackEnterPress();
 					handleSend(false);
 					return;
 				}

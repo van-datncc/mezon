@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useClanRestriction, useRoles, UserRestrictionZone } from '@mezon/core';
-import { channelMembersActions, RolesClanEntity, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectMemberChannelById, selectTheme, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, RolesClanEntity, selectAllRolesClan, selectCurrentChannelId, selectCurrentClan, selectTheme, selectUserChannelById, useAppDispatch } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, useMemo, useState } from 'react';
@@ -17,7 +17,7 @@ const checkAdminPermission = (role: RolesClanEntity, userId: string) => {
 
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const userById = useSelector(selectMemberChannelById(userID || '', currentChannelId || ''));
+	const userById = useSelector(selectUserChannelById(userID || '', currentChannelId || ''));
 	const { updateRole } = useRoles();
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
