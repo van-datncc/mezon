@@ -90,7 +90,7 @@ export const markdownStyles = (colors: Attributes) =>
 			color: colors.text,
 			backgroundColor: colors.primary,
 			fontSize: size.small,
-			lineHeight: size.s_20,
+			lineHeight: size.s_17,
 		},
 		fence: {
 			color: colors.text,
