@@ -1,4 +1,14 @@
-import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, Notification, NotificationChannelCategorySetting, NotifiReactMessage, PermissionRoleChannel } from 'mezon-js';
+import {
+	ChannelDescription,
+	ChannelMessage,
+	ChannelStreamMode,
+	ChannelType,
+	HashtagDm,
+	Notification,
+	NotificationChannelCategorySetting,
+	NotifiReactMessage,
+	PermissionRoleChannel,
+} from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -70,8 +80,8 @@ export type INotifiReactMessage = NotifiReactMessage;
 export type IDefaultNotificationClan = ApiNotificationSetting;
 
 export type IDefaultNotificationCategory = ApiNotificationSetting & {
-	active?: number,
-	time_mute?: string,
+	active?: number;
+	time_mute?: string;
 };
 
 export type IDefaultNotification = ApiNotificationSetting & {
@@ -201,7 +211,6 @@ export type IUser = {
 	name: string;
 	username: string;
 	id: string;
-	avatarSm: string;
 };
 
 export type MetaDateStatusUser = {
@@ -357,9 +366,9 @@ export type IChannelUser = ChannelDescription & {
 	id: string;
 };
 
-export type IPermissionRoleChannel =  PermissionRoleChannel & {
-	id: string
-}
+export type IPermissionRoleChannel = PermissionRoleChannel & {
+	id: string;
+};
 
 export type IEmoticons = {
 	[key: string]: string;
