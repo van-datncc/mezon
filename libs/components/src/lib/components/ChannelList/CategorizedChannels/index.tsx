@@ -44,7 +44,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 		const windowHeight = window.innerHeight;
 		
 		if (event.button === MouseButton.RIGHT) {
-			await dispatch(defaultNotificationCategoryActions.getDefaultNotificationCategory({categoryId: category?.id ?? '', noCache: false}));
+			await dispatch(defaultNotificationCategoryActions.getDefaultNotificationCategory({categoryId: category?.id ?? ''}));
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelCategory(!isShowPanelCategory);

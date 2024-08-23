@@ -1,10 +1,7 @@
 import { IChannelUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
 import { ChannelDescription } from 'mezon-js';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-
-const LIST_CHANNEL_USER_CACHED_TIME = 1000 * 60 * 3;
+import { ensureSocket, getMezonCtx } from '../helpers';
 
 export const LIST_CHANNELS_USER_FEATURE_KEY = 'listchannelbyusers';
 
@@ -30,33 +27,14 @@ export interface ListChannelsByUserRootState {
 	[LIST_CHANNELS_USER_FEATURE_KEY]: ListChannelsByUserState;
 }
 
-export const fetchChannelsByUserCached = memoize(
-	async (mezon: MezonValueContext) => {
-		const response = await mezon.socketRef.current?.ListChannelByUserId();
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: LIST_CHANNEL_USER_CACHED_TIME,
-		normalizer: (args) => {
-			return args[0].session.username || "";
-		},
-	},
-);
-
-type fetchChannelsArgs = {
-	noCache?: boolean;
-};
 
 export const fetchListChannelsByUser = createAsyncThunk(
 	'channelsByUser/fetchListChannelsByUser',
-	async ({ noCache }: fetchChannelsArgs, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		if (noCache) {
-			fetchChannelsByUserCached.clear(mezon);
-		}
-		const response = await fetchChannelsByUserCached(mezon);
-		if (!response.channeldesc) {
+	async (_, thunkAPI) => {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+	
+		const response = await mezon.socketRef.current?.ListChannelByUserId();
+		if (!response?.channeldesc) {
 			return [];
 		}
 

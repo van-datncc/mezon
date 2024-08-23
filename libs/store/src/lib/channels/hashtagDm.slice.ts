@@ -1,7 +1,6 @@
 import { IHashtagDm, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
-import memoize from 'memoizee';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { ensureSocket, getMezonCtx } from '../helpers';
 import { HashtagDm } from 'mezon-js';
 
 export interface HashtagDmEntity extends IHashtagDm {
@@ -24,31 +23,12 @@ export const HashtagDmAdapter = createEntityAdapter<HashtagDmEntity>();
 type fetchHashtagDmArgs = {
 	userIds: string[];
 	limit?: number;
-	noCache?: boolean;
 	directId: string;
 };
 
-const LIST_COMMON_CHANNEL_VOID_CACHED_TIME = 1000 * 60 * 3;
-export const fetchHashtagDmCached = memoize(
-	(mezon: MezonValueContext, userIds: string[], limit: number) =>
-		mezon.socketRef.current?.hashtagDMList(userIds, limit),
-	{
-		promise: true,
-		maxAge: LIST_COMMON_CHANNEL_VOID_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1].join('_');
-		},
-	},
-);
-
-export const fetchHashtagDm = createAsyncThunk('channels/fetchHashtagDm', async ({ userIds, noCache, directId }: fetchHashtagDmArgs, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-	if (noCache) {
-		fetchHashtagDmCached.clear(mezon, userIds, 50);
-	}
-	
-	const response = await fetchHashtagDmCached(mezon, userIds, 50);
+export const fetchHashtagDm = createAsyncThunk('channels/fetchHashtagDm', async ({ userIds, directId }: fetchHashtagDmArgs, thunkAPI) => {
+	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+	const response = await mezon.socketRef.current?.hashtagDMList(userIds, 50);
 	if (!response?.hashtag_dm) {
 		return [];
 	}
