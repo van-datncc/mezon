@@ -37,7 +37,6 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 	mode,
 }) => {
 	const { videos, images, documents } = useMemo(() => classifyAttachments(attachments), [attachments]);
-
 	return (
 		<>
 			{videos.length > 0 && (

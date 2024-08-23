@@ -108,7 +108,12 @@ const SearchMessageChannel = () => {
 	};
 
 	const handleClickSearchOptions = (value: string) => {
-		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value: valueInputSearch + value }));
+		dispatch(
+			searchMessagesActions.setValueInputSearch({
+				channelId: currentChannel?.id ?? '',
+				value: hasKeySearch(value ?? '') ? value : valueInputSearch + value,
+			}),
+		);
 		searchRef.current?.focus();
 	};
 
@@ -211,7 +216,7 @@ const SearchMessageChannel = () => {
 					<Icons.Close defaultSize="w-4 h-4" />
 				</button>
 			</div>
-			{isShowSearchMessageModal && (
+			{isShowSearchMessageModal && !hasKeySearch(valueInputSearch ?? '') && (
 				<SearchMessageChannelModal
 					hasKeySearch={hasKeySearch(valueInputSearch ?? '')}
 					valueInputSearch={valueInputSearch}

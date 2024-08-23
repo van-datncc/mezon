@@ -65,6 +65,15 @@ export function useReference(channelId?: string) {
 		[dispatch],
 	);
 
+	const removeAttachmentByIndex = (channelId: string, indexItem: number) => {
+		dispatch(
+			referencesActions.removeAttachment({
+				channelId: channelId || '',
+				index: indexItem,
+			}),
+		);
+	};
+
 	return useMemo(
 		() => ({
 			setDataReferences,
@@ -79,6 +88,7 @@ export function useReference(channelId?: string) {
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
+			removeAttachmentByIndex,
 		}),
 		[
 			setDataReferences,
@@ -93,6 +103,7 @@ export function useReference(channelId?: string) {
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
+			removeAttachmentByIndex,
 		],
 	);
 }

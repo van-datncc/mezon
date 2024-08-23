@@ -108,12 +108,18 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	const handleOpenUserProfileSetting = () => {
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
 		setIsShowSettingFooterStatus(true);
+		if (onClose) {
+			onClose ();
+		}
 	}
 	
 	const handleOpenClanProfileSetting = () => {
 		setIsUserProfile(false);
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
 		setIsShowSettingFooterStatus(true);
+		if (onClose) {
+			onClose ();
+		}
 	}
 	
 	return (

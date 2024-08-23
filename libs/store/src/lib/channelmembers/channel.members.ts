@@ -345,6 +345,14 @@ export const channelMembers = createSlice({
 				}
 			});
 		},
+		
+		removeUserByUserIdAndClanId: (state, action: PayloadAction<{ userId: string; clanId: string;}>) => {
+			const { userId, clanId } = action.payload;
+			const ids = Object.values(state.entities)
+                        .filter((channelUser) => channelUser.clan_id === clanId && channelUser.user?.id === userId)
+                        .map((message) => message.id);
+						channelMembersAdapter.removeMany(state, ids);
+		}
 	},
 	extraReducers: (builder) => {
 		builder
