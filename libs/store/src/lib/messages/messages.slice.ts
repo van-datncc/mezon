@@ -54,7 +54,6 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 			name: channelMess.username || '',
 			username: channelMess.username || '',
 			id: channelMess.sender_id || '',
-			avatarSm: channelMess.avatar || '',
 		},
 		lastSeen: lastSeenId === (channelMess.id || channelMess.message_id),
 		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
@@ -198,8 +197,8 @@ export const fetchMessages = createAsyncThunk(
 			};
 		}
 
-		const firstMessage = response.messages.find((item) => item.code === EMessageCode.FIRST_MESSAGE);
-		if (firstMessage) {
+		const firstMessage = response.messages[response.messages.length - 1];
+		if (firstMessage.code === EMessageCode.FIRST_MESSAGE) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
 		}
 
@@ -226,11 +225,11 @@ export const fetchMessages = createAsyncThunk(
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
 
-		const lastLoadMessageId = messages[messages.length - 1]?.id;
+		const lastLoadMessage = messages[messages.length - 1];
+		const hasMore = lastLoadMessage.isFirst === false ? false : true;
 
-		const hasMore = firstMessage?.id === lastLoadMessageId;
 		if (messages.length > 0) {
-			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessageId, hasMore } }));
+			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
 		}
 
 		if (response.last_seen_message?.id) {
@@ -594,13 +593,15 @@ export const messagesSlice = createSlice({
 			state.idMessageToJump = action.payload;
 		},
 
-		setNewMessageToUpdateImage(state, action: PayloadAction<ChannelMessage>) {
+		setNewMessageToUpdateImage(state, action) {
 			const data = action.payload;
 			state.newMesssageUpdateImage = {
 				channel_id: data.channel_id,
 				message_id: data.message_id,
 				clan_id: data.clan_id,
 				mode: data.mode,
+				mentions: data.mentions,
+				content: data.content,
 			};
 		},
 

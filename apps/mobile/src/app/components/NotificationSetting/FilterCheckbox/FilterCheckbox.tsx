@@ -1,4 +1,3 @@
-import { capitalizeFirstLetter } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
@@ -36,7 +35,7 @@ const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(
 						<Text style={styles.labelOption}>{label}</Text>
 					</Block>
 					{[ENotificationType.CATEGORY_DEFAULT]?.includes?.(label as ENotificationType) && (
-						<Text style={styles.defaultNotifyName}>{capitalizeFirstLetter(defaultNotifyName)}</Text>
+						<Text style={styles.defaultNotifyName}>{defaultNotifyName}</Text>
 					)}
 				</View>
 

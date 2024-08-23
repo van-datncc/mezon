@@ -121,7 +121,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 										scope="col"
 										className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase tracking-wider w-1/2 text-left"
 									>
-										Roles - {numRoles}
+										Roles - {numRoles - 1}
 									</th>
 									<th
 										scope="col"
