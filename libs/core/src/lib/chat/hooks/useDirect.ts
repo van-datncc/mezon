@@ -20,16 +20,6 @@ export function useDirect({ autoFetch = false }: UseDirectParams = { autoFetch: 
 			const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDm));
 			const resPayload = response.payload as ApiCreateChannelDescRequest;
 
-			if (resPayload.channel_id) {
-				await dispatch(
-					directActions.joinDirectMessage({
-						directMessageId: resPayload.channel_id,
-						channelName: resPayload.channel_label,
-						type: Number(resPayload.type),
-					}),
-				);
-			}
-
 			return resPayload;
 		},
 		[dispatch],
