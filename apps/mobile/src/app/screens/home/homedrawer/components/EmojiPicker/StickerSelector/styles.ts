@@ -1,10 +1,10 @@
-import { Colors, size } from '@mezon/mobile-ui';
+import { Colors, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
 	content: {
-		height: 110,
-		width: 110,
+		height: (Metrics.screenWidth - size.s_6 * size.s_10) / 5,
+		width: (Metrics.screenWidth - size.s_6 * size.s_10) / 5,
 		borderRadius: 10,
 		overflow: 'hidden',
 		backgroundColor: Colors.black,
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		gap: 10,
+		gap: size.s_10,
 		justifyContent: 'space-between',
 		alignItems: 'center',
 	},

@@ -33,35 +33,36 @@ export { default as ChannelMessageOpt } from './components/Message/ChannelMessag
 export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak';
 export { default as AttachmentLoading } from './components/MessageBox/AttachmentLoading';
 export { default as AttachmentPreviewThumbnail } from './components/MessageBox/AttachmentPreviewThumbnail';
-export { default as MessageBox } from './components/MessageBox/index';
 export { default as MentionReactInput } from './components/MessageBox/ReactionMentionInput';
 export { default as CustomModalMentions } from './components/MessageBox/ReactionMentionInput/CustomModalMentions';
 export { default as SuggestItem } from './components/MessageBox/ReactionMentionInput/SuggestItem';
+export { default as MessageBox } from './components/MessageBox/index';
 export { default as MessageWithUser } from './components/MessageWithUser';
 export { default as MessageImage } from './components/MessageWithUser/MessageImage';
 export { default as MessageModalImage } from './components/MessageWithUser/MessageModalImage';
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
 export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
 export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
-export { default as ModalNotificationSetting } from './components/notificationSetting/index';
 export { default as SearchModal } from './components/SearchModal/index';
 export { default as ToastController } from './components/ToastController/ToastController';
+export { default as ModalNotificationSetting } from './components/notificationSetting/index';
 
 export { Icons } from '@mezon/ui';
+export * from './components/AvatarImage/AvatarImage';
+export { default as AppDirectoryList } from './components/ClanSettings/AppDirectory/AppDirectoryList';
+export { default as CustomDropdown } from './components/CustomDropdown';
 export { default as FileUploadByDnD } from './components/DragAndDrop/UploadFileByDnd';
+export { default as FirstJoinPopup } from './components/FirstJoinPopup';
 export { default as ForwardMessageModal } from './components/ForwardMessage';
 export * from './components/LoginForm';
 export * from './components/MessageBox/index';
 export { default as MessageVideo } from './components/MessageWithUser/MessageVideo';
+export { ModalErrorTypeUpload, ModalOverData } from './components/ModalError';
 export { default as SidebarClanItem } from './components/ModalListClans';
 export { default as SidebarTooltip } from './components/ModalListClans/SidebarTooltip';
+export { default as ModalUserProfile } from './components/ModalUserProfile';
 export { default as NavLinkComponent } from './components/NavLink';
 export { default as ReplyMessageBox } from './components/ReplyMessageBox';
-export { default as FirstJoinPopup} from './components/FirstJoinPopup';
-export * from './components/AvatarImage/AvatarImage';
-export { default as CustomDropdown } from './components/CustomDropdown';
-export { ModalErrorTypeUpload, ModalOverData } from './components/ModalError';
-export { default as ModalUserProfile } from './components/ModalUserProfile';
 export { default as SearchMessageChannelRender } from './components/SearchMessageChannel/SearchMessageChannelRender';
 export { default as SettingAccount } from './components/SettingAccount';
 export { default as SettingAppearance } from './components/SettingAppearance';
@@ -69,10 +70,8 @@ export * from './components/SettingProfile';
 export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 export { default as UserMentionList } from './components/UserMentionList';
-export { default as AppDirectoryList } from './components/ClanSettings/AppDirectory/AppDirectoryList'
 // TODO: move firebase into new libs, maybe @mezon/firebase or @mezon/messaging
 export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
 
-export * from './components/ThumnailAttachmentRender';
-
+export * from './components/ThumbnailAttachmentRender';

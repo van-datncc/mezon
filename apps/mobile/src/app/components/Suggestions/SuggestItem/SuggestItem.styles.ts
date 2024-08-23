@@ -1,4 +1,4 @@
-import { Attributes, Colors, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, Fonts, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) => StyleSheet.create({
 	wrapperItem: {
@@ -20,7 +20,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontSize: size.medium,
 		fontWeight: '600',
 		color: colors.white,
-    flexBasis: '50%',
 	},
 	image: {
 		width: size.s_30,
@@ -53,16 +52,25 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		color: colors.text,
 	},
 	emojiImage: { width: size.s_20, height: size.s_20 },
-  roleText: {
-    color: colors.textRoleLink,
-    fontSize: size.medium,
-		fontWeight: '600',
-  },
-  textHere: {
-    fontSize: size.medium,
-		fontWeight: '600',
-		color: colors.white,
-    flexBasis: '15%',
-  }
-
+	roleText: {
+		color: colors.textRoleLink,
+		fontSize: size.medium,
+			fontWeight: '600',
+	},
+	textHere: {
+		fontSize: size.medium,
+			fontWeight: '600',
+			color: colors.white,
+		flexBasis: '15%',
+	},
+	channelWrapper: {
+		flexDirection: 'row',
+		flexBasis: '50%',
+		gap: size.s_8
+	},
+	channelBusyText: {
+        color: baseColor.redStrong,
+        fontStyle: "italic",
+        fontSize: Fonts.size.h7
+    }
 });

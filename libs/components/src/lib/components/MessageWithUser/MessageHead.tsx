@@ -1,7 +1,6 @@
 import { ShortUserProfile } from '@mezon/components';
-import { useGetPriorityNameFromUserClan, useOnClickOutside } from '@mezon/core';
+import { useGetPriorityNameFromUserClan, useOnClickOutside, useShowName } from '@mezon/core';
 import { IMessageWithUser, MouseButton } from '@mezon/utils';
-import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';

@@ -327,6 +327,9 @@ export const directSlice = createSlice({
 				channel.notifiCount = notifiCount;
 			}
 		},
+		removeByDirectID: (state, action: PayloadAction<string>) => {
+			directAdapter.removeOne(state, action.payload);
+		},
 	},
 	extraReducers: (builder) => {
 		builder

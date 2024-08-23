@@ -54,7 +54,6 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 			name: channelMess.username || '',
 			username: channelMess.username || '',
 			id: channelMess.sender_id || '',
-			avatarSm: channelMess.avatar || '',
 		},
 		lastSeen: lastSeenId === (channelMess.id || channelMess.message_id),
 		create_time_ms: channelMess.create_time_ms || creationTime.getTime() / 1000,
@@ -198,8 +197,8 @@ export const fetchMessages = createAsyncThunk(
 			};
 		}
 
-		const firstMessage = response.messages.find((item) => item.code === EMessageCode.FIRST_MESSAGE);
-		if (firstMessage) {
+		const firstMessage = response.messages[response.messages.length - 1];
+		if (firstMessage.code === EMessageCode.FIRST_MESSAGE) {
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId, firstMessageId: firstMessage.id }));
 		}
 
@@ -225,13 +224,12 @@ export const fetchMessages = createAsyncThunk(
 		});
 
 		thunkAPI.dispatch(reactionActions.updateBulkMessageReactions({ messages }));
-		
-		const lastLoadMessageId = messages[messages.length - 1].id
-		const hasMore = firstMessage?.id === lastLoadMessageId
+
+		const lastLoadMessage = messages[messages.length - 1];
+		const hasMore = lastLoadMessage.isFirst === false ? false : true;
+
 		if (messages.length > 0) {
-			thunkAPI.dispatch(
-				messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessageId, hasMore } }),
-			);
+			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId, param: { lastLoadMessageId: lastLoadMessage.id, hasMore } }));
 		}
 
 		if (response.last_seen_message?.id) {
@@ -595,13 +593,15 @@ export const messagesSlice = createSlice({
 			state.idMessageToJump = action.payload;
 		},
 
-		setNewMessageToUpdateImage(state, action: PayloadAction<ChannelMessage>) {
+		setNewMessageToUpdateImage(state, action) {
 			const data = action.payload;
 			state.newMesssageUpdateImage = {
 				channel_id: data.channel_id,
 				message_id: data.message_id,
 				clan_id: data.clan_id,
 				mode: data.mode,
+				mentions: data.mentions,
+				content: data.content,
 			};
 		},
 
@@ -827,15 +827,23 @@ export const messagesSlice = createSlice({
 					const channelId = action?.meta?.arg?.channelId;
 					const isFetchingLatestMessages = action.payload.isFetchingLatestMessages || false;
 					const isClearMessage = action.payload.isClearMessage || false;
+					const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId];
 					state.loadingStatus = 'loaded';
 
 					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
 					if (!isNew || !channelId) return state;
 					const reversedMessages = action.payload.messages.reverse();
 
-					if (isFetchingLatestMessages || isClearMessage) {
+					// remove all messages if clear message is true
+					if (isClearMessage) {
 						handleRemoveManyMessages(state, channelId);
 					}
+
+					// remove all messages if ís fetching latest messages and is viewing older messages
+					if (isFetchingLatestMessages && isViewingOlderMessages) {
+						handleRemoveManyMessages(state, channelId);
+					}
+
 					const direction = action.meta.arg.direction || Direction_Mode.BEFORE_TIMESTAMP;
 
 					handleSetManyMessages({
@@ -1143,7 +1151,7 @@ const handleSetManyMessages = ({
 
 	state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
 
-	state.channelMessages[channelId] = handleLimitMessage(state.channelMessages[channelId], 100, direction);
+	state.channelMessages[channelId] = handleLimitMessage(state.channelMessages[channelId], 200, direction);
 
 	// update is viewing older messages
 	state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
