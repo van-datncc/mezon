@@ -602,6 +602,7 @@ export const messagesSlice = createSlice({
 				mode: data.mode,
 				mentions: data.mentions,
 				content: data.content,
+				isMe: data.isMe,
 			};
 		},
 

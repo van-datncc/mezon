@@ -1,6 +1,5 @@
 import { useDragAndDrop, useReference } from '@mezon/core';
 import { referencesActions, useAppDispatch } from '@mezon/store';
-import { handleFiles } from '@mezon/utils';
 import { DragEvent } from 'react';
 import DragAndDropUI from './DragAndDropUI';
 
@@ -36,8 +35,7 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 		setDraggingState(false);
 		const files = e.dataTransfer.files;
 		const filesArray = Array.from(files);
-		handleFiles(filesArray, setAttachmentData);
-		dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentId, files: filesArray }));
+		dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentId, messageId: '', files: filesArray }));
 	};
 	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;
 }

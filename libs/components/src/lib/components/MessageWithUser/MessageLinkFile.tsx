@@ -1,9 +1,6 @@
-import { selectAttachmentAfterUpload } from '@mezon/store';
-import { Spinner } from 'flowbite-react';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Icons } from '../../components';
+import { useState } from 'react';
+import { Icons, RenderAttachmentThumbnail } from '../../components';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
@@ -22,7 +19,8 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 	const handleDownload = () => {
 		window.open(attachmentData.url);
 	};
-	// const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
+	const attachmentToFile = mapApiMessageAttachmentToFile(attachmentData);
+	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentToFile, 'w-8 h-10');
 
 	const hideTheInformationFile =
 		attachmentData.filetype !== 'image/gif' &&
@@ -35,25 +33,14 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 		setHoverShowOptButtonStatus(true);
 	};
 
-	const isUploadSuccessfully = useMemo(() => {
-		return attachmentData.size && attachmentData.size > 0;
-	}, [attachmentData.size]);
-
-	const attachmentAfterUpload = useSelector(selectAttachmentAfterUpload);
-
 	return (
 		<div
-			onMouseEnter={isUploadSuccessfully ? hoverOptButton : () => {}}
+			onMouseEnter={hoverOptButton}
 			onMouseLeave={() => setHoverShowOptButtonStatus(false)}
 			className={`break-all w-full cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded max-w-full ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
 			role="button"
 		>
-			{!isUploadSuccessfully && (
-				<div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-					<Spinner aria-label="Loading spinner" />
-				</div>
-			)}{' '}
-			{/* <div className="flex items-center">{thumbnailAttachment}</div> */}
+			<div className="flex items-center">{thumbnailAttachment}</div>
 			{hideTheInformationFile && (
 				<div className=" cursor-pointer " onClick={handleDownload} onKeyDown={handleDownload}>
 					<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
@@ -79,3 +66,12 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 }
 
 export default MessageLinkFile;
+
+export function mapApiMessageAttachmentToFile(attachment: ApiMessageAttachment): File {
+	const fileContent = new Blob();
+	const file = new File([fileContent], attachment.filename || 'unknown', {
+		type: attachment.filetype || 'application/octet-stream',
+		lastModified: new Date().getTime(),
+	});
+	return file;
+}

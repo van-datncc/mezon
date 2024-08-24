@@ -1,4 +1,4 @@
-import { IMessage } from '@mezon/utils';
+import { IMessage, PreSendAttachment, uploadingAttachmentStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 
@@ -22,8 +22,8 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageRefEdit: string;
 	statusLoadingAttachment: boolean;
 	idMessageMention: string;
-	attachmentAfterUpload: Record<string, File[]>;
-	displayPreviewAttachmentsPanel: Record<string, boolean>;
+	attachmentAfterUpload: PreSendAttachment[];
+	uploadingStatuses: Record<string, Record<string, uploadingAttachmentStatus>>;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -45,8 +45,8 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefEdit: '',
 	statusLoadingAttachment: false,
 	idMessageMention: '',
-	attachmentAfterUpload: {},
-	displayPreviewAttachmentsPanel: {},
+	attachmentAfterUpload: [],
+	uploadingStatuses: {},
 });
 
 export const referencesSlice = createSlice({
@@ -60,10 +60,15 @@ export const referencesSlice = createSlice({
 			state.idMessageMention = action.payload;
 		},
 
-		setPreviewAttachemtsPanel(state, action: PayloadAction<{ channelId: string; isDisplay: boolean }>) {
-			const { channelId, isDisplay } = action.payload;
-			console.log(action.payload);
-			state.displayPreviewAttachmentsPanel[channelId] = isDisplay;
+		updateAttachmentMessageId(state, action: PayloadAction<{ channelId: string; messageId: string }>) {
+			const { channelId, messageId } = action.payload;
+
+			state.attachmentAfterUpload = state.attachmentAfterUpload.map((attachment) => {
+				if (attachment.channelId === channelId && attachment.messageId === '') {
+					return { ...attachment, messageId }; // Return updated attachment
+				}
+				return attachment;
+			});
 		},
 
 		setDataReferences(state, action) {
@@ -77,19 +82,26 @@ export const referencesSlice = createSlice({
 		setOpenEditMessageState(state, action) {
 			state.openEditMessageState = action.payload;
 		},
-		setAtachmentAfterUpload(state, action: PayloadAction<{ channelId: string; files: File[] }>) {
-			const { channelId, files } = action.payload;
 
-			if (channelId === '' && files?.length === 0) {
-				state.attachmentAfterUpload = {};
-				return;
+		setAtachmentAfterUpload(state, action: PayloadAction<PreSendAttachment>) {
+			const newAttachment = action.payload;
+			const { channelId, files } = newAttachment;
+
+			const existingAttachmentIndex = state.attachmentAfterUpload.findIndex((attachment) => attachment.channelId === channelId);
+
+			if (existingAttachmentIndex !== -1) {
+				if (files.length === 0) {
+					state.attachmentAfterUpload.splice(existingAttachmentIndex, 1);
+				} else {
+					const existingAttachment = state.attachmentAfterUpload[existingAttachmentIndex];
+					state.attachmentAfterUpload[existingAttachmentIndex] = {
+						...existingAttachment,
+						files: [...existingAttachment.files, ...files],
+					};
+				}
+			} else if (files.length > 0) {
+				state.attachmentAfterUpload.push(newAttachment);
 			}
-
-			if (!state.attachmentAfterUpload[channelId]) {
-				state.attachmentAfterUpload[channelId] = [];
-			}
-
-			state.attachmentAfterUpload[channelId] = [...state.attachmentAfterUpload[channelId], ...files];
 		},
 
 		setAttachmentData(state, action: PayloadAction<{ channelId: string; attachments: ApiMessageAttachment[] }>) {
@@ -105,19 +117,45 @@ export const referencesSlice = createSlice({
 		},
 
 		removeAttachment(state, action: PayloadAction<{ channelId: string; index: number }>) {
-			const attachments = state.attachmentDataRef[action.payload.channelId];
-			if (attachments && action.payload.index >= 0 && action.payload.index < attachments.length) {
-				state.attachmentDataRef[action.payload.channelId].splice(action.payload.index, 1);
-			}
+			const { channelId, index } = action.payload;
 
-			if (
-				state.attachmentAfterUpload[action.payload.channelId] &&
-				action.payload.index >= 0 &&
-				action.payload.index < state.attachmentAfterUpload[action.payload.channelId].length
-			) {
-				state.attachmentAfterUpload[action.payload.channelId].splice(action.payload.index, 1);
+			const attachmentIndex = state.attachmentAfterUpload.findIndex((attachment) => attachment.channelId === channelId);
+
+			if (attachmentIndex !== -1) {
+				const attachment = state.attachmentAfterUpload[attachmentIndex];
+
+				if (index >= 0 && index < attachment.files.length) {
+					attachment.files.splice(index, 1);
+
+					if (attachment.files.length === 0) {
+						state.attachmentAfterUpload.splice(attachmentIndex, 1);
+					} else {
+						state.attachmentAfterUpload[attachmentIndex] = {
+							...attachment,
+							files: [...attachment.files],
+						};
+					}
+				}
 			}
 		},
+
+		setUploadingStatus: (state, action: PayloadAction<{ channelId: string; messageId: string; hasSpinning: boolean; count: number }>) => {
+			const { channelId, messageId, hasSpinning, count } = action.payload;
+
+			if (!state.uploadingStatuses[channelId]) {
+				state.uploadingStatuses[channelId] = {};
+			}
+
+			if (count > 0) {
+				state.uploadingStatuses[channelId][messageId] = {
+					hasSpinning,
+					count,
+				};
+			} else {
+				delete state.uploadingStatuses[channelId][messageId];
+			}
+		},
+
 		setIdReferenceMessageReply(state, action: PayloadAction<{ channelId: string; idMessageRefReply: string }>) {
 			state.idMessageRefReply[action.payload.channelId] = action.payload.idMessageRefReply;
 		},
@@ -175,6 +213,17 @@ export const selectMessageMetionId = createSelector(getReferencesState, (state: 
 
 export const selectAttachmentAfterUpload = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentAfterUpload);
 
+export const selectUploadingStatus = (channelId: string, messageId: string) =>
+	createSelector(
+		(state: { references: ReferencesState }) => state.references.uploadingStatuses,
+		(uploadingStatuses) => {
+			const status = uploadingStatuses[channelId]?.[messageId];
+			return {
+				hasSpinning: status?.hasSpinning ?? false,
+				count: status?.count ?? 0,
+			};
+		},
+	);
 export const selectAttachmentData = (channelId: string) =>
 	createSelector(getReferencesState, (state: ReferencesState) => {
 		return state.attachmentDataRef[channelId] || [];
@@ -184,21 +233,8 @@ export const selectIdMessageRefReply = (channelId: string) =>
 	createSelector(getReferencesState, (state: ReferencesState) => {
 		return state.idMessageRefReply[channelId] || '';
 	});
-export const selectDisplayPreviewAttachmentsPanel = (channelId: string) =>
-	createSelector(getReferencesState, (state: ReferencesState) => {
-		return state.displayPreviewAttachmentsPanel[channelId] || [];
-	});
 
-// {
-// 	"filename": "7stickers.zip",
-// 	"filetype": "application/x-zip-compressed",
-// 	"size": 0,
-// 	"url": "7stickers.zip"
-// }
-// 0:File
-// lastModified:1724148491821
-// lastModifiedDate: Tue Aug 20 2024 17:08:11 GMT+0700 (Indochina Time) {}
-// name:"7stickers.zip"
-// size:47563707
-// type:"application/x-zip-compressed"
-// webkitRelativePath:""
+export const selectFilteredAttachments = (channelId: string) =>
+	createSelector(selectAttachmentAfterUpload, (attachmentAfterUpload) =>
+		Object.values(attachmentAfterUpload).filter((item) => item.channelId === channelId),
+	);

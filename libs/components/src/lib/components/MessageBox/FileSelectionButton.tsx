@@ -1,10 +1,9 @@
 import { useChatSending } from '@mezon/core';
-import { referencesActions, selectAttachmentAfterUpload, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectFilteredAttachments, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 export type FileSelectionButtonProps = {
@@ -18,34 +17,21 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 	const dispatch = useAppDispatch();
 	const session = sessionRef.current;
 	const client = clientRef.current;
-	const attachmentAfterUpload = useSelector(selectAttachmentAfterUpload);
-	const [attachmentPreview, setAttachmentPreview] = useState<ApiMessageAttachment[]>([]);
+	const attachmentFilteredByChannelId = useSelector(selectFilteredAttachments(currentChannelId));
 	const newMessage = useSelector(selectNewMesssageUpdateImage);
+
 	const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0 });
 
-	// const { attachmentDataRef } = useReference(currentChannelId);
-
-	// useEffect(() => {
-	// 	if (attachmentPreview && attachmentPreview?.length > 0) {
-	// 		dispatch(
-	// 			referencesActions.setAttachmentData({
-	// 				channelId: currentChannelId,
-	// 				attachments: attachmentPreview ?? [],
-	// 			}),
-	// 		);
-	// 	}
-	// }, [attachmentPreview]);
-
 	useEffect(() => {
-		if (client && session && attachmentAfterUpload[currentChannelId]?.length > 0) {
-			const promises = attachmentAfterUpload[currentChannelId]?.map((file) =>
-				handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file),
-			);
+		if (attachmentFilteredByChannelId.length > 0 && attachmentFilteredByChannelId[0]?.messageId !== '' && client && session) {
+			const promises = attachmentFilteredByChannelId[0]?.files.map((file) => {
+				return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
+			});
 
 			Promise.all(promises)
 				.then((results) => {
 					updateImageLinkMessage(
-						newMessage.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '0',
+						newMessage.clan_id,
 						newMessage.channel_id ?? '',
 						newMessage.mode,
 						newMessage.content,
@@ -56,26 +42,58 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 						true,
 					);
 				})
-				.finally(() => {
-					dispatch(referencesActions.setAtachmentAfterUpload({ channelId: '', files: [] }));
+				.then(() => {
+					dispatch(
+						referencesActions.setUploadingStatus({
+							channelId: currentChannelId,
+							messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
+							hasSpinning: false,
+							count: attachmentFilteredByChannelId[0]?.files?.length ?? 0,
+						}),
+					);
 				})
 				.catch((error) => {
 					console.error('Error uploading files:', error);
 				});
+			dispatch(
+				referencesActions.setUploadingStatus({
+					channelId: currentChannelId,
+					messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
+					hasSpinning: true,
+					count: attachmentFilteredByChannelId[0]?.files?.length,
+				}),
+			);
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId: currentChannelId,
+					messageId: '',
+					files: [],
+				}),
+			);
+		}
+	}, [attachmentFilteredByChannelId[0]?.messageId]);
+
+	useEffect(() => {
+		if (newMessage.isMe && attachmentFilteredByChannelId.length > 0 && attachmentFilteredByChannelId[0]?.files.length > 0) {
+			dispatch(
+				referencesActions.updateAttachmentMessageId({
+					channelId: currentChannelId,
+					messageId: newMessage.message_id ?? '',
+				}),
+			);
 		}
 	}, [newMessage]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
-			// handleFiles(Array.from(e.target.files), setAttachmentPreview);
-			dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, files: Array.from(e.target.files) }));
 			dispatch(
-				referencesActions.setPreviewAttachemtsPanel({
-					channelId: currentChannelId ?? '',
-					isDisplay: true,
+				referencesActions.setAtachmentAfterUpload({
+					channelId: currentChannelId,
+					messageId: '',
+					files: Array.from(e.target.files),
 				}),
-			);
-			e.target.value = '';
+			),
+				(e.target.value = '');
 		}
 	};
 

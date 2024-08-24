@@ -40,7 +40,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 
 	return (
 		<>
-			{videos?.length > 0 && (
+			{videos.length > 0 && (
 				<div className="flex flex-row justify-start flex-wrap w-full gap-2 mt-5">
 					{videos.map((video, index) => (
 						<div key={`${video.url}_${index}`} className="w-fit gap-y-2">
@@ -50,7 +50,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 				</div>
 			)}
 
-			{images?.length > 0 && (
+			{images.length > 0 && (
 				<div className="flex flex-row justify-start flex-wrap w-full gap-x-2">
 					{images.map((image, index) => {
 						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
@@ -63,7 +63,7 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 				</div>
 			)}
 
-			{documents?.length > 0 &&
+			{documents.length > 0 &&
 				documents.map((document, index) => <MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} />)}
 		</>
 	);

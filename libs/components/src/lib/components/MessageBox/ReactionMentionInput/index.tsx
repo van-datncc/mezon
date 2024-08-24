@@ -26,6 +26,7 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
+	selectFilteredAttachments,
 	selectHashtagDMByDirectId,
 	selectIdMessageRefEdit,
 	selectIdMessageRefReply,
@@ -251,6 +252,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
 	const { mentionList, hashtagList, emojiList } = useProcessMention(mentionRaw, roleList);
+	const attachmentFilteredByChannelId = useSelector(selectFilteredAttachments(currentChannelId ?? ''));
+
+	const checkAttachment = useMemo(() => {
+		return attachmentFilteredByChannelId[0]?.files?.length > 0;
+	}, [attachmentFilteredByChannelId[0]]);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
@@ -263,14 +269,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				vk: voiceLinkRoomList,
 			};
 
-			if ((!valueTextInput && attachmentDataRef?.length === 0) || ((valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)) {
+			if ((!valueTextInput && !checkAttachment) || ((valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
 			if (
 				valueTextInput &&
 				typeof valueTextInput === 'string' &&
 				!(valueTextInput || '').trim() &&
-				attachmentDataRef?.length === 0 &&
+				!checkAttachment &&
 				mentionData?.length === 0
 			) {
 				if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel) {
@@ -293,7 +299,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					filterEmptyArrays(payload),
 					mentionList,
-					attachmentDataRef,
+					[], // attachmentDataRef,
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
@@ -348,12 +354,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					shortName: '',
 					id: '',
 					isReset: true,
-				}),
-			);
-			dispatch(
-				referencesActions.setPreviewAttachemtsPanel({
-					channelId: currentChannelId ?? '',
-					isDisplay: false,
 				}),
 			);
 		},

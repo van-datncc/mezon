@@ -1,12 +1,11 @@
 import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useReference } from '@mezon/core';
 import {
-	ReferencesState,
 	messagesActions,
 	referencesActions,
-	selectAttachmentAfterUpload,
 	selectAttachmentData,
 	selectCloseMenu,
+	selectFilteredAttachments,
 	selectStatusLoadingAttachment,
 	selectStatusMenu,
 	selectTheme,
@@ -109,8 +108,16 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					}
 
 					handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file)
-						.then((attachment) => {
-							handleFinishUpload(attachment);
+						.then(() => {
+							dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, messageId: '', files: [file] }));
+							dispatch(
+								referencesActions.setUploadingStatus({
+									channelId: currentChannelId,
+									messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
+									hasSpinning: false,
+									count: attachmentFilteredByChannelId[0]?.files?.length ?? 0,
+								}),
+							);
 							files.length = 0;
 							navigator.clipboard
 								.writeText('')
@@ -144,26 +151,22 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const handleChildContextMenu = (event: React.MouseEvent) => {
 		event.stopPropagation();
 	};
-	const attachmentAfterUpload = useSelector(selectAttachmentAfterUpload);
-	const atts = attachmentAfterUpload[currentChannelId ?? ''];
-	const displayPreviewAttachmentsPanel = useSelector((state: ReferencesState) => state.displayPreviewAttachmentsPanel);
+	const attachmentFilteredByChannelId = useSelector(selectFilteredAttachments(currentChannelId ?? ''));
 
-	const getStatusPreviewAttachmentPanel = useMemo(
-		() => displayPreviewAttachmentsPanel?.[currentChannelId ?? ''] ?? false,
-		[displayPreviewAttachmentsPanel, currentChannelId],
-	);
-	console.log('getStatusPreviewAttachmentPanel', getStatusPreviewAttachmentPanel);
+	const checkAttachment = useMemo(() => {
+		return attachmentFilteredByChannelId[0]?.files?.length > 0;
+	}, [attachmentFilteredByChannelId[0]]);
 
 	return (
 		<div className="relative max-sm:-pb-2  ">
-			{getStatusPreviewAttachmentPanel && (
+			{checkAttachment && (
 				<div
-					className={`${atts?.length > 0 ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+					className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 				>
 					<div
 						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'attachment-scroll-light' : ''}`}
 					>
-						{atts?.map((item: File, index: number) => {
+						{attachmentFilteredByChannelId[0]?.files?.map((item: File, index: number) => {
 							return (
 								<Fragment key={index}>
 									<AttachmentPreviewThumbnail

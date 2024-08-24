@@ -1,5 +1,12 @@
 import { useAuth, useChatMessages } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannelId, selectIdMessageRefReply, selectIdMessageToJump, selectJumpPinMessageId } from '@mezon/store';
+import {
+	MessagesEntity,
+	selectCurrentChannelId,
+	selectIdMessageRefReply,
+	selectIdMessageToJump,
+	selectJumpPinMessageId,
+	selectUploadingStatus,
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import classNames from 'classnames';
 import React, { useMemo, useRef } from 'react';
@@ -58,6 +65,8 @@ function MessageWithUser({
 	const checkReplied = idMessageRefReply === message.id && message.id !== lastMessageId;
 	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 
+	const { hasSpinning, count } = useSelector(selectUploadingStatus(currentChannelId ?? '', message.id));
+
 	const hasIncludeMention = useMemo(() => {
 		const userIdMention = userLogin.userProfile?.user?.id;
 		const mentionOnMessage = message.mentions;
@@ -107,6 +116,7 @@ function MessageWithUser({
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
+
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -132,7 +142,15 @@ function MessageWithUser({
 												isSearchMessage={isSearchMessage}
 											/>
 										)}
-										<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+										{hasSpinning ? (
+											<div
+												className={`break-all w-full cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded max-w-full 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' relative`}
+											>
+												uploading {count} {count === 1 ? 'file' : 'files'}!
+											</div>
+										) : (
+											<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+										)}
 									</div>
 								</div>
 							</div>

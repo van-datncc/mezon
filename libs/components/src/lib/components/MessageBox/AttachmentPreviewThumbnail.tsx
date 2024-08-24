@@ -32,7 +32,7 @@ const AttachmentPreviewThumbnail: React.FC<AttachmentPreviewThumbnailProps> = ({
 			className="flex justify-center items-center p-2 mb-3 rounded dark:bg-bgSecondary bg-bgLightSecondary w-[216px] h-[216px] flex-shrink-0 border dark:text-textDarkTheme text-textLightTheme dark:border-bgSecondary relative"
 		>
 			<div className="cursor-pointer rounded-md flex flex-row justify-center items-center mb-2">
-				<div>{/* <div>{thumbnailAttachment}</div> */}</div>
+				<div>{thumbnailAttachment}</div>
 				<div className="dark:bg-bgPrimary bg-bgLightPrimary flex flex-row w-21 top-[-1px] right-[-16px] h-8 absolute rounded-sm shadow-shadowInbox">
 					<button
 						onClick={handleShowAttachment}

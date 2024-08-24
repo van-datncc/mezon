@@ -721,6 +721,7 @@ export type MessageTypeUpdateLink = {
 	mode?: ChannelStreamMode;
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
+	isMe?: true;
 };
 
 export enum EUserSettings {
@@ -745,3 +746,18 @@ export enum EUserSettings {
 	ADVANCED = 'Advanced',
 	LOG_OUT = 'Log Out',
 }
+
+export type PreSendAttachment = {
+	channelId?: string;
+	messageId?: string;
+	mode?: string;
+	clan_id?: string;
+	files: File[];
+};
+
+export type uploadingAttachmentStatus = {
+	channelId?: string;
+	messageId?: string;
+	hasSpinning?: boolean;
+	count?: number;
+};
