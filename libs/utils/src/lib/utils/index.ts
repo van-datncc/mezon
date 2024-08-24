@@ -333,7 +333,7 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 			file,
 			maxWidth,
 			maxHeight,
-			'JPEG',
+			'WEBP',
 			100,
 			0,
 			(uri) => {
