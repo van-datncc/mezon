@@ -255,7 +255,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(userAdds: UserChannelAddedEvent) => {
 			const user = userAdds.users.find((user: any) => user.user_id === userId);
 			if (user) {
-				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
+				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_DM || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 					dispatch(fetchDirectMessage({ noCache: true }));
 				}
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
@@ -279,7 +279,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelType: userAdds.channel_type,
 					}),
 				);
-				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
+				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 					dispatch(fetchDirectMessage({ noCache: true }));
 					dispatch(fetchListFriends({ noCache: true }));
 				}
