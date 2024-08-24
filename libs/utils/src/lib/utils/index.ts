@@ -346,7 +346,7 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 	});
 
 export function findClanAvatarByUserId(userId: string, data: ChannelUserListChannelUser[]) {
-	for (let item of data) {
+	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.clan_avatar;
 		}
@@ -355,7 +355,7 @@ export function findClanAvatarByUserId(userId: string, data: ChannelUserListChan
 }
 
 export function findClanNickByUserId(userId: string, data: ChannelUserListChannelUser[]) {
-	for (let item of data) {
+	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.clan_nick;
 		}
@@ -364,7 +364,7 @@ export function findClanNickByUserId(userId: string, data: ChannelUserListChanne
 }
 
 export function findDisplayNameByUserId(userId: string, data: ChannelUserListChannelUser[]) {
-	for (let item of data) {
+	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.user.display_name;
 		}
@@ -431,7 +431,7 @@ type ElementToken =
 	| (ILinkVoiceRoomOnMessage & { kindOf: ETokenMessage.VOICE_LINKS });
 
 export const createFormattedString = (data: IExtendedMessage): string => {
-	let { t = '' } = data;
+	const { t = '' } = data;
 	const elements: ElementToken[] = [];
 	(Object.keys(data) as (keyof IExtendedMessage)[]).forEach((key) => {
 		const itemArray = data[key];
@@ -452,7 +452,7 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 		return startA - startB;
 	});
 	let result = '';
-	let lastIndex: number = 0;
+	let lastIndex = 0;
 
 	elements.forEach((element) => {
 		const startindex = element.s ?? lastIndex;
@@ -499,18 +499,18 @@ export const processText = (inputString: string) => {
 	const markdowns: IMarkdownOnMessage[] = [];
 	const voiceRooms: ILinkVoiceRoomOnMessage[] = [];
 
-	const singleBacktick: string = '`';
-	const tripleBacktick: string = '```';
-	const httpPrefix: string = 'http';
-	const googleMeetPrefix: string = 'https://meet.google.com/';
+	const singleBacktick = '`';
+	const tripleBacktick = '```';
+	const httpPrefix = 'http';
+	const googleMeetPrefix = 'https://meet.google.com/';
 
 	let i = 0;
-	while (i < inputString.length) {
+	while (i < inputString?.length) {
 		if (inputString.startsWith(httpPrefix, i)) {
 			// Link processing
 			const startindex = i;
 			i += httpPrefix.length;
-			while (i < inputString.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
+			while (i < inputString?.length && ![' ', '\n', '\r', '\t'].includes(inputString[i])) {
 				i++;
 			}
 			const endindex = i;
@@ -532,11 +532,11 @@ export const processText = (inputString: string) => {
 			const startindex = i;
 			i += tripleBacktick.length;
 			let markdown = '';
-			while (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) !== tripleBacktick) {
+			while (i < inputString?.length && inputString.substring(i, i + tripleBacktick.length) !== tripleBacktick) {
 				markdown += inputString[i];
 				i++;
 			}
-			if (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
+			if (i < inputString?.length && inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
@@ -548,11 +548,11 @@ export const processText = (inputString: string) => {
 			const startindex = i;
 			i++;
 			let markdown = '';
-			while (i < inputString.length && inputString[i] !== singleBacktick) {
+			while (i < inputString?.length && inputString[i] !== singleBacktick) {
 				markdown += inputString[i];
 				i++;
 			}
-			if (i < inputString.length && inputString[i] === singleBacktick) {
+			if (i < inputString?.length && inputString[i] === singleBacktick) {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {

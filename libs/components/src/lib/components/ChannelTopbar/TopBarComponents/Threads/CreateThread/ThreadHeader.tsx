@@ -1,6 +1,6 @@
 import { useMessageValue, useThreads } from '@mezon/core';
+import { Icons } from '@mezon/ui';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
-import * as Icons from '../../../../../../../../ui/src/lib/Icons';
 
 type ThreadHeaderProps = {
 	threadCurrentChannel?: ApiChannelDescription | null;
@@ -8,13 +8,13 @@ type ThreadHeaderProps = {
 
 const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
 	const { setNameValueThread, setIsShowCreateThread, setTurnOffThreadMessage } = useThreads();
-	const { setValueTextInput } = useMessageValue();
+	const { setRequestInput, request } = useMessageValue();
 
 	const handleCloseModal = () => {
 		setTurnOffThreadMessage();
 		setIsShowCreateThread(false);
 		setNameValueThread('');
-		setValueTextInput('', true);
+		setRequestInput({ ...request, valueTextInput: '' }, true);
 	};
 
 	return (

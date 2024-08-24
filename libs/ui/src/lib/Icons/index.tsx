@@ -3418,13 +3418,13 @@ export const PhoneOff = ({ defaultFill = 'white', defaultSize = 'w-5 h-5' }) => 
 	);
 };
 
-export const IconLoadingTyping = ({ iconFill = 'dark:text-textDarkTheme text-textPrimaryLight', width='18',height='8',bgFill='bg-transparent'}) => {
+export const IconLoadingTyping = ({ iconFill = 'dark:fill-textDarkTheme fill-textPrimaryLight', width='18',height='8',bgFill='bg-transparent'}) => {
 	return (
     <span  className={`rounded-lg flex items-center justify-center px-[2px] py-[1px] ${bgFill}`}>
     <svg id="dots" width={width} height={height} viewBox="0 0 100 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
-    <circle id="dot1" cx="13" cy="30" r="13" fill={iconFill}></circle>
-    <circle id="dot2" cx="50" cy="30" r="13" fill={iconFill}></circle>
-    <circle id="dot3" cx="86" cy="30" r="13" fill={iconFill}></circle>
+    <circle id="dot1" cx="13" cy="30" r="13" className={iconFill}></circle>
+    <circle id="dot2" cx="50" cy="30" r="13" className={iconFill}></circle>
+    <circle id="dot3" cx="86" cy="30" r="13" className={iconFill}></circle>
 </svg>
     </span>
 
