@@ -78,7 +78,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		requestAnimationFrame(async () => {
 			const store = await getStoreAsync();
 			await Promise.all([
-				store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id })),
 				store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id)),
 				store.dispatch(
 					channelMembersActions.fetchChannelMembers({
@@ -96,7 +95,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		requestAnimationFrame(async () => {
 			const store = await getStoreAsync();
 			await Promise.all([
-				store.dispatch(clansActions.joinClan({ clanId: '0' })),
 				store.dispatch(clansActions.setCurrentClanId('0')),
 				store.dispatch(
 					directActions.joinDirectMessage({
@@ -201,7 +199,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 								<Image source={{ uri: currentDmGroup?.channel_avatar?.[0] || '' }} style={styles.friendAvatar} />
 							) : (
 								<View style={styles.wrapperTextAvatar}>
-									<Text style={[styles.textAvatar]}>{(currentDmGroup?.channel_label || currentDmGroup?.usernames)?.charAt?.(0)}</Text>
+									<Text style={[styles.textAvatar]}>
+										{(currentDmGroup?.channel_label || currentDmGroup?.usernames)?.charAt?.(0)}
+									</Text>
 								</View>
 							)}
 							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
