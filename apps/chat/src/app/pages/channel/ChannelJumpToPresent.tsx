@@ -1,5 +1,5 @@
-import { messagesActions, useAppDispatch } from "@mezon/store";
-import { useCallback } from "react";
+import { messagesActions, useAppDispatch } from '@mezon/store';
+import { useCallback } from 'react';
 
 type ChannelTypingProps = {
 	channelId: string;
@@ -15,5 +15,9 @@ export function ChannelJumpToPresent({ channelId, mode }: ChannelTypingProps) {
 		dispatch(messagesActions.setIdMessageToJump(null));
 	}, [channelId, dispatch]);
 
-	return <div className="left-4 pl-4 cursor-pointer dark:bg-bgPrimary" onClick={handleJumpToPresent}>Viewing older messages      (Click to jump to present)</div>;
+	return (
+		<div className="left-4 pl-4 cursor-pointer dark:bg-bgPrimary dark:text-white text-black" onClick={handleJumpToPresent}>
+			Viewing older messages (Click to jump to present)
+		</div>
+	);
 }

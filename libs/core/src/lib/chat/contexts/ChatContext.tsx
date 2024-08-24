@@ -287,10 +287,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[userId, dispatch],
 	);
-	// TODO add user clan
-	const onuserclanadded = useCallback((userAdds: AddClanUserEvent) => {
-		console.log('userAddsuserAdds: ', userAdds);
-	}, []);
+
+	const onuserclanadded = useCallback(
+		(userJoinClan: AddClanUserEvent) => {
+			dispatch(channelMembersActions.addUserJoinClan(userJoinClan));
+		},
+		[dispatch],
+	);
 
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
