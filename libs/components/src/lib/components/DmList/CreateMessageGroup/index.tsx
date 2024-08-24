@@ -3,10 +3,11 @@ import { DirectEntity, FriendsEntity, IFriend, channelUsersActions, directAction
 import { Icons, InputField } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import EmptySearchFriends from './EmptySearchFriends';
+import { GROUP_CHAT_MAXIMUM_MEMBERS } from '@mezon/utils';
 
 type CreateMessageGroupProps = {
 	isOpen: boolean;
@@ -27,12 +28,10 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 	const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 	const boxRef = useRef<HTMLDivElement | null>(null);
 
-	const { filteredFriends, filterListFriendsNotInGroup } = useFriends();
+	const { filteredFriends } = useFriends();
 
-	const listFriends =
-		currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM
-			? filterListFriendsNotInGroup()
-			: filteredFriends(searchTerm.trim().toUpperCase());
+	const listFriends = filteredFriends(searchTerm.trim().toUpperCase(),currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP || currentDM?.type === ChannelType.CHANNEL_TYPE_DM)
+
 
 	const handleSelectFriends = (idFriend: string) => {
 		setSelectedFriends((prevSelectedFriends) => {
@@ -178,7 +177,13 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 			setIdActive(listFriends[0].id);
 		}
 	}, [searchTerm]);
-
+  const numberCanAdd = useMemo(()=>{
+    if(currentDM?.type !== ChannelType.CHANNEL_TYPE_GROUP){
+      return friends.length > GROUP_CHAT_MAXIMUM_MEMBERS ? GROUP_CHAT_MAXIMUM_MEMBERS : friends.length;
+    }
+    const numberMemberInDM = (friends.length - listFriends.length);
+    return numberMemberInDM < GROUP_CHAT_MAXIMUM_MEMBERS ? (GROUP_CHAT_MAXIMUM_MEMBERS - numberMemberInDM > listFriends.length ? listFriends.length : GROUP_CHAT_MAXIMUM_MEMBERS - numberMemberInDM ) : 0;
+  },[friends])
 	return (
 		<div
 			onMouseDown={(e) => e.stopPropagation()}
@@ -190,7 +195,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 			<div className="cursor-default text-start">
 				<div className="p-4">
 					<h3 className="text-xl dark:text-white text-textLightTheme">Select Friends</h3>
-					<p className="dark:text-textThreadPrimary text-textPrimaryLight pt-1">{`You can add ${friends.length} more friends.`}</p>
+					<p className="dark:text-textThreadPrimary text-textPrimaryLight pt-1">{`You can add ${numberCanAdd} more friends.`}</p>
 					<InputField
 						type="text"
 						placeholder="Type the username of a friend"
