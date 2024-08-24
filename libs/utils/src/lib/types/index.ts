@@ -34,6 +34,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser,
 } from 'mezon-js/api.gen';
+import { MentionItem } from 'react-mentions';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
@@ -721,6 +722,12 @@ export type MessageTypeUpdateLink = {
 	mode?: ChannelStreamMode;
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
+};
+
+export type RequestInput = {
+	valueTextInput: string;
+	content: string;
+	mentionRaw: MentionItem[];
 };
 
 export enum EUserSettings {
