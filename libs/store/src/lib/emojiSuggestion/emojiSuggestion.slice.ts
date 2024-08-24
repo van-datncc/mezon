@@ -3,7 +3,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import memoizee from 'memoizee';
 import { ClanEmoji } from 'mezon-js';
 import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 const LIST_EMOJI_CACHED_TIME = 1000 * 60 * 3;
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
@@ -52,7 +52,7 @@ const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => 
 });
 
 export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, noCache }: FetchEmojiArgs, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 	if (noCache) {
 		fetchEmojiCached.clear(mezon, clanId);
 	}

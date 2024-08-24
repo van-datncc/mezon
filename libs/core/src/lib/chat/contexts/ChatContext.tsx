@@ -287,10 +287,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[userId, dispatch],
 	);
-	// TODO add user clan
-	const onuserclanadded = useCallback((userAdds: AddClanUserEvent) => {
-		console.log('userAddsuserAdds: ', userAdds);
-	}, []);
+
+	const onuserclanadded = useCallback(
+		(userJoinClan: AddClanUserEvent) => {
+			dispatch(channelMembersActions.addUserJoinClan(userJoinClan));
+		},
+		[dispatch],
+	);
 
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
@@ -370,20 +373,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						}),
 					);
 				}
-			}
-
-			if (
-				(channelCreated && channelCreated.channel_private === 1 && channelCreated.channel_type === ChannelType.CHANNEL_TYPE_DM) ||
-				channelCreated.channel_type === ChannelType.CHANNEL_TYPE_GROUP
-			) {
-				dispatch(directActions.fetchDirectMessage({ noCache: true }));
-				dispatch(
-					channelsActions.joinChat({
-						clanId: channelCreated.clan_id,
-						channelId: channelCreated.channel_id,
-						channelType: channelCreated.channel_type,
-					}),
-				);
 			}
 		},
 		[dispatch],

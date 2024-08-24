@@ -101,7 +101,7 @@ const persistedChannelReducer = persistReducer(
 	{
 		key: 'channels',
 		storage,
-		blacklist: ['valueTextInput'],
+		blacklist: ['request'],
 	},
 	channelsReducer,
 );

@@ -3,22 +3,32 @@ import {
 	useAppParams,
 	useAuth,
 	useChannelMembersActions,
-	useClanRestriction, useDirect,
-	useFriends, useMessageValue, useSettingFooter
+	useClanRestriction,
+	useDirect,
+	useFriends,
+	useMessageValue,
+	useSettingFooter,
 } from '@mezon/core';
-import { selectAllRolesClan, selectCurrentChannel, selectCurrentClan, selectDmGroupCurrent, selectFriendStatus, selectMemberByUserId } from '@mezon/store';
-import {ChannelMembersEntity, EPermission, EUserSettings} from '@mezon/utils';
+import {
+	selectAllRolesClan,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectDmGroupCurrent,
+	selectFriendStatus,
+	selectMemberByUserId,
+} from '@mezon/store';
+import { ChannelMembersEntity, EPermission, EUserSettings } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
 import PanelGroupDM from './PanelGroupDm';
-import {useNavigate} from "react-router-dom";
 
 type PanelMemberProps = {
 	coords: Coords;
@@ -40,17 +50,26 @@ const useCheckRoleAdminMember = (userId: string) => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
 	}, [userById?.role_id, RolesClan]);
 	const hasAdminRole = useMemo(() => {
-		return userRolesClan.some(role => 
-			role?.permission_list?.permissions?.some(permission => 
-				permission.slug === 'administrator' && permission.active === 1
-			)
+		return userRolesClan.some((role) =>
+			role?.permission_list?.permissions?.some((permission) => permission.slug === 'administrator' && permission.active === 1),
 		);
 	}, [userRolesClan]);
-	
-	return hasAdminRole;
-}
 
-const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemoveMember, isMemberDMGroup, isMemberChannel, dataMemberCreate, onOpenProfile }: PanelMemberProps) => {
+	return hasAdminRole;
+};
+
+const PanelMember = ({
+	coords,
+	member,
+	directMessageValue,
+	name,
+	onClose,
+	onRemoveMember,
+	isMemberDMGroup,
+	isMemberChannel,
+	dataMemberCreate,
+	onOpenProfile,
+}: PanelMemberProps) => {
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClan = useSelector(selectCurrentClan);
@@ -59,7 +78,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const { removeMemberChannel } = useChannelMembersActions();
 	const hasAdminRole = useCheckRoleAdminMember(member?.user?.id || '');
 	const { directId } = useAppParams();
-	
+
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
@@ -74,19 +93,23 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const handleRemoveMemberChannel = async () => {
 		if (member) {
 			const userIds = [member?.user?.id ?? ''];
-			await removeMemberChannel({ channelId: directId || "", userIds });
+			await removeMemberChannel({ channelId: directId || '', userIds });
 		}
 	};
-	const friendInfor = useMemo(()=>{
-    return {
-      id : directMessageValue ? directMessageValue?.userId[0] || '' : member?.user?.id || '',
-      name : 	directMessageValue ? name || '' : member?.user?.username || ''
-    }
-  },[directMessageValue])
+	const friendInfor = useMemo(() => {
+		return {
+			id: directMessageValue ? directMessageValue?.userId[0] || '' : member?.user?.id || '',
+			name: directMessageValue ? name || '' : member?.user?.username || '',
+		};
+	}, [directMessageValue]);
 
 	const [hasAdministratorPermission] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasAddFriend = useSelector(selectFriendStatus(directMessageValue && directMessageValue.type !== ChannelType.CHANNEL_TYPE_GROUP ? directMessageValue.userId[0] : member?.user?.id || ''));
+	const hasAddFriend = useSelector(
+		selectFriendStatus(
+			directMessageValue && directMessageValue.type !== ChannelType.CHANNEL_TYPE_GROUP ? directMessageValue.userId[0] : member?.user?.id || '',
+		),
+	);
 	const isOwnerChannel = useMemo(() => userProfile?.user?.id === currentChannel?.creator_id, [currentChannel?.creator_id, userProfile?.user?.id]);
 	const isOwnerClan = useMemo(() => currentClan?.creator_id === member?.user?.id, [currentClan?.creator_id, member?.user?.id]);
 	const isSelf = useMemo(() => userProfile?.user?.id === member?.user?.id, [member?.user?.id, userProfile?.user?.id]);
@@ -97,55 +120,55 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 	const { toDmGroupPageFromMainApp } = useAppNavigation();
 	const navigate = useNavigate();
 	const { createDirectMessageWithUser } = useDirect();
-	const { setValueTextInput, valueTextInput } = useMessageValue(currentChannel?.channel_id);
+	const { setRequestInput, request } = useMessageValue(currentChannel?.channel_id);
 	const displayMentionName = useMemo(() => {
-		if(member?.clan_nick) return member.clan_nick;
+		if (member?.clan_nick) return member.clan_nick;
 		return member?.user?.display_name ?? member?.user?.username;
-	}, [member])
+	}, [member]);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageValue?.dmID ?? ''));
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile } = useSettingFooter();
-	
+
 	const handleOpenProfile = () => {
 		if (onOpenProfile) {
 			onOpenProfile();
 		}
 		onClose();
-	}
+	};
 
-	const handleDirectMessageWithUser = async() => {
+	const handleDirectMessageWithUser = async () => {
 		const response = await createDirectMessageWithUser(member?.user?.id || '');
-		if(response?.channel_id) {
+		if (response?.channel_id) {
 			const directDM = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
 			navigate('/' + directDM);
 		}
-	}
-	
+	};
+
 	const handleClickMention = () => {
-		const mention = `@[${displayMentionName}](${member?.user?.id})`
-		if(valueTextInput) {
-			setValueTextInput(valueTextInput + mention);
+		const mention = `@[${displayMentionName}](${member?.user?.id})`;
+		if (request?.valueTextInput) {
+			setRequestInput({ ...request, valueTextInput: request?.valueTextInput + mention });
 		} else {
-			setValueTextInput(mention);
+			setRequestInput({ ...request, valueTextInput: mention });
 		}
-	}
-	
+	};
+
 	useEffect(() => {
 		if (userProfile?.user?.id === currentDmGroup?.creator_id) {
 			setIsDmGroupOwner(true);
 		}
 	}, [currentDmGroup, userProfile]);
-	
-	const isShowManageMember = (isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel;
-	
-	
+
+	const isShowManageMember =
+		(isOwnerChannel || hasAdministratorPermission || (hasClanPermission && !hasAdminRole)) && !isOwnerClan && !isSelf && isMemberChannel;
+
 	const handleOpenClanProfileSetting = () => {
 		setIsUserProfile(false);
 		setIsShowSettingFooterInitTab(EUserSettings.PROFILES);
 		setIsShowSettingFooterStatus(true);
 		if (onClose) {
-			onClose ();
+			onClose();
 		}
-	}
+	};
 
 	return (
 		<div
@@ -165,18 +188,22 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 			}}
 		>
 			{directMessageValue && checkDmGroup ? (
-				<PanelGroupDM isDmGroupOwner={isDmGroupOwner} dmGroupId={directMessageValue.dmID} lastOne={!directMessageValue.userId.length}/>
+				<PanelGroupDM isDmGroupOwner={isDmGroupOwner} dmGroupId={directMessageValue.dmID} lastOne={!directMessageValue.userId.length} />
 			) : (
 				<>
 					<GroupPanelMember>
-						<ItemPanelMember children="Profile" onClick={handleOpenProfile}/>
-						{directMessageValue ? checkDm && <ItemPanelMember children="Call" /> : <ItemPanelMember children="Mention" onClick={handleClickMention}/>}
+						<ItemPanelMember children="Profile" onClick={handleOpenProfile} />
+						{directMessageValue ? (
+							checkDm && <ItemPanelMember children="Call" />
+						) : (
+							<ItemPanelMember children="Mention" onClick={handleClickMention} />
+						)}
 
 						{!isSelf && (
 							<>
 								{!checkDm && (
 									<>
-										<ItemPanelMember children="Message" onClick={handleDirectMessageWithUser}/>
+										<ItemPanelMember children="Message" onClick={handleDirectMessageWithUser} />
 										<ItemPanelMember children="Call" />
 									</>
 								)}
@@ -188,7 +215,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 					</GroupPanelMember>
 					{isMemberDMGroup && !isSelf && dataMemberCreate?.createId === userProfile?.user?.id && (
 						<GroupPanelMember>
-							<ItemPanelMember children="Remove From Group" onClick={handleRemoveMemberChannel} danger  />
+							<ItemPanelMember children="Remove From Group" onClick={handleRemoveMemberChannel} danger />
 							<ItemPanelMember children="Make Group Owner" danger />
 						</GroupPanelMember>
 					)}
@@ -199,7 +226,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							{isSelf && (
 								<>
 									<ItemPanelMember children="Deafen" type="checkbox" />
-									<ItemPanelMember children="Edit Clan Profile" onClick={handleOpenClanProfileSetting}/>
+									<ItemPanelMember children="Edit Clan Profile" onClick={handleOpenClanProfileSetting} />
 									<ItemPanelMember children="Apps" />
 								</>
 							)}
@@ -227,10 +254,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 										<ItemPanelMember
 											children="Remove Friend"
 											onClick={() => {
-												deleteFriend(
-													friendInfor.name,
-													friendInfor.id,
-												);
+												deleteFriend(friendInfor.name, friendInfor.id);
 											}}
 										/>
 									) : (
@@ -269,21 +293,11 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 										<ItemPanelMember children="Clan 3" />
 									</Dropdown>
 									{hasAddFriend.friend ? (
-										<ItemPanelMember
-											children="Remove Friend"
-											onClick={() =>
-												deleteFriend(
-													friendInfor.name,
-													friendInfor.id,
-												)
-											}
-										/>
+										<ItemPanelMember children="Remove Friend" onClick={() => deleteFriend(friendInfor.name, friendInfor.id)} />
 									) : (
 										<ItemPanelMember
 											children="Add Friend"
-											onClick={() =>
-												addFriend({ usernames: [friendInfor.name], ids: [] })
-											}
+											onClick={() => addFriend({ usernames: [friendInfor.name], ids: [] })}
 										/>
 									)}
 									<ItemPanelMember children="Block" />
@@ -296,7 +310,7 @@ const PanelMember = ({ coords, member, directMessageValue, name, onClose, onRemo
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{(isShowManageMember) && (
+					{isShowManageMember && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
