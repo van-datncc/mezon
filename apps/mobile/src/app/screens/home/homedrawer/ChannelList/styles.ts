@@ -58,4 +58,8 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			fontSize: size.s_14,
 		},
+		titleEvent: {
+			fontSize: size.s_14,
+			color: colors.textStrong
+		},
 	});
