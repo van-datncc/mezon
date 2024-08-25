@@ -115,7 +115,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	}: RenderItemInfo<ApiMessageAttachment>) => {
 		return (
 			<FastImage
-				source={{ uri: item?.url }}
+				source={{ uri: item?.url ?? '' }}
 				style={StyleSheet.absoluteFillObject}
 				resizeMode='contain'
 				onLoad={(e) => {
