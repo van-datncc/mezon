@@ -1,89 +1,191 @@
-import { ImageGallery, ImageObject } from '@georstat/react-native-image-gallery';
-import { Block, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import { selectAttachmentPhoto } from '@mezon/store';
-import { Snowflake } from '@theinternetfolks/snowflake';
+import { Block, Colors, size, Text } from '@mezon/mobile-ui';
+import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import React, { useCallback, useMemo } from 'react';
-import { Pressable } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Modal, StyleSheet } from 'react-native';
+import Gallery, { GalleryRef, RenderItemInfo } from 'react-native-awesome-gallery';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
-import { ImageItem } from './ImageItem';
+import { useThrottledCallback } from 'use-debounce';
 import { RenderFooterModal } from './RenderFooterModal';
 import { RenderHeaderModal } from './RenderHeaderModal';
 
 interface IImageListModalProps {
 	visible?: boolean;
 	onClose?: () => void;
-	imageSelected?: ApiMessageAttachment & { id?: string };
+	imageSelected?: AttachmentEntity;
 }
+
+interface IVisibleToolbarConfig {
+	showHeader: boolean;
+	showFooter: boolean;
+}
+const ORIGIN_SCALE = 1;
+const TIME_TO_HIDE_THUMBNAIL = 5000;
+const TIME_TO_SHOW_SAVE_IMAGE_SUCCESS = 3000;
 
 export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const { visible, onClose, imageSelected } = props;
-	const { themeValue } = useTheme();
+	const { t } = useTranslation('common');
+	const [currentImage, setCurrentImage] = useState<AttachmentEntity | null>(null);
+	const [visibleToolbarConfig, setVisibleToolbarConfig] = useState<IVisibleToolbarConfig>({ showHeader: true, showFooter: false });
+	const [currentScale, setCurrentScale] = useState(1);
+	const [showSavedImage, setShowSavedImage] = useState(false);
 	const allImageList = useSelector(selectAttachmentPhoto());
-	const [onlyView, setOnlyView] = useAnimatedState(false);
+	const ref = useRef<GalleryRef>(null);
+	const footerTimeoutRef = useRef<NodeJS.Timeout>(null);
+	const imageSavedTimeoutRef = useRef<NodeJS.Timeout>(null);
 
-	const formatImages: any[] = useMemo(() => {
-		if (!imageSelected.id) {
-			imageSelected['id'] = Snowflake.generate()
+	const initialIndex = useMemo(() => {
+		const imageIndexSelected = allImageList.findIndex(file => file?.filename === imageSelected?.filename);
+		return imageIndexSelected === -1 ? 0 : imageIndexSelected;
+	}, [allImageList, imageSelected])
+
+	const updateToolbarConfig = useCallback((newValue: Partial<IVisibleToolbarConfig>) => {
+		setVisibleToolbarConfig({ ...visibleToolbarConfig, ...newValue })
+	}, [visibleToolbarConfig])
+
+	const onIndexChange = (newIndex: number) => {
+		if (allImageList[newIndex]?.id !== currentImage?.id) {
+			setCurrentImage(allImageList[newIndex]);
+			ref.current?.reset(); //Note: reset scale
 		}
-		const uniqueImages = allImageList.filter((image, index, self) => {
-			return index === self.findIndex(i => i.url === image.url)
+	}
+
+	const setTimeoutHideFooter = useCallback(() => {
+		footerTimeoutRef.current = setTimeout(() => {
+			updateToolbarConfig({
+				showFooter: false
+			})
+		}, TIME_TO_HIDE_THUMBNAIL)
+	}, [updateToolbarConfig])
+
+	const onTap = () => {
+		updateToolbarConfig({
+			showHeader: !visibleToolbarConfig.showHeader,
+			showFooter: !visibleToolbarConfig.showHeader,
 		})
-		return [imageSelected, ...uniqueImages.filter(x => x.url !== imageSelected.url)]
-	}, [allImageList, imageSelected]);
+	}
 
-	const onImagePress = useCallback(() => {
-		setOnlyView(!onlyView);
-	}, [onlyView])
+	const clearTimeoutFooter = () => {
+		footerTimeoutRef.current && clearTimeout(footerTimeoutRef.current);
+	}
 
-	const renderCustomImage = (item: ImageObject, index: number) => {
+	const onPanStart = () => {
+		clearTimeoutFooter();
+		if (visibleToolbarConfig.showFooter) {
+			setTimeoutHideFooter();
+			return;
+		}
+		if (!visibleToolbarConfig.showFooter && currentScale === 1) {
+			updateToolbarConfig({ showFooter: true })
+			setTimeoutHideFooter();
+			return;
+		}
+	}
+
+	const onDoubleTap = (toScale: number) => {
+		if (toScale > ORIGIN_SCALE) {
+			clearTimeoutFooter();
+			updateToolbarConfig({
+				showHeader: false,
+				showFooter: false
+			});
+		}
+	}
+
+	const onImageThumbnailChange = useCallback((image: AttachmentEntity) => {
+		const imageIndexSelected = allImageList?.findIndex(i => i?.id === image?.id);
+		if (imageIndexSelected > -1) {
+			setCurrentImage(image);
+			ref.current?.setIndex(imageIndexSelected);
+			ref.current?.reset();
+
+			if (visibleToolbarConfig.showFooter) {
+				clearTimeoutFooter();
+				setTimeoutHideFooter();
+			}
+		}
+	}, [allImageList, setTimeoutHideFooter, visibleToolbarConfig.showFooter])
+
+	const renderItem = ({
+		item,
+		setImageDimensions,
+	}: RenderItemInfo<ApiMessageAttachment>) => {
 		return (
-			<Pressable>
-				<ImageItem uri={item.url} key={`${index}_${item?.id}`} onClose={onClose} onImagePress={onImagePress} />
-			</Pressable>
+			<FastImage
+				source={{ uri: item?.url }}
+				style={StyleSheet.absoluteFillObject}
+				resizeMode='contain'
+				onLoad={(e) => {
+					const { width, height } = e.nativeEvent;
+					setImageDimensions({ width, height });
+				}}
+			/>
 		);
-	}
+	};
 
-	const renderHeaderComponent = () => {
-		if (onlyView) return null;
-		return (<RenderHeaderModal onClose={onClose} />)
-	}
+	const onImageSaved = useCallback(() => {
+		setShowSavedImage(true);
+		imageSavedTimeoutRef.current = setTimeout(() => {
+			setShowSavedImage(false);
+		}, TIME_TO_SHOW_SAVE_IMAGE_SUCCESS)
+	}, [])
 
-	const renderFooterComponent = (item: ImageObject, currentIndex: number) => {
-		return <RenderFooterModal item={item} key={`${currentIndex}_${item?.id}`} />;
-	}
+	useEffect(() => {
+		if (visibleToolbarConfig.showFooter) {
+			clearTimeout(footerTimeoutRef.current);
+			setTimeoutHideFooter();
+		}
+	}, [visibleToolbarConfig.showFooter, currentImage?.id])
 
-	const renderCustomThumb = (item: ImageObject, _: number, isSelected: boolean) => {
-		return (
-			<Block height={onlyView ? 0 : 'auto'} marginRight={size.s_10}>
-				<FastImage
-					source={{ uri: item.url }}
-					style={{
-						height: 70,
-						width: 70,
-						borderRadius: 15,
-						borderWidth: 2,
-						borderColor: isSelected ? 'yellow' : 'transparent'
-					}}
-					resizeMode='cover'
-				/>
-			</Block>
-		)
-	}
+	useEffect(() => {
+		return () => {
+			footerTimeoutRef.current && clearTimeout(footerTimeoutRef.current);
+			imageSavedTimeoutRef.current && clearTimeout(imageSavedTimeoutRef.current);
+		}
+	}, [])
+
+	const setScaleDebounced = useThrottledCallback(setCurrentScale, 300);
 
 	return (
-		<ImageGallery
-			close={onClose}
-			isOpen={visible}
-			thumbSize={size.s_24 * 3}
-			disableSwipe={false}
-			images={formatImages}
-			thumbColor={themeValue.bgViolet}
-			renderCustomImage={renderCustomImage}
-			renderHeaderComponent={renderHeaderComponent}
-			renderFooterComponent={renderFooterComponent}
-			renderCustomThumb={renderCustomThumb}
-		/>
-	);
+		<Modal visible={visible}>
+			<Block flex={1}>
+				{visibleToolbarConfig.showHeader && (
+					<RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} />
+				)}
+				<Gallery
+					ref={ref}
+					initialIndex={initialIndex}
+					data={allImageList}
+					keyExtractor={(item, index) => `${item?.filename}_${index}`}
+					onSwipeToClose={onClose}
+					onIndexChange={onIndexChange}
+					renderItem={renderItem}
+					onDoubleTap={onDoubleTap}
+					onTap={onTap}
+					onPanStart={onPanStart}
+					onScaleChange={setScaleDebounced}
+				/>
+				<RenderFooterModal
+					visible={visibleToolbarConfig.showFooter}
+					imageSelected={currentImage}
+					onImageThumbnailChange={onImageThumbnailChange}
+				/>
+				{showSavedImage && (
+					<Block
+						position='absolute'
+						top={'50%'}
+						width={'100%'}
+						alignItems='center'
+					>
+						<Block backgroundColor={Colors.bgDarkSlate} padding={size.s_10} borderRadius={size.s_10}>
+							<Text color={Colors.white}>{t('savedSuccessfully')}</Text>
+						</Block>
+					</Block>
+				)}
+			</Block>
+		</Modal>
+	)
 });
