@@ -1,3 +1,4 @@
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { reduxPersistStorage as storage } from '@mezon/mobile-components';
 import { MezonContextValue } from '@mezon/transport';
 import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
