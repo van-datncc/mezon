@@ -1,9 +1,12 @@
+import { EFailAttachment } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useState } from 'react';
 import { Icons, RenderAttachmentThumbnail } from '../../components';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
+	readonly mode?: ChannelStreamMode;
 };
 function formatFileSize(bytes: number) {
 	if (bytes >= 1000000) {
@@ -15,7 +18,7 @@ function formatFileSize(bytes: number) {
 	}
 }
 
-function MessageLinkFile({ attachmentData }: MessageImage) {
+function MessageLinkFile({ attachmentData, mode }: MessageImage) {
 	const handleDownload = () => {
 		window.open(attachmentData.url);
 	};
@@ -41,25 +44,33 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 			role="button"
 		>
 			<div className="flex items-center">{thumbnailAttachment}</div>
-			{hideTheInformationFile && (
-				<div className=" cursor-pointer " onClick={handleDownload} onKeyDown={handleDownload}>
-					<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
-					<p className="dark:text-textDarkTheme text-textLightTheme">size: {formatFileSize(attachmentData.size || 0)}</p>
-				</div>
-			)}
-			{hideTheInformationFile && hoverShowOptButtonStatus && (
-				<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md dark:bg-[#313338] border dark:border-0 bg-gray-200 flex flex-row justify-center items-center">
-					<div
-						onClick={handleDownload}
-						role="button"
-						className="rounded-l-md  w-8 h-8 flex flex-row justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
-					>
-						<Icons.Download defaultSize="w-4 h-4" />
-					</div>
-					<div className={` rounded-r-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#E13542]`}>
-						<Icons.TrashIcon className="w-4 h-4" />
-					</div>
-				</div>
+			{attachmentData.filename === EFailAttachment.FAIL_ATTACHMENT ? (
+				<div className="text-red-500">Attachment failed to load.</div>
+			) : (
+				hideTheInformationFile && (
+					<>
+						<div className="cursor-pointer" onClick={handleDownload} onKeyDown={handleDownload}>
+							<p className="text-blue-500 hover:underline">
+								{attachmentData.filename?.slice(attachmentData.filename?.lastIndexOf('/') + 1)}
+							</p>
+							<p className="dark:text-textDarkTheme text-textLightTheme">size: {formatFileSize(attachmentData.size || 0)}</p>
+						</div>
+						{hoverShowOptButtonStatus && (
+							<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md dark:bg-[#313338] border dark:border-0 bg-gray-200 flex flex-row justify-center items-center">
+								<div
+									onClick={handleDownload}
+									role="button"
+									className="rounded-l-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
+								>
+									<Icons.Download defaultSize="w-4 h-4" />
+								</div>
+								<div className={`rounded-r-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#E13542]`}>
+									<Icons.TrashIcon className="w-4 h-4" />
+								</div>
+							</div>
+						)}
+					</>
+				)
 			)}
 		</div>
 	);

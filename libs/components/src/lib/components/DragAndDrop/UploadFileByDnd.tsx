@@ -1,4 +1,4 @@
-import { useDragAndDrop, useReference } from '@mezon/core';
+import { useDragAndDrop } from '@mezon/core';
 import { referencesActions, useAppDispatch } from '@mezon/store';
 import { DragEvent } from 'react';
 import DragAndDropUI from './DragAndDropUI';
@@ -10,7 +10,6 @@ type FileUploadByDnDOpt = {
 function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 	const dispatch = useAppDispatch();
 	const { setDraggingState } = useDragAndDrop();
-	const { setAttachmentData } = useReference(currentId);
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();

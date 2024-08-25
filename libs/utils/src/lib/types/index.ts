@@ -755,9 +755,19 @@ export type PreSendAttachment = {
 	files: File[];
 };
 
-export type uploadingAttachmentStatus = {
+export type UploadingAttachmentStatus = {
 	channelId?: string;
 	messageId?: string;
-	hasSpinning?: boolean;
+	statusUpload?: EUploadingStatus;
 	count?: number;
 };
+
+export enum EUploadingStatus {
+	LOADING = 'loading',
+	SUCCESSFULLY = 'successfully',
+	ERROR = 'error',
+}
+
+export enum EFailAttachment {
+	FAIL_ATTACHMENT = 'failAttachment',
+}

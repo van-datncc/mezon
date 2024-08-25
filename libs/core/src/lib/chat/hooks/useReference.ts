@@ -1,7 +1,6 @@
 import {
 	messagesActions,
 	referencesActions,
-	selectAttachmentData,
 	selectDataReferences,
 	selectIdMessageToJump,
 	selectOpenOptionMessageState,
@@ -10,7 +9,7 @@ import {
 	threadsActions,
 	useAppDispatch,
 } from '@mezon/store';
-import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -18,7 +17,6 @@ export function useReference(channelId?: string) {
 	const dispatch = useAppDispatch();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
-	const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
@@ -51,13 +49,6 @@ export function useReference(channelId?: string) {
 		[dispatch],
 	);
 
-	const setAttachmentData = useCallback(
-		(attachments: ApiMessageAttachment[]) => {
-			dispatch(referencesActions.setAttachmentData({ channelId: channelId || '', attachments }));
-		},
-		[channelId, dispatch],
-	);
-
 	const setOpenOptionMessageState = useCallback(
 		(status: boolean) => {
 			dispatch(messagesActions.setOpenOptionMessageState(status));
@@ -81,8 +72,6 @@ export function useReference(channelId?: string) {
 			setOpenThreadMessageState,
 			dataReferences,
 			openThreadMessageState,
-			attachmentDataRef,
-			setAttachmentData,
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,
@@ -96,8 +85,7 @@ export function useReference(channelId?: string) {
 			setOpenThreadMessageState,
 			dataReferences,
 			openThreadMessageState,
-			attachmentDataRef,
-			setAttachmentData,
+
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,

@@ -3,7 +3,6 @@ import { useReference } from '@mezon/core';
 import {
 	messagesActions,
 	referencesActions,
-	selectAttachmentData,
 	selectCloseMenu,
 	selectFilteredAttachments,
 	selectStatusLoadingAttachment,
@@ -11,7 +10,7 @@ import {
 	selectTheme,
 	useAppDispatch,
 } from '@mezon/store';
-import { handleUploadFile, useMezon } from '@mezon/transport';
+import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue, typeConverts } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, useCallback, useMemo } from 'react';
@@ -40,7 +39,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
-	const attachmentDataRef = useSelector(selectAttachmentData(currentChannelId || ''));
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
 	const appearanceTheme = useSelector(selectTheme);
 	const { removeAttachmentByIndex } = useReference();
@@ -51,21 +49,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 			const now = Date.now();
 			const filename = now + '.txt';
 			const file = new File([fileContent], filename, { type: 'text/plain' });
-
-			const session = sessionRef.current;
-			const client = clientRef.current;
-
-			if (!client || !session || !currentChannelId) {
-				throw new Error('Client is not initialized');
-			}
-			handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file)
-				.then((attachment) => {
-					handleFinishUpload(attachment);
-					return 'handled';
-				})
-				.catch((err) => {
-					return 'not-handled';
-				});
+			dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, messageId: '', files: [file] }));
 		}
 	}, []);
 
@@ -77,7 +61,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				}
 			});
 			dispatch(messagesActions.setIsFocused(true));
-			dispatch(referencesActions.setAttachmentData({ channelId: currentChannelId || '', attachments: [attachment] }));
 		},
 		[currentChannelId],
 	);
@@ -85,7 +68,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const onPastedFiles = useCallback(
 		(event: React.ClipboardEvent<HTMLDivElement>) => {
 			const items = (event.clipboardData || (window as any).clipboardData).items;
-			const files: Blob[] = [];
+			const files: File[] = [];
 			if (items) {
 				for (let i = 0; i < items.length; i++) {
 					if (items[i].type.indexOf('image') !== -1) {
@@ -95,55 +78,12 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						}
 					}
 				}
-
 				if (files.length > 0) {
-					const blob = new Blob(files, { type: files[0].type });
-					const filename = Date.now() + '.png';
-					const file = new File([blob], filename, { type: blob.type });
-					const session = sessionRef.current;
-					const client = clientRef.current;
-
-					if (!client || !session || !currentChannelId) {
-						throw new Error('Client is not initialized');
-					}
-
-					handleUploadFile(client, session, currentClanId || '', currentChannelId || '', filename, file)
-						.then(() => {
-							dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, messageId: '', files: [file] }));
-							dispatch(
-								referencesActions.setUploadingStatus({
-									channelId: currentChannelId,
-									messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
-									hasSpinning: false,
-									count: attachmentFilteredByChannelId[0]?.files?.length ?? 0,
-								}),
-							);
-							files.length = 0;
-							navigator.clipboard
-								.writeText('')
-								.then(() => {})
-								.catch((error) => {
-									console.error('Failed to clear clipboard:', error);
-								});
-							return 'handled';
-						})
-						.catch((err) => {
-							console.error('Error uploading file:', err);
-							files.length = 0;
-							navigator.clipboard
-								.writeText('')
-								.then(() => {})
-								.catch((error) => {
-									console.error('Failed to clear clipboard:', error);
-								});
-							return 'not-handled';
-						});
-
-					return 'not-handled';
+					dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, messageId: '', files: files }));
 				}
 			}
 		},
-		[attachmentDataRef, clientRef, currentChannelId, currentClanId, sessionRef, props.mode],
+		[clientRef, currentChannelId, currentClanId, sessionRef, props.mode],
 	);
 
 	const closeMenu = useSelector(selectCloseMenu);
@@ -185,14 +125,10 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 			<div
 				className={`flex flex-inline items-start gap-2 box-content mb-4 max-sm:mb-0
-				 dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${attachmentDataRef?.length > 0 ? 'rounded-t-none' : 'rounded-t-lg'}
+				 dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}
 				  ${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
 			>
-				<FileSelectionButton
-					currentClanId={currentClanId || ''}
-					currentChannelId={currentChannelId || ''}
-					onFinishUpload={handleFinishUpload}
-				/>
+				<FileSelectionButton currentClanId={currentClanId || ''} currentChannelId={currentChannelId || ''} />
 
 				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md `}>
 					<div

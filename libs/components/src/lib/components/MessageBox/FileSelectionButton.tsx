@@ -2,16 +2,15 @@ import { useChatSending } from '@mezon/core';
 import { referencesActions, selectFilteredAttachments, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { EUploadingStatus, failAttachment } from '@mezon/utils';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
 	currentChannelId: string;
-	onFinishUpload: (attachment: ApiMessageAttachment) => void;
 };
-function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }: FileSelectionButtonProps) {
+function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionButtonProps) {
 	const { sessionRef, clientRef } = useMezon();
 
 	const dispatch = useAppDispatch();
@@ -39,7 +38,7 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 						newMessage.mentions,
 						results,
 						undefined,
-						true,
+						false,
 					);
 				})
 				.then(() => {
@@ -47,19 +46,38 @@ function FileSelectionButton({ currentClanId, currentChannelId, onFinishUpload }
 						referencesActions.setUploadingStatus({
 							channelId: currentChannelId,
 							messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
-							hasSpinning: false,
-							count: attachmentFilteredByChannelId[0]?.files?.length ?? 0,
+							statusUpload: EUploadingStatus.SUCCESSFULLY,
+							count: attachmentFilteredByChannelId[0]?.files?.length,
 						}),
 					);
 				})
 				.catch((error) => {
+					updateImageLinkMessage(
+						newMessage.clan_id,
+						newMessage.channel_id ?? '',
+						newMessage.mode,
+						newMessage.content,
+						newMessage.message_id,
+						newMessage.mentions,
+						[failAttachment],
+						undefined,
+						false,
+					);
+					dispatch(
+						referencesActions.setUploadingStatus({
+							channelId: currentChannelId,
+							messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
+							statusUpload: EUploadingStatus.ERROR,
+							count: attachmentFilteredByChannelId[0]?.files?.length,
+						}),
+					);
 					console.error('Error uploading files:', error);
 				});
 			dispatch(
 				referencesActions.setUploadingStatus({
 					channelId: currentChannelId,
 					messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
-					hasSpinning: true,
+					statusUpload: EUploadingStatus.LOADING,
 					count: attachmentFilteredByChannelId[0]?.files?.length,
 				}),
 			);

@@ -128,7 +128,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
-		if (newMessageUpdateImage.clan_id !== '0') {
+		if (newMessageUpdateImage.clan_id && newMessageUpdateImage.clan_id !== '0') {
 			processLink(
 				newMessageUpdateImage.clan_id!,
 				newMessageUpdateImage.channel_id!,
@@ -139,7 +139,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				newMessageUpdateImage.message_id,
 			);
 		}
-
 		setContentPayload({});
 		setMentionPayload([]);
 		setAttachmentPayload([]);

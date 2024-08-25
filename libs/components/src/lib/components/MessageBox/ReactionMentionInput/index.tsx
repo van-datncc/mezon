@@ -19,7 +19,6 @@ import {
 	selectAllAccount,
 	selectAllRolesClan,
 	selectAllUsesClan,
-	selectAttachmentData,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
@@ -165,10 +164,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentDmOrChannelId || ''));
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
-	const attachmentDataRef = useSelector(selectAttachmentData(currentDmOrChannelId || ''));
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
-	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(currentDmOrChannelId || '');
+	const { setDataReferences, setOpenThreadMessageState } = useReference(currentDmOrChannelId || '');
 	const { valueTextInput, setValueTextInput } = useMessageValue(
 		props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string),
 	);
@@ -252,7 +250,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const [mentionRaw, setMentionRaw] = useState<MentionItem[]>([]);
 	const { mentionList, hashtagList, emojiList } = useProcessMention(mentionRaw, roleList);
-	const attachmentFilteredByChannelId = useSelector(selectFilteredAttachments(currentChannelId ?? ''));
+	const attachmentFilteredByChannelId = useSelector(selectFilteredAttachments(currentDmOrChannelId ?? ''));
 
 	const checkAttachment = useMemo(() => {
 		return attachmentFilteredByChannelId[0]?.files?.length > 0;
@@ -299,7 +297,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					filterEmptyArrays(payload),
 					mentionList,
-					[], // attachmentDataRef,
+					[],
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
@@ -307,7 +305,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setValueTextInput('', props.isThread);
-				setAttachmentData([]);
 				dispatch(referencesActions.setIdReferenceMessageReply({ channelId: currentDmOrChannelId as string, idMessageRefReply: '' }));
 				setMentionEveryone(false);
 				setDataReferences([]);
@@ -331,7 +328,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					props.onSend(
 						filterEmptyArrays(payload),
 						mentionList,
-						attachmentDataRef,
+						[],
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
 						anonymousMessage,
@@ -341,7 +338,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setValueTextInput('', props.isThread);
 				setMentionEveryone(false);
-				setAttachmentData([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setContent('');
 				setMentionData([]);
@@ -359,7 +355,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		},
 		[
 			valueTextInput,
-			attachmentDataRef,
 			mentionData,
 			nameValueThread,
 			props,
@@ -378,7 +373,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			usersClan,
 			members,
 			setValueTextInput,
-			setAttachmentData,
 			setDataReferences,
 			currentChannelId,
 			valueThread?.content.t,
