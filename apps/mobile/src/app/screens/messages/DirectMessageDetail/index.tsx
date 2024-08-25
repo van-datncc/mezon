@@ -79,6 +79,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			const store = await getStoreAsync();
 			await Promise.all([
 				store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id)),
+				// Rejoin previous clan (other than 0) when exiting the DM detail screen
+				store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id })),
 				store.dispatch(
 					channelMembersActions.fetchChannelMembers({
 						clanId: currentChannel?.clan_id || '',

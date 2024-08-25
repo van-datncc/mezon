@@ -1,5 +1,12 @@
 import { useChatSending, useDirectMessages } from '@mezon/core';
-import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons, getAttachmentUnique } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	ID_MENTION_HERE,
+	IRoleMention,
+	Icons,
+	getAttachmentUnique,
+	IS_TABLET
+} from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
@@ -54,7 +61,7 @@ interface IChatMessageInputProps {
 	channelsEntities?: any;
 	attachmentDataRef?: ApiMessageAttachment[];
 }
-const inputWidthWhenHasInput = Dimensions.get('window').width * 0.72;
+const inputWidthWhenHasInput = Dimensions.get('window').width * (IS_TABLET ? 0.8 : 0.72);
 
 export const ChatMessageInput = memo(
 	forwardRef(

@@ -1,5 +1,5 @@
 import { HomeTab, MessageTab, NotiTab, ProfileTab } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
@@ -43,7 +43,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Servers',
-						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <HomeTab color={color} />),
+						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <HomeTab color={color} width={size.s_22} height={size.s_22} />),
 					}}
 				/>
 				<TabStack.Screen
@@ -52,7 +52,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Messages',
-						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <MessageTab color={color} />),
+						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <MessageTab color={color} width={size.s_22} height={size.s_22} />),
 					}}
 				/>
 				<TabStack.Screen
@@ -61,7 +61,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Notifications',
-						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <NotiTab color={color} />),
+						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <NotiTab color={color} width={size.s_22} height={size.s_22} />),
 					}}
 				/>
 				<TabStack.Screen
@@ -70,7 +70,7 @@ const BottomNavigator = () => {
 					options={{
 						headerShown: false,
 						title: 'Profile',
-						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <ProfileTab color={color} />),
+						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <ProfileTab color={color} width={size.s_22} height={size.s_22} />),
 					}}
 				/>
 			</TabStack.Navigator>
