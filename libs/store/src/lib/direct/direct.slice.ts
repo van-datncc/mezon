@@ -376,6 +376,13 @@ export const selectDmGroupCurrentId = createSelector(getDirectState, (state) => 
 
 export const selectDmGroupCurrentType = createSelector(getDirectState, (state) => state.currentDirectMessageType);
 
+export const selectUserIdCurrentDm = createSelector(selectAllDirectMessages, selectDmGroupCurrentId,
+	(directMessages, currentId) => {
+		const currentDm = directMessages.find((dm) => dm.id === currentId);
+		return currentDm?.user_id || [];
+	}
+)
+
 export const selectIsLoadDMData = createSelector(getDirectState, (state) => state.loadingStatus !== 'not loaded');
 
 export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirectMessageEntities, (channelEntities) => channelEntities[dmId]);
