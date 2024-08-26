@@ -322,7 +322,6 @@ export const channelMembers = createSlice({
 			state.toFollowUserIds = [...new Set(newUsers)];
 		},
 		setMemberChannels: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
-			console.log ('check set member channels action: ', action.payload);
 			state.memberChannels = action.payload;
 		},
 		addNewMember: (state, action: PayloadAction<ChannelPresenceEvent>) => {
@@ -473,7 +472,7 @@ export const selectAllUserIdsToFollow = createSelector(getChannelMembersState, (
 export const selectMembersByChannelId = (channelId?: string | null) =>
 	createSelector(selectChannelMembersEntities, (entities) => {
 		const members = Object.values(entities);
-		return members.filter((member) => member && member.user !== null && (member.channelId === channelId || member.thread_id === channelId));
+		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
 	});
 
 export const selectUserChannelById = (userID: string, channelID: string) =>
