@@ -1,4 +1,4 @@
-import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive } from '@mezon/utils';
+import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
@@ -48,7 +48,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	currentCategory: ICategory | null;
 	channelMetadata: EntityState<ChannelMeta, string>;
 	currentVoiceChannelId: string;
-	valueTextInput: Record<string, string>;
+	request: Record<string, RequestInput>;
 	idChannelSelected: Record<string, string>;
 	modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 }
@@ -68,7 +68,7 @@ type fetchChannelMembersPayload = {
 	channelId: string;
 	noFetchMembers?: boolean;
 	messageId?: string;
-  isDmGroup?: boolean;
+	isDmGroup?: boolean;
 };
 
 type JoinChatPayload = {
@@ -99,7 +99,7 @@ export const joinChannel = createAsyncThunk(
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ channelId, messageId }));
 			} else {
-				thunkAPI.dispatch(messagesActions.fetchMessages({ channelId }));
+				thunkAPI.dispatch(messagesActions.fetchMessages({ channelId, isFetchingLatestMessages: true }));
 			}
 
 			if (!noFetchMembers) {
@@ -152,9 +152,9 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteChannelDesc(mezon.session, body.channelId);
 		if (response) {
-      if(body.isDmGroup){
-        return true;
-      }
+			if (body.isDmGroup) {
+				return true;
+			}
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clanId, noCache: true }));
 		}
 	} catch (error) {
@@ -283,7 +283,7 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	currentCategory: null,
 	channelMetadata: channelMetaAdapter.getInitialState(),
 	currentVoiceChannelId: '',
-	valueTextInput: {},
+	request: {},
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
 	modeResponsive: ModeResponsive.MODE_DM,
 	quantityNotifyChannels: {},
@@ -386,8 +386,8 @@ export const channelsSlice = createSlice({
 				},
 			});
 		},
-		setValueTextInput: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
-			state.valueTextInput[action.payload.channelId] = action.payload.value;
+		setRequestInput: (state, action: PayloadAction<{ channelId: string; request: RequestInput }>) => {
+			state.request[action.payload.channelId] = action.payload.request;
 		},
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
@@ -490,6 +490,7 @@ export const channelsActions = {
  * import { useSelector } from 'react-redux';
 import { channel } from 'process';
 import { mess } from '@mezon/store';
+import { remove } from '@mezon/mobile-components';
  *
  * // ...
  *
@@ -580,12 +581,10 @@ export const selectLastChannelTimestamp = (channelId: string) =>
 		return channel?.lastSeenTimestamp || 0;
 	});
 
-export const selectValueTextInputByChannelId = (channelId: string) =>
+export const selectRequestByChannelId = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {
-		return state.valueTextInput[channelId];
+		return state.request?.[channelId];
 	});
-
-export const selectAllTextInput = createSelector(getChannelsState, (state) => state.valueTextInput);
 
 export const selectIdChannelSelectedByClanId = (clanId: string) =>
 	createSelector(getChannelsState, (state) => {

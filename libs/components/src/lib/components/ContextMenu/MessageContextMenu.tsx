@@ -109,14 +109,17 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	});
 
 	const handleReplyMessage = () => {
-		dispatch(referencesActions.setOpenReplyMessageState(true));
-		dispatch(referencesActions.setIdReferenceMessageReply(message.id));
+		dispatch(
+			referencesActions.setIdReferenceMessageReply({
+				channelId: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || '',
+				idMessageRefReply: message.id,
+			}),
+		);
 		dispatch(messagesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	};
 
 	const handleEditMessage = () => {
-		dispatch(referencesActions.setOpenReplyMessageState(false));
 		dispatch(reactionActions.setReactionRightState(false));
 		dispatch(referencesActions.setOpenEditMessageState(true));
 		dispatch(referencesActions.setIdReferenceMessageEdit(message.id));

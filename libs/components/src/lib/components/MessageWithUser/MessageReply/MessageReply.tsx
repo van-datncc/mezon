@@ -1,7 +1,7 @@
+import { useShowName } from '@mezon/core';
 import { messagesActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
-import useShowName from 'libs/core/src/lib/chat/hooks/useShowName';
 import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import MessageLine from '../MessageLine';

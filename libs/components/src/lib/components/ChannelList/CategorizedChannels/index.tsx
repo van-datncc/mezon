@@ -44,7 +44,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 		const windowHeight = window.innerHeight;
 		
 		if (event.button === MouseButton.RIGHT) {
-			await dispatch(defaultNotificationCategoryActions.getDefaultNotificationCategory({categoryId: category?.id ?? '', noCache: false}));
+			await dispatch(defaultNotificationCategoryActions.getDefaultNotificationCategory({categoryId: category?.id ?? ''}));
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelCategory(!isShowPanelCategory);
@@ -93,7 +93,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 							onClick={() => {
 								handleToggleCategory();
 							}}
-							className="dark:text-[#AEAEAE] text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
+							className="dark:text-contentTertiary text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
 						>
 							{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 							<span className='one-line'>
@@ -102,13 +102,13 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 						</button>
 						<button
 							onClick={handleSortByName}
-							className="focus-visible:outline-none dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black"
+							className="focus-visible:outline-none dark:text-contentTertiary text-colorTextLightMode dark:hover:text-white hover:text-black"
 						>
 							<Icons.UpDownIcon />
 						</button>
 						<UserRestrictionZone policy={isShowCreateChannel}>
 							<button
-								className="focus-visible:outline-none"
+								className="focus-visible:outline-none dark:text-contentTertiary text-colorTextLightMode dark:hover:text-white hover:text-black"
 								onClick={() => handleOpenCreateChannelModal(category)}
 							>
 								<Icons.Plus />
@@ -131,7 +131,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({category}) => 
 				
 				)}
 				{isShowCategoryChannels && (
-					<div className="mt-[5px] space-y-0.5 text-[#AEAEAE]">
+					<div className="mt-[5px] space-y-0.5 text-contentTertiary">
 						{category?.channels
 							?.filter((channel: IChannel) => {
 								const categoryIsOpen = isShowCategoryChannels;

@@ -57,7 +57,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 							<Image source={Images.AVATAR_GROUP} style={{ width: 40, height: 40, borderRadius: 50 }} />
 						) : (
 							<MezonAvatar
-								avatarUrl={dmGroup.channel_avatar?.at(0)}
+								avatarUrl={dmGroup?.channel_avatar?.at(0)}
 								username={dmGroup?.channel_label}
 								height={40} width={40}
 							/>

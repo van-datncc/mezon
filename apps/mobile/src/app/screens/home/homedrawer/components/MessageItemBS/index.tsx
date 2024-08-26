@@ -5,8 +5,8 @@ import { baseColor, Colors, size, useAnimatedState, useTheme } from '@mezon/mobi
 import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { appActions, MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectMessageEntitiesByChannelId, selectPinMessageByChannelId, setIsForwardAll, useAppSelector } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
-import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { useImage } from 'apps/mobile/src/app/hooks/useImage';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,6 @@ import { Alert, DeviceEventEmitter, Platform, Pressable, Text, View } from 'reac
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import RNFetchBlob from 'rn-fetch-blob';
 import { MezonBottomSheet } from '../../../../../../app/temp-ui';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
@@ -41,13 +40,14 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 
 	const { isCanDeleteMessage, isCanManageThread } = useUserPermission();
+	const { downloadImage, saveImageToCameraRoll } = useImage();
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || ''),
 	);
 	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const messagePosition = useMemo(() => {
 		return convertedAllMessagesEntities?.findIndex(
-		  (value: MessagesEntity) => value.id === message?.id
+			(value: MessagesEntity) => value.id === message?.id
 		);
 	}, [convertedAllMessagesEntities, message?.id]);
 
@@ -74,48 +74,6 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 	}, [mode]);
-
-	const downloadImage = async (imageUrl: string, type: string) => {
-		try {
-			const response = await RNFetchBlob.config({
-				fileCache: true,
-				appendExt: type,
-			}).fetch('GET', imageUrl);
-
-			if (response.info().status === 200) {
-				const filePath = response.path();
-				return filePath;
-			} else {
-				console.error('Error downloading image:', response.info());
-				return null;
-			}
-		} catch (error) {
-			console.error('Error downloading image:', error);
-		} finally {
-			dispatch(appActions.setLoadingMainMobile(false));
-		}
-	};
-
-	const saveImageToCameraRoll = async (filePath: string, type: string) => {
-		try {
-			await CameraRoll.save(filePath, { type: type === 'video' ? 'video' : 'photo' });
-
-			Toast.show({
-				text1: 'Save successfully',
-				type: 'info',
-			});
-		} catch (err) {
-			Toast.show({
-				text1: 'Error saving image',
-				type: 'error',
-			});
-		} finally {
-			if (Platform.OS === 'android') {
-				await RNFetchBlob.fs.unlink(filePath);
-			}
-			dispatch(appActions.setLoadingMainMobile(false));
-		}
-	};
 
 	const handleActionReply = () => {
 		onClose();
@@ -355,7 +313,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.CopyMessageLink:
 				return <Icons.LinkIcon color={themeValue.text} />;
 			case EMessageActionType.Report:
-				return <Icons.FlagIcon color={baseColor.red} height={20} width={20} />;
+				return <Icons.FlagIcon color={baseColor.red} height={14} width={14} />;
 			default:
 				return <View />;
 		}
@@ -389,7 +347,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 		}
 		const mediaList =
 			message?.attachments?.length > 0 &&
-			message.attachments?.every((att) => att?.filetype?.includes('image') || att?.filetype?.includes('video'))
+				message.attachments?.every((att) => att?.filetype?.includes('image') || att?.filetype?.includes('video'))
 				? []
 				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 

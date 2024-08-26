@@ -165,5 +165,12 @@ export const style = (colors: Attributes) =>
 			fontSize: size.h6,
 			color: Colors.white,
 		},
-    lottie: { width: 30, height: 20 }
+		lottie: { width: 30, height: 20 },
+		contentMessage: {
+			flex: 1,
+			maxHeight: size.s_22,
+			flexDirection: 'row',
+			flexWrap: 'nowrap',
+			overflow: 'hidden'
+		}
 	});

@@ -1,4 +1,5 @@
-import { selectCurrentChannel, selectMemberByUserId } from '@mezon/store';
+import { useAppParams } from '@mezon/core';
+import { selectCurrentChannel, selectDirectById, selectMemberByUserId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -13,7 +14,8 @@ export type ChatWelComeProp = {
 };
 
 function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
-	const currentChannel = useSelector(selectCurrentChannel);
+	const { directId } = useAppParams();
+	const currentChannel = directId ? useSelector(selectDirectById(directId as string)) : useSelector(selectCurrentChannel);
 	const user = useSelector(selectMemberByUserId(currentChannel?.creator_id as string));
 	const classNameSubtext = 'dark:text-zinc-400 text-colorTextLightMode text-sm';
 	const showName = <span className="font-medium">{name || userName}</span>;
@@ -42,8 +44,8 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 				))
 			}
 			{(isDm || isDmGroup) && (
-				<WelComeDm 
-					name={name}
+				<WelComeDm
+					name={(name || `${currentChannel?.creator_name}'s Groups`)}
 					userName={userName}
 					avatar={avatarDM}
 					classNameSubtext={classNameSubtext}
