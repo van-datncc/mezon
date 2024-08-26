@@ -42,7 +42,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listChannels = useSelector(selectAllChannelsByUser);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1);
-	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1);
+	const listDM = dmGroupChatList.filter(
+		(groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1,
+	);
 	const usersClan = useSelector(selectAllUsesClan);
 	const membersInClan = useSelector(selectAllChannelMembers);
 
@@ -63,7 +65,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
 						idDM: itemDM?.id ?? '',
 						displayName: itemDM.channel_label,
-						lastSentTimeStamp: itemDM.last_sent_message?.timestamp,
+						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
 						typeChat: TypeSearch.Dm_Type,
 						type: ChannelType.CHANNEL_TYPE_DM,
 					};
@@ -76,7 +78,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 						name: itemGr?.channel_label ?? '',
 						avatarUser: 'assets/images/avatar-group.png' ?? '',
 						idDM: itemGr?.id ?? '',
-						lastSentTimeStamp: itemGr.last_sent_message?.timestamp,
+						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
 						type: ChannelType.CHANNEL_TYPE_GROUP,
 						typeChat: TypeSearch.Dm_Type,
 					};
@@ -146,7 +148,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				channel_private: item.channel_private,
 				type: item.type,
 				parrent_id: item.parrent_id,
-				meeting_code: item.meeting_code
+				meeting_code: item.meeting_code,
 			};
 		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
@@ -377,7 +379,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					{!normalizeSearchText.startsWith('@') && !normalizeSearchText.startsWith('#') ? (
 						<>
 							<ListSearchModal
-								listSearch={totalListsSorted.slice(0,50)}
+								listSearch={totalListsSorted.slice(0, 50)}
 								itemRef={itemRef}
 								handleSelect={handleSelect}
 								searchText={normalizeSearchText}
@@ -396,7 +398,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
 									<ListSearchModal
-										listSearch={memSearchSorted.slice(0,50)}
+										listSearch={memSearchSorted.slice(0, 50)}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={normalizeSearchText}
@@ -410,7 +412,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 								<>
 									<span className="text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 									<ListSearchModal
-										listSearch={channelSearchSorted.slice(0,50)}
+										listSearch={channelSearchSorted.slice(0, 50)}
 										itemRef={itemRef}
 										handleSelect={handleSelect}
 										searchText={normalizeSearchText.slice(1)}
