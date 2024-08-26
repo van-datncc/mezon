@@ -295,6 +295,7 @@ export const getRolesClanState = (rootState: { [ROLES_CLAN_FEATURE_KEY]: RolesCl
 	rootState[ROLES_CLAN_FEATURE_KEY];
 
 export const selectAllRolesClan = createSelector(getRolesClanState, selectAll);
+export const selectEveryoneRole = createSelector(selectAllRolesClan, (state)=>state.find(role=> role.slug === 'everyone'));
 
 export const selectCurrentRoleId = createSelector(getRolesClanState, (state) => state.currentRoleId);
 
