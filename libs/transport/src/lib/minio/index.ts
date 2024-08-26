@@ -110,7 +110,7 @@ export async function handleUploadFileMobile(
 
 export function createUploadFilePath(session: Session, currentClanId: string, currentChannelId: string, filename: string): string {
 	const ms = new Date().getMinutes();
-	filename = ms + '/' + filename;
+	filename = ms + filename;
 	filename = filename.replace(/-|\(|\)| /g, '_');
 	if (!currentClanId) {
 		currentClanId = '0';
