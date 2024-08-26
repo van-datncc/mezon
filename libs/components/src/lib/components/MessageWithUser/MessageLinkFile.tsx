@@ -53,7 +53,7 @@ function MessageLinkFile({ attachmentData }: MessageImage) {
 			<div className="flex items-center">{thumbnailAttachment}</div>
 			{hideTheInformationFile && (
 				<div className=" cursor-pointer " onClick={handleDownload} onKeyDown={handleDownload}>
-					<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
+					<p className="text-blue-500 hover:underline">{attachmentData.filename?.slice(attachmentData.filename?.lastIndexOf('/') + 1)}</p>
 					<p className="dark:text-textDarkTheme text-textLightTheme">size: {formatFileSize(attachmentData.size || 0)}</p>
 				</div>
 			)}
