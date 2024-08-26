@@ -128,6 +128,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.updateDMSocket(message));
 			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+			dispatch(listChannelsByUserActions.updateLastSentTime({channelId: message.channel_id}));
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 
 			dispatch(messagesActions.addNewMessage(mess));
