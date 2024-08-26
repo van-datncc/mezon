@@ -74,7 +74,6 @@ export const searchMessageSlice = createSlice({
 			state.currentPage = action.payload;
 		},
 		setValueInputSearch: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
-			console.log('action.payload', action.payload);
 			const { channelId, value } = action.payload;
 			state.valueInputSearch[channelId] = value;
 		},

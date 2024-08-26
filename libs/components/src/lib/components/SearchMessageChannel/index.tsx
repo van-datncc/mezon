@@ -29,32 +29,6 @@ interface ExtendedSuggestionDataItem extends SuggestionDataItem {
 	subDisplay?: string;
 }
 
-// const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
-// 	const dispatch = useAppDispatch();
-// 	const isActive = useSelector(selectIsShowMemberList);
-// 	const { fetchSearchMessages, currentPage } = useSearchMessages();
-// 	const currentClanId = useSelector(selectCurrentClanId);
-// 	const currentChannel = useSelector(selectCurrentChannel);
-// 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
-
-// 	const valueInputSearch = useSelector(selectValueInputSearchMessage(currentChannel?.channel_id as string));
-
-// 	const isSearchMessage = useSelector(selectIsSearchMessage(currentChannel?.channel_id as string));
-
-// 	const userListData = UserMentionList({
-// 		channelID: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.id ?? '') : (currentDmGroupId ?? ''),
-// 		channelMode: mode,
-// 	});
-
-// 	const userListDataSearchByMention = userListData.map((user) => {
-// 		return {
-// 			id: user?.id ?? '',
-// 			display: user?.username ?? '',
-// 			avatarUrl: user?.avatarUrl ?? '',
-// 			subDisplay: user?.display,
-// 		};
-// 	});
-
 const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const dispatch = useAppDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
