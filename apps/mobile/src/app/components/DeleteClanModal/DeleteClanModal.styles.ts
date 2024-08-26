@@ -44,27 +44,7 @@ export const styles = StyleSheet.create({
   },
   contentText: {
     color: Colors.textGray,
-    fontSize: Fonts.size.h8,
-    textAlign: "center"
-  },
-  label: {
-    color: Colors.textGray,
-    fontSize: Fonts.size.h7,
-    marginVertical: size.s_10
-  },
-  input: {
-    color: Colors.textGray,
-		fontSize: Fonts.size.h7,
-		borderRadius: 10,
-		paddingHorizontal: size.s_8,
-    paddingVertical: size.s_4,
-		display: 'flex',
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-  inputError: {
-    fontSize: Fonts.size.h8,
-    color: Colors.red,
-    marginTop: size.s_4
+    fontSize: Fonts.size.small,
+    lineHeight: size.s_18
   }
 })

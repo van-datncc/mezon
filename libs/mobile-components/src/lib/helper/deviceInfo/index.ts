@@ -17,3 +17,5 @@ export function getBasicAppInfo() {
 		app_env: '',
 	};
 }
+
+export const IS_TABLET = DeviceInfo.isTablet();

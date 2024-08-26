@@ -1,20 +1,78 @@
-import { useTheme } from '@mezon/mobile-ui';
-import React from 'react';
-import { TouchableOpacity } from 'react-native';
-import { style } from './styles';
 import { Icons } from '@mezon/mobile-components';
+import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
+import { AttachmentEntity, selectMemberByUserId } from '@mezon/store-mobile';
+import { convertTimeString } from '@mezon/utils';
+import React from 'react';
+import { Platform, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
+import { useImage } from '../../hooks/useImage';
+import { MezonClanAvatar } from '../../temp-ui';
+import { style } from './styles';
 
 interface IRenderFooterModalProps {
-	onClose?: any;
+	onClose?: () => void;
+	imageSelected?: AttachmentEntity;
+	onImageSaved?: () => void;
 }
 
-export const RenderHeaderModal = React.memo((props: IRenderFooterModalProps) => {
+export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved }: IRenderFooterModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const uploader = useSelector(selectMemberByUserId(imageSelected?.uploader || ''));
+	const { downloadImage, saveImageToCameraRoll } = useImage();
+	const handleDownloadImage = async () => {
+		if (!imageSelected?.url) {
+			return;
+		}
+		try {
+			const { url, filetype } = imageSelected;
+			const filetypeParts = filetype.split('/');
+			const filePath = await downloadImage(url, filetypeParts[1]);
+			if (filePath) {
+				await saveImageToCameraRoll('file://' + filePath, filetypeParts[0]);
+			}
+			onImageSaved();
+		} catch (error) {
+			console.log('download image error', error)
+		}
+	}
 
 	return (
-		<TouchableOpacity activeOpacity={0.8} onPress={props.onClose} style={styles.btnCloseHeader}>
-			<Icons.CloseSmallIcon color={'white'} height={30} width={30} />
-		</TouchableOpacity>
+		<Block
+			position='absolute'
+			top={Platform.OS === 'ios' ? size.s_28 : size.s_14}
+			left={0}
+			zIndex={1}
+			justifyContent='space-between'
+			flexDirection='row'
+			backgroundColor='rgba(0, 0, 0, 0.4)'
+			width='100%'
+			padding={size.s_10}
+			alignItems='center'
+		>
+			<Block flexDirection='row' alignItems='center' gap={size.s_10}>
+				<TouchableOpacity onPress={onClose}>
+					<Icons.ArrowLargeLeftIcon color={Colors.white} />
+				</TouchableOpacity>
+				{!!uploader && (
+					<Block
+						flexDirection={'row'}
+						alignItems={'center'}
+						gap={size.s_6}
+					>
+						<Block style={styles.wrapperAvatar}>
+							<MezonClanAvatar alt={uploader?.user?.username} image={uploader?.user?.avatar_url} />
+						</Block>
+						<Block style={styles.messageBoxTop}>
+							<Text style={styles.userNameMessageBox}>{uploader?.user?.username || 'Anonymous'}</Text>
+							<Text style={styles.dateMessageBox}>{imageSelected?.create_time ? convertTimeString(imageSelected?.create_time) : ''}</Text>
+						</Block>
+					</Block>
+				)}
+			</Block>
+			<TouchableOpacity onPress={handleDownloadImage}>
+				<Icons.DownloadIcon color={Colors.white} />
+			</TouchableOpacity>
+		</Block>
 	);
 });
