@@ -21,6 +21,7 @@ import {
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { IFile } from 'apps/mobile/src/app/temp-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -33,7 +34,6 @@ import UseMentionList from '../../../../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
-import { IFile } from '../../AttachmentPicker/Gallery';
 import AttachmentPreview from '../../AttachmentPreview';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import { ChatMessageInput } from '../ChatMessageInput';
@@ -171,14 +171,16 @@ export const ChatBoxBottomBar = memo(
 			await handleTextInputChange(textFormat);
 		};
 
-		const removeAttachmentByUrl = (urlToRemove: string) => {
+		const removeAttachmentByUrl = useCallback((filename: string) => {
+			const index = attachmentDataRef.findIndex((attachment => attachment.filename === filename));
+
 			dispatch(
 				referencesActions.removeAttachment({
 					channelId: channelId,
-					urlAttachment: urlToRemove,
+					index
 				}),
 			);
-		};
+		}, [attachmentDataRef]);
 
 		const onSendSuccess = useCallback(() => {
 			setText('');

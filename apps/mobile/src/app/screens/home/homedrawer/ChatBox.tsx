@@ -9,6 +9,7 @@ import { ActionMessageSelected } from './components/ChatBox/ActionMessageSelecte
 import { ChatBoxBottomBar } from './components/ChatBox/ChatBoxBottomBar';
 import { EMessageActionType } from './enums';
 import { IMessageActionNeedToResolve } from './types';
+import UpdateAttachmentMessages from './UpdateAttachmentMessage';
 
 interface IChatBoxProps {
 	channelId: string;
@@ -74,6 +75,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 					</Block>
 				</Block>
 			)}
+			<UpdateAttachmentMessages />
 		</Block>
 	);
 });

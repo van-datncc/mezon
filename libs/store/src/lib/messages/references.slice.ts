@@ -11,6 +11,13 @@ export interface ReferencesEntity extends IMessage {
 	id: string;
 }
 
+export interface IAttachmentFile {
+	name: string;
+	path: string;
+	type: string;
+	size: number;
+}
+
 export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
@@ -23,6 +30,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	statusLoadingAttachment: boolean;
 	idMessageMention: string;
 	attachmentAfterUpload: Record<string, File[]>;
+	pendingAttachmentMobile: Record<string, IAttachmentFile[]>;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -45,6 +53,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	statusLoadingAttachment: false,
 	idMessageMention: '',
 	attachmentAfterUpload: {},
+	pendingAttachmentMobile: {}
 });
 
 export const referencesSlice = createSlice({
@@ -80,6 +89,19 @@ export const referencesSlice = createSlice({
 			}
 
 			state.attachmentAfterUpload[channelId] = [...state.attachmentAfterUpload[channelId], ...files];
+		},
+
+		setPendingAttachment(state, action: PayloadAction<{ channelId: string; files: IAttachmentFile[] }>) {
+			const { channelId, files } = action.payload;
+			if (channelId === '' && files.length === 0) {
+				state.pendingAttachmentMobile = {};
+			}
+
+			if (!state.pendingAttachmentMobile[channelId]) {
+				state.pendingAttachmentMobile[channelId] = [];
+			}
+
+			state.pendingAttachmentMobile[channelId] = [...state.pendingAttachmentMobile[channelId], ...files];
 		},
 
 		setAttachmentData(state, action: PayloadAction<{ channelId: string; attachments: ApiMessageAttachment[] }>) {
@@ -164,6 +186,8 @@ export const selectStatusLoadingAttachment = createSelector(getReferencesState, 
 export const selectMessageMetionId = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageMention);
 
 export const selectAttachmentAfterUpload = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentAfterUpload);
+
+export const selectPendingAttachments = createSelector(getReferencesState, (state: ReferencesState) => state.pendingAttachmentMobile);
 
 export const selectAttachmentData = (channelId: string) =>
 	createSelector(getReferencesState, (state: ReferencesState) => {

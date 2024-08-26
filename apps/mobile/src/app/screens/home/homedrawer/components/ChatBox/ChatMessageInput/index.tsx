@@ -3,9 +3,9 @@ import {
 	ActionEmitEvent,
 	ID_MENTION_HERE,
 	IRoleMention,
+	IS_TABLET,
 	Icons,
-	getAttachmentUnique,
-	IS_TABLET
+	getAttachmentUnique
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
@@ -112,7 +112,7 @@ export const ChatMessageInput = memo(
 					roleName: item.title ?? '',
 				}));
 			}, [rolesInClan]);
-			
+
 			const removeTags = (text: string) => {
 				if (!text)
 					return '';
@@ -188,18 +188,12 @@ export const ChatMessageInput = memo(
 				[editSendMessage],
 			);
 
-			const isCanSendMessage = useMemo(() => {
-				return !!attachmentDataRef?.length || text?.length > 0;
-			}, [attachmentDataRef?.length, text?.length]);
 
 			const doesIdRoleExist = (id: string, roles: IRoleMention[]): boolean => {
 				return roles?.some((role) => role?.roleId === id);
 			};
 
 			const handleSendMessage = async () => {
-				if (!isCanSendMessage) {
-					return;
-				}
 				clearInputAfterSendMessage();
 				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => {
 					const isRole = doesIdRoleExist(mention?.user_id ?? '', roleList ?? []);
@@ -236,14 +230,7 @@ export const ChatMessageInput = memo(
 				};
 
 				const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
-				const checkAttachmentLoading = attachmentDataUnique.some((attachment: ApiMessageAttachment) => !attachment?.size);
-				if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
-					Toast.show({
-						type: 'error',
-						text1: t('toast.attachmentIsLoading'),
-					});
-					return;
-				}
+
 				dispatch(
 					referencesActions.resetDataAttachment({
 						channelId: channelId,
@@ -252,19 +239,19 @@ export const ChatMessageInput = memo(
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? ([
-							{
-								message_id: '',
-								message_ref_id: targetMessage.id,
-								ref_type: 0,
-								message_sender_id: targetMessage?.sender_id,
-								message_sender_username: targetMessage?.username,
-								mesages_sender_avatar: targetMessage?.avatar,
-								message_sender_clan_nick: targetMessage?.clan_nick,
-								message_sender_display_name: targetMessage?.display_name,
-								content: JSON.stringify(targetMessage.content),
-								has_attachment: Boolean(targetMessage?.attachments?.length),
-							},
-						] as Array<ApiMessageRef>)
+						{
+							message_id: '',
+							message_ref_id: targetMessage.id,
+							ref_type: 0,
+							message_sender_id: targetMessage?.sender_id,
+							message_sender_username: targetMessage?.username,
+							mesages_sender_avatar: targetMessage?.avatar,
+							message_sender_clan_nick: targetMessage?.clan_nick,
+							message_sender_display_name: targetMessage?.display_name,
+							content: JSON.stringify(targetMessage.content),
+							has_attachment: Boolean(targetMessage?.attachments?.length),
+						},
+					] as Array<ApiMessageRef>)
 					: undefined;
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 

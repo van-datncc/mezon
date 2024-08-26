@@ -2,6 +2,7 @@ import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions } from '@mezon/store';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
+import { IFile } from 'apps/mobile/src/app/temp-ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +11,7 @@ import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
-import Gallery, { IFile } from './Gallery';
+import Gallery from './Gallery';
 import { style } from './styles';
 
 export type AttachmentPickerProps = {
@@ -104,6 +105,32 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		});
 	};
 
+	const handleSelectedAttachments = (file: IFile) => {
+		dispatch(
+			referencesActions.setAttachmentData({
+				channelId: currentChannelId,
+				attachments: [
+					{
+						filename: file.name,
+						filetype: file.type,
+						size: 0, // Mark as pending upload item
+						url: file.uri
+					}
+				],
+			}),
+		);
+
+		dispatch(referencesActions.setPendingAttachment({
+			channelId: currentChannelId,
+			files: [{
+				name: file.name,
+				path: file.uri,
+				type: file.type,
+				size: file.size as number,
+			}]
+		}));
+	}
+
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
 			dispatch(
@@ -128,7 +155,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					<Text style={styles.titleButtonHeader}>{t('message:actions.files')}</Text>
 				</TouchableOpacity>
 			</View>
-			<Gallery onPickGallery={handleFiles} currentChannelId={currentChannelId} />
+			<Gallery onPickGallery={handleSelectedAttachments} currentChannelId={currentChannelId} />
 		</View>
 	);
 }
