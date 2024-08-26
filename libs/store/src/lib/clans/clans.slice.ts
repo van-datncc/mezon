@@ -13,6 +13,7 @@ import { defaultNotificationActions } from '../notificationSetting/notificationS
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { voiceActions } from '../voice/voice.slice';
+import * as Sentry from "@sentry/browser";
 
 export const CLANS_FEATURE_KEY = 'clans';
 
@@ -131,6 +132,7 @@ export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan'
 		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateClanName(clan_name);
 		return isDuplicateName?.exist;
 	} catch (error: any) {
+		Sentry.captureException(error);
 		const errmsg = await error.json();
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
@@ -242,7 +244,8 @@ export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		await mezon.socketRef.current?.joinClanChat(clanId);
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		Sentry.captureException(error)
+		return thunkAPI.rejectWithValue(error);
 	}
 });
 

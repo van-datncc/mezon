@@ -1,6 +1,7 @@
 import { trackError } from '@mezon/utils';
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { Toast, ToastPayload, toastActions } from '../toasts';
+import * as Sentry from "@sentry/browser";
 
 // Create the middleware instance and methods
 export const errorListenerMiddleware = createListenerMiddleware({
@@ -79,10 +80,29 @@ function createErrorToast(error: any): ToastPayload {
 errorListenerMiddleware.startListening({
 	//   actionCreator: anyActionCreator,
 	predicate: isErrorPredicate,
-	effect: async (action, listenerApi) => {
+	effect: async (action: any, listenerApi) => {
 		const error = normalizeError(action);
 
 		trackError(error);
+
+		if (action.payload) {
+			const key = Object.keys(action.payload);
+			if (key.length === 0) {
+				if (typeof action.payload.json === 'function') {
+					action.payload.json().then((data: any) => {
+						Sentry.captureException(data.message);
+					});
+				}
+			} else {
+				if (typeof action.payload[key[0]].json === 'function') {
+					action.payload[key[0]].json().then((data: any) => {
+						Sentry.captureException(data.message);
+					});
+				}else{
+					Sentry.captureException(action.payload);
+				}
+			}
+		}
 
 		if (!error) {
 			return;

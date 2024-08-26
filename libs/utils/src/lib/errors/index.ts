@@ -1,5 +1,5 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-
+import * as Sentry from "@sentry/browser";
 export type FormalError = {
 	message: string;
 	name: string;
@@ -13,7 +13,12 @@ export function isFormalError(error: unknown): error is FormalError {
 
 export function trackError(rawError: unknown) {
 	const formalError = isFormalError(rawError) ? rawError : extractActionError(rawError);
-	console.log(formalError);
+	if(formalError.message){
+		Sentry.captureException(formalError.message);
+	}else{
+		Sentry.captureException(formalError);
+	}
+	console.log("formalError", formalError);
 }
 
 export function trackActionError(action: PayloadAction<unknown, string, unknown>, raise = false) {

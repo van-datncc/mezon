@@ -3,6 +3,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import memoize from 'memoizee';
 import { ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import * as Sentry from "@sentry/browser";
 
 export const PIN_MESSAGE_FEATURE_KEY = 'pinmessages';
 
@@ -109,6 +110,7 @@ export const joinPinMessage = createAsyncThunk('messages/joinPinMessage', async 
 		const now = Math.floor(Date.now() / 1000);
 		await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now.toString(), 1);
 	} catch (e) {
+		Sentry.captureException(e);
 		console.error('Error updating last seen message', e);
 	}
 });
@@ -121,6 +123,7 @@ export const updateLastSeenPin = createAsyncThunk(
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now.toString(), 0);
 		} catch (e) {
+			Sentry.captureException(e);
 			console.error('Error updating last seen message', e);
 		}
 	},
