@@ -1,7 +1,7 @@
 import { useAppNavigation, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import { selectAllAccount, selectFriendStatus, selectMemberById, selectMemberByUserId } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -69,13 +69,7 @@ const ModalUserProfile = ({
 	const sendMessage = async (userId: string) => {
 		const response = await createDirectMessageWithUser(userId);
 		if (response.channel_id) {
-			let channelMode = 0;
-			if (Number(response.type) === ChannelType.CHANNEL_TYPE_DM) {
-				channelMode = ChannelStreamMode.STREAM_MODE_DM;
-			}
-			if (Number(response.type) === ChannelType.CHANNEL_TYPE_GROUP) {
-				channelMode = ChannelStreamMode.STREAM_MODE_GROUP;
-			}
+			const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 			sendInviteMessage(content, response.channel_id, channelMode);
 			setContent('');
 			const directChat = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
@@ -143,7 +137,9 @@ const ModalUserProfile = ({
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
 					<div>
-						<p className="font-semibold tracking-wider text-xl one-line my-0">{name || userById?.user?.display_name || userById?.user?.username}</p>
+						<p className="font-semibold tracking-wider text-xl one-line my-0">
+							{name || userById?.user?.display_name || userById?.user?.username}
+						</p>
 						<p className="font-medium tracking-wide text-sm my-0">
 							{isFooterProfile
 								? userProfile?.user?.username

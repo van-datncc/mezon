@@ -1,5 +1,12 @@
-import { channelsActions, selectAllTextInput, selectCurrentChannelId, selectDmGroupCurrentId, selectModeResponsive, selectValueTextInputByChannelId, useAppDispatch } from '@mezon/store';
-import { ModeResponsive } from '@mezon/utils';
+import {
+	channelsActions,
+	selectCurrentChannelId,
+	selectDmGroupCurrentId,
+	selectModeResponsive,
+	selectRequestByChannelId,
+	useAppDispatch,
+} from '@mezon/store';
+import { ModeResponsive, RequestInput } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -8,36 +15,32 @@ export function useMessageValue(channelId?: string) {
 	const mode = useSelector(selectModeResponsive);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
-	const valueTextInput = useSelector(selectValueTextInputByChannelId(mode === ModeResponsive.MODE_CLAN ? (channelId || '') : (currentDmGroupId || '')));
-	const allTextInput = useSelector(selectAllTextInput);
+	const request = useSelector(selectRequestByChannelId(mode === ModeResponsive.MODE_CLAN ? channelId || '' : currentDmGroupId || ''));
 
-	const setValueTextInput = useCallback(
-		(value: string, isThread?: boolean) => {
-			if(mode === ModeResponsive.MODE_CLAN){
+	const setRequestInput = useCallback(
+		(request: RequestInput, isThread?: boolean) => {
+			if (mode === ModeResponsive.MODE_CLAN) {
 				dispatch(
-					channelsActions.setValueTextInput({
+					channelsActions.setRequestInput({
 						channelId: isThread ? currentChannelId + String(isThread) : (currentChannelId as string),
-						value,
+						request,
 					}),
 				);
 			} else {
 				dispatch(
-					channelsActions.setValueTextInput({
+					channelsActions.setRequestInput({
 						channelId: currentDmGroupId || '',
-						value,
+						request,
 					}),
 				);
 			}
-			
 		},
 		[currentChannelId, currentDmGroupId, mode, dispatch],
 	);
 
 	const setModeResponsive = useCallback(
 		(value: string) => {
-			dispatch(
-				channelsActions.setModeResponsive(value)
-			);
+			dispatch(channelsActions.setModeResponsive(value));
 		},
 		[dispatch],
 	);
@@ -47,13 +50,10 @@ export function useMessageValue(channelId?: string) {
 			currentChannelId,
 			mode,
 			currentDmGroupId,
-			allTextInput,
-			valueTextInput,
-			setValueTextInput,
+			request,
+			setRequestInput,
 			setModeResponsive,
 		}),
-		[setValueTextInput, setModeResponsive, valueTextInput, allTextInput, currentDmGroupId, mode, currentChannelId],
+		[setRequestInput, setModeResponsive, request, currentDmGroupId, mode, currentChannelId],
 	);
 }
-
-

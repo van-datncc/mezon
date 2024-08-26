@@ -63,7 +63,16 @@ export function useFriends() {
 	);
 
 	const filteredFriends = useCallback(
-		(searchTerm: string) => {
+		(searchTerm: string, isAddMember?: boolean) => {
+      if(isAddMember){
+        return friends.filter((friend) => {
+          if(friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm)){
+            if (!groupDmMember?.some((user) => user.user?.id === friend.id)) {
+              return friend;
+            }
+          }
+        });
+      }
 			return friends.filter(
 				(friend) =>
 					friend.user?.display_name?.toUpperCase().includes(searchTerm) || friend.user?.username?.toUpperCase().includes(searchTerm),
@@ -72,13 +81,6 @@ export function useFriends() {
 		[friends],
 	);
 
-	const filterListFriendsNotInGroup = useCallback(() => {
-		return friends.filter((friend) => {
-			if (!groupDmMember?.some((user) => user.user?.id === friend.id)) {
-				return friend;
-			}
-		});
-	}, []);
 	return useMemo(
 		() => ({
 			friends,
@@ -89,7 +91,6 @@ export function useFriends() {
 			blockFriend,
 			unBlockFriend,
 			filteredFriends,
-			filterListFriendsNotInGroup,
 		}),
 		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends],
 	);

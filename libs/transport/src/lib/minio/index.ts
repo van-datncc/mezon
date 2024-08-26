@@ -174,7 +174,10 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 					if (response.ok) {
 						const now = Date.now();
 						const contentSize = response.headers.get('Content-Length');
-						const contentType = response.headers.get('Content-Type');
+						let contentType = response.headers.get('Content-Type');
+						if (contentType?.includes('charset=utf-8')) {
+							contentType = contentType.split(';')?.[0];
+						}
 						if (contentType) {
 							resolve({
 								filename: now + contentType,

@@ -33,7 +33,7 @@ export const ChatMessageLeftArea = memo(
 			<Block flexDirection="row" gap={size.s_6}>
 				{text?.length > 0 && !isShowAttachControl ? (
 					<TouchableOpacity style={[styles.btnIcon]} onPress={() => setIsShowAttachControl(!isShowAttachControl)}>
-						<Icons.ChevronSmallLeftIcon width={22} height={22} color={themeValue.textStrong} />
+						<Icons.ChevronSmallLeftIcon width={size.s_22} height={size.s_22} color={themeValue.textStrong} />
 					</TouchableOpacity>
 				) : (
 					<>
@@ -45,7 +45,7 @@ export const ChatMessageLeftArea = memo(
 								style={[styles.btnIcon]}
 								onPress={() => navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD })}
 							>
-								<Icons.ThreadPlusIcon width={22} height={22} color={themeValue.textStrong} />
+								<Icons.ThreadPlusIcon width={size.s_22} height={size.s_22} color={themeValue.textStrong} />
 							</TouchableOpacity>
 						)}
 					</>

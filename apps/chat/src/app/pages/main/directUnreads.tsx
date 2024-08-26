@@ -28,7 +28,7 @@ function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 						className="min-w-12 min-h-12 max-w-12 max-h-12"
 						src={
 							directMessage.type === ChannelType.CHANNEL_TYPE_DM
-								? directMessage.channel_avatar?.at(0)
+								? directMessage?.channel_avatar?.at(0)
 								: 'assets/images/avatar-group.png'
 						}
 					/>

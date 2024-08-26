@@ -1,10 +1,8 @@
 {
   "deleteClanModal": {
-    "title": "Xóa clan",
+    "title": "Xóa máy chủ",
     "description": "Bạn có chắc chắn muốn xóa {{currentClan}} không? Hành động này không thể hoàn tác.",
     "confirm": "Có",
-    "cancel": "Không",
-    "inputClanName": "Nhập vào tên clan",
-    "inputError": "Bạn đã nhập sai tên clan"
+    "cancel": "Không"
   }
 }
