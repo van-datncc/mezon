@@ -123,7 +123,7 @@ export default class App {
 		});
 
 		App.application.on('will-finish-launching', function () {
-
+			// console.log("will-finish-launching");
 		});
 
 		// if main window is ready to show, close the splash window and show the main window
