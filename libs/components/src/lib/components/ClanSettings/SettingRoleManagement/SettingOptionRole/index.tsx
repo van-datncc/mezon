@@ -45,18 +45,17 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 
 	const roleUsersCount = activeRole?.role_user_list?.role_users?.length || 0;
 
-	const isSelectDisplayTab = selectedButton === RoleTabs.Display_Tab;
+	const isSelectDisplayTab = selectedButton === RoleTabs.Display_Tab && everyoneRole?.id !== clickRole;
 	const isSelectPermissionTab = selectedButton === RoleTabs.Permission_Tab || everyoneRole?.id === clickRole;
-	const isSelectManageTab = selectedButton === RoleTabs.Manage_Tab;
+	const isSelectManageTab = selectedButton === RoleTabs.Manage_Tab && everyoneRole?.id !== clickRole;
 
 	return (
 		<>
 			<div className="pr-5">
 				<div className="w-full flex justify-between mb-5 border-b border-gray-200 dark:border-gray-500">
-					{
-						clickRole !== everyoneRole?.id &&
+					<span className={` ${clickRole === everyoneRole?.id ? ' cursor-not-allowed' : ''}`}>
 						<button
-							className={`py-[5px] text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${isSelectDisplayTab ? 'dark:text-white text-black' : 'text-contentTertiary'}`}
+							className={`py-[5px] text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${isSelectDisplayTab ? 'dark:text-white text-black' : 'text-contentTertiary'} ${clickRole === everyoneRole?.id ? 'pointer-events-none select-none' : ''}`}
 							onClick={() => {
 								handleButtonClick('Display');
 								dispatch(toggleIsShowFalse());
@@ -67,8 +66,7 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 								className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${isSelectDisplayTab ? 'bg-blue-400' : ''}`}
 							/>
 						</button>
-					}
-
+          </span>
 					<button
 						className={`py-[5px] text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${isSelectPermissionTab ? 'dark:text-white text-black' : 'text-contentTertiary'}`}
 						onClick={() => {
@@ -81,10 +79,9 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 							className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${isSelectPermissionTab ? 'bg-blue-400' : ''}`}
 						/>
 					</button>
-					{
-						clickRole !== everyoneRole?.id &&
+					<span className={` ${clickRole === everyoneRole?.id ? ' cursor-not-allowed' : ''}`}>
 						<button
-							className={`py-[5px] text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${isSelectManageTab ? 'dark:text-white text-black' : 'text-contentTertiary'}`}
+							className={`py-[5px] text-[15px] text-left transition duration-300 rounded relative tracking-wider font-medium group ${isSelectManageTab ? 'dark:text-white text-black' : 'text-contentTertiary'} ${clickRole === everyoneRole?.id ? 'pointer-events-none select-none' : ''}`}
 							onClick={() => {
 								handleButtonClick('Manage Members');
 								dispatch(toggleIsShowFalse());
@@ -95,7 +92,7 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 								className={`absolute inset-x-0 bottom-0 h-[2px] group-hover:bg-blue-300 ${isSelectManageTab ? 'bg-blue-400' : ''}`}
 							/>
 						</button>
-					}
+          </span>
 				</div>
 			</div>
 			
