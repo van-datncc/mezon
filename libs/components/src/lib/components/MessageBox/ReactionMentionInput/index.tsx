@@ -194,6 +194,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { key, ctrlKey, shiftKey } = event;
 		const isEnterKey = key === 'Enter';
+		const isComposing = event.nativeEvent.isComposing;
 
 		if (isEnterKey && ctrlKey && shiftKey) {
 			event.preventDefault();
@@ -207,7 +208,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 		switch (key) {
 			case 'Enter': {
-				if (shiftKey) {
+				if (shiftKey || isComposing) {
 					return;
 				} else {
 					event.preventDefault();
