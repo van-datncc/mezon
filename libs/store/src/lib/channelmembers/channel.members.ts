@@ -4,6 +4,7 @@ import memoize from 'memoizee';
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import {RootState} from "../store";
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
@@ -84,6 +85,9 @@ export const fetchChannelMembers = createAsyncThunk(
 		}
 
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
+		const state = thunkAPI.getState() as RootState;
+		const channelMembers = selectMembersByChannelId(channelId)(state);
+		thunkAPI.dispatch(channelMembersActions.setMemberChannels(channelMembers))
 		if (Date.now() - response.time < 100) {
 			if (!response.channel_users) {
 				return [];
@@ -296,6 +300,7 @@ export const channelMembers = createSlice({
 			state.toFollowUserIds = [...new Set(newUsers)];
 		},
 		setMemberChannels: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
+			console.log ('check set member channels action: ', action.payload);
 			state.memberChannels = action.payload;
 		},
 		addNewMember: (state, action: PayloadAction<ChannelPresenceEvent>) => {
@@ -446,7 +451,7 @@ export const selectAllUserIdsToFollow = createSelector(getChannelMembersState, (
 export const selectMembersByChannelId = (channelId?: string | null) =>
 	createSelector(selectChannelMembersEntities, (entities) => {
 		const members = Object.values(entities);
-		return members.filter((member) => member && member.user !== null && member.channelId === channelId);
+		return members.filter((member) => member && member.user !== null && (member.channelId === channelId || member.thread_id === channelId));
 	});
 
 export const selectMemberByGoogleId = (googleId: string) =>
