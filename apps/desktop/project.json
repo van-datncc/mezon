@@ -17,7 +17,7 @@
         }
       ],
       "mac": {
-        "icon": "apps/chat/src/assets/mac-icon.ico",        
+        "icon": "apps/chat/src/assets/mac-icon.png",        
         "appId": "mezon.ai",
         "publish": [
           {
@@ -124,7 +124,7 @@
         "outputPath": "dist/packages",
         "prepackageOnly": true,
         "mac": {
-          "icon": "apps/chat/src/assets/mac-icon.ico",        
+          "icon": "apps/chat/src/assets/mac-icon.png",        
           "appId": "mezon.ai",
           "publish": [
             {
@@ -181,7 +181,7 @@
         "sourcePath": "dist/apps",
         "outputPath": "dist/executables",
         "mac": {
-          "icon": "apps/chat/src/assets/mac-icon.ico",        
+          "icon": "apps/chat/src/assets/mac-icon.png",        
           "appId": "mezon.ai",
           "publish": [
             {
