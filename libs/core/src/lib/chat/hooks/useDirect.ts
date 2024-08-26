@@ -1,5 +1,4 @@
 import { directActions, useAppDispatch } from '@mezon/store';
-
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
@@ -19,16 +18,6 @@ export function useDirect({ autoFetch = false }: UseDirectParams = { autoFetch: 
 			};
 			const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDm));
 			const resPayload = response.payload as ApiCreateChannelDescRequest;
-
-			if (resPayload.channel_id) {
-				await dispatch(
-					directActions.joinDirectMessage({
-						directMessageId: resPayload.channel_id,
-						channelName: resPayload.channel_label,
-						type: Number(resPayload.type),
-					}),
-				);
-			}
 
 			return resPayload;
 		},

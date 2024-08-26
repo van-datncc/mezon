@@ -1,4 +1,4 @@
-import { Colors, size } from "@mezon/mobile-ui";
+import { Colors, Fonts, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -41,5 +41,10 @@ export const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: '600',
     textAlign: 'center'
+  },
+  contentText: {
+    color: Colors.textGray,
+    fontSize: Fonts.size.small,
+    lineHeight: size.s_18
   }
 })

@@ -1,5 +1,7 @@
 import { useChatTypings } from '@mezon/core';
+import { Icons } from '@mezon/ui';
 import { useMemo } from 'react';
+
 
 type ChannelTypingProps = {
 	channelId: string;
@@ -13,11 +15,9 @@ export function ChannelTyping({ channelId, mode }: ChannelTypingProps) {
 		if (typingUsers.length === 1) {
 			return (
 				<>
-					<span className='dark:text-textDarkTheme text-textPrimaryLight text-xs font-semibold [&:nth-child(2)]:delay-500 [&:nth-child(1)]:delay-1000'>
-						<span className='up-and-down-animated absolute left-0'>•</span>
-						<span className='up-and-down-animated absolute left-2'>•</span>
-						<span className='up-and-down-animated absolute left-3'>•</span>
-					</span>
+        <span className='absolute bottom-1 -left-1'>
+					<Icons.IconLoadingTyping/>
+        </span>
 
 					<span className='dark:text-textDarkTheme text-textPrimaryLight text-xs font-semibold mr-[2px] '>
 

@@ -123,8 +123,10 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
     const category = isSticker ? 'Among Us' : 'Custom';
     const id = Snowflake.generate();
     const path = (isSticker ? 'stickers/' : 'emojis/') + id + '.webp';
-
-    const resizeFile = (await resizeFileImage(file, dimension.maxWidth, dimension.maxHeight, 'file')) as File;
+    let resizeFile = file;
+    if(!file.name.endsWith('.gif')){
+      resizeFile =  (await resizeFileImage(file, dimension.maxWidth, dimension.maxHeight, 'file')) as File;
+    }
 
     handleUploadEmoticon(client, session, path, resizeFile).then(async (attachment: ApiMessageAttachment) => {
       const request: ApiClanStickerAddRequest = {

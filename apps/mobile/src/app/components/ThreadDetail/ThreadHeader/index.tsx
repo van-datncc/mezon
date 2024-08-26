@@ -49,7 +49,7 @@ export const ThreadHeader = memo(() => {
 							</View>
 						) : (
 							<MezonAvatar
-								avatarUrl={currentChannel.channel_avatar?.[0]}
+								avatarUrl={currentChannel?.channel_avatar?.[0]}
 								username={currentChannel?.channel_label || currentChannel?.usernames}
 								userStatus={userStatus}
 							/>

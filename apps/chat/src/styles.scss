@@ -702,51 +702,71 @@ input:-webkit-autofill:active {
 }
 
 /* LoadingTyping.css */
-#dots #dot1 {
-	animation: load 1s infinite;
+#dot1 {
+  animation: load 1s infinite ease-in-out;
 }
-
-#dots #dot2 {
-	animation: load 1s infinite;
+#dot2 {
+	animation: load 1s infinite ease-in-out, holdDot2 1s infinite ease-in-out;
 	animation-delay: 0.2s;
 }
-
-#dots #dot3 {
-	animation: load 1s infinite;
+#dot3 {
+	animation: load 1s infinite ease-in-out, holdDot3 1s infinite ease-in-out;
 	animation-delay: 0.4s;
 }
 
-@keyframes load {
-	0% {
-		opacity: 0;
-	}
-	50% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
-	}
-}
-
-.up-and-down-animated{
-  animation: upAnDown 1.5s infinite linear ;
-}
-
-@keyframes upAnDown{
-  0%{
+@keyframes holdDot2{
+   0% {
     transform: translateY(0);
   }
-  25%{
+  20%{
+     transform: translateY(-3px) translateX(-6px);
+  }
+  40% {
+    transform: translateY(-3px) translateX(-6px);
+  }
+  60% {
+     transform: translateY(0);
+  }
+}
+
+@keyframes holdDot3{
+   0% {
+    transform: translateY(0);
+  }
+  20%{
+     transform: translateY(-3px) translateX(-12px);
+  }
+  40% {
+    transform: translateY(-3px) translateX(-12px);
+  }
+  60% {
+     transform: translateY(0);
+  }
+}
+
+@keyframes load {
+  0% {
+    opacity: 0.5;
+    scale: 1;
+    transform: translateY(0);
+  }
+  20%{
+     opacity: 1;
+     scale: 1.2;
+     transform: translateY(-3px);
+  }
+  40% {
+    opacity: 1;
+    scale: 1.2;
     transform: translateY(-3px);
   }
-  50%{
-    transform: translateY(0);
-
+  60% {
+     opacity: 0.5;
+     scale: 1;
+     transform: translateY(0);
   }
-  75%{
-    transform: translateY(3px);
-  }
-  100%{
-    
+  100% {
+    opacity: 0.5;
+    scale: 1;
   }
 }

@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import React, { memo, useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity, View } from 'react-native';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
@@ -32,9 +32,9 @@ function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
 		<View>
 			<TouchableOpacity onPress={onPickerPress}>
 				{mode !== 'emoji' ? (
-					<Icons.ReactionIcon width={22} height={22} color={themeValue.text} />
+					<Icons.ReactionIcon width={size.s_22} height={size.s_22} color={themeValue.text} />
 				) : (
-					<Icons.KeyboardIcon width={22} height={22} color={themeValue.text} />
+					<Icons.KeyboardIcon width={size.s_22} height={size.s_22} color={themeValue.text} />
 				)}
 			</TouchableOpacity>
 		</View>

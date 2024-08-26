@@ -2,19 +2,19 @@ import { useAppNavigation, useAppParams, useClanRestriction, useMenu, useOnClick
 import {
 	channelsActions,
 	notificationSettingActions,
-	referencesActions,
-	selectCloseMenu, selectCurrentChannelId,
-	useAppDispatch, useAppSelector,
-	voiceActions
+	selectCloseMenu,
+	selectCurrentChannelId,
+	useAppDispatch,
+	useAppSelector,
+	voiceActions,
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, EPermission, IChannel, MouseButton } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
-import { AddPerson, SettingProfile } from '../../../../../ui/src/lib/Icons';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
 import PanelChannel from '../PanelChannel';
@@ -86,11 +86,12 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 		const windowHeight = window.innerHeight;
 
 		if (event.button === MouseButton.RIGHT) {
-			await dispatch(notificationSettingActions.getNotificationSetting({
-				channelId: channel.channel_id || '',
-				noCache: false,
-				isCurrentChannel: channel.channel_id === currentChannelId
-			}));
+			await dispatch(
+				notificationSettingActions.getNotificationSetting({
+					channelId: channel.channel_id || '',
+					isCurrentChannel: channel.channel_id === currentChannelId,
+				}),
+			);
 			const distanceToBottom = windowHeight - event.clientY;
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
@@ -116,7 +117,6 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = () => {
 		setTurnOffThreadMessage();
-		dispatch(referencesActions.setOpenReplyMessageState(false));
 		if (closeMenu) {
 			setStatusMenu(false);
 		}
@@ -187,11 +187,11 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 			{isShowSettingChannel ? (
 				numberNotification !== 0 ? (
 					<>
-						<AddPerson
+						<Icons.AddPerson
 							className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block dark:text-white text-black `}
 							onClick={handleCreateLinkInvite}
 						/>
-						<SettingProfile
+						<Icons.SettingProfile
 							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block dark:text-white text-black `}
 							onClick={handleOpenCreate}
 						/>
@@ -203,11 +203,11 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 					</>
 				) : (
 					<>
-						<AddPerson
+						<Icons.AddPerson
 							className={`absolute ml-auto w-4 h-4 top-[6px] hidden group-hover:block dark:group-hover:text-white group-hover:text-black ${currentURL === channelPath ? 'dark:text-white text-black' : 'text-transparent'} right-8 cursor-pointer`}
 							onClick={handleCreateLinkInvite}
 						/>
-						<SettingProfile
+						<Icons.SettingProfile
 							className={`absolute ml-auto w-4 h-4 top-[6px] right-3 ${currentURL === channelPath ? 'dark:text-white text-black' : 'text-transparent'} hidden group-hover:block dark:group-hover:text-white group-hover:text-black cursor-pointer`}
 							onClick={handleOpenCreate}
 						/>
@@ -215,7 +215,7 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				)
 			) : (
 				<>
-					<AddPerson
+					<Icons.AddPerson
 						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block dark:group-hover:text-white group-hover:text-black  ${currentURL === channelPath ? 'dark:text-white text-black' : 'text-transparent'} hidden right-3 cursor-pointer`}
 						onClick={handleCreateLinkInvite}
 					/>

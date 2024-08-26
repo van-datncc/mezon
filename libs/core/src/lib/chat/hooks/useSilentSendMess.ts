@@ -1,4 +1,4 @@
-import { channelsActions, directActions, useAppDispatch } from "@mezon/store";
+import { directActions, useAppDispatch } from "@mezon/store";
 import { ChannelType } from "mezon-js";
 import { ApiCreateChannelDescRequest } from "mezon-js/api.gen";
 import { useCallback, useMemo } from "react";
@@ -14,16 +14,6 @@ export function useSilentSendMess () {
 			};
 			const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDm));
 			const resPayload = response.payload as ApiCreateChannelDescRequest;
-
-			if (resPayload.channel_id) {
-				await dispatch(
-					channelsActions.joinChat({
-						clanId: resPayload.clan_id || '',
-                        channelId: resPayload.channel_id || '',
-                        channelType: ChannelType.CHANNEL_TYPE_DM,
-					})
-				);
-			}
 
 			return resPayload;
 		},

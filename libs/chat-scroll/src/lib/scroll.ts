@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { IScrollOptions, SCROLL_DEFAULT_OPTIONS } from './scroll-options';
 
 /**
  * React hook for controlling scrollable HTML element.
  * @private
  * @param targetRef Reference of scrollable HTML element.
  */
-export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrollResponse => {
+export const useScroll = (targetRef: React.MutableRefObject<Element>, options: IScrollOptions = SCROLL_DEFAULT_OPTIONS): IUseScrollResponse => {
 	const scrollEventHandlerRef = useRef<EventListener>(() => {
 		return;
 	});
@@ -16,18 +17,6 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrol
 		scrollEventHandlerRef.current = handler;
 		setHandlerId((prev) => prev + 1);
 	}, []);
-
-	useEffect(() => {
-		const handler = scrollEventHandlerRef.current;
-		const el = targetRef.current;
-
-		handler({} as Event);
-		el.addEventListener('scroll', handler);
-
-		return () => {
-			el.removeEventListener('scroll', handler);
-		};
-	}, [handlerId, targetRef]);
 
 	const fetching = useRef<boolean>(false);
 	const storedScrollHeight = useRef<number>(0);
@@ -67,6 +56,25 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrol
 	}, [targetRef]);
 
 	const getClientHeight = useCallback(() => targetRef.current.clientHeight, [targetRef]);
+
+	useEffect(() => {
+    let scrollHandlerTimeoutId: NodeJS.Timeout;
+
+		const handler = (event: Event) => {
+      scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
+      scrollHandlerTimeoutId = setTimeout(() => {
+        scrollEventHandlerRef.current(event);
+      }, options?.debounce);
+		};
+
+		const el = targetRef.current;
+
+		el.addEventListener('scroll', handler);
+
+		return () => {
+			el.removeEventListener('scroll', handler);
+		};
+	}, [handlerId, targetRef, options]);
 
 	return {
 		isFetching,
@@ -154,3 +162,4 @@ export interface IUseScrollResponse {
 	 */
 	setScrollEventHandler: (newScrollHandler: IScrollEventHandler) => void;
 }
+

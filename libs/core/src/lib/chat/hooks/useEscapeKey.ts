@@ -7,8 +7,6 @@ export const useEscapeKey = (handler: () => void) => {
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-				dispatch(referencesActions.setOpenReplyMessageState(false));
-				dispatch(referencesActions.setIdReferenceMessageReply(''));
 				dispatch(messagesActions.setIdMessageToJump(''));
 				dispatch(messagesActions.setOpenOptionMessageState(false));
 				dispatch(referencesActions.setDataReferences(null));

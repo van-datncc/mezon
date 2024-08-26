@@ -131,7 +131,7 @@ export default function DirectMessage() {
 									userName={isDmChannel ? currentDmGroup?.usernames : undefined}
 									type={isDmChannel ? ChannelType.CHANNEL_TYPE_DM : ChannelType.CHANNEL_TYPE_GROUP}
 									mode={isDmChannel ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP}
-									avatarDM={isDmChannel ? currentDmGroup.channel_avatar?.at(0) : 'assets/images/avatar-group.png'}
+									avatarDM={isDmChannel ? currentDmGroup?.channel_avatar?.at(0) : 'assets/images/avatar-group.png'}
 								/>
 							}
 						</div>
@@ -216,7 +216,7 @@ export default function DirectMessage() {
 								hiddenRole={true}
 								showNote={true}
 								showPopupLeft={true}
-								avatar={currentDmGroup.channel_avatar?.[0]}
+								avatar={currentDmGroup?.channel_avatar?.[0]}
 							/>
 						</div>
 					)}

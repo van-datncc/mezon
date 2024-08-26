@@ -20,20 +20,12 @@ import {
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Authentication } from './Authentication';
-import { APP_SCREEN } from './ScreenTypes';
-import { UnAuthentication } from './UnAuthentication';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { AppState, DeviceEventEmitter, StatusBar, View } from 'react-native';
-import NetInfoComp from '../components/NetworkInfo';
-// import SplashScreen from '../components/SplashScreen';
 import {
 	ActionEmitEvent,
 	STORAGE_CHANNEL_CURRENT_CACHE,
@@ -46,15 +38,15 @@ import {
 	setCurrentClanLoader,
 	setDefaultChannelLoader,
 } from '@mezon/mobile-components';
+import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
 import { ChannelType } from 'mezon-js';
-import BootSplash from 'react-native-bootsplash';
+import { AppState, DeviceEventEmitter, StatusBar } from 'react-native';
 import Toast from 'react-native-toast-message';
+import NetInfoComp from '../components/NetworkInfo';
+import SplashScreen from '../components/SplashScreen';
 import { toastConfig } from '../configs/toastConfig';
 
-const RootStack = createStackNavigator();
-
-// Keep the splash screen visible while we fetch resources
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
@@ -65,34 +57,24 @@ const NavigationMain = () => {
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
 
 	useEffect(() => {
-		const timer = setTimeout(() => {
+		const timer = setTimeout(async () => {
 			setIsReadyForUse(true);
-		}, 800);
+			await notifee.cancelAllNotifications();
+			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+		}, 500);
 		return () => clearTimeout(timer);
 	}, []);
 
 	useEffect(() => {
 		if (isLoggedIn) {
-			// dispatch(appActions.setLoadingMainMobile(true));
 			initAppLoading();
 		}
 	}, [isLoggedIn]);
 
 	useEffect(() => {
-		const timer = setTimeout(async () => {
-			await BootSplash.hide({ fade: true });
-			await notifee.cancelAllNotifications();
-			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		}, 850);
-
-		return () => {
-			clearTimeout(timer);
-		};
-	}, []);
-
-	useEffect(() => {
-		let timeout;
+		// Trigger when app is in background back to active
+		let timeout: string | number | NodeJS.Timeout;
 		const appStateSubscription = AppState.addEventListener('change', (state) => {
 			if (isLoggedIn)
 				timeout = setTimeout(async () => {
@@ -179,14 +161,14 @@ const NavigationMain = () => {
 						channelId: currentChannelId,
 						noCache: true,
 						isFetchingLatestMessages: true,
-					})
+					}),
 				),
 				store.dispatch(
 					voiceActions.fetchVoiceChannelMembers({
 						clanId: currentClanId ?? '',
 						channelId: '',
 						channelType: ChannelType.CHANNEL_TYPE_VOICE,
-					})
+					}),
 				),
 			];
 			await Promise.all(promise);
@@ -217,7 +199,7 @@ const NavigationMain = () => {
 				return;
 			}
 		} catch (error) {
-			console.log('Tom log  => error authLoader', error);
+			console.log('error authLoader', error);
 		}
 	}, []);
 
@@ -266,38 +248,14 @@ const NavigationMain = () => {
 		[currentClanId],
 	);
 
-	if (!isReadyForUse) {
-		return (
-			<View>
-				<NetInfoComp />
-			</View>
-		);
-	}
+	const MyStackComponent = lazy(() => import('./RootStack'));
 
 	return (
 		<NavigationContainer>
-			<NetInfoComp />
-			<RootStack.Navigator screenOptions={{ headerShown: false }}>
-				{isLoggedIn ? (
-					<RootStack.Group
-						screenOptions={{
-							gestureEnabled: false,
-						}}
-					>
-						<RootStack.Screen name={APP_SCREEN.AUTHORIZE} component={Authentication} />
-					</RootStack.Group>
-				) : (
-					<RootStack.Group
-						screenOptions={{
-							animationTypeForReplace: 'pop',
-							gestureEnabled: false,
-						}}
-					>
-						<RootStack.Screen name={APP_SCREEN.UN_AUTHORIZE} component={UnAuthentication} />
-					</RootStack.Group>
-				)}
-			</RootStack.Navigator>
-			{/*{isLoadingSplashScreen && <SplashScreen />}*/}
+			<Suspense fallback={<SplashScreen />}>
+				<NetInfoComp />
+				{isReadyForUse && <MyStackComponent />}
+			</Suspense>
 		</NavigationContainer>
 	);
 };

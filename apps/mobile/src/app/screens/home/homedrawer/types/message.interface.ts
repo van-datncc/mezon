@@ -1,5 +1,6 @@
 import { MessagesEntity } from '@mezon/store-mobile';
 import { EmojiDataOptionals, IEmoji, IMessageSendPayload, IMessageWithUser, IUserAccount } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiUser } from 'mezon-js/api.gen';
 import { EMessageActionType, EMessageBSToShow } from '../enums';
 
@@ -8,7 +9,7 @@ export interface IReplyBottomSheet {
 	onClose: () => void;
 	type: EMessageBSToShow | null;
 	onConfirmAction: (payload: IConfirmActionPayload) => void;
-	mode?: number;
+	mode?: ChannelStreamMode;
 	clanId?: string;
 	isOnlyEmojiPicker?: boolean;
 	user?: ApiUser | null;

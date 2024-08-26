@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useScroll } from './scroll';
 
 // brute force function to execute a function multiple times with a time limit
@@ -47,8 +47,13 @@ export const useStickyScroll = (
 	const [sticky, setSticky] = useState<boolean>(true);
 	const stickyRef = useRef(sticky);
 	const animationRef = useRef<ReturnType<typeof brushForceCall>>();
+	const { setScrollEventHandler } = useScroll(targetRef);
 
 	const { data: items } = data;
+
+	const lastItemId = useMemo(() => {
+		return items.length > 0 ? items[items.length - 1] : '';
+	}, [items]);
 
 	const moveScrollToBottom = useCallback(async () => {
 		if (animationRef.current) {
@@ -60,6 +65,7 @@ export const useStickyScroll = (
 		}
 
 		function moveScroll() {
+      console.log('moveScroll');
 			targetRef.current.scrollTop = targetRef.current.scrollHeight;
 			return false;
 		}
@@ -74,14 +80,10 @@ export const useStickyScroll = (
 		return true;
 	}, [targetRef, animationRef]);
 
-	useEffect(() => {
-		stickyRef.current = sticky;
-		if (sticky) {
-			moveScrollToBottom();
-		}
-	}, [items, targetRef, sticky, moveScrollToBottom]);
-
 	const updateStuckToBottom = useCallback(() => {
+    if (!targetRef.current) {
+      return;
+    }
 		const { scrollHeight, clientHeight, scrollTop } = targetRef.current;
 		const currentlyAtBottom = scrollHeight === scrollTop + clientHeight;
 
@@ -93,13 +95,11 @@ export const useStickyScroll = (
 	}, [targetRef, stickyRef]);
 
 	const handleScroll = useCallback(
-		(e: any) => {
+		(e: Event) => {
 			updateStuckToBottom();
 		},
 		[updateStuckToBottom],
 	);
-
-	const { setScrollEventHandler } = useScroll(targetRef);
 
 	useEffect(() => {
 		if (enabled) {
@@ -114,11 +114,11 @@ export const useStickyScroll = (
 	/**
 	 * Scrolls to bottom.
 	 */
-	const scrollToBottom = async () => {
+	const scrollToBottom = useCallback(async () => {
 		await moveScrollToBottom();
 		setSticky(true);
 		return true;
-	};
+	}, [moveScrollToBottom]);
 
 	/**
 	 * Scrolls to message with given id.
@@ -160,6 +160,14 @@ export const useStickyScroll = (
 	 */
 	const disable = () => setEnabled(false);
 
+	// update sticky scroll state when data changes
+	useEffect(() => {
+		stickyRef.current = sticky;
+		if (sticky) {
+			scrollToBottom();
+		}
+	}, [lastItemId, targetRef, sticky, scrollToBottom]);
+
 	return {
 		enabled,
 		sticky,
@@ -179,8 +187,6 @@ export interface IChatScrollData {
 	 */
 	data: any[];
 
-	/**
-	
 	/**
 	 * has next page
 	 */

@@ -171,8 +171,8 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 						style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
 						onPress={() => bottomSheetEventRef?.current?.present()}
 					>
-						<Icons.CalendarIcon height={20} width={20} color={themeValue.text} />
-						<Text style={{ color: themeValue.textStrong }}>
+						<Icons.CalendarIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+						<Text style={styles.titleEvent} >
 							{allEventManagement?.length > 0 ? `${allEventManagement?.length} Events` : 'Events'}
 						</Text>
 					</TouchableOpacity>
@@ -191,15 +191,15 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
 				<ClanMenu inviteRef={bottomSheetInviteRef} />
 			</MezonBottomSheet>
-
+			
 			<MezonBottomSheet ref={bottomSheetCategoryMenuRef} heightFitContent>
 				<CategoryMenu inviteRef={bottomSheetInviteRef} category={currentPressedCategory} />
 			</MezonBottomSheet>
-
+			
 			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent onDismiss={() => setCurrentPressedChannel(null)}>
 				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedChannel} />
 			</MezonBottomSheet>
-
+			
 			<MezonBottomSheet
 				title={`${allEventManagement?.length} Events`}
 				ref={bottomSheetEventRef}

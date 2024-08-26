@@ -16,7 +16,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     channelListHeaderItemTitle: {
         textTransform: 'uppercase',
-        fontSize: 15,
+        fontSize: size.s_14,
         fontWeight: 'bold',
         color: colors.text,
         flexBasis: '75%'

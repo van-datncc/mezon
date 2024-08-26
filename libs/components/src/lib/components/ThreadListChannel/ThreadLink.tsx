@@ -5,13 +5,13 @@ import {
 	selectCountNotifyByChannelId,
 	selectCurrentChannel,
 	selectIsUnreadChannelById,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 import { Coords, classes } from '../ChannelLink';
 import SettingChannel from '../ChannelSetting';
 import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
@@ -72,7 +72,6 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 	const { setTurnOffThreadMessage } = useThreads();
 	const handleClick = (thread: IChannel) => {
 		dispatch(referencesActions.setOpenEditMessageState(false));
-		dispatch(referencesActions.setOpenReplyMessageState(false));
 		if (currentChanel?.channel_id === thread.parrent_id) {
 			setIsShowCreateThread(false, thread.parrent_id);
 		}
@@ -109,7 +108,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 			>
 				{thread.channel_label}
 			</Link>
-			
+
 			{isShowPanelChannel && (
 				<PanelChannel
 					onDeleteChannel={handleDeleteChannel}
@@ -119,7 +118,7 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 					setIsShowPanelChannel={setIsShowPanelChannel}
 				/>
 			)}
-			
+
 			{openSetting && (
 				<SettingChannel
 					onClose={() => {
@@ -128,15 +127,11 @@ const ThreadLink = ({ thread, isFirstThread }: ThreadLinkProps) => {
 					channel={thread}
 				/>
 			)}
-			
+
 			{showModal && (
-				<DeleteModal
-					onClose={() => setShowModal(false)}
-					channelLabel={thread.channel_label || ''}
-					channelId={thread.channel_id as string}
-				/>
+				<DeleteModal onClose={() => setShowModal(false)} channelLabel={thread.channel_label || ''} channelId={thread.channel_id as string} />
 			)}
-			
+
 			{numberNotification !== 0 && (
 				<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs font-medium">
 					{numberNotification}

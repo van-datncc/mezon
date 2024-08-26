@@ -9,7 +9,7 @@
           <key>PHSupportedMediaTypes</key>
              <array>
                  <string>Video</string>
-                
+
                  <string>Image</string>
              </array>
           <key>NSExtensionActivationRule</key>
