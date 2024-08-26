@@ -1,4 +1,4 @@
-import { BrowserWindow, screen, shell } from 'electron';
+import { BrowserWindow, dialog, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import { format } from 'url';
@@ -93,6 +93,10 @@ export default class App {
 							App.loadMainWindow({ deepLinkUrl: dataString });
 						}
 					}
+				} else if (process.platform == "darwin") {
+					App.application.on('open-url', (event, url) => {
+						dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+					})
 				}
 
 				if (App.mainWindow) {
@@ -169,12 +173,10 @@ export default class App {
 				}),
 			);
 		}
-
-		if (process.platform == 'win32' || process.platform == 'linux') {
-			// Keep only command line / deep linked arguments
-			deeplinkingUrl = process.argv.slice(1);
-			App.application.setAppUserModelId('mezon.ai');
-		}
+		
+		// Keep only command line / deep linked arguments
+		deeplinkingUrl = process.argv.slice(1);
+		App.application.setAppUserModelId('mezon.ai');
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
