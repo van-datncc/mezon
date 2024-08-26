@@ -26,9 +26,12 @@ const SearchMessageChannel = () => {
 	const { fetchSearchMessages, currentPage } = useSearchMessages();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
+
 	const valueInputSearch = useSelector(selectValueInputSearchMessage(currentChannel?.channel_id as string));
+
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentChannel?.channel_id as string));
 	const { listUserSearch } = useClans();
+
 	const { setIsShowCreateThread } = useThreads();
 	const [expanded, setExpanded] = useState(false);
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
@@ -64,7 +67,6 @@ const SearchMessageChannel = () => {
 		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.id ?? '', value }));
 		setValueDisplay(newPlainTextValue);
 		const filter: SearchFilter[] = [];
-		filter.push();
 		if (mentions.length === 0) {
 			filter.push(
 				{
@@ -76,8 +78,11 @@ const SearchMessageChannel = () => {
 			);
 		}
 		for (const mention of mentions) {
-			const convertMemtion = mention.display.split(':');
-			filter.push({ field_name: searchFieldName[convertMemtion[0]], field_value: convertMemtion[1] });
+			const convertMention = mention.display.split(':');
+			filter.push(
+				{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
+				{ field_name: 'channel_id', field_value: currentChannel?.id },
+			);
 		}
 		setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
 	};
@@ -193,7 +198,7 @@ const SearchMessageChannel = () => {
 						data={listUserSearch ?? []}
 						trigger="mentions:"
 						displayTransform={(id: any, display: any) => {
-							return `from:${display}`;
+							return `mentions:${display}`;
 						}}
 						renderSuggestion={(suggestion) => {
 							return <SelectItem title="mentions: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
