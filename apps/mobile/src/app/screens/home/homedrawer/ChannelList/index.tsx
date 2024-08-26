@@ -7,6 +7,7 @@ import {
 	categoriesActions,
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
+	selectCurrentChannel,
 	selectCurrentClan,
 	useAppDispatch,
 } from '@mezon/store-mobile';
@@ -54,6 +55,8 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const dispatch = useAppDispatch();
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { isCanManageEvent } = useUserPermission();
+  const flashListRef = useRef(null);
+  const currentChannel = useSelector(selectCurrentChannel);
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -126,6 +129,21 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			},
 		});
 	};
+
+	const scrollToItemById = (id) => {
+		const index = categorizedChannels?.findIndex((item) => item?.category_id === id);
+		if (flashListRef?.current) {
+			flashListRef?.current?.scrollToIndex({ index, animated: true });
+		}
+	};
+
+	const onContentSizeChange = (w, h) => {
+		if (categorizedChannels?.length && h > 0 && isLoading === 'loaded') {
+			setTimeout(() => {
+				scrollToItemById(currentChannel?.category_id);
+			}, 300);
+		}
+	};
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
 			<View style={styles.mainList}>
@@ -161,6 +179,8 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlashList
+          onContentSizeChange={onContentSizeChange}
+          ref={flashListRef}
 					data={categorizedChannels || []}
 					keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
 					estimatedItemSize={40}
