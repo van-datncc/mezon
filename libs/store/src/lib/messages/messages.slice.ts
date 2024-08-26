@@ -1205,6 +1205,8 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 	const channelEntity = state.channelMessages[channelId];
 	const index = channelEntity.ids.indexOf(messageId);
 
+	const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId];
+
 	if (index === -1) return channelEntity;
 
 	const { isStartedMessageGroup, isStartedMessageOfTheDay } = channelEntity.entities[messageId];
@@ -1213,6 +1215,23 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 	if (nextMessageId && isStartedMessageGroup) {
 		channelEntity.entities[nextMessageId].isStartedMessageGroup = isStartedMessageGroup;
 		channelEntity.entities[nextMessageId].isStartedMessageOfTheDay = isStartedMessageOfTheDay;
+	}
+
+	// check if the message is the  channel last message
+	// if it is, remove the last message
+	if (state.lastMessageByChannel[channelId]?.id === messageId) {
+		if (isViewingOlderMessages) {
+			// remove last message
+			delete state.lastMessageByChannel[channelId];
+		} else {
+			// get let last message id
+			const prevMessageId = channelEntity.ids[index - 1];
+
+			if (prevMessageId) {
+				// set last message id to the previous message
+				state.lastMessageByChannel[channelId] = channelEntity.entities[prevMessageId];
+			}
+		}
 	}
 
 	return channelMessagesAdapter.removeOne(channelEntity, messageId);
