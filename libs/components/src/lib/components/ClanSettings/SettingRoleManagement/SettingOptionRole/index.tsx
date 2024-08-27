@@ -1,5 +1,5 @@
 import { useClanOwner } from '@mezon/core';
-import { RolesClanEntity, getSelectedRoleId, selectAllRolesClan, selectEveryoneRole, toggleIsShowFalse } from '@mezon/store';
+import { RolesClanEntity, getSelectedRoleId, selectEveryoneRole, toggleIsShowFalse } from '@mezon/store';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCheckHasAdministrator } from '../../SettingMainRoles/listActiveRole';
@@ -28,12 +28,12 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 	};
 
 	const renderContent = useCallback(() => {
-    if(everyoneRole?.id === clickRole){
-      return <SettingPermissions RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit} />;
-    }
+		if (everyoneRole?.id === clickRole) {
+			return <SettingPermissions RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit} />;
+		}
 		switch (selectedButton) {
 			case TabsSelectRole.Tab_Display:
-				return <SettingDisplayRole RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit}/>;
+				return <SettingDisplayRole RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit} />;
 			case TabsSelectRole.Tab_Permissions:
 				return <SettingPermissions RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit} />;
 			case TabsSelectRole.Tab_Manage_Members:
@@ -41,7 +41,7 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 			default:
 				return null;
 		}
-	  }, [selectedButton, RolesClan, hasPermissionEdit,clickRole]);
+	}, [selectedButton, RolesClan, hasPermissionEdit, clickRole]);
 
 	const roleUsersCount = activeRole?.role_user_list?.role_users?.length || 0;
 
