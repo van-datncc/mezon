@@ -9,7 +9,7 @@ import {
 	selectUploadingStatus,
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EFailAttachment, EUploadingStatus } from '@mezon/utils';
+import { EUploadingStatus } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo, useRef } from 'react';
@@ -75,6 +75,19 @@ function MessageWithUser({
 		[currentChannelId, currentDmId, mode],
 	);
 	const { statusUpload, count } = useSelector(selectUploadingStatus(currentDmOrChannelId ?? '', message.id));
+	// Computed values
+	const attachments = message.attachments ?? [];
+	const mentions = message.mentions ?? [];
+	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
+	const isMeMessage = message.isMe;
+
+	const shouldNotRender = useMemo(() => {
+		return hasFailedAttachment && !isMeMessage && Object.keys(message.content).length === 0 && mentions.length === 0;
+	}, [hasFailedAttachment, isMeMessage, message.content, mentions]);
+
+	const shouldSkipAttachmentRender = useMemo(() => {
+		return hasFailedAttachment && !isMeMessage && Object.keys(message.content).length !== 0 && mentions.length !== 0;
+	}, [hasFailedAttachment, isMeMessage, message.content, mentions]);
 
 	const hasIncludeMention = useMemo(() => {
 		const userIdMention = userLogin.userProfile?.user?.id;
@@ -126,22 +139,10 @@ function MessageWithUser({
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
-	const checkFailAtt = useMemo(() => {
-		if (
-			message.attachments &&
-			message.attachments[0]?.filename === EFailAttachment.FAIL_ATTACHMENT &&
-			message.content.t === '' &&
-			message.mentions?.length === 0 &&
-			!message.isMe
-		) {
-			return true;
-		}
-	}, [message.attachments]);
-
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
-			{!checkFailAtt && (
+			{!shouldNotRender && (
 				<div className={containerClass} ref={containerRef} onContextMenu={onContextMenu} id={`msg-${message.id}`}>
 					<div className="relative rounded-sm overflow-visible">
 						<div className={childDivClass}></div>
@@ -173,7 +174,9 @@ function MessageWithUser({
 													Uploading {count} {count === 1 ? 'file' : 'files'}!
 												</div>
 											) : (
-												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+												!shouldSkipAttachmentRender && (
+													<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
+												)
 											)}
 										</div>
 									</div>
