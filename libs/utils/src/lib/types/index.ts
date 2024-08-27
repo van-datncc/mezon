@@ -5,7 +5,7 @@ import {
 	ChannelType,
 	HashtagDm,
 	Notification,
-	NotificationChannelCategorySetting,
+	NotificationChannelCategorySetting, NotificationType,
 	NotifiReactMessage,
 	PermissionRoleChannel
 } from 'mezon-js';
@@ -755,4 +755,11 @@ export enum EUserSettings {
 	STREAMER_MODE = 'Streamer Mode',
 	ADVANCED = 'Advanced',
 	LOG_OUT = 'Log Out'
+}
+
+export enum ENotificationTypes {
+	DEFAULT = 0,
+	ALL_MESSAGE = NotificationType.ALL_MESSAGE,
+	MENTION_MESSAGE = NotificationType.MENTION_MESSAGE,
+	NOTHING_MESSAGE = NotificationType.NOTHING_MESSAGE,
 }
