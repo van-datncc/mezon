@@ -10,7 +10,7 @@ import {
 	LoadingStatus,
 	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
-	checkSameDayByCreateTime,
+	checkSameDayByCreateTime
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -21,8 +21,10 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
-	weakMapMemoize,
+	isAnyOf,
+	weakMapMemoize
 } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -53,10 +55,10 @@ export const mapMessageChannelToEntity = (channelMess: ChannelMessage, lastSeenI
 		user: {
 			name: channelMess.username || '',
 			username: channelMess.username || '',
-			id: channelMess.sender_id || '',
+			id: channelMess.sender_id || ''
 		},
 		lastSeen: lastSeenId === (channelMess.id || channelMess.message_id),
-		create_time_seconds: channelMess.create_time_seconds || creationTime.getTime() / 1000,
+		create_time_seconds: channelMess.create_time_seconds || creationTime.getTime() / 1000
 	};
 };
 
@@ -145,8 +147,8 @@ export const fetchMessagesCached = memoize(
 				args[3] = 1;
 			}
 			return args[1] + args[2] + args[3] + args[0].session.username;
-		},
-	},
+		}
+	}
 );
 
 type fetchMessageChannelPayload = {
@@ -162,7 +164,7 @@ export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
 	async (
 		{ channelId, noCache, messageId, direction, isFetchingLatestMessages, isClearMessage }: fetchMessageChannelPayload,
-		thunkAPI,
+		thunkAPI
 	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
@@ -174,7 +176,7 @@ export const fetchMessages = createAsyncThunk(
 
 		if (!response.messages) {
 			return {
-				messages: [],
+				messages: []
 			};
 		}
 
@@ -187,13 +189,13 @@ export const fetchMessages = createAsyncThunk(
 				thunkAPI.dispatch(
 					messagesActions.setChannelLastMessage({
 						channelId,
-						messageId: lastSeenMessageId,
-					}),
+						messageId: lastSeenMessageId
+					})
 				);
 			}
 
 			return {
-				messages: [],
+				messages: []
 			};
 		}
 
@@ -214,8 +216,8 @@ export const fetchMessages = createAsyncThunk(
 			thunkAPI.dispatch(
 				messagesActions.setLastMessage({
 					...lastSentMessage,
-					channel_id: channelId,
-				}),
+					channel_id: channelId
+				})
 			);
 		}
 
@@ -236,8 +238,8 @@ export const fetchMessages = createAsyncThunk(
 			thunkAPI.dispatch(
 				messagesActions.setChannelLastMessage({
 					channelId,
-					messageId: response.last_seen_message?.id,
-				}),
+					messageId: response.last_seen_message?.id
+				})
 			);
 			const lastMessage = messages.find((message) => message.id === response.last_seen_message?.id);
 
@@ -248,7 +250,7 @@ export const fetchMessages = createAsyncThunk(
 					channelLabel: lastMessage.channel_label,
 					messageId: lastMessage.id,
 					messageCreatedAt: lastMessage.create_time_seconds ? +lastMessage.create_time_seconds : 0,
-					messageSeenAt: 0,
+					messageSeenAt: 0
 				});
 			}
 		}
@@ -261,9 +263,9 @@ export const fetchMessages = createAsyncThunk(
 		return {
 			messages,
 			isFetchingLatestMessages,
-			isClearMessage,
+			isClearMessage
 		};
-	},
+	}
 );
 
 type LoadMoreMessArgs = {
@@ -299,8 +301,8 @@ export const loadMoreMessage = createAsyncThunk(
 						channelId: channelId,
 						noCache: true,
 						messageId: lastScrollMessageId,
-						direction: direction,
-					}),
+						direction: direction
+					})
 				);
 			} else {
 				// scroll down
@@ -316,15 +318,15 @@ export const loadMoreMessage = createAsyncThunk(
 						channelId: channelId,
 						noCache: true,
 						messageId: firstScrollMessageId,
-						direction: direction,
-					}),
+						direction: direction
+					})
 				);
 			}
 		} catch (e) {
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
 		}
-	},
+	}
 );
 
 type JumpToMessageArgs = {
@@ -356,8 +358,8 @@ export const jumpToMessage = createAsyncThunk(
 						messageId: messageId,
 						direction: Direction_Mode.AROUND_TIMESTAMP,
 						isFetchingLatestMessages,
-						isClearMessage: true,
-					}),
+						isClearMessage: true
+					})
 				);
 			}
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump(messageId));
@@ -365,7 +367,7 @@ export const jumpToMessage = createAsyncThunk(
 			console.log(e);
 			return thunkAPI.rejectWithValue([]);
 		}
-	},
+	}
 );
 
 type UpdateMessageArgs = {
@@ -382,6 +384,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now);
 		} catch (e) {
+			Sentry.captureException(e);
 			console.error('Error updating last seen message', e);
 		}
 	},
@@ -396,8 +399,8 @@ export const updateLastSeenMessage = createAsyncThunk(
 				return false;
 			}
 			return true;
-		},
-	},
+		}
+	}
 );
 
 type SendMessagePayload = {
@@ -461,7 +464,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			avatar: '',
 			isSending: true,
 			references: [],
-			isMe: true,
+			isMe: true
 		};
 		const fakeMess = mapMessageChannelToEntity(fakeMessage);
 
@@ -518,7 +521,7 @@ export const updateTypingUsers = createAsyncThunk(
 		// after 30 seconds recalculate typing users
 		await sleep(TYPING_TIMEOUT + 100);
 		thunkAPI.dispatch(messagesActions.recheckTypingUsers());
-	},
+	}
 );
 
 export type SendMessageArgs = {
@@ -545,7 +548,7 @@ export type SetUserTypingArgs = {
 };
 
 const channelMessagesAdapter = createEntityAdapter<MessagesEntity>({
-	sortComparer: orderMessageByTimeMsAscending,
+	sortComparer: orderMessageByTimeMsAscending
 });
 
 export const initialMessagesState: MessagesState = {
@@ -565,7 +568,7 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: false,
 	idMessageToJump: '',
-	newMesssageUpdateImage: { message_id: '' },
+	newMesssageUpdateImage: { message_id: '' }
 };
 
 export type SetCursorChannelArgs = {
@@ -602,7 +605,7 @@ export const messagesSlice = createSlice({
 				mode: data.mode,
 				mentions: data.mentions,
 				content: data.content,
-				isMe: data.isMe,
+				isMe: data.isMe
 			};
 		},
 
@@ -613,7 +616,7 @@ export const messagesSlice = createSlice({
 
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
-					id: channelId,
+					id: channelId
 				});
 			}
 			const channelEntity = state.channelMessages[channelId];
@@ -634,7 +637,7 @@ export const messagesSlice = createSlice({
 						const newContent = content;
 
 						const sendingMessages = state.channelMessages[channelId].ids.filter(
-							(id) => state.channelMessages[channelId].entities[id].isSending,
+							(id) => state.channelMessages[channelId].entities[id].isSending
 						);
 						if (sendingMessages && sendingMessages.length) {
 							for (const mid of sendingMessages) {
@@ -662,7 +665,8 @@ export const messagesSlice = createSlice({
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
 							hideEditted: action.payload.hideEditted,
-						},
+							update_time: action.payload.update_time
+						}
 					});
 					break;
 				}
@@ -677,7 +681,7 @@ export const messagesSlice = createSlice({
 			if (isCurrentChannel || isMe) {
 				state.unreadMessagesEntries = {
 					...state.unreadMessagesEntries,
-					[action.payload.channel_id]: action.payload.id,
+					[action.payload.channel_id]: action.payload.id
 				};
 			}
 			const typingUserKey = buildTypingUserKey(action.payload.channel_id, action.payload.sender_id || '');
@@ -702,7 +706,7 @@ export const messagesSlice = createSlice({
 			// update is viewing older messages
 			state.isViewingOlderMessagesByChannelId[action.payload.channel_id] = computeIsViewingOlderMessagesByChannelId(
 				state,
-				action.payload.channel_id,
+				action.payload.channel_id
 			);
 		},
 		markAsSent: (state, action: PayloadAction<MarkAsSentArgs>) => {
@@ -715,19 +719,19 @@ export const messagesSlice = createSlice({
 			action: PayloadAction<{
 				messageId: string;
 				channelId: string;
-			}>,
+			}>
 		) => {
 			const channelId = action.payload.channelId;
 			if (!state.channelMessages?.[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
-					id: channelId,
+					id: channelId
 				});
 			}
 			channelMessagesAdapter.updateOne(state.channelMessages[channelId], {
 				id: action.payload.messageId,
 				changes: {
-					isError: true,
-				},
+					isError: true
+				}
 			});
 		},
 		clearChannelMessages: (state, action: PayloadAction<string>) => {
@@ -738,7 +742,7 @@ export const messagesSlice = createSlice({
 			action: PayloadAction<{
 				channelId: string;
 				messageId: string;
-			}>,
+			}>
 		) => {
 			const { channelId, messageId } = action.payload;
 			handleRemoveOneMessage({ state, channelId, messageId });
@@ -747,14 +751,14 @@ export const messagesSlice = createSlice({
 		setChannelLastMessage: (state, action: PayloadAction<SetChannelLastMessageArgs>) => {
 			state.unreadMessagesEntries = {
 				...state.unreadMessagesEntries,
-				[action.payload.channelId]: action.payload.messageId,
+				[action.payload.channelId]: action.payload.messageId
 			};
 		},
 		UpdateChannelLastMessage: (state, action: PayloadAction<{ channelId: string }>) => {
 			const lastMess = state.channelMessages[action.payload.channelId]?.ids.at(-1);
 			state.unreadMessagesEntries = {
 				...state.unreadMessagesEntries,
-				[action.payload.channelId]: lastMess || '',
+				[action.payload.channelId]: lastMess || ''
 			};
 		},
 		setUserTyping: (state, action: PayloadAction<SetUserTypingArgs>) => {
@@ -764,8 +768,8 @@ export const messagesSlice = createSlice({
 					channelId: action.payload.channelId,
 					isTyping: action.payload.isTyping,
 					timeAt: Date.now(),
-					userId: action.payload.userId,
-				},
+					userId: action.payload.userId
+				}
 			};
 		},
 		recheckTypingUsers: (state) => {
@@ -805,17 +809,17 @@ export const messagesSlice = createSlice({
 							updatedEntities[messageId] = {
 								...message,
 								clan_avatar: clanAvt,
-								clan_nick: clanNick,
+								clan_nick: clanNick
 							};
 						}
 					}
 					state.channelMessages[channelId] = {
 						...channel,
-						entities: updatedEntities,
+						entities: updatedEntities
 					};
 				}
 			}
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -851,15 +855,18 @@ export const messagesSlice = createSlice({
 						state,
 						channelId,
 						adapterPayload: reversedMessages,
-						direction,
+						direction
 					});
-				},
+				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
+			})
+			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state) => {
+				state.isJumpingToPresent = true;
 			});
-	},
+	}
 });
 
 /*
@@ -896,7 +903,7 @@ export const messagesActions = {
 	updateTypingUsers,
 	sendTypingUser,
 	loadMoreMessage,
-	jumpToMessage,
+	jumpToMessage
 };
 
 export const getMessagesState = (rootState: { [MESSAGES_FEATURE_KEY]: MessagesState }): MessagesState => rootState[MESSAGES_FEATURE_KEY];
@@ -1031,7 +1038,7 @@ const emptyArray: string[] = [];
 
 export const createCachedSelector = createSelectorCreator({
 	memoize: weakMapMemoize,
-	argsMemoize: weakMapMemoize,
+	argsMemoize: weakMapMemoize
 });
 
 export const getChannelIdAsSecondParam = (_: unknown, channelId: string) => channelId;
@@ -1055,6 +1062,14 @@ export const selectMessageEntitiesByChannelId = createCachedSelector([getMessage
 	return messagesState.channelMessages[channelId]?.entities || emptyObject;
 });
 
+export const selectAllMessagesByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	const channelMessages = messagesState.channelMessages[channelId];
+	if (!channelMessages) {
+		return [];
+	}
+	return channelMessagesAdapter.getSelectors().selectAll(channelMessages);
+});
+
 export const selectMessageIdsByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
 	return messagesState?.channelMessages[channelId]?.ids || emptyArray;
 });
@@ -1063,7 +1078,7 @@ export const selectMessageEntityById = createCachedSelector(
 	[getMessagesState, getChannelIdAsSecondParam, (_, __, messageId) => messageId],
 	(messagesState, channelId, messageId) => {
 		return messagesState.channelMessages[channelId]?.entities?.[messageId] || emptyObject;
-	},
+	}
 );
 
 export const selectLassSendMessageEntityBySenderId = createCachedSelector(
@@ -1071,7 +1086,7 @@ export const selectLassSendMessageEntityBySenderId = createCachedSelector(
 	(entities, ids, senderId) => {
 		const matchedId = [...ids].reverse().find((id) => entities?.[id]?.sender_id === senderId);
 		return matchedId ? entities[matchedId] : null;
-	},
+	}
 );
 
 export const selectChannelDraftMessage = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
@@ -1106,7 +1121,7 @@ export const selectLastSeenMessage = (channelId: string, messageId: string) =>
 		[(state) => selectLastMessageIdByChannelId(state, channelId), selectUnreadMessageIdByChannelId(channelId)],
 		(lastMessageId, unreadMessageId) => {
 			return Boolean(messageId === unreadMessageId && messageId !== lastMessageId);
-		},
+		}
 	);
 
 export const selectIsViewingOlderMessagesByChannelId = (channelId: string) =>
@@ -1137,7 +1152,7 @@ const handleSetManyMessages = ({
 	state,
 	channelId,
 	adapterPayload,
-	direction,
+	direction
 }: {
 	state: MessagesState;
 	channelId?: string;
@@ -1147,7 +1162,7 @@ const handleSetManyMessages = ({
 	if (!channelId) return state;
 	if (!state.channelMessages[channelId])
 		state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
-			id: channelId,
+			id: channelId
 		});
 
 	state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
@@ -1167,7 +1182,7 @@ const handleUpdateIsCombineMessage = (
 		id: string;
 	},
 	messageIds: string[],
-	needUpdateFirstMessage = true,
+	needUpdateFirstMessage = true
 ) => {
 	if (!messageIds?.length) return channelEntity;
 	const entities = channelEntity.entities;
@@ -1253,7 +1268,7 @@ const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: Mess
 const handleLimitMessage = (
 	channelEntity: EntityState<MessagesEntity, string> & { id: string },
 	limit: number,
-	direction: Direction_Mode = Direction_Mode.AFTER_TIMESTAMP,
+	direction: Direction_Mode = Direction_Mode.AFTER_TIMESTAMP
 ) => {
 	const ids = channelEntity.ids;
 

@@ -29,7 +29,7 @@ function brushForceCall(fn: () => boolean, totalMs: number) {
 	const animationFrameId = loop();
 
 	return {
-		cancel: () => animationFrameId && cancelAnimationFrame(animationFrameId),
+		cancel: () => animationFrameId && cancelAnimationFrame(animationFrameId)
 	};
 }
 
@@ -41,7 +41,7 @@ function brushForceCall(fn: () => boolean, totalMs: number) {
 export const useStickyScroll = (
 	targetRef: React.MutableRefObject<Element>,
 	data: IChatScrollData,
-	options?: IUseStickyScrollOptions,
+	options?: IUseStickyScrollOptions
 ): IUseStickyScrollResponse => {
 	const [enabled, setEnabled] = useState<boolean>(options?.enabled ?? true);
 	const [sticky, setSticky] = useState<boolean>(true);
@@ -97,7 +97,7 @@ export const useStickyScroll = (
 		(e: Event) => {
 			updateStuckToBottom();
 		},
-		[updateStuckToBottom],
+		[updateStuckToBottom]
 	);
 
 	useEffect(() => {
@@ -173,7 +173,7 @@ export const useStickyScroll = (
 		scrollToBottom,
 		scrollToMessage,
 		enable,
-		disable,
+		disable
 	};
 };
 

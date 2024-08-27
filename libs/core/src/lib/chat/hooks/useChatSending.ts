@@ -5,7 +5,7 @@ import {
 	selectCurrentUserId,
 	selectDirectById,
 	selectNewMesssageUpdateImage,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
@@ -52,7 +52,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
 			anonymous?: boolean,
-			mentionEveryone?: boolean,
+			mentionEveryone?: boolean
 		) => {
 			setContentPayload(content);
 			setMentionPayload(mentions);
@@ -69,11 +69,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 					references,
 					anonymous,
 					mentionEveryone,
-					senderId: currentUserId,
-				}),
+					senderId: currentUserId
+				})
 			);
 		},
-		[dispatch, channelID, clanID, mode, currentUserId],
+		[dispatch, channelID, clanID, mode, currentUserId]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -87,7 +87,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			messageId: string,
 			mentions: ApiMessageMention[],
 			attachments?: ApiMessageAttachment[],
-			hideEditted?: boolean,
+			hideEditted?: boolean
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -98,7 +98,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments, hideEditted);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
+		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode]
 	);
 
 	const updateImageLinkMessage = React.useCallback(
@@ -111,7 +111,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			mentions?: ApiMessageMention[],
 			attachments?: ApiMessageAttachment[],
 			messageEdit?: IMessageWithUser,
-			hideEditted?: boolean,
+			hideEditted?: boolean
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -123,7 +123,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 			await socket.updateChatMessage(clanId ?? '', channelId ?? '', mode ?? 0, messageId ?? '', content, mentions, attachments, hideEditted);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode],
+		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode]
 	);
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
@@ -136,7 +136,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				contentPayload,
 				mentionPayload,
 				attachmentPayload,
-				newMessageUpdateImage.message_id,
+				newMessageUpdateImage.message_id
 			);
 		}
 		setContentPayload({});
@@ -149,8 +149,8 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 			updateImageLinkMessage,
 			sendMessage,
 			sendMessageTyping,
-			editSendMessage,
+			editSendMessage
 		}),
-		[updateImageLinkMessage, sendMessage, sendMessageTyping, editSendMessage],
+		[updateImageLinkMessage, sendMessage, sendMessageTyping, editSendMessage]
 	);
 }

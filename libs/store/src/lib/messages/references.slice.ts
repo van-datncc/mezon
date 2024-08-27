@@ -44,7 +44,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	statusLoadingAttachment: false,
 	idMessageMention: '',
 	attachmentAfterUpload: {},
-	uploadingStatuses: {},
+	uploadingStatuses: {}
 });
 
 export const referencesSlice = createSlice({
@@ -65,7 +65,7 @@ export const referencesSlice = createSlice({
 			if (attachment && attachment.messageId === '') {
 				state.attachmentAfterUpload[channelId] = {
 					...attachment,
-					messageId,
+					messageId
 				};
 			}
 		},
@@ -93,7 +93,7 @@ export const referencesSlice = createSlice({
 				state.attachmentAfterUpload[channelId] = {
 					channelId: channelId,
 					files: files,
-					messageId: messageId || '',
+					messageId: messageId || ''
 				};
 			} else {
 				if (files && files.length > 0) {
@@ -127,7 +127,7 @@ export const referencesSlice = createSlice({
 						// Update the attachment entry with the remaining files
 						state.attachmentAfterUpload[channelId] = {
 							...attachment,
-							files: [...attachment.files],
+							files: [...attachment.files]
 						};
 					}
 				}
@@ -136,7 +136,7 @@ export const referencesSlice = createSlice({
 
 		setUploadingStatus: (
 			state,
-			action: PayloadAction<{ channelId: string; messageId: string; statusUpload: EUploadingStatus; count: number }>,
+			action: PayloadAction<{ channelId: string; messageId: string; statusUpload: EUploadingStatus; count: number }>
 		) => {
 			const { channelId, messageId, statusUpload, count } = action.payload;
 
@@ -147,7 +147,7 @@ export const referencesSlice = createSlice({
 			if (count > 0) {
 				state.uploadingStatuses[channelId][messageId] = {
 					statusUpload,
-					count,
+					count
 				};
 			} else {
 				delete state.uploadingStatuses[channelId][messageId];
@@ -162,7 +162,7 @@ export const referencesSlice = createSlice({
 		},
 		setIdReferenceMessageEdit(state, action) {
 			state.idMessageRefEdit = action.payload;
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -177,13 +177,13 @@ export const referencesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const referencesReducer = referencesSlice.reducer;
 
 export const referencesActions = {
-	...referencesSlice.actions,
+	...referencesSlice.actions
 };
 
 const { selectAll, selectEntities } = referencesAdapter.getSelectors();
@@ -215,9 +215,9 @@ export const selectUploadingStatus = (channelId: string, messageId: string) =>
 			const status = uploadingStatuses[channelId]?.[messageId];
 			return {
 				statusUpload: status?.statusUpload,
-				count: status?.count ?? 0,
+				count: status?.count ?? 0
 			};
-		},
+		}
 	);
 
 export const selectIdMessageRefReply = (channelId: string) =>
