@@ -1,27 +1,27 @@
 import {
-  ApiChannelMessageHeaderWithChannel,
-  ChannelDraftMessages,
-  Direction_Mode,
-  EMessageCode,
-  EmojiDataOptionals,
-  IMessageSendPayload,
-  IMessageWithUser,
-  LIMIT_MESSAGE,
-  LoadingStatus,
-  MessageTypeUpdateLink,
-  checkContinuousMessagesByCreateTimeMs,
-  checkSameDayByCreateTime,
+	ApiChannelMessageHeaderWithChannel,
+	ChannelDraftMessages,
+	Direction_Mode,
+	EMessageCode,
+	EmojiDataOptionals,
+	IMessageSendPayload,
+	IMessageWithUser,
+	LIMIT_MESSAGE,
+	LoadingStatus,
+	MessageTypeUpdateLink,
+	checkContinuousMessagesByCreateTimeMs,
+	checkSameDayByCreateTime,
 } from '@mezon/utils';
 import {
-  EntityState,
-  GetThunkAPI,
-  PayloadAction,
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSelectorCreator,
-  createSlice,
-  weakMapMemoize,
+	EntityState,
+	GetThunkAPI,
+	PayloadAction,
+	createAsyncThunk,
+	createEntityAdapter,
+	createSelector,
+	createSelectorCreator,
+	createSlice,
+	weakMapMemoize,
 } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
@@ -380,7 +380,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now.toString());
+			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now);
 		} catch (e) {
 			console.error('Error updating last seen message', e);
 		}
