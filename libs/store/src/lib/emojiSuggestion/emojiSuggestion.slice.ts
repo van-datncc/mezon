@@ -70,11 +70,11 @@ export const createEmojiSetting = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const res = await mezon.client.createClanEmoji(mezon.session, form.request);
 			if (!res) {
-				return thunkAPI.rejectWithValue({});
+				return thunkAPI.rejectWithValue({  });
 			}
 			thunkAPI.dispatch(fetchEmoji({ clanId: form.clanId, noCache: true }));
 		} catch (error) {
-			return thunkAPI.rejectWithValue({});
+			return thunkAPI.rejectWithValue({ error });
 		}
 	},
 );
@@ -87,7 +87,7 @@ export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji
 			return { request, emojiId };
 		}
 	} catch (error) {
-		return thunkAPI.rejectWithValue({});
+		return thunkAPI.rejectWithValue({ error });
 	}
 });
 
@@ -101,10 +101,9 @@ export const deleteEmojiSetting = createAsyncThunk(
 				return data.emoji;
 			}
 		} catch (error) {
-			return thunkAPI.rejectWithValue({});
-		}
-	},
-);
+		return thunkAPI.rejectWithValue({ error });
+	}
+});
 
 export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestionAdapter.getInitialState({
 	loadingStatus: 'not loaded',

@@ -30,6 +30,7 @@ import { channelsActions } from '../channels/channels.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
+import * as Sentry from "@sentry/browser";
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -382,6 +383,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now);
 		} catch (e) {
+			Sentry.captureException(e)
 			console.error('Error updating last seen message', e);
 		}
 	},

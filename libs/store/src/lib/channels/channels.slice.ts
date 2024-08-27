@@ -14,6 +14,7 @@ import { notificationSettingActions } from '../notificationSetting/notificationS
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
+import * as Sentry from "@sentry/browser";
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -83,7 +84,8 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType);
 		return channel;
 	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
+		Sentry.captureException(error);
+		return thunkAPI.rejectWithValue({error});
 	}
 });
 

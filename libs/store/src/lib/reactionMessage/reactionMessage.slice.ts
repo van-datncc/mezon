@@ -2,6 +2,7 @@ import { EmojiDataOptionals, EmojiPlaces, EmojiStorage, IReaction } from '@mezon
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageReaction } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
+import * as Sentry from "@sentry/browser";
 
 export const REACTION_FEATURE_KEY = 'reaction';
 
@@ -98,7 +99,8 @@ export const writeMessageReaction = createAsyncThunk(
 
 			await socket.writeMessageReaction(id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete);
 		} catch (e) {
-			return thunkAPI.rejectWithValue('Error while writing message reaction');
+			Sentry.captureException(e)
+			return thunkAPI.rejectWithValue(e);
 		}
 	},
 );

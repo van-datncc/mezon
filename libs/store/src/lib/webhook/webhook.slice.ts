@@ -49,7 +49,7 @@ export const fetchWebhooks = createAsyncThunk(
 			return response.webhooks;
 		} catch (error) {
 			console.log(error);
-			return thunkAPI.rejectWithValue({});
+			return thunkAPI.rejectWithValue({error});
 		}
 	},
 );
@@ -68,25 +68,28 @@ export const generateWebhook = createAsyncThunk(
 			}
 		} catch (error) {
 			console.log(error);
-			return thunkAPI.rejectWithValue({});
+			return thunkAPI.rejectWithValue({ error });
 		}
 	},
 );
 
-export const deleteWebhookById = createAsyncThunk('integration/deleteWebhook', async (data:{webhook: ApiWebhook, clanId: string, channelId: string}, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string);
-		if (response) {
-			thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
-			return data.webhook;
+export const deleteWebhookById = createAsyncThunk(
+	'integration/deleteWebhook',
+	async (data: { webhook: ApiWebhook; clanId: string; channelId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.deleteWebhookById(mezon.session, data.webhook.id as string);
+			if (response) {
+				thunkAPI.dispatch(fetchWebhooks({ channelId: data.channelId, clanId: data.clanId, noCache: true }));
+				return data.webhook;
+			}
+			thunkAPI.rejectWithValue({});
+		} catch (err) {
+			console.log(err);
+			return thunkAPI.rejectWithValue(err);
 		}
-		thunkAPI.rejectWithValue({});
-	} catch (err) {
-		console.log(err);
-		return thunkAPI.rejectWithValue(err);
-	}
-});
+	},
+);
 
 export const updateWebhookBySpecificId = createAsyncThunk(
 	'integration/editWebhook',
@@ -119,7 +122,7 @@ export const integrationWebhookSlice = createSlice({
 			})
 			.addCase(fetchWebhooks.rejected, (state) => {
 				state.loadingStatus = 'error';
-			})
+			});
 	},
 });
 
