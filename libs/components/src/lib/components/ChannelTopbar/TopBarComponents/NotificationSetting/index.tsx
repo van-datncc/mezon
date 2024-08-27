@@ -10,12 +10,11 @@ import {
 } from '@mezon/store';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
-import { NotificationType } from 'mezon-js';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { notificationTypesList, notiLabels } from "../../../PanelChannel";
 import ItemPanel from "../../../PanelChannel/ItemPanel";
-import {ENotificationTypes} from "@mezon/utils";
+import { ENotificationTypes } from "@mezon/utils";
 
 const NotificationSetting = () => {
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
