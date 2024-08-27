@@ -6,7 +6,7 @@ import ModalSuccess from "./ModalSuccess";
 
 type ModalTryProps = {
     nameApp?: string,
-    handleOpenModal: () => void,
+    handleOpenModal?: () => void,
 }
 
 const ModalTry = (props: ModalTryProps) => {
@@ -25,7 +25,7 @@ const ModalTry = (props: ModalTryProps) => {
                 <FooterModal name={nameApp}/>
                 <ModalAsk handelBack={handleOpenModal} handleOpenModal={handleModalSuccess}/>
             </div>:
-            <ModalSuccess name={nameApp} handleModal={handleModalSuccess} isModalTry/>
+            <ModalSuccess name={nameApp} isModalTry/>
     )
 }
 
