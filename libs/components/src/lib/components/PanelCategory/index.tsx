@@ -1,11 +1,11 @@
-import {Coords} from "../ChannelLink";
-import {ENotificationTypes, EPermission, ICategory} from "@mezon/utils";
-import {useEffect, useRef, useState} from "react";
+import { Coords } from "../ChannelLink";
+import { ENotificationTypes, EPermission, ICategory } from "@mezon/utils";
+import { useEffect, useRef, useState } from "react";
 import GroupPanels from "../PanelChannel/GroupPanels";
 import ItemPanel from "../PanelChannel/ItemPanel";
-import {Dropdown} from "flowbite-react";
-import {notificationTypesList} from "../PanelChannel";
-import {useClanRestriction, UserRestrictionZone} from "@mezon/core";
+import { Dropdown } from "flowbite-react";
+import { notificationTypesList } from "../PanelChannel";
+import { useClanRestriction, UserRestrictionZone } from "@mezon/core";
 import {
 	defaultNotificationCategoryActions,
 	selectCurrentClanId,
@@ -14,8 +14,8 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from "@mezon/store";
-import {NotificationType} from "mezon-js";
-import {format} from "date-fns";
+import { NotificationType } from "mezon-js";
+import { format } from "date-fns";
 
 interface IPanelCategoryProps {
   coords: Coords,
