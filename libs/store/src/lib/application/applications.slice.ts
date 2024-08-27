@@ -20,7 +20,7 @@ export const applicationInitialState: IApplicationState = {
 	appsData: {
 		apps: [],
 		next_cursor: undefined,
-		total_count: undefined,
+		total_count: undefined
 	},
 	appDetail: {
 		id: '',
@@ -30,9 +30,9 @@ export const applicationInitialState: IApplicationState = {
 		disable_time: undefined,
 		is_shadow: undefined,
 		role: undefined,
-		token: undefined,
+		token: undefined
 	},
-	currentAppId: undefined,
+	currentAppId: undefined
 };
 
 const FETCH_CACHED_TIME = 3 * 60 * 1000;
@@ -46,7 +46,7 @@ const fetchApplicationsCached = memoizee((mezon: MezonValueContext) => mezon.cli
 	maxAge: FETCH_CACHED_TIME,
 	normalizer: (args) => {
 		return args[0].session.username as string;
-	},
+	}
 });
 
 export const fetchApplications = createAsyncThunk('adminApplication/fetchApplications', async ({ noCache }: IFetchAppsArg, thunkAPI) => {
@@ -81,7 +81,7 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 		if (response) {
 			thunkAPI.dispatch(fetchApplications({ noCache: true }));
 		} else {
-			thunkAPI.rejectWithValue({ });
+			thunkAPI.rejectWithValue({});
 		}
 	} catch (err) {
 		console.log(err);
@@ -89,7 +89,7 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 	}
 });
 
-export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async (data: { appId: string, clanId: string }, thunkAPI) => {
+export const addBotChat = createAsyncThunk('adminApplication/addBotChat', async (data: { appId: string; clanId: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		await mezon.client.addAppToClan(mezon.session, data.appId, data.clanId);
@@ -105,7 +105,7 @@ export const adminApplicationSlice = createSlice({
 	reducers: {
 		setCurrentAppId: (state, action) => {
 			state.currentAppId = action.payload;
-		},
+		}
 	},
 	extraReducers(builder) {
 		builder.addCase(fetchApplications.pending, (state) => {
@@ -121,7 +121,7 @@ export const adminApplicationSlice = createSlice({
 		builder.addCase(getApplicationDetail.fulfilled, (state, action) => {
 			state.appDetail = action.payload;
 		});
-	},
+	}
 });
 
 export const getApplicationState = (rootState: { [ADMIN_APPLICATIONS]: IApplicationState }): IApplicationState => rootState[ADMIN_APPLICATIONS];

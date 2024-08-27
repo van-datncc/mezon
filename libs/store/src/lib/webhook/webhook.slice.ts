@@ -21,7 +21,7 @@ export interface IFetchWebhooksByChannelIdArg {
 export const initialWebhookState: IWebHookState = {
 	loadingStatus: 'not loaded',
 	errors: null,
-	webhookList: [],
+	webhookList: []
 };
 
 const LIST_WEBHOOK_CACHED_TIME = 1000 * 60 * 3;
@@ -33,8 +33,8 @@ const fetchWebhooksCached = memoizee(
 		maxAge: LIST_WEBHOOK_CACHED_TIME,
 		normalizer: (args) => {
 			return args[2] + args[1] + args[0].session.username;
-		},
-	},
+		}
+	}
 );
 
 export const fetchWebhooks = createAsyncThunk(
@@ -49,9 +49,9 @@ export const fetchWebhooks = createAsyncThunk(
 			return response.webhooks;
 		} catch (error) {
 			console.log(error);
-			return thunkAPI.rejectWithValue({error});
+			return thunkAPI.rejectWithValue({ error });
 		}
-	},
+	}
 );
 
 export const generateWebhook = createAsyncThunk(
@@ -70,7 +70,7 @@ export const generateWebhook = createAsyncThunk(
 			console.log(error);
 			return thunkAPI.rejectWithValue({ error });
 		}
-	},
+	}
 );
 
 export const deleteWebhookById = createAsyncThunk(
@@ -88,7 +88,7 @@ export const deleteWebhookById = createAsyncThunk(
 			console.log(err);
 			return thunkAPI.rejectWithValue(err);
 		}
-	},
+	}
 );
 
 export const updateWebhookBySpecificId = createAsyncThunk(
@@ -104,7 +104,7 @@ export const updateWebhookBySpecificId = createAsyncThunk(
 			console.log(err);
 			return thunkAPI.rejectWithValue(err);
 		}
-	},
+	}
 );
 
 export const integrationWebhookSlice = createSlice({
@@ -123,7 +123,7 @@ export const integrationWebhookSlice = createSlice({
 			.addCase(fetchWebhooks.rejected, (state) => {
 				state.loadingStatus = 'error';
 			});
-	},
+	}
 });
 
 export const getWebHookState = (rootState: { [INTEGRATION_WEBHOOK]: IWebHookState }): IWebHookState => rootState[INTEGRATION_WEBHOOK];

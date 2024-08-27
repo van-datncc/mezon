@@ -4,13 +4,13 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, useLoaderData, useParams } from 'react-router-dom';
 import { useAppearance } from '../../context/AppearanceContext';
-import { IAuthLoaderData } from "../../loader/authLoader";
+import { IAuthLoaderData } from '../../loader/authLoader';
 import ModalAddBot from './ModalAddBot';
 import ModalTry from './ModalTry';
 
 const Install: React.FC = () => {
 	const dispatch = useAppDispatch();
-    const { isLogin, redirect } = useLoaderData() as IAuthLoaderData;
+	const { isLogin, redirect } = useLoaderData() as IAuthLoaderData;
 	const { applicationId } = useParams();
 	const appSelect = useSelector(selectAppById(applicationId || ''));
 
@@ -28,10 +28,9 @@ const Install: React.FC = () => {
 		dispatch(fetchApplications({}));
 	}, [dispatch]);
 
-    if (!isLogin) {
+	if (!isLogin) {
 		return <Navigate to={redirect || '/login'} replace />;
 	}
-
 
 	return (
 		<div className="dark:bg-bgPrimary bg-bgLightPrimary flex flex-col h-screen dark:text-textDarkTheme text-textLightTheme relative justify-center items-center">
@@ -46,13 +45,9 @@ const Install: React.FC = () => {
 				</div>
 			) : (
 				<>
-					{openModalAdd && 
-                            <ModalAddBot 
-                                nameApp={appSelect?.appname} 
-                                handleOpenModal={handleOpenModalAdd}  
-                                applicationId={applicationId || ''}
-                            />
-                        }
+					{openModalAdd && (
+						<ModalAddBot nameApp={appSelect?.appname} handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
+					)}
 					{openModalTry && <ModalTry nameApp={appSelect?.appname} handleOpenModal={handleOpenModalTry} />}
 				</>
 			)}

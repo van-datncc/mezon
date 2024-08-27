@@ -5,49 +5,47 @@ import { useSelector } from 'react-redux';
 import ModalSuccess from './ModalSuccess';
 
 type ModalAddBotProps = {
-    nameApp?: string;
-    applicationId: string;
-    handleOpenModal: () => void;
-}
+	nameApp?: string;
+	applicationId: string;
+	handleOpenModal: () => void;
+};
 
 export type TypeSelectClan = {
-    clanId: string,
-    clanName: string,
-    isEmpty: boolean | null,
-}
+	clanId: string;
+	clanName: string;
+	isEmpty: boolean | null;
+};
 
 enum RequestStatusSuccess {
-    Fulfill = "fulfilled",
+	Fulfill = 'fulfilled'
 }
 
 const ModalAddBot = (props: ModalAddBotProps) => {
 	const { nameApp = '', applicationId, handleOpenModal } = props;
-    const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 	const account = useSelector(selectAllAccount);
 	const [openModalSuccess, setOpenModalSuccess] = useState(false);
 
-    const [selectClan, setSelectClan] = useState<TypeSelectClan>(
-        {
-            clanId: '',
-            clanName: '',
-            isEmpty: null,
-        }
-    );
+	const [selectClan, setSelectClan] = useState<TypeSelectClan>({
+		clanId: '',
+		clanName: '',
+		isEmpty: null
+	});
 
 	const handleModalSuccess = useCallback(() => {
 		setOpenModalSuccess(!openModalSuccess);
 	}, [openModalSuccess]);
 
-    const handleAddBot = useCallback(async () => {
-        if(!selectClan.clanId){
-            setSelectClan(prev => ({...prev, isEmpty: true}));
-        } else {
-			const respond = await dispatch(addBotChat({appId: applicationId, clanId: selectClan.clanId}));
-            if(respond.meta.requestStatus === RequestStatusSuccess.Fulfill) {
-                handleModalSuccess();
-            }
-        }
-    },[applicationId, dispatch, handleModalSuccess, selectClan]);
+	const handleAddBot = useCallback(async () => {
+		if (!selectClan.clanId) {
+			setSelectClan((prev) => ({ ...prev, isEmpty: true }));
+		} else {
+			const respond = await dispatch(addBotChat({ appId: applicationId, clanId: selectClan.clanId }));
+			if (respond.meta.requestStatus === RequestStatusSuccess.Fulfill) {
+				handleModalSuccess();
+			}
+		}
+	}, [applicationId, dispatch, handleModalSuccess, selectClan]);
 
 	return !openModalSuccess ? (
 		<div className="rounded bg-bgProfileBody max-w-[440px] w-full pt-4 flex flex-col text-center gap-y-2">
@@ -124,10 +122,10 @@ export const HeaderModal = memo((props: HeaderModalProps) => {
 });
 
 type SelectClanProps = {
-    userId?: string;
-    selectClan: TypeSelectClan;
-    setSelectClan: React.Dispatch<React.SetStateAction<TypeSelectClan>>;
-}
+	userId?: string;
+	selectClan: TypeSelectClan;
+	setSelectClan: React.Dispatch<React.SetStateAction<TypeSelectClan>>;
+};
 
 export const SelectClan = memo((props: SelectClanProps) => {
 	const { userId, selectClan, setSelectClan } = props;
@@ -141,36 +139,27 @@ export const SelectClan = memo((props: SelectClanProps) => {
 		<div className="space-y-3 px-4">
 			<hr className="h-[0.08px] w-full border-borderDivider my-4" />
 			<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2 text-left">Add to server:</p>
-            {selectClan.isEmpty && <p className="text-colorDanger text-xs text-left">Please select a server.</p>}
+			{selectClan.isEmpty && <p className="text-colorDanger text-xs text-left">Please select a server.</p>}
 			<select
 				name="clan"
 				defaultValue=""
 				className="block w-full mt-1 dark:bg-black bg-bgLightTertiary rounded p-2 font-normal text-base tracking-wide outline-none"
-                onChange={
-                    (event) => {
-                        const selectedValue = JSON.parse(event.target.value);
-                        setSelectClan({
-                            isEmpty: false, 
-                            clanId: selectedValue.id, 
-                            clanName: selectedValue.name,
-                        });
-                    }
-                }
+				onChange={(event) => {
+					const selectedValue = JSON.parse(event.target.value);
+					setSelectClan({
+						isEmpty: false,
+						clanId: selectedValue.id,
+						clanName: selectedValue.name
+					});
+				}}
 			>
 				<option value="" disabled hidden>
 					Select a serve
 				</option>
-				{clans.map((clan) => 
-                    (
-					<option 
-                        key={clan.clan_id} 
-                        value={JSON.stringify({ id: clan.clan_id, name: clan.clan_name })}
-                    >
-                        
+				{clans.map((clan) => (
+					<option key={clan.clan_id} value={JSON.stringify({ id: clan.clan_id, name: clan.clan_name })}>
 						{clan.clan_name}
-                    
 					</option>
-                
 				))}
 			</select>
 			<p className="text-xs text-contentTertiary text-left">
@@ -208,10 +197,10 @@ export const FooterModal = memo((props: FooterModalProps) => {
 });
 
 type ModalAskProps = {
-    handelBack?: () => void;
-    handleAddBot?: () => void;
-    handleOpenModal?: () => void;
-}
+	handelBack?: () => void;
+	handleAddBot?: () => void;
+	handleOpenModal?: () => void;
+};
 
 export const ModalAsk = memo((props: ModalAskProps) => {
 	const { handelBack = () => {}, handleAddBot, handleOpenModal = () => {} } = props;
@@ -222,7 +211,10 @@ export const ModalAsk = memo((props: ModalAskProps) => {
 			</button>
 			<div className="flex items-center gap-x-2">
 				<p className="text-xs text-contentTertiary">Click to authorize this app</p>
-				<button onClick={handleAddBot || handleOpenModal} className="text-sm px-4 py-2 bg-primary rounded text-white font-medium hover:bg-opacity-80">
+				<button
+					onClick={handleAddBot || handleOpenModal}
+					className="text-sm px-4 py-2 bg-primary rounded text-white font-medium hover:bg-opacity-80"
+				>
 					Authorise
 				</button>
 			</div>

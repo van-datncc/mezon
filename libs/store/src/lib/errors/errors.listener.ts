@@ -1,7 +1,7 @@
 import { trackError } from '@mezon/utils';
 import { createListenerMiddleware } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import { Toast, ToastPayload, toastActions } from '../toasts';
-import * as Sentry from "@sentry/browser";
 
 // Create the middleware instance and methods
 export const errorListenerMiddleware = createListenerMiddleware({
@@ -38,8 +38,8 @@ function getErrorFromRejectedWithValue(action: any) {
 		error: action.error,
 		action: action,
 		config: action.meta.error || {
-			toast: true,
-		},
+			toast: true
+		}
 	};
 }
 
@@ -56,7 +56,7 @@ function createErrorToast(error: any): ToastPayload {
 		message: error.message,
 		type: 'error',
 		id: Date.now().toString(),
-		position: 'top-right',
+		position: 'top-right'
 	};
 
 	if (typeof error.config === 'object' && error.config.toast) {
@@ -67,7 +67,7 @@ function createErrorToast(error: any): ToastPayload {
 		if (typeof error.config.toast === 'object') {
 			toast = {
 				...toast,
-				...error.config.toast,
+				...error.config.toast
 			};
 		}
 	}
@@ -98,7 +98,7 @@ errorListenerMiddleware.startListening({
 					action.payload[key[0]].json().then((data: any) => {
 						Sentry.captureException(data.message);
 					});
-				}else{
+				} else {
 					Sentry.captureException(action.payload);
 				}
 			}
@@ -108,17 +108,16 @@ errorListenerMiddleware.startListening({
 			return;
 		}
 
-        if (error && error.config && !error.config.toast) {
-          return;
-        }
+		if (error && error.config && !error.config.toast) {
+			return;
+		}
 
-        const toast = createErrorToast(error);
-    
-        if (!toast) {
-            return;
-        }
+		const toast = createErrorToast(error);
 
-        listenerApi.dispatch(toastActions.addToast(toast));
+		if (!toast) {
+			return;
+		}
 
-	},
+		listenerApi.dispatch(toastActions.addToast(toast));
+	}
 });

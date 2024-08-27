@@ -29,7 +29,7 @@ type UpdateEmojiRequest = {
 };
 
 export const emojiSuggestionAdapter = createEntityAdapter({
-	selectId: (emo: EmojiSuggestionEntity) => emo.id || '',
+	selectId: (emo: EmojiSuggestionEntity) => emo.id || ''
 });
 
 type FetchEmojiArgs = {
@@ -48,7 +48,7 @@ const fetchEmojiCached = memoizee((mezon: MezonValueContext, clanId: string) => 
 	maxAge: LIST_EMOJI_CACHED_TIME,
 	normalizer: (args) => {
 		return args[1] + args[0].session.username;
-	},
+	}
 });
 
 export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ clanId, noCache }: FetchEmojiArgs, thunkAPI) => {
@@ -70,13 +70,13 @@ export const createEmojiSetting = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const res = await mezon.client.createClanEmoji(mezon.session, form.request);
 			if (!res) {
-				return thunkAPI.rejectWithValue({  });
+				return thunkAPI.rejectWithValue({});
 			}
 			thunkAPI.dispatch(fetchEmoji({ clanId: form.clanId, noCache: true }));
 		} catch (error) {
 			return thunkAPI.rejectWithValue({ error });
 		}
-	},
+	}
 );
 
 export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji', async ({ request, emojiId }: UpdateEmojiRequest, thunkAPI) => {
@@ -91,16 +91,14 @@ export const updateEmojiSetting = createAsyncThunk('settingClanEmoji/updateEmoji
 	}
 });
 
-export const deleteEmojiSetting = createAsyncThunk(
-	'settingClanEmoji/deleteEmoji',
-	async (data: { emoji: ClanEmoji; clan_id: string }, thunkAPI) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const res = await mezon.client.deleteByIdClanEmoji(mezon.session, data.emoji.id || '', data.clan_id);
-			if (res) {
-				return data.emoji;
-			}
-		} catch (error) {
+export const deleteEmojiSetting = createAsyncThunk('settingClanEmoji/deleteEmoji', async (data: { emoji: ClanEmoji; clan_id: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const res = await mezon.client.deleteByIdClanEmoji(mezon.session, data.emoji.id || '', data.clan_id);
+		if (res) {
+			return data.emoji;
+		}
+	} catch (error) {
 		return thunkAPI.rejectWithValue({ error });
 	}
 });
@@ -114,7 +112,7 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	keyCodeFromKeyBoardState: 1000,
 	textToSearchEmojiSuggestion: '',
 	addEmojiAction: false,
-	shiftPressed: false,
+	shiftPressed: false
 });
 
 export const emojiSuggestionSlice = createSlice({
@@ -149,7 +147,7 @@ export const emojiSuggestionSlice = createSlice({
 			if (!state.emojiObjPicked[shortName]) {
 				state.emojiObjPicked[shortName] = id;
 			}
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -170,14 +168,14 @@ export const emojiSuggestionSlice = createSlice({
 			emojiSuggestionAdapter.updateOne(state, {
 				id: action.payload?.emojiId ?? '',
 				changes: {
-					shortname: dataChange?.shortname,
-				},
+					shortname: dataChange?.shortname
+				}
 			});
 		});
 		builder.addCase(deleteEmojiSetting.fulfilled, (state, action) => {
 			emojiSuggestionAdapter.removeOne(state, action.payload?.id ?? '');
 		});
-	},
+	}
 });
 
 export const emojiSuggestionReducer = emojiSuggestionSlice.reducer;
@@ -187,7 +185,7 @@ export const emojiSuggestionActions = {
 	fetchEmoji,
 	updateEmojiSetting,
 	deleteEmojiSetting,
-	createEmojiSetting,
+	createEmojiSetting
 };
 
 const { selectAll, selectEntities } = emojiSuggestionAdapter.getSelectors();
