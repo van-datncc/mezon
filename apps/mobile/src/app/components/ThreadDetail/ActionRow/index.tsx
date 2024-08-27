@@ -8,10 +8,11 @@ import { selectCurrentChannelNotificatonSelected } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { EActionMute } from '../../../hooks/useStatusMuteChannel';
+import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN, AppStackScreenProps } from '../../../navigation/ScreenTypes';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './style';
+import { ENotificationActive } from '../../MuteThreadDetailModal';
 enum EActionRow {
 	Search,
 	Threads,
@@ -28,6 +29,7 @@ export const ActionRow = React.memo(() => {
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const [isChannel, setIsChannel] = useState<boolean>();
 	const { isCanManageThread, isCanManageChannel } = useUserPermission();
+  const { statusMute } = useStatusMuteChannel();
 
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parrent_id));
@@ -97,7 +99,7 @@ export const ActionRow = React.memo(() => {
 						<View style={styles.iconBtn}>
 							<View style={styles.iconWrapper}>
 								{[EActionRow.Mute].includes(action.type) ? (
-									getNotificationChannelSelected?.active === EActionMute.Mute ? (
+									statusMute === ENotificationActive.ON ? (
 										<Icons.BellIcon width={22} height={22} color={themeValue.text} />
 									) : (
 										<Icons.BellSlashIcon width={22} height={22} color={themeValue.text} />

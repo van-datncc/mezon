@@ -18,7 +18,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
-import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
+import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import ChannelMessages from './ChannelMessages';
@@ -29,6 +29,7 @@ import BottomKeyboardPicker from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
+import { ENotificationActive } from '../../../components/MuteThreadDetailModal';
 
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
@@ -265,8 +266,7 @@ const HomeDefaultHeader = React.memo(
 				</TouchableOpacity>
 				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
-						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
-						{statusMute === EActionMute.Mute ? (
+						{statusMute === ENotificationActive.OFF ? (
 							<Icons.BellSlashIcon width={20} height={20} color={themeValue.textStrong} />
 						) : (
 							<Icons.BellIcon width={20} height={20} color={themeValue.textStrong} />

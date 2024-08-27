@@ -34,7 +34,7 @@ type MuteThreadDetailModalProps = {
 	route: MuteThreadDetailRouteProp;
 };
 
-enum ENotificationActive {
+export enum ENotificationActive {
 	ON = 1,
 	OFF = 0
 }
