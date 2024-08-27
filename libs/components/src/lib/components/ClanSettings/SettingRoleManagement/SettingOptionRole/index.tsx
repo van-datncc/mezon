@@ -1,4 +1,4 @@
-import { useClanOwner } from '@mezon/core';
+import { useAppNavigation, useClanOwner } from '@mezon/core';
 import { RolesClanEntity, getSelectedRoleId, selectEveryoneRole, toggleIsShowFalse } from '@mezon/store';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import SettingDisplayRole from '../SettingDisplayRole';
 import SettingManageMembers from '../SettingManageMembers';
 import SettingPermissions from '../SettingPermissions';
 import { TabsSelectRole } from './tabSelectRole';
+import { EVERYONE_ROLE_ID } from '@mezon/utils';
 
 enum RoleTabs {
 	Display_Tab = "Display",
@@ -23,12 +24,13 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 	const hasPermissionAdmin = useCheckHasAdministrator(activeRole?.permission_list?.permissions);
 	const hasPermissionEdit = isClanOwner || !hasPermissionAdmin;
 	const dispatch = useDispatch();
-	const handleButtonClick = (buttonName: string) => {
+	
+  const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 	};
 
 	const renderContent = useCallback(() => {
-		if (everyoneRole?.id === clickRole) {
+		if (clickRole === EVERYONE_ROLE_ID) {
 			return <SettingPermissions RolesClan={RolesClan} hasPermissionEdit={hasPermissionEdit} />;
 		}
 		switch (selectedButton) {
@@ -45,9 +47,9 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 
 	const roleUsersCount = activeRole?.role_user_list?.role_users?.length || 0;
 
-	const isSelectDisplayTab = selectedButton === RoleTabs.Display_Tab && everyoneRole?.id !== clickRole;
-	const isSelectPermissionTab = selectedButton === RoleTabs.Permission_Tab || everyoneRole?.id === clickRole;
-	const isSelectManageTab = selectedButton === RoleTabs.Manage_Tab && everyoneRole?.id !== clickRole;
+	const isSelectDisplayTab = selectedButton === RoleTabs.Display_Tab && EVERYONE_ROLE_ID !== clickRole;
+	const isSelectPermissionTab = selectedButton === RoleTabs.Permission_Tab || EVERYONE_ROLE_ID === clickRole;
+	const isSelectManageTab = selectedButton === RoleTabs.Manage_Tab && EVERYONE_ROLE_ID !== clickRole;
 
 	return (
 		<>
