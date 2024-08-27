@@ -4,6 +4,7 @@ import { useAppNavigation, useAppParams } from '@mezon/core';
 import { deleteChannel, fetchDirectMessage, removeMemberChannel, selectCurrentUserId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { useState } from 'react';
 import LeaveClanPopup from '../ClanHeader/LeaveClanPopup';
+import ModalConfirm from '../ModalConfirm';
 
 interface PanelGroupDMPProps {
 	isDmGroupOwner: boolean;
@@ -32,9 +33,9 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 
 	const handleConfirmLeave = (e : Event) => {
     e.stopPropagation();
-
 		setPopupLeave(true);
 	}
+
 	const handleCancelLeave = () => {
 		setPopupLeave(false);
 	}
@@ -71,7 +72,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 			<ItemPanelMember children={lastOne ? "Delete Group" : "Leave Group"} danger onClick={handleConfirmLeave} />
       {
 				popupLeave && lastOne &&
-				<LeaveClanPopup handleCancel={handleCancelLeave} handleLeave={handleLeaveDmGroup} leaveTitle='Delete Group' leaveName='' />
+				<ModalConfirm handleCancel={handleCancelLeave} handleConfirm={handleLeaveDmGroup} title='delete' leaveName='this group' buttonName='Delete Group' />
 			}
       </>
 	);

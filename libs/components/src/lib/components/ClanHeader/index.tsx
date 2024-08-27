@@ -15,6 +15,7 @@ import ItemModal from './ItemModal';
 import LeaveClanPopup from './LeaveClanPopup';
 import ModalCreateCategory from './ModalCreateCategory';
 import { useNavigate } from 'react-router-dom';
+import ModalConfirm from '../ModalConfirm';
 
 export type ClanHeaderProps = {
 	name?: string;
@@ -175,7 +176,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				</div>
 			)}
 
-			{isShowLeaveClanPopup && <LeaveClanPopup handleCancel={toggleLeaveClanPopup} handleLeave={handleLeaveClan} leaveName={currentClan?.clan_name} leaveTitle='Leave Clan'/>}
+			{isShowLeaveClanPopup && <ModalConfirm handleCancel={toggleLeaveClanPopup} handleConfirm={handleLeaveClan} leaveName={currentClan?.clan_name} title='leave' buttonName='Leave Clan'/> }
 
 			{openServerSettings && (
 				<ClanSetting
