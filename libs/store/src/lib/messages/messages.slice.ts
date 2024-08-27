@@ -662,8 +662,9 @@ export const messagesSlice = createSlice({
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
-							hideEditted: action.payload.hideEditted
-						}
+							hideEditted: action.payload.hideEditted,
+							update_time: action.payload.update_time,
+						},
 					});
 					break;
 				}
@@ -1054,6 +1055,14 @@ export const selectLastLoadedMessageIdByChannelId = (channelId: string) =>
 
 export const selectMessageEntitiesByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
 	return messagesState.channelMessages[channelId]?.entities || emptyObject;
+});
+
+export const selectAllMessagesByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
+	const channelMessages = messagesState.channelMessages[channelId];
+	if (!channelMessages) {
+		return [];
+	}
+	return channelMessagesAdapter.getSelectors().selectAll(channelMessages);
 });
 
 export const selectMessageIdsByChannelId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {

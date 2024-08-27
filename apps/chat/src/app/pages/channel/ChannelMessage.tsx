@@ -8,10 +8,10 @@ import {
 } from '@mezon/components';
 import { useSeenMessagePool } from '@mezon/core';
 import {
+	MessagesEntity,
 	selectChannelDraftMessage,
 	selectIdMessageRefEdit,
 	selectLastSeenMessage,
-	selectMessageEntityById,
 	selectOpenEditMessageState,
 	useAppSelector
 } from '@mezon/store';
@@ -24,7 +24,7 @@ import { useDeleteMessageHook } from './useDeleteMessage';
 
 type MessageProps = {
 	channelId: string;
-	messageId: string;
+	message: MessagesEntity;
 	mode: number;
 	isHighlight?: boolean;
 	channelLabel: string;
@@ -32,14 +32,17 @@ type MessageProps = {
 	userName?: string;
 };
 
-export function ChannelMessage({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
-	const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
+export function ChannelMessage({ message, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
+	// todo: remove old logic
+	// const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu, preloadMessageContextMenu } = useMessageContextMenu();
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
+
+	const messageId = useMemo(() => message.id, [message.id]);
 
 	const isEditing = useMemo(() => {
 		if (channelDraftMessage.message_id === messageId) {
@@ -113,4 +116,16 @@ ChannelMessage.Skeleton = () => (
 	</div>
 );
 
-export const MemorizedChannelMessage = memo(ChannelMessage);
+const propsAreEqual = (prevProps: MessageProps, nextProps: MessageProps) => {
+	return (
+		prevProps.message.id === nextProps.message.id &&
+		prevProps.message.update_time === nextProps.message.update_time &&
+		prevProps.avatarDM === nextProps.avatarDM &&
+		prevProps.userName === nextProps.userName &&
+		prevProps.channelId === nextProps.channelId &&
+		prevProps.mode === nextProps.mode &&
+		prevProps.channelLabel === nextProps.channelLabel
+	);
+};
+
+export const MemorizedChannelMessage = memo(ChannelMessage, propsAreEqual);

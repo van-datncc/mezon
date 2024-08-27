@@ -9,7 +9,7 @@ import {
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
-	selectMessageIdsByChannelId,
+	selectAllMessagesByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotifed,
 	selectOpenModalAttachment,
@@ -34,8 +34,7 @@ type ChannelMessagesProps = {
 };
 
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
-	const messages = useAppSelector((state) => selectMessageIdsByChannelId(state, channelId));
-
+	const messages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const idMessageNotifed = useSelector(selectMessageNotifed);
@@ -95,15 +94,15 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage);
 
 	const messagesView = useMemo(() => {
-		return messages.map((messageId) => {
+		return messages.map((message) => {
 			return (
 				<MemorizedChannelMessage
 					avatarDM={avatarDM}
 					userName={userName}
-					key={messageId}
-					messageId={messageId}
+					key={message.id}
+					message={message}
 					channelId={channelId}
-					isHighlight={messageId === idMessageNotifed}
+					isHighlight={message.id === idMessageNotifed}
 					mode={mode}
 					channelLabel={channelLabel ?? ''}
 				/>
