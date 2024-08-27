@@ -9,7 +9,7 @@ import { ActionMessageSelected } from './components/ChatBox/ActionMessageSelecte
 import { ChatBoxBottomBar } from './components/ChatBox/ChatBoxBottomBar';
 import { EMessageActionType } from './enums';
 import { IMessageActionNeedToResolve } from './types';
-import UpdateAttachmentMessages from './UpdateAttachmentMessage';
+import useUpdateAttachmentMessages from './UpdateAttachmentMessage';
 
 interface IChatBoxProps {
 	channelId: string;
@@ -26,6 +26,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	const { t } = useTranslation(['message'])
 	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
 	const { isCanSendMessage } = useUserPermission();
+	useUpdateAttachmentMessages();
 
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(props?.mode)
@@ -75,7 +76,6 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 					</Block>
 				</Block>
 			)}
-			<UpdateAttachmentMessages />
 		</Block>
 	);
 });

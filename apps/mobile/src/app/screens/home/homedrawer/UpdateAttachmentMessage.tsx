@@ -6,7 +6,7 @@ import { useMezon } from "@mezon/transport";
 import { ChannelStreamMode } from "mezon-js";
 import { useEffect } from "react";
 
-export default function UpdateAttachmentMessages() {
+export default function useUpdateAttachmentMessages() {
     const { sessionRef, clientRef } = useMezon();
     const dispatch = useAppDispatch();
 
@@ -55,7 +55,5 @@ export default function UpdateAttachmentMessages() {
         dispatch(referencesActions.setPendingAttachment({ channelId: '', files: [] }));
     }, [newMessage]);
 
-    return (
-        <></>
-    )
+    return;
 }
