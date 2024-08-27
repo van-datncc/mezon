@@ -44,7 +44,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefEdit: '',
 	statusLoadingAttachment: false,
 	idMessageMention: '',
-	attachmentAfterUpload: {},
+	attachmentAfterUpload: {}
 });
 
 export const referencesSlice = createSlice({
@@ -119,7 +119,7 @@ export const referencesSlice = createSlice({
 		},
 		resetDataAttachment(state, action: PayloadAction<{ channelId: string }>) {
 			state.attachmentDataRef[action.payload.channelId] = [];
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -134,13 +134,13 @@ export const referencesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const referencesReducer = referencesSlice.reducer;
 
 export const referencesActions = {
-	...referencesSlice.actions,
+	...referencesSlice.actions
 };
 
 const { selectAll, selectEntities } = referencesAdapter.getSelectors();

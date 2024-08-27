@@ -254,7 +254,8 @@
       }
     },
     "lint": {
-      "command": "eslint apps/desktop/**/*.ts"
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
