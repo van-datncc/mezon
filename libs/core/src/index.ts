@@ -4,7 +4,6 @@ export * from './lib/app/hooks/useMessages';
 export * from './lib/auth/hooks/useAuth';
 export * from './lib/auth/hooks/useMemberStatus';
 export * from './lib/chat/contexts/ChatContext';
-export * from './lib/chat/contexts/FileContext';
 export * from './lib/chat/hooks/useAccount';
 export * from './lib/chat/hooks/useApp';
 export * from './lib/chat/hooks/useAttachment';

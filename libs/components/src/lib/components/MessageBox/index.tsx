@@ -1,5 +1,5 @@
 import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useFileContext, useReference } from '@mezon/core';
+import { useReference } from '@mezon/core';
 import { referencesActions, selectCloseMenu, selectStatusLoadingAttachment, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
@@ -35,26 +35,24 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 
-	const { addFiles } = useFileContext();
 	const onConvertToFiles = useCallback((content: string) => {
 		if (content.length > MIN_THRESHOLD_CHARS) {
 			const fileContent = new Blob([content], { type: 'text/plain' });
 			const now = Date.now();
 			const filename = now + '.txt';
 			const file = new File([fileContent], filename, { type: 'text/plain' });
-			addFiles(props.currentChannelId ?? '', [file]),
-				dispatch(
-					referencesActions.setAtachmentAfterUpload({
-						channelId: currentChannelId,
-						messageId: '',
-						files: [file].map((file) => ({
-							filename: file.name,
-							filetype: file.type,
-							size: file.size,
-							url: URL.createObjectURL(file),
-						})),
-					}),
-				);
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId: currentChannelId,
+					messageId: '',
+					files: [file].map((file) => ({
+						filename: file.name,
+						filetype: file.type,
+						size: file.size,
+						url: URL.createObjectURL(file),
+					})),
+				}),
+			);
 		}
 	}, []);
 
@@ -73,19 +71,18 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 				}
 
 				if (files.length > 0) {
-					addFiles(props.currentChannelId ?? '', files),
-						dispatch(
-							referencesActions.setAtachmentAfterUpload({
-								channelId: currentChannelId,
-								messageId: '',
-								files: files.map((file) => ({
-									filename: file.name,
-									filetype: file.type,
-									size: file.size,
-									url: URL.createObjectURL(file),
-								})),
-							}),
-						);
+					dispatch(
+						referencesActions.setAtachmentAfterUpload({
+							channelId: currentChannelId,
+							messageId: '',
+							files: files.map((file) => ({
+								filename: file.name,
+								filetype: file.type,
+								size: file.size,
+								url: URL.createObjectURL(file),
+							})),
+						}),
+					);
 				}
 			}
 		},

@@ -646,3 +646,24 @@ export function filterEmptyArrays<T extends Record<string, any>>(payload: T): T 
 			return { ...acc, [key]: value };
 		}, {} as T);
 }
+
+export async function fetchAndCreateFiles(fileData: ApiMessageAttachment[] | null): Promise<File[]> {
+	if (!fileData || fileData.length === 0) {
+		throw new Error('No file data provided.');
+	}
+
+	const createdFiles = await Promise.all(
+		fileData.map(async (file) => {
+			if (!file.url) {
+				throw new Error(`File URL is missing for file: ${file.filename}`);
+			}
+
+			const response = await fetch(file.url);
+			const blob = await response.blob();
+			const createdFile = new File([blob], file.filename ?? 'untitled', { type: file.filetype || 'application/octet-stream' });
+			return createdFile;
+		}),
+	);
+
+	return createdFiles;
+}

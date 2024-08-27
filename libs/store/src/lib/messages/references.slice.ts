@@ -65,7 +65,7 @@ export const referencesSlice = createSlice({
 			if (attachment && attachment.messageId === '') {
 				state.attachmentAfterUpload[channelId] = {
 					...attachment,
-					messageId, // Update the messageId
+					messageId,
 				};
 			}
 		},
