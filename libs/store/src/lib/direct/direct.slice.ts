@@ -37,8 +37,8 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 function extractDMMeta(channel: DirectEntity): DMMeta {
 	return {
 		id: channel.id,
-		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds || 0),
-		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds || 0),
+		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
+		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
 		notifiCount: Number(channel.count_mess_unread || 0),
 	};
 }
@@ -135,8 +135,8 @@ export const fetchDirectMessage = createAsyncThunk(
 		if (Date.now() - response.time < 100) {
 			const listStatusUnreadDM = response.channeldesc.map((channel) => {
 				const status = getStatusUnread(
-					Number(channel.last_seen_message?.timestamp_seconds ?? ''),
-					Number(channel.last_sent_message?.timestamp_seconds ?? ''),
+					Number(channel.last_seen_message?.timestamp_seconds),
+					Number(channel.last_sent_message?.timestamp_seconds),
 				);
 				return { dmId: channel.channel_id ?? '', isUnread: status };
 			});
