@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { notificationTypesList, notiLabels } from "../../../PanelChannel";
 import ItemPanel from "../../../PanelChannel/ItemPanel";
+import {ENotificationTypes} from "@mezon/utils";
 
 const NotificationSetting = () => {
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
@@ -118,7 +119,7 @@ const NotificationSetting = () => {
     }
     setisNotifyReactMessage(!isNotifyReactMessage);
   };
-
+	
 	return (
 		<div className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-[4px] w-[202px] shadow-sm overflow-hidden py-[6px] px-[8px] dark:bg-black bg-white">
@@ -170,9 +171,9 @@ const NotificationSetting = () => {
           type="radio"
           name="NotificationSetting"
           defaultNotifi={true}
-          checked={getNotificationChannelSelected?.notification_setting_type === undefined}
+          checked={getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT}
           subText={defaultNotifiName}
-          onClick={() => setNotification(0)}
+          onClick={() => setNotification(ENotificationTypes.DEFAULT)}
         />
         {notificationTypesList.map(notification => (
           <ItemPanel

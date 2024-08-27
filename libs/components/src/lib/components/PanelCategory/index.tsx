@@ -1,6 +1,6 @@
 import {Coords} from "../ChannelLink";
-import {EPermission, ICategory} from "@mezon/utils";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {ENotificationTypes, EPermission, ICategory} from "@mezon/utils";
+import {useEffect, useRef, useState} from "react";
 import GroupPanels from "../PanelChannel/GroupPanels";
 import ItemPanel from "../PanelChannel/ItemPanel";
 import {Dropdown} from "flowbite-react";
@@ -9,7 +9,7 @@ import {useClanRestriction, UserRestrictionZone} from "@mezon/core";
 import {
 	defaultNotificationCategoryActions,
 	selectCurrentClanId,
-	selectDefaultNotificationCategory, selectDefaultNotificationClan,
+	selectDefaultNotificationCategory,
 	SetDefaultNotificationPayload,
 	useAppDispatch,
 	useAppSelector
@@ -173,8 +173,8 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({coords, category, onDelet
               type="radio"
               name="NotificationSetting"
               defaultNotifi={true}
-              onClick={() => handleChangeSettingType(0)}
-              checked={defaultCategoryNotificationSetting?.notification_setting_type === 0}
+              onClick={() => handleChangeSettingType(ENotificationTypes.DEFAULT)}
+              checked={defaultCategoryNotificationSetting?.notification_setting_type === ENotificationTypes.DEFAULT}
             />
             {notificationTypesList.map(notification => (
               <ItemPanel
