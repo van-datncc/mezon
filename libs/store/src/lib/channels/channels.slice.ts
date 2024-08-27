@@ -215,8 +215,8 @@ type fetchChannelsArgs = {
 function extractChannelMeta(channel: ChannelsEntity): ChannelMeta {
 	return {
 		id: channel.id,
-		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp || 0),
-		lastSentTimestamp: Number(channel.last_sent_message?.timestamp || 0),
+		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
+		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
 		lastSeenPinMessage: channel.last_pin_message || '',
 	};
 }
@@ -253,7 +253,7 @@ export const fetchChannels = createAsyncThunk(
 				.map((channelText) => {
 					return {
 						channelId: channelText.channel_id ?? '',
-						lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp || 0),
+						lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp_seconds || 0),
 						clanId: channelText.clan_id ?? '',
 					};
 				});

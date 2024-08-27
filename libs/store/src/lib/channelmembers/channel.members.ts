@@ -5,6 +5,7 @@ import { AddClanUserEvent, ChannelPresenceEvent, ChannelType, StatusPresenceEven
 import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import * as Sentry from "@sentry/browser";
+import {RootState} from "../store";
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
@@ -85,6 +86,9 @@ export const fetchChannelMembers = createAsyncThunk(
 		}
 
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
+		const state = thunkAPI.getState() as RootState;
+		const channelMembers = selectMembersByChannelId(channelId)(state);
+		thunkAPI.dispatch(channelMembersActions.setMemberChannels(channelMembers))
 		if (Date.now() - response.time < 100) {
 			if (!response.channel_users) {
 				return [];
