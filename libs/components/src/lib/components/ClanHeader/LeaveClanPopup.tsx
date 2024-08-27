@@ -9,7 +9,7 @@ interface ILeaveClanPopupProps {
 const LeaveClanPopup = ({ handleCancel, handleLeave, leaveTitle, leaveName}: ILeaveClanPopupProps) => {
 	
 	return (
-		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e)=>e.stopPropagation()}>
+		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
 			<div className="fixed inset-0 bg-black opacity-80" />
 			<div className="relative z-10 w-[440px]">
 				<div className="dark:bg-[#313338] bg-white pt-[16px] px-[16px]">
