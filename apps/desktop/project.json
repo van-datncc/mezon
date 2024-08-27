@@ -9,7 +9,7 @@
       "outputs": [
         "{options.outputPath}"
       ],
-      "appId": "mezon.ai",
+      "appId": "mezon.ai",      
       "publish": [
         {
           "provider": "generic",
@@ -19,12 +19,19 @@
       "mac": {
         "icon": "apps/chat/src/assets/mac-icon.png",        
         "appId": "mezon.ai",
+        "target": [
+          "dmg"
+        ],
         "publish": [
           {
             "provider": "generic",
             "url": "https://cdn.mezon.vn/release/"
           }
         ]
+      },
+      "dmg" : {
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+        "uninstallDisplayName": "${productName}"
       },
       "win": {
         "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
@@ -126,12 +133,19 @@
         "mac": {
           "icon": "apps/chat/src/assets/mac-icon.png",        
           "appId": "mezon.ai",
+          "target": [
+            "dmg"
+          ],
           "publish": [
             {
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
           ]
+        },
+        "dmg" : {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "uninstallDisplayName": "${productName}"
         },
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
@@ -183,12 +197,19 @@
         "mac": {
           "icon": "apps/chat/src/assets/mac-icon.png",        
           "appId": "mezon.ai",
+          "target": [
+            "dmg"
+          ],
           "publish": [
             {
               "provider": "generic",
               "url": "https://cdn.mezon.vn/release/"
             }
           ]
+        },
+        "dmg" : {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+          "uninstallDisplayName": "${productName}"
         },
         "win": {
           "icon": "apps/chat/src/assets/desktop-taskbar-256x256.ico",
