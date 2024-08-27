@@ -6,9 +6,8 @@ interface ILeaveClanPopupProps {
   leaveTitle : string;
 }
 
-const LeaveClanPopup = ({ handleCancel ,handleLeave,leaveTitle,leaveName}: ILeaveClanPopupProps) => {
+const LeaveClanPopup = ({ handleCancel, handleLeave, leaveTitle, leaveName}: ILeaveClanPopupProps) => {
 	
-
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e)=>e.stopPropagation()}>
 			<div className="fixed inset-0 bg-black opacity-80" />
