@@ -2,13 +2,12 @@ import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, MessagesEntity, useAppDispatch } from '@mezon/store';
-import { FlashList } from '@shopify/flash-list';
 import React, { useCallback } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import { style } from './styles';
 
 interface IChannelListMessageProps {
-  flatListRef: React.RefObject<FlashList<MessagesEntity>>;
+  flatListRef: React.RefObject<FlatList<MessagesEntity>>;
   messages: MessagesEntity[];
   handleScroll: (event) => void;
   renderItem: ({ item }: { item: MessagesEntity }) => React.ReactElement;
@@ -33,8 +32,10 @@ const ChannelListMessage = React.memo(({
 	const keyExtractor = useCallback((message) => message.id, []);
 
 	const dispatch = useAppDispatch();
-  const timestamp = Date.now() / 1000;
-  dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: messages[0].channel_id, timestamp }));
+  if(messages?.[0]?.channel_id ) {
+    const timestamp = Date.now() / 1000;
+    dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: messages[0].channel_id, timestamp }));
+  }
 
   const ViewLoadMore = () => {
     return (
@@ -45,7 +46,7 @@ const ChannelListMessage = React.memo(({
   };
 
   return (
-    <FlashList
+    <FlatList
       ref={flatListRef}
       data={messages || []}
       onScroll={handleScroll}
@@ -54,11 +55,18 @@ const ChannelListMessage = React.memo(({
       renderItem={renderItem}
       removeClippedSubviews={true}
       keyExtractor={keyExtractor}
-      estimatedItemSize={100}
       onEndReached={messages?.length ? () => {onLoadMore(ELoadMoreDirection.bottom)} : undefined}
       onEndReachedThreshold={0.1}
-      showsVerticalScrollIndicator={false}
+      initialNumToRender={20}
+      maxToRenderPerBatch={10}
+      windowSize={21}
+      scrollEventThrottle={60}
+      viewabilityConfig={{
+        itemVisiblePercentThreshold: 50,
+        minimumViewTime: 500,
+      }}
       ListHeaderComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
+      ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
   />
   )
 }, (prev, curr) => {

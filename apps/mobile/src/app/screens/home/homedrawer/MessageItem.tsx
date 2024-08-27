@@ -397,7 +397,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	);
 },
   (prevProps, nextProps) => {
-	return prevProps.messageId === nextProps.messageId;
+	return prevProps.messageId + prevProps?.message.update_time === 
+	nextProps.messageId + nextProps?.message.update_time;
   }
 );
 
