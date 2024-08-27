@@ -9,6 +9,7 @@ const useProcessedContent = (inputText: string) => {
 	const [markdownList, setMarkdownList] = useState<IMarkdownOnMessage[]>([]);
 	const [voiceLinkRoomList, setVoiceLinkRoomList] = useState<ILinkVoiceRoomOnMessage[]>([]);
 	const emojiObjPicked = useSelector(selectEmojiObjSuggestion);
+
 	useEffect(() => {
 		const processInput = () => {
 			const resultString = inputText.replace(/\[|\]/g, '');
