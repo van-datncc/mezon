@@ -65,7 +65,6 @@ export const useStickyScroll = (
 		}
 
 		function moveScroll() {
-			console.log('moveScroll');
 			targetRef.current.scrollTop = targetRef.current.scrollHeight;
 			return false;
 		}
