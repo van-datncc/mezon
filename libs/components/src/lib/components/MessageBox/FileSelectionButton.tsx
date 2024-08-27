@@ -1,9 +1,9 @@
-import { useChatSending, useFileContext } from '@mezon/core';
+import { useChatSending } from '@mezon/core';
 import { referencesActions, selectAttachmentByChannelId, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { EUploadingStatus, failAttachment } from '@mezon/utils';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 export type FileSelectionButtonProps = {
@@ -20,23 +20,72 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 	const session = sessionRef.current;
 	const client = clientRef.current;
 	const dispatch = useAppDispatch();
+	const [files, setFiles] = useState<File[]>([]);
 
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(currentChannelId));
+
+	const getFileBufferFromUrl = async (blobUrl: string): Promise<ArrayBuffer> => {
+		// Fetch the Blob from the URL
+		const response = await fetch(blobUrl);
+		const blob = await response.blob();
+
+		// Read the Blob as an ArrayBuffer
+		return new Promise<ArrayBuffer>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(reader.result as ArrayBuffer);
+			reader.onerror = reject;
+			reader.readAsArrayBuffer(blob);
+		});
+	};
+
+	const createFileFromBuffer = async (fileInfo: { filename: string; filetype: string; size: number; url: string }): Promise<File> => {
+		// Fetch the buffer
+		const buffer = await getFileBufferFromUrl(fileInfo.url);
+
+		// Create a Blob from the buffer
+		const blob = new Blob([buffer], { type: fileInfo.filetype });
+
+		// Create and return a File object
+		return new File([blob], fileInfo.filename, { type: fileInfo.filetype });
+	};
+
+	const getBufferFromFile = async () => {
+		// Filter out files with missing properties
+		const validFiles = attachmentFilteredByChannelId?.files?.filter((file) => file.filename && file.filetype && file.size && file.url);
+
+		// Map over valid files and create File objects
+		const filesPromises = validFiles?.map(async (file) => {
+			if (file.filename && file.filetype && file.size && file.url) {
+				return createFileFromBuffer({
+					filename: file.filename,
+					filetype: file.filetype,
+					size: file.size,
+					url: file.url,
+				});
+			}
+			// Handle cases where properties are missing
+			throw new Error('File information is incomplete');
+		});
+
+		try {
+			const files = await Promise.all(filesPromises);
+			setFiles(files);
+			return files;
+		} catch (error) {
+			console.error('Error creating files:', error);
+			return [];
+		}
+	};
+
+	console.log('getBufferFromFile', getBufferFromFile());
+
 	const newMessage = useSelector(selectNewMesssageUpdateImage);
 
 	const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0 });
 
-	const { getFiles, addFiles, resetFiles } = useFileContext();
-
 	useEffect(() => {
-		if (
-			attachmentFilteredByChannelId?.messageId !== '' &&
-			getFiles(currentChannelId) &&
-			getFiles(currentChannelId).length > 0 &&
-			client &&
-			session
-		) {
-			const promises = getFiles(currentChannelId)?.map((file) => {
+		if (attachmentFilteredByChannelId?.messageId !== '' && files && files.length > 0 && client && session) {
+			const promises = files?.map((file) => {
 				return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
 			});
 			Promise.all(promises)
@@ -93,7 +142,6 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 					count: attachmentFilteredByChannelId?.files?.length,
 				}),
 			);
-			resetFiles(currentChannelId);
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
@@ -118,7 +166,7 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 	const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
 			const fileArr = Array.from(e.target.files);
-			addFiles(currentChannelId, fileArr);
+			// addFiles(currentChannelId, fileArr);
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
