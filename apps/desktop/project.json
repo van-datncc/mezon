@@ -17,8 +17,11 @@
         }
       ],
       "mac": {
-        "icon": "apps/chat/src/assets/mac-icon.png",        
+        "icon": "apps/chat/src/assets/mac-icon.png",
         "appId": "mezon.ai",
+        "target": [
+          "default"
+        ],
         "publish": [
           {
             "provider": "generic",
@@ -40,18 +43,21 @@
         ]
       },
       "nsis": {
-          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
-          "uninstallDisplayName": "${productName}",
-          "include": "scripts/installer.nsh",
-          "packElevateHelper": false,
-          "runAfterFinish": true,
-          "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": false
-        },
-        "msi": {
-          "additionalWixArgs": ["-ext", "WixUtilExtension"],
-          "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
-        },
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+        "uninstallDisplayName": "${productName}",
+        "include": "scripts/installer.nsh",
+        "packElevateHelper": false,
+        "runAfterFinish": true,
+        "createDesktopShortcut": true,
+        "deleteAppDataOnUninstall": false
+      },
+      "msi": {
+        "additionalWixArgs": [
+          "-ext",
+          "WixUtilExtension"
+        ],
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
+      },
       "linux": {
         "category": "Utility",
         "target": "deb",
@@ -124,8 +130,11 @@
         "outputPath": "dist/packages",
         "prepackageOnly": true,
         "mac": {
-          "icon": "apps/chat/src/assets/mac-icon.png",        
+          "icon": "apps/chat/src/assets/mac-icon.png",
           "appId": "mezon.ai",
+          "target": [
+            "default"
+          ],
           "publish": [
             {
               "provider": "generic",
@@ -156,7 +165,10 @@
           "deleteAppDataOnUninstall": true
         },
         "msi": {
-          "additionalWixArgs": ["-ext", "WixUtilExtension"],
+          "additionalWixArgs": [
+            "-ext",
+            "WixUtilExtension"
+          ],
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
@@ -181,8 +193,11 @@
         "sourcePath": "dist/apps",
         "outputPath": "dist/executables",
         "mac": {
-          "icon": "apps/chat/src/assets/mac-icon.png",        
+          "icon": "apps/chat/src/assets/mac-icon.png",
           "appId": "mezon.ai",
+          "target": [
+            "default"
+          ],
           "publish": [
             {
               "provider": "generic",
@@ -212,7 +227,10 @@
           "deleteAppDataOnUninstall": true
         },
         "msi": {
-          "additionalWixArgs": ["-ext", "WixUtilExtension"],
+          "additionalWixArgs": [
+            "-ext",
+            "WixUtilExtension"
+          ],
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
