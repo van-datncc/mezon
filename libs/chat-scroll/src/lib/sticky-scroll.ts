@@ -65,7 +65,6 @@ export const useStickyScroll = (
 		}
 
 		function moveScroll() {
-      console.log('moveScroll');
 			targetRef.current.scrollTop = targetRef.current.scrollHeight;
 			return false;
 		}
@@ -81,9 +80,9 @@ export const useStickyScroll = (
 	}, [targetRef, animationRef]);
 
 	const updateStuckToBottom = useCallback(() => {
-    if (!targetRef.current) {
-      return;
-    }
+		if (!targetRef.current) {
+			return;
+		}
 		const { scrollHeight, clientHeight, scrollTop } = targetRef.current;
 		const currentlyAtBottom = scrollHeight === scrollTop + clientHeight;
 

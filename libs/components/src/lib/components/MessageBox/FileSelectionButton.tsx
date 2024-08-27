@@ -10,13 +10,17 @@ export type FileSelectionButtonProps = {
 	currentClanId: string;
 	currentChannelId: string;
 };
+type LightweightFile = {
+	file: File;
+	size: number;
+};
 
 function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionButtonProps) {
 	const { sessionRef, clientRef } = useMezon();
-
-	const dispatch = useAppDispatch();
 	const session = sessionRef.current;
 	const client = clientRef.current;
+	const dispatch = useAppDispatch();
+
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(currentChannelId));
 	const newMessage = useSelector(selectNewMesssageUpdateImage);
 
@@ -25,8 +29,13 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 	const { getFiles, addFiles, resetFiles } = useFileContext();
 
 	useEffect(() => {
-		if (newMessage.message_id === '') return;
-		if (attachmentFilteredByChannelId?.messageId !== '' && getFiles(currentChannelId) && client && session) {
+		if (
+			attachmentFilteredByChannelId?.messageId !== '' &&
+			getFiles(currentChannelId) &&
+			getFiles(currentChannelId).length > 0 &&
+			client &&
+			session
+		) {
 			const promises = getFiles(currentChannelId)?.map((file) => {
 				return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
 			});
@@ -106,7 +115,7 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 		}
 	}, [newMessage]);
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
 			const fileArr = Array.from(e.target.files);
 			addFiles(currentChannelId, fileArr);
