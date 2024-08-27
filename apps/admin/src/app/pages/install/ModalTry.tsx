@@ -25,7 +25,7 @@ const ModalTry = (props: ModalTryProps) => {
 			<ModalAsk handelBack={handleOpenModal} handleOpenModal={handleModalSuccess} />
 		</div>
 	) : (
-		<ModalSuccess name={nameApp} handleModal={handleModalSuccess} isModalTry />
+		<ModalSuccess name={nameApp} isModalTry />
 	);
 };
 
