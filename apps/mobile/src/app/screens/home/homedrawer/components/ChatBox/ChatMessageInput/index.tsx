@@ -183,13 +183,10 @@ export const ChatMessageInput = memo(
 
 			const onEditMessage = useCallback(
 				async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
-					let attachments = [];
-					if (messageActionNeedToResolve.targetMessage?.attachments.length || attachmentDataRef?.length) {
-						attachments = [...messageActionNeedToResolve.targetMessage.attachments, ...getAttachmentUnique(attachmentDataRef)];
-					}
+					const { attachments } = messageActionNeedToResolve.targetMessage;
 					await editSendMessage(editMessage, messageId, mentions, attachments, true);
 				},
-				[editSendMessage, attachmentDataRef, messageActionNeedToResolve],
+				[editSendMessage, messageActionNeedToResolve],
 			);
 
 			const isCanSendMessage = useMemo(() => {
