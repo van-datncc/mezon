@@ -78,7 +78,8 @@
         "singleQuote": true,
         "printWidth": 150,
         "trailingComma": "none",
-        "parser": "typescript"
+        "parser": "typescript",
+        "endOfLine": "auto"
       }
     ]
   }

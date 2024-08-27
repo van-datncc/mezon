@@ -4,5 +4,6 @@
 	"singleQuote": true,
 	"printWidth": 150,
 	"trailingComma": "none",
+	"endOfLine": "auto",
 	"plugins": ["prettier-plugin-organize-imports"]
 }
