@@ -8,7 +8,7 @@ import {
 	fromUnixTime,
 	isSameDay,
 	startOfDay,
-	subDays,
+	subDays
 } from 'date-fns';
 import { ApiMessageAttachment, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
@@ -32,7 +32,7 @@ import {
 	MentionDataProps,
 	SearchItemProps,
 	SenderInfoOptionals,
-	UsersClanEntity,
+	UsersClanEntity
 } from '../types/index';
 
 export const convertTimeString = (dateString: string) => {
@@ -93,7 +93,7 @@ export const uniqueUsers = (mentions: ILineMention[], userClans: UsersClanEntity
 	const userMentionsFormat = userMentions.map((user) => user.substring(1));
 
 	const usersNotInChannels = userMentionsFormat.filter(
-		(username) => !userChannels.map((user) => user.user).some((user) => user?.username === username),
+		(username) => !userChannels.map((user) => user.user).some((user) => user?.username === username)
 	);
 
 	const userInClans = userClans.map((clan) => clan.user);
@@ -197,11 +197,11 @@ export const convertReactionDataFromMessage = (message: IMessageWithUser) => {
 				senders: [
 					{
 						sender_id: reaction.sender_id,
-						count: reaction.count,
-					},
+						count: reaction.count
+					}
 				],
 				channel_id: message.channel_id,
-				message_id: message.id,
+				message_id: message.id
 			};
 		} else {
 			const existingItem = emojiDataItems[key];
@@ -341,7 +341,7 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 			},
 			type,
 			minWidth,
-			minHeight,
+			minHeight
 		);
 	});
 
@@ -381,7 +381,7 @@ export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: C
 			...item,
 			clanAvatar: avatarClanFinding,
 			clanNick: clanNickFinding,
-			prioritizeName: prioritizeName,
+			prioritizeName: prioritizeName
 		};
 	});
 }
@@ -418,7 +418,7 @@ export function sortFilteredList(filteredList: SearchItemProps[], searchText: st
 export const getRoleList = (rolesInClan: ApiRole[]) => {
 	return rolesInClan.map((item) => ({
 		roleId: item.id ?? '',
-		roleName: item.title ?? '',
+		roleName: item.title ?? ''
 	}));
 };
 
@@ -519,12 +519,12 @@ export const processText = (inputString: string) => {
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
 					s: startindex,
-					e: endindex,
+					e: endindex
 				});
 			} else {
 				links.push({
 					s: startindex,
-					e: endindex,
+					e: endindex
 				});
 			}
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
@@ -570,7 +570,7 @@ export const processText = (inputString: string) => {
 export function addMention(obj: IMessageSendPayload, mentionValue: IMentionOnMessage[]): IExtendedMessage {
 	const updatedObj: IExtendedMessage = {
 		...obj,
-		mentions: mentionValue,
+		mentions: mentionValue
 	};
 
 	return updatedObj;
@@ -661,7 +661,7 @@ export const handleFiles = (files: File[], setAttachmentPreview: (attachments: A
 						filename: fileDetails.filename,
 						filetype: fileDetails.filetype,
 						size: 0,
-						url: fileDetails.url,
+						url: fileDetails.url
 					} as ApiMessageAttachment;
 				})
 				.catch((error) => {
@@ -673,7 +673,7 @@ export const handleFiles = (files: File[], setAttachmentPreview: (attachments: A
 				filename: file.name,
 				filetype: file.type,
 				size: 0,
-				url: file.name,
+				url: file.name
 			} as ApiMessageAttachment);
 		}
 	});
@@ -681,7 +681,7 @@ export const handleFiles = (files: File[], setAttachmentPreview: (attachments: A
 	Promise.all(filePromises)
 		.then((attachments) => {
 			const validAttachments: ApiMessageAttachment[] = attachments.filter(
-				(attachment): attachment is ApiMessageAttachment => attachment !== null,
+				(attachment): attachment is ApiMessageAttachment => attachment !== null
 			);
 			setAttachmentPreview(validAttachments);
 		})
@@ -699,7 +699,7 @@ export function processFile(file: File): Promise<{ filename: string; filetype: s
 				filename: file.name,
 				filetype: file.type,
 				size: file.size,
-				url: blobUrl,
+				url: blobUrl
 			});
 		} catch (error) {
 			reject(error);

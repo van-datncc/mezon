@@ -24,19 +24,19 @@ export interface UpdateStickerArgs {
 	clan_id: string;
 }
 export const stickerAdapter = createEntityAdapter({
-	selectId: (sticker: ClanSticker) => sticker.id || '',
+	selectId: (sticker: ClanSticker) => sticker.id || ''
 });
 
 export const initialSettingClanStickerState: SettingClanStickerState = stickerAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null,
+	error: null
 });
 const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.socketRef.current?.listClanStickersByClanId(clanId), {
 	promise: true,
 	maxAge: LIST_STICKER_CACHED_TIME,
 	normalizer: (args) => {
 		return args[1] + args[0].session.username;
-	},
+	}
 });
 
 export const fetchStickerByClanId = createAsyncThunk(
@@ -55,7 +55,7 @@ export const fetchStickerByClanId = createAsyncThunk(
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
 		}
-	},
+	}
 );
 export const createSticker = createAsyncThunk(
 	'settingClanSticker/createSticker',
@@ -66,12 +66,12 @@ export const createSticker = createAsyncThunk(
 			if (res) {
 				thunkAPI.dispatch(fetchStickerByClanId({ clanId: form.clanId, noCache: true }));
 			} else {
-				return thunkAPI.rejectWithValue({  });
+				return thunkAPI.rejectWithValue({});
 			}
 		} catch (error) {
 			return thunkAPI.rejectWithValue({ error });
 		}
-	},
+	}
 );
 
 export const updateSticker = createAsyncThunk(
@@ -86,7 +86,7 @@ export const updateSticker = createAsyncThunk(
 		} catch (error) {
 			return thunkAPI.rejectWithValue({ error });
 		}
-	},
+	}
 );
 
 export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker', async (data: { stickerId: string; clan_id: string }, thunkAPI) => {
@@ -118,12 +118,12 @@ export const settingClanStickerSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 export const stickerSettingActions = {
 	...stickersSlice.actions,
-	fetchStickerByClanId,
+	fetchStickerByClanId
 };
 
 export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: SettingClanStickerState }): SettingClanStickerState =>

@@ -1,5 +1,5 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import * as Sentry from "@sentry/browser";
+import * as Sentry from '@sentry/browser';
 export type FormalError = {
 	message: string;
 	name: string;
@@ -13,16 +13,15 @@ export function isFormalError(error: unknown): error is FormalError {
 
 export function trackError(rawError: unknown) {
 	const formalError = isFormalError(rawError) ? rawError : extractActionError(rawError);
-	if(formalError.message){
+	if (formalError.message) {
 		Sentry.captureException(formalError.message);
-	}else{
+	} else {
 		Sentry.captureException(formalError);
 	}
-	console.log("formalError", formalError);
+	console.log('formalError', formalError);
 }
 
 export function trackActionError(action: PayloadAction<unknown, string, unknown>, raise = false) {
-
 	if ('error' in action === false) {
 		return;
 	}
@@ -38,21 +37,21 @@ export function trackActionError(action: PayloadAction<unknown, string, unknown>
 }
 
 export function extractActionError(action: any): FormalError {
-	if(!action){
+	if (!action) {
 		return {
-			message: "un not error",
+			message: 'un not error',
 			name: 'Error',
 			stack: '',
-			action: '',
+			action: ''
 		};
 	}
-	const error = action.error
+	const error = action.error;
 	if (typeof action === 'string') {
 		return {
 			message: error,
 			name: 'Error',
 			stack: '',
-			action: action,
+			action: action
 		};
 	}
 
@@ -61,7 +60,7 @@ export function extractActionError(action: any): FormalError {
 			message: error.message,
 			name: error.name,
 			stack: error.stack ?? '',
-			action: action,
+			action: action
 		};
 	}
 
@@ -71,7 +70,7 @@ export function extractActionError(action: any): FormalError {
 			name: '',
 			stack: '',
 			...JSON.parse(JSON.stringify(error)),
-			action: action,
+			action: action
 		};
 	}
 
@@ -79,6 +78,6 @@ export function extractActionError(action: any): FormalError {
 		message: 'Unknown error',
 		name: 'Error',
 		stack: '',
-		action: action,
+		action: action
 	};
 }

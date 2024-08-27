@@ -14,7 +14,7 @@ export const GROUP_CHAT_MAXIMUM_MEMBERS = 9;
 
 export const threadError: ThreadError = {
 	name: 'Thread Name is required',
-	message: 'Starter Message is required',
+	message: 'Starter Message is required'
 };
 
 export const MIN_THRESHOLD_CHARS = 4000;
@@ -27,7 +27,7 @@ export type ITypeConvert = {
 export const typeConverts: ITypeConvert[] = [
 	{ type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', typeConvert: 'application/msword' },
 	{ type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', typeConvert: 'application/vnd.ms-powerpoint' },
-	{ type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', typeConvert: 'application/vnd.ms-excel' },
+	{ type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', typeConvert: 'application/vnd.ms-excel' }
 ];
 
 export const fileTypeVideo = ['video/mp4', 'video/webm', 'video/mpeg', 'video/x-msvideo'];
