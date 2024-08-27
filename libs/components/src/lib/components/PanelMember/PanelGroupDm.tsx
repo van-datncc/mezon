@@ -39,6 +39,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 	const handleCancelLeave = () => {
 		setPopupLeave(false);
 	}
+  
 	return (
 		<>
 			<div className="border-b dark:border-[#2e2f34]">
