@@ -65,10 +65,10 @@ export async function handleUploadFile(
 				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
 				fileType = `text/${fileExtension}`;
 			}
-			const { path, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
+			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
 			const buf = await file?.arrayBuffer();
 
-			resolve(uploadFile(client, session, path, fileType, file.size, Buffer.from(buf), false, originalFilename));
+			resolve(uploadFile(client, session, filePath, fileType, file.size, Buffer.from(buf), false, originalFilename));
 		} catch (error) {
 			reject(new Error(`${error}`));
 		}
@@ -98,8 +98,8 @@ export async function handleUploadFileMobile(
 					console.log('Failed to read file data.');
 					return;
 				}
-				const { path, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
-				resolve(uploadFile(client, session, path, fileType, file.size, arrayBuffer, true, originalFilename));
+				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
+				resolve(uploadFile(client, session, filePath, fileType, file.size, arrayBuffer, true, originalFilename));
 			}
 		} catch (error) {
 			console.log('handleUploadFileMobile Error: ', error);
@@ -113,7 +113,7 @@ export function createUploadFilePath(
 	currentClanId: string,
 	currentChannelId: string,
 	filename: string,
-): { path: string; originalFilename: string } {
+): { filePath: string; originalFilename: string } {
 	const originalFilename = filename;
 
 	const ms = new Date().getMinutes();
@@ -123,8 +123,8 @@ export function createUploadFilePath(
 		currentClanId = '0';
 	}
 
-	const path = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
-	return { path, originalFilename };
+	const filePath = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
+	return { filePath, originalFilename };
 }
 
 export async function uploadFile(
