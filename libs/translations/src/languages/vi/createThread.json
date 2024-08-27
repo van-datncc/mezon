@@ -10,5 +10,6 @@
   "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ bao gồm chữ, số, _ hoặc -).",
   "threadName": "Tên Chủ đề",
   "privateThread": "Chủ đề Riêng tư",
-  "onlyPeopleInviteThread": "Chỉ những người bạn mời và người điều hành mới có thể xem chủ đề này"
+  "onlyPeopleInviteThread": "Chỉ những người bạn mời và người điều hành mới có thể xem chủ đề này",
+  "newThread": "Chủ đề mới"
 }

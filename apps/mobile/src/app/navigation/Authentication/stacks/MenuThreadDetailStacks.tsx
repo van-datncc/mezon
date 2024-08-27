@@ -89,7 +89,7 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 										</View>
 									)}
 									<Text style={{ color: themeValue.textStrong, fontSize: size.h6, fontWeight: '700' }}>
-										{openThreadMessageState ? 'New Thread' : currentChannel?.channel_label}
+										{openThreadMessageState ? t('newThread', { ns: 'createThread' }) : currentChannel?.channel_label}
 									</Text>
 									<Icons.ChevronSmallRightIcon width={14} height={14} style={{ marginLeft: 5 }} color={themeValue.text} />
 								</View>
