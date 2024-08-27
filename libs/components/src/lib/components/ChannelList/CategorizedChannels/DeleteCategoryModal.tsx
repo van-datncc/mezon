@@ -1,8 +1,9 @@
-import { useAppNavigation, useCategory } from '@mezon/core';
+import { useAppNavigation, useCategory, useEscapeKey } from '@mezon/core';
 import {
 	categoriesActions,
 	useAppDispatch
 } from '@mezon/store';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 type DeleteModalProps = {
@@ -16,7 +17,7 @@ type DeleteModalProps = {
 const DeleteCategoryModal = ({ onClose, onCloseModal, clanId, categoryId, categoryName }: DeleteModalProps) => {
 	const dispatch = useAppDispatch();
 	const { categorizedChannels } = useCategory();
-	const { toChannelPage } = useAppNavigation();
+	const { toChannelPage, toClanPage } = useAppNavigation();
 	const navigate = useNavigate();
 
 	const handleDeleteCategory = async (categoryId: string) => {
@@ -27,20 +28,42 @@ const DeleteCategoryModal = ({ onClose, onCloseModal, clanId, categoryId, catego
 		if (targetIndex !== -1) {
 			if (targetIndex === 0) {
 				channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
+				if (!channelNavId) {
+					const clanPath = toClanPage(clanId ?? '');
+					navigate(clanPath);
+				}
 			} else if (targetIndex === categorizedChannels.length - 1) {
 				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
 			} else {
 				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
 			}
 		}
-		const channelPath = toChannelPage(channelNavId ?? '', clanId ?? '');
-		navigate(channelPath);
+
+		if (channelNavId && clanId) {
+			const channelPath = toChannelPage(channelNavId ?? '', clanId ?? '');
+			navigate(channelPath);
+		}
 
 		onClose();
 		if (onCloseModal) {
 			onCloseModal();
 		}
 	};
+
+	useEffect(() => {
+		const handleEnterKey = (event: KeyboardEvent) => {
+			if (event.key === 'Enter') {
+				handleDeleteCategory(categoryId);
+			}
+		};
+
+		document.addEventListener('keydown', handleEnterKey);
+		return () => {
+			document.removeEventListener('keydown', handleEnterKey);
+		};
+	}, [handleDeleteCategory]);
+
+	useEscapeKey(onClose)
 
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50 dark:text-white text-black">
