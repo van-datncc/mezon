@@ -1,4 +1,4 @@
-import { useDragAndDrop } from '@mezon/core';
+import { useDragAndDrop, useFileContext } from '@mezon/core';
 import { referencesActions, useAppDispatch } from '@mezon/store';
 import { DragEvent } from 'react';
 import DragAndDropUI from './DragAndDropUI';
@@ -10,6 +10,7 @@ type FileUploadByDnDOpt = {
 function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 	const dispatch = useAppDispatch();
 	const { setDraggingState } = useDragAndDrop();
+	const { addFiles } = useFileContext();
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -34,7 +35,19 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 		setDraggingState(false);
 		const files = e.dataTransfer.files;
 		const filesArray = Array.from(files);
-		dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentId, messageId: '', files: filesArray }));
+		addFiles(currentId, filesArray);
+		dispatch(
+			referencesActions.setAtachmentAfterUpload({
+				channelId: currentId,
+				messageId: '',
+				files: filesArray.map((file) => ({
+					filename: file.name,
+					filetype: file.type,
+					size: file.size,
+					url: URL.createObjectURL(file),
+				})),
+			}),
+		);
 	};
 	return <DragAndDropUI onDragEnter={handleDragEnter} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} />;
 }

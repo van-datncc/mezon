@@ -1,9 +1,10 @@
 import { Icons } from '@mezon/ui';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useState } from 'react';
 import { RenderAttachmentThumbnail } from '../ThumbnailAttachmentRender';
 
 interface AttachmentPreviewThumbnailProps {
-	attachment: File;
+	attachment: ApiMessageAttachment;
 	onRemove?: (channelId: string, index: number) => void;
 	indexOfItem: number;
 	channelId: string;
@@ -18,7 +19,7 @@ const AttachmentPreviewThumbnail: React.FC<AttachmentPreviewThumbnailProps> = ({
 		}
 	};
 
-	const filename = attachment.name;
+	const filename = attachment.filename;
 	const displayedFilename = filename && filename.length > 25 ? filename.substring(0, 25) + '...' : filename;
 	const thumbnailAttachment = RenderAttachmentThumbnail(attachment);
 
@@ -28,7 +29,7 @@ const AttachmentPreviewThumbnail: React.FC<AttachmentPreviewThumbnailProps> = ({
 
 	return (
 		<div
-			title={attachment.name}
+			title={attachment.filename}
 			className="flex justify-center items-center p-2 mb-3 rounded dark:bg-bgSecondary bg-bgLightSecondary w-[216px] h-[216px] flex-shrink-0 border dark:text-textDarkTheme text-textLightTheme dark:border-bgSecondary relative"
 		>
 			<div className="cursor-pointer rounded-md flex flex-row justify-center items-center mb-2">

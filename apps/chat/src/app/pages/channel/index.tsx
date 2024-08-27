@@ -1,5 +1,5 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useCheckAlonePermission, useClanRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
+import { FileProvider, useCheckAlonePermission, useClanRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelsActions,
 	notificationActions,
@@ -11,7 +11,7 @@ import {
 	selectIsShowMemberList,
 	selectIsViewingOlderMessagesByChannelId,
 	selectStatusMenu,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store';
 import { EPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -101,39 +101,41 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	}, [isShowMemberList, setIsShowCreateThread]);
 
 	return (
-		<>
-			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
-			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-0"
-				id="mainChat"
-				onDragEnter={handleDragEnter}
-			>
-				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
-					<div
-						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
-					>
+		<FileProvider>
+			<>
+				{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+				<div
+					className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-0"
+					id="mainChat"
+					onDragEnter={handleDragEnter}
+				>
+					<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 						<div
-							className={`overflow-y-auto dark:bg-bgPrimary max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
-							ref={messagesContainerRef}
+							className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
 						>
-							<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+							<div
+								className={`overflow-y-auto dark:bg-bgPrimary max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChat ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
+								ref={messagesContainerRef}
+							>
+								<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+							</div>
+							<ChannelMainContentText channelId={currentChannel?.id as string} />
 						</div>
-						<ChannelMainContentText channelId={currentChannel?.id as string} />
+						{isShowMemberList && (
+							<div
+								onContextMenu={(event) => event.preventDefault()}
+								className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+								id="memberList"
+							>
+								<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+								<MemberList />
+							</div>
+						)}
+						{isSearchMessage && <SearchMessageChannel />}
 					</div>
-					{isShowMemberList && (
-						<div
-							onContextMenu={(event) => event.preventDefault()}
-							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
-							id="memberList"
-						>
-							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
-							<MemberList />
-						</div>
-					)}
-					{isSearchMessage && <SearchMessageChannel />}
 				</div>
-			</div>
-		</>
+			</>
+		</FileProvider>
 	);
 };
 
@@ -151,4 +153,3 @@ const SearchMessageChannel = () => {
 	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
 	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
 };
-

@@ -1,5 +1,5 @@
-import { useChatSending } from '@mezon/core';
-import { referencesActions, selectFilteredAttachments, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
+import { useChatSending, useFileContext } from '@mezon/core';
+import { referencesActions, selectAttachmentByChannelId, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { EUploadingStatus, failAttachment } from '@mezon/utils';
@@ -10,23 +10,26 @@ export type FileSelectionButtonProps = {
 	currentClanId: string;
 	currentChannelId: string;
 };
+
 function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionButtonProps) {
 	const { sessionRef, clientRef } = useMezon();
 
 	const dispatch = useAppDispatch();
 	const session = sessionRef.current;
 	const client = clientRef.current;
-	const attachmentFilteredByChannelId = useSelector(selectFilteredAttachments(currentChannelId));
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(currentChannelId));
 	const newMessage = useSelector(selectNewMesssageUpdateImage);
 
 	const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0 });
 
+	const { getFiles, addFiles, resetFiles } = useFileContext();
+
 	useEffect(() => {
-		if (attachmentFilteredByChannelId.length > 0 && attachmentFilteredByChannelId[0]?.messageId !== '' && client && session) {
-			const promises = attachmentFilteredByChannelId[0]?.files.map((file) => {
+		if (newMessage.message_id === '') return;
+		if (attachmentFilteredByChannelId?.messageId !== '' && getFiles(currentChannelId) && client && session) {
+			const promises = getFiles(currentChannelId)?.map((file) => {
 				return handleUploadFile(client, session, currentClanId, currentChannelId, file.name, file);
 			});
-
 			Promise.all(promises)
 				.then((results) => {
 					updateImageLinkMessage(
@@ -45,9 +48,9 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 					dispatch(
 						referencesActions.setUploadingStatus({
 							channelId: currentChannelId,
-							messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
+							messageId: attachmentFilteredByChannelId?.messageId ?? '',
 							statusUpload: EUploadingStatus.SUCCESSFULLY,
-							count: attachmentFilteredByChannelId[0]?.files?.length,
+							count: attachmentFilteredByChannelId?.files?.length,
 						}),
 					);
 				})
@@ -66,9 +69,9 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 					dispatch(
 						referencesActions.setUploadingStatus({
 							channelId: currentChannelId,
-							messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
+							messageId: attachmentFilteredByChannelId?.messageId ?? '',
 							statusUpload: EUploadingStatus.ERROR,
-							count: attachmentFilteredByChannelId[0]?.files?.length,
+							count: attachmentFilteredByChannelId?.files?.length,
 						}),
 					);
 					console.error('Error uploading files:', error);
@@ -76,11 +79,12 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 			dispatch(
 				referencesActions.setUploadingStatus({
 					channelId: currentChannelId,
-					messageId: attachmentFilteredByChannelId[0]?.messageId ?? '',
+					messageId: attachmentFilteredByChannelId?.messageId ?? '',
 					statusUpload: EUploadingStatus.LOADING,
-					count: attachmentFilteredByChannelId[0]?.files?.length,
+					count: attachmentFilteredByChannelId?.files?.length,
 				}),
 			);
+			resetFiles(currentChannelId);
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
@@ -89,10 +93,10 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 				}),
 			);
 		}
-	}, [attachmentFilteredByChannelId[0]?.messageId]);
+	}, [attachmentFilteredByChannelId?.messageId, currentChannelId]);
 
 	useEffect(() => {
-		if (newMessage.isMe && attachmentFilteredByChannelId.length > 0 && attachmentFilteredByChannelId[0]?.files.length > 0) {
+		if (newMessage.isMe && attachmentFilteredByChannelId?.files.length > 0) {
 			dispatch(
 				referencesActions.updateAttachmentMessageId({
 					channelId: currentChannelId,
@@ -104,11 +108,18 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
+			const fileArr = Array.from(e.target.files);
+			addFiles(currentChannelId, fileArr);
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
 					messageId: '',
-					files: Array.from(e.target.files),
+					files: fileArr.map((file) => ({
+						filename: file.name,
+						filetype: file.type,
+						size: file.size,
+						url: URL.createObjectURL(file),
+					})),
 				}),
 			),
 				(e.target.value = '');

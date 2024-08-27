@@ -1,16 +1,13 @@
 import { Icons } from '@mezon/ui';
 import { SHOW_POSITION, fileTypeImage, fileTypeVideo } from '@mezon/utils';
-import { useCallback, useMemo } from 'react';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { useCallback } from 'react';
 import { useMessageContextMenu } from '../ContextMenu';
 import MessageVideo from '../MessageWithUser/MessageVideo';
 import { typeFormats } from './TypeFormats';
 
-export const RenderAttachmentThumbnail = (attachment: File, size?: string, pos?: string) => {
-	const getUrlMedia = useMemo(() => {
-		return URL.createObjectURL(attachment);
-	}, [attachment]);
-
-	const fileType = attachment.type;
+export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size?: string, pos?: string) => {
+	const fileType = attachment.filetype;
 
 	const renderIcon = typeFormats.find((typeFormat) => typeFormat.type === fileType);
 
@@ -21,15 +18,21 @@ export const RenderAttachmentThumbnail = (attachment: File, size?: string, pos?:
 	const { setPositionShow } = useMessageContextMenu();
 
 	const handleContextMenu = useCallback(() => {
-		if (attachment.type === 'image/gif') {
+		if (attachment.filetype === 'image/gif') {
 			setPositionShow(SHOW_POSITION.IN_STICKER);
 		}
-	}, [attachment.type]);
+	}, [attachment.filetype]);
 
 	return (
 		<div onContextMenu={handleContextMenu}>
 			{hasFileImage && (
-				<img key="image-thumbnail" src={getUrlMedia} role="presentation" className="w-[174px] aspect-square object-cover" alt={getUrlMedia} />
+				<img
+					key="image-thumbnail"
+					src={attachment.url}
+					role="presentation"
+					className="w-[174px] aspect-square object-cover"
+					alt={attachment.url}
+				/>
 			)}
 
 			{hasFileVideo && (

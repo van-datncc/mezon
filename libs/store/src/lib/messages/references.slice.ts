@@ -21,7 +21,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	idMessageRefEdit: string;
 	statusLoadingAttachment: boolean;
 	idMessageMention: string;
-	attachmentAfterUpload: PreSendAttachment[];
+	attachmentAfterUpload: Record<string, PreSendAttachment>;
 	uploadingStatuses: Record<string, Record<string, UploadingAttachmentStatus>>;
 }
 
@@ -43,7 +43,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageRefEdit: '',
 	statusLoadingAttachment: false,
 	idMessageMention: '',
-	attachmentAfterUpload: [],
+	attachmentAfterUpload: {},
 	uploadingStatuses: {},
 });
 
@@ -60,12 +60,14 @@ export const referencesSlice = createSlice({
 
 		updateAttachmentMessageId(state, action: PayloadAction<{ channelId: string; messageId: string }>) {
 			const { channelId, messageId } = action.payload;
-			state.attachmentAfterUpload = state.attachmentAfterUpload.map((attachment) => {
-				if (attachment.channelId === channelId && attachment.messageId === '') {
-					return { ...attachment, messageId }; // Return updated attachment
-				}
-				return attachment;
-			});
+			const attachment = state.attachmentAfterUpload[channelId];
+
+			if (attachment && attachment.messageId === '') {
+				state.attachmentAfterUpload[channelId] = {
+					...attachment,
+					messageId, // Update the messageId
+				};
+			}
 		},
 
 		setDataReferences(state, action) {
@@ -79,43 +81,51 @@ export const referencesSlice = createSlice({
 		setOpenEditMessageState(state, action) {
 			state.openEditMessageState = action.payload;
 		},
-
 		setAtachmentAfterUpload(state, action: PayloadAction<PreSendAttachment>) {
 			const newAttachment = action.payload;
-			const { channelId, files } = newAttachment;
+			const { channelId, files, messageId } = newAttachment;
 
-			const existingAttachmentIndex = state.attachmentAfterUpload.findIndex((attachment) => attachment.channelId === channelId);
+			if (!channelId) {
+				return;
+			}
 
-			if (existingAttachmentIndex !== -1) {
-				if (files.length === 0) {
-					state.attachmentAfterUpload.splice(existingAttachmentIndex, 1);
-				} else {
-					const existingAttachment = state.attachmentAfterUpload[existingAttachmentIndex];
-					state.attachmentAfterUpload[existingAttachmentIndex] = {
-						...existingAttachment,
-						files: [...existingAttachment.files, ...files],
-					};
+			if (!state.attachmentAfterUpload[channelId]) {
+				state.attachmentAfterUpload[channelId] = {
+					channelId: channelId,
+					files: files,
+					messageId: messageId || '',
+				};
+			} else {
+				if (files && files.length > 0) {
+					state.attachmentAfterUpload[channelId].files = [...state.attachmentAfterUpload[channelId].files, ...files];
 				}
-			} else if (files.length > 0) {
-				state.attachmentAfterUpload.push(newAttachment);
+
+				if (messageId) {
+					state.attachmentAfterUpload[channelId].messageId = messageId;
+				}
+			}
+
+			if (files && files.length === 0) {
+				delete state.attachmentAfterUpload[channelId];
 			}
 		},
 
 		removeAttachment(state, action: PayloadAction<{ channelId: string; index: number }>) {
 			const { channelId, index } = action.payload;
 
-			const attachmentIndex = state.attachmentAfterUpload.findIndex((attachment) => attachment.channelId === channelId);
+			const attachment = state.attachmentAfterUpload[channelId];
 
-			if (attachmentIndex !== -1) {
-				const attachment = state.attachmentAfterUpload[attachmentIndex];
-
+			if (attachment) {
 				if (index >= 0 && index < attachment.files.length) {
+					// Remove the file at the specified index
 					attachment.files.splice(index, 1);
 
+					// If no files are left, remove the attachment entry
 					if (attachment.files.length === 0) {
-						state.attachmentAfterUpload.splice(attachmentIndex, 1);
+						delete state.attachmentAfterUpload[channelId];
 					} else {
-						state.attachmentAfterUpload[attachmentIndex] = {
+						// Update the attachment entry with the remaining files
+						state.attachmentAfterUpload[channelId] = {
 							...attachment,
 							files: [...attachment.files],
 						};
@@ -215,7 +225,5 @@ export const selectIdMessageRefReply = (channelId: string) =>
 		return state.idMessageRefReply[channelId] || '';
 	});
 
-export const selectFilteredAttachments = (channelId: string) =>
-	createSelector(selectAttachmentAfterUpload, (attachmentAfterUpload) =>
-		Object.values(attachmentAfterUpload).filter((item) => item.channelId === channelId),
-	);
+export const selectAttachmentByChannelId = (channelId: string) =>
+	createSelector(selectAttachmentAfterUpload, (attachmentAfterUpload) => attachmentAfterUpload[channelId] || null);

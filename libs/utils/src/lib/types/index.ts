@@ -763,7 +763,7 @@ export type PreSendAttachment = {
 	messageId?: string;
 	mode?: string;
 	clan_id?: string;
-	files: File[];
+	files: ApiMessageAttachment[];
 };
 
 export type UploadingAttachmentStatus = {

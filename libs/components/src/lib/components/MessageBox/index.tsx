@@ -1,19 +1,10 @@
 import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useReference } from '@mezon/core';
-import {
-	messagesActions,
-	referencesActions,
-	selectCloseMenu,
-	selectFilteredAttachments,
-	selectStatusLoadingAttachment,
-	selectStatusMenu,
-	selectTheme,
-	useAppDispatch,
-} from '@mezon/store';
+import { useFileContext, useReference } from '@mezon/core';
+import { referencesActions, selectCloseMenu, selectStatusLoadingAttachment, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue, typeConverts } from '@mezon/utils';
+import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { Fragment, ReactElement, useCallback, useMemo } from 'react';
+import { Fragment, ReactElement, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import FileSelectionButton from './FileSelectionButton';
@@ -41,29 +32,31 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const { currentChannelId, currentClanId } = props;
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
 	const appearanceTheme = useSelector(selectTheme);
-	const { removeAttachmentByIndex } = useReference();
 
+	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
+
+	const { addFiles } = useFileContext();
 	const onConvertToFiles = useCallback((content: string) => {
 		if (content.length > MIN_THRESHOLD_CHARS) {
 			const fileContent = new Blob([content], { type: 'text/plain' });
 			const now = Date.now();
 			const filename = now + '.txt';
 			const file = new File([fileContent], filename, { type: 'text/plain' });
-			dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, messageId: '', files: [file] }));
+			addFiles(props.currentChannelId ?? '', [file]),
+				dispatch(
+					referencesActions.setAtachmentAfterUpload({
+						channelId: currentChannelId,
+						messageId: '',
+						files: [file].map((file) => ({
+							filename: file.name,
+							filetype: file.type,
+							size: file.size,
+							url: URL.createObjectURL(file),
+						})),
+					}),
+				);
 		}
 	}, []);
-
-	const handleFinishUpload = useCallback(
-		async (attachment: ApiMessageAttachment) => {
-			typeConverts.map((typeConvert) => {
-				if (typeConvert.type === attachment.filetype) {
-					return (attachment.filetype = typeConvert.typeConvert);
-				}
-			});
-			dispatch(messagesActions.setIsFocused(true));
-		},
-		[currentChannelId],
-	);
 
 	const onPastedFiles = useCallback(
 		(event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -78,8 +71,21 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 						}
 					}
 				}
+
 				if (files.length > 0) {
-					dispatch(referencesActions.setAtachmentAfterUpload({ channelId: currentChannelId, messageId: '', files: files }));
+					addFiles(props.currentChannelId ?? '', files),
+						dispatch(
+							referencesActions.setAtachmentAfterUpload({
+								channelId: currentChannelId,
+								messageId: '',
+								files: files.map((file) => ({
+									filename: file.name,
+									filetype: file.type,
+									size: file.size,
+									url: URL.createObjectURL(file),
+								})),
+							}),
+						);
 				}
 			}
 		},
@@ -91,11 +97,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const handleChildContextMenu = (event: React.MouseEvent) => {
 		event.stopPropagation();
 	};
-	const attachmentFilteredByChannelId = useSelector(selectFilteredAttachments(currentChannelId ?? ''));
-
-	const checkAttachment = useMemo(() => {
-		return attachmentFilteredByChannelId[0]?.files?.length > 0;
-	}, [attachmentFilteredByChannelId[0]]);
 
 	return (
 		<div className="relative max-sm:-pb-2  ">
@@ -106,7 +107,7 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 					<div
 						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll  ${appearanceTheme === 'light' ? 'attachment-scroll-light' : ''}`}
 					>
-						{attachmentFilteredByChannelId[0]?.files?.map((item: File, index: number) => {
+						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 							return (
 								<Fragment key={index}>
 									<AttachmentPreviewThumbnail

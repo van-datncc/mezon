@@ -25,7 +25,7 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
-	selectFilteredAttachments,
+	// selectFilteredAttachments,
 	selectHashtagDMByDirectId,
 	selectIdMessageRefEdit,
 	selectIdMessageRefReply,
@@ -165,7 +165,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
-	const { setDataReferences, setOpenThreadMessageState } = useReference(currentDmOrChannelId || '');
+	const { setDataReferences, setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
 
 	const { mentions } = useMessageLine(request?.content);
@@ -249,12 +249,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
 
 	const { mentionList, hashtagList, emojiList } = useProcessMention(request?.mentionRaw, roleList);
-
-	const attachmentFilteredByChannelId = useSelector(selectFilteredAttachments(currentDmOrChannelId ?? ''));
-
-	const checkAttachment = useMemo(() => {
-		return attachmentFilteredByChannelId[0]?.files?.length > 0;
-	}, [attachmentFilteredByChannelId[0]]);
 
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {

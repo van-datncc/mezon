@@ -1,6 +1,7 @@
 import {
 	messagesActions,
 	referencesActions,
+	selectAttachmentByChannelId,
 	selectDataReferences,
 	selectIdMessageToJump,
 	selectOpenOptionMessageState,
@@ -20,6 +21,11 @@ export function useReference(channelId?: string) {
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
+
+	const checkAttachment = useMemo(() => {
+		return attachmentFilteredByChannelId?.files?.length > 0;
+	}, [attachmentFilteredByChannelId]);
 
 	const setStatusLoadingAttachment = useCallback(
 		(status: boolean) => {
@@ -78,6 +84,8 @@ export function useReference(channelId?: string) {
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
 			removeAttachmentByIndex,
+			attachmentFilteredByChannelId,
+			checkAttachment,
 		}),
 		[
 			setDataReferences,
@@ -85,13 +93,14 @@ export function useReference(channelId?: string) {
 			setOpenThreadMessageState,
 			dataReferences,
 			openThreadMessageState,
-
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
 			removeAttachmentByIndex,
+			attachmentFilteredByChannelId,
+			checkAttachment,
 		],
 	);
 }
