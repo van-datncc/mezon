@@ -198,12 +198,6 @@
           "target": [
             "default"
           ],
-          "hardenedRuntime": false,
-          "entitlements": "apps/desktop/src/assets/entitlements.mas.plist",
-          "entitlementsInherit": "./resources/mac/entitlements.mas.inherit.plist",
-          "entitlementsLoginHelper": "./resources/mac/entitlements.mas.inherit.plist",
-          "provisioningProfile": "./mas.provisionprofile",
-          "singleArchFiles": "*",
           "publish": [
             {
               "provider": "generic",
@@ -255,7 +249,9 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",
