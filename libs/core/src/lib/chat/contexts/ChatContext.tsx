@@ -6,6 +6,7 @@ import {
 	clansSlice,
 	directActions,
 	directSlice,
+	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
 	fetchListFriends,
@@ -40,6 +41,7 @@ import {
 	ChannelUpdatedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
+	EventStatusNotificationEvent,
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
@@ -407,6 +409,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const oneventstatusnotification = useCallback(
+		(eventStatusNotification : EventStatusNotificationEvent) => {
+			dispatch(eventManagementActions.updateStatusEvent(eventStatusNotification))
+		},
+		[dispatch]
+	)
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -452,6 +461,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onchannelupdated = onchannelupdated;
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
+
+			socket.oneventstatusnotification = oneventstatusnotification;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -473,7 +484,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
-			onvoiceleaved
+			onvoiceleaved,
+			oneventstatusnotification
 		]
 	);
 
@@ -525,6 +537,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onclanprofileupdated = () => {};
+
+			socket.oneventstatusnotification = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -549,6 +563,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchanneldeleted,
 		onchannelupdated,
 		onHeartbeatTimeout,
+		oneventstatusnotification,
 		setCallbackEventFn
 	]);
 
@@ -573,3 +588,4 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+

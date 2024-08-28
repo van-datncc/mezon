@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
-import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
+import { compareDate, differenceTime } from '../timeFomatEvent';
 import ModalDelEvent from './modalDelEvent';
 import PanelEventItem from './panelEventItem';
 
@@ -51,8 +51,42 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const isSameDay = useMemo(() => {
 		return compareDate(new Date(), createTime || '');
 	}, [createTime]);
+	const eventStatus = ["UPCOMMING", "ONGOING", "FINSHED"]
+	const time : { state : Number, message : string} = useMemo(() => {
+		if (event?.message) {
+			return {
+				state: 0,
+				message : "Test"
+			}
+		} else {
+			const currentTime = Date.now();
+			
+			const startTimeLocal = new Date(start);
+			const startTimeUTC = startTimeLocal.getTime() + (startTimeLocal.getTimezoneOffset() * 60000);
 
-	const time = useMemo(() => timeFomat(start), [start]);
+			const leftTime = startTimeUTC -currentTime;
+			const tenMinuteLeftMessage = "Event will start in 10 minutes. Join in!"
+			const eventTakingPlaceMessage = "Event is taking place!"
+
+			if (leftTime <= 1000 * 60 * 100 && leftTime >= 0) {
+				return {
+					state: 0,
+					message:tenMinuteLeftMessage
+				};
+			}
+			
+			if (leftTime <= 0) {
+				return {
+					state: 0,
+					message:eventTakingPlaceMessage
+				};
+			}
+		}
+		return {
+			state: 0,
+			message: ""
+		}
+	}, [start, event?.message]);
 
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
@@ -103,7 +137,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							<div className="text-[#5765F2] rounded-full px-2 dark:bg-bgLightModeSecond bg-bgLightModeButton font-semibold">New</div>
 						)}
 						<Icons.IconEvents />
-						<p className="font-semibold dark:text-zinc-400 text-colorTextLightMode">{time}</p>
+						<p className={`font-semibold dark:text-zinc-400 text-colorTextLightMode ${event?.message ? 'text-blue-400' : ''}`}>{time.message}</p>
 					</div>
 					{event?.creator_id && (
 						<Tooltip

@@ -1,6 +1,7 @@
 import { IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoize from 'memoizee';
+import { EventStatusNotificationEvent } from 'mezon-js';
 import { ApiEventManagement } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
@@ -8,6 +9,8 @@ export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
 
 export interface EventManagementEntity extends IEventManagement {
 	id: string;
+	message?: string;
+	status?: string;
 }
 
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();
@@ -129,7 +132,10 @@ export const eventManagementSlice = createSlice({
 		},
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
-		}
+		},
+		updateStatusEvent: (state, action : {payload : EventStatusNotificationEvent}) => {
+			eventManagementAdapter.updateOne(state, {id : action.payload.event_id, changes: {message:action.payload.message, status: action.payload.event_status}})
+		} 
 	},
 	extraReducers: (builder) => {
 		builder
