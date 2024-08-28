@@ -1,7 +1,7 @@
-import { CheckIcon, isEqual } from '@mezon/mobile-components';
+import { CheckIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, selectChannelById, useAppDispatch } from '@mezon/store-mobile';
-import { BellIcon, FolderPlusIcon, LinkIcon, PinIcon, TrashIcon, UserShieldIcon, WebhookIcon } from 'libs/mobile-components/src/lib/icons2';
+import { BellIcon, FolderPlusIcon, LinkIcon, PinIcon, TrashIcon, WebhookIcon } from 'libs/mobile-components/src/lib/icons2';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 	const { t: t1 } = useTranslation(['screenStack']);
 	const dispatch = useAppDispatch();
 	const channel = useSelector(selectChannelById(channelId || ''));
-	const isChannel = useMemo(() => channel.parrent_id === "0", [channel.parrent_id])
+	const isChannel = useMemo(() => channel?.parrent_id === "0", [channel?.parrent_id])
 	const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
 	const [originSettingValue, setOriginSettingValue] = useState<IChannelSettingValue>({
 		channelName: '',
@@ -102,8 +102,16 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 				{
 					title: t('fields.channelPermission.permission'),
 					expandable: true,
-					icon: <UserShieldIcon color={themeValue.text} />,
-					isShow: isChannel
+					icon: <Icons.BravePermission color={themeValue.text} />,
+					isShow: isChannel,
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+							screen: APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION,
+							params: {
+								channelId,
+							},
+						});
+					}
 				},
 			] satisfies IMezonMenuItemProps[],
 		[],

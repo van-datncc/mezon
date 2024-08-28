@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import ChannelSetting from '../../../components/ChannelSetting';
 import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
+import { ChannelPermissionSetting } from '../../../screens/channelPermissionSetting';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 type StackMenuChannelScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
@@ -51,6 +52,10 @@ export function MenuChannelStacks({ }: any) {
 				options={{
 					headerShown: false,
 				}}
+			/>
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION}
+				component={ChannelPermissionSetting}
 			/>
 		</Stack.Navigator>
 	);

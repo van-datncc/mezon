@@ -74,5 +74,16 @@
     },
     "toast": {
         "updated": "Update successfully"
+    },
+    "channelPermission": {
+        "title": "Permissions",
+        "basicView": "Basic View",
+        "advancedView": "Advanced View",
+        "roles": "Roles",
+        "members": "Members",
+        "edit": "Edit",
+        "done": "Done",
+        "addRole": "Add Role",
+        "addMember": "Add Member"
     }
 }

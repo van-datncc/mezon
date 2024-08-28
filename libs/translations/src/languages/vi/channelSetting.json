@@ -73,5 +73,16 @@
     },
     "toast": {
         "updated": "Cập nhật thành công"
+    },
+        "channelPermission": {
+        "title": "Quyền truy cập",
+        "basicView": "Cơ bản",
+        "advancedView": "Nâng cao",
+        "roles": "Vai trò",
+        "members": "Thành viên",
+        "edit": "Chỉnh sửa",
+        "done": "Hoàn tất",
+        "addRole": "Thêm vai trò",
+        "addMember": "Thêm thành viên"
     }
 }
