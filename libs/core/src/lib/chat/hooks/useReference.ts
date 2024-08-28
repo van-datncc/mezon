@@ -1,7 +1,7 @@
 import {
 	messagesActions,
 	referencesActions,
-	selectAttachmentData,
+	selectAttachmentByChannelId,
 	selectDataReferences,
 	selectIdMessageToJump,
 	selectOpenOptionMessageState,
@@ -10,7 +10,7 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
-import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -18,10 +18,14 @@ export function useReference(channelId?: string) {
 	const dispatch = useAppDispatch();
 	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
-	const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
+
+	const checkAttachment = useMemo(() => {
+		return attachmentFilteredByChannelId?.files?.length > 0;
+	}, [attachmentFilteredByChannelId]);
 
 	const setStatusLoadingAttachment = useCallback(
 		(status: boolean) => {
@@ -51,13 +55,6 @@ export function useReference(channelId?: string) {
 		[dispatch]
 	);
 
-	const setAttachmentData = useCallback(
-		(attachments: ApiMessageAttachment[]) => {
-			dispatch(referencesActions.setAttachmentData({ channelId: channelId || '', attachments }));
-		},
-		[channelId, dispatch]
-	);
-
 	const setOpenOptionMessageState = useCallback(
 		(status: boolean) => {
 			dispatch(messagesActions.setOpenOptionMessageState(status));
@@ -81,14 +78,14 @@ export function useReference(channelId?: string) {
 			setOpenThreadMessageState,
 			dataReferences,
 			openThreadMessageState,
-			attachmentDataRef,
-			setAttachmentData,
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
-			removeAttachmentByIndex
+			removeAttachmentByIndex,
+			attachmentFilteredByChannelId,
+			checkAttachment
 		}),
 		[
 			setDataReferences,
@@ -96,13 +93,14 @@ export function useReference(channelId?: string) {
 			setOpenThreadMessageState,
 			dataReferences,
 			openThreadMessageState,
-			attachmentDataRef,
-			setAttachmentData,
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,
 			statusLoadingAttachment,
 			setStatusLoadingAttachment,
+			removeAttachmentByIndex,
+			attachmentFilteredByChannelId,
+			checkAttachment,
 			removeAttachmentByIndex
 		]
 	);

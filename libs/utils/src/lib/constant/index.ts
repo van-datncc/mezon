@@ -34,3 +34,12 @@ export const typeConverts: ITypeConvert[] = [
 export const fileTypeVideo = ['video/mp4', 'video/webm', 'video/mpeg', 'video/x-msvideo'];
 
 export const fileTypeImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
+
+export const failAttachment = {
+	filename: 'failAttachment',
+	url: '',
+	filetype: 'unknown',
+	size: 0,
+	width: 0,
+	height: 0,
+};

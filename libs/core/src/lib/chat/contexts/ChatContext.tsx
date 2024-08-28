@@ -134,7 +134,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.code === 0) {
-				dispatch(messagesActions.setNewMessageToUpdateImage(message));
+				dispatch(messagesActions.setNewMessageToUpdateImage(mess));
 			}
 
 			dispatch(notificationActions.setIsMessageRead(true));

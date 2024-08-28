@@ -605,7 +605,8 @@ export const messagesSlice = createSlice({
 				clan_id: data.clan_id,
 				mode: data.mode,
 				mentions: data.mentions,
-				content: data.content
+				content: data.content,
+				isMe: data.isMe
 			};
 		},
 
@@ -665,8 +666,8 @@ export const messagesSlice = createSlice({
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
 							hideEditted: action.payload.hideEditted,
-							update_time: action.payload.update_time,
-						},
+							update_time: action.payload.update_time
+						}
 					});
 					break;
 				}

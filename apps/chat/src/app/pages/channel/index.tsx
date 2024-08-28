@@ -11,7 +11,7 @@ import {
 	selectIsShowMemberList,
 	selectIsViewingOlderMessagesByChannelId,
 	selectStatusMenu,
-	useAppDispatch
+	useAppDispatch,
 } from '@mezon/store';
 import { EPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';

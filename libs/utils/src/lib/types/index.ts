@@ -726,6 +726,7 @@ export type MessageTypeUpdateLink = {
 	mode?: ChannelStreamMode;
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
+	isMe?: true;
 };
 
 export type RequestInput = {
@@ -762,4 +763,29 @@ export enum ENotificationTypes {
 	ALL_MESSAGE = NotificationType.ALL_MESSAGE,
 	MENTION_MESSAGE = NotificationType.MENTION_MESSAGE,
 	NOTHING_MESSAGE = NotificationType.NOTHING_MESSAGE,
+}
+
+export type PreSendAttachment = {
+	channelId?: string;
+	messageId?: string;
+	mode?: string;
+	clan_id?: string;
+	files: ApiMessageAttachment[];
+};
+
+export type UploadingAttachmentStatus = {
+	channelId?: string;
+	messageId?: string;
+	statusUpload?: EUploadingStatus;
+	count?: number;
+};
+
+export enum EUploadingStatus {
+	LOADING = 'loading',
+	SUCCESSFULLY = 'successfully',
+	ERROR = 'error',
+}
+
+export enum EFailAttachment {
+	FAIL_ATTACHMENT = 'failAttachment',
 }
