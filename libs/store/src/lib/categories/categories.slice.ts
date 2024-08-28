@@ -87,7 +87,7 @@ export const initialCategoriesState: CategoriesState = categoriesAdapter.getInit
 	loadingStatus: 'not loaded',
 	categories: [],
 	error: null,
-	sortChannelByCategoryId: {},
+	sortChannelByCategoryId: {}
 });
 
 export const categoriesSlice = createSlice({
@@ -103,7 +103,7 @@ export const categoriesSlice = createSlice({
 			if (action.payload.categoryId) {
 				state.sortChannelByCategoryId[action.payload.categoryId] = action.payload.isSortChannelByCategoryId;
 			}
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -130,7 +130,7 @@ export const categoriesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	},
+	}
 });
 
 /*
@@ -185,7 +185,7 @@ export const selectCategoriesEntities = createSelector(getCategoriesState, selec
 export const selectCategoryById = (id: string) => createSelector(selectCategoriesEntities, (categoriesEntities) => categoriesEntities[id]);
 
 export const selectCurrentCategory = createSelector(selectCategoriesEntities, selectCurrentCategoryId, (categoriesEntities, clanId) =>
-	clanId ? categoriesEntities[clanId] : null,
+	clanId ? categoriesEntities[clanId] : null
 );
 
 export const selectDefaultCategory = createSelector(selectAllCategories, (categories) => categories[0]);

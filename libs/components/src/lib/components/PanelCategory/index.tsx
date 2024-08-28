@@ -7,7 +7,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from "@mezon/store";
-import { EPermission, ICategory } from "@mezon/utils";
+import { ENotificationTypes, EPermission, ICategory } from "@mezon/utils";
 import { format } from "date-fns";
 import { Dropdown } from "flowbite-react";
 import { NotificationType } from "mezon-js";
@@ -177,8 +177,8 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 							type="radio"
 							name="NotificationSetting"
 							defaultNotifi={true}
-							onClick={() => handleChangeSettingType(0)}
-							checked={defaultCategoryNotificationSetting?.notification_setting_type === 0}
+							onClick={() => handleChangeSettingType(ENotificationTypes.DEFAULT)}
+							checked={defaultCategoryNotificationSetting?.notification_setting_type === ENotificationTypes.DEFAULT}
 						/>
 						{notificationTypesList.map(notification => (
 							<ItemPanel
