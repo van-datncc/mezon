@@ -79,7 +79,7 @@ export default function useUpdateAttachmentMessages() {
                         newMessage.mentions,
                         [failAttachment],
                         undefined,
-                        true,
+                        true
                     );
 
                     dispatch(

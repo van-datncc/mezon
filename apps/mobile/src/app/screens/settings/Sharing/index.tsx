@@ -1,4 +1,4 @@
-import { useCategory } from '@mezon/core';
+import { useCategory, useReference } from '@mezon/core';
 import {
 	CHANNEL_ID_SHARING,
 	CloseIcon,
@@ -9,9 +9,8 @@ import {
 	SendIcon,
 	cloneDeep,
 	debounce,
-	getAttachmentUnique,
 	load,
-	save,
+	save
 } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
@@ -19,25 +18,21 @@ import {
 	directActions,
 	getStoreAsync,
 	referencesActions,
-	selectAttachmentData,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectDirectsOpenlist,
 } from '@mezon/store-mobile';
-import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
+import { createUploadFilePath, useMezon } from '@mezon/transport';
 import { ILinkOnMessage } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
-import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
-import { IFile } from '../../home/homedrawer/components/AttachmentPicker/Gallery';
 import { styles } from './styles';
 
 export const Sharing = ({ data, onClose }) => {
@@ -58,7 +53,8 @@ export const Sharing = ({ data, onClose }) => {
 	const dataMedia = useMemo(() => {
 		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
-	const attachmentDataRef = useSelector(selectAttachmentData(CHANNEL_ID_SHARING || ''));
+
+	const { attachmentFilteredByChannelId, removeAttachmentByIndex, checkAttachment } = useReference(CHANNEL_ID_SHARING);
 
 	useEffect(() => {
 		if (data) {
@@ -177,7 +173,7 @@ export const Sharing = ({ data, onClose }) => {
 				lk: dataSend.links || [],
 			},
 			[],
-			getAttachmentUnique(attachmentDataRef) || [],
+			attachmentFilteredByChannelId?.files || [],
 			[],
 		);
 	};
@@ -202,7 +198,7 @@ export const Sharing = ({ data, onClose }) => {
 				lk: dataSend.links || [],
 			},
 			[], //mentions
-			getAttachmentUnique(attachmentDataRef) || [], //attachments
+			attachmentFilteredByChannelId?.files || [], //attachments
 			[], //references
 			false, //anonymous
 			false, //mentionEveryone
@@ -256,73 +252,24 @@ export const Sharing = ({ data, onClose }) => {
 	const convertFileFormat = async () => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
-				const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
+				const { filePath } = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
+
 				dispatch(
-					referencesActions.setAttachmentData({
+					referencesActions.setAtachmentAfterUpload({
 						channelId: CHANNEL_ID_SHARING,
-						attachments: [
-							{
-								url: media?.contentUri || media?.filePath,
-								filename: fileName,
-								filetype: media?.mimeType,
-							},
-						],
+						messageId: '',
+						files: [{
+							url: media?.contentUri || media?.filePath,
+							filename: filePath,
+							filetype: media?.mimeType,
+							size: media?.size,
+						}],
 					}),
 				);
-				const fileData = await RNFS.readFile(media.contentUri || media?.filePath, 'base64');
-
-				return {
-					uri: media.contentUri || media?.filePath,
-					name: media?.fileName || media?.contentUri || media?.filePath,
-					type: media?.mimeType,
-					fileData,
-				};
 			}),
 		);
-		handleFiles(fileFormats);
-		// setAttachmentData({
-		// 	url: filePath,
-		// 	filename: image?.filename || image?.uri,
-		// 	filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
-		// });
+
 	};
-
-	const handleFiles = (files: IFile | any) => {
-		const session = mezon.sessionRef.current;
-		const client = mezon.clientRef.current;
-		if (!files || !client || !session || !currentClan.id) {
-			throw new Error('Client or files are not initialized');
-		}
-
-		const promises = Array.from(files).map((file: IFile | any) => {
-			return handleUploadFileMobile(client, session, currentClan.id, currentChannelId, file.name, file);
-		});
-
-		Promise.all(promises).then((attachments) => {
-			attachments.forEach((attachment) => handleFinishUpload({ ...attachment, size: attachment.size || 100 }));
-		});
-	};
-
-	const handleFinishUpload = useCallback(
-		(attachment: ApiMessageAttachment) => {
-			dispatch(
-				referencesActions.setAttachmentData({
-					channelId: CHANNEL_ID_SHARING,
-					attachments: [attachment],
-				}),
-			);
-		},
-		[dispatch],
-	);
-
-	function removeAttachmentByUrl(urlToRemove: string) {
-		dispatch(
-			referencesActions.removeAttachment({
-				channelId: CHANNEL_ID_SHARING,
-				urlAttachment: urlToRemove,
-			}),
-		);
-	}
 
 	return (
 		<SafeAreaView style={styles.wrapper}>
@@ -346,10 +293,10 @@ export const Sharing = ({ data, onClose }) => {
 			<ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
 				<View style={styles.rowItem}>
 					<Text style={styles.title}>Message preview</Text>
-					{!!getAttachmentUnique(attachmentDataRef)?.length && (
+					{checkAttachment && (
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
 							<ScrollView horizontal style={styles.wrapperMedia}>
-								{getAttachmentUnique(attachmentDataRef)?.map((media: any, index) => {
+								{attachmentFilteredByChannelId?.files?.map((media: any, index) => {
 									let isFile;
 
 									if (Platform.OS === 'android') {
@@ -374,7 +321,7 @@ export const Sharing = ({ data, onClose }) => {
 											{isUploaded && (
 												<TouchableOpacity
 													style={styles.iconRemoveMedia}
-													onPress={() => removeAttachmentByUrl(media.url ?? '')}
+													onPress={() => removeAttachmentByIndex(CHANNEL_ID_SHARING, index)}
 												>
 													<CloseIcon width={size.s_18} height={size.s_18} />
 												</TouchableOpacity>
