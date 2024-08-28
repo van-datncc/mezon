@@ -80,9 +80,9 @@ export const Sharing = ({ data, onClose }) => {
 
 	const getFullFileName = useCallback(
 		(fileName: string) => {
-			return createUploadFilePath(session, currentClan.id, currentChannelId, fileName);
+			return createUploadFilePath(session, currentClan?.id, currentChannelId, fileName);
 		},
-		[currentChannelId, currentClan.id, session],
+		[currentChannelId, currentClan?.id, session],
 	);
 
 	function flattenData(categorizedChannels: any) {
@@ -270,6 +270,8 @@ export const Sharing = ({ data, onClose }) => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
 				const { filePath } = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
+				console.log(filePath);
+
 				dispatch(
 					referencesActions.setAtachmentAfterUpload({
 						channelId: CHANNEL_ID_SHARING,
