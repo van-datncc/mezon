@@ -1,31 +1,23 @@
 import { useChatSending } from "@mezon/core";
 import { handleUploadAttachmentMobile } from "@mezon/mobile-components";
-import { referencesActions, selectAttachmentByChannelId, selectCurrentChannelId, selectCurrentClanId, selectDmGroupCurrentId, selectNewMesssageUpdateImage } from "@mezon/store";
+import { referencesActions, selectAttachmentByChannelId, selectNewMesssageUpdateImage } from "@mezon/store";
 import { useAppDispatch, useAppSelector } from "@mezon/store-mobile";
 import { useMezon } from "@mezon/transport";
 import { EUploadingStatus, failAttachment } from "@mezon/utils";
-import { ChannelStreamMode } from "mezon-js";
-import { useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
-export default function useUpdateAttachmentMessages({ mode }: { mode: ChannelStreamMode }) {
+interface IUpdateAttachment {
+    currentChannelId: string;
+    currentClanId: string;
+}
+export default function useUpdateAttachmentMessages({ currentChannelId, currentClanId }: IUpdateAttachment) {
     const { sessionRef, clientRef } = useMezon();
     const dispatch = useAppDispatch();
 
     const newMessage = useAppSelector(selectNewMesssageUpdateImage);
-    const currentChannelId = useAppSelector(selectCurrentChannelId);
-    const currentClanId = useAppSelector(selectCurrentClanId);
-    const currentDMChannelId = useSelector(selectDmGroupCurrentId);
+    const attachmentFilteredByChannelId = useAppSelector(selectAttachmentByChannelId(currentChannelId));
 
-    const channelId = useMemo(() => {
-        return mode == ChannelStreamMode.STREAM_MODE_DM
-            ? currentDMChannelId || "0"
-            : currentChannelId || "0"
-    }, [currentChannelId, currentDMChannelId]);
-
-    const attachmentFilteredByChannelId = useAppSelector(selectAttachmentByChannelId(channelId));
-
-    const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0 });
+    const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0, directMessageId: currentChannelId });
 
     const session = sessionRef.current;
     const client = clientRef.current;
@@ -39,14 +31,14 @@ export default function useUpdateAttachmentMessages({ mode }: { mode: ChannelStr
 
             dispatch(
                 referencesActions.setAtachmentAfterUpload({
-                    channelId: channelId,
+                    channelId: currentChannelId,
                     messageId: '',
                     files: [],
                 }),
             );
 
             const promises = attachmentFilteredByChannelId?.files?.map((file) =>
-                handleUploadAttachmentMobile(client, session, currentClanId, channelId, {
+                handleUploadAttachmentMobile(client, session, currentClanId, currentChannelId, {
                     name: file.filename,
                     path: file.url,
                     type: file.filetype,
@@ -56,8 +48,10 @@ export default function useUpdateAttachmentMessages({ mode }: { mode: ChannelStr
 
             Promise.all(promises)
                 .then((results) => {
+                    console.log(results);
+
                     updateImageLinkMessage(
-                        newMessage.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '0',
+                        newMessage.clan_id,
                         newMessage.channel_id ?? '',
                         newMessage.mode,
                         newMessage.content,
@@ -65,13 +59,13 @@ export default function useUpdateAttachmentMessages({ mode }: { mode: ChannelStr
                         newMessage.mentions,
                         results,
                         undefined,
-                        true,
+                        true
                     );
                 })
                 .then(() => {
                     dispatch(
                         referencesActions.setUploadingStatus({
-                            channelId: channelId,
+                            channelId: currentChannelId,
                             messageId: attachmentFilteredByChannelId?.messageId ?? '',
                             statusUpload: EUploadingStatus.SUCCESSFULLY,
                             count: attachmentFilteredByChannelId?.files?.length,
@@ -93,7 +87,7 @@ export default function useUpdateAttachmentMessages({ mode }: { mode: ChannelStr
 
                     dispatch(
                         referencesActions.setUploadingStatus({
-                            channelId: channelId,
+                            channelId: currentChannelId,
                             messageId: attachmentFilteredByChannelId?.messageId ?? '',
                             statusUpload: EUploadingStatus.ERROR,
                             count: attachmentFilteredByChannelId?.files?.length,
@@ -105,19 +99,19 @@ export default function useUpdateAttachmentMessages({ mode }: { mode: ChannelStr
 
         dispatch(
             referencesActions.setUploadingStatus({
-                channelId: channelId,
+                channelId: currentChannelId,
                 messageId: attachmentFilteredByChannelId?.messageId ?? '',
                 statusUpload: EUploadingStatus.LOADING,
                 count: attachmentFilteredByChannelId?.files?.length,
             }),
         );
-    }, [attachmentFilteredByChannelId?.messageId, channelId]);
+    }, [attachmentFilteredByChannelId?.messageId, currentChannelId]);
 
     useEffect(() => {
         if (newMessage.isMe && attachmentFilteredByChannelId?.files.length > 0) {
             dispatch(
                 referencesActions.updateAttachmentMessageId({
-                    channelId: channelId,
+                    channelId: currentChannelId,
                     messageId: newMessage.message_id ?? '',
                 }),
             );
