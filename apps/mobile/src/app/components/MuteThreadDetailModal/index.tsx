@@ -46,7 +46,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 						{
 							title: t('notifySettingThreadModal.muteDuration.forFifteenMinutes'),
 							onPress: () => {
-								handleScheduleMute(1 * 60 * 1000);
+								handleScheduleMute(15 * 60 * 1000);
 							}
 						},
 						{
