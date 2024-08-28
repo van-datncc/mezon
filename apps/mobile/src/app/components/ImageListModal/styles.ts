@@ -5,17 +5,17 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		messageBoxTop: {
 			gap: size.s_2,
-			justifyContent:'center'
+			justifyContent: 'center'
 		},
 		userNameMessageBox: {
 			fontSize: size.medium,
 			marginRight: size.s_10,
 			fontWeight: '600',
-			color: Colors.white,
+			color: Colors.white
 		},
 		dateMessageBox: {
 			fontSize: size.small,
-			color: Colors.white,
+			color: Colors.white
 		},
 		wrapperAvatar: {
 			width: size.s_40,
@@ -24,7 +24,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			backgroundColor: Colors.gray72,
-			overflow: 'hidden',
+			overflow: 'hidden'
 		},
 		imageWrapper: {
 			width: size.s_40,
@@ -35,11 +35,11 @@ export const style = (colors: Attributes) =>
 		},
 		imageSelected: {
 			borderWidth: 2,
-			borderColor: Colors.azureBlue,
+			borderColor: Colors.azureBlue
 		},
 		image: {
 			width: '100%',
 			height: '100%',
-			borderRadius: 3,
-		},
+			borderRadius: 3
+		}
 	});
