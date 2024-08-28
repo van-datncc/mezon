@@ -14,30 +14,34 @@ interface PanelGroupDMPProps {
 const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps) => {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
-	const currentUserId = useAppSelector(selectCurrentUserId)
+	const currentUserId = useAppSelector(selectCurrentUserId);
 	const { navigate } = useAppNavigation();
 	const [popupLeave, setPopupLeave] = useState<boolean>(false);
 	const handleLeaveDmGroup = async () => {
 		const isLeaveOrDeleteGroup = lastOne
-			? await dispatch(deleteChannel({ clanId: "", channelId: dmGroupId ?? '', isDmGroup: true }))
-			: await dispatch(removeMemberChannel({ channelId: dmGroupId || "", userIds: [currentUserId], kickMember: false }));
+			? await dispatch(deleteChannel({ clanId: '', channelId: dmGroupId ?? '', isDmGroup: true }))
+			: await dispatch(removeMemberChannel({ channelId: dmGroupId || '', userIds: [currentUserId], kickMember: false }));
 		if (!isLeaveOrDeleteGroup) {
 			return;
 		}
 		if (directId === dmGroupId) {
-			navigate("/chat/direct/friends");
+			navigate('/chat/direct/friends');
 		}
 		await dispatch(fetchDirectMessage({ noCache: true }));
-	}
+	};
 
 	const handleConfirmLeave = (e: Event) => {
-		e.stopPropagation();
-		setPopupLeave(true);
-	}
+		if (lastOne) {
+			e.stopPropagation();
+			setPopupLeave(true);
+			return;
+		}
+		handleLeaveDmGroup();
+	};
 
 	const handleCancelLeave = () => {
 		setPopupLeave(false);
-	}
+	};
 
 	return (
 		<>
@@ -69,11 +73,16 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 					<ItemPanelMember children="Until I turn it back on" />
 				</Dropdown>
 			</div>
-			<ItemPanelMember children={lastOne ? "Delete Group" : "Leave Group"} danger onClick={handleConfirmLeave} />
-			{
-				popupLeave && lastOne &&
-				<ModalConfirm handleCancel={handleCancelLeave} handleConfirm={handleLeaveDmGroup} title='delete' modalName='this group' buttonName='Delete Group' />
-			}
+			<ItemPanelMember children={lastOne ? 'Delete Group' : 'Leave Group'} danger onClick={handleConfirmLeave} />
+			{popupLeave && lastOne && (
+				<ModalConfirm
+					handleCancel={handleCancelLeave}
+					handleConfirm={handleLeaveDmGroup}
+					title="delete"
+					modalName="this group"
+					buttonName="Delete Group"
+				/>
+			)}
 		</>
 	);
 };
