@@ -33,13 +33,14 @@ type MessageProps = {
 };
 
 export function ChannelMessage({ message, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
+	console.log('message: ', message);
 	// todo: remove old logic
 	// const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const { showMessageContextMenu, preloadMessageContextMenu } = useMessageContextMenu();
+	const { showMessageContextMenu } = useMessageContextMenu();
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 
 	const messageId = useMemo(() => message.id, [message.id]);
@@ -81,10 +82,6 @@ export function ChannelMessage({ message, channelId, mode, channelLabel, isHighl
 	useEffect(() => {
 		markMessageAsSeen(message);
 	}, [markMessageAsSeen, message]);
-
-	useEffect(() => {
-		preloadMessageContextMenu(messageId);
-	}, [preloadMessageContextMenu, messageId]);
 
 	return (
 		<>
