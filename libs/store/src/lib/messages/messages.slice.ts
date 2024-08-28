@@ -21,7 +21,6 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
-	isAnyOf,
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -863,9 +862,6 @@ export const messagesSlice = createSlice({
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			})
-			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state) => {
-				state.isJumpingToPresent = true;
 			});
 	}
 });
