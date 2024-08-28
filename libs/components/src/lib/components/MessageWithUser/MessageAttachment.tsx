@@ -1,4 +1,4 @@
-import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { EMimeTypes, IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -20,11 +20,11 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 
 	attachments.forEach((attachment) => {
 		if (
-			(attachment.filetype?.indexOf('video/mp4') !== -1 || attachment.filetype?.indexOf('video/quicktime') !== -1) &&
-			!attachment.url?.includes('tenor.com')
+			(attachment.filetype?.indexOf(EMimeTypes.mp4) !== -1 || attachment.filetype?.indexOf(EMimeTypes.mov) !== -1) &&
+			!attachment.url?.includes(EMimeTypes.tenor)
 		) {
 			videos.push(attachment);
-		} else if (attachment.filetype?.indexOf('image/png') !== -1 || attachment.filetype?.indexOf('image/jpeg') !== -1) {
+		} else if (attachment.filetype?.indexOf(EMimeTypes.png) !== -1 || attachment.filetype?.indexOf(EMimeTypes.jpeg) !== -1) {
 			images.push(attachment);
 		} else {
 			documents.push(attachment);
