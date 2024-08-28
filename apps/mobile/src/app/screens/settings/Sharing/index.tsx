@@ -239,6 +239,23 @@ export const Sharing = ({ data, onClose }) => {
 			text: dataText,
 			links,
 		};
+
+		dispatch(
+			referencesActions.setAtachmentAfterUpload({
+				channelId: channelSelected?.channel_id,
+				messageId: '',
+				files: attachmentFilteredByChannelId?.files
+			}),
+		);
+
+		dispatch(
+			referencesActions.setAtachmentAfterUpload({
+				channelId: CHANNEL_ID_SHARING,
+				messageId: '',
+				files: []
+			}),
+		);
+
 		// Send to DM message
 		if (channelSelected.type === ChannelType.CHANNEL_TYPE_GROUP || channelSelected.type === ChannelType.CHANNEL_TYPE_DM) {
 			await sendToDM(dataSend);
@@ -253,7 +270,6 @@ export const Sharing = ({ data, onClose }) => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
 				const { filePath } = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
-
 				dispatch(
 					referencesActions.setAtachmentAfterUpload({
 						channelId: CHANNEL_ID_SHARING,
@@ -262,7 +278,7 @@ export const Sharing = ({ data, onClose }) => {
 							url: media?.contentUri || media?.filePath,
 							filename: filePath,
 							filetype: media?.mimeType,
-							size: media?.size,
+							size: 1,
 						}],
 					}),
 				);
