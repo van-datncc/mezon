@@ -10,6 +10,7 @@ import {
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	emojiSuggestionActions,
+	referencesActions,
 	selectChannelsEntities,
 	selectCurrentChannel,
 	selectDmGroupCurrentId,
@@ -372,18 +373,18 @@ export const ChatBoxBottomBar = memo(
 						return (attachment.filetype = typeConvert.typeConvert);
 					}
 				});
-				// dispatch(
-				// 	referencesActions.setAtachmentAfterUpload({
-				// 		channelId: currentChannel?.id,
-				// 		messageId: '',
-				// 		files: [file].map((file) => ({
-				// 			filename: file.name,
-				// 			filetype: file.type,
-				// 			size: file.size,
-				// 			url: URL.createObjectURL(file),
-				// 		})),
-				// 	}),
-				// );
+				dispatch(
+					referencesActions.setAtachmentAfterUpload({
+						channelId: currentChannel?.id,
+						messageId: '',
+						files: [{
+							filename: attachment.filename,
+							size: attachment.size,
+							filetype: attachment.filetype,
+							url: attachment.url
+						}]
+					}),
+				);
 			},
 			[channelId, dispatch],
 		);
