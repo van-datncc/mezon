@@ -183,9 +183,10 @@ export const ChatMessageInput = memo(
 
 			const onEditMessage = useCallback(
 				async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
-					await editSendMessage(editMessage, messageId, mentions);
+					const { attachments } = messageActionNeedToResolve.targetMessage;
+					await editSendMessage(editMessage, messageId, mentions, attachments, true);
 				},
-				[editSendMessage],
+				[editSendMessage, messageActionNeedToResolve],
 			);
 
 
