@@ -41,7 +41,7 @@ export const fetchCategories = createAsyncThunk('categories/fetchCategories', as
 		return [];
 	}
 	return response.categorydesc.map(mapCategoryToEntity);
-});
+	});
 
 export const createNewCategory = createAsyncThunk('categories/createCategories', async (body: ApiCreateCategoryDescRequest, thunkAPI) => {
 	try {
@@ -59,8 +59,8 @@ export const createNewCategory = createAsyncThunk('categories/createCategories',
 });
 
 export const deleteCategory = createAsyncThunk(
-	'categories/deleteChannel',
-	async ({ clanId, categoryId }: { clanId: string; categoryId: string }, thunkAPI) => {
+	'categories/deleteCategory',
+	async ({ clanId, categoryId }: { clanId: string; categoryId: string}, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId);
@@ -130,7 +130,19 @@ export const categoriesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-	}
+
+		builder
+			.addCase(deleteCategory.pending, (state: CategoriesState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(deleteCategory.fulfilled, (state: CategoriesState) => {
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(deleteCategory.rejected, (state: CategoriesState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+	},
 });
 
 /*

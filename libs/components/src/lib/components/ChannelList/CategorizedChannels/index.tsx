@@ -1,14 +1,15 @@
-import { useClanRestriction, useEscapeKey, useOnClickOutside, UserRestrictionZone } from '@mezon/core';
+import { useAppNavigation, useCategory, useClanRestriction, useEscapeKey, useOnClickOutside, UserRestrictionZone } from '@mezon/core';
 import { categoriesActions, channelsActions, defaultNotificationCategoryActions, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
 import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import CategorySetting from '../../CategorySetting';
 import { Coords } from '../../ChannelLink';
+import ModalConfirm from '../../ModalConfirm';
 import PanelCategory from '../../PanelCategory';
 import ChannelListItem from '../ChannelListItem';
-import DeleteCategoryModal from './DeleteCategoryModal';
 
 type CategorizedChannelsProps = {
 	category: ICategoryChannel;
@@ -29,7 +30,10 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const [isShowCategorySetting, setIsShowCategorySetting] = useState<boolean>(false);
 	const [isShowCategoryChannels, setIsShowCategoryChannels] = useState<boolean>(true);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+	const { categorizedChannels } = useCategory();
+	const { toChannelPage, toMembersPage } = useAppNavigation();
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
 
@@ -77,6 +81,35 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 		setIsShowPanelCategory(false);
 	};
 
+	const confirmDeleteCategory = async () => {
+		await dispatch(categoriesActions.deleteCategory({ clanId: category.clan_id as string, categoryId: category.id as string }));
+		const targetIndex = categorizedChannels.findIndex((obj) => obj.category_id === category.id);
+
+		let channelNavId = '';
+		if (targetIndex !== -1) {
+			if (targetIndex === 0) {
+				channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
+				if (!channelNavId) {
+					const clanPath = toMembersPage(category.clan_id ?? '');
+					navigate(clanPath);
+					return
+				}
+			} else if (targetIndex === categorizedChannels.length - 1) {
+				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+			} else {
+				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+			}
+		}
+
+		if (channelNavId && category.clan_id) {
+			const channelPath = toChannelPage(channelNavId ?? '', category.clan_id ?? '');
+			navigate(channelPath);
+			return
+		}
+
+		setShowModal(false);
+	};
+
 	useOnClickOutside(panelRef, () => setIsShowPanelCategory(false));
 
 	useEscapeKey(() => setIsShowPanelCategory(false));
@@ -121,11 +154,14 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 						)}
 
 						{showModal && (
-							<DeleteCategoryModal
-								onClose={() => setShowModal(false)}
-								categoryName={category.category_name || ''}
-								clanId={category.clan_id as string}
-								categoryId={category.category_id as string}
+							<ModalConfirm
+								handleCancel={() => setShowModal(false)}
+								modalName={category.category_name || ''}
+								handleConfirm={confirmDeleteCategory}
+								title='delete'
+								buttonName='Delete category'
+								message='This cannot be undone'
+								customModalName='Category'
 							/>
 						)}
 
