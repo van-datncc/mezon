@@ -26,7 +26,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	const { t } = useTranslation(['message'])
 	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
 	const { isCanSendMessage } = useUserPermission();
-	useUpdateAttachmentMessages();
+	useUpdateAttachmentMessages({ mode: props.mode });
 
 	const isDM = useMemo(() => {
 		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(props?.mode)
