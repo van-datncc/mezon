@@ -113,7 +113,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	// Jump to message when user is jumping to message
 	useEffect(() => {
 		if (idMessageToJump && isMessageExist) {
-			chatScrollRef.scrollToMessage(`msg-${idMessageToJump}`).then((res) => {
+			chatScrollRef.scrollToMessage(idMessageToJump).then((res) => {
 				if (res) {
 					dispatch(messagesActions.setIdMessageToJump(null));
 				}
