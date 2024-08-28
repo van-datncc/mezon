@@ -1,6 +1,6 @@
-import { fetchApplications, selectAppById, useAppDispatch } from '@mezon/store';
+import { selectAppById } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, useLoaderData, useParams } from 'react-router-dom';
 import { useAppearance } from '../../context/AppearanceContext';
@@ -9,7 +9,6 @@ import ModalAddBot from './ModalAddBot';
 import ModalTry from './ModalTry';
 
 const Install: React.FC = () => {
-	const dispatch = useAppDispatch();
 	const { isLogin, redirect } = useLoaderData() as IAuthLoaderData;
 	const { applicationId } = useParams();
 	const appSelect = useSelector(selectAppById(applicationId || ''));
@@ -23,10 +22,6 @@ const Install: React.FC = () => {
 	const handleOpenModalTry = useCallback(() => {
 		setOpenModalTry(!openModalTry);
 	}, [openModalTry]);
-
-	useEffect(() => {
-		dispatch(fetchApplications({}));
-	}, [dispatch]);
 
 	if (!isLogin) {
 		return <Navigate to={redirect || '/login'} replace />;
