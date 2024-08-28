@@ -6,6 +6,7 @@ import {
 	clansSlice,
 	directActions,
 	directSlice,
+	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
 	fetchListFriends,
@@ -40,6 +41,7 @@ import {
 	ChannelUpdatedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
+	EventManagement,
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
@@ -407,6 +409,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const onEventCreated = useCallback(
+		(eventManagement: EventManagement) => {
+			if (eventManagement) {
+				const createEventPayload = {
+					clan_id: eventManagement.clan_id,
+					channel_id: eventManagement.channel_id,
+					address: eventManagement.address,
+					title: eventManagement.title,
+					start_time: eventManagement.start_time,
+					end_time: eventManagement.end_time,
+					description: eventManagement.description,
+					logo: eventManagement.logo
+				};
+
+				dispatch(eventManagementActions.fetchCreateEventManagement(createEventPayload));
+			}
+		},
+		[dispatch]
+	);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -452,6 +474,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onchannelupdated = onchannelupdated;
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
+
+			socket.onEventCreated = onEventCreated;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -473,7 +497,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
-			onvoiceleaved
+			onvoiceleaved,
+			onEventCreated
 		]
 	);
 
@@ -549,7 +574,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchanneldeleted,
 		onchannelupdated,
 		onHeartbeatTimeout,
-		setCallbackEventFn
+		setCallbackEventFn,
+		onEventCreated
 	]);
 
 	useEffect(() => {
