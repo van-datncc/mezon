@@ -42,7 +42,6 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		return allImageList.findIndex((file) => file?.filename === imageSelected?.filename);
 	}, [allImageList, imageSelected]);
 
-	//TODO: update later when allImageList updated
 	const formattedImageList = useMemo(() => {
 		const index = allImageList.findIndex((file) => file?.filename === imageSelected?.filename);
 		return index === -1 ? [{ ...imageSelected, id: `${Snowflake.generate()}` }, ...allImageList] : allImageList;
@@ -58,7 +57,6 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const onIndexChange = useCallback(
 		(newIndex: number) => {
 			if (formattedImageList[newIndex]?.id !== currentImage?.id) {
-				console.log('123123');
 				setCurrentImage(formattedImageList[newIndex]);
 				ref.current?.reset(); //Note: reset scale
 			}
