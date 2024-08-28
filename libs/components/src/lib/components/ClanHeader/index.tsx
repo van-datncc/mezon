@@ -1,18 +1,19 @@
-import { useCategory, useClanRestriction, useEscapeKey, useOnClickOutside } from '@mezon/core';
-import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { useAuth, useCategory, useChannelMembersActions, useClanRestriction, useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { categoriesActions, selectCurrentClan, selectCurrentClanId, selectCurrentVoiceChannelId, useAppDispatch } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
 import ModalInvite from '../ListMemberInvite/modalInvite';
+import ModalConfirm from '../ModalConfirm';
 import SearchModal from '../SearchModal';
 import ModalNotificationSetting from '../notificationSetting';
 import ItemModal from './ItemModal';
-import LeaveClanPopup from './LeaveClanPopup';
 import ModalCreateCategory from './ModalCreateCategory';
 
 export type ClanHeaderProps = {
@@ -27,9 +28,14 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { categorizedChannels } = useCategory();
-	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const { removeMemberClan } = useChannelMembersActions();
+	const { userProfile } = useAuth();
+	const currentChannelId = useSelector(selectCurrentVoiceChannelId);
+	const currentClan = useSelector(selectCurrentClan);
+	const navigate = useNavigate();
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteClanModal} open={true} channelID={channelId || ''} />
 	));
@@ -45,7 +51,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const channelId = categorizedChannels.at(0)?.channels.at(0)?.channel_id;
 
 	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
-	const toggleLeaveClanPopup = ()=>{
+	const toggleLeaveClanPopup = () => {
 		setIsShowLeaveClanPopup(!isShowLeaveClanPopup);
 		setIsShowModalPanelClan(false)
 	}
@@ -91,7 +97,14 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasChannelManagePermission;
 
 	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
-  useEscapeKey(()=>setIsShowModalPanelClan(false))
+	useEscapeKey(() => setIsShowModalPanelClan(false))
+
+	const handleLeaveClan = async () => {
+		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
+		toggleLeaveClanPopup();
+		navigate("/mezon");
+	};
+
 	return (
 		<>
 			{type === 'direct' ? (
@@ -121,7 +134,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%] shadow-xl"
 							>
 								<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
-									{(hasPermissionCreateCategory) &&<ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
+									{(hasPermissionCreateCategory) && <ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
 									<ItemModal
 										onClick={handleShowInviteClanModal}
 										children="Invite People"
@@ -162,7 +175,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				</div>
 			)}
 
-			{isShowLeaveClanPopup && <LeaveClanPopup toggleShowPopup={toggleLeaveClanPopup}/>}
+			{isShowLeaveClanPopup && <ModalConfirm handleCancel={toggleLeaveClanPopup} handleConfirm={handleLeaveClan} modalName={currentClan?.clan_name} title='leave' buttonName='Leave Clan' />}
 
 			{openServerSettings && (
 				<ClanSetting

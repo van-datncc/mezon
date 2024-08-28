@@ -5,10 +5,9 @@ import { format } from 'url';
 import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
-import { setup } from 'electron-push-receiver';
 import tray from '../Tray';
+import { setup } from './push-receiver';
 
-let deeplinkingUrl;
 const isQuitting = false;
 
 export default class App {
@@ -69,9 +68,9 @@ export default class App {
 			webPreferences: {
 				contextIsolation: true,
 				backgroundThrottling: false,
-				preload: join(__dirname, 'main.preload.js'),
+				preload: join(__dirname, 'main.preload.js')
 			},
-			icon: join(__dirname, 'assets', 'favicon.ico'),
+			icon: join(__dirname, 'assets', 'favicon.ico')
 		});
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenu(null);
@@ -173,8 +172,8 @@ export default class App {
 					pathname: baseUrl,
 					protocol: 'file:',
 					slashes: true,
-					query: params,
-				}),
+					query: params
+				})
 			);
 		}
 

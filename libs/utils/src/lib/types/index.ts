@@ -6,8 +6,9 @@ import {
 	HashtagDm,
 	Notification,
 	NotificationChannelCategorySetting,
+	NotificationType,
 	NotifiReactMessage,
-	PermissionRoleChannel,
+	PermissionRoleChannel
 } from 'mezon-js';
 import {
 	ApiAccount,
@@ -32,12 +33,13 @@ import {
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
-	RoleUserListRoleUser,
+	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
 import { MentionItem } from 'react-mentions';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
 export * from './messageLine';
+export * from './mimeTypes';
 export * from './permissions';
 export * from './thumbnailPos';
 
@@ -246,12 +248,12 @@ export type ChannelListProps = { className?: string };
 
 export enum ChannelStatus {
 	OPEN = 'open',
-	CLOSE = 'close',
+	CLOSE = 'close'
 }
 
 export enum channelStatusEnum {
 	LOCK = 'lock',
-	UNLOCK = 'unlock',
+	UNLOCK = 'unlock'
 }
 
 export interface CategoryProps {
@@ -269,7 +271,7 @@ export type IUserAccount = ApiAccount;
 export type IPermission = ApiPermission;
 
 export enum ChannelStatusEnum {
-	isPrivate = 1,
+	isPrivate = 1
 }
 
 export interface ChannelProps {
@@ -297,7 +299,7 @@ export enum EmojiPlaces {
 	EMOJI_REACTION = 'EMOJI_REACTION',
 	EMOJI_REACTION_BOTTOM = 'EMOJI_REACTION_BOTTOM',
 	EMOJI_EDITOR = 'EMOJI_EDITOR',
-	EMOJI_REACTION_NONE = 'EMOJI_REACTION_NONE',
+	EMOJI_REACTION_NONE = 'EMOJI_REACTION_NONE'
 }
 
 export interface UnreadChannel {
@@ -339,7 +341,7 @@ export enum SubPanelName {
 	STICKERS = 'STICKER',
 	EMOJI = 'EMOJI',
 	EMOJI_REACTION_RIGHT = 'EMOJI_REACTION_RIGHT',
-	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM',
+	EMOJI_REACTION_BOTTOM = 'EMOJI_REATIONN_BOTTOM'
 }
 
 export enum MemberProfileType {
@@ -348,7 +350,7 @@ export enum MemberProfileType {
 	DM_LIST = 'dm_list_friends',
 	DM_MEMBER_GROUP = 'dm_member_group',
 	LIST_FRIENDS = 'list_friends',
-	MESSAGE = 'message',
+	MESSAGE = 'message'
 }
 
 export type IReaction = ApiMessageReaction & {
@@ -542,18 +544,18 @@ export type RemoveChannelUsers = {
 export enum Tabs_Option {
 	LOCATION = 0,
 	EVENT_INFO = 1,
-	REVIEW = 2,
+	REVIEW = 2
 }
 
 export enum OptionEvent {
 	OPTION_SPEAKER = 'Speaker',
-	OPTION_LOCATION = 'Location',
+	OPTION_LOCATION = 'Location'
 }
 
 export enum MentionTypeEnum {
 	MENTION = 'MENTION',
 	HASHTAG = 'HASHTAG',
-	EMOJI_SYNTAX = 'EMOJI_SYNTAX',
+	EMOJI_SYNTAX = 'EMOJI_SYNTAX'
 }
 
 export type ContenSubmitEventProps = {
@@ -573,7 +575,7 @@ export enum SHOW_POSITION {
 	IN_LINK = 'IN_LINK',
 	IN_EMOJI = 'IN_EMOJI',
 	IN_STICKER = 'IN_STICKER',
-	NONE = 'NONE',
+	NONE = 'NONE'
 }
 
 export type EmojiStorage = {
@@ -587,13 +589,13 @@ export type EmojiStorage = {
 export enum Direction_Mode {
 	AROUND_TIMESTAMP = 1,
 	AFTER_TIMESTAMP = 2,
-	BEFORE_TIMESTAMP = 3,
+	BEFORE_TIMESTAMP = 3
 }
 
 export enum MouseButton {
 	LEFT = 0,
 	MIDDLE = 1,
-	RIGHT = 2,
+	RIGHT = 2
 }
 
 export enum NotificationCode {
@@ -607,24 +609,24 @@ export enum NotificationCode {
 	USER_BANNED = -8,
 	USER_MENTIONED = -9,
 	USER_REACTIONED = -10,
-	USER_REPLIED = -11,
+	USER_REPLIED = -11
 }
 
 export enum ChannelIsNotThread {
-	TRUE = '0',
+	TRUE = '0'
 }
 
 export enum RoleEveryOne {
-	TRUE = '0',
+	TRUE = '0'
 }
 
 export enum EMessageCode {
-	FIRST_MESSAGE = 11,
+	FIRST_MESSAGE = 11
 }
 
 export enum ModeResponsive {
 	MODE_CLAN = 'clan',
-	MODE_DM = 'dm',
+	MODE_DM = 'dm'
 }
 
 export type ApiChannelMessageHeaderWithChannel = ApiChannelMessageHeader & {
@@ -634,7 +636,7 @@ export type ApiChannelMessageHeaderWithChannel = ApiChannelMessageHeader & {
 export enum ThemeApp {
 	Light = 'light',
 	Dark = 'dark',
-	System = 'system',
+	System = 'system'
 }
 
 export interface INotification extends Notification {
@@ -656,12 +658,12 @@ export type TNotificationChannel = {
 };
 
 export enum SlugPermission {
-	Admin = 'administrator',
+	Admin = 'administrator'
 }
 
 export enum TypeSearch {
 	Dm_Type = 1,
-	Channel_Type = 2,
+	Channel_Type = 2
 }
 
 export type SearchItemProps = {
@@ -683,17 +685,17 @@ export type SearchItemProps = {
 };
 
 export enum EEmojiCategory {
-	CUSTOM = 'Custom',
+	CUSTOM = 'Custom'
 }
 
 export enum ActiveDm {
-	OPEN_DM = 1,
+	OPEN_DM = 1
 }
 
 export enum ETypeMEntion {
 	MENTION = 0,
 	HASHTAG = 1,
-	EMOJI = 2,
+	EMOJI = 2
 }
 
 export interface IRoleMention {
@@ -707,7 +709,7 @@ export enum ETokenMessage {
 	HASHTAGS = 'hg',
 	LINKS = 'lk',
 	VOICE_LINKS = 'vk',
-	MARKDOWNS = 'mk',
+	MARKDOWNS = 'mk'
 }
 export type SearchFilter = {
 	field_name: string;
@@ -715,7 +717,7 @@ export type SearchFilter = {
 };
 
 export enum ETypeLinkMedia {
-	IMAGE_PREFIX = 'image',
+	IMAGE_PREFIX = 'image'
 }
 
 export type MessageTypeUpdateLink = {
@@ -726,6 +728,7 @@ export type MessageTypeUpdateLink = {
 	mode?: ChannelStreamMode;
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
+	isMe?: true;
 };
 
 export type RequestInput = {
@@ -754,5 +757,37 @@ export enum EUserSettings {
 	LANGUAGE = 'Language',
 	STREAMER_MODE = 'Streamer Mode',
 	ADVANCED = 'Advanced',
-	LOG_OUT = 'Log Out',
+	LOG_OUT = 'Log Out'
+}
+
+export enum ENotificationTypes {
+	DEFAULT = 0,
+	ALL_MESSAGE = NotificationType.ALL_MESSAGE,
+	MENTION_MESSAGE = NotificationType.MENTION_MESSAGE,
+	NOTHING_MESSAGE = NotificationType.NOTHING_MESSAGE
+}
+
+export type PreSendAttachment = {
+	channelId?: string;
+	messageId?: string;
+	mode?: string;
+	clan_id?: string;
+	files: ApiMessageAttachment[];
+};
+
+export type UploadingAttachmentStatus = {
+	channelId?: string;
+	messageId?: string;
+	statusUpload?: EUploadingStatus;
+	count?: number;
+};
+
+export enum EUploadingStatus {
+	LOADING = 'loading',
+	SUCCESSFULLY = 'successfully',
+	ERROR = 'error'
+}
+
+export enum EFailAttachment {
+	FAIL_ATTACHMENT = 'failAttachment'
 }

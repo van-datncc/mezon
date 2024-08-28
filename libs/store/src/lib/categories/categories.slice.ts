@@ -1,6 +1,7 @@
+import { channelsActions } from '@mezon/store';
 import { ICategory, LoadingStatus, SortChannel } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import {ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest} from 'mezon-js/api.gen';
+import { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
@@ -31,9 +32,9 @@ type fetchCategoriesPayload = {
 };
 
 type updatCategoryPayload = {
-  clanId: string;
-  request: ApiUpdateCategoryDescRequest;
-}
+	clanId: string;
+	request: ApiUpdateCategoryDescRequest;
+};
 export const fetchCategories = createAsyncThunk('categories/fetchCategories', async ({ clanId }: fetchCategoriesPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.listCategoryDescs(mezon.session, clanId);
@@ -41,7 +42,7 @@ export const fetchCategories = createAsyncThunk('categories/fetchCategories', as
 		return [];
 	}
 	return response.categorydesc.map(mapCategoryToEntity);
-});
+	});
 
 export const createNewCategory = createAsyncThunk('categories/createCategories', async (body: ApiCreateCategoryDescRequest, thunkAPI) => {
 	try {
@@ -58,21 +59,38 @@ export const createNewCategory = createAsyncThunk('categories/createCategories',
 	}
 });
 
-export const updateCategory = createAsyncThunk('categories/updateCategory', async({clanId, request}: updatCategoryPayload, thunkAPI) => {
-    try {
-      const mezon = await ensureSession(getMezonCtx(thunkAPI));
-      const response = await mezon.client.updateCategory(mezon.session, request);
-      thunkAPI.dispatch(fetchCategories({clanId}))
-    } catch (error) {
-      return thunkAPI.rejectWithValue([])
-    }
-})
+export const deleteCategory = createAsyncThunk(
+    'categories/deleteCategory',
+    async ({ clanId, categoryId }: { clanId: string; categoryId: string}, thunkAPI) => {
+        try {
+            const mezon = await ensureSession(getMezonCtx(thunkAPI));
+            const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId);
+            if (response) {
+                thunkAPI.dispatch(fetchCategories({ clanId }));
+                thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
+                thunkAPI.dispatch(channelsActions.removeRememberChannel({clanId}));
+            }
+        } catch (error) {
+            return thunkAPI.rejectWithValue([]);
+        }
+    },
+);
+
+export const updateCategory = createAsyncThunk('categories/updateCategory', async ({ clanId, request }: updatCategoryPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.updateCategory(mezon.session, request);
+		thunkAPI.dispatch(fetchCategories({ clanId }));
+	} catch (error) {
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 
 export const initialCategoriesState: CategoriesState = categoriesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	categories: [],
 	error: null,
-	sortChannelByCategoryId: {},
+	sortChannelByCategoryId: {}
 });
 
 export const categoriesSlice = createSlice({
@@ -88,7 +106,7 @@ export const categoriesSlice = createSlice({
 			if (action.payload.categoryId) {
 				state.sortChannelByCategoryId[action.payload.categoryId] = action.payload.isSortChannelByCategoryId;
 			}
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
@@ -112,6 +130,18 @@ export const categoriesSlice = createSlice({
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(createNewCategory.rejected, (state: CategoriesState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+
+		builder
+			.addCase(deleteCategory.pending, (state: CategoriesState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(deleteCategory.fulfilled, (state: CategoriesState) => {
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(deleteCategory.rejected, (state: CategoriesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -141,7 +171,7 @@ export const categoriesReducer = categoriesSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const categoriesActions = { ...categoriesSlice.actions, fetchCategories, createNewCategory, updateCategory };
+export const categoriesActions = { ...categoriesSlice.actions, fetchCategories, createNewCategory, updateCategory, deleteCategory };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -170,9 +200,9 @@ export const selectCategoriesEntities = createSelector(getCategoriesState, selec
 export const selectCategoryById = (id: string) => createSelector(selectCategoriesEntities, (categoriesEntities) => categoriesEntities[id]);
 
 export const selectCurrentCategory = createSelector(selectCategoriesEntities, selectCurrentCategoryId, (categoriesEntities, clanId) =>
-	clanId ? categoriesEntities[clanId] : null,
+	clanId ? categoriesEntities[clanId] : null
 );
 
-export const selectDefaultCategory = createSelector(selectAllCategories, categories => categories[0]);
+export const selectDefaultCategory = createSelector(selectAllCategories, (categories) => categories[0]);
 
 export const selectCategoriesIds = createSelector(getCategoriesState, (entities) => entities.ids);

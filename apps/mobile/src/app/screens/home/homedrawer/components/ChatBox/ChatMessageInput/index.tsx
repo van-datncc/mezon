@@ -3,9 +3,9 @@ import {
 	ActionEmitEvent,
 	ID_MENTION_HERE,
 	IRoleMention,
+	IS_TABLET,
 	Icons,
-	getAttachmentUnique,
-	IS_TABLET
+	getAttachmentUnique
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
@@ -112,7 +112,7 @@ export const ChatMessageInput = memo(
 					roleName: item.title ?? '',
 				}));
 			}, [rolesInClan]);
-			
+
 			const removeTags = (text: string) => {
 				if (!text)
 					return '';
@@ -183,9 +183,10 @@ export const ChatMessageInput = memo(
 
 			const onEditMessage = useCallback(
 				async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
-					await editSendMessage(editMessage, messageId, mentions);
+					const { attachments } = messageActionNeedToResolve.targetMessage;
+					await editSendMessage(editMessage, messageId, mentions, attachments, true);
 				},
-				[editSendMessage],
+				[editSendMessage, messageActionNeedToResolve],
 			);
 
 			const isCanSendMessage = useMemo(() => {
@@ -252,19 +253,19 @@ export const ChatMessageInput = memo(
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? ([
-							{
-								message_id: '',
-								message_ref_id: targetMessage.id,
-								ref_type: 0,
-								message_sender_id: targetMessage?.sender_id,
-								message_sender_username: targetMessage?.username,
-								mesages_sender_avatar: targetMessage?.avatar,
-								message_sender_clan_nick: targetMessage?.clan_nick,
-								message_sender_display_name: targetMessage?.display_name,
-								content: JSON.stringify(targetMessage.content),
-								has_attachment: Boolean(targetMessage?.attachments?.length),
-							},
-						] as Array<ApiMessageRef>)
+						{
+							message_id: '',
+							message_ref_id: targetMessage.id,
+							ref_type: 0,
+							message_sender_id: targetMessage?.sender_id,
+							message_sender_username: targetMessage?.username,
+							mesages_sender_avatar: targetMessage?.avatar,
+							message_sender_clan_nick: targetMessage?.clan_nick,
+							message_sender_display_name: targetMessage?.display_name,
+							content: JSON.stringify(targetMessage.content),
+							has_attachment: Boolean(targetMessage?.attachments?.length),
+						},
+					] as Array<ApiMessageRef>)
 					: undefined;
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 
