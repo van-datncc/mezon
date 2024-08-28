@@ -353,7 +353,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									mentions: message.mentions,
 									...(checkOneLinkImage ? { t: '' } : {})
 								}}
-								isEdited={message?.hideEditted}
+								isEdited={message?.hideEditted && !!message.content?.t}
 								translate={t}
 								onMention={onMention}
 								onChannelMention={onChannelMention}
@@ -387,10 +387,10 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		</Animated.View>
 	);
 },
-  (prevProps, nextProps) => {
-	return prevProps.messageId + prevProps?.message.update_time === 
-	nextProps.messageId + nextProps?.message.update_time;
-  }
+	(prevProps, nextProps) => {
+		return prevProps.messageId + prevProps?.message.update_time ===
+			nextProps.messageId + nextProps?.message.update_time;
+	}
 );
 
 export default MessageItem;
