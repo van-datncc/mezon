@@ -33,9 +33,6 @@ type MessageProps = {
 };
 
 export function ChannelMessage({ message, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
-	console.log('message: ', message);
-	// todo: remove old logic
-	// const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
