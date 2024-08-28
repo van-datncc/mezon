@@ -10,7 +10,7 @@ import {
 	LoadingStatus,
 	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
-	checkSameDayByCreateTime
+	checkSameDayByCreateTime,
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -271,11 +271,12 @@ export const fetchMessages = createAsyncThunk(
 type LoadMoreMessArgs = {
 	channelId: string;
 	direction?: Direction_Mode;
+	fromMobile: boolean;
 };
 
 export const loadMoreMessage = createAsyncThunk(
 	'messages/loadMoreMessage',
-	async ({ channelId, direction = Direction_Mode.BEFORE_TIMESTAMP }: LoadMoreMessArgs, thunkAPI) => {
+	async ({ channelId, direction = Direction_Mode.BEFORE_TIMESTAMP, fromMobile = false }: LoadMoreMessArgs, thunkAPI) => {
 		try {
 			const state = getMessagesState(getMessagesRootState(thunkAPI));
 			// ignore when:
@@ -283,7 +284,7 @@ export const loadMoreMessage = createAsyncThunk(
 			// - loading
 			// - already have message to jump to
 			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
-			if (state.isJumpingToPresent || state.loadingStatus === 'loading' || state.idMessageToJump) {
+			if ((state.isJumpingToPresent && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
 				return;
 			}
 
@@ -296,7 +297,7 @@ export const loadMoreMessage = createAsyncThunk(
 					return;
 				}
 
-				return thunkAPI.dispatch(
+				return await thunkAPI.dispatch(
 					fetchMessages({
 						channelId: channelId,
 						noCache: true,

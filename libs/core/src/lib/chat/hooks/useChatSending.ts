@@ -33,6 +33,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const dispatch = useAppDispatch();
 	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
+	//TODO: fix channel dispatch too much
 	const channel = useSelector(selectChannelById(channelId));
 	let channelID = channelId;
 	let clanID = currentClanId;
