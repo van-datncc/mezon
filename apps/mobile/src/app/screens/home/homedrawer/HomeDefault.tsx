@@ -1,5 +1,14 @@
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	ENotificationActive,
+	EOpenSearchChannelFrom,
+	Icons,
+	STORAGE_AGREED_POLICY,
+	getChannelById,
+	load,
+	save
+} from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -8,7 +17,7 @@ import {
 	selectAllClans,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -29,7 +38,6 @@ import BottomKeyboardPicker from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
-import { ENotificationActive } from '../../../components/MuteThreadDetailModal';
 
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
@@ -83,7 +91,7 @@ const HomeDefault = React.memo((props: any) => {
 			return () => {
 				setIsFocusChannelView(false);
 			};
-		}, [currentChannel?.channel_id]),
+		}, [currentChannel?.channel_id])
 	);
 
 	useEffect(() => {
@@ -113,8 +121,8 @@ const HomeDefault = React.memo((props: any) => {
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',
 				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type,
-			}),
+				channelType: currentChannel?.type
+			})
 		);
 	};
 
@@ -168,7 +176,7 @@ const HomeDefault = React.memo((props: any) => {
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: themeValue.secondary,
+							backgroundColor: themeValue.secondary
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
@@ -203,7 +211,7 @@ const HomeDefaultHeader = React.memo(
 		navigation,
 		currentChannel,
 		openBottomSheet,
-		onOpenDrawer,
+		onOpenDrawer
 	}: {
 		navigation: any;
 		currentChannel: ChannelsEntity;
@@ -227,8 +235,8 @@ const HomeDefaultHeader = React.memo(
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 				params: {
-					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault,
-				},
+					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+				}
 			});
 		};
 		return (
@@ -279,7 +287,7 @@ const HomeDefaultHeader = React.memo(
 				)}
 			</View>
 		);
-	},
+	}
 );
 
 export default HomeDefault;
