@@ -1,10 +1,9 @@
-import { useAppNavigation, useCategory, useClanRestriction, useEscapeKey, useOnClickOutside, UserRestrictionZone } from '@mezon/core';
+import { useCategory, useClanRestriction, useEscapeKey, useOnClickOutside, UserRestrictionZone } from '@mezon/core';
 import { categoriesActions, channelsActions, defaultNotificationCategoryActions, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
 import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import CategorySetting from '../../CategorySetting';
 import { Coords } from '../../ChannelLink';
 import ModalConfirm from '../../ModalConfirm';
@@ -24,16 +23,14 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
-		distanceToBottom: 0,
+		distanceToBottom: 0
 	});
 	const [showModal, setShowModal] = useState(false);
 	const [isShowCategorySetting, setIsShowCategorySetting] = useState<boolean>(false);
 	const [isShowCategoryChannels, setIsShowCategoryChannels] = useState<boolean>(true);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
-	const { categorizedChannels } = useCategory();
-	const { toChannelPage, toMembersPage } = useAppNavigation();
+	const { handleDeleteCategory } = useCategory();
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
 
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasManageChannelPermission || hasClanPermission;
 
@@ -62,7 +59,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 
 	const handleSortByName = () => {
 		dispatch(
-			categoriesActions.setCategoryIdSortChannel({ isSortChannelByCategoryId: !categoryIdSortChannel[category.id], categoryId: category.id }),
+			categoriesActions.setCategoryIdSortChannel({ isSortChannelByCategoryId: !categoryIdSortChannel[category.id], categoryId: category.id })
 		);
 	};
 
@@ -76,37 +73,13 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 		openModalCreateNewChannel(category);
 	};
 
-	const handleDeleteCategory = () => {
+	const openModalDeleteCategory = () => {
 		setShowModal(true);
 		setIsShowPanelCategory(false);
 	};
 
 	const confirmDeleteCategory = async () => {
-		await dispatch(categoriesActions.deleteCategory({ clanId: category.clan_id as string, categoryId: category.id as string }));
-		const targetIndex = categorizedChannels.findIndex((obj) => obj.category_id === category.id);
-
-		let channelNavId = '';
-		if (targetIndex !== -1) {
-			if (targetIndex === 0) {
-				channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
-				if (!channelNavId) {
-					const clanPath = toMembersPage(category.clan_id ?? '');
-					navigate(clanPath);
-					return
-				}
-			} else if (targetIndex === categorizedChannels.length - 1) {
-				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
-			} else {
-				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
-			}
-		}
-
-		if (channelNavId && category.clan_id) {
-			const channelPath = toChannelPage(channelNavId ?? '', category.clan_id ?? '');
-			navigate(channelPath);
-			return
-		}
-
+		handleDeleteCategory({ category });
 		setShowModal(false);
 	};
 
@@ -115,73 +88,71 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	useEscapeKey(() => setIsShowPanelCategory(false));
 
 	return (
-		<>
-			<div>
-				{category.category_name && (
-					<div className="flex flex-row px-2 relative gap-1" onMouseDown={handleMouseClick} ref={panelRef} role={'button'}>
+		<div>
+			{category.category_name && (
+				<div className="flex flex-row px-2 relative gap-1" onMouseDown={handleMouseClick} ref={panelRef} role={'button'}>
+					<button
+						onClick={() => {
+							handleToggleCategory();
+						}}
+						className="dark:text-contentTertiary text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
+					>
+						{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
+						<span className="one-line">{category.category_name}</span>
+					</button>
+					<button
+						onClick={handleSortByName}
+						className="focus-visible:outline-none dark:text-contentTertiary text-colorTextLightMode dark:hover:text-white hover:text-black"
+					>
+						<Icons.UpDownIcon />
+					</button>
+					<UserRestrictionZone policy={isShowCreateChannel}>
 						<button
-							onClick={() => {
-								handleToggleCategory();
-							}}
-							className="dark:text-contentTertiary text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
-						>
-							{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
-							<span className="one-line">{category.category_name}</span>
-						</button>
-						<button
-							onClick={handleSortByName}
 							className="focus-visible:outline-none dark:text-contentTertiary text-colorTextLightMode dark:hover:text-white hover:text-black"
+							onClick={() => handleOpenCreateChannelModal(category)}
 						>
-							<Icons.UpDownIcon />
+							<Icons.Plus />
 						</button>
-						<UserRestrictionZone policy={isShowCreateChannel}>
-							<button
-								className="focus-visible:outline-none dark:text-contentTertiary text-colorTextLightMode dark:hover:text-white hover:text-black"
-								onClick={() => handleOpenCreateChannelModal(category)}
-							>
-								<Icons.Plus />
-							</button>
-						</UserRestrictionZone>
+					</UserRestrictionZone>
 
-						{isShowPanelCategory && (
-							<PanelCategory
-								coords={coords}
-								setIsShowPanelChannel={setIsShowPanelCategory}
-								onDeleteCategory={handleDeleteCategory}
-								setOpenSetting={setIsShowCategorySetting}
-								category={category}
-							/>
-						)}
+					{isShowPanelCategory && (
+						<PanelCategory
+							coords={coords}
+							setIsShowPanelChannel={setIsShowPanelCategory}
+							onDeleteCategory={openModalDeleteCategory}
+							setOpenSetting={setIsShowCategorySetting}
+							category={category}
+						/>
+					)}
 
-						{showModal && (
-							<ModalConfirm
-								handleCancel={() => setShowModal(false)}
-								modalName={category.category_name || ''}
-								handleConfirm={confirmDeleteCategory}
-								title='delete'
-								buttonName='Delete category'
-								message='This cannot be undone'
-								customModalName='Category'
-							/>
-						)}
+					{showModal && (
+						<ModalConfirm
+							handleCancel={() => setShowModal(false)}
+							modalName={category.category_name || ''}
+							handleConfirm={confirmDeleteCategory}
+							title="delete"
+							buttonName="Delete category"
+							message="This cannot be undone"
+							customModalName="Category"
+						/>
+					)}
 
-						{isShowCategorySetting && <CategorySetting onClose={handleCloseCategorySetting} category={category} />}
-					</div>
-				)}
-				{isShowCategoryChannels && (
-					<div className="mt-[5px] space-y-0.5 text-contentTertiary">
-						{category?.channels
-							?.filter((channel: IChannel) => {
-								const categoryIsOpen = isShowCategoryChannels;
-								return categoryIsOpen || channel?.unread;
-							})
-							.map((channel: IChannel) => {
-								return <ChannelListItem key={channel.id} channel={channel as ChannelThreads} />;
-							})}
-					</div>
-				)}
-			</div>
-		</>
+					{isShowCategorySetting && <CategorySetting onClose={handleCloseCategorySetting} category={category} />}
+				</div>
+			)}
+			{isShowCategoryChannels && (
+				<div className="mt-[5px] space-y-0.5 text-contentTertiary">
+					{category?.channels
+						?.filter((channel: IChannel) => {
+							const categoryIsOpen = isShowCategoryChannels;
+							return categoryIsOpen || channel?.unread;
+						})
+						.map((channel: IChannel) => {
+							return <ChannelListItem key={channel.id} channel={channel as ChannelThreads} />;
+						})}
+				</div>
+			)}
+		</div>
 	);
 };
 
