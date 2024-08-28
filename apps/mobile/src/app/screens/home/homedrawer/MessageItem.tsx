@@ -211,15 +211,6 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		}
 	}, []);
 
-	const isEdited = useMemo(() => {
-		if (message?.update_time) {
-			const updateDate = new Date(message?.update_time);
-			const createDate = new Date(message?.create_time);
-			return updateDate > createDate;
-		}
-		return false;
-	}, [message?.create_time, message?.update_time]);
-
 	const senderDisplayName = useMemo(() => {
 		if (isDM) {
 			return message?.display_name || message?.username || '';
@@ -362,7 +353,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 									mentions: message.mentions,
 									...(checkOneLinkImage ? { t: '' } : {})
 								}}
-								isEdited={isEdited}
+								isEdited={message?.hideEditted}
 								translate={t}
 								onMention={onMention}
 								onChannelMention={onChannelMention}
@@ -392,7 +383,7 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 				</View>
 			</View>
 			{/* </Swipeable> */}
-			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={isEdited} />
+			<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />
 		</Animated.View>
 	);
 },
