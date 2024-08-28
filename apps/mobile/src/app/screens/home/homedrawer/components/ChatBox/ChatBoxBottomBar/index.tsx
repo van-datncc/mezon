@@ -13,7 +13,6 @@ import {
 	referencesActions,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	selectDmGroupCurrentId,
 	selectEmojiSuggestion,
 	threadsActions,
 	useAppDispatch
@@ -91,13 +90,7 @@ export const ChatBoxBottomBar = memo(
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 		const currentChannel = useSelector(selectCurrentChannel);
-		const currentDMChannelId = useSelector(selectDmGroupCurrentId);
-
-		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(
-			mode == ChannelStreamMode.STREAM_MODE_DM
-				? currentDMChannelId
-				: currentChannel?.id || "0"
-		);
+		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
 
 		const channelsEntities = useSelector(selectChannelsEntities);
 		const navigation = useNavigation<any>();
