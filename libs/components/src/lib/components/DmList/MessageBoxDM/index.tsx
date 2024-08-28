@@ -34,7 +34,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 			content: IMessageSendPayload,
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>,
+			references?: Array<ApiMessageRef>
 		) => {
 			if (sessionUser) {
 				sendDirectMessage(content, mentions, [], references);
@@ -42,7 +42,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 				console.error('Session is not available');
 			}
 		},
-		[sendDirectMessage, sessionUser],
+		[sendDirectMessage, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -87,7 +87,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					style={{
 						position: 'fixed',
 						bottom: '76px',
-						right: setMarginleft,
+						right: setMarginleft
 					}}
 					onClick={(e) => {
 						e.stopPropagation();
@@ -112,7 +112,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 						e.stopPropagation();
 					}}
 				>
-					<GifStickerEmojiPopup emojiAction={emojiAction} mode={mode} messageEmojiId={idMessageRefReaction} />
+					<GifStickerEmojiPopup emojiAction={emojiAction} mode={mode} />
 				</div>
 			)}
 		</div>

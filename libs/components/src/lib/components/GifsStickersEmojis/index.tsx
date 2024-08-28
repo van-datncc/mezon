@@ -1,5 +1,5 @@
 import { useAppParams, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel, selectIdMessageRefReaction } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef, useState } from 'react';
@@ -12,18 +12,18 @@ import TenorGifCategories from './gifs/TenorGifCategories';
 import { InputSearch } from './inputSearch';
 
 export type GifStickerEmojiPopupOptions = {
-	messageEmojiId?: string;
 	emojiAction?: EmojiPlaces;
 	mode?: number;
 };
 
-const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerEmojiPopupOptions) => {
+const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { type } = useAppParams();
 	const [mod, setMod] = useState(0);
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
 	const { setValueInputSearch } = useGifsStickersEmoji();
 	const [isShowSetting, setIsShowSetting] = useState(false);
+	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -117,7 +117,7 @@ const GifStickerEmojiPopup = ({ messageEmojiId, emojiAction, mode }: GifStickerE
 					)}
 					{isShowEmojiPicker() && (
 						<div className="flex h-full pr-2 w-full md:w-[500px]">
-							<EmojiPickerComp mode={mode} messageEmojiId={messageEmojiId} onClickAddButton={handleOpenSetting} />
+							<EmojiPickerComp mode={mode} messageEmojiId={idMessageRefReaction} onClickAddButton={handleOpenSetting} />
 						</div>
 					)}
 				</div>
