@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { IScrollOptions, SCROLL_DEFAULT_OPTIONS } from './scroll-options';
 
 /**
  * React hook for controlling scrollable HTML element.
  * @private
  * @param targetRef Reference of scrollable HTML element.
  */
-export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrollResponse => {
+export const useScroll = (targetRef: React.MutableRefObject<Element>, options: IScrollOptions = SCROLL_DEFAULT_OPTIONS): IUseScrollResponse => {
 	const scrollEventHandlerRef = useRef<EventListener>(() => {
 		return;
 	});
@@ -39,7 +40,7 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrol
 		(offset: number) => {
 			targetRef.current.scrollTop = offset;
 		},
-		[targetRef],
+		[targetRef]
 	);
 
 	const getStoredScrollHeight = useCallback(() => storedScrollHeight.current, []);
@@ -57,16 +58,23 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrol
 	const getClientHeight = useCallback(() => targetRef.current.clientHeight, [targetRef]);
 
 	useEffect(() => {
-		const handler = scrollEventHandlerRef.current;
+		let scrollHandlerTimeoutId: NodeJS.Timeout;
+
+		const handler = (event: Event) => {
+			scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
+			scrollHandlerTimeoutId = setTimeout(() => {
+				scrollEventHandlerRef.current(event);
+			}, options?.debounce);
+		};
+
 		const el = targetRef.current;
 
-		handler({} as Event);
 		el.addEventListener('scroll', handler);
 
 		return () => {
 			el.removeEventListener('scroll', handler);
 		};
-	}, [handlerId, targetRef]);
+	}, [handlerId, targetRef, options]);
 
 	return {
 		isFetching,
@@ -80,7 +88,7 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>): IUseScrol
 		storeCurrentScrollHeight,
 		getStoredScrollTop,
 		storeCurrentScrollTop,
-		setScrollEventHandler,
+		setScrollEventHandler
 	};
 };
 

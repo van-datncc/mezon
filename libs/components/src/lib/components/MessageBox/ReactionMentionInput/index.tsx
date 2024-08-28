@@ -19,13 +19,13 @@ import {
 	selectAllAccount,
 	selectAllRolesClan,
 	selectAllUsesClan,
-	selectAttachmentData,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
+	// selectFilteredAttachments,
 	selectHashtagDMByDirectId,
 	selectIdMessageRefEdit,
 	selectIdMessageRefReply,
@@ -33,6 +33,7 @@ import {
 	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectIsShowMemberListDM,
+	selectIsShowPopupQuickMess,
 	selectIsUseProfileDM,
 	selectLassSendMessageEntityBySenderId,
 	selectMessageByMessageId,
@@ -162,10 +163,9 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentDmOrChannelId || ''));
 	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
-	const attachmentDataRef = useSelector(selectAttachmentData(currentDmOrChannelId || ''));
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
-	const { setDataReferences, setOpenThreadMessageState, setAttachmentData } = useReference(currentDmOrChannelId || '');
+	const { setDataReferences, setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
 
 	const { mentions } = useMessageLine(request?.content);
@@ -191,6 +191,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 
 	const { trackEnterPress } = useEnterPressTracker();
+	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { key, ctrlKey, shiftKey } = event;
 		const isEnterKey = key === 'Enter';
@@ -260,17 +261,14 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				vk: voiceLinkRoomList,
 			};
 
-			if (
-				(!request?.valueTextInput && attachmentDataRef?.length === 0) ||
-				((request?.valueTextInput || '').trim() === '' && attachmentDataRef?.length === 0)
-			) {
+			if ((!request?.valueTextInput && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
 			if (
 				request?.valueTextInput &&
 				typeof request?.valueTextInput === 'string' &&
 				!(request?.valueTextInput || '').trim() &&
-				attachmentDataRef?.length === 0 &&
+				!checkAttachment &&
 				mentionData?.length === 0
 			) {
 				if (!nameValueThread?.trim() && props.isThread && !threadCurrentChannel) {
@@ -293,7 +291,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				props.onSend(
 					filterEmptyArrays(payload),
 					mentionList,
-					attachmentDataRef,
+					[],
 					dataReferences,
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
@@ -301,7 +299,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
-				setAttachmentData([]);
 				dispatch(referencesActions.setIdReferenceMessageReply({ channelId: currentDmOrChannelId as string, idMessageRefReply: '' }));
 				setMentionEveryone(false);
 				setDataReferences([]);
@@ -324,7 +321,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					props.onSend(
 						filterEmptyArrays(payload),
 						mentionList,
-						attachmentDataRef,
+						[],
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
 						anonymousMessage,
@@ -334,7 +331,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
-				setAttachmentData([]);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
@@ -351,7 +347,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		},
 		[
 			request,
-			attachmentDataRef,
 			mentionData,
 			nameValueThread,
 			props,
@@ -368,7 +363,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			mentions,
 			usersClan,
 			members,
-			setAttachmentData,
 			setDataReferences,
 			currentChannelId,
 			valueThread?.content.t,
@@ -485,13 +479,13 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	useClickUpToEdit(editorRef, request?.valueTextInput, clickUpToEditMessage);
 
 	useEffect(() => {
-		if ((closeMenu && statusMenu) || openEditMessageState) {
-			return;
+		if ((closeMenu && statusMenu) || openEditMessageState || isShowPopupQuickMess) {
+			return editorRef?.current?.blur();
 		}
 		if (getRefMessageReply !== null || (emojiPicked?.shortName !== '' && !reactionRightState) || (!openEditMessageState && !idMessageRefEdit)) {
 			return focusToElement(editorRef);
 		}
-	}, [getRefMessageReply, emojiPicked, openEditMessageState, idMessageRefEdit]);
+	}, [getRefMessageReply, emojiPicked, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
@@ -704,7 +698,6 @@ const useEnterPressTracker = () => {
 
 	const resetEnterCount = () => {
 		setEnterCount(0);
-		handleClosePopupQuickMess();
 		if (timerRef.current) {
 			clearTimeout(timerRef.current);
 			timerRef.current = null;

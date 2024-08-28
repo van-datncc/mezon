@@ -18,8 +18,8 @@ export function useSeenMessagePool() {
 				messagesActions.updateLastSeenMessage({
 					clanId: action.clanId,
 					channelId: action.channelId,
-					messageId: action.messageId,
-				}),
+					messageId: action.messageId
+				})
 			);
 		});
 	}, [dispatch]);
@@ -39,8 +39,8 @@ export function useSeenMessagePool() {
 			channelId: message.channel_id || '',
 			channelLabel: message.channel_label,
 			messageId: message.id || '',
-			messageCreatedAt: message.create_time_ms ? +message.create_time_ms : 0,
-			messageSeenAt: +Date.now(),
+			messageCreatedAt: message.create_time_seconds ? +message.create_time_seconds : 0,
+			messageSeenAt: +Date.now()
 		});
 	}, []);
 
@@ -48,8 +48,8 @@ export function useSeenMessagePool() {
 		() => ({
 			markMessageAsSeen,
 			initWorker,
-			unInitWorker,
+			unInitWorker
 		}),
-		[initWorker, markMessageAsSeen, unInitWorker],
+		[initWorker, markMessageAsSeen, unInitWorker]
 	);
 }
