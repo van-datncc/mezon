@@ -8,7 +8,7 @@ import {
 	getAttachmentUnique
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
+import { emojiSuggestionActions, messagesActions, selectCurrentClanId } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
@@ -231,11 +231,15 @@ export const ChatMessageInput = memo(
 
 				const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
 
-				dispatch(
-					referencesActions.resetDataAttachment({
-						channelId: channelId,
-					}),
-				);
+				// TODO: - nghia - reset attachments
+				// dispatch(
+				// 	referencesActions.setAtachmentAfterUpload({
+				// 		channelId: ,
+				// 		messageId: '',
+				// 		files: [],
+				// 	}),
+				// );
+
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? ([

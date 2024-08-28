@@ -1,22 +1,21 @@
+import { useReference } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
-	getAttachmentUnique,
 	load,
 	mentionUserPattern,
-	save,
+	save
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	emojiSuggestionActions,
-	referencesActions,
-	selectAttachmentData,
 	selectChannelsEntities,
 	selectCurrentChannel,
+	selectDmGroupCurrentId,
 	selectEmojiSuggestion,
 	threadsActions,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
@@ -90,8 +89,15 @@ export const ChatBoxBottomBar = memo(
 		const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
-		const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 		const currentChannel = useSelector(selectCurrentChannel);
+		const currentDMChannelId = useSelector(selectDmGroupCurrentId);
+
+		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(
+			mode == ChannelStreamMode.STREAM_MODE_DM
+				? currentDMChannelId
+				: currentChannel?.id || "0"
+		);
+
 		const channelsEntities = useSelector(selectChannelsEntities);
 		const navigation = useNavigation<any>();
 		const inputRef = useRef<TextInput>();
@@ -168,17 +174,6 @@ export const ChatBoxBottomBar = memo(
 			const textFormat = `${text?.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `;
 			await handleTextInputChange(textFormat);
 		};
-
-		const removeAttachmentByUrl = useCallback((filename: string) => {
-			const index = attachmentDataRef?.findIndex((attachment => attachment.filename === filename));
-
-			dispatch(
-				referencesActions.removeAttachment({
-					channelId: channelId,
-					index
-				}),
-			);
-		}, [attachmentDataRef]);
 
 		const onSendSuccess = useCallback(() => {
 			setText('');
@@ -377,12 +372,18 @@ export const ChatBoxBottomBar = memo(
 						return (attachment.filetype = typeConvert.typeConvert);
 					}
 				});
-				dispatch(
-					referencesActions.setAttachmentData({
-						channelId: channelId,
-						attachments: [attachment],
-					}),
-				);
+				// dispatch(
+				// 	referencesActions.setAtachmentAfterUpload({
+				// 		channelId: currentChannel?.id,
+				// 		messageId: '',
+				// 		files: [file].map((file) => ({
+				// 			filename: file.name,
+				// 			filetype: file.type,
+				// 			size: file.size,
+				// 			url: URL.createObjectURL(file),
+				// 		})),
+				// 	}),
+				// );
 			},
 			[channelId, dispatch],
 		);
@@ -432,6 +433,10 @@ export const ChatBoxBottomBar = memo(
 			}, 300);
 		};
 
+		const handleRemoveAttachment = (index: number) => {
+			removeAttachmentByIndex(currentChannel?.id, index);
+		}
+
 		useEffect(() => {
 			if (messageActionNeedToResolve !== null) {
 				const { isStillShowKeyboard } = messageActionNeedToResolve;
@@ -471,8 +476,10 @@ export const ChatBoxBottomBar = memo(
 				<HashtagSuggestions {...triggers.hashtag} />
 				<EmojiSuggestion {...triggers.emoji} />
 
-				{!!attachmentDataRef?.length && (
-					<AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
+				{checkAttachment && (
+					<AttachmentPreview
+						attachments={attachmentFilteredByChannelId.files}
+						onRemove={handleRemoveAttachment} />
 				)}
 
 				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
@@ -510,7 +517,7 @@ export const ChatBoxBottomBar = memo(
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						isShowCreateThread={isShowCreateThread}
 						channelsEntities={channelsEntities}
-						attachmentDataRef={attachmentDataRef}
+						attachmentDataRef={attachmentFilteredByChannelId?.files}
 					/>
 				</Block>
 			</Block>

@@ -1,11 +1,12 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { referencesActions } from '@mezon/store';
+import { appActions, referencesActions } from '@mezon/store';
 import { createUploadFilePath, useMezon } from '@mezon/transport';
 import { IFile } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
 import Gallery from './Gallery';
@@ -22,7 +23,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['message']);
-	const { sessionRef, clientRef } = useMezon();
+	const { sessionRef } = useMezon();
 	const timeRef = useRef<any>();
 	const dispatch = useDispatch();
 
@@ -35,88 +36,50 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const getFullFileName = useCallback(
 		(fileName: string) => {
 			const session = sessionRef.current;
-			return createUploadFilePath(session, currentClanId, currentChannelId, fileName);
+			return createUploadFilePath(session, currentClanId, currentChannelId, fileName)?.filePath;
 		},
 		[currentChannelId, currentClanId, sessionRef],
 	);
 
-	// const onPickFiles = async () => {
-	// 	try {
-	// 		timeRef.current = setTimeout(() => {
-	// 			dispatch(appActions.setIsFromFCMMobile(true));
-	// 		}, 500);
-	// 		const res = await DocumentPicker.pick({
-	// 			type: [DocumentPicker.types.allFiles],
-	// 		});
-	// 		const file = res?.[0];
-	// 		const attachment = {
-	// 			url: file?.uri || file?.fileCopyUri,
-	// 			filename: getFullFileName(file?.name || file?.uri),
-	// 			filetype: file?.type,
-	// 		};
-	// 		dispatch(
-	// 			referencesActions.setAttachmentData({
-	// 				channelId: currentChannelId,
-	// 				attachments: [attachment],
-	// 			}),
-	// 		);
-	// 		const fileData = await RNFS.readFile(file?.uri || file?.fileCopyUri, 'base64');
+	const onPickFiles = async () => {
+		try {
+			timeRef.current = setTimeout(() => {
+				dispatch(appActions.setIsFromFCMMobile(true));
+			}, 500);
+			const res = await DocumentPicker.pick({
+				type: [DocumentPicker.types.allFiles],
+			});
+			const file = res?.[0];
 
-	// 		const fileFormat: IFile = {
-	// 			uri: file?.uri || file?.fileCopyUri,
-	// 			name: file?.name,
-	// 			type: file?.type,
-	// 			size: file?.size,
-	// 			fileData
-	// 		};
-	// 		timeRef.current = setTimeout(() => {
-	// 			dispatch(appActions.setIsFromFCMMobile(false));
-	// 		}, 2000);
-	// 		handleFiles([fileFormat]);
-	// 	} catch (err) {
-	// 		timeRef.current = setTimeout(() => {
-	// 			dispatch(appActions.setIsFromFCMMobile(false));
-	// 		}, 2000);
-	// 		if (DocumentPicker.isCancel(err)) {
-	// 			onCancel?.();
-	// 			// User cancelled the picker
-	// 		} else {
-	// 			throw err;
-	// 		}
-	// 	}
-	// };
+			console.log(file);
 
-	// const handleFiles = (files: IFile | any) => {
-	// 	const session = sessionRef.current;
-	// 	const client = clientRef.current;
-	// 	if (!files || !client || !session || !currentChannelId) {
-	// 		throw new Error('Client or files are not initialized');
-	// 	}
+			dispatch(referencesActions.setAtachmentAfterUpload({
+				channelId: currentChannelId,
+				files: [{
+					filename: getFullFileName(file?.name || file?.uri),
+					url: file?.uri || file?.fileCopyUri,
+					filetype: file?.type,
+					size: file.size as number,
+				}]
+			}));
 
-	// 	const promises = Array.from(files).map((file: IFile | any) => {
-	// 		return handleUploadFileMobile(client, session, currentClanId, currentChannelId, file.name, file);
-	// 	});
-
-	// 	Promise.all(promises).then((attachments) => {
-	// 		attachments.forEach((attachment) => handleFinishUpload(attachment));
-	// 	});
-	// };
+			timeRef.current = setTimeout(() => {
+				dispatch(appActions.setIsFromFCMMobile(false));
+			}, 2000);
+		} catch (err) {
+			timeRef.current = setTimeout(() => {
+				dispatch(appActions.setIsFromFCMMobile(false));
+			}, 2000);
+			if (DocumentPicker.isCancel(err)) {
+				onCancel?.();
+				// User cancelled the picker
+			} else {
+				throw err;
+			}
+		}
+	};
 
 	const handleSelectedAttachments = useCallback((file: IFile) => {
-		// dispatch(
-		// 	referencesActions.setAttachmentData({
-		// 		channelId: currentChannelId,
-		// 		attachments: [
-		// 			{
-		// 				filename: file.name,
-		// 				filetype: file.type,
-		// 				size: 0, // Mark as pending upload item
-		// 				url: file.uri
-		// 			}
-		// 		],
-		// 	}),
-		// );
-
 		dispatch(referencesActions.setAtachmentAfterUpload({
 			channelId: currentChannelId,
 			files: [{
@@ -128,18 +91,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		}));
 	}, [])
 
-	// const handleFinishUpload = useCallback(
-	// 	(attachment: ApiMessageAttachment) => {
-	// 		dispatch(
-	// 			referencesActions.setAttachmentData({
-	// 				channelId: currentChannelId,
-	// 				attachments: [attachment],
-	// 			}),
-	// 		);
-	// 	},
-	// 	[currentChannelId, dispatch],
-	// );
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.wrapperHeader}>
@@ -147,10 +98,10 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					<Icons.PollsIcon height={20} width={20} color={themeValue.text} />
 					<Text style={styles.titleButtonHeader}>{t('message:actions.polls')}</Text>
 				</TouchableOpacity>
-				{/* <TouchableOpacity activeOpacity={0.8} onPress={onPickFiles} style={styles.buttonHeader}>
+				<TouchableOpacity activeOpacity={0.8} onPress={onPickFiles} style={styles.buttonHeader}>
 					<Icons.AttachmentIcon height={20} width={20} color={themeValue.text} />
 					<Text style={styles.titleButtonHeader}>{t('message:actions.files')}</Text>
-				</TouchableOpacity> */}
+				</TouchableOpacity>
 			</View>
 			<Gallery onPickGallery={handleSelectedAttachments} currentChannelId={currentChannelId} />
 		</View>

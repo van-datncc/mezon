@@ -31,7 +31,7 @@ export async function handleUploadAttachmentMobile(
                 return;
             }
 
-            const fullFilename = createUploadFilePath(session, currentClanId, currentChannelId, fileName);
+            const { filePath: fullFilename } = createUploadFilePath(session, currentClanId, currentChannelId, fileName);
             resolve(uploadFile(client, session, fullFilename, fileType, file.size, arrayBuffer, true));
         }
         catch (error) {

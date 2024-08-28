@@ -1,8 +1,9 @@
 import { useChatSending } from "@mezon/core";
 import { handleUploadAttachmentMobile } from "@mezon/mobile-components";
-import { referencesActions, selectCurrentChannelId, selectCurrentClanId, selectNewMesssageUpdateImage, selectPendingAttachments } from "@mezon/store";
+import { referencesActions, selectAttachmentByChannelId, selectCurrentChannelId, selectCurrentClanId, selectNewMesssageUpdateImage } from "@mezon/store";
 import { useAppDispatch, useAppSelector } from "@mezon/store-mobile";
 import { useMezon } from "@mezon/transport";
+import { EUploadingStatus, failAttachment } from "@mezon/utils";
 import { ChannelStreamMode } from "mezon-js";
 import { useEffect } from "react";
 
@@ -10,10 +11,10 @@ export default function useUpdateAttachmentMessages() {
     const { sessionRef, clientRef } = useMezon();
     const dispatch = useAppDispatch();
 
-    const pendingAttachments = useAppSelector(selectPendingAttachments);
     const newMessage = useAppSelector(selectNewMesssageUpdateImage);
     const currentChannelId = useAppSelector(selectCurrentChannelId);
     const currentClanId = useAppSelector(selectCurrentClanId);
+    const attachmentFilteredByChannelId = useAppSelector(selectAttachmentByChannelId(currentChannelId));
 
     const { updateImageLinkMessage } = useChatSending({ channelId: newMessage.channel_id ?? '', mode: newMessage.mode ?? 0 });
 
@@ -21,21 +22,31 @@ export default function useUpdateAttachmentMessages() {
     const client = clientRef.current;
 
     useEffect(() => {
-        if (client && session && pendingAttachments[currentChannelId]?.length > 0) {
-            console.log(pendingAttachments);
+        if (attachmentFilteredByChannelId?.messageId !== '' &&
+            attachmentFilteredByChannelId !== null &&
+            attachmentFilteredByChannelId.files.length > 0 &&
+            client &&
+            session) {
 
-            const promises = pendingAttachments[currentChannelId]?.map((file) =>
+            dispatch(
+                referencesActions.setAtachmentAfterUpload({
+                    channelId: currentChannelId,
+                    messageId: '',
+                    files: [],
+                }),
+            );
+
+            const promises = attachmentFilteredByChannelId?.files?.map((file) =>
                 handleUploadAttachmentMobile(client, session, currentClanId, currentChannelId, {
-                    name: file.name,
-                    path: file.path,
-                    type: file.type,
+                    name: file.filename,
+                    path: file.url,
+                    type: file.filetype,
                     size: file.size
                 }),
             );
 
             Promise.all(promises)
                 .then((results) => {
-                    console.log(results);
                     updateImageLinkMessage(
                         newMessage.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '0',
                         newMessage.channel_id ?? '',
@@ -48,11 +59,60 @@ export default function useUpdateAttachmentMessages() {
                         true,
                     );
                 })
+                .then(() => {
+                    dispatch(
+                        referencesActions.setUploadingStatus({
+                            channelId: currentChannelId,
+                            messageId: attachmentFilteredByChannelId?.messageId ?? '',
+                            statusUpload: EUploadingStatus.SUCCESSFULLY,
+                            count: attachmentFilteredByChannelId?.files?.length,
+                        }),
+                    );
+                })
                 .catch((error) => {
+                    updateImageLinkMessage(
+                        newMessage.clan_id,
+                        newMessage.channel_id ?? '',
+                        newMessage.mode,
+                        newMessage.content,
+                        newMessage.message_id,
+                        newMessage.mentions,
+                        [failAttachment],
+                        undefined,
+                        true,
+                    );
+
+                    dispatch(
+                        referencesActions.setUploadingStatus({
+                            channelId: currentChannelId,
+                            messageId: attachmentFilteredByChannelId?.messageId ?? '',
+                            statusUpload: EUploadingStatus.ERROR,
+                            count: attachmentFilteredByChannelId?.files?.length,
+                        }),
+                    );
                     console.error('Error uploading files:', error);
                 });
         }
-        dispatch(referencesActions.setPendingAttachment({ channelId: '', files: [] }));
+
+        dispatch(
+            referencesActions.setUploadingStatus({
+                channelId: currentChannelId,
+                messageId: attachmentFilteredByChannelId?.messageId ?? '',
+                statusUpload: EUploadingStatus.LOADING,
+                count: attachmentFilteredByChannelId?.files?.length,
+            }),
+        );
+    }, [attachmentFilteredByChannelId?.messageId, currentChannelId]);
+
+    useEffect(() => {
+        if (newMessage.isMe && attachmentFilteredByChannelId?.files.length > 0) {
+            dispatch(
+                referencesActions.updateAttachmentMessageId({
+                    channelId: currentChannelId,
+                    messageId: newMessage.message_id ?? '',
+                }),
+            );
+        }
     }, [newMessage]);
 
     return;

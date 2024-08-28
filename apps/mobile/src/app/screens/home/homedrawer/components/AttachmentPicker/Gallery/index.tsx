@@ -1,23 +1,18 @@
+import { useReference } from '@mezon/core';
 import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { appActions, referencesActions, selectAttachmentData, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
-import { createUploadFilePath, useMezon } from '@mezon/transport';
+import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission, PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
 import { IFile } from 'apps/mobile/src/app/temp-ui';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
-import { useSelector } from 'react-redux';
 import { style } from './styles';
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
 	currentChannelId: string;
-}
-
-type IRenderItem = PhotoIdentifier[] | {
-	isUseCamera: boolean
 }
 
 const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
@@ -26,17 +21,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
 	const [pageInfo, setPageInfo] = useState(null);
 	const [loading, setLoading] = useState(false);
-	const attachmentDataRef = useSelector(selectAttachmentData(currentChannelId || ''));
-	const currentClanId = useSelector(selectCurrentClanId);
-	const { sessionRef } = useMezon();
-	const session = sessionRef.current;
 	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>();
-
-	const attachmentsFileName = useMemo(() => {
-		if (!attachmentDataRef?.length) return [];
-		return attachmentDataRef.map((attachment) => attachment.filename);
-	}, [attachmentDataRef]);
+	const { removeAttachmentByIndex, attachmentFilteredByChannelId } = useReference(currentChannelId);
 
 	useEffect(() => {
 		checkAndRequestPermissions();
@@ -45,13 +32,6 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			timerRef?.current && clearTimeout(timerRef.current);
 		};
 	}, []);
-
-	const getFullFileName = useCallback(
-		(fileName: string) => {
-			return createUploadFilePath(session, currentClanId, currentChannelId, fileName);
-		},
-		[currentChannelId, currentClanId, session],
-	);
 
 	const checkAndRequestPermissions = async () => {
 		const hasPermission = await requestPermission();
@@ -139,16 +119,6 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 	};
 
-	const removeAttachmentByUrl = useCallback((filename: string) => {
-		const index = attachmentDataRef.findIndex((attachment => attachment.filename === filename))
-		dispatch(
-			referencesActions.removeAttachment({
-				channelId: currentChannelId,
-				index
-			}),
-		);
-	}, [attachmentDataRef])
-
 	const renderItem = ({ item }) => {
 		if (item?.isUseCamera) {
 			return (
@@ -159,14 +129,14 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 		const fileName = item?.node?.image?.filename;
 		const isVideo = item?.node?.type?.startsWith?.('video');
-		const isSelected = attachmentsFileName?.some((i) => i?.includes(fileName));
+		const isSelected = attachmentFilteredByChannelId?.files.some(file => file.filename === fileName);
 
 		return (
 			<TouchableOpacity
 				style={styles.itemGallery}
 				onPress={() => {
 					if (isSelected) {
-						removeAttachmentByUrl(fileName);
+						handleRemove(fileName)
 					} else {
 						handleGalleryPress(item);
 					}
@@ -254,6 +224,11 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			await loadPhotos(pageInfo.end_cursor);
 		}
 	};
+
+	const handleRemove = (filename: string) => {
+		const index = attachmentFilteredByChannelId?.files?.findIndex(file => file.filename === filename);
+		removeAttachmentByIndex(currentChannelId, index);
+	}
 
 	return (
 		<View style={{ flex: 1 }}>
