@@ -271,7 +271,7 @@ export const fetchMessages = createAsyncThunk(
 type LoadMoreMessArgs = {
 	channelId: string;
 	direction?: Direction_Mode;
-	fromMobile: boolean;
+	fromMobile?: boolean;
 };
 
 export const loadMoreMessage = createAsyncThunk(
