@@ -48,7 +48,7 @@ const Header = ({ toggleSideBar }: IHeaderProps) => {
 				<div onClick={toggleSideBar} className="w-8 hidden max-lg:block">
 					<Icons.MenuBarIcon className="w-full" />
 				</div>
-				<Link to="/admin/applications" className="flex flex-row items-center justify-center gap-[4px]">
+				<Link to="/applications" className="flex flex-row items-center justify-center gap-[4px]">
 					<Image
 						src={`${isDarkMode ? 'assets/images/mezon-logo-black.svg' : 'assets/images/mezon-logo-white.svg'}`}
 						alt={'logoMezon'}

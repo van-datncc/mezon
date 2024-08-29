@@ -8,7 +8,7 @@ const InitialRoutes = () => {
 	if (!isLogin) {
 		return <Navigate to="/login" replace />;
 	}
-	return <Navigate to="/admin/applications" replace />;
+	return <Navigate to="/applications" replace />;
 };
 
 export default InitialRoutes;

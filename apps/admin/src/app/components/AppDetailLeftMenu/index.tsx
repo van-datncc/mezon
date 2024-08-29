@@ -22,7 +22,7 @@ const AppDetailLeftMenu = ({ tabs, mode = 'root', currentAppId }: ISideBarProps)
 
 	return (
 		<div className="flex flex-col gap-6 items-center w-full ">
-			<Link to={'/admin/applications'} className="w-full flex gap-1 items-center">
+			<Link to={'/applications'} className="w-full flex gap-1 items-center">
 				<div className="w-4">
 					<Icons.LeftArrowIcon className="w-full" />
 				</div>
@@ -63,7 +63,7 @@ const AppDetailLeftMenu = ({ tabs, mode = 'root', currentAppId }: ISideBarProps)
 					{tabs.map((tab, index) => (
 						<NavLink
 							key={index}
-							to={`/admin/applications/${currentAppId}/${tab.routerLink}`}
+							to={`/applications/${currentAppId}/${tab.routerLink}`}
 							className={({ isActive }) =>
 								isActive
 									? 'sidebar-tab flex gap-3 items-center py-2 px-4 dark:bg-[#3C4370] bg-bgLightModeButton text-[#5865F3] dark:text-[#C9CDFB] rounded-[4px]'
