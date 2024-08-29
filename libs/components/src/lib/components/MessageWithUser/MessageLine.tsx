@@ -24,7 +24,7 @@ const MessageLine = ({
 	isOnlyContainEmoji,
 	isSearchMessage,
 	isTokenClickAble,
-	isHideLinkOneImage,
+	isHideLinkOneImage
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -93,7 +93,7 @@ const RenderContent = memo(
 		parentWidth,
 		isOnlyContainEmoji,
 		isTokenClickAble,
-		isHideLinkOneImage,
+		isHideLinkOneImage
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const elements: ElementToken[] = [
@@ -102,7 +102,7 @@ const RenderContent = memo(
 			...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })),
 			...mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })),
 			...lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })),
-			...vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })),
+			...vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS }))
 		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 		let lastindex = 0;
@@ -113,11 +113,11 @@ const RenderContent = memo(
 				const s = element.s ?? 0;
 				const e = element.e ?? 0;
 
-				let contentInElement = t?.substring(s, e);
+				const contentInElement = t?.substring(s, e);
 
 				if (lastindex < s) {
 					formattedContent.push(
-						<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}`} text={t?.slice(lastindex, s) ?? ''} />,
+						<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}`} text={t?.slice(lastindex, s) ?? ''} />
 					);
 				}
 
@@ -128,7 +128,7 @@ const RenderContent = memo(
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`hashtag-${index}-${s}-${element.channelid}`}
 							channelHastagId={`<#${element.channelid}>`}
-						/>,
+						/>
 					);
 				}
 
@@ -141,7 +141,7 @@ const RenderContent = memo(
 							tagName={contentInElement ?? ''}
 							tagUserId={element.user_id ? element.user_id : (element.role_id ?? '')}
 							mode={mode}
-						/>,
+						/>
 					);
 				}
 
@@ -152,7 +152,7 @@ const RenderContent = memo(
 							emojiSyntax={contentInElement ?? ''}
 							onlyEmoji={isOnlyContainEmoji ?? false}
 							emojiId={element.emojiid ?? ''}
-						/>,
+						/>
 					);
 				}
 
@@ -163,7 +163,7 @@ const RenderContent = memo(
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`link-${index}-${s}-${contentInElement}`}
 							content={contentInElement}
-						/>,
+						/>
 					);
 				}
 
@@ -177,7 +177,7 @@ const RenderContent = memo(
 									isJumMessageEnabled={isJumMessageEnabled}
 									key={`voicelink-${index}-${s}-${voiceChannelFound?.channel_id}`}
 									channelHastagId={`<#${voiceChannelFound?.channel_id}>`}
-								/>,
+								/>
 							)
 						: formattedContent.push(
 								<MarkdownContent
@@ -185,7 +185,7 @@ const RenderContent = memo(
 									isJumMessageEnabled={isJumMessageEnabled}
 									key={`voicelink-${index}-${s}-${contentInElement}`}
 									content={contentInElement}
-								/>,
+								/>
 							);
 				}
 
@@ -207,7 +207,7 @@ const RenderContent = memo(
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`markdown-${index}-${s}-${contentInElement}`}
 							content={content}
-						/>,
+						/>
 					);
 				}
 
@@ -229,14 +229,16 @@ const RenderContent = memo(
 								whiteSpace: 'nowrap',
 								overflow: 'hidden',
 								textOverflow: 'ellipsis',
-								maxWidth: parentWidth,
+								maxWidth: parentWidth
 							}
-						: undefined
+						: {
+								whiteSpace: 'pre-line'
+							}
 				}
 				className={`${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}
 			>
 				{content}
 			</div>
 		);
-	},
+	}
 );
