@@ -43,15 +43,15 @@ function ApplicationsPage() {
 			<div>
 				<div className="mb-[40px]">
 					<div className="flex flex-row justify-between w-full">
-						<div className="text-[24px] font-medium">Applications</div>
+						<div className="text-2xl font-medium">Applications</div>
 						<div
 							onClick={toggleCreatePopup}
-							className="text-[15px] py-[10px] px-[16px] text-white bg-[#5865F2] hover:bg-[#4752c4] cursor-pointer rounded-sm"
+							className="text-[15px] py-[10px] px-[16px] text-white bg-[#5865F2] hover:bg-[#4752c4] cursor-pointer rounded-sm text-nowrap"
 						>
 							New Application
 						</div>
 					</div>
-					<div className="text-[20px]">
+					<div className="text-[20px] dark:text-textSecondary mt-4">
 						Develop <span className="text-blue-600 hover:underline cursor-pointer">apps</span> to customize and extend Discord for
 						millions of users.
 					</div>
@@ -186,7 +186,7 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 	return (
 		<div className="flex flex-col gap-5">
 			<div className="text-[20px]">My Applications</div>
-			<div className="flex flex-wrap gap-4 gap-x-4 max-md:justify-evenly">
+			<div className="flex flex-wrap gap-4 gap-x-4">
 				{appListForDisplaying &&
 					appListForDisplaying.map((value, index) => (
 						<div

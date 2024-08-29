@@ -67,12 +67,12 @@ const AppDetailLeftMenu = ({ tabs, mode = 'root', currentAppId }: ISideBarProps)
 							className={({ isActive }) =>
 								isActive
 									? 'sidebar-tab flex gap-3 items-center py-2 px-4 dark:bg-[#3C4370] bg-bgLightModeButton text-[#5865F3] dark:text-[#C9CDFB] rounded-[4px]'
-									: 'sidebar-tab flex gap-3 items-center py-2 px-4 dark:text-textDarkTheme text-textLightTheme hover:dark:bg-[#3C4370] hover:bg-bgLightModeButton hover:text-[#5865F3] rounded-md'
+									: 'sidebar-tab flex gap-3 items-center py-2 px-4 dark:text-white text-textLightTheme hover:dark:bg-[#3C4370] hover:bg-bgLightModeButton hover:text-[#5865F3] rounded-md'
 							}
 						>
 							{tab.imgSrc && <img src={tab.imgSrc} alt="img" width={20} height={20} />}
 							<div>{tab.icon}</div>
-							<p className="font-medium text-base leading-5">{tab.name}</p>
+							<p className="font-medium text-base">{tab.name}</p>
 						</NavLink>
 					))}
 				</div>

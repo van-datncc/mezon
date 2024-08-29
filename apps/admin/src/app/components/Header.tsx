@@ -42,7 +42,7 @@ const Header = ({ toggleSideBar }: IHeaderProps) => {
 
 	return (
 		<div
-			className={`sticky dark:bg-bgPrimary bg-bgLightPrimary z-40 w-full px-[42px] py-[12px] flex flex-row items-center justify-between border-b-[1px] border-solid ${isDarkMode ? 'dark:border-borderDividerLight' : 'border-bgModifierHoverLight'}`}
+			className={`sticky dark:bg-bgPrimary bg-bgLightPrimary z-40 w-full px-[42px] py-[10px] flex flex-row items-center justify-between border-b-[1px] border-solid ${isDarkMode ? 'dark:border-borderDividerLight' : 'border-bgModifierHoverLight'}`}
 		>
 			<div className="flex items-center gap-3">
 				<div onClick={toggleSideBar} className="w-8 hidden max-lg:block">
@@ -55,7 +55,7 @@ const Header = ({ toggleSideBar }: IHeaderProps) => {
 						width={28}
 						height={28}
 					/>
-					<span className="text-[12px] font-bold">MEZON</span>
+					<span className="text-[12px] font-bold dark:text-textPrimary text-colorTextLightMode">MEZON</span>
 				</Link>
 			</div>
 			<div className="flex flex-row items-center justify-center relative">
