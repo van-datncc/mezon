@@ -114,8 +114,8 @@ function MemberProfile({
 		}
 	};
 
-	const handleDefault = () => {
-		// e.stopPropagation();
+	const handleDefault = (e: MouseEvent) => {
+		e.stopPropagation();
 	};
 
 	const handleClosePannelMember = () => {
