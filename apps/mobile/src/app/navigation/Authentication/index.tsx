@@ -2,16 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAuth } from '@mezon/core';
-import { CHANNEL_ID_SHARING, getAppInfo } from '@mezon/mobile-components';
+import { getAppInfo } from '@mezon/mobile-components';
 import {
 	appActions,
 	fcmActions,
 	getStoreAsync,
-	referencesActions,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDmGroupCurrentId,
-	selectLoadingMainMobile,
+	selectLoadingMainMobile
 } from '@mezon/store-mobile';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
@@ -142,11 +141,6 @@ export const Authentication = () => {
 
 	const onCloseFileShare = () => {
 		setFileShared(undefined);
-		dispatch(
-			referencesActions.resetDataAttachment({
-				channelId: CHANNEL_ID_SHARING,
-			}),
-		);
 		navigation.goBack();
 	};
 

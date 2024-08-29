@@ -1,26 +1,26 @@
+import { useReference } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
-	getAttachmentUnique,
 	load,
 	mentionUserPattern,
-	save,
+	save
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	emojiSuggestionActions,
 	referencesActions,
-	selectAttachmentData,
 	selectChannelsEntities,
 	selectCurrentChannel,
 	selectEmojiSuggestion,
 	threadsActions,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { IFile } from 'apps/mobile/src/app/temp-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -33,7 +33,6 @@ import UseMentionList from '../../../../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
-import { IFile } from '../../AttachmentPicker/Gallery';
 import AttachmentPreview from '../../AttachmentPreview';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import { ChatMessageInput } from '../ChatMessageInput';
@@ -44,7 +43,7 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
 		trigger: '@',
 		allowedSpacesCount: 0,
-		isInsertSpaceAfterMention: true,
+		isInsertSpaceAfterMention: true
 	},
 	hashtag: {
 		trigger: '#',
@@ -52,14 +51,14 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 		isInsertSpaceAfterMention: true,
 		textStyle: {
 			fontWeight: 'bold',
-			color: Colors.white,
-		},
+			color: Colors.white
+		}
 	},
 	emoji: {
 		trigger: ':',
 		allowedSpacesCount: 0,
-		isInsertSpaceAfterMention: true,
-	},
+		isInsertSpaceAfterMention: true
+	}
 };
 
 interface IChatInputProps {
@@ -82,7 +81,7 @@ export const ChatBoxBottomBar = memo(
 		messageActionNeedToResolve,
 		messageAction,
 		onDeleteMessageActionNeedToResolve,
-		onShowKeyboardBottomSheet,
+		onShowKeyboardBottomSheet
 	}: IChatInputProps) => {
 		const dispatch = useAppDispatch();
 		const [text, setText] = useState<string>('');
@@ -90,8 +89,9 @@ export const ChatBoxBottomBar = memo(
 		const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
-		const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 		const currentChannel = useSelector(selectCurrentChannel);
+		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
+
 		const channelsEntities = useSelector(selectChannelsEntities);
 		const navigation = useNavigation<any>();
 		const inputRef = useRef<TextInput>();
@@ -120,7 +120,7 @@ export const ChatBoxBottomBar = memo(
 			onSelectionChange: (position) => {
 				handleSelectionChange(position);
 			},
-			triggersConfig: inputTriggersConfig,
+			triggersConfig: inputTriggersConfig
 		});
 		const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(text);
 
@@ -136,7 +136,7 @@ export const ChatBoxBottomBar = memo(
 			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
 				...allCachedMessage,
-				[channelId]: text,
+				[channelId]: text
 			});
 		};
 
@@ -165,15 +165,6 @@ export const ChatBoxBottomBar = memo(
 			await handleTextInputChange(textFormat);
 		};
 
-		const removeAttachmentByUrl = (urlToRemove: string) => {
-			dispatch(
-				referencesActions.removeAttachment({
-					channelId: channelId,
-					urlAttachment: urlToRemove,
-				}),
-			);
-		};
-
 		const onSendSuccess = useCallback(() => {
 			setText('');
 			setTextChange('');
@@ -185,8 +176,8 @@ export const ChatBoxBottomBar = memo(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
 					shortName: '',
 					id: '',
-					isReset: true,
-				}),
+					isReset: true
+				})
 			);
 		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText]);
 
@@ -200,7 +191,7 @@ export const ChatBoxBottomBar = memo(
 					onShowKeyboardBottomSheet(false, 0);
 				}
 			},
-			[keyboardHeight, onShowKeyboardBottomSheet],
+			[keyboardHeight, onShowKeyboardBottomSheet]
 		);
 
 		const getChannelById = (channelId: string) => {
@@ -220,7 +211,7 @@ export const ChatBoxBottomBar = memo(
 					matches.push({
 						start: matches.length ? match?.index - matches.length * 2 : match?.index,
 						end: pattern?.lastIndex - (matches.length + 1) * 2,
-						content: match[0]?.slice(2, -1),
+						content: match[0]?.slice(2, -1)
 					});
 				}
 				return matches;
@@ -253,7 +244,7 @@ export const ChatBoxBottomBar = memo(
 							return {
 								user_id: mention.id?.toString() ?? '',
 								s: m?.start,
-								e: m?.end,
+								e: m?.end
 							};
 						}
 					});
@@ -273,7 +264,7 @@ export const ChatBoxBottomBar = memo(
 							hashtagList.push({
 								channelid: channelInfo.id.toString() ?? '',
 								s: mentionUsers?.length ? startindex - 2 * mentionBeforeCount : startindex,
-								e: startindex + word.length - 2 * mentionBeforeCount,
+								e: startindex + word.length - 2 * mentionBeforeCount
 							});
 						}
 					}
@@ -338,7 +329,7 @@ export const ChatBoxBottomBar = memo(
 				onDeleteMessageActionNeedToResolve();
 				openKeyBoard();
 			},
-			[messageActionNeedToResolve?.targetMessage?.sender_id, onDeleteMessageActionNeedToResolve],
+			[messageActionNeedToResolve?.targetMessage?.sender_id, onDeleteMessageActionNeedToResolve]
 		);
 
 		const onConvertToFiles = useCallback(async (content: string) => {
@@ -374,13 +365,19 @@ export const ChatBoxBottomBar = memo(
 					}
 				});
 				dispatch(
-					referencesActions.setAttachmentData({
-						channelId: channelId,
-						attachments: [attachment],
+					referencesActions.setAtachmentAfterUpload({
+						channelId: currentChannel?.id,
+						messageId: '',
+						files: [{
+							filename: attachment.filename,
+							size: attachment.size,
+							filetype: attachment.filetype,
+							url: attachment.url
+						}]
 					}),
 				);
 			},
-			[channelId, dispatch],
+			[channelId, dispatch]
 		);
 
 		const writeTextToFile = async (text: string) => {
@@ -407,7 +404,7 @@ export const ChatBoxBottomBar = memo(
 				name: filename,
 				type: 'text/plain',
 				size: (await RNFS.stat(path)).size.toString(),
-				fileData: fileData,
+				fileData: fileData
 			};
 
 			return fileFormat;
@@ -427,6 +424,10 @@ export const ChatBoxBottomBar = memo(
 				setIsFocus(true);
 			}, 300);
 		};
+
+		const handleRemoveAttachment = (index: number) => {
+			removeAttachmentByIndex(currentChannel?.id, index);
+		}
 
 		useEffect(() => {
 			if (messageActionNeedToResolve !== null) {
@@ -471,8 +472,10 @@ export const ChatBoxBottomBar = memo(
 				<HashtagSuggestions {...triggers.hashtag} />
 				<EmojiSuggestion {...triggers.emoji} />
 
-				{!!attachmentDataRef?.length && (
-					<AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
+				{checkAttachment && (
+					<AttachmentPreview
+						attachments={attachmentFilteredByChannelId.files}
+						onRemove={handleRemoveAttachment} />
 				)}
 
 				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
@@ -510,10 +513,10 @@ export const ChatBoxBottomBar = memo(
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						isShowCreateThread={isShowCreateThread}
 						channelsEntities={channelsEntities}
-						attachmentDataRef={attachmentDataRef}
+						attachmentDataRef={attachmentFilteredByChannelId?.files}
 					/>
 				</Block>
 			</Block>
 		);
-	},
+	}
 );
