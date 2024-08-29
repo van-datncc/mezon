@@ -68,7 +68,7 @@ export const UnreadDMBadgeList = React.memo(() => {
 	const filterUnreadDM = useCallback(
 		(dm: DirectEntity) => {
 			const { last_sent_message, count_mess_unread } = dm;
-			return last_sent_message?.sender_id !== userId || (count_mess_unread !== undefined && count_mess_unread > 0);
+			return last_sent_message?.sender_id !== userId && count_mess_unread !== undefined && count_mess_unread > 0;
 		},
 		[userId]
 	);
