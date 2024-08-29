@@ -179,7 +179,7 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 		height: 0
 	};
 
-	const typeImages = ['.jpg', '.jpeg', '.png', '.webp'];
+	const typeImages = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.apng'];
 
 	for (const typeImage of typeImages) {
 		if (url.toLowerCase().endsWith(typeImage)) {
