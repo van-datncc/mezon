@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux';
 import { MezonRadioButton } from '../../temp-ui';
 import FilterCheckbox from './FilterCheckbox/FilterCheckbox';
 import { style } from './NotificationSetting.styles';
+import { NotificationType } from 'mezon-js';
 
 export const enum ENotificationType {
 	CATEGORY_DEFAULT = 'Use Category Default',
@@ -25,6 +26,12 @@ export const enum ENotificationType {
 	NOTHING_MESSAGE = 'NOTHING',
 	MENTION_MESSAGE = 'MENTION',
 }
+
+export const notifyLabels: Record<number, string> = {
+  [NotificationType.ALL_MESSAGE]: "All",
+  [NotificationType.MENTION_MESSAGE]: 'Only @mention',
+  [NotificationType.NOTHING_MESSAGE]: 'Nothing'
+};
 
 export default function NotificationSetting() {
 	const { themeValue } = useTheme();
@@ -41,19 +48,19 @@ export default function NotificationSetting() {
 			id: 1,
 			label: t('bottomSheet.labelOptions.allMessage'),
 			isChecked: false,
-			value: ENotificationType.ALL_MESSAGE,
+			value: NotificationType.ALL_MESSAGE,
 		},
     {
 			id: 2,
 			label: t('bottomSheet.labelOptions.mentionMessage'),
 			isChecked: false,
-			value: ENotificationType.MENTION_MESSAGE,
+			value: NotificationType.MENTION_MESSAGE,
 		},
 		{
 			id: 3,
 			label: t('bottomSheet.labelOptions.notThingMessage'),
 			isChecked: false,
-			value: ENotificationType.NOTHING_MESSAGE,
+			value: NotificationType.NOTHING_MESSAGE,
 		},
 
 	];
@@ -75,9 +82,9 @@ export default function NotificationSetting() {
 
 	useEffect(() => {
 		if (defaultNotificationCategory?.notification_setting_type) {
-			setDefaultNotifyName(defaultNotificationCategory.notification_setting_type);
+			setDefaultNotifyName(notifyLabels[defaultNotificationCategory?.notification_setting_type]);
 		} else if (defaultNotificationClan?.notification_setting_type) {
-			setDefaultNotifyName(defaultNotificationClan.notification_setting_type);
+			setDefaultNotifyName(notifyLabels[defaultNotificationClan?.notification_setting_type]);
 		}
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
 
@@ -87,13 +94,13 @@ export default function NotificationSetting() {
 		if (notifyOptionSelected?.length) {
 			const notifyOptionSettingSelected = notifyOptionSelected.find((option) => option.isChecked);
 			if (
-				[ENotificationType.ALL_MESSAGE, ENotificationType.MENTION_MESSAGE, ENotificationType.NOTHING_MESSAGE].includes(
+				[NotificationType.ALL_MESSAGE, NotificationType.MENTION_MESSAGE, NotificationType.NOTHING_MESSAGE].includes(
 					notifyOptionSettingSelected?.value,
 				)
 			) {
 				const body = {
 					channel_id: currentChannelId || '',
-					notification_type: notifyOptionSettingSelected?.value || '',
+					notification_type: notifyOptionSettingSelected?.value || 0,
 					clan_id: currentClanId || '',
 				};
 				dispatch(notificationSettingActions.setNotificationSetting(body));
