@@ -50,16 +50,19 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	}, [sendMessageTyping]);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
+
 	useEffect(() => {
-		const isActive =
-			(subPanelActive !== SubPanelName.NONE &&
-				subPanelActive !== SubPanelName.EMOJI_REACTION_RIGHT &&
-				subPanelActive !== SubPanelName.EMOJI_REACTION_BOTTOM) ||
-			((subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) &&
-				window.innerWidth < 640);
+		const isEmojiReactionPanel = subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM;
+
+		const isOtherActivePanel = subPanelActive !== SubPanelName.NONE && !isEmojiReactionPanel;
+
+		const isSmallScreen = window.innerWidth < 640;
+
+		const isActive = isOtherActivePanel || (isEmojiReactionPanel && isSmallScreen);
 
 		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
+
 	return (
 		<div className="mx-2 relative " role="button" ref={messageBox}>
 			{isEmojiOnChat && (

@@ -8,7 +8,7 @@ import {
 	selectCurrentClanId,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { IChannel } from '@mezon/utils';
+import { FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS, IChannel } from '@mezon/utils';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
 import { ChannelType } from 'mezon-js';
@@ -51,43 +51,43 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 						{
 							title: t('notifySettingThreadModal.muteDuration.forFifteenMinutes'),
 							onPress: () => {
-								handleScheduleMute(15 * 60 * 1000);
-							},
+								handleScheduleMute(FOR_15_MINUTES);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.forOneHour'),
 							onPress: () => {
-								handleScheduleMute(60 * 60 * 1000);
-							},
+								handleScheduleMute(FOR_1_HOUR);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.forThreeHours'),
 							onPress: () => {
-								handleScheduleMute(3 * 60 * 60 * 1000);
-							},
+								handleScheduleMute(FOR_3_HOURS);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.forEightHours'),
 							onPress: () => {
-								handleScheduleMute(8 * 60 * 60 * 1000);
-							},
+								handleScheduleMute(FOR_8_HOURS);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.forTwentyFourHours'),
 							onPress: () => {
-								handleScheduleMute(24 * 60 * 60 * 1000);
-							},
+								handleScheduleMute(FOR_24_HOURS);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.untilTurnItBackOn'),
 							onPress: () => {
 								handleScheduleMute(Infinity);
-							},
-						},
-					],
-				},
+							}
+						}
+					]
+				}
 			] as IMezonMenuSectionProps[],
-		[],
+		[]
 	);
 
 	const navigation = useNavigation<any>();
@@ -122,7 +122,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 							: `"${currentChannel?.channel_label}"`}
 				</Text>
 			</View>
-		),
+		)
 	});
 
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
@@ -150,7 +150,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 							channel_id: currentChannel?.channel_id || '',
 							notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 							clan_id: currentClanId || '',
-							active: ENotificationActive.ON,
+							active: ENotificationActive.ON
 						};
 						dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 						clearTimeout(idTimeOut);
@@ -165,7 +165,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 			channel_id: currentChannel?.channel_id || '',
 			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 			clan_id: currentClanId || '',
-			active,
+			active
 		};
 		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 		navigateToThreadDetail();
@@ -185,7 +185,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 				channel_id: currentChannel?.channel_id || '',
 				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 				clan_id: currentClanId || '',
-				time_mute: unmuteTimeISO,
+				time_mute: unmuteTimeISO
 			};
 			dispatch(notificationSettingActions.setNotificationSetting(body));
 		} else {
@@ -193,7 +193,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 				channel_id: currentChannel?.channel_id || '',
 				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 				clan_id: currentClanId || '',
-				active: ENotificationActive.OFF,
+				active: ENotificationActive.OFF
 			};
 			dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 		}
@@ -202,8 +202,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 
 	return (
 		<View style={styles.wrapper}>
-			{getNotificationChannelSelected?.active === ENotificationActive.ON ||
-				getNotificationChannelSelected.id == "0" ? (
+			{getNotificationChannelSelected?.active === ENotificationActive.ON || getNotificationChannelSelected.id == '0' ? (
 				<MezonMenu menu={menu} />
 			) : (
 				<View style={styles.optionsBox}>
