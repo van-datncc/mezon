@@ -40,7 +40,7 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 		(offset: number) => {
 			targetRef.current.scrollTop = offset;
 		},
-		[targetRef],
+		[targetRef]
 	);
 
 	const getStoredScrollHeight = useCallback(() => storedScrollHeight.current, []);
@@ -58,13 +58,13 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 	const getClientHeight = useCallback(() => targetRef.current.clientHeight, [targetRef]);
 
 	useEffect(() => {
-    let scrollHandlerTimeoutId: NodeJS.Timeout;
+		let scrollHandlerTimeoutId: NodeJS.Timeout;
 
 		const handler = (event: Event) => {
-      scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
-      scrollHandlerTimeoutId = setTimeout(() => {
-        scrollEventHandlerRef.current(event);
-      }, options?.debounce);
+			scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
+			scrollHandlerTimeoutId = setTimeout(() => {
+				scrollEventHandlerRef.current(event);
+			}, options?.debounce);
 		};
 
 		const el = targetRef.current;
@@ -72,6 +72,7 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 		el.addEventListener('scroll', handler);
 
 		return () => {
+			scrollHandlerTimeoutId && clearTimeout(scrollHandlerTimeoutId);
 			el.removeEventListener('scroll', handler);
 		};
 	}, [handlerId, targetRef, options]);
@@ -88,7 +89,7 @@ export const useScroll = (targetRef: React.MutableRefObject<Element>, options: I
 		storeCurrentScrollHeight,
 		getStoredScrollTop,
 		storeCurrentScrollTop,
-		setScrollEventHandler,
+		setScrollEventHandler
 	};
 };
 
@@ -162,4 +163,3 @@ export interface IUseScrollResponse {
 	 */
 	setScrollEventHandler: (newScrollHandler: IScrollEventHandler) => void;
 }
-

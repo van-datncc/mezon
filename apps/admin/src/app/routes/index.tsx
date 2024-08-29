@@ -10,6 +10,7 @@ import RootLayout from '../layouts/RootLayout';
 import { appLoader, CustomLoaderFunction } from '../loader/appLoader';
 import { authLoader } from '../loader/authLoader';
 // Pages
+import { applicationLoader } from '../loader/applicationLoader';
 import InitialRoutes from './InititalRoutes';
 const Login = loadable(() => import('../pages/login'));
 const ApplicationsPage = loadable(() => import('../pages/applications'));
@@ -30,10 +31,10 @@ export const Routes = () => {
 				await loaderFunction({
 					...props,
 					dispatch,
-					initialPath: initialPath,
+					initialPath: initialPath
 				});
 		},
-		[dispatch, initialPath],
+		[dispatch, initialPath]
 	);
 
 	const routes = useMemo(
@@ -46,11 +47,11 @@ export const Routes = () => {
 					children: [
 						{
 							path: '',
-							element: <InitialRoutes />,
+							element: <InitialRoutes />
 						},
 						{
 							path: 'login',
-							element: <Login />,
+							element: <Login />
 						},
 						{
 							path: 'admin',
@@ -59,57 +60,62 @@ export const Routes = () => {
 							children: [
 								{
 									path: '',
-									element: <InitialRoutes />,
+									element: <InitialRoutes />
 								},
 								{
 									path: 'applications',
-									element: <ApplicationsPage />,
+									element: <ApplicationsPage />
 								},
 								{
 									path: 'applications/:applicationId',
-									element: <div><Outlet /></div>,
+									element: (
+										<div>
+											<Outlet />
+										</div>
+									),
+									loader: loaderWithStore(applicationLoader),
 									children: [
 										{
-											path: "*",
+											path: '*',
 											element: <Navigate to="information" />
 										},
 										{
-											path: "",
+											path: '',
 											element: <Navigate to="information" />
 										},
 										{
 											path: 'information',
-											element: <GeneralInformation />,
+											element: <GeneralInformation />
 										},
 										{
 											path: 'installation',
-											element: <Installation />,
-										},
-									],
+											element: <Installation />
+										}
+									]
 								},
 								{
 									path: 'teams',
-									element: <TeamsPage />,
+									element: <TeamsPage />
 								},
 								{
 									path: 'embeds',
-									element: <EmbedsPage />,
+									element: <EmbedsPage />
 								},
 								{
 									path: 'docs',
-									element: <DocsPage />,
-								},
-							],
+									element: <DocsPage />
+								}
+							]
 						},
 						{
 							path: 'install/:applicationId',
 							loader: loaderWithStore(authLoader),
-							element: <Install />,
-						},
-					],
-				},
+							element: <Install />
+						}
+					]
+				}
 			]),
-		[loaderWithStore],
+		[loaderWithStore]
 	);
 
 	return <RouterProvider router={routes} />;

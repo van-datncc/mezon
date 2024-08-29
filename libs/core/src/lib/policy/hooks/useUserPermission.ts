@@ -16,8 +16,8 @@ const getUserPermissionsStatus = (activeRoleIds: string[] = [], clanRoles: Roles
 		[EPermission.everyone]: true
 	};
 
-  clanRoles.forEach((role) => {
-    const activeRole = activeRoleIds.includes(role?.id);
+	clanRoles.forEach((role) => {
+		const activeRole = activeRoleIds.includes(role?.id);
 
 		if (activeRole || role?.slug === EPermission.everyone) {
 			const listOfActivePermission = role?.permission_list?.permissions?.filter((p) => p?.active) || [];
@@ -30,8 +30,8 @@ const getUserPermissionsStatus = (activeRoleIds: string[] = [], clanRoles: Roles
 		}
 	});
 
-  return result;
-}
+	return result;
+};
 
 export function useUserPermission() {
 	const { userId, userProfile } = useAuth();
@@ -40,12 +40,12 @@ export function useUserPermission() {
 	const currentClan = useSelector(selectCurrentClan);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const userPermissionsStatus = useMemo(() => {
-		return getUserPermissionsStatus(userById?.role_id, rolesClan)
-	}, [userById?.role_id, rolesClan])
+		return getUserPermissionsStatus(userById?.role_id, rolesClan);
+	}, [userById?.role_id, rolesClan]);
 
 	const isClanOwner = useMemo(() => {
-		return currentClan?.creator_id === userProfile?.user?.id
-	}, [currentClan?.creator_id, userProfile?.user?.id])
+		return currentClan?.creator_id === userProfile?.user?.id;
+	}, [currentClan?.creator_id, userProfile?.user?.id]);
 
 	return {
 		userPermissionsStatus,
