@@ -1,16 +1,16 @@
-import { useAppNavigation, useDirect, useFormatDate, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
+import { useAppNavigation, useDirect, useMemberCustomStatus, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import { selectAllAccount, selectFriendStatus, selectMemberById, selectMemberByUserId } from '@mezon/store';
-import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
+import AboutUserProfile from './AboutUserProfile';
 import AvatarProfile from './AvatarProfile';
 import NoteUserProfile from './NoteUserProfile';
 import RoleUserProfile from './RoleUserProfile';
 import StatusProfile from './StatusProfile';
 import GroupIconBanner from './StatusProfile/groupIconBanner';
-import UserDescription from './UserDescription';
 import PendingFriend from './pendingFriend';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -28,19 +28,12 @@ type ModalUserProfileProps = {
 	avatar?: string;
 	positionType?: string;
 	name?: string;
-	status?: boolean;
-	user?: ChannelMembersEntity;
 };
 
 export type OpenModalProps = {
 	openFriend: boolean;
 	openOption: boolean;
 };
-
-enum ETileDetail {
-	AboutMe = 'About me',
-	MemberSince = 'Member Since'
-}
 
 const ModalUserProfile = ({
 	userID,
@@ -54,7 +47,7 @@ const ModalUserProfile = ({
 	mode,
 	avatar,
 	positionType,
-	name
+	name,
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
@@ -62,14 +55,12 @@ const ModalUserProfile = ({
 	const userCustomStatus = useMemberCustomStatus(userID || '');
 	const userById = useSelector(selectMemberByUserId(userID ?? ''));
 	const memberById = useSelector(selectMemberById(userID ?? ''));
-	const date = new Date(userById?.user?.create_time as string | Date);
-	const { timeFormatted } = useFormatDate({ date });
 
 	const [content, setContent] = useState<string>('');
 
 	const initOpenModal = {
 		openFriend: false,
-		openOption: false
+		openOption: false,
 	};
 	const [openModal, setOpenModal] = useState<OpenModalProps>(initOpenModal);
 
@@ -142,8 +133,6 @@ const ModalUserProfile = ({
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={userCustomStatus}
 				isAnonymous={checkAnonymous}
-				userID={userID}
-				positionType={positionType}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
@@ -164,8 +153,7 @@ const ModalUserProfile = ({
 
 					{checkAddFriend.myPendingFriend && !showPopupLeft && <PendingFriend user={userById} />}
 
-					{isFooterProfile ? null : <UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me as string} />}
-					{isFooterProfile ? null : <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
+					{isFooterProfile ? null : <AboutUserProfile userID={userID} />}
 					{isFooterProfile ? (
 						<StatusProfile userById={userById} />
 					) : (
