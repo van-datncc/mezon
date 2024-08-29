@@ -26,9 +26,7 @@ export default class App {
 	}
 
 	private static onWindowAllClosed() {
-		if (process.platform !== 'darwin') {
-			App.application.quit();
-		}
+		App.application.quit();
 	}
 
 	private static onClose(event) {
