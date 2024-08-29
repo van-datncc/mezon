@@ -4,8 +4,7 @@ import {
 	ID_MENTION_HERE,
 	IRoleMention,
 	IS_TABLET,
-	Icons,
-	getAttachmentUnique
+	Icons
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, messagesActions, selectCurrentClanId } from '@mezon/store';
@@ -230,8 +229,6 @@ export const ChatMessageInput = memo(
 					references: [],
 				};
 
-				const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
-
 				// TODO: - nghia - reset attachments
 				// dispatch(
 				// 	referencesActions.setAtachmentAfterUpload({
@@ -275,7 +272,7 @@ export const ChatMessageInput = memo(
 									await sendMessage(
 										filterEmptyArrays(payloadSendMessage),
 										simplifiedMentionList || [],
-										attachmentDataUnique || [],
+										attachmentDataRef || [],
 										reference,
 										false,
 										isMentionEveryOne,
@@ -286,7 +283,7 @@ export const ChatMessageInput = memo(
 									await handleSendDM(
 										filterEmptyArrays(payloadSendMessage),
 										simplifiedMentionList,
-										attachmentDataUnique || [],
+										attachmentDataRef || [],
 										reference,
 									);
 									break;
