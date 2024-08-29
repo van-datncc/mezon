@@ -70,47 +70,41 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
 	};
 
-	const fetchMemberChannel = useCallback(() => {
+	const fetchMemberChannel = useCallback(async () => {
 		if (!currentChannel) {
 			return;
 		}
-
-		requestAnimationFrame(async () => {
-			const store = await getStoreAsync();
-			await Promise.all([
-				store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id)),
-				// Rejoin previous clan (other than 0) when exiting the DM detail screen
-				store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id })),
-				store.dispatch(
-					channelMembersActions.fetchChannelMembers({
-						clanId: currentChannel?.clan_id || '',
-						channelId: currentChannel?.channel_id || '',
-						channelType: currentChannel?.type,
-						noCache: true,
-					}),
-				),
-			]);
-		});
+		const store = await getStoreAsync();
+		await Promise.all([
+			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id)),
+			// Rejoin previous clan (other than 0) when exiting the DM detail screen
+			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id })),
+			store.dispatch(
+				channelMembersActions.fetchChannelMembers({
+					clanId: currentChannel?.clan_id || '',
+					channelId: currentChannel?.channel_id || '',
+					channelType: currentChannel?.type,
+					noCache: true,
+				}),
+			),
+		]);
 	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
-		requestAnimationFrame(async () => {
-			const store = await getStoreAsync();
-			await Promise.all([
-				store.dispatch(clansActions.setCurrentClanId('0')),
-				store.dispatch(
-					directActions.joinDirectMessage({
-						directMessageId: currentDmGroup?.id,
-						channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
-						type: currentDmGroup?.type,
-						noCache: true,
-						isFetchingLatestMessages: true,
-					}),
-				),
-			]);
-			save(STORAGE_CLAN_ID, currentChannel?.clan_id);
-		});
-		return null;
+		const store = await getStoreAsync();
+		await Promise.all([
+			store.dispatch(clansActions.setCurrentClanId('0')),
+			store.dispatch(
+				directActions.joinDirectMessage({
+					directMessageId: currentDmGroup?.id,
+					channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
+					type: currentDmGroup?.type,
+					noCache: true,
+					isFetchingLatestMessages: true,
+				}),
+			),
+		]);
+		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 
 	useEffect(() => {

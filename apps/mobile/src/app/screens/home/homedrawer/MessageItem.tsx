@@ -47,6 +47,7 @@ const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_I
 
 export type MessageItemProps = {
 	message?: MessagesEntity;
+	previousMessage?: MessagesEntity;
 	messageId?: string;
 	isMessNotifyMention?: boolean;
 	mode: number;
@@ -78,6 +79,8 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('message');
 	const message: MessagesEntity = props?.message;
+	const previousMessage: MessagesEntity = props?.previousMessage;
+
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -91,8 +94,21 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 	const messageReferences = useMemo(() => {
 		return message?.references?.[0] as ApiMessageRef;
 	}, [message?.references]);
-
-	const isCombine = !message?.isStartedMessageGroup;
+	
+	
+	const isSameUser = useMemo(() => {
+		return message?.user?.id === previousMessage?.user?.id
+	}, [message?.user?.id, previousMessage?.user?.id]);
+	
+	const isTimeGreaterThan5Minutes = useMemo(() => {
+		if (message?.create_time && previousMessage?.create_time) {
+			return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 5 * 60 * 1000;
+		}
+		return false;
+	}, [message?.create_time, previousMessage?.create_time]);
+	
+	const isCombine = isSameUser && isTimeGreaterThan5Minutes;
+	
 	const swipeableRef = React.useRef(null);
 	const backgroundColor = React.useRef(new Animated.Value(0)).current;
 
@@ -251,11 +267,13 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
 		}
 	};
-
-	if (message.isStartedMessageGroup && message.sender_id == '0')
+	
+	// Message welcome
+	if (message?.sender_id === '0' && !message?.content?.t) {
 		return (
 			<WelcomeMessage channelId={props.channelId} />
 		)
+	}
 
 	const handlePressIn = () => {
 		Animated.timing(backgroundColor, {
@@ -387,10 +405,12 @@ const MessageItem = React.memo((props: MessageItemProps) => {
 		</Animated.View>
 	);
 },
-  (prevProps, nextProps) => {
-	return prevProps.messageId + prevProps?.message.update_time === 
-	nextProps.messageId + nextProps?.message.update_time;
-  }
+	(prevProps, nextProps) => {
+		return (
+			prevProps?.message?.id + prevProps?.message?.update_time + prevProps?.previousMessage?.id ===
+			nextProps?.message?.id + nextProps?.message?.update_time + nextProps?.previousMessage?.id
+		);
+	}
 );
 
 export default MessageItem;

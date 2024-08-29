@@ -44,8 +44,8 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 		if (draftProfile?.nick_name) {
 			profileVaile.displayName = draftProfile?.nick_name;
 		}
-		if (draftProfile?.avartar) {
-			profileVaile.urlImage = draftProfile.avartar;
+		if (draftProfile?.avatar) {
+			profileVaile.urlImage = draftProfile.avatar;
 		}
 		return profileVaile;
 	}, [draftProfile, userProfile]);
@@ -86,10 +86,10 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 	};
 
 	const handleClose = () => {
-		if (userClansProfile?.nick_name || userClansProfile?.avartar) {
+		if (userClansProfile?.nick_name || userClansProfile?.avatar) {
 			console.log(1);
 			setDisplayName(userClansProfile.nick_name || '');
-			setUrlImage(userClansProfile.avartar || '');
+			setUrlImage(userClansProfile.avatar || '');
 		} else {
 			setDisplayName(userProfile?.user?.username || '');
 			setUrlImage(userProfile?.user?.avatar_url || '');
