@@ -36,8 +36,9 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 	const handleUpdateEmoji = async () => {
 		const request: MezonUpdateClanEmojiByIdBody = {
 			source: getSrcEmoji(item.id as string),
-			shortname: ':' + emojiName + ':',
+			shortname: emojiName,
 			category: item.category,
+			clan_id: clanId,
 		};
 		await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: item.id || '' }));
 	};
