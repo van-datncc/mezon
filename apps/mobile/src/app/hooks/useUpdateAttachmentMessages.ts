@@ -48,8 +48,6 @@ export default function useUpdateAttachmentMessages({ currentChannelId, currentC
 
             Promise.all(promises)
                 .then((results) => {
-                    console.log(results);
-
                     updateImageLinkMessage(
                         newMessage.clan_id,
                         newMessage.channel_id ?? '',

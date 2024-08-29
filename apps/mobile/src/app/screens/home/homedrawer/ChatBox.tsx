@@ -6,11 +6,11 @@ import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter } from 'react-native';
+import useUpdateAttachmentMessages from '../../../hooks/useUpdateAttachmentMessages';
 import { ActionMessageSelected } from './components/ChatBox/ActionMessageSelected';
 import { ChatBoxBottomBar } from './components/ChatBox/ChatBoxBottomBar';
 import { EMessageActionType } from './enums';
 import { IMessageActionNeedToResolve } from './types';
-import useUpdateAttachmentMessages from './UpdateAttachmentMessage';
 
 interface IChatBoxProps {
 	channelId: string;

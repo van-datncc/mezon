@@ -51,8 +51,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 			});
 			const file = res?.[0];
 
-			console.log(file);
-
 			dispatch(referencesActions.setAtachmentAfterUpload({
 				channelId: currentChannelId,
 				files: [{
