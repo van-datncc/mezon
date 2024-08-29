@@ -1,6 +1,6 @@
 {
   "name": "mezon",
-  "version": "1.1.45",
+  "version": "1.1.51",
   "license": "MIT",
   "description": "Mezon application",
   "productName": "Mezon",
@@ -147,7 +147,7 @@
     "babel-loader": "^8.2.3",
     "cross-env": "^7.0.3",
     "css-loader": "^6.10.0",
-    "electron": "^30.0.6",
+    "electron": "^32.0.1",
     "electron-builder": "^24.13.3",
     "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
