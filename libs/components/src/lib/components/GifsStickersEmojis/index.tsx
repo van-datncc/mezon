@@ -24,7 +24,6 @@ const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions
 	const { setValueInputSearch } = useGifsStickersEmoji();
 	const [isShowSetting, setIsShowSetting] = useState(false);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
-	console.log('idMessageRefReaction: ', idMessageRefReaction);
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
