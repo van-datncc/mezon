@@ -1,10 +1,10 @@
 import { useEventManagement, useOnClickOutside } from '@mezon/core';
 import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
 import { compareDate, differenceTime } from '../timeFomatEvent';
@@ -28,9 +28,30 @@ export type ItemEventManagementProps = {
 	setOpenModalDetail?: (status: boolean) => void;
 };
 
+export enum EEventStatus {
+	UPCOMING = 'UPCOMING',
+	ONGOING = 'ONGOING',
+	FINISHED = 'FINISHED',
+	UNKNOWN = 'UNKNOWN'
+}
+
 const ItemEventManagement = (props: ItemEventManagementProps) => {
-	const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, createTime, checkUserCreate, isReviewEvent, setOpenModalDetail } =
-		props;
+	const {
+		topic,
+		voiceChannel,
+		titleEvent,
+		option,
+		address,
+		logo,
+		logoRight,
+		start,
+		end,
+		event,
+		createTime,
+		checkUserCreate,
+		isReviewEvent,
+		setOpenModalDetail
+	} = props;
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
@@ -45,48 +66,33 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
-		distanceToBottom: 0,
+		distanceToBottom: 0
 	});
 
 	const isSameDay = useMemo(() => {
 		return compareDate(new Date(), createTime || '');
 	}, [createTime]);
-	const eventStatus = ["UPCOMMING", "ONGOING", "FINSHED"]
-	const time : { state : Number, message : string} = useMemo(() => {
-		if (event?.message) {
-			return {
-				state: 0,
-				message : "Test"
-			}
-		} else {
+
+	const time = useMemo(() => {
+		if (event?.status) {
+			return event.status;
+		} else if (start) {
 			const currentTime = Date.now();
-			
 			const startTimeLocal = new Date(start);
-			const startTimeUTC = startTimeLocal.getTime() + (startTimeLocal.getTimezoneOffset() * 60000);
+			const startTimeUTC = startTimeLocal.getTime() + startTimeLocal.getTimezoneOffset() * 60000;
+			const leftTime = startTimeUTC - currentTime;
 
-			const leftTime = startTimeUTC -currentTime;
-			const tenMinuteLeftMessage = "Event will start in 10 minutes. Join in!"
-			const eventTakingPlaceMessage = "Event is taking place!"
-
-			if (leftTime <= 1000 * 60 * 100 && leftTime >= 0) {
-				return {
-					state: 0,
-					message:tenMinuteLeftMessage
-				};
+			if (leftTime > 0 && leftTime <= 1000 * 60 * 10) {
+				return EEventStatus.UPCOMING;
 			}
-			
+
 			if (leftTime <= 0) {
-				return {
-					state: 0,
-					message:eventTakingPlaceMessage
-				};
+				return EEventStatus.ONGOING;
 			}
 		}
-		return {
-			state: 0,
-			message: ""
-		}
-	}, [start, event?.message]);
+
+		return EEventStatus.UNKNOWN;
+	}, [start, event?.status]);
 
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
@@ -137,7 +143,17 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							<div className="text-[#5765F2] rounded-full px-2 dark:bg-bgLightModeSecond bg-bgLightModeButton font-semibold">New</div>
 						)}
 						<Icons.IconEvents />
-						<p className={`font-semibold dark:text-zinc-400 text-colorTextLightMode ${event?.message ? 'text-blue-400' : ''}`}>{time.message}</p>
+						<p
+							className={`font-semibold dark:text-zinc-400 text-colorTextLightMode ${
+								time === EEventStatus.UPCOMING ? 'text-purple-500' : time === EEventStatus.ONGOING ? 'text-blue-400' : ''
+							}`}
+						>
+							{time === EEventStatus.UPCOMING
+								? 'Event will start in 10 minutes. Join in!'
+								: time === EEventStatus.ONGOING
+									? 'Event is taking place!'
+									: event?.start_event}
+						</p>
 					</div>
 					{event?.creator_id && (
 						<Tooltip
@@ -146,12 +162,12 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							animation="duration-500"
 							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 						>
-							<AvatarImage 
+							<AvatarImage
 								alt={userCreate?.user?.username || ''}
 								userName={userCreate?.user?.username}
 								className="min-w-6 min-h-6 max-w-6 max-h-6"
 								src={userCreate?.user?.avatar_url}
-								classNameText='text-[9px] pt-[3px]'
+								classNameText="text-[9px] pt-[3px]"
 							/>
 						</Tooltip>
 					)}

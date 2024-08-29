@@ -410,11 +410,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oneventstatusnotification = useCallback(
-		(eventStatusNotification : EventStatusNotificationEvent) => {
-			dispatch(eventManagementActions.updateStatusEvent(eventStatusNotification))
+		(eventStatusNotification: EventStatusNotificationEvent) => {
+			dispatch(eventManagementActions.updateStatusEvent(eventStatusNotification));
 		},
 		[dispatch]
-	)
+	);
 
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
@@ -537,7 +537,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onclanprofileupdated = () => {};
-
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oneventstatusnotification = () => {};
 		};
 	}, [
@@ -588,4 +588,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-

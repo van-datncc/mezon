@@ -9,7 +9,6 @@ export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
 
 export interface EventManagementEntity extends IEventManagement {
 	id: string;
-	message?: string;
 	status?: string;
 }
 
@@ -133,9 +132,12 @@ export const eventManagementSlice = createSlice({
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
 		},
-		updateStatusEvent: (state, action : {payload : EventStatusNotificationEvent}) => {
-			eventManagementAdapter.updateOne(state, {id : action.payload.event_id, changes: {message:action.payload.message, status: action.payload.event_status}})
-		} 
+		updateStatusEvent: (state, action: { payload: EventStatusNotificationEvent }) => {
+			eventManagementAdapter.updateOne(state, {
+				id: action.payload.event_id,
+				changes: { status: action.payload.event_status }
+			});
+		}
 	},
 	extraReducers: (builder) => {
 		builder
