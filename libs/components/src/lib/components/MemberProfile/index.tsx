@@ -114,10 +114,6 @@ function MemberProfile({
 		}
 	};
 
-	const handleDefault = (e: MouseEvent) => {
-		e.stopPropagation();
-	};
-
 	const handleClosePannelMember = () => {
 		setIsShowPanel(false);
 	};
@@ -294,7 +290,7 @@ function MemberProfile({
 				<div
 					className={`dark:bg-black bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed md:right-[245px] right-auto left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
 					style={{ bottom: positionTop ? '15px' : '', top: positionTop ? '' : `${top}px` }}
-					onMouseDown={handleDefault}
+					onMouseDown={(e) => e.stopPropagation()}
 					onClick={(e) => e.stopPropagation()}
 				>
 					<ShortUserProfile
