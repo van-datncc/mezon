@@ -29,7 +29,6 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { categorizedChannels } = useCategory();
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasChannelManagePermission] = useClanRestriction([EPermission.manageChannel]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const { removeMemberClan } = useChannelMembersActions();
 	const { userProfile } = useAuth();
@@ -53,8 +52,8 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
 	const toggleLeaveClanPopup = () => {
 		setIsShowLeaveClanPopup(!isShowLeaveClanPopup);
-		setIsShowModalPanelClan(false)
-	}
+		setIsShowModalPanelClan(false);
+	};
 
 	const onClose = () => {
 		setOpenCreateCate(false);
@@ -63,7 +62,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const handleCreateCate = async (nameCate: string) => {
 		const body: ApiCreateCategoryDescRequest = {
 			clan_id: currentClanId?.toString(),
-			category_name: nameCate,
+			category_name: nameCate
 		};
 		await dispatch(categoriesActions.createNewCategory(body));
 		onClose();
@@ -94,15 +93,15 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
-	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasChannelManagePermission;
+	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasClanPermission;
 
 	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
-	useEscapeKey(() => setIsShowModalPanelClan(false))
+	useEscapeKey(() => setIsShowModalPanelClan(false));
 
 	const handleLeaveClan = async () => {
 		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
 		toggleLeaveClanPopup();
-		navigate("/mezon");
+		navigate('/mezon');
 	};
 
 	return (
@@ -134,7 +133,13 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%] shadow-xl"
 							>
 								<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
-									{(hasPermissionCreateCategory) && <ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
+									{hasPermissionCreateCategory && (
+										<ItemModal
+											onClick={handleShowCreateCategory}
+											children="Create Category"
+											endIcon={<Icons.CreateCategoryIcon />}
+										/>
+									)}
 									<ItemModal
 										onClick={handleShowInviteClanModal}
 										children="Invite People"
@@ -175,7 +180,15 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				</div>
 			)}
 
-			{isShowLeaveClanPopup && <ModalConfirm handleCancel={toggleLeaveClanPopup} handleConfirm={handleLeaveClan} modalName={currentClan?.clan_name} title='leave' buttonName='Leave Clan' />}
+			{isShowLeaveClanPopup && (
+				<ModalConfirm
+					handleCancel={toggleLeaveClanPopup}
+					handleConfirm={handleLeaveClan}
+					modalName={currentClan?.clan_name}
+					title="leave"
+					buttonName="Leave Clan"
+				/>
+			)}
 
 			{openServerSettings && (
 				<ClanSetting
