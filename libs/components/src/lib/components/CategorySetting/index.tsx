@@ -1,25 +1,25 @@
+import { Icons } from "@mezon/ui";
+import { ICategoryChannel } from "@mezon/utils";
 import React, { useState } from "react";
-import { Icons }  from "@mezon/ui";
 import ExitSetting from "../ChannelSetting/exitSetting";
 import { categorySettingItem, categorySettingList, ItemObjProps } from "../ClanSettings/ItemObj";
 import CategorySettingSidebar from "./CategorySettingSidebar";
 import OverviewSetting from "./OverviewSetting";
-import {ICategory} from "@mezon/utils";
 
 interface ICategorySettingProps {
   onClose: () => void,
-  category: ICategory | null
+  category: ICategoryChannel;
 }
 
-const CategorySetting: React.FC<ICategorySettingProps> = ({onClose, category}) => {
+const CategorySetting: React.FC<ICategorySettingProps> = ({ onClose, category }) => {
   const [menu, setMenu] = useState(true);
   const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
-  const [currentSetting, setCurrentSetting] = useState<ItemObjProps> (categorySettingList[0])
-  
+  const [currentSetting, setCurrentSetting] = useState<ItemObjProps>(categorySettingList[0])
+
   const handleSettingItemClick = (settingItem: ItemObjProps) => {
     setCurrentSetting(settingItem);
   };
-  
+
   return (
     <div className="flex fixed inset-0  w-screen z-10" onMouseDown={(event) => event.stopPropagation()} role="button">
       <div className="flex text-gray- w-screen relative text-white">
@@ -47,7 +47,7 @@ const CategorySetting: React.FC<ICategorySettingProps> = ({onClose, category}) =
             handleMenu={(value: boolean) => setMenu(value)}
             currentSetting={currentSetting}
             setIsShowDeletePopup={() => setIsShowDeletePopup(true)}
-            categoryName={category?.category_name || ''}
+            category={category}
           />
         </div>
         <div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[40px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
@@ -55,7 +55,7 @@ const CategorySetting: React.FC<ICategorySettingProps> = ({onClose, category}) =
             <h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme sbm:mt-[60px] mt-[10px]">
               {currentSetting.name}
             </h2>
-	          {currentSetting.id === categorySettingItem.OVERVIEW && <OverviewSetting category={category}/>}
+            {currentSetting.id === categorySettingItem.OVERVIEW && <OverviewSetting category={category} />}
           </div>
         </div>
         <ExitSetting onClose={onClose} />
