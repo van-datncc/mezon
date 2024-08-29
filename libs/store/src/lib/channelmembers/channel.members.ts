@@ -56,7 +56,7 @@ export const channelMembersAdapter = createEntityAdapter<ChannelMembersEntity>()
 
 const fetchChannelMembersCached = memoize(
 	async (mezon: MezonValueContext, clanId: string, channelId: string, channelType: ChannelType) => {
-		const response = await mezon.client.listChannelUsers(mezon.session, clanId, channelId, channelType, 1, 100, '');
+		const response = await mezon.client.listChannelUsers(mezon.session, clanId, channelId, channelType, 1, 1000, '');
 		return { ...response, time: Date.now() };
 	},
 	{
