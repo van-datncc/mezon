@@ -102,6 +102,7 @@ export const ChatBoxBottomBar = memo(
 		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 		const { sessionRef, clientRef } = useMezon();
 		const listMentions = UseMentionList(channelId || '', mode);
+		const [textChange, setTextChange] = useState<string>('');
 		const inputTriggersConfig = useMemo(() => {
 			const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 
@@ -158,14 +159,9 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, [channelId]);
 
-		useEffect(() => {
-			if (emojiPicked) {
-				handleEventAfterEmojiPicked();
-			}
-		}, [emojiPicked]);
-
-		const handleEventAfterEmojiPicked = async () => {
-			const textFormat = `${text?.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `;
+		const handleEventAfterEmojiPicked = async (shortName: string) => {
+			const textFormat = `${textChange?.endsWith(' ') ? textChange : textChange + ' '}${shortName?.toString()} `;
+			setTextChange(textFormat);
 			await handleTextInputChange(textFormat);
 		};
 
@@ -180,6 +176,7 @@ export const ChatBoxBottomBar = memo(
 
 		const onSendSuccess = useCallback(() => {
 			setText('');
+			setTextChange('');
 			setMentionsOnMessage([]);
 			setHashtagsOnMessage([]);
 			onDeleteMessageActionNeedToResolve();
@@ -234,6 +231,7 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const handleTextInputChange = async (text: string) => {
+			setTextChange(text);
 			const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
 			if (isConvertToFileTxt) {
 				setText('');
@@ -450,9 +448,13 @@ export const ChatBoxBottomBar = memo(
 			const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
 				handleClearText();
 			});
+			const addEmojiPickedListener = DeviceEventEmitter.addListener(ActionEmitEvent.ADD_EMOJI_PICKED, (emoji) => {
+				handleEventAfterEmojiPicked(emoji.shortName);
+			});
 			return () => {
 				keyboardListener.remove();
 				clearTextInputListener.remove();
+				addEmojiPickedListener.remove();
 			};
 		}, []);
 
