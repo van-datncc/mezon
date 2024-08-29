@@ -164,7 +164,7 @@ const ModalUserProfile = ({
 
 					{checkAddFriend.myPendingFriend && !showPopupLeft && <PendingFriend user={userById} />}
 
-					{isFooterProfile ? null : <UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me} />}
+					{isFooterProfile ? null : <UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me as string} />}
 					{isFooterProfile ? null : <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
 					{isFooterProfile ? (
 						<StatusProfile userById={userById} />

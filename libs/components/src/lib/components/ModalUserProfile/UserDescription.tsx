@@ -1,6 +1,6 @@
 type UserDescriptionProps = {
 	title: string;
-	detail: string | undefined;
+	detail: string;
 };
 
 const UserDescription = ({ title, detail }: UserDescriptionProps) => {
