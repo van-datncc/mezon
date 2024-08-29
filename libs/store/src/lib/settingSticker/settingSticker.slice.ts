@@ -4,7 +4,6 @@ import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, cre
 import memoizee from 'memoizee';
 import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
-import { stickersSlice } from '../giftStickerEmojiPanel/stickers.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
@@ -122,7 +121,6 @@ export const settingClanStickerSlice = createSlice({
 });
 
 export const stickerSettingActions = {
-	...stickersSlice.actions,
 	fetchStickerByClanId
 };
 

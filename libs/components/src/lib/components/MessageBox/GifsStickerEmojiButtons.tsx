@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/components';
 import { useAppParams, useGifs, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, settingClanStickerActions, useAppDispatch } from '@mezon/store';
+import { reactionActions, referencesActions, settingClanStickerActions, useAppDispatch } from '@mezon/store';
 import { SubPanelName } from '@mezon/utils';
 import { memo, useCallback } from 'react';
 
@@ -29,8 +29,9 @@ const GifStickerEmojiButtons = memo(({ activeTab, currentClanId }: GifStickerEmo
 			} else {
 				setSubPanelActive(SubPanelName.GIFS);
 			}
+			dispatch(referencesActions.setIdReferenceMessageReaction(''));
 		},
-		[subPanelActive, setSubPanelActive],
+		[subPanelActive, setSubPanelActive]
 	);
 
 	const handleOpenStickers = useCallback(
@@ -48,8 +49,9 @@ const GifStickerEmojiButtons = memo(({ activeTab, currentClanId }: GifStickerEmo
 			} else {
 				setSubPanelActive(SubPanelName.STICKERS);
 			}
+			dispatch(referencesActions.setIdReferenceMessageReaction(''));
 		},
-		[subPanelActive, setSubPanelActive],
+		[subPanelActive, setSubPanelActive]
 	);
 
 	const handleOpenEmoji = useCallback(
@@ -64,8 +66,9 @@ const GifStickerEmojiButtons = memo(({ activeTab, currentClanId }: GifStickerEmo
 			} else {
 				setSubPanelActive(SubPanelName.EMOJI);
 			}
+			dispatch(referencesActions.setIdReferenceMessageReaction(''));
 		},
-		[setSubPanelActive, subPanelActive],
+		[setSubPanelActive, subPanelActive]
 	);
 
 	return (

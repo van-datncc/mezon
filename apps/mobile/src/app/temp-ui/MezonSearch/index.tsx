@@ -9,39 +9,31 @@ import { style } from './styles';
 interface MezonInputProps {
 	onChangeText?: (text: string) => void;
 	onFocusText?: () => void;
-	onBlurText?: () => void;
+	onCancelButton?: () => void;
 	hasBackground?: boolean;
 	size?: 'small' | 'medium' | 'large';
 	value?: string;
 	isShowCancel?: boolean;
 }
 
-export default function MezonSearch({ onChangeText, onFocusText, onBlurText, hasBackground, size = 'medium', value, isShowCancel = false }: MezonInputProps) {
+export default function MezonSearch({ onChangeText, onFocusText, onCancelButton, hasBackground, size = 'medium', value, isShowCancel = false }: MezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const inputRef = useRef(null);
 	const timeoutRef = useRef(null);
-	const isFocusingBack = useRef(false);
 	const { t } = useTranslation(['searchMessageChannel']);
-
-	const handleBlurText = () => {
-		if (!isFocusingBack.current) {
-		  onBlurText && onBlurText()
-		}
-	}
 
 	const clearTextInput = () => {
 		onChangeText('');
-		isFocusingBack.current = true;
 
 		timeoutRef.current = setTimeout(() => {
 			inputRef.current?.focus();
-			isFocusingBack.current = false;
 		}, 100);	
 	};
 
 	const handleCancelPress = () => {
 		onChangeText('')
+		onCancelButton && onCancelButton()
 	}
 
 	useEffect(() => {
@@ -62,7 +54,6 @@ export default function MezonSearch({ onChangeText, onFocusText, onBlurText, has
 					value={value} 
 					onChangeText={onChangeText} 
 					onFocus={onFocusText}
-					onBlur={handleBlurText}
 				/>
 				{!!value?.length && (
 					<Pressable onPress={clearTextInput}>

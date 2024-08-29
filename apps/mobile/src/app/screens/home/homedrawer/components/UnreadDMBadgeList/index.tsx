@@ -3,11 +3,11 @@ import { UserGroupIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, selectDirectsUnreadlist } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
-import { APP_SCREEN } from 'apps/mobile/src/app/navigation/ScreenTypes';
 import { ChannelType } from 'mezon-js';
-import React, { memo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import { style } from './styles';
 
 const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
@@ -48,7 +48,7 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 	const navigateToDirectMessageMDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-			params: { directMessageId: dm?.channel_id, from: APP_SCREEN.HOME },
+			params: { directMessageId: dm?.channel_id, from: APP_SCREEN.HOME }
 		});
 	};
 
@@ -61,10 +61,21 @@ const UnreadDMBadgeItem = memo(({ dm }: { dm: DirectEntity }) => {
 
 export const UnreadDMBadgeList = React.memo(() => {
 	const { userId } = useAuth();
-	const unReadDirectMessageList = useSelector(selectDirectsUnreadlist);
-	const unReadDM = unReadDirectMessageList.filter((dm) => dm?.last_sent_message?.sender_id !== userId);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const unReadDirectMessageList = useSelector(selectDirectsUnreadlist);
+
+	const filterUnreadDM = useCallback(
+		(dm: DirectEntity) => {
+			const { last_sent_message, count_mess_unread } = dm;
+			return last_sent_message?.sender_id !== userId && count_mess_unread !== undefined && count_mess_unread > 0;
+		},
+		[userId]
+	);
+	const unReadDM = useMemo(() => {
+		return unReadDirectMessageList.filter(filterUnreadDM);
+	}, [filterUnreadDM, unReadDirectMessageList]);
+
 	return (
 		<View style={styles.container}>
 			{!!unReadDM?.length &&
