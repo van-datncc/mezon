@@ -4,7 +4,7 @@ import {
 	selectIdMessageRefReaction,
 	selectIsMessageHasReaction,
 	selectReactionBottomState,
-	selectReactionBottomStateResponsive,
+	selectReactionBottomStateResponsive
 } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import React, { useRef, useState } from 'react';
@@ -38,7 +38,7 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 			{isMessageMatched && reactionBottomState && reactionBottomStateResponsive && (
 				<div className="w-fit md:hidden z-30 absolute bottom-0 block">
 					<div className="scale-75 transform mb-0 z-20">
-						<GifStickerEmojiPopup messageEmojiId={message.id} mode={mode} />
+						<GifStickerEmojiPopup mode={mode} />
 					</div>
 				</div>
 			)}

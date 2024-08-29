@@ -43,7 +43,7 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
 		trigger: '@',
 		allowedSpacesCount: 0,
-		isInsertSpaceAfterMention: true,
+		isInsertSpaceAfterMention: true
 	},
 	hashtag: {
 		trigger: '#',
@@ -51,14 +51,14 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 		isInsertSpaceAfterMention: true,
 		textStyle: {
 			fontWeight: 'bold',
-			color: Colors.white,
-		},
+			color: Colors.white
+		}
 	},
 	emoji: {
 		trigger: ':',
 		allowedSpacesCount: 0,
-		isInsertSpaceAfterMention: true,
-	},
+		isInsertSpaceAfterMention: true
+	}
 };
 
 interface IChatInputProps {
@@ -81,7 +81,7 @@ export const ChatBoxBottomBar = memo(
 		messageActionNeedToResolve,
 		messageAction,
 		onDeleteMessageActionNeedToResolve,
-		onShowKeyboardBottomSheet,
+		onShowKeyboardBottomSheet
 	}: IChatInputProps) => {
 		const dispatch = useAppDispatch();
 		const [text, setText] = useState<string>('');
@@ -102,6 +102,7 @@ export const ChatBoxBottomBar = memo(
 		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 		const { sessionRef, clientRef } = useMezon();
 		const listMentions = UseMentionList(channelId || '', mode);
+		const [textChange, setTextChange] = useState<string>('');
 		const inputTriggersConfig = useMemo(() => {
 			const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 
@@ -119,7 +120,7 @@ export const ChatBoxBottomBar = memo(
 			onSelectionChange: (position) => {
 				handleSelectionChange(position);
 			},
-			triggersConfig: inputTriggersConfig,
+			triggersConfig: inputTriggersConfig
 		});
 		const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(text);
 
@@ -135,7 +136,7 @@ export const ChatBoxBottomBar = memo(
 			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
 				...allCachedMessage,
-				[channelId]: text,
+				[channelId]: text
 			});
 		};
 
@@ -158,19 +159,15 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, [channelId]);
 
-		useEffect(() => {
-			if (emojiPicked) {
-				handleEventAfterEmojiPicked();
-			}
-		}, [emojiPicked]);
-
-		const handleEventAfterEmojiPicked = async () => {
-			const textFormat = `${text?.endsWith(' ') ? text : text + ' '}${emojiPicked?.toString()} `;
+		const handleEventAfterEmojiPicked = async (shortName: string) => {
+			const textFormat = `${textChange?.endsWith(' ') ? textChange : textChange + ' '}${shortName?.toString()} `;
+			setTextChange(textFormat);
 			await handleTextInputChange(textFormat);
 		};
 
 		const onSendSuccess = useCallback(() => {
 			setText('');
+			setTextChange('');
 			setMentionsOnMessage([]);
 			setHashtagsOnMessage([]);
 			onDeleteMessageActionNeedToResolve();
@@ -179,8 +176,8 @@ export const ChatBoxBottomBar = memo(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
 					shortName: '',
 					id: '',
-					isReset: true,
-				}),
+					isReset: true
+				})
 			);
 		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText]);
 
@@ -194,7 +191,7 @@ export const ChatBoxBottomBar = memo(
 					onShowKeyboardBottomSheet(false, 0);
 				}
 			},
-			[keyboardHeight, onShowKeyboardBottomSheet],
+			[keyboardHeight, onShowKeyboardBottomSheet]
 		);
 
 		const getChannelById = (channelId: string) => {
@@ -214,7 +211,7 @@ export const ChatBoxBottomBar = memo(
 					matches.push({
 						start: matches.length ? match?.index - matches.length * 2 : match?.index,
 						end: pattern?.lastIndex - (matches.length + 1) * 2,
-						content: match[0]?.slice(2, -1),
+						content: match[0]?.slice(2, -1)
 					});
 				}
 				return matches;
@@ -225,6 +222,7 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const handleTextInputChange = async (text: string) => {
+			setTextChange(text);
 			const isConvertToFileTxt = text?.length > MIN_THRESHOLD_CHARS;
 			if (isConvertToFileTxt) {
 				setText('');
@@ -246,7 +244,7 @@ export const ChatBoxBottomBar = memo(
 							return {
 								user_id: mention.id?.toString() ?? '',
 								s: m?.start,
-								e: m?.end,
+								e: m?.end
 							};
 						}
 					});
@@ -266,7 +264,7 @@ export const ChatBoxBottomBar = memo(
 							hashtagList.push({
 								channelid: channelInfo.id.toString() ?? '',
 								s: mentionUsers?.length ? startindex - 2 * mentionBeforeCount : startindex,
-								e: startindex + word.length - 2 * mentionBeforeCount,
+								e: startindex + word.length - 2 * mentionBeforeCount
 							});
 						}
 					}
@@ -331,7 +329,7 @@ export const ChatBoxBottomBar = memo(
 				onDeleteMessageActionNeedToResolve();
 				openKeyBoard();
 			},
-			[messageActionNeedToResolve?.targetMessage?.sender_id, onDeleteMessageActionNeedToResolve],
+			[messageActionNeedToResolve?.targetMessage?.sender_id, onDeleteMessageActionNeedToResolve]
 		);
 
 		const onConvertToFiles = useCallback(async (content: string) => {
@@ -379,7 +377,7 @@ export const ChatBoxBottomBar = memo(
 					}),
 				);
 			},
-			[channelId, dispatch],
+			[channelId, dispatch]
 		);
 
 		const writeTextToFile = async (text: string) => {
@@ -406,7 +404,7 @@ export const ChatBoxBottomBar = memo(
 				name: filename,
 				type: 'text/plain',
 				size: (await RNFS.stat(path)).size.toString(),
-				fileData: fileData,
+				fileData: fileData
 			};
 
 			return fileFormat;
@@ -451,9 +449,13 @@ export const ChatBoxBottomBar = memo(
 			const clearTextInputListener = DeviceEventEmitter.addListener(ActionEmitEvent.CLEAR_TEXT_INPUT, () => {
 				handleClearText();
 			});
+			const addEmojiPickedListener = DeviceEventEmitter.addListener(ActionEmitEvent.ADD_EMOJI_PICKED, (emoji) => {
+				handleEventAfterEmojiPicked(emoji.shortName);
+			});
 			return () => {
 				keyboardListener.remove();
 				clearTextInputListener.remove();
+				addEmojiPickedListener.remove();
 			};
 		}, []);
 
@@ -516,5 +518,5 @@ export const ChatBoxBottomBar = memo(
 				</Block>
 			</Block>
 		);
-	},
+	}
 );
