@@ -1,13 +1,13 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { useMemo, useRef } from 'react';
+import { FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
 import { IMezonMenuSectionProps, MezonMenu, reserve } from '../../../temp-ui';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import { style } from './MuteClanNotificationBS.styles';
-import { useState } from 'react';
 
 type MuteClanNotificationBSProps = {
 	onChangeScheduleMute?: (duration: number) => void;
@@ -18,8 +18,8 @@ const MuteClanNotificationBS = ({ onChangeScheduleMute, currentChannel, descript
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const bottomSheetDetail = useRef<BottomSheetModal>(null);
-	const { t } = useTranslation(['notificationSetting','clanNotificationsSetting']);
-  const [isMute, setIsMute] = useState<boolean>(false);
+	const { t } = useTranslation(['notificationSetting', 'clanNotificationsSetting']);
+	const [isMute, setIsMute] = useState<boolean>(false);
 
 	const menu = useMemo(
 		() =>
@@ -29,43 +29,43 @@ const MuteClanNotificationBS = ({ onChangeScheduleMute, currentChannel, descript
 						{
 							title: t('notifySettingThreadModal.muteDuration.forFifteenMinutes'),
 							onPress: () => {
-								onChangeScheduleMute(15 * 60 * 1000);
-							},
+								onChangeScheduleMute(FOR_15_MINUTES);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.forOneHour'),
 							onPress: () => {
-								onChangeScheduleMute(60 * 60 * 1000);
-							},
+								onChangeScheduleMute(FOR_1_HOUR);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.forThreeHours'),
 							onPress: () => {
-								onChangeScheduleMute(3 * 60 * 60 * 1000);
-							},
+								onChangeScheduleMute(FOR_3_HOURS);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.forEightHours'),
 							onPress: () => {
-								onChangeScheduleMute(8 * 60 * 60 * 1000);
-							},
+								onChangeScheduleMute(FOR_8_HOURS);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.forTwentyFourHours'),
 							onPress: () => {
-								onChangeScheduleMute(24 * 60 * 60 * 1000);
-							},
+								onChangeScheduleMute(FOR_24_HOURS);
+							}
 						},
 						{
 							title: t('notifySettingThreadModal.muteDuration.untilTurnItBackOn'),
 							onPress: () => {
 								onChangeScheduleMute(Infinity);
-							},
-						},
-					],
-				},
+							}
+						}
+					]
+				}
 			] as IMezonMenuSectionProps[],
-		[],
+		[]
 	);
 
 	const handleMuteChannel = () => {
@@ -79,7 +79,7 @@ const MuteClanNotificationBS = ({ onChangeScheduleMute, currentChannel, descript
 				<TouchableOpacity onPress={handleMuteChannel} style={styles.wrapperUnmuteBox}>
 					<Icons.BellSlashIcon width={20} height={20} style={{ marginRight: 20 }} color={themeValue.text} />
 					<Text style={styles.option}>
-						{`${ isMute ? 'Mute' : 'Unmute'} #${currentChannel?.channel_category_label || currentChannel?.label || ''}`}
+						{`${isMute ? 'Mute' : 'Unmute'} #${currentChannel?.channel_category_label || currentChannel?.label || ''}`}
 					</Text>
 				</TouchableOpacity>
 			</Block>

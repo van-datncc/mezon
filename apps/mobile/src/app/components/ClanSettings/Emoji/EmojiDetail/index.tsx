@@ -7,7 +7,7 @@ import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { forwardRef, Ref, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { Pressable } from 'react-native-gesture-handler';
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -38,7 +38,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 			source: getSrcEmoji(item.id as string),
 			shortname: emojiName,
 			category: item.category,
-			clan_id: clanId,
+			clan_id: clanId
 		};
 		await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: request, emojiId: item.id || '' }));
 	};
@@ -65,7 +65,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 			setEmojiName(item.shortname?.split(':')?.join(''));
 			Toast.show({
 				type: 'info',
-				text1: t('toast.reject'),
+				text1: t('toast.reject')
 			});
 		} else if (emojiName !== item.shortname?.split(':')?.join('')) {
 			handleUpdateEmoji();
@@ -80,7 +80,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 		return (
 			<View style={styles.rightItem}>
 				<TouchableOpacity style={styles.deleteButton} onPress={handleDeleteEmoji}>
-					<Icons.TrashIcon width={size.s_20} height={size.s_20} color={baseColor.white}/>
+					<Icons.TrashIcon width={size.s_20} height={size.s_20} color={baseColor.white} />
 					<Text style={styles.whiteText}>{t('emojiList.delete')}</Text>
 				</TouchableOpacity>
 			</View>

@@ -5,7 +5,7 @@ import {
 	getAttachmentUnique,
 	load,
 	mentionUserPattern,
-	save,
+	save
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
@@ -16,7 +16,7 @@ import {
 	selectCurrentChannel,
 	selectEmojiSuggestion,
 	threadsActions,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
@@ -44,7 +44,7 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 	mention: {
 		trigger: '@',
 		allowedSpacesCount: 0,
-		isInsertSpaceAfterMention: true,
+		isInsertSpaceAfterMention: true
 	},
 	hashtag: {
 		trigger: '#',
@@ -52,14 +52,14 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 		isInsertSpaceAfterMention: true,
 		textStyle: {
 			fontWeight: 'bold',
-			color: Colors.white,
-		},
+			color: Colors.white
+		}
 	},
 	emoji: {
 		trigger: ':',
 		allowedSpacesCount: 0,
-		isInsertSpaceAfterMention: true,
-	},
+		isInsertSpaceAfterMention: true
+	}
 };
 
 interface IChatInputProps {
@@ -82,7 +82,7 @@ export const ChatBoxBottomBar = memo(
 		messageActionNeedToResolve,
 		messageAction,
 		onDeleteMessageActionNeedToResolve,
-		onShowKeyboardBottomSheet,
+		onShowKeyboardBottomSheet
 	}: IChatInputProps) => {
 		const dispatch = useAppDispatch();
 		const [text, setText] = useState<string>('');
@@ -120,7 +120,7 @@ export const ChatBoxBottomBar = memo(
 			onSelectionChange: (position) => {
 				handleSelectionChange(position);
 			},
-			triggersConfig: inputTriggersConfig,
+			triggersConfig: inputTriggersConfig
 		});
 		const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(text);
 
@@ -136,7 +136,7 @@ export const ChatBoxBottomBar = memo(
 			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
 			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, {
 				...allCachedMessage,
-				[channelId]: text,
+				[channelId]: text
 			});
 		};
 
@@ -169,8 +169,8 @@ export const ChatBoxBottomBar = memo(
 			dispatch(
 				referencesActions.removeAttachment({
 					channelId: channelId,
-					urlAttachment: urlToRemove,
-				}),
+					urlAttachment: urlToRemove
+				})
 			);
 		};
 
@@ -185,8 +185,8 @@ export const ChatBoxBottomBar = memo(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
 					shortName: '',
 					id: '',
-					isReset: true,
-				}),
+					isReset: true
+				})
 			);
 		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText]);
 
@@ -200,7 +200,7 @@ export const ChatBoxBottomBar = memo(
 					onShowKeyboardBottomSheet(false, 0);
 				}
 			},
-			[keyboardHeight, onShowKeyboardBottomSheet],
+			[keyboardHeight, onShowKeyboardBottomSheet]
 		);
 
 		const getChannelById = (channelId: string) => {
@@ -220,7 +220,7 @@ export const ChatBoxBottomBar = memo(
 					matches.push({
 						start: matches.length ? match?.index - matches.length * 2 : match?.index,
 						end: pattern?.lastIndex - (matches.length + 1) * 2,
-						content: match[0]?.slice(2, -1),
+						content: match[0]?.slice(2, -1)
 					});
 				}
 				return matches;
@@ -253,7 +253,7 @@ export const ChatBoxBottomBar = memo(
 							return {
 								user_id: mention.id?.toString() ?? '',
 								s: m?.start,
-								e: m?.end,
+								e: m?.end
 							};
 						}
 					});
@@ -273,7 +273,7 @@ export const ChatBoxBottomBar = memo(
 							hashtagList.push({
 								channelid: channelInfo.id.toString() ?? '',
 								s: mentionUsers?.length ? startindex - 2 * mentionBeforeCount : startindex,
-								e: startindex + word.length - 2 * mentionBeforeCount,
+								e: startindex + word.length - 2 * mentionBeforeCount
 							});
 						}
 					}
@@ -338,7 +338,7 @@ export const ChatBoxBottomBar = memo(
 				onDeleteMessageActionNeedToResolve();
 				openKeyBoard();
 			},
-			[messageActionNeedToResolve?.targetMessage?.sender_id, onDeleteMessageActionNeedToResolve],
+			[messageActionNeedToResolve?.targetMessage?.sender_id, onDeleteMessageActionNeedToResolve]
 		);
 
 		const onConvertToFiles = useCallback(async (content: string) => {
@@ -376,11 +376,11 @@ export const ChatBoxBottomBar = memo(
 				dispatch(
 					referencesActions.setAttachmentData({
 						channelId: channelId,
-						attachments: [attachment],
-					}),
+						attachments: [attachment]
+					})
 				);
 			},
-			[channelId, dispatch],
+			[channelId, dispatch]
 		);
 
 		const writeTextToFile = async (text: string) => {
@@ -407,7 +407,7 @@ export const ChatBoxBottomBar = memo(
 				name: filename,
 				type: 'text/plain',
 				size: (await RNFS.stat(path)).size.toString(),
-				fileData: fileData,
+				fileData: fileData
 			};
 
 			return fileFormat;
@@ -515,5 +515,5 @@ export const ChatBoxBottomBar = memo(
 				</Block>
 			</Block>
 		);
-	},
+	}
 );
