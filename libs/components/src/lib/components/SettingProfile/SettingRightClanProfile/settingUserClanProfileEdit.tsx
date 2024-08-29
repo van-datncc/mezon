@@ -5,9 +5,10 @@ import { InputField } from '@mezon/ui';
 import { fileTypeImage, resizeFileImage } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ModalSettingSave } from '../../ClanSettings/SettingRoleManagement';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingRightClanCard, { Profilesform } from '../SettingUserClanProfileCard';
-import SettingUserClanProfileSave, { ModalSettingSave } from './SettingUserClanProfileSave';
+import SettingUserClanProfileSave from './SettingUserClanProfileSave';
 
 interface SettingRightClanEditProps {
 	flagOption: boolean;
