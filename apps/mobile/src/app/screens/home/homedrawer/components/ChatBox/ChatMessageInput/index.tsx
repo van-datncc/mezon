@@ -4,11 +4,10 @@ import {
 	ID_MENTION_HERE,
 	IRoleMention,
 	IS_TABLET,
-	Icons,
-	getAttachmentUnique
+	Icons
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, messagesActions, referencesActions, selectCurrentClanId } from '@mezon/store';
+import { emojiSuggestionActions, messagesActions, selectCurrentClanId } from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
@@ -189,18 +188,12 @@ export const ChatMessageInput = memo(
 				[editSendMessage, messageActionNeedToResolve],
 			);
 
-			const isCanSendMessage = useMemo(() => {
-				return !!attachmentDataRef?.length || text?.length > 0;
-			}, [attachmentDataRef?.length, text?.length]);
 
 			const doesIdRoleExist = (id: string, roles: IRoleMention[]): boolean => {
 				return roles?.some((role) => role?.roleId === id);
 			};
 
 			const handleSendMessage = async () => {
-				if (!isCanSendMessage) {
-					return;
-				}
 				clearInputAfterSendMessage();
 				const simplifiedMentionList = mentionsOnMessage?.map?.((mention) => {
 					const isRole = doesIdRoleExist(mention?.user_id ?? '', roleList ?? []);
@@ -236,20 +229,15 @@ export const ChatMessageInput = memo(
 					references: [],
 				};
 
-				const attachmentDataUnique = getAttachmentUnique(attachmentDataRef);
-				const checkAttachmentLoading = attachmentDataUnique.some((attachment: ApiMessageAttachment) => !attachment?.size);
-				if (checkAttachmentLoading && !!attachmentDataUnique?.length) {
-					Toast.show({
-						type: 'error',
-						text1: t('toast.attachmentIsLoading'),
-					});
-					return;
-				}
-				dispatch(
-					referencesActions.resetDataAttachment({
-						channelId: channelId,
-					}),
-				);
+				// TODO: - nghia - reset attachments
+				// dispatch(
+				// 	referencesActions.setAtachmentAfterUpload({
+				// 		channelId: ,
+				// 		messageId: '',
+				// 		files: [],
+				// 	}),
+				// );
+
 				const { targetMessage, type } = messageActionNeedToResolve || {};
 				const reference = targetMessage
 					? ([
@@ -284,7 +272,7 @@ export const ChatMessageInput = memo(
 									await sendMessage(
 										filterEmptyArrays(payloadSendMessage),
 										simplifiedMentionList || [],
-										attachmentDataUnique || [],
+										attachmentDataRef || [],
 										reference,
 										false,
 										isMentionEveryOne,
@@ -295,7 +283,7 @@ export const ChatMessageInput = memo(
 									await handleSendDM(
 										filterEmptyArrays(payloadSendMessage),
 										simplifiedMentionList,
-										attachmentDataUnique || [],
+										attachmentDataRef || [],
 										reference,
 									);
 									break;
