@@ -11,7 +11,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -54,6 +54,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
+	const isMentionHashtagDMRef = useRef(false);
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -84,9 +85,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					clanId: currentChannel?.clan_id || '',
 					channelId: currentChannel?.channel_id || '',
 					channelType: currentChannel?.type,
-					noCache: true,
-				}),
-			),
+					noCache: true
+				})
+			)
 		]);
 	}, [currentChannel]);
 
@@ -100,18 +101,29 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
 					type: currentDmGroup?.type,
 					noCache: true,
-					isFetchingLatestMessages: true,
-				}),
-			),
+					isFetchingLatestMessages: true
+				})
+			)
 		]);
 		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 
 	useEffect(() => {
+		const onMentionHashtagDM = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MENTION_HASHTAG_DM, ({ isMentionHashtagDM }) => {
+			isMentionHashtagDMRef.current = isMentionHashtagDM;
+		});
 		return () => {
-			fetchMemberChannel();
+			onMentionHashtagDM.remove();
 		};
-	}, [fetchMemberChannel]);
+	}, []);
+
+	useEffect(() => {
+		return () => {
+			if (!isMentionHashtagDMRef.current) {
+				fetchMemberChannel();
+			}
+		};
+	}, [fetchMemberChannel, isMentionHashtagDMRef]);
 
 	useEffect(() => {
 		if (currentDmGroup?.id) {
@@ -140,8 +152,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
 						type: currentDmGroup.type,
 						noCache: true,
-						isFetchingLatestMessages: true,
-					}),
+						isFetchingLatestMessages: true
+					})
 				);
 
 				store.dispatch(appActions.setIsFromFCMMobile(false));
@@ -223,7 +235,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 								clanId={'0'}
 								channelLabel={currentDmGroup?.channel_label || currentDmGroup?.usernames}
 								mode={Number(
-									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
+									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 								)}
 							/>
 						</View>
@@ -233,14 +245,14 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 						hiddenIcon={{
-							threadIcon: true,
+							threadIcon: true
 						}}
 					/>
 					<Block height={Platform.OS === 'ios' ? 10 : 0} backgroundColor={themeValue.secondary} />
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: themeValue.secondary,
+							backgroundColor: themeValue.secondary
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (

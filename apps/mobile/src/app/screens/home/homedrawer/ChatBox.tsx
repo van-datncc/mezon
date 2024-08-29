@@ -22,13 +22,13 @@ interface IChatBoxProps {
 }
 export const ChatBox = memo((props: IChatBoxProps) => {
 	const { themeValue } = useTheme();
-	const { t } = useTranslation(['message'])
+	const { t } = useTranslation(['message']);
 	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
 	const { isCanSendMessage } = useUserPermission();
 
 	const isDM = useMemo(() => {
-		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(props?.mode)
-	}, [props?.mode])
+		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(props?.mode);
+	}, [props?.mode]);
 
 	useEffect(() => {
 		if (props?.channelId && messageActionNeedToResolve) {
@@ -53,9 +53,18 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	return (
 		<Block>
 			{isCanSendMessage || isDM ? (
-				<Block backgroundColor={themeValue.secondary} borderTopWidth={1} borderTopColor={themeValue.border} flexDirection='column' justifyContent='space-between'>
+				<Block
+					backgroundColor={themeValue.secondary}
+					borderTopWidth={1}
+					borderTopColor={themeValue.border}
+					flexDirection="column"
+					justifyContent="space-between"
+				>
 					{messageActionNeedToResolve && (
-						<ActionMessageSelected messageActionNeedToResolve={messageActionNeedToResolve} onClose={() => setMessageActionNeedToResolve(null)} />
+						<ActionMessageSelected
+							messageActionNeedToResolve={messageActionNeedToResolve}
+							onClose={() => setMessageActionNeedToResolve(null)}
+						/>
 					)}
 					<ChatBoxBottomBar
 						messageActionNeedToResolve={messageActionNeedToResolve}
