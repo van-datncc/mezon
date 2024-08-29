@@ -54,7 +54,7 @@ export const Routes = () => {
 							element: <Login />
 						},
 						{
-							path: 'admin',
+							path: '',
 							loader: loaderWithStore(authLoader),
 							element: <RootLayout />,
 							children: [

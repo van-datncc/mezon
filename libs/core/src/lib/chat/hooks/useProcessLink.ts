@@ -65,7 +65,6 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 
 				Promise.all(resultPromises)
 					.then((results) => {
-						console.log('results', results);
 						const filteredImageAttachments = results.filter((result): result is ApiMessageAttachment => result !== null);
 						const combinedAttachments = [...(attachmentPayload ?? []), ...filteredImageAttachments].filter(
 							(attachment, index, self) => index === self.findIndex((a) => a.url === attachment.url)

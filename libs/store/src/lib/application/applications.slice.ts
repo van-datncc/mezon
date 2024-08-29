@@ -115,6 +115,17 @@ export const editApplication = createAsyncThunk(
 	}
 );
 
+export const deleteApplication = createAsyncThunk('adminApplication/deleteApplication', async ({ appId }: { appId: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.deleteApp(mezon.session, appId);
+		return response;
+	} catch (err) {
+		console.log(err);
+		return thunkAPI.rejectWithValue({ err });
+	}
+});
+
 export const adminApplicationSlice = createSlice({
 	name: ADMIN_APPLICATIONS,
 	initialState: applicationInitialState,

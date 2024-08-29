@@ -1,8 +1,8 @@
+import { useReference } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
-	getAttachmentUnique,
 	getChannelHashtag,
 	load,
 	mentionRegexSplit,
@@ -16,7 +16,6 @@ import {
 	referencesActions,
 	selectAllChannels,
 	selectAllHashtagDm,
-	selectChannelsEntities,
 	selectCurrentChannel,
 	selectEmojiSuggestion,
 	threadsActions,
@@ -26,6 +25,8 @@ import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { createSelector } from '@reduxjs/toolkit';
+// eslint-disable-next-line
+import { IFile } from 'apps/mobile/src/app/temp-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -38,7 +39,6 @@ import UseMentionList from '../../../../../../hooks/useUserMentionList';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
-import { IFile } from '../../AttachmentPicker/Gallery';
 import AttachmentPreview from '../../AttachmentPreview';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import { ChatMessageInput } from '../ChatMessageInput';
@@ -100,9 +100,9 @@ export const ChatBoxBottomBar = memo(
 		const [isShowAttachControl, setIsShowAttachControl] = useState<boolean>(false);
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
-		const attachmentDataRef = useSelector(selectAttachmentData(channelId || ''));
 		const currentChannel = useSelector(selectCurrentChannel);
-		const channelsEntities = useSelector(selectChannelsEntities);
+		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
+
 		const navigation = useNavigation<any>();
 		const inputRef = useRef<TextInput>();
 		const cursorPositionRef = useRef(0);
@@ -177,7 +177,6 @@ export const ChatBoxBottomBar = memo(
 			setTextChange(textFormat);
 			await handleTextInputChange(textFormat);
 		};
-
 		const removeAttachmentByUrl = (urlToRemove: string) => {
 			dispatch(
 				referencesActions.removeAttachment({
@@ -357,12 +356,20 @@ export const ChatBoxBottomBar = memo(
 						return (attachment.filetype = typeConvert.typeConvert);
 					}
 				});
-				// dispatch(
-				// 	referencesActions.setAttachmentData({
-				// 		channelId: channelId,
-				// 		attachments: [attachment]
-				// 	})
-				// );
+				dispatch(
+					referencesActions.setAtachmentAfterUpload({
+						channelId: currentChannel?.id,
+						messageId: '',
+						files: [
+							{
+								filename: attachment.filename,
+								size: attachment.size,
+								filetype: attachment.filetype,
+								url: attachment.url
+							}
+						]
+					})
+				);
 			},
 			[channelId, dispatch]
 		);
@@ -412,6 +419,10 @@ export const ChatBoxBottomBar = memo(
 			}, 300);
 		};
 
+		const handleRemoveAttachment = (index: number) => {
+			removeAttachmentByIndex(currentChannel?.id, index);
+		};
+
 		useEffect(() => {
 			if (messageActionNeedToResolve !== null) {
 				const { isStillShowKeyboard } = messageActionNeedToResolve;
@@ -455,9 +466,7 @@ export const ChatBoxBottomBar = memo(
 				<HashtagSuggestions directMessageId={channelId} mode={mode} {...triggers.hashtag} />
 				<EmojiSuggestion {...triggers.emoji} />
 
-				{!!attachmentDataRef?.length && (
-					<AttachmentPreview attachments={getAttachmentUnique(attachmentDataRef)} onRemove={removeAttachmentByUrl} />
-				)}
+				{checkAttachment && <AttachmentPreview attachments={attachmentFilteredByChannelId.files} onRemove={handleRemoveAttachment} />}
 
 				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
 					<ChatMessageLeftArea
@@ -493,8 +502,7 @@ export const ChatBoxBottomBar = memo(
 						markdownsOnMessage={markdownList}
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						isShowCreateThread={isShowCreateThread}
-						channelsEntities={channelsEntities}
-						attachmentDataRef={attachmentDataRef}
+						attachmentDataRef={attachmentFilteredByChannelId?.files}
 					/>
 				</Block>
 			</Block>

@@ -6,6 +6,7 @@ import { ApiApp, ApiMessageAttachment, MezonUpdateAppBody } from 'mezon-js/api.g
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import DeleteAppPopup from '../applications/DeleteAppPopup';
 
 const GeneralInformation = () => {
 	const { sessionRef, clientRef } = useMezon();
@@ -119,7 +120,10 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 	const handleCopyUrl = (url: string) => {
 		navigator.clipboard.writeText(url);
 	};
-
+	const [isShowDeletePopup, setIsShowDeletePopup] = useState(false);
+	const toggleDeletePopup = () => {
+		setIsShowDeletePopup(!isShowDeletePopup);
+	};
 	return (
 		<div className="flex-1 flex flex-col gap-7">
 			<div className="w-full flex flex-col gap-2">
@@ -168,6 +172,15 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 					Copy
 				</div>
 			</div>
+			<div className="flex justify-end">
+				<div
+					onClick={toggleDeletePopup}
+					className="text-[15px] px-4 py-[10px] text-white bg-red-600 hover:bg-red-800 cursor-pointer rounded-sm w-fit"
+				>
+					Delete App
+				</div>
+			</div>
+			{isShowDeletePopup && <DeleteAppPopup appId={appId} appName={appDetail.appname as string} togglePopup={toggleDeletePopup} />}
 		</div>
 	);
 };

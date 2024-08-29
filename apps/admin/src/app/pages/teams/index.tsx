@@ -5,7 +5,7 @@ function TeamsPage() {
 	return (
 		<div className="flex flex-1 flex-col items-center">
 			<div className="flex flex-row justify-between w-full">
-				<span className="text-[24px] font-medium">Teams</span>
+				<span className="text-2xl font-medium">Teams</span>
 			</div>
 		</div>
 	);

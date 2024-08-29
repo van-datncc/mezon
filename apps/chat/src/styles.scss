@@ -703,70 +703,83 @@ input:-webkit-autofill:active {
 
 /* LoadingTyping.css */
 #dot1 {
-  animation: load 1s infinite ease-in-out;
+	animation: load 1s infinite ease-in-out;
 }
 #dot2 {
-	animation: load 1s infinite ease-in-out, holdDot2 1s infinite ease-in-out;
+	animation:
+		load 1s infinite ease-in-out,
+		holdDot2 1s infinite ease-in-out;
 	animation-delay: 0.2s;
 }
 #dot3 {
-	animation: load 1s infinite ease-in-out, holdDot3 1s infinite ease-in-out;
+	animation:
+		load 1s infinite ease-in-out,
+		holdDot3 1s infinite ease-in-out;
 	animation-delay: 0.4s;
 }
 
-@keyframes holdDot2{
-   0% {
-    transform: translateY(0);
-  }
-  20%{
-     transform: translateY(-3px) translateX(-6px);
-  }
-  40% {
-    transform: translateY(-3px) translateX(-6px);
-  }
-  60% {
-     transform: translateY(0);
-  }
+@keyframes holdDot2 {
+	0% {
+		transform: translateY(0);
+	}
+	20% {
+		transform: translateY(-3px) translateX(-6px);
+	}
+	40% {
+		transform: translateY(-3px) translateX(-6px);
+	}
+	60% {
+		transform: translateY(0);
+	}
 }
 
-@keyframes holdDot3{
-   0% {
-    transform: translateY(0);
-  }
-  20%{
-     transform: translateY(-3px) translateX(-12px);
-  }
-  40% {
-    transform: translateY(-3px) translateX(-12px);
-  }
-  60% {
-     transform: translateY(0);
-  }
+@keyframes holdDot3 {
+	0% {
+		transform: translateY(0);
+	}
+	20% {
+		transform: translateY(-3px) translateX(-12px);
+	}
+	40% {
+		transform: translateY(-3px) translateX(-12px);
+	}
+	60% {
+		transform: translateY(0);
+	}
 }
 
 @keyframes load {
-  0% {
-    opacity: 0.5;
-    scale: 1;
-    transform: translateY(0);
-  }
-  20%{
-     opacity: 1;
-     scale: 1.2;
-     transform: translateY(-3px);
-  }
-  40% {
-    opacity: 1;
-    scale: 1.2;
-    transform: translateY(-3px);
-  }
-  60% {
-     opacity: 0.5;
-     scale: 1;
-     transform: translateY(0);
-  }
-  100% {
-    opacity: 0.5;
-    scale: 1;
-  }
+	0% {
+		opacity: 0.5;
+		scale: 1;
+		transform: translateY(0);
+	}
+	20% {
+		opacity: 1;
+		scale: 1.2;
+		transform: translateY(-3px);
+	}
+	40% {
+		opacity: 1;
+		scale: 1.2;
+		transform: translateY(-3px);
+	}
+	60% {
+		opacity: 0.5;
+		scale: 1;
+		transform: translateY(0);
+	}
+	100% {
+		opacity: 0.5;
+		scale: 1;
+	}
+}
+
+.custom-member-list::-webkit-scrollbar {
+	display: none;
+}
+
+.custom-member-list {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }

@@ -16,33 +16,33 @@ const useProcessMention = (mentionsRaw: MentionItem[], roleList: IRoleMention[])
 				mentions.push({
 					role_id: id,
 					s,
-					e,
+					e
 				});
 			} else {
 				mentions.push({
 					user_id: id,
 					s,
-					e,
+					e
 				});
 			}
 		} else if (childIndex === ETypeMEntion.HASHTAG) {
 			hashtags.push({
 				channelid: id,
 				s,
-				e,
+				e
 			});
 		} else if (childIndex === ETypeMEntion.EMOJI) {
 			emojis.push({
 				emojiid: id,
 				s,
-				e,
+				e
 			});
 		}
 	});
 	return {
 		mentionList: mentions,
 		hashtagList: hashtags,
-		emojiList: emojis,
+		emojiList: emojis
 	};
 };
 

@@ -76,7 +76,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 					<div className="hover:underline cursor-pointer" onClick={togglePopup}>
 						Cancel
 					</div>
-					<button type="submit" className="bg-blue-600 hover:bg-blue-800 text-white rounded-md px-[20px] py-[9px] cursor-pointer">
+					<button type="submit" className="bg-blue-600 hover:bg-blue-800 text-white rounded px-[20px] py-[9px] cursor-pointer">
 						Create
 					</button>
 				</div>

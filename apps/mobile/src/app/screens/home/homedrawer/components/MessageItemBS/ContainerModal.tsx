@@ -50,7 +50,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { isCanDeleteMessage, isCanManageThread } = useUserPermission();
 	const { downloadImage, saveImageToCameraRoll } = useImage();
 	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || '')
+		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
 	);
 	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const messagePosition = useMemo(() => {

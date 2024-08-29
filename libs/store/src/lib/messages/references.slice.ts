@@ -11,6 +11,13 @@ export interface ReferencesEntity extends IMessage {
 	id: string;
 }
 
+export interface IAttachmentFile {
+	name: string;
+	path: string;
+	type: string;
+	size: number;
+}
+
 export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
