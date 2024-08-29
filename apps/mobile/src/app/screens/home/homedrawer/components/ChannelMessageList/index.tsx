@@ -48,6 +48,7 @@ const ChannelListMessage = React.memo(({
   return (
     <FlatList
       ref={flatListRef}
+      inverted
       data={messages || []}
       onScroll={handleScroll}
       keyboardShouldPersistTaps={'handled'}
@@ -55,7 +56,7 @@ const ChannelListMessage = React.memo(({
       renderItem={renderItem}
       removeClippedSubviews={true}
       keyExtractor={keyExtractor}
-      onEndReached={messages?.length ? () => {onLoadMore(ELoadMoreDirection.bottom)} : undefined}
+      onEndReached={messages?.length ? () => {onLoadMore(ELoadMoreDirection.top)} : undefined}
       onEndReachedThreshold={0.1}
       initialNumToRender={20}
       maxToRenderPerBatch={10}
