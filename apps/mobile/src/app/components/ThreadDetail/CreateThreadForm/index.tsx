@@ -205,6 +205,8 @@ export default function CreateThreadForm() {
 								<View style={styles.messageBox}>
 									<MessageItem
 										messageId={valueThread?.id}
+										message={valueThread}
+										showUserInformation
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel?.channel_id}
 										isNumberOfLine={true}
