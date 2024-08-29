@@ -55,7 +55,7 @@ const CategorySetting: React.FC<ICategorySettingProps> = ({ onClose, category })
             <h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme sbm:mt-[60px] mt-[10px]">
               {currentSetting.name}
             </h2>
-            {currentSetting.id === categorySettingItem.OVERVIEW && <OverviewSetting category={category} />}
+            {currentSetting.id === categorySettingItem.OVERVIEW && <OverviewSetting category={category} onClose={onClose}/>}
           </div>
         </div>
         <ExitSetting onClose={onClose} />

@@ -16,7 +16,6 @@ import { emojiSuggestionReducer } from './emojiSuggestion/emojiSuggestion.slice'
 import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
 import { gifsStickerEmojiReducer } from './giftStickerEmojiPanel/gifsStickerEmoji.slice';
-import { stickersReducer } from './giftStickerEmojiPanel/stickers.slice';
 import { inviteReducer } from './invite/invite.slice';
 import { messagesReducer } from './messages/messages.slice';
 import { referencesReducer } from './messages/references.slice';
@@ -165,7 +164,6 @@ const reducer = {
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
 	gifs: gifsReducer,
-	stickers: stickersReducer,
 	gifsStickersEmojis: gifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
