@@ -24,6 +24,7 @@ const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions
 	const { setValueInputSearch } = useGifsStickersEmoji();
 	const [isShowSetting, setIsShowSetting] = useState(false);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
+	console.log('idMessageRefReaction: ', idMessageRefReaction);
 
 	useEffect(() => {
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -65,10 +66,10 @@ const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions
 				onClick={(e) => e.stopPropagation()}
 				className={`w-[370px] max-sm:w-full max-sm:pt-0 max-sm:rounded-none max-sm:mt-[-0.5rem]
 			sbm:w-[500px] max-sbm:w-[312px] max-sbm:rounded-lg h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30
-			 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : 'min-h-[500px]'}`}
+			 ${emojiAction === EmojiPlaces.EMOJI_REACTION || emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM ? 'min-h-[400px]' : isShowEmojiPicker() ? 'min-h-[350px]' : 'min-h-[500px]'}`}
 			>
 				<div className="w-full">
-					{emojiAction !== EmojiPlaces.EMOJI_REACTION && (
+					{!idMessageRefReaction && (
 						<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1 max-sm:justify-evenly">
 							<button
 								className={` relative px-2 mx-2 rounded-md ${subPanelActive === SubPanelName.GIFS ? ' font-semibold dark:text-white text-black' : ' dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black '}`}

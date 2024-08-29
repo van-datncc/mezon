@@ -1,7 +1,7 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import { referencesActions, selectIdMessageRefReply } from '@mezon/store';
-import { IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 	const dispatch = useDispatch();
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
+
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(channelId));
 
@@ -41,24 +42,14 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
 	useEffect(() => {
-		if (
-			subPanelActive !== SubPanelName.NONE &&
-			subPanelActive !== SubPanelName.EMOJI_REACTION_RIGHT &&
-			subPanelActive !== SubPanelName.EMOJI_REACTION_BOTTOM
-		) {
-			setIsEmojiOnChat(true);
-		} else {
-			setIsEmojiOnChat(false);
-		}
-	}, [subPanelActive]);
+		const isActive =
+			(subPanelActive !== SubPanelName.NONE &&
+				subPanelActive !== SubPanelName.EMOJI_REACTION_RIGHT &&
+				subPanelActive !== SubPanelName.EMOJI_REACTION_BOTTOM) ||
+			((subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) &&
+				window.innerWidth < 640);
 
-	useEffect(() => {
-		if (
-			(subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && window.innerWidth < 640) ||
-			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && window.innerWidth < 640)
-		) {
-			setIsEmojiOnChat(true);
-		}
+		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
 
 	const handleCloseReplyMessageBox = () => {
@@ -76,7 +67,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 					}}
 					className="max-sbm:bottom-[60px] bottom-[76px] right-[10px] absolute bg"
 				>
-					<GifStickerEmojiPopup />
+					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} />
 				</div>
 			)}
 			{idMessageRefReply && <ReplyMessageBox channelId={channelId} idMessage={idMessageRefReply} />}
