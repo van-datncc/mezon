@@ -94,7 +94,7 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const onContentSizeChange = useCallback((w, h) => {
 		if (categorizedChannels?.length && h > 0 && isLoading === 'loaded') {
 			timeoutRef.current = setTimeout(() => {
-				scrollToItemById(currentChannel?.category_id);
+				scrollToItemById?.(currentChannel?.category_id);
 			}, 300);
 		}
 	}, []);
