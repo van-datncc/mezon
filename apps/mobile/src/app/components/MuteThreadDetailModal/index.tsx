@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { AngleRight, Icons } from '@mezon/mobile-components';
+import { AngleRight, ENotificationActive, ENotificationChannelId, Icons } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
@@ -33,11 +33,6 @@ type MuteThreadDetailRouteProp = RouteProp<RootStackParamList, 'MuteThreadDetail
 type MuteThreadDetailModalProps = {
 	route: MuteThreadDetailRouteProp;
 };
-
-enum ENotificationActive {
-	ON = 1,
-	OFF = 0
-}
 
 const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	const { themeValue } = useTheme();
@@ -202,7 +197,8 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 
 	return (
 		<View style={styles.wrapper}>
-			{getNotificationChannelSelected?.active === ENotificationActive.ON || getNotificationChannelSelected.id == '0' ? (
+			{getNotificationChannelSelected?.active === ENotificationActive.ON ||
+			getNotificationChannelSelected.id == ENotificationChannelId.Default ? (
 				<MezonMenu menu={menu} />
 			) : (
 				<View style={styles.optionsBox}>
