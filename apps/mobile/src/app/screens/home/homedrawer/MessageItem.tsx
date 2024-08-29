@@ -261,7 +261,7 @@ const MessageItem = React.memo(
 					type: EMessageActionType.Reply,
 					targetMessage: message,
 					isStillShowKeyboard: true,
-					replyTo: senderDisplayName
+					replyTo: senderDisplayName,
 				};
 				//Note: trigger to ChatBox.tsx
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
@@ -270,7 +270,9 @@ const MessageItem = React.memo(
 
 		// Message welcome
 		if (message?.sender_id === '0' && !message?.content?.t) {
-			return <WelcomeMessage channelId={props.channelId} />;
+			return (
+				<WelcomeMessage channelId={props.channelId} />
+			)
 		}
 
 		const handlePressIn = () => {
@@ -308,7 +310,7 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageMention,
-						checkMessageTargetToMoved && styles.highlightMessageReply
+						checkMessageTargetToMoved && styles.highlightMessageReply,
 					]}
 				>
 					{!!messageReferences && (
@@ -350,7 +352,7 @@ const MessageItem = React.memo(
 								onMessageAction({
 									type: EMessageBSToShow.MessageAction,
 									senderDisplayName,
-									message
+									message,
 								});
 								dispatch(setSelectedMessage(message));
 							}}
@@ -390,7 +392,7 @@ const MessageItem = React.memo(
 										onMessageAction({
 											type: EMessageBSToShow.MessageAction,
 											senderDisplayName,
-											message
+											message,
 										});
 									}}
 								/>
