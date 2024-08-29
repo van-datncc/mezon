@@ -51,35 +51,15 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 	useEffect(() => {
-		if (
-			subPanelActive !== SubPanelName.NONE &&
-			subPanelActive !== SubPanelName.EMOJI_REACTION_RIGHT &&
-			subPanelActive !== SubPanelName.EMOJI_REACTION_BOTTOM
-		) {
-			setIsEmojiOnChat(true);
-		} else {
-			setIsEmojiOnChat(false);
-		}
-	}, [subPanelActive]);
+		const isActive =
+			(subPanelActive !== SubPanelName.NONE &&
+				subPanelActive !== SubPanelName.EMOJI_REACTION_RIGHT &&
+				subPanelActive !== SubPanelName.EMOJI_REACTION_BOTTOM) ||
+			((subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) &&
+				window.innerWidth < 640);
 
-	useEffect(() => {
-		if (
-			(subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && window.innerWidth < 640) ||
-			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && window.innerWidth < 640)
-		) {
-			setIsEmojiOnChat(true);
-		}
+		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
-
-	useEffect(() => {
-		if (subPanelActive === SubPanelName.EMOJI) {
-			setEmojiAction(EmojiPlaces.EMOJI_EDITOR);
-		}
-		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
-			setEmojiAction(EmojiPlaces.EMOJI_REACTION);
-		}
-	}, [subPanelActive]);
-
 	return (
 		<div className="mx-2 relative " role="button" ref={messageBox}>
 			{isEmojiOnChat && (
@@ -94,7 +74,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					}}
 					className="z-20"
 				>
-					<GifStickerEmojiPopup />
+					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
 			{idMessageRefReply && <ReplyMessageBox channelId={directParamId} idMessage={idMessageRefReply} />}
@@ -105,16 +85,6 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 				listMentions={UserMentionList({ channelID: directParamId, channelMode: mode })}
 				mode={mode}
 			/>
-			{isEmojiOnChat && ( // responsive mobile
-				<div
-					className={`relative h-[300px]  overflow-y-scroll w-full hidden max-sm:block animate-slideUp`}
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
-				>
-					<GifStickerEmojiPopup emojiAction={emojiAction} mode={mode} />
-				</div>
-			)}
 		</div>
 	);
 }

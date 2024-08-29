@@ -67,7 +67,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 					}}
 					className="max-sbm:bottom-[60px] bottom-[76px] right-[10px] absolute bg"
 				>
-					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} />
+					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
 			{idMessageRefReply && <ReplyMessageBox channelId={channelId} idMessage={idMessageRefReply} />}
