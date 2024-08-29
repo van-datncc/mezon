@@ -1,6 +1,5 @@
-import { useCategory, useReference } from '@mezon/core';
+import { useCategory } from '@mezon/core';
 import {
-	CHANNEL_ID_SHARING,
 	CloseIcon,
 	PenIcon,
 	STORAGE_CLAN_ID,
@@ -9,26 +8,28 @@ import {
 	SendIcon,
 	cloneDeep,
 	debounce,
+	getAttachmentUnique,
 	load,
-	save
+	save,
 } from '@mezon/mobile-components';
 import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
 import {
 	channelsActions,
 	directActions,
 	getStoreAsync,
-	referencesActions,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectDirectsOpenlist,
 } from '@mezon/store-mobile';
-import { createUploadFilePath, useMezon } from '@mezon/transport';
+import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { ILinkOnMessage } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
+import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { isImage, isVideo } from '../../../utils/helpers';
@@ -49,12 +50,11 @@ export const Sharing = ({ data, onClose }) => {
 	const [channelSelected, setChannelSelected] = useState<any>();
 	const inputSearchRef = useRef<any>();
 	const session = mezon.sessionRef.current;
+	const [attachmentUpload, setAttachmentUpload] = useState<any>([]);
 
 	const dataMedia = useMemo(() => {
 		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
-
-	const { attachmentFilteredByChannelId, removeAttachmentByIndex, checkAttachment } = useReference(CHANNEL_ID_SHARING);
 
 	useEffect(() => {
 		if (data) {
@@ -80,9 +80,9 @@ export const Sharing = ({ data, onClose }) => {
 
 	const getFullFileName = useCallback(
 		(fileName: string) => {
-			return createUploadFilePath(session, currentClan?.id, currentChannelId, fileName);
+			return createUploadFilePath(session, currentClan.id, currentChannelId, fileName);
 		},
-		[currentChannelId, currentClan?.id, session],
+		[currentChannelId, currentClan.id, session],
 	);
 
 	function flattenData(categorizedChannels: any) {
@@ -173,7 +173,7 @@ export const Sharing = ({ data, onClose }) => {
 				lk: dataSend.links || [],
 			},
 			[],
-			attachmentFilteredByChannelId?.files || [],
+			getAttachmentUnique(attachmentUpload) || [],
 			[],
 		);
 	};
@@ -198,7 +198,7 @@ export const Sharing = ({ data, onClose }) => {
 				lk: dataSend.links || [],
 			},
 			[], //mentions
-			attachmentFilteredByChannelId?.files || [], //attachments
+			getAttachmentUnique(attachmentUpload) || [], //attachments
 			[], //references
 			false, //anonymous
 			false, //mentionEveryone
@@ -239,23 +239,6 @@ export const Sharing = ({ data, onClose }) => {
 			text: dataText,
 			links,
 		};
-
-		dispatch(
-			referencesActions.setAtachmentAfterUpload({
-				channelId: channelSelected?.channel_id,
-				messageId: '',
-				files: attachmentFilteredByChannelId?.files
-			}),
-		);
-
-		dispatch(
-			referencesActions.setAtachmentAfterUpload({
-				channelId: CHANNEL_ID_SHARING,
-				messageId: '',
-				files: []
-			}),
-		);
-
 		// Send to DM message
 		if (channelSelected.type === ChannelType.CHANNEL_TYPE_GROUP || channelSelected.type === ChannelType.CHANNEL_TYPE_DM) {
 			await sendToDM(dataSend);
@@ -269,25 +252,54 @@ export const Sharing = ({ data, onClose }) => {
 	const convertFileFormat = async () => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
-				const { filePath } = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
-				console.log(filePath);
+				const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
+				setAttachmentUpload((prev) => [...prev, { url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }]);
+				const fileData = await RNFS.readFile(media.contentUri || media?.filePath, 'base64');
 
-				dispatch(
-					referencesActions.setAtachmentAfterUpload({
-						channelId: CHANNEL_ID_SHARING,
-						messageId: '',
-						files: [{
-							url: media?.contentUri || media?.filePath,
-							filename: filePath,
-							filetype: media?.mimeType,
-							size: 1,
-						}],
-					}),
-				);
+				return {
+					uri: media.contentUri || media?.filePath,
+					name: media?.fileName || media?.contentUri || media?.filePath,
+					type: media?.mimeType,
+					fileData,
+				};
 			}),
 		);
-
+		handleFiles(fileFormats);
+		// setAttachmentData({
+		// 	url: filePath,
+		// 	filename: image?.filename || image?.uri,
+		// 	filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
+		// });
 	};
+
+	const handleFiles = (files: any) => {
+		const session = mezon.sessionRef.current;
+		const client = mezon.clientRef.current;
+		if (!files || !client || !session || !currentClan.id) {
+			throw new Error('Client or files are not initialized');
+		}
+
+		const promises = Array.from(files).map((file: any) => {
+			return handleUploadFileMobile(client, session, currentClan.id, currentChannelId, file.name, file);
+		});
+
+		Promise.all(promises).then((attachments) => {
+			attachments.forEach((attachment) => handleFinishUpload({ ...attachment, size: attachment.size || 100 }));
+		});
+	};
+
+	const handleFinishUpload = useCallback(
+		(attachment: ApiMessageAttachment) => {
+			setAttachmentUpload([...attachmentUpload, attachment]);
+		},
+		[dispatch],
+	);
+
+	function removeAttachmentByUrl(urlToRemove: string) {
+		setAttachmentUpload((prevAttachments) =>
+			prevAttachments.filter((attachment) => attachment.url !== urlToRemove)
+		);
+	}
 
 	return (
 		<SafeAreaView style={styles.wrapper}>
@@ -311,11 +323,13 @@ export const Sharing = ({ data, onClose }) => {
 			<ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
 				<View style={styles.rowItem}>
 					<Text style={styles.title}>Message preview</Text>
-					{checkAttachment && (
+					{!!getAttachmentUnique(attachmentUpload)?.length && (
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
 							<ScrollView horizontal style={styles.wrapperMedia}>
-								{attachmentFilteredByChannelId?.files?.map((media: any, index) => {
+								{getAttachmentUnique(attachmentUpload)?.map((media: any, index) => {
 									let isFile;
+									console.log('Tom log  => media', media);
+
 
 									if (Platform.OS === 'android') {
 										isFile = !media?.filetype?.includes?.('video') && !media?.filetype?.includes?.('image');
@@ -339,7 +353,7 @@ export const Sharing = ({ data, onClose }) => {
 											{isUploaded && (
 												<TouchableOpacity
 													style={styles.iconRemoveMedia}
-													onPress={() => removeAttachmentByIndex(CHANNEL_ID_SHARING, index)}
+													onPress={() => removeAttachmentByUrl(media.url ?? '')}
 												>
 													<CloseIcon width={size.s_18} height={size.s_18} />
 												</TouchableOpacity>
