@@ -118,12 +118,15 @@ export default function EmojiSelector({
 				displayName: category === 'Custom' && currentClan?.clan_name ? currentClan?.clan_name : category,
 				name: category,
 				icon: cateIcon[index],
-				emojis: emojis
-					.filter((emoji) => emoji.category.includes(category))
-					.map((emoji) => ({
-						...emoji,
-						category: category
-					}))
+				emojis: emojis.reduce((acc, emoji) => {
+					if (emoji.category.includes(category)) {
+						acc.push({
+							...emoji,
+							category: category
+						});
+					}
+					return acc;
+				}, [])
 			})),
 		[categoriesEmoji, emojis, currentClan]
 	);
