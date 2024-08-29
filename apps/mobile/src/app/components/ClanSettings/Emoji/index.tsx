@@ -104,7 +104,7 @@ export default function ClanEmojiSetting({ navigation }: MenuClanScreenProps<Cla
 								id: id,
 								category: 'Custom',
 								clan_id: currentClanId,
-								shortname: ':' + shortname + ':',
+								shortname: shortname,
 								source: attachment.url,
 							};
 							dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
