@@ -36,7 +36,6 @@ export * from './lib/chat/hooks/useDragAndDrop';
 export * from './lib/chat/hooks/useEmojiSuggestion';
 export * from './lib/chat/hooks/useEscapeKey';
 export * from './lib/chat/hooks/useEventManagement';
-export * from './lib/chat/hooks/useFormatDate';
 export * from './lib/chat/hooks/useFriends';
 export * from './lib/chat/hooks/useGetPriorityNameFromUserClan';
 export * from './lib/chat/hooks/useGifs';

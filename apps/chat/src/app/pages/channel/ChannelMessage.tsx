@@ -6,10 +6,9 @@ import {
 	UnreadMessageBreak,
 	useMessageContextMenu
 } from '@mezon/components';
-import { useAuth, useSeenMessagePool } from '@mezon/core';
+import { useSeenMessagePool } from '@mezon/core';
 import {
 	MessagesEntity,
-	selectAllMessagesByChannelId,
 	selectChannelDraftMessage,
 	selectIdMessageRefEdit,
 	selectLastSeenMessage,
@@ -34,18 +33,12 @@ type MessageProps = {
 };
 
 export function ChannelMessage({ message, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
-	// todo: remove old logic
-	// const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
-	const allMessages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
 	const { markMessageAsSeen } = useSeenMessagePool();
 	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu } = useMessageContextMenu();
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-	const { userProfile } = useAuth();
-
-	const checkLastMessUser = Boolean(userProfile?.user?.id !== allMessages[allMessages.length - 1]?.user?.id);
 
 	const messageId = useMemo(() => message.id, [message.id]);
 
@@ -105,7 +98,7 @@ export function ChannelMessage({ message, channelId, mode, channelLabel, isHighl
 				</div>
 			)}
 
-			{checkLastMessUser && lastSeen && <UnreadMessageBreak />}
+			{lastSeen && <UnreadMessageBreak />}
 			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
 		</>
 	);
