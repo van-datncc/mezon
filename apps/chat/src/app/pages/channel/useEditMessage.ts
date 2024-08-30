@@ -12,7 +12,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [message.clan_id]);
 	const attachmentsOnMessage = useMemo(() => {
 		return message.attachments;
-	}, [message.id, message.attachments]);
+	}, [message.attachments]);
 
 	const dispatch = useDispatch();
 	const { editSendMessage, updateImageLinkMessage } = useChatSending({ channelId: channelId || '', mode });
@@ -52,12 +52,12 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 
 	const handleSend = useCallback(
 		(editMessage: IMessageSendPayload, messageId: string, draftMention: ApiMessageMention[]) => {
-			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage, true);
+			editSendMessage(editMessage, messageId, draftMention, attachmentsOnMessage, false);
 			setChannelDraftMessage(channelId, messageId, editMessage, draftMention, attachmentsOnMessage ?? []);
 			dispatch(referencesActions.setOpenEditMessageState(false));
 			processLink(clanIdInMes ?? '', channelId ?? '', mode ?? 0, editMessage, draftMention, attachmentsOnMessage, messageId, message);
 		},
-		[editSendMessage, setChannelDraftMessage, dispatch, processLink, clanIdInMes, channelId, mode]
+		[editSendMessage, attachmentsOnMessage, setChannelDraftMessage, channelId, dispatch, processLink, clanIdInMes, mode, message]
 	);
 
 	return {

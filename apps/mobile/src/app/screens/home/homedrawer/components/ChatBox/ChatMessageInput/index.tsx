@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useChatSending, useDirectMessages } from '@mezon/core';
 import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, IS_TABLET, Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
@@ -16,7 +17,6 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Dimensions, InteractionManager, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -51,6 +51,8 @@ interface IChatMessageInputProps {
 	markdownsOnMessage?: IMarkdownOnMessage[];
 	voiceLinkRoomOnMessage?: ILinkVoiceRoomOnMessage[];
 	isShowCreateThread?: boolean;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	channelsEntities?: any;
 	attachmentDataRef?: ApiMessageAttachment[];
 	isPublic?: boolean;
 }
@@ -92,7 +94,6 @@ export const ChatMessageInput = memo(
 			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
 			const currentClanId = useSelector(selectCurrentClanId);
-			const { t } = useTranslation(['message']);
 			const { editSendMessage, sendMessage } = useChatSending({
 				channelId,
 				mode,
@@ -118,7 +119,7 @@ export const ChatMessageInput = memo(
 
 			const handleTyping = useCallback(async () => {
 				dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode, isPublic }));
-			}, [channelId, currentClanId, dispatch, mode]);
+			}, [channelId, currentClanId, dispatch, isPublic, mode]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
@@ -177,7 +178,7 @@ export const ChatMessageInput = memo(
 				async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
 					if (editMessage?.t === messageActionNeedToResolve?.targetMessage?.content?.t) return;
 					const { attachments } = messageActionNeedToResolve.targetMessage;
-					await editSendMessage(editMessage, messageId, mentions, attachments, true);
+					await editSendMessage(editMessage, messageId, mentions, attachments, false);
 				},
 				[editSendMessage, messageActionNeedToResolve]
 			);

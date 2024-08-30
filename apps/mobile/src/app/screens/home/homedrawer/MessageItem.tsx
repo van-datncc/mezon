@@ -115,7 +115,6 @@ const MessageItem = React.memo(
 		}, [message?.create_time, previousMessage?.create_time]);
 
 		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
-
 		const swipeableRef = React.useRef(null);
 		const backgroundColor = React.useRef(new Animated.Value(0)).current;
 
@@ -161,6 +160,7 @@ const MessageItem = React.memo(
 				message
 			});
 			dispatch(setSelectedMessage(message));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [message, preventAction]);
 
 		const onPressAvatar = useCallback(() => {
@@ -199,7 +199,7 @@ const MessageItem = React.memo(
 					console.log('error', error);
 				}
 			},
-			[usersClan, onMessageAction]
+			[usersClan, rolesInClan, onMessageAction]
 		);
 
 		const jumpToChannel = async (channelId: string, clanId: string) => {

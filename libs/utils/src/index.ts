@@ -1,4 +1,5 @@
 export * from './lib/async';
+export * from './lib/bridge';
 export * from './lib/constant';
 export * from './lib/contextmenu';
 export * from './lib/dom';
