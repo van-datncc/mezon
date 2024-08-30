@@ -56,12 +56,12 @@ const Notifications = () => {
 		switch (tabNotify) {
 			case EActionDataNotify.Individual:
 				setNotificationsFilter(
-					sortNotifications.filter((item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED),
+					sortNotifications.filter((item) => item.code !== NotificationCode.USER_MENTIONED && item.code !== NotificationCode.USER_REPLIED)
 				);
 				break;
 			case EActionDataNotify.Mention:
 				setNotificationsFilter(
-					sortNotifications.filter((item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED),
+					sortNotifications.filter((item) => item.code === NotificationCode.USER_MENTIONED || item.code === NotificationCode.USER_REPLIED)
 				);
 				break;
 			case EActionDataNotify.All:
@@ -76,7 +76,7 @@ const Notifications = () => {
 	const handleTabChange = (value, isSelected) => {
 		setSelectedTabs((prevState) => ({
 			...prevState,
-			[value]: isSelected,
+			[value]: isSelected
 		}));
 	};
 
@@ -87,7 +87,7 @@ const Notifications = () => {
 	useEffect(() => {
 		const { individual, mention } = selectedTabs;
 		handleFilterNotify(
-			individual && mention ? EActionDataNotify.All : individual ? EActionDataNotify.Individual : mention ? EActionDataNotify.Mention : null,
+			individual && mention ? EActionDataNotify.All : individual ? EActionDataNotify.Individual : mention ? EActionDataNotify.Mention : null
 		);
 	}, [selectedTabs.individual, selectedTabs.mention]);
 
@@ -119,8 +119,8 @@ const Notifications = () => {
 			channelsActions.joinChannel({
 				clanId: notify?.content?.clan_id ?? '',
 				channelId: notify?.content?.channel_id,
-				noFetchMembers: false,
-			}),
+				noFetchMembers: false
+			})
 		);
 		navigation.dispatch(DrawerActions.closeDrawer());
 	};
