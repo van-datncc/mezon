@@ -1,7 +1,7 @@
-import { useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannelId } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ChannelListItem } from '../ChannelListItem';
@@ -19,7 +19,7 @@ interface IChannelListSectionProps {
 const ChannelListSection = memo(
 	({ data, onLongPressCategory, onLongPressChannel, onPressSortChannel, onLongPressThread }: IChannelListSectionProps) => {
 		const styles = style(useTheme().themeValue);
-		const [isCollapsed, setIsCollapsed] = useAnimatedState(false);
+		const [isCollapsed, setIsCollapsed] = useState(false);
 		const currentChanelId = useSelector(selectCurrentChannelId);
 
 		const toggleCollapse = useCallback(() => {
