@@ -108,7 +108,7 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 										}
 									}}
 									className={classNameInputCheckbox}
-									disabled={hiddenPermissionAdmin(permission.slug) || !hasPermissionEdit}
+									disabled={hiddenPermissionAdmin(permission.slug) || !hasPermissionEdit || clickRole === EVERYONE_ROLE_ID}
 								/>
 							</label>
 						</li>
