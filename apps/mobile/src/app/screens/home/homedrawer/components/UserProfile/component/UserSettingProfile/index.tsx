@@ -1,6 +1,6 @@
 import { useAuth, useChannelMembersActions, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
-import { baseColor, Block, Text, useTheme } from '@mezon/mobile-ui';
+import { Block, Text, baseColor, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
@@ -14,7 +14,7 @@ export enum EActionSettingUserProfile {
 	Manage = 'Manage',
 	TimeOut = 'Timeout',
 	Kick = 'Kick',
-	Ban = 'Ban',
+	Ban = 'Ban'
 }
 
 interface IUserSettingProfileProps {
@@ -85,31 +85,31 @@ const UserSettingProfile = ({
 				value: EActionSettingUserProfile.Manage,
 				icon: <Icons.SettingsIcon color={themeValue.text} width={20} height={20} />,
 				action: handleSettingUserProfile,
-				isShow: isClanOwner || userPermissionsStatus.administrator || userPermissionsStatus['manage-clan'],
+				isShow: isClanOwner || userPermissionsStatus.hasAdministrator || userPermissionsStatus.hasManageClan
 			},
 			{
 				label: `${EActionSettingUserProfile.TimeOut}`,
 				value: EActionSettingUserProfile.TimeOut,
 				icon: <Icons.ClockWarningIcon color={themeValue.text} width={20} height={20} />,
 				action: handleSettingUserProfile,
-				isShow: isClanOwner && !isItMe,
+				isShow: isClanOwner && !isItMe
 			},
 			{
 				label: `${EActionSettingUserProfile.Kick}`,
 				value: EActionSettingUserProfile.Kick,
 				icon: <Icons.UserMinusIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: (isClanOwner || userPermissionsStatus.administrator) && !isItMe && !isThatClanOwner,
+				isShow: (isClanOwner || userPermissionsStatus.hasAdministrator) && !isItMe && !isThatClanOwner
 			},
 			{
 				label: `${EActionSettingUserProfile.Ban}`,
 				value: EActionSettingUserProfile.Ban,
 				icon: <Icons.HammerIcon width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: isClanOwner && !isItMe,
-			},
-		]
-		return settingList
+				isShow: isClanOwner && !isItMe
+			}
+		];
+		return settingList;
 	}, [isItMe, isClanOwner, themeValue, userPermissionsStatus, isThatClanOwner]);
 
 	const handleRemoveUserClans = useCallback(async () => {
@@ -123,12 +123,12 @@ const UserSettingProfile = ({
 
 	function handleUserModalClose() {
 		setVisibleManageUserModal(false);
-		onShowManagementUserModalChange?.(false)
+		onShowManagementUserModalChange?.(false);
 	}
 
 	return (
 		<Block>
-			{showActionOutside && profileSetting.some(action => action.isShow) && (
+			{showActionOutside && profileSetting.some((action) => action.isShow) && (
 				<Block style={styles.wrapper}>
 					{profileSetting?.map((item, index) => {
 						if (!item?.isShow) return <Block />;
@@ -136,12 +136,10 @@ const UserSettingProfile = ({
 							<TouchableOpacity onPress={() => item.action(item.value)} key={index}>
 								<Block style={styles.option}>
 									{item?.icon}
-									<Text style={styles.textOption}>
-										{item?.label}
-									</Text>
+									<Text style={styles.textOption}>{item?.label}</Text>
 								</Block>
 							</TouchableOpacity>
-						)
+						);
 					})}
 				</Block>
 			)}
@@ -152,7 +150,7 @@ const UserSettingProfile = ({
 					setVisibleKickUserModal(visible);
 				}}
 			>
-				<KickUserClanModal onRemoveUserClan={(value) => handleRemoveUserClans(value)} user={user} />
+				<KickUserClanModal onRemoveUserClan={handleRemoveUserClans} user={user} />
 			</MezonModal>
 
 			<ManageUserModal
