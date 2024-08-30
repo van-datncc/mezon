@@ -60,11 +60,8 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			const store = await getStoreAsync();
-
-			await Promise.all([
-				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
-			]);
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
 
 			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
 			if (!channelsCache?.includes(channelId)) {

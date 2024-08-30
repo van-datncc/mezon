@@ -514,6 +514,7 @@ export const ChatBoxBottomBar = memo(
 						isShowCreateThread={isShowCreateThread}
 						channelsEntities={channelsEntities}
 						attachmentDataRef={attachmentFilteredByChannelId?.files}
+						isPublic={!currentChannel?.channel_private}
 					/>
 				</Block>
 			</Block>

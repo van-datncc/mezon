@@ -59,6 +59,7 @@ interface IChatMessageInputProps {
 	isShowCreateThread?: boolean;
 	channelsEntities?: any;
 	attachmentDataRef?: ApiMessageAttachment[];
+	isPublic?: boolean;
 }
 const inputWidthWhenHasInput = Dimensions.get('window').width * (IS_TABLET ? 0.8 : 0.72);
 
@@ -90,6 +91,7 @@ export const ChatMessageInput = memo(
 				isShowCreateThread,
 				channelsEntities,
 				attachmentDataRef,
+				isPublic,
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>,
 		) => {
@@ -124,7 +126,7 @@ export const ChatMessageInput = memo(
 			}, [onSendSuccess, ref]);
 
 			const handleTyping = useCallback(async () => {
-				dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode }));
+				dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode, isPublic }));
 			}, [channelId, currentClanId, dispatch, mode]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
@@ -147,7 +149,7 @@ export const ChatMessageInput = memo(
 			);
 
 			const handleDirectMessageTyping = useCallback(async () => {
-				await Promise.all([dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode }))]);
+				await Promise.all([dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode, isPublic: false }))]);
 			}, [channelId, dispatch, mode]);
 
 			const handleDirectMessageTypingDebounced = useThrottledCallback(handleDirectMessageTyping, 1000);
@@ -182,6 +184,8 @@ export const ChatMessageInput = memo(
 
 			const onEditMessage = useCallback(
 				async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
+					if (editMessage?.t === messageActionNeedToResolve?.targetMessage?.content?.t)
+						return;
 					const { attachments } = messageActionNeedToResolve.targetMessage;
 					await editSendMessage(editMessage, messageId, mentions, attachments, true);
 				},

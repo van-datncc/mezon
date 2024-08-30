@@ -14,6 +14,7 @@ export interface IReplyBottomSheet {
 	isOnlyEmojiPicker?: boolean;
 	user?: ApiUser | null;
 	senderDisplayName?: string;
+	isPublic?: boolean;
 }
 
 export interface IMessageActionPayload {

@@ -29,9 +29,10 @@ type ChannelMessagesProps = {
 	channelLabel?: string;
 	avatarDM?: string;
 	mode: ChannelStreamMode;
+	isPublic?: boolean;
 };
 
-const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode, isPublic }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -229,7 +230,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 	return (
 		<View style={{ flex: 1 }}>
 			<View style={styles.wrapperChannelMessage}>
-				{isLoading === 'loading' && !isLoadMore && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
+				{isLoading === 'loading' && !isLoadMore?.current && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
 					<MessageItemSkeleton skeletonNumber={15} />
 				)}
 
@@ -266,6 +267,7 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 					}}
 					user={userSelected}
 					senderDisplayName={senderDisplayName}
+					isPublic={isPublic}
 				/>
 
 				{currentMessageActionType === EMessageActionType.ForwardMessage && (
