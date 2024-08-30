@@ -457,7 +457,7 @@ export const ChatBoxBottomBar = memo(
 				clearTextInputListener.remove();
 				addEmojiPickedListener.remove();
 			};
-		}, []);
+		}, [handleEventAfterEmojiPicked]);
 
 		return (
 			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
