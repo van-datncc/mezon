@@ -1,6 +1,5 @@
 import { useCategory } from '@mezon/core';
 import {
-	CHANNEL_ID_SHARING,
 	CloseIcon,
 	PenIcon,
 	STORAGE_CLAN_ID,
@@ -18,8 +17,6 @@ import {
 	channelsActions,
 	directActions,
 	getStoreAsync,
-	referencesActions,
-	selectAttachmentData,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectDirectsOpenlist,
@@ -37,7 +34,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
-import { IFile } from '../../home/homedrawer/components/AttachmentPicker/Gallery';
 import { styles } from './styles';
 
 export const Sharing = ({ data, onClose }) => {
@@ -54,11 +50,11 @@ export const Sharing = ({ data, onClose }) => {
 	const [channelSelected, setChannelSelected] = useState<any>();
 	const inputSearchRef = useRef<any>();
 	const session = mezon.sessionRef.current;
+	const [attachmentUpload, setAttachmentUpload] = useState<any>([]);
 
 	const dataMedia = useMemo(() => {
 		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
-	const attachmentDataRef = useSelector(selectAttachmentData(CHANNEL_ID_SHARING || ''));
 
 	useEffect(() => {
 		if (data) {
@@ -177,7 +173,7 @@ export const Sharing = ({ data, onClose }) => {
 				lk: dataSend.links || [],
 			},
 			[],
-			getAttachmentUnique(attachmentDataRef) || [],
+			getAttachmentUnique(attachmentUpload) || [],
 			[],
 		);
 	};
@@ -202,7 +198,7 @@ export const Sharing = ({ data, onClose }) => {
 				lk: dataSend.links || [],
 			},
 			[], //mentions
-			getAttachmentUnique(attachmentDataRef) || [], //attachments
+			getAttachmentUnique(attachmentUpload) || [], //attachments
 			[], //references
 			false, //anonymous
 			false, //mentionEveryone
@@ -257,18 +253,7 @@ export const Sharing = ({ data, onClose }) => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
 				const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
-				dispatch(
-					referencesActions.setAttachmentData({
-						channelId: CHANNEL_ID_SHARING,
-						attachments: [
-							{
-								url: media?.contentUri || media?.filePath,
-								filename: fileName,
-								filetype: media?.mimeType,
-							},
-						],
-					}),
-				);
+				setAttachmentUpload((prev) => [...prev, { url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }]);
 				const fileData = await RNFS.readFile(media.contentUri || media?.filePath, 'base64');
 
 				return {
@@ -287,14 +272,14 @@ export const Sharing = ({ data, onClose }) => {
 		// });
 	};
 
-	const handleFiles = (files: IFile | any) => {
+	const handleFiles = (files: any) => {
 		const session = mezon.sessionRef.current;
 		const client = mezon.clientRef.current;
 		if (!files || !client || !session || !currentClan.id) {
 			throw new Error('Client or files are not initialized');
 		}
 
-		const promises = Array.from(files).map((file: IFile | any) => {
+		const promises = Array.from(files).map((file: any) => {
 			return handleUploadFileMobile(client, session, currentClan.id, currentChannelId, file.name, file);
 		});
 
@@ -305,22 +290,14 @@ export const Sharing = ({ data, onClose }) => {
 
 	const handleFinishUpload = useCallback(
 		(attachment: ApiMessageAttachment) => {
-			dispatch(
-				referencesActions.setAttachmentData({
-					channelId: CHANNEL_ID_SHARING,
-					attachments: [attachment],
-				}),
-			);
+			setAttachmentUpload([...attachmentUpload, attachment]);
 		},
 		[dispatch],
 	);
 
 	function removeAttachmentByUrl(urlToRemove: string) {
-		dispatch(
-			referencesActions.removeAttachment({
-				channelId: CHANNEL_ID_SHARING,
-				urlAttachment: urlToRemove,
-			}),
+		setAttachmentUpload((prevAttachments) =>
+			prevAttachments.filter((attachment) => attachment.url !== urlToRemove)
 		);
 	}
 
@@ -346,12 +323,11 @@ export const Sharing = ({ data, onClose }) => {
 			<ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
 				<View style={styles.rowItem}>
 					<Text style={styles.title}>Message preview</Text>
-					{!!getAttachmentUnique(attachmentDataRef)?.length && (
+					{!!getAttachmentUnique(attachmentUpload)?.length && (
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
 							<ScrollView horizontal style={styles.wrapperMedia}>
-								{getAttachmentUnique(attachmentDataRef)?.map((media: any, index) => {
+								{getAttachmentUnique(attachmentUpload)?.map((media: any, index) => {
 									let isFile;
-
 									if (Platform.OS === 'android') {
 										isFile = !media?.filetype?.includes?.('video') && !media?.filetype?.includes?.('image');
 									} else {

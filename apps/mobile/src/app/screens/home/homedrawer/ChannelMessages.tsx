@@ -23,8 +23,6 @@ import MessageItem from './MessageItem';
 import { style } from './styles';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
 
-const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
-
 type ChannelMessagesProps = {
 	channelId: string;
 	clanId: string;
@@ -51,8 +49,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 	const [isOnlyEmojiPicker, setIsOnlyEmojiPicker] = useState<boolean>(false);
 	const [senderDisplayName, setSenderDisplayName] = useState('');
 	const [imageSelected, setImageSelected] = useState<AttachmentEntity>();
-
-	const checkAnonymous = useMemo(() => messageSelected?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [messageSelected?.sender_id]);
 
 	const [currentMessageActionType, setCurrentMessageActionType] = useState<EMessageActionType | null>(null);
 
@@ -269,7 +265,6 @@ const ChannelMessages = React.memo(({ channelId, clanId, channelLabel, mode }: C
 						setOpenBottomSheet(null);
 					}}
 					user={userSelected}
-					checkAnonymous={checkAnonymous}
 					senderDisplayName={senderDisplayName}
 				/>
 

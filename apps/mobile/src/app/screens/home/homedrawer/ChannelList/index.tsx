@@ -7,9 +7,8 @@ import {
 	categoriesActions,
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
-	selectCurrentChannel,
 	selectCurrentClan,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -31,7 +30,7 @@ import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
 
-const ChannelList = React.memo(({ data }: { data: any }) => {
+const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, idCurrentCateByChannel: string }) => {
 	const categorizedChannels = useMemo(() => {
 		return !!data && typeof data === 'string' ? JSON.parse(data) : [];
 	}, [data]);
@@ -56,7 +55,6 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { isCanManageEvent } = useUserPermission();
 	const flashListRef = useRef(null);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const handlePress = useCallback(() => {
@@ -84,20 +82,20 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			dispatch(
 				categoriesActions.setCategoryIdSortChannel({
 					isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id],
-					categoryId: channel?.category_id,
-				}),
+					categoryId: channel?.category_id
+				})
 			);
 		},
-		[categoryIdSortChannel, dispatch],
+		[categoryIdSortChannel, dispatch]
 	);
 
 	const onContentSizeChange = useCallback((w, h) => {
 		if (categorizedChannels?.length && h > 0 && isLoading === 'loaded') {
 			timeoutRef.current = setTimeout(() => {
-				scrollToItemById?.(currentChannel?.category_id);
+				scrollToItemById?.(idCurrentCateByChannel);
 			}, 300);
 		}
-	}, []);
+	}, [idCurrentCateByChannel]);
 
 	useEffect(() => {
 		return () => {
@@ -119,7 +117,7 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 				/>
 			);
 		},
-		[handleLongPressCategory, handleLongPressChannel, handleOnPressSortChannel, handleLongPressThread],
+		[handleLongPressCategory, handleLongPressChannel, handleOnPressSortChannel, handleLongPressThread]
 	);
 
 	function handlePressEventCreate() {
@@ -129,8 +127,8 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			params: {
 				onGoBack: () => {
 					bottomSheetEventRef?.current?.present();
-				},
-			},
+				}
+			}
 		});
 	}
 
@@ -142,8 +140,8 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 			params: {
-				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList,
-			},
+				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
+			}
 		});
 	};
 

@@ -11,7 +11,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -75,10 +75,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			return;
 		}
 		const store = await getStoreAsync();
-		await Promise.all([
-			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id)),
+			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
 			// Rejoin previous clan (other than 0) when exiting the DM detail screen
-			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id })),
+			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
 			store.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: currentChannel?.clan_id || '',
@@ -86,14 +85,12 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					channelType: currentChannel?.type,
 					noCache: true,
 				}),
-			),
-		]);
+			);
 	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
-		await Promise.all([
-			store.dispatch(clansActions.setCurrentClanId('0')),
+			store.dispatch(clansActions.setCurrentClanId('0'));
 			store.dispatch(
 				directActions.joinDirectMessage({
 					directMessageId: currentDmGroup?.id,
@@ -102,8 +99,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					noCache: true,
 					isFetchingLatestMessages: true,
 				}),
-			),
-		]);
+			);
 		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 
@@ -140,8 +136,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
 						type: currentDmGroup.type,
 						noCache: true,
-						isFetchingLatestMessages: true,
-					}),
+						isFetchingLatestMessages: true
+					})
 				);
 
 				store.dispatch(appActions.setIsFromFCMMobile(false));
@@ -223,7 +219,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 								clanId={'0'}
 								channelLabel={currentDmGroup?.channel_label || currentDmGroup?.usernames}
 								mode={Number(
-									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
+									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 								)}
 							/>
 						</View>
@@ -233,14 +229,14 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						mode={Number(currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 						hiddenIcon={{
-							threadIcon: true,
+							threadIcon: true
 						}}
 					/>
 					<Block height={Platform.OS === 'ios' ? 10 : 0} backgroundColor={themeValue.secondary} />
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: themeValue.secondary,
+							backgroundColor: themeValue.secondary
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (

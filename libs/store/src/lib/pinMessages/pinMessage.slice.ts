@@ -102,26 +102,30 @@ type UpdatePinMessage = {
 	clanId: string;
 	channelId: string;
 	messageId: string;
+	isPublic: boolean;
 };
 
-export const joinPinMessage = createAsyncThunk('messages/joinPinMessage', async ({ clanId, channelId, messageId }: UpdatePinMessage, thunkAPI) => {
-	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const now = Math.floor(Date.now() / 1000);
-		await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now, 1);
-	} catch (e) {
-		Sentry.captureException(e);
-		console.error('Error updating last seen message', e);
-	}
-});
-
-export const updateLastSeenPin = createAsyncThunk(
-	'messages/updateLastPinMessage',
-	async ({ clanId, channelId, messageId }: UpdatePinMessage, thunkAPI) => {
+export const joinPinMessage = createAsyncThunk(
+	'messages/joinPinMessage',
+	async ({ clanId, channelId, messageId, isPublic }: UpdatePinMessage, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, messageId, now, 0);
+			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, isPublic, messageId, now, 1);
+		} catch (e) {
+			Sentry.captureException(e);
+			console.error('Error updating last seen message', e);
+		}
+	}
+);
+
+export const updateLastPin = createAsyncThunk(
+	'messages/updateLastPinMessage',
+	async ({ clanId, channelId, messageId, isPublic }: UpdatePinMessage, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const now = Math.floor(Date.now() / 1000);
+			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, isPublic, messageId, now, 0);
 		} catch (e) {
 			Sentry.captureException(e);
 			console.error('Error updating last seen message', e);
@@ -190,7 +194,7 @@ export const pinMessageActions = {
 	fetchChannelPinMessages,
 	setChannelPinMessage,
 	deleteChannelPinMessage,
-	updateLastSeenPin,
+	updateLastPin,
 	joinPinMessage
 };
 

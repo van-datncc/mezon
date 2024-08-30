@@ -11,7 +11,7 @@ import {
 	selectIsShowMemberList,
 	selectIsViewingOlderMessagesByChannelId,
 	selectStatusMenu,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { EPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -59,7 +59,13 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
-			{currentChannel && <ChannelTyping channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
+			{currentChannel && (
+				<ChannelTyping
+					channelId={currentChannel?.id}
+					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					isPublic={!currentChannel.channel_private}
+				/>
+			)}
 			{isViewingOldMessage && <ChannelJumpToPresent channelId={currentChannel?.id} mode={0} />}
 			{currentChannel ? (
 				<ChannelMessageBox clanId={currentChannel?.clan_id} channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />

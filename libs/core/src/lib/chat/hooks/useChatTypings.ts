@@ -6,9 +6,10 @@ import { useAuth } from '../../auth/hooks/useAuth';
 interface UseChatTypingsOptions {
 	channelId: string;
 	mode: number;
+	isPublic: boolean;
 }
 
-export function useChatTypings({ channelId, mode }: UseChatTypingsOptions) {
+export function useChatTypings({ channelId, mode, isPublic }: UseChatTypingsOptions) {
 	const { userId } = useAuth();
 	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
 	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds?.filter((userID) => userID !== userId) || []));
@@ -17,8 +18,15 @@ export function useChatTypings({ channelId, mode }: UseChatTypingsOptions) {
 	const dispatch = useAppDispatch();
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode }));
-	}, [channelId, currentClanId, dispatch, mode]);
+		dispatch(
+			messagesActions.sendTypingUser({
+				clanId: currentClanId || '',
+				channelId,
+				mode,
+				isPublic: isPublic
+			})
+		);
+	}, [channelId, currentClanId, dispatch, isPublic, mode]);
 
 	return useMemo(
 		() => ({

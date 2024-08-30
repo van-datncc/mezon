@@ -20,7 +20,8 @@ export function useChatReaction() {
 			emoji: string,
 			count: number,
 			message_sender_id: string,
-			action_delete: boolean
+			action_delete: boolean,
+			is_public: boolean
 		) => {
 			return dispatch(
 				reactionActions.writeMessageReaction({
@@ -33,7 +34,8 @@ export function useChatReaction() {
 					emoji,
 					count,
 					messageSenderId: message_sender_id,
-					actionDelete: action_delete
+					actionDelete: action_delete,
+					isPublic: is_public
 				})
 			);
 		},
