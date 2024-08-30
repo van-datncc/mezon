@@ -111,7 +111,7 @@ export const gifsSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchGifCategories.fulfilled, (state: GifsState, action: PayloadAction<GifCategoriesEntity[]>) => {
-				gifsAdapter.setMany(state, action.payload);
+				gifsAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchGifCategories.rejected, (state: GifsState, action) => {
