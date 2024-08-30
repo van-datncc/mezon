@@ -19,6 +19,7 @@ interface IMezonInputProps {
 	showBorderOnFocus?: boolean,
 	errorMessage?: string;
 	onFocus?: () => void;
+	onBlur?: () => void;
 	prefixIcon?: ReactNode;
 	postfixIcon?: ReactNode;
 	disabled?: boolean;
@@ -29,6 +30,7 @@ export default function MezonInput({ placeHolder,
 	textarea,
 	value,
 	onFocus,
+	onBlur,
 	onTextChange,
 	maxCharacter = 60,
 	inputWrapperStyle,
@@ -64,6 +66,7 @@ export default function MezonInput({ placeHolder,
 	function handleBlur() {
 		setShowCount(false);
 		setFocus(false);
+		onBlur?.();
 	}
 
 	const renderBorder = (): StyleProp<ViewStyle> => {

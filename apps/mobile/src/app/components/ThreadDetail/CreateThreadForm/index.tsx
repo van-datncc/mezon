@@ -17,6 +17,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClanId,
 	useAppDispatch,
+	selectOpenThreadMessageState,
 } from '@mezon/store-mobile';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -50,7 +51,7 @@ export default function CreateThreadForm() {
 
 	const navigation = useNavigation<any>();
 	const formikRef = useRef(null);
-	const { openThreadMessageState } = useReference();
+	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { valueThread, threadCurrentChannel } = useThreads();
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
@@ -176,10 +177,12 @@ export default function CreateThreadForm() {
 										label={t('threadName')}
 										onTextChange={handleChange('nameValueThread')}
 										onFocus={() => {
-											setHeightKeyboardShow(0);
+											setHeightKeyboardShow(345);
 											bottomPickerRef.current?.close();
 										}}
-										// onBlur={handleBlur('nameValueThread')}
+										onBlur={() => {
+											setHeightKeyboardShow(0);
+										}}
 										value={values.nameValueThread}
 										placeHolder="New Thread"
 										maxCharacter={64}
