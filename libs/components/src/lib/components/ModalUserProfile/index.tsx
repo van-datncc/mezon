@@ -164,10 +164,10 @@ const ModalUserProfile = ({
 
 					{checkAddFriend.myPendingFriend && !showPopupLeft && <PendingFriend user={userById} />}
 
-					{mode !== 4 && mode !== 3 && isFooterProfile && (
+					{mode !== 4 && mode !== 3 && !isFooterProfile && (
 						<UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me as string} />
 					)}
-					{mode !== 4 && mode !== 3 && isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
+					{mode !== 4 && mode !== 3 && !isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
 					{isFooterProfile ? (
 						<StatusProfile userById={userById} />
 					) : (
