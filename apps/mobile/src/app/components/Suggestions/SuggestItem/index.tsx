@@ -52,14 +52,9 @@ const SuggestItem = ({ channelId, avatarUrl, name, subText, isDisplayDefaultAvat
 				)}
 				{emojiSrc && <Image style={styles.emojiImage} source={{ uri: emojiSrc }} />}
 				{!isChannelPrivate && isChannelText && !isThread && <Icons.TextIcon width={16} height={16} color={themeValue.channelNormal} />}
-				{channel?.channel_private === ChannelStatusEnum.isPrivate && isChannelText && !isThread && (
-					<Icons.TextLockIcon width={16} height={16} color={themeValue.channelNormal} />
-				)}
+				{isChannelPrivate && isChannelText && !isThread && <Icons.TextLockIcon width={16} height={16} color={themeValue.channelNormal} />}
 				{!isChannelPrivate && isChannelText && isThread && <ThreadIcon width={16} height={16} color={themeValue.channelNormal} />}
-
-				{channel?.channel_private === ChannelStatusEnum.isPrivate && isChannelText && isThread && (
-					<ThreadIconLocker width={16} height={16} color={themeValue.channelNormal} />
-				)}
+				{isChannelPrivate && isChannelText && isThread && <ThreadIconLocker width={16} height={16} color={themeValue.channelNormal} />}
 				{!isChannelPrivate && isChannelVoice && <Icons.VoiceNormalIcon width={16} height={16} color={themeValue.channelNormal} />}
 				{isChannelPrivate && isChannelVoice && <Icons.VoiceLockIcon width={16} height={16} color={themeValue.channelNormal} />}
 				{isRoleUser || name.startsWith('here') ? (
