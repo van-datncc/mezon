@@ -1,5 +1,14 @@
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	ENotificationActive,
+	EOpenSearchChannelFrom,
+	Icons,
+	STORAGE_AGREED_POLICY,
+	getChannelById,
+	load,
+	save
+} from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -8,7 +17,7 @@ import {
 	selectAllClans,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -18,7 +27,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
-import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
+import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import ChannelMessages from './ChannelMessages';
@@ -82,7 +91,7 @@ const HomeDefault = React.memo((props: any) => {
 			return () => {
 				setIsFocusChannelView(false);
 			};
-		}, [currentChannel?.channel_id]),
+		}, [currentChannel?.channel_id])
 	);
 
 	useEffect(() => {
@@ -112,8 +121,8 @@ const HomeDefault = React.memo((props: any) => {
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',
 				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type,
-			}),
+				channelType: currentChannel?.type
+			})
 		);
 	};
 
@@ -167,7 +176,7 @@ const HomeDefault = React.memo((props: any) => {
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: themeValue.secondary,
+							backgroundColor: themeValue.secondary
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
@@ -202,7 +211,7 @@ const HomeDefaultHeader = React.memo(
 		navigation,
 		currentChannel,
 		openBottomSheet,
-		onOpenDrawer,
+		onOpenDrawer
 	}: {
 		navigation: any;
 		currentChannel: ChannelsEntity;
@@ -226,8 +235,8 @@ const HomeDefaultHeader = React.memo(
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 				params: {
-					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault,
-				},
+					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+				}
 			});
 		};
 		return (
@@ -265,8 +274,7 @@ const HomeDefaultHeader = React.memo(
 				</TouchableOpacity>
 				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
-						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
-						{statusMute === EActionMute.Mute ? (
+						{statusMute === ENotificationActive.OFF ? (
 							<Icons.BellSlashIcon width={20} height={20} color={themeValue.textStrong} />
 						) : (
 							<Icons.BellIcon width={20} height={20} color={themeValue.textStrong} />
@@ -279,7 +287,7 @@ const HomeDefaultHeader = React.memo(
 				)}
 			</View>
 		);
-	},
+	}
 );
 
 export default HomeDefault;

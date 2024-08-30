@@ -34,21 +34,22 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
 				if (url.startsWith(origin)) {
+					const urlInvite = new URL(url);
 					dispatch(inviteActions.setIsClickInvite(true));
-					navigateToChannel(url, navigate);
+					navigate(urlInvite.pathname);
 				} else {
 					window.open(url, '_blank');
 				}
 			}
 		},
-		[isJumMessageEnabled, isTokenClickAble],
+		[isJumMessageEnabled, isTokenClickAble]
 	);
 
 	const classes = clx(
 		'prose-code:text-sm inline prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',
 		{
-			lightMode: appearanceTheme === 'light',
-		},
+			lightMode: appearanceTheme === 'light'
+		}
 	);
 
 	return (
@@ -68,13 +69,13 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 									color: 'rgb(59,130,246)',
 									cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
 									wordBreak: 'break-word',
-									textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline',
+									textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline'
 								}}
 								className="tagLink"
 							>
 								{props.children}
 							</span>
-						),
+						)
 					}}
 				/>
 			</div>

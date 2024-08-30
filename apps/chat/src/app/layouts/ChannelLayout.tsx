@@ -55,11 +55,7 @@ const ChannelLayout = () => {
 							className={`fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 						>
 							<div className="mb-0 z-10 h-full">
-								<GifStickerEmojiPopup
-									messageEmojiId={idMessageRefReaction}
-									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-									emojiAction={EmojiPlaces.EMOJI_REACTION}
-								/>
+								<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 							</div>
 						</div>
 					)}
@@ -76,11 +72,7 @@ const ChannelLayout = () => {
 							}}
 						>
 							<div className="mb-0 z-10 h-full">
-								<GifStickerEmojiPopup
-									messageEmojiId={idMessageRefReaction}
-									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-									emojiAction={EmojiPlaces.EMOJI_REACTION}
-								/>
+								<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 							</div>
 						</div>
 					)}

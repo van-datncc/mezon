@@ -9,7 +9,7 @@ import {
 	selectCategoryIdSortChannel,
 	selectCurrentChannel,
 	selectCurrentClan,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -84,11 +84,11 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			dispatch(
 				categoriesActions.setCategoryIdSortChannel({
 					isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id],
-					categoryId: channel?.category_id,
-				}),
+					categoryId: channel?.category_id
+				})
 			);
 		},
-		[categoryIdSortChannel, dispatch],
+		[categoryIdSortChannel, dispatch]
 	);
 
 	const onContentSizeChange = useCallback((w, h) => {
@@ -119,7 +119,7 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 				/>
 			);
 		},
-		[handleLongPressCategory, handleLongPressChannel, handleOnPressSortChannel, handleLongPressThread],
+		[handleLongPressCategory, handleLongPressChannel, handleOnPressSortChannel, handleLongPressThread]
 	);
 
 	function handlePressEventCreate() {
@@ -129,8 +129,8 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 			params: {
 				onGoBack: () => {
 					bottomSheetEventRef?.current?.present();
-				},
-			},
+				}
+			}
 		});
 	}
 
@@ -142,8 +142,8 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 			params: {
-				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList,
-			},
+				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
+			}
 		});
 	};
 
