@@ -90,7 +90,7 @@ export const setMuteNotificationSetting = createAsyncThunk(
 	async ({ channel_id, notification_type, active, clan_id, is_current_channel = true }: SetMuteNotificationPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
-			channel_id: channel_id,
+			id: channel_id,
 			notification_type: notification_type,
 			active: active
 		};

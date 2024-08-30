@@ -6,7 +6,7 @@ import {
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
 	selectJumpPinMessageId,
-	selectUploadingStatus,
+	selectUploadingStatus
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUploadingStatus } from '@mezon/utils';
@@ -55,7 +55,7 @@ function MessageWithUser({
 	isHighlight,
 	popup,
 	isShowFull,
-	isSearchMessage,
+	isSearchMessage
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
@@ -72,7 +72,7 @@ function MessageWithUser({
 
 	const currentDmOrChannelId = useMemo(
 		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannelId : currentDmId),
-		[currentChannelId, currentDmId, mode],
+		[currentChannelId, currentDmId, mode]
 	);
 	const { statusUpload, count } = useSelector(selectUploadingStatus(currentDmOrChannelId ?? '', message.id));
 	// Computed values
@@ -92,7 +92,10 @@ function MessageWithUser({
 	const hasIncludeMention = useMemo(() => {
 		const userIdMention = userLogin.userProfile?.user?.id;
 		const mentionOnMessage = message.mentions;
-		const includesHere = message.content.t?.includes('@here');
+		let includesHere = false;
+		if (message.content.t) {
+			includesHere = message.content.t?.includes('@here');
+		}
 		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
 		return includesHere || includesUser;
 	}, [message.content.t, userLogin.userProfile?.user?.id, message.mentions]);
@@ -119,7 +122,7 @@ function MessageWithUser({
 		'mt-3': !isCombine || checkReferences,
 		'is-sending': message.isSending,
 		'is-error': message.isError,
-		'bg-[#383B47]': isHighlight,
+		'bg-[#383B47]': isHighlight
 	});
 
 	const parentDivClass = classNames(
@@ -128,17 +131,16 @@ function MessageWithUser({
 		{ 'pt-[2px]': !isCombine },
 		{ 'dark:bg-[#383B47]': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
 		{ 'dark:bg-[#403D38]': checkMessageIncludeMention || checkJumpPinMessage },
-		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
+		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
 		{ 'dark:bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
 		{ 'dark:bg-[#403D38]': hasIncludeMention },
-		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved },
+		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
-
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}

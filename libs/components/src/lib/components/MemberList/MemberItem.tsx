@@ -1,4 +1,4 @@
-import { useMemberCustomStatus, useMemberStatus } from '@mezon/core';
+import { useMemberCustomStatus } from '@mezon/core';
 import { ChannelMembersEntity } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
@@ -14,7 +14,6 @@ export type MemberItemProps = {
 };
 
 function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name }: MemberItemProps) {
-	const userStatus = useMemberStatus(user.user?.id || '');
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '');
 
 	return (

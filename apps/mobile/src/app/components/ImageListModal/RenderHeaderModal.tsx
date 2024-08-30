@@ -33,39 +33,37 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 			}
 			onImageSaved();
 		} catch (error) {
-			console.log('download image error', error)
+			console.log('download image error', error);
 		}
-	}
+	};
 
 	return (
 		<Block
-			position='absolute'
+			position="absolute"
 			top={Platform.OS === 'ios' ? size.s_28 : size.s_14}
 			left={0}
 			zIndex={1}
-			justifyContent='space-between'
-			flexDirection='row'
-			backgroundColor='rgba(0, 0, 0, 0.4)'
-			width='100%'
+			justifyContent="space-between"
+			flexDirection="row"
+			backgroundColor="rgba(0, 0, 0, 0.4)"
+			width="100%"
 			padding={size.s_10}
-			alignItems='center'
+			alignItems="center"
 		>
-			<Block flexDirection='row' alignItems='center' gap={size.s_10}>
+			<Block flexDirection="row" alignItems="center" gap={size.s_10}>
 				<TouchableOpacity onPress={onClose}>
 					<Icons.ArrowLargeLeftIcon color={Colors.white} />
 				</TouchableOpacity>
 				{!!uploader && (
-					<Block
-						flexDirection={'row'}
-						alignItems={'center'}
-						gap={size.s_6}
-					>
+					<Block flexDirection={'row'} alignItems={'center'} gap={size.s_6}>
 						<Block style={styles.wrapperAvatar}>
 							<MezonClanAvatar alt={uploader?.user?.username} image={uploader?.user?.avatar_url} />
 						</Block>
 						<Block style={styles.messageBoxTop}>
 							<Text style={styles.userNameMessageBox}>{uploader?.user?.username || 'Anonymous'}</Text>
-							<Text style={styles.dateMessageBox}>{imageSelected?.create_time ? convertTimeString(imageSelected?.create_time) : ''}</Text>
+							<Text style={styles.dateMessageBox}>
+								{imageSelected?.create_time ? convertTimeString(imageSelected?.create_time) : ''}
+							</Text>
 						</Block>
 					</Block>
 				)}

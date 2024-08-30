@@ -17,22 +17,20 @@ function MemberList() {
 					MEMBER - {onlineMembers.length}
 				</p>
 				<div className="flex flex-col gap-4 ">
-					<ListMember lisMembers={onlineMembers} isOffline={false} />
+					<ListMember
+						lisMembers={[
+							...onlineMembers,
+							{
+								offlineSeparate: true
+							},
+							...offlineMembers
+						]}
+						offlineCount={offlineMembers.length}
+					/>
 				</div>
-				{offlineMembers.length > 0 && (
-					<>
-						<p className="mt-7 mb-3 dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-							Offline - {offlineMembers.length}
-						</p>
-						<div className="flex flex-col gap-4 mb-3">
-							<ListMember lisMembers={offlineMembers} isOffline={true} />
-						</div>
-					</>
-				)}
 			</div>
 		</div>
 	);
 }
 
 export default MemberList;
-

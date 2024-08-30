@@ -1,44 +1,29 @@
+import { useReference } from '@mezon/core';
 import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { appActions, referencesActions, selectAttachmentData, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
-import { createUploadFilePath, useMezon } from '@mezon/transport';
-import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { appActions, useAppDispatch } from '@mezon/store-mobile';
+import { CameraRoll, iosReadGalleryPermission, iosRequestReadWriteGalleryPermission, PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
+import { IFile } from 'apps/mobile/src/app/temp-ui';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
-import { useSelector } from 'react-redux';
 import { style } from './styles';
 interface IProps {
 	onPickGallery: (files: IFile | any) => void;
 	currentChannelId: string;
 }
 
-export interface IFile {
-	uri: string;
-	name: string;
-	type: string;
-	size: string;
-	fileData: any;
-}
 const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [photos, setPhotos] = useState([]);
+	const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
 	const [pageInfo, setPageInfo] = useState(null);
 	const [loading, setLoading] = useState(false);
-	const attachmentDataRef = useSelector(selectAttachmentData(currentChannelId || ''));
-	const currentClanId = useSelector(selectCurrentClanId);
-	const { sessionRef } = useMezon();
-	const session = sessionRef.current;
 	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>();
-
-	const attachmentsFileName = useMemo(() => {
-		if (!attachmentDataRef?.length) return [];
-		return attachmentDataRef.map((attachment) => attachment.filename);
-	}, [attachmentDataRef]);
+	const { removeAttachmentByIndex, attachmentFilteredByChannelId } = useReference(currentChannelId);
 
 	useEffect(() => {
 		checkAndRequestPermissions();
@@ -47,13 +32,6 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			timerRef?.current && clearTimeout(timerRef.current);
 		};
 	}, []);
-
-	const getFullFileName = useCallback(
-		(fileName: string) => {
-			return createUploadFilePath(session, currentClanId, currentChannelId, fileName);
-		},
-		[currentChannelId, currentClanId, session],
-	);
 
 	const checkAndRequestPermissions = async () => {
 		const hasPermission = await requestPermission();
@@ -141,15 +119,6 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 	};
 
-	function removeAttachmentByUrl(indexOfItem) {
-		dispatch(
-			referencesActions.removeAttachment({
-				channelId: currentChannelId,
-				index: indexOfItem,
-			}),
-		);
-	}
-
 	const renderItem = ({ item }) => {
 		if (item?.isUseCamera) {
 			return (
@@ -158,17 +127,16 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				</TouchableOpacity>
 			);
 		}
-		const fileName = item?.node?.image?.filename || item?.node?.image?.uri;
+		const fileName = item?.node?.image?.filename;
 		const isVideo = item?.node?.type?.startsWith?.('video');
-		const isSelected = attachmentsFileName?.some((i) => i?.includes(getFullFileName(fileName)));
+		const isSelected = attachmentFilteredByChannelId?.files.some(file => file.filename === fileName);
 
 		return (
 			<TouchableOpacity
 				style={styles.itemGallery}
 				onPress={() => {
 					if (isSelected) {
-						const infoAttachment = attachmentDataRef?.find?.((attachment) => attachment?.filename === getFullFileName(fileName));
-						removeAttachmentByUrl(attachmentDataRef.indexOf(infoAttachment));
+						handleRemove(fileName)
 					} else {
 						handleGalleryPress(item);
 					}
@@ -190,26 +158,14 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		);
 	};
 
-	const handleGalleryPress = async (file: any) => {
+	const handleGalleryPress = async (file: PhotoIdentifier) => {
 		try {
 			const image = file?.node?.image;
 			const type = file?.node?.type;
 			const name = file?.node?.image?.filename || file?.node?.image?.uri;
+			const size = file?.node?.image?.fileSize;
 			let filePath = image?.uri;
-			const filename = getFullFileName(name);
 
-			dispatch(
-				referencesActions.setAttachmentData({
-					channelId: currentChannelId,
-					attachments: [
-						{
-							url: filePath,
-							filename,
-							filetype: type,
-						},
-					],
-				}),
-			);
 			if (Platform.OS === 'ios' && filePath.startsWith('ph://')) {
 				const ms = new Date().getTime();
 				const ext = image.extension;
@@ -221,17 +177,16 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 					filePath = await RNFS.copyAssetsFileIOS(filePath, destPath, image.width, image.height);
 				}
 			}
-			const fileData = await RNFS.readFile(filePath, 'base64');
 
 			const fileFormat: IFile = {
 				uri: filePath,
-				name: image?.filename || image?.uri,
 				type: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
-				size: image?.fileSize,
-				fileData,
+				size: size,
+				name,
+				fileData: filePath
 			};
 
-			onPickGallery([fileFormat]);
+			onPickGallery(fileFormat);
 		} catch (err) {
 			console.log('Error: ', err);
 		}
@@ -251,28 +206,15 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			} else {
 				const file = response.assets[0];
 
-				dispatch(
-					referencesActions.setAttachmentData({
-						channelId: currentChannelId,
-						attachments: [
-							{
-								url: file?.uri,
-								filename: file?.fileName || file?.uri,
-								filetype: file?.type,
-							},
-						],
-					}),
-				);
-				const fileBase64 = await RNFS.readFile(file?.uri, 'base64');
 				const fileFormat: IFile = {
 					uri: file?.uri,
 					name: file?.fileName,
 					type: file?.type,
-					size: file?.fileSize?.toString(),
-					fileData: fileBase64,
+					size: file?.fileSize,
+					fileData: file?.uri,
 				};
 
-				onPickGallery([fileFormat]);
+				onPickGallery(fileFormat);
 			}
 		});
 	};
@@ -282,6 +224,11 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			await loadPhotos(pageInfo.end_cursor);
 		}
 	};
+
+	const handleRemove = (filename: string) => {
+		const index = attachmentFilteredByChannelId?.files?.findIndex(file => file.filename === filename);
+		removeAttachmentByIndex(currentChannelId, index);
+	}
 
 	return (
 		<View style={{ flex: 1 }}>

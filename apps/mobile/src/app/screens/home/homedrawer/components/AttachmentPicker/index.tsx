@@ -1,16 +1,15 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, referencesActions } from '@mezon/store';
-import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { createUploadFilePath, useMezon } from '@mezon/transport';
+import { IFile } from 'apps/mobile/src/app/temp-ui';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import RNFS from 'react-native-fs';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
-import Gallery, { IFile } from './Gallery';
+import Gallery from './Gallery';
 import { style } from './styles';
 
 export type AttachmentPickerProps = {
@@ -24,7 +23,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['message']);
-	const { sessionRef, clientRef } = useMezon();
+	const { sessionRef } = useMezon();
 	const timeRef = useRef<any>();
 	const dispatch = useDispatch();
 
@@ -37,7 +36,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const getFullFileName = useCallback(
 		(fileName: string) => {
 			const session = sessionRef.current;
-			return createUploadFilePath(session, currentClanId, currentChannelId, fileName);
+			return createUploadFilePath(session, currentClanId, currentChannelId, fileName)?.filePath;
 		},
 		[currentChannelId, currentClanId, sessionRef],
 	);
@@ -51,30 +50,20 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 				type: [DocumentPicker.types.allFiles],
 			});
 			const file = res?.[0];
-			const attachment = {
-				url: file?.uri || file?.fileCopyUri,
-				filename: getFullFileName(file?.name || file?.uri),
-				filetype: file?.type,
-			};
-			dispatch(
-				referencesActions.setAttachmentData({
-					channelId: currentChannelId,
-					attachments: [attachment],
-				}),
-			);
-			const fileData = await RNFS.readFile(file?.uri || file?.fileCopyUri, 'base64');
 
-			const fileFormat: IFile = {
-				uri: file?.uri || file?.fileCopyUri,
-				name: file?.name,
-				type: file?.type,
-				size: file?.size,
-				fileData
-			};
+			dispatch(referencesActions.setAtachmentAfterUpload({
+				channelId: currentChannelId,
+				files: [{
+					filename: getFullFileName(file?.name || file?.uri),
+					url: file?.uri || file?.fileCopyUri,
+					filetype: file?.type,
+					size: file.size as number,
+				}]
+			}));
+
 			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(false));
 			}, 2000);
-			handleFiles([fileFormat]);
 		} catch (err) {
 			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(false));
@@ -88,33 +77,17 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		}
 	};
 
-	const handleFiles = (files: IFile | any) => {
-		const session = sessionRef.current;
-		const client = clientRef.current;
-		if (!files || !client || !session || !currentChannelId) {
-			throw new Error('Client or files are not initialized');
-		}
-
-		const promises = Array.from(files).map((file: IFile | any) => {
-			return handleUploadFileMobile(client, session, currentClanId, currentChannelId, file.name, file);
-		});
-
-		Promise.all(promises).then((attachments) => {
-			attachments.forEach((attachment) => handleFinishUpload(attachment));
-		});
-	};
-
-	const handleFinishUpload = useCallback(
-		(attachment: ApiMessageAttachment) => {
-			dispatch(
-				referencesActions.setAttachmentData({
-					channelId: currentChannelId,
-					attachments: [attachment],
-				}),
-			);
-		},
-		[currentChannelId, dispatch],
-	);
+	const handleSelectedAttachments = useCallback((file: IFile) => {
+		dispatch(referencesActions.setAtachmentAfterUpload({
+			channelId: currentChannelId,
+			files: [{
+				filename: file.name,
+				url: file.uri,
+				filetype: file.type,
+				size: file.size as number,
+			}]
+		}));
+	}, [])
 
 	return (
 		<View style={styles.container}>
@@ -128,7 +101,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					<Text style={styles.titleButtonHeader}>{t('message:actions.files')}</Text>
 				</TouchableOpacity>
 			</View>
-			<Gallery onPickGallery={handleFiles} currentChannelId={currentChannelId} />
+			<Gallery onPickGallery={handleSelectedAttachments} currentChannelId={currentChannelId} />
 		</View>
 	);
 }

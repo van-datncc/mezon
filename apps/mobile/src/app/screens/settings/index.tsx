@@ -308,13 +308,13 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		debouncedHandleSearchChange(text)
 	}
 
-	const handleSearchFocus = () => {
-		setIsShowCancel(true)
-	}
+	const handleSearchFocus = useCallback(() => {
+		setIsShowCancel(true);
+	}, []);
 
-	const handleSearchBlur = () => {
-		setIsShowCancel(false)
-	}
+	const handleCancelButton = useCallback(() => {
+		setIsShowCancel(false);
+	}, []);
 
 	return (
 		<View style={styles.settingContainer}>
@@ -324,7 +324,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 					isShowCancel={isShowCancel}
 					onChangeText={handleSearchChange}
 					onFocusText={handleSearchFocus}
-					onBlurText={handleSearchBlur}
+					onCancelButton={handleCancelButton}
 				/>
 
 				<MezonMenu menu={renderedMenu} />

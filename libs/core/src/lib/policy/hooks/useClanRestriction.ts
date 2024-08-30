@@ -1,14 +1,17 @@
-import { selectCurrentClan } from '@mezon/store';
+import { selectCurrentClan, selectDmGroupCurrent } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useUserRestriction } from './useUserRestriction';
 
-export type ClanRestrictionReturnType = [boolean, { isClanOwner: boolean }];
+export type ClanRestrictionReturnType = [boolean, { isClanOwner: boolean; isOwnerGroupDM: boolean }];
 
 export function useClanRestriction(restrictions: EPermission[]): ClanRestrictionReturnType {
 	const currentClan = useSelector(selectCurrentClan);
+	const { directId } = useAppParams();
+	const currentGroupDM = useSelector(selectDmGroupCurrent(directId as string));
 	const { userProfile } = useAuth();
 	const isAllowed = useUserRestriction(restrictions);
 
@@ -16,5 +19,9 @@ export function useClanRestriction(restrictions: EPermission[]): ClanRestriction
 		return currentClan?.creator_id === userProfile?.user?.id;
 	}, [currentClan, userProfile]);
 
-	return [isAllowed, { isClanOwner }] as ClanRestrictionReturnType;
+	const isOwnerGroupDM = useMemo(() => {
+		return currentGroupDM?.creator_id === userProfile?.user?.id;
+	}, [directId]);
+
+	return [isAllowed, { isClanOwner, isOwnerGroupDM }] as ClanRestrictionReturnType;
 }

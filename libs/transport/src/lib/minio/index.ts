@@ -179,36 +179,44 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 		height: 0
 	};
 
-	return new Promise<ApiMessageAttachment>((resolve, reject) => {
-		if (url?.length < 512) {
-			fetch(url, { method: 'HEAD' })
-				.then((response) => {
-					if (response.ok) {
-						const now = Date.now();
-						const contentSize = response.headers.get('Content-Length');
-						let contentType = response.headers.get('Content-Type');
-						if (contentType?.includes('charset=utf-8')) {
-							contentType = contentType.split(';')?.[0];
-						}
-						if (contentType) {
-							resolve({
-								filename: now + contentType,
-								url: url,
-								filetype: contentType,
-								size: Number(contentSize),
-								width: 0,
-								height: 0
-							});
-						}
-					} else {
-						resolve(defaultAttachment);
-					}
-				})
-				.catch((e) => {
+	const typeImages = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.apng'];
+
+	for (const typeImage of typeImages) {
+		if (url.toLowerCase().endsWith(typeImage)) {
+			return new Promise<ApiMessageAttachment>((resolve, reject) => {
+				if (url?.length < 512) {
+					fetch(url, { method: 'HEAD' })
+						.then((response) => {
+							if (response.ok) {
+								const now = Date.now();
+								const contentSize = response.headers.get('Content-Length');
+								let contentType = response.headers.get('Content-Type');
+								if (contentType?.includes('charset=utf-8')) {
+									contentType = contentType.split(';')?.[0];
+								}
+								if (contentType) {
+									resolve({
+										filename: now + contentType,
+										url: url,
+										filetype: contentType,
+										size: Number(contentSize),
+										width: 0,
+										height: 0
+									});
+								}
+							} else {
+								resolve(defaultAttachment);
+							}
+						})
+						.catch((e) => {
+							resolve(defaultAttachment);
+						});
+				} else {
 					resolve(defaultAttachment);
-				});
-		} else {
-			resolve(defaultAttachment);
+				}
+			});
 		}
-	});
+	}
+
+	return Promise.resolve(defaultAttachment);
 }
