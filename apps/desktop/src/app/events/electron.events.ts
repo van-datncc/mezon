@@ -5,6 +5,7 @@
 
 import { app, ipcMain } from 'electron';
 import { environment } from '../../environments/environment';
+import { GET_APP_VERSION } from './constants';
 
 export default class ElectronEvents {
 	static bootstrapElectronEvents(): Electron.IpcMain {
@@ -13,7 +14,7 @@ export default class ElectronEvents {
 }
 
 // Retrieve app version
-ipcMain.handle('get-app-version', (event) => {
+ipcMain.handle(GET_APP_VERSION, (event) => {
 	console.log(`Fetching application version... [v${environment.version}]`);
 
 	return environment.version;
