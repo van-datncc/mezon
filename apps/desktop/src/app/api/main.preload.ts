@@ -1,20 +1,21 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { UPDATE_BADGE_COUNT } from '../services/badge/constants';
+import { GET_APP_VERSION, GET_DEVICE_ID, SENDER_ID, SET_BADGE_COUNT } from '../events/constants';
 
 contextBridge.exposeInMainWorld('electron', {
-	getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 	platform: process.platform,
-	ipcRenderer: ipcRenderer,
-	on(eventName: string, callback: () => void) {
+	getAppVersion: () => ipcRenderer.invoke(GET_APP_VERSION),
+	on(eventName: string, callback: (...args: any[]) => void) {
 		ipcRenderer.on(eventName, callback);
 	},
-	send(eventName: string, ...params: unknown[]) {
+	send(eventName: string, ...params: any[]) {
 		return ipcRenderer.send(eventName, ...params);
 	},
 	removeListener(channel: string, listener: () => void) {
 		return ipcRenderer.removeListener(channel, listener);
 	},
-	getDeviceId: () => ipcRenderer.invoke('get-device-id'),
-	senderId: (senderId: string) => ipcRenderer.invoke('sender-id', senderId),
-	setBadgeCount: (badgeCount: number) => ipcRenderer.send(UPDATE_BADGE_COUNT, badgeCount)
+	getDeviceId: () => ipcRenderer.invoke(GET_DEVICE_ID),
+	senderId: (senderId: string) => ipcRenderer.invoke(SENDER_ID, senderId),
+	setBadgeCount: (badgeCount: number) => {
+		ipcRenderer.send(SET_BADGE_COUNT, badgeCount);
+	}
 });

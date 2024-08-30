@@ -1,5 +1,6 @@
 import { ipcMain, IpcMainEvent, nativeImage } from 'electron';
-import { BADGE_DESCRIPTION, UPDATE_BADGE_COUNT } from './constants';
+import { SET_BADGE_COUNT } from '../../events/constants';
+import { BADGE_DESCRIPTION } from './constants';
 import { BadgeIconGenerator } from './icon';
 import { BadgeOptions, IBadge } from './types';
 
@@ -19,11 +20,11 @@ export class Badge implements IBadge {
 	}
 
 	public initListeners(): void {
-		ipcMain.on(UPDATE_BADGE_COUNT, this.onBadgeCountUpdate);
+		ipcMain.on(SET_BADGE_COUNT, this.onBadgeCountUpdate);
 	}
 
 	public removeAllListeners(): void {
-		ipcMain.removeListener(UPDATE_BADGE_COUNT, this.onBadgeCountUpdate);
+		ipcMain.removeListener(SET_BADGE_COUNT, this.onBadgeCountUpdate);
 	}
 
 	private onBadgeCountUpdate = (event: IpcMainEvent, badgeNumber: number) => {
@@ -47,13 +48,13 @@ export class WindowBadge implements IBadge {
 	}
 
 	public initListeners() {
-		ipcMain.on(UPDATE_BADGE_COUNT, this.onBadgeCountUpdate);
+		ipcMain.on(SET_BADGE_COUNT, this.onBadgeCountUpdate);
 		this.mainWindow.on('closed', this.onWindowClosed);
 		this.mainWindow.on('show', this.onWindowShow);
 	}
 
 	public removeAllListeners() {
-		ipcMain.removeListener(UPDATE_BADGE_COUNT, this.onBadgeCountUpdate);
+		ipcMain.removeListener(SET_BADGE_COUNT, this.onBadgeCountUpdate);
 		this.mainWindow.removeListener('closed', this.onWindowClosed);
 		this.mainWindow.removeListener('show', this.onWindowShow);
 	}
