@@ -355,7 +355,8 @@ export const channelsSlice = createSlice({
 				id: payload.channel_id,
 				changes: {
 					channel_label: payload.channel_label,
-					status: payload.status
+					status: payload.status,
+					meeting_code: payload.meeting_code
 				}
 			});
 		},
@@ -395,11 +396,10 @@ export const channelsSlice = createSlice({
 			state.idChannelSelected[action.payload.clanId] = action.payload.channelId;
 			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
 		},
-		removeRememberChannel: (state, action: PayloadAction<{ clanId: string;}>) => {
-			delete (state.idChannelSelected[action.payload.clanId])
+		removeRememberChannel: (state, action: PayloadAction<{ clanId: string }>) => {
+			delete state.idChannelSelected[action.payload.clanId];
 			localStorage.setItem('remember_channel', JSON.stringify(state.idChannelSelected));
-
-		},
+		}
 	},
 	extraReducers: (builder) => {
 		builder
