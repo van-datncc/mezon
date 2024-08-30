@@ -2,7 +2,7 @@ import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { rolesClanActions, selectCurrentClanId, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -40,6 +40,14 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
 	}, [isClanOwner, clanRole, userPermissionsStatus]);
 
+	const handleBack = useCallback(() => {
+		if (isNotChange) {
+			navigation?.goBack();
+			return;
+		}
+		setShowModalConfirmSave(true);
+	}, [isNotChange, navigation]);
+
 	navigation.setOptions({
 		headerTitle: () => (
 			<Block>
@@ -65,15 +73,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		},
 		headerLeft: () => {
 			return (
-				<TouchableOpacity
-					onPress={() => {
-						if (isNotChange) {
-							navigation?.goBack();
-							return;
-						}
-						setShowModalConfirmSave(true);
-					}}
-				>
+				<TouchableOpacity onPress={handleBack}>
 					<Block marginLeft={size.s_16}>
 						<Icons.ArrowLargeLeftIcon color={themeValue.white} height={size.s_22} width={size.s_22} />
 					</Block>
