@@ -1,6 +1,7 @@
-import { CheckIcon, isEqual } from '@mezon/mobile-components';
+import { useCategory } from '@mezon/core';
+import { CheckIcon, getUpdateOrAddClanChannelCache, isEqual, load, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { categoriesActions, selectCategoryById, useAppDispatch } from '@mezon/store-mobile';
+import { categoriesActions, channelsActions, getStoreAsync, selectCategoryById, useAppDispatch } from '@mezon/store-mobile';
 import { UserShieldIcon } from 'libs/mobile-components/src/lib/icons2';
 import { ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,8 +19,9 @@ export default function CategorySetting({ navigation, route }: MenuClanScreenPro
 	const styles = style(themeValue);
 	const { t } = useTranslation(['categorySetting']);
 	const dispatch = useAppDispatch();
-    const { categoryId } = route.params;
-    const category = useSelector(selectCategoryById(categoryId || ''));
+	const { categorizedChannels } = useCategory();
+	const { categoryId } = route.params;
+	const category = useSelector(selectCategoryById(categoryId || ''));
 	const [isVisibleDeleteCategoryModal, setIsVisibleDeleteCategoryModal] = useState<boolean>(false);
 	const [categorySettingValue, setCategorySettingValue] = useState<string>('');
 	const [currentSettingValue, setCurrentSettingValue] = useState<string>('');
@@ -106,13 +108,42 @@ export default function CategorySetting({ navigation, route }: MenuClanScreenPro
 		});
 	};
 
+	const handleFocusDefaultChannel = async () => {
+		const targetIndex = categorizedChannels.findIndex((obj) => obj.category_id === category.id);
+		let channelNavId = '';
+		if (targetIndex !== -1) {
+			if (targetIndex === 0) {
+				channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
+			} else {
+				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+			}
+		}
+
+		if (channelNavId && category.clan_id) {
+			const store = await getStoreAsync();
+			const dataSave = getUpdateOrAddClanChannelCache(category.clan_id, channelNavId);
+			await Promise.all([
+				store.dispatch(channelsActions.joinChannel({ clanId: category.clan_id  ?? '', channelId: channelNavId, noFetchMembers: false })),
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
+			]);
+
+			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+			if (!channelsCache?.includes(channelNavId)) {
+				save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelNavId]);
+			}
+			return;
+		}
+	}
+
 	const handleDeleteCategory = async () => {
+		navigation.navigate(APP_SCREEN.HOME);
+
 		await dispatch(categoriesActions.deleteCategory({ 
             clanId: category.clan_id as string, 
             categoryId: category.id as string 
         }));
-
-        navigation.navigate(APP_SCREEN.HOME);
+				
+		handleFocusDefaultChannel()
 	};
 
 	const handleDeleteModalVisibleChange = (visible: boolean) => {
