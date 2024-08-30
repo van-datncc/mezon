@@ -124,6 +124,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 			<ScrollView contentContainerStyle={styles.container}>
 				<MezonInput
 					value={channelName}
+					maxCharacter={64}
 					onTextChange={setChannelName}
 					label={t('fields.channelName.title')}
 					errorMessage={t('fields.channelName.errorMessage')}

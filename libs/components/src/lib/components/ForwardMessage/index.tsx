@@ -8,13 +8,14 @@ import {
 	selectAllChannelMembers,
 	selectAllDirectMessages,
 	selectAllUsesClan,
+	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
 	selectModeResponsive,
 	selectTheme,
 	useAppDispatch,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
 import {
 	ChannelThreads,
@@ -24,7 +25,7 @@ import {
 	addAttributesSearchList,
 	getAvatarForPrioritize,
 	normalizeString,
-	removeDuplicatesById,
+	removeDuplicatesById
 } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
 import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
@@ -33,6 +34,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MessageContent from '../MessageWithUser/MessageContent';
 import ListSearchForwardMessage from './ListSearchForwardMessage';
+
 type ModalParam = {
 	openModal: boolean;
 };
@@ -60,7 +62,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const membersInClan = useSelector(selectAllChannelMembers);
 	const isForwardAll = useSelector(getIsFowardAll);
 	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || ''),
+		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')
 	);
 	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const allMessagesBySenderId = convertedAllMessagesEntities.filter((message) => message.sender_id === selectedMessage?.user?.id);
@@ -70,6 +72,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 
 	const [selectedObjectIdSends, setSelectedObjectIdSends] = useState<ObjectSend[]>([]);
 	const [searchText, setSearchText] = useState('');
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	useEffect(() => {
 		if (isLoading === 'loaded') {
@@ -110,15 +113,21 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				for (const message of combineMessages) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, message);
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, message);
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
 				for (const message of combineMessages) {
-					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, message);
+					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
 				}
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 				for (const message of combineMessages) {
-					sendForwardMessage(selectedObjectIdSend.clanId || '', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+					sendForwardMessage(
+						selectedObjectIdSend.clanId || '',
+						selectedObjectIdSend.id,
+						ChannelStreamMode.STREAM_MODE_CHANNEL,
+						!currentChannel?.channel_private,
+						message
+					);
 				}
 			}
 		}
@@ -129,15 +138,16 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const sentToMessage = async () => {
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, selectedMessage);
+				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_GROUP) {
-				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, selectedMessage);
+				sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_GROUP, false, selectedMessage);
 			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_TEXT) {
 				sendForwardMessage(
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_CHANNEL,
-					selectedMessage,
+					!currentChannel?.channel_private,
+					selectedMessage
 				);
 			}
 		}
@@ -157,7 +167,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						userName: itemDM?.usernames,
 						displayName: itemDM.channel_label,
 						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
-						typeSearch: TypeSearch.Dm_Type,
+						typeSearch: TypeSearch.Dm_Type
 					};
 				})
 			: [];
@@ -172,7 +182,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						userName: itemGr?.usernames,
 						displayName: itemGr.channel_label,
 						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
-						typeSearch: TypeSearch.Dm_Type,
+						typeSearch: TypeSearch.Dm_Type
 					};
 				})
 			: [];
@@ -187,7 +197,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						clanNick: itemUserClan?.clan_nick ?? '',
 						lastSentTimeStamp: '0',
 						idDM: '',
-						type: TypeSearch.Dm_Type,
+						type: TypeSearch.Dm_Type
 					};
 				})
 			: [];
@@ -201,11 +211,11 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 							...itemDM,
 							clanNick: user.clanNick || '',
 							displayName: user.displayName || itemDM.displayName,
-							avatarUser: user.avatarUser || '',
+							avatarUser: user.avatarUser || ''
 						}
 					: itemDM;
 			}),
-			...listGroupSearch,
+			...listGroupSearch
 		];
 		return removeDuplicatesById(listSearch.filter((item) => item.id !== accountId));
 	}, [accountId, listDM, listGroup, membersInClan, usersClan]);
@@ -223,7 +233,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 				channel_label: item?.channel_label ?? '',
 				lastSentTimeStamp: item.last_sent_message?.timestamp_seconds,
 				typeSearch: TypeSearch.Channel_Type,
-				prioritizeName: item?.channel_label ?? '',
+				prioritizeName: item?.channel_label ?? ''
 			};
 		});
 		return list;
@@ -238,10 +248,10 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		const memberResults = addPropsIntoListMember.some(
 			(item) =>
 				(item.prioritizeName && item.prioritizeName.toUpperCase().includes(normalizedSearchText)) ||
-				(item.name && item.name.toUpperCase().includes(normalizedSearchText)),
+				(item.name && item.name.toUpperCase().includes(normalizedSearchText))
 		);
 		const channelResults = listChannelSearch.some(
-			(item) => item.prioritizeName && item.prioritizeName.toUpperCase().includes(normalizedSearchText),
+			(item) => item.prioritizeName && item.prioritizeName.toUpperCase().includes(normalizedSearchText)
 		);
 		return !memberResults && !channelResults;
 	}, [addPropsIntoListMember, listChannelSearch, normalizedSearchText]);

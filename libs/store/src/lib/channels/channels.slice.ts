@@ -76,12 +76,13 @@ type JoinChatPayload = {
 	clanId: string;
 	channelId: string;
 	channelType: number;
+	isPublic: boolean;
 };
 
-export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, channelId, channelType }: JoinChatPayload, thunkAPI) => {
+export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, channelId, channelType, isPublic }: JoinChatPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType);
+		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType, isPublic);
 		return channel;
 	} catch (error) {
 		Sentry.captureException(error);
@@ -131,7 +132,8 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 					channelsActions.joinChat({
 						clanId: response.clan_id as string,
 						channelId: response.channel_id as string,
-						channelType: response.type as number
+						channelType: response.type as number,
+						isPublic: !body.channel_private
 					})
 				);
 			}

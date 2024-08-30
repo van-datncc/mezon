@@ -1,7 +1,7 @@
 import { useReference } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { selectCurrentChannel, selectOpenThreadMessageState } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, TransitionSpecs, createStackNavigator } from '@react-navigation/stack';
@@ -20,9 +20,9 @@ export const MenuThreadDetailStacks = ({ }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const Stack = createStackNavigator();
-	const { openThreadMessageState } = useReference();
+	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const navigation = useNavigation();
-  const { t } = useTranslation(['notificationSetting', 'createThread']);
+    const { t } = useTranslation(['notificationSetting', 'createThread']);
 	const currentChannel = useSelector(selectCurrentChannel);
 	return (
 		<Stack.Navigator

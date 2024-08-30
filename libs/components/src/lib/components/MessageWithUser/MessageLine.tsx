@@ -42,7 +42,16 @@ const MessageLine = ({
 		};
 	}, []);
 	return (
-		<div onClick={isJumMessageEnabled ? onClickToMessage : () => {}} className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}>
+		<div
+			onClick={
+				isJumMessageEnabled
+					? onClickToMessage
+					: () => {
+							// eslint-disable-next-line @typescript-eslint/no-empty-function
+						}
+			}
+			className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}
+		>
 			<RenderContent
 				isHideLinkOneImage={isHideLinkOneImage}
 				isTokenClickAble={isTokenClickAble}
@@ -96,13 +105,18 @@ const RenderContent = memo(
 		isHideLinkOneImage
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
+		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
+		const ejm = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
+		const mkm = Array.isArray(mk) ? mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) : [];
+		const lkm = Array.isArray(lk) ? lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })) : [];
+		const vkm = Array.isArray(vk) ? vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS })) : [];
 		const elements: ElementToken[] = [
 			...mentions.map((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })),
-			...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
-			...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })),
-			...mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })),
-			...lk.map((item) => ({ ...item, kindOf: ETokenMessage.LINKS })),
-			...vk.map((item) => ({ ...item, kindOf: ETokenMessage.VOICE_LINKS }))
+			...hgm,
+			...ejm,
+			...mkm,
+			...lkm,
+			...vkm
 		].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 		let lastindex = 0;

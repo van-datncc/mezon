@@ -328,9 +328,6 @@ export const Sharing = ({ data, onClose }) => {
 							<ScrollView horizontal style={styles.wrapperMedia}>
 								{getAttachmentUnique(attachmentUpload)?.map((media: any, index) => {
 									let isFile;
-									console.log('Tom log  => media', media);
-
-
 									if (Platform.OS === 'android') {
 										isFile = !media?.filetype?.includes?.('video') && !media?.filetype?.includes?.('image');
 									} else {
