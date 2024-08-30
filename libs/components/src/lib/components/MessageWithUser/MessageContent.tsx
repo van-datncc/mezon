@@ -74,8 +74,9 @@ const MessageText = ({
 	}, [attachmentOnMessage, contentTonMessage]);
 
 	const showEditted = useMemo(() => {
-		return !message.hideEditted;
+		return message.hideEditted === false;
 	}, [message.hideEditted]);
+
 	return (
 		<>
 			{' '}
