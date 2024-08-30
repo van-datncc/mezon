@@ -277,7 +277,12 @@ export const selectCountNotifyByChannelId = (channelId: string) =>
 	createSelector(getNotificationState, (state) => {
 		return state.quantityNotifyChannels[channelId] || 0;
 	});
+
 export const selectCountNotifyByClanId = (clanId: string) =>
 	createSelector(getNotificationState, (state) => {
 		return state.quantityNotifyClans[clanId] || 0;
 	});
+
+export const selectTotalClansNotify = createSelector(getNotificationState, (state) => {
+	return Object.values(state.quantityNotifyClans).reduce((totalNotifyCount, notifyCount) => totalNotifyCount + notifyCount, 0);
+});
