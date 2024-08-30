@@ -1,6 +1,6 @@
 import { useReference, useThreads } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { APP_SCREEN, MenuThreadScreenProps } from '../../navigation/ScreenTypes';
@@ -26,7 +26,7 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 		headerRight: () => <ThreadAddButton onPress={handleNavigateCreateForm} />
 	});
 
-	const handleNavigateCreateForm = () => {
+	const handleNavigateCreateForm = useCallback(() => {
 		setOpenThreadMessageState(false);
 		setValueThread(null);
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
@@ -35,7 +35,8 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 				channelThreads: channelThreads
 			}
 		});
-	};
+	}, []);
+
 	return (
 		// TODO: MezonMenu??
 		<View style={styles.createChannelContainer}>

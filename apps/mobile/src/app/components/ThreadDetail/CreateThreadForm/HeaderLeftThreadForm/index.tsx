@@ -1,18 +1,19 @@
-import { useReference } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
+import { selectOpenThreadMessageState } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { style } from './HeaderLeftThreadForm.style';
 
 const HeaderLeftThreadForm = ({ currentChannel }: { currentChannel: ChannelThreads }) => {
 	const { themeValue } = useTheme();
 	const navigation = useNavigation();
 	const styles = style(themeValue);
-	const { openThreadMessageState } = useReference();
+	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { t } = useTranslation(['createThread']);
 
 	return (
