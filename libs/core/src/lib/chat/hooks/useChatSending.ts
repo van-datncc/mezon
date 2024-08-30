@@ -168,16 +168,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		setContentPayload({});
 		setMentionPayload([]);
 		setAttachmentPayload([]);
-	}, [
-		attachmentPayload,
-		contentPayload,
-		mentionPayload,
-		newMessageUpdateImage.channel_id,
-		newMessageUpdateImage.clan_id,
-		newMessageUpdateImage.message_id,
-		newMessageUpdateImage.mode,
-		processLink
-	]);
+	}, [newMessageUpdateImage.message_id]);
 
 	return useMemo(
 		() => ({
