@@ -169,6 +169,7 @@ export const Sharing = ({ data, onClose }) => {
 			'0',
 			channelSelected.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
+			false,
 			{
 				t: dataSend.text,
 				lk: dataSend.links || [],
@@ -195,6 +196,7 @@ export const Sharing = ({ data, onClose }) => {
 			currentClan.id,
 			channelSelected.channel_id,
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
+			!channelSelected.channel_private,
 			{
 				t: dataSend.text,
 				lk: dataSend.links || [],
