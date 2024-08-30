@@ -75,35 +75,31 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			return;
 		}
 		const store = await getStoreAsync();
-		await Promise.all([
-			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id)),
+			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
 			// Rejoin previous clan (other than 0) when exiting the DM detail screen
-			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id })),
+			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
 			store.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: currentChannel?.clan_id || '',
 					channelId: currentChannel?.channel_id || '',
 					channelType: currentChannel?.type,
-					noCache: true
-				})
-			)
-		]);
+					noCache: true,
+				}),
+			);
 	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
-		await Promise.all([
-			store.dispatch(clansActions.setCurrentClanId('0')),
+			store.dispatch(clansActions.setCurrentClanId('0'));
 			store.dispatch(
 				directActions.joinDirectMessage({
 					directMessageId: currentDmGroup?.id,
 					channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
 					type: currentDmGroup?.type,
 					noCache: true,
-					isFetchingLatestMessages: true
-				})
-			)
-		]);
+					isFetchingLatestMessages: true,
+				}),
+			);
 		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 

@@ -44,7 +44,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage('0', channel.id, mode, content, mentions, attachments, references, false, false);
+			await socket.writeChatMessage('0', channel.id, mode, !channel.channel_private, content, mentions, attachments, references, false, false);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
 			if (lastMessage) {
@@ -59,7 +59,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	}, [dispatch, channelId]);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode }));
+		dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode, isPublic: false }));
 	}, [channelId, dispatch, mode]);
 
 	const { updateImageLinkMessage } = useChatSending({ channelId, mode });

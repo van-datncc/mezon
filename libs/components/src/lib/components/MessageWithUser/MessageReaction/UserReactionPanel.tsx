@@ -35,7 +35,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		emoji_id: string,
 		emoji: string,
 		message_sender_id: string,
-		countRemoved: number,
+		countRemoved: number
 	) => {
 		await reactionMessageDispatch(
 			id,
@@ -48,6 +48,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
+			!currentChannel?.channel_private
 		);
 	};
 
@@ -132,7 +133,7 @@ type SenderItemProps = {
 		emoji_id: string,
 		emoji: string,
 		message_sender_id: string,
-		countRemoved: number,
+		countRemoved: number
 	) => Promise<void>;
 	hideSenderOnPanel: (emojiData: any, senderId: string) => void;
 };
@@ -146,7 +147,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 			emojiShowPanel.emoji_id ?? '',
 			emojiShowPanel.emoji ?? '',
 			sender.sender_id ?? '',
-			sender.count ?? 0,
+			sender.count ?? 0
 		);
 
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');

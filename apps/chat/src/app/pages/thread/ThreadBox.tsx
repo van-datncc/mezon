@@ -27,7 +27,6 @@ const ThreadBox = () => {
 	const { threadCurrentChannel } = useThreads();
 	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
-		channelLabel: threadCurrentChannel?.channel_label as string,
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL
 	});
 
@@ -63,7 +62,8 @@ const ThreadBox = () => {
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
 								channelId: thread.channel_id as string,
-								channelType: thread.type as number
+								channelType: thread.type as number,
+								isPublic: !thread.channel_private
 							})
 						);
 						await sendMessageThread(content, mentions, attachments, references, thread);

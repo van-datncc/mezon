@@ -1,5 +1,5 @@
 import BottomSheet from '@gorhom/bottom-sheet';
-import { useReference, useThreadMessage, useThreads } from '@mezon/core';
+import { useThreadMessage, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	Icons,
@@ -17,6 +17,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectOpenThreadMessageState,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
@@ -51,7 +52,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const formikRef = useRef(null);
-	const { openThreadMessageState } = useReference();
+	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { valueThread, threadCurrentChannel } = useThreads();
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
@@ -176,10 +177,12 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 										label={t('threadName')}
 										onTextChange={handleChange('nameValueThread')}
 										onFocus={() => {
-											setHeightKeyboardShow(0);
+											setHeightKeyboardShow(345);
 											bottomPickerRef.current?.close();
 										}}
-										// onBlur={handleBlur('nameValueThread')}
+										onBlur={() => {
+											setHeightKeyboardShow(0);
+										}}
 										value={values.nameValueThread}
 										placeHolder="New Thread"
 										maxCharacter={64}
@@ -206,6 +209,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 									<MessageItem
 										messageId={valueThread?.id}
 										message={valueThread}
+										showUserInformation
 										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 										channelId={currentChannel?.channel_id}
 										isNumberOfLine={true}

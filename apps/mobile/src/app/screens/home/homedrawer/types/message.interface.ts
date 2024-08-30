@@ -13,7 +13,6 @@ export interface IReplyBottomSheet {
 	clanId?: string;
 	isOnlyEmojiPicker?: boolean;
 	user?: ApiUser | null;
-	checkAnonymous?: boolean;
 	senderDisplayName?: string;
 }
 

@@ -1,5 +1,12 @@
 import { useAuth, useCategory, useChannelMembersActions, useClanRestriction, useEscapeKey, useOnClickOutside } from '@mezon/core';
-import { categoriesActions, selectCurrentClan, selectCurrentClanId, selectCurrentVoiceChannelId, useAppDispatch } from '@mezon/store';
+import {
+	categoriesActions,
+	hasGrandchildModal,
+	selectCurrentClan,
+	selectCurrentClanId,
+	selectCurrentVoiceChannelId,
+	useAppDispatch
+} from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
@@ -43,7 +50,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [openCreateCate, setOpenCreateCate] = useState(false);
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const [isShowModalPanelClan, setIsShowModalPanelClan] = useState<boolean>(false);
-
+	const hasChildModal = useSelector(hasGrandchildModal);
 	const [openNotiSettingModal, closeNotiSettingModal] = useModal(() => (
 		<ModalNotificationSetting onClose={closeNotiSettingModal} open={true} channelID={channelId || ''} />
 	));
@@ -96,7 +103,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const hasPermissionCreateCategory = hasAdminPermission || isClanOwner || hasClanPermission;
 
 	const hasPermissionChangeFull = isClanOwner || hasClanPermission || hasAdminPermission;
-	useEscapeKey(() => setIsShowModalPanelClan(false));
+	useEscapeKey(() => {
+		setIsShowModalPanelClan(false);
+		if (!hasChildModal) {
+			setOpenServerSettings(false);
+		}
+	});
 
 	const handleLeaveClan = async () => {
 		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
