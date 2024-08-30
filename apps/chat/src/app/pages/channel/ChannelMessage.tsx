@@ -76,7 +76,6 @@ export function ChannelMessage({ message, channelId, mode, channelLabel, isHighl
 	useEffect(() => {
 		markMessageAsSeen(message);
 	}, [markMessageAsSeen, message]);
-
 	return (
 		<>
 			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}

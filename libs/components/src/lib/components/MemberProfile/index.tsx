@@ -1,24 +1,15 @@
 import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
-import {useChannelMembersActions, useEscapeKey, useOnClickOutside} from '@mezon/core';
-import {
-	ChannelMembersEntity,
-	selectAllAccount,
-	selectCurrentChannelId,
-	selectCurrentClan,
-	selectCurrentClanId,
-	selectDmGroupCurrentId,
-	selectTypingUserIds,
-	selectTypingUserIdsByChannelId,
-} from '@mezon/store';
+import { useChannelMembersActions, useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { memo, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { OfflineStatus, OnlineStatus } from '../../../../../ui/src/lib/Icons';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import PanelMember from '../PanelMember';
+import StatusUser from '../StatusUser';
 import UserProfileModalInner from '../UserProfileModalInner';
 import ModalRemoveMemberClan from './ModalRemoveMemberClan';
 
@@ -55,8 +46,6 @@ function MemberProfile({
 	customStatus,
 	isHideStatus,
 	isHideIconStatus,
-	numberCharacterCollapse = 6,
-	textColor = 'contentSecondary',
 	isHideUserName,
 	classParent = '',
 	user,
@@ -65,13 +54,12 @@ function MemberProfile({
 	isHideAnimation,
 	isUnReadDirect,
 	directMessageValue,
-	isMemberGroupDm,
 	positionType,
 	countMember,
 	dataMemberCreate,
 	isHiddenAvatarPanel,
 	userNameAva,
-	hideLongName,
+	hideLongName
 }: MemberProfileProps) {
 	const [isShowUserProfile, setIsShowUserProfile] = useState<boolean>(false);
 	const [isShowPanel, setIsShowPanel] = useState<boolean>(false);
@@ -80,7 +68,7 @@ function MemberProfile({
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
-		distanceToBottom: 0,
+		distanceToBottom: 0
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
 	const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean>(false);
@@ -123,10 +111,6 @@ function MemberProfile({
 		}
 	};
 
-	const handleDefault = (e: any) => {
-		e.stopPropagation();
-	};
-
 	const handleClosePannelMember = () => {
 		setIsShowPanel(false);
 	};
@@ -137,7 +121,7 @@ function MemberProfile({
 		setIsShowUserProfile(false);
 	};
 
-	const handleRemoveMember = async (value: string) => {
+	const handleRemoveMember = async () => {
 		if (user) {
 			const userIds = [user.user?.id ?? ''];
 			await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
@@ -152,11 +136,11 @@ function MemberProfile({
 	};
 
 	useOnClickOutside(panelRef, handleClickOutSide);
-	
+
 	useEscapeKey(() => {
 		setIsShowUserProfile(false);
 		setIsShowPanel(false);
-	})
+	});
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 
@@ -168,12 +152,15 @@ function MemberProfile({
 
 	const isListDm = useMemo(() => positionType === MemberProfileType.DM_LIST, [positionType]);
 
-	const isAnonymous = useMemo(() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, []);
+	const isAnonymous = useMemo(
+		() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID,
+		[isFooter, user?.user?.id, userProfile?.user?.id]
+	);
 
-	const userName = useMemo(() => (isFooter ? userProfile?.user?.username || '' : name || ''), []);
+	const userName = useMemo(() => (isFooter ? userProfile?.user?.username || '' : name || ''), [isFooter, name, userProfile?.user?.username]);
 
 	const subNameRef = useRef<HTMLInputElement>(null);
-	const minWidthNameMain = useMemo(() => subNameRef.current?.offsetWidth, [subNameRef?.current]);
+	const minWidthNameMain = useMemo(() => subNameRef.current?.offsetWidth, [subNameRef]);
 
 	const handleOpenProfileModal = () => {
 		setIsOpenProfileModal(true);
@@ -184,18 +171,20 @@ function MemberProfile({
 	};
 
 	const isOwnerClanOrGroup = useMemo(() => {
-		return (dataMemberCreate?.createId || currentClan?.creator_id) &&
+		return (
+			(dataMemberCreate?.createId || currentClan?.creator_id) &&
 			(dataMemberCreate ? dataMemberCreate?.createId : currentClan?.creator_id) === user?.user?.id
-	}, [dataMemberCreate])
+		);
+	}, [currentClan?.creator_id, dataMemberCreate, user?.user?.id]);
 
 	return (
-		<div className="relative group" >
+		<div className="relative group">
 			<div
 				ref={panelRef}
 				onMouseDown={handleMouseClick}
 				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${isFooter ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
-				<a className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
+				<div className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
 					<AvatarImage
 						alt={userName}
 						userName={userNameAva ?? userName}
@@ -204,7 +193,7 @@ function MemberProfile({
 						src={avatar}
 						isAnonymous={isAnonymous}
 					/>
-					{!isHideIconStatus ? (
+					{!isHideIconStatus && (
 						<StatusUser
 							isListDm={isListDm}
 							isMemberChannel={isMemberChannel}
@@ -213,10 +202,8 @@ function MemberProfile({
 							directMessageValue={directMessageValue}
 							userId={user?.user?.id}
 						/>
-					) : (
-						<></>
 					)}
-				</a>
+				</div>
 				<div className="flex flex-col items-start h-full">
 					<div
 						ref={subNameRef}
@@ -249,7 +236,7 @@ function MemberProfile({
                   ${isFooter ? 'top-[-7px] leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
                   ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
-                  ${classParent == '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
+                  ${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
                   ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
 							    `}
 									title={name}
@@ -262,13 +249,16 @@ function MemberProfile({
 									{isListFriend && <span className="hidden group-hover/list_friends:inline">&nbsp;{userNameAva}</span>}
 								</p>
 								{isOwnerClanOrGroup && (
-										<button className="w-[14px] h-[14px] ml-1">
-											<Icons.OwnerIcon />
-										</button>
-									)}
+									<button className="w-[14px] h-[14px] ml-1">
+										<Icons.OwnerIcon />
+									</button>
+								)}
 							</div>
 							{customStatus && (isMemberChannel || isMemberDMGroup) && (
-								<p className="dark:text-contentTertiary text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] " title={customStatus}>
+								<p
+									className="dark:text-contentTertiary text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] "
+									title={customStatus}
+								>
 									{customStatus}
 								</p>
 							)}
@@ -298,7 +288,7 @@ function MemberProfile({
 				<div
 					className={`dark:bg-black bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed md:right-[245px] right-auto left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
 					style={{ bottom: positionTop ? '15px' : '', top: positionTop ? '' : `${top}px` }}
-					onMouseDown={handleDefault}
+					onMouseDown={(e) => e.stopPropagation()}
 					onClick={(e) => e.stopPropagation()}
 				>
 					<ShortUserProfile
@@ -319,58 +309,9 @@ function MemberProfile({
 				/>
 			)}
 
-			{isOpenProfileModal && (
-				<UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal} />
-			)}
+			{isOpenProfileModal && <UserProfileModalInner openModal={isOpenProfileModal} userId={user?.user?.id} onClose={handleCloseProfileModal} />}
 		</div>
 	);
 }
 
 export default MemberProfile;
-
-type StatusUserProps = {
-	status?: boolean;
-	isMemberDMGroup: boolean;
-	isMemberChannel: boolean;
-	isListDm: boolean;
-	directMessageValue?: directMessageValueProps;
-	userId?: string;
-};
-
-const StatusUser = memo((props: StatusUserProps) => {
-	const { status, isMemberChannel, isMemberDMGroup, isListDm, directMessageValue, userId = '' } = props;
-	const typingUserIds = useSelector(selectTypingUserIds);
-	const currentDMChannelID = useSelector(selectDmGroupCurrentId);
-	const currentChannelID = useSelector(selectCurrentChannelId);
-	const typingListMemberDMIds = useSelector(selectTypingUserIdsByChannelId(currentDMChannelID || ''));
-	const typingListMemberChannelIds = useSelector(selectTypingUserIdsByChannelId(currentChannelID || ''));
-	const typingListDMIds = useSelector(selectTypingUserIdsByChannelId(directMessageValue?.dmID || ''));
-	const checkDmGroup = Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP;
-
-	const checkTypingUser = useMemo(() => {
-		switch (true) {
-			case isMemberDMGroup:
-				return typingListMemberDMIds?.includes(userId);
-			case isMemberChannel:
-				return typingListMemberChannelIds?.includes(userId);
-
-			case isListDm: 
-				return typingListDMIds?.some(id => directMessageValue?.userId?.includes(id));
-
-			default:
-				return false;
-		}
-	}, [isMemberDMGroup, isMemberChannel, isListDm, typingUserIds]);
-
-	return (
-    <span
-		className={`absolute bottom-[0px] inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${(checkTypingUser) ? 'rounded-lg -right-3' : 'rounded-full right-[-4px]'}`}
-    >
-		{checkTypingUser ?
-      <Icons.IconLoadingTyping bgFill='bg-colorSuccess'/>
-    : 
-        	(!checkDmGroup && (status ? <OnlineStatus /> : <OfflineStatus />))
-		}
-    </span>
-  );
-})
