@@ -357,7 +357,8 @@ export const channelsSlice = createSlice({
 				id: payload.channel_id,
 				changes: {
 					channel_label: payload.channel_label,
-					status: payload.status
+					status: payload.status,
+					meeting_code: payload.meeting_code
 				}
 			});
 		},

@@ -138,6 +138,13 @@ const HomeDefault = React.memo((props: any) => {
 		setIsShowLicenseAgreement(Platform.OS === 'ios' && isAgreed?.toString() !== 'true');
 	};
 
+	const handleSheetChanges = useCallback((index) => {
+		if (index === -1) {
+			onShowKeyboardBottomSheet(false, 0);
+			setTypeKeyboardBottomSheet('text');
+		}
+	}, []);
+
 	return (
 		<View style={[styles.homeDefault]}>
 			<LicenseAgreement
@@ -180,7 +187,12 @@ const HomeDefault = React.memo((props: any) => {
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
+						<BottomKeyboardPicker
+							height={heightKeyboardShow}
+							ref={bottomPickerRef}
+							isStickyHeader={typeKeyboardBottomSheet === 'emoji'}
+							onSheetChanges={handleSheetChanges}
+						>
 							{typeKeyboardBottomSheet === 'emoji' ? (
 								<EmojiPicker
 									onDone={() => {
