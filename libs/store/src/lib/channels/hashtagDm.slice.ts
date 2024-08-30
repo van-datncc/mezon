@@ -49,7 +49,7 @@ export const hashtagDmSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchHashtagDm.fulfilled, (state: HashtagDmState, action: PayloadAction<HashtagDmEntity[]>) => {
-				HashtagDmAdapter.setMany(state, action.payload);
+				HashtagDmAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchHashtagDm.rejected, (state: HashtagDmState, action) => {
