@@ -7,7 +7,6 @@ import {
 	categoriesActions,
 	selectAllEventManagement,
 	selectCategoryIdSortChannel,
-	selectCurrentChannel,
 	selectCurrentClan,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -31,7 +30,7 @@ import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
 
-const ChannelList = React.memo(({ data }: { data: any }) => {
+const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, idCurrentCateByChannel: string }) => {
 	const categorizedChannels = useMemo(() => {
 		return !!data && typeof data === 'string' ? JSON.parse(data) : [];
 	}, [data]);
@@ -56,7 +55,6 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { isCanManageEvent } = useUserPermission();
 	const flashListRef = useRef(null);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const handlePress = useCallback(() => {
@@ -94,10 +92,10 @@ const ChannelList = React.memo(({ data }: { data: any }) => {
 	const onContentSizeChange = useCallback((w, h) => {
 		if (categorizedChannels?.length && h > 0 && isLoading === 'loaded') {
 			timeoutRef.current = setTimeout(() => {
-				scrollToItemById?.(currentChannel?.category_id);
+				scrollToItemById?.(idCurrentCateByChannel);
 			}, 300);
 		}
-	}, []);
+	}, [idCurrentCateByChannel]);
 
 	useEffect(() => {
 		return () => {

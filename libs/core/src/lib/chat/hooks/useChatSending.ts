@@ -37,9 +37,13 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const channel = useSelector(selectChannelById(channelId));
 	let channelID = channelId;
 	let clanID = currentClanId;
+	let isPublic = false;
 	if (direct) {
 		channelID = direct.id;
 		clanID = '0';
+	}
+	if (channel) {
+		isPublic = !channel.channel_private;
 	}
 
 	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
@@ -64,7 +68,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 					channelId: channelID,
 					clanId: clanID || '',
 					mode,
-					isPublic: !channel.channel_private,
+					isPublic: isPublic,
 					content,
 					mentions,
 					attachments,
@@ -84,7 +88,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				clanId: clanID || '',
 				channelId,
 				mode,
-				isPublic: !channel.channel_private
+				isPublic: isPublic
 			})
 		);
 	}, [channelId, clanID, dispatch, mode]);
@@ -105,17 +109,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(
-				clanID || '',
-				channelId,
-				mode,
-				!channel.channel_private,
-				messageId,
-				content,
-				mentions,
-				attachments,
-				hideEditted
-			);
+			await socket.updateChatMessage(clanID || '', channelId, mode, isPublic, messageId, content, mentions, attachments, hideEditted);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode]
 	);
@@ -144,7 +138,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				clanId ?? '',
 				channelId ?? '',
 				mode ?? 0,
-				!channel.channel_private,
+				isPublic,
 				messageId ?? '',
 				content,
 				mentions,

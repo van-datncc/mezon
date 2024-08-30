@@ -111,6 +111,7 @@ export const style = (colors: Attributes) =>
 
 		defaultText: {
 			color: colors.text,
+			fontSize: size.medium,
 		},
 
 		addMessage: {
@@ -135,9 +136,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		lastMessage: {
-			fontSize: size.s_12,
 			color: colors.textStrong,
-			lineHeight: size.s_18,
 		},
 
 		dateTime: {
@@ -170,6 +169,7 @@ export const style = (colors: Attributes) =>
 			flex: 1,
 			maxHeight: size.s_22,
 			flexDirection: 'row',
+			alignItems: 'flex-end',
 			flexWrap: 'nowrap',
 			overflow: 'hidden'
 		}

@@ -13,7 +13,13 @@ import { useSelector } from 'react-redux';
 import EmptyPinMess from './EmptyPinMess';
 import ItemPinMessage from './ItemPinMessage';
 
-const ListPinMessage = ({ onClose = () => {} }: { onClose?: () => void }) => {
+const ListPinMessage = ({
+	onClose = () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+	}
+}: {
+	onClose?: () => void;
+}) => {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);

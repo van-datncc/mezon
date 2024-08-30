@@ -42,7 +42,16 @@ const MessageLine = ({
 		};
 	}, []);
 	return (
-		<div onClick={isJumMessageEnabled ? onClickToMessage : () => {}} className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}>
+		<div
+			onClick={
+				isJumMessageEnabled
+					? onClickToMessage
+					: () => {
+							// eslint-disable-next-line @typescript-eslint/no-empty-function
+						}
+			}
+			className={`${!isJumMessageEnabled ? '' : 'cursor-pointer'} `}
+		>
 			<RenderContent
 				isHideLinkOneImage={isHideLinkOneImage}
 				isTokenClickAble={isTokenClickAble}
