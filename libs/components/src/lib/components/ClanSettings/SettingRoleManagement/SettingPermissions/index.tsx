@@ -12,7 +12,7 @@ import {
 	toggleIsShowTrue
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
-import { SlugPermission } from '@mezon/utils';
+import { EVERYONE_ROLE_ID, SlugPermission } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -23,7 +23,7 @@ export type ModalSettingSave = {
 	handleUpdateUser: () => void;
 };
 
-const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
+const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[]; hasPermissionEdit: boolean }) => {
 	const dispatch = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const { permissionsDefault } = useUserPolicy(currentClan?.id || '');
@@ -75,9 +75,8 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 
 	const isClanOwner = useClanOwner();
 	const hiddenPermissionAdmin = (slug: string) => {
-		return isClanOwner ? false : (slug === SlugPermission.Admin && hasPermissionEdit);
-	}
-
+		return isClanOwner ? false : slug === SlugPermission.Admin && hasPermissionEdit;
+	};
 
 	return (
 		<div className="pr-5">
@@ -94,14 +93,17 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 			<div>
 				<ul className="flex flex-col gap-y-[5px]">
 					{searchResults.map((permission) => (
-						<li key={permission.id} className={`flex items-center justify-between ${hasPermissionEdit ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
+						<li
+							key={permission.id}
+							className={`flex items-center justify-between ${hasPermissionEdit && clickRole !== EVERYONE_ROLE_ID ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+						>
 							<span className="font-normal">{permission.title}</span>
 							<label>
 								<input
 									type="checkbox"
 									checked={selectedPermissions.includes(permission.id)}
 									onChange={() => {
-										if (hasPermissionEdit) {
+										if (hasPermissionEdit && clickRole !== EVERYONE_ROLE_ID) {
 											handlePermissionToggle(permission.id);
 										}
 									}}
