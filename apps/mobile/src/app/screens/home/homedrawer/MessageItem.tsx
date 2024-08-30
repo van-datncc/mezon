@@ -95,7 +95,7 @@ const MessageItem = React.memo(
 
 		const isTimeGreaterThan5Minutes = useMemo(() => {
 			if (message?.create_time && previousMessage?.create_time) {
-				return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 5 * 60 * 1000;
+				return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 2 * 60 * 1000;
 			}
 			return false;
 		}, [message?.create_time, previousMessage?.create_time]);
@@ -332,7 +332,7 @@ const MessageItem = React.memo(
 										mentions: message.mentions,
 										...(checkOneLinkImage ? { t: '' } : {})
 									}}
-									isEdited={message?.hideEditted}
+									isEdited={message.hideEditted === false && !!message?.content?.t}
 									translate={t}
 									onMention={onMention}
 									onChannelMention={onChannelMention}
@@ -362,7 +362,7 @@ const MessageItem = React.memo(
 					</View>
 				</View>
 				{/* </Swipeable> */}
-				<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />
+				{/*<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />*/}
 			</Animated.View>
 		);
 	},
