@@ -87,7 +87,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				isPublic: !channel.channel_private
 			})
 		);
-	}, [channel.channel_private, channelId, clanID, dispatch, mode]);
+	}, [channelId, clanID, dispatch, mode]);
 
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(
