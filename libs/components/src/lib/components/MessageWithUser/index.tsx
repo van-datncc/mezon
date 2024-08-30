@@ -92,7 +92,10 @@ function MessageWithUser({
 	const hasIncludeMention = useMemo(() => {
 		const userIdMention = userLogin.userProfile?.user?.id;
 		const mentionOnMessage = message.mentions;
-		const includesHere = message.content.t?.includes('@here');
+		let includesHere = false;
+		if (message.content.t) {
+			includesHere = message.content.t?.includes('@here');
+		}
 		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
 		return includesHere || includesUser;
 	}, [message.content.t, userLogin.userProfile?.user?.id, message.mentions]);
