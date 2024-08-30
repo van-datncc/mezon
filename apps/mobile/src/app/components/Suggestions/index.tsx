@@ -152,15 +152,16 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	if (!keyword) {
 		return;
 	}
-	const handleEmojiSuggestionPress = (emoji: ApiClanEmojiListResponse) => {
+	const handleEmojiSuggestionPress = (emoji: any) => {
+		const emojiItemName = `:${emoji?.shortname?.split?.(':')?.join('')}:`;
 		onSelect({
 			...emoji,
-			display: emoji.shortname,
-			name: emoji.shortname
+			display: emojiItemName,
+			name: emojiItemName
 		});
 		dispatch(
 			emojiSuggestionActions.setSuggestionEmojiObjPicked({
-				shortName: emoji.shortname,
+				shortName: emojiItemName,
 				id: emoji.id
 			})
 		);
@@ -172,7 +173,7 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 			data={emojiListPNG?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20)}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleEmojiSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={false} name={item?.shortname ?? ''} emojiId={item?.id} />
+					<SuggestItem isDisplayDefaultAvatar={false} name={`:${item?.shortname?.split?.(':')?.join('')}:` ?? ''} emojiId={item?.id} />
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}

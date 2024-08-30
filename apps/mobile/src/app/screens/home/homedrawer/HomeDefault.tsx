@@ -138,6 +138,13 @@ const HomeDefault = React.memo((props: any) => {
 		setIsShowLicenseAgreement(Platform.OS === 'ios' && isAgreed?.toString() !== 'true');
 	};
 
+	const handleSheetChanges = useCallback((index) => {
+		if (index === -1) {
+			onShowKeyboardBottomSheet(false, 0);
+			setTypeKeyboardBottomSheet('text');
+		}
+	}, []);
+
 	return (
 		<View style={[styles.homeDefault]}>
 			<LicenseAgreement
@@ -159,6 +166,7 @@ const HomeDefault = React.memo((props: any) => {
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
 						channelLabel={currentChannel?.channel_label}
+						isPublic={!currentChannel?.channel_private}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 					{/* {heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
@@ -180,7 +188,12 @@ const HomeDefault = React.memo((props: any) => {
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
+						<BottomKeyboardPicker
+							height={heightKeyboardShow}
+							ref={bottomPickerRef}
+							isStickyHeader={typeKeyboardBottomSheet === 'emoji'}
+							onSheetChanges={handleSheetChanges}
+						>
 							{typeKeyboardBottomSheet === 'emoji' ? (
 								<EmojiPicker
 									onDone={() => {

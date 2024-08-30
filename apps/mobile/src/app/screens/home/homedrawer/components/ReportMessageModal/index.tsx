@@ -119,6 +119,7 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
 					<Text style={styles.selectedMessageText}>{t('reportMessage.selectedMessage')}</Text>
 					<View style={styles.messageBox}>
 						<MessageItem
+							message={message}
 							messageId={message.id}
 							channelId={message.channel_id}
 							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}

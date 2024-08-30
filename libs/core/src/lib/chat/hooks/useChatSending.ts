@@ -37,9 +37,13 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const channel = useSelector(selectChannelById(channelId));
 	let channelID = channelId;
 	let clanID = currentClanId;
+	let isPublic = false;
 	if (direct) {
 		channelID = direct.id;
 		clanID = '0';
+	}
+	if (channel) {
+		isPublic = !channel.channel_private;
 	}
 
 	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
@@ -64,6 +68,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 					channelId: channelID,
 					clanId: clanID || '',
 					mode,
+					isPublic: isPublic,
 					content,
 					mentions,
 					attachments,
@@ -78,7 +83,14 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ clanId: clanID || '', channelId, mode }));
+		dispatch(
+			messagesActions.sendTypingUser({
+				clanId: clanID || '',
+				channelId,
+				mode,
+				isPublic: isPublic
+			})
+		);
 	}, [channelId, clanID, dispatch, mode]);
 
 	// Move this function to to a new action of messages slice
@@ -97,7 +109,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments, hideEditted);
+			await socket.updateChatMessage(clanID || '', channelId, mode, isPublic, messageId, content, mentions, attachments, hideEditted);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode]
 	);
@@ -122,9 +134,19 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanId ?? '', channelId ?? '', mode ?? 0, messageId ?? '', content, mentions, attachments, hideEditted);
+			await socket.updateChatMessage(
+				clanId ?? '',
+				channelId ?? '',
+				mode ?? 0,
+				isPublic,
+				messageId ?? '',
+				content,
+				mentions,
+				attachments,
+				hideEditted
+			);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode]
+		[sessionRef, clientRef, socketRef, channel, direct]
 	);
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 

@@ -7,7 +7,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		justifyContent: 'center',
 	},
 	listChannels: {
-		paddingTop: size.s_14,
+		paddingVertical: size.s_14,
 		backgroundColor: colors.secondary,
 	}
 });

@@ -24,7 +24,7 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
 			<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
 				<Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.textStrong} />
 			</Pressable>
-		),
+		)
 	});
 
 	const onRoleNameChange = (roleName: string) => {
@@ -39,8 +39,8 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
 				type: 'success',
 				props: {
 					text2: t('createNewRole.createSuccess', { roleName }),
-					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+				}
 			});
 		} else {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
@@ -48,8 +48,8 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
 				type: 'success',
 				props: {
 					text2: t('failed'),
-					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-				},
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
 			});
 		}
 	};
@@ -94,6 +94,5 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
 				</Block>
 			</Block>
 		</TouchableWithoutFeedback>
-
 	);
 };

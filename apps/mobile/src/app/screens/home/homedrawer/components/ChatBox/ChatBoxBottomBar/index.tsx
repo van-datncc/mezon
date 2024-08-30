@@ -495,6 +495,7 @@ export const ChatBoxBottomBar = memo(
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						isShowCreateThread={isShowCreateThread}
 						attachmentDataRef={attachmentFilteredByChannelId?.files}
+						isPublic={!currentChannel?.channel_private}
 					/>
 				</Block>
 			</Block>
