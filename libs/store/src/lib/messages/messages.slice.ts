@@ -10,7 +10,7 @@ import {
 	LoadingStatus,
 	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
-	checkSameDayByCreateTime,
+	checkSameDayByCreateTime
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -415,10 +415,11 @@ type SendMessagePayload = {
 	mentionEveryone?: boolean;
 	mode: number;
 	senderId: string;
+	isPublic: boolean;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
-	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
+	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, isPublic, clanId, senderId } = payload;
 	const id = Date.now().toString();
 
 	async function doSend() {
@@ -432,7 +433,18 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			throw new Error('Client is not initialized');
 		}
 
-		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
+		const res = await socket.writeChatMessage(
+			clanId,
+			channelId,
+			mode,
+			isPublic,
+			content,
+			mentions,
+			attachments,
+			references,
+			anonymous,
+			mentionEveryone
+		);
 
 		return res;
 	}
@@ -529,13 +541,17 @@ export type SendMessageArgs = {
 	clanId: string;
 	channelId: string;
 	mode: number;
+	isPublic: boolean;
 };
 
-export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async ({ clanId, channelId, mode }: SendMessageArgs, thunkAPI) => {
-	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode);
-	return ack;
-});
+export const sendTypingUser = createAsyncThunk(
+	'messages/sendTypingUser',
+	async ({ clanId, channelId, mode, isPublic }: SendMessageArgs, thunkAPI) => {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic);
+		return ack;
+	}
+);
 
 export type SetChannelLastMessageArgs = {
 	channelId: string;
