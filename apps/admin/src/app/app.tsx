@@ -1,7 +1,10 @@
-import { initStore, MezonStoreProvider } from '@mezon/store';
+import { initStore, MezonStoreProvider, selectIsLogin } from '@mezon/store';
 import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
+import { electronBridge } from '@mezon/utils';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import isElectron from 'is-electron';
 import { useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { createBrowserRouter } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
@@ -23,8 +26,21 @@ const mezon: CreateMezonClientOptions = {
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
 };
 
+const AppInitializer = () => {
+	const isLogin = useSelector(selectIsLogin);
+	if (isElectron()) {
+		if (isLogin) {
+			electronBridge?.initListeners();
+		} else {
+			electronBridge?.removeAllListeners();
+		}
+	}
+
+	return null;
+};
+
 export function App() {
-	const routes = createBrowserRouter([
+	createBrowserRouter([
 		{
 			path: '',
 			element: <AppLayout />,
@@ -78,6 +94,7 @@ export function App() {
 
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
+			<AppInitializer />
 			<Routes />
 		</MezonStoreProvider>
 	);

@@ -1,12 +1,5 @@
-import {
-	ActionEmitEvent,
-	getUpdateOrAddClanChannelCache,
-	ReplyIcon,
-	ReplyMessageDeleted,
-	save,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE
-} from '@mezon/mobile-components';
-import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
+import { getUpdateOrAddClanChannelCache, ReplyIcon, ReplyMessageDeleted, save, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
+import { Block, Text, useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
 	ChannelsEntity,
@@ -21,12 +14,12 @@ import {
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
+import { Animated, Linking, Platform, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction } from './components';
 import { RenderTextMarkdownContent } from './constants';
-import { EMessageActionType, EMessageBSToShow } from './enums';
+import { EMessageBSToShow } from './enums';
 import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
@@ -40,7 +33,7 @@ import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
 import { NewMessageRedLine } from './components/NewMessageRedLine';
-import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
+import { IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
@@ -109,7 +102,6 @@ const MessageItem = React.memo(
 
 		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
 
-		const swipeableRef = React.useRef(null);
 		const backgroundColor = React.useRef(new Animated.Value(0)).current;
 
 		const checkMessageTargetToMoved = useMemo(() => {
@@ -154,6 +146,7 @@ const MessageItem = React.memo(
 				message
 			});
 			dispatch(setSelectedMessage(message));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [message, preventAction]);
 
 		const onPressAvatar = useCallback(() => {
@@ -192,7 +185,7 @@ const MessageItem = React.memo(
 					console.log('error', error);
 				}
 			},
-			[usersClan, onMessageAction]
+			[usersClan, rolesInClan, onMessageAction]
 		);
 
 		const jumpToChannel = async (channelId: string, clanId: string) => {
@@ -238,41 +231,9 @@ const MessageItem = React.memo(
 			return isDM ? message?.display_name || message?.user?.username : message?.user?.username;
 		}, [isDM, message?.display_name, message?.user?.username]);
 
-		const renderRightActions = (progress, dragX) => {
-			const scale = dragX.interpolate({
-				inputRange: [-50, 0],
-				outputRange: [1, 0],
-				extrapolate: 'clamp'
-			});
-			return (
-				<Animated.View style={[{ transform: [{ scale }] }, { alignItems: 'center', justifyContent: 'center' }]}>
-					<ReplyMessageDeleted width={70} height={25} color={Colors.bgViolet} />
-				</Animated.View>
-			);
-		};
-
-		const handleSwipeableOpen = (direction: 'left' | 'right') => {
-			if (preventAction && swipeableRef.current) {
-				swipeableRef.current.close();
-			}
-			if (direction === 'right') {
-				swipeableRef.current?.close();
-				const payload: IMessageActionNeedToResolve = {
-					type: EMessageActionType.Reply,
-					targetMessage: message,
-					isStillShowKeyboard: true,
-					replyTo: senderDisplayName,
-				};
-				//Note: trigger to ChatBox.tsx
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
-			}
-		};
-
 		// Message welcome
 		if (message?.sender_id === '0' && !message?.content?.t) {
-			return (
-				<WelcomeMessage channelId={props.channelId} />
-			)
+			return <WelcomeMessage channelId={props.channelId} />;
 		}
 
 		const handlePressIn = () => {
@@ -310,7 +271,7 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageMention,
-						checkMessageTargetToMoved && styles.highlightMessageReply,
+						checkMessageTargetToMoved && styles.highlightMessageReply
 					]}
 				>
 					{!!messageReferences && (
@@ -352,7 +313,7 @@ const MessageItem = React.memo(
 								onMessageAction({
 									type: EMessageBSToShow.MessageAction,
 									senderDisplayName,
-									message,
+									message
 								});
 								dispatch(setSelectedMessage(message));
 							}}
@@ -392,7 +353,7 @@ const MessageItem = React.memo(
 										onMessageAction({
 											type: EMessageBSToShow.MessageAction,
 											senderDisplayName,
-											message,
+											message
 										});
 									}}
 								/>

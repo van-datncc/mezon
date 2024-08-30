@@ -79,7 +79,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				})
 			);
 		},
-		[dispatch, channelID, clanID, mode, currentUserId]
+		[dispatch, channelID, clanID, mode, isPublic, currentUserId]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -91,7 +91,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				isPublic: isPublic
 			})
 		);
-	}, [channelId, clanID, dispatch, mode]);
+	}, [channelId, clanID, dispatch, isPublic, mode]);
 
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(
@@ -111,7 +111,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 			await socket.updateChatMessage(clanID || '', channelId, mode, isPublic, messageId, content, mentions, attachments, hideEditted);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode]
+		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode, isPublic]
 	);
 
 	const updateImageLinkMessage = React.useCallback(
@@ -146,15 +146,18 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				hideEditted
 			);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct]
+		[sessionRef, clientRef, socketRef, channel, direct, isPublic]
 	);
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
 		if (newMessageUpdateImage.clan_id && newMessageUpdateImage.clan_id !== '0') {
 			processLink(
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.clan_id!,
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.channel_id!,
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.mode!,
 				contentPayload,
 				mentionPayload,
@@ -165,7 +168,16 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		setContentPayload({});
 		setMentionPayload([]);
 		setAttachmentPayload([]);
-	}, [newMessageUpdateImage.message_id]);
+	}, [
+		attachmentPayload,
+		contentPayload,
+		mentionPayload,
+		newMessageUpdateImage.channel_id,
+		newMessageUpdateImage.clan_id,
+		newMessageUpdateImage.message_id,
+		newMessageUpdateImage.mode,
+		processLink
+	]);
 
 	return useMemo(
 		() => ({
