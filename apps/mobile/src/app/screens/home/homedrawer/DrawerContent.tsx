@@ -1,7 +1,7 @@
 import { useCategory } from '@mezon/core';
 import { cleanChannelData } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { RootState, selectAllClans } from '@mezon/store-mobile';
+import { RootState, selectAllClans, selectCurrentChannel } from '@mezon/store-mobile';
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ import { style } from './styles';
 const ChannelListWrapper = React.memo(() => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
+	const currentChannel = useSelector(selectCurrentChannel);
 	const { categorizedChannels: categorizedChannelsRaw } = useCategory();
 	const categorizedChannels = useMemo(() => {
 		return categorizedChannelsRaw.map((item) => {
@@ -25,7 +26,7 @@ const ChannelListWrapper = React.memo(() => {
 
 	return (
 		<>
-			{clansLoadingStatus === 'loaded' && !clans?.length ? <UserEmptyClan /> : <ChannelList data={JSON.stringify(categorizedChannels || [])} />}
+			{clansLoadingStatus === 'loaded' && !clans?.length ? <UserEmptyClan /> : <ChannelList data={JSON.stringify(categorizedChannels || [])} idCurrentCateByChannel={currentChannel?.category_id || ''} />}
 		</>
 	);
 });

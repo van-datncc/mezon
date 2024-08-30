@@ -31,7 +31,10 @@ export const useCheckUpdatedVersion = () => {
 	};
 
 	useEffect(() => {
-		checkUpdatedVersion();
+		const timer = setTimeout(() => {
+			checkUpdatedVersion();
+		}, 5000);
+		return () => clearTimeout(timer);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
