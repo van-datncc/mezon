@@ -1,7 +1,14 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useCategory, useReference, useUserPermission } from '@mezon/core';
-import { getUpdateOrAddClanChannelCache, Icons, load, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
-import { baseColor, Colors, useTheme } from '@mezon/mobile-ui';
+import {
+	Icons,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	getUpdateOrAddClanChannelCache,
+	load,
+	save
+} from '@mezon/mobile-components';
+import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -21,7 +28,7 @@ interface IChannelMenuProps {
 type StackMenuClanScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
 export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 	const { t } = useTranslation(['channelMenu']);
-	const { themeValue } = useTheme()
+	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { setOpenThreadMessageState } = useReference();
 	const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
@@ -32,7 +39,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 
 	const isChannel = useMemo(() => {
 		return Array.isArray(channel?.threads);
-	}, [channel?.threads])
+	}, [channel?.threads]);
 
 	const { dismiss } = useBottomSheetModal();
 
@@ -42,8 +49,8 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		{
 			title: t('menu.watchMenu.markAsRead'),
 			onPress: () => reserve(),
-			icon: <Icons.EyeIcon color={themeValue.textStrong} />,
-		},
+			icon: <Icons.EyeIcon color={themeValue.textStrong} />
+		}
 	];
 
 	const inviteMenu: IMezonMenuItemProps[] = [
@@ -53,8 +60,8 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 				inviteRef?.current?.present();
 				dismiss();
 			},
-			icon: <Icons.GroupPlusIcon color={themeValue.textStrong} />,
-		},
+			icon: <Icons.GroupPlusIcon color={themeValue.textStrong} />
+		}
 		//TODO: update later
 		// {
 		// 	title: t('menu.inviteMenu.favorite'),
@@ -78,13 +85,13 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		{
 			title: isChannel ? t('menu.notification.muteCategory') : t('menu.notification.muteThread'),
 			onPress: () => reserve(),
-			icon: <Icons.BellSlashIcon color={themeValue.textStrong} />,
+			icon: <Icons.BellSlashIcon color={themeValue.textStrong} />
 		},
 		{
 			title: t('menu.notification.notification'),
 			onPress: () => reserve(),
-			icon: <Icons.ChannelNotificationIcon color={themeValue.textStrong} />,
-		},
+			icon: <Icons.ChannelNotificationIcon color={themeValue.textStrong} />
+		}
 	];
 
 	const threadMenu: IMezonMenuItemProps[] = [
@@ -93,11 +100,14 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 			onPress: () => {
 				dismiss();
 				setOpenThreadMessageState(false);
-				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD });
+				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+					screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD,
+					params: { channelThreads: channel }
+				});
 			},
 			icon: <Icons.ThreadIcon color={themeValue.textStrong} />
 		}
-	]
+	];
 
 	const organizationMenu: IMezonMenuItemProps[] = [
 		{
@@ -131,7 +141,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 				color: Colors.textRed
 			},
 			isShow: isCanManageChannel
-		},
+		}
 	];
 
 	const manageThreadMenu: IMezonMenuItemProps[] = [
@@ -145,7 +155,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 					params: {
 						channelId: channel?.channel_id,
 						isChannel: isChannel
-					},
+					}
 				});
 			},
 			isShow: isCanManageThread
@@ -160,41 +170,41 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 				color: Colors.textRed
 			},
 			isShow: isCanManageThread
-		},
+		}
 	];
 
 	const mainChannelMenu: IMezonMenuSectionProps[] = [
 		{
-			items: watchMenu,
+			items: watchMenu
 		},
 		{
-			items: inviteMenu,
+			items: inviteMenu
 		},
 		{
-			items: notificationMenu,
+			items: notificationMenu
 		},
 		{
-			items: threadMenu,
+			items: threadMenu
 		},
 		{
-			items: organizationMenu,
-		},
-	]
+			items: organizationMenu
+		}
+	];
 
 	const mainThreadMenu: IMezonMenuSectionProps[] = [
 		{
-			items: watchMenu,
+			items: watchMenu
 		},
 		{
-			items: manageThreadMenu,
+			items: manageThreadMenu
 		},
 		{
 			items: notificationMenu
 		}
-	]
+	];
 
 	const handleFocusDefaultChannel = async () => {
-		const firstTextChannel = categorizedChannels[0]?.channels?.filter(channel => channel?.type === 1)?.[0];
+		const firstTextChannel = categorizedChannels[0]?.channels?.filter((channel) => channel?.type === 1)?.[0];
 		if (!firstTextChannel) return;
 		const { clan_id: clanId, channel_id: channelId } = firstTextChannel;
 		const store = await getStoreAsync();
@@ -208,24 +218,20 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 		if (!channelsCache?.includes(channelId)) {
 			save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
 		}
-	}
+	};
 
 	const handleConfirmDeleteChannel = async () => {
 		await dispatch(channelsActions.deleteChannel({ channelId: channel?.channel_id || '', clanId: channel?.clan_id || '' }));
 		setIsShowModalConfirm(false);
 		dismiss();
 		handleFocusDefaultChannel();
-	}
+	};
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<View style={styles.avatarWrapper}>
-					<MezonClanAvatar
-						alt={currentClan?.clan_name}
-						image={currentClan?.logo}
-						defaultColor={baseColor.blurple}
-					/>
+					<MezonClanAvatar alt={currentClan?.clan_name} image={currentClan?.logo} defaultColor={baseColor.blurple} />
 				</View>
 				<Text style={styles.serverName}>{channel?.channel_label}</Text>
 			</View>
@@ -238,9 +244,10 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 				visible={isShowModalConfirm}
 				onVisibleChange={setIsShowModalConfirm}
 				onConfirm={handleConfirmDeleteChannel}
-				title={isChannel ?
-					t('modalConfirm.channel.title', { channelName: channel?.channel_label }) :
-					t('modalConfirm.thread.title', { threadName: channel?.channel_label })
+				title={
+					isChannel
+						? t('modalConfirm.channel.title', { channelName: channel?.channel_label })
+						: t('modalConfirm.thread.title', { threadName: channel?.channel_label })
 				}
 				confirmText={isChannel ? t('modalConfirm.channel.confirmText') : t('modalConfirm.thread.confirmText')}
 				content={isChannel ? t('modalConfirm.channel.content') : t('modalConfirm.thread.content')}
