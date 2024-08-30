@@ -1,7 +1,7 @@
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectDirectsOpenlist, selectMemberById } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectCurrentChannelId, selectDirectsOpenlist, selectUserChannelById } from '@mezon/store-mobile';
 import { IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -31,7 +31,7 @@ export enum EFriendState {
 	Friend,
 	SentRequestFriend,
 	ReceivedRequestFriend,
-	Block,
+	Block
 }
 
 const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true }: userProfileProps) => {
@@ -39,7 +39,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 	const styles = style(themeValue);
 	const { userProfile } = useAuth();
 	const { t } = useTranslation(['userProfile']);
-	const userById = useSelector(selectMemberById(userId || user?.id || ''));
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const userById = useSelector(selectUserChannelById(userId || user?.id || '', currentChannelId || ''));
 
 	const userStatus = useMemberStatus(userId || user?.id);
 	const rolesClan = useSelector(selectAllRolesClan);
@@ -74,7 +75,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			if (directMessage?.id) {
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 					screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-					params: { directMessageId: directMessage?.id },
+					params: { directMessageId: directMessage?.id }
 				});
 				return;
 			}
@@ -82,11 +83,11 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			if (response?.channel_id) {
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 					screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-					params: { directMessageId: response?.channel_id },
+					params: { directMessageId: response?.channel_id }
 				});
 			}
 		},
-		[createDirectMessageWithUser, listDM, navigation],
+		[createDirectMessageWithUser, listDM, navigation]
 	);
 
 	const navigateToMessageDetail = () => {
@@ -102,7 +103,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			text: t('userAction.sendMessage'),
 			icon: <Icons.ChatIcon color={themeValue.text} />,
 			action: navigateToMessageDetail,
-			isShow: true,
+			isShow: true
 		},
 		{
 			id: 2,
@@ -112,7 +113,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 				//TODO
 				Toast.show({ type: 'info', text1: 'Updating...' });
 			},
-			isShow: true,
+			isShow: true
 		},
 		{
 			id: 3,
@@ -122,7 +123,7 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 				//TODO
 				Toast.show({ type: 'info', text1: 'Updating...' });
 			},
-			isShow: true,
+			isShow: true
 		},
 		{
 			id: 4,
@@ -133,14 +134,14 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 				if (userIdToAddFriend) {
 					addFriend({
 						usernames: [],
-						ids: [userIdToAddFriend],
+						ids: [userIdToAddFriend]
 					});
 				}
 			},
 			isShow: !targetUser,
 			textStyles: {
-				color: Colors.green,
-			},
+				color: Colors.green
+			}
 		},
 		{
 			id: 5,
@@ -151,9 +152,9 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			},
 			isShow: !!targetUser && [EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state),
 			textStyles: {
-				color: Colors.goldenrodYellow,
-			},
-		},
+				color: Colors.goldenrodYellow
+			}
+		}
 	];
 
 	const handleAcceptFriend = () => {

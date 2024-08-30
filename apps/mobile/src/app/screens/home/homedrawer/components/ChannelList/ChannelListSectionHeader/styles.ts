@@ -23,6 +23,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     sortButton: {
-        paddingHorizontal: size.s_14, paddingVertical: size.s_6
+        paddingHorizontal: size.s_14,
+        paddingTop: size.s_8,
+        paddingBottom: size.s_6,
     }
 })

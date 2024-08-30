@@ -21,10 +21,12 @@ const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOpt
 		({ val }: { val: 'individual' | 'mention' }) => (
 			<MezonSwitch
 				value={selectedTabs[val]}
-				onChange={(isSelected) => handleTabChange(val, isSelected)}
+				onValueChange={(isSelected) => {
+					handleTabChange(val, isSelected);
+				}}
 			/>
 		),
-		[],
+		[]
 	);
 
 	const notificationMenu = useMemo(
@@ -33,15 +35,15 @@ const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOpt
 				{
 					title: t('tabNotify.forYou'),
 					icon: <Icons.AtIcon color={themeValue.textStrong} />,
-					component: <Btn val="individual" />,
+					component: <Btn val="individual" />
 				},
 				{
 					title: t('tabNotify.mention'),
 					icon: <Icons.BellIcon color={themeValue.textStrong} />,
-					component: <Btn val="mention" />,
-				},
+					component: <Btn val="mention" />
+				}
 			] satisfies IMezonMenuItemProps[],
-		[],
+		[]
 	);
 
 	const settingMenu = useMemo(
@@ -51,15 +53,15 @@ const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOpt
 					title: t('tabNotify.notificationSettings'),
 					icon: <Icons.SettingsIcon color={themeValue.textStrong} />,
 					expandable: true,
-					onPress: () => reserve(),
-				},
+					onPress: () => reserve()
+				}
 			] satisfies IMezonMenuItemProps[],
-		[],
+		[]
 	);
 
 	const menu = useMemo(
 		() => [{ items: notificationMenu }, { items: settingMenu }] satisfies IMezonMenuSectionProps[],
-		[notificationMenu, settingMenu],
+		[notificationMenu, settingMenu]
 	);
 
 	return (

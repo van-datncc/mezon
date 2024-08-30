@@ -166,6 +166,7 @@ const HomeDefault = React.memo((props: any) => {
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
 						channelLabel={currentChannel?.channel_label}
+						isPublic={!currentChannel?.channel_private}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 					{/* {heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (

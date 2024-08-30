@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectEveryoneRole, selectRoleByRoleId } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,42 +24,46 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const [searchPermissionText, setSearchPermissionText] = useState('');
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
+	const clanRole = useSelector(selectRoleByRoleId(roleId));
+	const everyoneRole = useSelector(selectEveryoneRole);
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
 
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);
 	}, [roleId]);
 
+	const isEveryoneRole = useMemo(() => {
+		return everyoneRole?.id === clanRole?.id;
+	}, [everyoneRole?.id, clanRole?.id]);
+
 	//Note: create new role
 	const newRole = useMemo(() => {
 		return rolesClan?.[rolesClan.length - 1];
 	}, [rolesClan]);
 
-	//Note: edit role
-	const clanRole = useMemo(() => {
-		return rolesClan?.find((role) => role?.id === roleId);
-	}, [roleId, rolesClan]);
-
 	const isCanEditRole = useMemo(() => {
+		if (isEveryoneRole) return false;
 		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
-	}, [isClanOwner, clanRole, userPermissionsStatus])
+	}, [isClanOwner, clanRole, userPermissionsStatus, isEveryoneRole]);
 
-	const getDisablePermission = useCallback((slug: string) => {
-		switch (slug) {
-			case EPermission.administrator:
-				return !isClanOwner;
-			case EPermission.manageClan:
-				return (!isClanOwner && !userPermissionsStatus.administrator) || !isCanEditRole;
-			default:
-				return !isCanEditRole;
-		}
-	}, [userPermissionsStatus, isClanOwner, isCanEditRole])
+	const getDisablePermission = useCallback(
+		(slug: string) => {
+			switch (slug) {
+				case EPermission.administrator:
+					return !isClanOwner;
+				case EPermission.manageClan:
+					return (!isClanOwner && !userPermissionsStatus.hasAdministrator) || !isCanEditRole;
+				default:
+					return !isCanEditRole;
+			}
+		},
+		[userPermissionsStatus, isClanOwner, isCanEditRole]
+	);
 
 	const permissionList = useMemo(() => {
 		const allPermission = newRole?.permission_list?.permissions || [];
 		return allPermission.map((p) => ({ ...p, disabled: getDisablePermission(p?.slug) }));
 	}, [newRole?.permission_list?.permissions, getDisablePermission]);
-
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originSelectedPermissions, selectedPermissions);
@@ -75,15 +79,15 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 			selectedMembers,
 			selectedPermissions,
 			[],
-			removePermissionList,
+			removePermissionList
 		);
 		if (response) {
 			Toast.show({
 				type: 'success',
 				props: {
 					text2: t('roleDetail.changesSaved'),
-					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+				}
 			});
 			navigation.goBack();
 		} else {
@@ -91,8 +95,8 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 				type: 'success',
 				props: {
 					text2: t('failed'),
-					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-				},
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
 			});
 		}
 	};
@@ -101,17 +105,17 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 		headerTitle: !isEditRoleMode
 			? t('setupPermission.title')
 			: () => {
-				return (
-					<Block>
-						<Text center bold h3 color={themeValue?.white}>
-							{clanRole?.title}
-						</Text>
-						<Text center color={themeValue?.text}>
-							{t('roleDetail.role')}
-						</Text>
-					</Block>
-				);
-			},
+					return (
+						<Block>
+							<Text center bold h3 color={themeValue?.white}>
+								{clanRole?.title}
+							</Text>
+							<Text center color={themeValue?.text}>
+								{t('roleDetail.role')}
+							</Text>
+						</Block>
+					);
+				},
 		headerLeft: () => {
 			if (isEditRoleMode) {
 				return (
@@ -137,7 +141,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 					</Block>
 				</TouchableOpacity>
 			);
-		},
+		}
 	});
 
 	const onSelectPermissionChange = (value: boolean, permissionId: string) => {
@@ -167,8 +171,8 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 				type: 'success',
 				props: {
 					text2: t('failed'),
-					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-				},
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
 			});
 		}
 	};
@@ -196,7 +200,11 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 						</Text>
 					</Block>
 
-					<MezonInput value={searchPermissionText} onTextChange={setSearchPermissionText} placeHolder={t('setupPermission.searchPermission')} />
+					<MezonInput
+						value={searchPermissionText}
+						onTextChange={setSearchPermissionText}
+						placeHolder={t('setupPermission.searchPermission')}
+					/>
 
 					<Block marginVertical={size.s_10} flex={1}>
 						<Block borderRadius={size.s_10} overflow="hidden">
@@ -206,7 +214,10 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 								ItemSeparatorComponent={SeparatorWithLine}
 								renderItem={({ item }) => {
 									return (
-										<TouchableOpacity onPress={() => onSelectPermissionChange(!selectedPermissions.includes(item?.id), item?.id)} disabled={item?.disabled}>
+										<TouchableOpacity
+											onPress={() => onSelectPermissionChange(!selectedPermissions.includes(item?.id), item?.id)}
+											disabled={item?.disabled}
+										>
 											<Block
 												flexDirection="row"
 												alignItems="center"
