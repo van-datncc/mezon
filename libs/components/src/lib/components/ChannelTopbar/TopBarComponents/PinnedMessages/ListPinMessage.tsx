@@ -2,23 +2,25 @@ import { useAppParams } from '@mezon/core';
 import {
 	PinMessageEntity,
 	pinMessageActions,
+	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectPinMessageByChannelId,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyPinMess from './EmptyPinMess';
 import ItemPinMessage from './ItemPinMessage';
 
-const ListPinMessage = ({onClose=()=>{}}:{onClose?: () => void}) => {
+const ListPinMessage = ({ onClose = () => {} }: { onClose?: () => void }) => {
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dmChannelId = useSelector(selectPinMessageByChannelId(directId));
 	const clanChannelId = useSelector(selectPinMessageByChannelId(currentChannelId));
+	const channel = useSelector(selectCurrentChannel);
 	let listPinMessages: PinMessageEntity[] = [];
 
 	if (dmChannelId) {
@@ -37,23 +39,26 @@ const ListPinMessage = ({onClose=()=>{}}:{onClose?: () => void}) => {
 	useEffect(() => {
 		if (!checkListPinMessages) {
 			dispatch(
-				pinMessageActions.updateLastSeenPin({
+				pinMessageActions.updateLastPin({
 					clanId: currentClanId ?? '',
 					channelId: currentChannelId ?? '',
 					messageId: listPinMessages[listPinMessages.length - 1]?.message_id ?? '',
-				}),
+					isPublic: !channel?.channel_private
+				})
 			);
 		}
 	}, [listPinMessages]);
 
 	return (
-		<div className='min-h-36'>
+		<div className="min-h-36">
 			{checkListPinMessages ? (
 				<EmptyPinMess />
-			) :
-				(
-					<div className="flex flex-col items-center justify-center space-y-2 py-2">
-						{listPinMessages.slice().reverse().map((pinMessage) => {
+			) : (
+				<div className="flex flex-col items-center justify-center space-y-2 py-2">
+					{listPinMessages
+						.slice()
+						.reverse()
+						.map((pinMessage) => {
 							// Parse content if it's a JSON string
 							let contentString = pinMessage.content;
 							if (typeof contentString === 'string') {
@@ -66,17 +71,17 @@ const ListPinMessage = ({onClose=()=>{}}:{onClose?: () => void}) => {
 							}
 
 							return (
-								<ItemPinMessage 
-									pinMessage={pinMessage} 
-									contentString={contentString} 
-									handleUnPinMessage={handleUnPinMessage} 
-									key={pinMessage.id} 
+								<ItemPinMessage
+									pinMessage={pinMessage}
+									contentString={contentString}
+									handleUnPinMessage={handleUnPinMessage}
+									key={pinMessage.id}
 									onClose={onClose}
 								/>
 							);
 						})}
-					</div>
-				)}
+				</div>
+			)}
 		</div>
 	);
 };

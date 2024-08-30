@@ -190,6 +190,7 @@ export default function DirectMessage() {
 											? ChannelStreamMode.STREAM_MODE_DM
 											: ChannelStreamMode.STREAM_MODE_GROUP
 									}
+									isPublic={false}
 								/>
 							)}
 							<DirectMessageBox
