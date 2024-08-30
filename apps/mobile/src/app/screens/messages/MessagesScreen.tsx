@@ -1,3 +1,4 @@
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
@@ -5,15 +6,17 @@ import { DirectEntity, RootState, selectAllClans, selectDirectsOpenlist, selectT
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import { MezonBottomSheet } from '../../temp-ui';
 import { normalizeString } from '../../utils/helpers';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
+import MessageMenu from '../home/homedrawer/components/MessageMenu';
 import { RenderTextMarkdownContent } from '../home/homedrawer/constants';
 import { style } from './styles';
 
@@ -21,10 +24,10 @@ const SeparatorListFriend = () => {
 	return <View style={{ height: size.s_8 }} />;
 };
 
-const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any }) => {
+const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any, onLongPress }) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
-	const { directMessage, navigation } = props;
+	const { directMessage, navigation, onLongPress } = props;
 	const hasUserTyping = useSelector(selectTypingUserIdsByChannelId(directMessage?.channel_id.toString()));
 	const { t } = useTranslation('message');
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id?.[0] : '');
@@ -79,7 +82,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 	}, [directMessage]);
 
 	return (
-		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()}>
+		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()} onLongPress={onLongPress}>
 			{directMessage?.channel_avatar?.length > 1 ? (
 				<View style={styles.groupAvatar}>
 					<Icons.GroupIcon />
@@ -130,6 +133,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const { t } = useTranslation(['dmMessage', 'common']);
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
+	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
 
 	const sortDM = (a, b) => {
 		const timestampA = parseFloat(a.last_sent_message?.timestamp_seconds || '0');
@@ -164,6 +168,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 
+	const [directMessageSelected, setDirectMessageSelected] = useState<DirectEntity>(null)
+	const handleLongPress = useCallback((directMessage: DirectEntity) => {
+		bottomSheetDMMessageRef.current?.present();
+		setDirectMessageSelected(directMessage)
+		// setCurrentPressedCategory(category);
+	}, []);
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.headerWrapper}>
@@ -196,13 +207,17 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					showsVerticalScrollIndicator={false}
 					keyExtractor={(dm) => dm.id.toString()}
 					ItemSeparatorComponent={SeparatorListFriend}
-					renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} />}
+					renderItem={({ item }) => <DmListItem directMessage={item} navigation={navigation} key={item.id} onLongPress={() => handleLongPress(item)} />}
 				/>
 			)}
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
 				<Icons.MessagePlusIcon width={22} height={22} />
 			</Pressable>
+
+			<MezonBottomSheet ref={bottomSheetDMMessageRef} snapPoints={['40%', '60%']}>
+				<MessageMenu messageInfo={directMessageSelected} />
+			</MezonBottomSheet>
 		</View>
 	);
 };

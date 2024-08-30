@@ -1,4 +1,19 @@
 {
     "title": "Messages",
-    "addFriend": "Add Friend"
+    "addFriend": "Add Friend",
+    "menu": {
+        "leaveGroup": "Leave Group",
+        "deleteGroup": "Delete Group",
+        "profile": "Profile",
+        "closeDm": "Close DM",
+        "markAsRead": "Mark As Read",
+        "favorite": "Favorite",
+        "muteConversation": "Mute Conversation",
+        "notificationSettings": "Notification Settings"
+    },
+    "confirm": {
+        "title": "Leave '{{groupName}}'",
+        "content": "Are you sure you want to leave {{groupName}}? You won't be able to rejoin this group unless you are re-invited.",
+        "confirmText": "Yes"
+    }
 }
