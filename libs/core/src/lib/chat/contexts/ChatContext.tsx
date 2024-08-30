@@ -269,7 +269,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelsActions.joinChat({
 							clanId: userAdds.clan_id,
 							channelId: userAdds.channel_id,
-							channelType: userAdds.channel_type
+							channelType: userAdds.channel_type,
+							isPublic: userAdds.is_public
 						})
 					);
 				}
@@ -372,7 +373,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelsActions.joinChat({
 							clanId: channelCreated.clan_id,
 							channelId: channelCreated.channel_id,
-							channelType: channelCreated.channel_type
+							channelType: channelCreated.channel_type,
+							isPublic: !channelCreated.channel_private
 						})
 					);
 				}

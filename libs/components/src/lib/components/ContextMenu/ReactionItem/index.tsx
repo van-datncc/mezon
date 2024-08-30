@@ -43,6 +43,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			1,
 			userId.userId ?? '',
 			false,
+			!currentChannel?.channel_private
 		);
 	}, [emojiId, emojiShortCode, activeMode, messageId, channelID, currentChannel]);
 
