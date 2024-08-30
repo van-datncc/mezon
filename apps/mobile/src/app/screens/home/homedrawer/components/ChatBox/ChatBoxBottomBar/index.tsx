@@ -10,9 +10,7 @@ import {
 } from '@mezon/mobile-components';
 import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
-	ReferencesState,
 	emojiSuggestionActions,
-	getReferencesState,
 	referencesActions,
 	selectAllChannels,
 	selectAllHashtagDm,
@@ -24,7 +22,6 @@ import {
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { createSelector } from '@reduxjs/toolkit';
 // eslint-disable-next-line
 import { IFile } from 'apps/mobile/src/app/temp-ui';
 import { ChannelStreamMode } from 'mezon-js';
@@ -78,11 +75,6 @@ interface IChatInputProps {
 	onDeleteMessageActionNeedToResolve?: () => void;
 	onShowKeyboardBottomSheet?: (isShow: boolean, height: number, type?: string) => void;
 }
-
-export const selectAttachmentData = (channelId: string) =>
-	createSelector(getReferencesState, (state: ReferencesState) => {
-		return state.attachmentAfterUpload[channelId] || [];
-	});
 
 export const ChatBoxBottomBar = memo(
 	({
