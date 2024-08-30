@@ -15,6 +15,7 @@ export interface IReplyBottomSheet {
 	user?: ApiUser | null;
 	senderDisplayName?: string;
 	isPublic?: boolean;
+	channelId?: string;
 }
 
 export interface IMessageActionPayload {

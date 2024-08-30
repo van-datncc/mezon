@@ -160,6 +160,7 @@ export const Sharing = ({ data, onClose }) => {
 				clanId: channelSelected?.clan_id,
 				channelId: channelSelected?.channel_id,
 				channelType: channelSelected?.type,
+				isPublic: false,
 			}),
 		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
@@ -185,6 +186,7 @@ export const Sharing = ({ data, onClose }) => {
 				clanId: channelSelected.clan_id,
 				channelId: channelSelected.channel_id,
 				channelType: channelSelected.type,
+				isPublic: !channelSelected?.channel_private
 			}),
 		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
