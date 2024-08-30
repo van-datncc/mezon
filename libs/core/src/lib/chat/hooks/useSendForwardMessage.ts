@@ -1,4 +1,3 @@
-import {} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageWithUser } from '@mezon/utils';
 import React, { useMemo } from 'react';
@@ -9,7 +8,7 @@ export function useSendForwardMessage() {
 	const client = clientRef.current;
 
 	const sendForwardMessage = React.useCallback(
-		async (clanid: string, channel_id: string, mode: number, message: IMessageWithUser) => {
+		async (clanid: string, channel_id: string, mode: number, isPublic: boolean, message: IMessageWithUser) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -19,7 +18,16 @@ export function useSendForwardMessage() {
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage(clanid, channel_id, mode, message.content, message.mentions, message.attachments, message.references);
+			await socket.writeChatMessage(
+				clanid,
+				channel_id,
+				mode,
+				isPublic,
+				message.content,
+				message.mentions,
+				message.attachments,
+				message.references
+			);
 		},
 		[sessionRef, clientRef, socketRef]
 	);
