@@ -8,7 +8,7 @@ import {
 	selectAllClans,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -82,7 +82,7 @@ const HomeDefault = React.memo((props: any) => {
 			return () => {
 				setIsFocusChannelView(false);
 			};
-		}, [currentChannel?.channel_id]),
+		}, [currentChannel?.channel_id])
 	);
 
 	useEffect(() => {
@@ -112,8 +112,8 @@ const HomeDefault = React.memo((props: any) => {
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',
 				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type,
-			}),
+				channelType: currentChannel?.type
+			})
 		);
 	};
 
@@ -128,6 +128,13 @@ const HomeDefault = React.memo((props: any) => {
 
 		setIsShowLicenseAgreement(Platform.OS === 'ios' && isAgreed?.toString() !== 'true');
 	};
+
+	const handleSheetChanges = useCallback((index) => {
+		if (index === -1) {
+			onShowKeyboardBottomSheet(false, 0);
+			setTypeKeyboardBottomSheet('text');
+		}
+	}, []);
 
 	return (
 		<View style={[styles.homeDefault]}>
@@ -167,11 +174,16 @@ const HomeDefault = React.memo((props: any) => {
 					<View
 						style={{
 							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: themeValue.secondary,
+							backgroundColor: themeValue.secondary
 						}}
 					/>
 					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
+						<BottomKeyboardPicker
+							height={heightKeyboardShow}
+							ref={bottomPickerRef}
+							isStickyHeader={typeKeyboardBottomSheet === 'emoji'}
+							onSheetChanges={handleSheetChanges}
+						>
 							{typeKeyboardBottomSheet === 'emoji' ? (
 								<EmojiPicker
 									onDone={() => {
@@ -202,7 +214,7 @@ const HomeDefaultHeader = React.memo(
 		navigation,
 		currentChannel,
 		openBottomSheet,
-		onOpenDrawer,
+		onOpenDrawer
 	}: {
 		navigation: any;
 		currentChannel: ChannelsEntity;
@@ -226,8 +238,8 @@ const HomeDefaultHeader = React.memo(
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 				params: {
-					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault,
-				},
+					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+				}
 			});
 		};
 		return (
@@ -279,7 +291,7 @@ const HomeDefaultHeader = React.memo(
 				)}
 			</View>
 		);
-	},
+	}
 );
 
 export default HomeDefault;
