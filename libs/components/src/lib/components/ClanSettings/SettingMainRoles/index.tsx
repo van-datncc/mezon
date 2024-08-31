@@ -11,9 +11,10 @@ import {
 	setRemovePermissions,
 	setSelectedPermissions,
 	setSelectedRoleId,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
+import { EVERYONE_ROLE_ID } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';
@@ -50,14 +51,14 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 	};
 
 	const handleDeleteRole = async (roleId: string) => {
-		await dispatch(rolesClanActions.fetchDeleteRole({ roleId, clanId: currentClanId || "" }));
+		await dispatch(rolesClanActions.fetchDeleteRole({ roleId, clanId: currentClanId || '' }));
 	};
 	const appearanceTheme = useSelector(selectTheme);
 
 	const [valueSearch, setValueSearch] = useState('');
 	useEffect(() => {
 		setActiveRoles(roles.filter((role) => role?.title?.toLowerCase().includes(valueSearch.toLowerCase())));
-	},[valueSearch, roles]);
+	}, [valueSearch, roles]);
 
 	return (
 		<>
@@ -68,7 +69,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 					</p>
 					<div
 						onClick={() => {
-							handleRoleClick(rolesClan[0]?.id);
+							handleRoleClick(EVERYONE_ROLE_ID);
 							setOpenEdit(true);
 						}}
 						className="rounded dark:bg-bgSecondary bg-bgLightMode p-4 pr-6 flex justify-between cursor-pointer group mb-4 dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton"
