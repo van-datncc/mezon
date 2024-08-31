@@ -30,7 +30,6 @@ import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
-import ChannelMessages from './ChannelMessages';
 import { ChatBox } from './ChatBox';
 import { IModeKeyboardPicker } from './components';
 import AttachmentPicker from './components/AttachmentPicker';
@@ -38,6 +37,7 @@ import BottomKeyboardPicker from './components/BottomKeyboardPicker';
 import EmojiPicker from './components/EmojiPicker';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
+import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
@@ -162,7 +162,7 @@ const HomeDefault = React.memo((props: any) => {
 			/>
 			{currentChannel && isFocusChannelView && (
 				<View style={styles.channelView}>
-					<ChannelMessages
+					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
 						channelLabel={currentChannel?.channel_label}
