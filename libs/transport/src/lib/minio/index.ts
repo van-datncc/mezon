@@ -47,6 +47,15 @@ export async function handleUploadEmoticon(client: Client, session: Session, fil
 		}
 	});
 }
+const mimeTypeMap: Record<string, string> = {
+	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+	'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx'
+};
+
+function getFileType(mimeType: string): string {
+	return mimeTypeMap[mimeType] || mimeType;
+}
 
 export async function handleUploadFile(
 	client: Client,
@@ -65,10 +74,12 @@ export async function handleUploadFile(
 				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
 				fileType = `text/${fileExtension}`;
 			}
+			const shortFileType = getFileType(fileType);
+
 			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
 			const buf = await file?.arrayBuffer();
 
-			resolve(uploadFile(client, session, filePath, fileType, file.size, Buffer.from(buf), false, originalFilename));
+			resolve(uploadFile(client, session, filePath, shortFileType, file.size, Buffer.from(buf), false, originalFilename));
 		} catch (error) {
 			reject(new Error(`${error}`));
 		}
@@ -116,16 +127,18 @@ export function createUploadFilePath(
 ): { filePath: string; originalFilename: string } {
 	const originalFilename = filename;
 
+	// Append milliseconds timestamp to filename
 	const ms = new Date().getMilliseconds();
 	filename = ms + filename;
-	filename = filename.replace(/-|\(|\)| /g, '_');
+	filename = filename.replace(/[^a-zA-Z0-9.]/g, '_');
+	// Ensure valid clan and channel IDs
 	if (!currentClanId) {
 		currentClanId = '0';
 	}
 	if (!currentChannelId) {
 		currentChannelId = '0';
 	}
-	const filePath = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
+	const filePath = `${currentClanId}/${currentChannelId}/${session.user_id}/${filename}`;
 	return { filePath, originalFilename };
 }
 
