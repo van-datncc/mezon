@@ -41,7 +41,7 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 	bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
 	after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
 	hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
-	focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-200 
+	focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-slate-200
 	disabled:after:bg-slate-300 disabled:checked:hover:bg-slate-200 disabled:checked:after:hover:bg-slate-300`;
 
 	const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -75,7 +75,10 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 
 	const isClanOwner = useClanOwner();
 	const hiddenPermissionAdmin = (slug: string) => {
-		return isClanOwner ? false : slug === SlugPermission.Admin && hasPermissionEdit;
+		if (isClanOwner) {
+			return false;
+		}
+		return slug === SlugPermission.Admin && hasPermissionEdit;
 	};
 
 	return (
