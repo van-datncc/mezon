@@ -2,7 +2,12 @@
 import { useChatSending, useDirectMessages } from '@mezon/core';
 import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, IS_TABLET, Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, messagesActions, selectCurrentClanId } from '@mezon/store';
+import {
+	emojiSuggestionActions,
+	messagesActions,
+	selectAttachmentByChannelId,
+	selectCurrentClanId
+} from '@mezon/store';
 import { selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
@@ -53,7 +58,6 @@ interface IChatMessageInputProps {
 	isShowCreateThread?: boolean;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	channelsEntities?: any;
-	attachmentDataRef?: ApiMessageAttachment[];
 	isPublic?: boolean;
 }
 const inputWidthWhenHasInput = Dimensions.get('window').width * (IS_TABLET ? 0.8 : 0.72);
@@ -84,7 +88,6 @@ export const ChatMessageInput = memo(
 				markdownsOnMessage,
 				voiceLinkRoomOnMessage,
 				isShowCreateThread,
-				attachmentDataRef,
 				isPublic
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>
@@ -94,12 +97,19 @@ export const ChatMessageInput = memo(
 			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
 			const currentClanId = useSelector(selectCurrentClanId);
+			const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
+			
 			const { editSendMessage, sendMessage } = useChatSending({
 				channelId,
 				mode,
 				directMessageId: channelId || ''
 			});
 			const rolesInClan = useSelector(selectAllRolesClan);
+			
+			const attachmentDataRef = useMemo(() => {
+				return attachmentFilteredByChannelId?.files || [];
+			}, [attachmentFilteredByChannelId]);
+			
 			const roleList = useMemo(() => {
 				return rolesInClan?.map((item) => ({
 					roleId: item.id ?? '',

@@ -3,8 +3,8 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
 	content: {
-		height: (Metrics.screenWidth - size.s_6 * size.s_10) / 5,
-		width: (Metrics.screenWidth - size.s_6 * size.s_10) / 5,
+		height: (Metrics.screenWidth - size.s_6 * size.s_10) / 5.1,
+		width: (Metrics.screenWidth - size.s_6 * size.s_10) / 5.1,
 		borderRadius: 10,
 		overflow: 'hidden',
 		backgroundColor: Colors.black,
@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		gap: size.s_10,
-		justifyContent: 'space-between',
 		alignItems: 'center',
 	},
 });

@@ -22,13 +22,12 @@ import { useMezon } from '@mezon/transport';
 type ChannelMessagesProps = {
 	channelId: string;
 	clanId: string;
-	channelLabel?: string;
 	avatarDM?: string;
 	mode: ChannelStreamMode;
 	isPublic?: boolean;
 };
 
-const ChannelMessagesWrapper = React.memo(({ channelId, clanId, channelLabel, mode, isPublic }: ChannelMessagesProps) => {
+const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { socketRef } = useMezon();
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
@@ -123,7 +122,6 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, channelLabel, mo
 		<View style={{ flex: 1 }}>
 			<ChannelMessages
 				channelId={channelId}
-				channelLabel={channelLabel}
 				mode={mode}
 				onOpenImage={onOpenImage}
 				onMessageAction={onMessageAction}

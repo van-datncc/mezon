@@ -10,7 +10,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Keyboard, Text, TextInput, View } from 'react-native';
+import { Keyboard, Platform, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EmojiSelector from './EmojiSelector';
 import GifSelector from './GifSelector';
@@ -139,7 +139,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 	};
 
 	const onScroll = (e: { nativeEvent: { contentOffset: { y: number } } }) => {
-		if (e.nativeEvent.contentOffset.y < -100) {
+		if (e.nativeEvent.contentOffset.y < -100 || (e.nativeEvent.contentOffset.y <= -5 && Platform.OS === 'android')) {
 			handleBottomSheetCollapse();
 		}
 

@@ -57,7 +57,6 @@ export type MessageItemProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	channelId?: string;
-	channelName?: string;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;

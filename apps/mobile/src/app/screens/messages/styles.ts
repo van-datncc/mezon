@@ -87,7 +87,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: size.s_8,
-			marginBottom: size.s_4,
+			marginBottom: size.s_10,
 		},
 		friendAvatar: {
 			width: size.s_40,

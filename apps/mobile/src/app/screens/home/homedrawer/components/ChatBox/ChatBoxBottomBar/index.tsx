@@ -1,4 +1,3 @@
-import { useReference } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
@@ -12,8 +11,6 @@ import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	emojiSuggestionActions,
 	referencesActions,
-	selectAttachmentByChannelId,
-	selectChannelsEntities,
 	selectAllChannels,
 	selectAllHashtagDm,
 	selectCurrentChannel,
@@ -94,14 +91,6 @@ export const ChatBoxBottomBar = memo(
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 		const currentChannel = useSelector(selectCurrentChannel);
-		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
-
-		// const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
-		const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
-		
-		const checkAttachment = useMemo(() => {
-			return attachmentFilteredByChannelId?.files?.length > 0;
-		}, [attachmentFilteredByChannelId]);
 		
 		const navigation = useNavigation<any>();
 		const inputRef = useRef<TextInput>();
@@ -175,14 +164,6 @@ export const ChatBoxBottomBar = memo(
 			const textFormat = `${textChange?.endsWith(' ') ? textChange : textChange + ' '}${shortName?.toString()} `;
 			setTextChange(textFormat);
 			await handleTextInputChange(textFormat);
-		};
-		const removeAttachmentByUrl = (urlToRemove: string) => {
-			dispatch(
-				referencesActions.removeAttachment({
-					channelId: channelId,
-					urlAttachment: urlToRemove
-				})
-			);
 		};
 
 		const onSendSuccess = useCallback(() => {
@@ -418,16 +399,6 @@ export const ChatBoxBottomBar = memo(
 			}, 300);
 		};
 
-		const handleRemoveAttachment = (index: number) => {
-			dispatch(
-				referencesActions.removeAttachment({
-					channelId: channelId || '',
-					index: index
-				})
-			);
-			// removeAttachmentByIndex(currentChannel?.id, index);
-		}
-
 		useEffect(() => {
 			if (messageActionNeedToResolve !== null) {
 				const { isStillShowKeyboard } = messageActionNeedToResolve;
@@ -470,8 +441,7 @@ export const ChatBoxBottomBar = memo(
 				/>
 				<HashtagSuggestions directMessageId={channelId} mode={mode} {...triggers.hashtag} />
 				<EmojiSuggestion {...triggers.emoji} />
-
-				{checkAttachment && <AttachmentPreview attachments={attachmentFilteredByChannelId.files} onRemove={handleRemoveAttachment} />}
+				<AttachmentPreview channelId={channelId} />
 
 				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
 					<ChatMessageLeftArea
@@ -507,7 +477,6 @@ export const ChatBoxBottomBar = memo(
 						markdownsOnMessage={markdownList}
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						isShowCreateThread={isShowCreateThread}
-						attachmentDataRef={attachmentFilteredByChannelId?.files}
 						isPublic={!currentChannel?.channel_private}
 					/>
 				</Block>
