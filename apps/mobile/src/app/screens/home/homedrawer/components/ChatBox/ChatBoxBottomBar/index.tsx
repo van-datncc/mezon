@@ -11,9 +11,9 @@ import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	emojiSuggestionActions,
 	referencesActions,
+	selectAttachmentByChannelId,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	selectEmojiSuggestion,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -90,14 +90,18 @@ export const ChatBoxBottomBar = memo(
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 		const currentChannel = useSelector(selectCurrentChannel);
-		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
-
+		// const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
+		const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
+		
+		const checkAttachment = useMemo(() => {
+			return attachmentFilteredByChannelId?.files?.length > 0;
+		}, [attachmentFilteredByChannelId]);
+		
 		const channelsEntities = useSelector(selectChannelsEntities);
 		const navigation = useNavigation<any>();
 		const inputRef = useRef<TextInput>();
 		const cursorPositionRef = useRef(0);
 		const currentTextInput = useRef('');
-		const emojiPicked = useSelector(selectEmojiSuggestion);
 		const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 		const { sessionRef, clientRef } = useMezon();
@@ -426,7 +430,13 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const handleRemoveAttachment = (index: number) => {
-			removeAttachmentByIndex(currentChannel?.id, index);
+			dispatch(
+				referencesActions.removeAttachment({
+					channelId: channelId || '',
+					index: index
+				})
+			);
+			// removeAttachmentByIndex(currentChannel?.id, index);
 		}
 
 		useEffect(() => {
@@ -457,7 +467,7 @@ export const ChatBoxBottomBar = memo(
 				clearTextInputListener.remove();
 				addEmojiPickedListener.remove();
 			};
-		}, []);
+		}, [handleEventAfterEmojiPicked]);
 
 		return (
 			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
@@ -514,6 +524,7 @@ export const ChatBoxBottomBar = memo(
 						isShowCreateThread={isShowCreateThread}
 						channelsEntities={channelsEntities}
 						attachmentDataRef={attachmentFilteredByChannelId?.files}
+						isPublic={!currentChannel?.channel_private}
 					/>
 				</Block>
 			</Block>

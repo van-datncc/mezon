@@ -10,10 +10,11 @@ interface IProps {
 	height: number;
 	children: React.ReactNode;
 	isStickyHeader: boolean;
+	onSheetChanges?: (index: number) => void;
 }
 
 const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
-	{ height = 1, children, isStickyHeader = false }: IProps,
+	{ height = 1, children, isStickyHeader = false, onSheetChanges }: IProps,
 	ref: Ref<BottomSheetMethods>
 ) {
 	const { themeValue } = useTheme();
@@ -24,8 +25,10 @@ const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
 			snapPoints={[height === 0 ? 1 : height, '100%']}
 			animateOnMount
 			backgroundStyle={{
-				backgroundColor: themeValue.secondary,
+				backgroundColor: themeValue.secondary
 			}}
+			enablePanDownToClose
+			onChange={onSheetChanges ? onSheetChanges : undefined}
 		>
 			<BottomSheetScrollView stickyHeaderIndices={isStickyHeader ? [0] : []} style={styles.contentContainer}>
 				{children}

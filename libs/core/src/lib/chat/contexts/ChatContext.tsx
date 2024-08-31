@@ -131,12 +131,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
-
-			dispatch(messagesActions.addNewMessage(mess));
-			if (mess.code === 0) {
-				dispatch(messagesActions.setNewMessageToUpdateImage(mess));
+			if (message.channel_id === currentChannelId || message.channel_id === currentDirectId) {
+				dispatch(messagesActions.addNewMessage(mess));
+				if (mess.code === 0) {
+					dispatch(messagesActions.setNewMessageToUpdateImage(mess));
+				}
 			}
-
 			dispatch(notificationActions.setIsMessageRead(true));
 			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
@@ -269,7 +269,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelsActions.joinChat({
 							clanId: userAdds.clan_id,
 							channelId: userAdds.channel_id,
-							channelType: userAdds.channel_type
+							channelType: userAdds.channel_type,
+							isPublic: userAdds.is_public
 						})
 					);
 				}
@@ -372,7 +373,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelsActions.joinChat({
 							clanId: channelCreated.clan_id,
 							channelId: channelCreated.channel_id,
-							channelType: channelCreated.channel_type
+							channelType: channelCreated.channel_type,
+							isPublic: !channelCreated.channel_private
 						})
 					);
 				}

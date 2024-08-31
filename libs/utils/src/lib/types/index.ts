@@ -717,7 +717,8 @@ export type SearchFilter = {
 };
 
 export enum ETypeLinkMedia {
-	IMAGE_PREFIX = 'image'
+	IMAGE_PREFIX = 'image',
+	VIDEO_PREFIX = 'video'
 }
 
 export type MessageTypeUpdateLink = {

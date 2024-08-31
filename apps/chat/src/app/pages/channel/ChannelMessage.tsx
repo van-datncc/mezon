@@ -19,8 +19,6 @@ import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import MessageInput from './MessageInput';
-import ModalDeleteMess from './ModalDeleteMess';
-import { useDeleteMessageHook } from './useDeleteMessage';
 
 type MessageProps = {
 	channelId: string;
@@ -34,12 +32,11 @@ type MessageProps = {
 
 export function ChannelMessage({ message, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
 	const { markMessageAsSeen } = useSeenMessagePool();
-	const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
+	// const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu } = useMessageContextMenu();
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-
 	const messageId = useMemo(() => message.id, [message.id]);
 
 	const isEditing = useMemo(() => {
@@ -79,7 +76,6 @@ export function ChannelMessage({ message, channelId, mode, channelLabel, isHighl
 	useEffect(() => {
 		markMessageAsSeen(message);
 	}, [markMessageAsSeen, message]);
-
 	return (
 		<>
 			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
@@ -99,7 +95,7 @@ export function ChannelMessage({ message, channelId, mode, channelLabel, isHighl
 			)}
 
 			{lastSeen && <UnreadMessageBreak />}
-			{deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />}
+			{/* {deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />} */}
 		</>
 	);
 }

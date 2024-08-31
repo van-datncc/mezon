@@ -1,20 +1,18 @@
 import { SHOW_POSITION } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { ShowContextMenuParams, useContextMenu } from 'react-contexify';
 import MessageContextMenu from './MessageContextMenu';
 
 const MESSAGE_CONTEXT_MENU_ID = 'message-context-menu';
 
 type MessageContextMenuContextValue = {
-	messageId: string;
 	showMessageContextMenu: (
 		event: React.MouseEvent<HTMLElement>,
 		messageId: string,
 		mode: ChannelStreamMode,
 		props?: Partial<MessageContextMenuProps>
 	) => void;
-	preloadMessageContextMenu: (messageId: string) => void;
 	setPositionShow: (showPostion: SHOW_POSITION) => void;
 	posShowMenu: string;
 	setImageURL: (url: string) => void;
@@ -27,11 +25,10 @@ export type MessageContextMenuProps = {
 };
 
 export const MessageContextMenuContext = createContext<MessageContextMenuContextValue>({
-	messageId: '',
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	showMessageContextMenu: () => {},
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	preloadMessageContextMenu: () => {},
+	showMessageContextMenu: () => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+	},
+
 	setPositionShow: () => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 	},
@@ -43,7 +40,7 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 });
 
 export const MessageContextMenuProvider = ({ children }: { children: React.ReactNode }) => {
-	const [messageId, setMessageId] = useState('');
+	const messageIdRef = useRef<string>('');
 	const [elementTarget, setElementTarget] = useState<HTMLElement | null>(null);
 	const [activeMode, setActiveMode] = useState<ChannelStreamMode>(ChannelStreamMode.STREAM_MODE_CHANNEL);
 	const [posShowMenu, setPosShowMenu] = useState<string>(SHOW_POSITION.NONE);
@@ -54,12 +51,10 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 	});
 
 	const menu = useMemo(() => {
-		return <MessageContextMenu id={MESSAGE_CONTEXT_MENU_ID} messageId={messageId} elementTarget={elementTarget} activeMode={activeMode} />;
-	}, [messageId, elementTarget, activeMode]);
-
-	const preloadMessageContextMenu = useCallback((messageId: string) => {
-		setMessageId(messageId);
-	}, []);
+		return (
+			<MessageContextMenu id={MESSAGE_CONTEXT_MENU_ID} messageId={messageIdRef.current} elementTarget={elementTarget} activeMode={activeMode} />
+		);
+	}, [elementTarget, activeMode]);
 
 	const setPositionShow = useCallback((pos: string) => {
 		setPosShowMenu(pos);
@@ -83,7 +78,7 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 
 	const showMessageContextMenu = useCallback(
 		(event: React.MouseEvent<HTMLElement>, messageId: string, mode: ChannelStreamMode, props?: Partial<MessageContextMenuProps>) => {
-			setMessageId(messageId);
+			messageIdRef.current = messageId;
 			setElementTarget(event.target as HTMLElement);
 			setActiveMode(mode);
 			const niceProps = {
@@ -97,15 +92,13 @@ export const MessageContextMenuProvider = ({ children }: { children: React.React
 
 	const value = useMemo(
 		() => ({
-			messageId,
 			showMessageContextMenu,
-			preloadMessageContextMenu,
 			setPositionShow,
 			posShowMenu,
 			setImageURL,
 			imageSrc
 		}),
-		[showMessageContextMenu, preloadMessageContextMenu, messageId, setPositionShow, posShowMenu, setImageURL, imageSrc]
+		[showMessageContextMenu, setPositionShow, posShowMenu, setImageURL, imageSrc]
 	);
 
 	return (

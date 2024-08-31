@@ -160,7 +160,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const handlePinMessage = async () => {
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
-			pinMessageActions.joinPinMessage({ clanId: currentClanId ?? '', channelId: currentChannel?.channel_id ?? '', messageId: message?.id })
+			pinMessageActions.joinPinMessage({
+				clanId: currentClanId ?? '',
+				channelId: currentChannel?.channel_id ?? '',
+				messageId: message?.id,
+				isPublic: !currentChannel?.channel_private
+			})
 		);
 	};
 

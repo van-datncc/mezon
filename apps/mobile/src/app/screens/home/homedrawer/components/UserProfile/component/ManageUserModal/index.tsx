@@ -3,23 +3,27 @@ import { CheckIcon, CloseIcon, Icons } from "@mezon/mobile-components";
 import { baseColor, Block, Colors, size, Text, useTheme, verticalScale } from "@mezon/mobile-ui";
 import { ChannelMembersEntity, selectAllRolesClan, selectCurrentClan } from "@mezon/store-mobile";
 import { toastConfig } from "apps/mobile/src/app/configs/toastConfig";
-import { IMezonMenuSectionProps, MezonAvatar, MezonMenu } from "apps/mobile/src/app/temp-ui";
-import { memo, useEffect, useMemo, useState } from "react";
+import { IMezonMenuSectionProps, MezonAvatar, MezonMenu, MezonModal } from 'apps/mobile/src/app/temp-ui';
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Toast from "react-native-toast-message";
 import { useSelector } from "react-redux";
 import { EActionSettingUserProfile, IProfileSetting } from "../UserSettingProfile";
+import KickUserClanModal from '../KickUserClanModal';
 
 interface IManageUserModalProp {
     user: ChannelMembersEntity;
     visible: boolean;
     onclose: () => void;
     profileSetting: IProfileSetting[];
+    setVisibleKickUserModal: any;
+    visibleKickUserModal: any;
+    handleRemoveUserClans: () => void;
 }
 
-export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }: IManageUserModalProp) => {
+export const ManageUserModal = memo(({ user, visible, onclose, profileSetting, visibleKickUserModal, setVisibleKickUserModal, handleRemoveUserClans }: IManageUserModalProp) => {
     const { themeValue } = useTheme();
     const [editMode, setEditMode] = useState(false);
     const rolesClan = useSelector(selectAllRolesClan);
@@ -223,6 +227,14 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
                 </ScrollView>
             </Block>
             <Toast config={toastConfig} />
+            <MezonModal
+                visible={visibleKickUserModal}
+                visibleChange={(visible) => {
+                    setVisibleKickUserModal(visible);
+                }}
+            >
+                <KickUserClanModal onRemoveUserClan={(value) => handleRemoveUserClans(value)} user={user} />
+            </MezonModal>
         </Modal>
     )
 })

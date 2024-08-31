@@ -20,13 +20,13 @@ import { PanGestureHandler } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import ChannelMessages from '../../home/homedrawer/ChannelMessages';
 import { ChatBox } from '../../home/homedrawer/ChatBox';
 import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
 import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
 import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
 import { style } from './styles';
+import ChannelMessagesWrapper from '../../home/homedrawer/ChannelMessagesWrapper';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -75,35 +75,31 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			return;
 		}
 		const store = await getStoreAsync();
-		await Promise.all([
-			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id)),
+			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
 			// Rejoin previous clan (other than 0) when exiting the DM detail screen
-			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id })),
+			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
 			store.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: currentChannel?.clan_id || '',
 					channelId: currentChannel?.channel_id || '',
 					channelType: currentChannel?.type,
-					noCache: true
-				})
-			)
-		]);
+					noCache: true,
+				}),
+			);
 	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
-		await Promise.all([
-			store.dispatch(clansActions.setCurrentClanId('0')),
+			store.dispatch(clansActions.setCurrentClanId('0'));
 			store.dispatch(
 				directActions.joinDirectMessage({
 					directMessageId: currentDmGroup?.id,
 					channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
 					type: currentDmGroup?.type,
 					noCache: true,
-					isFetchingLatestMessages: true
-				})
-			)
-		]);
+					isFetchingLatestMessages: true,
+				}),
+			);
 		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 
@@ -218,13 +214,14 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				<View style={styles.content}>
 					<PanGestureHandler failOffsetY={[-5, 5]} onHandlerStateChange={onHandlerStateChange}>
 						<View style={{ flex: 1 }}>
-							<ChannelMessages
+							<ChannelMessagesWrapper
 								channelId={currentDmGroup.id}
 								clanId={'0'}
 								channelLabel={currentDmGroup?.channel_label || currentDmGroup?.usernames}
 								mode={Number(
 									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 								)}
+								isPublic={false}
 							/>
 						</View>
 					</PanGestureHandler>
