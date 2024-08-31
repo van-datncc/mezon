@@ -1,12 +1,12 @@
 import BottomSheet from '@gorhom/bottom-sheet';
-import { useReference, useThreadMessage, useThreads } from '@mezon/core';
+import { useThreadMessage, useThreads } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	Icons,
 	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
-	save,
+	save
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
@@ -15,12 +15,12 @@ import {
 	createNewChannel,
 	getStoreAsync,
 	selectCurrentChannel,
+	selectCurrentChannelId,
 	selectCurrentClanId,
-	useAppDispatch,
 	selectOpenThreadMessageState,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -28,7 +28,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { APP_SCREEN, MenuThreadScreenProps } from '../../../navigation/ScreenTypes';
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
 import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components';
@@ -39,28 +39,34 @@ import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { MezonInput, MezonSwitch } from '../../../temp-ui';
 import { validInput } from '../../../utils/validate';
 import { style } from './CreateThreadForm.style';
-
-export default function CreateThreadForm() {
+import HeaderLeftThreadForm from './HeaderLeftThreadForm';
+type CreateThreadFormScreen = typeof APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL;
+export default function CreateThreadForm({ navigation, route }: MenuThreadScreenProps<CreateThreadFormScreen>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
+	const { channelThreads } = route.params || {};
 	const { t } = useTranslation(['createThread']);
-	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	const navigation = useNavigation<any>();
 	const formikRef = useRef(null);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { valueThread, threadCurrentChannel } = useThreads();
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
-		channelLabel: threadCurrentChannel?.channel_label as string,
-		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
+		mode: ChannelStreamMode.STREAM_MODE_CHANNEL
 	});
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
+	navigation.setOptions({
+		headerShown: true,
+		headerTitle: () => <Text></Text>,
+		headerLeft: () => <HeaderLeftThreadForm currentChannel={channelThreads || currentChannel} />,
+		headerTintColor: themeValue.white
+	});
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -81,9 +87,9 @@ export default function CreateThreadForm() {
 				clan_id: currentClanId?.toString(),
 				channel_label: value.nameValueThread,
 				channel_private: value.isPrivate,
-				parrent_id: (currentChannel?.parrent_id === '0' ? currentChannel?.channel_id : currentChannel?.parrent_id) || '',
+				parrent_id: (channelThreads ? channelThreads?.id : currentChannelId) || '',
 				category_id: currentChannel?.category_id,
-				type: ChannelType.CHANNEL_TYPE_TEXT,
+				type: ChannelType.CHANNEL_TYPE_TEXT
 			};
 			try {
 				const newThreadResponse = await dispatch(createNewChannel(body));
@@ -97,7 +103,7 @@ export default function CreateThreadForm() {
 				Alert.alert('Created Thread Failed', "Thread not found or you're not allowed to update");
 			}
 		},
-		[currentChannel, currentChannel?.parrent_id, currentClanId, dispatch],
+		[currentChannel, currentChannel?.parrent_id, currentClanId, dispatch]
 	);
 
 	const handleSendMessageThread = useCallback(
@@ -106,7 +112,7 @@ export default function CreateThreadForm() {
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
-			value?: ThreadValue,
+			value?: ThreadValue
 		) => {
 			if (sessionUser) {
 				if (value?.nameValueThread) {
@@ -117,7 +123,8 @@ export default function CreateThreadForm() {
 								clanId: currentClanId as string,
 								channelId: thread.channel_id as string,
 								channelType: thread.type as number,
-							}),
+								isPublic: !thread.channel_private
+							})
 						);
 						save(STORAGE_CLAN_ID, currentClanId);
 						await sendMessageThread(content, mentions, attachments, references, thread);
@@ -127,7 +134,7 @@ export default function CreateThreadForm() {
 				console.error('Session is not available');
 			}
 		},
-		[createThread, sendMessageThread, sessionUser, currentClanId, dispatch],
+		[createThread, sendMessageThread, sessionUser, currentClanId, dispatch]
 	);
 
 	useEffect(() => {
@@ -157,14 +164,7 @@ export default function CreateThreadForm() {
 	return (
 		<KeyboardAvoidingView style={styles.createChannelContainer}>
 			<ScrollView contentContainerStyle={{ flex: 1 }}>
-				<Formik
-					validate={(values) => {
-						setIsCheckValid(validInput(values?.nameValueThread));
-					}}
-					innerRef={formikRef}
-					initialValues={{ nameValueThread: null, isPrivate: false }}
-					onSubmit={() => { }}
-				>
+				<Formik innerRef={formikRef} initialValues={{ nameValueThread: null, isPrivate: false }} onSubmit={() => {}}>
 					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values, touched, errors }) => (
 						<View style={styles.createChannelContent}>
 							<View style={{ marginHorizontal: 20 }}>
@@ -222,14 +222,14 @@ export default function CreateThreadForm() {
 								channelId={currentChannel?.channel_id}
 								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 								hiddenIcon={{
-									threadIcon: true,
+									threadIcon: true
 								}}
 								onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 							/>
 							<View
 								style={{
 									height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-									backgroundColor: themeValue.secondary,
+									backgroundColor: themeValue.secondary
 								}}
 							/>
 							{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (

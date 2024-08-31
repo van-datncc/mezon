@@ -1,23 +1,25 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectAllEventManagement } from '@mezon/store-mobile';
-import { useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet, MezonTab } from '../../temp-ui';
 import EventDetail from './EventDetail';
 import EventItem from './EventItem';
 import EventMember from './EventMember';
 import { style } from './styles';
+import { useUserPermission } from '@mezon/core';
 
-export default function EventViewer() {
+export default function EventViewer({ handlePressEventCreate }: { handlePressEventCreate: () => void }) {
 	// const { dismiss } = useBottomSheetModal()
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const [currentEvent, setCurrentEvent] = useState<EventManagementEntity>();
 	const bottomSheetDetail = useRef<BottomSheetModal>(null);
+	const { isCanManageEvent } = useUserPermission();
 
 	function handlePress(event: EventManagementEntity) {
 		setCurrentEvent(event);
@@ -26,6 +28,17 @@ export default function EventViewer() {
 
 	return (
 		<View style={styles.container}>
+			<View style={styles.header}>
+				<View style={[styles.section, styles.sectionRight]}></View>
+				<Text style={[styles.section, styles.sectionTitle]}>{`${allEventManagement?.length} Events`}</Text>
+				<View style={[styles.section, styles.sectionRight]}>
+					{isCanManageEvent && (
+						<TouchableOpacity onPress={handlePressEventCreate}>
+							<Text style={{ color: baseColor.blurple, fontWeight: 'bold' }}>Create</Text>
+						</TouchableOpacity>
+					)}
+				</View>
+			</View>
 			{allEventManagement?.length > 0 ? (
 				allEventManagement?.map((event, index) => <EventItem event={event} key={index.toString()} onPress={() => handlePress(event)} />)
 			) : (

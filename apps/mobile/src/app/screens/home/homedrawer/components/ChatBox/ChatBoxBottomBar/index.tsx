@@ -12,10 +12,11 @@ import { Block, Colors, size } from '@mezon/mobile-ui';
 import {
 	emojiSuggestionActions,
 	referencesActions,
+	selectAttachmentByChannelId,
+	selectChannelsEntities,
 	selectAllChannels,
 	selectAllHashtagDm,
 	selectCurrentChannel,
-	selectEmojiSuggestion,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -95,11 +96,17 @@ export const ChatBoxBottomBar = memo(
 		const currentChannel = useSelector(selectCurrentChannel);
 		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
 
+		// const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
+		const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
+		
+		const checkAttachment = useMemo(() => {
+			return attachmentFilteredByChannelId?.files?.length > 0;
+		}, [attachmentFilteredByChannelId]);
+		
 		const navigation = useNavigation<any>();
 		const inputRef = useRef<TextInput>();
 		const cursorPositionRef = useRef(0);
 		const currentTextInput = useRef('');
-		const emojiPicked = useSelector(selectEmojiSuggestion);
 		const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 		const { sessionRef, clientRef } = useMezon();
@@ -412,8 +419,14 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const handleRemoveAttachment = (index: number) => {
-			removeAttachmentByIndex(currentChannel?.id, index);
-		};
+			dispatch(
+				referencesActions.removeAttachment({
+					channelId: channelId || '',
+					index: index
+				})
+			);
+			// removeAttachmentByIndex(currentChannel?.id, index);
+		}
 
 		useEffect(() => {
 			if (messageActionNeedToResolve !== null) {
