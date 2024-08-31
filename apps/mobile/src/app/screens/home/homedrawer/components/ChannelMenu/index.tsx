@@ -9,7 +9,7 @@ import {
 	save
 } from '@mezon/mobile-components';
 import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, getStoreAsync, selectCurrentClan, useAppDispatch } from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, selectCurrentClan, threadsActions, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useMemo, useState } from 'react';
@@ -30,7 +30,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 	const { t } = useTranslation(['channelMenu']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { setOpenThreadMessageState } = useReference();
+	// const { setOpenThreadMessageState } = useReference();
 	const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useAppDispatch();
@@ -99,7 +99,7 @@ export default function ChannelMenu({ channel, inviteRef }: IChannelMenuProps) {
 			title: t('menu.thread.threads'),
 			onPress: () => {
 				dismiss();
-				setOpenThreadMessageState(false);
+				dispatch(threadsActions.setOpenThreadMessageState(false));
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
 					screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD,
 					params: { channelThreads: channel }

@@ -1,17 +1,18 @@
 import { MenuHorizontalIcon, VerifyIcon } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { ClansEntity } from '@mezon/store-mobile';
+import { selectCurrentClan } from '@mezon/store-mobile';
 import React, { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { style } from './styles';
+import { useSelector } from 'react-redux';
 
 interface IProps {
 	onPress: () => void;
-	clan: ClansEntity;
 }
 
-const ChannelListHeader = ({ onPress, clan }: IProps) => {
+const ChannelListHeader = ({ onPress }: IProps) => {
+	const currentClan = useSelector(selectCurrentClan);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	function handlePress() {
@@ -19,13 +20,13 @@ const ChannelListHeader = ({ onPress, clan }: IProps) => {
 	}
 
 	return (
-		<View style={[styles.container, { height: clan?.banner ? 150 : 70 }]}>
-			{clan?.banner && <FastImage source={{ uri: clan?.banner }} style={{ flex: 1 }} resizeMode="cover" />}
+		<View style={[styles.container, { height: currentClan?.banner ? 150 : 70 }]}>
+			{currentClan?.banner && <FastImage source={{ uri: currentClan?.banner }} style={{ flex: 1 }} resizeMode="cover" />}
 
 			<TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.listHeader}>
 				<View style={styles.titleNameWrapper}>
 					<Text numberOfLines={1} style={styles.titleServer}>
-						{clan?.clan_name}
+						{currentClan?.clan_name}
 					</Text>
 					<VerifyIcon width={18} height={18} color={baseColor.blurple} />
 				</View>

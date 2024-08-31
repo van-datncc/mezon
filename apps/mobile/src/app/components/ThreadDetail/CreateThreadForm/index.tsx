@@ -56,7 +56,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	const { valueThread, threadCurrentChannel } = useThreads();
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
-		channelLabel: threadCurrentChannel?.channel_label as string,
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL
 	});
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
@@ -123,7 +122,8 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
 								channelId: thread.channel_id as string,
-								channelType: thread.type as number
+								channelType: thread.type as number,
+								isPublic: !thread.channel_private
 							})
 						);
 						save(STORAGE_CLAN_ID, currentClanId);
