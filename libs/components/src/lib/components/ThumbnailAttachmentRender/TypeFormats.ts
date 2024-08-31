@@ -89,15 +89,19 @@ export const typeFormats = [
 		type: 'application/vnd.rar',
 		icon: Icons.RarThumbnail
 	},
+
 	{
-		type: 'application/x-zip-compressed',
+		type: 'application/x-compressed',
 		icon: Icons.RarThumbnail
 	},
 	{
 		type: 'application/x-7z-compressed',
 		icon: Icons.RarThumbnail
 	},
-
+	{
+		type: 'application/x-zip-compressed',
+		icon: Icons.RarThumbnail
+	},
 	{
 		type: 'text/markdown',
 		icon: Icons.DocThumbnail
