@@ -1,14 +1,9 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useUserPermission } from '@mezon/core';
-import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels, isEmpty } from '@mezon/mobile-components';
-import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
+import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
-	categoriesActions,
 	selectAllEventManagement,
-	selectCategoryIdSortChannel,
-	selectCurrentClan,
-	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -30,14 +25,9 @@ import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
 
-const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, idCurrentCateByChannel: string }) => {
-	const categorizedChannels = useMemo(() => {
-		return !!data && typeof data === 'string' ? JSON.parse(data) : [];
-	}, [data]);
-
+const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: any }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const currentClan = useSelector(selectCurrentClan);
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
 	const { t } = useTranslation(['searchMessageChannel']);
 	const allEventManagement = useSelector(selectAllEventManagement);
@@ -51,9 +41,6 @@ const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, i
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
-	const dispatch = useAppDispatch();
-	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
-	const { isCanManageEvent } = useUserPermission();
 	const flashListRef = useRef(null);
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -77,25 +64,13 @@ const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, i
 		setCurrentPressedChannel(channel);
 	}, []);
 
-	const handleOnPressSortChannel = useCallback(
-		(channel: IChannel) => {
-			dispatch(
-				categoriesActions.setCategoryIdSortChannel({
-					isSortChannelByCategoryId: !categoryIdSortChannel[channel?.category_id],
-					categoryId: channel?.category_id
-				})
-			);
-		},
-		[categoryIdSortChannel, dispatch]
-	);
-
-	const onContentSizeChange = useCallback((w, h) => {
-		if (categorizedChannels?.length && h > 0 && isLoading === 'loaded') {
-			timeoutRef.current = setTimeout(() => {
-				scrollToItemById?.(idCurrentCateByChannel);
-			}, 300);
-		}
-	}, [idCurrentCateByChannel]);
+	// const onContentSizeChange = useCallback((w, h) => {
+	// 	if (categorizedChannels?.length && h > 0 && isLoading === 'loaded') {
+	// 		timeoutRef.current = setTimeout(() => {
+	// 			scrollToItemById?.(idCurrentCateByChannel);
+	// 		}, 300);
+	// 	}
+	// }, [idCurrentCateByChannel]);
 
 	useEffect(() => {
 		return () => {
@@ -112,15 +87,14 @@ const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, i
 					data={item}
 					onLongPressCategory={handleLongPressCategory}
 					onLongPressChannel={handleLongPressChannel}
-					onPressSortChannel={handleOnPressSortChannel}
 					onLongPressThread={handleLongPressThread}
 				/>
 			);
 		},
-		[handleLongPressCategory, handleLongPressChannel, handleOnPressSortChannel, handleLongPressThread]
+		[handleLongPressCategory, handleLongPressChannel, handleLongPressThread]
 	);
 
-	function handlePressEventCreate() {
+	const handlePressEventCreate = useCallback(() => {
 		bottomSheetEventRef?.current?.dismiss();
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
 			screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT,
@@ -130,11 +104,7 @@ const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, i
 				}
 			}
 		});
-	}
-
-	if (isEmpty(currentClan)) {
-		return <Block height={20} />;
-	}
+	}, []);
 
 	const navigateToSearchPage = () => {
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
@@ -145,17 +115,17 @@ const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, i
 		});
 	};
 
-	const scrollToItemById = (id) => {
-		const index = categorizedChannels?.findIndex((item) => item?.category_id === id);
-		if (index !== -1 && flashListRef?.current) {
-			flashListRef?.current?.scrollToIndex({ index, animated: true });
-		}
-	};
+	// const scrollToItemById = (id) => {
+	// 	const index = categorizedChannels?.findIndex((item) => item?.category_id === id);
+	// 	if (index !== -1 && flashListRef?.current) {
+	// 		flashListRef?.current?.scrollToIndex({ index, animated: true });
+	// 	}
+	// };
 
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
 			<View style={styles.mainList}>
-				<ChannelListHeader onPress={handlePress} clan={currentClan} />
+				<ChannelListHeader onPress={handlePress} />
 
 				<View style={styles.channelListSearch}>
 					<TouchableOpacity onPress={() => navigateToSearchPage()} style={styles.searchBox}>
@@ -185,7 +155,7 @@ const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, i
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
 				<FlashList
-					onContentSizeChange={onContentSizeChange}
+					// onContentSizeChange={onContentSizeChange}
 					ref={flashListRef}
 					data={categorizedChannels || []}
 					keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
@@ -207,18 +177,10 @@ const ChannelList = React.memo(({ data, idCurrentCateByChannel }: { data: any, i
 			</MezonBottomSheet>
 
 			<MezonBottomSheet
-				title={`${allEventManagement?.length} Events`}
 				ref={bottomSheetEventRef}
 				heightFitContent={allEventManagement?.length === 0}
-				headerRight={
-					isCanManageEvent && (
-						<TouchableOpacity onPress={handlePressEventCreate}>
-							<Text style={{ color: baseColor.blurple, fontWeight: 'bold' }}>Create</Text>
-						</TouchableOpacity>
-					)
-				}
 			>
-				<EventViewer />
+				<EventViewer handlePressEventCreate={handlePressEventCreate} />
 			</MezonBottomSheet>
 		</ChannelListContext.Provider>
 	);

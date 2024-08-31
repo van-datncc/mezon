@@ -9,6 +9,7 @@ import GroupThread from './GroupThread';
 import ThreadAddButton from './ThreadAddButton';
 import ThreadItem from './ThreadItem';
 import { style } from './styles';
+import { threadsActions, useAppDispatch } from '@mezon/store-mobile';
 
 type CreateThreadModalScreen = typeof APP_SCREEN.MENU_THREAD.CREATE_THREAD;
 export default function CreateThreadModal({ navigation, route }: MenuThreadScreenProps<CreateThreadModalScreen>) {
@@ -18,7 +19,8 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const { threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
 	const { t } = useTranslation(['createThread']);
 	const { setValueThread } = useThreads();
-	const { setOpenThreadMessageState } = useReference();
+	// const { setOpenThreadMessageState } = useReference();
+	const dispatch = useAppDispatch();
 	navigation.setOptions({
 		headerShown: true,
 		headerTitle: t('threads', { ns: 'createThread' }),
@@ -27,7 +29,7 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	});
 
 	const handleNavigateCreateForm = useCallback(() => {
-		setOpenThreadMessageState(false);
+		dispatch(threadsActions.setOpenThreadMessageState(false));
 		setValueThread(null);
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
 			screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL,
