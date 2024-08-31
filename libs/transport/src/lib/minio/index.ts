@@ -116,7 +116,7 @@ export function createUploadFilePath(
 ): { filePath: string; originalFilename: string } {
 	const originalFilename = filename;
 
-	const ms = new Date().getMinutes();
+	const ms = new Date().getMilliseconds();
 	filename = ms + filename;
 	filename = filename.replace(/-|\(|\)| /g, '_');
 	if (!currentClanId) {
