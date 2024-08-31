@@ -84,7 +84,6 @@ export const ChatMessageInput = memo(
 				markdownsOnMessage,
 				voiceLinkRoomOnMessage,
 				isShowCreateThread,
-				channelsEntities,
 				attachmentDataRef,
 				isPublic
 			}: IChatMessageInputProps,
@@ -104,13 +103,13 @@ export const ChatMessageInput = memo(
 			const roleList = useMemo(() => {
 				return rolesInClan?.map((item) => ({
 					roleId: item.id ?? '',
-					roleName: item.title ?? ''
+					roleName: item?.title ?? ''
 				}));
 			}, [rolesInClan]);
 
 			const removeTags = (text: string) => {
 				if (!text) return '';
-				return text?.replace?.(/@\[(.*?)\]/g, '@$1');
+				return text?.replace?.(/@\[(.*?)\]/g, '@$1')?.replace?.(/<#(.*?)>/g, '#$1');
 			};
 
 			const clearInputAfterSendMessage = useCallback(() => {
@@ -207,7 +206,6 @@ export const ChatMessageInput = memo(
 						};
 					}
 				});
-
 				const payloadSendMessage: IMessageSendPayload = {
 					t: removeTags(text),
 					hg: hashtagsOnMessage,
@@ -326,7 +324,7 @@ export const ChatMessageInput = memo(
 								},
 								{ height: Math.max(size.s_40, heightInput) }
 							]}
-							children={renderTextContent(text, channelsEntities)}
+							children={renderTextContent(text)}
 							onContentSizeChange={(e) => {
 								if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);
 							}}
