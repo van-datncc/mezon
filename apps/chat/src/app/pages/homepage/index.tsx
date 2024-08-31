@@ -38,7 +38,7 @@ function Homepage() {
 					)}
 					<div className="mid flex gap-[40px] items-center font-semibold max-lg:hidden">
 						<a
-							href="https://drive.google.com/file/d/1zfLNnJMlFKEGLbm9ce-8VPqLbIZFvh5O/view"
+							href="https://cdn.mezon.vn/release/mezon-1.1.54-win-x64.exe"
 							target="_blank"
 							rel="noreferrer"
 							className="hover:underline cursor-pointer"
@@ -124,7 +124,7 @@ function Homepage() {
 							<a
 								style={{ borderRadius: '28px' }}
 								className="max-md:w-7/12 max-sm:w-11/12 flex items-center gap-2 justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
-								href="https://drive.google.com/file/d/1zfLNnJMlFKEGLbm9ce-8VPqLbIZFvh5O/view"
+								href="https://cdn.mezon.vn/release/mezon-1.1.54-win-x64.exe"
 								target="_blank"
 								rel="noreferrer"
 							>
