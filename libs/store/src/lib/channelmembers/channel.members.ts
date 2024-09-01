@@ -115,25 +115,6 @@ export const fetchChannelMembers = createAsyncThunk(
 	}
 );
 
-export const followUserStatus = createAsyncThunk('channelMembers/followUserStatus', async (_, thunkAPI) => {
-	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const listUserIds = selectAllUserIdsToFollow(getChannelMemberRootState(thunkAPI));
-	const listFollowingUserIds = selectFollowingUserIds(getChannelMemberRootState(thunkAPI));
-	if (listUserIds.length !== listFollowingUserIds?.length || listUserIds.some((id) => !listFollowingUserIds.includes(id))) {
-		const response = await mezon.addStatusFollow(listUserIds);
-		const onlineStatus = response.presences.map((item) => {
-			return { userId: item.user_id, status: true };
-		});
-		thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
-
-		thunkAPI.dispatch(channelMembersActions.setFollowingUserIds(listUserIds));
-		if (!response) {
-			return thunkAPI.rejectWithValue([]);
-		}
-		return response;
-	}
-});
-
 export const fetchChannelMembersPresence = createAsyncThunk(
 	'channelMembers/fetchChannelMembersPresence',
 	async (channelPresence: ChannelPresenceEvent, thunkAPI) => {
@@ -315,11 +296,6 @@ export const channelMembers = createSlice({
 		setCustomStatusUser: (state, action: PayloadAction<CustomStatusUserArgs>) => {
 			state.customStatusUser[action.payload.userId] = action.payload.customStatus;
 		},
-
-		addUserIdsToFollow: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
-			const newUsers = [...state.toFollowUserIds, ...action.payload];
-			state.toFollowUserIds = [...new Set(newUsers)];
-		},
 		setMemberChannels: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
 			state.memberChannels = action.payload;
 		},
@@ -428,7 +404,6 @@ export const channelMembersActions = {
 	...channelMembers.actions,
 	fetchChannelMembers,
 	fetchChannelMembersPresence,
-	followUserStatus,
 	updateStatusUser,
 	removeMemberChannel,
 	updateCustomStatus
