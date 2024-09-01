@@ -90,7 +90,7 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 autoUpdater.on('update-not-available', (info: UpdateInfo) => {
 	new Notification({
 		title: 'No update',
-		body: 'The current version is the latest. ' + info.version
+		body: `The current version (${info.version}) is the latest.`
 	}).show();
 });
 
