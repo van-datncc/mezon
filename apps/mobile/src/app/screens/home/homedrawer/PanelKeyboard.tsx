@@ -27,15 +27,13 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 			bottomPickerRef.current?.collapse();
 		} else {
 			setTypeKeyboardBottomSheet('text');
-			bottomPickerRef.current?.close();
+			bottomPickerRef.current?.forceClose();
 		}
 	}, []);
 	
 	useImperativeHandle(ref, () => ({
 		onShowKeyboardBottomSheet
 	}));
-	
-
 	
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);

@@ -150,6 +150,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic }
 						show={currentMessageActionType === EMessageActionType.ForwardMessage}
 						onClose={() => setCurrentMessageActionType(null)}
 						message={messageSelected}
+						isPublic={isPublic}
 					/>
 				)}
 

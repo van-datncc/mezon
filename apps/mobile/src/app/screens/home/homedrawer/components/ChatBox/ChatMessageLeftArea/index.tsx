@@ -9,7 +9,7 @@ import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import { style } from '../ChatBoxBottomBar/style';
 
 interface IChatMessageLeftAreaProps {
-	text: string;
+	isAvailableSending: boolean;
 	isShowAttachControl: boolean;
 	setIsShowAttachControl: Dispatch<SetStateAction<boolean>>;
 	isShowCreateThread?: boolean;
@@ -19,7 +19,7 @@ interface IChatMessageLeftAreaProps {
 
 export const ChatMessageLeftArea = memo(
 	({
-		text,
+		isAvailableSending,
 		isShowAttachControl,
 		setIsShowAttachControl,
 		isShowCreateThread,
@@ -31,7 +31,7 @@ export const ChatMessageLeftArea = memo(
 		const navigation = useNavigation<any>();
 		return (
 			<Block flexDirection="row" gap={size.s_6}>
-				{text?.length > 0 && !isShowAttachControl ? (
+				{isAvailableSending && !isShowAttachControl ? (
 					<TouchableOpacity style={[styles.btnIcon]} onPress={() => setIsShowAttachControl(!isShowAttachControl)}>
 						<Icons.ChevronSmallLeftIcon width={size.s_22} height={size.s_22} color={themeValue.textStrong} />
 					</TouchableOpacity>

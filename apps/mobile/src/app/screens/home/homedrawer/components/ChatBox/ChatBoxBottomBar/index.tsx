@@ -103,6 +103,10 @@ export const ChatBoxBottomBar = memo(
 		const [textChange, setTextChange] = useState<string>('');
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
+		
+		const isAvailableSending = useMemo(() => {
+			return text?.length > 0 && text?.trim()?.length > 0;
+		}, [text]);
 
 		const inputTriggersConfig = useMemo(() => {
 			const isDM = [ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
@@ -126,8 +130,8 @@ export const ChatBoxBottomBar = memo(
 		const { emojiList, linkList, markdownList, voiceLinkRoomList } = useProcessedContent(text);
 
 		const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-		const [mentionsOnMessage, setMentionsOnMessage] = useState<IMentionOnMessage[]>([]);
-		const [hashtagsOnMessage, setHashtagsOnMessage] = useState<IHashtagOnMessage[]>([]);
+		const mentionsOnMessage = useRef<IMentionOnMessage[]>([]);
+		const hashtagsOnMessage = useRef<IHashtagOnMessage[]>([]);
 
 		const isShowCreateThread = useMemo(() => {
 			return !hiddenIcon?.threadIcon && !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
@@ -169,8 +173,8 @@ export const ChatBoxBottomBar = memo(
 		const onSendSuccess = useCallback(() => {
 			setText('');
 			setTextChange('');
-			setMentionsOnMessage([]);
-			setHashtagsOnMessage([]);
+			mentionsOnMessage.current = [];
+			hashtagsOnMessage.current = [];
 			onDeleteMessageActionNeedToResolve();
 			resetCachedText();
 			dispatch(
@@ -242,8 +246,8 @@ export const ChatBoxBottomBar = memo(
 						}
 					}
 				});
-				setHashtagsOnMessage(hashtagList);
-				setMentionsOnMessage(mentionList);
+				hashtagsOnMessage.current = hashtagList;
+				mentionsOnMessage.current = mentionList;
 				setMentionTextValue(text);
 				setText(convertedHashtag);
 			}
@@ -431,23 +435,25 @@ export const ChatBoxBottomBar = memo(
 
 		return (
 			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
-				<Suggestions
-					channelId={channelId}
-					{...triggers.mention}
-					messageActionNeedToResolve={messageActionNeedToResolve}
-					onAddMentionMessageAction={onAddMentionMessageAction}
-					mentionTextValue={mentionTextValue}
-					channelMode={mode}
-				/>
-				<HashtagSuggestions directMessageId={channelId} mode={mode} {...triggers.hashtag} />
-				<EmojiSuggestion {...triggers.emoji} />
+				{triggers?.mention?.keyword !== undefined && (
+					<Suggestions
+						channelId={channelId}
+						{...triggers.mention}
+						messageActionNeedToResolve={messageActionNeedToResolve}
+						onAddMentionMessageAction={onAddMentionMessageAction}
+						mentionTextValue={mentionTextValue}
+						channelMode={mode}
+					/>
+				)}
+				{triggers?.hashtag?.keyword !== undefined && <HashtagSuggestions directMessageId={channelId} mode={mode} {...triggers.hashtag} />}
+				{triggers?.emoji?.keyword !== undefined && <EmojiSuggestion {...triggers.emoji} />}
 				<AttachmentPreview channelId={channelId} />
 
 				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
 					<ChatMessageLeftArea
 						isShowAttachControl={isShowAttachControl}
 						setIsShowAttachControl={setIsShowAttachControl}
-						text={text}
+						isAvailableSending={isAvailableSending}
 						isShowCreateThread={isShowCreateThread}
 						modeKeyBoardBottomSheet={modeKeyBoardBottomSheet}
 						handleKeyboardBottomSheetMode={handleKeyboardBottomSheetMode}
