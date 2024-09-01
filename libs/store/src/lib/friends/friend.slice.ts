@@ -72,9 +72,6 @@ export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', asy
 		return { userId: friend.user?.id ?? '', status: friend.user?.online ?? false };
 	});
 	const listFriends = response.friends.map(mapFriendToEntity);
-	const userIds = listFriends.map((friend) => friend.user?.id || '');
-	thunkAPI.dispatch(channelMembersActions.addUserIdsToFollow(userIds));
-	thunkAPI.dispatch(channelMembersActions.followUserStatus());
 	thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
 	return listFriends;
 });
