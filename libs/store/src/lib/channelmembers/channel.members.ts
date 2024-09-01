@@ -5,7 +5,6 @@ import memoize from 'memoizee';
 import { AddClanUserEvent, ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
-import { RootState } from '../store';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
@@ -86,32 +85,27 @@ export const fetchChannelMembers = createAsyncThunk(
 		}
 
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
-		const state = thunkAPI.getState() as RootState;
-		const channelMembers = selectMembersByChannelId(channelId)(state);
-		thunkAPI.dispatch(channelMembersActions.setMemberChannels(channelMembers));
-		if (Date.now() - response.time < 100) {
-			if (!response.channel_users) {
-				return [];
-			}
-			if (repace) {
-				thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
-			}
-
-			const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
-			thunkAPI.dispatch(channelMembersActions.addMany(members));
-			const customStatusInit = members.map((member) => {
-				const status = (member?.user?.metadata as any)?.status ?? '';
-				return { userId: member.user?.id ?? '', customStatus: status };
-			});
-			const onlineStatus = response.channel_users.map((item) => {
-				return { userId: item.user?.id ?? '', status: item.user?.online ?? false };
-			});
-			thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
-			thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
-			thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
-			return members;
+		// 		old logic: if (Date.now() - response.time < 100) {
+		if (!response.channel_users) {
+			return [];
 		}
-		return null;
+		if (repace) {
+			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
+		}
+
+		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
+		thunkAPI.dispatch(channelMembersActions.addMany(members));
+		const customStatusInit = members.map((member) => {
+			const status = (member?.user?.metadata as any)?.status ?? '';
+			return { userId: member.user?.id ?? '', customStatus: status };
+		});
+		const onlineStatus = response.channel_users.map((item) => {
+			return { userId: item.user?.id ?? '', status: item.user?.online ?? false };
+		});
+		thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
+		thunkAPI.dispatch(channelMembersActions.setMemberChannels(members));
+		thunkAPI.dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+		return members;
 	}
 );
 
