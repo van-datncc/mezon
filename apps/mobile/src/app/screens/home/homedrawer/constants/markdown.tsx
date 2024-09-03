@@ -1,6 +1,6 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { useAppSelector } from '@mezon/store';
+import { selectHashtagDmEntities, useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUsesClan, selectChannelsEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
@@ -9,6 +9,7 @@ import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
+import { useSelector } from 'react-redux';
 import { ChannelHashtag } from '../components/MarkdownFormatText/ChannelHashtag';
 import { EmojiMarkup } from '../components/MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../components/MarkdownFormatText/MentionUser';
@@ -178,6 +179,8 @@ export type IMarkdownProps = {
 	isNumberOfLine?: boolean;
 	isMessageReply?: boolean;
 	mode?: number;
+	isHiddenHashtag?: boolean;
+	directMessageId?: string;
 };
 
 /**
@@ -335,12 +338,24 @@ export const removeBlockCode = (text: string) => {
 };
 
 export const RenderTextMarkdownContent = React.memo(
-	({ content, isEdited, translate, onMention, onChannelMention, isNumberOfLine, isMessageReply, mode }: IMarkdownProps) => {
+	({
+		content,
+		isEdited,
+		translate,
+		onMention,
+		onChannelMention,
+		isNumberOfLine,
+		isMessageReply,
+		mode,
+		isHiddenHashtag,
+		directMessageId
+	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
 		const usersClan = useAppSelector(selectAllUsesClan);
 		const usersInChannel = useAppSelector(selectAllChannelMembers);
 		const channelsEntities = useAppSelector(selectChannelsEntities);
+		const hashtagDmEntities = useSelector(selectHashtagDmEntities);
 
 		if (isMessageReply) {
 			customStyle = { ...styleMessageReply(themeValue) };
@@ -375,7 +390,17 @@ export const RenderTextMarkdownContent = React.memo(
 					formattedContent += t?.slice?.(lastIndex, s)?.toString() ?? '';
 				}
 				if (element.kindOf === ETokenMessage.HASHTAGS) {
-					formattedContent += ChannelHashtag({ channelHashtagId: element.channelid, channelsEntities });
+					if (isHiddenHashtag) {
+						formattedContent = contentInElement;
+					} else {
+						formattedContent += ChannelHashtag({
+							channelHashtagId: element.channelid,
+							channelsEntities,
+							hashtagDmEntities,
+							mode,
+							directMessageId
+						});
+					}
 				}
 				if (element.kindOf === ETokenMessage.MENTIONS) {
 					formattedContent += MentionUser({
