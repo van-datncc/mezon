@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error: Workaround for typing issues with ELoadMoreDirection
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { ActionEmitEvent, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
@@ -25,7 +25,7 @@ type ChannelMessagesProps = {
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
 };
 
-const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAction,setIsOnlyEmojiPicker  }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -58,7 +58,7 @@ const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAct
 			showSKlListener.remove();
 		};
 	}, []);
-	
+
 	const jumpToRepliedMessage = useCallback(
 		(messageId: string) => {
 			const indexToJump = messages.findIndex((message) => message.id === messageId);
@@ -141,29 +141,31 @@ const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAct
 		}
 		return isCached;
 	}, [channelId]);
-	
+
 	return (
 		<View style={styles.wrapperChannelMessage}>
 			{isLoading === 'loading' && !checkChannelCacheLoading && isShowSkeleton && !messages?.length && (
 				<MessageItemSkeleton skeletonNumber={15} />
 			)}
-			
+
 			<ChannelMessageList
 				flatListRef={flatListRef}
 				messages={messages}
-				handleScroll={() => {}}
+				handleScroll={() => {
+					// eslint-disable-next-line no-empty-function
+				}}
 				renderItem={renderItem}
 				onLoadMore={onLoadMore}
 				isLoadMore={isLoadMore.current}
 				hasMoreMessage={hasMoreMessage}
 			/>
-			
+
 			{/*{showScrollToBottomButton && (*/}
 			{/*	<TouchableOpacity style={styles.btnScrollDown} onPress={scrollToBottom} activeOpacity={0.8}>*/}
 			{/*		<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />*/}
 			{/*	</TouchableOpacity>*/}
 			{/*)}*/}
-			
+
 			<MessageUserTyping channelId={channelId} />
 		</View>
 	);

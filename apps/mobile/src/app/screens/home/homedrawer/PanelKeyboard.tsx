@@ -1,7 +1,5 @@
 import BottomSheet from '@gorhom/bottom-sheet';
-import {
-	ActionEmitEvent,
-} from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, View } from 'react-native';
@@ -30,25 +28,25 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 			bottomPickerRef.current?.forceClose();
 		}
 	}, []);
-	
+
 	useImperativeHandle(ref, () => ({
 		onShowKeyboardBottomSheet
 	}));
-	
+
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 		return () => {
 			appStateSubscription.remove();
 		};
 	}, []);
-	
+
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'background') {
 			Keyboard.dismiss();
 			setHeightKeyboardShow(0);
 		}
 	};
-	
+
 	return (
 		<>
 			<View
@@ -58,11 +56,7 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 				}}
 			/>
 			{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-				<BottomKeyboardPicker
-					height={heightKeyboardShow}
-					ref={bottomPickerRef}
-					isStickyHeader={typeKeyboardBottomSheet === 'emoji'}
-				>
+				<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
 					{typeKeyboardBottomSheet === 'emoji' ? (
 						<EmojiPicker
 							onDone={() => {

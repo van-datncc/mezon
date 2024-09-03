@@ -10,7 +10,7 @@ import {
 	selectDirectsOpenlist,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { ChannelThreads, IMessageWithUser } from '@mezon/utils';
 import { SeparatorWithLine } from 'apps/mobile/src/app/components/Common';
@@ -58,7 +58,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 	const selectedMessage = useSelector(getSelectedMessage);
 
 	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || ''),
+		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
 	);
 	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const allMessagesBySenderId = useMemo(() => {
@@ -75,7 +75,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 			type: dm?.type,
 			avatar: dm?.type === ChannelType.CHANNEL_TYPE_DM ? dm?.channel_avatar?.[0] : 'assets/images/avatar-group.png',
 			name: dm?.channel_label,
-			clanId: '',
+			clanId: ''
 		};
 	};
 
@@ -85,7 +85,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 			type: channel?.type,
 			avatar: '#',
 			name: channel?.channel_label,
-			clanId: channel?.clan_id,
+			clanId: channel?.clan_id
 		};
 	};
 
@@ -165,8 +165,8 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 				type: 'success',
 				props: {
 					text2: t('forwardMessagesSuccessfully'),
-					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />
+				}
 			});
 		} catch (error) {
 			console.log('Forward all messages log => error', error);
@@ -197,8 +197,8 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 				type: 'success',
 				props: {
 					text2: t('forwardMessagesSuccessfully'),
-					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />
+				}
 			});
 		} catch (error) {
 			console.log('error', error);
@@ -273,7 +273,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 								borderWidth: 1.5,
 								borderColor: isChecked ? Colors.bgButton : Colors.white,
 								borderRadius: 5,
-								opacity: 1,
+								opacity: 1
 							}}
 							textStyle={{ fontFamily: 'JosefinSans-Regular' }}
 						/>

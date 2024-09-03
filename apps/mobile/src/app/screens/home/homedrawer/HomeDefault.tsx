@@ -1,13 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import {
-	ENotificationActive,
-	EOpenSearchChannelFrom,
-	Icons,
-	STORAGE_AGREED_POLICY,
-	getChannelById,
-	load,
-	save
-} from '@mezon/mobile-components';
+import { ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -16,7 +8,7 @@ import {
 	selectAllClans,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -29,12 +21,12 @@ import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
+import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
+import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
-import ChannelMessagesWrapper from './ChannelMessagesWrapper';
-import PanelKeyboard from './PanelKeyboard';
 
 const HomeDefault = React.memo((props: any) => {
 	const { themeValue } = useTheme();
@@ -94,7 +86,6 @@ const HomeDefault = React.memo((props: any) => {
 		};
 	}, []);
 
-
 	const fetchMemberChannel = async () => {
 		if (!currentChannel) {
 			return;
@@ -148,11 +139,7 @@ const HomeDefault = React.memo((props: any) => {
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
-					<PanelKeyboard
-						ref={panelKeyboardRef}
-						currentChannelId={currentChannel.channel_id}
-						currentClanId={currentChannel?.clan_id}
-					/>
+					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
 				</View>
 			)}
 

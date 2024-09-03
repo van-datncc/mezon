@@ -24,7 +24,7 @@ export const ChatMessageLeftArea = memo(
 		setIsShowAttachControl,
 		isShowCreateThread,
 		modeKeyBoardBottomSheet,
-		handleKeyboardBottomSheetMode,
+		handleKeyboardBottomSheetMode
 	}: IChatMessageLeftAreaProps) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
@@ -52,5 +52,5 @@ export const ChatMessageLeftArea = memo(
 				)}
 			</Block>
 		);
-	},
+	}
 );

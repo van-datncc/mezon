@@ -91,7 +91,7 @@ export const ChatBoxBottomBar = memo(
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 		const currentChannel = useSelector(selectCurrentChannel);
-		
+
 		const navigation = useNavigation<any>();
 		const inputRef = useRef<TextInput>();
 		const cursorPositionRef = useRef(0);
@@ -103,7 +103,7 @@ export const ChatBoxBottomBar = memo(
 		const [textChange, setTextChange] = useState<string>('');
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
-		
+
 		const isAvailableSending = useMemo(() => {
 			return text?.length > 0 && text?.trim()?.length > 0;
 		}, [text]);

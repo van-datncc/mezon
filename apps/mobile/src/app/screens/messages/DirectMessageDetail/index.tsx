@@ -19,11 +19,11 @@ import { PanGestureHandler } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import ChannelMessagesWrapper from '../../home/homedrawer/ChannelMessagesWrapper';
 import { ChatBox } from '../../home/homedrawer/ChatBox';
+import PanelKeyboard from '../../home/homedrawer/PanelKeyboard';
 import { IModeKeyboardPicker } from '../../home/homedrawer/components';
 import { style } from './styles';
-import ChannelMessagesWrapper from '../../home/homedrawer/ChannelMessagesWrapper';
-import PanelKeyboard from '../../home/homedrawer/PanelKeyboard';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -66,31 +66,31 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			return;
 		}
 		const store = await getStoreAsync();
-			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
-			// Rejoin previous clan (other than 0) when exiting the DM detail screen
-			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
-			store.dispatch(
-				channelMembersActions.fetchChannelMembers({
-					clanId: currentChannel?.clan_id || '',
-					channelId: currentChannel?.channel_id || '',
-					channelType: currentChannel?.type,
-					noCache: true,
-				}),
-			);
+		store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
+		// Rejoin previous clan (other than 0) when exiting the DM detail screen
+		store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
+		store.dispatch(
+			channelMembersActions.fetchChannelMembers({
+				clanId: currentChannel?.clan_id || '',
+				channelId: currentChannel?.channel_id || '',
+				channelType: currentChannel?.type,
+				noCache: true
+			})
+		);
 	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
-			store.dispatch(clansActions.setCurrentClanId('0'));
-			store.dispatch(
-				directActions.joinDirectMessage({
-					directMessageId: currentDmGroup?.id,
-					channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
-					type: currentDmGroup?.type,
-					noCache: true,
-					isFetchingLatestMessages: true,
-				}),
-			);
+		store.dispatch(clansActions.setCurrentClanId('0'));
+		store.dispatch(
+			directActions.joinDirectMessage({
+				directMessageId: currentDmGroup?.id,
+				channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
+				type: currentDmGroup?.type,
+				noCache: true,
+				isFetchingLatestMessages: true
+			})
+		);
 		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 

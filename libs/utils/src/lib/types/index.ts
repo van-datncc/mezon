@@ -197,6 +197,8 @@ export type SearchMessage = ApiSearchMessageDocument & {
 };
 
 export type IMessageWithUser = IMessage & {
+	isStartedMessageGroup?: boolean;
+	isStartedMessageOfTheDay?: boolean;
 	user: IUser | null;
 };
 

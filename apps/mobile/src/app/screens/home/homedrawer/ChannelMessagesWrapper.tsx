@@ -1,23 +1,20 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import {
-	attachmentActions,
-	AttachmentEntity,
-} from '@mezon/store';
+import { attachmentActions, AttachmentEntity } from '@mezon/store';
 import { messagesActions, useAppDispatch } from '@mezon/store-mobile';
+import { useMezon } from '@mezon/transport';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiUser } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, View } from 'react-native';
 import { ImageListModal } from '../../../components/ImageListModal';
+import ChannelMessages from './ChannelMessages';
 import { MessageItemBS } from './components';
 import { ConfirmPinMessageModal } from './components/ConfirmPinMessageModal';
 import ForwardMessageModal from './components/ForwardMessage';
 import { ReportMessageModal } from './components/ReportMessageModal';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { IConfirmActionPayload, IMessageActionPayload } from './types';
-import ChannelMessages from './ChannelMessages';
-import { useMezon } from '@mezon/transport';
 
 type ChannelMessagesProps = {
 	channelId: string;
@@ -40,7 +37,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic }
 	const [currentMessageActionType, setCurrentMessageActionType] = useState<EMessageActionType | null>(null);
 
 	const [visibleImageModal, setVisibleImageModal] = useState<boolean>(false);
-	
+
 	useEffect(() => {
 		return () => {
 			dispatch(
@@ -65,26 +62,23 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic }
 		const socket = socketRef.current;
 		await socket.removeChatMessage(clanId || '', channelId, mode, isPublic, messageId);
 	};
-	
-	const onConfirmAction = useCallback(
-		(payload: IConfirmActionPayload) => {
-			const { type, message } = payload;
-			switch (type) {
-				case EMessageActionType.DeleteMessage:
-					onDeleteMessage(message?.id);
-					break;
-				case EMessageActionType.ForwardMessage:
-				case EMessageActionType.Report:
-				case EMessageActionType.PinMessage:
-				case EMessageActionType.UnPinMessage:
-					setCurrentMessageActionType(type);
-					break;
-				default:
-					break;
-			}
-		},
-		[]
-	);
+
+	const onConfirmAction = useCallback((payload: IConfirmActionPayload) => {
+		const { type, message } = payload;
+		switch (type) {
+			case EMessageActionType.DeleteMessage:
+				onDeleteMessage(message?.id);
+				break;
+			case EMessageActionType.ForwardMessage:
+			case EMessageActionType.Report:
+			case EMessageActionType.PinMessage:
+			case EMessageActionType.UnPinMessage:
+				setCurrentMessageActionType(type);
+				break;
+			default:
+				break;
+		}
+	}, []);
 
 	const onOpenImage = useCallback(
 		async (image: AttachmentEntity) => {
@@ -94,7 +88,6 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic }
 		},
 		[channelId, clanId, dispatch]
 	);
-
 
 	const onMessageAction = useCallback((payload: IMessageActionPayload) => {
 		const { message, type, user, senderDisplayName } = payload;

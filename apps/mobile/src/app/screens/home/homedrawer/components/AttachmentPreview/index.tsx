@@ -1,12 +1,12 @@
 import { Icons, PlayIcon } from '@mezon/mobile-components';
 import { baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
-import React, { useMemo } from 'react';
-import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
-import AttachmentFilePreview from '../AttachmentFilePreview';
-import { style } from './styles';
-import { useSelector } from 'react-redux';
 import { referencesActions, selectAttachmentByChannelId } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
+import React, { useMemo } from 'react';
+import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import AttachmentFilePreview from '../AttachmentFilePreview';
+import { style } from './styles';
 
 interface IProps {
 	channelId: string;
@@ -16,13 +16,13 @@ const AttachmentPreview = ({ channelId }: IProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	
+
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
-	
+
 	const checkAttachment = useMemo(() => {
 		return attachmentFilteredByChannelId?.files?.length > 0;
 	}, [attachmentFilteredByChannelId?.files?.length]);
-	
+
 	const handleRemoveAttachment = (index: number) => {
 		dispatch(
 			referencesActions.removeAttachment({
@@ -30,12 +30,12 @@ const AttachmentPreview = ({ channelId }: IProps) => {
 				index: index
 			})
 		);
-	}
-	
+	};
+
 	if (!checkAttachment) {
 		return null;
 	}
-	
+
 	return (
 		<ScrollView
 			horizontal
@@ -55,19 +55,15 @@ const AttachmentPreview = ({ channelId }: IProps) => {
 							<Image source={{ uri: attachment.url }} style={styles.attachmentItemImage} />
 						)}
 
-						<TouchableOpacity
-							style={styles.iconClose}
-							activeOpacity={0.8}
-							onPress={() => handleRemoveAttachment(index)}
-						>
+						<TouchableOpacity style={styles.iconClose} activeOpacity={0.8} onPress={() => handleRemoveAttachment(index)}>
 							<Icons.CloseSmallBoldIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
 						</TouchableOpacity>
 
-						{isVideo &&
+						{isVideo && (
 							<View style={styles.videoOverlay}>
 								<PlayIcon width={size.s_20} height={size.s_20} />
 							</View>
-						}
+						)}
 					</View>
 				);
 			})}

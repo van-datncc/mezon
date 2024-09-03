@@ -1,7 +1,7 @@
 import { TouchableOpacity, TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
-import { debounce, Icons } from '@mezon/mobile-components';
+import { Icons, debounce } from '@mezon/mobile-components';
 import { Block, Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId, settingClanStickerActions } from '@mezon/store';
 import { getStoreAsync, gifsActions, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
@@ -82,7 +82,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 		const promises = [];
 		const store = await getStoreAsync();
 		promises.push(
-			store.dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentDirectMessage?.channel_id ? '0' : clanId || '0' })),
+			store.dispatch(settingClanStickerActions.fetchStickerByClanId({ clanId: currentDirectMessage?.channel_id ? '0' : clanId || '0' }))
 		);
 		await Promise.all(promises);
 	}, [clanId, currentDirectMessage?.channel_id]);
@@ -90,7 +90,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 	const { sendMessage } = useChatSending({
 		channelId: currentDirectMessage?.channel_id || currentChannel?.id || '',
 		mode: dmMode || channelMode,
-		directMessageId: currentDirectMessage?.channel_id || '',
+		directMessageId: currentDirectMessage?.channel_id || ''
 	});
 
 	const handleSend = useCallback(
@@ -98,11 +98,11 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 			content: IMessageSendPayload,
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>,
+			references?: Array<ApiMessageRef>
 		) => {
 			sendMessage(content, mentions, attachments, references);
 		},
-		[sendMessage],
+		[sendMessage]
 	);
 
 	function handleSelected(type: ExpressionType, data: any) {
@@ -127,7 +127,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 
 	const debouncedSetSearchText = useCallback(
 		debounce((text) => setSearchText(text), 300),
-		[],
+		[]
 	);
 
 	const handleBottomSheetExpand = () => {
@@ -174,7 +174,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 						<View style={styles.textInputWrapper}>
 							<Icons.MagnifyingIcon height={18} width={18} color={themeValue.text} />
 							<TextInput
-								placeholder={mode === 'sticker' ? t('findThePerfectSticker') :"search"}
+								placeholder={mode === 'sticker' ? t('findThePerfectSticker') : 'search'}
 								placeholderTextColor={themeValue.text}
 								style={styles.textInput}
 								onFocus={handleInputSearchFocus}

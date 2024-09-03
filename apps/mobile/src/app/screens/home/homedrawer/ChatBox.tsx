@@ -34,8 +34,8 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	}, [props?.mode]);
 
 	useUpdateAttachmentMessages({
-		currentChannelId: props.channelId || "",
-		currentClanId: isDM ? "0" : currentClanId
+		currentChannelId: props.channelId || '',
+		currentClanId: isDM ? '0' : currentClanId
 	});
 
 	useEffect(() => {
