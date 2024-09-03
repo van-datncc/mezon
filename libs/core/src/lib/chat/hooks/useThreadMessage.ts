@@ -1,4 +1,4 @@
-import { channelsActions, messagesActions, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { channelMetaActions, messagesActions, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -57,7 +57,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			}
 
 			const timestamp = Date.now() / 1000;
-			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
 		[sessionRef, clientRef, socketRef, currentClanId, mode, currentChannel?.channel_private, dispatch, channelId]
 	);
