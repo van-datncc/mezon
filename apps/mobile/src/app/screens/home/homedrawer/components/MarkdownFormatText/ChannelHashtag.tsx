@@ -1,20 +1,28 @@
-import { ChannelsEntity } from '@mezon/store';
-import { ChannelType } from 'mezon-js';
+import { ChannelsEntity, HashtagDmEntity } from '@mezon/store';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 
 type IChannelHashtag = {
 	channelHashtagId: string;
-	channelsEntities: any;
+	channelsEntities?: Record<string, ChannelsEntity>;
+	hashtagDmEntities?: Record<string, HashtagDmEntity>;
+	directMessageId?: string;
+	mode?: number;
 };
-export const ChannelHashtag = ({ channelHashtagId, channelsEntities }: IChannelHashtag) => {
+export const ChannelHashtag = ({ channelHashtagId, channelsEntities, directMessageId, mode, hashtagDmEntities }: IChannelHashtag) => {
 	const getChannelById = (channelHashtagId: string): ChannelsEntity => {
-		const channel = channelsEntities?.[channelHashtagId];
+		let channel: ChannelsEntity;
+		if (directMessageId && [ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
+			channel = hashtagDmEntities[directMessageId + channelHashtagId];
+		} else {
+			channel = channelsEntities[channelHashtagId];
+		}
 		if (channel) {
 			return channel;
 		}
 
 		return {
 			id: channelHashtagId,
-			channel_label: 'unknown',
+			channel_label: 'unknown'
 		};
 	};
 
