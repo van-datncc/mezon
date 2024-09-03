@@ -1,4 +1,4 @@
-import { useAuth, useChatMessages } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import {
 	MessagesEntity,
 	selectCurrentChannelId,
@@ -6,7 +6,9 @@ import {
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
 	selectJumpPinMessageId,
-	selectUploadingStatus
+	selectLastMessageIdByChannelId,
+	selectUploadingStatus,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUploadingStatus } from '@mezon/utils';
@@ -61,7 +63,7 @@ function MessageWithUser({
 
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const { lastMessageId } = useChatMessages({ channelId: currentChannelId ?? '' });
+	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, currentChannelId ?? ''));
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isHover = useHover(containerRef);
 	const userLogin = useAuth();
