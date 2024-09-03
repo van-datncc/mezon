@@ -6,19 +6,19 @@ export const style = (colors: Attributes) =>
 		container: {
 			backgroundColor: colors.secondary,
 			flex: 1,
-			paddingHorizontal: size.s_18,
+			paddingHorizontal: size.s_18
 		},
 
 		headerWrapper: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			alignItems: 'center',
-			paddingVertical: size.s_20,
+			paddingVertical: size.s_20
 		},
 
 		headerTitle: {
 			fontSize: size.h6,
-			color: colors.textStrong,
+			color: colors.textStrong
 		},
 
 		addFriendWrapper: {
@@ -30,16 +30,16 @@ export const style = (colors: Attributes) =>
 			borderWidth: 1,
 			borderColor: colors.border,
 			paddingHorizontal: size.s_10,
-			paddingVertical: size.s_6,
+			paddingVertical: size.s_6
 		},
 
 		addFriendText: {
 			fontSize: size.label,
-			color: colors.textStrong,
+			color: colors.textStrong
 		},
 
 		dmMessageListContainer: {
-			marginTop: size.s_18,
+			marginTop: size.s_18
 		},
 
 		searchMessage: {
@@ -47,7 +47,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: 40,
 			alignItems: 'center',
 			paddingHorizontal: size.s_12,
-			flexDirection: 'row',
+			flexDirection: 'row'
 		},
 
 		searchInput: {
@@ -56,7 +56,7 @@ export const style = (colors: Attributes) =>
 			height: size.s_50,
 			color: colors.textStrong,
 			paddingVertical: size.s_6,
-			paddingHorizontal: size.s_12,
+			paddingHorizontal: size.s_12
 		},
 
 		statusTyping: {
@@ -69,7 +69,7 @@ export const style = (colors: Attributes) =>
 			borderWidth: 3,
 			alignItems: 'center',
 			justifyContent: 'center',
-			borderColor: colors.secondary,
+			borderColor: colors.secondary
 		},
 
 		statusCircle: {
@@ -80,38 +80,38 @@ export const style = (colors: Attributes) =>
 			bottom: 0,
 			right: 0,
 			borderWidth: 2,
-			borderColor: colors.secondary,
+			borderColor: colors.secondary
 		},
 
 		messageItem: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: size.s_8,
-			marginBottom: size.s_4,
+			marginBottom: size.s_10
 		},
 		friendAvatar: {
 			width: size.s_40,
 			height: size.s_40,
-			borderRadius: 50,
+			borderRadius: 50
 		},
 
 		messageContent: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between',
-			gap: size.s_2,
+			gap: size.s_2
 		},
 
 		online: {
-			backgroundColor: baseColor.green,
+			backgroundColor: baseColor.green
 		},
 		offline: {
-			backgroundColor: Colors.bgGrayDark,
+			backgroundColor: Colors.bgGrayDark
 		},
 
 		defaultText: {
 			color: colors.text,
-			fontSize: size.medium,
+			fontSize: size.medium
 		},
 
 		addMessage: {
@@ -123,7 +123,7 @@ export const style = (colors: Attributes) =>
 			backgroundColor: baseColor.blurple,
 			borderRadius: 50,
 			alignItems: 'center',
-			justifyContent: 'center',
+			justifyContent: 'center'
 		},
 
 		groupAvatar: {
@@ -132,37 +132,37 @@ export const style = (colors: Attributes) =>
 			height: size.s_40,
 			borderRadius: 50,
 			justifyContent: 'center',
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 
 		lastMessage: {
-			color: colors.textStrong,
+			color: colors.textStrong
 		},
 
 		dateTime: {
-			fontSize: size.s_12,
+			fontSize: size.s_12
 		},
 
 		channelLabel: {
 			fontSize: size.s_14,
-			flex: 1,
+			flex: 1
 		},
 		avatarWrapper: {
 			borderRadius: 50,
 			backgroundColor: colors.colorAvatarDefault,
 			height: size.s_40,
-			width: size.s_40,
+			width: size.s_40
 		},
 		wrapperTextAvatar: {
 			width: size.s_40,
 			height: size.s_40,
 			justifyContent: 'center',
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 		textAvatar: {
 			textAlign: 'center',
 			fontSize: size.h6,
-			color: Colors.white,
+			color: Colors.white
 		},
 		lottie: { width: 30, height: 20 },
 		contentMessage: {
