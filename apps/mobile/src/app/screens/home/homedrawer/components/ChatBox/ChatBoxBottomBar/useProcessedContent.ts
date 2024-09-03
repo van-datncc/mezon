@@ -12,7 +12,7 @@ const useProcessedContent = (inputText: string) => {
 
 	useEffect(() => {
 		const processInput = () => {
-			const resultString = inputText.replace(/\[|\]/g, '');
+			const resultString = inputText.replace(/[\[\]<>]/g, '');
 			const { emojis, links, markdowns, voiceRooms } = processText(resultString, emojiObjPicked);
 			setEmojiList(emojis);
 			setLinkList(links);
@@ -57,7 +57,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 					emojis.push({
 						emojiid: emojiObjPicked?.[`:${shortname}:`],
 						s: startindex,
-						e: endindex,
+						e: endindex
 					});
 				}
 				i++;
@@ -75,12 +75,12 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
 					s: startindex,
-					e: endindex,
+					e: endindex
 				});
 			} else {
 				links.push({
 					s: startindex,
-					e: endindex,
+					e: endindex
 				});
 			}
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {

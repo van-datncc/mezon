@@ -54,6 +54,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
+	const isMentionHashtagDMRef = useRef(false);
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		setHeightKeyboardShow(height);
@@ -104,10 +105,21 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 
 	useEffect(() => {
+		const onMentionHashtagDM = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MENTION_HASHTAG_DM, ({ isMentionHashtagDM }) => {
+			isMentionHashtagDMRef.current = isMentionHashtagDM;
+		});
 		return () => {
-			fetchMemberChannel();
+			onMentionHashtagDM.remove();
 		};
-	}, [fetchMemberChannel]);
+	}, []);
+
+	useEffect(() => {
+		return () => {
+			if (!isMentionHashtagDMRef.current) {
+				fetchMemberChannel();
+			}
+		};
+	}, [fetchMemberChannel, isMentionHashtagDMRef]);
 
 	useEffect(() => {
 		if (currentDmGroup?.id) {
