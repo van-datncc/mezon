@@ -1,7 +1,7 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
 import { useCheckAlonePermission, useClanRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
 import {
-	channelsActions,
+	channelMetaActions,
 	notificationActions,
 	selectChannelById,
 	selectCloseMenu,
@@ -27,7 +27,7 @@ function useChannelSeen(channelId: string) {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
-		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 		dispatch(
 			notificationActions.setLastSeenTimeStampChannel({
 				channelId,

@@ -15,6 +15,7 @@ import { notificationSettingActions } from '../notificationSetting/notificationS
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
+import { ChannelMetaEntity, channelMetaActions } from './channelmeta.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -31,15 +32,6 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	return { ...channelRes, id: channelRes.channel_id || '', status: channelRes.meeting_code ? 1 : 0 };
 };
 
-interface ChannelMeta {
-	id: string;
-	lastSeenTimestamp: number;
-	lastSentTimestamp: number;
-	lastSeenPinMessage: string;
-}
-
-const channelMetaAdapter = createEntityAdapter<ChannelMeta>();
-
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	loadingStatus: LoadingStatus;
 	socketStatus: LoadingStatus;
@@ -47,7 +39,6 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	currentChannelId?: string | null;
 	isOpenCreateNewChannel?: boolean;
 	currentCategory: ICategory | null;
-	channelMetadata: EntityState<ChannelMeta, string>;
 	currentVoiceChannelId: string;
 	request: Record<string, RequestInput>;
 	idChannelSelected: Record<string, string>;
@@ -214,7 +205,7 @@ type fetchChannelsArgs = {
 	noCache?: boolean;
 };
 
-function extractChannelMeta(channel: ChannelsEntity): ChannelMeta {
+function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
 	return {
 		id: channel.id,
 		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
@@ -274,7 +265,7 @@ export const fetchChannels = createAsyncThunk(
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
 		const meta = channels.map((ch) => extractChannelMeta(ch));
-		thunkAPI.dispatch(channelsActions.updateBulkChannelMetadata(meta));
+		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
 	}
 );
@@ -285,7 +276,6 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	error: null,
 	isOpenCreateNewChannel: false,
 	currentCategory: null,
-	channelMetadata: channelMetaAdapter.getInitialState(),
 	currentVoiceChannelId: '',
 	request: {},
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
@@ -318,27 +308,6 @@ export const channelsSlice = createSlice({
 		},
 		getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
 			state.currentCategory = action.payload;
-		},
-		setChannelLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			const channel = state.channelMetadata.entities[action.payload.channelId];
-			if (channel) {
-				channel.lastSentTimestamp = action.payload.timestamp;
-			}
-		},
-		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			const channel = state.channelMetadata.entities[action.payload.channelId];
-			if (channel) {
-				channel.lastSeenTimestamp = action.payload.timestamp;
-			}
-		},
-		setChannelLastSeenPinMessage: (state, action: PayloadAction<{ channelId: string; lastSeenPinMess: string }>) => {
-			const channel = state.channelMetadata.entities[action.payload.channelId];
-			if (channel) {
-				channel.lastSeenPinMessage = action.payload.lastSeenPinMess;
-			}
-		},
-		updateBulkChannelMetadata: (state, action: PayloadAction<ChannelMeta[]>) => {
-			state.channelMetadata = channelMetaAdapter.upsertMany(state.channelMetadata, action.payload);
 		},
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
 			const payload = action.payload;
@@ -569,25 +538,6 @@ export const selectDefaultChannelIdByClanId = (clanId: string, categories?: stri
 		const defaultChannel = channels.find((channel) => channel.parrent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_TEXT);
 
 		return defaultChannel ? defaultChannel.id : null;
-	});
-
-export const selectLastSeenPinMessageChannelById = (channelId: string) =>
-	createSelector(getChannelsState, (state) => {
-		const channel = state.channelMetadata.entities[channelId];
-		return channel?.lastSeenPinMessage || '';
-	});
-
-export const selectIsUnreadChannelById = (channelId: string) =>
-	createSelector(getChannelsState, (state) => {
-		const channel = state.channelMetadata.entities[channelId];
-		// unread last seen timestamp is less than last sent timestamp
-		return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
-	});
-
-export const selectLastChannelTimestamp = (channelId: string) =>
-	createSelector(getChannelsState, (state) => {
-		const channel = state.channelMetadata.entities[channelId];
-		return channel?.lastSeenTimestamp || 0;
 	});
 
 export const selectRequestByChannelId = (channelId: string) =>
