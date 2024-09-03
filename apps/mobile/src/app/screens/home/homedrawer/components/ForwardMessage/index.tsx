@@ -38,9 +38,10 @@ interface ForwardMessageModalProps {
 	show?: boolean;
 	onClose: () => void;
 	message: IMessageWithUser;
+	isPublic?: boolean;
 }
 
-const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProps) => {
+const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessageModalProps) => {
 	const [searchText, setSearchText] = useState('');
 	const [selectedForwardObjects, setSelectedForwardObjects] = useState<IForwardIObject[]>([]);
 
@@ -142,17 +143,17 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 				switch (type) {
 					case ChannelType.CHANNEL_TYPE_DM:
 						for (const message of combineMessages) {
-							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, message);
+							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, false, message);
 						}
 						break;
 					case ChannelType.CHANNEL_TYPE_GROUP:
 						for (const message of combineMessages) {
-							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, message);
+							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
 						}
 						break;
 					case ChannelType.CHANNEL_TYPE_TEXT:
 						for (const message of combineMessages) {
-							sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+							sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, isPublic, message);
 						}
 						break;
 					default:
@@ -180,13 +181,13 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 				const { type, channelId, clanId = '' } = selectedObjectSend;
 				switch (type) {
 					case ChannelType.CHANNEL_TYPE_DM:
-						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, message);
+						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, false, message);
 						break;
 					case ChannelType.CHANNEL_TYPE_GROUP:
-						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, message);
+						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
 						break;
 					case ChannelType.CHANNEL_TYPE_TEXT:
-						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, isPublic, message);
 						break;
 					default:
 						break;

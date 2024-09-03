@@ -19,14 +19,13 @@ import { IMessageActionPayload } from './types';
 
 type ChannelMessagesProps = {
 	channelId: string;
-	channelLabel?: string;
 	mode: ChannelStreamMode;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
 };
 
-const ChannelMessages = React.memo(({ channelId, channelLabel, mode, onOpenImage, onMessageAction,setIsOnlyEmojiPicker  }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAction,setIsOnlyEmojiPicker  }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -121,14 +120,13 @@ const ChannelMessages = React.memo(({ channelId, channelLabel, mode, onOpenImage
 					messageId={item.id}
 					mode={mode}
 					channelId={channelId}
-					channelName={channelLabel}
 					onOpenImage={onOpenImage}
 					onMessageAction={onMessageAction}
 					setIsOnlyEmojiPicker={setIsOnlyEmojiPicker}
 				/>
 			);
 		},
-		[jumpToRepliedMessage, mode, channelId, channelLabel, onOpenImage, onMessageAction]
+		[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction]
 	);
 
 	const checkChannelCacheLoading = useMemo(() => {
