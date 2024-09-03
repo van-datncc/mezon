@@ -95,7 +95,6 @@ export const ChatBoxBottomBar = memo(
 		const currentChannel = useSelector(selectCurrentChannel);
 		const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
 
-		// const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(channelId);
 		const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
 
 		const checkAttachment = useMemo(() => {
@@ -424,7 +423,6 @@ export const ChatBoxBottomBar = memo(
 					index: index
 				})
 			);
-			// removeAttachmentByIndex(currentChannel?.id, index);
 		};
 
 		useEffect(() => {
