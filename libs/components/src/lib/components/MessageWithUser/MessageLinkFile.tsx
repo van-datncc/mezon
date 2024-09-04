@@ -22,8 +22,7 @@ function MessageLinkFile({ attachmentData, mode }: MessageImage) {
 	const handleDownload = () => {
 		window.open(attachmentData.url);
 	};
-	const attachmentToFile = mapApiMessageAttachmentToFile(attachmentData);
-	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentToFile, 'w-8 h-10');
+	const thumbnailAttachment = RenderAttachmentThumbnail(attachmentData, 'w-8 h-10');
 
 	const hideTheInformationFile =
 		attachmentData.filetype !== 'image/gif' &&
@@ -75,12 +74,3 @@ function MessageLinkFile({ attachmentData, mode }: MessageImage) {
 }
 
 export default MessageLinkFile;
-
-export function mapApiMessageAttachmentToFile(attachment: ApiMessageAttachment): File {
-	const fileContent = new Blob();
-	const file = new File([fileContent], attachment.filename || 'unknown', {
-		type: attachment.filetype || 'application/octet-stream',
-		lastModified: new Date().getTime(),
-	});
-	return file;
-}

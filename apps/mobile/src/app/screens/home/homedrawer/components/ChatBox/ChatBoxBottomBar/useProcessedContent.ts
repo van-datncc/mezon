@@ -1,23 +1,24 @@
 import { selectEmojiObjSuggestion } from '@mezon/store';
 import { EMarkdownType, IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 const useProcessedContent = (inputText: string) => {
-	const [emojiList, setEmojiList] = useState<IEmojiOnMessage[]>([]);
-	const [linkList, setLinkList] = useState<ILinkOnMessage[]>([]);
-	const [markdownList, setMarkdownList] = useState<IMarkdownOnMessage[]>([]);
-	const [voiceLinkRoomList, setVoiceLinkRoomList] = useState<ILinkVoiceRoomOnMessage[]>([]);
+	const emojiList = useRef<IEmojiOnMessage[]>([]);
+	const linkList = useRef<ILinkOnMessage[]>([]);
+	const markdownList = useRef<IMarkdownOnMessage[]>([]);
+	const voiceLinkRoomList = useRef<ILinkVoiceRoomOnMessage[]>([]);
 	const emojiObjPicked = useSelector(selectEmojiObjSuggestion);
 
 	useEffect(() => {
 		const processInput = () => {
-			const resultString = inputText.replace(/\[|\]/g, '');
+			const resultString = inputText.replace(/[[]<>]/g, '');
 			const { emojis, links, markdowns, voiceRooms } = processText(resultString, emojiObjPicked);
-			setEmojiList(emojis);
-			setLinkList(links);
-			setMarkdownList(markdowns);
-			setVoiceLinkRoomList(voiceRooms);
+			emojiList.current = emojis;
+			linkList.current = links;
+			markdownList.current = markdowns;
+			markdownList.current = markdowns;
+			voiceLinkRoomList.current = voiceRooms;
 		};
 
 		processInput();
@@ -57,7 +58,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 					emojis.push({
 						emojiid: emojiObjPicked?.[`:${shortname}:`],
 						s: startindex,
-						e: endindex,
+						e: endindex
 					});
 				}
 				i++;
@@ -75,12 +76,12 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 			if (link.startsWith(googleMeetPrefix)) {
 				voiceRooms.push({
 					s: startindex,
-					e: endindex,
+					e: endindex
 				});
 			} else {
 				links.push({
 					s: startindex,
-					e: endindex,
+					e: endindex
 				});
 			}
 		} else if (inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {

@@ -6,7 +6,8 @@ import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
-import { setup } from './push-receiver';
+import { initBadge } from './services/badge';
+import { setupPushReceiver } from './services/push-receiver';
 
 const isQuitting = false;
 
@@ -25,9 +26,7 @@ export default class App {
 	}
 
 	private static onWindowAllClosed() {
-		if (process.platform !== 'darwin') {
-			App.application.quit();
-		}
+		App.application.quit();
 	}
 
 	private static onClose(event) {
@@ -43,10 +42,10 @@ export default class App {
 		if (rendererAppName) {
 			App.initMainWindow();
 			App.loadMainWindow();
+			App.setupBadge();
+			App.setupPushReceiver();
 			tray.init(isQuitting);
 		}
-
-		setup(App.mainWindow.webContents);
 	}
 
 	private static onActivate() {
@@ -83,11 +82,13 @@ export default class App {
 					const url = argv.pop().slice(1);
 
 					if (url) {
-						const index = url.indexOf('=');
-						const dataString = url.substring(index + 1);
+						const index = url.indexOf('data=');
+						if (index > 0) {
+							const dataString = url.substring(index + 5);
 
-						if (dataString) {
-							App.loadMainWindow({ deepLinkUrl: dataString });
+							if (dataString) {
+								App.loadMainWindow({ deepLinkUrl: dataString });
+							}
 						}
 					}
 				}
@@ -143,6 +144,7 @@ export default class App {
 			App.application.exit();
 		});
 	}
+
 	private static generateQueryString(params: Record<string, string>): string {
 		return Object.keys(params)
 			.map((key) => {
@@ -187,5 +189,19 @@ export default class App {
 		App.application.on('window-all-closed', App.onWindowAllClosed);
 		App.application.on('ready', App.onReady);
 		App.application.on('activate', App.onActivate);
+	}
+
+	/**
+	 * setup receive notification from FCM
+	 */
+	private static setupPushReceiver() {
+		return setupPushReceiver(App.mainWindow.webContents);
+	}
+
+	/**
+	 * setup badge for the app
+	 */
+	private static setupBadge() {
+		return initBadge(App.application, App.mainWindow);
 	}
 }

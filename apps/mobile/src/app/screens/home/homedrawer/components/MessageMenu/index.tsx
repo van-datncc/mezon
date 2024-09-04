@@ -4,7 +4,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentUserId, useAppSelector } from '@mezon/store';
 import { deleteChannel, DirectEntity, fetchDirectMessage, removeMemberChannel, useAppDispatch } from '@mezon/store-mobile';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from 'apps/mobile/src/app/temp-ui';
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
 import { style } from './styles';
@@ -14,7 +14,7 @@ interface IServerMenuProps {
     messageInfo: DirectEntity
 }
 
-export default function MessageMenu({ messageInfo }: IServerMenuProps) {
+function MessageMenu({ messageInfo }: IServerMenuProps) {
 	const { t } = useTranslation(['dmMessage']);
 	const { themeValue } = useTheme();
 	const [isVisibleLeaveGroupModal, setIsVisibleLeaveGroupModal] = useState<boolean>(false);
@@ -121,7 +121,7 @@ export default function MessageMenu({ messageInfo }: IServerMenuProps) {
                     </View>
                 ) : (
                     <View style={styles.avatarWrapper}>
-                        {messageInfo?.channel_avatar?.[0] ? (
+                        {!!messageInfo?.channel_avatar?.[0] ? (
                             <Image source={{ uri: messageInfo?.channel_avatar?.[0] }} style={styles.friendAvatar} />
                         ) : (
                             <View style={styles.wrapperTextAvatar}>
@@ -156,3 +156,5 @@ export default function MessageMenu({ messageInfo }: IServerMenuProps) {
 		</View>
 	);
 }
+
+export default memo(MessageMenu);

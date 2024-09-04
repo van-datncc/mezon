@@ -1,11 +1,12 @@
-import { app, BrowserWindow, dialog, ipcMain, Notification } from 'electron';
+import { BrowserWindow, Notification, app, dialog, ipcMain } from 'electron';
 import log from 'electron-log/main';
-import { autoUpdater, UpdateInfo } from 'electron-updater';
+import { UpdateInfo, autoUpdater } from 'electron-updater';
 import { machineId } from 'node-machine-id';
 import { join } from 'path';
 import { format } from 'url';
 import App from './app/app';
 import { rendererAppName } from './app/constants';
+import { GET_DEVICE_ID, NAVIGATE_TO_URL, SENDER_ID } from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
@@ -33,15 +34,15 @@ export default class Main {
 	}
 }
 
-ipcMain.handle('sender-id', () => {
+ipcMain.handle(SENDER_ID, () => {
 	return environment.senderId;
 });
 
-ipcMain.handle('get-device-id', async () => {
+ipcMain.handle(GET_DEVICE_ID, async () => {
 	return await machineId();
 });
 
-ipcMain.on('navigate-to-url', async (event, path, isSubPath) => {
+ipcMain.on(NAVIGATE_TO_URL, async (event, path, isSubPath) => {
 	if (App.mainWindow) {
 		const baseUrl = join(__dirname, '..', rendererAppName, 'index.html');
 
@@ -89,7 +90,7 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 autoUpdater.on('update-not-available', (info: UpdateInfo) => {
 	new Notification({
 		title: 'No update',
-		body: 'The current version is the latest. ' + info.version
+		body: `The current version (${info.version}) is the latest.`
 	}).show();
 });
 

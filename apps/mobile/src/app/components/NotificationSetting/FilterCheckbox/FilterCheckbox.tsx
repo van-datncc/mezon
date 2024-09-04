@@ -34,7 +34,7 @@ const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(
 						)}
 						<Text style={styles.labelOption}>{label}</Text>
 					</Block>
-					{[ENotificationType.CATEGORY_DEFAULT]?.includes?.(label as ENotificationType) && (
+					{[ENotificationType.CATEGORY_DEFAULT].includes?.(label as ENotificationType) && (
 						<Text style={styles.defaultNotifyName}>{defaultNotifyName}</Text>
 					)}
 				</View>
@@ -42,7 +42,7 @@ const FilterCheckbox: React.FC<FilterCheckboxProps> = React.memo(
 				<MezonRadioButton checked={isChecked} />
 			</TouchableOpacity>
 		);
-	},
+	}
 );
 
 export default FilterCheckbox;

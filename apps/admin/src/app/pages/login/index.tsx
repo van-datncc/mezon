@@ -21,7 +21,7 @@ function Login() {
 
 	useEffect(() => {
 		if (isLogin) {
-			navigate('/admin/applications');
+			navigate('/applications');
 		}
 	}, [isLogin, navigate]);
 

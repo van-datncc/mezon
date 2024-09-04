@@ -7,13 +7,14 @@ import {
 	referencesActions,
 	selectCurrentChannel,
 	threadsActions,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
 	handleContextMenu: (event: React.MouseEvent<HTMLElement>, props: any) => void;
@@ -22,19 +23,18 @@ type ChannelMessageOptProps = {
 const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const refOpt = useRef<HTMLDivElement>(null);
-
 	const checkHiddenIconThread = !currentChannel || Snowflake.isValid(currentChannel.parrent_id ?? '');
-
 	const replyMenu = useMenuReplyMenuBuilder(message);
 	const editMenu = useEditMenuBuilder(message);
 	const reactMenu = useReactMenuBuilder(message);
 	const threadMenu = useThreadMenuBuilder(message, checkHiddenIconThread);
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
-
 	const items = useMenuBuilder([reactMenu, replyMenu, editMenu, threadMenu, optionMenu]);
 
 	return (
-		<div className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block -top-4 right-6 w-fit`}>
+		<div
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!message.isStartedMessageGroup ? '-top-4' : message.isStartedMessageOfTheDay ? 'top-6' : '-top-1'}  right-6 w-fit `}
+		>
 			<div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
 				<div className="w-fit h-full flex justify-between" ref={refOpt}>
 					{items.map((item, index) => (
@@ -90,9 +90,9 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 					message_id: messageId,
 					draftContent: message.content,
 					draftMention: message.mentions ?? [],
-					draftAttachment: message.attachments ?? [],
-				},
-			}),
+					draftAttachment: message.attachments ?? []
+				}
+			})
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));
 	}, [dispatch, message, messageId]);
@@ -103,7 +103,7 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 				'edit',
 				'edit',
 				handleItemClick,
-				<Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`} />,
+				<Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`} />
 			);
 		});
 	});
@@ -126,7 +126,7 @@ function useReactMenuBuilder(message: IMessageWithUser) {
 				dispatch(reactionActions.setReactionTopState(false));
 			}
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	return useMenuBuilderPlugin((builder) => {
@@ -167,7 +167,7 @@ function useOptionMenuBuilder(handleContextMenu: any) {
 			const props = { position };
 			handleContextMenu(event, props);
 		},
-		[handleContextMenu],
+		[handleContextMenu]
 	);
 
 	return useMenuBuilderPlugin((builder) => {

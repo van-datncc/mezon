@@ -1,5 +1,5 @@
-import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, getChannelById, load, save } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -8,25 +8,23 @@ import {
 	selectAllClans,
 	selectChannelsEntities,
 	selectCurrentChannel,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../components/NotificationSetting';
-import useStatusMuteChannel, { EActionMute } from '../../../hooks/useStatusMuteChannel';
+import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
-import ChannelMessages from './ChannelMessages';
+import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
+import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
-import AttachmentPicker from './components/AttachmentPicker';
-import BottomKeyboardPicker from './components/BottomKeyboardPicker';
-import EmojiPicker from './components/EmojiPicker';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
 
@@ -37,22 +35,15 @@ const HomeDefault = React.memo((props: any) => {
 	const timeoutRef = useRef<any>(null);
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
 	const [isShowLicenseAgreement, setIsShowLicenseAgreement] = useState<boolean>(false);
-	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
-	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
-	const bottomPickerRef = useRef<BottomSheet>(null);
 	const navigation = useNavigation<any>();
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const dispatch = useAppDispatch();
+	const panelKeyboardRef = useRef(null);
 	const prevChannelIdRef = useRef<string>();
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
-		setHeightKeyboardShow(height);
-		if (isShow) {
-			setTypeKeyboardBottomSheet(type);
-			bottomPickerRef.current?.collapse();
-		} else {
-			setTypeKeyboardBottomSheet('text');
-			bottomPickerRef.current?.close();
+		if (panelKeyboardRef?.current) {
+			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
 		}
 	}, []);
 
@@ -82,27 +73,18 @@ const HomeDefault = React.memo((props: any) => {
 			return () => {
 				setIsFocusChannelView(false);
 			};
-		}, [currentChannel?.channel_id]),
+		}, [currentChannel?.channel_id])
 	);
 
 	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 		const timeout = setTimeout(() => {
 			checkShowLicenseAgreement();
 		}, 500);
 		return () => {
-			appStateSubscription.remove();
 			timeoutRef?.current && clearTimeout(timeoutRef.current);
 			clearTimeout(timeout);
 		};
 	}, []);
-
-	const handleAppStateChange = async (state: string) => {
-		if (state === 'background') {
-			Keyboard.dismiss();
-			setHeightKeyboardShow(0);
-		}
-	};
 
 	const fetchMemberChannel = async () => {
 		if (!currentChannel) {
@@ -112,8 +94,8 @@ const HomeDefault = React.memo((props: any) => {
 			channelMembersActions.fetchChannelMembers({
 				clanId: currentChannel?.clan_id || '',
 				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type,
-			}),
+				channelType: currentChannel?.type
+			})
 		);
 	};
 
@@ -146,47 +128,18 @@ const HomeDefault = React.memo((props: any) => {
 			/>
 			{currentChannel && isFocusChannelView && (
 				<View style={styles.channelView}>
-					<ChannelMessages
+					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
-						channelLabel={currentChannel?.channel_label}
+						isPublic={!currentChannel?.channel_private}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
-					{/* {heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<Block position={'absolute'} flex={1} height={'100%'} width={'100%'}>
-							<TouchableOpacity style={{ flex: 1 }} onPress={() => onShowKeyboardBottomSheet(false, 0, 'text')}></TouchableOpacity>
-						</Block>
-					)} */}
-
 					<ChatBox
 						channelId={currentChannel?.channel_id}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					/>
-
-					<View
-						style={{
-							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: themeValue.secondary,
-						}}
-					/>
-					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
-							{typeKeyboardBottomSheet === 'emoji' ? (
-								<EmojiPicker
-									onDone={() => {
-										onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
-										DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
-									}}
-									bottomSheetRef={bottomPickerRef}
-								/>
-							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
-							) : (
-								<View />
-							)}
-						</BottomKeyboardPicker>
-					)}
+					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
 				</View>
 			)}
 
@@ -202,7 +155,7 @@ const HomeDefaultHeader = React.memo(
 		navigation,
 		currentChannel,
 		openBottomSheet,
-		onOpenDrawer,
+		onOpenDrawer
 	}: {
 		navigation: any;
 		currentChannel: ChannelsEntity;
@@ -219,6 +172,10 @@ const HomeDefaultHeader = React.memo(
 		const { statusMute } = useStatusMuteChannel();
 
 		useEffect(() => {
+			if (!currentChannel?.parrent_id) {
+				setChannelOfThread(null);
+				return;
+			}
 			setChannelOfThread(getChannelById(currentChannel?.parrent_id, channelsEntities));
 		}, [currentChannel?.parrent_id, channelsEntities]);
 
@@ -226,8 +183,8 @@ const HomeDefaultHeader = React.memo(
 			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 				params: {
-					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault,
-				},
+					openSearchChannelFrom: EOpenSearchChannelFrom.HeaderDefault
+				}
 			});
 		};
 		return (
@@ -265,8 +222,7 @@ const HomeDefaultHeader = React.memo(
 				</TouchableOpacity>
 				{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => openBottomSheet()}>
-						{/* <SearchIcon width={22} height={22} style={{ marginRight: 20 }} /> */}
-						{statusMute === EActionMute.Mute ? (
+						{statusMute === ENotificationActive.OFF ? (
 							<Icons.BellSlashIcon width={20} height={20} color={themeValue.textStrong} />
 						) : (
 							<Icons.BellIcon width={20} height={20} color={themeValue.textStrong} />
@@ -279,7 +235,7 @@ const HomeDefaultHeader = React.memo(
 				)}
 			</View>
 		);
-	},
+	}
 );
 
 export default HomeDefault;

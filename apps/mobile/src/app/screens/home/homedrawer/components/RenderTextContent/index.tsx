@@ -1,34 +1,15 @@
+import { mentionRegex, mentionRegexSplit } from '@mezon/mobile-components';
 import { Colors } from '@mezon/mobile-ui';
-import { ChannelsEntity } from '@mezon/store-mobile';
-import { IEmoji } from '@mezon/utils';
 import React from 'react';
 import { Text } from 'react-native';
-import { channelIdRegex, highlightEmojiRegex} from '../../../../../utils/helpers';
+import { highlightEmojiRegex } from '../../../../../utils/helpers';
 import { styles } from './RenderTextContent.styles';
-import { mentionRegex, mentionRegexSplit } from '@mezon/mobile-components';
 
-export const renderTextContent = (text: string, channelsEntities?: Record<string, ChannelsEntity>) => {
-	const getChannelById = (channelHashtagId: string) => {
-		const channel = channelsEntities?.[channelHashtagId];
-		if (channel) {
-			return channel;
-		} else {
-			return {
-				channel_label: channelHashtagId,
-			};
-		}
-	};
-
-	const renderChannelMention = (id: string) => {
-		const channelId = id?.match(channelIdRegex)[1];
-		const channel = getChannelById(channelId);
-
+export const renderTextContent = (text: string) => {
+	const renderChannelMention = (channelLabel: string) => {
 		return (
 			<Text>
-				<Text style={styles.contentMessageMention}>
-					{'#'}
-					{channel?.channel_label || ''}
-				</Text>
+				<Text style={styles.contentMessageMention}>{channelLabel.slice(1, -1) || ''}</Text>
 			</Text>
 		);
 	};
@@ -36,7 +17,7 @@ export const renderTextContent = (text: string, channelsEntities?: Record<string
 	const renderUserMention = (id: string) => {
 		return (
 			<Text>
-				<Text style={styles.contentMessageMention}>{`@${id?.slice(2,-1)}`}</Text>
+				<Text style={styles.contentMessageMention}>{`@${id?.slice(2, -1)}`}</Text>
 			</Text>
 		);
 	};

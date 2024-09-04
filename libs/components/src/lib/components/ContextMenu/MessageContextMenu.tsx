@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { Icons } from '@mezon/components';
-import { useAuth, useCheckAlonePermission, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, useCheckAlonePermission, useClanRestriction, useDeleteMessage, useReference, useThreads } from '@mezon/core';
 import {
 	MessagesEntity,
 	directActions,
@@ -24,7 +24,7 @@ import {
 	threadsActions,
 	toggleIsShowPopupForwardTrue,
 	useAppDispatch,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
 import {
 	ContextMenuItem,
@@ -36,9 +36,9 @@ import {
 	handleCopyImage,
 	handleCopyLink,
 	handleOpenLink,
-	handleSaveImage,
+	handleSaveImage
 } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
 import { ModalAddPinMess } from '../PinMessModal';
@@ -62,14 +62,14 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
 	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || ''),
+		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || '')
 	);
 	const convertedAllMessagesEntities = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
-	const [checkAdmintrator, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
+	const [checkAdmintrator, { isClanOwner, isOwnerGroupDM }] = useClanRestriction([EPermission.administrator]);
 	const checkSenderMessage = useMemo(() => {
 		return message?.sender_id === userId;
 	}, [message?.sender_id, userId]);
@@ -84,6 +84,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
 	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
 	const isAlone = useCheckAlonePermission();
+	const { type } = useAppParams();
 
 	const [createThread] = useClanRestriction([EPermission.manageChannel]);
 	const [isAllowDelMessage] = useClanRestriction([EPermission.deleteMessage]);
@@ -105,15 +106,15 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	// add action
 	const { deleteSendMessage } = useDeleteMessage({
 		channelId: currentChannel?.id || '',
-		mode: activeMode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+		mode: activeMode ?? ChannelStreamMode.STREAM_MODE_CHANNEL
 	});
 
 	const handleReplyMessage = () => {
 		dispatch(
 			referencesActions.setIdReferenceMessageReply({
 				channelId: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || '',
-				idMessageRefReply: message.id,
-			}),
+				idMessageRefReply: message.id
+			})
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
@@ -130,9 +131,9 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					message_id: message.id,
 					draftContent: message.content,
 					draftMention: message.mentions ?? [],
-					draftAttachment: message.attachments ?? [],
-				},
-			}),
+					draftAttachment: message.attachments ?? []
+				}
+			})
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));
 	};
@@ -159,7 +160,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const handlePinMessage = async () => {
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
-			pinMessageActions.joinPinMessage({ clanId: currentClanId ?? '', channelId: currentChannel?.channel_id ?? '', messageId: message?.id }),
+			pinMessageActions.joinPinMessage({
+				clanId: currentClanId ?? '',
+				channelId: currentChannel?.channel_id ?? '',
+				messageId: message?.id,
+				isPublic: !currentChannel?.channel_private
+			})
 		);
 	};
 
@@ -246,12 +252,14 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const enableDelMessageItem = useMemo(() => {
 		if (!checkPos) return false;
+		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
+			return checkSenderMessage || isOwnerGroupDM;
+		}
 		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 			return delMessage || isAllowDelMessage || checkSenderMessage || isClanOwner || checkAdmintrator;
-		} else {
-			return checkSenderMessage;
 		}
-	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanOwner, checkAdmintrator, checkPos]);
+		return checkSenderMessage;
+	}, [delMessage, isAllowDelMessage, checkSenderMessage, isClanOwner, checkAdmintrator, checkPos, isOwnerGroupDM]);
 
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
@@ -298,7 +306,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				'addReaction', // id
 				'Add Reaction', // lable
 				() => console.log('add reaction'),
-				<Icons.RightArrowRightClick />,
+				<Icons.RightArrowRightClick />
 			);
 		});
 
@@ -307,7 +315,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				'viewReaction',
 				'View Reaction',
 				() => console.log('view reaction'),
-				<Icons.ViewReactionRightClick defaultSize="w-4 h-4" />,
+				<Icons.ViewReactionRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -323,7 +331,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					}
 				},
 
-				<Icons.EditMessageRightClick defaultSize="w-4 h-4" />,
+				<Icons.EditMessageRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -340,7 +348,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				'Reply',
 				() => handleReplyMessage(),
 
-				<Icons.ReplyRightClick defaultSize="w-4 h-4" />,
+				<Icons.ReplyRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -359,7 +367,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 						console.error('Failed to copy text', error);
 					}
 				},
-				<Icons.CopyTextRightClick />,
+				<Icons.CopyTextRightClick />
 			);
 		});
 
@@ -376,7 +384,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				'copyMessageLink',
 				'Copy Message Link',
 				() => console.log('copyMessageLink'),
-				<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />,
+				<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -391,7 +399,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 						'forwardAll',
 						'Forward All Message',
 						() => handleForwardAllMessage(),
-						<Icons.ForwardRightClick defaultSize="w-4 h-4" />,
+						<Icons.ForwardRightClick defaultSize="w-4 h-4" />
 					);
 				});
 		}
@@ -403,7 +411,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				() => {
 					console.log('speak Message');
 				},
-				<Icons.SpeakMessageRightClick defaultSize="w-4 h-4" />,
+				<Icons.SpeakMessageRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -414,7 +422,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				() => {
 					console.log('remove reaction');
 				},
-				<Icons.RightArrowRightClick defaultSize="w-4 h-4" />,
+				<Icons.RightArrowRightClick defaultSize="w-4 h-4" />
 			);
 		});
 		builder.when(enableRemoveAllReactionsItem, (builder) => {
@@ -434,7 +442,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 						console.error('Failed to delete message', error);
 					}
 				},
-				<Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />,
+				<Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -445,7 +453,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 				() => {
 					console.log('report message');
 				},
-				<Icons.ReportMessageRightClick defaultSize="w-4 h-4" />,
+				<Icons.ReportMessageRightClick defaultSize="w-4 h-4" />
 			);
 		});
 
@@ -508,7 +516,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		pinMessageStatus,
 		checkPos,
 		urlImage,
-		posShowMenu,
+		posShowMenu
 	]);
 
 	return (

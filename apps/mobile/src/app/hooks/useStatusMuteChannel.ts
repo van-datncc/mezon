@@ -1,32 +1,39 @@
-import { selectDefaultNotificationCategory, selectDefaultNotificationClan, selectCurrentChannelNotificatonSelected } from '@mezon/store-mobile';
+import { ENotificationActive, ENotificationChannelId } from '@mezon/mobile-components';
+import { selectCurrentChannelNotificatonSelected, selectDefaultNotificationCategory, selectDefaultNotificationClan } from '@mezon/store-mobile';
+import { NotificationType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-export const enum EActionMute {
-	Mute = 1,
-	UnMute = 0,
-}
-
 const useStatusMuteChannel = () => {
-	const [statusMute, setStatusMute] = useState<EActionMute>(EActionMute.UnMute);
+	const [statusMute, setStatusMute] = useState<ENotificationActive>(ENotificationActive.ON);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	useEffect(() => {
-		const isChannelMuted =
-			getNotificationChannelSelected?.active !== EActionMute.Mute || getNotificationChannelSelected?.notification_setting_type === 'NOTHING';
-		const isCategoryMuted = defaultNotificationCategory?.notification_setting_type === 'NOTHING';
-		const isClanMuted = defaultNotificationClan?.notification_setting_type === 'NOTHING';
-		if (isChannelMuted) {
-			setStatusMute(EActionMute.Mute);
-		} else if (!getNotificationChannelSelected?.notification_setting_type) {
-			setStatusMute(isCategoryMuted || isClanMuted ? EActionMute.Mute : EActionMute.UnMute);
+		if (
+			getNotificationChannelSelected?.active === ENotificationActive.ON &&
+			getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+		) {
+			setStatusMute(ENotificationActive.OFF);
+		} else if (
+			getNotificationChannelSelected?.id !== ENotificationChannelId.Default &&
+			getNotificationChannelSelected?.active !== ENotificationActive.ON
+		) {
+			setStatusMute(ENotificationActive.OFF);
+		} else if (getNotificationChannelSelected?.id === ENotificationChannelId.Default) {
+			if (defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
+				setStatusMute(ENotificationActive.OFF);
+			} else if (defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
+				setStatusMute(ENotificationActive.OFF);
+			} else {
+				setStatusMute(ENotificationActive.ON);
+			}
 		} else {
-			setStatusMute(EActionMute.UnMute);
+			setStatusMute(ENotificationActive.ON);
 		}
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
 	return {
-		statusMute,
+		statusMute
 	};
 };
 

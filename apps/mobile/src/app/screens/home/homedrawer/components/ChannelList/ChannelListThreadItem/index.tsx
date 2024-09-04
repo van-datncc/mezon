@@ -1,11 +1,12 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectNotificationMentionCountByChannelId } from '@mezon/store-mobile';
+import { selectNotificationMentionCountByChannelId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import LongCornerIcon from '../../../../../../../assets/svg/long-corner.svg';
 import ShortCornerIcon from '../../../../../../../assets/svg/short-corner.svg';
 import { style } from './styles';
+import { selectIsUnreadChannelById, selectLastChannelTimestamp } from '@mezon/store';
 
 interface IChannelListThreadItemProps {
 	onPress?: (thread: any) => void;

@@ -3,6 +3,7 @@ import appThemeSetting from './appThemeSetting.json';
 import appearanceSetting from './appearanceSetting.json';
 import categoryCreator from './categoryCreator.json';
 import categoryMenu from './categoryMenu.json';
+import categorySetting from './categorySetting.json';
 import { default as channelCreator, default as channelMenu } from './channelCreator.json';
 import channelSetting from './channelSetting.json';
 import clan from './clan.json';
@@ -12,7 +13,7 @@ import clanNotificationsSetting from './clanNotificationsSetting.json';
 import clanOverviewSetting from './clanOverviewSetting.json';
 import clanRoles from './clanRoles.json';
 import clanSetting from './clanSetting.json';
-import clanStickerSettings from './clanStickerSetting.json';
+import clanStickerSettings from "./clanStickerSetting.json";
 import common from './common.json';
 import createThread from './createThread.json';
 import customUserStatus from './customUserStatus.json';
@@ -68,6 +69,7 @@ export default {
 	appearanceSetting,
 	appThemeSetting,
 	accountSetting,
+	categorySetting,
 	deleteClan,
 	media,
 	clanRoles,

@@ -47,6 +47,15 @@ export async function handleUploadEmoticon(client: Client, session: Session, fil
 		}
 	});
 }
+const mimeTypeMap: Record<string, string> = {
+	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+	'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx'
+};
+
+function getFileType(mimeType: string): string {
+	return mimeTypeMap[mimeType] || mimeType;
+}
 
 export async function handleUploadFile(
 	client: Client,
@@ -65,10 +74,12 @@ export async function handleUploadFile(
 				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
 				fileType = `text/${fileExtension}`;
 			}
+			const shortFileType = getFileType(fileType);
+
 			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
 			const buf = await file?.arrayBuffer();
 
-			resolve(uploadFile(client, session, filePath, fileType, file.size, Buffer.from(buf), false, originalFilename));
+			resolve(uploadFile(client, session, filePath, shortFileType, file.size, Buffer.from(buf), false, originalFilename));
 		} catch (error) {
 			reject(new Error(`${error}`));
 		}
@@ -116,16 +127,18 @@ export function createUploadFilePath(
 ): { filePath: string; originalFilename: string } {
 	const originalFilename = filename;
 
-	const ms = new Date().getMinutes();
+	// Append milliseconds timestamp to filename
+	const ms = new Date().getMilliseconds();
 	filename = ms + filename;
-	filename = filename.replace(/-|\(|\)| /g, '_');
+	filename = filename.replace(/[^a-zA-Z0-9.]/g, '_');
+	// Ensure valid clan and channel IDs
 	if (!currentClanId) {
 		currentClanId = '0';
 	}
 	if (!currentChannelId) {
 		currentChannelId = '0';
 	}
-	const filePath = currentClanId + '/' + currentChannelId + '/' + session.user_id + '/' + filename;
+	const filePath = `${currentClanId}/${currentChannelId}/${session.user_id}/${filename}`;
 	return { filePath, originalFilename };
 }
 
@@ -179,36 +192,44 @@ export function handleUrlInput(url: string): Promise<ApiMessageAttachment> {
 		height: 0
 	};
 
-	return new Promise<ApiMessageAttachment>((resolve, reject) => {
-		if (url?.length < 512) {
-			fetch(url, { method: 'HEAD' })
-				.then((response) => {
-					if (response.ok) {
-						const now = Date.now();
-						const contentSize = response.headers.get('Content-Length');
-						let contentType = response.headers.get('Content-Type');
-						if (contentType?.includes('charset=utf-8')) {
-							contentType = contentType.split(';')?.[0];
-						}
-						if (contentType) {
-							resolve({
-								filename: now + contentType,
-								url: url,
-								filetype: contentType,
-								size: Number(contentSize),
-								width: 0,
-								height: 0
-							});
-						}
-					} else {
-						resolve(defaultAttachment);
-					}
-				})
-				.catch((e) => {
+	const typeImages = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.apng'];
+
+	for (const typeImage of typeImages) {
+		if (url.toLowerCase().endsWith(typeImage)) {
+			return new Promise<ApiMessageAttachment>((resolve, reject) => {
+				if (url?.length < 512) {
+					fetch(url, { method: 'HEAD' })
+						.then((response) => {
+							if (response.ok) {
+								const now = Date.now();
+								const contentSize = response.headers.get('Content-Length');
+								let contentType = response.headers.get('Content-Type');
+								if (contentType?.includes('charset=utf-8')) {
+									contentType = contentType.split(';')?.[0];
+								}
+								if (contentType) {
+									resolve({
+										filename: now + contentType,
+										url: url,
+										filetype: contentType,
+										size: Number(contentSize),
+										width: 0,
+										height: 0
+									});
+								}
+							} else {
+								resolve(defaultAttachment);
+							}
+						})
+						.catch((e) => {
+							resolve(defaultAttachment);
+						});
+				} else {
 					resolve(defaultAttachment);
-				});
-		} else {
-			resolve(defaultAttachment);
+				}
+			});
 		}
-	});
+	}
+
+	return Promise.resolve(defaultAttachment);
 }

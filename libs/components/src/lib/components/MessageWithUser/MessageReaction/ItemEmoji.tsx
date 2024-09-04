@@ -4,9 +4,8 @@ import {
 	reactionActions,
 	selectCurrentChannel,
 	selectCurrentClanId,
-	selectDirectById,
 	selectEmojiHover,
-	selectUserReactionPanelState,
+	selectUserReactionPanelState
 } from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -32,17 +31,18 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const emojiItemRef = useRef<HTMLDivElement | null>(null);
 	const userPanelRef = useRef<HTMLDivElement | null>(null);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const [channelLabel, setChannelLabel] = useState('');
-	const direct = useSelector(selectDirectById(message.channel_id));
+	// const [channelLabel, setChannelLabel] = useState('');
+	// const direct = useSelector(selectDirectById(message.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
 
-	useEffect(() => {
-		if (direct != undefined) {
-			setChannelLabel('');
-		} else {
-			setChannelLabel(currentChannel?.channel_label || '');
-		}
-	}, [message]);
+	// comment function un-used
+	// useEffect(() => {
+	// 	if (direct != undefined) {
+	// 		setChannelLabel('');
+	// 	} else {
+	// 		setChannelLabel(currentChannel?.channel_label || '');
+	// 	}
+	// }, [message]);
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -52,7 +52,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		emoji: string,
 		count: number,
 		message_sender_id: string,
-		action_delete: boolean,
+		action_delete: boolean
 	) {
 		await reactionMessageDispatch(
 			id,
@@ -65,6 +65,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			1,
 			message_sender_id ?? '',
 			false,
+			!currentChannel?.channel_private
 		);
 	}
 
@@ -185,7 +186,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 							emoji.emoji ?? '',
 							1,
 							userId.userId ?? '',
-							false,
+							false
 						)
 					}
 					getUrlItem={getUrlItem}
@@ -206,7 +207,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 							top: topUserPanel,
 							left: leftUserPanel,
 							right: rightUserPanel,
-							bottom: bottomUserPanel,
+							bottom: bottomUserPanel
 						}}
 					>
 						<ArrowItem arrow={arrowTop} isRightLimit={isRightLimit} isLeftLimit={isLeftLimit} emojiCross={emoji} />
@@ -251,7 +252,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 				</div>
 			</div>
 		);
-	},
+	}
 );
 
 type ArrowItemProps = {
@@ -273,7 +274,7 @@ function ArrowItem({ arrow, isRightLimit, emojiCross, isLeftLimit }: ArrowItemPr
 			className="w-full h-3  cursor-pointer"
 			style={{
 				display: 'flex',
-				justifyContent: isRightLimit && !isLeftLimit ? 'flex-end' : !isRightLimit && isLeftLimit ? 'flex-start' : 'center',
+				justifyContent: isRightLimit && !isLeftLimit ? 'flex-end' : !isRightLimit && isLeftLimit ? 'flex-start' : 'center'
 			}}
 		>
 			{arrow && window.innerWidth >= 640 && <Icons.ArrowDownFill className={`dark:text-[#28272b] text-white`} />}
