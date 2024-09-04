@@ -1,6 +1,13 @@
-import { Icons } from '@mezon/components';
 import { useAttachments } from '@mezon/core';
-import { selectAttachment, selectAttachmentPhoto, selectMessageIdAttachment, selectModeAttachment, selectOpenModalAttachment } from '@mezon/store';
+import {
+	selectAttachment,
+	selectAttachmentPhoto,
+	selectCurrentChannel,
+	selectMessageIdAttachment,
+	selectModeAttachment,
+	selectOpenModalAttachment
+} from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { SHOW_POSITION } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -47,7 +54,7 @@ const MessageModalImage = () => {
 		if (scale === 1) {
 			setPosition({
 				x: 0,
-				y: 0,
+				y: 0
 			});
 		}
 	};
@@ -64,7 +71,7 @@ const MessageModalImage = () => {
 			setPositionShow(SHOW_POSITION.IN_VIEWER);
 			setImageURL(urlImg);
 		},
-		[showMessageContextMenu, messageId, mode, setPositionShow, setImageURL, urlImg],
+		[showMessageContextMenu, messageId, mode, setPositionShow, setImageURL, urlImg]
 	);
 
 	const handleKeyDown = (event: any) => {
@@ -99,7 +106,7 @@ const MessageModalImage = () => {
 		setDragging(true);
 		setDragStart({
 			x: event.clientX - position.x,
-			y: event.clientY - position.y,
+			y: event.clientY - position.y
 		});
 	};
 
@@ -107,7 +114,7 @@ const MessageModalImage = () => {
 		if (dragging && scale !== 1) {
 			setPosition({
 				x: event.clientX - dragStart.x,
-				y: event.clientY - dragStart.y,
+				y: event.clientY - dragStart.y
 			});
 		}
 	};
@@ -116,50 +123,93 @@ const MessageModalImage = () => {
 		setDragging(false);
 	};
 
+	const currentChannel = useSelector(selectCurrentChannel);
+
 	return (
-		<div className="justify-center items-center flex flex-col md:flex-row fixed z-50 inset-0 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode">
-			<div className="flex-1 flex justify-center items-center p-5 overflow-hidden h-full w-full">
-				<img
-					src={urlImg}
-					alt={urlImg}
-					className="md:max-h-[90vh] max-h-full object-contain rounded-[10px] cursor-default h-fit"
-					onDragStart={handleDrag}
-					onWheel={handleWheel}
-					onMouseUp={handleMouseUp}
-					onMouseMove={handleMouseMove}
-					onMouseDown={handleMouseDown}
-					onMouseLeave={handleMouseUp}
-					style={{
-						transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
-						transition: `${dragging ? '' : 'transform 0.2s ease'}`,
-					}}
-					onContextMenu={handleContextMenu}
-				/>
+		<div className="justify-center items-center flex flex-col fixed z-50 inset-0 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode">
+			<div className="flex justify-center items-center bg-[#2e2e2e] w-full h-[30px] relative">
+				<div>{currentChannel?.channel_label}</div>
+				<div onClick={closeModal} className="w-4 absolute right-2 top-2 cursor-pointer">
+					<Icons.MenuClose className="text-white w-full" />
+				</div>
 			</div>
-			<button
-				className={`bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out absolute top-5 ${showList && checkNumberAtt ? 'md:right-[270px] right-5' : 'right-5'} ${checkNumberAtt ? '' : 'right-5'}`}
-				onClick={closeModal}
-			>
-				X
-			</button>
-			{checkNumberAtt && (
+			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)]">
+				<div className="flex-1 flex justify-center items-center p-5 overflow-hidden h-full w-full">
+					<img
+						src={urlImg}
+						alt={urlImg}
+						className="md:max-h-[90vh] max-h-full object-contain rounded-[10px] cursor-default h-fit"
+						onDragStart={handleDrag}
+						onWheel={handleWheel}
+						onMouseUp={handleMouseUp}
+						onMouseMove={handleMouseMove}
+						onMouseDown={handleMouseDown}
+						onMouseLeave={handleMouseUp}
+						style={{
+							transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+							transition: `${dragging ? '' : 'transform 0.2s ease'}`
+						}}
+						onContextMenu={handleContextMenu}
+					/>
+				</div>
+				{/* {checkNumberAtt && (
 				<button
 					className={`bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out absolute flex justify-center items-center ${showList ? 'md:-rotate-90 md:top-5 md:right-[200px] md:left-auto left-5 bottom-[110px]' : 'md:rotate-90 md:top-[72px] md:right-5 md:left-auto rotate-180 left-5 bottom-5'}`}
 					onClick={handleShowList}
 				>
 					<Icons.ArrowDown defaultFill="white" defaultSize="w-[20px] h-[30px]" />
 				</button>
-			)}
-			{showList && checkNumberAtt && (
-				<ListAttachment
-					attachments={attachments}
-					urlImg={urlImg}
-					setUrlImg={setUrlImg}
-					handleDrag={handleDrag}
-					setScale={setScale}
-					setPosition={setPosition}
-				/>
-			)}
+			)} */}
+				{showList && checkNumberAtt && (
+					<ListAttachment
+						attachments={attachments}
+						urlImg={urlImg}
+						setUrlImg={setUrlImg}
+						handleDrag={handleDrag}
+						setScale={setScale}
+						setPosition={setPosition}
+					/>
+				)}
+			</div>
+			<div className="h-14 flex px-4 w-full items-center">
+				<div className="flex-1 flex items-center">
+					<div className="flex gap-2">
+						<div className="w-10 aspect-square object-cover">
+							<img
+								src="https://steamuserimages-a.akamaihd.net/ugc/1667980019599930485/F57B5D6531681D2C2CB8090EBA30F734F1412017/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false"
+								alt="user-avatar"
+								className="w-full rounded-full"
+							/>
+						</div>
+						<div className="flex flex-col justify-between">
+							<div className="text-[14px] font-semibold">Anh.TranTruong</div>
+							<div className="text-[12px]">Today at 11:37</div>
+						</div>
+					</div>
+				</div>
+				<div className="flex-1 gap-3 text-white flex items-center justify-center">
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+						<Icons.RotateLeftIcon className="w-5" />
+					</div>
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+						<Icons.RotateRightIcon className="w-5" />
+					</div>
+					<div className="">
+						<Icons.StraightLineIcon className="w-5" />
+					</div>
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+						<Icons.ZoomIcon className="w-5" />
+					</div>
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+						<Icons.AspectRatioIcon className="w-5" />
+					</div>
+				</div>
+				<div className="flex-1 flex justify-end">
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+						<Icons.SideMenuIcon className="w-5" />
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 };

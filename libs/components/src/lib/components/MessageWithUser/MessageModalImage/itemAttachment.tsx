@@ -15,16 +15,13 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 	const url = attachment.url;
 	const isSelected = url === urlImg;
 	return (
-		<div
-			className={`border ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton w-full h-fit dark:border-white border-colorTextLightMode' : 'border-transparent'}`}
-			ref={isSelected ? selectedImageRef : null}
-		>
-			{showDate && <div className={`dark:text-white text-black mb-1 text-center sbm:block hidden`}>{previousDate}</div>}
-			<div className={isSelected ? 'flex items-center' : 'relative'} onClick={() => setUrlImg(url || '')}>
+		<div className={` w-fit h-fit `} ref={isSelected ? selectedImageRef : null}>
+			{showDate && <div className={`dark:text-white text-black mb-1 text-center`}>{previousDate}</div>}
+			<div className={`rounded-md ${isSelected ? 'flex items-center border-2 border-white' : 'relative'}`} onClick={() => setUrlImg(url || '')}>
 				<img
 					src={url}
 					alt={url}
-					className={`md:size-[150px] size-[100px] md:max-w-[150px] max-w-[100px] md:max-h-[150px] max-h-[100px] mx-auto gap-5 object-cover rounded cursor-pointer ${isSelected ? '' : 'overlay'}`}
+					className={`size-[88px] max-w-[88px] max-h-[88px] mx-auto gap-5 object-cover rounded-md cursor-pointer ${isSelected ? '' : 'overlay'} border-2 ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton border-colorTextLightMode' : 'border-transparent'}`}
 					onDragStart={handleDrag}
 					onKeyDown={(event) => {
 						if (event.key === 'Enter') {
