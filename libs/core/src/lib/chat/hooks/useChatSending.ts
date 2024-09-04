@@ -37,9 +37,13 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const channel = useSelector(selectChannelById(channelId));
 	let channelID = channelId;
 	let clanID = currentClanId;
+	let isPublic = false;
 	if (direct) {
 		channelID = direct.id;
 		clanID = '0';
+	}
+	if (channel) {
+		isPublic = !channel.channel_private;
 	}
 
 	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
@@ -64,6 +68,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 					channelId: channelID,
 					clanId: clanID || '',
 					mode,
+					isPublic: isPublic,
 					content,
 					mentions,
 					attachments,
@@ -74,12 +79,19 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				})
 			);
 		},
-		[dispatch, channelID, clanID, mode, currentUserId]
+		[dispatch, channelID, clanID, mode, isPublic, currentUserId]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ clanId: clanID || '', channelId, mode }));
-	}, [channelId, clanID, dispatch, mode]);
+		dispatch(
+			messagesActions.sendTypingUser({
+				clanId: clanID || '',
+				channelId,
+				mode,
+				isPublic: isPublic
+			})
+		);
+	}, [channelId, clanID, dispatch, isPublic, mode]);
 
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(
@@ -97,9 +109,9 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, messageId, content, mentions, attachments, hideEditted);
+			await socket.updateChatMessage(clanID || '', channelId, mode, isPublic, messageId, content, mentions, attachments, hideEditted);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode]
+		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode, isPublic]
 	);
 
 	const updateImageLinkMessage = React.useCallback(
@@ -122,17 +134,30 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanId ?? '', channelId ?? '', mode ?? 0, messageId ?? '', content, mentions, attachments, hideEditted);
+			await socket.updateChatMessage(
+				clanId ?? '',
+				channelId ?? '',
+				mode ?? 0,
+				isPublic,
+				messageId ?? '',
+				content,
+				mentions,
+				attachments,
+				hideEditted
+			);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode]
+		[sessionRef, clientRef, socketRef, channel, direct, isPublic]
 	);
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
 		if (newMessageUpdateImage.clan_id && newMessageUpdateImage.clan_id !== '0') {
 			processLink(
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.clan_id!,
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.channel_id!,
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.mode!,
 				contentPayload,
 				mentionPayload,

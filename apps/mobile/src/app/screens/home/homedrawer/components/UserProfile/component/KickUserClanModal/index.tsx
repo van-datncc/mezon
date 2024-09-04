@@ -9,13 +9,7 @@ import { MezonInput } from '../../../../../../../../app/temp-ui';
 import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../../../../../../app/temp-ui/MezonButton2';
 import { style } from './KickUserClanModal.style';
 
-const KickUserClanModal = ({
-	user,
-	onRemoveUserClan,
-}: {
-	user: ChannelMembersEntity;
-	onRemoveUserClan: (value: string) => void;
-}) => {
+const KickUserClanModal = ({ user, onRemoveUserClan }: { user: ChannelMembersEntity; onRemoveUserClan: () => void }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['userProfile']);
@@ -49,7 +43,7 @@ const KickUserClanModal = ({
 				</Block>
 
 				<MezonButton
-					onPress={() => onRemoveUserClan(reason)}
+					onPress={onRemoveUserClan}
 					title={t('kickUserClanModal.buttonName', { userName: user?.user?.username || user?.['username'] })}
 					type={EMezonButtonTheme.THEME}
 					size={EMezonButtonSize.LG}

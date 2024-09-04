@@ -1,9 +1,13 @@
 import {
 	ActionEmitEvent,
 	getUpdateOrAddClanChannelCache,
+	remove,
 	ReplyIcon,
 	ReplyMessageDeleted,
 	save,
+	setDefaultChannelLoader,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
@@ -31,15 +35,15 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { setSelectedMessage } from '@mezon/store';
+import { clansActions, setSelectedMessage } from '@mezon/store';
 import { ETypeLinkMedia } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
 import { AvatarMessage } from './components/AvatarMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
-import { NewMessageRedLine } from './components/NewMessageRedLine';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
@@ -52,7 +56,6 @@ export type MessageItemProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	channelId?: string;
-	channelName?: string;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
 	jumpToRepliedMessage?: (messageId: string) => void;
@@ -75,12 +78,14 @@ const MessageItem = React.memo(
 			onMessageAction,
 			setIsOnlyEmojiPicker,
 			showUserInformation = false,
-			preventAction = false
+			preventAction = false,
+			channelId = ''
 		} = props;
 		const dispatch = useAppDispatch();
 		const { t } = useTranslation('message');
 		const message: MessagesEntity = props?.message;
 		const previousMessage: MessagesEntity = props?.previousMessage;
+		const navigation = useNavigation<any>();
 
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const userProfile = useSelector(selectAllAccount);
@@ -102,13 +107,12 @@ const MessageItem = React.memo(
 
 		const isTimeGreaterThan5Minutes = useMemo(() => {
 			if (message?.create_time && previousMessage?.create_time) {
-				return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 5 * 60 * 1000;
+				return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 2 * 60 * 1000;
 			}
 			return false;
 		}, [message?.create_time, previousMessage?.create_time]);
 
 		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
-
 		const swipeableRef = React.useRef(null);
 		const backgroundColor = React.useRef(new Animated.Value(0)).current;
 
@@ -154,6 +158,7 @@ const MessageItem = React.memo(
 				message
 			});
 			dispatch(setSelectedMessage(message));
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [message, preventAction]);
 
 		const onPressAvatar = useCallback(() => {
@@ -192,7 +197,7 @@ const MessageItem = React.memo(
 					console.log('error', error);
 				}
 			},
-			[usersClan, onMessageAction]
+			[usersClan, rolesInClan, onMessageAction]
 		);
 
 		const jumpToChannel = async (channelId: string, clanId: string) => {
@@ -214,16 +219,36 @@ const MessageItem = React.memo(
 				const channelId = channel?.channel_id;
 				const clanId = channel?.clan_id;
 
-				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.status === 1 && channel?.meeting_code) {
+				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 					await Linking.openURL(urlVoice);
 				} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
+					handleChangeClan(clanId);
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_MENTION_HASHTAG_DM, {
+						isMentionHashtagDM: true
+					});
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 					await jumpToChannel(channelId, clanId);
 				}
 			} catch (error) {
 				console.log(error);
+			}
+		}, []);
+
+		const handleChangeClan = useCallback(async (clanId: string) => {
+			navigation.navigate('HomeDefault');
+			const store = await getStoreAsync();
+			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+			save(STORAGE_CLAN_ID, clanId);
+			const promises = [];
+			promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
+			promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
+			promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
+			const results = await Promise.all(promises);
+			const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
+			if (channelResp) {
+				await setDefaultChannelLoader(channelResp.payload, clanId);
 			}
 		}, []);
 
@@ -261,7 +286,7 @@ const MessageItem = React.memo(
 					type: EMessageActionType.Reply,
 					targetMessage: message,
 					isStillShowKeyboard: true,
-					replyTo: senderDisplayName,
+					replyTo: senderDisplayName
 				};
 				//Note: trigger to ChatBox.tsx
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
@@ -270,9 +295,7 @@ const MessageItem = React.memo(
 
 		// Message welcome
 		if (message?.sender_id === '0' && !message?.content?.t) {
-			return (
-				<WelcomeMessage channelId={props.channelId} />
-			)
+			return <WelcomeMessage channelId={props.channelId} />;
 		}
 
 		const handlePressIn = () => {
@@ -310,7 +333,7 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageMention,
-						checkMessageTargetToMoved && styles.highlightMessageReply,
+						checkMessageTargetToMoved && styles.highlightMessageReply
 					]}
 				>
 					{!!messageReferences && (
@@ -352,7 +375,7 @@ const MessageItem = React.memo(
 								onMessageAction({
 									type: EMessageBSToShow.MessageAction,
 									senderDisplayName,
-									message,
+									message
 								});
 								dispatch(setSelectedMessage(message));
 							}}
@@ -371,13 +394,14 @@ const MessageItem = React.memo(
 										mentions: message.mentions,
 										...(checkOneLinkImage ? { t: '' } : {})
 									}}
-									isEdited={message?.hideEditted}
+									isEdited={message.hideEditted === false && !!message?.content?.t}
 									translate={t}
 									onMention={onMention}
 									onChannelMention={onChannelMention}
 									isNumberOfLine={isNumberOfLine}
 									isMessageReply={false}
 									mode={mode}
+									directMessageId={channelId}
 								/>
 							</Block>
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
@@ -392,7 +416,7 @@ const MessageItem = React.memo(
 										onMessageAction({
 											type: EMessageBSToShow.MessageAction,
 											senderDisplayName,
-											message,
+											message
 										});
 									}}
 								/>
@@ -401,7 +425,7 @@ const MessageItem = React.memo(
 					</View>
 				</View>
 				{/* </Swipeable> */}
-				<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />
+				{/*<NewMessageRedLine channelId={props?.channelId} messageId={props?.messageId} isEdited={message?.hideEditted} />*/}
 			</Animated.View>
 		);
 	},

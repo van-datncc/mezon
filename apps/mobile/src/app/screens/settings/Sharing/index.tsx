@@ -160,6 +160,7 @@ export const Sharing = ({ data, onClose }) => {
 				clanId: channelSelected?.clan_id,
 				channelId: channelSelected?.channel_id,
 				channelType: channelSelected?.type,
+				isPublic: false,
 			}),
 		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
@@ -168,6 +169,7 @@ export const Sharing = ({ data, onClose }) => {
 			'0',
 			channelSelected.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
+			false,
 			{
 				t: dataSend.text,
 				lk: dataSend.links || [],
@@ -185,6 +187,7 @@ export const Sharing = ({ data, onClose }) => {
 				clanId: channelSelected.clan_id,
 				channelId: channelSelected.channel_id,
 				channelType: channelSelected.type,
+				isPublic: !channelSelected?.channel_private
 			}),
 		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
@@ -193,6 +196,7 @@ export const Sharing = ({ data, onClose }) => {
 			currentClan.id,
 			channelSelected.channel_id,
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
+			!channelSelected.channel_private,
 			{
 				t: dataSend.text,
 				lk: dataSend.links || [],
@@ -328,9 +332,6 @@ export const Sharing = ({ data, onClose }) => {
 							<ScrollView horizontal style={styles.wrapperMedia}>
 								{getAttachmentUnique(attachmentUpload)?.map((media: any, index) => {
 									let isFile;
-									console.log('Tom log  => media', media);
-
-
 									if (Platform.OS === 'android') {
 										isFile = !media?.filetype?.includes?.('video') && !media?.filetype?.includes?.('image');
 									} else {

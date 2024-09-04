@@ -105,7 +105,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				emojiPicked.trim(),
 				1,
 				messageEmoji?.sender_id ?? '',
-				false
+				false,
+				!currentChannel?.channel_private
 			);
 			setSubPanelActive(SubPanelName.NONE);
 			dispatch(referencesActions.setIdReferenceMessageReaction(''));

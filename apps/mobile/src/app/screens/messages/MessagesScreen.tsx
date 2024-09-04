@@ -31,7 +31,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 	const redirectToMessageDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-			params: { directMessageId: directMessage?.id },
+			params: { directMessageId: directMessage?.id }
 		});
 	};
 
@@ -41,7 +41,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
-			username: username,
+			username: username
 		}));
 	}, [directMessage]);
 
@@ -65,7 +65,9 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 				<Text style={[styles.defaultText, styles.lastMessage]}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
-				{!!content && <RenderTextMarkdownContent content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />}
+				{!!content && (
+					<RenderTextMarkdownContent isHiddenHashtag={true} content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />
+				)}
 			</View>
 		);
 	};
@@ -150,7 +152,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 
 	const filteredDataDM = useMemo(() => {
 		return filterDmGroupsByChannelLabel(dmGroupChatList)?.filter?.((dm) =>
-			normalizeString(dm.channel_label || dm.usernames)?.includes(normalizeString(searchText)),
+			normalizeString(dm.channel_label || dm.usernames)?.includes(normalizeString(searchText))
 		);
 	}, [dmGroupChatList, searchText]);
 

@@ -1,7 +1,7 @@
 import { IRolesClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiRole, RoleUserListRoleUser } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
 export const ROLES_CLAN_FEATURE_KEY = 'rolesclan';
@@ -37,15 +37,15 @@ type GetRolePayload = {
 export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
 	async ({ clanId, repace = false, channelId }: GetRolePayload, thunkAPI) => {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listRoles(mezon.session, 100, 1, '', clanId);
-		if (!response.roles) {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const response = await mezon.socketRef.current?.listRoles(clanId || '', 100, 1, '');
+		if (!response?.roles?.roles) {
 			return [];
 		}
 		if (repace) {
 			thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId ?? ''));
 		}
-		return response.roles.map(mapRolesClanToEntity);
+		return response.roles.roles.map(mapRolesClanToEntity);
 	}
 );
 
@@ -296,6 +296,7 @@ export const getRolesClanState = (rootState: { [ROLES_CLAN_FEATURE_KEY]: RolesCl
 export const selectAllRolesClan = createSelector(getRolesClanState, selectAll);
 export const selectEveryoneRole = createSelector(selectAllRolesClan, (state) => state.find((role) => role.slug === 'everyone'));
 export const selectRoleByRoleId = (roleID: string) => createSelector(selectAllRolesClan, (allRoleClan) => allRoleClan?.find((r) => r?.id === roleID));
+
 export const selectCurrentRoleId = createSelector(getRolesClanState, (state) => state.currentRoleId);
 
 export const selectRolesClanEntities = createSelector(getRolesClanState, selectEntities);

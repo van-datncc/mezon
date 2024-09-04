@@ -2,7 +2,7 @@ import { useAuth, useChannelMembersActions, useUserPermission } from '@mezon/cor
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Block, Text, baseColor, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonModal } from '../../../../../../../../app/temp-ui/MezonModal';
@@ -112,14 +112,14 @@ const UserSettingProfile = ({
 		return settingList;
 	}, [isItMe, isClanOwner, themeValue, userPermissionsStatus, isThatClanOwner]);
 
-	const handleRemoveUserClans = async (value: string) => {
+	const handleRemoveUserClans = useCallback(async () => {
 		if (user) {
 			setVisibleKickUserModal(false);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_INFO_USER_BOTTOM_SHEET, { isHiddenBottomSheet: true });
 			const userIds = [user.user?.id ?? ''];
 			await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
 		}
-	};
+	}, [currentClanId, removeMemberClan, user]);
 
 	function handleUserModalClose() {
 		setVisibleManageUserModal(false);
@@ -150,10 +150,18 @@ const UserSettingProfile = ({
 					setVisibleKickUserModal(visible);
 				}}
 			>
-				<KickUserClanModal onRemoveUserClan={(value) => handleRemoveUserClans(value)} user={user} />
+				<KickUserClanModal onRemoveUserClan={handleRemoveUserClans} user={user} />
 			</MezonModal>
 
-			<ManageUserModal visible={visibleManageUserModal} user={user} onclose={handleUserModalClose} profileSetting={profileSetting} />
+			<ManageUserModal
+				visibleKickUserModal={visibleKickUserModal}
+				setVisibleKickUserModal={setVisibleKickUserModal}
+				handleRemoveUserClans={handleRemoveUserClans}
+				visible={visibleManageUserModal}
+				user={user}
+				onclose={handleUserModalClose}
+				profileSetting={profileSetting}
+			/>
 		</Block>
 	);
 };

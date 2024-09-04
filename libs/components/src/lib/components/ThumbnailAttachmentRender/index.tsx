@@ -22,7 +22,6 @@ export const RenderAttachmentThumbnail = (attachment: ApiMessageAttachment, size
 			setPositionShow(SHOW_POSITION.IN_STICKER);
 		}
 	}, [attachment.filetype]);
-
 	return (
 		<div onContextMenu={handleContextMenu}>
 			{hasFileImage && (

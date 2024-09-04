@@ -27,5 +27,30 @@ export const style = (colors: Attributes) => StyleSheet.create({
         padding: Metrics.size.l,
         borderRadius: 28,
         backgroundColor: colors.tertiary,
-    }
+    },
+    header: {
+        display: "flex",
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+    section: {
+        flex: 1
+    },
+    sectionTitle: {
+        textAlign: "center",
+        color: colors.textStrong,
+        fontWeight: "bold",
+        flexGrow: 1,
+        flexBasis: 10
+    },
+    titleMD: {
+        fontSize: Fonts.size.h6
+    },
+    sectionRight: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        paddingRight: Metrics.size.m
+    },
 })

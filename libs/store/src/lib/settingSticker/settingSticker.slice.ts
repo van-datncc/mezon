@@ -12,6 +12,7 @@ const LIST_STICKER_CACHED_TIME = 1000 * 60 * 3;
 export interface SettingClanStickerState extends EntityState<ClanSticker, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	hasGrandchildModal: boolean;
 }
 export interface FetchStickerArgs {
 	clanId: string;
@@ -28,7 +29,8 @@ export const stickerAdapter = createEntityAdapter({
 
 export const initialSettingClanStickerState: SettingClanStickerState = stickerAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null
+	error: null,
+	hasGrandchildModal: false
 });
 const fetchStickerCached = memoizee((mezon: MezonValueContext, clanId: string) => mezon.socketRef.current?.listClanStickersByClanId(clanId), {
 	promise: true,
@@ -103,7 +105,14 @@ export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker'
 export const settingClanStickerSlice = createSlice({
 	name: SETTING_CLAN_STICKER,
 	initialState: initialSettingClanStickerState,
-	reducers: {},
+	reducers: {
+		openModalInChild: (state) => {
+			state.hasGrandchildModal = true;
+		},
+		closeModalInChild: (state) => {
+			state.hasGrandchildModal = false;
+		}
+	},
 	extraReducers(builder) {
 		builder
 			.addCase(fetchStickerByClanId.fulfilled, (state: SettingClanStickerState, actions) => {
@@ -129,5 +138,6 @@ export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: Sett
 const { selectAll, selectEntities } = stickerAdapter.getSelectors();
 export const selectAllStickerSuggestion = createSelector(getStickerSettingState, selectAll);
 export const selectStickerSuggestionEntities = createSelector(getStickerSettingState, selectEntities);
+export const hasGrandchildModal = createSelector(getStickerSettingState, (state) => state.hasGrandchildModal);
 export const settingStickerReducer = settingClanStickerSlice.reducer;
 export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByClanId };
