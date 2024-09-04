@@ -1,4 +1,5 @@
 import { MezonContextValue } from '@mezon/transport';
+import storage from '@react-native-async-storage/async-storage';
 import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
@@ -16,7 +17,6 @@ import { emojiSuggestionReducer } from './emojiSuggestion/emojiSuggestion.slice'
 import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
 import { gifsStickerEmojiReducer } from './giftStickerEmojiPanel/gifsStickerEmoji.slice';
-import { stickersReducer } from './giftStickerEmojiPanel/stickers.slice';
 import { inviteReducer } from './invite/invite.slice';
 import { messagesReducer } from './messages/messages.slice';
 import { referencesReducer } from './messages/references.slice';
@@ -24,9 +24,11 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
-import storage from '@react-native-async-storage/async-storage';
+import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
+import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
 import { ERRORS_FEATURE_KEY, errorsReducer } from './errors/errors.slice';
@@ -36,6 +38,7 @@ import { notifiReactMessageReducer } from './notificationSetting/notificationRea
 import { channelCategorySettingReducer, defaultNotificationCategoryReducer } from './notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingReducer } from './notificationSetting/notificationSettingChannel.slice';
 import { defaultNotificationClanReducer } from './notificationSetting/notificationSettingClan.slice';
+import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
@@ -56,8 +59,7 @@ const persistedReducer = persistReducer(
 const persistedClansReducer = persistReducer(
 	{
 		key: 'clans',
-		storage,
-		blacklist: ['loadingStatus']
+		storage
 	},
 	clansReducer
 );
@@ -65,10 +67,17 @@ const persistedClansReducer = persistReducer(
 const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
-		storage,
-		blacklist: ['hasInternetMobile', 'isFromFcmMobile', 'loadingMainMobile']
+		storage
 	},
 	appReducer
+);
+
+const persistedEmojiSuggestionReducer = persistReducer(
+	{
+		key: 'suggestionemoji',
+		storage
+	},
+	emojiSuggestionReducer
 );
 
 const persistedMessageReducer = persistReducer(
@@ -92,7 +101,7 @@ const persistedChannelReducer = persistReducer(
 	{
 		key: 'channels',
 		storage,
-		blacklist: ['loadingStatus']
+		blacklist: ['request']
 	},
 	channelsReducer
 );
@@ -105,27 +114,110 @@ const persistedThreadReducer = persistReducer(
 	threadsReducer
 );
 
-const persistedChannelMembberReducer = persistReducer(
+const persistedChannelMembersReducer = persistReducer(
 	{
-		key: 'channelsMember',
-		storage
+		key: 'channelmembers',
+		storage,
+		blacklist: ['onlineStatusUser']
 	},
 	channelMembersReducer
 );
 
-const persistedUserClanReducer = persistReducer(
+const persistedListUsersByUserReducer = persistReducer(
 	{
-		key: 'usersClan',
-		storage
+		key: 'listusersbyuserid',
+		storage,
+		blacklist: ['onlineStatusUser']
 	},
-	usersClanReducer
+	listUsersByUserReducer
 );
-const persistedEmojiSuggestionReducer = persistReducer(
+
+const persistedListchannelsByUserReducer = persistReducer(
 	{
-		key: 'emojiSuggestion',
+		key: 'listchannelbyusers',
 		storage
 	},
-	emojiSuggestionReducer
+	listchannelsByUserReducer
+);
+
+const persistedPermissionRoleChannelReducer = persistReducer(
+	{
+		key: 'listpermissionroleschannel',
+		storage
+	},
+	permissionRoleChannelReducer
+);
+
+const persistedRolesClanReducer = persistReducer(
+	{
+		key: 'rolesclan',
+		storage
+	},
+	RolesClanReducer
+);
+
+const persistedEventMngtReducer = persistReducer(
+	{
+		key: 'eventmanagement',
+		storage
+	},
+	eventManagementReducer
+);
+
+const persistedChannelCatSettingReducer = persistReducer(
+	{
+		key: 'notichannelcategorysetting',
+		storage
+	},
+	channelCategorySettingReducer
+);
+
+const persistedPinMsgReducer = persistReducer(
+	{
+		key: 'pinmessages',
+		storage
+	},
+	pinMessageReducer
+);
+
+const persistedDefaultNotiClanReducer = persistReducer(
+	{
+		key: 'defaultnotificationclan',
+		storage
+	},
+	defaultNotificationClanReducer
+);
+
+const persistedDefaultNotiCatReducer = persistReducer(
+	{
+		key: 'defaultnotificationcategory',
+		storage
+	},
+	defaultNotificationCategoryReducer
+);
+
+const persistedHashTagDmReducer = persistReducer(
+	{
+		key: 'hashtagdm',
+		storage
+	},
+	hashtagDmReducer
+);
+
+const persistedNotiReactMsgReducer = persistReducer(
+	{
+		key: 'notifireactmessage',
+		storage
+	},
+	notifiReactMessageReducer
+);
+
+const persistedGifsStickerEmojiReducer = persistReducer(
+	{
+		key: 'gifsstickersemojis',
+		storage
+	},
+	gifsStickerEmojiReducer
 );
 
 const reducer = {
@@ -135,14 +227,17 @@ const reducer = {
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
-	channelMembers: persistedChannelMembberReducer,
+	listchannelbyusers: persistedListchannelsByUserReducer,
+	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
+	channelMembers: persistedChannelMembersReducer,
+	listusersbyuserid: persistedListUsersByUserReducer,
 	threads: persistedThreadReducer,
 	[SEARCH_MESSAGES_FEATURE_KEY]: searchMessageReducer,
 	messages: persistedMessageReducer,
 	categories: persistedCatReducer,
-	rolesclan: RolesClanReducer,
-	eventmanagement: eventManagementReducer,
-	usersClan: persistedUserClanReducer,
+	rolesclan: persistedRolesClanReducer,
+	eventmanagement: persistedEventMngtReducer,
+	usersClan: usersClanReducer,
 	[POLICIES_FEATURE_KEY]: policiesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
@@ -150,12 +245,12 @@ const reducer = {
 	roleId: roleIdReducer,
 	policiesDefaultSlice: policiesDefaultReducer,
 	notificationsetting: notificationSettingReducer,
-	pinmessages: pinMessageReducer,
-	defaultnotificationclan: defaultNotificationClanReducer,
-	defaultnotificationcategory: defaultNotificationCategoryReducer,
-	notichannelcategorysetting: channelCategorySettingReducer,
-	hashtagdm: hashtagDmReducer,
-	notifireactmessage: notifiReactMessageReducer,
+	pinmessages: persistedPinMsgReducer,
+	defaultnotificationclan: persistedDefaultNotiClanReducer,
+	defaultnotificationcategory: persistedDefaultNotiCatReducer,
+	notichannelcategorysetting: persistedChannelCatSettingReducer,
+	hashtagdm: persistedHashTagDmReducer,
+	notifireactmessage: persistedNotiReactMsgReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
@@ -165,13 +260,13 @@ const reducer = {
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
 	gifs: gifsReducer,
-	stickers: stickersReducer,
-	gifsStickersEmojis: gifsStickerEmojiReducer,
+	gifsStickersEmojis: persistedGifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
-	settingSticker: settingStickerReducer
+	settingSticker: settingStickerReducer,
+	adminApplication: adminApplicationReducer
 };
 
 let storeInstance = configureStore({

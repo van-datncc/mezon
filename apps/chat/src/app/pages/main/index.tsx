@@ -166,7 +166,7 @@ function MyApp() {
 							to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
 							onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
 						>
-							<NavLinkComponent active={pathName.includes('direct')}>
+							<NavLinkComponent active={pathName?.includes('direct')}>
 								<div>
 									<Image
 										src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
@@ -201,7 +201,7 @@ function MyApp() {
 								<SidebarClanItem
 									linkClan={`/chat/clans/${clan.id}`}
 									option={clan}
-									active={!pathName.includes('direct') && currentClanId === clan.clan_id}
+									active={!pathName?.includes('direct') && currentClanId === clan.clan_id}
 								/>
 							</SidebarTooltip>
 						);

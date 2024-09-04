@@ -1,5 +1,6 @@
 import { Block, Colors, size, Text } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,39 +39,49 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const imageSavedTimeoutRef = useRef<NodeJS.Timeout>(null);
 
 	const initialIndex = useMemo(() => {
-		const imageIndexSelected = allImageList.findIndex(file => file?.filename === imageSelected?.filename);
-		return imageIndexSelected === -1 ? 0 : imageIndexSelected;
-	}, [allImageList, imageSelected])
+		return allImageList.findIndex((file) => file?.filename === imageSelected?.filename);
+	}, [allImageList, imageSelected]);
 
-	const updateToolbarConfig = useCallback((newValue: Partial<IVisibleToolbarConfig>) => {
-		setVisibleToolbarConfig({ ...visibleToolbarConfig, ...newValue })
-	}, [visibleToolbarConfig])
+	const formattedImageList = useMemo(() => {
+		const index = allImageList.findIndex((file) => file?.filename === imageSelected?.filename);
+		return index === -1 ? [{ ...imageSelected, id: `${Snowflake.generate()}` }, ...allImageList] : allImageList;
+	}, []);
 
-	const onIndexChange = (newIndex: number) => {
-		if (allImageList[newIndex]?.id !== currentImage?.id) {
-			setCurrentImage(allImageList[newIndex]);
-			ref.current?.reset(); //Note: reset scale
-		}
-	}
+	const updateToolbarConfig = useCallback(
+		(newValue: Partial<IVisibleToolbarConfig>) => {
+			setVisibleToolbarConfig({ ...visibleToolbarConfig, ...newValue });
+		},
+		[visibleToolbarConfig]
+	);
+
+	const onIndexChange = useCallback(
+		(newIndex: number) => {
+			if (formattedImageList[newIndex]?.id !== currentImage?.id) {
+				setCurrentImage(formattedImageList[newIndex]);
+				ref.current?.reset(); //Note: reset scale
+			}
+		},
+		[currentImage?.id, formattedImageList]
+	);
 
 	const setTimeoutHideFooter = useCallback(() => {
 		footerTimeoutRef.current = setTimeout(() => {
 			updateToolbarConfig({
 				showFooter: false
-			})
-		}, TIME_TO_HIDE_THUMBNAIL)
-	}, [updateToolbarConfig])
+			});
+		}, TIME_TO_HIDE_THUMBNAIL);
+	}, [updateToolbarConfig]);
 
 	const onTap = () => {
 		updateToolbarConfig({
 			showHeader: !visibleToolbarConfig.showHeader,
-			showFooter: !visibleToolbarConfig.showHeader,
-		})
-	}
+			showFooter: !visibleToolbarConfig.showHeader
+		});
+	};
 
 	const clearTimeoutFooter = () => {
 		footerTimeoutRef.current && clearTimeout(footerTimeoutRef.current);
-	}
+	};
 
 	const onPanStart = () => {
 		clearTimeoutFooter();
@@ -79,11 +90,11 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 			return;
 		}
 		if (!visibleToolbarConfig.showFooter && currentScale === 1) {
-			updateToolbarConfig({ showFooter: true })
+			updateToolbarConfig({ showFooter: true });
 			setTimeoutHideFooter();
 			return;
 		}
-	}
+	};
 
 	const onDoubleTap = (toScale: number) => {
 		if (toScale > ORIGIN_SCALE) {
@@ -93,31 +104,31 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 				showFooter: false
 			});
 		}
-	}
+	};
 
-	const onImageThumbnailChange = useCallback((image: AttachmentEntity) => {
-		const imageIndexSelected = allImageList?.findIndex(i => i?.id === image?.id);
-		if (imageIndexSelected > -1) {
-			setCurrentImage(image);
-			ref.current?.setIndex(imageIndexSelected);
-			ref.current?.reset();
+	const onImageThumbnailChange = useCallback(
+		(image: AttachmentEntity) => {
+			const imageIndexSelected = formattedImageList?.findIndex((i) => i?.id === image?.id);
+			if (imageIndexSelected > -1) {
+				setCurrentImage(image);
+				ref.current?.setIndex(imageIndexSelected);
+				ref.current?.reset();
 
-			if (visibleToolbarConfig.showFooter) {
-				clearTimeoutFooter();
-				setTimeoutHideFooter();
+				if (visibleToolbarConfig.showFooter) {
+					clearTimeoutFooter();
+					setTimeoutHideFooter();
+				}
 			}
-		}
-	}, [allImageList, setTimeoutHideFooter, visibleToolbarConfig.showFooter])
+		},
+		[formattedImageList, setTimeoutHideFooter, visibleToolbarConfig.showFooter]
+	);
 
-	const renderItem = ({
-		item,
-		setImageDimensions,
-	}: RenderItemInfo<ApiMessageAttachment>) => {
+	const renderItem = ({ item, setImageDimensions }: RenderItemInfo<ApiMessageAttachment>) => {
 		return (
 			<FastImage
 				source={{ uri: item?.url ?? '' }}
 				style={StyleSheet.absoluteFillObject}
-				resizeMode='contain'
+				resizeMode="contain"
 				onLoad={(e) => {
 					const { width, height } = e.nativeEvent;
 					setImageDimensions({ width, height });
@@ -130,35 +141,33 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		setShowSavedImage(true);
 		imageSavedTimeoutRef.current = setTimeout(() => {
 			setShowSavedImage(false);
-		}, TIME_TO_SHOW_SAVE_IMAGE_SUCCESS)
-	}, [])
+		}, TIME_TO_SHOW_SAVE_IMAGE_SUCCESS);
+	}, []);
 
 	useEffect(() => {
 		if (visibleToolbarConfig.showFooter) {
 			clearTimeout(footerTimeoutRef.current);
 			setTimeoutHideFooter();
 		}
-	}, [visibleToolbarConfig.showFooter, currentImage?.id])
+	}, [visibleToolbarConfig.showFooter, currentImage?.id]);
 
 	useEffect(() => {
 		return () => {
 			footerTimeoutRef.current && clearTimeout(footerTimeoutRef.current);
 			imageSavedTimeoutRef.current && clearTimeout(imageSavedTimeoutRef.current);
-		}
-	}, [])
+		};
+	}, []);
 
 	const setScaleDebounced = useThrottledCallback(setCurrentScale, 300);
 
 	return (
 		<Modal visible={visible}>
 			<Block flex={1}>
-				{visibleToolbarConfig.showHeader && (
-					<RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} />
-				)}
+				{visibleToolbarConfig.showHeader && <RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} />}
 				<Gallery
 					ref={ref}
-					initialIndex={initialIndex}
-					data={allImageList}
+					initialIndex={initialIndex === -1 ? 0 : initialIndex}
+					data={formattedImageList}
 					keyExtractor={(item, index) => `${item?.filename}_${index}`}
 					onSwipeToClose={onClose}
 					onIndexChange={onIndexChange}
@@ -169,17 +178,13 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 					onScaleChange={setScaleDebounced}
 				/>
 				<RenderFooterModal
+					allImageList={formattedImageList}
 					visible={visibleToolbarConfig.showFooter}
 					imageSelected={currentImage}
 					onImageThumbnailChange={onImageThumbnailChange}
 				/>
 				{showSavedImage && (
-					<Block
-						position='absolute'
-						top={'50%'}
-						width={'100%'}
-						alignItems='center'
-					>
+					<Block position="absolute" top={'50%'} width={'100%'} alignItems="center">
 						<Block backgroundColor={Colors.bgDarkSlate} padding={size.s_10} borderRadius={size.s_10}>
 							<Text color={Colors.white}>{t('savedSuccessfully')}</Text>
 						</Block>
@@ -187,5 +192,5 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 				)}
 			</Block>
 		</Modal>
-	)
+	);
 });

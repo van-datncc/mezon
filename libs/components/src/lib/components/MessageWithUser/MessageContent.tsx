@@ -19,7 +19,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 
 	const isOnlyContainEmoji = useMemo(() => {
 		return isValidEmojiData(contentUpdatedMention);
-	}, [contentUpdatedMention, message.content, message.mentions]);
+	}, [contentUpdatedMention]);
 
 	const lineValue = useMemo(() => {
 		if (lines === undefined && typeof message.content === 'string') {
@@ -48,7 +48,7 @@ const MessageText = ({
 	mode,
 	content,
 	isOnlyContainEmoji,
-	isSearchMessage,
+	isSearchMessage
 }: {
 	message: IMessageWithUser;
 	lines: string;
@@ -74,8 +74,9 @@ const MessageText = ({
 	}, [attachmentOnMessage, contentTonMessage]);
 
 	const showEditted = useMemo(() => {
-		return !message.hideEditted;
+		return message.hideEditted === false;
 	}, [message.hideEditted]);
+
 	return (
 		<>
 			{' '}
@@ -92,7 +93,7 @@ const MessageText = ({
 							mode={mode}
 						/>
 					</div>
-					{!showEditted && (
+					{showEditted && (
 						<p className="ml-[5px] opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
 							(edited)
 						</p>

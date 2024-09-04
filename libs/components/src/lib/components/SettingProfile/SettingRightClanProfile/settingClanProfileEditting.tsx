@@ -5,9 +5,10 @@ import { InputField } from '@mezon/ui';
 import { fileTypeImage, resizeFileImage } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ModalSettingSave } from '../../ClanSettings/SettingRoleManagement';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
-import SettingRightClanCard, { Profilesform } from '../SettingUserClanProfileCard';
-import SettingUserClanProfileSave, { ModalSettingSave } from './SettingUserClanProfileSave';
+import SettingRightClanCard from '../SettingUserClanProfileCard';
+import SettingUserClanProfileSave from './SettingUserClanProfileSave';
 
 interface SettingRightClanEditProps {
 	flagOption: boolean;
@@ -30,13 +31,13 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 	}, [userClansProfile]);
 
 	const setUrlImage = (url_image: string) => {
-		setDraftProfile((prevState) => (prevState ? { ...prevState, avartar: url_image } : prevState));
+		setDraftProfile((prevState) => (prevState ? { ...prevState, avatar: url_image } : prevState));
 	};
 	const setDisplayName = (nick_name: string) => {
 		setDraftProfile((prevState) => (prevState ? { ...prevState, nick_name } : prevState));
 	};
 
-	const editProfile = useMemo<Profilesform>(() => {
+	const editProfile = useMemo(() => {
 		const profileVaile = {
 			displayName: '',
 			urlImage: userProfile?.user?.avatar_url ?? ''
@@ -87,7 +88,6 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 
 	const handleClose = () => {
 		if (userClansProfile?.nick_name || userClansProfile?.avatar) {
-			console.log(1);
 			setDisplayName(userClansProfile.nick_name || '');
 			setUrlImage(userClansProfile.avatar || '');
 		} else {

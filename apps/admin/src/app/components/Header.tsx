@@ -42,20 +42,20 @@ const Header = ({ toggleSideBar }: IHeaderProps) => {
 
 	return (
 		<div
-			className={`sticky dark:bg-bgPrimary bg-bgLightPrimary z-40 w-full px-[42px] py-[12px] flex flex-row items-center justify-between border-b-[1px] border-solid ${isDarkMode ? 'dark:border-borderDividerLight' : 'border-bgModifierHoverLight'}`}
+			className={`sticky dark:bg-bgPrimary bg-bgLightPrimary z-40 w-full px-[42px] py-[10px] flex flex-row items-center justify-between border-b-[1px] border-solid ${isDarkMode ? 'dark:border-borderDividerLight' : 'border-bgModifierHoverLight'}`}
 		>
 			<div className="flex items-center gap-3">
 				<div onClick={toggleSideBar} className="w-8 hidden max-lg:block">
 					<Icons.MenuBarIcon className="w-full" />
 				</div>
-				<Link to="/admin/applications" className="flex flex-row items-center justify-center gap-[4px]">
+				<Link to="/applications" className="flex flex-row items-center justify-center gap-[4px]">
 					<Image
 						src={`${isDarkMode ? 'assets/images/mezon-logo-black.svg' : 'assets/images/mezon-logo-white.svg'}`}
 						alt={'logoMezon'}
 						width={28}
 						height={28}
 					/>
-					<span className="text-[12px] font-bold">MEZON</span>
+					<span className="text-[12px] font-bold dark:text-textPrimary text-colorTextLightMode">MEZON</span>
 				</Link>
 			</div>
 			<div className="flex flex-row items-center justify-center relative">

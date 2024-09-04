@@ -7,8 +7,8 @@ export interface ITabs {
 }
 
 export const tabs: ITabs[] = [
-	{ name: 'Applications', routerLink: '/admin/applications' },
-	{ name: 'Teams', routerLink: '/admin/teams' },
-	{ name: 'Embed Debugger', routerLink: '/admin/embeds' },
-	{ name: 'Document', routerLink: '/admin/docs' }
+	{ name: 'Applications', routerLink: '/applications' },
+	{ name: 'Teams', routerLink: '/teams' },
+	{ name: 'Embed Debugger', routerLink: '/embeds' },
+	{ name: 'Document', routerLink: '/docs' }
 ];

@@ -146,7 +146,6 @@ export default function DirectMessage() {
 							>
 								<div className="mb-0 z-10 h-full">
 									<GifStickerEmojiPopup
-										messageEmojiId={idMessageRefReaction}
 										mode={
 											currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 												? ChannelStreamMode.STREAM_MODE_DM
@@ -171,7 +170,6 @@ export default function DirectMessage() {
 							>
 								<div className="mb-0 z-50 h-full ">
 									<GifStickerEmojiPopup
-										messageEmojiId={idMessageRefReaction}
 										mode={
 											currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 												? ChannelStreamMode.STREAM_MODE_DM
@@ -192,6 +190,7 @@ export default function DirectMessage() {
 											? ChannelStreamMode.STREAM_MODE_DM
 											: ChannelStreamMode.STREAM_MODE_GROUP
 									}
+									isPublic={false}
 								/>
 							)}
 							<DirectMessageBox

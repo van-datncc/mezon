@@ -82,11 +82,15 @@ export type WriteMessageReactionArgs = {
 	count: number;
 	messageSenderId: string;
 	actionDelete: boolean;
+	isPublic: boolean;
 };
 
 export const writeMessageReaction = createAsyncThunk(
 	'messages/writeMessageReaction',
-	async ({ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete }: WriteMessageReactionArgs, thunkAPI) => {
+	async (
+		{ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete, isPublic }: WriteMessageReactionArgs,
+		thunkAPI
+	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const session = mezon.sessionRef.current;
@@ -97,7 +101,19 @@ export const writeMessageReaction = createAsyncThunk(
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeMessageReaction(id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete);
+			await socket.writeMessageReaction(
+				id,
+				clanId,
+				channelId,
+				mode,
+				isPublic,
+				messageId,
+				emoji_id,
+				emoji,
+				count,
+				messageSenderId,
+				actionDelete
+			);
 		} catch (e) {
 			Sentry.captureException(e);
 			return thunkAPI.rejectWithValue(e);

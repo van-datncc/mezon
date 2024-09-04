@@ -35,8 +35,8 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
 					messageId: '',
-					files: [],
-				}),
+					files: []
+				})
 			);
 			fetchAndCreateFiles(attachmentFilteredByChannelId.files).then((createdFiles) => {
 				const promises = createdFiles?.map((file) => {
@@ -54,7 +54,7 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 							newMessage.mentions,
 							results,
 							undefined,
-							false,
+							true
 						);
 					})
 					.then(() => {
@@ -63,8 +63,8 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 								channelId: currentChannelId,
 								messageId: attachmentFilteredByChannelId?.messageId ?? '',
 								statusUpload: EUploadingStatus.SUCCESSFULLY,
-								count: attachmentFilteredByChannelId?.files?.length,
-							}),
+								count: attachmentFilteredByChannelId?.files?.length
+							})
 						);
 					})
 					.catch((error) => {
@@ -77,15 +77,15 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 							newMessage.mentions,
 							[failAttachment],
 							undefined,
-							false,
+							true
 						);
 						dispatch(
 							referencesActions.setUploadingStatus({
 								channelId: currentChannelId,
 								messageId: attachmentFilteredByChannelId?.messageId ?? '',
 								statusUpload: EUploadingStatus.ERROR,
-								count: attachmentFilteredByChannelId?.files?.length,
-							}),
+								count: attachmentFilteredByChannelId?.files?.length
+							})
 						);
 						console.error('Error uploading files:', error);
 					});
@@ -94,8 +94,8 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 						channelId: currentChannelId,
 						messageId: attachmentFilteredByChannelId?.messageId ?? '',
 						statusUpload: EUploadingStatus.LOADING,
-						count: attachmentFilteredByChannelId?.files?.length,
-					}),
+						count: attachmentFilteredByChannelId?.files?.length
+					})
 				);
 			});
 		}
@@ -106,8 +106,8 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 			dispatch(
 				referencesActions.updateAttachmentMessageId({
 					channelId: currentChannelId,
-					messageId: newMessage.message_id ?? '',
-				}),
+					messageId: newMessage.message_id ?? ''
+				})
 			);
 		}
 	}, [newMessage]);
@@ -123,11 +123,11 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 						filename: file.name,
 						filetype: file.type,
 						size: file.size,
-						url: URL.createObjectURL(file),
-					})),
-				}),
-			),
-				(e.target.value = '');
+						url: URL.createObjectURL(file)
+					}))
+				})
+			);
+			e.target.value = ''; // Reset the input value after processing
 		}
 	};
 

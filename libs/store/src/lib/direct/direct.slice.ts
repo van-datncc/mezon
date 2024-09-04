@@ -68,7 +68,8 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 					channelsActions.joinChat({
 						clanId: '0',
 						channelId: response.channel_id as string,
-						channelType: response.type as number
+						channelType: response.type as number,
+						isPublic: false
 					})
 				);
 			}

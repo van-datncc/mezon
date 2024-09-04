@@ -1,9 +1,12 @@
-import { MezonStoreProvider, initStore } from '@mezon/store';
+import { MezonStoreProvider, initStore, selectIsLogin } from '@mezon/store';
 import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { electronBridge } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import 'react-toastify/dist/ReactToastify.css';
 import WebFont from 'webfontloader';
 import './app.module.scss';
@@ -25,6 +28,19 @@ const mezon: CreateMezonClientOptions = {
 	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
 };
 
+const AppInitializer = () => {
+	const isLogin = useSelector(selectIsLogin);
+	if (isElectron()) {
+		if (isLogin) {
+			electronBridge?.initListeners();
+		} else {
+			electronBridge?.removeAllListeners();
+		}
+	}
+
+	return null;
+};
+
 export function App() {
 	const mezon = useMezon();
 	const { store, persistor } = useMemo(() => {
@@ -41,6 +57,7 @@ export function App() {
 
 	return (
 		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
+			<AppInitializer />
 			<Routes />
 		</MezonStoreProvider>
 	);

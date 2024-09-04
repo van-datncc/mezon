@@ -2,6 +2,7 @@ import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import CategoryCreator from '../../../components/Category';
+import CategorySetting from '../../../components/CategorySetting';
 import ChannelCreator from '../../../components/ChannelCreator';
 import ClanNotificationSetting from '../../../components/ClanNotificationSetting';
 import NotificationOverrides from '../../../components/ClanNotificationSetting/NotificationOverrides';
@@ -144,6 +145,14 @@ export const MenuClanStacks = ({ }: any) => {
 				component={CreateNewRole}
 				options={{
 					headerLeftLabelVisible: false,
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CLAN.CATEGORY_SETTING}
+				component={CategorySetting}
+				options={{
+					headerTitle: t('menuClanStack.categorySetting'),
 				}}
 			/>
 

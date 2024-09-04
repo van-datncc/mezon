@@ -17,7 +17,6 @@ import { emojiSuggestionReducer } from './emojiSuggestion/emojiSuggestion.slice'
 import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
 import { gifsStickerEmojiReducer } from './giftStickerEmojiPanel/gifsStickerEmoji.slice';
-import { stickersReducer } from './giftStickerEmojiPanel/stickers.slice';
 import { inviteReducer } from './invite/invite.slice';
 import { messagesReducer } from './messages/messages.slice';
 import { referencesReducer } from './messages/references.slice';
@@ -28,6 +27,7 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
+import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
@@ -213,20 +213,20 @@ const persistedNotiReactMsgReducer = persistReducer(
 	notifiReactMessageReducer
 );
 
-const persistedStickersReducer = persistReducer(
-	{
-		key: 'stickers',
-		storage
-	},
-	stickersReducer
-);
-
 const persistedGifsStickerEmojiReducer = persistReducer(
 	{
 		key: 'gifsstickersemojis',
 		storage
 	},
 	gifsStickerEmojiReducer
+);
+
+const persistedChannelMetaReducer = persistReducer(
+	{
+		key: 'channelmeta',
+		storage
+	},
+	channelMetaReducer
 );
 
 const reducer = {
@@ -236,6 +236,7 @@ const reducer = {
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
+	channelmeta: persistedChannelMetaReducer,
 	listchannelbyusers: persistedListchannelsByUserReducer,
 	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
 	channelMembers: persistedChannelMembersReducer,
@@ -269,7 +270,6 @@ const reducer = {
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
 	gifs: gifsReducer,
-	stickers: persistedStickersReducer,
 	gifsStickersEmojis: persistedGifsStickerEmojiReducer,
 	dragAndDrop: dragAndDropReducer,
 	[ERRORS_FEATURE_KEY]: errorsReducer,

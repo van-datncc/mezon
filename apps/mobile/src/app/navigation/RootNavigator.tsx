@@ -123,6 +123,7 @@ const NavigationMain = () => {
 					channelId: currentChannelId,
 					noCache: true,
 					isFetchingLatestMessages: true,
+					isClearMessage: true,
 				}),
 			);
 		}
@@ -161,6 +162,7 @@ const NavigationMain = () => {
 						channelId: currentChannelId,
 						noCache: true,
 						isFetchingLatestMessages: true,
+						isClearMessage: true,
 					}),
 				),
 				store.dispatch(
