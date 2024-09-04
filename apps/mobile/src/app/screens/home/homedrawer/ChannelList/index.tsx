@@ -5,10 +5,10 @@ import {
 	RootState,
 	selectAllEventManagement,
 } from '@mezon/store-mobile';
-import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
+import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -129,7 +129,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 				<View style={styles.channelListSearch}>
 					<TouchableOpacity onPress={() => navigateToSearchPage()} style={styles.searchBox}>
-						<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />
+						<Icons.MagnifyingIcon color={themeValue.text} height={size.s_20} width={size.s_20} />
 						<Text style={styles.placeholderSearchBox}>{t('search')}</Text>
 					</TouchableOpacity>
 					<Pressable
@@ -139,7 +139,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 							bottomSheetInviteRef?.current?.present?.();
 						}}
 					>
-						<Icons.UserPlusIcon height={18} width={18} color={themeValue.text} />
+						<Icons.UserPlusIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 					</Pressable>
 					<InviteToChannel isUnknownChannel={isUnknownChannel} ref={bottomSheetInviteRef} />
 				</View>

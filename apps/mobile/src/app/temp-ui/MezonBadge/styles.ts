@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
 
     title: {
         color: Colors.white,
-        fontSize: Fonts.size.h9,
+        fontSize: Fonts.size.tiny,
     }
 })
 

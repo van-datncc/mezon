@@ -1,8 +1,8 @@
+import { IS_TABLET } from '@mezon/mobile-components';
 import { Attributes, baseColor, size } from "@mezon/mobile-ui";
 import { Dimensions, Platform, StyleSheet } from "react-native";
-import { IS_TABLET } from '@mezon/mobile-components';
 const width = Dimensions.get('window').width;
-const inputWidth = width * (IS_TABLET ? 0.72 : 0.6);
+const inputWidth = width * (IS_TABLET ? 0.7 : 0.6);
 export const style = (colors: Attributes) => StyleSheet.create({
   btnIcon: {
 		width: size.s_40,
