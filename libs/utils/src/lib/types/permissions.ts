@@ -5,6 +5,5 @@ export enum EPermission {
 	sendMessage = 'send-message',
 	deleteMessage = 'delete-message',
 	manageThread = 'manage-thread',
-	manageClan = 'manage-clan',
-	everyone = 'everyone'
+	manageClan = 'manage-clan'
 }
