@@ -4,7 +4,7 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		fileViewer: {
 			gap: size.s_6,
-			marginTop: size.s_6,
+			marginVertical: size.s_6,
 			paddingHorizontal: size.s_10,
 			width: '80%',
 			minHeight: verticalScale(50),
