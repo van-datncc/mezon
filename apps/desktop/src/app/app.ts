@@ -82,11 +82,13 @@ export default class App {
 					const url = argv.pop().slice(1);
 
 					if (url) {
-						const index = url.indexOf('=');
-						const dataString = url.substring(index + 1);
+						const index = url.indexOf('data=');
+						if (index > 0) {
+							const dataString = url.substring(index + 5);
 
-						if (dataString) {
-							App.loadMainWindow({ deepLinkUrl: dataString });
+							if (dataString) {
+								App.loadMainWindow({ deepLinkUrl: dataString });
+							}
 						}
 					}
 				}

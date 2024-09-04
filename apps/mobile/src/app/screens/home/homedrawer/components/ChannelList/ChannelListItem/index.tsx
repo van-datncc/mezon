@@ -11,7 +11,6 @@ import {
 	channelsActions,
 	getStoreAsync,
 	selectCurrentChannelId,
-	selectIsUnreadChannelById,
 	selectVoiceChannelMembersByChannelId
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
@@ -25,6 +24,7 @@ import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import ListChannelThread from '../ChannelListThread';
 import UserListVoiceChannel from '../ChannelListUserVoice';
 import { style } from './styles';
+import { selectIsUnreadChannelById } from '@mezon/store';
 
 interface IChannelListItemProps {
 	data: any;

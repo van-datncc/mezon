@@ -1,9 +1,10 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectLastChannelTimestamp, selectNotificationMentionCountByChannelId } from '@mezon/store-mobile';
+import { selectNotificationMentionCountByChannelId } from '@mezon/store-mobile';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
+import { selectLastChannelTimestamp } from '@mezon/store';
 
 interface IChannelBadgeUnreadProps {
 	channelId: string;
