@@ -16,6 +16,8 @@ import ListAttachment from './listAttachment';
 
 const MessageModalImage = () => {
 	const [scale, setScale] = useState(1);
+	const [rotate, setRotate] = useState(0);
+
 	const [showList, setShowList] = useState(true);
 	const attachments = useSelector(selectAttachmentPhoto());
 	const { setOpenModalAttachment } = useAttachments();
@@ -125,6 +127,14 @@ const MessageModalImage = () => {
 
 	const currentChannel = useSelector(selectCurrentChannel);
 
+	const handleRotateImg = (direction: 'LEFT' | 'RIGHT') => {
+		if (direction === 'LEFT') {
+			setRotate(rotate - 90);
+		} else {
+			setRotate(rotate + 90);
+		}
+	};
+
 	return (
 		<div className="justify-center items-center flex flex-col fixed z-50 inset-0 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode">
 			<div className="flex justify-center items-center bg-[#2e2e2e] w-full h-[30px] relative">
@@ -146,7 +156,7 @@ const MessageModalImage = () => {
 						onMouseDown={handleMouseDown}
 						onMouseLeave={handleMouseUp}
 						style={{
-							transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+							transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px) rotate-[${rotate}deg]`,
 							transition: `${dragging ? '' : 'transform 0.2s ease'}`
 						}}
 						onContextMenu={handleContextMenu}
@@ -188,10 +198,10 @@ const MessageModalImage = () => {
 					</div>
 				</div>
 				<div className="flex-1 gap-3 text-white flex items-center justify-center">
-					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer" onClick={() => handleRotateImg('LEFT')}>
 						<Icons.RotateLeftIcon className="w-5" />
 					</div>
-					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer" onClick={() => handleRotateImg('RIGHT')}>
 						<Icons.RotateRightIcon className="w-5" />
 					</div>
 					<div className="">
