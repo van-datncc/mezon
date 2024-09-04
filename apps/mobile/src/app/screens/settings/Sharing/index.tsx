@@ -35,6 +35,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import { styles } from './styles';
+import { channelMetaActions } from '@mezon/store';
 
 export const Sharing = ({ data, onClose }) => {
 	const listDM = useSelector(selectDirectsOpenlist);
@@ -208,7 +209,7 @@ export const Sharing = ({ data, onClose }) => {
 			false, //mentionEveryone
 		);
 		const timestamp = Date.now() / 1000;
-		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: channelSelected.channel_id, timestamp }));
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channelSelected.channel_id, timestamp }));
 	};
 
 	const processText = (inputString: string) => {
