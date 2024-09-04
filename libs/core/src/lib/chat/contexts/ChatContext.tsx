@@ -126,8 +126,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const idToCompare = !isMobile ? channelId : currentChannelId;
 				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
+			dispatch(messagesActions.addNewMessage(mess));
 			if (message.channel_id === currentChannelId || message.channel_id === currentDirectId) {
-				dispatch(messagesActions.addNewMessage(mess));
 				if (mess.code === 0 && mess.attachments) {
 					dispatch(messagesActions.setNewMessageToUpdateImage(mess));
 				}
