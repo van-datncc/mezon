@@ -51,8 +51,9 @@ module.exports = {
 	bgInputDark: '#26262B',
 	bgAvatarLight: '#A612A2',
 	bgIconLight: '#5C5E66',
-
+	channelActiveColor: 'color-mix( in oklab, hsl(0 calc(1 * 0%) 100% / 1) 100%, black 0% )',
 	/* text */
+	channelTextLabel: 'color-mix( in oklab, hsl(214 calc(1 * 8.1%) 61.2% / 1) 100%, black 0% )',
 	channelTextarea: '#383A40',
 	channelTextareaLight: '#EBEDEF',
 	textPrimary: '#DBDEE1',
