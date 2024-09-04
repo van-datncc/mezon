@@ -95,20 +95,20 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 						onClick={() => {
 							handleToggleCategory();
 						}}
-						className="dark:text-contentTertiary text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
+						className="dark:text-channelTextLabel text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
 					>
 						{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 						<span className="one-line">{category.category_name}</span>
 					</button>
 					<button
 						onClick={handleSortByName}
-						className="focus-visible:outline-none dark:text-contentTertiary text-colorTextLightMode dark:hover:text-white hover:text-black"
+						className="focus-visible:outline-none dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black"
 					>
 						<Icons.UpDownIcon />
 					</button>
 					<UserRestrictionZone policy={isShowCreateChannel}>
 						<button
-							className="focus-visible:outline-none dark:text-contentTertiary text-colorTextLightMode dark:hover:text-white hover:text-black"
+							className="focus-visible:outline-none dark:text-channelTextLabely text-colorTextLightMode dark:hover:text-white hover:text-black"
 							onClick={() => handleOpenCreateChannelModal(category)}
 						>
 							<Icons.Plus />
