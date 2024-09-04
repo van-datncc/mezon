@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChevronSmallRightIcon,
 } from 'libs/mobile-components/src/lib/icons2';
@@ -52,7 +52,7 @@ export default function MezonMenuItem({
 					</View>
 					{component}
 					{previewValue && <Text style={styles.previewValue}>{previewValue}</Text>}
-					{expandable && <ChevronSmallRightIcon height={18} width={18} color={themeValue.text} />}
+					{expandable && <ChevronSmallRightIcon height={size.s_18} width={size.s_18} color={themeValue.text} />}
 				</View>
 			</TouchableOpacity>
 		)

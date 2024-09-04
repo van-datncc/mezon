@@ -20,6 +20,6 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     title: {
         color: colors.textStrong,
-        fontSize: Fonts.size.h9,
+        fontSize: Fonts.size.tiny,
     }
 })

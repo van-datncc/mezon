@@ -171,13 +171,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			<View style={styles.headerWrapper}>
 				<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
 				<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
-					<Icons.UserPlusIcon height={20} width={20} color={themeValue.textStrong} />
+					<Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 				</Pressable>
 			</View>
 
 			<View style={styles.searchMessage}>
-				<Icons.MagnifyingIcon height={20} width={20} color={themeValue.text} />
+				<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
 				<TextInput
 					placeholder={t('common:searchPlaceHolder')}
 					placeholderTextColor={themeValue.text}
@@ -203,7 +203,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			)}
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
-				<Icons.MessagePlusIcon width={22} height={22} />
+				<Icons.MessagePlusIcon width={size.s_22} height={size.s_22} />
 			</Pressable>
 		</View>
 	);

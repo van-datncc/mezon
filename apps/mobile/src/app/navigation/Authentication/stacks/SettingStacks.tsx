@@ -31,7 +31,7 @@ export const SettingStacks = ({ }: any) => {
 				},
 				headerTitleStyle: {
 					fontWeight: 'bold',
-					fontSize: Fonts.size.h7,
+					fontSize: Fonts.size.medium,
 				},
 				cardStyle: {
 					backgroundColor: "transparent",

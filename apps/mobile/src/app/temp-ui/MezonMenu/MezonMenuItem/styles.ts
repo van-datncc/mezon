@@ -19,14 +19,14 @@ export const style = (colors: Attributes) =>
 
 		btnTitle: {
 			color: colors.text,
-			fontSize: Fonts.size.h7,
+			fontSize: Fonts.size.medium,
 			fontWeight: '600',
 		},
 
 		btnDescription: {
 			marginTop: Metrics.size.s,
 			color: colors.text,
-			fontSize: Fonts.size.h9,
+			fontSize: Fonts.size.tiny,
 		},
 
 		btnTitleWrapper: {
@@ -51,6 +51,6 @@ export const style = (colors: Attributes) =>
 
 		previewValue: {
 			color: colors.text,
-			fontSize: Fonts.size.h8,
+			fontSize: Fonts.size.small,
 		},
 	});

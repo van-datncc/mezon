@@ -1,3 +1,4 @@
+import { IS_TABLET } from '@mezon/mobile-components';
 import { Attributes, Colors, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
@@ -17,7 +18,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			gap: size.s_8,
-      alignItems: 'center'
+			alignItems: 'center'
 		},
 		channelListSearchWrapperInput: {
 			backgroundColor: Colors.tertiaryWeight,
@@ -39,20 +40,20 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			borderRadius: 50,
 			backgroundColor: colors.primary,
-			width: 40,
-			height: 40,
+			width: size.s_40,
+			height:  size.s_40,
 		},
 		searchBox: {
 			backgroundColor: colors.primary,
 			borderRadius: size.s_50,
-			paddingHorizontal: Metrics.size.m,
+			paddingHorizontal: IS_TABLET ? Metrics.size.l : Metrics.size.m,
 			display: 'flex',
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: Metrics.size.m,
 			flexBasis: size.s_50,
 			flexGrow: 1,
-      paddingVertical: size.s_8
+			paddingVertical: size.s_8
 		},
 		placeholderSearchBox: {
 			color: colors.text,

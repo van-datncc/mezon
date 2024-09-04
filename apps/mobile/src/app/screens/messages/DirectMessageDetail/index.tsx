@@ -1,6 +1,6 @@
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
-import { Block, useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelMembersActions,
@@ -180,7 +180,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		<SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
 			<View style={styles.headerWrapper}>
 				<Pressable onPress={() => handleBack()} style={styles.backButton}>
-					<Icons.ArrowLargeLeftIcon color={themeValue.text} height={20} width={20} />
+					<Icons.ArrowLargeLeftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />
 				</Pressable>
 				<Pressable style={styles.channelTitle} onPress={() => navigateToThreadDetail()}>
 					{currentDmGroup?.channel_avatar?.length > 1 ? (

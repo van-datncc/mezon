@@ -32,17 +32,20 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     text: {
-        color: colors.text
+        color: colors.text,
+        fontSize: size.medium
     },
 
     whiteText: {
         color: Colors.white,
-        marginLeft: 10
+        marginLeft: 10,
+        fontSize: size.medium
     },
 
     textTitle: {
         color: colors.textStrong,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontSize: size.s_12
     },
 
     button: {
@@ -61,7 +64,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         position: 'absolute',
         width: size.s_100,
         height: size.s_100,
-        borderRadius: 50,
+        borderRadius: size.s_50,
         backgroundColor: colors.secondary,
         left: size.s_18,
         bottom: -size.s_50,
@@ -78,9 +81,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     dotOnline: {
         position: 'absolute',
-        width: 20,
-        height: 20,
-        borderRadius: 10,
+        width: size.s_20,
+        height: size.s_20,
+        borderRadius: size.s_50,
         backgroundColor: baseColor.green,
         bottom: size.s_2,
         right: size.s_2,
@@ -94,7 +97,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         padding: size.s_18,
         marginTop: size.s_20,
         borderWidth: 1,
-        borderColor: colors.border
+        borderColor: colors.border,
     },
 
     viewInfo: {
@@ -103,7 +106,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     textName: {
-        fontSize: size.h5,
+        fontSize: size.s_20,
         fontWeight: 'bold',
         color: colors.textStrong,
         marginRight: 10
@@ -135,11 +138,12 @@ export const style = (colors: Attributes) => StyleSheet.create({
     imgWrapper: {
         width: '100%',
         height: '100%',
-        borderRadius: 50
+        borderRadius: size.s_50
     },
     imgList: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         flex: 1
     },
     imageFriend: {

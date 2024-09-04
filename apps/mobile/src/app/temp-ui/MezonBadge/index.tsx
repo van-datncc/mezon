@@ -1,4 +1,5 @@
 import { VerifyIcon } from '@mezon/mobile-components';
+import { size } from '@mezon/mobile-ui';
 import { Text, View } from 'react-native';
 import styles from './styles';
 
@@ -18,7 +19,7 @@ export default function MezonBadge({ title, type }: MezonBadgeProps) {
 
 	return (
 		<View style={[styles.container, renderContainerStyle()]}>
-			<VerifyIcon height={16} width={16} />
+			<VerifyIcon height={size.s_16} width={size.s_16} />
 			<Text style={styles.title}>{title}</Text>
 		</View>
 	);
