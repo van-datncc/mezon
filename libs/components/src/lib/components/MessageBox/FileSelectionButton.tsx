@@ -15,7 +15,6 @@ function FileSelectionButton({ currentClanId, currentChannelId }: FileSelectionB
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
-					messageId: '',
 					files: fileArr.map((file) => ({
 						filename: file.name,
 						filetype: file.type,

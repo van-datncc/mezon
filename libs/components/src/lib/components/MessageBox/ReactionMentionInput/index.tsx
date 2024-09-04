@@ -357,8 +357,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			);
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
-					channelId: currentChannelId ?? '',
-					messageId: '',
+					channelId: currentDmOrChannelId ?? '',
 					files: []
 				})
 			);
