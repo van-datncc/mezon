@@ -12,7 +12,7 @@ import {
 	load,
 	save,
 } from '@mezon/mobile-components';
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import { Colors, size } from '@mezon/mobile-ui';
 import {
 	channelsActions,
 	directActions,
@@ -46,7 +46,7 @@ export const Sharing = ({ data, onClose }) => {
 	const dispatch = useDispatch();
 	const [dataText, setDataText] = useState<string>('');
 	const [dataShareTo, setDataShareTo] = useState<any>([]);
-	const [isLoading, setIsLoading] = useAnimatedState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [searchText, setSearchText] = useState<string>('');
 	const [channelSelected, setChannelSelected] = useState<any>();
 	const inputSearchRef = useRef<any>();

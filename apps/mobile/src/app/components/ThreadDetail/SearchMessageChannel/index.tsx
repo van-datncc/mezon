@@ -66,7 +66,6 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		if (!searchText?.length) return listChannels;
 		return listChannels
 			.filter((item) => item?.channel_label?.toUpperCase()?.indexOf(searchText?.toUpperCase()) > -1)
-			.slice(0, 8)
 			.sort((a: any, b: any) => {
 				const indexA = a?.channel_label?.toUpperCase().indexOf(searchText?.toUpperCase());
 				const indexB = b?.channel_label?.toUpperCase().indexOf(searchText?.toUpperCase());
