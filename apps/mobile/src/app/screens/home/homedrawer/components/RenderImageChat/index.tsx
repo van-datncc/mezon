@@ -23,6 +23,10 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 
 	const isUploading = !image?.url?.includes('http');
 
+	if (!image.url) {
+		return null;
+	}
+	
 	return (
 		<TouchableOpacity disabled={isUploading || disable} activeOpacity={0.8} key={index} onPress={() => onPress(image)} onLongPress={onLongPress}>
 			<FastImage

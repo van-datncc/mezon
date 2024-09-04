@@ -59,6 +59,9 @@ export const MessageAttachment = React.memo(({ message, onOpenImage, onLongPress
 
 	const renderDocuments = () => {
 		return documents.map((document, index) => {
+			if (!document?.url) {
+				return null;
+			}
 			const isShowImage = isImage(document?.url?.toLowerCase());
 			if (isShowImage) {
 				const checkImage = notImplementForGifOrStickerSendFromPanel(document);
