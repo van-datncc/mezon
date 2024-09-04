@@ -4,7 +4,7 @@ import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, ModeResponsive, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useRef, useState } from 'react';
-import { mockCategoryLogo, mockStickers } from './StickerMockData';
+import { mockCategoryLogo } from './StickerMockData';
 
 type ChannelMessageBoxProps = {
 	channelId: string;
@@ -29,11 +29,11 @@ function StickerSquare({ channelId, mode }: ChannelMessageBoxProps) {
 			content: IMessageSendPayload,
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>,
+			references?: Array<ApiMessageRef>
 		) => {
 			sendMessage(content, mentions, attachments, references);
 		},
-		[sendMessage],
+		[sendMessage]
 	);
 
 	const clanStickers = useAppSelector(selectAllStickerSuggestion);
@@ -41,7 +41,7 @@ function StickerSquare({ channelId, mode }: ChannelMessageBoxProps) {
 	const modeResponsive = useAppSelector(selectModeResponsive);
 	const categoryLogo = [
 		...(modeResponsive === ModeResponsive.MODE_CLAN ? [{ id: 0, url: currentClan?.logo, type: 'custom' }] : []),
-		...mockCategoryLogo,
+		...mockCategoryLogo
 	].filter(Boolean);
 
 	const stickers = [
@@ -49,10 +49,9 @@ function StickerSquare({ channelId, mode }: ChannelMessageBoxProps) {
 			? clanStickers.map((sticker) => ({
 					id: sticker.id,
 					url: sticker.source,
-					type: 'custom',
+					type: 'custom'
 				}))
-			: []),
-		...mockStickers,
+			: [])
 	].filter(Boolean);
 
 	const { setSubPanelActive } = useGifsStickersEmoji();

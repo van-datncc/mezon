@@ -109,19 +109,28 @@ export const selectChannelMetaEntities = createSelector(getChannelMetaState, sel
 
 export const selectLastSeenPinMessageChannelById = (channelId: string) =>
 	createSelector(getChannelMetaState, (state) => {
-		const channel = state.entities[channelId];
-		return channel?.lastSeenPinMessage || '';
+		if (state?.entities) {
+			const channel = state.entities[channelId];
+			return channel?.lastSeenPinMessage || '';
+		}
+		return '';
 	});
 
 export const selectIsUnreadChannelById = (channelId: string) =>
 	createSelector(getChannelMetaState, (state) => {
-		const channel = state.entities[channelId];
-		// unread last seen timestamp is less than last sent timestamp
-		return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
+		if (state?.entities) {
+			const channel = state.entities[channelId];
+			// unread last seen timestamp is less than last sent timestamp
+			return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
+		}
+		return false;
 	});
 
 export const selectLastChannelTimestamp = (channelId: string) =>
 	createSelector(getChannelMetaState, (state) => {
-		const channel = state.entities[channelId];
-		return channel?.lastSeenTimestamp || 0;
+		if (state?.entities) {
+			const channel = state.entities[channelId];
+			return channel?.lastSeenTimestamp || 0;
+		}
+		return 0;
 	});

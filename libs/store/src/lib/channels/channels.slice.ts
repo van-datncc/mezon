@@ -485,7 +485,7 @@ export const selectAllChannels = createSelector(getChannelsState, selectAll);
 
 export const selectChannelsEntities = createSelector(getChannelsState, selectEntities);
 
-export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (clansEntities) => clansEntities[id] || null);
+export const selectChannelById = (id: string) => createSelector(selectChannelsEntities, (channelsEntities) => channelsEntities[id] || null);
 
 export const selectCurrentChannelId = createSelector(getChannelsState, (state) => state.currentChannelId);
 
@@ -512,7 +512,7 @@ export const selectChannelFirst = createSelector(selectAllChannels, (channels) =
 export const selectChannelSecond = createSelector(selectAllChannels, (channels) => channels[1]);
 
 export const selectChannelsByClanId = (clainId: string) =>
-	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id == clainId));
+	createSelector(selectAllChannels, (channels) => channels.filter((ch) => ch.clan_id === clainId));
 
 export const selectDefaultChannelIdByClanId = (clanId: string, categories?: string[]) =>
 	createSelector(selectChannelsByClanId(clanId), (channels) => {

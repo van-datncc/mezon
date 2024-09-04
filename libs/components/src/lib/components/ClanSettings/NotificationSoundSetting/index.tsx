@@ -13,62 +13,62 @@ const initialSoundList: SoundType[] = [
 		id: 1,
 		fileName: 'alert-1',
 		src: 'https://www2.cs.uic.edu/~i101/SoundFiles/taunt.wav',
-		isSelected: true,
+		isSelected: true
 	},
 	{
 		id: 2,
 		fileName: 'alert-2',
 		src: 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars3.wav',
-		isSelected: false,
+		isSelected: false
 	},
 	{
 		id: 3,
 		fileName: 'alert-3',
 		src: 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand3.wav',
-		isSelected: false,
+		isSelected: false
 	},
 	{
 		id: 4,
 		fileName: 'alert-4',
 		src: 'https://www2.cs.uic.edu/~i101/SoundFiles/preamble10.wav',
-		isSelected: false,
+		isSelected: false
 	},
 	{
 		id: 5,
 		fileName: 'alert-5',
 		src: 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg10.wav',
-		isSelected: false,
+		isSelected: false
 	},
 	{
 		id: 6,
 		fileName: 'alert-6',
 		src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-		isSelected: false,
+		isSelected: false
 	},
 	{
 		id: 7,
 		fileName: 'alert-7',
 		src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-		isSelected: false,
+		isSelected: false
 	},
 	{
 		id: 8,
 		fileName: 'alert-8',
 		src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-		isSelected: false,
+		isSelected: false
 	},
 	{
 		id: 9,
 		fileName: 'alert-9',
 		src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-		isSelected: false,
+		isSelected: false
 	},
 	{
 		id: 10,
 		fileName: 'alert-10',
 		src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-		isSelected: false,
-	},
+		isSelected: false
+	}
 ];
 
 const NotificationSoundSetting = () => {
@@ -79,7 +79,7 @@ const NotificationSoundSetting = () => {
 	const handleSelectSound = (selectedSound: SoundType) => {
 		const updatedSoundList = soundList.map((sound) => ({
 			...sound,
-			isSelected: sound.id === selectedSound.id,
+			isSelected: sound.id === selectedSound.id
 		}));
 		setSoundList(updatedSoundList);
 		setCurrentSound(selectedSound);
