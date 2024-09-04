@@ -57,18 +57,14 @@ export default function MessageMenu({ messageInfo }: IServerMenuProps) {
 
     const markAsReadMenu: IMezonMenuItemProps[] = [
 		{
-			onPress: () => {
-				setIsVisibleLeaveGroupModal(true);
-			},
+			onPress: () => reserve(),
 			title: t('menu.markAsRead'),
 		},
 	];
 
     const favoriteMenu: IMezonMenuItemProps[] = [
 		{
-			onPress: () => {
-				setIsVisibleLeaveGroupModal(true);
-			},
+			onPress: () => reserve(),
 			title: t('menu.favorite'),
 		},
 	];
