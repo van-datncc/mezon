@@ -7,7 +7,6 @@ import {
 	clansSlice,
 	directActions,
 	directSlice,
-	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
 	fetchListFriends,
@@ -43,7 +42,6 @@ import {
 	ChannelUpdatedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
-	EventStatusNotificationEvent,
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
@@ -419,9 +417,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
-	const oneventstatusnotification = useCallback(
-		(eventStatusNotification: EventStatusNotificationEvent) => {
-			dispatch(eventManagementActions.updateStatusEvent(eventStatusNotification));
+	const oneventcreated = useCallback(
+		(eventCreatedEvent: any) => {
+			console.log(eventCreatedEvent);
+
+			// dispatch(eventManagementActions.updateStatusEvent(eventStatusNotification));
 		},
 		[dispatch]
 	);
@@ -470,9 +470,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onchannelupdated = onchannelupdated;
 
-			socket.onheartbeattimeout = onHeartbeatTimeout;
+			socket.oneventcreated = oneventcreated;
 
-			socket.oneventstatusnotification = oneventstatusnotification;
+			socket.onheartbeattimeout = onHeartbeatTimeout;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -495,7 +495,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
-			oneventstatusnotification
+			oneventcreated
 		]
 	);
 
@@ -547,8 +547,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onclanprofileupdated = () => {};
-			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventstatusnotification = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -573,7 +571,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchanneldeleted,
 		onchannelupdated,
 		onHeartbeatTimeout,
-		oneventstatusnotification,
+		oneventcreated,
 		setCallbackEventFn
 	]);
 
