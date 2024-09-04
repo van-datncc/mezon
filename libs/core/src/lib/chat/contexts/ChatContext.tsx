@@ -127,12 +127,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
 			dispatch(messagesActions.addNewMessage(mess));
-			if (message.channel_id === currentChannelId || message.channel_id === currentDirectId) {
-				if (mess.code === 0 && mess.attachments) {
-					dispatch(messagesActions.setNewMessageToUpdateImage(mess));
-				}
-			}
-
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 				dispatch(directActions.updateDMSocket(message));
