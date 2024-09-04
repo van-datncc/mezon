@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useDirectMessages, useGifsStickersEmoji } from '@mezon/core';
-import { RootState, selectIdMessageRefReaction, selectIdMessageRefReply, selectIsShowMemberList } from '@mezon/store';
+import { RootState, selectIdMessageRefReply } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -15,11 +15,8 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const { sendDirectMessage, sendMessageTyping } = useDirectMessages({ channelId: directParamId, mode: mode });
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
-	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
-	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const messageBox = useRef<HTMLDivElement>(null);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(directParamId));
 
