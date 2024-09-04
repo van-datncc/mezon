@@ -84,6 +84,10 @@
         "edit": "Edit",
         "done": "Done",
         "addRole": "Add Role",
-        "addMember": "Add Member"
+        "addMember": "Add Member",
+        "privateChannel": "Private Channel",
+        "basicViewDescription": "By making a channel private, only select members and roles will be able to view this channel",
+        "addMemberAndRoles": "Add members or roles",
+        "whoCanAccess": "Who can access"
     }
 }

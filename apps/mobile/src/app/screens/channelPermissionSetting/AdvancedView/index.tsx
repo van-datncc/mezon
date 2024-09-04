@@ -33,7 +33,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	}, [t]);
 
 	const handleAction = (type: EAdvancedPermissionSetting) => {
-		//
+		//TODO
 	};
 	return (
 		<Block>
