@@ -31,19 +31,19 @@ export const channelMetaSlice = createSlice({
 		remove: channelMetaAdapter.removeOne,
 		update: channelMetaAdapter.updateOne,
 		setChannelLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			const channel = state.entities[action.payload.channelId];
+			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSentTimestamp = action.payload.timestamp;
 			}
 		},
 		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			const channel = state.entities[action.payload.channelId];
+			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSeenTimestamp = action.payload.timestamp;
 			}
 		},
 		setChannelLastSeenPinMessage: (state, action: PayloadAction<{ channelId: string; lastSeenPinMess: string }>) => {
-			const channel = state.entities[action.payload.channelId];
+			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSeenPinMessage = action.payload.lastSeenPinMess;
 			}
@@ -109,13 +109,13 @@ export const selectChannelMetaEntities = createSelector(getChannelMetaState, sel
 
 export const selectLastSeenPinMessageChannelById = (channelId: string) =>
 	createSelector(getChannelMetaState, (state) => {
-		const channel = state.entities[channelId];
+		const channel = state?.entities[channelId];
 		return channel?.lastSeenPinMessage || '';
 	});
 
 export const selectIsUnreadChannelById = (channelId: string) =>
 	createSelector(getChannelMetaState, (state) => {
-		const channel = state.entities[channelId];
+		const channel = state?.entities[channelId];
 		// unread last seen timestamp is less than last sent timestamp
 		return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
 	});
