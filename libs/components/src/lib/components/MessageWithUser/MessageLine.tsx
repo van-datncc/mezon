@@ -1,7 +1,7 @@
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
 import { EMarkdownType, ETokenMessage, IExtendedMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
 
@@ -28,19 +28,19 @@ const MessageLine = ({
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
-	const [maxWidth, setMaxWidth] = useState(window.innerWidth - 600);
+	// const [maxWidth, setMaxWidth] = useState(window.innerWidth - 600);
 
-	useEffect(() => {
-		const handleResize = () => {
-			setMaxWidth(window.innerWidth - 600);
-		};
+	// useEffect(() => {
+	// 	const handleResize = () => {
+	// 		setMaxWidth(window.innerWidth - 600);
+	// 	};
 
-		window.addEventListener('resize', handleResize);
+	// 	window.addEventListener('resize', handleResize);
 
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
-	}, []);
+	// 	return () => {
+	// 		window.removeEventListener('resize', handleResize);
+	// 	};
+	// }, []);
 	return (
 		<div
 			onClick={
@@ -61,7 +61,7 @@ const MessageLine = ({
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
 				allChannelVoice={allChannelVoice}
 				isSearchMessage={isSearchMessage}
-				parentWidth={maxWidth}
+				// parentWidth={maxWidth}
 			/>
 		</div>
 	);
@@ -242,8 +242,8 @@ const RenderContent = memo(
 						? {
 								whiteSpace: 'nowrap',
 								overflow: 'hidden',
-								textOverflow: 'ellipsis',
-								maxWidth: parentWidth
+								textOverflow: 'ellipsis'
+								// maxWidth: parentWidth
 							}
 						: {
 								whiteSpace: 'pre-line'
