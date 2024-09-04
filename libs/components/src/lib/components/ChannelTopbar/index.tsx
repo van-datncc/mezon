@@ -16,13 +16,13 @@ import {
 	selectNewNotificationStatus,
 	selectStatusMenu,
 	selectTheme,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalInvite from '../ListMemberInvite/modalInvite';
@@ -39,7 +39,7 @@ export type ChannelTopbarProps = {
 	mode?: ChannelStreamMode;
 };
 
-function ChannelTopbar({ channel, mode }: ChannelTopbarProps) {
+const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 	const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -51,7 +51,7 @@ function ChannelTopbar({ channel, mode }: ChannelTopbarProps) {
 			{isChannelVoice ? <TopBarChannelVoice channel={channel} /> : <TopBarChannelText channel={channel} mode={mode} />}
 		</div>
 	);
-}
+});
 
 function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
