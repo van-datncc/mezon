@@ -14,6 +14,8 @@ import { useSelector } from 'react-redux';
 import { MessageContextMenuProps, useMessageContextMenu } from '../../ContextMenu';
 import ListAttachment from './listAttachment';
 
+export const MAX_SCALE_IMAGE = 5;
+
 const MessageModalImage = () => {
 	const [scale, setScale] = useState(1);
 	const [rotate, setRotate] = useState(0);
@@ -134,9 +136,17 @@ const MessageModalImage = () => {
 			setRotate(rotate + 90);
 		}
 	};
-
+	const handleScaleImage = (scaleUp: boolean) => {
+		if (scaleUp) {
+			if (scale < MAX_SCALE_IMAGE) {
+				setScale(scale + 1.5);
+			}
+			return;
+		}
+		setScale(1);
+	};
 	return (
-		<div className="justify-center items-center flex flex-col fixed z-50 inset-0 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode">
+		<div className="justify-center items-center flex flex-col fixed z-50 inset-0 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode select-none">
 			<div className="flex justify-center items-center bg-[#2e2e2e] w-full h-[30px] relative">
 				<div>{currentChannel?.channel_label}</div>
 				<div onClick={closeModal} className="w-4 absolute right-2 top-2 cursor-pointer">
@@ -144,11 +154,11 @@ const MessageModalImage = () => {
 				</div>
 			</div>
 			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)]">
-				<div className="flex-1 flex justify-center items-center p-5 overflow-hidden h-full w-full">
+				<div className="flex-1 flex justify-center items-center px-5 overflow-hidden h-full w-full relative">
 					<img
 						src={urlImg}
 						alt={urlImg}
-						className="md:max-h-[90vh] max-h-full object-contain rounded-[10px] cursor-default h-fit"
+						className={`object-contain rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-full'}`}
 						onDragStart={handleDrag}
 						onWheel={handleWheel}
 						onMouseUp={handleMouseUp}
@@ -156,11 +166,20 @@ const MessageModalImage = () => {
 						onMouseDown={handleMouseDown}
 						onMouseLeave={handleMouseUp}
 						style={{
-							transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px) rotate-[${rotate}deg]`,
-							transition: `${dragging ? '' : 'transform 0.2s ease'}`
+							transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px) `,
+							transition: `${dragging ? '' : 'transform 0.2s ease'}`,
+							rotate: `${rotate}deg`
 						}}
 						onContextMenu={handleContextMenu}
 					/>
+					<div className={`h-full w-12 absolute flex flex-col right-0 gap-2 justify-center`}>
+						<div className="rounded-full rotate-180 bg-bgTertiary cursor-pointer w-10 aspect-square flex items-center justify-center dark:text-white">
+							<Icons.ArrowDown />
+						</div>
+						<div className="rounded-full  bg-bgTertiary  cursor-pointer w-10 aspect-square flex items-center justify-center dark:text-white">
+							<Icons.ArrowDown />
+						</div>
+					</div>
 				</div>
 				{/* {checkNumberAtt && (
 				<button
@@ -181,8 +200,8 @@ const MessageModalImage = () => {
 					/>
 				)}
 			</div>
-			<div className="h-14 flex px-4 w-full items-center">
-				<div className="flex-1 flex items-center">
+			<div className="h-14 flex px-4 w-full items-center justify-between">
+				<div className="flex items-center">
 					<div className="flex gap-2">
 						<div className="w-10 aspect-square object-cover">
 							<img
@@ -192,12 +211,12 @@ const MessageModalImage = () => {
 							/>
 						</div>
 						<div className="flex flex-col justify-between">
-							<div className="text-[14px] font-semibold">Anh.TranTruong</div>
+							<div className="text-[14px] font-semibold">Nga.NguyenThi</div>
 							<div className="text-[12px]">Today at 11:37</div>
 						</div>
 					</div>
 				</div>
-				<div className="flex-1 gap-3 text-white flex items-center justify-center">
+				<div className="gap-3 text-white flex items-center justify-center">
 					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer" onClick={() => handleRotateImg('LEFT')}>
 						<Icons.RotateLeftIcon className="w-5" />
 					</div>
@@ -207,14 +226,14 @@ const MessageModalImage = () => {
 					<div className="">
 						<Icons.StraightLineIcon className="w-5" />
 					</div>
-					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer" onClick={() => handleScaleImage(true)}>
 						<Icons.ZoomIcon className="w-5" />
 					</div>
-					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer" onClick={() => handleScaleImage(false)}>
 						<Icons.AspectRatioIcon className="w-5" />
 					</div>
 				</div>
-				<div className="flex-1 flex justify-end">
+				<div className="flex justify-end" onClick={handleShowList}>
 					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer">
 						<Icons.SideMenuIcon className="w-5" />
 					</div>
