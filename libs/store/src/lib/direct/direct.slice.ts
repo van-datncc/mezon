@@ -420,3 +420,7 @@ export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, (di
 });
 
 export const selectDirectById = (id: string) => createSelector(selectDirectMessageEntities, (clansEntities) => clansEntities[id]);
+
+export const selectTotalUnreadDM = createSelector(selectDirectsUnreadlist, (listUnreadDM) => {
+	return listUnreadDM.reduce((total, count) => total + (count.count_mess_unread ?? 0), 0);
+});
