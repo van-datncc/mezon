@@ -1,4 +1,3 @@
-import BottomSheet from '@gorhom/bottom-sheet';
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
@@ -14,19 +13,17 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Image, Platform, Pressable, Text, View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { ChatBox } from '../../home/homedrawer/ChatBox';
-import { IModeKeyboardPicker } from '../../home/homedrawer/components';
-import AttachmentPicker from '../../home/homedrawer/components/AttachmentPicker';
-import BottomKeyboardPicker from '../../home/homedrawer/components/BottomKeyboardPicker';
-import EmojiPicker from '../../home/homedrawer/components/EmojiPicker';
-import { style } from './styles';
 import ChannelMessagesWrapper from '../../home/homedrawer/ChannelMessagesWrapper';
+import { ChatBox } from '../../home/homedrawer/ChatBox';
+import PanelKeyboard from '../../home/homedrawer/PanelKeyboard';
+import { IModeKeyboardPicker } from '../../home/homedrawer/components';
+import { style } from './styles';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -51,19 +48,12 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const userStatus = useMemberStatus(currentDmGroup?.user_id?.length === 1 ? currentDmGroup?.user_id[0] : '');
-	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
-	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
-	const bottomPickerRef = useRef<BottomSheet>(null);
 	const isMentionHashtagDMRef = useRef(false);
+	const panelKeyboardRef = useRef(null);
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
-		setHeightKeyboardShow(height);
-		if (isShow) {
-			setTypeKeyboardBottomSheet(type);
-			bottomPickerRef.current?.collapse();
-		} else {
-			setTypeKeyboardBottomSheet('text');
-			bottomPickerRef.current?.close();
+		if (panelKeyboardRef?.current) {
+			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
 		}
 	}, []);
 
@@ -76,31 +66,31 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			return;
 		}
 		const store = await getStoreAsync();
-			store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
-			// Rejoin previous clan (other than 0) when exiting the DM detail screen
-			store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
-			store.dispatch(
-				channelMembersActions.fetchChannelMembers({
-					clanId: currentChannel?.clan_id || '',
-					channelId: currentChannel?.channel_id || '',
-					channelType: currentChannel?.type,
-					noCache: true,
-				}),
-			);
+		store.dispatch(clansActions.setCurrentClanId(currentChannel?.clan_id));
+		// Rejoin previous clan (other than 0) when exiting the DM detail screen
+		store.dispatch(clansActions.joinClan({ clanId: currentChannel?.clan_id }));
+		store.dispatch(
+			channelMembersActions.fetchChannelMembers({
+				clanId: currentChannel?.clan_id || '',
+				channelId: currentChannel?.channel_id || '',
+				channelType: currentChannel?.type,
+				noCache: true
+			})
+		);
 	}, [currentChannel]);
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
-			store.dispatch(clansActions.setCurrentClanId('0'));
-			store.dispatch(
-				directActions.joinDirectMessage({
-					directMessageId: currentDmGroup?.id,
-					channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
-					type: currentDmGroup?.type,
-					noCache: true,
-					isFetchingLatestMessages: true,
-				}),
-			);
+		store.dispatch(clansActions.setCurrentClanId('0'));
+		store.dispatch(
+			directActions.joinDirectMessage({
+				directMessageId: currentDmGroup?.id,
+				channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
+				type: currentDmGroup?.type,
+				noCache: true,
+				isFetchingLatestMessages: true
+			})
+		);
 		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);
 
@@ -229,7 +219,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 							<ChannelMessagesWrapper
 								channelId={currentDmGroup.id}
 								clanId={'0'}
-								channelLabel={currentDmGroup?.channel_label || currentDmGroup?.usernames}
 								mode={Number(
 									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 								)}
@@ -246,30 +235,12 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						}}
 					/>
 					<Block height={Platform.OS === 'ios' ? 10 : 0} backgroundColor={themeValue.secondary} />
-					<View
-						style={{
-							height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-							backgroundColor: themeValue.secondary
-						}}
+					<PanelKeyboard
+						ref={panelKeyboardRef}
+						directMessageId={currentDmGroup?.id || ''}
+						currentChannelId={directMessageId}
+						currentClanId={currentClanId}
 					/>
-					{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
-						<BottomKeyboardPicker height={heightKeyboardShow} ref={bottomPickerRef} isStickyHeader={typeKeyboardBottomSheet === 'emoji'}>
-							{typeKeyboardBottomSheet === 'emoji' ? (
-								<EmojiPicker
-									onDone={() => {
-										onShowKeyboardBottomSheet(false, heightKeyboardShow, 'text');
-										DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, {});
-									}}
-									bottomSheetRef={bottomPickerRef}
-									directMessageId={currentDmGroup?.id || ''}
-								/>
-							) : typeKeyboardBottomSheet === 'attachment' ? (
-								<AttachmentPicker currentChannelId={directMessageId} currentClanId={currentClanId} />
-							) : (
-								<View />
-							)}
-						</BottomKeyboardPicker>
-					)}
 				</View>
 			) : null}
 		</SafeAreaView>

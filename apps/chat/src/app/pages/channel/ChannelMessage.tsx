@@ -32,7 +32,6 @@ type MessageProps = {
 
 export function ChannelMessage({ message, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>) {
 	const { markMessageAsSeen } = useSeenMessagePool();
-	// const { deleteMessage, setDeleteMessage } = useDeleteMessageHook(channelId, channelLabel, mode);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const { showMessageContextMenu } = useMessageContextMenu();
@@ -76,6 +75,7 @@ export function ChannelMessage({ message, channelId, mode, channelLabel, isHighl
 	useEffect(() => {
 		markMessageAsSeen(message);
 	}, [markMessageAsSeen, message]);
+
 	return (
 		<>
 			{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
@@ -95,7 +95,6 @@ export function ChannelMessage({ message, channelId, mode, channelLabel, isHighl
 			)}
 
 			{lastSeen && <UnreadMessageBreak />}
-			{/* {deleteMessage && <ModalDeleteMess mode={mode} closeModal={() => setDeleteMessage(false)} mess={message} />} */}
 		</>
 	);
 }

@@ -1,6 +1,7 @@
 import {
 	channelMembers,
 	channelMembersActions,
+	channelMetaActions,
 	channelsActions,
 	channelsSlice,
 	clansSlice,
@@ -36,6 +37,7 @@ import {
 	ChannelDeletedEvent,
 	ChannelMessage,
 	ChannelPresenceEvent,
+	ChannelStreamMode,
 	ChannelType,
 	ChannelUpdatedEvent,
 	ClanProfileUpdatedEvent,
@@ -124,21 +126,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const idToCompare = !isMobile ? channelId : currentChannelId;
 				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
-
-			await dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
-			dispatch(directActions.updateDMSocket(message));
-			dispatch(channelsActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
-			dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
-			dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
-			dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
 			if (message.channel_id === currentChannelId || message.channel_id === currentDirectId) {
 				dispatch(messagesActions.addNewMessage(mess));
-				if (mess.code === 0) {
+				if (mess.code === 0 && mess.attachments) {
 					dispatch(messagesActions.setNewMessageToUpdateImage(mess));
 				}
 			}
+
+			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+				dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
+				dispatch(directActions.updateDMSocket(message));
+				dispatch(directActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+				dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
+			} else {
+				dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
+			}
+			dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			dispatch(notificationActions.setIsMessageRead(true));
-			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
+			// remove: setChannelLastSentTimestamp for fix re-render currentChannel when receive new message
+			// dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
 		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId]
 	);
@@ -184,7 +190,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			if (currentChannel?.channel_id === (notification as any).channel_id) {
 				const timestamp = Date.now() / 1000;
-				dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
+				dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
 			}
 
 			if (notification.code === NotificationCode.FRIEND_REQUEST || notification.code === NotificationCode.FRIEND_ACCEPT) {
@@ -201,7 +207,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannel?.channel_id ?? '', noCache: true }));
 			}
 			if (pin.operation === 0) {
-				dispatch(channelsActions.setChannelLastSeenPinMessage({ channelId: pin.channel_id, lastSeenPinMess: pin.message_id }));
+				dispatch(channelMetaActions.setChannelLastSeenPinMessage({ channelId: pin.channel_id, lastSeenPinMess: pin.message_id }));
 			}
 		},
 		[currentChannel?.channel_id, dispatch]

@@ -1,7 +1,7 @@
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { MessagesEntity, channelsActions, useAppDispatch } from '@mezon/store';
+import { MessagesEntity, useAppDispatch, channelMetaActions } from '@mezon/store';
 import React, { useCallback } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 import { style } from './styles';
@@ -26,7 +26,7 @@ const ChannelListMessage = React.memo(
 		const dispatch = useAppDispatch();
 		if (messages?.[0]?.channel_id) {
 			const timestamp = Date.now() / 1000;
-			dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId: messages[0].channel_id, timestamp }));
+			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: messages[0].channel_id, timestamp }));
 		}
 
 		const ViewLoadMore = () => {
@@ -64,7 +64,7 @@ const ChannelListMessage = React.memo(
 					itemVisiblePercentThreshold: 50,
 					minimumViewTime: 500
 				}}
-				ListHeaderComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
+				// ListHeaderComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 				ListFooterComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
 			/>
 		);

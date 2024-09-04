@@ -28,7 +28,7 @@ import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { channelsActions } from '../channels/channels.slice';
+import { channelMetaActions } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
@@ -492,7 +492,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 
 		if (!isViewingOlderMessages) {
 			const timestamp = Date.now() / 1000;
-			thunkAPI.dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+			thunkAPI.dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 
 			const mess = { ...fakeMess, id: res.message_id, create_time: res.create_time };
 
