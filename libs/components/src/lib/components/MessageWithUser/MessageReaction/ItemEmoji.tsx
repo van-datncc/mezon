@@ -4,7 +4,6 @@ import {
 	reactionActions,
 	selectCurrentChannel,
 	selectCurrentClanId,
-	selectDirectById,
 	selectEmojiHover,
 	selectUserReactionPanelState
 } from '@mezon/store';
@@ -32,17 +31,18 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const emojiItemRef = useRef<HTMLDivElement | null>(null);
 	const userPanelRef = useRef<HTMLDivElement | null>(null);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const [channelLabel, setChannelLabel] = useState('');
-	const direct = useSelector(selectDirectById(message.channel_id));
+	// const [channelLabel, setChannelLabel] = useState('');
+	// const direct = useSelector(selectDirectById(message.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
 
-	useEffect(() => {
-		if (direct != undefined) {
-			setChannelLabel('');
-		} else {
-			setChannelLabel(currentChannel?.channel_label || '');
-		}
-	}, [message]);
+	// comment function un-used
+	// useEffect(() => {
+	// 	if (direct != undefined) {
+	// 		setChannelLabel('');
+	// 	} else {
+	// 		setChannelLabel(currentChannel?.channel_label || '');
+	// 	}
+	// }, [message]);
 
 	async function reactOnExistEmoji(
 		id: string,

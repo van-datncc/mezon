@@ -26,13 +26,13 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 	const dispatch = useAppDispatch();
 
 	const getIdMessageToJump = useCallback(
-		(idRefMessage: string, e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
+		(e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
-			if (idRefMessage) {
-				dispatch(messagesActions.jumpToMessage({ messageId: idRefMessage, channelId: message?.channel_id }));
+			if (messageIdRef) {
+				dispatch(messagesActions.jumpToMessage({ messageId: messageIdRef, channelId: message?.channel_id }));
 			}
 		},
-		[dispatch, message],
+		[dispatch, message?.channel_id, messageIdRef]
 	);
 
 	const markUpOnReplyParent = useRef<HTMLDivElement | null>(null);
@@ -61,7 +61,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 							{hasAttachmentInMessageRef ? (
 								<div className=" flex flex-row items-center">
 									<div
-										onClick={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
+										onClick={getIdMessageToJump}
 										className="text-[14px] pr-1 mr-[-5px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer italic   w-fit one-line break-all pt-0"
 									>
 										Click to see attachment
@@ -74,7 +74,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message }) => {
 									<MessageLine
 										isTokenClickAble={false}
 										isJumMessageEnabled={true}
-										onClickToMessage={(e) => getIdMessageToJump(messageIdRef ?? '', e)}
+										onClickToMessage={getIdMessageToJump}
 										content={messageContentRef}
 									/>
 								</div>
