@@ -31,19 +31,19 @@ export const channelMetaSlice = createSlice({
 		remove: channelMetaAdapter.removeOne,
 		update: channelMetaAdapter.updateOne,
 		setChannelLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			const channel = state.entities[action.payload.channelId];
+			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSentTimestamp = action.payload.timestamp;
 			}
 		},
 		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			const channel = state.entities[action.payload.channelId];
+			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSeenTimestamp = action.payload.timestamp;
 			}
 		},
 		setChannelLastSeenPinMessage: (state, action: PayloadAction<{ channelId: string; lastSeenPinMess: string }>) => {
-			const channel = state.entities[action.payload.channelId];
+			const channel = state?.entities[action.payload.channelId];
 			if (channel) {
 				channel.lastSeenPinMessage = action.payload.lastSeenPinMess;
 			}
