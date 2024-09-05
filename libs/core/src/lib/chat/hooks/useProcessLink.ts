@@ -29,7 +29,6 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 			newMessageIdUpdateImage?: string,
 			messageEdit?: IMessageWithUser
 		) => {
-			console.log('messageEdit', messageEdit);
 			if (!contentPayload?.lk && messageEdit?.attachments && messageEdit?.attachments?.length > 0) {
 				const filteredAttachments =
 					messageEdit?.attachments?.filter(
@@ -41,7 +40,6 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 							contentPayload?.t &&
 							!contentPayload.t.includes(attachment.url)
 					) ?? [];
-				console.log('filteredAttachments', filteredAttachments);
 				const finalAttachments = messageEdit?.attachments?.filter((attachment) => !filteredAttachments.includes(attachment));
 				if (messageEdit?.attachments && messageEdit?.attachments?.length > 0) {
 					updateImageLinkMessage(

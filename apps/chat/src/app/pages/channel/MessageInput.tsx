@@ -165,8 +165,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const [titleMention, setTitleMention] = useState('');
 
-	const { mentionList, hashtagList, emojiList } = useProcessMention(mentions, roleList);
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const { mentionList, hashtagList, emojiList } = useProcessMention(mentions, roleList);
+
 		const { links, markdowns, voiceRooms } = processText(newPlainTextValue);
 		setChannelDraftMessage(
 			channelId,

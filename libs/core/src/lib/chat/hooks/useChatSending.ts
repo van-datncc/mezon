@@ -30,6 +30,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 
+	const currentDmOrChannelId = useMemo(
+		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? channelId : directMessageId),
+		[channelId, directMessageId, mode]
+	);
+
 	const dispatch = useAppDispatch();
 	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
@@ -144,13 +149,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 
 	useEffect(() => {
-		if (
-			newMessageUpdateImage.clan_id &&
-			newMessageUpdateImage.clan_id !== '0' &&
-			newMessageUpdateImage.isMe &&
-			newMessageUpdateImage.attachments &&
-			newMessageUpdateImage.attachments?.length > 0
-		) {
+		if (newMessageUpdateImage.mode === ChannelStreamMode.STREAM_MODE_CHANNEL && newMessageUpdateImage.isMe) {
 			processLink(
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				newMessageUpdateImage.clan_id!,
@@ -164,7 +163,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				newMessageUpdateImage.message_id
 			);
 		}
-	}, [newMessageUpdateImage.attachments]);
+	}, [newMessageUpdateImage.message_id]);
 
 	return useMemo(
 		() => ({

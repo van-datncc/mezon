@@ -438,7 +438,6 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			}
 
 			let uploadedFiles: ApiMessageAttachment[] = [];
-			console.log(attachments);
 			// Check if there are attachments
 			if (attachments && attachments.length > 0) {
 				const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
@@ -460,7 +459,6 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 				uploadedFiles = [...uploadedFiles, ...directLinks.map((link) => ({ url: link.url, filetype: link.filetype }))];
 			}
 
-			console.log('uploadedFiles: ', uploadedFiles);
 			const res = await socket.writeChatMessage(
 				clanId,
 				channelId,
