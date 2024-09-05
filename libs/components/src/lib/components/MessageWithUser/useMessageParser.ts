@@ -5,15 +5,11 @@ import {
 	addMention,
 	convertDateString,
 	convertTimeHour,
-	convertTimeString,
+	convertTimeString
 } from '@mezon/utils';
 import { useMemo } from 'react';
 
 export function useMessageParser(message: IMessageWithUser) {
-	const attachments = useMemo(() => {
-		return message?.attachments;
-	}, [message?.attachments]);
-
 	const mentions = useMemo(() => {
 		return message?.mentions as IMentionOnMessage;
 	}, [message?.mentions]);
@@ -40,8 +36,6 @@ export function useMessageParser(message: IMessageWithUser) {
 	const messageHour = useMemo(() => {
 		return convertTimeHour(message?.create_time || ('' as string));
 	}, [message?.create_time]);
-
-	const hasAttachments = attachments && attachments.length > 0;
 
 	const userClanNickname = useMemo(() => {
 		return message?.clan_nick;
@@ -117,11 +111,9 @@ export function useMessageParser(message: IMessageWithUser) {
 		content,
 		messageTime,
 		messageHour,
-		attachments,
 		mentions,
 		lines,
 		messageDate,
-		hasAttachments,
 		userClanNickname,
 		userClanAvatar,
 		userDisplayName,
@@ -136,6 +128,6 @@ export function useMessageParser(message: IMessageWithUser) {
 		messageAvatarSenderRef,
 		messageClanNicknameSenderRef,
 		messageDisplayNameSenderRef,
-		contentUpdatedMention,
+		contentUpdatedMention
 	};
 }

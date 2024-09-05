@@ -623,7 +623,7 @@ export enum RoleEveryOne {
 }
 
 export enum EMessageCode {
-	FIRST_MESSAGE = 11
+	FIRST_MESSAGE = 4
 }
 
 export enum ModeResponsive {
@@ -772,7 +772,6 @@ export enum ENotificationTypes {
 
 export type PreSendAttachment = {
 	channelId?: string;
-	messageId?: string;
 	mode?: string;
 	clan_id?: string;
 	files: ApiMessageAttachment[];

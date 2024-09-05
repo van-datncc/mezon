@@ -11,10 +11,9 @@ import {
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
-	setRecentEmoji,
 	SmilingFaceIcon
 } from '@mezon/mobile-components';
-import { baseColor, Colors, Metrics, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Colors, Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { useAppSelector } from '@mezon/store';
 import { emojiSuggestionActions, selectCurrentClan } from '@mezon/store-mobile';
 import { getSrcEmoji, IEmoji } from '@mezon/utils';
@@ -83,7 +82,7 @@ export default function EmojiSelector({
 	const { categoriesEmoji, emojis } = getEmojis(currentClan?.clan_id || '0');
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [selectedCategory, setSelectedCategory] = useAnimatedState<string>('');
+	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const refScrollView = useRef<ScrollView>(null);
@@ -141,7 +140,7 @@ export default function EmojiSelector({
 	const handleEmojiSelect = useCallback(
 		async (emoji: IEmoji) => {
 			onSelected(emoji.id, emoji.shortname);
-			setRecentEmoji(emoji, currentClan?.id || '0');
+			// setRecentEmoji(emoji, currentClan?.id || '0');
 			handleBottomSheetCollapse?.();
 			if (!isReactMessage) {
 				const emojiItemName = `:${emoji.shortname?.split(':').join('')}:`;

@@ -5,7 +5,6 @@ import { useMemo } from 'react';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
 import MessageVideo from './MessageVideo';
-import { useMessageParser } from './useMessageParser';
 
 type MessageAttachmentProps = {
 	message: IMessageWithUser;
@@ -79,10 +78,12 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 
 // TODO: refactor component for message lines
 const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentProps) => {
-	const { attachments, hasAttachments } = useMessageParser(message);
-	if (!hasAttachments) return null;
+	const validateAttachment = useMemo(() => {
+		return (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
+	}, [message.attachments]);
+	if (!validateAttachment) return null;
 
-	return <Attachments mode={mode} messageId={message.id} attachments={attachments ?? []} onContextMenu={onContextMenu} />;
+	return <Attachments mode={mode} messageId={message.id} attachments={validateAttachment ?? []} onContextMenu={onContextMenu} />;
 };
 
 export default MessageAttachment;
