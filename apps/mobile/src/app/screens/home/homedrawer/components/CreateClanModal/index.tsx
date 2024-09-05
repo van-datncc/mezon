@@ -1,18 +1,18 @@
 import { useClans } from '@mezon/core';
 import { AddIcon, QUALITY_IMAGE_UPLOAD, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
+import { channelsActions, checkDuplicateNameClan, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import { MezonButton, MezonInput, MezonModal } from '../../../../../temp-ui';
+import { IFile, MezonButton, MezonInput, MezonModal } from '../../../../../temp-ui';
 import { validInput } from '../../../../../utils/validate';
-import { IFile } from '../AttachmentPicker/Gallery';
 import { style } from './CreateClanModal.styles';
 
 interface ICreateClanProps {
@@ -26,22 +26,36 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 	const [nameClan, setNameClan] = useState<string>('');
 	const [urlImage, setUrlImage] = useState('');
 	const [isCheckValid, setIsCheckValid] = useState<boolean>();
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const { t } = useTranslation(['clan']);
 	const { sessionRef, clientRef } = useMezon();
 	const { createClans } = useClans();
 	const handleCreateClan = async () => {
 		const store = await getStoreAsync();
-		createClans(nameClan?.trim?.(), urlImage).then(async (res) => {
-			if (res && res?.clan_id) {
-				store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
-				save(STORAGE_CLAN_ID, res?.clan_id);
-				store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
-				const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
-				await setDefaultChannelLoader(respChannel.payload, res?.clan_id);
-				setVisible(false);
-			}
-		});
+		const isDuplicate = await store.dispatch(checkDuplicateNameClan(nameClan.trim()));
+		if (isDuplicate) {
+			Toast.show({
+				type: 'error',
+				text1: t('duplicateNameMessage')
+			});
+			return;
+		}
+		setIsSubmitting(true);
+		createClans(nameClan?.trim?.(), urlImage)
+			.then(async (res) => {
+				if (res && res?.clan_id) {
+					store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
+					save(STORAGE_CLAN_ID, res?.clan_id);
+					store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
+					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
+					await setDefaultChannelLoader(respChannel.payload, res?.clan_id);
+					setVisible(false);
+				}
+			})
+			.finally(() => {
+				setIsSubmitting(false);
+			});
 	};
 
 	useEffect(() => {
@@ -59,7 +73,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 		const options = {
 			durationLimit: 10000,
 			mediaType: 'photo',
-      quality: QUALITY_IMAGE_UPLOAD
+			quality: QUALITY_IMAGE_UPLOAD
 		};
 
 		ImagePicker.launchImageLibrary(options as CameraOptions, async (response) => {
@@ -75,7 +89,7 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 					name: file?.fileName,
 					type: file?.type,
 					size: file?.fileSize?.toString(),
-					fileData,
+					fileData
 				};
 				handleFile([fileFormat][0]);
 			}
@@ -127,13 +141,14 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 						placeHolder={`${userProfile?.user?.username}'s clan`}
 						value={nameClan}
 						maxCharacter={64}
+						disabled={isSubmitting}
 						errorMessage={t('errorMessage')}
 					/>
 
 					<Text style={styles.community}>
 						{t('byCreatingClan')} <Text style={styles.communityGuideLines}>Community Guidelines.</Text>
 					</Text>
-					<MezonButton disabled={!isCheckValid} viewContainerStyle={styles.button} onPress={handleCreateClan}>
+					<MezonButton disabled={!isCheckValid || isSubmitting} viewContainerStyle={styles.button} onPress={handleCreateClan}>
 						<Text style={styles.buttonText}>{t('createServer')}</Text>
 					</MezonButton>
 				</View>

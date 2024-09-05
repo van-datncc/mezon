@@ -1,7 +1,7 @@
 import { selectAllClans, selectCurrentClan } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import SettingUserClanProfileEdit from './SettingUserClanProfileEdit';
+import SettingUserClanProfileEdit from './settingClanProfileEditting';
 const SettingRightClan = () => {
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);

@@ -42,7 +42,7 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 				})
 			);
 
-			await socket.removeChatMessage(clanId || '', channelIdDelete, mode, messageId);
+			await socket.removeChatMessage(clanId || '', channelIdDelete, mode, !channel?.channel_private, messageId);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, channelId, dispatch, currentClanId, mode]
 	);

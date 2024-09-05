@@ -1,8 +1,10 @@
+import { handleUploadFile } from '@mezon/transport';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
 	Direction_Mode,
 	EMessageCode,
+	EMimeTypes,
 	EmojiDataOptionals,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -11,6 +13,7 @@ import {
 	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
 	checkSameDayByCreateTime,
+	fetchAndCreateFiles
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -28,7 +31,7 @@ import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { channelsActions } from '../channels/channels.slice';
+import { channelMetaActions } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx, sleep } from '../helpers';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { seenMessagePool } from './SeenMessagePool';
@@ -415,26 +418,66 @@ type SendMessagePayload = {
 	mentionEveryone?: boolean;
 	mode: number;
 	senderId: string;
+	isPublic: boolean;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
-	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, clanId, senderId } = payload;
+	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, isPublic, clanId, senderId } = payload;
 	const id = Date.now().toString();
 
 	async function doSend() {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-		const session = mezon.sessionRef.current;
-		const client = mezon.clientRef.current;
-		const socket = mezon.socketRef.current;
+			const session = mezon.sessionRef.current;
+			const client = mezon.clientRef.current;
+			const socket = mezon.socketRef.current;
 
-		if (!client || !session || !socket || !channelId) {
-			throw new Error('Client is not initialized');
+			if (!client || !session || !socket || !channelId) {
+				throw new Error('Client is not initialized');
+			}
+
+			let uploadedFiles: ApiMessageAttachment[] = [];
+
+			// Check if there are attachments
+			if (attachments && attachments.length > 0) {
+				const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
+				const nonDirectAttachments = attachments.filter(
+					(att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon)
+				);
+
+				if (nonDirectAttachments.length > 0) {
+					const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
+
+					const uploadPromises = createdFiles.map((file) => {
+						return handleUploadFile(client, session, clanId, channelId, file.name, file);
+					});
+
+					const uploadedNonDirectFiles = await Promise.all(uploadPromises);
+					uploadedFiles = [...uploadedFiles, ...uploadedNonDirectFiles];
+				}
+
+				uploadedFiles = [...uploadedFiles, ...directLinks.map((link) => ({ url: link.url, filetype: link.filetype }))];
+			}
+
+			const res = await socket.writeChatMessage(
+				clanId,
+				channelId,
+				mode,
+				isPublic,
+				content,
+				mentions,
+				uploadedFiles,
+				references,
+				anonymous,
+				mentionEveryone
+			);
+
+			return res;
+		} catch (error) {
+			console.error('Failed to send message:', error);
+			throw error;
 		}
-
-		const res = await socket.writeChatMessage(clanId, channelId, mode, content, mentions, attachments, references, anonymous, mentionEveryone);
-
-		return res;
 	}
 
 	async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
@@ -480,7 +523,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 
 		if (!isViewingOlderMessages) {
 			const timestamp = Date.now() / 1000;
-			thunkAPI.dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+			thunkAPI.dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 
 			const mess = { ...fakeMess, id: res.message_id, create_time: res.create_time };
 
@@ -529,13 +572,17 @@ export type SendMessageArgs = {
 	clanId: string;
 	channelId: string;
 	mode: number;
+	isPublic: boolean;
 };
 
-export const sendTypingUser = createAsyncThunk('messages/sendTypingUser', async ({ clanId, channelId, mode }: SendMessageArgs, thunkAPI) => {
-	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode);
-	return ack;
-});
+export const sendTypingUser = createAsyncThunk(
+	'messages/sendTypingUser',
+	async ({ clanId, channelId, mode, isPublic }: SendMessageArgs, thunkAPI) => {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic);
+		return ack;
+	}
+);
 
 export type SetChannelLastMessageArgs = {
 	channelId: string;

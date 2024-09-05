@@ -1,5 +1,5 @@
 import { DeviceUUID } from 'device-uuid';
-import { Client, Session, Socket, Status } from 'mezon-js';
+import { Client, Session, Socket } from 'mezon-js';
 import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
@@ -27,7 +27,6 @@ export type MezonContextValue = {
 	authenticateApple: (token: string) => Promise<Session>;
 	logOutMezon: () => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
-	addStatusFollow: (ids: string[]) => Promise<Status>;
 	reconnect: (clanId: string) => Promise<unknown>;
 };
 
@@ -206,20 +205,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[createSocket]
 	);
 
-	const addStatusFollow = React.useCallback(
-		async (userIds: string[]) => {
-			const socket = socketRef.current;
-
-			if (!socket) {
-				throw new Error('Socket is not initialized');
-			}
-
-			const statusFollow = await socket.followUsers(userIds);
-			return statusFollow;
-		},
-		[socketRef]
-	);
-
 	const value = React.useMemo<MezonContextValue>(
 		() => ({
 			clientRef,
@@ -232,7 +217,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			authenticateApple,
 			refreshSession,
 			createSocket,
-			addStatusFollow,
 			logOutMezon,
 			reconnect
 		}),
@@ -247,7 +231,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			authenticateApple,
 			refreshSession,
 			createSocket,
-			addStatusFollow,
 			logOutMezon,
 			reconnect
 		]

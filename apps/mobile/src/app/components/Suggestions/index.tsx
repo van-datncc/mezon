@@ -1,7 +1,7 @@
-import { useChannels } from '@mezon/core';
-import { emojiSuggestionActions, selectAllEmojiSuggestion } from '@mezon/store';
+import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion, selectHashtagDMByDirectId } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { FC, memo, useEffect, useMemo } from 'react';
 import { FlatList, Pressable } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -43,7 +43,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 
 			return listMentions.filter(filterMatchedMentions).map((item) => ({
 				...item,
-				name: item?.display,
+				name: item?.display
 			}));
 		}, [keyword, listMentions]);
 
@@ -74,7 +74,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 				keyboardShouldPersistTaps="handled"
 			/>
 		);
-	},
+	}
 );
 
 export type ChannelsMention = {
@@ -89,23 +89,31 @@ export interface MentionHashtagSuggestionsProps {
 	// channelId: string;
 	keyword?: string;
 	onSelect: (user: MentionDataProps) => void;
+	directMessageId: string;
+	mode: number;
 }
 
-const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSelect }) => {
-	const { listChannels } = useChannels();
-
+const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSelect, directMessageId, mode }) => {
+	const channels = useSelector(selectAllChannels);
+	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directMessageId || ''));
 	const listChannelsMention = useMemo(() => {
-		return listChannels.map((item) => ({
+		let channelsMention = [];
+		if ([ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
+			channelsMention = commonChannelDms;
+		} else {
+			channelsMention = channels;
+		}
+		return channelsMention?.map((item) => ({
+			...item,
 			id: item?.channel_id ?? '',
 			display: item?.channel_label ?? '',
 			subText: item?.category_name ?? '',
-			name: item?.channel_label ?? '',
+			name: item?.channel_label ?? ''
 		}));
-	}, [listChannels]);
+	}, [channels, commonChannelDms, mode]);
 	if (keyword == null) {
 		return null;
 	}
-
 	const handleSuggestionPress = (channel: ChannelsMention) => {
 		onSelect(channel);
 	};
@@ -116,7 +124,13 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 			data={listChannelsMention?.filter((item) => item?.name?.toLocaleLowerCase().includes(keyword?.toLocaleLowerCase()))}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleSuggestionPress(item)}>
-					<SuggestItem channelId={item?.id} isDisplayDefaultAvatar={false} name={item?.display ?? ''} symbol="#" subText={(item as ChannelsMention).subText.toUpperCase()} />
+					<SuggestItem
+						channelId={item?.id}
+						channel={item}
+						isDisplayDefaultAvatar={false}
+						name={item?.display ?? ''}
+						subText={(item as ChannelsMention).subText.toUpperCase()}
+					/>
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}
@@ -138,17 +152,18 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 	if (!keyword) {
 		return;
 	}
-	const handleEmojiSuggestionPress = (emoji: ApiClanEmojiListResponse) => {
+	const handleEmojiSuggestionPress = (emoji: any) => {
+		const emojiItemName = `:${emoji?.shortname?.split?.(':')?.join('')}:`;
 		onSelect({
 			...emoji,
-			display: emoji.shortname,
-			name: emoji.shortname,
+			display: emojiItemName,
+			name: emojiItemName
 		});
 		dispatch(
 			emojiSuggestionActions.setSuggestionEmojiObjPicked({
-				shortName: emoji.shortname,
-				id: emoji.id,
-			}),
+				shortName: emojiItemName,
+				id: emoji.id
+			})
 		);
 	};
 
@@ -158,7 +173,7 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 			data={emojiListPNG?.filter((emoji) => emoji?.shortname && emoji?.shortname?.indexOf(keyword?.toLowerCase()) > -1)?.slice(0, 20)}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleEmojiSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={false} name={item?.shortname ?? ''} emojiId={item?.id} />
+					<SuggestItem isDisplayDefaultAvatar={false} name={`:${item?.shortname?.split?.(':')?.join('')}:` ?? ''} emojiId={item?.id} />
 				</Pressable>
 			)}
 			keyExtractor={(_, index) => index.toString()}
@@ -169,4 +184,3 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = ({ keyword, onSelect }) => {
 };
 
 export { EmojiSuggestion, HashtagSuggestions, Suggestions };
-

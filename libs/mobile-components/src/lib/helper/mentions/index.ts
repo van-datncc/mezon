@@ -1,14 +1,17 @@
+import { ChannelsEntity, HashtagDmEntity } from '@mezon/store-mobile';
+import { ChannelStreamMode } from 'mezon-js';
+
 export const convertMentionsToText = (text: string) => {
 	if (!text) {
 		return '';
 	}
-	const mentionPattern = /{@}\[([^\]]+)\]\(\d+\)|{#}\[([^\]]+)\]\((\d+)\)|\{\:\}\[([^\]]+)\]\(([^\)]+)\)/g;
+	const mentionPattern = /{@}\[([^\]]+)\]\(\d+\)|{#}\[([^\]]+)\]\((\d+)\)|\{:\}\[([^\]]+)\]\(([^)]+)\)/g;
 
 	return text?.replace(mentionPattern, (match, userMention, hashtagMention, hashtagId, tagValue) => {
 		if (userMention) {
 			return `@[${userMention}]`;
 		} else if (hashtagMention && hashtagId) {
-			return `<#${hashtagId}>`;
+			return `<#${hashtagMention}>`;
 		} else if (tagValue) {
 			return `${tagValue}`;
 		} else {
@@ -30,4 +33,12 @@ export const convertMentionsToData = (text: string) => {
 		});
 	}
 	return result;
+};
+
+export const getChannelHashtag = (hashtagDmEntities: HashtagDmEntity[], channelsEntities: ChannelsEntity[], mode: number, channelLabel: string) => {
+	if ([ChannelStreamMode.STREAM_MODE_DM].includes(mode)) {
+		return hashtagDmEntities?.find((item) => item?.channel_label === channelLabel);
+	} else {
+		return channelsEntities?.find((item) => item?.channel_label === channelLabel);
+	}
 };

@@ -1311,7 +1311,7 @@ export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			viewBox="0 0 18 17"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-contentTertiary text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
 		>
 			<g id="Live area" clipPath="url(#clip0_2155_1604)">
 				<g id="Vector">
@@ -1750,7 +1750,7 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 };
 
 export const ArrowDown: React.FC<IconProps> = ({
-	defaultSize = 'w-4 h-4 dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4'
+	defaultSize = 'w-4 h-4 dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4'
 }) => {
 	return (
 		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
@@ -2069,7 +2069,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill, defaultSize = 
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-contentTertiary text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
 		>
 			<path
 				d="M11.5512 1.57323C11.9214 1.75834 12.1065 2.12856 12.1065 2.40622V19.0659C12.1065 19.4361 11.9214 19.7138 11.5512 19.8989C11.2735 20.084 10.8107 19.9915 10.5331 19.8064L4.88727 15.3638H1.92554C1.37022 15.3638 1 14.9936 1 14.4382V7.03392C1 6.47859 1.37022 6.10838 1.92554 6.10838H4.97982L10.6256 1.66579C10.9033 1.48068 11.2735 1.48068 11.5512 1.57323Z"
@@ -2101,7 +2101,7 @@ export const HashtagLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} block dark:text-[#AEAEAE] text-colorTextLightMode`}
+			className={`block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
 		>
 			<g className="transform translate-y-[2px] translate-x-[-1.5px]">
 				<path
@@ -2127,7 +2127,7 @@ export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} block dark:text-[#AEAEAE] text-colorTextLightMode`}
+			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
 		>
 			<g className="transform translate-y-[4.5px] translate-x-[-0.7px]">
 				<path
@@ -2758,7 +2758,7 @@ export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function IconEvents({ defaultSize = 'w-5 h-5 dark:text-contentTertiary text-colorTextLightMode' }) {
+export function IconEvents({ defaultSize = 'w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode' }) {
 	return (
 		<svg
 			aria-hidden="true"

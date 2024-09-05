@@ -11,6 +11,13 @@ export interface ReferencesEntity extends IMessage {
 	id: string;
 }
 
+export interface IAttachmentFile {
+	name: string;
+	path: string;
+	type: string;
+	size: number;
+}
+
 export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
@@ -58,18 +65,6 @@ export const referencesSlice = createSlice({
 			state.idMessageMention = action.payload;
 		},
 
-		updateAttachmentMessageId(state, action: PayloadAction<{ channelId: string; messageId: string }>) {
-			const { channelId, messageId } = action.payload;
-			const attachment = state.attachmentAfterUpload[channelId];
-
-			if (attachment && attachment.messageId === '') {
-				state.attachmentAfterUpload[channelId] = {
-					...attachment,
-					messageId
-				};
-			}
-		},
-
 		setDataReferences(state, action) {
 			state.dataReferences = action.payload;
 		},
@@ -83,7 +78,7 @@ export const referencesSlice = createSlice({
 		},
 		setAtachmentAfterUpload(state, action: PayloadAction<PreSendAttachment>) {
 			const newAttachment = action.payload;
-			const { channelId, files, messageId } = newAttachment;
+			const { channelId, files } = newAttachment;
 
 			if (!channelId) {
 				return;
@@ -92,16 +87,11 @@ export const referencesSlice = createSlice({
 			if (!state.attachmentAfterUpload[channelId]) {
 				state.attachmentAfterUpload[channelId] = {
 					channelId: channelId,
-					files: files,
-					messageId: messageId || ''
+					files: files
 				};
 			} else {
 				if (files && files.length > 0) {
 					state.attachmentAfterUpload[channelId].files = [...state.attachmentAfterUpload[channelId].files, ...files];
-				}
-
-				if (messageId) {
-					state.attachmentAfterUpload[channelId].messageId = messageId;
 				}
 			}
 

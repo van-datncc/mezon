@@ -197,6 +197,8 @@ export type SearchMessage = ApiSearchMessageDocument & {
 };
 
 export type IMessageWithUser = IMessage & {
+	isStartedMessageGroup?: boolean;
+	isStartedMessageOfTheDay?: boolean;
 	user: IUser | null;
 };
 
@@ -621,7 +623,7 @@ export enum RoleEveryOne {
 }
 
 export enum EMessageCode {
-	FIRST_MESSAGE = 11
+	FIRST_MESSAGE = 4
 }
 
 export enum ModeResponsive {
@@ -717,7 +719,8 @@ export type SearchFilter = {
 };
 
 export enum ETypeLinkMedia {
-	IMAGE_PREFIX = 'image'
+	IMAGE_PREFIX = 'image',
+	VIDEO_PREFIX = 'video'
 }
 
 export type MessageTypeUpdateLink = {
@@ -769,7 +772,6 @@ export enum ENotificationTypes {
 
 export type PreSendAttachment = {
 	channelId?: string;
-	messageId?: string;
 	mode?: string;
 	clan_id?: string;
 	files: ApiMessageAttachment[];

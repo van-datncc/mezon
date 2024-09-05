@@ -1,17 +1,11 @@
-import {
-	Icons,
-	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save
-} from '@mezon/mobile-components';
+import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { channelsActions, getStoreAsync, selectIsUnreadChannelById, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
+import { selectIsUnreadChannelById } from '@mezon/store';
+import { channelsActions, getStoreAsync, selectCurrentChannelId, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
@@ -23,7 +17,6 @@ import { style } from './styles';
 interface IChannelListItemProps {
 	data: any;
 	image?: string;
-	isActive: boolean;
 	onLongPress: () => void;
 	onLongPressThread?: (thread: ChannelThreads) => void;
 }
@@ -36,10 +29,15 @@ export enum StatusVoiceChannel {
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const currentChanelId = useSelector(selectCurrentChannelId);
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
+
+	const isActive = useMemo(() => {
+		return currentChanelId === props?.data?.id;
+	}, [currentChanelId, props?.data?.id]);
 
 	useEffect(() => {
 		return () => {
@@ -60,16 +58,8 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			const store = await getStoreAsync();
-
-			await Promise.all([
-				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
-			]);
-
-			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-			if (!channelsCache?.includes(channelId)) {
-				save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-			}
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		}
 	};
 
@@ -79,7 +69,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				activeOpacity={1}
 				onPress={() => handleRouteData()}
 				onLongPress={props.onLongPress}
-				style={[styles.channelListLink, props.isActive && styles.channelListItemActive]}
+				style={[styles.channelListLink, isActive && styles.channelListItemActive]}
 			>
 				<View style={[styles.channelListItem]}>
 					{isUnRead && <View style={styles.dotIsNew} />}

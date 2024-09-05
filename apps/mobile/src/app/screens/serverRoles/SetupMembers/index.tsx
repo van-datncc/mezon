@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
-import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectAllUsesClan, UsersClanEntity } from '@mezon/store-mobile';
+import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
+import { UsersClanEntity, selectAllRolesClan, selectAllUsesClan, selectRoleByRoleId } from '@mezon/store-mobile';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
@@ -25,6 +25,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	const [searchMemberText, setSearchMemberText] = useState('');
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
+	const clanRole = useSelector(selectRoleByRoleId(roleId));
 	const { isClanOwner, userPermissionsStatus } = useUserPermission();
 
 	//Note: create new role
@@ -32,18 +33,13 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 		return RolesClan?.[RolesClan.length - 1];
 	}, [RolesClan]);
 
-	//Note: edit role
-	const clanRole = useMemo(() => {
-		return RolesClan?.find((role) => role?.id === roleId);
-	}, [roleId, RolesClan]);
-
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);
 	}, [roleId]);
 
 	const isCanEditRole = useMemo(() => {
 		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
-	}, [isClanOwner, clanRole, userPermissionsStatus])
+	}, [isClanOwner, clanRole, userPermissionsStatus]);
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originSelectedMembers, selectedMembers);
@@ -60,15 +56,15 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 			selectedMembers,
 			selectedPermissions,
 			removeMemberList,
-			[],
+			[]
 		);
 		if (response) {
 			Toast.show({
 				type: 'success',
 				props: {
 					text2: t('roleDetail.changesSaved'),
-					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+				}
 			});
 			navigation.goBack();
 		} else {
@@ -76,8 +72,8 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 				type: 'success',
 				props: {
 					text2: t('failed'),
-					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-				},
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
 			});
 		}
 	};
@@ -86,17 +82,17 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 		headerTitle: !isEditRoleMode
 			? t('setupMember.title')
 			: () => {
-				return (
-					<Block>
-						<Text center bold h3 color={themeValue?.white}>
-							{clanRole?.title}
-						</Text>
-						<Text center color={themeValue?.text}>
-							{t('roleDetail.role')}
-						</Text>
-					</Block>
-				);
-			},
+					return (
+						<Block>
+							<Text center bold h3 color={themeValue?.white}>
+								{clanRole?.title}
+							</Text>
+							<Text center color={themeValue?.text}>
+								{t('roleDetail.role')}
+							</Text>
+						</Block>
+					);
+				},
 		headerLeft: () => {
 			if (isEditRoleMode) {
 				return (
@@ -109,7 +105,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 				<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
 					<Icons.CloseSmallBoldIcon height={20} width={20} color={themeValue.textStrong} />
 				</Pressable>
-			)
+			);
 		},
 		headerRight: () => {
 			if (!isEditRoleMode || (isEditRoleMode && isNotChange)) return null;
@@ -122,7 +118,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 					</Block>
 				</TouchableOpacity>
 			);
-		},
+		}
 	});
 
 	useEffect(() => {
@@ -161,22 +157,27 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 				type: 'success',
 				props: {
 					text2: t('failed'),
-					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-				},
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
 			});
 		}
 	};
 
-	const mapUserPermission = useCallback((clanUser: UsersClanEntity) => {
-		return { ...clanUser, disabled: !isCanEditRole }
-	}, [isCanEditRole])
+	const mapUserPermission = useCallback(
+		(clanUser: UsersClanEntity) => {
+			return { ...clanUser, disabled: !isCanEditRole };
+		},
+		[isCanEditRole]
+	);
 
 	const filteredMemberList = useMemo(() => {
-		return usersClan?.filter(
-			(it) =>
-				normalizeString(it?.user?.display_name).includes(normalizeString(searchMemberText)) ||
-				normalizeString(it?.user?.username).includes(normalizeString(searchMemberText)),
-		).map(mapUserPermission);
+		return usersClan
+			?.filter(
+				(it) =>
+					normalizeString(it?.user?.display_name).includes(normalizeString(searchMemberText)) ||
+					normalizeString(it?.user?.username).includes(normalizeString(searchMemberText))
+			)
+			.map(mapUserPermission);
 	}, [searchMemberText, usersClan, mapUserPermission]);
 
 	return (
@@ -202,7 +203,10 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 								ItemSeparatorComponent={SeparatorWithLine}
 								renderItem={({ item }) => {
 									return (
-										<TouchableOpacity disabled={item?.disabled} onPress={() => onSelectMemberChange(!selectedMembers?.includes(item?.id), item?.id)}>
+										<TouchableOpacity
+											disabled={item?.disabled}
+											onPress={() => onSelectMemberChange(!selectedMembers?.includes(item?.id), item?.id)}
+										>
 											<Block
 												flexDirection="row"
 												alignItems="center"
@@ -212,10 +216,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 												gap={size.s_10}
 											>
 												<Block flex={1} flexDirection="row" gap={size.s_10} alignItems="center">
-													<MezonAvatar
-														avatarUrl={item?.user?.avatar_url}
-														username={item?.user?.username}
-													/>
+													<MezonAvatar avatarUrl={item?.user?.avatar_url} username={item?.user?.username} />
 													<Block>
 														{item?.user?.display_name ? (
 															<Text color={themeValue.white}>{item?.user?.display_name}</Text>
@@ -235,7 +236,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 															borderWidth: 1.5,
 															borderColor: selectedMembers?.includes(item?.id) ? Colors.bgButton : Colors.tertiary,
 															borderRadius: 5,
-															opacity: item?.disabled ? .4 : 1
+															opacity: item?.disabled ? 0.4 : 1
 														}}
 														disabled={item?.disabled}
 														textStyle={{ fontFamily: 'JosefinSans-Regular' }}

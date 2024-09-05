@@ -1,11 +1,10 @@
-import { EMimeTypes, IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { EMimeTypes, ETypeLinkMedia, IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import MessageImage from './MessageImage';
 import MessageLinkFile from './MessageLinkFile';
 import MessageVideo from './MessageVideo';
-import { useMessageParser } from './useMessageParser';
 
 type MessageAttachmentProps = {
 	message: IMessageWithUser;
@@ -20,11 +19,16 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 
 	attachments.forEach((attachment) => {
 		if (
-			(attachment.filetype?.indexOf(EMimeTypes.mp4) !== -1 || attachment.filetype?.indexOf(EMimeTypes.mov) !== -1) &&
-			!attachment.url?.includes(EMimeTypes.tenor)
+			((attachment.filetype?.indexOf(EMimeTypes.mp4) !== -1 || attachment.filetype?.indexOf(EMimeTypes.mov) !== -1) &&
+				!attachment.url?.includes(EMimeTypes.tenor)) ||
+			attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX)
 		) {
 			videos.push(attachment);
-		} else if (attachment.filetype?.indexOf(EMimeTypes.png) !== -1 || attachment.filetype?.indexOf(EMimeTypes.jpeg) !== -1) {
+		} else if (
+			attachment.filetype?.indexOf(EMimeTypes.png) !== -1 ||
+			attachment.filetype?.indexOf(EMimeTypes.jpeg) !== -1 ||
+			attachment.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)
+		) {
 			images.push(attachment);
 		} else {
 			documents.push(attachment);
@@ -74,10 +78,12 @@ const Attachments: React.FC<{ attachments: ApiMessageAttachment[]; messageId: st
 
 // TODO: refactor component for message lines
 const MessageAttachment = ({ message, onContextMenu, mode }: MessageAttachmentProps) => {
-	const { attachments, hasAttachments } = useMessageParser(message);
-	if (!hasAttachments) return null;
+	const validateAttachment = useMemo(() => {
+		return (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
+	}, [message.attachments]);
+	if (!validateAttachment) return null;
 
-	return <Attachments mode={mode} messageId={message.id} attachments={attachments ?? []} onContextMenu={onContextMenu} />;
+	return <Attachments mode={mode} messageId={message.id} attachments={validateAttachment ?? []} onContextMenu={onContextMenu} />;
 };
 
 export default MessageAttachment;

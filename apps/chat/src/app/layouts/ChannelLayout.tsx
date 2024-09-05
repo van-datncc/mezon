@@ -1,13 +1,6 @@
 import { GifStickerEmojiPopup, Icons } from '@mezon/components';
 import { useApp, useGifsStickersEmoji, useThreads } from '@mezon/core';
-import {
-	selectCloseMenu,
-	selectCurrentChannel,
-	selectIdMessageRefReaction,
-	selectPositionEmojiButtonSmile,
-	selectReactionTopState,
-	selectStatusMenu
-} from '@mezon/store';
+import { selectCloseMenu, selectCurrentChannel, selectPositionEmojiButtonSmile, selectReactionTopState, selectStatusMenu } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useState } from 'react';
@@ -18,7 +11,6 @@ const ChannelLayout = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isChannelVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 	const reactionTopState = useSelector(selectReactionTopState);
-	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -55,11 +47,7 @@ const ChannelLayout = () => {
 							className={`fixed size-[500px] max-sm:hidden right-1 ${closeMenu && !statusMenu && 'w-[370px]'} ${reactionTopState ? 'top-20' : 'bottom-20'} ${isShowCreateThread && 'ssm:right-[650px]'} ${isShowMemberList && 'ssm:right-[420px]'} ${!isShowCreateThread && !isShowMemberList && 'ssm:right-44'}`}
 						>
 							<div className="mb-0 z-10 h-full">
-								<GifStickerEmojiPopup
-									messageEmojiId={idMessageRefReaction}
-									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-									emojiAction={EmojiPlaces.EMOJI_REACTION}
-								/>
+								<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 							</div>
 						</div>
 					)}
@@ -76,11 +64,7 @@ const ChannelLayout = () => {
 							}}
 						>
 							<div className="mb-0 z-10 h-full">
-								<GifStickerEmojiPopup
-									messageEmojiId={idMessageRefReaction}
-									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-									emojiAction={EmojiPlaces.EMOJI_REACTION}
-								/>
+								<GifStickerEmojiPopup mode={ChannelStreamMode.STREAM_MODE_CHANNEL} emojiAction={EmojiPlaces.EMOJI_REACTION} />
 							</div>
 						</div>
 					)}

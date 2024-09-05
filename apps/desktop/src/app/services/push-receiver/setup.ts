@@ -1,14 +1,14 @@
 import { ipcMain } from 'electron';
 import Store from 'electron-store';
 import { listen, register } from 'push-receiver-v2';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import {
+	FCM_TOKEN_UPDATED,
 	NOTIFICATION_RECEIVED,
 	NOTIFICATION_SERVICE_ERROR,
 	NOTIFICATION_SERVICE_STARTED,
-	START_NOTIFICATION_SERVICE,
-	TOKEN_UPDATED
-} from './constants';
+	START_NOTIFICATION_SERVICE
+} from '../../events/constants';
 import { ElectronStoreType } from './types';
 
 const electronStore = new Store<ElectronStoreType>();
@@ -28,7 +28,7 @@ const firebaseConfig = {
 let started = false;
 
 // To be call from the main process
-export function setup(webContents: Electron.WebContents) {
+function setup(webContents: Electron.WebContents) {
 	// Will be called by the renderer process
 	ipcMain.on(START_NOTIFICATION_SERVICE, async (_, senderId: string) => {
 		// Retrieve saved credentials
@@ -51,7 +51,7 @@ export function setup(webContents: Electron.WebContents) {
 				// Save senderId
 				electronStore.set('senderId', senderId);
 				// Notify the renderer process that the FCM token has changed
-				webContents.send(TOKEN_UPDATED, credentials.fcm.token);
+				webContents.send(FCM_TOKEN_UPDATED, credentials.fcm.token);
 			}
 			// Listen for GCM/FCM notifications
 			await listen({ ...credentials, persistentIds }, onNotificationFactory(webContents));
@@ -78,3 +78,5 @@ function onNotificationFactory(webContents: Electron.WebContents) {
 		}
 	};
 }
+
+export { setup as setupPushReceiver };

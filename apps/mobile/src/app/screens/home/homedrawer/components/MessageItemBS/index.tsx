@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAnimatedState, useTheme } from '@mezon/mobile-ui';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useTheme } from '@mezon/mobile-ui';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { MezonBottomSheet } from '../../../../../../app/temp-ui';
 import { EMessageBSToShow } from '../../enums';
@@ -13,7 +13,7 @@ export const MessageItemBS = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { type, onClose, isOnlyEmojiPicker = false } = props;
-	const [isShowEmojiPicker, setIsShowEmojiPicker] = useAnimatedState(false);
+	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
 
 	const setVisibleBottomSheet = (isShow: boolean) => {
 		if (bottomSheetRef) {

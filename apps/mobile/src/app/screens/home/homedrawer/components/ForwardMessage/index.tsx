@@ -10,7 +10,7 @@ import {
 	selectDirectsOpenlist,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { ChannelThreads, IMessageWithUser } from '@mezon/utils';
 import { SeparatorWithLine } from 'apps/mobile/src/app/components/Common';
@@ -38,9 +38,10 @@ interface ForwardMessageModalProps {
 	show?: boolean;
 	onClose: () => void;
 	message: IMessageWithUser;
+	isPublic?: boolean;
 }
 
-const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProps) => {
+const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessageModalProps) => {
 	const [searchText, setSearchText] = useState('');
 	const [selectedForwardObjects, setSelectedForwardObjects] = useState<IForwardIObject[]>([]);
 
@@ -57,7 +58,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 	const selectedMessage = useSelector(getSelectedMessage);
 
 	const allMessagesEntities = useAppSelector((state) =>
-		selectMessageEntitiesByChannelId(state, (!!currentDmId ? currentDmId : currentChannelId) || ''),
+		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
 	);
 	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
 	const allMessagesBySenderId = useMemo(() => {
@@ -74,7 +75,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 			type: dm?.type,
 			avatar: dm?.type === ChannelType.CHANNEL_TYPE_DM ? dm?.channel_avatar?.[0] : 'assets/images/avatar-group.png',
 			name: dm?.channel_label,
-			clanId: '',
+			clanId: ''
 		};
 	};
 
@@ -84,7 +85,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 			type: channel?.type,
 			avatar: '#',
 			name: channel?.channel_label,
-			clanId: channel?.clan_id,
+			clanId: channel?.clan_id
 		};
 	};
 
@@ -142,17 +143,17 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 				switch (type) {
 					case ChannelType.CHANNEL_TYPE_DM:
 						for (const message of combineMessages) {
-							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, message);
+							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, false, message);
 						}
 						break;
 					case ChannelType.CHANNEL_TYPE_GROUP:
 						for (const message of combineMessages) {
-							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, message);
+							sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
 						}
 						break;
 					case ChannelType.CHANNEL_TYPE_TEXT:
 						for (const message of combineMessages) {
-							sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+							sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, isPublic, message);
 						}
 						break;
 					default:
@@ -164,8 +165,8 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 				type: 'success',
 				props: {
 					text2: t('forwardMessagesSuccessfully'),
-					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />
+				}
 			});
 		} catch (error) {
 			console.log('Forward all messages log => error', error);
@@ -180,13 +181,13 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 				const { type, channelId, clanId = '' } = selectedObjectSend;
 				switch (type) {
 					case ChannelType.CHANNEL_TYPE_DM:
-						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, message);
+						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_DM, false, message);
 						break;
 					case ChannelType.CHANNEL_TYPE_GROUP:
-						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, message);
+						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
 						break;
 					case ChannelType.CHANNEL_TYPE_TEXT:
-						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, message);
+						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, isPublic, message);
 						break;
 					default:
 						break;
@@ -196,8 +197,8 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 				type: 'success',
 				props: {
 					text2: t('forwardMessagesSuccessfully'),
-					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />
+				}
 			});
 		} catch (error) {
 			console.log('error', error);
@@ -272,7 +273,7 @@ const ForwardMessageModal = ({ show, message, onClose }: ForwardMessageModalProp
 								borderWidth: 1.5,
 								borderColor: isChecked ? Colors.bgButton : Colors.white,
 								borderRadius: 5,
-								opacity: 1,
+								opacity: 1
 							}}
 							textStyle={{ fontFamily: 'JosefinSans-Regular' }}
 						/>

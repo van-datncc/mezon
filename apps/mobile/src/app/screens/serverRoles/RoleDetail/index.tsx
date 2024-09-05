@@ -1,8 +1,8 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { rolesClanActions, selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
-import { useEffect, useMemo, useState } from 'react';
+import { rolesClanActions, selectCurrentClanId, selectRoleByRoleId, useAppDispatch } from '@mezon/store-mobile';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Keyboard, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -14,33 +14,39 @@ import { checkCanEditPermission } from '../helper';
 
 enum EActionType {
 	permissions,
-	members,
+	members
 }
 
 type RoleDetailScreen = typeof APP_SCREEN.MENU_CLAN.ROLE_DETAIL;
 export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetailScreen>) => {
 	const roleId = route.params?.roleId;
 	const { t } = useTranslation('clanRoles');
-	const RolesClan = useSelector(selectAllRolesClan);
 	const [originRoleName, setOriginRoleName] = useState('');
 	const [currentRoleName, setCurrentRoleName] = useState('');
 	const [showModalConfirmSave, setShowModalConfirmSave] = useState(false);
 	const { themeValue } = useTheme();
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
+	const currentClanId = useSelector(selectCurrentClanId);
 	const { userPermissionsStatus, isClanOwner } = useUserPermission();
-
-	const clanRole = useMemo(() => {
-		return RolesClan.find((role) => role?.id === roleId);
-	}, [roleId, RolesClan]);
+	const clanRole = useSelector(selectRoleByRoleId(roleId));
 
 	const isNotChange = useMemo(() => {
 		return isEqual(originRoleName, currentRoleName);
 	}, [originRoleName, currentRoleName]);
 
 	const isCanEditRole = useMemo(() => {
+		if (!clanRole) return false;
 		return checkCanEditPermission({ isClanOwner, role: clanRole, userPermissionsStatus });
-	}, [isClanOwner, clanRole, userPermissionsStatus])
+	}, [isClanOwner, clanRole, userPermissionsStatus]);
+
+	const handleBack = useCallback(() => {
+		if (isNotChange) {
+			navigation?.goBack();
+			return;
+		}
+		setShowModalConfirmSave(true);
+	}, [isNotChange, navigation]);
 
 	navigation.setOptions({
 		headerTitle: () => (
@@ -56,9 +62,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		headerRight: () => {
 			if (isNotChange) return null;
 			return (
-				<TouchableOpacity
-					onPress={async () => handleSave()}
-				>
+				<TouchableOpacity onPress={async () => handleSave()}>
 					<Block marginRight={size.s_20}>
 						<Text h4 color={Colors.textViolet}>
 							{t('roleDetail.save')}
@@ -69,18 +73,12 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		},
 		headerLeft: () => {
 			return (
-				<TouchableOpacity onPress={() => {
-					if (isNotChange) {
-						navigation?.goBack();
-						return;
-					}
-					setShowModalConfirmSave(true);
-				}}>
+				<TouchableOpacity onPress={handleBack}>
 					<Block marginLeft={size.s_16}>
 						<Icons.ArrowLargeLeftIcon color={themeValue.white} height={size.s_22} width={size.s_22} />
 					</Block>
 				</TouchableOpacity>
-			)
+			);
 		}
 	});
 
@@ -88,22 +86,14 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		setShowModalConfirmSave(false);
 		const selectedPermissions = clanRole?.permission_list?.permissions.filter((it) => it?.active).map((it) => it?.id);
 		const selectedMembers = clanRole?.role_user_list?.role_users?.map((it) => it?.id);
-		const response = await updateRole(
-			clanRole.clan_id,
-			clanRole.id,
-			currentRoleName,
-			selectedMembers,
-			selectedPermissions,
-			[],
-			[],
-		);
+		const response = await updateRole(clanRole.clan_id, clanRole.id, currentRoleName, selectedMembers, selectedPermissions, [], []);
 		if (response) {
 			Toast.show({
 				type: 'success',
 				props: {
 					text2: t('roleDetail.changesSaved'),
-					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />,
-				},
+					leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+				}
 			});
 			navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
 		} else {
@@ -111,22 +101,22 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				type: 'success',
 				props: {
 					text2: t('failed'),
-					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-				},
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
 			});
 		}
-	}
+	};
 
-	const deleteRole = () => {
+	const deleteRole = async () => {
 		Alert.alert('Delete Role', 'Are you sure you want to delete this role?', [
 			{
 				text: 'No',
-				style: 'cancel',
+				style: 'cancel'
 			},
 			{
 				text: 'Yes',
 				onPress: async () => {
-					const response = await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id }));
+					const response = await dispatch(rolesClanActions.fetchDeleteRole({ roleId: clanRole?.id, clanId: currentClanId }));
 					if (response?.payload) {
 						// Toast.show({
 						// 	type: 'success',
@@ -141,12 +131,12 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 							type: 'success',
 							props: {
 								text2: t('failed'),
-								leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />,
-							},
+								leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+							}
 						});
 					}
-				},
-			},
+				}
+			}
 		]);
 	};
 
@@ -175,7 +165,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		if (!value && !isNotChange) {
 			navigation?.goBack();
 		}
-	}
+	};
 
 	const actionList = useMemo(() => {
 		return [
@@ -183,14 +173,14 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				id: 1,
 				actionTitle: t('roleDetail.permissions'),
 				type: EActionType.permissions,
-				isView: !isCanEditRole,
+				isView: !isCanEditRole
 			},
 			{
 				id: 2,
 				actionTitle: t('roleDetail.members'),
 				type: EActionType.members,
-				isView: !isCanEditRole,
-			},
+				isView: !isCanEditRole
+			}
 		];
 	}, [t, isCanEditRole]);
 	return (
@@ -225,7 +215,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 											padding={size.s_12}
 											gap={size.s_10}
 										>
-											<Block flex={1} flexDirection='row' gap={size.s_6}>
+											<Block flex={1} flexDirection="row" gap={size.s_6}>
 												<Text color={themeValue.white}>{item.actionTitle}</Text>
 												{item?.isView && (
 													<Icons.LockIcon color={themeValue.textDisabled} height={size.s_16} width={size.s_16} />

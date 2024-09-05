@@ -27,6 +27,7 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
+import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
@@ -215,9 +216,18 @@ const persistedNotiReactMsgReducer = persistReducer(
 const persistedGifsStickerEmojiReducer = persistReducer(
 	{
 		key: 'gifsstickersemojis',
-		storage
+		storage,
+		blacklist: ['subPanelActive']
 	},
 	gifsStickerEmojiReducer
+);
+
+const persistedChannelMetaReducer = persistReducer(
+	{
+		key: 'channelmeta',
+		storage
+	},
+	channelMetaReducer
 );
 
 const reducer = {
@@ -227,6 +237,7 @@ const reducer = {
 	attachments: attachmentReducer,
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
+	channelmeta: persistedChannelMetaReducer,
 	listchannelbyusers: persistedListchannelsByUserReducer,
 	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
 	channelMembers: persistedChannelMembersReducer,

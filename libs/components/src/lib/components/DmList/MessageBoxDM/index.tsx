@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useDirectMessages, useGifsStickersEmoji } from '@mezon/core';
-import { RootState, selectIdMessageRefReaction, selectIdMessageRefReply, selectIsShowMemberList } from '@mezon/store';
+import { RootState, selectIdMessageRefReply } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -15,11 +15,8 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const { sendDirectMessage, sendMessageTyping } = useDirectMessages({ channelId: directParamId, mode: mode });
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
-	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const [emojiAction, setEmojiAction] = useState<EmojiPlaces>(EmojiPlaces.EMOJI_REACTION_NONE);
-	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const messageBox = useRef<HTMLDivElement>(null);
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(directParamId));
 
@@ -34,15 +31,15 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 			content: IMessageSendPayload,
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>,
+			references?: Array<ApiMessageRef>
 		) => {
 			if (sessionUser) {
-				sendDirectMessage(content, mentions, [], references);
+				sendDirectMessage(content, mentions, attachments, references);
 			} else {
 				console.error('Session is not available');
 			}
 		},
-		[sendDirectMessage, sessionUser],
+		[sendDirectMessage, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -50,34 +47,17 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	}, [sendMessageTyping]);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
-	useEffect(() => {
-		if (
-			subPanelActive !== SubPanelName.NONE &&
-			subPanelActive !== SubPanelName.EMOJI_REACTION_RIGHT &&
-			subPanelActive !== SubPanelName.EMOJI_REACTION_BOTTOM
-		) {
-			setIsEmojiOnChat(true);
-		} else {
-			setIsEmojiOnChat(false);
-		}
-	}, [subPanelActive]);
 
 	useEffect(() => {
-		if (
-			(subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && window.innerWidth < 640) ||
-			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && window.innerWidth < 640)
-		) {
-			setIsEmojiOnChat(true);
-		}
-	}, [subPanelActive]);
+		const isEmojiReactionPanel = subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM;
 
-	useEffect(() => {
-		if (subPanelActive === SubPanelName.EMOJI) {
-			setEmojiAction(EmojiPlaces.EMOJI_EDITOR);
-		}
-		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
-			setEmojiAction(EmojiPlaces.EMOJI_REACTION);
-		}
+		const isOtherActivePanel = subPanelActive !== SubPanelName.NONE && !isEmojiReactionPanel;
+
+		const isSmallScreen = window.innerWidth < 640;
+
+		const isActive = isOtherActivePanel || (isEmojiReactionPanel && isSmallScreen);
+
+		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
 
 	return (
@@ -87,14 +67,14 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					style={{
 						position: 'fixed',
 						bottom: '76px',
-						right: setMarginleft,
+						right: setMarginleft
 					}}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
 					className="z-20"
 				>
-					<GifStickerEmojiPopup />
+					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
 			{idMessageRefReply && <ReplyMessageBox channelId={directParamId} idMessage={idMessageRefReply} />}
@@ -105,16 +85,6 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 				listMentions={UserMentionList({ channelID: directParamId, channelMode: mode })}
 				mode={mode}
 			/>
-			{isEmojiOnChat && ( // responsive mobile
-				<div
-					className={`relative h-[300px]  overflow-y-scroll w-full hidden max-sm:block animate-slideUp`}
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
-				>
-					<GifStickerEmojiPopup emojiAction={emojiAction} mode={mode} messageEmojiId={idMessageRefReaction} />
-				</div>
-			)}
 		</div>
 	);
 }

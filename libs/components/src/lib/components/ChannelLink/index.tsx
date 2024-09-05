@@ -133,7 +133,12 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 	);
 	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 	return (
-		<div ref={panelRef} onMouseDown={(event) => handleMouseClick(event)} role="button" className="relative group">
+		<div
+			ref={panelRef}
+			onMouseDown={(event) => handleMouseClick(event)}
+			role="button"
+			className={`relative group ${isUnReadChannel ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute before:bg-channelActiveColor before:top-3' : ''}`}
+		>
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
 					className={`${classes[state]} ${channel.status === StatusVoiceChannel.Active ? 'cursor-pointer' : 'cursor-not-allowed'} ${currentURL === channelPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
@@ -145,11 +150,11 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 				>
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 					<div className="relative mt-[-5px]">
-						{isPrivate === ChannelStatusEnum.isPrivate && <Icons.SpeakerLocked defaultSize="w-5 h-5" />}
-						{(isPrivate === undefined || isPrivate === 0) && <Icons.Speaker defaultSize="w-5 5-5" />}
+						{isPrivate === ChannelStatusEnum.isPrivate && <Icons.SpeakerLocked defaultSize="w-5 h-5 " />}
+						{(isPrivate === undefined || isPrivate === 0) && <Icons.Speaker defaultSize="w-5 5-5 " />}
 					</div>
 					<p
-						className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${currentURL === channelPath || isUnReadChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+						className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${currentURL === channelPath || isUnReadChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
@@ -164,16 +169,20 @@ function ChannelLink({ clanId, channel, isPrivate, createInviteLink, isUnReadCha
 						{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 						<div className="relative mt-[-5px]">
 							{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-								<Icons.SpeakerLocked defaultSize="w-5 h-5" />
+								<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 							)}
 							{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
-								<Icons.HashtagLocked defaultSize="w-5 h-5 " />
+								<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 							)}
-							{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5" />}
-							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && <Icons.Hashtag defaultSize="w-5 h-5" />}
+							{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
+								<Icons.Speaker defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+							)}
+							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
+								<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+							)}
 						</div>
 						<p
-							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${currentURL === channelPath || isUnReadChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${currentURL === channelPath || isUnReadChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20

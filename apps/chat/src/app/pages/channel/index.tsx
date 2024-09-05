@@ -1,17 +1,16 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
 import { useCheckAlonePermission, useClanRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
 import {
-	channelsActions,
+	channelMetaActions,
 	notificationActions,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
-	selectIsMessageRead,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectIsViewingOlderMessagesByChannelId,
 	selectStatusMenu,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { EPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -24,11 +23,11 @@ import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const isMessageRead = useSelector(selectIsMessageRead);
+	// const isMessageRead = useSelector(selectIsMessageRead);
 	const currentChannel = useSelector(selectChannelById(channelId));
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
-		dispatch(channelsActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 		dispatch(
 			notificationActions.setLastSeenTimeStampChannel({
 				channelId,
@@ -36,10 +35,10 @@ function useChannelSeen(channelId: string) {
 				clanId: currentChannel?.clan_id ?? ''
 			})
 		);
-		if (isMessageRead && channelId === currentChannel?.channel_id) {
-			dispatch(notificationActions.setIsMessageRead(false));
-		}
-	}, [channelId, currentChannel, dispatch, isMessageRead]);
+		// if (isMessageRead && channelId === currentChannel?.channel_id) {
+		// 	dispatch(notificationActions.setIsMessageRead(false));
+		// }
+	}, [channelId, currentChannel, dispatch]);
 }
 
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
@@ -59,7 +58,13 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
-			{currentChannel && <ChannelTyping channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />}
+			{currentChannel && (
+				<ChannelTyping
+					channelId={currentChannel?.id}
+					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					isPublic={!currentChannel.channel_private}
+				/>
+			)}
 			{isViewingOldMessage && <ChannelJumpToPresent channelId={currentChannel?.id} mode={0} />}
 			{currentChannel ? (
 				<ChannelMessageBox clanId={currentChannel?.clan_id} channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />

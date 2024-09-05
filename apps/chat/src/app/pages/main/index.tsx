@@ -19,10 +19,13 @@ import {
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
 	selectStatusMenu,
-	selectTheme
+	selectTheme,
+	selectTotalClansNotify,
+	selectTotalUnreadDM
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, TIME_OF_SHOWING_FIRST_POPUP } from '@mezon/utils';
+import { IClan, ModeResponsive, TIME_OF_SHOWING_FIRST_POPUP, electronBridge } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -41,6 +44,8 @@ function MyApp() {
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
+	const totalClanNotify = useSelector(selectTotalClansNotify);
+	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
 
 	const { setCloseMenu, setStatusMenu } = useMenu();
@@ -152,6 +157,12 @@ function MyApp() {
 
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 
+	useEffect(() => {
+		if (isElectron()) {
+			electronBridge?.setBadgeCount(totalClanNotify + totalUnreadDM);
+		}
+	}, [totalClanNotify, totalUnreadDM]);
+
 	return (
 		<div className="flex h-screen overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
@@ -166,7 +177,7 @@ function MyApp() {
 							to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
 							onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
 						>
-							<NavLinkComponent active={pathName.includes('direct')}>
+							<NavLinkComponent active={pathName?.includes('direct')}>
 								<div>
 									<Image
 										src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
@@ -201,7 +212,7 @@ function MyApp() {
 								<SidebarClanItem
 									linkClan={`/chat/clans/${clan.id}`}
 									option={clan}
-									active={!pathName.includes('direct') && currentClanId === clan.clan_id}
+									active={!pathName?.includes('direct') && currentClanId === clan.clan_id}
 								/>
 							</SidebarTooltip>
 						);

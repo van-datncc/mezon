@@ -68,7 +68,8 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 					channelsActions.joinChat({
 						clanId: '0',
 						channelId: response.channel_id as string,
-						channelType: response.type as number
+						channelType: response.type as number,
+						isPublic: false
 					})
 				);
 			}
@@ -419,3 +420,7 @@ export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, (di
 });
 
 export const selectDirectById = (id: string) => createSelector(selectDirectMessageEntities, (clansEntities) => clansEntities[id]);
+
+export const selectTotalUnreadDM = createSelector(selectDirectsUnreadlist, (listUnreadDM) => {
+	return listUnreadDM.reduce((total, count) => total + (count.count_mess_unread ?? 0), 0);
+});

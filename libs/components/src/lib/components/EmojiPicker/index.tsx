@@ -1,6 +1,7 @@
 import { useAppParams, useChatReaction, useClanRestriction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
 import {
 	reactionActions,
+	referencesActions,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDirectById,
@@ -8,7 +9,7 @@ import {
 	selectModeResponsive,
 	selectReactionPlaceActive,
 	selectTheme,
-	useAppSelector,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EEmojiCategory, EPermission, EmojiPlaces, IEmoji, ModeResponsive, SubPanelName, getSrcEmoji } from '@mezon/utils';
@@ -69,7 +70,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		<Icons.Bicycle defaultSize="w-7 h-7" />,
 		<Icons.Object defaultSize="w-7 h-7" />,
 		<Icons.Heart defaultSize="w-7 h-7" />,
-		<Icons.Ribbon defaultSize="w-7 h-7" />,
+		<Icons.Ribbon defaultSize="w-7 h-7" />
 	];
 	const categoriesWithIcons = categoriesEmoji.map((category, index) => ({ name: category, icon: categoryIcons[index] }));
 	const { reactionMessageDispatch } = useChatReaction();
@@ -105,8 +106,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				1,
 				messageEmoji?.sender_id ?? '',
 				false,
+				!currentChannel?.channel_private
 			);
 			setSubPanelActive(SubPanelName.NONE);
+			dispatch(referencesActions.setIdReferenceMessageReaction(''));
 		} else if (subPanelActive === SubPanelName.EMOJI) {
 			setAddEmojiActionChatbox(!addEmojiState);
 			setSuggestionEmojiObjPicked(emojiId, emojiPicked);
@@ -277,7 +280,7 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 			.filter((emoji) => emoji?.category?.includes(categoryParam))
 			.map((emoji) => ({
 				...emoji,
-				category: emoji.category,
+				category: emoji.category
 			}));
 		return filteredEmojis;
 	};
@@ -324,7 +327,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 	onEmojiHover,
 	categoryName,
 	onClickAddButton,
-	showAddButton,
+	showAddButton
 }) => {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
@@ -361,7 +364,7 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 					onMouseEnter={() =>
 						onEmojiHover({
 							shortname: 'Upload a custom emoji',
-							src: '',
+							src: ''
 						})
 					}
 				>
