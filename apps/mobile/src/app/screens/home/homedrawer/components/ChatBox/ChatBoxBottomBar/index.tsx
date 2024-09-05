@@ -2,6 +2,7 @@ import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
+	createFormattedString,
 	getChannelHashtag,
 	load,
 	mentionRegexSplit,
@@ -12,18 +13,31 @@ import {
 	emojiSuggestionActions,
 	referencesActions,
 	selectAllChannels,
+	selectAllEmojiSuggestion,
 	selectAllHashtagDm,
+	selectChannelDraftMessage,
 	selectCurrentChannel,
 	threadsActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
+import {
+	ChannelDraftMessages,
+	IHashtagOnMessage,
+	IMentionOnMessage,
+	IMessageSendPayload,
+	MIN_THRESHOLD_CHARS,
+	MentionDataProps,
+	addMention,
+	typeConverts
+} from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 // eslint-disable-next-line
 import { IFile } from 'apps/mobile/src/app/temp-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { ApiMessageMention } from 'mezon-js/dist/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Keyboard, Platform, TextInput } from 'react-native';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
@@ -103,6 +117,27 @@ export const ChatBoxBottomBar = memo(
 		const [textChange, setTextChange] = useState<string>('');
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
+		const emojiListPNG = useSelector(selectAllEmojiSuggestion);
+		const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId)) as ChannelDraftMessages;
+		const processedContentDraft: IMessageSendPayload = useMemo(() => {
+			return {
+				t: channelDraftMessage.draftContent?.t,
+				hg: channelDraftMessage.draftContent?.hg,
+				ej: channelDraftMessage.draftContent?.ej,
+				lk: channelDraftMessage.draftContent?.lk,
+				mk: channelDraftMessage.draftContent?.mk,
+				vk: channelDraftMessage.draftContent?.vk
+			};
+		}, [channelDraftMessage.draftContent]);
+		const processedMentionDraft: ApiMessageMention[] = useMemo(() => {
+			return channelDraftMessage.draftMention;
+		}, [channelDraftMessage.draftMention]);
+
+		const addMentionToContent = useMemo(
+			() => addMention(processedContentDraft, processedMentionDraft),
+			[processedContentDraft, processedMentionDraft]
+		);
+		const formatContentDraft = useMemo(() => createFormattedString(addMentionToContent), [addMentionToContent]);
 
 		const isAvailableSending = useMemo(() => {
 			return text?.length > 0 && text?.trim()?.length > 0;
@@ -245,6 +280,19 @@ export const ChatBoxBottomBar = memo(
 							});
 						}
 					}
+
+					if (word?.startsWith(':') && word?.endsWith(':')) {
+						const shortName = word;
+						const emoji = emojiListPNG?.find((item) => item?.shortname === shortName);
+						if (emoji) {
+							dispatch(
+								emojiSuggestionActions.setSuggestionEmojiObjPicked({
+									shortName: emoji?.shortname,
+									id: emoji.id
+								})
+							);
+						}
+					}
 				});
 				hashtagsOnMessage.current = hashtagList;
 				mentionsOnMessage.current = mentionList;
@@ -270,7 +318,7 @@ export const ChatBoxBottomBar = memo(
 			const { type, targetMessage } = messageAction;
 			switch (type) {
 				case EMessageActionType.EditMessage:
-					handleTextInputChange(targetMessage.content.t);
+					handleTextInputChange(formatContentDraft);
 					break;
 				case EMessageActionType.CreateThread:
 					dispatch(threadsActions.setOpenThreadMessageState(true));

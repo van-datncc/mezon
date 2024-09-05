@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import {
 	MessagesEntity,
 	appActions,
@@ -37,7 +37,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { userProfile } = useAuth();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '', isPublic = false  } = props;
+	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '', isPublic = false } = props;
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
@@ -76,6 +76,17 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		};
 		//Note: trigger to ChatBox.tsx
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
+		dispatch(
+			messagesActions.setChannelDraftMessage({
+				channelId: message.channel_id,
+				channelDraftMessage: {
+					message_id: message?.id,
+					draftContent: message?.content,
+					draftMention: message?.mentions ?? [],
+					draftAttachment: message?.attachments ?? []
+				}
+			})
+		);
 	};
 	const listPinMessages = useSelector(selectPinMessageByChannelId(message?.channel_id));
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -509,5 +520,14 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		}
 	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
 
-	return <View style={[styles.bottomSheetWrapper, { backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }]}>{content}</View>;
+	return (
+		<View
+			style={[
+				styles.bottomSheetWrapper,
+				{ backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }
+			]}
+		>
+			{content}
+		</View>
+	);
 });
