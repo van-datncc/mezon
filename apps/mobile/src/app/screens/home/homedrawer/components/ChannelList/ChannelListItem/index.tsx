@@ -1,18 +1,7 @@
-import {
-	Icons,
-	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save
-} from '@mezon/mobile-components';
+import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	getStoreAsync,
-	selectCurrentChannelId,
-	selectVoiceChannelMembersByChannelId
-} from '@mezon/store-mobile';
+import { selectIsUnreadChannelById } from '@mezon/store';
+import { channelsActions, getStoreAsync, selectCurrentChannelId, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -24,7 +13,6 @@ import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import ListChannelThread from '../ChannelListThread';
 import UserListVoiceChannel from '../ChannelListUserVoice';
 import { style } from './styles';
-import { selectIsUnreadChannelById } from '@mezon/store';
 
 interface IChannelListItemProps {
 	data: any;
@@ -46,7 +34,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
-	
+
 	const isActive = useMemo(() => {
 		return currentChanelId === props?.data?.id;
 	}, [currentChanelId, props?.data?.id]);
@@ -70,8 +58,8 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			const store = await getStoreAsync();
-			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		}
 	};
 
