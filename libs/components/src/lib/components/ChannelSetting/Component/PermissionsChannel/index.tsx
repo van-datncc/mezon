@@ -2,12 +2,13 @@ import { useAuth, useEscapeKey } from '@mezon/core';
 import { channelsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 import PermissionManage from './PermissionManage';
 import ListMemberPermission from './listMemberPermission';
 import ListRolePermission from './listRolePermission';
+
 export type PermissionsChannelProps = {
 	channel: IChannel;
 	openModalAdd: boolean;
@@ -27,20 +28,20 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 
-	const handleToggle = () => {
+	const handleToggle = useCallback(() => {
 		setValueToggle(!valueToggle);
-	};
+	}, []);
 
-	const handleReset = () => {
+	const handleReset = useCallback(() => {
 		setSelectedRoleIds([]);
 		setSelectedUserIds([]);
 		setValueToggle(valueToggleInit);
 		if (resetTriggerRef.current) {
 			resetTriggerRef.current();
 		}
-	};
+	}, [valueToggleInit]);
 
-	const handleSaveChannelPrivateChanged = async () => {
+	const handleSaveChannelPrivateChanged = useCallback(async () => {
 		setValueToggleInit(valueToggle);
 		const updatedUserIds = userProfile?.user?.id ? [...selectedUserIds, userProfile.user.id] : selectedUserIds;
 		await dispatch(
@@ -51,33 +52,34 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 				role_ids: selectedRoleIds
 			})
 		);
-	};
+	}, [valueToggle, selectedUserIds, selectedRoleIds, userProfile, channel]);
 
-	const handleSave = () => {
+	const handleSave = useCallback(() => {
 		if (valueToggle !== valueToggleInit) {
 			handleSaveChannelPrivateChanged();
 		}
 		if (saveTriggerRef.current && permissionsListHasChanged) {
 			saveTriggerRef.current();
 		}
-	};
+	}, [valueToggle, valueToggleInit, permissionsListHasChanged, handleSaveChannelPrivateChanged]);
 
-	const openAddMemRoleModal = () => {
+	const openAddMemRoleModal = useCallback(() => {
 		setShowAddMemRole(true);
 		setOpenModalAdd(true);
-	};
+	}, [setOpenModalAdd]);
 
-	const closeAddMemRoleModal = () => {
+	const closeAddMemRoleModal = useCallback(() => {
 		setShowAddMemRole(false);
 		setOpenModalAdd(false);
-	};
+	}, [setOpenModalAdd]);
 
-	const handleSelectedUsersChange = (newSelectedUserIds: string[]) => {
+	const handleSelectedUsersChange = useCallback((newSelectedUserIds: string[]) => {
 		setSelectedUserIds(newSelectedUserIds);
-	};
-	const handleSelectedRolesChange = (newSelectedRoleIds: string[]) => {
+	}, []);
+
+	const handleSelectedRolesChange = useCallback((newSelectedRoleIds: string[]) => {
 		setSelectedRoleIds(newSelectedRoleIds);
-	};
+	}, []);
 
 	useEscapeKey(() => {
 		if (openModalAdd) {

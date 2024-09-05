@@ -46,42 +46,41 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 
 	const listPermissionRef = useRef<ListPermissionHandle>(null);
 
-	const handleSelect = (id: string, option: number, active?: boolean) => {
-		const matchingRoleChannel = listPermissionRoleChannel.find((roleChannel) => roleChannel.permission_id === id);
+	const handleSelect = useCallback(
+		(id: string, option: number, active?: boolean) => {
+			const matchingRoleChannel = listPermissionRoleChannel.find((roleChannel) => roleChannel.permission_id === id);
 
-		if (id === EPermissionId.VIEW_CHANNEL && currentRoleId === EVERYONE_ROLE_ID) {
-			if (option === TypeChoose.Remove) {
-				setIsPrivateChannel(true);
-			} else {
-				setIsPrivateChannel(false);
+			if (id === EPermissionId.VIEW_CHANNEL && currentRoleId === EVERYONE_ROLE_ID) {
+				setIsPrivateChannel(option === TypeChoose.Remove);
 			}
-		}
 
-		if (active !== undefined) {
-			if (matchingRoleChannel && matchingRoleChannel.active === active) {
-				if (permissions[id] !== undefined) {
+			if (active !== undefined) {
+				if (matchingRoleChannel && matchingRoleChannel.active === active) {
+					if (permissions[id] !== undefined) {
+						const { [id]: _, ...rest } = permissions;
+						setPermissions(rest);
+					}
+					return;
+				} else {
+					setPermissions((prevPermissions) => ({
+						...prevPermissions,
+						[id]: option
+					}));
+				}
+			} else {
+				if (matchingRoleChannel) {
+					setPermissions((prevPermissions) => ({
+						...prevPermissions,
+						[id]: option
+					}));
+				} else {
 					const { [id]: _, ...rest } = permissions;
 					setPermissions(rest);
 				}
-				return;
-			} else {
-				setPermissions((prevPermissions) => ({
-					...prevPermissions,
-					[id]: option
-				}));
 			}
-		} else {
-			if (matchingRoleChannel) {
-				setPermissions((prevPermissions) => ({
-					...prevPermissions,
-					[id]: option
-				}));
-			} else {
-				const { [id]: _, ...rest } = permissions;
-				setPermissions(rest);
-			}
-		}
-	};
+		},
+		[currentRoleId, listPermissionRoleChannel, permissions, setIsPrivateChannel]
+	);
 
 	const handleSelectRole = useCallback(
 		(id: string) => {
