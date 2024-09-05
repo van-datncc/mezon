@@ -26,10 +26,10 @@ const MessageModalImage = () => {
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 	const attachment = useSelector(selectAttachment);
 	const [urlImg, setUrlImg] = useState(attachment);
-	const [currentIndexAtt, setCurrentIndexAtt] = useState(attachments.findIndex((img) => img.url === urlImg));
+	const [currentIndexAtt, setCurrentIndexAtt] = useState(-1);
 	const attLength = attachments.length;
 	const checkNumberAtt = attLength > 1;
-	const { showMessageContextMenu, setPositionShow, setImageURL, imageSrc } = useMessageContextMenu();
+	const { showMessageContextMenu, setPositionShow, setImageURL } = useMessageContextMenu();
 
 	const mode = useSelector(selectModeAttachment);
 	const messageId = useSelector(selectMessageIdAttachment);
@@ -43,6 +43,13 @@ const MessageModalImage = () => {
 		setScale(1);
 		setUrlImg(attachment);
 	}, [openModalAttachment]);
+
+	useEffect(() => {
+		if (attachments.length > 0) {
+			const indexImage = attachments.findIndex((img) => img.url === urlImg);
+			setCurrentIndexAtt(indexImage);
+		}
+	}, [attachments.length]);
 
 	const handleDrag = (e: any) => {
 		e.preventDefault();
@@ -80,24 +87,36 @@ const MessageModalImage = () => {
 
 	const handleKeyDown = (event: any) => {
 		if (event.key === 'Escape') {
-			console.log('close view img');
 			closeModal();
+			return;
 		}
 		if (event.key === 'ArrowUp') {
-			const newIndex = currentIndexAtt > 0 ? currentIndexAtt - 1 : attLength - 1;
-			setUrlImg(attachments[newIndex]?.url || '');
+			handleSelectNextImage();
 		}
 		if (event.key === 'ArrowDown') {
-			const newIndex = currentIndexAtt < attLength - 1 ? currentIndexAtt + 1 : 0;
-			setUrlImg(attachments[newIndex]?.url || '');
+			handleSelectPreviousImage();
 		}
+	};
+
+	const handleSelectNextImage = () => {
+		const newIndex = currentIndexAtt > 0 ? currentIndexAtt - 1 : currentIndexAtt;
+		if (newIndex !== currentIndexAtt) {
+			handleSelectImage(newIndex);
+		}
+	};
+	const handleSelectPreviousImage = () => {
+		const newIndex = currentIndexAtt < attLength - 1 ? currentIndexAtt + 1 : currentIndexAtt;
+		if (newIndex !== currentIndexAtt) {
+			handleSelectImage(newIndex);
+		}
+	};
+	const handleSelectImage = (newIndex: number) => {
+		setUrlImg(attachments[newIndex]?.url || '');
+		setCurrentIndexAtt(newIndex);
 	};
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyDown);
-
-		setCurrentIndexAtt(attachments.findIndex((img) => img.url === urlImg));
-
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown);
 		};
@@ -136,6 +155,7 @@ const MessageModalImage = () => {
 			setRotate(rotate + 90);
 		}
 	};
+
 	const handleScaleImage = (scaleUp: boolean) => {
 		if (scaleUp) {
 			if (scale < MAX_SCALE_IMAGE) {
@@ -145,6 +165,7 @@ const MessageModalImage = () => {
 		}
 		setScale(1);
 	};
+
 	return (
 		<div className="justify-center items-center flex flex-col fixed z-50 inset-0 outline-none focus:outline-none dark:bg-black bg-white dark:text-white text-colorTextLightMode select-none">
 			<div className="flex justify-center items-center bg-[#2e2e2e] w-full h-[30px] relative">
@@ -172,23 +193,23 @@ const MessageModalImage = () => {
 						}}
 						onContextMenu={handleContextMenu}
 					/>
-					<div className={`h-full w-12 absolute flex flex-col right-0 gap-2 justify-center`}>
-						<div className="rounded-full rotate-180 bg-bgTertiary cursor-pointer w-10 aspect-square flex items-center justify-center dark:text-white">
+					<div
+						className={`h-full w-12 absolute flex flex-col right-0 gap-2 justify-center ${scale === 1 ? 'opacity-100' : 'opacity-0 hover:opacity-100'}`}
+					>
+						<div
+							className="rounded-full rotate-180 bg-bgTertiary cursor-pointer w-10 aspect-square flex items-center justify-center dark:text-white"
+							onClick={handleSelectNextImage}
+						>
 							<Icons.ArrowDown />
 						</div>
-						<div className="rounded-full  bg-bgTertiary  cursor-pointer w-10 aspect-square flex items-center justify-center dark:text-white">
+						<div
+							className="rounded-full  bg-bgTertiary  cursor-pointer w-10 aspect-square flex items-center justify-center dark:text-white"
+							onClick={handleSelectPreviousImage}
+						>
 							<Icons.ArrowDown />
 						</div>
 					</div>
 				</div>
-				{/* {checkNumberAtt && (
-				<button
-					className={`bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out absolute flex justify-center items-center ${showList ? 'md:-rotate-90 md:top-5 md:right-[200px] md:left-auto left-5 bottom-[110px]' : 'md:rotate-90 md:top-[72px] md:right-5 md:left-auto rotate-180 left-5 bottom-5'}`}
-					onClick={handleShowList}
-				>
-					<Icons.ArrowDown defaultFill="white" defaultSize="w-[20px] h-[30px]" />
-				</button>
-			)} */}
 				{showList && checkNumberAtt && (
 					<ListAttachment
 						attachments={attachments}
@@ -197,6 +218,8 @@ const MessageModalImage = () => {
 						handleDrag={handleDrag}
 						setScale={setScale}
 						setPosition={setPosition}
+						setCurrentIndexAtt={setCurrentIndexAtt}
+						currentIndexAtt={currentIndexAtt}
 					/>
 				)}
 			</div>

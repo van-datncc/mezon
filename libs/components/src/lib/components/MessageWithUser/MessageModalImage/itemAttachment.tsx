@@ -8,16 +8,26 @@ type ItemAttachmentProps = {
 	showDate: boolean;
 	setUrlImg: React.Dispatch<React.SetStateAction<string>>;
 	handleDrag: (e: any) => void;
+	index: number;
+	setCurrentIndexAtt: React.Dispatch<React.SetStateAction<number>>;
+	currentIndexAtt: number;
 };
 
 const ItemAttachment = (props: ItemAttachmentProps) => {
-	const { attachment, urlImg, previousDate, selectedImageRef, showDate, setUrlImg, handleDrag } = props;
+	const { attachment, urlImg, previousDate, selectedImageRef, showDate, setUrlImg, handleDrag, setCurrentIndexAtt, index, currentIndexAtt } = props;
 	const url = attachment.url;
-	const isSelected = url === urlImg;
+	const isSelected = index === currentIndexAtt;
+	const handleSelectImage = () => {
+		setUrlImg(url || '');
+		setCurrentIndexAtt(index);
+	};
 	return (
 		<div className={` w-fit h-fit `} ref={isSelected ? selectedImageRef : null}>
 			{showDate && <div className={`dark:text-white text-black mb-1 text-center`}>{previousDate}</div>}
-			<div className={`rounded-md ${isSelected ? 'flex items-center border-2 border-white' : 'relative'}`} onClick={() => setUrlImg(url || '')}>
+			<div
+				className={`rounded-md cursor-pointer ${isSelected ? 'flex items-center border-2 border-white' : 'relative'}`}
+				onClick={handleSelectImage}
+			>
 				<img
 					src={url}
 					alt={url}
@@ -25,7 +35,7 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 					onDragStart={handleDrag}
 					onKeyDown={(event) => {
 						if (event.key === 'Enter') {
-							setUrlImg(url || '');
+							handleSelectImage();
 						}
 					}}
 				/>
