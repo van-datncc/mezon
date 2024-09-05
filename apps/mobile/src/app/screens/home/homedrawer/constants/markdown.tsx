@@ -481,7 +481,7 @@ export const RenderTextMarkdownContent = React.memo(
 					}
 				}}
 			>
-				{contentRender}
+				{formatBlockCode(contentRender?.trim(), isMessageReply)}
 			</Markdown>
 		);
 
