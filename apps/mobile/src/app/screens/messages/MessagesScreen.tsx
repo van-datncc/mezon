@@ -24,7 +24,7 @@ const SeparatorListFriend = () => {
 	return <View style={{ height: size.s_8 }} />;
 };
 
-const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any, onLongPress }) => {
+const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any; onLongPress }) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { directMessage, navigation, onLongPress } = props;
@@ -69,7 +69,11 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
 				{!!content && (
-					<RenderTextMarkdownContent isHiddenHashtag={true} content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />
+					<RenderTextMarkdownContent
+						isOpenLink={false}
+						isHiddenHashtag={true}
+						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
+					/>
 				)}
 			</View>
 		);
@@ -170,10 +174,10 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 
-	const [directMessageSelected, setDirectMessageSelected] = useState<DirectEntity>(null)
+	const [directMessageSelected, setDirectMessageSelected] = useState<DirectEntity>(null);
 	const handleLongPress = useCallback((directMessage: DirectEntity) => {
 		bottomSheetDMMessageRef.current?.present();
-		setDirectMessageSelected(directMessage)
+		setDirectMessageSelected(directMessage);
 	}, []);
 
 	return (
@@ -208,14 +212,9 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					showsVerticalScrollIndicator={false}
 					keyExtractor={(dm) => dm.id.toString()}
 					ItemSeparatorComponent={SeparatorListFriend}
-					renderItem={({ item }) => 
-						<DmListItem 
-							directMessage={item} 
-							navigation={navigation} 
-							key={item.id} 
-							onLongPress={() => handleLongPress(item)} 
-						/>
-					}
+					renderItem={({ item }) => (
+						<DmListItem directMessage={item} navigation={navigation} key={item.id} onLongPress={() => handleLongPress(item)} />
+					)}
 				/>
 			)}
 
