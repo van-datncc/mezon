@@ -15,7 +15,6 @@ import {
 } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useImage } from 'apps/mobile/src/app/hooks/useImage';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +22,7 @@ import { Alert, DeviceEventEmitter, Platform, Pressable, Text, View } from 'reac
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { useImage } from '../../../../../hooks/useImage';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
@@ -139,22 +139,28 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		);
 	};
 
-	const handleActionPinMessage = () => {
+	const handleActionPinMessage = async () => {
 		if (message) onClose();
-		timeoutRef.current = setTimeout(() => {
-			onConfirmAction({
-				type: EMessageActionType.PinMessage
-			});
-		}, 500);
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.PinMessage
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0
+		);
 	};
 
 	const handleActionUnPinMessage = () => {
 		if (message) onClose();
-		timeoutRef.current = setTimeout(() => {
-			onConfirmAction({
-				type: EMessageActionType.UnPinMessage
-			});
-		}, 500);
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.UnPinMessage
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0
+		);
 	};
 
 	const handleActionMarkUnRead = () => {
