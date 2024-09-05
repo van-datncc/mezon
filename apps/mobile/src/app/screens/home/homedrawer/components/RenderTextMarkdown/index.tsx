@@ -10,9 +10,9 @@ import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
-import { ChannelHashtag } from '../components/MarkdownFormatText/ChannelHashtag';
-import { EmojiMarkup } from '../components/MarkdownFormatText/EmojiMarkup';
-import { MentionUser } from '../components/MarkdownFormatText/MentionUser';
+import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
+import { EmojiMarkup } from '../MarkdownFormatText/EmojiMarkup';
+import { MentionUser } from '../MarkdownFormatText/MentionUser';
 
 interface ElementToken {
 	s?: number;
@@ -331,11 +331,6 @@ export const formatBlockCode = (text: string, isMessageReply: boolean) => {
 		return '\n' + block + '\n';
 	};
 	return text?.replace?.(codeBlockRegexGlobal, addNewlinesToCodeBlock);
-};
-
-export const removeBlockCode = (text: string) => {
-	const regex = /(`{1,3})(.*?)\1/g;
-	return text?.replace?.(regex, '$2');
 };
 
 export const RenderTextMarkdownContent = React.memo(
