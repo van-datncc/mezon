@@ -50,8 +50,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
     statusCircle: {
         position: 'absolute',
-        width: 12,
-        height: 12,
+        width: size.s_10,
+        height: size.s_10,
         borderRadius: 10,
         bottom: 0,
         right: -2,

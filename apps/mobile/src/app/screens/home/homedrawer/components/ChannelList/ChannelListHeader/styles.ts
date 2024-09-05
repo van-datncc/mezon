@@ -1,4 +1,5 @@
-import { Attributes, Colors, Fonts, Metrics } from "@mezon/mobile-ui";
+import { IS_TABLET } from "@mezon/mobile-components";
+import { Attributes, Colors, Fonts, Metrics, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -18,19 +19,19 @@ export const style = (colors: Attributes) => StyleSheet.create({
         maxWidth: '85%',
         display: "flex",
         backgroundColor: colors.primary,
-        paddingHorizontal: 10,
-        paddingVertical: 3,
+        paddingHorizontal: size.s_10,
+        paddingVertical: size.s_4,
         borderRadius: 20,
         flexDirection: "row",
         justifyContent: "space-between",
-        gap: Metrics.size.s,
+        gap: IS_TABLET ? Metrics.size.m : Metrics.size.s,
         alignItems: "center",
     },
 
     titleServer: {
         color: colors.text,
         fontWeight: 'bold',
-        fontSize: 16
+        fontSize: size.s_15
     },
 
     infoHeader: {

@@ -24,7 +24,7 @@ const SeparatorListFriend = () => {
 	return <View style={{ height: size.s_8 }} />;
 };
 
-const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any, onLongPress }) => {
+const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any; onLongPress }) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { directMessage, navigation, onLongPress } = props;
@@ -69,7 +69,11 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
 				{!!content && (
-					<RenderTextMarkdownContent isHiddenHashtag={true} content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />
+					<RenderTextMarkdownContent
+						isOpenLink={false}
+						isHiddenHashtag={true}
+						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
+					/>
 				)}
 			</View>
 		);
@@ -170,10 +174,10 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 
-	const [directMessageSelected, setDirectMessageSelected] = useState<DirectEntity>(null)
+	const [directMessageSelected, setDirectMessageSelected] = useState<DirectEntity>(null);
 	const handleLongPress = useCallback((directMessage: DirectEntity) => {
 		bottomSheetDMMessageRef.current?.present();
-		setDirectMessageSelected(directMessage)
+		setDirectMessageSelected(directMessage);
 	}, []);
 
 	return (
@@ -181,13 +185,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			<View style={styles.headerWrapper}>
 				<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
 				<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
-					<Icons.UserPlusIcon height={20} width={20} color={themeValue.textStrong} />
+					<Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 				</Pressable>
 			</View>
 
 			<View style={styles.searchMessage}>
-				<Icons.MagnifyingIcon height={20} width={20} color={themeValue.text} />
+				<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
 				<TextInput
 					placeholder={t('common:searchPlaceHolder')}
 					placeholderTextColor={themeValue.text}
@@ -208,19 +212,14 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					showsVerticalScrollIndicator={false}
 					keyExtractor={(dm) => dm.id.toString()}
 					ItemSeparatorComponent={SeparatorListFriend}
-					renderItem={({ item }) => 
-						<DmListItem 
-							directMessage={item} 
-							navigation={navigation} 
-							key={item.id} 
-							onLongPress={() => handleLongPress(item)} 
-						/>
-					}
+					renderItem={({ item }) => (
+						<DmListItem directMessage={item} navigation={navigation} key={item.id} onLongPress={() => handleLongPress(item)} />
+					)}
 				/>
 			)}
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
-				<Icons.MessagePlusIcon width={22} height={22} />
+				<Icons.MessagePlusIcon width={size.s_22} height={size.s_22} />
 			</Pressable>
 
 			<MezonBottomSheet ref={bottomSheetDMMessageRef} snapPoints={['40%', '60%']}>
