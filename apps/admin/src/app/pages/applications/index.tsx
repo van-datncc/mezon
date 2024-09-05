@@ -190,7 +190,7 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 				{appListForDisplaying &&
 					appListForDisplaying.map((value, index) => (
 						<div
-							onClick={() => goToAppDetailPage(value.id)}
+							onClick={() => goToAppDetailPage(value.id as string)}
 							key={index}
 							className={`dark:bg-[#2b2d31] dark:hover:bg-[#1e1f22] bg-bgLightModeSecond hover:bg-[#e3e5e8] p-[10px] ${isSmallSizeSort ? 'w-[128px]' : 'w-[206px]'} rounded-md cursor-pointer hover:-translate-y-2 duration-200 hover:shadow-2xl`}
 						>
