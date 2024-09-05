@@ -1,4 +1,4 @@
-import { ChannelsEntity, HashtagDmEntity } from '@mezon/store-mobile';
+import { ChannelsEntity, EmojiSuggestionEntity, HashtagDmEntity } from '@mezon/store-mobile';
 import {
 	ETokenMessage,
 	IEmojiOnMessage,
@@ -7,7 +7,8 @@ import {
 	ILinkOnMessage,
 	ILinkVoiceRoomOnMessage,
 	IMarkdownOnMessage,
-	IMentionOnMessage
+	IMentionOnMessage,
+	IMessageWithUser
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 
@@ -95,4 +96,22 @@ export const createFormattedString = (data: IExtendedMessage): string => {
 	});
 	result += t.slice(lastIndex);
 	return result;
+};
+
+export const formatContentEditMessage = (message: IMessageWithUser, emojiList: EmojiSuggestionEntity[]) => {
+	const processedContentMentionsDraft = {
+		t: message?.content?.t,
+		hg: message?.content?.hg,
+		ej: message?.content?.ej,
+		lk: message?.content?.lk,
+		mk: message?.content?.mk,
+		vk: message?.content?.vk,
+		mentions: message?.mentions
+	};
+	const formatContentDraft = createFormattedString(processedContentMentionsDraft);
+	const emojiPicked = message?.content?.ej?.map((item) => {
+		return emojiList?.find((emoji) => emoji?.id === item?.emojiid);
+	});
+
+	return { formatContentDraft, emojiPicked };
 };
