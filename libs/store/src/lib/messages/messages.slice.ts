@@ -4,6 +4,7 @@ import {
 	ChannelDraftMessages,
 	Direction_Mode,
 	EMessageCode,
+	EMimeTypes,
 	EmojiDataOptionals,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -438,14 +439,25 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 
 			let uploadedFiles: ApiMessageAttachment[] = [];
 
+			// Check if there are attachments
 			if (attachments && attachments.length > 0) {
-				const createdFiles = await fetchAndCreateFiles(attachments);
+				const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
+				const nonDirectAttachments = attachments.filter(
+					(att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon)
+				);
 
-				const uploadPromises = createdFiles.map((file) => {
-					return handleUploadFile(client, session, clanId, channelId, file.name, file);
-				});
+				if (nonDirectAttachments.length > 0) {
+					const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
 
-				uploadedFiles = await Promise.all(uploadPromises);
+					const uploadPromises = createdFiles.map((file) => {
+						return handleUploadFile(client, session, clanId, channelId, file.name, file);
+					});
+
+					const uploadedNonDirectFiles = await Promise.all(uploadPromises);
+					uploadedFiles = [...uploadedFiles, ...uploadedNonDirectFiles];
+				}
+
+				uploadedFiles = [...uploadedFiles, ...directLinks.map((link) => ({ url: link.url, filetype: link.filetype }))];
 			}
 
 			const res = await socket.writeChatMessage(
@@ -464,7 +476,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			return res;
 		} catch (error) {
 			console.error('Failed to send message:', error);
-			throw error; // Re-throw the error if you want to handle it further up the call stack
+			throw error;
 		}
 	}
 
