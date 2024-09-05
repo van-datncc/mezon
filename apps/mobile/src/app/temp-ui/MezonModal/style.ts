@@ -32,10 +32,10 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	textTitle: {
 		color: colors.textStrong,
-		fontSize: 20,
+		fontSize: size.s_20,
 	},
 	confirm: {
 		color: colors.textStrong,
-		fontSize: 18
+		fontSize: size.s_18
 	},
 });

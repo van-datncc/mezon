@@ -31,7 +31,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 
     label: {
         color: colors.text,
-        fontSize: 14,
+        fontSize: size.medium,
         fontWeight: 'bold',
         marginBottom: 5
     },
@@ -41,6 +41,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
         paddingHorizontal: 10,
         color: colors.textStrong,
         flexGrow: 1,
+        fontSize: size.medium
     },
 
     clearBtn: {

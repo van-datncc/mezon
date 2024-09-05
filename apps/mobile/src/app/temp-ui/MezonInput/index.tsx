@@ -104,7 +104,7 @@ export default function MezonInput({ placeHolder,
 
 					{!textarea && value?.length > 0 && !disabled && (
 						<TouchableOpacity onPress={handleClearBtn} style={styles.clearBtn}>
-							<CircleXIcon height={18} width={18} color={themeValue.text} />
+							<CircleXIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 						</TouchableOpacity>
 					)}
 				</View>
