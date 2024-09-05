@@ -48,7 +48,6 @@ const ListAttachment = (props: ListAttachmentProps) => {
             <ItemAttachment
               key={attachment.id}
               attachment={attachment}
-              urlImg={urlImg}
               previousDate={currentDate}
               selectedImageRef={selectedImageRef}
               showDate={showDate}

@@ -1,8 +1,7 @@
-import { AttachmentEntity } from '@mezon/store';
+import { AttachmentEntity, attachmentActions, useAppDispatch } from '@mezon/store';
 
 type ItemAttachmentProps = {
 	attachment: AttachmentEntity;
-	urlImg: string;
 	previousDate: any;
 	selectedImageRef: React.MutableRefObject<HTMLDivElement | null>;
 	showDate: boolean;
@@ -14,12 +13,13 @@ type ItemAttachmentProps = {
 };
 
 const ItemAttachment = (props: ItemAttachmentProps) => {
-	const { attachment, urlImg, previousDate, selectedImageRef, showDate, setUrlImg, handleDrag, setCurrentIndexAtt, index, currentIndexAtt } = props;
-	const url = attachment.url;
+	const { attachment, previousDate, selectedImageRef, showDate, setUrlImg, handleDrag, setCurrentIndexAtt, index, currentIndexAtt } = props;
+	const dispatch = useAppDispatch();
 	const isSelected = index === currentIndexAtt;
 	const handleSelectImage = () => {
-		setUrlImg(url || '');
+		setUrlImg(attachment.url || '');
 		setCurrentIndexAtt(index);
+		dispatch(attachmentActions.setCurrentAttachment(attachment));
 	};
 	return (
 		<div className={` w-fit h-fit `} ref={isSelected ? selectedImageRef : null}>
@@ -29,8 +29,8 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 				onClick={handleSelectImage}
 			>
 				<img
-					src={url}
-					alt={url}
+					src={attachment.url}
+					alt={attachment.url}
 					className={`size-[88px] max-w-[88px] max-h-[88px] mx-auto gap-5 object-cover rounded-md cursor-pointer ${isSelected ? '' : 'overlay'} border-2 ${isSelected ? 'dark:bg-slate-700 bg-bgLightModeButton border-colorTextLightMode' : 'border-transparent'}`}
 					onDragStart={handleDrag}
 					onKeyDown={(event) => {

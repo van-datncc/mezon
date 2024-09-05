@@ -1,16 +1,19 @@
 import { useAttachments } from '@mezon/core';
 import {
+	attachmentActions,
 	selectAttachment,
 	selectAttachmentPhoto,
+	selectCurrentAttachmentShowImage,
 	selectCurrentChannel,
+	selectMemberById,
 	selectMessageIdAttachment,
 	selectModeAttachment,
 	selectOpenModalAttachment
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { SHOW_POSITION } from '@mezon/utils';
+import { SHOW_POSITION, handleSaveImage } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { MessageContextMenuProps, useMessageContextMenu } from '../../ContextMenu';
 import ListAttachment from './listAttachment';
 
@@ -33,7 +36,7 @@ const MessageModalImage = () => {
 
 	const mode = useSelector(selectModeAttachment);
 	const messageId = useSelector(selectMessageIdAttachment);
-
+	const dispatch = useDispatch();
 	const handleShowList = () => {
 		setShowList(!showList);
 	};
@@ -74,6 +77,7 @@ const MessageModalImage = () => {
 		setOpenModalAttachment(false);
 		setPositionShow(SHOW_POSITION.NONE);
 		setImageURL('');
+		dispatch(attachmentActions.removeCurrentAttachment());
 	};
 
 	const handleContextMenu = useCallback(
@@ -113,10 +117,12 @@ const MessageModalImage = () => {
 	const handleSelectImage = (newIndex: number) => {
 		setUrlImg(attachments[newIndex]?.url || '');
 		setCurrentIndexAtt(newIndex);
+		dispatch(attachmentActions.setCurrentAttachment(attachments[newIndex]));
 	};
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyDown);
+
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown);
 		};
@@ -164,6 +170,10 @@ const MessageModalImage = () => {
 			return;
 		}
 		setScale(1);
+	};
+
+	const handleDownloadImage = async () => {
+		await handleSaveImage(urlImg);
 	};
 
 	return (
@@ -225,21 +235,15 @@ const MessageModalImage = () => {
 			</div>
 			<div className="h-14 flex px-4 w-full items-center justify-between">
 				<div className="flex items-center">
-					<div className="flex gap-2">
-						<div className="w-10 aspect-square object-cover">
-							<img
-								src="https://steamuserimages-a.akamaihd.net/ugc/1667980019599930485/F57B5D6531681D2C2CB8090EBA30F734F1412017/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false"
-								alt="user-avatar"
-								className="w-full rounded-full"
-							/>
-						</div>
-						<div className="flex flex-col justify-between">
-							<div className="text-[14px] font-semibold">Nga.NguyenThi</div>
-							<div className="text-[12px]">Today at 11:37</div>
-						</div>
-					</div>
+					<SenderUser />
 				</div>
 				<div className="gap-3 text-white flex items-center justify-center">
+					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer" onClick={handleDownloadImage}>
+						<Icons.HomepageDownload className="w-5 h-5" />
+					</div>
+					<div className="">
+						<Icons.StraightLineIcon className="w-5" />
+					</div>
 					<div className="p-2 hover:bg-[#434343] rounded-md cursor-pointer" onClick={() => handleRotateImg('LEFT')}>
 						<Icons.RotateLeftIcon className="w-5" />
 					</div>
@@ -261,6 +265,22 @@ const MessageModalImage = () => {
 						<Icons.SideMenuIcon className="w-5" />
 					</div>
 				</div>
+			</div>
+		</div>
+	);
+};
+
+const SenderUser = () => {
+	const attachment = useSelector(selectCurrentAttachmentShowImage);
+	const user = useSelector(selectMemberById(attachment?.uploader as string));
+	return (
+		<div className="flex gap-2">
+			<div className="w-10 aspect-square object-cover overflow-hidden">
+				<img src={user?.clan_avatar ?? user?.user?.avatar_url} alt="user-avatar" className="w-full rounded-full" />
+			</div>
+			<div className="flex flex-col justify-between">
+				<div className="text-[14px] font-semibold">{user?.clan_nick ?? user?.user?.display_name ?? user?.user?.username}</div>
+				<div className="text-[12px]">{attachment?.create_time}</div>
 			</div>
 		</div>
 	);
