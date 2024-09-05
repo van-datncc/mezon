@@ -623,7 +623,7 @@ export enum RoleEveryOne {
 }
 
 export enum EMessageCode {
-	FIRST_MESSAGE = 11
+	FIRST_MESSAGE = 4
 }
 
 export enum ModeResponsive {
