@@ -40,12 +40,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 		} else {
 			setUserRemoveChar(username);
 		}
-		let user;
-		if (mode === 4 || mode === 3) {
-			user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
-		} else {
-			user = memberChannels?.find((userChannel) => userChannel.user?.id === tagUserId);
-		}
+		const user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
 
 		if (user) {
 			setFoundUser(user);
@@ -96,7 +91,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 					style={{
 						left: `${positionLeft}px`,
 						top: positionBottom ? '' : `${positionTop}px`,
-						bottom: positionBottom ? '64px' : '',
+						bottom: positionBottom ? '64px' : ''
 					}}
 					onMouseDown={(e) => e.stopPropagation()}
 				>
@@ -112,8 +107,10 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 			{foundUser !== null || tagName === '@here' ? (
 				<>
 					<Link
+						// eslint-disable-next-line @typescript-eslint/no-empty-function
 						onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
 						ref={panelRef}
+						// eslint-disable-next-line @typescript-eslint/no-empty-function
 						onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
 						style={{ textDecoration: 'none' }}
 						to={''}
@@ -122,7 +119,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 
 				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 					>
-						{foundUser?.user?.username ? tagName : '@here'}
+						{foundUser?.clan_nick || foundUser?.user?.display_name || foundUser?.user?.username || '@here'}
 					</Link>
 					{`${checkLastChar(username) ? `${username.charAt(username.length - 1)}` : ''}`}
 				</>

@@ -6,9 +6,7 @@ import {
 	selectIdMessageRefReply,
 	selectIdMessageToJump,
 	selectJumpPinMessageId,
-	selectLastMessageIdByChannelId,
-	selectUploadingStatus,
-	useAppSelector
+	selectUploadingStatus
 } from '@mezon/store';
 import { EUploadingStatus } from '@mezon/utils';
 import classNames from 'classnames';
@@ -61,12 +59,11 @@ function MessageWithUser({
 
 	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, currentChannelId ?? ''));
 
 	const userLogin = useAuth();
 	const isCombine = !message.isStartedMessageGroup;
-	const checkReplied = idMessageRefReply === message.id && message.id !== lastMessageId;
-	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
+	const checkReplied = false;
+	const checkMessageTargetToMoved = false;
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 
 	const currentDmOrChannelId = useMemo(

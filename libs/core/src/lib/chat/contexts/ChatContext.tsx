@@ -126,13 +126,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const idToCompare = !isMobile ? channelId : currentChannelId;
 				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
-			if (message.channel_id === currentChannelId || message.channel_id === currentDirectId) {
-				dispatch(messagesActions.addNewMessage(mess));
-				if (mess.code === 0 && mess.attachments) {
-					dispatch(messagesActions.setNewMessageToUpdateImage(mess));
-				}
-			}
-
+			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 				dispatch(directActions.updateDMSocket(message));
@@ -143,7 +137,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 			dispatch(notificationActions.setIsMessageRead(true));
-			dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
+			// remove: setChannelLastSentTimestamp for fix re-render currentChannel when receive new message
+			// dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
 		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId]
 	);

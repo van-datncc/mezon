@@ -6,12 +6,14 @@ import { View } from 'react-native';
 const widthMedia = Metrics.screenWidth - 150;
 export const RenderVideoChat = React.memo(
 	({ videoURL }: { videoURL: string }) => {
+		if (!videoURL) return null;
+
 		return (
 			<View
 				style={{
 					height: 170,
 					width: widthMedia + size.s_50,
-					marginTop: size.s_10,
+					marginTop: size.s_10
 				}}
 			>
 				<ExpoVideo
@@ -19,7 +21,7 @@ export const RenderVideoChat = React.memo(
 						console.log('load error', err);
 					}}
 					source={{
-						uri: videoURL,
+						uri: videoURL
 					}}
 					useNativeControls
 					resizeMode={ResizeMode.CONTAIN}
@@ -31,11 +33,11 @@ export const RenderVideoChat = React.memo(
 						height: 160,
 						borderRadius: size.s_4,
 						overflow: 'hidden',
-						backgroundColor: Colors.borderDim,
+						backgroundColor: Colors.borderDim
 					}}
 				/>
 			</View>
 		);
 	},
-	(prevProps, nextProps) => prevProps.videoURL === nextProps.videoURL,
+	(prevProps, nextProps) => prevProps.videoURL === nextProps.videoURL
 );
