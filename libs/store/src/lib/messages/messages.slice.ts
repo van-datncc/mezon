@@ -1,3 +1,4 @@
+import { handleUploadFile } from '@mezon/transport';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
@@ -10,7 +11,8 @@ import {
 	LoadingStatus,
 	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
-	checkSameDayByCreateTime
+	checkSameDayByCreateTime,
+	fetchAndCreateFiles
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -423,30 +425,47 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 	const id = Date.now().toString();
 
 	async function doSend() {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-		const session = mezon.sessionRef.current;
-		const client = mezon.clientRef.current;
-		const socket = mezon.socketRef.current;
+			const session = mezon.sessionRef.current;
+			const client = mezon.clientRef.current;
+			const socket = mezon.socketRef.current;
 
-		if (!client || !session || !socket || !channelId) {
-			throw new Error('Client is not initialized');
+			if (!client || !session || !socket || !channelId) {
+				throw new Error('Client is not initialized');
+			}
+
+			let uploadedFiles: ApiMessageAttachment[] = [];
+
+			if (attachments && attachments.length > 0) {
+				const createdFiles = await fetchAndCreateFiles(attachments);
+
+				const uploadPromises = createdFiles.map((file) => {
+					return handleUploadFile(client, session, clanId, channelId, file.name, file);
+				});
+
+				uploadedFiles = await Promise.all(uploadPromises);
+			}
+
+			const res = await socket.writeChatMessage(
+				clanId,
+				channelId,
+				mode,
+				isPublic,
+				content,
+				mentions,
+				uploadedFiles,
+				references,
+				anonymous,
+				mentionEveryone
+			);
+
+			return res;
+		} catch (error) {
+			console.error('Failed to send message:', error);
+			throw error; // Re-throw the error if you want to handle it further up the call stack
 		}
-
-		const res = await socket.writeChatMessage(
-			clanId,
-			channelId,
-			mode,
-			isPublic,
-			content,
-			mentions,
-			attachments,
-			references,
-			anonymous,
-			mentionEveryone
-		);
-
-		return res;
 	}
 
 	async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
