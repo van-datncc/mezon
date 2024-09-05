@@ -731,7 +731,7 @@ export type MessageTypeUpdateLink = {
 	mode?: ChannelStreamMode;
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
-	isMe?: true;
+	isMe?: boolean;
 };
 
 export type RequestInput = {

@@ -644,21 +644,18 @@ export const messagesSlice = createSlice({
 			state.idMessageToJump = action.payload;
 		},
 
-		setNewMessageToUpdateImage(state, action) {
-			const data = action.payload;
-			state.newMesssageUpdateImage = {
-				channel_id: data.channel_id,
-				message_id: data.message_id,
-				clan_id: data.clan_id,
-				mode: data.mode,
-				mentions: data.mentions,
-				content: data.content,
-				isMe: data.isMe
-			};
-		},
-
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
+
+			state.newMesssageUpdateImage = {
+				channel_id: action.payload.channel_id,
+				message_id: action.payload.message_id,
+				clan_id: action.payload.clan_id,
+				mode: action.payload.mode,
+				mentions: action.payload.mentions,
+				content: action.payload.content,
+				isMe: action.payload.isMe
+			};
 
 			if (!channelId || !messageId) return state;
 
