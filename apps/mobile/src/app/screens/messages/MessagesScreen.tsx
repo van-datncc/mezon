@@ -17,7 +17,7 @@ import { MezonBottomSheet } from '../../temp-ui';
 import { normalizeString } from '../../utils/helpers';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
-import { RenderTextMarkdownContent } from '../home/homedrawer/constants';
+import { RenderTextMarkdownContent } from '../home/homedrawer/components';
 import { style } from './styles';
 
 const SeparatorListFriend = () => {
