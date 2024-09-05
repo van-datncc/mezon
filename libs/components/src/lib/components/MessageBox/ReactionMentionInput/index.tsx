@@ -537,11 +537,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [currentChannelId, currentDmGroupId]);
 
 	useEffect(() => {
-		if (isFocused) {
+		if (isFocused || attachmentFilteredByChannelId?.files.length > 0) {
 			editorRef.current?.focus();
 			dispatch(messagesActions.setIsFocused(false));
 		}
-	}, [dispatch, isFocused]);
+	}, [dispatch, isFocused, attachmentFilteredByChannelId?.files]);
 
 	const [mentionWidth, setMentionWidth] = useState('');
 	const [chatBoxMaxWidth, setChatBoxMaxWidth] = useState('');
