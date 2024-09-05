@@ -1,28 +1,32 @@
 import { useAuth, useEscapeKey } from '@mezon/core';
 import { channelsActions, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
-import { memo, useState } from 'react';
-import * as Icons from '../../../../../../../ui/src/lib/Icons';
+import React, { memo, useRef, useState } from 'react';
 import { AddMemRole } from '../Modal/addMemRoleModal';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
+import PermissionManage from './PermissionManage';
 import ListMemberPermission from './listMemberPermission';
 import ListRolePermission from './listRolePermission';
-import PermissionManage from './PermissionManage';
 export type PermissionsChannelProps = {
 	channel: IChannel;
 	openModalAdd: boolean;
-	setOpenModalAdd: React.Dispatch<React.SetStateAction<boolean>>
+	setOpenModalAdd: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const PermissionsChannel = (props: PermissionsChannelProps) => {
 	const { channel, openModalAdd, setOpenModalAdd } = props;
 	const [showAddMemRole, setShowAddMemRole] = useState(false);
-	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private === undefined);
+	const [valueToggleInit, setValueToggleInit] = useState(channel.channel_private !== undefined);
 	const [valueToggle, setValueToggle] = useState(valueToggleInit);
 	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+	const [permissionsListHasChanged, setPermissionsListHasChanged] = useState(false);
+	const saveTriggerRef = useRef<() => void | null>(null);
+	const resetTriggerRef = useRef<() => void | null>(null);
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
+
 	const handleToggle = () => {
 		setValueToggle(!valueToggle);
 	};
@@ -31,9 +35,12 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 		setSelectedRoleIds([]);
 		setSelectedUserIds([]);
 		setValueToggle(valueToggleInit);
+		if (resetTriggerRef.current) {
+			resetTriggerRef.current();
+		}
 	};
 
-	const handleSave = async () => {
+	const handleSaveChannelPrivateChanged = async () => {
 		setValueToggleInit(valueToggle);
 		const updatedUserIds = userProfile?.user?.id ? [...selectedUserIds, userProfile.user.id] : selectedUserIds;
 		await dispatch(
@@ -41,9 +48,18 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 				channel_id: channel.id,
 				channel_private: channel.channel_private || 0,
 				user_ids: updatedUserIds,
-				role_ids: selectedRoleIds,
-			}),
+				role_ids: selectedRoleIds
+			})
 		);
+	};
+
+	const handleSave = () => {
+		if (valueToggle !== valueToggleInit) {
+			handleSaveChannelPrivateChanged();
+		}
+		if (saveTriggerRef.current && permissionsListHasChanged) {
+			saveTriggerRef.current();
+		}
 	};
 
 	const openAddMemRoleModal = () => {
@@ -63,15 +79,19 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 		setSelectedRoleIds(newSelectedRoleIds);
 	};
 
-	useEscapeKey(openModalAdd ? closeAddMemRoleModal : () => {});
+	useEscapeKey(() => {
+		if (openModalAdd) {
+			closeAddMemRoleModal();
+		}
+	});
 
 	return (
 		<>
-			<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
+			<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] sbm:pb-7 sbm:px-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
 				<div className="dark:text-white text-[15px] text-black">
 					<HeaderModal name={channel.category_name} />
 					<div className="rounded-md overflow-hidden mt-4">
-						<div className="dark:bg-black bg-white flex justify-between items-start p-4">
+						<div className="dark:bg-bgTertiary bg-white flex justify-between items-start p-4">
 							<div>
 								<div className="inline-flex mb-2">
 									<Icons.LockIcon />
@@ -89,13 +109,13 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 									focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
 									 disabled:bg-slate-200 disabled:after:bg-slate-300"
 								type="checkbox"
-								checked={!valueToggle}
+								checked={valueToggle}
 								id="id-c01"
 								onChange={handleToggle}
 							/>
 						</div>
-						{!valueToggle && (
-							<div className="p-4 dark:bg-[#0B0B0B] bg-white">
+						{valueToggle && (
+							<div className="p-4 dark:bg-bgSecondary bg-white">
 								<div className="flex justify-between items-center pb-4">
 									<p className="uppercase font-bold text-xs">Who can access this channel?</p>
 									<button className="bg-[#155EEF] hover:bg-blue-500 px-4 py-1 rounded text-white" onClick={openAddMemRoleModal}>
@@ -120,9 +140,15 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 						)}
 					</div>
 					<hr className="border-t border-solid dark:border-gray-700 border-bgModifierHoverLight mt-10 mb-[30px]" />
-					<PermissionManage channelID={channel.id}/>
+					<PermissionManage
+						channelId={channel.id}
+						setIsShowSaveButton={setValueToggle}
+						setPermissionsListHasChanged={setPermissionsListHasChanged}
+						saveTriggerRef={saveTriggerRef}
+						resetTriggerRef={resetTriggerRef}
+					/>
 				</div>
-				{valueToggleInit !== valueToggle && (
+				{(valueToggleInit !== valueToggle || permissionsListHasChanged) && (
 					<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 				)}
 			</div>
@@ -144,21 +170,19 @@ export default PermissionsChannel;
 
 type HeaderModalProps = {
 	name?: string;
-}
+};
 
-const HeaderModal = memo(
-	(props: HeaderModalProps) => {
-		const { name = '' } = props;
-		return (
-			<>
-				<h3 className="mb-4 font-bold text-xl">Channel Permissions</h3>
-				<p className="mb-3">Use permissions to customise who can do what in this channel.</p>
-				<div className="flex mt-4 p-4">
-					<Icons.SyncIcon defaultFill="#F0B033" defaultSize="mr-2" />
-					<p>Permissions synced with category: </p>
-					<p className="font-bold pl-1"> {name}</p>
-				</div>
-			</>
-		)
-	}
-)
+const HeaderModal = memo((props: HeaderModalProps) => {
+	const { name = '' } = props;
+	return (
+		<>
+			<h3 className="mb-4 font-bold text-xl">Channel Permissions</h3>
+			<p className="mb-3">Use permissions to customise who can do what in this channel.</p>
+			<div className="flex mt-4 p-4">
+				<Icons.SyncIcon defaultFill="#F0B033" defaultSize="mr-2" />
+				<p>Permissions synced with category: </p>
+				<p className="font-bold pl-1"> {name}</p>
+			</div>
+		</>
+	);
+});
