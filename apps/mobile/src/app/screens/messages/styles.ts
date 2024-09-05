@@ -17,7 +17,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		headerTitle: {
-			fontSize: size.h6,
+			fontSize: size.s_18,
 			color: colors.textStrong
 		},
 
@@ -26,7 +26,7 @@ export const style = (colors: Attributes) =>
 			gap: size.s_8,
 			alignItems: 'center',
 			backgroundColor: colors.primary,
-			borderRadius: 20,
+			borderRadius: size.s_20,
 			borderWidth: 1,
 			borderColor: colors.border,
 			paddingHorizontal: size.s_10,
@@ -56,7 +56,8 @@ export const style = (colors: Attributes) =>
 			height: size.s_50,
 			color: colors.textStrong,
 			paddingVertical: size.s_6,
-			paddingHorizontal: size.s_12
+			paddingHorizontal: size.s_12,
+			fontSize: size.medium
 		},
 
 		statusTyping: {

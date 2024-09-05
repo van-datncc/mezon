@@ -16,7 +16,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     inlineText: {
-        fontSize: Fonts.size.h8,
+        fontSize: Fonts.size.small,
         color: colors.text
     },
 })
