@@ -27,7 +27,10 @@ export default function GifSelector({ onSelected, searchText, onScroll }: GifSel
 	const { valueInputToCheckHandleSearch, setValueInputSearch } = useGifsStickersEmoji();
 
 	useEffect(() => {
-		fetchGifsDataSearch(searchText);
+		if (searchText.length > 0) {
+			fetchGifsDataSearch(searchText);
+		}
+
 		setValueInputSearch(searchText);
 	}, [searchText]);
 
