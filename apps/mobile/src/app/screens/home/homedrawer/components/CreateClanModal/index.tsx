@@ -1,7 +1,7 @@
 import { useClans } from '@mezon/core';
 import { AddIcon, QUALITY_IMAGE_UPLOAD, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
+import { channelsActions, checkDuplicateNameClan, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { Image, Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback, View
 import RNFS from 'react-native-fs';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { IFile, MezonButton, MezonInput, MezonModal } from '../../../../../temp-ui';
 import { validInput } from '../../../../../utils/validate';
@@ -31,8 +32,16 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 	const { sessionRef, clientRef } = useMezon();
 	const { createClans } = useClans();
 	const handleCreateClan = async () => {
-		setIsSubmitting(true);
 		const store = await getStoreAsync();
+		const isDuplicate = await store.dispatch(checkDuplicateNameClan(nameClan.trim()));
+		if (isDuplicate) {
+			Toast.show({
+				type: 'error',
+				text1: t('duplicateNameMessage')
+			});
+			return;
+		}
+		setIsSubmitting(true);
 		createClans(nameClan?.trim?.(), urlImage)
 			.then(async (res) => {
 				if (res && res?.clan_id) {

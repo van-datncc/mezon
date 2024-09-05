@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
-import { Colors, baseColor, size, useAnimatedState, useTheme } from '@mezon/mobile-ui';
+import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import {
 	MessagesEntity,
@@ -37,13 +37,13 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { userProfile } = useAuth();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '', isPublic = false  } = props;
+	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '', isPublic = false } = props;
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
 	const { t } = useTranslation(['message']);
 	const { reactionMessageDispatch } = useChatReaction();
-	const [isShowEmojiPicker, setIsShowEmojiPicker] = useAnimatedState(false);
+	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
 
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -385,7 +385,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			1,
 			senderId ?? '',
 			false,
-			currentDmId ? false : isPublic
+			true
 		);
 		onClose();
 	};
@@ -509,5 +509,14 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		}
 	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
 
-	return <View style={styles.bottomSheetWrapper}>{content}</View>;
+	return (
+		<View
+			style={[
+				styles.bottomSheetWrapper,
+				{ backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }
+			]}
+		>
+			{content}
+		</View>
+	);
 });
