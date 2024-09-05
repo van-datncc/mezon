@@ -29,6 +29,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 			newMessageIdUpdateImage?: string,
 			messageEdit?: IMessageWithUser
 		) => {
+			console.log('messageEdit', messageEdit);
 			if (!contentPayload?.lk && messageEdit?.attachments && messageEdit?.attachments?.length > 0) {
 				const filteredAttachments =
 					messageEdit?.attachments?.filter(
@@ -36,9 +37,11 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 							attachment.url &&
 							attachment?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
 							!attachment.url.startsWith('https://cdn.mezon.vn') &&
+							!attachment.url.startsWith('blob:') &&
 							contentPayload?.t &&
 							!contentPayload.t.includes(attachment.url)
 					) ?? [];
+				console.log('filteredAttachments', filteredAttachments);
 				const finalAttachments = messageEdit?.attachments?.filter((attachment) => !filteredAttachments.includes(attachment));
 				if (messageEdit?.attachments && messageEdit?.attachments?.length > 0) {
 					updateImageLinkMessage(
@@ -50,7 +53,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 						mentionPayload ?? [],
 						finalAttachments,
 						undefined,
-						true
+						false
 					);
 				}
 			} else if (contentPayload?.lk) {
@@ -79,7 +82,7 @@ export function useProcessLink({ updateImageLinkMessage }: UseProcessLinkOptions
 								mentionPayload ?? [],
 								combinedAttachments,
 								undefined,
-								!messageEdit ? false : true
+								messageEdit ? false : true
 							);
 						}
 					})

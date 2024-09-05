@@ -732,6 +732,8 @@ export type MessageTypeUpdateLink = {
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
 	isMe?: boolean;
+	code?: number;
+	attachments?: ApiMessageAttachment[];
 };
 
 export type RequestInput = {
