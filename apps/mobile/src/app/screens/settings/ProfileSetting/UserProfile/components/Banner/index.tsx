@@ -70,8 +70,8 @@ export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBa
 			<View style={styles.avatarContainer}>
 				<MezonImagePicker
 					ref={avatarPickerRef}
-					width={100}
-					height={100}
+					width={size.s_100}
+					height={size.s_100}
 					defaultValue={avatar || ''}
 					alt={alt}
 					rounded

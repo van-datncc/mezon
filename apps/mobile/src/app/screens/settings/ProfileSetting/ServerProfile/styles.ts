@@ -28,8 +28,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
     clanAvatarWrapper: {
         borderRadius: size.s_10,
         overflow: 'hidden',
-        width: 40,
-        height: 40
+        width: size.s_40,
+        height: size.s_40
     },
     avatar: {
         height: size.s_30,

@@ -24,7 +24,7 @@ export const style = (colors: Attributes) =>
 
 		sectionTitle: {
 			color: colors.textStrong,
-			fontSize: 11,
+			fontSize: Fonts.size.small,
 			fontWeight: '600',
 			marginBottom: Fonts.size.s_10,
 		},

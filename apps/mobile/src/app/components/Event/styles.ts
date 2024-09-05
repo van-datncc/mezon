@@ -40,6 +40,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     sectionTitle: {
         textAlign: "center",
         color: colors.textStrong,
+        fontSize: Fonts.size.medium,
         fontWeight: "bold",
         flexGrow: 1,
         flexBasis: 10

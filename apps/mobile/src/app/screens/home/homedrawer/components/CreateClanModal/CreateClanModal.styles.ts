@@ -5,7 +5,7 @@ import { transparent } from 'tailwindcss/colors';
 export const style = (colors: Attributes) => StyleSheet.create({
 	headerModal: { backgroundColor: transparent },
 	input: {
-		height: 40,
+		height: size.s_40,
 		padding: 10,
 		backgroundColor: Colors.charcoalBlack,
 		borderRadius: 8,
@@ -17,7 +17,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		height: '100%',
 	},
 	headerTitle: {
-		fontSize: size.h5,
+		fontSize: size.s_20,
 		fontWeight: '700',
 		color: colors.textStrong,
 		textAlign: 'center',
@@ -32,12 +32,12 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 
 	uploadImage: {
-		width: 100,
-		height: 100,
+		width: size.s_100,
+		height: size.s_100,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		borderRadius: 50,
+		borderRadius: size.s_50,
 		borderStyle: 'dashed',
 		borderColor: colors.borderRadio,
 		borderWidth: 1,
@@ -79,7 +79,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	button: {
 		width: '100%',
-		height: 40,
+		height: size.s_40,
 		backgroundColor: Colors.bgButton,
 		borderRadius: 50,
 		display: 'flex',

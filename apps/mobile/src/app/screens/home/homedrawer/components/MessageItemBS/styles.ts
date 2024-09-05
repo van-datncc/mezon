@@ -55,9 +55,11 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	actionText: {
 		color: colors.text,
+		fontSize: size.medium
 	},
 	warningActionText: {
 		color: Colors.textRed,
+		fontSize: size.medium
 	},
 	actionIcon: {
 		color: Colors.white,

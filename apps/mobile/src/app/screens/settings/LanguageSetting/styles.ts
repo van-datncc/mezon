@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     optionText: {
-        color: Colors.textGray
+        color: Colors.textGray,
+        fontSize: size.medium
     }
 })

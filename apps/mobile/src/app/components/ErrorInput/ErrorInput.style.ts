@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
   },
   errorWrapper: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: size.s_6,
     marginVertical: size.s_6,
   }
