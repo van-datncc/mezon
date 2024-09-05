@@ -64,20 +64,16 @@ type ElementToken =
 export const createFormattedString = (data: IExtendedMessage): string => {
 	const { t = '' } = data;
 	const elements: ElementToken[] = (Object.keys(data) as (keyof IExtendedMessage)[])
-
 		.flatMap((key) => (Array.isArray(data[key]) ? data[key].map((item) => item && { ...item, kindOf: key }) : []))
 		.filter(Boolean) as ElementToken[];
-
 	elements?.sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
-
 	let result = '';
 	let lastIndex = 0;
 
-	elements.forEach((element) => {
+	elements?.forEach((element) => {
 		const startindex = element.s ?? lastIndex;
 		const endindex = element.e ?? startindex;
 		result += t.slice(lastIndex, startindex);
-
 		const contentInElement = t.substring(startindex, endindex);
 
 		switch (element.kindOf) {
