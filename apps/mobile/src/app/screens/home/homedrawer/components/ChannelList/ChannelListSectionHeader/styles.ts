@@ -12,6 +12,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     channelListHeaderItem: {
         flexDirection: 'row',
         alignItems: 'center',
+        flex: 1,
     },
 
     channelListHeaderItemTitle: {
@@ -19,12 +20,12 @@ export const style = (colors: Attributes) => StyleSheet.create({
         fontSize: size.s_14,
         fontWeight: 'bold',
         color: colors.text,
-        flexBasis: '75%'
     },
 
     sortButton: {
         paddingHorizontal: size.s_14,
         paddingTop: size.s_8,
         paddingBottom: size.s_6,
+        marginLeft: 'auto'
     }
 })
