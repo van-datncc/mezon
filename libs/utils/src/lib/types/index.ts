@@ -772,7 +772,6 @@ export enum ENotificationTypes {
 
 export type PreSendAttachment = {
 	channelId?: string;
-	messageId?: string;
 	mode?: string;
 	clan_id?: string;
 	files: ApiMessageAttachment[];

@@ -1,6 +1,6 @@
 import { directActions, messagesActions, selectDirectById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { handleUploadFile, useMezon } from '@mezon/transport';
+import { IMessageSendPayload, fetchAndCreateFiles } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -44,7 +44,29 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.writeChatMessage('0', channel.id, mode, !channel.channel_private, content, mentions, attachments, references, false, false);
+			let uploadedFiles: ApiMessageAttachment[] = [];
+			if (attachments && attachments.length > 0) {
+				const createdFiles = await fetchAndCreateFiles(attachments);
+
+				const uploadPromises = createdFiles.map((file) => {
+					return handleUploadFile(client, session, '0', channel.id, file.name, file);
+				});
+
+				uploadedFiles = await Promise.all(uploadPromises);
+			}
+
+			await socket.writeChatMessage(
+				'0',
+				channel.id,
+				mode,
+				!channel.channel_private,
+				content,
+				mentions,
+				uploadedFiles,
+				references,
+				false,
+				false
+			);
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
 			if (lastMessage) {
@@ -82,6 +104,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 		setMentionPayload([]);
 		setAttachmentPayload([]);
 	}, [newMessageUpdateImage.message_id]);
+
 	return useMemo(
 		() => ({
 			client,
