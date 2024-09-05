@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth } from '@mezon/core';
 import { CheckIcon, Icons } from '@mezon/mobile-components';
-import { Text, useTheme } from '@mezon/mobile-ui';
+import { size, Text, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -101,7 +101,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 				<View style={{ flex: 1 }}>
 					<Text style={styles.clanName}>{selectedClan?.clan_name}</Text>
 				</View>
-				<Icons.ChevronSmallRightIcon height={15} width={15} color={themeValue.text} />
+				<Icons.ChevronSmallRightIcon height={size.s_15} width={size.s_15} color={themeValue.text} />
 			</TouchableOpacity>
 
 			<BannerAvatar
@@ -113,7 +113,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => onPressHashtag()} style={styles.btnIcon}>
-					<Icons.TextIcon width={16} height={16} />
+					<Icons.TextIcon width={size.s_16} height={size.s_16} />
 				</TouchableOpacity>
 			</View>
 

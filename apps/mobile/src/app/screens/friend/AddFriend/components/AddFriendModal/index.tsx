@@ -158,7 +158,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 								disabled={!requestAddFriend.usernames[0]?.length}
 								onPress={() => sentFriendRequest()}
 								viewContainerStyle={styles.sendButton}
-								textStyle={{ color: baseColor.white }}
+								textStyle={{ color: baseColor.white, fontSize: size.medium }}
 							>
 								{t('addFriend.sendRequestButton')}
 							</MezonButton>

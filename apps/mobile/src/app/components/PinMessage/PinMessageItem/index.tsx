@@ -2,7 +2,7 @@ import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { PinMessageEntity } from '@mezon/store-mobile';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/constants/markdown';
+import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
 import { style } from './PinMessageItem.styles';
 import { IExtendedMessage } from '@mezon/utils';

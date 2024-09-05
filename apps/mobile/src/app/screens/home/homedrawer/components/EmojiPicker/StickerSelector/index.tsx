@@ -6,7 +6,6 @@ import { TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import Sticker from './Sticker';
-import { mockCategoryLogo, mockStickers } from './StickerMockData';
 import styles from './styles';
 
 type StickerSelectorProps = {
@@ -24,8 +23,7 @@ export default function StickerSelector({ onSelected, onScroll }: StickerSelecto
 		...(modeResponsive === ModeResponsive.MODE_CLAN
 			? [{ id: 0, url: currentClan?.logo, type: 'custom' }]
 			: []),
-		...mockCategoryLogo,
-	].filter(Boolean)), [modeResponsive, mockCategoryLogo, currentClan?.logo])
+	].filter(Boolean)), [modeResponsive, currentClan?.logo])
 
 	const stickers = useMemo(() => ([
 		...(modeResponsive === ModeResponsive.MODE_CLAN
@@ -35,8 +33,7 @@ export default function StickerSelector({ onSelected, onScroll }: StickerSelecto
 				type: 'custom',
 			}))
 			: []),
-		...mockStickers,
-	].filter(Boolean)), [modeResponsive, mockStickers, clanStickers]);
+	].filter(Boolean)), [modeResponsive, clanStickers]);
 
 	function handlePressCategory(name: string) {
 		setSelectedType(name);

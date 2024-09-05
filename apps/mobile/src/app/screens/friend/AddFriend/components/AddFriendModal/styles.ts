@@ -13,7 +13,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
     searchInput: {
         borderRadius: size.s_10,
         color: colors.textStrong,
-        paddingVertical: size.s_12
+        paddingVertical: size.s_12,
+        fontSize: size.medium,
     },
     searchUsernameWrapper: {
         backgroundColor: colors.secondary,
@@ -32,7 +33,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
     defaultText: {
         color: colors.text,
-        paddingVertical: size.s_14
+        paddingVertical: size.s_14,
+        fontSize: size.medium,
     },
     byTheWayText: {
         flexDirection: 'row',
