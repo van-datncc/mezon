@@ -237,7 +237,7 @@ function MemberProfile({
                   ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
-                  ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-[#AEAEAE] text-colorTextLightMode'}
+                  ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}
 							    `}
 									title={name}
 								>
@@ -256,7 +256,7 @@ function MemberProfile({
 							</div>
 							{customStatus && (isMemberChannel || isMemberDMGroup) && (
 								<p
-									className="dark:text-contentTertiary text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] "
+									className="dark:text-channelTextLabel text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] "
 									title={customStatus}
 								>
 									{customStatus}
@@ -266,7 +266,7 @@ function MemberProfile({
 					)}
 
 					{Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<p className="dark:text-[#AEAEAE] text-colorTextLightMode text-xs">{countMember} Members</p>
+						<p className="dark:text-channelTextLabel text-colorTextLightMode text-xs">{countMember} Members</p>
 					)}
 				</div>
 			</div>

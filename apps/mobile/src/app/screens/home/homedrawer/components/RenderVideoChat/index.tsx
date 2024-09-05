@@ -6,6 +6,8 @@ import { View } from 'react-native';
 const widthMedia = Metrics.screenWidth - 150;
 export const RenderVideoChat = React.memo(
 	({ videoURL }: { videoURL: string }) => {
+		if (!videoURL) return null;
+		
 		return (
 			<View
 				style={{

@@ -39,7 +39,7 @@ export const Events = () => {
 							<Icons.IconEvents />
 						</div>
 					</div>
-					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">
+					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">
 						{numberEventManagement === 0 && 'Events'}
 						{numberEventManagement === 1 && '1 Event'}
 						{numberEventManagement > 1 && `${numberEventManagement} Events`}
@@ -59,10 +59,10 @@ export const Events = () => {
 				<div className="grow w-5 flex-row items-center gap-2 flex">
 					<div className="w-5 h-5 relative flex flex-row items-center">
 						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-							<Icons.MemberList defaultSize="w-5 h-5" />
+							<Icons.MemberList defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 						</div>
 					</div>
-					<div className="w-[99px] dark:text-zinc-400 text-colorTextLightMode text-base font-medium">Members</div>
+					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Members</div>
 				</div>
 			</Link>
 			{showModal && <EventModal onClose={closeModal} numberEventManagement={numberEventManagement} />}
