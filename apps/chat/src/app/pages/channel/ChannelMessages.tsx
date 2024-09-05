@@ -36,6 +36,7 @@ type ChannelMessagesProps = {
 export default function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mode }: ChannelMessagesProps) {
 	const messages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
 	const chatRef = useRef<HTMLDivElement | null>(null);
+	const anchorRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const firstMessageId = useAppSelector((state) => selectFirstMessageId(state, channelId));
@@ -47,6 +48,13 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 	const [shouldRenderLoadingBlock, setShouldRenderLoadingBlock] = useState<boolean>(false);
+
+	const onChatRender = useCallback((node: HTMLDivElement | null) => {
+		chatRef.current = node;
+		if (node) {
+			node.scrollTop = node.scrollHeight;
+		}
+	}, []);
 
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -91,7 +99,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
-	const chatScrollRef = useChatScroll(chatRef, chatRefData, loadMoreMessage);
+	const chatScrollRef = useChatScroll(chatRef, anchorRef, chatRefData, loadMoreMessage);
 
 	const messagesView = useMemo(() => {
 		return messages.map((message) => {
@@ -124,7 +132,7 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	// Jump to present when user is jumping to present
 	useEffect(() => {
 		if (isJumpingToPresent) {
-			chatScrollRef.scrollToBottom().then(() => {
+			chatScrollRef.scrollToAnchor().then(() => {
 				dispatch(messagesActions.setIsJumpingToPresent(false));
 			});
 		}
@@ -175,22 +183,20 @@ export default function ChannelMessages({ channelId, channelLabel, type, avatarD
 	return (
 		<MessageContextMenuProvider>
 			<div
-				className={classNames(
-					'dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full md:[overflow-anchor:none]',
-					{
-						customScrollLightMode: appearanceTheme === 'light'
-					}
-				)}
+				className={classNames('dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full', {
+					customScrollLightMode: appearanceTheme === 'light'
+				})}
 				id="scrollLoading"
-				ref={chatRef}
+				ref={onChatRender}
 			>
-				<div className="flex flex-col min-h-full justify-end md:[overflow-anchor:none]">
+				<div className="flex flex-col min-h-full justify-end">
 					{shouldRenderLoadingBlock && isFetching && (
 						<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
 					)}
 					{messagesView}
 					{openModalAttachment && <MessageModalImage />}
 				</div>
+				<div ref={anchorRef} className="anchor"></div>
 			</div>
 		</MessageContextMenuProvider>
 	);

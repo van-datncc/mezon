@@ -1,7 +1,5 @@
-import { useTheme } from '@mezon/mobile-ui';
-import {
-	ChevronSmallRightIcon,
-} from 'libs/mobile-components/src/lib/icons2';
+import { size, useTheme } from '@mezon/mobile-ui';
+import { ChevronSmallRightIcon } from 'libs/mobile-components/src/lib/icons2';
 import { ReactNode } from 'react';
 import { StyleProp, Text, TextStyle, TouchableOpacity, View } from 'react-native';
 import { style } from './styles';
@@ -30,7 +28,7 @@ export default function MezonMenuItem({
 	disabled = false,
 	description,
 	isShow = true,
-	previewValue,
+	previewValue
 }: IMezonMenuItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -52,7 +50,7 @@ export default function MezonMenuItem({
 					</View>
 					{component}
 					{previewValue && <Text style={styles.previewValue}>{previewValue}</Text>}
-					{expandable && <ChevronSmallRightIcon height={18} width={18} color={themeValue.text} />}
+					{expandable && <ChevronSmallRightIcon height={size.s_18} width={size.s_18} color={themeValue.text} />}
 				</View>
 			</TouchableOpacity>
 		)
