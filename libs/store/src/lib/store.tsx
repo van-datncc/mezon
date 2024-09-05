@@ -216,7 +216,8 @@ const persistedNotiReactMsgReducer = persistReducer(
 const persistedGifsStickerEmojiReducer = persistReducer(
 	{
 		key: 'gifsstickersemojis',
-		storage
+		storage,
+		blacklist: ['subPanelActive']
 	},
 	gifsStickerEmojiReducer
 );
