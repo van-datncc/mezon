@@ -49,6 +49,7 @@ import { toastListenerMiddleware } from './toasts/toasts.listener';
 import { TOASTS_FEATURE_KEY, toastsReducer } from './toasts/toasts.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
+import {systemMessageReducer} from "./systemMessages/systemMessage.slide";
 const persistedReducer = persistReducer(
 	{
 		key: 'auth',
@@ -277,7 +278,8 @@ const reducer = {
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
 	settingSticker: settingStickerReducer,
-	adminApplication: adminApplicationReducer
+	adminApplication: adminApplicationReducer,
+	systemMessages: systemMessageReducer
 };
 
 let storeInstance = configureStore({

@@ -12,8 +12,8 @@ export interface GifEntity extends IGif {
 }
 
 export interface GifCategoriesResponse {
-	locale: string,
-	tags: GifCategoriesEntity[],
+	locale: string;
+	tags: GifCategoriesEntity[];
 }
 
 export const gifsAdapter = createEntityAdapter<GifCategoriesEntity>({

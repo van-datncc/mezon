@@ -44,7 +44,7 @@ export const MezonModal = (props: IMezonModalProps) => {
 		visibleBackButton = false,
 		rightBtnText,
 		onClickRightBtn,
-		containerStyle,
+		containerStyle
 	} = props;
 
 	const setVisible = (value: boolean) => {
@@ -71,20 +71,20 @@ export const MezonModal = (props: IMezonModalProps) => {
 							<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 								{visibleBackButton ? (
 									<Pressable onPress={() => onBack && onBack()}>
-										<ArrowLeftIcon height={size.s_20} width={size.s_20}/>
+										<ArrowLeftIcon height={size.s_20} width={size.s_20} />
 									</Pressable>
 								) : (
 									<View />
 								)}
 								<Pressable onPress={() => setVisible(false)}>
-									<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24}/>
+									<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24} />
 								</Pressable>
 							</View>
 						) : (
 							<View style={[styles.headerWrapper, isEmptyHeader && styles.bgDefault, headerStyles]}>
 								<View style={styles.headerContent}>
 									<Pressable onPress={() => setVisible(false)}>
-										<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24}/>
+										<Icons.CloseIcon color={themeValue.textStrong} height={size.s_24} width={size.s_24} />
 									</Pressable>
 									{isTitleString ? (
 										<Text style={[styles.textTitle, titleStyle]}>{title}</Text>

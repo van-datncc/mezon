@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth } from '@mezon/core';
 import { CheckIcon, Icons } from '@mezon/mobile-components';
-import { size, Text, useTheme } from '@mezon/mobile-ui';
+import { Text, size, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +40,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 	const onPressHashtag = () => {
 		Toast.show({
 			type: 'info',
-			text1: 'Original known as ' + userProfile?.user?.username + '#' + userId,
+			text1: 'Original known as ' + userProfile?.user?.username + '#' + userId
 		});
 	};
 
@@ -61,14 +61,14 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 			[
 				{
 					text: t('changedAlert.keepEditing'),
-					style: 'cancel',
+					style: 'cancel'
 				},
 				{
 					text: t('changedAlert.discard'),
-					onPress: () => setSelectedClan(clan),
-				},
+					onPress: () => setSelectedClan(clan)
+				}
 			],
-			{ cancelable: false },
+			{ cancelable: false }
 		);
 	};
 
@@ -108,7 +108,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 				avatar={clanProfileValue?.imgUrl}
 				alt={clanProfileValue?.username}
 				onLoad={handleAvatarChange}
-				defaultAvatar={userProfile?.user?.avatar_url || ""}
+				defaultAvatar={userProfile?.user?.avatar_url || ''}
 			/>
 
 			<View style={styles.btnGroup}>
