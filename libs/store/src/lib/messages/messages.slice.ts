@@ -24,7 +24,6 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
-	isAnyOf,
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -99,7 +98,7 @@ export interface MessagesState {
 	isFocused: boolean;
 	idMessageToJump: string;
 	channelDraftMessage: Record<string, ChannelDraftMessages>;
-	isJumpingToPresent: boolean;
+	isJumpingToPresent: Record<string, boolean>;
 	channelMessages: Record<
 		string,
 		EntityState<MessagesEntity, string> & {
@@ -259,7 +258,7 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		if (isFetchingLatestMessages) {
-			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent(true));
+			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 		}
 
@@ -287,7 +286,7 @@ export const loadMoreMessage = createAsyncThunk(
 			// - loading
 			// - already have message to jump to
 			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
-			if ((state.isJumpingToPresent && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
+			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
 				return;
 			}
 
@@ -614,7 +613,7 @@ export const initialMessagesState: MessagesState = {
 	channelDraftMessage: {},
 	isFocused: false,
 	isViewingOlderMessagesByChannelId: {},
-	isJumpingToPresent: false,
+	isJumpingToPresent: {},
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' }
 };
@@ -842,8 +841,8 @@ export const messagesSlice = createSlice({
 		deleteChannelDraftMessage(state, action: PayloadAction<{ channelId: string }>) {
 			delete state.channelDraftMessage[action.payload.channelId];
 		},
-		setIsJumpingToPresent(state, action: PayloadAction<boolean>) {
-			state.isJumpingToPresent = action.payload;
+		setIsJumpingToPresent(state, action: PayloadAction<{ channelId: string; status: boolean }>) {
+			state.isJumpingToPresent[action.payload.channelId] = action.payload.status;
 		},
 		updateUserMessage: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;
@@ -905,14 +904,17 @@ export const messagesSlice = createSlice({
 						adapterPayload: reversedMessages,
 						direction
 					});
+					state.isJumpingToPresent[channelId] = true;
 				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			})
-			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state) => {
-				state.isJumpingToPresent = true;
+				const channelId = action?.meta?.arg?.channelId;
+				if (!state.isJumpingToPresent) {
+					state.isJumpingToPresent = {};
+				}
+				state.isJumpingToPresent[channelId] = true;
 			});
 	}
 });
@@ -1184,7 +1186,7 @@ export const selectIsMessageIdExist = (channelId: string, messageId: string) =>
 		return Boolean(state.channelMessages[channelId]?.entities[messageId]);
 	});
 
-export const selectIsJumpingToPresent = createSelector(getMessagesState, (state) => state.isJumpingToPresent);
+export const selectIsJumpingToPresent = (channelId: string) => createSelector(getMessagesState, (state) => state.isJumpingToPresent[channelId]);
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
 export const selectNewMesssageUpdateImage = createSelector(getMessagesState, (state: MessagesState) => state.newMesssageUpdateImage);
