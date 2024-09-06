@@ -5,7 +5,7 @@ import {
 	getUpdateOrAddClanChannelCache,
 	load,
 	save,
-	setDefaultChannelLoader,
+	setDefaultChannelLoader
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
@@ -28,14 +28,14 @@ export const checkNotificationPermission = async () => {
 		Alert.alert('Notification Permission', 'Notifications are disabled. Please enable them in settings.', [
 			{
 				text: 'Cancel',
-				style: 'cancel',
+				style: 'cancel'
 			},
 			{
 				text: 'OK',
 				onPress: () => {
 					openAppSettings();
-				},
-			},
+				}
+			}
 		]);
 	} else if (
 		authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -54,14 +54,14 @@ const requestNotificationPermission = async () => {
 		Alert.alert('Notification Permission', 'Notification permission denied.', [
 			{
 				text: 'Cancel',
-				style: 'cancel',
+				style: 'cancel'
 			},
 			{
 				text: 'OK',
 				onPress: () => {
 					openAppSettings();
-				},
-			},
+				}
+			}
 		]);
 	}
 };
@@ -77,7 +77,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 	try {
 		const channelId = await notifee.createChannel({
 			id: 'default',
-			name: 'mezon',
+			name: 'mezon'
 		});
 		await notifee.displayNotification({
 			title: title || '',
@@ -90,8 +90,8 @@ export const createLocalNotification = async (title: string, body: string, data:
 				color: '#000000',
 				sound: 'default',
 				pressAction: {
-					id: 'default',
-				},
+					id: 'default'
+				}
 			},
 			ios: {
 				critical: true,
@@ -101,9 +101,9 @@ export const createLocalNotification = async (title: string, body: string, data:
 					badge: true,
 					banner: true,
 					list: true,
-					sound: true,
-				},
-			},
+					sound: true
+				}
+			}
 		});
 	} catch (err) {
 		console.log('err', err);
@@ -173,7 +173,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 					await Promise.all([
 						store.dispatch(clansActions.joinClan({ clanId: clanId })),
 						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
-						store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
+						store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }))
 					]);
 				};
 				await joinAndChangeClan(store, clanId);
@@ -196,7 +196,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				if (navigation) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 						screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-						params: { directMessageId: messageId },
+						params: { directMessageId: messageId }
 					});
 				}
 				store.dispatch(appActions.setLoadingMainMobile(false));
@@ -205,7 +205,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 					const joinChangeFetchAndSetLoader = async (store: any, clanIdCache: string) => {
 						const [respCurrentClan, respChannel] = await Promise.all([
 							store.dispatch(clansActions.changeCurrentClan({ clanId: clanIdCache, noCache: true, isNotSetCurrentClanId: true })),
-							store.dispatch(channelsActions.fetchChannels({ clanId: clanIdCache, noCache: true })),
+							store.dispatch(channelsActions.fetchChannels({ clanId: clanIdCache, noCache: true }))
 						]);
 
 						await setDefaultChannelLoader(respChannel.payload, clanIdCache);
@@ -251,7 +251,7 @@ export const setupNotificationListeners = async (navigation) => {
 	await notifee.createChannel({
 		id: 'default',
 		name: 'mezon',
-		importance: AndroidImportance.HIGH,
+		importance: AndroidImportance.HIGH
 	});
 
 	if (IS_ANDROID) {
@@ -268,7 +268,7 @@ export const setupNotificationListeners = async (navigation) => {
 						processNotification({
 							notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 							navigation,
-							time: 600,
+							time: 600
 						});
 					}
 				}
@@ -279,7 +279,7 @@ export const setupNotificationListeners = async (navigation) => {
 		processNotification({
 			notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
 			navigation,
-			time: 0,
+			time: 0
 		});
 	});
 
@@ -296,7 +296,7 @@ export const setupNotificationListeners = async (navigation) => {
 			case EventType.PRESS:
 				processNotification({
 					notification: detail.notification,
-					navigation,
+					navigation
 				});
 				console.log('User pressed notification', detail.notification);
 

@@ -1,6 +1,6 @@
-import { AttachmentLoading, AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
+import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
 import { useReference } from '@mezon/core';
-import { referencesActions, selectCloseMenu, selectStatusLoadingAttachment, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -30,7 +30,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 	const dispatch = useAppDispatch();
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
-	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
 	const appearanceTheme = useSelector(selectTheme);
 
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
@@ -114,7 +113,6 @@ function MessageBox(props: MessageBoxProps): ReactElement {
 								</Fragment>
 							);
 						})}
-						{statusLoadingAttachment && <AttachmentLoading />}
 					</div>
 				</div>
 			)}

@@ -640,7 +640,7 @@ export const messagesSlice = createSlice({
 		setFirstMessageId: (state, action: PayloadAction<{ channelId: string; firstMessageId: string }>) => {
 			state.firstMessageId[action.payload.channelId] = action.payload.firstMessageId;
 		},
-		setChannelIdLastFetch: (state, action: PayloadAction<{ channelId: string; }>) => {
+		setChannelIdLastFetch: (state, action: PayloadAction<{ channelId: string }>) => {
 			state.channelIdLastFetch = action.payload.channelId;
 		},
 		setIdMessageToJump(state, action) {
@@ -906,7 +906,8 @@ export const messagesSlice = createSlice({
 						adapterPayload: reversedMessages,
 						direction
 					});
-					state.isJumpingToPresent[channelId] = true;
+
+					if (Object.prototype.toString.call(state.isJumpingToPresent) === '[object Object]') state.isJumpingToPresent[channelId] = true;
 				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {

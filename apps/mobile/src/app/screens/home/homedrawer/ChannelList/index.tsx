@@ -4,7 +4,6 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllEventManagement } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
@@ -157,9 +156,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					data={categorizedChannels || []}
 					keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
 					renderItem={renderItemChannelList}
-					getItemLayout={(data, index) => (
-						{length: 40, offset: 40 * index, index}
-					)}
+					getItemLayout={(data, index) => ({ length: 40, offset: 40 * index, index })}
 				/>
 			</View>
 

@@ -1,10 +1,10 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useDirectMessages, useGifsStickersEmoji } from '@mezon/core';
-import { RootState, selectIdMessageRefReply } from '@mezon/store';
-import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';
+import { useDirectMessages, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
+import { RootState, referencesActions, selectDataReferences } from '@mezon/store';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
 interface DirectIdProps {
@@ -18,7 +18,8 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const messageBox = useRef<HTMLDivElement>(null);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply(directParamId));
+	const dataReferences = useSelector(selectDataReferences(directParamId ?? ''));
+	const dispatch = useDispatch();
 
 	const setMarginleft = useMemo(() => {
 		if (messageBox?.current?.getBoundingClientRect()) {
@@ -59,7 +60,16 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 
 		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
+	const handleCloseReplyMessageBox = () => {
+		dispatch(
+			referencesActions.setDataReferences({
+				channelId: directParamId,
+				dataReferences: blankReferenceObj
+			})
+		);
+	};
 
+	useEscapeKey(handleCloseReplyMessageBox);
 	return (
 		<div className="mx-2 relative " role="button" ref={messageBox}>
 			{isEmojiOnChat && (
@@ -77,7 +87,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
-			{idMessageRefReply && <ReplyMessageBox channelId={directParamId} idMessage={idMessageRefReply} />}
+			{dataReferences.message_ref_id && <ReplyMessageBox channelId={directParamId} dataReferences={dataReferences} />}
 			<MessageBox
 				onSend={handleSend}
 				currentChannelId={directParamId}

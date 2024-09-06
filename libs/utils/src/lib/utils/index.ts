@@ -10,7 +10,7 @@ import {
 	startOfDay,
 	subDays
 } from 'date-fns';
-import { ApiMessageAttachment, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageRef, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
@@ -668,3 +668,19 @@ export async function fetchAndCreateFiles(fileData: ApiMessageAttachment[] | nul
 
 	return createdFiles;
 }
+
+export const blankReferenceObj: ApiMessageRef = {
+	message_id: '',
+	message_ref_id: '',
+	ref_type: 0,
+	message_sender_id: '',
+	message_sender_username: '',
+	mesages_sender_avatar: '',
+	message_sender_clan_nick: '',
+	message_sender_display_name: '',
+	content: '',
+	has_attachment: false,
+	channel_id: '',
+	mode: 0,
+	channel_label: ''
+};
