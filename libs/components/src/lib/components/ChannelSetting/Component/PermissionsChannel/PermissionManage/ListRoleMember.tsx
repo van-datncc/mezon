@@ -8,7 +8,7 @@ import {
 	UsersClanEntity
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { EVERYONE_ROLE_ID, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../../AvatarImage/AvatarImage';
@@ -25,8 +25,9 @@ type ListRoleMemberProps = {
 
 const ListRoleMember = memo((props: ListRoleMemberProps) => {
 	const { listManageInChannel, usersClan, channelId, onSelect, canChange, listManageNotInChannel } = props;
-	const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+	const [selectedItemId, setSelectedItemId] = useState<string | null>(EVERYONE_ROLE_ID);
 	const dispatch = useAppDispatch();
+
 	useEffect(() => {
 		if (listManageInChannel.length > 0) {
 			setSelectedItemId(listManageInChannel[0].id);
