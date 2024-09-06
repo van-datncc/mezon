@@ -50,20 +50,21 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		// borderWidth: 0.4,
 		// borderColor: Colors.gray48
 	},
-
+	
 	channelDotWrapper: {
-		backgroundColor: baseColor.red,
-		height: 20,
-		width: 20,
-		display: "flex",
-		justifyContent: "center",
-		alignItems: "center",
-		borderRadius: 10,
+		backgroundColor: baseColor.redStrong,
+		height: size.s_18,
+		width: size.s_18,
+		right: size.s_18,
+		justifyContent: 'center',
+		alignItems: 'center',
+		borderRadius: size.s_18,
 	},
-
+	
 	channelDot: {
 		color: baseColor.white,
-		fontSize: Fonts.size.h8,
+		fontSize: size.s_10,
+		fontWeight: 'bold',
 	},
 	
 	

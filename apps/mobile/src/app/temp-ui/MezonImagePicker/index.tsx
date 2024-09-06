@@ -1,5 +1,5 @@
 import { Icons, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
@@ -186,7 +186,7 @@ export default memo(forwardRef(function MezonImagePicker({
 							penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right },
 						]}
 					>
-						<Icons.PencilIcon height={12} width={12} color={themeValue.text} />
+						<Icons.PencilIcon height={size.s_12} width={size.s_12} color={themeValue.text} />
 					</View>
 				)}
 			</View>

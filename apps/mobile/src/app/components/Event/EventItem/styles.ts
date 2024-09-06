@@ -43,9 +43,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
     },
 
     avatar: {
-        width: 20,
-        height: 20,
-        borderRadius: 10,
+        width: Fonts.size.s_20,
+        height: Fonts.size.s_20,
+        borderRadius: Fonts.size.s_10,
         overflow: "hidden"
     },
 

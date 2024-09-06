@@ -1,4 +1,4 @@
-import { Attributes, Fonts, Metrics } from '@mezon/mobile-ui';
+import { Attributes, Fonts, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) => StyleSheet.create({
@@ -9,7 +9,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 
 	inputWrapper: {
-		borderRadius: 10,
+		borderRadius: size.s_10,
 		paddingHorizontal: Metrics.size.l,
 		display: 'flex',
 		flexDirection: 'row',
@@ -21,7 +21,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	input: {
 		color: colors.textStrong,
 		fontSize: Fonts.size.small,
-		height: 40,
+		height: size.s_40,
 		flexBasis: 10,
 		flexGrow: 1,
 		paddingVertical: 0

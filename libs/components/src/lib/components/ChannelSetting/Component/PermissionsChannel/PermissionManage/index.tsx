@@ -4,7 +4,7 @@ import MainPermissionManage from './MainPermissionManage';
 
 type PermissionManageProps = {
 	channelId: string;
-	setIsShowSaveButton: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsPrivateChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	setPermissionsListHasChanged: React.Dispatch<React.SetStateAction<boolean>>;
 	saveTriggerRef: React.MutableRefObject<(() => void) | null>;
 	resetTriggerRef: React.MutableRefObject<(() => void) | null>;
@@ -12,7 +12,7 @@ type PermissionManageProps = {
 
 const PermissionManage: React.FC<PermissionManageProps> = ({
 	channelId,
-	setIsShowSaveButton,
+	                                                           setIsPrivateChannel,
 	setPermissionsListHasChanged,
 	saveTriggerRef,
 	resetTriggerRef
@@ -24,7 +24,7 @@ const PermissionManage: React.FC<PermissionManageProps> = ({
 			{showRole && (
 				<MainPermissionManage
 					channelId={channelId}
-					setIsShowSaveButton={setIsShowSaveButton}
+					setIsPrivateChannel={setIsPrivateChannel}
 					setPermissionsListHasChanged={setPermissionsListHasChanged}
 					saveTriggerRef={saveTriggerRef}
 					resetTriggerRef={resetTriggerRef}

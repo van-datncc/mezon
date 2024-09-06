@@ -13,13 +13,15 @@ export const style = (colors: Attributes) => StyleSheet.create({
         overflow: 'hidden',
     },
     whiteText: {
-        color: colors.text
+        color: colors.text,
+        fontSize: size.medium
     },
     addFriendItem: {
         padding: size.s_10,
         backgroundColor: colors.secondary
     },
     addFriendText: {
-        color: colors.textStrong
+        color: colors.textStrong,
+        fontSize: size.medium
     }
 })

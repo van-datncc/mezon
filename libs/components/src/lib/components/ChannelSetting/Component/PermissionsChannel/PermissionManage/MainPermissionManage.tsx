@@ -1,12 +1,12 @@
 import {
-	permissionRoleChannelActions,
+	permissionRoleChannelActions, RolesClanEntity,
 	selectAllPermissionRoleChannel,
 	selectAllRolesClan,
 	selectAllUsesClan,
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
-import { EPermissionId, EVERYONE_ROLE_ID } from '@mezon/utils';
+import {EPermissionId, EVERYONE_ROLE_ID, EVERYONE_ROLE_TITLE} from '@mezon/utils';
 import { ApiPermissionUpdate } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -37,6 +37,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	const listPermissionRoleChannel = useSelector(selectAllPermissionRoleChannel);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const rolesInChannel = useSelector(selectRolesByChannelId(channelId));
+	const [listRole, setListRole] = useState<RolesClanEntity[]>([]);
 	const dispatch = useAppDispatch();
 	const rolesNotInChannel = useMemo(() => {
 		const roleInChannelIds = new Set(rolesInChannel.map((roleInChannel) => roleInChannel.id));
@@ -120,19 +121,28 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 			await handleSave(currentRoleId || '', permissionsArray);
 		};
 	}, [permissions, currentRoleId]);
-
+	
+	useEffect(() => {
+		const roleExists = listRole.some((role) => role.id === EVERYONE_ROLE_ID);
+		if (!roleExists) {
+			setListRole([{ id: EVERYONE_ROLE_ID, title: EVERYONE_ROLE_TITLE }, ...rolesInChannel]);
+		}
+	}, [rolesInChannel, listRole]);
+	
 	return (
-		<div className="flex mt-4 gap-x-4">
-			<ListRoleMember
-				listManageInChannel={rolesInChannel}
-				listManageNotInChannel={rolesNotInChannel}
-				usersClan={usersClan}
-				channelId={channelId}
-				onSelect={handleSelectRole}
-				canChange={permissionsLength === 0}
-			/>
-			<ListPermission onSelect={handleSelect} ref={listPermissionRef} />
-		</div>
+		listRole.length > 0 && (
+			<div className="flex mt-4 gap-x-4">
+				<ListRoleMember
+					listManageInChannel={listRole}
+					listManageNotInChannel={rolesNotInChannel}
+					usersClan={usersClan}
+					channelId={channelId}
+					onSelect={handleSelectRole}
+					canChange={permissionsLength === 0}
+				/>
+				<ListPermission onSelect={handleSelect} ref={listPermissionRef} />
+			</div>
+		)
 	);
 };
 

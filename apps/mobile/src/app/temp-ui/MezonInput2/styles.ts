@@ -6,6 +6,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     color: colors.text,
     textTransform: 'uppercase',
     paddingHorizontal: size.s_20,
+    fontSize: size.medium
   },
   input: {
     backgroundColor: colors.secondary,
@@ -14,6 +15,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
     paddingHorizontal: size.s_20,
     paddingVertical: 0,
     height: size.s_50,
+    fontSize: size.medium
   },
   errorInput: {
     paddingHorizontal: size.s_20,

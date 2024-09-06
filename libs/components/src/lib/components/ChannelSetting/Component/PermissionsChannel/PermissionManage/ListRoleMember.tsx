@@ -1,8 +1,17 @@
-import { permissionRoleChannelActions, RolesClanEntity, useAppDispatch, UsersClanEntity } from '@mezon/store';
+import {
+	channelUsersActions,
+	permissionRoleChannelActions,
+	RolesClanEntity,
+	selectChannelById,
+	selectCurrentClanId,
+	useAppDispatch,
+	UsersClanEntity
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EVERYONE_ROLE_ID, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { memo, useEffect, useRef, useState } from 'react';
-import { AvatarImage } from './../../../../AvatarImage/AvatarImage';
+import { useSelector } from 'react-redux';
+import { AvatarImage } from '../../../../AvatarImage/AvatarImage';
 
 type ListRoleMemberProps = {
 	listManageNotInChannel: RolesClanEntity[];
@@ -15,15 +24,17 @@ type ListRoleMemberProps = {
 };
 
 const ListRoleMember = memo((props: ListRoleMemberProps) => {
-	const { listManageInChannel, usersClan, channelId, onSelect, canChange } = props;
+	const { listManageInChannel, usersClan, channelId, onSelect, canChange, listManageNotInChannel } = props;
 	const [selectedItemId, setSelectedItemId] = useState<string | null>(EVERYONE_ROLE_ID);
 	const dispatch = useAppDispatch();
-
+	
 	useEffect(() => {
-		setSelectedItemId(EVERYONE_ROLE_ID);
-		onSelect(EVERYONE_ROLE_ID);
-		dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: EVERYONE_ROLE_ID }));
-	}, [channelId]);
+		if (listManageInChannel.length > 0) {
+			setSelectedItemId(listManageInChannel[0].id);
+			onSelect(listManageInChannel[0].id);
+			dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: listManageInChannel[0].id }));
+		}
+	}, [channelId, listManageInChannel]);
 
 	const handleItemClick = (item: any) => {
 		if (canChange) {
@@ -35,23 +46,8 @@ const ListRoleMember = memo((props: ListRoleMemberProps) => {
 
 	return (
 		<div className="basis-1/3">
-			<HeaderAddRoleMember listManageNotInChannel={listManageInChannel} usersClan={usersClan} />
+			<HeaderAddRoleMember listManageNotInChannel={listManageNotInChannel} usersClan={usersClan} channelId={channelId} />
 			<div className="mt-2">
-				<div
-					key={EVERYONE_ROLE_ID}
-					onClick={() =>
-						handleItemClick({
-							id: EVERYONE_ROLE_ID
-						})
-					}
-					className={`w-full py-1.5 px-[10px] text-[15px] bg-transparent hover:bg-bgLightModeButton font-medium inline-flex gap-x-2 items-center rounded ${
-						selectedItemId === EVERYONE_ROLE_ID
-							? 'dark:bg-bgModifierHover bg-bgLightModeButton'
-							: 'dark:text-textDarkTheme text-textLightTheme'
-					}`}
-				>
-					@everyone
-				</div>
 				{listManageInChannel.map((item) => (
 					<div
 						key={item.id}
@@ -75,16 +71,39 @@ export default ListRoleMember;
 type HeaderAddRoleMemberProps = {
 	listManageNotInChannel: RolesClanEntity[];
 	usersClan: UsersClanEntity[];
+	channelId: string;
 };
 
 const HeaderAddRoleMember = memo((props: HeaderAddRoleMemberProps) => {
-	const { listManageNotInChannel, usersClan } = props;
+	const { listManageNotInChannel, usersClan, channelId } = props;
 	const [showPopup, setShowPopup] = useState(false);
+	const channel = useSelector(selectChannelById(channelId));
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const dispatch = useAppDispatch();
+	const addRole = async (roleId: string) => {
+		const body = {
+			clanId: currentClanId || '',
+			channelId: channel.id,
+			roleIds: [roleId],
+			channelType: channel.type
+		};
+		await dispatch(channelUsersActions.addChannelRoles(body));
+	};
+
+	const addUser = async (userId: string) => {
+		const body = {
+			channelId: channel.id,
+			channelType: channel.type,
+			userIds: [userId],
+			clanId: currentClanId || ''
+		};
+		await dispatch(channelUsersActions.addChannelUsers(body));
+	};
 	return (
 		<div ref={panelRef} className="flex justify-between items-center relative" onClick={() => setShowPopup(!showPopup)}>
 			<h4 className="uppercase font-bold text-xs text-contentTertiary">Roles/Members</h4>
-			<Icons.PlusIcon defaultSize="size-4 text-contentTertiary cursor-pointer" />
+			{channel?.channel_private === 1 && <Icons.PlusIcon defaultSize="size-4 text-contentTertiary cursor-pointer" />}
 			{showPopup && (
 				<div className="absolute bottom-5 w-64 rounded-lg overflow-hidden dark:text-contentTertiary text-colorTextLightMode border dark:border-gray-700 border-gray-300">
 					<div className="dark:bg-bgTertiary bg-bgLightModeSecond flex gap-x-1 p-4 text-sm">
@@ -99,6 +118,7 @@ const HeaderAddRoleMember = memo((props: HeaderAddRoleMemberProps) => {
 									<div
 										key={item.id}
 										className="rounded px-3 py-2 font-semibold dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton dark:hover:text-white hover:text-black"
+										onClick={() => addRole(item.id)}
 									>
 										{item.title}
 									</div>
@@ -109,14 +129,15 @@ const HeaderAddRoleMember = memo((props: HeaderAddRoleMemberProps) => {
 							<div>
 								<p className="px-3 py-2 uppercase text-[11px] font-bold">Member</p>
 								{usersClan.map((item) => (
-									<ItemUser
-										key={item.id}
-										userName={item.user?.username}
-										displayName={item.user?.display_name}
-										clanName={item.clan_nick}
-										avatar={item.user?.avatar_url}
-										avatarClan={item.clan_avatar}
-									/>
+									<div key={item.id} onClick={() => addUser(item.id)}>
+										<ItemUser
+											userName={item.user?.username}
+											displayName={item.user?.display_name}
+											clanName={item.clan_nick}
+											avatar={item.user?.avatar_url}
+											avatarClan={item.clan_avatar}
+										/>
+									</div>
 								))}
 							</div>
 						)}

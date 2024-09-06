@@ -1,10 +1,10 @@
-import { Attributes, Fonts, Metrics, baseColor } from "@mezon/mobile-ui";
+import { Attributes, Fonts, Metrics, baseColor, size } from "@mezon/mobile-ui";
 import { StyleSheet } from "react-native";
 
 export const style = ({ textStrong, }: Attributes) => StyleSheet.create({
     avatarWrapper: {
-        width: 60,
-        height: 60,
+        width: size.s_60,
+        height: size.s_60,
         backgroundColor: baseColor.blurple,
         borderRadius: 10,
         overflow: "hidden"
@@ -12,7 +12,7 @@ export const style = ({ textStrong, }: Attributes) => StyleSheet.create({
 
     serverName: {
         color: textStrong,
-        fontSize: Fonts.size.h7,
+        fontSize: Fonts.size.medium,
         fontWeight: "700"
     },
 

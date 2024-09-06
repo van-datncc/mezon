@@ -1,7 +1,7 @@
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 import { useAuth } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { KeyboardAvoidingView, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { IUserProfileValue } from '..';
@@ -44,7 +44,7 @@ export default function UserProfile({ userProfileValue, setCurrentUserProfileVal
 			/>
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => handleHashtagPress()} style={styles.btnIcon}>
-					<Icons.TextIcon width={16} height={16} />
+					<Icons.TextIcon width={size.s_16} height={size.s_16} />
 				</TouchableOpacity>
 			</View>
 

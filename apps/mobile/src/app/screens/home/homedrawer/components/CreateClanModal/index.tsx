@@ -1,6 +1,6 @@
 import { useClans } from '@mezon/core';
 import { AddIcon, QUALITY_IMAGE_UPLOAD, save, setDefaultChannelLoader, STORAGE_CLAN_ID, UploadImage } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, checkDuplicateNameClan, clansActions, getStoreAsync, selectAllAccount, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { useEffect, useState } from 'react';
@@ -123,8 +123,8 @@ const CreateClanModal = ({ visible, setVisible }: ICreateClanProps) => {
 						<TouchableOpacity style={styles.uploadImage} onPress={onOpen}>
 							{!urlImage ? (
 								<View style={[styles.uploadCreateClan]}>
-									<AddIcon style={styles.addIcon} height={30} width={30} color={Colors.bgButton} />
-									<UploadImage height={20} width={20} color={Colors.bgGrayLight} />
+									<AddIcon style={styles.addIcon} height={size.s_30} width={size.s_30} color={Colors.bgButton} />
+									<UploadImage height={size.s_20} width={size.s_20} color={Colors.bgGrayLight} />
 									<Text style={styles.uploadText}>{t('upload')}</Text>
 								</View>
 							) : (
