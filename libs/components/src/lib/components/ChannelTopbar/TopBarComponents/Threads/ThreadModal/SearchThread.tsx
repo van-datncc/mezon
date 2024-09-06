@@ -1,4 +1,4 @@
-import * as Icons from '../../../../../../../../ui/src/lib/Icons';
+import { Icons } from '@mezon/ui';
 
 const SearchThread = () => {
 	const hanldeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -11,7 +11,7 @@ const SearchThread = () => {
 				<input
 					type="text"
 					placeholder="Search for Thread Name"
-					className="dark:text-[#AEAEAE] text-black text-sm placeholder-[#AEAEAE] placeholder:text-sm outline-none bg-transparent w-full"
+					className="dark:text-contentTertiary text-black text-sm dark:placeholder-contentTertiary placeholder-bgPrimary placeholder:text-sm outline-none bg-transparent w-full"
 					onChange={(event) => hanldeChange(event)}
 				/>
 			</div>

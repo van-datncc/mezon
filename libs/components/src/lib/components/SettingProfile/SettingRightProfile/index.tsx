@@ -33,13 +33,13 @@ const SettingRightProfile = ({ menuIsOpen }: SettingRightProfileProps) => {
 				<div className="flex flex-row gap-4 mt-6 mb-4">
 					<button
 						onClick={handleUserSettingsClick}
-						className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.USER_SETTING ? 'border-[#155EEF]' : 'border-transparent text-[#AEAEAE]'}`}
+						className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.USER_SETTING ? 'border-[#155EEF]' : 'border-transparent dark:text-textThreadPrimary text-textSecondary800'}`}
 					>
 						User Profile
 					</button>
 					<button
 						onClick={handleClanProfileClick}
-						className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.CLAN_SETTING ? 'border-[#155EEF]' : 'border-transparent text-[#AEAEAE]'}`}
+						className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.CLAN_SETTING ? 'border-[#155EEF]' : 'border-transparent dark:text-textThreadPrimary text-textSecondary800'}`}
 					>
 						Clan Profiles
 					</button>

@@ -49,7 +49,7 @@ export const removeChannelUsers = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			thunkAPI.dispatch(channelMembersActions.remove(`${channelId}${userId}`));
+			thunkAPI.dispatch(channelMembersActions.remove({ channelId, userId }));
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();

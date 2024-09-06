@@ -3,7 +3,7 @@ import {
 	inviteActions,
 	selectAllChannels,
 	selectAllDirectMessages,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectMembersByChannelId,
 	useAppDispatch
 } from '@mezon/store';
@@ -16,7 +16,7 @@ export function useDMInvite(channelID?: string) {
 	const dispatch = useAppDispatch();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const rawMembers = useSelector(selectMembersByChannelId(channelID));
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const allChannels = useSelector(selectAllChannels);
 	const isChannelPrivate = allChannels.find((channel) => channel.channel_id === channelID)?.channel_private === 1;
 	const listDMInvite = useMemo(() => {

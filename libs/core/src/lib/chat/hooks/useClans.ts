@@ -2,7 +2,7 @@ import {
 	ClansEntity,
 	clansActions,
 	selectAllClans,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectShowNumEvent,
@@ -18,7 +18,7 @@ export function useClans() {
 	const clans = useSelector(selectAllClans);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
 
 	const setClanShowNumEvent = React.useCallback(

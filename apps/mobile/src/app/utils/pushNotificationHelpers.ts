@@ -88,7 +88,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 				channelId: 'mezon-mobile',
 				smallIcon: 'ic_notification',
 				color: '#000000',
-				sound: 'hollow',
+				sound: 'default',
 				pressAction: {
 					id: 'default',
 				},
@@ -96,7 +96,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			ios: {
 				critical: true,
 				criticalVolume: 0.9,
-				sound: 'hollow.wav',
+				sound: 'default',
 				foregroundPresentationOptions: {
 					badge: true,
 					banner: true,

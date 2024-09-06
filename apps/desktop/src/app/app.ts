@@ -69,7 +69,7 @@ export default class App {
 				backgroundThrottling: false,
 				preload: join(__dirname, 'main.preload.js')
 			},
-			icon: join(__dirname, 'assets', 'favicon.ico')
+			icon: join(__dirname, 'assets', 'linux-icon.png')
 		});
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenu(null);

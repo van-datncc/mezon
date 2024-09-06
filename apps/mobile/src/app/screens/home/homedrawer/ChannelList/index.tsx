@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
@@ -151,13 +151,15 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
-				<FlashList
+				<FlatList
 					// onContentSizeChange={onContentSizeChange}
 					ref={flashListRef}
 					data={categorizedChannels || []}
 					keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
-					estimatedItemSize={40}
 					renderItem={renderItemChannelList}
+					getItemLayout={(data, index) => (
+						{length: 40, offset: 40 * index, index}
+					)}
 				/>
 			</View>
 

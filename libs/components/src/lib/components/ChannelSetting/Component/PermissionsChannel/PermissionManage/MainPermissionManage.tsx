@@ -1,12 +1,13 @@
 import {
-	permissionRoleChannelActions, RolesClanEntity,
+	permissionRoleChannelActions,
+	RolesClanEntity,
 	selectAllPermissionRoleChannel,
 	selectAllRolesClan,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
-import {EPermissionId, EVERYONE_ROLE_ID, EVERYONE_ROLE_TITLE} from '@mezon/utils';
+import { EPermissionId, EVERYONE_ROLE_ID, EVERYONE_ROLE_TITLE } from '@mezon/utils';
 import { ApiPermissionUpdate } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -43,7 +44,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 		const roleInChannelIds = new Set(rolesInChannel.map((roleInChannel) => roleInChannel.id));
 		return rolesClan.filter((role) => !roleInChannelIds.has(role.id));
 	}, [rolesClan, rolesInChannel]);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 
 	const listPermissionRef = useRef<ListPermissionHandle>(null);
 
@@ -121,14 +122,14 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 			await handleSave(currentRoleId || '', permissionsArray);
 		};
 	}, [permissions, currentRoleId]);
-	
+
 	useEffect(() => {
 		const roleExists = listRole.some((role) => role.id === EVERYONE_ROLE_ID);
 		if (!roleExists) {
 			setListRole([{ id: EVERYONE_ROLE_ID, title: EVERYONE_ROLE_TITLE }, ...rolesInChannel]);
 		}
 	}, [rolesInChannel, listRole]);
-	
+
 	return (
 		listRole.length > 0 && (
 			<div className="flex mt-4 gap-x-4">

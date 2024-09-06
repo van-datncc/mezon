@@ -20,21 +20,21 @@ export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function OnlineStatus(props: React.HTMLAttributes<SVGElement>) {
+export const OnlineStatus: React.FC<IconProps> = ({ defaultSize = 'w-[11px] h-[10px]' }) => {
 	return (
-		<svg width="11" height="10" viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+		<svg viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<circle cx="6" cy="6" r="6" fill="#16A34A" />
 		</svg>
 	);
-}
+};
 
-export function OfflineStatus(props: React.HTMLAttributes<SVGElement>) {
+export const OfflineStatus: React.FC<IconProps> = ({ defaultSize = 'w-[11px] h-[10px]' }) => {
 	return (
-		<svg width="11" height="10" viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+		<svg viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<rect x="1.5" y="1.5" width="9" height="9" rx="4.5" stroke="#AEAEAE" strokeWidth="3" />
 		</svg>
 	);
-}
+};
 
 export function Verified(props: React.HTMLAttributes<SVGElement>) {
 	return (
@@ -1077,6 +1077,7 @@ interface IconProps {
 	defaultFill?: string;
 	defaultSize?: string;
 	isWhite?: boolean;
+	size?: string;
 }
 
 export const ThreadIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
@@ -1750,10 +1751,11 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 };
 
 export const ArrowDown: React.FC<IconProps> = ({
-	defaultSize = 'w-4 h-4 dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4'
+	defaultSize = 'w-4 h-4 dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4',
+	size = ''
 }) => {
 	return (
-		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} ${size}`}>
 			<g id="Live area">
 				<path
 					id="Vector"
@@ -4188,6 +4190,16 @@ export function SideMenuIcon(props: React.HTMLAttributes<SVGElement>) {
 					></path>{' '}
 				</g>{' '}
 			</g>
+		</svg>
+	);
+}
+export function ThreadEmpty(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg x="0" y="0" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+			<path
+				d="M12 2.81a1 1 0 0 1 0-1.41l.36-.36a1 1 0 0 1 1.41 0l9.2 9.2a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.3.13l-9.54-6.72a1 1 0 0 1-.08-1.58l1-1L12 2.8ZM12 21.2a1 1 0 0 1 0 1.41l-.35.35a1 1 0 0 1-1.41 0l-9.2-9.19a1 1 0 0 1 0-1.41l.7-.7a1 1 0 0 1 1.3-.12l9.54 6.72a1 1 0 0 1 .07 1.58l-1 1 .35.36ZM15.66 16.8a1 1 0 0 1-1.38.28l-8.49-5.66A1 1 0 1 1 6.9 9.76l8.49 5.65a1 1 0 0 1 .27 1.39ZM17.1 14.25a1 1 0 1 0 1.11-1.66L9.73 6.93a1 1 0 0 0-1.11 1.66l8.49 5.66Z"
+				fill="currentColor"
+			></path>
 		</svg>
 	);
 }

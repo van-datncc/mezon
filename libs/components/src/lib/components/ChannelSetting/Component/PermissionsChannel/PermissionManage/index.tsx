@@ -12,7 +12,7 @@ type PermissionManageProps = {
 
 const PermissionManage: React.FC<PermissionManageProps> = ({
 	channelId,
-	                                                           setIsPrivateChannel,
+	setIsPrivateChannel,
 	setPermissionsListHasChanged,
 	saveTriggerRef,
 	resetTriggerRef
