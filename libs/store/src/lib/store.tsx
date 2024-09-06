@@ -1,5 +1,5 @@
 import { MezonContextValue } from '@mezon/transport';
-import { ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
+import { Middleware, ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
@@ -292,6 +292,25 @@ export type RootState = ReturnType<typeof storeInstance.getState>;
 
 export type PreloadedRootState = RootState | undefined;
 
+const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
+	// Check if the action is of type 'persist/REHYDRATE' and the key is 'messages'
+	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
+		const { channelIdLastFetch, channelMessages } = action.payload || {};
+
+		if (channelIdLastFetch && channelMessages?.[channelIdLastFetch]) {
+			// Limit the channelMessages to only include messages for the last fetched channelId
+			action.payload = {
+				...action.payload,
+				channelMessages: {
+					[channelIdLastFetch]: channelMessages[channelIdLastFetch]
+				}
+			};
+		}
+	}
+	// Pass the action to the next middleware or reducer
+	return next(action);
+};
+
 export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRootState) => {
 	const store = configureStore({
 		reducer,
@@ -305,7 +324,7 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 				},
 				immutableCheck: false,
 				serializableCheck: false
-			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
+			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware, limitDataMiddleware)
 	});
 	storeInstance = store;
 	storeCreated = true;
