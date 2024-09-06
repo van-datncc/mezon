@@ -1,7 +1,7 @@
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Icons, getNearTime } from '@mezon/mobile-components';
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -14,22 +14,33 @@ type IMezonDateTimePicker = Omit<IMezonFakeBoxProps, 'onPress' | 'postfixIcon' |
 	onChange?: (time: Date) => void;
 	value?: Date;
 	keepTime?: boolean;
+	need24HourFormat?: { is24hourSource: 'locale' | 'device' };
+	needLocale?: { locale: string };
 };
 
-export default memo(function MezonDateTimePicker({ mode = 'date', onChange, value, keepTime, ...props }: IMezonDateTimePicker) {
+export default memo(function MezonDateTimePicker({
+	mode = 'date',
+	onChange,
+	value,
+	keepTime,
+	need24HourFormat,
+	needLocale,
+	...props
+}: IMezonDateTimePicker) {
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const bottomSheetRef = useRef<BottomSheetModalMethods>();
 	const [date, setDate] = useState(value || getNearTime(120));
+	const isModeTime = useMemo(() => mode === 'time', [mode]);
+
 	const [currentDate, setCurrentDate] = useState(value || getNearTime(120));
 
 	useEffect(() => {
 		setDate(value || getNearTime(120));
 		setCurrentDate(value || getNearTime(120));
 	}, [value]);
-
 	const handleChange = useCallback(() => {
-		if (keepTime && mode !== 'time' && value) {
+		if (keepTime && !isModeTime && value) {
 			const new_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), value.getHours(), value.getMinutes(), value.getSeconds());
 
 			setCurrentDate(new_date);
@@ -54,10 +65,11 @@ export default memo(function MezonDateTimePicker({ mode = 'date', onChange, valu
 			<MezonFakeInputBox
 				{...props}
 				value={
-					mode === 'time'
+					isModeTime
 						? currentDate.toLocaleTimeString([], {
 								hour: '2-digit',
-								minute: '2-digit'
+								minute: '2-digit',
+								hour12: !need24HourFormat
 							})
 						: currentDate.toLocaleDateString([], {
 								year: 'numeric',
@@ -84,7 +96,14 @@ export default memo(function MezonDateTimePicker({ mode = 'date', onChange, valu
 				}
 			>
 				<View style={styles.bsContainer}>
-					<DatePicker date={date} onDateChange={setDate} mode={mode} theme={themeBasic === ThemeModeBase.DARK ? 'dark' : 'light'} />
+					<DatePicker
+						{...(need24HourFormat && isModeTime ? need24HourFormat : {})}
+						{...(needLocale && isModeTime ? needLocale : {})}
+						date={date}
+						onDateChange={setDate}
+						mode={mode}
+						theme={themeBasic === ThemeModeBase.DARK ? 'dark' : 'light'}
+					/>
 				</View>
 			</MezonBottomSheet>
 		</View>
