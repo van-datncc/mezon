@@ -156,7 +156,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		[currentChannel?.channel_id, currentDmId, props.mode]
 	);
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
-	console.log('dataReferences: ', dataReferences);
 
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);

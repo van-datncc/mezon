@@ -18,7 +18,6 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const messageBox = useRef<HTMLDivElement>(null);
-	// const idMessageRefReply = useSelector(selectIdMessageRefReply(directParamId));
 	const dataReferences = useSelector(selectDataReferences(directParamId ?? ''));
 	const dispatch = useDispatch();
 
