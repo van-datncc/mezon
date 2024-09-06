@@ -143,6 +143,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			<MezonConfirm
 				visible={isVisibleLeaveGroupModal}
 				onConfirm={handleLeaveGroupConfirm}
+				onVisibleChange={setIsVisibleLeaveGroupModal}
 				title={t('confirm.title', {
 					groupName: messageInfo?.channel_label
 				})}

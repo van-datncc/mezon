@@ -73,13 +73,14 @@ export default function EventMenu({ event, eventDetailRef }: IEventMenuProps) {
 		<View style={styles.container}>
 			<MezonMenu menu={menu} />
 
-			{isVisibleCancelEventModal && <MezonConfirm
+			<MezonConfirm
 				visible={isVisibleCancelEventModal}
+				onVisibleChange={setIsVisibleCancelEventModal}
 				onConfirm={handleCancelEventConfirm}
 				title={t('confirm.title')}
 				content={t('confirm.content')}
 				confirmText={t('confirm.title')}
-			/>}
+			/>
 		</View>
 	);
 }
