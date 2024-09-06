@@ -39,7 +39,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 	});
 	const convertToLocalTime = (utcDate) => {
 		const timezoneOffset = utcDate.getTimezoneOffset();
-		return new Date(utcDate.getTime() - timezoneOffset * 60000);
+		return new Date(utcDate.getTime() - timezoneOffset * 60000).toISOString();
 	};
 
 	function handleClose() {
@@ -48,8 +48,8 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 	}
 
 	async function handleCreate() {
-		const timeValueStart = (convertToLocalTime(startTime) as Date).toISOString();
-		const timeValueEnd = (convertToLocalTime(endTime) as Date).toISOString();
+		const timeValueStart = convertToLocalTime(startTime);
+		const timeValueEnd = convertToLocalTime(endTime);
 		if (type === OptionEvent.OPTION_SPEAKER) {
 			await createEventManagement(currentClanId || '', channelId, location, title, timeValueStart, timeValueStart, description, '');
 		} else {
