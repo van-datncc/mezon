@@ -30,11 +30,6 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 
-	const currentDmOrChannelId = useMemo(
-		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? channelId : directMessageId),
-		[channelId, directMessageId, mode]
-	);
-
 	const dispatch = useAppDispatch();
 	const direct = useSelector(selectDirectById(directMessageId || directId || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();

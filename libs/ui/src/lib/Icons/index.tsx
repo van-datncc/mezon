@@ -20,21 +20,21 @@ export function Discord(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function OnlineStatus(props: React.HTMLAttributes<SVGElement>) {
+export const OnlineStatus: React.FC<IconProps> = ({ defaultSize = 'w-[11px] h-[10px]' }) => {
 	return (
-		<svg width="11" height="10" viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+		<svg viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<circle cx="6" cy="6" r="6" fill="#16A34A" />
 		</svg>
 	);
-}
+};
 
-export function OfflineStatus(props: React.HTMLAttributes<SVGElement>) {
+export const OfflineStatus: React.FC<IconProps> = ({ defaultSize = 'w-[11px] h-[10px]' }) => {
 	return (
-		<svg width="11" height="10" viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+		<svg viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<rect x="1.5" y="1.5" width="9" height="9" rx="4.5" stroke="#AEAEAE" strokeWidth="3" />
 		</svg>
 	);
-}
+};
 
 export function Verified(props: React.HTMLAttributes<SVGElement>) {
 	return (
@@ -1077,6 +1077,7 @@ interface IconProps {
 	defaultFill?: string;
 	defaultSize?: string;
 	isWhite?: boolean;
+	size?: string;
 }
 
 export const ThreadIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
@@ -1750,10 +1751,11 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 };
 
 export const ArrowDown: React.FC<IconProps> = ({
-	defaultSize = 'w-4 h-4 dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4'
+	defaultSize = 'w-4 h-4 dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4',
+	size = ''
 }) => {
 	return (
-		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} ${size}`}>
 			<g id="Live area">
 				<path
 					id="Vector"

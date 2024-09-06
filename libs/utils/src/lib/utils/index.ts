@@ -33,7 +33,7 @@ import {
 	SearchItemProps,
 	SenderInfoOptionals,
 	UsersClanEntity
-} from '../types/index';
+} from '../types';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -583,7 +583,7 @@ export function isValidEmojiData(data: IExtendedMessage): boolean | undefined {
 
 	const validShortnames = data?.ej?.map((emoji: IEmojiOnMessage) => data.t?.substring(emoji.s ?? 0, emoji.e));
 
-	const text = data?.t ? data?.t : '';
+	const text = typeof data?.t === 'string' ? data?.t : '';
 	const shortnamesInT = text
 		?.split(' ')
 		?.map((shortname: string) => shortname.trim())
