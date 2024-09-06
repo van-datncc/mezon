@@ -41,10 +41,10 @@ export default function EventMenu({ event, eventDetailRef }: IEventMenuProps) {
 				{
 					title: t('menu.cancelEvent'),
 					onPress: () => {
-						setIsVisibleCancelEventModal(true)
+						setIsVisibleCancelEventModal(true);
 					},
-					textStyle: { color: 'red' },
-				},
+					textStyle: { color: 'red' }
+				}
 				// {
 				// 	title: t('menu.reportEvent'),
 				// 	onPress: () => reserve(),
@@ -58,28 +58,30 @@ export default function EventMenu({ event, eventDetailRef }: IEventMenuProps) {
 				// 	title: t('menu.copyEventID'),
 				// 	onPress: () => reserve(),
 				// },
-			],
-		},
+			]
+		}
 	];
 
 	const handleCancelEventConfirm = async () => {
 		await deleteEventManagement(event?.clan_id || '', event?.id || '');
-		eventDetailRef?.current.dismiss()
-		dismiss()
-		setIsVisibleCancelEventModal(false)
-	}
+		eventDetailRef?.current.dismiss();
+		dismiss();
+		setIsVisibleCancelEventModal(false);
+	};
 
 	return (
 		<View style={styles.container}>
 			<MezonMenu menu={menu} />
 
-			{isVisibleCancelEventModal && <MezonConfirm
-				visible={isVisibleCancelEventModal}
-				onConfirm={handleCancelEventConfirm}
-				title={t('confirm.title')}
-				content={t('confirm.content')}
-				confirmText={t('confirm.title')}
-			/>}
+			{isVisibleCancelEventModal && (
+				<MezonConfirm
+					visible={isVisibleCancelEventModal}
+					onConfirm={handleCancelEventConfirm}
+					title={t('confirm.title')}
+					content={t('confirm.content')}
+					confirmText={t('confirm.title')}
+				/>
+			)}
 		</View>
 	);
 }

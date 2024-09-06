@@ -43,9 +43,9 @@ export { default as MessageModalImage } from './components/MessageWithUser/Messa
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
 export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
 export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
-export { default as ModalNotificationSetting } from './components/notificationSetting';
 export { default as SearchModal } from './components/SearchModal';
 export { default as ToastController } from './components/ToastController/ToastController';
+export { default as ModalNotificationSetting } from './components/notificationSetting';
 
 export { Icons } from '@mezon/ui';
 export * from './components/AvatarImage/AvatarImage';
@@ -76,4 +76,3 @@ export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
 
 export * from './components/ThumbnailAttachmentRender';
-
