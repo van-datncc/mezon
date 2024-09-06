@@ -13,7 +13,6 @@ import {
 	emojiSuggestionActions,
 	referencesActions,
 	selectAllChannels,
-	selectAllEmojiSuggestion,
 	selectAllHashtagDm,
 	selectCurrentChannel,
 	threadsActions,
@@ -105,7 +104,6 @@ export const ChatBoxBottomBar = memo(
 		const [textChange, setTextChange] = useState<string>('');
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
-		const emojiListPNG = useSelector(selectAllEmojiSuggestion);
 
 		const isAvailableSending = useMemo(() => {
 			return text?.length > 0 && text?.trim()?.length > 0;
@@ -274,13 +272,13 @@ export const ChatBoxBottomBar = memo(
 			let dataEditMessageFormatted;
 			switch (type) {
 				case EMessageActionType.EditMessage:
-					dataEditMessageFormatted = formatContentEditMessage(targetMessage, emojiListPNG);
+					dataEditMessageFormatted = formatContentEditMessage(targetMessage);
 					if (dataEditMessageFormatted?.emojiPicked?.length) {
 						dataEditMessageFormatted?.emojiPicked?.forEach((emoji) => {
 							dispatch(
 								emojiSuggestionActions.setSuggestionEmojiObjPicked({
-									shortName: emoji?.shortname,
-									id: emoji.id
+									shortName: emoji?.shortName,
+									id: emoji?.emojiid
 								})
 							);
 						});

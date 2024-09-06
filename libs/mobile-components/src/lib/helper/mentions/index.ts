@@ -1,4 +1,4 @@
-import { ChannelsEntity, EmojiSuggestionEntity, HashtagDmEntity } from '@mezon/store-mobile';
+import { ChannelsEntity, HashtagDmEntity } from '@mezon/store-mobile';
 import {
 	ETokenMessage,
 	IEmojiOnMessage,
@@ -54,6 +54,12 @@ export const getChannelHashtag = (hashtagDmEntities: HashtagDmEntity[], channels
 	}
 };
 
+type EmojiPicked = {
+	shortName: string;
+	s?: number;
+	e?: number;
+};
+
 type ElementToken =
 	| (IMentionOnMessage & { kindOf: ETokenMessage.MENTIONS })
 	| (IHashtagOnMessage & { kindOf: ETokenMessage.HASHTAGS })
@@ -62,43 +68,48 @@ type ElementToken =
 	| (IMarkdownOnMessage & { kindOf: ETokenMessage.MARKDOWNS })
 	| (ILinkVoiceRoomOnMessage & { kindOf: ETokenMessage.VOICE_LINKS });
 
-export const createFormattedString = (data: IExtendedMessage): string => {
+export const createFormattedString = (data: IExtendedMessage) => {
 	const { t = '' } = data;
 	const elements: ElementToken[] = (Object.keys(data) as (keyof IExtendedMessage)[])
 		.flatMap((key) => (Array.isArray(data[key]) ? data[key].map((item) => item && { ...item, kindOf: key }) : []))
 		.filter(Boolean) as ElementToken[];
 	elements?.sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
-	let result = '';
+	let formatContentDraft = '';
+	const emojiPicked: EmojiPicked[] = [];
 	let lastIndex = 0;
 
 	elements?.forEach((element) => {
 		const startindex = element.s ?? lastIndex;
 		const endindex = element.e ?? startindex;
-		result += t.slice(lastIndex, startindex);
+		formatContentDraft += t.slice(lastIndex, startindex);
 		const contentInElement = t.substring(startindex, endindex);
 
 		switch (element.kindOf) {
 			case ETokenMessage.MENTIONS:
 				if (element.user_id || element.role_id) {
 					const id = element.user_id ?? element.role_id;
-					result += `{@}[${contentInElement.slice(1)}](${id})`;
+					formatContentDraft += `{@}[${contentInElement.slice(1)}](${id})`;
 				}
 				break;
 			case ETokenMessage.HASHTAGS:
-				result += `{#}[${contentInElement.slice(1)}](${element.channelid})`;
+				formatContentDraft += `{#}[${contentInElement.slice(1)}](${element.channelid})`;
+				break;
+			case ETokenMessage.EMOJIS:
+				emojiPicked?.push({ ...element, shortName: contentInElement });
+				formatContentDraft += contentInElement;
 				break;
 			default:
-				result += contentInElement;
+				formatContentDraft += contentInElement;
 				break;
 		}
 
 		lastIndex = endindex;
 	});
-	result += t.slice(lastIndex);
-	return result;
+	formatContentDraft += t.slice(lastIndex);
+	return { formatContentDraft, emojiPicked };
 };
 
-export const formatContentEditMessage = (message: IMessageWithUser, emojiList: EmojiSuggestionEntity[]) => {
+export const formatContentEditMessage = (message: IMessageWithUser) => {
 	const processedContentMentionsDraft = {
 		t: message?.content?.t,
 		hg: message?.content?.hg,
@@ -108,10 +119,7 @@ export const formatContentEditMessage = (message: IMessageWithUser, emojiList: E
 		vk: message?.content?.vk,
 		mentions: message?.mentions
 	};
-	const formatContentDraft = createFormattedString(processedContentMentionsDraft);
-	const emojiPicked = message?.content?.ej?.map((item) => {
-		return emojiList?.find((emoji) => emoji?.id === item?.emojiid);
-	});
+	const { formatContentDraft, emojiPicked } = createFormattedString(processedContentMentionsDraft);
 
 	return { formatContentDraft, emojiPicked };
 };
