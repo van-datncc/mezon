@@ -14,9 +14,7 @@ export default function EventTime({ event }: IEventTimeProps) {
 	const styles = style(themeValue);
 	return (
 		<View style={styles.inline}>
-			{
-				isSameDay(event.create_time as string) && <MezonBadge title="new" type="success" />
-			}
+			{isSameDay(event.create_time as string) && <MezonBadge title="new" type="success" />}
 			<Icons.CalendarIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 			<Text style={styles.smallText}>{timeFormat(event.start_time)} </Text>
 

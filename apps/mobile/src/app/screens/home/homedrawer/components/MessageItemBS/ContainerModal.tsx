@@ -430,7 +430,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					})}
 
 					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28 }}>
-						<Icons.ReactionIcon color={themeValue.text} height={size.s_24} width={size.s_24}/>
+						<Icons.ReactionIcon color={themeValue.text} height={size.s_24} width={size.s_24} />
 					</Pressable>
 				</View>
 				<View style={styles.messageActionGroup}>

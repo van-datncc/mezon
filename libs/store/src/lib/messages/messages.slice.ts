@@ -24,7 +24,6 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
-	isAnyOf,
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -99,7 +98,7 @@ export interface MessagesState {
 	isFocused: boolean;
 	idMessageToJump: string;
 	channelDraftMessage: Record<string, ChannelDraftMessages>;
-	isJumpingToPresent: boolean;
+	isJumpingToPresent: Record<string, boolean>;
 	channelMessages: Record<
 		string,
 		EntityState<MessagesEntity, string> & {
@@ -259,7 +258,7 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		if (isFetchingLatestMessages) {
-			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent(true));
+			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 		}
 
@@ -287,7 +286,7 @@ export const loadMoreMessage = createAsyncThunk(
 			// - loading
 			// - already have message to jump to
 			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
-			if ((state.isJumpingToPresent && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
+			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
 				return;
 			}
 
@@ -438,7 +437,6 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			}
 
 			let uploadedFiles: ApiMessageAttachment[] = [];
-
 			// Check if there are attachments
 			if (attachments && attachments.length > 0) {
 				const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
@@ -614,7 +612,7 @@ export const initialMessagesState: MessagesState = {
 	channelDraftMessage: {},
 	isFocused: false,
 	isViewingOlderMessagesByChannelId: {},
-	isJumpingToPresent: false,
+	isJumpingToPresent: {},
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' }
 };
@@ -644,23 +642,21 @@ export const messagesSlice = createSlice({
 			state.idMessageToJump = action.payload;
 		},
 
-		setNewMessageToUpdateImage(state, action) {
-			const data = action.payload;
-			state.newMesssageUpdateImage = {
-				channel_id: data.channel_id,
-				message_id: data.message_id,
-				clan_id: data.clan_id,
-				mode: data.mode,
-				mentions: data.mentions,
-				content: data.content,
-				isMe: data.isMe
-			};
-		},
-
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
 
 			if (!channelId || !messageId) return state;
+			state.newMesssageUpdateImage = {
+				channel_id: action.payload.channel_id,
+				message_id: action.payload.id,
+				clan_id: action.payload.clan_id,
+				mode: action.payload.mode,
+				mentions: action.payload.mentions,
+				content: action.payload.content,
+				isMe: action.payload.isMe,
+				code: action.payload.code,
+				attachments: action.payload.attachments
+			};
 
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
@@ -842,8 +838,8 @@ export const messagesSlice = createSlice({
 		deleteChannelDraftMessage(state, action: PayloadAction<{ channelId: string }>) {
 			delete state.channelDraftMessage[action.payload.channelId];
 		},
-		setIsJumpingToPresent(state, action: PayloadAction<boolean>) {
-			state.isJumpingToPresent = action.payload;
+		setIsJumpingToPresent(state, action: PayloadAction<{ channelId: string; status: boolean }>) {
+			state.isJumpingToPresent[action.payload.channelId] = action.payload.status;
 		},
 		updateUserMessage: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;
@@ -905,14 +901,17 @@ export const messagesSlice = createSlice({
 						adapterPayload: reversedMessages,
 						direction
 					});
+					state.isJumpingToPresent[channelId] = true;
 				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			})
-			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state) => {
-				state.isJumpingToPresent = true;
+				const channelId = action?.meta?.arg?.channelId;
+				if (!state.isJumpingToPresent) {
+					state.isJumpingToPresent = {};
+				}
+				state.isJumpingToPresent[channelId] = true;
 			});
 	}
 });
@@ -1184,7 +1183,7 @@ export const selectIsMessageIdExist = (channelId: string, messageId: string) =>
 		return Boolean(state.channelMessages[channelId]?.entities[messageId]);
 	});
 
-export const selectIsJumpingToPresent = createSelector(getMessagesState, (state) => state.isJumpingToPresent);
+export const selectIsJumpingToPresent = (channelId: string) => createSelector(getMessagesState, (state) => state.isJumpingToPresent[channelId]);
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
 export const selectNewMesssageUpdateImage = createSelector(getMessagesState, (state: MessagesState) => state.newMesssageUpdateImage);

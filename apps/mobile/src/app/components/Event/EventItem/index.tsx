@@ -55,12 +55,17 @@ export default function EventItem({ event, onPress, showActions = true }: IEvent
 					<EventLocation event={event} />
 				</View>
 
-				{showActions &&
+				{showActions && (
 					<View style={styles.inline}>
-						<MezonButton icon={<Icons.CheckmarkSmallIcon height={size.s_20} width={size.s_20} color={themeValue.text} />} title="Interested" fluid border />
+						<MezonButton
+							icon={<Icons.CheckmarkSmallIcon height={size.s_20} width={size.s_20} color={themeValue.text} />}
+							title="Interested"
+							fluid
+							border
+						/>
 						<MezonButton icon={<Icons.ShareIcon height={size.s_20} width={size.s_20} color={themeValue.text} />} />
 					</View>
-				}
+				)}
 			</View>
 		</Pressable>
 	);
