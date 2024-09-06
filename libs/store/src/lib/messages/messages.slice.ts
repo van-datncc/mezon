@@ -906,7 +906,8 @@ export const messagesSlice = createSlice({
 						adapterPayload: reversedMessages,
 						direction
 					});
-					state.isJumpingToPresent[channelId] = true;
+
+					if (Object.prototype.toString.call(state.isJumpingToPresent) === '[object Object]') state.isJumpingToPresent[channelId] = true;
 				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
