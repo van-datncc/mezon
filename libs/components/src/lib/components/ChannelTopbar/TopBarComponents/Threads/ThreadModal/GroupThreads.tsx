@@ -6,7 +6,7 @@ type GroupThreadsProps = {
 const GroupThreads = ({ title, children }: GroupThreadsProps) => {
 	return (
 		<div>
-			<div className="mt-2 mb-2 h-6 text-xs font-semibold leading-6 uppercase">{title}</div>
+			<div className="mt-2 mb-2 h-6 text-xs font-semibold leading-6 uppercase dark:text-bgLightPrimary text-bgPrimary">{title}</div>
 			{children}
 		</div>
 	);

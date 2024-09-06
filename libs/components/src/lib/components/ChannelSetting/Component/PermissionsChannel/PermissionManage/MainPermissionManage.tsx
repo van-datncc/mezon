@@ -3,7 +3,7 @@ import {
 	RolesClanEntity,
 	selectAllPermissionRoleChannel,
 	selectAllRolesClan,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
@@ -44,7 +44,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 		const roleInChannelIds = new Set(rolesInChannel.map((roleInChannel) => roleInChannel.id));
 		return rolesClan.filter((role) => !roleInChannelIds.has(role.id));
 	}, [rolesClan, rolesInChannel]);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 
 	const listPermissionRef = useRef<ListPermissionHandle>(null);
 

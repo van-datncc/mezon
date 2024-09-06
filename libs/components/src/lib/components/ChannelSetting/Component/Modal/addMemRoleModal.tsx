@@ -3,20 +3,19 @@ import {
 	channelUsersActions,
 	RolesClanEntity,
 	selectAllRolesClan,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectCurrentClanId,
 	selectMembersByChannelId,
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
-import { InputField } from '@mezon/ui';
+import { Icons, InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiUser } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
-import * as Icons from '../../../../../../../ui/src/lib/Icons';
 import ListMembers from './listMembers';
 import ListRole from './listRoles';
 interface AddMemRoleProps {
@@ -56,7 +55,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 		[rolesClan, rolesAddChannel]
 	);
 
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const rawMembers = useSelector(selectMembersByChannelId(channel.id));
 	const listUserInvite = useMemo(() => {
 		if (channel.channel_private !== 1) {
