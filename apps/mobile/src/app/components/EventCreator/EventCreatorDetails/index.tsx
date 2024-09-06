@@ -149,6 +149,8 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 									mode="time"
 									onChange={(value) => setStartTime(value)}
 									value={startTime}
+									need24HourFormat={{ is24hourSource: 'locale' }}
+									needLocale={{ locale: 'vi' }}
 								/>
 							</View>
 						</View>
@@ -169,6 +171,8 @@ export default function EventCreatorDetails({ navigation, route }: MenuClanScree
 										mode="time"
 										onChange={(value) => setEndTime(value)}
 										value={endTime}
+										need24HourFormat={{ is24hourSource: 'locale' }}
+										needLocale={{ locale: 'vi' }}
 									/>
 								</View>
 							</View>

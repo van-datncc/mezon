@@ -37,6 +37,10 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 			</TouchableOpacity>
 		)
 	});
+	const convertToLocalTime = (utcDate) => {
+		const timezoneOffset = utcDate.getTimezoneOffset();
+		return new Date(utcDate.getTime() - timezoneOffset * 60000);
+	};
 
 	function handleClose() {
 		onGoBack?.();
@@ -44,13 +48,12 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 	}
 
 	async function handleCreate() {
-		const timeValueStart = (startTime as Date).toISOString();
-		const timeValueEnd = (endTime as Date).toISOString();
-
+		const timeValueStart = (convertToLocalTime(startTime) as Date).toISOString();
+		const timeValueEnd = (convertToLocalTime(endTime) as Date).toISOString();
 		if (type === OptionEvent.OPTION_SPEAKER) {
-			await createEventManagement(currentClanId || '', channelId, title, title, timeValueStart, timeValueStart, description, '');
+			await createEventManagement(currentClanId || '', channelId, location, title, timeValueStart, timeValueStart, description, '');
 		} else {
-			await createEventManagement(currentClanId || '', channelId, title, title, timeValueStart, timeValueEnd, description, '');
+			await createEventManagement(currentClanId || '', channelId, location, title, timeValueStart, timeValueEnd, description, '');
 		}
 		onGoBack?.();
 		navigation.navigate(APP_SCREEN.HOME);
