@@ -736,7 +736,9 @@ export type MessageTypeUpdateLink = {
 	mode?: ChannelStreamMode;
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
-	isMe?: true;
+	isMe?: boolean;
+	code?: number;
+	attachments?: ApiMessageAttachment[];
 };
 
 export type RequestInput = {

@@ -24,7 +24,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 		headerTitle: t('screens.eventPreview.headerTitle'),
 		headerTitleStyle: {
 			fontSize: Fonts.size.h7,
-			color: themeValue.textDisabled,
+			color: themeValue.textDisabled
 		},
 		headerLeft: () => (
 			<TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
@@ -35,7 +35,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
 				<Icons.CloseLargeIcon height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
 			</TouchableOpacity>
-		),
+		)
 	});
 
 	function handleClose() {
@@ -68,7 +68,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 						creator_id: myUser.userId,
 						title: title,
 						description: description,
-						channel_id: channelId,
+						channel_id: channelId
 					}}
 					showActions={false}
 				/>

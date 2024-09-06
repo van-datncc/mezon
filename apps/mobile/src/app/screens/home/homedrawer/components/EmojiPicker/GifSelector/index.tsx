@@ -21,7 +21,7 @@ export default function GifSelector({ onSelected, searchText, onScroll }: GifSel
 		dataGifsFeartured,
 		trendingClickingStatus,
 		setButtonArrowBack,
-		fetchGifsDataSearch,
+		fetchGifsDataSearch
 	} = useGifs();
 
 	const { valueInputToCheckHandleSearch, setValueInputSearch } = useGifsStickersEmoji();

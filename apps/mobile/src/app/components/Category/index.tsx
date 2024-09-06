@@ -43,7 +43,7 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
 			<Pressable style={{ padding: 20 }} onPress={handleClose}>
 				<Icons.CloseSmallBoldIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
 			</Pressable>
-		),
+		)
 	});
 
 	const handleCreateCategory = async () => {
@@ -51,7 +51,7 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
 
 		const body: ApiCreateCategoryDescRequest = {
 			clan_id: currentClanId?.toString(),
-			category_name: categoryName?.trim(),
+			category_name: categoryName?.trim()
 		};
 		await dispatch(categoriesActions.createNewCategory(body));
 		setCategoryName('');
@@ -70,10 +70,10 @@ export default function CategoryCreator({ navigation }: MenuClanScreenProps<Crea
 				{
 					title: t('fields.catePrivate.title'),
 					component: <MezonSwitch />,
-					icon: <Icons.LockIcon height={size.s_18} width={size.s_18} color={themeValue.text} />,
-				},
-			],
-		},
+					icon: <Icons.LockIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
+				}
+			]
+		}
 	];
 
 	return (

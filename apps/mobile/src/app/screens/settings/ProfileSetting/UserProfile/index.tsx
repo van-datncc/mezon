@@ -30,7 +30,7 @@ export default function UserProfile({ userProfileValue, setCurrentUserProfileVal
 	function handleHashtagPress() {
 		Toast.show({
 			type: 'info',
-			text1: 'Original known as ' + auth.userProfile?.user?.username + '#' + auth.userId,
+			text1: 'Original known as ' + auth.userProfile?.user?.username + '#' + auth.userId
 		});
 	}
 
@@ -40,7 +40,7 @@ export default function UserProfile({ userProfileValue, setCurrentUserProfileVal
 				avatar={userProfileValue?.imgUrl}
 				alt={userProfileValue?.username}
 				onLoad={handleAvatarChange}
-				defaultAvatar={process.env.NX_LOGO_MEZON || ""}
+				defaultAvatar={process.env.NX_LOGO_MEZON || ''}
 			/>
 			<View style={styles.btnGroup}>
 				<TouchableOpacity onPress={() => handleHashtagPress()} style={styles.btnIcon}>
@@ -53,7 +53,7 @@ export default function UserProfile({ userProfileValue, setCurrentUserProfileVal
 					displayName: userProfileValue.displayName,
 					username: userProfileValue.username,
 					aboutMe: userProfileValue.aboutMe,
-					imgUrl: userProfileValue.imgUrl,
+					imgUrl: userProfileValue.imgUrl
 				}}
 				onChange={handleDetailChange}
 			/>

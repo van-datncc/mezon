@@ -1,2 +1,2 @@
-export * from './inviteToChannel'
-export * from './message'
+export * from './inviteToChannel';
+export * from './message';
