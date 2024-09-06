@@ -76,7 +76,7 @@ export async function handleUploadFile(
 			}
 			const shortFileType = getFileType(fileType);
 
-			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
+			const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, false);
 			const buf = await file?.arrayBuffer();
 
 			resolve(uploadFile(client, session, filePath, shortFileType, file.size, Buffer.from(buf), false, originalFilename));
@@ -109,7 +109,7 @@ export async function handleUploadFileMobile(
 					console.log('Failed to read file data.');
 					return;
 				}
-				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename);
+				const { filePath, originalFilename } = createUploadFilePath(session, currentClanId, currentChannelId, filename, true);
 				resolve(uploadFile(client, session, filePath, fileType, file.size, arrayBuffer, true, originalFilename));
 			}
 		} catch (error) {
@@ -123,10 +123,11 @@ export function createUploadFilePath(
 	session: Session,
 	currentClanId: string,
 	currentChannelId: string,
-	filename: string
+	filename: string,
+	isMobile: boolean
 ): { filePath: string; originalFilename: string } {
-	const originalFilename = filename;
-
+	const lastUnderscoreIndex = filename.lastIndexOf('_');
+	const originalFilename = lastUnderscoreIndex !== -1 && !isMobile ? filename.substring(0, lastUnderscoreIndex) : filename;
 	// Append milliseconds timestamp to filename
 	const ms = new Date().getMilliseconds();
 	filename = ms + filename;

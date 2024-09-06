@@ -448,7 +448,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 				if (nonDirectAttachments.length > 0) {
 					const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
 					const uploadPromises = createdFiles.map((file, index) => {
-						const filename = index + file.name;
+						const filename = file.name + '_' + index;
 						return handleUploadFile(client, session, clanId, channelId, filename, file);
 					});
 
