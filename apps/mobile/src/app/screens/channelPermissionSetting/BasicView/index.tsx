@@ -55,7 +55,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	};
 	return (
 		<ScrollView>
-			<TouchableOpacity onPress={() => onPrivateChannelChange(!channel?.channel_private)}>
+			<TouchableOpacity onPress={() => onPrivateChannelChange(!isPrivateChannel)}>
 				<Block
 					flexDirection="row"
 					justifyContent="space-between"
@@ -105,7 +105,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				})} */}
 
 				<Block backgroundColor={themeValue.primary} borderRadius={size.s_14}>
-					{availableAccessMemberList.map((member) => {
+					{availableAccessMemberList?.map((member) => {
 						return <MemberItem key={member?.id} member={member} channelId={channel?.channel_id} />;
 					})}
 				</Block>
