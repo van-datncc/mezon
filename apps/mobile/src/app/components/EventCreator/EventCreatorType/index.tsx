@@ -66,13 +66,13 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 			] satisfies IMezonOptionData,
 		[]
 	);
-	
+
 	const channels = voicesChannel?.map((item) => ({
 		title: item.channel_label,
 		value: item.channel_id,
 		icon: <SpeakerIcon height={20} width={20} color={themeValue.text} />
 	}));
-	
+
 	const [eventType, setEventType] = useState<OptionEvent>();
 	const [channelID, setChannelID] = useState<string>(channels?.[0]?.value || '');
 	const [location, setLocation] = useState<string>('');
@@ -114,7 +114,7 @@ export default memo(function EventCreatorType({ navigation, route }: MenuClanScr
 					</View>
 
 					<MezonOption data={options} onChange={handleEventTypeChange} />
-					
+
 					{eventType && eventType === OptionEvent.OPTION_SPEAKER && voicesChannel.length && (
 						<MezonSelect
 							prefixIcon={<Icons.VoiceNormalIcon height={20} width={20} color={themeValue.textStrong} />}

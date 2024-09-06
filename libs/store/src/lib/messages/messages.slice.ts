@@ -640,7 +640,7 @@ export const messagesSlice = createSlice({
 		setFirstMessageId: (state, action: PayloadAction<{ channelId: string; firstMessageId: string }>) => {
 			state.firstMessageId[action.payload.channelId] = action.payload.firstMessageId;
 		},
-		setChannelIdLastFetch: (state, action: PayloadAction<{ channelId: string; }>) => {
+		setChannelIdLastFetch: (state, action: PayloadAction<{ channelId: string }>) => {
 			state.channelIdLastFetch = action.payload.channelId;
 		},
 		setIdMessageToJump(state, action) {
