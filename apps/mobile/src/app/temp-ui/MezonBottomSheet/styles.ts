@@ -24,7 +24,8 @@ export const style = (colors: Attributes) =>
 			color: colors.textStrong,
 			fontWeight: 'bold',
 			flexGrow: 1,
-			flexBasis: 10
+			flexBasis: 10,
+			fontSize: Fonts.size.medium
 		},
 
 		titleSM: {},

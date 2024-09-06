@@ -16,8 +16,8 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../temp-ui';
 import { normalizeString } from '../../utils/helpers';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
+import { RenderTextMarkdownContent } from '../home/homedrawer/components';
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
-import { RenderTextMarkdownContent } from '../home/homedrawer/constants';
 import { style } from './styles';
 
 const SeparatorListFriend = () => {

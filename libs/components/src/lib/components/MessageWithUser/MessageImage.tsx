@@ -42,7 +42,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	};
 	const imgStyle = {
 		width: isDimensionsValid ? `${attachmentData.width}%` : undefined,
-		height: isDimensionsValid ? `${attachmentData.height}%` : undefined,
+		height: isDimensionsValid ? `${attachmentData.height}%` : undefined
 	};
 
 	const [imageError, setImageError] = useState(false);
@@ -59,7 +59,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				onContextMenu((e || {}) as React.MouseEvent<HTMLImageElement>);
 			}
 		},
-		[attachmentData?.url, onContextMenu, setImageURL, setPositionShow],
+		[attachmentData?.url, onContextMenu, setImageURL, setPositionShow]
 	);
 
 	if (imageError || !attachmentData.url) {
@@ -69,7 +69,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		<div className="relative inline-block">
 			<img
 				onContextMenu={handleContextMenu}
-				className={`max-w-[100%] max-h-[30vh] object-cover my-2 rounded ${!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default'}`}
+				className={`w-[150px] h-[150px] aspect-auto object-cover my-2 rounded ${!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default'}`}
 				src={attachmentData.url?.toString()}
 				alt={attachmentData.url}
 				onClick={() => handleClick(attachmentData.url || '')}

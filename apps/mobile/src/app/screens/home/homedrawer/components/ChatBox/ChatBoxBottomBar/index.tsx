@@ -358,7 +358,6 @@ export const ChatBoxBottomBar = memo(
 				dispatch(
 					referencesActions.setAtachmentAfterUpload({
 						channelId: currentChannel?.id,
-						messageId: '',
 						files: [
 							{
 								filename: attachment.filename,

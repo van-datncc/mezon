@@ -1,8 +1,9 @@
 import { directActions, messagesActions, selectDirectById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, fetchAndCreateFiles } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useChatMessages } from './useChatMessages';
 import { useChatSending } from './useChatSending';
@@ -22,10 +23,6 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const { lastMessage } = useChatMessages({ channelId });
 	const channel = useSelector(selectDirectById(channelId));
 
-	const [contentPayload, setContentPayload] = useState<IMessageSendPayload>();
-	const [mentionPayload, setMentionPayload] = useState<ApiMessageMention[]>();
-	const [attachmentPayload, setAttachmentPayload] = useState<ApiMessageAttachment[]>();
-
 	const sendDirectMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -33,9 +30,6 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>
 		) => {
-			setContentPayload(content);
-			setMentionPayload(mentions);
-			setAttachmentPayload(attachments);
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -87,22 +81,18 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	const { updateImageLinkMessage } = useChatSending({ channelId, mode });
 
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
-
 	useEffect(() => {
-		if (newMessageUpdateImage.clan_id === '0') {
+		if (newMessageUpdateImage.mode !== ChannelStreamMode.STREAM_MODE_CHANNEL && newMessageUpdateImage.isMe) {
 			processLink(
 				newMessageUpdateImage.clan_id!,
 				newMessageUpdateImage.channel_id!,
 				newMessageUpdateImage.mode!,
-				contentPayload,
-				mentionPayload,
-				attachmentPayload,
+				newMessageUpdateImage.content,
+				newMessageUpdateImage.mentions,
+				newMessageUpdateImage.attachments,
 				newMessageUpdateImage.message_id
 			);
 		}
-		setContentPayload({});
-		setMentionPayload([]);
-		setAttachmentPayload([]);
 	}, [newMessageUpdateImage.message_id]);
 
 	return useMemo(
