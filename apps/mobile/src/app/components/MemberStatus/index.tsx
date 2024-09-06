@@ -19,7 +19,7 @@ import style from './style';
 
 enum EActionButton {
 	AddMembers = 'Add Members',
-	InviteMembers = 'Invite Members',
+	InviteMembers = 'Invite Members'
 }
 
 export const MemberListStatus = React.memo(() => {
@@ -37,18 +37,19 @@ export const MemberListStatus = React.memo(() => {
 	}, [currentChannel]);
 	const handleAddOrInviteMembers = useCallback((action: EActionButton) => {
 		if (action === EActionButton.InviteMembers) bottomSheetRef?.current?.present();
+		if (action === EActionButton.AddMembers) navigateToNewGroupScreen();
 	}, []);
 
 	const navigateToNewGroupScreen = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.NEW_GROUP,
-			params: { directMessage: currentChannel as DirectEntity },
+			params: { directMessage: currentChannel as DirectEntity }
 		});
 	};
 
 	const onClose = useCallback(() => {
-		setSelectedUser(null)
-	}, [])
+		setSelectedUser(null);
+	}, []);
 
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
