@@ -183,7 +183,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	return (
 		<MessageContextMenuProvider>
 			<div
-				className={classNames('dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full', {
+				className={classNames('dark:bg-bgPrimary pb-5 mr-1 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full', {
 					customScrollLightMode: appearanceTheme === 'light'
 				})}
 				id="scrollLoading"

@@ -1,5 +1,5 @@
-import { useAppNavigation, useChatMessages, useClans } from '@mezon/core';
-import {ChannelsEntity, selectMemberByUserId, selectMembersByChannelId, useAppSelector} from '@mezon/store';
+import { useAppNavigation, useChatMessages } from '@mezon/core';
+import { ChannelsEntity, selectMemberByUserId } from '@mezon/store';
 import { convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
@@ -10,18 +10,38 @@ import ThreadModalContent from './ThreadModalContent';
 
 type ThreadItemProps = {
 	thread: ChannelsEntity;
+	avatarMembers?: (string | undefined)[];
 	setIsShowThread: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
+const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 	const user = useSelector(selectMemberByUserId(thread?.last_sent_message?.sender_id as string));
-	const threadMembers = useAppSelector(selectMembersByChannelId(thread.channel_id));
-	const previewAvatarList = threadMembers.slice(0, 5).map(member => member?.user?.avatar_url);
-
 	const { avatarImg, username } = useMessageSender(user);
 	const { messages } = useChatMessages({ channelId: thread.channel_id as string });
+
+	const getRandomElements = (array: (string | undefined)[], count: number) => {
+		const result = [];
+		const usedIndices = new Set();
+
+		while (result.length < count && usedIndices.size < array.length) {
+			const randomIndex = Math.floor(Math.random() * array.length);
+			if (!usedIndices.has(randomIndex)) {
+				usedIndices.add(randomIndex);
+				result.push(array[randomIndex]);
+			}
+		}
+
+		return result;
+	};
+
+	const previewAvatarList = useMemo(() => {
+		if (avatarMembers && avatarMembers.length > 0) {
+			return getRandomElements(avatarMembers, 5);
+		}
+		return [];
+	}, [avatarMembers]);
 
 	const timeMessage = useMemo(() => {
 		if (thread && thread.last_sent_message && thread.last_sent_message.timestamp_seconds) {
@@ -38,7 +58,7 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
-			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightMode border border-bgPrimary dark:hover:border-bgModifierHover hover:bg-bgLightModeButton"
+			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 			role="button"
 		>
 			<div className="flex flex-row justify-between items-center">
@@ -47,7 +67,9 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 					{thread?.last_sent_message ? (
 						<div className="flex flex-row items-center h-6">
 							<Avatar img={avatarImg} rounded size={'xs'} theme={{ root: { size: { xs: 'w-4 h-4' } } }} className="mr-2" />
-							<span className="text-[#17AC86] text-sm font-semibold leading-4">{user?.user?.display_name ?? username}:&nbsp;</span>
+							<span className="w-[150px] overflow-hidden text-ellipsis whitespace-nowrap text-[#17AC86] text-sm font-semibold leading-4">
+								{user?.user?.display_name ?? username}:&nbsp;
+							</span>
 							<div className="overflow-hidden max-w-[140px]">
 								<ThreadModalContent messages={messages} thread={thread} />
 							</div>
@@ -64,10 +86,17 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 					)}
 				</div>
 				<div className="w-[120px]">
-					<Avatar.Group className="flex gap-3 justify-end">
-						{previewAvatarList?.map((avatar) => <Avatar key={avatar} img={avatar} rounded size="xs" />)}
-						{threadMembers && threadMembers.length > 5 && <Avatar.Counter total={threadMembers?.length - 5} className="h-6 w-6" />}
-					</Avatar.Group>
+					{avatarMembers && (
+						<Avatar.Group className="flex gap-3 justify-end items-center">
+							{previewAvatarList?.map((avatar) => <Avatar key={avatar} img={avatar} rounded size="xs" />)}
+							{avatarMembers && avatarMembers.length > 5 && (
+								<Avatar.Counter
+									total={avatarMembers?.length - 5 > 50 ? 50 : avatarMembers?.length - 5}
+									className="h-4 w-6 dark:text-bgLightPrimary text-bgPrimary ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
+								/>
+							)}
+						</Avatar.Group>
+					)}
 				</div>
 			</div>
 		</div>
