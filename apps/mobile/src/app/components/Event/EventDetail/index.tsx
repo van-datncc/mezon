@@ -15,9 +15,10 @@ import { style } from './styles';
 
 interface IEventDetailProps {
 	event: EventManagementEntity;
+	eventDetailRef?: any;
 }
 
-export default function EventDetail({ event }: IEventDetailProps) {
+export default function EventDetail({ event, eventDetailRef }: IEventDetailProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
@@ -76,7 +77,7 @@ export default function EventDetail({ event }: IEventDetailProps) {
 			</View>
 
 			<MezonBottomSheet ref={menuBottomSheet}>
-				<EventMenu event={event} />
+				<EventMenu event={event} eventDetailRef={eventDetailRef} />
 			</MezonBottomSheet>
 		</View>
 	);
