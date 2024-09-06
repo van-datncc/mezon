@@ -24,13 +24,14 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDmGroupCurrentId,
+	selectModeResponsive,
 	toastActions,
 	useAppDispatch,
 	usersClanActions,
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { NotificationCode } from '@mezon/utils';
+import { ModeResponsive, NotificationCode } from '@mezon/utils';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -82,6 +83,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const modeResponsive = useSelector(selectModeResponsive);
 	const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
@@ -294,6 +296,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserclanadded = useCallback(
 		(userJoinClan: AddClanUserEvent) => {
+			if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
+				return;
+			}
 			dispatch(channelMembersActions.addUserJoinClan(userJoinClan));
 		},
 		[dispatch]

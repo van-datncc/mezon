@@ -22,7 +22,7 @@ export const ListClanPopup = React.memo(() => {
 		const store = await getStoreAsync();
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		save(STORAGE_CLAN_ID, clanId);
-
+		store.dispatch(clansActions.setCurrentClanId(clanId));
 		const promises = [];
 		promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
 		promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));

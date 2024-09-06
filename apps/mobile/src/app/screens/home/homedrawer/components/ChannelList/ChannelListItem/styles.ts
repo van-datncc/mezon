@@ -22,7 +22,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 8,
-        borderRadius: 5
+        borderRadius: 5,
+        flex: 1,
     },
 
     dotIsNew: {

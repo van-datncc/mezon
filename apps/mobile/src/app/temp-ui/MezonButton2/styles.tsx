@@ -57,7 +57,7 @@ export const style = (colors: Attributes) =>
 		title: {
 			color: baseColor.white,
 			fontSize: Fonts.size.h7,
-			textAlign: "center",
-			width: "100%"
+			textAlign: 'center',
+			width: 'auto'
 		},
 	});

@@ -37,6 +37,7 @@ export default function MezonMenuItem({
 		isShow && (
 			<TouchableOpacity
 				disabled={disabled}
+				activeOpacity={1}
 				onPress={() => {
 					onPress && onPress();
 				}}
