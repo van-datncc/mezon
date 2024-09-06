@@ -89,9 +89,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					channelName: currentDmGroup?.channel_label || currentDmGroup?.usernames,
 					type: currentDmGroup?.type,
 					noCache: true,
-					isFetchingLatestMessages: true,
-				}),
-			),
+					isFetchingLatestMessages: true
+				})
+			)
 		]);
 		save(STORAGE_CLAN_ID, currentChannel?.clan_id);
 	}, [currentChannel?.clan_id, currentDmGroup?.channel_label, currentDmGroup?.id, currentDmGroup?.type, currentDmGroup?.usernames]);

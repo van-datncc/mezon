@@ -62,7 +62,25 @@ function useMenuReplyMenuBuilder(message: IMessageWithUser) {
 	const messageId = message.id;
 
 	const handleItemClick = useCallback(() => {
-		dispatch(referencesActions.setIdReferenceMessageReply({ channelId: message.channel_id, idMessageRefReply: messageId }));
+		dispatch(
+			referencesActions.setDataReferences({
+				channelId: message.channel_id,
+				dataReferences: {
+					message_ref_id: message.id,
+					ref_type: 0,
+					message_sender_id: message.sender_id,
+					content: JSON.stringify(message.content),
+					message_sender_username: message.username,
+					mesages_sender_avatar: message.clan_avatar ? message.clan_avatar : message.avatar,
+					message_sender_clan_nick: message.clan_nick,
+					message_sender_display_name: message.display_name,
+					has_attachment: (message.attachments && message.attachments?.length > 0) ?? false,
+					channel_id: message.channel_id ?? '',
+					mode: message.mode ?? 0,
+					channel_label: message.channel_label
+				}
+			})
+		);
 		dispatch(messagesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [dispatch, messageId]);
