@@ -1,3 +1,5 @@
+// this file is renamed because git is case-insensitive
+// TODO: rename this file to SettingUserClanProfileSave.tsx
 import { getSelectedRoleId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
@@ -10,7 +12,8 @@ export type ModalSettingSave = {
 export type SettingUserClanProfileSaveProps = {
 	PropsSave: ModalSettingSave;
 };
-const SettingUserClanProfileSave = (props: SettingUserClanProfileSaveProps) => {
+
+export const SettingUserClanProfileSave = (props: SettingUserClanProfileSaveProps) => {
 	const { PropsSave } = props;
 	const clickRole = useSelector(getSelectedRoleId);
 	return PropsSave.flagOption || clickRole === 'New Role' ? (
@@ -40,4 +43,3 @@ const SettingUserClanProfileSave = (props: SettingUserClanProfileSaveProps) => {
 		</div>
 	) : null;
 };
-export default SettingUserClanProfileSave;
