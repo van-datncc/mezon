@@ -1,12 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { RootState, authActions, selectTheme, useAppDispatch } from '@mezon/store';
-import { Loading } from 'libs/ui/src/lib/Loading/index';
+import { Icons, Loading } from '@mezon/ui';
 import { BaseSyntheticEvent, useCallback, useState } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
-import * as Icons from '../../../../../../ui/src/lib/Icons';
 
 export type LoginFormPayload = {
 	userEmail: string;
