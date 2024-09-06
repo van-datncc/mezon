@@ -1,5 +1,3 @@
-// this file is renamed because git is case-insensitive
-// TODO: rename this file to SettingUserClanProfileSave.tsx
 import { getSelectedRoleId } from '@mezon/store';
 import { useSelector } from 'react-redux';
 
