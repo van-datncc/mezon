@@ -2,7 +2,6 @@ import {
 	messagesActions,
 	referencesActions,
 	selectAttachmentByChannelId,
-	selectDataReferences,
 	selectIdMessageToJump,
 	selectOpenOptionMessageState,
 	selectOpenThreadMessageState,
@@ -10,13 +9,11 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
-import { ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useReference(channelId?: string) {
 	const dispatch = useAppDispatch();
-	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
@@ -30,13 +27,6 @@ export function useReference(channelId?: string) {
 	const setStatusLoadingAttachment = useCallback(
 		(status: boolean) => {
 			dispatch(referencesActions.setStatusLoadingAttachment(status));
-		},
-		[dispatch]
-	);
-
-	const setDataReferences = useCallback(
-		(dataReference: ApiMessageRef[]) => {
-			dispatch(referencesActions.setDataReferences(dataReference));
 		},
 		[dispatch]
 	);
@@ -62,21 +52,22 @@ export function useReference(channelId?: string) {
 		[dispatch]
 	);
 
-	const removeAttachmentByIndex = (channelId: string, indexItem: number) => {
-		dispatch(
-			referencesActions.removeAttachment({
-				channelId: channelId || '',
-				index: indexItem
-			})
-		);
-	};
+	const removeAttachmentByIndex = useCallback(
+		(channelId: string, indexItem: number) => {
+			dispatch(
+				referencesActions.removeAttachment({
+					channelId: channelId || '',
+					index: indexItem
+				})
+			);
+		},
+		[dispatch]
+	);
 
 	return useMemo(
 		() => ({
-			setDataReferences,
 			setIdMessageToJump,
 			setOpenThreadMessageState,
-			dataReferences,
 			openThreadMessageState,
 			openOptionMessageState,
 			idMessageToJump,
@@ -88,10 +79,8 @@ export function useReference(channelId?: string) {
 			checkAttachment
 		}),
 		[
-			setDataReferences,
 			setIdMessageToJump,
 			setOpenThreadMessageState,
-			dataReferences,
 			openThreadMessageState,
 			openOptionMessageState,
 			idMessageToJump,
@@ -100,8 +89,7 @@ export function useReference(channelId?: string) {
 			setStatusLoadingAttachment,
 			removeAttachmentByIndex,
 			attachmentFilteredByChannelId,
-			checkAttachment,
-			removeAttachmentByIndex
+			checkAttachment
 		]
 	);
 }

@@ -19,7 +19,12 @@ function ReplyMessageBox({ channelId, idMessage }: MessageReplyProps) {
 
 	const handleRemoveReply = () => {
 		dispatch(referencesActions.setIdReferenceMessageReply({ channelId, idMessageRefReply: '' }));
-		dispatch(referencesActions.setDataReferences(null));
+		dispatch(
+			referencesActions.setDataReferences({
+				channelId: channelId,
+				dataReferences: { has_attachment: false, channel_id: '', mode: 0, channel_label: '' }
+			})
+		);
 	};
 
 	return (

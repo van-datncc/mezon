@@ -26,7 +26,6 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
-	// selectFilteredAttachments,
 	selectHashtagDMByDirectId,
 	selectIdMessageRefEdit,
 	selectIdMessageRefReply,
@@ -132,7 +131,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { channels } = useChannels();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-	const dataReferences = useSelector(selectDataReferences);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { setSubPanelActive } = useGifsStickersEmoji();
 	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directId || ''));
@@ -158,6 +156,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
 		[currentChannel?.channel_id, currentDmId, props.mode]
 	);
+	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
+	console.log('dataReferences: ', dataReferences.content);
 
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
@@ -166,7 +166,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
-	const { setDataReferences, setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
+	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
 
 	const { mentions } = useMessageLine(request?.content);
@@ -298,12 +298,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (getRefMessageReply !== null && dataReferences && dataReferences.length > 0) {
+			if (getRefMessageReply !== null && dataReferences) {
 				props.onSend(
 					filterEmptyArrays(payload),
 					mentionList,
 					attachmentData,
-					dataReferences,
+					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
 					anonymousMessage,
 					mentionEveryone
@@ -312,7 +312,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				dispatch(referencesActions.setIdReferenceMessageReply({ channelId: currentDmOrChannelId as string, idMessageRefReply: '' }));
 				setMentionEveryone(false);
-				setDataReferences([]);
+				dispatch(
+					referencesActions.setDataReferences({
+						channelId: currentDmOrChannelId ?? '',
+						dataReferences: { has_attachment: false, channel_id: '', mode: 0, channel_label: '' }
+					})
+				);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
@@ -380,7 +385,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			mentions,
 			usersClan,
 			members,
-			setDataReferences,
 			currentChannelId,
 			valueThread?.content.t,
 			valueThread?.mentions,
@@ -509,11 +513,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	}, [emojiPicked, addEmojiState]);
 
 	useEffect(() => {
-		if (getRefMessageReply && getRefMessageReply.attachments) {
+		if (getRefMessageReply) {
 			dispatch(
-				referencesActions.setDataReferences([
-					{
-						message_id: '',
+				referencesActions.setDataReferences({
+					channelId: currentDmOrChannelId ?? '',
+					dataReferences: {
 						message_ref_id: getRefMessageReply.id,
 						ref_type: 0,
 						message_sender_id: getRefMessageReply.sender_id,
@@ -522,9 +526,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						mesages_sender_avatar: getRefMessageReply.clan_avatar ? getRefMessageReply.clan_avatar : getRefMessageReply.avatar,
 						message_sender_clan_nick: getRefMessageReply.clan_nick,
 						message_sender_display_name: getRefMessageReply.display_name,
-						has_attachment: getRefMessageReply.attachments?.length > 0
+						has_attachment: (getRefMessageReply.attachments && getRefMessageReply.attachments?.length > 0) ?? false,
+						channel_id: getRefMessageReply.channel_id ?? '',
+						mode: getRefMessageReply.mode ?? 0,
+						channel_label: getRefMessageReply.channel_label
 					}
-				])
+				})
 			);
 		}
 	}, [getRefMessageReply]);

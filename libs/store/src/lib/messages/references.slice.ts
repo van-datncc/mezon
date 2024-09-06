@@ -21,7 +21,7 @@ export interface IAttachmentFile {
 export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
-	dataReferences: ApiMessageRef[];
+	dataReferences: Record<string, ApiMessageRef>;
 	openEditMessageState: boolean;
 	idMessageRefReply: Record<string, string>;
 	idMessageRefReaction: string;
@@ -41,7 +41,7 @@ export const fetchReferences = createAsyncThunk<ReferencesEntity[]>('references/
 export const initialReferencesState: ReferencesState = referencesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	dataReferences: [],
+	dataReferences: {},
 	idMessageToJump: '',
 	openEditMessageState: false,
 	openReplyMessageState: false,
@@ -65,8 +65,8 @@ export const referencesSlice = createSlice({
 			state.idMessageMention = action.payload;
 		},
 
-		setDataReferences(state, action) {
-			state.dataReferences = action.payload;
+		setDataReferences(state, action: PayloadAction<{ channelId: string; dataReferences: ApiMessageRef }>) {
+			state.dataReferences[action.payload.channelId] = action.payload.dataReferences;
 		},
 
 		setStatusLoadingAttachment(state, action) {
@@ -184,7 +184,10 @@ export const selectAllReferences = createSelector(getReferencesState, selectAll)
 
 export const selectReferencesEntities = createSelector(getReferencesState, selectEntities);
 
-export const selectDataReferences = createSelector(getReferencesState, (state: ReferencesState) => state.dataReferences);
+export const selectDataReferences = (channelId: string) =>
+	createSelector(getReferencesState, (state: ReferencesState) => {
+		return state.dataReferences[channelId] || '';
+	});
 
 export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
 

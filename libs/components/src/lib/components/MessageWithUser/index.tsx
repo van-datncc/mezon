@@ -94,7 +94,7 @@ function MessageWithUser({
 	}, [message]);
 
 	const checkMessageHasReply = useMemo(() => {
-		return message.references && message.references?.length !== 0;
+		return message.references && message.references?.length !== 0 && message.references[0].message_ref_id !== undefined;
 	}, [message.references]);
 
 	const checkMessageIncludeMention = useMemo(() => {
