@@ -184,7 +184,7 @@ const MessageModalImage = () => {
 				</div>
 			</div>
 			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414]">
-				<div className="flex-1 flex justify-center items-center px-5 overflow-hidden h-full w-full relative">
+				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative">
 					<img
 						src={urlImg}
 						alt={urlImg}
