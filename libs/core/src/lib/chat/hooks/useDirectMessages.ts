@@ -42,8 +42,9 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 			if (attachments && attachments.length > 0) {
 				const createdFiles = await fetchAndCreateFiles(attachments);
 
-				const uploadPromises = createdFiles.map((file) => {
-					return handleUploadFile(client, session, '0', channel.id, file.name, file);
+				const uploadPromises = createdFiles.map((file, index) => {
+					const filename = file.name + '_' + index;
+					return handleUploadFile(client, session, '0', channel.id, filename, file);
 				});
 
 				uploadedFiles = await Promise.all(uploadPromises);
