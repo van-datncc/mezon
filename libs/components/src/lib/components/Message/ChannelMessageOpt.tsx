@@ -62,7 +62,6 @@ function useMenuReplyMenuBuilder(message: IMessageWithUser) {
 	const messageId = message.id;
 
 	const handleItemClick = useCallback(() => {
-		console.log(message);
 		dispatch(
 			referencesActions.setDataReferences({
 				channelId: message.channel_id,

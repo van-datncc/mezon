@@ -5,7 +5,6 @@ import {
 	selectIdMessageToJump,
 	selectOpenOptionMessageState,
 	selectOpenThreadMessageState,
-	selectStatusLoadingAttachment,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -17,19 +16,11 @@ export function useReference(channelId?: string) {
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const openOptionMessageState = useSelector(selectOpenOptionMessageState);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const statusLoadingAttachment = useSelector(selectStatusLoadingAttachment);
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
 
 	const checkAttachment = useMemo(() => {
 		return attachmentFilteredByChannelId?.files?.length > 0;
 	}, [attachmentFilteredByChannelId]);
-
-	const setStatusLoadingAttachment = useCallback(
-		(status: boolean) => {
-			dispatch(referencesActions.setStatusLoadingAttachment(status));
-		},
-		[dispatch]
-	);
 
 	const setIdMessageToJump = useCallback(
 		(idMessageToJump: string) => {
@@ -72,8 +63,6 @@ export function useReference(channelId?: string) {
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,
-			statusLoadingAttachment,
-			setStatusLoadingAttachment,
 			removeAttachmentByIndex,
 			attachmentFilteredByChannelId,
 			checkAttachment
@@ -85,8 +74,6 @@ export function useReference(channelId?: string) {
 			openOptionMessageState,
 			idMessageToJump,
 			setOpenOptionMessageState,
-			statusLoadingAttachment,
-			setStatusLoadingAttachment,
 			removeAttachmentByIndex,
 			attachmentFilteredByChannelId,
 			checkAttachment

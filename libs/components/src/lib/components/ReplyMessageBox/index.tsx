@@ -1,28 +1,29 @@
 import { useShowName } from '@mezon/core';
-import { referencesActions, selectMessageByMessageId } from '@mezon/store';
+import { referencesActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useDispatch, useSelector } from 'react-redux';
-import { useMessageParser } from '../MessageWithUser/useMessageParser';
+import { blankReferenceObj } from '@mezon/utils';
+import { ApiMessageRef } from 'mezon-js/api.gen';
+import { useDispatch } from 'react-redux';
 
 type MessageReplyProps = {
 	channelId: string;
-	idMessage: string;
+	dataReferences: ApiMessageRef;
 };
 
-function ReplyMessageBox({ channelId, idMessage }: MessageReplyProps) {
+function ReplyMessageBox({ channelId, dataReferences }: MessageReplyProps) {
 	const dispatch = useDispatch();
-	const refMessage = useSelector(selectMessageByMessageId(idMessage));
-
-	const { userClanNickname, userDisplayName, username, senderId } = useMessageParser(refMessage);
-
-	const nameShowed = useShowName(userClanNickname ?? '', userDisplayName ?? '', username ?? '', senderId ?? '');
+	const nameShowed = useShowName(
+		dataReferences.message_sender_clan_nick ?? '',
+		dataReferences.message_sender_display_name ?? '',
+		dataReferences.message_sender_username ?? '',
+		dataReferences.message_sender_id ?? ''
+	);
 
 	const handleRemoveReply = () => {
-		// dispatch(referencesActions.setIdReferenceMessageReply({ channelId, idMessageRefReply: '' }));
 		dispatch(
 			referencesActions.setDataReferences({
 				channelId: channelId,
-				dataReferences: { has_attachment: false, channel_id: '', mode: 0, channel_label: '' }
+				dataReferences: blankReferenceObj
 			})
 		);
 	};
