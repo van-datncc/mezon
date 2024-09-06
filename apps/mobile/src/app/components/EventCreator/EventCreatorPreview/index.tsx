@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import MezonButton from '../../../temp-ui/MezonButton2';
+import MezonButton, { EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
 import EventItem from '../../Event/EventItem';
 import { style } from './styles';
 
@@ -87,7 +87,12 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 			</View>
 
 			<View style={styles.btnWrapper}>
-				<MezonButton title={t('actions.create')} titleStyle={{ fontSize: Fonts.size.h7 }} type="success" onPress={handleCreate} />
+				<MezonButton
+					title={t('actions.create')}
+					titleStyle={{ fontSize: Fonts.size.h7 }}
+					type={EMezonButtonTheme.SUCCESS}
+					onPress={handleCreate}
+				/>
 			</View>
 		</View>
 	);
