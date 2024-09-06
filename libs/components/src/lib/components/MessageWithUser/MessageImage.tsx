@@ -69,7 +69,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		<div className="relative inline-block">
 			<img
 				onContextMenu={handleContextMenu}
-				className={`w-[150px] h-[150px] aspect-auto object-cover my-2 rounded ${!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default'}`}
+				className={`max-w-[100%] h-[150px] object-contain my-2 rounded ${!isDimensionsValid && !checkImage ? 'cursor-pointer' : 'cursor-default'}`}
 				src={attachmentData.url?.toString()}
 				alt={attachmentData.url}
 				onClick={() => handleClick(attachmentData.url || '')}
