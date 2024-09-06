@@ -81,7 +81,7 @@ function MessageWithUser({
 		const userIdMention = userLogin.userProfile?.user?.id;
 		const mentionOnMessage = message.mentions;
 		let includesHere = false;
-		if (message.content.t && typeof message.content.t == 'string') {
+		if (typeof message.content.t == 'string') {
 			includesHere = message.content.t?.includes('@here');
 		}
 		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
