@@ -339,7 +339,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideCreateThread = isDM || !isCanManageThread;
 		const isHideDeleteMessage = !((isCanDeleteMessage && !isDM) || isMyMessage);
 
-		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
+		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
 		const listOfActionShouldHide = [

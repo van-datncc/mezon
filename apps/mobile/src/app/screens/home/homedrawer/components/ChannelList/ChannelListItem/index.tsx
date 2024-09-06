@@ -60,7 +60,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			const store = await getStoreAsync();
 			timeoutRef.current = setTimeout(() => {
 				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-			}, 50);
+			}, 10);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		}
 	};

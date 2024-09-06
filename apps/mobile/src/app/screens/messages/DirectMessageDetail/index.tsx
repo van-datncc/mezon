@@ -81,7 +81,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const directMessageLoader = useCallback(async () => {
 		const store = await getStoreAsync();
-		store.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 		await Promise.all([
 			store.dispatch(clansActions.setCurrentClanId('0')),
 			store.dispatch(
