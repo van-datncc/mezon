@@ -57,7 +57,7 @@ export default function EventViewer({ handlePressEventCreate }: { handlePressEve
 
 			<MezonBottomSheet ref={bottomSheetDetail}>
 				<MezonTab
-					views={[<EventDetail event={currentEvent} />, <EventMember event={currentEvent} />]}
+					views={[<EventDetail event={currentEvent} eventDetailRef={bottomSheetDetail} />, <EventMember event={currentEvent} />]}
 					titles={['Event Info', 'Interested']}
 				/>
 			</MezonBottomSheet>
