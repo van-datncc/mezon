@@ -59,7 +59,7 @@
         "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
       },
       "linux": {
-        "icon": "apps/desktop/src/assets/mac-icon.png",
+        "icon": "apps/desktop/src/assets/linux-icon.png",
         "category": "Utility",
         "target": "deb",
         "mimeTypes": [
@@ -179,7 +179,7 @@
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
-          "icon": "apps/desktop/src/assets/mac-icon.png",
+          "icon": "apps/desktop/src/assets/linux-icon.png",
           "category": "Utility",
           "target": "deb",
           "mimeTypes": [
@@ -248,7 +248,7 @@
           "artifactName": "${name}-${version}-${os}-${arch}.${ext}"
         },
         "linux": {
-          "icon": "apps/desktop/src/assets/mac-icon.png",
+          "icon": "apps/desktop/src/assets/linux-icon.png",
           "category": "Utility",
           "target": "deb",
           "mimeTypes": [
