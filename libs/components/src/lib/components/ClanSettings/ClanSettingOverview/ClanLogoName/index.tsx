@@ -1,6 +1,6 @@
-import { Icons } from '@mezon/components';
 import { selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { Icons } from '@mezon/ui';
 import { ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
@@ -117,12 +117,9 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 								</div>
 								<input ref={fileInputRef} id="upload_logo" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 							</label>
-							<button
-								onClick={handleCloseFile}
-								className="absolute top-0 right-0 w-7 h-7 rounded-full bg-[#A7A8AC] hover:bg-[#919193] flex items-center justify-center"
-							>
-								{urlLogo ? <Icons.Close /> : <Icons.ImageUploadIcon />}
-							</button>
+							<div className="absolute right-[-10px] top-0 p-[5px] bg-[#ffffff] rounded-full z-50 shadow-xl border">
+								<Icons.SelectFileIcon />
+							</div>
 						</div>
 						<p className="text-[10px] mt-[10px]">Minimum Size: 128x128</p>
 					</div>
