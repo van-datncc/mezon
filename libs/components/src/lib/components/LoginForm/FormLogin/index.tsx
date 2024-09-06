@@ -21,7 +21,7 @@ export const validationSchema = Yup.object().shape({
 	userEmail: Yup.string().email('Invalid email address').required('Email is required'),
 	password: Yup.string()
 		.required('Password is required')
-		.matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/, 'Must Contain 8 Characters, One Uppercase, One Lowercase, One Number'),
+		.matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/, 'Must Contain 8 Characters, One Uppercase, One Lowercase, One Number')
 });
 
 function LoginForm(props: LoginFormProps) {
@@ -32,15 +32,15 @@ function LoginForm(props: LoginFormProps) {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		formState: { errors }
 	} = useForm<LoginFormPayload>({
 		resolver: yupResolver(validationSchema) as unknown as Resolver<LoginFormPayload>,
 
 		defaultValues: {
 			password: '',
 			remember: false,
-			userEmail: '',
-		},
+			userEmail: ''
+		}
 	});
 
 	const submitForm = useCallback(
@@ -50,7 +50,7 @@ function LoginForm(props: LoginFormProps) {
 			}
 			return false;
 		},
-		[onSubmit],
+		[onSubmit]
 	);
 
 	const handleFormSubmit = useCallback(
@@ -58,7 +58,7 @@ function LoginForm(props: LoginFormProps) {
 			e.preventDefault();
 			handleSubmit(submitForm)(e);
 		},
-		[handleSubmit, submitForm],
+		[handleSubmit, submitForm]
 	);
 
 	const [showPassword, setShowPassword] = useState(false);

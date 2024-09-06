@@ -27,7 +27,7 @@ const ListRoleMember = memo((props: ListRoleMemberProps) => {
 	const { listManageInChannel, usersClan, channelId, onSelect, canChange, listManageNotInChannel } = props;
 	const [selectedItemId, setSelectedItemId] = useState<string | null>(EVERYONE_ROLE_ID);
 	const dispatch = useAppDispatch();
-	
+
 	useEffect(() => {
 		if (listManageInChannel.length > 0) {
 			setSelectedItemId(listManageInChannel[0].id);
