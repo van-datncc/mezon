@@ -1,5 +1,5 @@
 import { useAppNavigation, useReference, useThreads } from '@mezon/core';
-import { searchMessagesActions, selectAllUsesClan, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
+import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Button } from 'flowbite-react';
 import { useMemo } from 'react';
@@ -21,7 +21,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 	const { setIsShowCreateThread, threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
 	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const allUsesClan = useSelector(selectAllUsesClan);
+	const allUsesClan = useSelector(selectAllUserClans);
 
 	const avatarMembers = useMemo(() => allUsesClan?.map((member) => member?.user?.avatar_url), [allUsesClan]);
 

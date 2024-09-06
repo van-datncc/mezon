@@ -85,11 +85,11 @@ const { selectAll, selectById } = UsersClanAdapter.getSelectors();
 
 export const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 
-export const selectAllUsesClan = createSelector(getUsersClanState, selectAll);
+export const selectAllUserClans = createSelector(getUsersClanState, selectAll);
 
 export const selectMemberClanByUserId = (userId: string) => createSelector(getUsersClanState, (state) => selectById(state, userId));
 
 export const selectMemberClanByGoogleId = (googleId: string) =>
-	createSelector(selectAllUsesClan, (members) => {
+	createSelector(selectAllUserClans, (members) => {
 		return members.find((member) => member.user?.google_id === googleId);
 	});

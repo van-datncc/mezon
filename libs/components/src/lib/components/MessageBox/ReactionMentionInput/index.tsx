@@ -18,7 +18,7 @@ import {
 	referencesActions,
 	selectAllAccount,
 	selectAllRolesClan,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectAttachmentByChannelId,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -143,7 +143,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const { emojis } = useEmojiSuggestion();
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 

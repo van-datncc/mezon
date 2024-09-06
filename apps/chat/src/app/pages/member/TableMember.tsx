@@ -1,4 +1,4 @@
-import { selectAllUsesClan } from '@mezon/store';
+import { selectAllUserClans } from '@mezon/store';
 import { getTimeDifferenceDate } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -11,7 +11,7 @@ interface ITableMemberProps {
 }
 
 const TableMember: React.FC<ITableMemberProps> = ({ currentPage, pageSize }) => {
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const displayUsersClan = useMemo(() => {
 		const start = (currentPage - 1) * pageSize;
 		const end = Math.min(start + pageSize, usersClan.length);
