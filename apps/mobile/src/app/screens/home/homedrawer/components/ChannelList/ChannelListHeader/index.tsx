@@ -1,11 +1,11 @@
 import { MenuHorizontalIcon, VerifyIcon } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClan } from '@mezon/store-mobile';
 import React, { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { style } from './styles';
 import { useSelector } from 'react-redux';
+import { style } from './styles';
 
 interface IProps {
 	onPress: () => void;
@@ -28,11 +28,11 @@ const ChannelListHeader = ({ onPress }: IProps) => {
 					<Text numberOfLines={1} style={styles.titleServer}>
 						{currentClan?.clan_name}
 					</Text>
-					<VerifyIcon width={18} height={18} color={baseColor.blurple} />
+					<VerifyIcon width={size.s_18} height={size.s_18} color={baseColor.blurple} />
 				</View>
 
 				<TouchableOpacity style={[styles.actions, { backgroundColor: themeValue.primary }]} onPress={handlePress}>
-					<MenuHorizontalIcon height={18} width={18} color={themeValue.text} />
+					<MenuHorizontalIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 				</TouchableOpacity>
 			</TouchableOpacity>
 		</View>

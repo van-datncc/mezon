@@ -16,8 +16,8 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../temp-ui';
 import { normalizeString } from '../../utils/helpers';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
+import { RenderTextMarkdownContent } from '../home/homedrawer/components';
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
-import { RenderTextMarkdownContent } from '../home/homedrawer/constants';
 import { style } from './styles';
 
 const SeparatorListFriend = () => {
@@ -69,7 +69,11 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
 				{!!content && (
-					<RenderTextMarkdownContent isHiddenHashtag={true} content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />
+					<RenderTextMarkdownContent
+						isOpenLink={false}
+						isHiddenHashtag={true}
+						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
+					/>
 				)}
 			</View>
 		);
@@ -181,13 +185,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			<View style={styles.headerWrapper}>
 				<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
 				<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
-					<Icons.UserPlusIcon height={20} width={20} color={themeValue.textStrong} />
+					<Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 					<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 				</Pressable>
 			</View>
 
 			<View style={styles.searchMessage}>
-				<Icons.MagnifyingIcon height={20} width={20} color={themeValue.text} />
+				<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
 				<TextInput
 					placeholder={t('common:searchPlaceHolder')}
 					placeholderTextColor={themeValue.text}
@@ -215,7 +219,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			)}
 
 			<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
-				<Icons.MessagePlusIcon width={22} height={22} />
+				<Icons.MessagePlusIcon width={size.s_22} height={size.s_22} />
 			</Pressable>
 
 			<MezonBottomSheet ref={bottomSheetDMMessageRef} snapPoints={['40%', '60%']}>

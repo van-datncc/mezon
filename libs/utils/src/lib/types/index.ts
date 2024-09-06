@@ -30,6 +30,7 @@ import {
 	ApiPinMessage,
 	ApiRole,
 	ApiSearchMessageDocument,
+	ApiSystemMessage,
 	ApiUser,
 	ChannelUserListChannelUser,
 	ClanUserListClanUser,
@@ -129,6 +130,10 @@ export type IChannel = ApiChannelDescription & {
 };
 
 export type IPinMessage = ApiPinMessage & {
+	id: string;
+};
+
+export type IPSystemMessage = ApiSystemMessage & {
 	id: string;
 };
 
@@ -731,7 +736,9 @@ export type MessageTypeUpdateLink = {
 	mode?: ChannelStreamMode;
 	content?: IMessageSendPayload;
 	mentions?: ApiMessageMention[];
-	isMe?: true;
+	isMe?: boolean;
+	code?: number;
+	attachments?: ApiMessageAttachment[];
 };
 
 export type RequestInput = {

@@ -9,24 +9,24 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			gap: size.s_10,
 			backgroundColor: colors.secondary,
-			paddingLeft: Metrics.size.xl,
+			paddingLeft: Metrics.size.xl
 		},
 
 		btnTextWrapper: {
 			flexBasis: 10,
-			flexGrow: 1,
+			flexGrow: 1
 		},
 
 		btnTitle: {
 			color: colors.text,
-			fontSize: Fonts.size.h7,
-			fontWeight: '600',
+			fontSize: Fonts.size.medium,
+			fontWeight: '600'
 		},
 
 		btnDescription: {
 			marginTop: Metrics.size.s,
 			color: colors.text,
-			fontSize: Fonts.size.h9,
+			fontSize: Fonts.size.tiny
 		},
 
 		btnTitleWrapper: {
@@ -38,19 +38,19 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'space-between',
 			gap: Metrics.size.s,
-			flexBasis: 10,
+			flexBasis: 10
 		},
 		borderBottom: {
 			borderBottomColor: colors.borderDim,
-			borderBottomWidth: 1,
+			borderBottomWidth: 1
 		},
 
 		disable: {
-			opacity: 0.5,
+			opacity: 0.5
 		},
 
 		previewValue: {
 			color: colors.text,
-			fontSize: Fonts.size.h8,
-		},
+			fontSize: Fonts.size.small
+		}
 	});
