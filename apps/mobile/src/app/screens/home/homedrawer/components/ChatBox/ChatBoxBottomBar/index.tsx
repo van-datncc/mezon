@@ -106,7 +106,7 @@ export const ChatBoxBottomBar = memo(
 		const listChannel = useSelector(selectAllChannels);
 
 		useEffect(() => {
-			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL && Platform.OS === 'android') {
 				setIsFocus(true);
 				inputRef && inputRef?.current && inputRef.current.focus();
 			}

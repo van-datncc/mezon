@@ -1,7 +1,7 @@
 import { useRoles, useUserPermission } from '@mezon/core';
 import { CheckIcon, CloseIcon, Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { UsersClanEntity, selectAllRolesClan, selectAllUsesClan, selectRoleByRoleId } from '@mezon/store-mobile';
+import { UsersClanEntity, selectAllRolesClan, selectAllUserClans, selectRoleByRoleId } from '@mezon/store-mobile';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
@@ -19,7 +19,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	const roleId = route.params?.roleId;
 	const { t } = useTranslation('clanRoles');
 	const RolesClan = useSelector(selectAllRolesClan);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const [originSelectedMembers, setOriginSelectedMembers] = useState<string[]>([]);
 	const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 	const [searchMemberText, setSearchMemberText] = useState('');
