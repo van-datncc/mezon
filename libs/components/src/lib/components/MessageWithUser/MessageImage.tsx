@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from '../ContextMenu';
 
 export type MessageImage = {
-	readonly attachmentData: ApiMessageAttachment;
+	readonly attachmentData: ApiMessageAttachment & { create_time?: string };
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	mode?: ChannelStreamMode;
 	messageId?: string;
@@ -30,6 +30,13 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		dispatch(attachmentActions.setMode(mode));
 		setOpenModalAttachment(true);
 		setAttachment(url);
+		dispatch(
+			attachmentActions.setCurrentAttachment({
+				id: attachmentData.message_id as string,
+				uploader: attachmentData.sender_id,
+				create_time: attachmentData.create_time
+			})
+		);
 
 		// if there is currentDmGroupId is fetch for DM
 		if ((currentClanId && currentChannelId) || currentDmGroupId) {
