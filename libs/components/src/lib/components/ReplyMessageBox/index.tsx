@@ -18,7 +18,7 @@ function ReplyMessageBox({ channelId, idMessage }: MessageReplyProps) {
 	const nameShowed = useShowName(userClanNickname ?? '', userDisplayName ?? '', username ?? '', senderId ?? '');
 
 	const handleRemoveReply = () => {
-		dispatch(referencesActions.setIdReferenceMessageReply({ channelId, idMessageRefReply: '' }));
+		// dispatch(referencesActions.setIdReferenceMessageReply({ channelId, idMessageRefReply: '' }));
 		dispatch(
 			referencesActions.setDataReferences({
 				channelId: channelId,

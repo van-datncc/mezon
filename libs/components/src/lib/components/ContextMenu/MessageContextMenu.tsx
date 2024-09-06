@@ -110,12 +110,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	});
 
 	const handleReplyMessage = () => {
-		dispatch(
-			referencesActions.setIdReferenceMessageReply({
-				channelId: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || '',
-				idMessageRefReply: message.id
-			})
-		);
+		// dispatch(
+		// 	referencesActions.setIdReferenceMessageReply({
+		// 		channelId: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || '',
+		// 		idMessageRefReply: message.id
+		// 	})
+		// );
 		dispatch(messagesActions.setIdMessageToJump(''));
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	};

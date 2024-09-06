@@ -23,7 +23,7 @@ export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	error?: string | null;
 	dataReferences: Record<string, ApiMessageRef>;
 	openEditMessageState: boolean;
-	idMessageRefReply: Record<string, string>;
+	// idMessageRefReply: Record<string, string>;
 	idMessageRefReaction: string;
 	idMessageRefEdit: string;
 	statusLoadingAttachment: boolean;
@@ -45,7 +45,7 @@ export const initialReferencesState: ReferencesState = referencesAdapter.getInit
 	idMessageToJump: '',
 	openEditMessageState: false,
 	openReplyMessageState: false,
-	idMessageRefReply: {},
+	// idMessageRefReply: {},
 	idMessageRefReaction: '',
 	idMessageRefEdit: '',
 	statusLoadingAttachment: false,
@@ -66,6 +66,7 @@ export const referencesSlice = createSlice({
 		},
 
 		setDataReferences(state, action: PayloadAction<{ channelId: string; dataReferences: ApiMessageRef }>) {
+			console.log('ac', action.payload);
 			state.dataReferences[action.payload.channelId] = action.payload.dataReferences;
 		},
 
@@ -144,9 +145,9 @@ export const referencesSlice = createSlice({
 			}
 		},
 
-		setIdReferenceMessageReply(state, action: PayloadAction<{ channelId: string; idMessageRefReply: string }>) {
-			state.idMessageRefReply[action.payload.channelId] = action.payload.idMessageRefReply;
-		},
+		// setIdReferenceMessageReply(state, action: PayloadAction<{ channelId: string; idMessageRefReply: string }>) {
+		// 	state.idMessageRefReply[action.payload.channelId] = action.payload.idMessageRefReply;
+		// },
 		setIdReferenceMessageReaction(state, action) {
 			state.idMessageRefReaction = action.payload;
 		},
@@ -213,10 +214,10 @@ export const selectUploadingStatus = (channelId: string, messageId: string) =>
 		}
 	);
 
-export const selectIdMessageRefReply = (channelId: string) =>
-	createSelector(getReferencesState, (state: ReferencesState) => {
-		return state.idMessageRefReply[channelId] || '';
-	});
+// export const selectIdMessageRefReply = (channelId: string) =>
+// 	createSelector(getReferencesState, (state: ReferencesState) => {
+// 		return state.idMessageRefReply[channelId] || '';
+// 	});
 
 export const selectAttachmentByChannelId = (channelId: string) =>
 	createSelector(selectAttachmentAfterUpload, (attachmentAfterUpload) => attachmentAfterUpload[channelId] || null);

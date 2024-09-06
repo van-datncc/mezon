@@ -1,10 +1,10 @@
-import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectIdMessageRefReply } from '@mezon/store';
+import { GifStickerEmojiPopup, MessageBox, UserMentionList } from '@mezon/components';
+import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
+// import { selectIdMessageRefReply } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
@@ -19,7 +19,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 	const { subPanelActive } = useGifsStickersEmoji();
 
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply(channelId));
+	// const idMessageRefReply = useSelector(selectIdMessageRefReply(channelId));
 
 	const handleSend = useCallback(
 		(
@@ -53,11 +53,11 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
 
-	const handleCloseReplyMessageBox = () => {
-		dispatch(referencesActions.setIdReferenceMessageReply({ channelId, idMessageRefReply: '' }));
-	};
+	// const handleCloseReplyMessageBox = () => {
+	// 	dispatch(referencesActions.setIdReferenceMessageReply({ channelId, idMessageRefReply: '' }));
+	// };
 
-	useEscapeKey(handleCloseReplyMessageBox);
+	// useEscapeKey(handleCloseReplyMessageBox);
 
 	return (
 		<div className="mx-2 relative" role="button">
@@ -71,7 +71,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
-			{idMessageRefReply && <ReplyMessageBox channelId={channelId} idMessage={idMessageRefReply} />}
+			{/* {idMessageRefReply && <ReplyMessageBox channelId={channelId} idMessage={idMessageRefReply} />} */}
 			<MessageBox
 				listMentions={UserMentionList({ channelID: channelId, channelMode: mode })}
 				onSend={handleSend}

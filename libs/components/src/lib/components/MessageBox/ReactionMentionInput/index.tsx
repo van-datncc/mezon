@@ -28,7 +28,6 @@ import {
 	selectDmGroupCurrentId,
 	selectHashtagDMByDirectId,
 	selectIdMessageRefEdit,
-	selectIdMessageRefReply,
 	selectIsFocused,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
@@ -36,7 +35,6 @@ import {
 	selectIsShowPopupQuickMess,
 	selectIsUseProfileDM,
 	selectLassSendMessageEntityBySenderId,
-	selectMessageByMessageId,
 	selectOpenEditMessageState,
 	selectOpenThreadMessageState,
 	selectReactionRightState,
@@ -157,12 +155,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		[currentChannel?.channel_id, currentDmId, props.mode]
 	);
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
-	console.log('dataReferences: ', dataReferences.content);
+	console.log('dataReferences: ', dataReferences);
 
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentDmOrChannelId || ''));
-	const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
+	// const idMessageRefReply = useSelector(selectIdMessageRefReply(currentDmOrChannelId || ''));
+	// const getRefMessageReply = useSelector(selectMessageByMessageId(idMessageRefReply));
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
@@ -298,7 +296,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				return;
 			}
 
-			if (getRefMessageReply !== null && dataReferences) {
+			if (dataReferences) {
 				props.onSend(
 					filterEmptyArrays(payload),
 					mentionList,
@@ -310,7 +308,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				);
 				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
-				dispatch(referencesActions.setIdReferenceMessageReply({ channelId: currentDmOrChannelId as string, idMessageRefReply: '' }));
+				// dispatch(referencesActions.setIdReferenceMessageReply({ channelId: currentDmOrChannelId as string, idMessageRefReply: '' }));
 				setMentionEveryone(false);
 				dispatch(
 					referencesActions.setDataReferences({
@@ -374,7 +372,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props,
 			threadCurrentChannel,
 			openThreadMessageState,
-			getRefMessageReply,
+			// getRefMessageReply,
 			dataReferences,
 			dispatch,
 			setSubPanelActive,
@@ -503,38 +501,39 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		if ((closeMenu && statusMenu) || openEditMessageState || isShowPopupQuickMess) {
 			return editorRef?.current?.blur();
 		}
-		if (getRefMessageReply !== null || (emojiPicked?.shortName !== '' && !reactionRightState) || (!openEditMessageState && !idMessageRefEdit)) {
-			return focusToElement(editorRef);
-		}
-	}, [getRefMessageReply, emojiPicked, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
+		// if (getRefMessageReply !== null || (emojiPicked?.shortName !== '' && !reactionRightState) || (!openEditMessageState && !idMessageRefEdit)) {
+		// 	return focusToElement(editorRef);
+		// }
+		// }, [getRefMessageReply, emojiPicked, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
+	}, [emojiPicked, openEditMessageState, idMessageRefEdit, isShowPopupQuickMess]);
 
 	useEffect(() => {
 		handleEventAfterEmojiPicked();
 	}, [emojiPicked, addEmojiState]);
 
-	useEffect(() => {
-		if (getRefMessageReply) {
-			dispatch(
-				referencesActions.setDataReferences({
-					channelId: currentDmOrChannelId ?? '',
-					dataReferences: {
-						message_ref_id: getRefMessageReply.id,
-						ref_type: 0,
-						message_sender_id: getRefMessageReply.sender_id,
-						content: JSON.stringify(getRefMessageReply.content),
-						message_sender_username: getRefMessageReply.username,
-						mesages_sender_avatar: getRefMessageReply.clan_avatar ? getRefMessageReply.clan_avatar : getRefMessageReply.avatar,
-						message_sender_clan_nick: getRefMessageReply.clan_nick,
-						message_sender_display_name: getRefMessageReply.display_name,
-						has_attachment: (getRefMessageReply.attachments && getRefMessageReply.attachments?.length > 0) ?? false,
-						channel_id: getRefMessageReply.channel_id ?? '',
-						mode: getRefMessageReply.mode ?? 0,
-						channel_label: getRefMessageReply.channel_label
-					}
-				})
-			);
-		}
-	}, [getRefMessageReply]);
+	// useEffect(() => {
+	// 	if (getRefMessageReply) {
+	// 		dispatch(
+	// 			referencesActions.setDataReferences({
+	// 				channelId: currentDmOrChannelId ?? '',
+	// 				dataReferences: {
+	// 					message_ref_id: getRefMessageReply.id,
+	// 					ref_type: 0,
+	// 					message_sender_id: getRefMessageReply.sender_id,
+	// 					content: JSON.stringify(getRefMessageReply.content),
+	// 					message_sender_username: getRefMessageReply.username,
+	// 					mesages_sender_avatar: getRefMessageReply.clan_avatar ? getRefMessageReply.clan_avatar : getRefMessageReply.avatar,
+	// 					message_sender_clan_nick: getRefMessageReply.clan_nick,
+	// 					message_sender_display_name: getRefMessageReply.display_name,
+	// 					has_attachment: (getRefMessageReply.attachments && getRefMessageReply.attachments?.length > 0) ?? false,
+	// 					channel_id: getRefMessageReply.channel_id ?? '',
+	// 					mode: getRefMessageReply.mode ?? 0,
+	// 					channel_label: getRefMessageReply.channel_label
+	// 				}
+	// 			})
+	// 		);
+	// 	}
+	// }, [getRefMessageReply]);
 
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	useEffect(() => {
