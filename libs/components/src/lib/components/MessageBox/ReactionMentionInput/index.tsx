@@ -18,7 +18,7 @@ import {
 	referencesActions,
 	selectAllAccount,
 	selectAllRolesClan,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectAttachmentByChannelId,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -140,7 +140,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const { members } = useChannelMembers({ channelId: currentChannelId });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const { emojis } = useEmojiSuggestion();
 	const { emojiPicked, addEmojiState } = useEmojiSuggestion();
 
@@ -562,7 +562,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				>
 					<div className="flex flex-col justify-end flex-grow">
 						{!threadCurrentChannel && (
-							<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-bgInputDark bg-bgLightModeButton rounded-full pointer-events-none">
+							<div className="relative flex items-center justify-center mx-4 w-16 h-16 dark:bg-bgInputDark bg-bgTextarea rounded-full pointer-events-none">
 								<Icons.ThreadIcon defaultSize="w-7 h-7" />
 								{isPrivate === 1 && (
 									<div className="absolute right-4 bottom-4">
@@ -577,7 +577,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 							value={nameValueThread ?? ''}
 							label="Thread Name"
 							placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
-							className="h-10 p-[10px] dark:bg-bgTertiary bg-white dark:text-white text-colorTextLightMode text-base outline-none rounded-md placeholder:text-sm"
+							className="h-10 p-[10px] dark:bg-bgTertiary bg-bgTextarea dark:text-white text-colorTextLightMode text-base outline-none rounded-md placeholder:text-sm"
 						/>
 						{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
 						{valueThread && openThreadMessageState && <ChannelMessageThread message={valueThread} />}

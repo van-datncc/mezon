@@ -5,10 +5,10 @@ import {
 	UsersClanEntity,
 	getNewAddMembers,
 	getSelectedRoleId,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectCurrentClan,
 	selectTheme,
-	setAddMemberRoles,
+	setAddMemberRoles
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import { ThemeApp, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
@@ -26,7 +26,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 	const dispatch = useDispatch();
 	const [searchTerm, setSearchTerm] = useState('');
 	const currentClan = useSelector(selectCurrentClan);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const addUsers = useSelector(getNewAddMembers);
 
 	const clickRole = useSelector(getSelectedRoleId);
@@ -160,7 +160,7 @@ type ItemMemberModalProps = {
 };
 
 const ItemMemberModal = (props: ItemMemberModalProps) => {
-	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar='', avatar = '', checked, onHandle } = props;
+	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', checked, onHandle } = props;
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
@@ -174,7 +174,7 @@ const ItemMemberModal = (props: ItemMemberModalProps) => {
 						src={avatarPrioritize}
 						classNameText="text-[9px] pt-[3px]"
 					/>
-					<p className='font-semibold one-line'>{namePrioritize}</p>
+					<p className="font-semibold one-line">{namePrioritize}</p>
 					<p className="text-contentTertiary one-line">{userName}</p>
 				</div>
 				<input id={id} type="checkbox" checked={checked} onChange={onHandle} />

@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { selectAllUsesClan } from '@mezon/store';
+import { selectAllUserClans } from '@mezon/store';
 import { Dropdown, Pagination } from 'flowbite-react';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -9,7 +9,7 @@ import TableMember from './TableMember';
 const MemberClan = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pageSize, setPageSize] = useState(5);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const totalPages = useMemo(() => {
 		return Math.ceil(usersClan.length / pageSize);
 	}, [usersClan.length, pageSize]);

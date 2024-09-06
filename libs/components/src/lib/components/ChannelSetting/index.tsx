@@ -1,9 +1,9 @@
 import { useEscapeKey } from '@mezon/core';
 import { fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import * as Icons from '../../../../../ui/src/lib/Icons';
 import SettingCategoryChannel from './Component/CategoryChannel';
 import IntegrationsChannel from './Component/IntegrationsChannel';
 import InvitesChannel from './Component/InvitesChannel';
@@ -17,11 +17,11 @@ export type ModalSettingProps = {
 	channel: IChannel;
 };
 export enum EChannelSettingTab {
-	OVERVIEW = "Overview",
-	PREMISSIONS = "Permissions",
-	INVITES = "Invites",
-	INTEGRATIONS = "Integrations",
-	CATEGORY = "Category"
+	OVERVIEW = 'Overview',
+	PREMISSIONS = 'Permissions',
+	INVITES = 'Invites',
+	INTEGRATIONS = 'Integrations',
+	CATEGORY = 'Category'
 }
 const SettingChannel = (props: ModalSettingProps) => {
 	const { onClose, channel } = props;
@@ -38,24 +38,30 @@ const SettingChannel = (props: ModalSettingProps) => {
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		dispatch(fetchWebhooks({ channelId: channel.channel_id as string, clanId: clanId }));
-	}, [channel.channel_id, dispatch])
+	}, [channel.channel_id, dispatch]);
 
 	const closeMenu = useSelector(selectCloseMenu);
 
 	const [openModalAdd, setOpenModalAdd] = useState(false);
-	useEscapeKey(!openModalAdd ? onClose : () => {});
-	
+
+	const handleClose = () => {
+		if (!openModalAdd) {
+			onClose();
+		}
+	};
+
+	useEscapeKey(handleClose);
 
 	return (
 		<div className="flex fixed inset-0  w-screen z-10 cursor-default" onMouseDown={(event) => event.stopPropagation()} role="button">
 			<div className="flex text-gray- w-screen relative text-white">
 				<div className="h-fit absolute top-5 right-5 block sbm:hidden z-[1]">
-					<button
-						className="bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out"
-						onClick={onClose}
+					<div
+						onClick={() => onClose()}
+						className="rounded-full p-[10px] border-2 dark:border-[#a8a6a6] border-black cursor-pointer dark:text-[#a8a6a6] text-black"
 					>
-						X
-					</button>
+						<Icons.CloseButton className="w-4" />
+					</div>
 				</div>
 				<div className="h-fit absolute top-5 left-5 block sbm:hidden z-[1]">
 					<button
@@ -73,7 +79,9 @@ const SettingChannel = (props: ModalSettingProps) => {
 					stateMenu={menu}
 				/>
 				{currentSetting === EChannelSettingTab.OVERVIEW && <OverviewChannel channel={channel} />}
-				{currentSetting === EChannelSettingTab.PREMISSIONS && <PermissionsChannel channel={channel} setOpenModalAdd={setOpenModalAdd} openModalAdd={openModalAdd}/>}
+				{currentSetting === EChannelSettingTab.PREMISSIONS && (
+					<PermissionsChannel channel={channel} setOpenModalAdd={setOpenModalAdd} openModalAdd={openModalAdd} />
+				)}
 				{currentSetting === EChannelSettingTab.INVITES && <InvitesChannel />}
 				{currentSetting === EChannelSettingTab.INTEGRATIONS && <IntegrationsChannel currentChannel={channel} />}
 				{currentSetting === EChannelSettingTab.CATEGORY && <SettingCategoryChannel channel={channel} />}

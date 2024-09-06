@@ -1,7 +1,7 @@
 import { useFriends } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, FriendsEntity, directActions, useAppDispatch } from '@mezon/store-mobile';
+import { DirectEntity, FriendsEntity, channelUsersActions, directActions, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType, User } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -37,7 +37,7 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 		return friendList.filter(
 			(friend) =>
 				normalizeString(friend?.user?.username).includes(normalizeString(searchText)) ||
-				normalizeString(friend?.user?.display_name).includes(normalizeString(searchText)),
+				normalizeString(friend?.user?.display_name).includes(normalizeString(searchText))
 		);
 	}, [friendList, searchText]);
 
@@ -61,27 +61,45 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 		setFriendIdSelectedList(friendIdSelected);
 	}, []);
 
+	const handleAddMemberToGroupChat = async (listAdd: ApiCreateChannelDescRequest) => {
+		await dispatch(
+			channelUsersActions.addChannelUsers({
+				channelId: directMessage?.channel_id as string,
+				clanId: directMessage?.clan_id as string,
+				userIds: listAdd.user_ids ?? [],
+				channelType: directMessage?.type
+			})
+		);
+
+		navigation.goBack();
+	};
+
 	const createNewGroup = async () => {
 		if (friendIdSelectedList?.length === 0) return;
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: friendIdSelectedList?.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
 			channel_private: 1,
-			user_ids: friendIdSelectedList,
+			user_ids: friendIdSelectedList
 		};
+
+		if (directMessage?.type === ChannelType.CHANNEL_TYPE_GROUP) {
+			handleAddMemberToGroupChat(bodyCreateDmGroup);
+			return;
+		}
 
 		const response = await dispatch(directActions.createNewDirectMessage(bodyCreateDmGroup));
 		const resPayload = response.payload as ApiCreateChannelDescRequest;
 		if (resPayload.channel_id) {
 			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
-				params: { directMessageId: resPayload.channel_id, from: APP_SCREEN.MESSAGES.NEW_GROUP },
+				params: { directMessageId: resPayload.channel_id, from: APP_SCREEN.MESSAGES.NEW_GROUP }
 			});
 		}
 	};
 
 	const onClose = useCallback(() => {
-		setSelectedUser(null)
-	}, [])
+		setSelectedUser(null);
+	}, []);
 
 	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
 	return (
@@ -93,11 +111,19 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 							<Icons.ArrowLargeLeftIcon height={20} width={20} color={themeValue.text} />
 						</Pressable>
 						<View style={styles.screenTitleWrapper}>
-							<Text style={styles.screenTitle}>{t('screen:headerTitle.newGroup')}</Text>
+							<Text style={styles.screenTitle}>
+								{directMessage?.type === ChannelType.CHANNEL_TYPE_GROUP
+									? t('screen:headerTitle.addMembers')
+									: t('screen:headerTitle.newGroup')}
+							</Text>
 						</View>
 						<View style={styles.actions}>
 							<Pressable onPress={() => createNewGroup()}>
-								<Text style={styles.actionText}>{t('message:newMessage.create')}</Text>
+								<Text style={styles.actionText}>
+									{directMessage?.type === ChannelType.CHANNEL_TYPE_GROUP
+										? t('message:newMessage.add')
+										: t('message:newMessage.create')}
+								</Text>
 							</Pressable>
 						</View>
 					</View>

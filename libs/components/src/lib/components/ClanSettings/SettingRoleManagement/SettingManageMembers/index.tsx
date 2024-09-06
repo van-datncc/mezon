@@ -1,5 +1,5 @@
 import { useRoles } from '@mezon/core';
-import { getNewAddMembers, getSelectedRoleId, RolesClanEntity, selectAllUsesClan, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
+import { getNewAddMembers, getSelectedRoleId, RolesClanEntity, selectAllUserClans, selectCurrentClan, setAddMemberRoles } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { getAvatarForPrioritize, getNameForPrioritize, UsersClanEntity } from '@mezon/utils';
 import { useEffect, useState } from 'react';
@@ -7,13 +7,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { AddMembersModal } from '../AddMembersModal';
 
-const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[], hasPermissionEdit: boolean }) => {
+const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: RolesClanEntity[]; hasPermissionEdit: boolean }) => {
 	const { updateRole } = useRoles();
 	const dispatchRole = useDispatch();
 	const currentClan = useSelector(selectCurrentClan);
 	const addUsers: string[] = useSelector(getNewAddMembers);
 	const clickRole = useSelector(getSelectedRoleId);
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const activeRole = RolesClan.find((role) => role.id === clickRole);
@@ -104,32 +104,27 @@ type ItemMemberProps = {
 	avatar?: string;
 	isNewRole: boolean;
 	onRemove: () => void;
-}
+};
 
 const ItemMember = (props: ItemMemberProps) => {
-	const {id='', userName='', displayName='', clanName='', clanAvatar='', avatar='', isNewRole, onRemove} = props;
+	const { id = '', userName = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', isNewRole, onRemove } = props;
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 	return (
 		<li key={id} className="flex justify-between items-center">
 			<div className="flex gap-x-2">
-				<AvatarImage 
-					alt={userName}
-					userName={userName}
-					className="min-w-6 min-h-6 max-w-6 max-h-6"
-					src={avatarPrioritize}
-				/>
+				<AvatarImage alt={userName} userName={userName} className="min-w-6 min-h-6 max-w-6 max-h-6" src={avatarPrioritize} />
 				<span className="dark:text-white text-black font-medium one-line">{namePrioritize}</span>
 				<span className="dark:text-colorNeutral text-colorTextLightMode font-light">{userName}</span>
 			</div>
 			{!isNewRole ? (
-				<div 
+				<div
 					onClick={onRemove}
 					className="w-4 h-4 rounded-full flex justify-center items-center dark:bg-slate-800 bg-bgLightModeButton mr-5 cursor-pointer"
 				>
-					<Icons.Close defaultSize="size-2 dark:text-white text-black"/>
+					<Icons.Close defaultSize="size-2 dark:text-white text-black" />
 				</div>
 			) : null}
 		</li>
-	)
-}
+	);
+};

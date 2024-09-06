@@ -10,7 +10,8 @@ export type ModalSettingSave = {
 export type SettingUserClanProfileSaveProps = {
 	PropsSave: ModalSettingSave;
 };
-const SettingUserClanProfileSave = (props: SettingUserClanProfileSaveProps) => {
+
+export const SettingUserClanProfileSave = (props: SettingUserClanProfileSaveProps) => {
 	const { PropsSave } = props;
 	const clickRole = useSelector(getSelectedRoleId);
 	return PropsSave.flagOption || clickRole === 'New Role' ? (
@@ -40,4 +41,3 @@ const SettingUserClanProfileSave = (props: SettingUserClanProfileSaveProps) => {
 		</div>
 	) : null;
 };
-export default SettingUserClanProfileSave;

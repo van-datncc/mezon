@@ -2,6 +2,7 @@ import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
+	formatContentEditMessage,
 	getChannelHashtag,
 	load,
 	mentionRegexSplit,
@@ -103,6 +104,13 @@ export const ChatBoxBottomBar = memo(
 		const [textChange, setTextChange] = useState<string>('');
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
+
+		useEffect(() => {
+			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+				setIsFocus(true);
+				inputRef && inputRef?.current && inputRef.current.focus();
+			}
+		}, [currentChannel?.id, mode]);
 
 		const isAvailableSending = useMemo(() => {
 			return text?.length > 0 && text?.trim()?.length > 0;
@@ -268,9 +276,21 @@ export const ChatBoxBottomBar = memo(
 
 		const handleMessageAction = (messageAction: IMessageActionNeedToResolve) => {
 			const { type, targetMessage } = messageAction;
+			let dataEditMessageFormatted;
 			switch (type) {
 				case EMessageActionType.EditMessage:
-					handleTextInputChange(targetMessage.content.t);
+					dataEditMessageFormatted = formatContentEditMessage(targetMessage);
+					if (dataEditMessageFormatted?.emojiPicked?.length) {
+						dataEditMessageFormatted?.emojiPicked?.forEach((emoji) => {
+							dispatch(
+								emojiSuggestionActions.setSuggestionEmojiObjPicked({
+									shortName: emoji?.shortName,
+									id: emoji?.emojiid
+								})
+							);
+						});
+					}
+					handleTextInputChange(dataEditMessageFormatted?.formatContentDraft);
 					break;
 				case EMessageActionType.CreateThread:
 					dispatch(threadsActions.setOpenThreadMessageState(true));

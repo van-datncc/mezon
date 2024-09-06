@@ -1,18 +1,20 @@
+import { useEscapeKey } from '@mezon/core';
 import {
 	ChannelsEntity,
+	hasGrandchildModal,
 	selectAllChannels,
 	selectChannelById,
-	selectCurrentChannel,
 	selectCurrentClanId,
 	selectMemberById,
 	selectTheme,
+	settingClanStickerActions,
 	updateWebhookBySpecificId,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
+import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread, IChannel } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import { Icons } from 'libs/components/src/lib/components';
 import { ApiMessageAttachment, ApiWebhook, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -29,7 +31,7 @@ const convertDate = (isoDateString: string): string => {
 	const options: Intl.DateTimeFormatOptions = {
 		day: 'numeric',
 		month: 'long',
-		year: 'numeric',
+		year: 'numeric'
 	};
 	return date.toLocaleDateString('en-GB', options);
 };
@@ -79,6 +81,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 	const dispatch = useAppDispatch();
 	const [isShowPopup, setIsShowPopup] = useState(false);
 	const toggleShowPopup = () => {
+		dispatch(settingClanStickerActions.openModalInChild());
 		setIsShowPopup(!isShowPopup);
 	};
 	const handleCopyUrl = (url: string) => {
@@ -94,14 +97,14 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 	const [dataForUpdate, setDataForUpdate] = useState<IDataForUpdate>({
 		channelIdForUpdate: webhookItem.channel_id,
 		webhookAvatarUrl: webhookItem.avatar,
-		webhookNameInput: webhookItem.webhook_name,
+		webhookNameInput: webhookItem.webhook_name
 	});
 
 	useEffect(() => {
 		setDataForUpdate({
 			channelIdForUpdate: webhookItem.channel_id,
 			webhookAvatarUrl: webhookItem.avatar,
-			webhookNameInput: webhookItem.webhook_name,
+			webhookNameInput: webhookItem.webhook_name
 		});
 		setDropdownValue(webhookChannel.channel_label);
 	}, [webhookItem.channel_id]);
@@ -127,9 +130,9 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 				(attachment: ApiMessageAttachment) => {
 					setDataForUpdate({
 						...dataForUpdate,
-						webhookAvatarUrl: attachment.url,
+						webhookAvatarUrl: attachment.url
 					});
-				},
+				}
 			);
 		}
 	};
@@ -138,17 +141,29 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 		const request: MezonUpdateWebhookByIdBody = {
 			avatar: dataForUpdate.webhookAvatarUrl,
 			channel_id: dataForUpdate.channelIdForUpdate,
-			webhook_name: dataForUpdate.webhookNameInput,
+			webhook_name: dataForUpdate.webhookNameInput
 		};
-		await dispatch(updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannel?.channel_id || '', clanId: clanId }));
+		await dispatch(
+			updateWebhookBySpecificId({ request: request, webhookId: webhookItem.id, channelId: currentChannel?.channel_id || '', clanId: clanId })
+		);
 		setHasChange(false);
 	};
+
+	const isChildModal = useSelector(hasGrandchildModal);
+
+	const handleUseEscapeKey = () => {
+		if (isChildModal) {
+			setIsShowPopup(false);
+			dispatch(settingClanStickerActions.closeModalInChild());
+		}
+	};
+	useEscapeKey(handleUseEscapeKey);
 
 	const handleResetChange = () => {
 		setDataForUpdate({
 			channelIdForUpdate: webhookItem.channel_id,
 			webhookAvatarUrl: webhookItem.avatar,
-			webhookNameInput: webhookItem.webhook_name,
+			webhookNameInput: webhookItem.webhook_name
 		});
 		setDropdownValue(webhookChannel.channel_label);
 		setHasChange(false);
@@ -184,7 +199,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 									onChange={(e) =>
 										setDataForUpdate({
 											...dataForUpdate,
-											webhookNameInput: e.target.value,
+											webhookNameInput: e.target.value
 										})
 									}
 									type="text"
@@ -206,7 +221,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 								/>
 							</div>
 						</div>
-						<div className='max-sm:hidden block'>
+						<div className="max-sm:hidden block">
 							<div className="border-t dark:border-[#3b3d44] my-[24px]" />
 							<div className="flex items-center gap-[20px]">
 								<div
@@ -222,7 +237,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel }: IExpendedWebhookM
 						</div>
 					</div>
 				</div>
-				<div className='max-sm:block hidden'>
+				<div className="max-sm:block hidden">
 					<div className="border-t dark:border-[#3b3d44] my-[24px]" />
 					<div className="flex items-center gap-[20px]">
 						<div
@@ -258,9 +273,8 @@ const WebhookItemChannelDropdown = ({
 	hasChange,
 	dataForUpdate,
 	dropdownValue,
-	setDropdownValue,
+	setDropdownValue
 }: IWebhookItemChannelDropdown) => {
-
 	const allChannel = useSelector(selectAllChannels);
 	const [parentChannelsInClan, setParentChannelsInClan] = useState<ChannelsEntity[]>([]);
 	useEffect(() => {
@@ -274,7 +288,7 @@ const WebhookItemChannelDropdown = ({
 		if (!hasChange) {
 			setDataForUpdate({
 				...dataForUpdate,
-				channelIdForUpdate: webhookItem.channel_id,
+				channelIdForUpdate: webhookItem.channel_id
 			});
 		}
 	}, [hasChange]);
@@ -284,7 +298,7 @@ const WebhookItemChannelDropdown = ({
 			trigger="click"
 			renderTrigger={() => (
 				<div className="w-full h-[50px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex flex-row px-3 justify-between items-center">
-					<p className='truncate max-w-[90%]'>{dropdownValue}</p>
+					<p className="truncate max-w-[90%]">{dropdownValue}</p>
 					<div>
 						<Icons.ArrowDownFill />
 					</div>
@@ -300,11 +314,11 @@ const WebhookItemChannelDropdown = ({
 						<Dropdown.Item
 							key={channel.channel_id}
 							children={channel.channel_label ?? ''}
-							className='truncate'
+							className="truncate"
 							onClick={() => {
 								setDataForUpdate({
 									...dataForUpdate,
-									channelIdForUpdate: channel.channel_id,
+									channelIdForUpdate: channel.channel_id
 								});
 								setDropdownValue(channel.channel_label);
 							}}

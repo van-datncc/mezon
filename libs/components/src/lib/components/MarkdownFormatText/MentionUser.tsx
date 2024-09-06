@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectAllChannelMembers, selectAllRolesClan, selectMemberChannels } from '@mezon/store';
+import { selectAllChannelMembers, selectAllRolesClan, selectCurrentChannelId, selectMemberChannels, useAppSelector } from '@mezon/store';
 import { MouseButton, checkLastChar, getRoleList } from '@mezon/utils';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,7 +16,8 @@ type ChannelHashtagProps = {
 
 const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId }: ChannelHashtagProps) => {
 	const panelRef = useRef<HTMLAnchorElement>(null);
-	const memberChannels = useSelector(selectMemberChannels);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const memberChannels = useAppSelector((state) => selectMemberChannels(currentChannelId as string)(state));
 
 	const usersInChannel = useSelector(selectAllChannelMembers);
 	const [foundUser, setFoundUser] = useState<any>(null);

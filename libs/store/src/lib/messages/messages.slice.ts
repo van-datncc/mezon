@@ -107,6 +107,7 @@ export interface MessagesState {
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
+	channelIdLastFetch: string;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -222,6 +223,7 @@ export const fetchMessages = createAsyncThunk(
 				})
 			);
 		}
+		thunkAPI.dispatch(messagesActions.setChannelIdLastFetch({ channelId }));
 
 		const messages = response.messages.map((item) => {
 			return mapMessageChannelToEntity(item, response.last_seen_message?.id);
@@ -613,7 +615,8 @@ export const initialMessagesState: MessagesState = {
 	isViewingOlderMessagesByChannelId: {},
 	isJumpingToPresent: {},
 	idMessageToJump: '',
-	newMesssageUpdateImage: { message_id: '' }
+	newMesssageUpdateImage: { message_id: '' },
+	channelIdLastFetch: ''
 };
 
 export type SetCursorChannelArgs = {
@@ -636,6 +639,9 @@ export const messagesSlice = createSlice({
 		},
 		setFirstMessageId: (state, action: PayloadAction<{ channelId: string; firstMessageId: string }>) => {
 			state.firstMessageId[action.payload.channelId] = action.payload.firstMessageId;
+		},
+		setChannelIdLastFetch: (state, action: PayloadAction<{ channelId: string }>) => {
+			state.channelIdLastFetch = action.payload.channelId;
 		},
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
@@ -900,7 +906,8 @@ export const messagesSlice = createSlice({
 						adapterPayload: reversedMessages,
 						direction
 					});
-					state.isJumpingToPresent[channelId] = true;
+
+					if (Object.prototype.toString.call(state.isJumpingToPresent) === '[object Object]') state.isJumpingToPresent[channelId] = true;
 				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {

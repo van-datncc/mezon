@@ -2,7 +2,6 @@ import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-
 import { MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
 import {
 	messagesActions,
-	selectFirstMessageId,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageToJump,
@@ -39,7 +38,6 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	const anchorRef = useRef<HTMLDivElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const idMessageNotified = useSelector(selectMessageNotified);
-	const firstMessageId = useAppSelector((state) => selectFirstMessageId(state, channelId));
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent(channelId));
 	const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump));
@@ -49,12 +47,15 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	const hasMoreBottom = useSelector(selectHasMoreBottomByChannelId(channelId));
 	const [shouldRenderLoadingBlock, setShouldRenderLoadingBlock] = useState<boolean>(false);
 
-	const onChatRender = useCallback((node: HTMLDivElement | null) => {
-		chatRef.current = node;
-		if (node) {
-			node.scrollTop = node.scrollHeight;
-		}
-	}, []);
+	const onChatRender = useCallback(
+		(node: HTMLDivElement | null) => {
+			chatRef.current = node;
+			if (channelId && node) {
+				node.scrollTop = node.scrollHeight;
+			}
+		},
+		[channelId]
+	);
 
 	const dispatch = useAppDispatch();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -116,7 +117,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 				/>
 			);
 		});
-	}, [messages, firstMessageId, channelId, idMessageNotified, mode, channelLabel, avatarDM, userName]);
+	}, [messages, channelId, idMessageNotified, mode, channelLabel, avatarDM, userName]);
 
 	// Jump to message when user is jumping to message
 	useEffect(() => {
@@ -136,7 +137,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 				dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
 			});
 		}
-	}, [dispatch, isJumpingToPresent, chatScrollRef]);
+	}, [dispatch, isJumpingToPresent, chatScrollRef, channelId]);
 
 	// Update last message of channel when component unmount
 	useEffect(() => {
@@ -183,7 +184,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	return (
 		<MessageContextMenuProvider>
 			<div
-				className={classNames('dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full', {
+				className={classNames('dark:bg-bgPrimary pb-5 mr-1 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full', {
 					customScrollLightMode: appearanceTheme === 'light'
 				})}
 				id="scrollLoading"
