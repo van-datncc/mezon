@@ -15,7 +15,7 @@ export type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
 	const dispatch = useDispatch();
-	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, mode });
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelIdOrDirectId: channelId, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
 
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
@@ -72,7 +72,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 					}}
 					className="max-sbm:bottom-[60px] bottom-[76px] right-[10px] absolute bg"
 				>
-					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
+					<GifStickerEmojiPopup channelIdOrDirectId={channelId} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
 			{dataReferences.message_ref_id && <ReplyMessageBox channelId={channelId} dataReferences={dataReferences} />}

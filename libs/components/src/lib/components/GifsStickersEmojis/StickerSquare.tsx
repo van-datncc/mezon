@@ -22,7 +22,7 @@ interface IStickerPanelProps {
 	onClickSticker: (stickerUrl: string) => void;
 }
 function StickerSquare({ channelId, mode }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelId, mode });
+	const { sendMessage } = useChatSending({ channelIdOrDirectId: channelId, mode });
 
 	const handleSend = useCallback(
 		(

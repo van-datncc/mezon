@@ -1,8 +1,8 @@
 import { useAppParams, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { selectCurrentChannel, selectIdMessageRefReaction } from '@mezon/store';
+import { selectChannelById, selectDirectById, selectIdMessageRefReaction } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
@@ -14,10 +14,21 @@ import { InputSearch } from './inputSearch';
 export type GifStickerEmojiPopupOptions = {
 	emojiAction?: EmojiPlaces;
 	mode?: number;
+	channelIdOrDirectId?: string;
 };
 
-const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions) => {
-	const currentChannel = useSelector(selectCurrentChannel);
+const GifStickerEmojiPopup = ({ emojiAction, mode, channelIdOrDirectId }: GifStickerEmojiPopupOptions) => {
+	// const currentChannel = useSelector(selectCurrentChannel);
+	const selectedChannel = useSelector(selectChannelById(channelIdOrDirectId ?? ''));
+	const selectedDirect = useSelector(selectDirectById(channelIdOrDirectId ?? ''));
+	const currentDirectOrChannel = useMemo(() => {
+		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			return selectedChannel;
+		} else {
+			return selectedDirect;
+		}
+	}, [mode, selectedChannel, selectedDirect]);
+
 	const { type } = useAppParams();
 	const [mod, setMod] = useState(0);
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
@@ -98,8 +109,8 @@ const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions
 						<div className="flex h-full pr-1 w-full md:w-[500px]">
 							<TenorGifCategories
 								activeTab={SubPanelName.EMOJI}
-								channelId={currentChannel?.id ?? ''}
-								channelLabel={currentChannel?.channel_label ?? ''}
+								channelId={currentDirectOrChannel?.channel_id ?? ''}
+								channelLabel={currentDirectOrChannel?.channel_label ?? ''}
 								mode={mod}
 							/>
 						</div>
@@ -107,7 +118,7 @@ const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions
 
 					{subPanelActive === SubPanelName.STICKERS && (
 						<div className="flex h-full pr-2 w-full md:w-[500px]">
-							<ImageSquare channelId={currentChannel?.id ?? ''} mode={mod} />
+							<ImageSquare channelId={currentDirectOrChannel?.channel_id ?? ''} mode={mod} />
 						</div>
 					)}
 					{subPanelActive === SubPanelName.EMOJI && (

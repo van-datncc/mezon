@@ -1,6 +1,7 @@
 import { useChatSending } from '@mezon/core';
 import { messagesActions, referencesActions, selectIdMessageRefEdit, selectOpenEditMessageState } from '@mezon/store';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { useProcessLink } from 'libs/core/src/lib/chat/hooks/useProcessLink';
 import { ApiMessageAttachment, ApiMessageMention } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
@@ -15,7 +16,7 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 	}, [message.attachments]);
 
 	const dispatch = useDispatch();
-	const { editSendMessage, updateImageLinkMessage } = useChatSending({ channelId: channelId || '', mode });
+	const { editSendMessage, updateImageLinkMessage } = useChatSending({ channelIdOrDirectId: channelId || '', mode });
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 

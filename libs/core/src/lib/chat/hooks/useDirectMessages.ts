@@ -1,4 +1,4 @@
-import { directActions, messagesActions, selectDirectById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectDirectById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { IMessageSendPayload, fetchAndCreateFiles } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -61,11 +61,11 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 				false,
 				false
 			);
-			const timestamp = Date.now() / 1000;
-			dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
-			if (lastMessage) {
-				dispatch(directActions.updateLastSeenTime(lastMessage));
-			}
+			// const timestamp = Date.now() / 1000;
+			// dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channel.id, timestamp }));
+			// if (lastMessage) {
+			// 	dispatch(directActions.updateLastSeenTime(lastMessage));
+			// }
 		},
 		[sessionRef, clientRef, socketRef, channel, mode, dispatch, lastMessage]
 	);
@@ -78,7 +78,7 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 		dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode, isPublic: false }));
 	}, [channelId, dispatch, mode]);
 
-	const { updateImageLinkMessage } = useChatSending({ channelId, mode });
+	const { updateImageLinkMessage } = useChatSending({ channelIdOrDirectId: channelId, mode });
 
 	const { processLink } = useProcessLink({ updateImageLinkMessage });
 	useEffect(() => {

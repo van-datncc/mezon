@@ -15,7 +15,7 @@ type ChannelMessageBoxProps = {
 };
 
 function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelId, mode });
+	const { sendMessage } = useChatSending({ channelIdOrDirectId: channelId, mode });
 	const {
 		dataGifCategories,
 		dataGifsSearch,
@@ -25,7 +25,7 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 		setClickedTrendingGif,
 		categoriesStatus,
 		setShowCategories,
-		setButtonArrowBack,
+		setButtonArrowBack
 	} = useGifs();
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const [dataToRenderGifs, setDataToRenderGifs] = useState<any>();
@@ -53,11 +53,11 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 			content: IMessageSendPayload,
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>,
+			references?: Array<ApiMessageRef>
 		) => {
 			sendMessage(content, mentions, attachments, references);
 		},
-		[sendMessage],
+		[sendMessage]
 	);
 
 	const handleClickGif = (giftUrl: string) => {

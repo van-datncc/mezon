@@ -1,5 +1,5 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useDirectMessages, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
+import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import { RootState, referencesActions, selectDataReferences } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -12,7 +12,9 @@ interface DirectIdProps {
 	mode: number;
 }
 export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
-	const { sendDirectMessage, sendMessageTyping } = useDirectMessages({ channelId: directParamId, mode: mode });
+	// const { sendDirectMessage, sendMessageTyping } = useDirectMessages({ channelId: directParamId, mode: mode });
+
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelIdOrDirectId: directParamId, mode: mode });
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -35,12 +37,12 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 			references?: Array<ApiMessageRef>
 		) => {
 			if (sessionUser) {
-				sendDirectMessage(content, mentions, attachments, references);
+				sendMessage(content, mentions, attachments, references);
 			} else {
 				console.error('Session is not available');
 			}
 		},
-		[sendDirectMessage, sessionUser]
+		[sendMessage, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -84,7 +86,7 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					}}
 					className="z-20"
 				>
-					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
+					<GifStickerEmojiPopup channelIdOrDirectId={directParamId} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
 			{dataReferences.message_ref_id && <ReplyMessageBox channelId={directParamId} dataReferences={dataReferences} />}
