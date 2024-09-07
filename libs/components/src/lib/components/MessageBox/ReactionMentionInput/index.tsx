@@ -419,7 +419,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
 		setRequestInput({ ...request, valueTextInput: newValue, content: newPlainTextValue, mentionRaw: mentions }, props.isThread);
-
+		if (mentions.some((mention) => mention.display === '@here')) {
+			setMentionEveryone(true);
+		} else {
+			setMentionEveryone(false);
+		}
 		if (typeof props.onTyping === 'function') {
 			props.onTyping();
 		}
