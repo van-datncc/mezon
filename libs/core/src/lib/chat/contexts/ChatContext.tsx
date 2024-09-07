@@ -371,9 +371,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(
 						channelsActions.joinChat({
 							clanId: channelCreated.clan_id,
+							parentId: channelCreated.parent_id,
 							channelId: channelCreated.channel_id,
 							channelType: channelCreated.channel_type,
-							isPublic: !channelCreated.channel_private
+							isPublic: !channelCreated.channel_private,
+							isParentPublic: channelCreated.is_parent_public
 						})
 					);
 				}
