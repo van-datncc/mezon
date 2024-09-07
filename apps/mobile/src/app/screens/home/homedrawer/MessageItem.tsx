@@ -335,7 +335,7 @@ const MessageItem = React.memo(
 						checkMessageTargetToMoved && styles.highlightMessageReply
 					]}
 				>
-					{!!messageReferences && (
+					{!!messageReferences && !!messageReferences?.message_ref_id && (
 						<MessageReferences
 							messageReferences={messageReferences}
 							preventAction={preventAction}
