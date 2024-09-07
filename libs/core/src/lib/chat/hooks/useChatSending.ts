@@ -1,54 +1,38 @@
-import {
-	directActions,
-	messagesActions,
-	selectChannelById,
-	selectCurrentClanId,
-	selectCurrentUserId,
-	selectDirectById,
-	selectNewMesssageUpdateImage,
-	useAppDispatch
-} from '@mezon/store';
+import { directActions, messagesActions, selectCurrentUserId, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useChatMessages } from './useChatMessages';
 import { useProcessLink } from './useProcessLink';
 
 export type UseChatSendingOptions = {
-	channelIdOrDirectId: string;
 	mode: number;
+	channelOrDirect: ApiChannelDescription | undefined;
 };
 
 // TODO: separate this hook into 2 hooks for send and edit message
-export function useChatSending({ channelIdOrDirectId, mode }: UseChatSendingOptions) {
-	const currentClanId = useSelector(selectCurrentClanId);
+export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions) {
+	const getClanId = useMemo(() => {
+		return channelOrDirect?.clan_id;
+	}, [channelOrDirect?.clan_id]);
+
+	const isPublic = useMemo(() => {
+		return !channelOrDirect?.channel_private;
+	}, [channelOrDirect?.channel_private]);
+
+	const channelIdOrDirectId = useMemo(() => {
+		return channelOrDirect?.channel_id;
+	}, [channelOrDirect?.channel_id]);
+
 	const currentUserId = useSelector(selectCurrentUserId);
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 	const dispatch = useAppDispatch();
-	const direct = useSelector(selectDirectById(channelIdOrDirectId));
-	console.log(direct);
-	const channel = useSelector(selectChannelById(channelIdOrDirectId));
 	const { clientRef, sessionRef, socketRef } = useMezon();
-	const { lastMessage } = useChatMessages({ channelId: channelIdOrDirectId });
-	let isPublic = false;
+	const { lastMessage } = useChatMessages({ channelId: channelIdOrDirectId ?? '' });
 
-	if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-		isPublic = !channel?.channel_private;
-	} else {
-		isPublic = !direct?.channel_private;
-	}
-
-	const getClanId = useMemo(() => {
-		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return currentClanId;
-		} else {
-			return '0';
-		}
-	}, [mode, currentClanId]);
-	console.log('getClanId', getClanId);
 	const sendMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -58,11 +42,9 @@ export function useChatSending({ channelIdOrDirectId, mode }: UseChatSendingOpti
 			anonymous?: boolean,
 			mentionEveryone?: boolean
 		) => {
-			console.log('channelIdOrDirectId', channelIdOrDirectId);
-			console.log('getClanId', getClanId);
 			await dispatch(
 				messagesActions.sendMessage({
-					channelId: channelIdOrDirectId,
+					channelId: channelIdOrDirectId ?? '',
 					clanId: getClanId ?? '',
 					mode,
 					isPublic: isPublic,
@@ -75,9 +57,9 @@ export function useChatSending({ channelIdOrDirectId, mode }: UseChatSendingOpti
 					senderId: currentUserId
 				})
 			);
-			if (direct) {
+			if (mode !== ChannelStreamMode.STREAM_MODE_CHANNEL) {
 				const timestamp = Date.now() / 1000;
-				dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channelIdOrDirectId, timestamp }));
+				dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channelIdOrDirectId ?? '', timestamp }));
 				if (lastMessage) {
 					dispatch(directActions.updateLastSeenTime(lastMessage));
 				}
@@ -90,7 +72,7 @@ export function useChatSending({ channelIdOrDirectId, mode }: UseChatSendingOpti
 		dispatch(
 			messagesActions.sendTypingUser({
 				clanId: getClanId ?? '',
-				channelId: channelIdOrDirectId,
+				channelId: channelIdOrDirectId ?? '',
 				mode,
 				isPublic: isPublic
 			})
@@ -109,13 +91,13 @@ export function useChatSending({ channelIdOrDirectId, mode }: UseChatSendingOpti
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
-			if (!client || !session || !socket || (!channel && !direct)) {
+			if (!client || !session || !socket || !channelOrDirect) {
 				throw new Error('Client is not initialized');
 			}
 
 			await socket.updateChatMessage(
 				getClanId ?? '',
-				channelIdOrDirectId,
+				channelIdOrDirectId ?? '',
 				mode,
 				isPublic,
 				messageId,
@@ -125,7 +107,7 @@ export function useChatSending({ channelIdOrDirectId, mode }: UseChatSendingOpti
 				hideEditted
 			);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, getClanId, channelIdOrDirectId, mode, isPublic]
+		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]
 	);
 
 	const updateImageLinkMessage = React.useCallback(
@@ -144,7 +126,7 @@ export function useChatSending({ channelIdOrDirectId, mode }: UseChatSendingOpti
 			const client = clientRef.current;
 			const socket = socketRef.current;
 
-			if (!client || !session || !socket || (!channel && !direct)) {
+			if (!client || !session || !socket || !channelOrDirect) {
 				throw new Error('Client is not initialized');
 			}
 
@@ -160,7 +142,7 @@ export function useChatSending({ channelIdOrDirectId, mode }: UseChatSendingOpti
 				hideEditted
 			);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, isPublic]
+		[sessionRef, clientRef, socketRef, channelOrDirect, isPublic]
 	);
 
 	const { processLink } = useProcessLink({ updateImageLinkMessage });

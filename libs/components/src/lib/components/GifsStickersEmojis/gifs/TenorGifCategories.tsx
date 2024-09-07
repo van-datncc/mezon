@@ -1,7 +1,7 @@
 import { useChatSending, useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { IGifCategory, IMessageSendPayload, SubPanelName } from '@mezon/utils';
 import { Loading } from 'libs/ui/src/lib/Loading';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useState } from 'react';
 import FeaturedGifs from './FeaturedGifs';
 import GifCategory from './GifCategory';
@@ -9,13 +9,12 @@ import GifCategory from './GifCategory';
 type ChannelMessageBoxProps = {
 	// activeTab use TenorGifCategories
 	activeTab: SubPanelName;
-	channelId: string;
-	channelLabel: string;
+	channelOrDirect: ApiChannelDescription | undefined;
 	mode: number;
 };
 
-function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelIdOrDirectId: channelId, mode });
+function TenorGifCategories({ channelOrDirect, mode }: ChannelMessageBoxProps) {
+	const { sendMessage } = useChatSending({ channelOrDirect: channelOrDirect ?? undefined, mode });
 	const {
 		dataGifCategories,
 		dataGifsSearch,
@@ -71,7 +70,12 @@ function TenorGifCategories({ channelId, channelLabel, mode }: ChannelMessageBox
 		}
 		return (
 			<div className="mx-2 grid grid-cols-2 justify-center h-[400px] overflow-y-scroll hide-scrollbar gap-2">
-				<FeaturedGifs onClickToTrending={() => ontrendingClickingStatus()} channelId={channelId} channelLabel={channelLabel} mode={mode} />
+				<FeaturedGifs
+					onClickToTrending={() => ontrendingClickingStatus()}
+					channelId={channelOrDirect?.channel_id ?? ''}
+					channelLabel={channelOrDirect?.channel_id ?? ''}
+					mode={mode}
+				/>
 
 				{Array.isArray(dataGifCategories) &&
 					dataGifCategories.map((item: IGifCategory, index: number) => <GifCategory gifCategory={item} key={index + item.name} />)}
