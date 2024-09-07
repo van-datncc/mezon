@@ -51,9 +51,11 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 
 			await socket.writeChatMessage(
 				'0',
+				'0',
 				channel.id,
 				mode,
 				!channel.channel_private,
+				false,
 				content,
 				mentions,
 				uploadedFiles,
@@ -75,7 +77,16 @@ export function useDirectMessages({ channelId, mode }: UseDirectMessagesOptions)
 	}, [dispatch, channelId]);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode, isPublic: false }));
+		dispatch(
+			messagesActions.sendTypingUser({
+				clanId: '0',
+				parentId: '0',
+				channelId: channelId,
+				mode: mode,
+				isPublic: false,
+				isParentPublic: false
+			})
+		);
 	}, [channelId, dispatch, mode]);
 
 	const { updateImageLinkMessage } = useChatSending({ channelId, mode });
