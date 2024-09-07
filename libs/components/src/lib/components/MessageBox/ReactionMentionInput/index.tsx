@@ -51,6 +51,7 @@ import {
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	SubPanelName,
+	TITLE_MENTION_HERE,
 	ThreadValue,
 	UsersClanEntity,
 	blankReferenceObj,
@@ -419,7 +420,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
 		setRequestInput({ ...request, valueTextInput: newValue, content: newPlainTextValue, mentionRaw: mentions }, props.isThread);
-		if (mentions.some((mention) => mention.display === '@here')) {
+		if (mentions.some((mention) => mention.display === TITLE_MENTION_HERE)) {
 			setMentionEveryone(true);
 		} else {
 			setMentionEveryone(false);

@@ -13,6 +13,7 @@ export const KEY_KEYBOARD = { BACKSPACE: 8, TAB: 9, ENTER: 13, ESC: 27, UP: 38, 
 export const GROUP_CHAT_MAXIMUM_MEMBERS = 9;
 export const EVERYONE_ROLE_ID = '1825450696619593728';
 export const EVERYONE_ROLE_TITLE = 'Every One';
+export const TITLE_MENTION_HERE = '@here';
 
 export const FOR_15_MINUTES = 15 * 60 * 1000;
 export const FOR_1_HOUR = 60 * 60 * 1000;
