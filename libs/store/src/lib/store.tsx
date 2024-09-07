@@ -88,7 +88,6 @@ const transformJumpingError = createTransform<MessagesState, MessagesState>(
 	},
 	(outboundState, key) => {
 		if (key === 'isJumpingToPresent') {
-			console.log('error');
 			return {
 				...outboundState,
 				isJumpingToPresent: {}

@@ -880,7 +880,6 @@ export const messagesSlice = createSlice({
 				fetchMessages.fulfilled,
 				(state: MessagesState, action: PayloadAction<FetchMessagesPayloadAction, string, FetchMessagesMeta>) => {
 					const channelId = action?.meta?.arg?.channelId;
-					console.log(channelId, 'channelId');
 					const isFetchingLatestMessages = action.payload.isFetchingLatestMessages || false;
 					const isClearMessage = action.payload.isClearMessage || false;
 					const isViewingOlderMessages = state.isViewingOlderMessagesByChannelId[channelId];
