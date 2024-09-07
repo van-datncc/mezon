@@ -105,13 +105,6 @@ export const ChatBoxBottomBar = memo(
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
 
-		useEffect(() => {
-			if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-				setIsFocus(true);
-				inputRef && inputRef?.current && inputRef.current.focus();
-			}
-		}, [currentChannel?.id, mode]);
-
 		const isAvailableSending = useMemo(() => {
 			return text?.length > 0 && text?.trim()?.length > 0;
 		}, [text]);

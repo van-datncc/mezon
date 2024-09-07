@@ -78,8 +78,10 @@ export const FriendList = React.memo(
 			const sendToDM = async (dataSend: { text: string }, channelSelected: DirectEntity) => {
 				await mezon.socketRef.current.writeChatMessage(
 					'0',
+					'0',
 					channelSelected.id,
 					Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
+					false,
 					false,
 					{
 						t: dataSend.text,

@@ -1,7 +1,7 @@
 import { MezonContextValue } from '@mezon/transport';
 import { Middleware, ThunkDispatch, UnknownAction, configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
-import { persistReducer, persistStore } from 'redux-persist';
+import { createTransform, persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { accountReducer } from './account/account.slice';
 import { appReducer } from './app/app.slice';
@@ -18,7 +18,7 @@ import { friendsReducer } from './friends/friend.slice';
 import { gifsReducer } from './giftStickerEmojiPanel/gifs.slice';
 import { gifsStickerEmojiReducer } from './giftStickerEmojiPanel/gifsStickerEmoji.slice';
 import { inviteReducer } from './invite/invite.slice';
-import { messagesReducer } from './messages/messages.slice';
+import { MessagesState, messagesReducer } from './messages/messages.slice';
 import { referencesReducer } from './messages/references.slice';
 import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
@@ -82,11 +82,28 @@ const persistedEmojiSuggestionReducer = persistReducer(
 	emojiSuggestionReducer
 );
 
+const transformJumpingError = createTransform<MessagesState, MessagesState>(
+	(inboundState) => {
+		return inboundState;
+	},
+	(outboundState, key) => {
+		if (key === 'isJumpingToPresent') {
+			return {
+				...outboundState,
+				isJumpingToPresent: {}
+			};
+		}
+		return outboundState;
+	},
+	{ whitelist: ['isJumpingToPresent'] }
+);
+
 const persistedMessageReducer = persistReducer(
 	{
 		key: 'messages',
 		storage,
-		blacklist: ['typingUsers', 'isSending']
+		blacklist: ['typingUsers', 'isSending'],
+		transforms: [transformJumpingError]
 	},
 	messagesReducer
 );
@@ -116,11 +133,28 @@ const persistedThreadReducer = persistReducer(
 	threadsReducer
 );
 
+const transformchannelmembersError = createTransform<MessagesState, MessagesState>(
+	(inboundState) => {
+		return inboundState;
+	},
+	(outboundState, key) => {
+		if (key === 'memberChannels') {
+			return {
+				...outboundState,
+				memberChannels: {}
+			};
+		}
+		return outboundState;
+	},
+	{ whitelist: ['memberChannels'] }
+);
+
 const persistedChannelMembersReducer = persistReducer(
 	{
 		key: 'channelmembers',
 		storage,
-		blacklist: ['onlineStatusUser']
+		blacklist: ['onlineStatusUser'],
+		transforms: [transformchannelmembersError]
 	},
 	channelMembersReducer
 );

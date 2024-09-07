@@ -74,7 +74,7 @@ export const Sharing = ({ data, onClose }) => {
 
 	const getFullFileName = useCallback(
 		(fileName: string) => {
-			return createUploadFilePath(session, currentClan.id, currentChannelId, fileName);
+			return createUploadFilePath(session, currentClan.id, currentChannelId, fileName, true);
 		},
 		[currentChannelId, currentClan.id, session]
 	);
@@ -161,8 +161,10 @@ export const Sharing = ({ data, onClose }) => {
 
 		await mezon.socketRef.current.writeChatMessage(
 			'0',
+			'0',
 			channelSelected.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
+			false,
 			false,
 			{
 				t: dataSend.text,
@@ -189,8 +191,10 @@ export const Sharing = ({ data, onClose }) => {
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,
 			channelSelected.channel_id,
+			channelSelected.channel_id,
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
 			!channelSelected.channel_private,
+			channelSelected?.parrent_id ? !channelSelected.channel_private : false,
 			{
 				t: dataSend.text,
 				lk: dataSend.links || []

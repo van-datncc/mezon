@@ -1,4 +1,4 @@
-import { directActions, messagesActions, selectCurrentUserId, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
+import { directActions, messagesActions, selectChannelById, selectCurrentUserId, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -27,6 +27,13 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 		return channelOrDirect?.channel_id;
 	}, [channelOrDirect?.channel_id]);
 
+	const parentId = useMemo(() => {
+		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			return channelOrDirect?.parrent_id;
+		}
+	}, [channelOrDirect?.channel_id]);
+	const parent = useSelector(selectChannelById(parentId || ''));
+
 	const currentUserId = useSelector(selectCurrentUserId);
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 	const dispatch = useAppDispatch();
@@ -44,10 +51,12 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 		) => {
 			await dispatch(
 				messagesActions.sendMessage({
+					parentId: parentId ?? '',
 					channelId: channelIdOrDirectId ?? '',
-					clanId: getClanId ?? '',
+					clanId: getClanId || '',
 					mode,
 					isPublic: isPublic,
+					isParentPublic: parent ? !parent.channel_private : false,
 					content,
 					mentions,
 					attachments,
@@ -71,10 +80,12 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const sendMessageTyping = React.useCallback(async () => {
 		dispatch(
 			messagesActions.sendTypingUser({
-				clanId: getClanId ?? '',
+				clanId: getClanId || '',
+				parentId: parentId ?? '',
 				channelId: channelIdOrDirectId ?? '',
 				mode,
-				isPublic: isPublic
+				isPublic: isPublic,
+				isParentPublic: parent ? !parent.channel_private : false
 			})
 		);
 	}, [channelIdOrDirectId, getClanId, dispatch, isPublic, mode]);
@@ -96,10 +107,12 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			}
 
 			await socket.updateChatMessage(
-				getClanId ?? '',
-				channelIdOrDirectId ?? '',
+				getClanId || '',
+				parentId || '',
+				channelIdOrDirectId,
 				mode,
 				isPublic,
+				parent ? !parent.channel_private : false,
 				messageId,
 				content,
 				mentions,
@@ -132,9 +145,11 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 
 			await socket.updateChatMessage(
 				clanId ?? '',
+				channel?.parrent_id || '',
 				channelId ?? '',
 				mode ?? 0,
 				isPublic,
+				parent ? !parent.channel_private : false,
 				messageId ?? '',
 				content,
 				mentions,
