@@ -100,18 +100,20 @@ export const deleteChannelPinMessage = createAsyncThunk(
 
 type UpdatePinMessage = {
 	clanId: string;
+	parentId: string;
 	channelId: string;
 	messageId: string;
 	isPublic: boolean;
+	isParentPublic: boolean;
 };
 
 export const joinPinMessage = createAsyncThunk(
 	'messages/joinPinMessage',
-	async ({ clanId, channelId, messageId, isPublic }: UpdatePinMessage, thunkAPI) => {
+	async ({ clanId, parentId, channelId, messageId, isPublic, isParentPublic }: UpdatePinMessage, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, isPublic, messageId, now, 1);
+			await mezon.socketRef.current?.writeLastPinMessage(clanId, parentId, channelId, 0, isPublic, isParentPublic, messageId, now, 1);
 		} catch (e) {
 			Sentry.captureException(e);
 			console.error('Error updating last seen message', e);
@@ -121,11 +123,11 @@ export const joinPinMessage = createAsyncThunk(
 
 export const updateLastPin = createAsyncThunk(
 	'messages/updateLastPinMessage',
-	async ({ clanId, channelId, messageId, isPublic }: UpdatePinMessage, thunkAPI) => {
+	async ({ clanId, parentId, channelId, messageId, isPublic, isParentPublic }: UpdatePinMessage, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, isPublic, messageId, now, 0);
+			await mezon.socketRef.current?.writeLastPinMessage(clanId, parentId, channelId, 0, isPublic, isParentPublic, messageId, now, 0);
 		} catch (e) {
 			Sentry.captureException(e);
 			console.error('Error updating last seen message', e);

@@ -1,4 +1,4 @@
-import { channelMetaActions, messagesActions, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { channelMetaActions, messagesActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -13,6 +13,7 @@ export type UseThreadMessage = {
 export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const dispatch = useAppDispatch();
 
 	const { clientRef, sessionRef, socketRef } = useMezon();
@@ -35,9 +36,11 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 
 			await socket.writeChatMessage(
 				currentClanId,
+				thread.parrent_id as string,
 				thread.channel_id as string,
 				mode,
 				!currentChannel?.channel_private,
+				parent ? !parent.channel_private : false,
 				{ t: content.t },
 				mentions,
 				attachments,
@@ -46,9 +49,11 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			if (content.contentThread) {
 				await socket.writeChatMessage(
 					currentClanId,
+					thread.parrent_id as string,
 					thread.channel_id as string,
 					mode,
 					!currentChannel?.channel_private,
+					parent ? !parent.channel_private : false,
 					{ t: content.contentThread },
 					[],
 					[],
@@ -67,15 +72,17 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			dispatch(
 				messagesActions.sendTypingUser({
 					clanId: currentClanId || '',
+					parentId: currentChannel?.parrent_id || '',
 					channelId,
 					mode,
-					isPublic: !currentChannel?.channel_private
+					isPublic: !currentChannel?.channel_private,
+					isParentPublic: parent ? !parent.channel_private : false
 				})
 			);
 		}
 	}, [channelId, currentChannel?.channel_private, currentClanId, dispatch, mode]);
 
-	const EditSendMessage = React.useCallback(
+	const editSendMessage = React.useCallback(
 		async (content: string, messageId: string) => {
 			const editMessage: IMessageSendPayload = {
 				t: content
@@ -87,7 +94,16 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.updateChatMessage(currentClanId, channelId, mode, !currentChannel?.channel_private, messageId, editMessage);
+			await socket.updateChatMessage(
+				currentClanId,
+				currentChannel?.parrent_id || '',
+				channelId,
+				mode,
+				!currentChannel?.channel_private,
+				parent ? !parent.channel_private : false,
+				messageId,
+				editMessage
+			);
 		},
 		[sessionRef, clientRef, socketRef, currentClanId, channelId, mode, currentChannel?.channel_private]
 	);
@@ -96,8 +112,8 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 		() => ({
 			sendMessageThread,
 			sendMessageTyping,
-			EditSendMessage
+			editSendMessage
 		}),
-		[sendMessageThread, sendMessageTyping, EditSendMessage]
+		[sendMessageThread, sendMessageTyping, editSendMessage]
 	);
 }

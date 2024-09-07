@@ -24,6 +24,7 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
+	isAnyOf,
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -410,6 +411,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 
 type SendMessagePayload = {
 	clanId: string;
+	parentId: string;
 	channelId: string;
 	content: IMessageSendPayload;
 	mentions?: Array<ApiMessageMention>;
@@ -420,10 +422,25 @@ type SendMessagePayload = {
 	mode: number;
 	senderId: string;
 	isPublic: boolean;
+	isParentPublic: boolean;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
-	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, isPublic, clanId, senderId } = payload;
+	const {
+		content,
+		mentions,
+		attachments,
+		references,
+		anonymous,
+		mentionEveryone,
+		parentId,
+		channelId,
+		mode,
+		isPublic,
+		isParentPublic,
+		clanId,
+		senderId
+	} = payload;
 	const id = Date.now().toString();
 
 	async function doSend() {
@@ -461,9 +478,11 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 
 			const res = await socket.writeChatMessage(
 				clanId,
+				parentId,
 				channelId,
 				mode,
 				isPublic,
+				isParentPublic,
 				content,
 				mentions,
 				uploadedFiles,
@@ -569,16 +588,18 @@ export const updateTypingUsers = createAsyncThunk(
 
 export type SendMessageArgs = {
 	clanId: string;
+	parentId: string;
 	channelId: string;
 	mode: number;
 	isPublic: boolean;
+	isParentPublic: boolean;
 };
 
 export const sendTypingUser = createAsyncThunk(
 	'messages/sendTypingUser',
-	async ({ clanId, channelId, mode, isPublic }: SendMessageArgs, thunkAPI) => {
+	async ({ clanId, parentId, channelId, mode, isPublic, isParentPublic }: SendMessageArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic);
+		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, parentId, channelId, mode, isPublic, isParentPublic);
 		return ack;
 	}
 );
@@ -906,17 +927,14 @@ export const messagesSlice = createSlice({
 						adapterPayload: reversedMessages,
 						direction
 					});
-
-					if (Object.prototype.toString.call(state.isJumpingToPresent) === '[object Object]') state.isJumpingToPresent[channelId] = true;
 				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-				const channelId = action?.meta?.arg?.channelId;
-				if (!state.isJumpingToPresent) {
-					state.isJumpingToPresent = {};
-				}
+			})
+			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state, action) => {
+				const channelId = action?.meta?.arg?.channel_id;
 				state.isJumpingToPresent[channelId] = true;
 			});
 	}

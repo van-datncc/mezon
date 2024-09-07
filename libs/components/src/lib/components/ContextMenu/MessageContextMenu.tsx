@@ -11,6 +11,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllDirectMessages,
+	selectChannelById,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrentId,
@@ -56,6 +57,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const parrent = useSelector(selectChannelById(currentChannel?.parrent_id ?? ''));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
@@ -175,9 +177,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(
 			pinMessageActions.joinPinMessage({
 				clanId: currentClanId ?? '',
+				parentId: currentChannel?.parrent_id ?? '',
 				channelId: currentChannel?.channel_id ?? '',
 				messageId: message?.id,
-				isPublic: !currentChannel?.channel_private
+				isPublic: !currentChannel?.channel_private,
+				isParentPublic: !parrent?.channel_private
 			})
 		);
 	};

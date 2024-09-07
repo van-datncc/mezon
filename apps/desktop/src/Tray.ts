@@ -1,4 +1,4 @@
-import { app, Menu, MenuItem, MenuItemConstructorOptions, nativeImage, Tray } from 'electron';
+import { app, Menu, MenuItem, MenuItemConstructorOptions, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import App from './app/app';
@@ -20,8 +20,8 @@ export class TrayIcon {
 
 	init = (isQuitting) => {
 		App.application.whenReady().then(() => {
-			const trayIcon = nativeImage.createFromPath(assetsDir);
-			this.tray = new Tray(trayIcon);
+			//const trayIcon = nativeImage.createFromPath(assetsDir);
+			this.tray = new Tray(assetsDir);
 
 			const template: (MenuItem | MenuItemConstructorOptions)[] = [
 				{
