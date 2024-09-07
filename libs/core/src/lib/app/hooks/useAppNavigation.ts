@@ -37,7 +37,7 @@ export function useAppNavigation() {
 	}, []);
 
 	const toClanPage = useCallback((clanId: string) => {
-		return `/chat/clans/${clanId}/channels`;
+		return `/chat/clans/${clanId}`;
 	}, []);
 
 	const toDmGroupPage = useCallback((directId: string, type: number) => {

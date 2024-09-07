@@ -20,9 +20,11 @@ export function useSendForwardMessage() {
 
 			await socket.writeChatMessage(
 				clanid,
+				'0',
 				channel_id,
 				mode,
 				isPublic,
+				false,
 				message.content,
 				message.mentions,
 				message.attachments,

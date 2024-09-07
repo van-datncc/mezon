@@ -520,6 +520,7 @@ export const selectMemberById = (userId: string) =>
 	createSelector(getChannelMembersState, (state) => {
 		for (const channelId in state.memberChannels) {
 			const channel = state.memberChannels[channelId];
+			if (!channel?.id) continue;
 			const member = channelMembersAdapter.getSelectors().selectById(channel, channelId + userId);
 			if (member && member.user?.id === userId) {
 				return member;

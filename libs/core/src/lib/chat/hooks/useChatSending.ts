@@ -35,6 +35,7 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	//TODO: fix channel dispatch too much
 	const channel = useSelector(selectChannelById(channelId));
+	const parent = useSelector(selectChannelById(channel?.parrent_id || ''));
 	let channelID = channelId;
 	let clanID = currentClanId;
 	let isPublic = false;
@@ -57,10 +58,12 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		) => {
 			await dispatch(
 				messagesActions.sendMessage({
+					parentId: channel?.parrent_id || '',
 					channelId: channelID,
 					clanId: clanID || '',
 					mode,
 					isPublic: isPublic,
+					isParentPublic: parent ? !parent.channel_private : false,
 					content,
 					mentions,
 					attachments,
@@ -78,9 +81,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 		dispatch(
 			messagesActions.sendTypingUser({
 				clanId: clanID || '',
+				parentId: channel?.parrent_id || '',
 				channelId,
 				mode,
-				isPublic: isPublic
+				isPublic: isPublic,
+				isParentPublic: parent ? !parent.channel_private : false
 			})
 		);
 	}, [channelId, clanID, dispatch, isPublic, mode]);
@@ -101,7 +106,19 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 				throw new Error('Client is not initialized');
 			}
 
-			await socket.updateChatMessage(clanID || '', channelId, mode, isPublic, messageId, content, mentions, attachments, hideEditted);
+			await socket.updateChatMessage(
+				clanID || '',
+				channel?.parrent_id || '',
+				channelId,
+				mode,
+				isPublic,
+				parent ? !parent.channel_private : false,
+				messageId,
+				content,
+				mentions,
+				attachments,
+				hideEditted
+			);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, clanID, channelId, mode, isPublic]
 	);
@@ -128,9 +145,11 @@ export function useChatSending({ channelId, mode, directMessageId }: UseChatSend
 
 			await socket.updateChatMessage(
 				clanId ?? '',
+				channel?.parrent_id || '',
 				channelId ?? '',
 				mode ?? 0,
 				isPublic,
+				parent ? !parent.channel_private : false,
 				messageId ?? '',
 				content,
 				mentions,

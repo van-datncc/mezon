@@ -1,6 +1,6 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import { reactionActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberByUserId } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -22,6 +22,8 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 	const currentChannel = useSelector(selectCurrentChannel);
 	const direct = useSelector(selectDirectById(message.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
+
 	useEffect(() => {
 		if (direct != undefined) {
 			setChannelLabel('');
@@ -40,6 +42,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		await reactionMessageDispatch(
 			id,
 			mode,
+			currentChannel?.parrent_id || '',
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '',
 			message.channel_id ?? '',
 			messageId,
@@ -48,7 +51,8 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
-			!currentChannel?.channel_private
+			!currentChannel?.channel_private,
+			parent ? !parent.channel_private : false
 		);
 	};
 
