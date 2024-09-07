@@ -2,6 +2,7 @@ import { useAppParams, useChatReaction, useClanRestriction, useEmojiSuggestion, 
 import {
 	reactionActions,
 	referencesActions,
+	selectChannelById,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDirectById,
@@ -81,6 +82,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const { setShiftPressed } = useEmojiSuggestion();
 	const currentChannel = useSelector(selectCurrentChannel);
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const { directId } = useAppParams();
 	const [channelID, setChannelID] = useState('');
 	const direct = useSelector(selectDirectById(directId || ''));
@@ -98,6 +100,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+				currentChannel?.parrent_id || '',
 				currentChannel?.clan_id || '',
 				channelID ?? '',
 				props.messageEmojiId ?? '',
@@ -106,7 +109,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				1,
 				messageEmoji?.sender_id ?? '',
 				false,
-				!currentChannel?.channel_private
+				!currentChannel?.channel_private,
+				parent ? !parent.channel_private : false
 			);
 			setSubPanelActive(SubPanelName.NONE);
 			dispatch(referencesActions.setIdReferenceMessageReaction(''));

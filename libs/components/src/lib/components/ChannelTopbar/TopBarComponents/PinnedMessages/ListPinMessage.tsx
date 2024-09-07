@@ -2,6 +2,7 @@ import { useAppParams } from '@mezon/core';
 import {
 	PinMessageEntity,
 	pinMessageActions,
+	selectChannelById,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -27,6 +28,7 @@ const ListPinMessage = ({
 	const dmChannelId = useSelector(selectPinMessageByChannelId(directId));
 	const clanChannelId = useSelector(selectPinMessageByChannelId(currentChannelId));
 	const channel = useSelector(selectCurrentChannel);
+	const parent = useSelector(selectChannelById(channel?.parrent_id ?? ''));
 	let listPinMessages: PinMessageEntity[] = [];
 
 	if (dmChannelId) {
@@ -47,9 +49,11 @@ const ListPinMessage = ({
 			dispatch(
 				pinMessageActions.updateLastPin({
 					clanId: currentClanId ?? '',
+					parentId: channel?.parrent_id ?? '',
 					channelId: currentChannelId ?? '',
 					messageId: listPinMessages[listPinMessages.length - 1]?.message_id ?? '',
-					isPublic: !channel?.channel_private
+					isPublic: !channel?.channel_private,
+					isParentPublic: parent ? !parent.channel_private : false
 				})
 			);
 		}
