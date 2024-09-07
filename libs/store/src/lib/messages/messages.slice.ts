@@ -24,6 +24,7 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
+	isAnyOf,
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -906,17 +907,14 @@ export const messagesSlice = createSlice({
 						adapterPayload: reversedMessages,
 						direction
 					});
-
-					if (Object.prototype.toString.call(state.isJumpingToPresent) === '[object Object]') state.isJumpingToPresent[channelId] = true;
 				}
 			)
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-				const channelId = action?.meta?.arg?.channelId;
-				if (!state.isJumpingToPresent) {
-					state.isJumpingToPresent = {};
-				}
+			})
+			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state, action) => {
+				const channelId = action?.meta?.arg?.channel_id;
 				state.isJumpingToPresent[channelId] = true;
 			});
 	}
