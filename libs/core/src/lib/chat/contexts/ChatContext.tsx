@@ -4,7 +4,6 @@ import {
 	channelMetaActions,
 	channelsActions,
 	channelsSlice,
-	clansActions,
 	clansSlice,
 	directActions,
 	directSlice,
@@ -268,7 +267,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
 				}
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
-					dispatch(clansActions.joinClan(userAdds.clan_id));
+					dispatch(
+						channelsActions.joinChat({
+							clanId: userAdds.clan_id,
+							parentId: userAdds.parent_id,
+							channelId: userAdds.channel_id,
+							channelType: userAdds.channel_type,
+							isPublic: userAdds.is_public,
+							isParentPublic: userAdds.is_parent_public
+						})
+					);
 				}
 			} else {
 				dispatch(
