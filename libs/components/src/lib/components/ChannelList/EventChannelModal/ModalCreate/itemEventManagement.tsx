@@ -1,5 +1,5 @@
 import { useEventManagement, useOnClickOutside } from '@mezon/core';
-import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberByUserId, selectTheme } from '@mezon/store';
+import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
 import { OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -34,7 +34,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
-	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
+	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const checkOptionVoice = useMemo(() => option === OptionEvent.OPTION_SPEAKER, [option]);
 	const checkOptionLocation = useMemo(() => option === OptionEvent.OPTION_LOCATION, [option]);
 
@@ -87,11 +87,11 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 			onClick={
 				setOpenModalDetail && event
 					? () => {
-							setOpenModalDetail(true);
-							setChooseEvent(event);
-						}
+						setOpenModalDetail(true);
+						setChooseEvent(event);
+					}
 					: // eslint-disable-next-line @typescript-eslint/no-empty-function
-						() => {}
+					() => { }
 			}
 			ref={panelRef}
 		>
@@ -112,7 +112,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							animation="duration-500"
 							style={appearanceTheme === 'light' ? 'light' : 'dark'}
 						>
-							<AvatarImage 
+							<AvatarImage
 								alt={userCreate?.user?.username || ''}
 								userName={userCreate?.user?.username}
 								className="min-w-6 min-h-6 max-w-6 max-h-6"

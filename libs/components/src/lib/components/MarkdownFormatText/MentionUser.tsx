@@ -18,8 +18,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 	const panelRef = useRef<HTMLAnchorElement>(null);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const memberChannels = useAppSelector((state) => selectMemberChannels(currentChannelId as string)(state));
-
-	const usersInChannel = useSelector(selectAllChannelMembers);
+	const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 	const [foundUser, setFoundUser] = useState<any>(null);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.stopPropagation();
@@ -35,14 +34,17 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 
 	const [userRemoveChar, setUserRemoveChar] = useState('');
 	const username = tagName.slice(1);
+
+	//TODO: fix it
+
 	useEffect(() => {
+		console.log(usersInChannel, 'usersInChannel');
 		if (checkLastChar(username)) {
 			setUserRemoveChar(username.slice(0, -1));
 		} else {
 			setUserRemoveChar(username);
 		}
 		const user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
-
 		if (user) {
 			setFoundUser(user);
 		} else {

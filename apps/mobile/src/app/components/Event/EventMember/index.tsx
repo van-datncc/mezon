@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { EventManagementEntity, selectMemberByUserId } from '@mezon/store-mobile';
+import { EventManagementEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../temp-ui/MezonAvatar';
@@ -10,7 +10,7 @@ interface IEventMemberProps {
 }
 
 const renderAvatar = (id: string, index: number) => {
-	const user = useSelector(selectMemberByUserId(id || ''));
+	const user = useSelector(selectMemberClanByUserId(id || ''));
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
