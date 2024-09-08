@@ -368,12 +368,12 @@ export const getChannelMembersState = (rootState: { [CHANNEL_MEMBERS_FEATURE_KEY
 const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 
 export const selectAllChannelMembers = createSelector(
-	[getChannelMembersState, (state: RootState, channelId: string) => channelId],
-	(channelMembersState, channelId) => {
+	[getChannelMembersState, getUsersClanState, (state: RootState, channelId: string) => channelId],
+	(channelMembersState, getUsersClanState, channelId) => {
 		return (
 			(channelMembersState.memberChannels[channelId]?.ids.map((memberId) => {
 				return {
-					...channelMembersState.entities[memberId],
+					...getUsersClanState.entities[memberId],
 					channelId,
 					userChannelId: channelId
 				};
