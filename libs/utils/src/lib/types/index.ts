@@ -70,6 +70,7 @@ export type IPermissionUser = ApiPermission & {
 };
 
 export type IUsersClan = ClanUserListClanUser & {
+	prioritizeName?: string;
 	id: string;
 };
 

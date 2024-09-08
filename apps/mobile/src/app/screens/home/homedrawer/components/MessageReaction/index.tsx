@@ -1,12 +1,7 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import {
-	selectChannelById,
-	selectComputedReactionsByMessageId,
-	selectCurrentChannel,
-	selectMemberByUserId
-} from '@mezon/store-mobile';
+import { selectChannelById, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -29,7 +24,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
-	
+
 	const userId = useMemo(() => userProfile?.user?.id, [userProfile?.user?.id]);
 
 	const reactOnExistEmoji = async (
@@ -40,7 +35,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		emoji: string,
 		count: number,
 		message_sender_id: string,
-		action_delete?: boolean,
+		action_delete?: boolean
 	) => {
 		await reactionMessageDispatch(
 			id,
@@ -114,7 +109,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 								emojiItemData.emoji ?? '',
 								1,
 								userId ?? '',
-								false,
+								false
 							);
 						}}
 						key={index + emojiItemData.emojiId}
@@ -167,7 +162,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 				>
 					<FastImage
 						source={{
-							uri: getSrcEmoji(emojiItem.emojiId),
+							uri: getSrcEmoji(emojiItem.emojiId)
 						}}
 						resizeMode={'contain'}
 						style={styles.iconEmojiReactionDetail}
@@ -286,8 +281,8 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 				draggable
 				customStyles={{
 					container: {
-						backgroundColor: 'transparent',
-					},
+						backgroundColor: 'transparent'
+					}
 				}}
 			>
 				<View style={styles.bottomSheetWrapper}>

@@ -182,7 +182,7 @@ export default function DirectMessage() {
 								/>
 							)}
 							<DirectMessageBox
-								directParamId={directId ?? ''}
+								direct={currentDmGroup}
 								mode={
 									currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 										? ChannelStreamMode.STREAM_MODE_DM
