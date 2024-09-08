@@ -1,22 +1,20 @@
-import { selectAllUserClans } from '@mezon/store';
-import { getTimeDifferenceDate } from '@mezon/utils';
+import { getTimeDifferenceDate, IUsersClan } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import TableMemberHeader from './TableMemberHeader';
 import TableMemberItem from './TableMemberItem';
 
 interface ITableMemberProps {
 	currentPage: number;
 	pageSize: number;
+	dataMember: IUsersClan[];
 }
 
-const TableMember: React.FC<ITableMemberProps> = ({ currentPage, pageSize }) => {
-	const usersClan = useSelector(selectAllUserClans);
+const TableMember: React.FC<ITableMemberProps> = ({ currentPage, pageSize, dataMember }) => {
 	const displayUsersClan = useMemo(() => {
 		const start = (currentPage - 1) * pageSize;
-		const end = Math.min(start + pageSize, usersClan.length);
-		return usersClan.slice(start, end);
-	}, [currentPage, pageSize, usersClan]);
+		const end = Math.min(start + pageSize, dataMember.length);
+		return dataMember.slice(start, end);
+	}, [currentPage, pageSize, dataMember]);
 
 	return (
 		<div className="flex flex-col flex-1 min-h-[48px]">
@@ -30,7 +28,7 @@ const TableMember: React.FC<ITableMemberProps> = ({ currentPage, pageSize }) => 
 						mezonJoinTime={getTimeDifferenceDate(user.user?.create_time || '')}
 						clanJoinTime={user.user?.join_time}
 						userId={user.id}
-						displayName={user.user?.display_name ?? ''}
+						displayName={user.prioritizeName!}
 					/>
 				))}
 			</div>
