@@ -104,16 +104,17 @@ type UpdatePinMessage = {
 	channelId: string;
 	messageId: string;
 	isPublic: boolean;
+	mode: number;
 	isParentPublic: boolean;
 };
 
 export const joinPinMessage = createAsyncThunk(
 	'messages/joinPinMessage',
-	async ({ clanId, parentId, channelId, messageId, isPublic, isParentPublic }: UpdatePinMessage, thunkAPI) => {
+	async ({ clanId, parentId, channelId, messageId, isPublic, isParentPublic, mode }: UpdatePinMessage, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastPinMessage(clanId, parentId, channelId, 0, isPublic, isParentPublic, messageId, now, 1);
+			await mezon.socketRef.current?.writeLastPinMessage(clanId, parentId, channelId, mode, isPublic, isParentPublic, messageId, now, 1);
 		} catch (e) {
 			Sentry.captureException(e);
 			console.error('Error updating last seen message', e);
