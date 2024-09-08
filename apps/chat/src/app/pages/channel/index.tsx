@@ -67,7 +67,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 			)}
 			{isViewingOldMessage && <ChannelJumpToPresent channelId={currentChannel?.id} mode={0} />}
 			{currentChannel ? (
-				<ChannelMessageBox clanId={currentChannel?.clan_id} channelId={currentChannel?.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 			) : (
 				<ChannelMessageBox.Skeleton />
 			)}

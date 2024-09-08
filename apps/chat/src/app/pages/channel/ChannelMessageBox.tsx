@@ -2,20 +2,23 @@ import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } fr
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import { referencesActions, selectDataReferences } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useState } from 'react';
+import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
-	channelId: string;
+	channel: ApiChannelDescription;
 	clanId?: string;
 	mode: number;
 };
 
-export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
+export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
+	const channelId = useMemo(() => {
+		return channel.channel_id;
+	}, [channel.channel_id]);
 	const dispatch = useDispatch();
-	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, mode });
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: channel, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
 
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
@@ -56,7 +59,7 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 	const handleCloseReplyMessageBox = () => {
 		dispatch(
 			referencesActions.setDataReferences({
-				channelId: channelId,
+				channelId: channelId ?? '',
 				dataReferences: blankReferenceObj
 			})
 		);
@@ -72,12 +75,12 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 					}}
 					className="max-sbm:bottom-[60px] bottom-[76px] right-[10px] absolute bg"
 				>
-					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
+					<GifStickerEmojiPopup channelOrDirect={channel} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
-			{dataReferences.message_ref_id && <ReplyMessageBox channelId={channelId} dataReferences={dataReferences} />}
+			{dataReferences.message_ref_id && <ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} />}
 			<MessageBox
-				listMentions={UserMentionList({ channelID: channelId, channelMode: mode })}
+				listMentions={UserMentionList({ channelID: channelId ?? '', channelMode: mode })}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}

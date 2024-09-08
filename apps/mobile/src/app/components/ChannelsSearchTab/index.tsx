@@ -24,14 +24,14 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 	const navigation = useNavigation<any>();
 	const listVoiceChannel = useMemo(
 		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_VOICE),
-		[listChannelSearch],
+		[listChannelSearch]
 	);
 	const listTextChannelAndThreads = useMemo(
 		() =>
 			listChannelSearch
 				?.flatMap((channel) => [channel, ...(channel?.threads || [])])
 				?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT),
-		[listChannelSearch],
+		[listChannelSearch]
 	);
 
 	const handleRouteData = async (channelData: ChannelThreads) => {
