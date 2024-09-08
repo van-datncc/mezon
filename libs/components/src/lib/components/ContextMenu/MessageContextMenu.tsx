@@ -176,12 +176,13 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
 			pinMessageActions.joinPinMessage({
-				clanId: currentClanId ?? '',
+				clanId: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (currentClanId ?? ''),
 				parentId: currentChannel?.parrent_id ?? '',
-				channelId: currentChannel?.channel_id ?? '',
+				channelId: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? currentDmId || '' : (currentChannel?.channel_id ?? ''),
 				messageId: message?.id,
-				isPublic: !currentChannel?.channel_private,
-				isParentPublic: !parrent?.channel_private
+				isPublic: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? false : !currentChannel?.channel_private,
+				isParentPublic: parrent ? !parrent.channel_private : false,
+				mode: activeMode as number
 			})
 		);
 	};

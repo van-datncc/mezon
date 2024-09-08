@@ -1,4 +1,4 @@
-import { messagesActions, selectCurrentChannel, selectCurrentClanId, selectDirectById, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, selectDirectById, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo } from 'react';
@@ -18,6 +18,7 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 	const direct = useSelector(selectDirectById(directId || (isDM && channelId) || ''));
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel);
+	const parent = useSelector(selectChannelById(channel?.parrent_id || ''));
 
 	const deleteSendMessage = React.useCallback(
 		async (messageId: string) => {
@@ -42,7 +43,15 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 				})
 			);
 
-			await socket.removeChatMessage(clanId || '', channelIdDelete, mode, !channel?.channel_private, messageId);
+			await socket.removeChatMessage(
+				clanId || '',
+				channel?.parrent_id || '',
+				channelIdDelete,
+				mode,
+				channel ? !channel.channel_private : false,
+				parent ? !parent.channel_private : false,
+				messageId
+			);
 		},
 		[sessionRef, clientRef, socketRef, channel, direct, channelId, dispatch, currentClanId, mode]
 	);
