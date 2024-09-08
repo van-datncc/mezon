@@ -252,6 +252,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
 				} else {
 					dispatch(channelMembers.actions.removeUserByUserIdAndClan({ userId: id, channelIds: channels.map((item) => item.id) }));
+					dispatch(usersClanActions.remove(id));
 				}
 			});
 		},
@@ -304,6 +305,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
 				return;
 			}
+			dispatch(
+				usersClanActions.add({
+					...userJoinClan,
+					id: userJoinClan?.user?.user_id
+				})
+			);
 			dispatch(channelMembersActions.addUserJoinClan(userJoinClan));
 		},
 		[dispatch]
