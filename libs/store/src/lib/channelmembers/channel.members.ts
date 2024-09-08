@@ -216,7 +216,7 @@ export const channelMembers = createSlice({
 		remove: (state, action: PayloadAction<{ channelId: string; userId: string }>) => {
 			const { channelId, userId } = action.payload;
 			const channelEntity = state.memberChannels[channelId];
-			state.memberChannels[channelId] = channelMembersAdapter.removeOne(channelEntity, channelId + userId);
+			state.memberChannels[channelId] = channelMembersAdapter.removeOne(channelEntity, userId);
 		},
 		removeUserByChannel: (state, action: PayloadAction<string>) => {
 			const channelId = action.payload;
@@ -236,25 +236,17 @@ export const channelMembers = createSlice({
 			}
 		},
 		addUserJoinClan: (state, action: PayloadAction<AddClanUserEvent>) => {
-			const { user, clan_id } = action.payload;
-
+			const { user } = action.payload;
 			const channelIds = [
 				...new Set(
-					Object.values(state.entities).map((channelUser) => {
-						return channelUser.channelId;
+					Object.values(state.memberChannels).map((channelUser) => {
+						return channelUser.id;
 					})
 				)
 			];
-			const memberId = user.user_id;
-			const allMemberChannels = channelIds.map((channelId) => {
-				return {
-					id: memberId + channelId,
-					channelId,
-					userId: memberId
-				};
+			channelIds.forEach((channelId) => {
+				state.memberChannels[channelId].ids.push(user.user_id);
 			});
-
-			channelMembersAdapter.addMany(state, allMemberChannels);
 		},
 		setFollowingUserIds: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
 			state.followingUserIds = action.payload;
