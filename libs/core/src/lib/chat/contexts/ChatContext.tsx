@@ -20,6 +20,7 @@ import {
 	notificationActions,
 	pinMessageActions,
 	reactionActions,
+	selectChannelsByClanId,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -27,6 +28,7 @@ import {
 	selectModeResponsive,
 	toastActions,
 	useAppDispatch,
+	useAppSelector,
 	usersClanActions,
 	voiceActions
 } from '@mezon/store';
@@ -84,6 +86,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const modeResponsive = useSelector(selectModeResponsive);
+	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
@@ -248,7 +251,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndClanId({ userId: id, clanId: user.clan_id }));
+					dispatch(channelMembers.actions.removeUserByUserIdAndClan({ userId: id, channelIds: channels.map((item) => item.id) }));
 				}
 			});
 		},
@@ -514,31 +517,31 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => {};
+			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => {};
+			socket.onuserchannelremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => {};
+			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => {};
+			socket.onuserchanneladded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => {};
+			socket.onuserclanadded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => {};
+			socket.onclanprofileupdated = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -587,3 +590,4 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+

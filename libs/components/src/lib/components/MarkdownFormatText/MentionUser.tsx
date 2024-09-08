@@ -1,7 +1,7 @@
 import { useOnClickOutside } from '@mezon/core';
 import { selectAllChannelMembers, selectAllRolesClan, selectCurrentChannelId, selectMemberChannels, useAppSelector } from '@mezon/store';
 import { MouseButton, checkLastChar, getRoleList } from '@mezon/utils';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
@@ -19,7 +19,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const memberChannels = useAppSelector((state) => selectMemberChannels(currentChannelId as string)(state));
 
-	const usersInChannel = useSelector(selectAllChannelMembers);
+	const usersInChannel = useAppSelector(selectAllChannelMembers(currentChannelId as string));
 	const [foundUser, setFoundUser] = useState<any>(null);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.stopPropagation();
@@ -35,20 +35,23 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 
 	const [userRemoveChar, setUserRemoveChar] = useState('');
 	const username = tagName.slice(1);
-	useEffect(() => {
-		if (checkLastChar(username)) {
-			setUserRemoveChar(username.slice(0, -1));
-		} else {
-			setUserRemoveChar(username);
-		}
-		const user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
 
-		if (user) {
-			setFoundUser(user);
-		} else {
-			setFoundUser(null);
-		}
-	}, [tagName, userRemoveChar, mode, usersInChannel, memberChannels]);
+	//TODO: fix it
+
+	// useEffect(() => {
+	// 	if (checkLastChar(username)) {
+	// 		setUserRemoveChar(username.slice(0, -1));
+	// 	} else {
+	// 		setUserRemoveChar(username);
+	// 	}
+	// 	const user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
+
+	// 	if (user) {
+	// 		setFoundUser(user);
+	// 	} else {
+	// 		setFoundUser(null);
+	// 	}
+	// }, [tagName, userRemoveChar, mode, usersInChannel, memberChannels]);
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 	const [positionBottom, setPositionBottom] = useState(false);
@@ -109,10 +112,10 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 				<>
 					<Link
 						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
+						onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => { }}
 						ref={panelRef}
 						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
+						onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => { }}
 						style={{ textDecoration: 'none' }}
 						to={''}
 						className={`font-medium px-0.1 rounded-sm
