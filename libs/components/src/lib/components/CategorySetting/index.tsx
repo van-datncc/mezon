@@ -24,12 +24,12 @@ const CategorySetting: React.FC<ICategorySettingProps> = ({ onClose, category })
 		<div className="flex fixed inset-0  w-screen z-10" onMouseDown={(event) => event.stopPropagation()} role="button">
 			<div className="flex text-gray- w-screen relative text-white">
 				<div className="h-fit absolute top-5 right-5 block sbm:hidden z-[1]">
-					<button
-						className="bg-[#AEAEAE] w-[30px] h-[30px] rounded-[50px] font-bold transform hover:scale-105 hover:bg-slate-400 transition duration-300 ease-in-out"
-						onClick={onClose}
+					<div
+						onClick={() => onClose()}
+						className="rounded-full p-[10px] border-2 dark:border-[#a8a6a6] border-black cursor-pointer dark:text-[#a8a6a6] text-black"
 					>
-						X
-					</button>
+						<Icons.CloseButton className="w-4" />
+					</div>
 				</div>
 				<div className="h-fit absolute top-5 left-5 block sbm:hidden z-[1]">
 					<button
