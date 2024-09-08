@@ -31,8 +31,12 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 			return channelOrDirect?.parrent_id;
 		}
-	}, [channelOrDirect?.channel_id]);
+	}, [channelOrDirect?.parrent_id, mode]);
 	const parent = useSelector(selectChannelById(parentId || ''));
+
+	const isParentPublic = useMemo(() => {
+		return !parent?.channel_private;
+	}, [parent?.channel_private]);
 
 	const currentUserId = useSelector(selectCurrentUserId);
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
@@ -56,7 +60,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					clanId: getClanId || '',
 					mode,
 					isPublic: isPublic,
-					isParentPublic: parent ? !parent.channel_private : false,
+					isParentPublic: isParentPublic,
 					content,
 					mentions,
 					attachments,
@@ -85,7 +89,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				channelId: channelIdOrDirectId ?? '',
 				mode,
 				isPublic: isPublic,
-				isParentPublic: parent ? !parent.channel_private : false
+				isParentPublic: isParentPublic
 			})
 		);
 	}, [channelIdOrDirectId, getClanId, dispatch, isPublic, mode]);
@@ -109,10 +113,10 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			await socket.updateChatMessage(
 				getClanId || '',
 				parentId || '',
-				channelIdOrDirectId,
+				channelIdOrDirectId ?? '',
 				mode,
 				isPublic,
-				parent ? !parent.channel_private : false,
+				isParentPublic,
 				messageId,
 				content,
 				mentions,
@@ -145,11 +149,11 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 
 			await socket.updateChatMessage(
 				clanId ?? '',
-				channel?.parrent_id || '',
+				parentId ?? '',
 				channelId ?? '',
 				mode ?? 0,
 				isPublic,
-				parent ? !parent.channel_private : false,
+				isParentPublic,
 				messageId ?? '',
 				content,
 				mentions,
