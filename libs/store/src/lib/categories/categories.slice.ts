@@ -79,8 +79,7 @@ export const deleteCategory = createAsyncThunk(
 export const updateCategory = createAsyncThunk('categories/updateCategory', async ({ clanId, request }: updatCategoryPayload, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		request.ClanId = clanId;
-		await mezon.client.updateCategory(mezon.session, request);
+		await mezon.client.updateCategory(mezon.session, clanId, request);
 		thunkAPI.dispatch(fetchCategories({ clanId }));
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
