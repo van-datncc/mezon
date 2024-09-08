@@ -23,9 +23,7 @@ const MemberListContent = memo(
 	({ currentChannel, listMemberIds }: { currentChannel: ChannelsEntity | null; listMemberIds: string[] }) => {
 		const usersClan = useSelector(selectAllUserClans);
 		const closeMenu = useSelector(selectCloseMenu);
-		const members = currentChannel?.channel_private
-			? usersClan.filter((item) => listMemberIds.includes(currentChannel?.id + item.id))
-			: usersClan;
+		const members = currentChannel?.channel_private ? usersClan.filter((item) => listMemberIds.includes(item.id)) : usersClan;
 		const onlineMembers = (members as ChannelMembersEntity[])
 			.filter((item) => {
 				return item.user?.online;
