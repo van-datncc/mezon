@@ -47,14 +47,16 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 			const store = await getStoreAsync();
 			const channelId = channelData?.channel_id;
 			const clanId = channelData?.clan_id;
-			timeoutRef.current = setTimeout(() => {
-				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-				const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-				if (!channelsCache?.includes(channelId)) {
-					save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-				}
+			timeoutRef.current = setTimeout(async () => {
+				requestAnimationFrame(async () => {
+					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+					await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+					const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
+					if (!channelsCache?.includes(channelId)) {
+						save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
+					}
+				});
 			}, 0);
 		}
 	};

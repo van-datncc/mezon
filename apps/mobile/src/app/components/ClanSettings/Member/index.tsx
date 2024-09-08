@@ -1,6 +1,6 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { baseColor, useTheme } from "@mezon/mobile-ui";
-import { selectAllUsesClan, useAppSelector } from "@mezon/store-mobile";
+import { selectAllUserClans, useAppSelector } from "@mezon/store-mobile";
 import { UsersClanEntity } from "@mezon/utils";
 import { useMemo, useRef, useState } from "react";
 import { KeyboardAvoidingView, ScrollView, Text, View } from "react-native";
@@ -14,7 +14,7 @@ type MemberClanScreen = typeof APP_SCREEN.MENU_CLAN.MEMBER_SETTING;
 export default function MemberSetting({ navigation }: MenuClanScreenProps<MemberClanScreen>) {
     const { themeValue } = useTheme();
     const styles = style(themeValue);
-    const usersClan = useAppSelector(selectAllUsesClan);
+    const usersClan = useAppSelector(selectAllUserClans);
     const memberPruneBSRef = useRef<BottomSheetModal>();
     const memberFilterBSRef = useRef<BottomSheetModal>();
     const [selectedUser, setSelectedUser] = useState<UsersClanEntity>();

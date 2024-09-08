@@ -64,12 +64,9 @@ const ClanLayout = () => {
 				<Outlet />
 			</div>
 			{isShowCreateThread && (
-				<>
-					<div className="w-2 cursor-ew-resize dark:bg-bgTertiary bg-bgLightTertiary" />
-					<div className="w-[480px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
-						<ThreadsMain />
-					</div>
-				</>
+				<div className="w-[480px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+					<ThreadsMain />
+				</div>
 			)}
 			<Setting />
 		</MezonPolicyProvider>
