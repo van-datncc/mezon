@@ -60,7 +60,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
-	const membersInClan = useAppSelector(selectAllChannelMembers(currentChannelId as string));
+	const membersInClan = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 	const isForwardAll = useSelector(getIsFowardAll);
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')
@@ -159,48 +159,48 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
 			? listDM.map((itemDM: DirectEntity) => {
-				return {
-					id: itemDM?.user_id?.[0] ?? '',
-					name: itemDM?.usernames ?? '',
-					avatarUser: itemDM?.channel_avatar?.[0] ?? '',
-					idDM: itemDM?.id ?? '',
-					typeChat: ChannelType.CHANNEL_TYPE_DM,
-					userName: itemDM?.usernames,
-					displayName: itemDM.channel_label,
-					lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
-					typeSearch: TypeSearch.Dm_Type
-				};
-			})
+					return {
+						id: itemDM?.user_id?.[0] ?? '',
+						name: itemDM?.usernames ?? '',
+						avatarUser: itemDM?.channel_avatar?.[0] ?? '',
+						idDM: itemDM?.id ?? '',
+						typeChat: ChannelType.CHANNEL_TYPE_DM,
+						userName: itemDM?.usernames,
+						displayName: itemDM.channel_label,
+						lastSentTimeStamp: itemDM.last_sent_message?.timestamp_seconds,
+						typeSearch: TypeSearch.Dm_Type
+					};
+				})
 			: [];
 		const listGroupSearch = listGroup.length
 			? listGroup.map((itemGr: DirectEntity) => {
-				return {
-					id: itemGr?.channel_id ?? '',
-					name: itemGr?.channel_label ?? '',
-					avatarUser: 'assets/images/avatar-group.png' ?? '',
-					idDM: itemGr?.id ?? '',
-					typeChat: ChannelType.CHANNEL_TYPE_GROUP,
-					userName: itemGr?.usernames,
-					displayName: itemGr.channel_label,
-					lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
-					typeSearch: TypeSearch.Dm_Type
-				};
-			})
+					return {
+						id: itemGr?.channel_id ?? '',
+						name: itemGr?.channel_label ?? '',
+						avatarUser: 'assets/images/avatar-group.png' ?? '',
+						idDM: itemGr?.id ?? '',
+						typeChat: ChannelType.CHANNEL_TYPE_GROUP,
+						userName: itemGr?.usernames,
+						displayName: itemGr.channel_label,
+						lastSentTimeStamp: itemGr.last_sent_message?.timestamp_seconds,
+						typeSearch: TypeSearch.Dm_Type
+					};
+				})
 			: [];
 
 		const listUserClanSearch = usersClan.length
 			? usersClan.map((itemUserClan: UsersClanEntity) => {
-				return {
-					id: itemUserClan?.id ?? '',
-					name: itemUserClan?.user?.username ?? '',
-					avatarUser: getAvatarForPrioritize(itemUserClan.clan_avatar, itemUserClan?.user?.avatar_url),
-					displayName: itemUserClan?.user?.display_name ?? '',
-					clanNick: itemUserClan?.clan_nick ?? '',
-					lastSentTimeStamp: '0',
-					idDM: '',
-					type: TypeSearch.Dm_Type
-				};
-			})
+					return {
+						id: itemUserClan?.id ?? '',
+						name: itemUserClan?.user?.username ?? '',
+						avatarUser: getAvatarForPrioritize(itemUserClan.clan_avatar, itemUserClan?.user?.avatar_url),
+						displayName: itemUserClan?.user?.display_name ?? '',
+						clanNick: itemUserClan?.clan_nick ?? '',
+						lastSentTimeStamp: '0',
+						idDM: '',
+						type: TypeSearch.Dm_Type
+					};
+				})
 			: [];
 
 		const usersClanMap = new Map(listUserClanSearch.map((user) => [user.id, user]));
@@ -209,11 +209,11 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 				const user = usersClanMap.get(itemDM.id);
 				return user
 					? {
-						...itemDM,
-						clanNick: user.clanNick || '',
-						displayName: user.displayName || itemDM.displayName,
-						avatarUser: user.avatarUser || ''
-					}
+							...itemDM,
+							clanNick: user.clanNick || '',
+							displayName: user.displayName || itemDM.displayName,
+							avatarUser: user.avatarUser || ''
+						}
 					: itemDM;
 			}),
 			...listGroupSearch
