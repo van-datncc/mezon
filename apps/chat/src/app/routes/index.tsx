@@ -21,6 +21,7 @@ import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
 
 // Pages
+import { MemberProvider } from '@mezon/core';
 import { appActions, useAppDispatch } from '@mezon/store';
 import { useCallback, useEffect, useMemo } from 'react';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
@@ -139,7 +140,11 @@ export const Routes = () => {
 																},
 																{
 																	path: 'member-safety',
-																	element: <MemberMain />
+																	element: (
+																		<MemberProvider>
+																			<MemberMain />
+																		</MemberProvider>
+																	)
 																},
 																{
 																	path: 'channels',
