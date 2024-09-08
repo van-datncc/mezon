@@ -38,7 +38,6 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 	//TODO: fix it
 
 	useEffect(() => {
-		console.log(usersInChannel, 'usersInChannel');
 		if (checkLastChar(username)) {
 			setUserRemoveChar(username.slice(0, -1));
 		} else {
@@ -111,10 +110,10 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 				<>
 					<Link
 						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
+						onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => { }}
 						ref={panelRef}
 						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
+						onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => { }}
 						style={{ textDecoration: 'none' }}
 						to={''}
 						className={`font-medium px-0.1 rounded-sm
