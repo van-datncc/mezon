@@ -16,7 +16,7 @@ export default class App {
 	// be closed automatically when the JavaScript object is garbage collected.
 	static mainWindow: Electron.BrowserWindow;
 	static application: Electron.App;
-	static BrowserWindow;
+	static BrowserWindow: typeof Electron.BrowserWindow;
 
 	public static isDevelopmentMode() {
 		const isEnvironmentSet: boolean = 'ELECTRON_IS_DEV' in process.env;
