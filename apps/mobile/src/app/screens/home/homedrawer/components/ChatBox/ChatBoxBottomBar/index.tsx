@@ -495,7 +495,8 @@ export const ChatBoxBottomBar = memo(
 						markdownsOnMessage={markdownList}
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						isShowCreateThread={isShowCreateThread}
-						isPublic={currentChannel ? !currentChannel.channel_private : false}
+						parentId={currentChannel?.parrent_id || ''}
+						isPublic={currentChannel ? !currentChannel?.channel_private : false}
 					/>
 				</Block>
 			</Block>
