@@ -146,19 +146,30 @@ const RenderContent = memo(
 					);
 				}
 
-				if (element.kindOf === ETokenMessage.MENTIONS) {
+				if (element.kindOf === ETokenMessage.MENTIONS && element.user_id) {
 					formattedContent.push(
 						<MentionUser
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
-							tagName={contentInElement ?? ''}
-							tagUserId={element.user_id ? element.user_id : (element.role_id ?? '')}
+							tagUserName={contentInElement ?? ''}
+							tagUserId={element.user_id}
 							mode={mode}
 						/>
 					);
 				}
-
+				if (element.kindOf === ETokenMessage.MENTIONS && element.role_id) {
+					formattedContent.push(
+						<MentionUser
+							isTokenClickAble={isTokenClickAble}
+							isJumMessageEnabled={isJumMessageEnabled}
+							key={`mentionUser-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+							tagRoleName={contentInElement ?? ''}
+							tagRoleId={element.role_id}
+							mode={mode}
+						/>
+					);
+				}
 				if (element.kindOf === ETokenMessage.EMOJIS) {
 					formattedContent.push(
 						<EmojiMarkup
