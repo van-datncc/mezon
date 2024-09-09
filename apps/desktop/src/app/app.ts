@@ -52,6 +52,11 @@ export default class App {
 		if (App.mainWindow === null) {
 			App.onReady();
 		}
+
+		// reopen window after soft quit on macos
+		if (process.platform === 'darwin' && !App.mainWindow?.isVisible()) {
+			App.mainWindow?.show();
+		}
 	}
 
 	private static initMainWindow() {
