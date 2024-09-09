@@ -218,7 +218,11 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 		}
 
 		if (content?.startsWith(':')) {
-			return <FastImage source={{ uri: payload }} style={isOnlyContainEmoji ? styles.onlyIconEmojiInMessage: styles.iconEmojiInMessage} resizeMode={'contain'} />;
+			return <FastImage 
+						source={{ uri: payload }} 
+						style={isOnlyContainEmoji ? styles.onlyIconEmojiInMessage: styles.iconEmojiInMessage} 
+						resizeMode={'contain'} 
+					/>;
 		}
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
 			if (payload.includes(TYPE_MENTION.voiceChannel)) {
