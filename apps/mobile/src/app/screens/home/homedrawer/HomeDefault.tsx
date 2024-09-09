@@ -131,7 +131,7 @@ const HomeDefault = React.memo((props: any) => {
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
-						isPublic={!currentChannel?.channel_private}
+						isPublic={currentChannel ? !currentChannel.channel_private : false}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 					<ChatBox
