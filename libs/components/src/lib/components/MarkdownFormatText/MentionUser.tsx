@@ -1,10 +1,9 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectAllChannelMembers, selectAllRolesClan, selectCurrentChannelId, useAppSelector } from '@mezon/store';
-import { MouseButton, checkLastChar, getRoleList } from '@mezon/utils';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { selectAllRolesClan, selectMemberClanByUserId } from '@mezon/store';
+import { MouseButton, getRoleList } from '@mezon/utils';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import ShortUserProfile from '../ShortUserProfile/ShortUserProfile';
 
 type ChannelHashtagProps = {
 	tagName: string;
@@ -15,17 +14,23 @@ type ChannelHashtagProps = {
 };
 
 const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId }: ChannelHashtagProps) => {
+	console.log('tagUserId: ', tagUserId);
+	console.log('tagName: ', tagName);
+	const getUser = useSelector(selectMemberClanByUserId(tagUserId));
+
+	console.log('usersClan: ', getUser);
+
+	const rolesInClan = useSelector(selectAllRolesClan);
+	const roleList = getRoleList(rolesInClan);
+
 	const panelRef = useRef<HTMLAnchorElement>(null);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
-	const [foundUser, setFoundUser] = useState<any>(null);
+	// const currentChannelId = useSelector(selectCurrentChannelId);
+	// const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
+	// const [foundUser, setFoundUser] = useState<any>(null);
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.stopPropagation();
 		e.preventDefault();
 	};
-
-	const rolesInClan = useSelector(selectAllRolesClan);
-	const roleList = getRoleList(rolesInClan);
 
 	const matchingRole = useMemo(() => {
 		return roleList.find((role) => `@${role.roleName}` === tagName);
@@ -36,19 +41,19 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 
 	//TODO: fix it
 
-	useEffect(() => {
-		if (checkLastChar(username)) {
-			setUserRemoveChar(username.slice(0, -1));
-		} else {
-			setUserRemoveChar(username);
-		}
-		const user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
-		if (user) {
-			setFoundUser(user);
-		} else {
-			setFoundUser(null);
-		}
-	}, [tagName, userRemoveChar, mode, usersInChannel]);
+	// useEffect(() => {
+	// 	if (checkLastChar(username)) {
+	// 		setUserRemoveChar(username.slice(0, -1));
+	// 	} else {
+	// 		setUserRemoveChar(username);
+	// 	}
+	// 	const user = usersInChannel.find((channelUsers) => channelUsers.user?.id === tagUserId);
+	// 	if (user) {
+	// 		setFoundUser(user);
+	// 	} else {
+	// 		setFoundUser(null);
+	// 	}
+	// }, [tagName, userRemoveChar, mode, usersInChannel]);
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 	const [positionBottom, setPositionBottom] = useState(false);
@@ -82,11 +87,27 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 			}
 		}
 	};
+
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
 		<>
-			{showProfileUser && (
+			<Link
+				// eslint-disable-next-line @typescript-eslint/no-empty-function
+				onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
+				ref={panelRef}
+				// eslint-disable-next-line @typescript-eslint/no-empty-function
+				onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
+				style={{ textDecoration: 'none' }}
+				to={''}
+				className={`font-medium px-0.1 rounded-sm
+				${tagName === '@here' ? 'cursor-text' : isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
+
+				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
+			>
+				{tagName}
+			</Link>{' '}
+			{/* {showProfileUser && (
 				<div
 					className="dark:bg-black bg-gray-200 mt-[10px] w-[300px] rounded-lg flex flex-col z-10 fixed opacity-100"
 					style={{
@@ -104,7 +125,6 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 					/>
 				</div>
 			)}
-
 			{foundUser !== null || tagName === '@here' ? (
 				<>
 					<Link
@@ -128,7 +148,7 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`@${matchingRole.roleName}`}</span>
 			) : (
 				<span>{tagName}</span>
-			)}
+			)} */}
 		</>
 	);
 };
