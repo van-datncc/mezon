@@ -38,7 +38,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	return (
 		<Block>
 			{!isAdvancedEditMode && (
-				<Block borderRadius={size.s_14} overflow="hidden" marginTop={size.s_16}>
+				<Block borderRadius={size.s_14} overflow="hidden">
 					<FlatList
 						data={actionList}
 						keyExtractor={(item) => item.type?.toString()}
