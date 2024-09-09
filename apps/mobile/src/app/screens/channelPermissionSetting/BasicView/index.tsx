@@ -1,11 +1,10 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectAllRolesClan, selectMembersByChannelId, selectRolesByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { ChannelsEntity, selectAllChannelMembers, useAppSelector } from '@mezon/store-mobile';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useSelector } from 'react-redux';
 import { MezonConfirm, MezonSwitch } from '../../../temp-ui';
 import { MemberItem } from '../components/MemberItem';
 
@@ -15,24 +14,14 @@ interface IBasicViewProps {
 
 export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const { themeValue } = useTheme();
-	const dispatch = useAppDispatch();
 	const { t } = useTranslation('channelSetting');
 	const [visibleModalConfirm, setVisibleModalConfirm] = useState(false);
-	const rolesChannel = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const rawMembers = useSelector(selectMembersByChannelId(channel?.channel_id));
-	const rolesClan = useSelector(selectAllRolesClan);
+	const rawMembers = useAppSelector((state) => selectAllChannelMembers(state, channel.channel_id as string));
 
 	const availableAccessMemberList = useMemo(() => {
 		if (!rawMembers) return [];
 		return rawMembers.filter((member) => member?.userChannelId !== '0');
 	}, [rawMembers]);
-
-	const listRolesInChannel = useMemo(() => {
-		if (channel?.channel_private === 0 || channel?.channel_private === undefined) {
-			return [];
-		}
-		return rolesChannel?.filter((role) => typeof role?.role_channel_active === 'number' && role?.role_channel_active === 1);
-	}, [rolesChannel, channel?.channel_private]);
 
 	const isPrivateChannel = useMemo(() => {
 		return Boolean(channel?.channel_private);

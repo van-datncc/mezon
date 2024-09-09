@@ -49,7 +49,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			1,
 			message_sender_id ?? '',
 			false,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : !currentChannel?.channel_private,
+			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
 			parent ? !parent.channel_private : false
 		);
 	};
@@ -69,7 +69,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			countToRemove,
 			userId ?? '',
 			true,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : !currentChannel?.channel_private,
+			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
 			parent ? !parent.channel_private : false
 		);
 	};

@@ -17,7 +17,7 @@ export type MemberListProps = { className?: string };
 function MemberList() {
 	const currentChannel = useAppSelector(selectCurrentChannel);
 	const parrentChannel = useAppSelector(selectChannelById(currentChannel?.parrent_id as string));
-	const listMemberIds = useAppSelector((state) => selectMemberIdsByChannelId(currentChannel?.id as string)(state));
+	const listMemberIds = useAppSelector((state) => selectMemberIdsByChannelId(state, currentChannel?.id as string));
 	return <MemberListContent currentChannel={currentChannel} parrentChannel={parrentChannel} listMemberIds={listMemberIds} />;
 }
 

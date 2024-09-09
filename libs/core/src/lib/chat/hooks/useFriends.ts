@@ -1,10 +1,11 @@
 import {
 	friendsActions,
 	requestAddFriendParam,
+	selectAllChannelMembers,
 	selectAllFriends,
 	selectCurrentChannelId,
-	selectMembersByChannelId,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,7 +13,7 @@ import { useSelector } from 'react-redux';
 export function useFriends() {
 	const friends = useSelector(selectAllFriends);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const groupDmMember = useSelector(selectMembersByChannelId(currentChannelId || ''));
+	const groupDmMember = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 
 	const dispatch = useAppDispatch();
 

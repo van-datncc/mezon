@@ -126,7 +126,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						selectedObjectIdSend.clanId || '',
 						selectedObjectIdSend.id,
 						ChannelStreamMode.STREAM_MODE_CHANNEL,
-						!currentChannel?.channel_private,
+						currentChannel ? !currentChannel.channel_private : false,
 						message
 					);
 				}
@@ -147,7 +147,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_CHANNEL,
-					!currentChannel?.channel_private,
+					currentChannel ? !currentChannel.channel_private : false,
 					selectedMessage
 				);
 			}
