@@ -2,13 +2,14 @@ import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import {
 	channelUsersActions,
+	selectAllChannelMembers,
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectCurrentClanId,
 	selectEveryoneRole,
-	selectMembersByChannelId,
 	selectRolesByChannelId,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +35,7 @@ export const AddMemberOrRoleBS = memo(({ bottomSheetRef, channel }: IAddMemberOr
 	const allClanMembers = useSelector(selectAllUserClans);
 	const allClanRoles = useSelector(selectAllRolesClan);
 
-	const listOfChannelMember = useSelector(selectMembersByChannelId(channel?.channel_id));
+	const listOfChannelMember = useAppSelector((state) => selectAllChannelMembers(state, channel.channel_id as string));
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
 
 	const listOfMemberCanAdd = useMemo(() => {

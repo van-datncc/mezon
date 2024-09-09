@@ -2,12 +2,13 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
 import {
+	selectAllChannelMembers,
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectEveryoneRole,
-	selectMembersByChannelId,
 	selectPermissionChannel,
-	selectRolesByChannelId
+	selectRolesByChannelId,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { EVERYONE_ROLE_ID, EVERYONE_ROLE_TITLE } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -34,7 +35,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	const allClanMembers = useSelector(selectAllUserClans);
 
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const listOfChannelMember = useSelector(selectMembersByChannelId(channel?.channel_id));
+	const listOfChannelMember = useAppSelector((state) => selectAllChannelMembers(state, channel.channel_id as string));
 
 	const listPermission = useSelector(selectPermissionChannel);
 
