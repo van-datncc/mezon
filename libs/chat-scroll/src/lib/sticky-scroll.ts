@@ -1,4 +1,6 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useAnchor } from './anchor';
+import { useScroll } from './scroll';
 
 const UI_STABILITY_TIMEOUT = 1000;
 
@@ -13,6 +15,8 @@ export const useStickyScroll = (
 	options?: IUseStickyScrollOptions
 ): IUseStickyScrollResponse => {
 	const [enabled, setEnabled] = useState<boolean>(options?.enabled ?? true);
+	const { setScrollEventHandler } = useScroll(targetRef, { debounce: 0 });
+	const anchor = useAnchor(targetRef, anchorRef);
 
 	/**
 	 * Scrolls to anchor.
@@ -49,6 +53,24 @@ export const useStickyScroll = (
 		}, UI_STABILITY_TIMEOUT);
 		return () => scrollTimeoutId && clearTimeout(scrollTimeoutId);
 	}, [targetRef, scrollToAnchorImmediately]);
+
+	useEffect(() => {
+		setScrollEventHandler(() => {
+			const target = targetRef?.current;
+			if (!target) {
+				return;
+			}
+
+			const { scrollTop, scrollHeight, clientHeight } = target;
+			const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+
+			if (isAtBottom) {
+				anchor.current.drop();
+			} else {
+				anchor.current.raise();
+			}
+		});
+	}, [targetRef, anchor, setScrollEventHandler]);
 
 	/**
 	 * Scrolls to message with given id.

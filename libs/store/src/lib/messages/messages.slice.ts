@@ -935,8 +935,8 @@ export const messagesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			})
-			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state, action) => {
-				const channelId = action?.meta?.arg?.channel_id;
+			.addMatcher(isAnyOf(sendMessage.fulfilled, sendMessage.rejected), (state, action) => {
+				const channelId = action?.meta?.arg?.channelId;
 				state.isJumpingToPresent[channelId] = true;
 			});
 	}
