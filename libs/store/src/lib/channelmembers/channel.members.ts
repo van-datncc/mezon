@@ -38,7 +38,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 			id: string;
 		}
 	>;
-	channelUsers?: ChannelUserListChannelUser[];
+	dmGroupUsers?: ChannelUserListChannelUser[];
 }
 
 // TODO: remove channelId from the parameter
@@ -108,7 +108,7 @@ export const fetchChannelMembers = createAsyncThunk(
 		thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
 		thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: channelId, members }));
 		thunkAPI.dispatch(usersClanActions.setManyStatusUser(onlineStatus));
-		thunkAPI.dispatch(channelMembersActions.setChannelUsers(members));
+		thunkAPI.dispatch(channelMembersActions.setDmGroupUsers(members));
 		return members;
 	}
 );
@@ -275,8 +275,8 @@ export const channelMembers = createSlice({
 				ids: memberIds
 			};
 		},
-		setChannelUsers: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
-			state.channelUsers = action.payload;
+		setDmGroupUsers: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
+			state.dmGroupUsers = action.payload;
 		},
 		addNewMember: (state, action: PayloadAction<ChannelPresenceEvent>) => {
 			const payload = action.payload;
