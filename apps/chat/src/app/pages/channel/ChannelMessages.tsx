@@ -134,7 +134,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	useEffect(() => {
 		if (isJumpingToPresent) {
 			chatScrollRef.scrollToAnchor().then(() => {
-				dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
+				dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: false }));
 			});
 		}
 	}, [dispatch, isJumpingToPresent, chatScrollRef, channelId]);
