@@ -105,7 +105,10 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 		})
 		.then((result) => {
 			if (result.response === 0) {
-				autoUpdater.quitAndInstall();
+				setTimeout(() => {
+					autoUpdater.quitAndInstall();
+					App.application.quit();
+				}, 5000);
 			}
 		});
 });

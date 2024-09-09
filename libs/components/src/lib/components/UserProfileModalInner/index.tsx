@@ -2,11 +2,11 @@ import { useAppNavigation, useDirect, useEscapeKey, useMemberCustomStatus, useOn
 import {
 	ChannelMembersEntity,
 	notificationActions,
+	selectAllChannelMembers,
 	selectCurrentChannelId,
 	selectCurrentUserId,
 	selectDmGroupCurrentId,
 	selectFriendStatus,
-	selectMembersByChannelId,
 	selectModeResponsive,
 	useAppDispatch,
 	useAppSelector
@@ -44,8 +44,8 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 	const modeResponsive = useAppSelector(selectModeResponsive);
 	const currentChannelId = useAppSelector(selectCurrentChannelId);
 	const currentDmId = useAppSelector(selectDmGroupCurrentId);
-	const channelMembers = useAppSelector(
-		selectMembersByChannelId((modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string)
+	const channelMembers = useAppSelector((state) =>
+		selectAllChannelMembers(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) as string)
 	);
 	const userById = channelMembers.find((member) => member?.user?.id === userId) as ChannelMembersEntity;
 	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
