@@ -105,13 +105,10 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 		})
 		.then((result) => {
 			if (result.response === 0) {
-				const browserWindows = App.BrowserWindow.getAllWindows();
-				browserWindows.forEach(function (browserWindow) {
-					// remove close event listeners because it is prevented in system tray feature
-					browserWindow.removeAllListeners('close');
-					browserWindow.close();
-				});
-				autoUpdater.quitAndInstall();
+				setTimeout(() => {
+					autoUpdater.quitAndInstall();
+					App.application.quit();
+				}, 5000);
 			}
 		});
 });
