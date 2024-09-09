@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useChatSending, useDirectMessages } from '@mezon/core';
+import { useChatSending } from '@mezon/core';
 import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons } from '@mezon/mobile-components';
 import { Block, baseColor, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, selectAttachmentByChannelId } from '@mezon/store';
+import { emojiSuggestionActions, selectAttachmentByChannelId, selectChannelById, selectDmGroupCurrent } from '@mezon/store';
 import { referencesActions, selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
 	IEmojiOnMessage,
@@ -15,7 +15,7 @@ import {
 	filterEmptyArrays
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { MutableRefObject, memo, useCallback, useMemo } from 'react';
 import { DeviceEventEmitter, InteractionManager, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -61,11 +61,12 @@ export const ChatMessageSending = memo(
 		const styles = style(themeValue);
 		const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
 		const rolesInClan = useSelector(selectAllRolesClan);
+		const currentChannel = useSelector(selectChannelById(channelId));
+		const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
 
 		const { editSendMessage, sendMessage } = useChatSending({
-			channelId,
 			mode,
-			directMessageId: channelId || ''
+			channelOrDirect: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel : currentDmGroup
 		});
 
 		const attachmentDataRef = useMemo(() => {
@@ -84,22 +85,6 @@ export const ChatMessageSending = memo(
 			return text?.replace?.(/@\[(.*?)\]/g, '@$1')?.replace?.(/<#(.*?)>/g, '#$1');
 		};
 
-		//start: DM stuff
-		const { sendDirectMessage } = useDirectMessages({
-			channelId,
-			mode
-		});
-		const handleSendDM = useCallback(
-			async (
-				content: IMessageSendPayload,
-				mentions?: Array<ApiMessageMention>,
-				attachments?: Array<ApiMessageAttachment>,
-				references?: Array<ApiMessageRef>
-			) => {
-				await sendDirectMessage(content, mentions, attachments, references);
-			},
-			[sendDirectMessage]
-		);
 		const onEditMessage = useCallback(
 			async (editMessage: IMessageSendPayload, messageId: string, mentions: ApiMessageMention[]) => {
 				if (editMessage?.t === messageActionNeedToResolve?.targetMessage?.content?.t) return;
@@ -183,24 +168,14 @@ export const ChatMessageSending = memo(
 				} else {
 					if (![EMessageActionType.CreateThread].includes(messageAction)) {
 						const isMentionEveryOne = mentionsOnMessage?.current?.some?.((mention) => mention.user_id === ID_MENTION_HERE);
-						switch (mode) {
-							case ChannelStreamMode.STREAM_MODE_CHANNEL:
-								await sendMessage(
-									filterEmptyArrays(payloadSendMessage),
-									simplifiedMentionList || [],
-									attachmentDataRef || [],
-									reference,
-									false,
-									isMentionEveryOne
-								);
-								break;
-							case ChannelStreamMode.STREAM_MODE_DM:
-							case ChannelStreamMode.STREAM_MODE_GROUP:
-								await handleSendDM(filterEmptyArrays(payloadSendMessage), simplifiedMentionList, attachmentDataRef || [], reference);
-								break;
-							default:
-								break;
-						}
+						await sendMessage(
+							filterEmptyArrays(payloadSendMessage),
+							simplifiedMentionList || [],
+							attachmentDataRef || [],
+							reference,
+							false,
+							isMentionEveryOne
+						);
 					}
 				}
 
