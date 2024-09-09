@@ -1,6 +1,13 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberClanByUserId } from '@mezon/store';
+import {
+	reactionActions,
+	selectChannelById,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectDirectById,
+	selectMemberClanByUserId
+} from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -51,7 +58,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
-			!currentChannel?.channel_private,
+			currentChannel ? !currentChannel.channel_private : false,
 			parent ? !parent.channel_private : false
 		);
 	};

@@ -1,13 +1,12 @@
-import { selectMembersByChannelId } from '@mezon/store';
+import { selectAllChannelMembers, useAppSelector } from '@mezon/store';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 export type useChannelMembersOptions = {
 	channelId?: string | null;
 };
 
 export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) {
-	const members = useSelector(selectMembersByChannelId(channelId as string));
+	const members = useAppSelector((state) => selectAllChannelMembers(state, channelId as string));
 
 	return useMemo(
 		() => ({
