@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { selectChannelById, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import {
 	MessagesEntity,
 	appActions,
@@ -44,10 +44,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { t } = useTranslation(['message']);
 	const { reactionMessageDispatch } = useChatReaction();
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
-
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 
 	const { isCanDeleteMessage, isCanManageThread } = useUserPermission();
 	const { downloadImage, saveImageToCameraRoll } = useImage();
@@ -339,7 +340,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideCreateThread = isDM || !isCanManageThread;
 		const isHideDeleteMessage = !((isCanDeleteMessage && !isDM) || isMyMessage);
 
-		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
+		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
 		const listOfActionShouldHide = [
@@ -383,6 +384,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			currentChannel?.parrent_id || '',
 			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (message?.clan_id ?? currentClanId),
 			message.channel_id ?? '',
 			messageId ?? '',
@@ -391,7 +393,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			1,
 			senderId ?? '',
 			false,
-			true
+			true,
+			parent ? !parent.channel_private : false
 		);
 		onClose();
 	};

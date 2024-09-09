@@ -36,7 +36,7 @@ export const FriendList = React.memo(
 	React.forwardRef(
 		(
 			{ isUnknownChannel, expiredTimeSelected, isDMThread = false, isKeyboardVisible, openEditLinkModal }: IInviteToChannelProp,
-			refRBSheet: React.Ref<BottomSheetModal>,
+			refRBSheet: React.Ref<BottomSheetModal>
 		) => {
 			const currentChannelId = useSelector(selectCurrentChannelId);
 			const currentChannel = useContext(threadDetailContext);
@@ -60,7 +60,7 @@ export const FriendList = React.memo(
 					return listDMInvite?.filter((dm) => normalizeString(dm?.channel_label).includes(normalizeString(searchUserText)));
 				}
 				return listUserInvite?.filter((UserInvite) =>
-					normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText)),
+					normalizeString(UserInvite?.user?.display_name).includes(normalizeString(searchUserText))
 				);
 			}, [searchUserText, listDMInvite, listUserInvite]);
 
@@ -70,29 +70,32 @@ export const FriendList = React.memo(
 					type: 'success',
 					props: {
 						text2: t('copyLink'),
-						leadingIcon: <LinkIcon color={Colors.textLink} />,
-					},
+						leadingIcon: <LinkIcon color={Colors.textLink} />
+					}
 				});
 			}, [currentInviteLink, t]);
 
 			const sendToDM = async (dataSend: { text: string }, channelSelected: DirectEntity) => {
 				await mezon.socketRef.current.writeChatMessage(
 					'0',
+					'0',
 					channelSelected.id,
 					Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
+					false,
+					false,
 					{
 						t: dataSend.text,
 						lk: [
 							{
 								e: dataSend.text.length,
 								lk: dataSend.text,
-								s: 0,
-							},
-						],
+								s: 0
+							}
+						]
 					},
 					[],
 					[],
-					[],
+					[]
 				);
 			};
 
@@ -142,7 +145,7 @@ export const FriendList = React.memo(
 			const showUpdating = () => {
 				Toast.show({
 					type: 'info',
-					text1: 'Coming soon',
+					text1: 'Coming soon'
 				});
 			};
 
@@ -151,28 +154,28 @@ export const FriendList = React.memo(
 					{
 						title: t('iconTitle.shareInvite'),
 						icon: <Icons.ShareIcon color={themeValue.text} />,
-						onPress: () => showUpdating(),
+						onPress: () => showUpdating()
 					},
 					{
 						title: t('iconTitle.copyLink'),
 						icon: <Icons.LinkIcon color={themeValue.text} />,
-						onPress: () => addInviteLinkToClipboard(),
+						onPress: () => addInviteLinkToClipboard()
 					},
 					{
 						title: t('iconTitle.youtube'),
 						icon: <Icons.BrandYoutubeIcon color={themeValue.text} />,
-						onPress: () => showUpdating(),
+						onPress: () => showUpdating()
 					},
 					{
 						title: t('iconTitle.facebook'),
 						icon: <Icons.BrandFacebookIcon color={themeValue.text} />,
-						onPress: () => showUpdating(),
+						onPress: () => showUpdating()
 					},
 					{
 						title: t('iconTitle.twitter'),
 						icon: <Icons.BrandTwitterIcon color={themeValue.text} />,
-						onPress: () => showUpdating(),
-					},
+						onPress: () => showUpdating()
+					}
 				];
 				return iconList;
 			}, [t, addInviteLinkToClipboard, themeValue]);
@@ -246,6 +249,6 @@ export const FriendList = React.memo(
 					)}
 				</View>
 			);
-		},
-	),
+		}
+	)
 );

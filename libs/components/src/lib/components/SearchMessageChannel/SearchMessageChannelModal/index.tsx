@@ -1,4 +1,4 @@
-import { selectAllUsesClan } from '@mezon/store';
+import { selectAllUserClans } from '@mezon/store';
 import { UsersClanEntity } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,9 +19,9 @@ const SearchMessageChannelModal = ({
 	valueInputSearch,
 	hasKeySearch,
 	isShowSearchOptions,
-	onClickSearchOptions,
+	onClickSearchOptions
 }: SearchMessageChannelModalProps) => {
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 
 	const userClanSearch = useMemo(() => {
 		return usersClan.length

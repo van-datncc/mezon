@@ -9,7 +9,12 @@ export const useEscapeKey = (handler: () => void) => {
 			if (event.key === 'Escape') {
 				dispatch(messagesActions.setIdMessageToJump(''));
 				dispatch(messagesActions.setOpenOptionMessageState(false));
-				dispatch(referencesActions.setDataReferences(null));
+				dispatch(
+					referencesActions.setDataReferences({
+						channelId: '',
+						dataReferences: { has_attachment: false, channel_id: '', mode: 0, channel_label: '' }
+					})
+				);
 				dispatch(reactionActions.setMessageMatchWithRef(false));
 
 				handler();

@@ -1,6 +1,6 @@
 import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberByUserId } from '@mezon/store';
+import { reactionActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, selectDirectById, selectMemberClanByUserId } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -22,6 +22,8 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 	const currentChannel = useSelector(selectCurrentChannel);
 	const direct = useSelector(selectDirectById(message.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
+
 	useEffect(() => {
 		if (direct != undefined) {
 			setChannelLabel('');
@@ -40,6 +42,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		await reactionMessageDispatch(
 			id,
 			mode,
+			currentChannel?.parrent_id || '',
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '',
 			message.channel_id ?? '',
 			messageId,
@@ -48,7 +51,8 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
-			!currentChannel?.channel_private
+			!currentChannel?.channel_private,
+			parent ? !parent.channel_private : false
 		);
 	};
 
@@ -79,7 +83,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] shadow-md
 				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
-						<PanelHeader emojiId={emojiShowPanel.emojiId} emojiListPNG={emojis} count={count} />
+						<PanelHeader emojiId={emojiShowPanel.emojiId} emojiName={emojiShowPanel.emoji ?? ''} count={count} />
 						{senderList.map((sender: SenderInfoOptionals, index: number) => {
 							if (sender.count && sender.count > 0) {
 								return (
@@ -107,16 +111,17 @@ export default UserReactionPanel;
 
 type PanelHeaderProps = {
 	emojiId: string | undefined;
-	emojiListPNG: any;
+	emojiName: string;
 	count: number;
 };
 
-const PanelHeader: React.FC<PanelHeaderProps> = ({ emojiId, emojiListPNG, count }) => {
+const PanelHeader: React.FC<PanelHeaderProps> = ({ emojiId, emojiName, count }) => {
 	return (
 		<div>
 			<div className="flex flex-row items-center m-2 dark:text-white text-black">
 				<img src={getSrcEmoji(emojiId ?? '')} className="w-5 h-5 min-h-5 min-w-5" />
 				<p className="text-sm ml-2">{count}</p>
+				<p className="text-sm ml-2">{emojiName}</p>
 			</div>
 			<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none" />
 		</div>
@@ -152,7 +157,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
-	const user = useSelector(selectMemberByUserId(sender.sender_id));
+	const user = useSelector(selectMemberClanByUserId(sender.sender_id));
 
 	return (
 		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">

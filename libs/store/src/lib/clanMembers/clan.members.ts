@@ -1,6 +1,7 @@
 import { IUsersClan, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ClanUserListClanUser } from 'mezon-js/api.gen';
+import { StatusUserArgs } from '../channelmembers/channel.members';
 import { ensureSession, getMezonCtx } from '../helpers';
 export const USERS_CLANS_FEATURE_KEY = 'usersClan';
 
@@ -56,6 +57,66 @@ export const UsersClanSlice = createSlice({
 					clan_avatar: clanAvt
 				}
 			});
+		},
+		setManyStatusUser: (state, action: PayloadAction<StatusUserArgs[]>) => {
+			const allMemberChannels = UsersClanAdapter.getSelectors().selectAll(state);
+			UsersClanAdapter.updateMany(
+				state,
+				allMemberChannels.map((member) => {
+					const memberUpdate = action.payload.find((memberUpdate) => memberUpdate.userId === member.user?.id);
+					if (member.user?.id === memberUpdate?.userId) {
+						return {
+							id: member.id,
+							changes: {
+								...member,
+								user: {
+									...member.user,
+									online: memberUpdate?.status
+								}
+							}
+						};
+					}
+					return {
+						id: member.id,
+						changes: { ...member }
+					};
+				})
+			);
+		},
+		updateUserChannel: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
+			const { userId, clanId, clanNick, clanAvt } = action.payload;
+			const channelsToUpdate = Object.values(state.entities).filter((channel) => channel?.clan_id === clanId && channel?.user?.id === userId);
+			channelsToUpdate.forEach((channel) => {
+				if (channel) {
+					UsersClanAdapter.updateOne(state, {
+						id: userId,
+						changes: {
+							clan_nick: clanNick,
+							clan_avatar: clanAvt
+						}
+					});
+				}
+			});
+		},
+		addRoleIdUser: (state, action) => {
+			const { userId, id } = action.payload;
+			const existingMember = state.entities[userId];
+
+			if (existingMember) {
+				const roleIds = existingMember.role_id || [];
+				const updatedRoleIds = [...roleIds, id];
+				existingMember.role_id = updatedRoleIds;
+			}
+		},
+		removeRoleIdUser: (state, action) => {
+			const { userId, id } = action.payload;
+			const existingMember = state.entities[userId];
+
+			if (existingMember) {
+				const roleIds = existingMember.role_id || [];
+				const updatedRoleIds = roleIds.filter((roleId) => roleId !== id);
+				existingMember.role_id = updatedRoleIds;
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -85,11 +146,11 @@ const { selectAll, selectById } = UsersClanAdapter.getSelectors();
 
 export const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 
-export const selectAllUsesClan = createSelector(getUsersClanState, selectAll);
+export const selectAllUserClans = createSelector(getUsersClanState, selectAll);
 
 export const selectMemberClanByUserId = (userId: string) => createSelector(getUsersClanState, (state) => selectById(state, userId));
 
 export const selectMemberClanByGoogleId = (googleId: string) =>
-	createSelector(selectAllUsesClan, (members) => {
+	createSelector(selectAllUserClans, (members) => {
 		return members.find((member) => member.user?.google_id === googleId);
 	});

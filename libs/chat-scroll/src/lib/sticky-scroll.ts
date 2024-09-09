@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useScroll } from './scroll';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-const ANCHOR_SCROLL_TIMEOUT = 5000;
+const UI_STABILITY_TIMEOUT = 1000;
 
 /**
  * React hook for keeping HTML element scroll at the bottom when content updates (if it is already at the bottom).
@@ -14,58 +13,42 @@ export const useStickyScroll = (
 	options?: IUseStickyScrollOptions
 ): IUseStickyScrollResponse => {
 	const [enabled, setEnabled] = useState<boolean>(options?.enabled ?? true);
-	const { setScrollEventHandler } = useScroll(targetRef);
 
 	/**
 	 * Scrolls to anchor.
 	 */
 	const scrollToAnchor = useCallback(() => {
 		return new Promise<boolean>((resolve) => {
-			if (!anchorRef.current) {
-				return resolve(false);
-			}
-			anchorRef.current?.scrollIntoView();
-			resolve(true);
+			// ensure view rendered before scrolling
+			setTimeout(() => {
+				if (!anchorRef.current) {
+					return resolve(false);
+				}
+				anchorRef.current?.scrollIntoView();
+				resolve(true);
+			}, 0);
 		});
 	}, [anchorRef]);
 
-	useEffect(() => {
-		if (!enabled) {
-			return;
-		}
-
-		if (!targetRef.current || !anchorRef.current) {
-			return;
-		}
-
-		const options = {
-			root: targetRef.current,
-			rootMargin: '0px',
-			threshold: 1.0
-		};
-
-		let intersectTimer: NodeJS.Timeout | null = null;
-		const observer = new IntersectionObserver((entries) => {
-			for (const entry of entries) {
-				if (entry.isIntersecting) {
-					// keep the anchor in view until the user scrolls
-					intersectTimer = setTimeout(() => {
-						observer.disconnect();
-					}, ANCHOR_SCROLL_TIMEOUT);
-				} else {
-					intersectTimer && clearTimeout(intersectTimer);
-					scrollToAnchor();
-				}
-			}
-		}, options);
-
-		setScrollEventHandler(() => {
-			observer.disconnect();
+	const scrollToAnchorImmediately = useCallback(() => {
+		requestAnimationFrame(() => {
+			anchorRef.current?.scrollIntoView();
 		});
+	}, [anchorRef]);
 
-		observer.observe(anchorRef.current);
-		return () => observer.disconnect();
-	}, [enabled, targetRef, anchorRef, scrollToAnchor, setScrollEventHandler]);
+	useLayoutEffect(() => {
+		let shouldSCroll = true;
+		let scrollTimeoutId: NodeJS.Timeout | null = null;
+		if (targetRef.current && shouldSCroll) {
+			scrollToAnchorImmediately();
+		}
+		scrollTimeoutId && clearTimeout(scrollTimeoutId);
+		// assume 1s for the ui is stable
+		scrollTimeoutId = setTimeout(() => {
+			shouldSCroll = false;
+		}, UI_STABILITY_TIMEOUT);
+		return () => scrollTimeoutId && clearTimeout(scrollTimeoutId);
+	}, [targetRef, scrollToAnchorImmediately]);
 
 	/**
 	 * Scrolls to message with given id.

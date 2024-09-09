@@ -1,3 +1,4 @@
+import { useEscapeKey } from '@mezon/core';
 import { Icons, Image } from '@mezon/ui';
 import { useState } from 'react';
 
@@ -9,8 +10,9 @@ interface IFirstJoinPopup {
 const FirstJoinPopup = ({ onclose, openCreateClanModal }: IFirstJoinPopup) => {
 	const [inputValue, setInputValue] = useState('');
 	const handleJoinClan = () => {
-		window.open(inputValue, '_blank'); 
+		window.open(inputValue, '_blank');
 	};
+	useEscapeKey(onclose);
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50 bg-[#000000c9]">
 			<div className="relative z-10 w-[680px] flex max-sm:justify-center">
@@ -49,10 +51,13 @@ const FirstJoinPopup = ({ onclose, openCreateClanModal }: IFirstJoinPopup) => {
 						<div className="flex items-center gap-1	">
 							<div>
 								Or{' '}
-								<span onClick={()=>{
-									openCreateClanModal();
-									onclose();
-								}} className="font-semibold hover:underline cursor-pointer">
+								<span
+									onClick={() => {
+										openCreateClanModal();
+										onclose();
+									}}
+									className="font-semibold hover:underline cursor-pointer"
+								>
 									Create your own clan
 								</span>
 							</div>

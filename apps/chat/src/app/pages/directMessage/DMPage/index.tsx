@@ -179,10 +179,11 @@ export default function DirectMessage() {
 											: ChannelStreamMode.STREAM_MODE_GROUP
 									}
 									isPublic={false}
+									isDM={true}
 								/>
 							)}
 							<DirectMessageBox
-								directParamId={directId ?? ''}
+								direct={currentDmGroup}
 								mode={
 									currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 										? ChannelStreamMode.STREAM_MODE_DM
