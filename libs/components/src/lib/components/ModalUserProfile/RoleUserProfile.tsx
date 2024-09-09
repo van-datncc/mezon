@@ -5,9 +5,10 @@ import {
 	selectAllRolesClan,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectMemberClanByUserId,
 	selectTheme,
-	selectUserChannelById,
 	useAppDispatch,
+	useAppSelector,
 	usersClanActions
 } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
@@ -26,7 +27,7 @@ const checkAdminPermission = (role: RolesClanEntity, userId: string) => {
 
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const userById = useSelector(selectUserChannelById(userID || '', currentChannelId || ''));
+	const userById = useAppSelector(selectMemberClanByUserId(userID || currentChannelId || ''));
 	const { updateRole } = useRoles();
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);

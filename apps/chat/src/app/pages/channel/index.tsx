@@ -62,7 +62,7 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 				<ChannelTyping
 					channelId={currentChannel?.id}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					isPublic={!currentChannel.channel_private}
+					isPublic={currentChannel ? !currentChannel.channel_private : false}
 				/>
 			)}
 			{isViewingOldMessage && <ChannelJumpToPresent channelId={currentChannel?.id} mode={0} />}

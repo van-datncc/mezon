@@ -6,7 +6,6 @@ import { AddClanUserEvent, ChannelPresenceEvent, ChannelType, StatusPresenceEven
 import { USERS_CLANS_FEATURE_KEY, UsersClanState, usersClanActions } from '../clanMembers/clan.members';
 import { DirectEntity, getDirectState } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
-import { RootState } from '../store';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
@@ -246,7 +245,7 @@ export const channelMembers = createSlice({
 				)
 			];
 			channelIds.forEach((channelId) => {
-				state.memberChannels[channelId].ids.push(user.user_id);
+				state.memberChannels[channelId]?.ids?.push(user.user_id);
 			});
 		},
 		setFollowingUserIds: (state: ChannelMembersState, action: PayloadAction<string[]>) => {
@@ -277,12 +276,12 @@ export const channelMembers = createSlice({
 			const payload = action.payload;
 			const userId = payload.joins[0].user_id;
 			const channelId = payload.channel_id;
-			state.memberChannels[channelId].ids.push(userId);
+			state.memberChannels[channelId]?.ids?.push(userId);
 		},
 		removeUserByUserIdAndClan: (state, action: PayloadAction<{ userId: string; channelIds: string[] }>) => {
 			const { userId, channelIds } = action.payload;
 			channelIds.forEach((channelId) => {
-				channelMembersAdapter.removeOne(state.memberChannels[channelId], userId);
+				state.memberChannels[channelId] && channelMembersAdapter.removeOne(state.memberChannels[channelId], userId);
 			});
 		}
 	},
@@ -361,10 +360,10 @@ export const getChannelMembersState = (rootState: { [CHANNEL_MEMBERS_FEATURE_KEY
 const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 
 export const selectAllChannelMembers = createSelector(
-	[getChannelMembersState, getUsersClanState, (state: RootState, channelId: string) => channelId],
+	[getChannelMembersState, getUsersClanState, (state, channelId: string) => channelId],
 	(channelMembersState, getUsersClanState, channelId) => {
 		return (
-			(channelMembersState.memberChannels[channelId]?.ids.map((memberId) => {
+			(channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
 				return {
 					...getUsersClanState.entities[memberId],
 					channelId,
@@ -375,18 +374,6 @@ export const selectAllChannelMembers = createSelector(
 	}
 );
 
-export const selectMembersByChannelId = (channelId: string) =>
-	createSelector(
-		(state: RootState) => selectAllChannelMembers(state, channelId),
-		(members) => members
-	);
-
-export const selectUserChannelById = (userID: string, channelID: string) =>
-	createSelector(
-		(state: RootState) => selectMembersByChannelId(channelID)(state),
-		(members) => members.find((member) => member.id === userID) || null
-	);
-
 export const selectMemberByGoogleId = (googleId: string) =>
 	createSelector(getUsersClanState, (members) => {
 		return Object.values(members.entities).find((user) => user.user?.google_id === googleId);
@@ -396,25 +383,22 @@ export const selectMemberStatus = createSelector(getChannelMembersState, (state)
 
 export const selectCustomUserStatus = createSelector(getChannelMembersState, (state) => state.customStatusUser);
 
-export const selectMemberChannels = (channelId: string) =>
-	createSelector(getChannelMembersState, (state) => {
-		return state.memberChannels[channelId]?.entities || {};
-	});
+export const selectMemberIdsByChannelId = createSelector(
+	[getChannelMembersState, (state, channelId: string) => channelId],
+	(getChannelMembersState, channelId) => {
+		return getChannelMembersState?.memberChannels[channelId]?.ids || [];
+	}
+);
 
-export const selectMemberIdsByChannelId = (channelId: string) =>
-	createSelector(getChannelMembersState, (state) => {
-		return state?.memberChannels[channelId]?.ids || [];
-	});
+export const selectMemberOnlineStatusById = createSelector(
+	[getUsersClanState, (state, userId: string) => userId],
+	(getUsersClanState, userId) => getUsersClanState.entities[userId]?.user?.online || false
+);
 
-export const selectMemberOnlineStatusById = (userId: string) =>
-	createSelector(getUsersClanState, (state) => {
-		return state.entities[userId]?.user?.online || false;
-	});
-
-export const selectMemberCustomStatusById = (userId: string) =>
-	createSelector(selectCustomUserStatus, (customStatus) => {
-		return customStatus?.[userId] || '';
-	});
+export const selectMemberCustomStatusById = createSelector(
+	[selectCustomUserStatus, (state, userId: string) => userId],
+	(selectCustomUserStatus, userId) => selectCustomUserStatus?.[userId] || ''
+);
 
 export const selectChannelMemberByUserIds = (channelId: string, userIds: string[], isDm = true) =>
 	createSelector(getUsersClanState, getDirectState, (usersClanState, directs) => {
