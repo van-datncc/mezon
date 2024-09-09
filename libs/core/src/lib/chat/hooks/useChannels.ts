@@ -30,30 +30,28 @@ export function useChannels() {
 
 	const navigateAfterDeleteChannel = (channelId: string) => {
 		let channelLink: string;
+		if (channelId !== currentChannelId) {
+			return;
+		}
 		if (channels.length === 1) {
 			channelLink = toMembersPage(currentClanId as string);
 			navigate(channelLink);
 			return;
 		}
-		if (channelId === currentChannelId) {
-			if (channelId === channels[0].channel_id) {
-				channelLink = toChannelPage(channels[1].channel_id as string, currentClanId as string);
-				navigate(channelLink);
-				return;
-			}
-			channelLink = toChannelPage(channels[0].channel_id as string, currentClanId as string);
-			navigate(channelLink);
-			return;
-		}
+		const nextLink = {
+			firstChannel: channels[0].channel_id,
+			secondChannel: channels[1].channel_id
+		};
+		const nextChannel = channelId === nextLink.firstChannel ? nextLink.secondChannel : nextLink.firstChannel;
+		channelLink = toChannelPage(nextChannel as string, currentClanId as string);
+		navigate(channelLink);
+		return;
 	};
 
-	return React.useMemo(
-		() => ({
-			channels,
-			listChannels,
-			navigateAfterDeleteChannel,
-			handleConfirmDeleteChannel
-		}),
-		[channels, listChannels, navigateAfterDeleteChannel, handleConfirmDeleteChannel]
-	);
+	return {
+		channels,
+		listChannels,
+		navigateAfterDeleteChannel,
+		handleConfirmDeleteChannel
+	};
 }
