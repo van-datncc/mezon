@@ -3,12 +3,12 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 const style = (colors: Attributes) => StyleSheet.create({
 	container: {
-		backgroundColor: colors.primary,
+		marginTop: size.s_10,
 		paddingHorizontal: size.s_20,
 		width: Dimensions.get('screen').width,
 	},
 	title: {
-		fontSize: size.label,
+		fontSize: size.medium,
 		color: colors.white,
 		fontWeight: '600',
 		marginBottom: size.s_20,
