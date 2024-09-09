@@ -1,17 +1,16 @@
-import { useChannelMembers } from '@mezon/core';
-import { selectAllRolesClan } from '@mezon/store-mobile';
+import { ID_MENTION_HERE } from '@mezon/mobile-components';
+import { selectAllRolesClan, selectMembersByChannelId } from '@mezon/store-mobile';
 import { ChannelMembersEntity, MentionDataProps } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { ID_MENTION_HERE } from '@mezon/mobile-components';
 
 function UseMentionList(channelID: string, channelMode?: number): MentionDataProps[] {
-	const { members } = useChannelMembers({ channelId: channelID });
+	const members = useSelector(selectMembersByChannelId(channelID as string));
 	const rolesInClan = useSelector(selectAllRolesClan);
-  const { t } = useTranslation('clanRoles');
+	const { t } = useTranslation('clanRoles');
 
 	const newUserMentionList = useMemo(() => {
 		if (!members || members.length === 0) {
@@ -26,7 +25,7 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 					id: item?.user?.id ?? '',
 					display: item?.clan_nick || item?.user?.display_name || item?.user?.username || '',
 					avatarUrl: item?.user?.avatar_url ?? '',
-          username: item?.user?.username
+					username: item?.user?.username
 				};
 			}) ?? [];
 		const hardcodedUser = {
@@ -37,9 +36,9 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 				id: ID_MENTION_HERE,
 				display_name: 'here',
 				username: 'here',
-				avatarUrl: '',
+				avatarUrl: ''
 			},
-      username: t('notifyEveryone')
+			username: t('notifyEveryone')
 		};
 		const sortedMentionList = [...mentionList].sort((a, b) => {
 			const displayA = a.display?.toLowerCase() || '';
@@ -56,7 +55,7 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 				display: item.title,
 				avatarUrl: '',
 				clanNick: item.title,
-				isRoleUser: true,
+				isRoleUser: true
 			})) ?? [];
 
 		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
