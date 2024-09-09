@@ -1,9 +1,9 @@
-import { selectMemberCustomStatusById, selectMemberOnlineStatusById, useAppSelector } from '@mezon/store';
+import { selectMemberCustomStatusById, selectMemberStatusById, useAppSelector } from '@mezon/store';
 import { useMemo } from 'react';
 import { useAuth } from './useAuth';
 
 export function useMemberStatus(memberId: string) {
-	const memberStatus = useAppSelector((state) => selectMemberOnlineStatusById(state, memberId));
+	const memberStatus = useAppSelector((state) => selectMemberStatusById(state, memberId));
 	const { userId } = useAuth();
 	const status = useMemo(() => (userId === memberId ? true : memberStatus), [memberStatus, userId]);
 	return status;
