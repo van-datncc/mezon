@@ -87,6 +87,19 @@
         "privateChannel": "Kênh riêng tư",
         "basicViewDescription": "Khi bạn chuyển kênh sang chế độ riêng tư, chỉ những thành viên và vai trò được chọn mới có thể xem kênh này",
         "addMemberAndRoles": "Thêm thành viên hoặc vai trò",
-        "whoCanAccess": "Ai có thể truy cập"
+        "whoCanAccess": "Ai có thể truy cập",
+        "warningModal": {
+            "publicChannelTitle": "Mở kênh này cho tất cả mọi người?",
+            "privateChannelTitle": "Chuyển kênh này thành riêng tư?",
+            "publicChannelContent": "{{channelLabel}} sẽ có sẵn cho tất cả các thành viên",
+            "privateChannelContent": "{{channelLabel}} sẽ trở thành riêng tư và chỉ hiển thị cho các thành viên và vai trò được chọn",
+            "confirm": "Đồng ý"
+        },
+        "bottomSheet": {
+            "addMembersOrRoles": "Thêm thành viên hoặc vai trò",
+            "add": "Thêm",
+            "roles": "VAI TRÒ",
+            "members": "THÀNH VIÊN"
+        }
     }
 }

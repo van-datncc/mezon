@@ -1,9 +1,16 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCheckOwnerForUser } from '@mezon/core';
+import { useAuth, useCheckOwnerForUser } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectAllUsesClan, selectEveryoneRole, selectMembersByChannelId, selectRolesByChannelId } from '@mezon/store-mobile';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
+import {
+	channelsActions,
+	selectAllUserClans,
+	selectEveryoneRole,
+	selectMembersByChannelId,
+	selectRolesByChannelId,
+	useAppDispatch
+} from '@mezon/store-mobile';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -12,20 +19,19 @@ import { MezonConfirm, MezonSwitch } from '../../../temp-ui';
 import { AddMemberOrRoleBS } from '../components/AddMemberOrRoleBS';
 import { MemberItem } from '../components/MemberItem';
 import { RoleItem } from '../components/RoleItem';
-
-interface IBasicViewProps {
-	channel: ChannelsEntity;
-}
+import { IBasicViewProps } from '../types/channelPermission.type';
 
 export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const { themeValue } = useTheme();
+	const { userId } = useAuth();
 	const [checkClanOwner] = useCheckOwnerForUser();
-	// const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 	const { t } = useTranslation('channelSetting');
 	const [visibleModalConfirm, setVisibleModalConfirm] = useState(false);
+	const [isPrivateChannel, setIsPrivateChannel] = useState(false);
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const everyoneRole = useSelector(selectEveryoneRole);
-	const allClanMembers = useSelector(selectAllUsesClan);
+	const allClanMembers = useSelector(selectAllUserClans);
 
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
 	const listOfChannelMember = useSelector(selectMembersByChannelId(channel?.channel_id));
@@ -33,10 +39,6 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const clanOwner = useMemo(() => {
 		return allClanMembers?.find((member) => checkClanOwner(member?.user?.id));
 	}, [allClanMembers, checkClanOwner]);
-
-	const isPrivateChannel = useMemo(() => {
-		return Boolean(channel?.channel_private);
-	}, [channel?.channel_private]);
 
 	const availableMemberList = useMemo(() => {
 		if (isPrivateChannel) {
@@ -53,7 +55,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	}, [listOfChannelRole, isPrivateChannel, everyoneRole]);
 
 	const onPrivateChannelChange = useCallback((value: boolean) => {
-		//TODO
+		setIsPrivateChannel(value);
 		setVisibleModalConfirm(true);
 	}, []);
 
@@ -62,12 +64,25 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	};
 
 	const updateChannel = async () => {
-		//TODO
+		await dispatch(
+			channelsActions.updateChannelPrivate({
+				channel_id: channel.id,
+				channel_private: isPrivateChannel ? 0 : 1,
+				user_ids: [userId],
+				role_ids: []
+			})
+		);
 	};
 
 	const closeModalConfirm = () => {
-		//TODO
+		setIsPrivateChannel(!isPrivateChannel);
 	};
+
+	useEffect(() => {
+		if (channel?.channel_private !== undefined) {
+			setIsPrivateChannel(Boolean(channel?.channel_private));
+		}
+	}, [channel?.channel_private]);
 	return (
 		<ScrollView>
 			<TouchableOpacity onPress={() => onPrivateChannelChange(!isPrivateChannel)}>
@@ -87,7 +102,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				</Block>
 			</TouchableOpacity>
 
-			{isPrivateChannel && (
+			{Boolean(channel?.channel_private) && (
 				<Block>
 					<Text color={themeValue.textDisabled}>{t('channelPermission.basicViewDescription')}</Text>
 
@@ -131,12 +146,16 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				onVisibleChange={setVisibleModalConfirm}
 				onConfirm={updateChannel}
 				onCancel={closeModalConfirm}
-				title={isPrivateChannel ? 'Make this channel private?' : 'Make this channel open to everyone?'}
-				confirmText={'Yes'}
+				title={
+					isPrivateChannel
+						? t('channelPermission.warningModal.privateChannelTitle')
+						: t('channelPermission.warningModal.publicChannelTitle')
+				}
+				confirmText={t('channelPermission.warningModal.confirm')}
 				content={
 					isPrivateChannel
-						? `${channel?.channel_label} will become available to all members`
-						: `${channel?.channel_label} will become private and visible to select members and roles`
+						? t('channelPermission.warningModal.privateChannelContent', { channelLabel: channel?.channel_label })
+						: t('channelPermission.warningModal.publicChannelContent', { channelLabel: channel?.channel_label })
 				}
 				hasBackdrop={true}
 			/>

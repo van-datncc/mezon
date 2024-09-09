@@ -8,7 +8,7 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import FastImage from 'react-native-fast-image';
 import { IMemberItemProps } from '../../types/channelPermission.type';
 
-export const MemberItem = memo(({ member, channelId, isCheckbox = false, isChecked = false }: IMemberItemProps) => {
+export const MemberItem = memo(({ member, channelId, isCheckbox = false, isChecked = false, onSelectMemberChange }: IMemberItemProps) => {
 	const { userId } = useAuth();
 	const [checkClanOwner] = useCheckOwnerForUser();
 	const isClanOwner = checkClanOwner(member?.user?.id);
@@ -23,16 +23,12 @@ export const MemberItem = memo(({ member, channelId, isCheckbox = false, isCheck
 		await dispatch(channelUsersActions.removeChannelUsers(body));
 	};
 
-	const onSelectMemberChange = () => {
-		//
-	};
-
 	const disableDeleteButton = useMemo(() => {
 		return isClanOwner || userId === member?.user?.id;
 	}, [isClanOwner, member?.user?.id, userId]);
 
 	return (
-		<TouchableOpacity onPress={onSelectMemberChange} disabled={!isCheckbox}>
+		<TouchableOpacity onPress={() => onSelectMemberChange(!isChecked, member?.user?.id)} disabled={!isCheckbox}>
 			<Block gap={size.s_10} flexDirection="row" padding={size.s_10} alignItems="center">
 				<FastImage
 					source={{ uri: member?.user?.avatar_url }}
@@ -53,9 +49,7 @@ export const MemberItem = memo(({ member, channelId, isCheckbox = false, isCheck
 						<BouncyCheckbox
 							size={20}
 							isChecked={isChecked}
-							onPress={(value) => {
-								//
-							}}
+							onPress={(value) => onSelectMemberChange(value, member?.user?.id)}
 							fillColor={Colors.bgButton}
 							iconStyle={{ borderRadius: 5 }}
 							innerIconStyle={{
@@ -63,7 +57,6 @@ export const MemberItem = memo(({ member, channelId, isCheckbox = false, isCheck
 								borderColor: isChecked ? Colors.bgButton : Colors.tertiary,
 								borderRadius: 5
 							}}
-							textStyle={{ fontFamily: 'JosefinSans-Regular' }}
 						/>
 					</Block>
 				) : (

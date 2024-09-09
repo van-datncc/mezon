@@ -1,14 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import {
-	selectAllRolesClan,
-	selectChannelById,
-	selectChannelMembersEntities,
-	selectMembersByChannelId,
-	selectRolesByChannelId,
-	selectRolesClanEntities,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { selectChannelById } from '@mezon/store-mobile';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TouchableOpacity } from 'react-native';
@@ -21,17 +13,11 @@ import { EPermissionSetting } from './types/channelPermission.enum';
 type ChannelPermissionSetting = typeof APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION;
 export const ChannelPermissionSetting = ({ navigation, route }: MenuChannelScreenProps<ChannelPermissionSetting>) => {
 	const { channelId } = route.params;
-	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId || ''));
 	const { themeValue } = useTheme();
 	const { t } = useTranslation('channelSetting');
 	const [currentTab, setCurrentTab] = useState<EPermissionSetting>(EPermissionSetting.AdvancedView);
 	const [isAdvancedEditMode, setIsAdvancedEditMode] = useState(false);
-	const rolesChannel = useSelector(selectRolesByChannelId(channelId));
-	const rawMembers = useSelector(selectMembersByChannelId(channelId));
-	const rolesClan = useSelector(selectAllRolesClan);
-	const rolesClanEntities = useSelector(selectRolesClanEntities);
-	const allmemmber = useSelector(selectChannelMembersEntities);
 
 	const onTabChange = (tab: EPermissionSetting) => {
 		if (tab === EPermissionSetting.BasicView) {
@@ -75,15 +61,16 @@ export const ChannelPermissionSetting = ({ navigation, route }: MenuChannelScree
 					</TouchableOpacity>
 				);
 			}
-			return (
-				<TouchableOpacity onPress={() => setIsAdvancedEditMode(true)}>
-					<Block marginRight={size.s_20}>
-						<Text h4 color={themeValue.white}>
-							{t('channelPermission.edit')}
-						</Text>
-					</Block>
-				</TouchableOpacity>
-			);
+			//TODO: update later
+			// return (
+			// 	<TouchableOpacity onPress={() => setIsAdvancedEditMode(true)}>
+			// 		<Block marginRight={size.s_20}>
+			// 			<Text h4 color={themeValue.white}>
+			// 				{t('channelPermission.edit')}
+			// 			</Text>
+			// 		</Block>
+			// 	</TouchableOpacity>
+			// );
 		},
 		headerLeft: () => {
 			return (
