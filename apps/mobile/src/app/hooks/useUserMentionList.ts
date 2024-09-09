@@ -1,5 +1,6 @@
+import { useChannelMembers } from '@mezon/core';
 import { ID_MENTION_HERE } from '@mezon/mobile-components';
-import { selectAllRolesClan, selectMembersByChannelId } from '@mezon/store-mobile';
+import { selectAllRolesClan } from '@mezon/store-mobile';
 import { ChannelMembersEntity, MentionDataProps } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
@@ -8,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 function UseMentionList(channelID: string, channelMode?: number): MentionDataProps[] {
-	const members = useSelector(selectMembersByChannelId(channelID as string));
+	const { members } = useChannelMembers({ channelId: channelID });
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const { t } = useTranslation('clanRoles');
 
