@@ -18,14 +18,16 @@ import { IConfirmActionPayload, IMessageActionPayload } from './types';
 
 type ChannelMessagesProps = {
 	channelId: string;
+	parentId: string;
 	clanId: string;
 	avatarDM?: string;
 	mode: ChannelStreamMode;
 	isPublic?: boolean;
+	isParentPublic?: boolean;
 	isDM?: boolean;
 };
 
-const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, isDM }: ChannelMessagesProps) => {
+const ChannelMessagesWrapper = React.memo(({ channelId, parentId, clanId, mode, isPublic, isParentPublic, isDM }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { socketRef } = useMezon();
 	const [openBottomSheet, setOpenBottomSheet] = useState<EMessageBSToShow | null>(null);
@@ -61,7 +63,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, clanId, mode, isPublic, 
 
 	const onDeleteMessage = async (messageId) => {
 		const socket = socketRef.current;
-		await socket.removeChatMessage(clanId || '', channelId, mode, isPublic, messageId);
+		await socket.removeChatMessage(clanId || '', parentId || '', channelId, mode, isPublic, isParentPublic, messageId);
 	};
 
 	const onConfirmAction = useCallback((payload: IConfirmActionPayload) => {
