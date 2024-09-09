@@ -1,7 +1,7 @@
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberByUserId } from '@mezon/store-mobile';
+import { selectChannelById, selectComputedReactionsByMessageId, selectCurrentChannel, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -23,6 +23,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { reactionMessageDispatch } = useChatReaction();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 
 	const userId = useMemo(() => userProfile?.user?.id, [userProfile?.user?.id]);
 
@@ -34,11 +35,12 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		emoji: string,
 		count: number,
 		message_sender_id: string,
-		action_delete?: boolean,
+		action_delete?: boolean
 	) => {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			currentChannel?.parrent_id || '',
 			currentChannel?.clan_id ?? '',
 			currentChannel?.id ?? '',
 			messageId ?? '',
@@ -48,6 +50,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			message_sender_id ?? '',
 			false,
 			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : !currentChannel?.channel_private,
+			parent ? !parent.channel_private : false
 		);
 	};
 
@@ -57,6 +60,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			currentChannel?.parrent_id || '',
 			currentChannel?.clan_id ?? '',
 			currentChannel?.id ?? '',
 			message.id ?? '',
@@ -66,6 +70,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			userId ?? '',
 			true,
 			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : !currentChannel?.channel_private,
+			parent ? !parent.channel_private : false
 		);
 	};
 
@@ -104,7 +109,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 								emojiItemData.emoji ?? '',
 								1,
 								userId ?? '',
-								false,
+								false
 							);
 						}}
 						key={index + emojiItemData.emojiId}
@@ -157,7 +162,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 				>
 					<FastImage
 						source={{
-							uri: getSrcEmoji(emojiItem.emojiId),
+							uri: getSrcEmoji(emojiItem.emojiId)
 						}}
 						resizeMode={'contain'}
 						style={styles.iconEmojiReactionDetail}
@@ -276,8 +281,8 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 				draggable
 				customStyles={{
 					container: {
-						backgroundColor: 'transparent',
-					},
+						backgroundColor: 'transparent'
+					}
 				}}
 			>
 				<View style={styles.bottomSheetWrapper}>
@@ -307,7 +312,7 @@ const MemberReact = React.memo((props: { userId: string; onSelectUserId: (userId
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { userId, onSelectUserId } = props;
-	const user = useSelector(selectMemberByUserId(userId || ''));
+	const user = useSelector(selectMemberClanByUserId(userId || ''));
 	const showUserInformation = () => {
 		onSelectUserId(user.user?.id);
 	};

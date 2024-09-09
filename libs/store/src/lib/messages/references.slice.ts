@@ -1,4 +1,4 @@
-import { EUploadingStatus, IMessage, PreSendAttachment, UploadingAttachmentStatus } from '@mezon/utils';
+import { IMessage, PreSendAttachment } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 
@@ -21,15 +21,12 @@ export interface IAttachmentFile {
 export interface ReferencesState extends EntityState<ReferencesEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	error?: string | null;
-	dataReferences: ApiMessageRef[];
+	dataReferences: Record<string, ApiMessageRef>;
 	openEditMessageState: boolean;
-	idMessageRefReply: Record<string, string>;
 	idMessageRefReaction: string;
 	idMessageRefEdit: string;
-	statusLoadingAttachment: boolean;
 	idMessageMention: string;
 	attachmentAfterUpload: Record<string, PreSendAttachment>;
-	uploadingStatuses: Record<string, Record<string, UploadingAttachmentStatus>>;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -41,17 +38,13 @@ export const fetchReferences = createAsyncThunk<ReferencesEntity[]>('references/
 export const initialReferencesState: ReferencesState = referencesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	dataReferences: [],
+	dataReferences: {},
 	idMessageToJump: '',
 	openEditMessageState: false,
-	openReplyMessageState: false,
-	idMessageRefReply: {},
 	idMessageRefReaction: '',
 	idMessageRefEdit: '',
-	statusLoadingAttachment: false,
 	idMessageMention: '',
-	attachmentAfterUpload: {},
-	uploadingStatuses: {}
+	attachmentAfterUpload: {}
 });
 
 export const referencesSlice = createSlice({
@@ -65,12 +58,10 @@ export const referencesSlice = createSlice({
 			state.idMessageMention = action.payload;
 		},
 
-		setDataReferences(state, action) {
-			state.dataReferences = action.payload;
-		},
-
-		setStatusLoadingAttachment(state, action) {
-			state.statusLoadingAttachment = action.payload;
+		setDataReferences(state, action: PayloadAction<{ channelId: string; dataReferences: ApiMessageRef }>) {
+			if (action.payload !== null) {
+				state.dataReferences[action.payload.channelId] = action.payload.dataReferences;
+			}
 		},
 
 		setOpenEditMessageState(state, action) {
@@ -124,29 +115,6 @@ export const referencesSlice = createSlice({
 			}
 		},
 
-		setUploadingStatus: (
-			state,
-			action: PayloadAction<{ channelId: string; messageId: string; statusUpload: EUploadingStatus; count: number }>
-		) => {
-			const { channelId, messageId, statusUpload, count } = action.payload;
-
-			if (!state.uploadingStatuses[channelId]) {
-				state.uploadingStatuses[channelId] = {};
-			}
-
-			if (count > 0) {
-				state.uploadingStatuses[channelId][messageId] = {
-					statusUpload,
-					count
-				};
-			} else {
-				delete state.uploadingStatuses[channelId][messageId];
-			}
-		},
-
-		setIdReferenceMessageReply(state, action: PayloadAction<{ channelId: string; idMessageRefReply: string }>) {
-			state.idMessageRefReply[action.payload.channelId] = action.payload.idMessageRefReply;
-		},
 		setIdReferenceMessageReaction(state, action) {
 			state.idMessageRefReaction = action.payload;
 		},
@@ -184,7 +152,10 @@ export const selectAllReferences = createSelector(getReferencesState, selectAll)
 
 export const selectReferencesEntities = createSelector(getReferencesState, selectEntities);
 
-export const selectDataReferences = createSelector(getReferencesState, (state: ReferencesState) => state.dataReferences);
+export const selectDataReferences = (channelId: string) =>
+	createSelector(getReferencesState, (state: ReferencesState) => {
+		return state.dataReferences[channelId] || '';
+	});
 
 export const selectOpenEditMessageState = createSelector(getReferencesState, (state: ReferencesState) => state.openEditMessageState);
 
@@ -192,28 +163,9 @@ export const selectIdMessageRefReaction = createSelector(getReferencesState, (st
 
 export const selectIdMessageRefEdit = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageRefEdit);
 
-export const selectStatusLoadingAttachment = createSelector(getReferencesState, (state: ReferencesState) => state.statusLoadingAttachment);
-
 export const selectMessageMetionId = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageMention);
 
 export const selectAttachmentAfterUpload = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentAfterUpload);
-
-export const selectUploadingStatus = (channelId: string, messageId: string) =>
-	createSelector(
-		(state: { references: ReferencesState }) => state.references.uploadingStatuses,
-		(uploadingStatuses) => {
-			const status = uploadingStatuses[channelId]?.[messageId];
-			return {
-				statusUpload: status?.statusUpload,
-				count: status?.count ?? 0
-			};
-		}
-	);
-
-export const selectIdMessageRefReply = (channelId: string) =>
-	createSelector(getReferencesState, (state: ReferencesState) => {
-		return state.idMessageRefReply[channelId] || '';
-	});
 
 export const selectAttachmentByChannelId = (channelId: string) =>
 	createSelector(selectAttachmentAfterUpload, (attachmentAfterUpload) => attachmentAfterUpload[channelId] || null);

@@ -1,7 +1,7 @@
 import { useAuth, useChannels, useFriends } from '@mezon/core';
 import { EOpenSearchChannelFrom, debounce } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
-import { selectAllDirectMessages, selectAllUsesClan } from '@mezon/store-mobile';
+import { selectAllDirectMessages, selectAllUserClans } from '@mezon/store-mobile';
 import { removeDuplicatesById } from '@mezon/utils';
 import { RouteProp } from '@react-navigation/native';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -36,7 +36,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === 3 && groupChat.channel_avatar);
 	const { friends } = useFriends();
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const { userProfile } = useAuth();
 	const accountId = userProfile?.user?.id ?? '';
 	const [pageID, setPageID] = useState<number>(0);

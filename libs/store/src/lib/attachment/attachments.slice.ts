@@ -91,7 +91,7 @@ export const attachmentSlice = createSlice({
 		setMessageId: (state, action) => {
 			state.messageId = action.payload;
 		},
-		setCurrentAttachment: (state, action) => {
+		setCurrentAttachment: (state, action: PayloadAction<AttachmentEntity | null>) => {
 			state.currentAttachment = action.payload;
 		},
 		removeCurrentAttachment: (state) => {

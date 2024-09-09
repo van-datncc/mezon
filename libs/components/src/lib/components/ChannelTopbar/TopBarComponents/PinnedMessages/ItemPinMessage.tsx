@@ -1,6 +1,7 @@
 import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
-import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClanId } from '@mezon/store';
-import { useState } from 'react';
+import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClanId, selectMessageByMessageId } from '@mezon/store';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import MemberProfile from '../../../MemberProfile';
 import MessageLine from '../../../MessageWithUser/MessageLine';
@@ -32,10 +33,12 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 		jumpToMessage();
 	};
 
+	const message = useSelector(selectMessageByMessageId(pinMessage.message_id as string));
+
 	return (
 		<div
 			key={pinMessage.id}
-			className="flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgPrimary hover:bg-bgLightModeThird bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden border dark:border-bgTertiary border-gray-300 group/item-pinMess"
+			className="relative flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgPrimary hover:bg-bgLightModeThird bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden border dark:border-bgTertiary border-gray-300 group/item-pinMess"
 		>
 			<div className="flex items-start gap-2">
 				<MemberProfile
@@ -55,9 +58,10 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					<div className="leading-6">
 						<MessageLine content={JSON.parse(pinMessage.content || '')} isJumMessageEnabled={false} isTokenClickAble={false} />
 					</div>
+					{message.attachments?.length ? <ListPinAttachment attachments={message.attachments} /> : <></>}
 				</div>
 			</div>
-			<div className="h-fit flex gap-x-2 items-center opacity-0 group-hover/item-pinMess:opacity-100">
+			<div className="absolute h-fit flex gap-x-2 items-center opacity-0 right-2 top-2 group-hover/item-pinMess:opacity-100">
 				<p
 					onClick={handleJumpMess}
 					className="text-xs dark:bg-bgTertiary bg-bgLightModeButton rounded p-1 h-fit dark:text-white text-colorTextLightMode"
@@ -81,6 +85,47 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					closeModal={() => setOpenModalDelPin(false)}
 				/>
 			)}
+		</div>
+	);
+};
+
+const ListPinAttachment = ({ attachments }: { attachments: ApiMessageAttachment[] }) => {
+	const gridClass = useMemo(() => {
+		let classGridParent = '';
+		let classGridChild = '';
+		if (attachments.length >= 5) {
+			classGridParent = `grid-cols-6`;
+			if (attachments.length % 3 === 1) {
+				classGridChild = classGridChild + ` col-span-2 first:col-span-6`;
+			}
+			if (attachments.length % 3 === 2) {
+				classGridChild = classGridChild + `col-span-2 first:col-span-3 [&:nth-child(2)]:col-span-3`;
+			} else {
+				classGridChild = classGridChild + ` col-span-2 `;
+			}
+			return {
+				classGridParent: classGridParent,
+				classGridChild: classGridChild
+			};
+		}
+		if (attachments.length < 5) {
+			classGridParent = `grid-cols-2`;
+			if (attachments.length % 2 === 1) {
+				classGridChild = classGridChild + `col-span-1 first:col-span-2`;
+			} else {
+				classGridChild = classGridChild + `col-span-1`;
+			}
+			return {
+				classGridParent: classGridParent,
+				classGridChild: classGridChild
+			};
+		}
+	}, [attachments]);
+	return (
+		<div className={`grid ${gridClass?.classGridParent} gap-1`}>
+			{attachments.map((attach) => {
+				return <img src={attach.url} className={`${gridClass?.classGridChild}`} />;
+			})}
 		</div>
 	);
 };

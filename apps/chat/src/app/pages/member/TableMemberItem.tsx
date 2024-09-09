@@ -1,5 +1,7 @@
 import { AvatarImage } from '@mezon/components';
+import { useMemberContext } from '@mezon/core';
 import { selectAllRolesClan, selectTheme } from '@mezon/store';
+import { HighlightMatchBold } from '@mezon/ui';
 import { Tooltip } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -26,15 +28,15 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 			return false;
 		});
 	}, [userId, RolesClan]);
-
+	const { searchQuery } = useMemberContext();
 	return (
 		<div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0">
 			<div className="flex-3 p-1">
 				<div className="flex flex-row gap-2 items-center">
 					<AvatarImage alt={username} userName={username} className="min-w-9 min-h-9 max-w-9 max-h-9" src={avatar} />
 					<div className="flex flex-col">
-						<p className="text-base font-medium">{displayName}</p>
-						<p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{username}</p>
+						<p className="text-base font-medium">{HighlightMatchBold(displayName, searchQuery)}</p>
+						<p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{HighlightMatchBold(username, searchQuery)}</p>
 					</div>
 				</div>
 			</div>

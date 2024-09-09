@@ -1,15 +1,12 @@
 import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, MemberListGroupChat, ModalUserProfile } from '@mezon/components';
 import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useThreads } from '@mezon/core';
 import {
-	RootState,
 	directActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
-	selectIdMessageRefReaction,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
-	selectMessageByChannelId,
 	selectPositionEmojiButtonSmile,
 	selectReactionTopState,
 	selectStatusMenu,
@@ -35,7 +32,6 @@ function useChannelSeen(channelId: string) {
 }
 export default function DirectMessage() {
 	// TODO: move selector to store
-	const isSending = useSelector((state: RootState) => state.messages.isSending);
 	const { clanId, directId, type } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
 	const { navigate } = useAppNavigation();
@@ -53,15 +49,7 @@ export default function DirectMessage() {
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
 
-	const messages = useSelector(selectMessageByChannelId(directId));
-	useEffect(() => {
-		if (messagesContainerRef.current) {
-			messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-		}
-	}, [isSending, [], messages]);
-
 	const reactionTopState = useSelector(selectReactionTopState);
-	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -191,10 +179,11 @@ export default function DirectMessage() {
 											: ChannelStreamMode.STREAM_MODE_GROUP
 									}
 									isPublic={false}
+									isDM={true}
 								/>
 							)}
 							<DirectMessageBox
-								directParamId={directId ?? ''}
+								direct={currentDmGroup}
 								mode={
 									currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
 										? ChannelStreamMode.STREAM_MODE_DM

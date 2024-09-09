@@ -1,14 +1,6 @@
 import { useAppParams } from '@mezon/core';
-import {
-	PinMessageEntity,
-	pinMessageActions,
-	selectCurrentChannel,
-	selectCurrentChannelId,
-	selectCurrentClanId,
-	selectPinMessageByChannelId,
-	useAppDispatch
-} from '@mezon/store';
-import { useEffect, useMemo } from 'react';
+import { PinMessageEntity, pinMessageActions, selectCurrentChannelId, selectPinMessageByChannelId, useAppDispatch } from '@mezon/store';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyPinMess from './EmptyPinMess';
 import ItemPinMessage from './ItemPinMessage';
@@ -23,10 +15,8 @@ const ListPinMessage = ({
 	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const dmChannelId = useSelector(selectPinMessageByChannelId(directId));
 	const clanChannelId = useSelector(selectPinMessageByChannelId(currentChannelId));
-	const channel = useSelector(selectCurrentChannel);
 	let listPinMessages: PinMessageEntity[] = [];
 
 	if (dmChannelId) {
@@ -41,19 +31,6 @@ const ListPinMessage = ({
 	};
 
 	const checkListPinMessages = useMemo(() => listPinMessages.length <= 0, [listPinMessages.length]);
-
-	useEffect(() => {
-		if (!checkListPinMessages) {
-			dispatch(
-				pinMessageActions.updateLastPin({
-					clanId: currentClanId ?? '',
-					channelId: currentChannelId ?? '',
-					messageId: listPinMessages[listPinMessages.length - 1]?.message_id ?? '',
-					isPublic: !channel?.channel_private
-				})
-			);
-		}
-	}, [listPinMessages]);
 
 	return (
 		<div className="min-h-36">

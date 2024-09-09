@@ -1,7 +1,8 @@
 import { useAppParams, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { selectCurrentChannel, selectIdMessageRefReaction } from '@mezon/store';
+import { selectIdMessageRefReaction } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ClanSetting from '../ClanSettings';
@@ -14,10 +15,10 @@ import { InputSearch } from './inputSearch';
 export type GifStickerEmojiPopupOptions = {
 	emojiAction?: EmojiPlaces;
 	mode?: number;
+	channelOrDirect?: ApiChannelDescription;
 };
 
-const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions) => {
-	const currentChannel = useSelector(selectCurrentChannel);
+const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: GifStickerEmojiPopupOptions) => {
 	const { type } = useAppParams();
 	const [mod, setMod] = useState(0);
 	const { subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
@@ -96,18 +97,13 @@ const GifStickerEmojiPopup = ({ emojiAction, mode }: GifStickerEmojiPopupOptions
 				<div className="w-full min-h-[400px] text-center md:w-[500px]" ref={emojiRefParentDiv}>
 					{subPanelActive === SubPanelName.GIFS && (
 						<div className="flex h-full pr-1 w-full md:w-[500px]">
-							<TenorGifCategories
-								activeTab={SubPanelName.EMOJI}
-								channelId={currentChannel?.id ?? ''}
-								channelLabel={currentChannel?.channel_label ?? ''}
-								mode={mod}
-							/>
+							<TenorGifCategories activeTab={SubPanelName.EMOJI} channelOrDirect={channelOrDirect} mode={mod} />
 						</div>
 					)}
 
 					{subPanelActive === SubPanelName.STICKERS && (
 						<div className="flex h-full pr-2 w-full md:w-[500px]">
-							<ImageSquare channelId={currentChannel?.id ?? ''} mode={mod} />
+							<ImageSquare channel={channelOrDirect} mode={mod} />
 						</div>
 					)}
 					{subPanelActive === SubPanelName.EMOJI && (

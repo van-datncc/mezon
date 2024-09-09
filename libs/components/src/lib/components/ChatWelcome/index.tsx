@@ -1,5 +1,5 @@
 import { useAppParams, useFriends } from '@mezon/core';
-import { selectCurrentChannel, selectDirectById, selectFriendStatus, selectMemberByUserId, selectUserIdCurrentDm } from '@mezon/store';
+import { selectCurrentChannel, selectDirectById, selectFriendStatus, selectMemberClanByUserId, selectUserIdCurrentDm } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -17,13 +17,13 @@ export type ChatWelComeProp = {
 function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const { directId } = useAppParams();
 	const currentChannel = directId ? useSelector(selectDirectById(directId as string)) : useSelector(selectCurrentChannel);
-	const user = useSelector(selectMemberByUserId(currentChannel?.creator_id as string));
+	const user = useSelector(selectMemberClanByUserId(currentChannel?.creator_id as string));
 	const classNameSubtext = 'dark:text-zinc-400 text-colorTextLightMode text-sm';
 	const showName = <span className="font-medium">{name || userName}</span>;
 
 	const isChannel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL;
 	const isChannelThread = currentChannel?.parrent_id !== ChannelIsNotThread.TRUE;
-	const isDm = mode === ChannelStreamMode.STREAM_MODE_DM ;
+	const isDm = mode === ChannelStreamMode.STREAM_MODE_DM;
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;
 
 	return (
@@ -36,7 +36,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 						userName={user?.user?.username}
 					/>
 				) : (
-					<WelComeChannel 
+					<WelComeChannel
 						name={name}
 						classNameSubtext={classNameSubtext}
 						showName={showName}
@@ -68,8 +68,8 @@ type WelComeChannelProps = {
 }
 
 const WelComeChannel = (props: WelComeChannelProps) => {
-	const {name='', classNameSubtext, showName, channelPrivate} = props;
-	return(
+	const { name = '', classNameSubtext, showName, channelPrivate } = props;
+	return (
 		<>
 			<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
 				<Icons.Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
@@ -93,8 +93,8 @@ type WelcomeChannelThreadProps = {
 }
 
 const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
-	const {name='', classNameSubtext, userName=''} = props;
-	return(
+	const { name = '', classNameSubtext, userName = '' } = props;
+	return (
 		<>
 			<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
 				<Icons.ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10" />
@@ -121,9 +121,9 @@ type WelComeDmProps = {
 }
 
 const WelComeDm = (props: WelComeDmProps) => {
-	const {name='', userName='', avatar='', classNameSubtext, showName, isDmGroup} = props;
+	const { name = '', userName = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
 	const usernameDm = userName.slice(0, -1);
-	return(
+	return (
 		<>
 			<AvatarImage
 				alt={userName}
@@ -137,10 +137,10 @@ const WelComeDm = (props: WelComeDmProps) => {
 					{name}
 				</p>
 			</div>
-			{!isDmGroup &&<p className='font-medium text-2xl dark:text-textDarkTheme text-textLightTheme'>{usernameDm}</p>}
+			{!isDmGroup && <p className='font-medium text-2xl dark:text-textDarkTheme text-textLightTheme'>{usernameDm}</p>}
 			<div className="text-base">
 				<p className={classNameSubtext}>
-					{isDmGroup ? 
+					{isDmGroup ?
 						(
 							<>Welcome to the beginning of the {showName} group.</>
 						) : (
@@ -149,7 +149,7 @@ const WelComeDm = (props: WelComeDmProps) => {
 					}
 				</p>
 			</div>
-			{!isDmGroup && <StatusFriend userName={usernameDm}/>}
+			{!isDmGroup && <StatusFriend userName={usernameDm} />}
 		</>
 	)
 }
@@ -159,7 +159,7 @@ type StatusFriendProps = {
 }
 
 const StatusFriend = memo((props: StatusFriendProps) => {
-	const {userName=""} = props;
+	const { userName = "" } = props;
 	const userID = useSelector(selectUserIdCurrentDm);
 	const checkAddFriend = useSelector(selectFriendStatus(userID[0] || ''));
 	const { acceptFriend, deleteFriend, addFriend } = useFriends();
@@ -168,7 +168,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 			{checkAddFriend.myPendingFriend &&
 				<>
 					<p className="dark:text-contentTertiary text-colorTextLightMode">Sent you a friend request:</p>
-					<button 
+					<button
 						className="rounded bg-bgSelectItem px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
 						onClick={() => {
 							acceptFriend(userName, userID[0]);
@@ -176,7 +176,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 					>
 						Accept
 					</button>
-					<button 
+					<button
 						className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
 						onClick={() => {
 							deleteFriend(userName, userID[0]);
@@ -187,7 +187,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 				</>
 			}
 			{checkAddFriend.friend &&
-				<button 
+				<button
 					className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
 					onClick={() => {
 						deleteFriend(userName, userID[0]);
@@ -197,7 +197,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 				</button>
 			}
 			{checkAddFriend.otherPendingFriend &&
-				<button 
+				<button
 					className="rounded bg-bgSelectItem opacity-50 cursor-not-allowed px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
 					onClick={() => console.log(1)}
 				>
@@ -205,7 +205,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 				</button>
 			}
 			{checkAddFriend.noFriend &&
-				<button 
+				<button
 					className="rounded bg-bgSelectItem px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
 					onClick={() => {
 						addFriend({
@@ -217,7 +217,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 					Add Friend
 				</button>
 			}
-			<button 
+			<button
 				className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
 			>
 				Block

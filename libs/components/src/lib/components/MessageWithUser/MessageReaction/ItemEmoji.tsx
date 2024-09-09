@@ -1,6 +1,13 @@
 import { Icons } from '@mezon/components';
 import { useAuth, useChatReaction } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
+import {
+	reactionActions,
+	selectChannelById,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectEmojiHover,
+	selectUserReactionPanelState
+} from '@mezon/store';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -25,18 +32,8 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const emojiItemRef = useRef<HTMLDivElement | null>(null);
 	const userPanelRef = useRef<HTMLDivElement | null>(null);
 	const currentChannel = useSelector(selectCurrentChannel);
-	// const [channelLabel, setChannelLabel] = useState('');
-	// const direct = useSelector(selectDirectById(message.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
-
-	// comment function un-used
-	// useEffect(() => {
-	// 	if (direct != undefined) {
-	// 		setChannelLabel('');
-	// 	} else {
-	// 		setChannelLabel(currentChannel?.channel_label || '');
-	// 	}
-	// }, [message]);
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -51,6 +48,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			currentChannel?.parrent_id || '',
 			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : currentClanId || '',
 			message.channel_id,
 			messageId ?? '',
@@ -59,7 +57,8 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			1,
 			message_sender_id ?? '',
 			false,
-			!currentChannel?.channel_private
+			!currentChannel?.channel_private,
+			parent ? !parent.channel_private : false
 		);
 	}
 

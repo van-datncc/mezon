@@ -1,7 +1,7 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectHashtagDmEntities, useAppSelector } from '@mezon/store';
-import { ChannelsEntity, selectAllChannelMembers, selectAllUsesClan, selectChannelsEntities } from '@mezon/store-mobile';
+import { selectCurrentChannelId, selectHashtagDmEntities, useAppSelector } from '@mezon/store';
+import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
@@ -349,8 +349,9 @@ export const RenderTextMarkdownContent = React.memo(
 	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
-		const usersClan = useAppSelector(selectAllUsesClan);
-		const usersInChannel = useAppSelector(selectAllChannelMembers);
+		const usersClan = useAppSelector(selectAllUserClans);
+		const currentChannelId = useSelector(selectCurrentChannelId);
+		const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 		const channelsEntities = useAppSelector(selectChannelsEntities);
 		const hashtagDmEntities = useSelector(selectHashtagDmEntities);
 

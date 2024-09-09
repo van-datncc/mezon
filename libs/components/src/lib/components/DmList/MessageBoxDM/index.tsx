@@ -1,24 +1,30 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useDirectMessages, useGifsStickersEmoji } from '@mezon/core';
-import { RootState, selectIdMessageRefReply } from '@mezon/store';
-import { EmojiPlaces, IMessageSendPayload, SubPanelName } from '@mezon/utils';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
+import { RootState, referencesActions, selectDataReferences } from '@mezon/store';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
+import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
 interface DirectIdProps {
-	directParamId: string;
+	// directParamId: string;
 	mode: number;
+	direct: ApiChannelDescription;
 }
-export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
-	const { sendDirectMessage, sendMessageTyping } = useDirectMessages({ channelId: directParamId, mode: mode });
+export function DirectMessageBox({ mode, direct }: DirectIdProps) {
+	const directParamId = useMemo(() => {
+		return direct.channel_id;
+	}, [direct.channel_id]);
+
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: direct, mode: mode });
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const messageBox = useRef<HTMLDivElement>(null);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply(directParamId));
+	const dataReferences = useSelector(selectDataReferences(directParamId ?? ''));
+	const dispatch = useDispatch();
 
 	const setMarginleft = useMemo(() => {
 		if (messageBox?.current?.getBoundingClientRect()) {
@@ -34,12 +40,12 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 			references?: Array<ApiMessageRef>
 		) => {
 			if (sessionUser) {
-				sendDirectMessage(content, mentions, attachments, references);
+				sendMessage(content, mentions, attachments, references);
 			} else {
 				console.error('Session is not available');
 			}
 		},
-		[sendDirectMessage, sessionUser]
+		[sendMessage, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -59,7 +65,16 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 
 		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
+	const handleCloseReplyMessageBox = () => {
+		dispatch(
+			referencesActions.setDataReferences({
+				channelId: directParamId ?? '',
+				dataReferences: blankReferenceObj
+			})
+		);
+	};
 
+	useEscapeKey(handleCloseReplyMessageBox);
 	return (
 		<div className="mx-2 relative " role="button" ref={messageBox}>
 			{isEmojiOnChat && (
@@ -74,15 +89,15 @@ export function DirectMessageBox({ directParamId, mode }: DirectIdProps) {
 					}}
 					className="z-20"
 				>
-					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
+					<GifStickerEmojiPopup channelOrDirect={direct} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
-			{idMessageRefReply && <ReplyMessageBox channelId={directParamId} idMessage={idMessageRefReply} />}
+			{dataReferences.message_ref_id && <ReplyMessageBox channelId={directParamId ?? ''} dataReferences={dataReferences} />}
 			<MessageBox
 				onSend={handleSend}
 				currentChannelId={directParamId}
 				onTyping={handleTypingDebounced}
-				listMentions={UserMentionList({ channelID: directParamId, channelMode: mode })}
+				listMentions={UserMentionList({ channelID: directParamId ?? '', channelMode: mode })}
 				mode={mode}
 			/>
 		</div>

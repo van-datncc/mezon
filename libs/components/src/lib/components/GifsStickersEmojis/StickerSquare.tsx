@@ -2,12 +2,12 @@ import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { selectAllStickerSuggestion, selectCurrentClan, selectModeResponsive, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, ModeResponsive, SubPanelName } from '@mezon/utils';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useRef, useState } from 'react';
 import { mockCategoryLogo } from './StickerMockData';
 
 type ChannelMessageBoxProps = {
-	channelId: string;
+	channel: ApiChannelDescription | undefined;
 	mode: number;
 };
 
@@ -21,9 +21,8 @@ interface IStickerPanelProps {
 	stickerList: any[];
 	onClickSticker: (stickerUrl: string) => void;
 }
-function StickerSquare({ channelId, mode }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelId, mode });
-
+function StickerSquare({ channel, mode }: ChannelMessageBoxProps) {
+	const { sendMessage } = useChatSending({ channelOrDirect: channel, mode });
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,

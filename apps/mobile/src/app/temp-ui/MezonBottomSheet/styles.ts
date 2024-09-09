@@ -1,4 +1,4 @@
-import { Attributes, Fonts, Metrics } from '@mezon/mobile-ui';
+import { Attributes, Fonts } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -11,7 +11,8 @@ export const style = (colors: Attributes) =>
 			display: 'flex',
 			flex: 1,
 			flexDirection: 'row',
-			justifyContent: 'space-between'
+			justifyContent: 'space-between',
+			alignItems: 'center'
 		},
 
 		section: {
@@ -37,15 +38,13 @@ export const style = (colors: Attributes) =>
 		sectionRight: {
 			display: 'flex',
 			flexDirection: 'row',
-			justifyContent: 'flex-end',
-			paddingRight: Metrics.size.m
+			justifyContent: 'flex-end'
 		},
 
 		sectionLeft: {
 			display: 'flex',
 			flexDirection: 'row',
-			justifyContent: 'flex-start',
-			paddingLeft: Metrics.size.m
+			justifyContent: 'flex-start'
 		},
 		handleIndicator: {
 			backgroundColor: colors.secondary

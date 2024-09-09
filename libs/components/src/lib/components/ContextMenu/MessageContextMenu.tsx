@@ -11,6 +11,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllDirectMessages,
+	selectChannelById,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrentId,
@@ -56,6 +57,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const parrent = useSelector(selectChannelById(currentChannel?.parrent_id ?? ''));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
 	const message = useSelector(selectMessageByMessageId(messageId));
@@ -111,9 +113,22 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const handleReplyMessage = () => {
 		dispatch(
-			referencesActions.setIdReferenceMessageReply({
-				channelId: (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDmId) || '',
-				idMessageRefReply: message.id
+			referencesActions.setDataReferences({
+				channelId: message.channel_id,
+				dataReferences: {
+					message_ref_id: message.id,
+					ref_type: 0,
+					message_sender_id: message.sender_id,
+					content: JSON.stringify(message.content),
+					message_sender_username: message.username,
+					mesages_sender_avatar: message.clan_avatar ? message.clan_avatar : message.avatar,
+					message_sender_clan_nick: message.clan_nick,
+					message_sender_display_name: message.display_name,
+					has_attachment: (message.attachments && message.attachments?.length > 0) ?? false,
+					channel_id: message.channel_id ?? '',
+					mode: message.mode ?? 0,
+					channel_label: message.channel_label
+				}
 			})
 		);
 		dispatch(messagesActions.setIdMessageToJump(''));
@@ -161,10 +176,13 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
 			pinMessageActions.joinPinMessage({
-				clanId: currentClanId ?? '',
-				channelId: currentChannel?.channel_id ?? '',
+				clanId: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (currentClanId ?? ''),
+				parentId: currentChannel?.parrent_id ?? '',
+				channelId: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? currentDmId || '' : (currentChannel?.channel_id ?? ''),
 				messageId: message?.id,
-				isPublic: !currentChannel?.channel_private
+				isPublic: activeMode != ChannelStreamMode.STREAM_MODE_CHANNEL ? false : !currentChannel?.channel_private,
+				isParentPublic: parrent ? !parrent.channel_private : false,
+				mode: activeMode as number
 			})
 		);
 	};
