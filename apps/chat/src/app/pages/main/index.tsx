@@ -213,6 +213,7 @@ function MyApp() {
 									linkClan={`/chat/clans/${clan.id}`}
 									option={clan}
 									active={!pathName?.includes('direct') && currentClanId === clan.clan_id}
+									pathname={pathName}
 								/>
 							</SidebarTooltip>
 						);
