@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
 import { AddClanUserEvent, ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState, usersClanActions } from '../clanMembers/clan.members';
+import { DirectEntity, getDirectState } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
@@ -415,14 +416,29 @@ export const selectMemberCustomStatusById = (userId: string) =>
 		return customStatus?.[userId] || '';
 	});
 
-export const selectChannelMemberByUserIds = (channelId: string, userIds: string[]) =>
-	createSelector(getUsersClanState, (usersClanState) => {
+export const selectChannelMemberByUserIds = (channelId: string, userIds: string[], isDm = true) =>
+	createSelector(getUsersClanState, getDirectState, (usersClanState, directs) => {
+		const users = isDm ? directs : usersClanState;
 		return userIds.map((userId) => {
-			const userInfo = usersClanState.entities[userId];
+			const userInfo = users.entities[isDm ? channelId : userId];
+			if (isDm) {
+				const { usernames, channel_label } = userInfo as DirectEntity;
+				return {
+					channelId,
+					userChannelId: channelId,
+					user: {
+						...userInfo,
+						username: usernames,
+						display_name: channel_label
+					},
+					id: userInfo.id
+				} as ChannelMembersEntity;
+			}
 			return {
 				channelId,
 				userChannelId: channelId,
-				...userInfo
+				...userInfo,
+				id: userInfo.id
 			} as ChannelMembersEntity;
 		});
 	});
