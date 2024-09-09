@@ -39,7 +39,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 				thread.parrent_id as string,
 				thread.channel_id as string,
 				mode,
-				!currentChannel?.channel_private,
+				currentChannel ? !currentChannel.channel_private : false,
 				parent ? !parent.channel_private : false,
 				{ t: content.t },
 				mentions,
@@ -52,7 +52,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 					thread.parrent_id as string,
 					thread.channel_id as string,
 					mode,
-					!currentChannel?.channel_private,
+					currentChannel ? !currentChannel.channel_private : false,
 					parent ? !parent.channel_private : false,
 					{ t: content.contentThread },
 					[],
@@ -75,7 +75,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 					parentId: currentChannel?.parrent_id || '',
 					channelId,
 					mode,
-					isPublic: !currentChannel?.channel_private,
+					isPublic: currentChannel ? !currentChannel.channel_private : false,
 					isParentPublic: parent ? !parent.channel_private : false
 				})
 			);
@@ -99,7 +99,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 				currentChannel?.parrent_id || '',
 				channelId,
 				mode,
-				!currentChannel?.channel_private,
+				currentChannel ? !currentChannel.channel_private : false,
 				parent ? !parent.channel_private : false,
 				messageId,
 				editMessage
