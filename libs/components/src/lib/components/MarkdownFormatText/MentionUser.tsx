@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectAllRolesClan, selectMemberClanByUserId } from '@mezon/store';
+import { selectAllChannelMembers, selectAllRolesClan, selectCurrentChannelId, useAppSelector } from '@mezon/store';
 import { MouseButton, getRoleList } from '@mezon/utils';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,9 +16,10 @@ type ChannelHashtagProps = {
 const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId }: ChannelHashtagProps) => {
 	console.log('tagUserId: ', tagUserId);
 	console.log('tagName: ', tagName);
-	const getUser = useSelector(selectMemberClanByUserId(tagUserId));
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 
-	console.log('usersClan: ', getUser);
+	console.log('usersClan: ', usersInChannel);
 
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
@@ -91,23 +92,28 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
-		<>
-			<Link
-				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
-				ref={panelRef}
-				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
-				style={{ textDecoration: 'none' }}
-				to={''}
-				className={`font-medium px-0.1 rounded-sm
+		<Link
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
+			ref={panelRef}
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
+			style={{ textDecoration: 'none' }}
+			to={''}
+			className={`font-medium px-0.1 rounded-sm
 				${tagName === '@here' ? 'cursor-text' : isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
 
 				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
-			>
-				{tagName}
-			</Link>{' '}
-			{/* {showProfileUser && (
+		>
+			{tagName}
+		</Link>
+	);
+};
+
+export default memo(MentionUser);
+
+{
+	/* {showProfileUser && (
 				<div
 					className="dark:bg-black bg-gray-200 mt-[10px] w-[300px] rounded-lg flex flex-col z-10 fixed opacity-100"
 					style={{
@@ -148,9 +154,5 @@ const MentionUser = ({ tagName, mode, isJumMessageEnabled, isTokenClickAble, tag
 				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`@${matchingRole.roleName}`}</span>
 			) : (
 				<span>{tagName}</span>
-			)} */}
-		</>
-	);
-};
-
-export default memo(MentionUser);
+			)} */
+}
