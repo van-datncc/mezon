@@ -220,7 +220,7 @@ export const channelMembers = createSlice({
 			if (!state.userRemoved) {
 				state.userRemoved = {};
 			}
-			state.userRemoved = action.payload;
+			state.userRemoved[channelId] = userId;
 			const channelEntity = state.memberChannels[channelId];
 			channelMembersAdapter.removeOne(channelEntity, userId);
 		},
@@ -444,8 +444,10 @@ export const selectGrouplMembers = createSelector([getDirectState, (state, group
 	}) as ChannelMembersEntity[];
 });
 
-export const selectUserRemovedByChannelId = createSelector(getChannelMembersState, (state: ChannelMembersState) => state.userRemoved);
+export const selectUserRemoved = createSelector(getChannelMembersState, (state: ChannelMembersState) => state.userRemoved);
 
+export const selectUserRemovedByChannelId = (channelId: string) =>
+	createSelector(selectUserRemoved, (userRemoved = {}) => userRemoved[channelId] || null);
 export const selectMemberStatusById = createSelector(
 	[
 		getUsersClanState,
@@ -499,5 +501,26 @@ export const selectAllChannelMembers = createSelector(
 					userChannelId: channelId
 				}));
 		return members;
+	}
+);
+
+export const selectAllChannelMemberIds = createSelector(
+	[
+		getChannelMembersState,
+		getUsersClanState,
+		selectGrouplMembers,
+		(state, channelId: string) => {
+			const channel = state.channels?.entities[channelId];
+			const parentChannel = state.channels?.entities[channel?.parrent_id];
+			const isPrivate = channel?.channel_private || parentChannel?.channel_private || '';
+			const isDm = state.direct?.currentDirectMessageId === channelId || '';
+			return `${channelId},${isPrivate},${isDm}`;
+		}
+	],
+	(channelMembersState, usersClanState, directs, payload) => {
+		const [channelId, isPrivate, isDm] = payload.split(',');
+		if (isDm) return directs.map((dm) => dm.user_id);
+		const memberIds = isPrivate ? channelMembersState.memberChannels[channelId]?.ids || [] : Object.keys(usersClanState.entities);
+		return memberIds;
 	}
 );

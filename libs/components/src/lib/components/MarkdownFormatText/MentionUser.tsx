@@ -1,9 +1,10 @@
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
 import {
+	selectAllChannelMemberIds,
+	// selectAllChannelMemberIds,
 	selectAllRoleIds,
 	selectChannelMemberByUserIds,
 	selectCurrentChannelId,
-	selectMemberIdsByChannelId,
 	selectUserRemovedByChannelId,
 	useAppSelector
 } from '@mezon/store';
@@ -41,20 +42,24 @@ type UserProfilePopupProps = {
 };
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
-	console.log('tagRoleId: ', tagRoleId);
-	console.log('tagRoleName: ', tagRoleName);
-	console.log('tagUserId: ', tagUserId);
-	console.log('tagUserName: ', tagUserName);
+	// console.log('mode :', mode);
+	// console.log('tagRoleId: ', tagRoleId);
+	// console.log('tagRoleName: ', tagRoleName);
+	// console.log('tagUserId: ', tagUserId);
+	// console.log('tagUserName: ', tagUserName);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const getUserRemoved = useSelector(selectUserRemovedByChannelId);
+
+	const getUserRemoved = useSelector(selectUserRemovedByChannelId(currentChannelId ?? ''));
+
 	console.log('getUserRemoved: ', getUserRemoved);
 
-	const allUserIds = useAppSelector((state) => selectMemberIdsByChannelId(state, currentChannelId as string));
+	const allUserIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
+	console.log('allUserIds :', allUserIds);
 	const allRoleIds = useSelector(selectAllRoleIds);
 
 	const checkUserIsExist = useMemo(() => {
 		return allUserIds.includes(tagUserId ?? '');
-	}, [allUserIds, tagUserId]);
+	}, [allUserIds]);
 
 	const checkRoleIsExist = useMemo(() => {
 		return allRoleIds.includes(tagRoleId ?? '');
@@ -69,7 +74,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		}
 		if (tagRoleId && !checkRoleIsExist) {
 			return {
-				display: '@unknown_role',
+				display: '@unknowrole',
 				type: MentionType.ROLE_NOT_EXIST
 			};
 		}
@@ -79,13 +84,13 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				type: MentionType.HERE
 			};
 		}
-		if (tagUserId && !checkUserIsExist && tagUserName !== '@here' && mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return {
-				display: '@unknown_user',
-				type: MentionType.USER_NOT_EXIST
-			};
-		}
-		if (tagUserId && checkUserIsExist && tagUserName !== '@here' && mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+		// if (tagUserId && tagUserName !== '@here') {
+		// 	return {
+		// 		display: '@unknowuser',
+		// 		type: MentionType.USER_NOT_EXIST
+		// 	};
+		// }
+		if (tagUserId && tagUserName !== '@here') {
 			return {
 				display: tagUserName,
 				type: MentionType.USER_EXIST
@@ -176,12 +181,8 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					{displayToken.display}
 				</button>
 			)}
-			{displayToken?.type === MentionType.USER_NOT_EXIST && (
-				<span className={'font-medium px-0.5 rounded-sm cursor-text italic dark:bg-[#3C4270] bg-[#D1E0FF]'}>{displayToken.display}</span>
-			)}
-			{displayToken?.type === MentionType.ROLE_NOT_EXIST && (
-				<span className={'font-medium px-0.5 rounded-sm cursor-text italic dark:bg-[#3C4270] bg-[#D1E0FF]'}>{displayToken.display}</span>
-			)}
+			{displayToken?.type === MentionType.USER_NOT_EXIST && <span>{displayToken.display}</span>}
+			{displayToken?.type === MentionType.ROLE_NOT_EXIST && <span>{displayToken.display}</span>}
 		</>
 	);
 };
