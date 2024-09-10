@@ -408,7 +408,7 @@ export const selectMemberCustomStatusById = createSelector(
 	(selectCustomUserStatus, userId) => selectCustomUserStatus?.[userId] || ''
 );
 
-export const selectChannelMemberByUserIds = (channelId: string, userIds: string[], isDm = false) =>
+export const selectChannelMemberByUserIds = (channelId: string, userIds: string[], isDm = true) =>
 	createSelector(getUsersClanState, getDirectState, (usersClanState, directs) => {
 		const users = isDm ? directs : usersClanState;
 		return userIds.map((userId) => {
