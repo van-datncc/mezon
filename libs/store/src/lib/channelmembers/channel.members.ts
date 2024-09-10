@@ -410,7 +410,6 @@ export const selectChannelMemberByUserIds = createSelector(
 				id: userInfo?.id
 			} as ChannelMembersEntity);
 		});
-
 		return members as ChannelMembersEntity[];
 	}
 );
