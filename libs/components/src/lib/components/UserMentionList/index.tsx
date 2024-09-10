@@ -12,7 +12,7 @@ interface UserMentionListProps {
 }
 
 function UserMentionList({ channelID, channelMode }: UserMentionListProps): MentionDataProps[] {
-	const { membersOfParent } = useChannelMembers({ channelId: channelID });
+	const { membersOfParent } = useChannelMembers({ channelId: channelID, mode: channelMode ?? 0 });
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const filteredRoles = rolesInClan.filter((role) => role.id !== EVERYONE_ROLE_ID);
 	const newUserMentionList = useMemo(() => {

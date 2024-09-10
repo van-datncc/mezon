@@ -84,13 +84,13 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 		ref.current.focus();
 	}
 };
-export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[]) => {
+export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null) => {
 	const getListId = mentions
 		.map((item) => item.user_id)
 		.filter((user_id): user_id is string => user_id !== undefined && user_id !== ID_MENTION_HERE);
 	const uniqueUserIds = Array.from(new Set(getListId));
-	const memUserIds = userChannels.map((member) => member?.user?.id);
-	const userIdsNotInChannel = uniqueUserIds.filter((user_id) => !memUserIds.includes(user_id));
+	const memUserIds = userChannels?.map((member) => member?.user?.id);
+	const userIdsNotInChannel = uniqueUserIds.filter((user_id) => !memUserIds?.includes(user_id));
 
 	return userIdsNotInChannel;
 };

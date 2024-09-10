@@ -138,7 +138,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const { membersOfChild } = useChannelMembers({ channelId: currentChannelId });
+	const { membersOfChild } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
@@ -227,14 +227,11 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			currentChannel: ChannelsEntity | null,
 			mentions: IMentionOnMessage[],
 			userClans: UsersClanEntity[],
-			membersOfChild: ChannelMembersEntity[]
+			membersOfChild: ChannelMembersEntity[] | null
 		) => {
 			if (!currentChannel?.channel_private) return;
 
 			const userIds = uniqueUsers(mentions, membersOfChild);
-			console.log('members: ', membersOfChild);
-			console.log('mentions: ', mentions);
-			console.log('userIds: ', userIds);
 
 			const body = {
 				channelId: currentChannel?.channel_id as string,
