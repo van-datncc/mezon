@@ -1,5 +1,12 @@
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
-import { selectAllRoleIds, selectChannelMemberByUserIds, selectCurrentChannelId, selectMemberIdsByChannelId, useAppSelector } from '@mezon/store';
+import {
+	selectAllRoleIds,
+	selectChannelMemberByUserIds,
+	selectCurrentChannelId,
+	selectMemberIdsByChannelId,
+	selectUserRemovedByChannelId,
+	useAppSelector
+} from '@mezon/store';
 import { MouseButton, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo, useRef, useState } from 'react';
@@ -35,6 +42,9 @@ type UserProfilePopupProps = {
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const getUserRemoved = useSelector(selectUserRemovedByChannelId(currentChannelId ?? ''));
+	console.log('getUserRemoved: ', getUserRemoved);
+
 	const allUserIds = useAppSelector((state) => selectMemberIdsByChannelId(state, currentChannelId as string));
 	const allRoleIds = useSelector(selectAllRoleIds);
 

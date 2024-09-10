@@ -39,6 +39,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 		}
 	>;
 	dmGroupUsers?: ChannelUserListChannelUser[];
+	userRemoved?: Record<string, string>;
 }
 
 // TODO: remove channelId from the parameter
@@ -198,7 +199,8 @@ export const initialChannelMembersState: ChannelMembersState = channelMembersAda
 	onlineStatusUser: {},
 	toFollowUserIds: [],
 	customStatusUser: {},
-	memberChannels: {}
+	memberChannels: {},
+	userRemoved: {}
 });
 
 export type StatusUserArgs = {
@@ -229,6 +231,10 @@ export const channelMembers = createSlice({
 
 		removeUserByUserIdAndChannelId: (state, action: PayloadAction<{ userId: string; channelId: string }>) => {
 			const { userId, channelId } = action.payload;
+			if (!state.userRemoved) {
+				state.userRemoved = {};
+			}
+			state.userRemoved[channelId] = userId;
 			const channelEntity = state.memberChannels[channelId];
 			channelMembersAdapter.removeOne(channelEntity, userId);
 		},
@@ -449,3 +455,7 @@ export const selectMemberStatusById = createSelector([selectChannelMembersEntiti
 	const member = entitiesArray.find((member) => member?.user?.id === userId);
 	return member?.user?.online || false;
 });
+
+export const selectUserRemovedByChannelId = (channelId: string) => (state: ChannelMembersState) => {
+	return state.userRemoved?.[channelId] ?? null;
+};
