@@ -1,10 +1,10 @@
-import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
+import { IChannel, IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
 import { AddClanUserEvent, ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
-import { ChannelUserListChannelUser } from 'mezon-js/api.gen';
-import { USERS_CLANS_FEATURE_KEY, UsersClanState, usersClanActions } from '../clanMembers/clan.members';
+import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
+import { USERS_CLANS_FEATURE_KEY, UsersClanState } from '../clanMembers/clan.members';
 import { DirectEntity, getDirectState } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 
@@ -38,14 +38,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 			id: string;
 		}
 	>;
-	dmGroupUsers?: ChannelUserListChannelUser[];
 }
-
-// TODO: remove channelId from the parameter
-export const mapChannelMemberToEntity = (channelRes: any, channelId?: string, userChannelId?: string) => {
-	const id = `${channelRes.user?.id}`;
-	return { ...channelRes, id: id || '', channelId, userChannelId };
-};
 
 export const mapUserIdToEntity = (userId: string, username: string, online: boolean) => {
 	return { username: username, id: userId, online };
@@ -97,19 +90,11 @@ export const fetchChannelMembers = createAsyncThunk(
 			thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
 		}
 
-		const members = response.channel_users.map((channelRes) => mapChannelMemberToEntity(channelRes, channelId, channelRes.id));
-		const customStatusInit = members.map((member) => {
-			const status = (member?.user?.metadata as any)?.status ?? '';
-			return { userId: member.user?.id ?? '', customStatus: status };
-		});
-		const onlineStatus = response.channel_users.map((item) => {
-			return { userId: item.user?.id ?? '', status: item.user?.online ?? false };
-		});
-		thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
-		thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: channelId, members }));
-		thunkAPI.dispatch(usersClanActions.setManyStatusUser(onlineStatus));
-		thunkAPI.dispatch(channelMembersActions.setDmGroupUsers(members));
-		return members;
+		//TODO:remove
+		// thunkAPI.dispatch(channelMembersActions.setManyCustomStatusUser(customStatusInit));
+
+		thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: channelId, members: response.channel_users }));
+		return response.channel_users;
 	}
 );
 
@@ -261,7 +246,7 @@ export const channelMembers = createSlice({
 		setCustomStatusUser: (state, action: PayloadAction<CustomStatusUserArgs>) => {
 			state.customStatusUser[action.payload.userId] = action.payload.customStatus;
 		},
-		setMemberChannels: (state, action: PayloadAction<{ channelId: string; members: ChannelMembersEntity[] }>) => {
+		setMemberChannels: (state, action: PayloadAction<{ channelId: string; members: ChannelUserListChannelUser[] }>) => {
 			const { channelId, members } = action.payload;
 			if (!state.memberChannels[channelId]) {
 				state.memberChannels[channelId] = {
@@ -269,14 +254,11 @@ export const channelMembers = createSlice({
 					id: channelId
 				};
 			}
-			const memberIds = members.map((member) => member.id);
+			const memberIds = members.map((member) => member.user_id as string);
 			state.memberChannels[channelId] = {
 				...state.memberChannels[channelId],
 				ids: memberIds
 			};
-		},
-		setDmGroupUsers: (state, action: PayloadAction<ChannelUserListChannelUser[]>) => {
-			state.dmGroupUsers = action.payload;
 		},
 		addNewMember: (state, action: PayloadAction<ChannelPresenceEvent>) => {
 			const payload = action.payload;
@@ -296,9 +278,8 @@ export const channelMembers = createSlice({
 			.addCase(fetchChannelMembers.pending, (state: ChannelMembersState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<IChannelMember[] | null>) => {
+			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<ChannelUserListChannelUser[] | null>) => {
 				if (action.payload !== null) {
-					channelMembersAdapter.setAll(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {
 					state.loadingStatus = 'not loaded';
@@ -368,17 +349,31 @@ export const getChannelMembersState = (rootState: { [CHANNEL_MEMBERS_FEATURE_KEY
 const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 
 export const selectAllChannelMembers = createSelector(
-	[getChannelMembersState, getUsersClanState, (state, channelId: string) => channelId],
-	(channelMembersState, getUsersClanState, channelId) => {
-		return (
-			(channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
+	[
+		getChannelMembersState,
+		getUsersClanState,
+		(state, channelId: string) => {
+			const isPrivate = state.channels?.entities[channelId]?.channel_private;
+			//Todo: addtion parrent channel is private
+			return `${channelId},${isPrivate}`;
+		}
+	],
+	(channelMembersState, getUsersClanState, payload) => {
+		const [channelId, isPrivate] = payload.split(',');
+		const members = isPrivate
+			? (channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
 				return {
 					...getUsersClanState.entities[memberId],
 					channelId,
 					userChannelId: channelId
 				};
 			}) as ChannelMembersEntity[]) || []
-		);
+			: Object.values(getUsersClanState.entities)?.map((member) => ({
+				...member,
+				channelId,
+				userChannelId: channelId
+			}));
+		return members;
 	}
 );
 
@@ -408,12 +403,21 @@ export const selectMemberCustomStatusById = createSelector(
 	(selectCustomUserStatus, userId) => selectCustomUserStatus?.[userId] || ''
 );
 
-export const selectChannelMemberByUserIds = (channelId: string, userIds: string[], isDm = true) =>
-	createSelector(getUsersClanState, getDirectState, (usersClanState, directs) => {
+export const selectChannelMemberByUserIds = createSelector(
+	[
+		getUsersClanState,
+		getDirectState,
+		(state, channelId: string, userIds?: string, isDm?: string) => {
+			return `${channelId},${userIds},${isDm}`;
+		}
+	],
+	(usersClanState, directs, payload) => {
+		const [channelId, userIds, isDm] = payload.split(',');
 		const users = isDm ? directs : usersClanState;
-		return userIds.map((userId) => {
+		if (!userIds.trim()) return [];
+		return userIds.split('/')?.map((userId) => {
 			const userInfo = users.entities[isDm ? channelId : userId];
-			if (isDm) {
+			if (isDm && userInfo) {
 				const { usernames, channel_label } = userInfo as DirectEntity;
 				return {
 					channelId,
@@ -430,22 +434,46 @@ export const selectChannelMemberByUserIds = (channelId: string, userIds: string[
 				channelId,
 				userChannelId: channelId,
 				...userInfo,
-				id: userInfo.id
+				id: userInfo?.id
 			} as ChannelMembersEntity;
 		});
-	});
-
-export const selectChannelMembersEntities = createSelector(getChannelMembersState, selectEntities);
-
-export const selectMembersByChannelId = createSelector(
-	[selectChannelMembersEntities, (state, channelId: string) => channelId],
-	(entities, channelId) => {
-		return Object.values(entities).filter((member) => member && member.user !== null && member.channelId === channelId);
 	}
 );
 
-export const selectMemberStatusById = createSelector([selectChannelMembersEntities, (state, userId: string) => userId], (entities, userId) => {
-	const entitiesArray = Object.values(entities);
-	const member = entitiesArray.find((member) => member?.user?.id === userId);
-	return member?.user?.online || false;
+export const selectGrouplMembers = createSelector([getDirectState, (state, groupId: string) => groupId], (directs, groupId) => {
+	const group = directs.entities[groupId];
+	if (!group?.user_id) {
+		return [];
+	}
+	const groupLabels = group.channel_label?.split(',');
+	const groupDisplayNames = group.usernames?.split(',');
+	return group?.user_id?.map((userId, index) => {
+		return {
+			channelId: groupId,
+			userChannelId: groupId,
+			user: {
+				...group,
+				avatar_url: group.channel_avatar?.[index],
+				username: groupLabels?.[index],
+				display_name: groupDisplayNames?.[index],
+				online: group.is_online?.[index]
+			},
+			id: userId
+		};
+	}) as ChannelMembersEntity[];
 });
+
+export const selectMemberStatusById = createSelector(
+	[
+		getUsersClanState,
+		getDirectState,
+		(state, userId: string) => {
+			return `${userId},${state?.direct.currentDirectMessageId}`;
+		}
+	],
+	(usersClanState, directs, payload) => {
+		const [userId, currentDirectMessageId] = payload.split(',');
+		const user = usersClanState?.entities[userId] || directs.entities[currentDirectMessageId];
+		return user?.user?.online || (user as IChannel)?.is_online?.[0] || false;
+	}
+);
