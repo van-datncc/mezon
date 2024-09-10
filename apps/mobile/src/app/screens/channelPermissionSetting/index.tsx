@@ -8,11 +8,8 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { AdvancedView } from './AdvancedView';
 import { BasicView } from './BasicView';
+import { EPermissionSetting } from './types/channelPermission.enum';
 
-export enum EPermissionSetting {
-	BasicView,
-	AdvancedView
-}
 type ChannelPermissionSetting = typeof APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION;
 export const ChannelPermissionSetting = ({ navigation, route }: MenuChannelScreenProps<ChannelPermissionSetting>) => {
 	const { channelId } = route.params;
@@ -64,15 +61,16 @@ export const ChannelPermissionSetting = ({ navigation, route }: MenuChannelScree
 					</TouchableOpacity>
 				);
 			}
-			return (
-				<TouchableOpacity onPress={() => setIsAdvancedEditMode(true)}>
-					<Block marginRight={size.s_20}>
-						<Text h4 color={themeValue.white}>
-							{t('channelPermission.edit')}
-						</Text>
-					</Block>
-				</TouchableOpacity>
-			);
+			//TODO: update later
+			// return (
+			// 	<TouchableOpacity onPress={() => setIsAdvancedEditMode(true)}>
+			// 		<Block marginRight={size.s_20}>
+			// 			<Text h4 color={themeValue.white}>
+			// 				{t('channelPermission.edit')}
+			// 			</Text>
+			// 		</Block>
+			// 	</TouchableOpacity>
+			// );
 		},
 		headerLeft: () => {
 			return (
@@ -87,7 +85,7 @@ export const ChannelPermissionSetting = ({ navigation, route }: MenuChannelScree
 
 	return (
 		<Block flex={1} backgroundColor={themeValue.secondary} paddingHorizontal={size.s_12}>
-			<Block backgroundColor={themeValue.tertiary} flexDirection="row" borderRadius={size.s_16} gap={size.s_6}>
+			<Block backgroundColor={themeValue.tertiary} marginBottom={size.s_10} flexDirection="row" borderRadius={size.s_16} gap={size.s_6}>
 				{permissionSettingTabs.map((tab) => {
 					const isActive = currentTab === tab.type;
 					return (

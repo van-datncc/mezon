@@ -1,10 +1,10 @@
-import { useClanRestriction } from '@mezon/core';
+import { useChannels, useClanRestriction } from '@mezon/core';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, EPermission, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
 import { EChannelSettingTab } from '.';
-import { DeleteModal } from './Component/Modal/deleteChannelModal';
+import ModalConfirm from '../ModalConfirm';
 
 export type ChannelSettingItemProps = {
 	onItemClick: (settingName: string) => void;
@@ -26,6 +26,15 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
 		onItemClick && onItemClick(buttonName);
+	};
+
+	const { handleConfirmDeleteChannel } = useChannels();
+	const handleCloseModalShow = () => {
+		setShowModal(false);
+	};
+	const handleDeleteChannel = () => {
+		handleConfirmDeleteChannel(channel.channel_id as string, channel.clan_id as string);
+		handleCloseModalShow();
 	};
 
 	return (
@@ -68,7 +77,6 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				<button
 					className={`p-2 dark:text-red-600 text-red-600 text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight dark:hover:bg-bgModalLight ${selectedButton === 'Delete' ? 'dark:bg-[#232E3B] bg-bgLightModeButton  ' : ''} w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
-						handleButtonClick('Delete');
 						setShowModal(true);
 					}}
 				>
@@ -76,11 +84,11 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				</button>
 			</div>
 			{showModal && (
-				<DeleteModal
-					onCloseModal={onCloseModal}
-					onClose={() => setShowModal(false)}
-					channelLabel={channel?.channel_label || ''}
-					channelId={channel.channel_id as string}
+				<ModalConfirm
+					handleCancel={handleCloseModalShow}
+					handleConfirm={handleDeleteChannel}
+					title="delete"
+					modalName={`${channel.channel_label}`}
 				/>
 			)}
 		</div>

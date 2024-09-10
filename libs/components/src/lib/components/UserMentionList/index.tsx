@@ -12,15 +12,15 @@ interface UserMentionListProps {
 }
 
 function UserMentionList({ channelID, channelMode }: UserMentionListProps): MentionDataProps[] {
-	const { members } = useChannelMembers({ channelId: channelID });
+	const { membersOfParent } = useChannelMembers({ channelId: channelID, mode: channelMode ?? 0 });
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const filteredRoles = rolesInClan.filter((role) => role.id !== EVERYONE_ROLE_ID);
 	const newUserMentionList = useMemo(() => {
-		if (!members || members.length === 0) {
+		if (!membersOfParent || membersOfParent.length === 0) {
 			return [];
 		}
 
-		const userMentionRaw = members;
+		const userMentionRaw = membersOfParent;
 		const mentionList =
 			userMentionRaw?.map((item: ChannelMembersEntity) => ({
 				id: item?.user?.id ?? '',
@@ -55,7 +55,7 @@ function UserMentionList({ channelID, channelMode }: UserMentionListProps): Ment
 		} else {
 			return [...sortedMentionList];
 		}
-	}, [channelMode, members]);
+	}, [channelMode, membersOfParent]);
 
 	return newUserMentionList;
 }
