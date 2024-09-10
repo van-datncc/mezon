@@ -1,5 +1,5 @@
 import { EOpenSearchChannelFrom } from '@mezon/mobile-components';
-import { DirectEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
+import { ChannelsEntity, DirectEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
 import { ChannelThreads, IChannel, OptionEvent } from '@mezon/utils';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -147,7 +147,7 @@ type MenuChannelStackParamList = {
 		channelId: string;
 	};
 	[APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY]: {
-		channelId: string;
+		channel: ChannelsEntity;
 	};
 };
 

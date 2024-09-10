@@ -100,7 +100,7 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 							screen: APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY,
 							params: {
-								channelId
+								channel
 							}
 						});
 					}

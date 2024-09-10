@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { Block, size, Text, useTheme } from '@mezon/mobile-ui';
-import { CategoriesEntity, channelsActions, selectAllCategories, selectChannelById, useAppDispatch } from '@mezon/store-mobile';
+import { CategoriesEntity, channelsActions, selectAllCategories, useAppDispatch } from '@mezon/store-mobile';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,8 +11,7 @@ import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu } from '../../te
 
 type ChangeCategory = typeof APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY;
 export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<ChangeCategory>) => {
-	const { channelId } = route.params;
-	const currentChannel = useSelector(selectChannelById(channelId || ''));
+	const { channel } = route.params;
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['channelSetting']);
     const listCategory = useSelector(selectAllCategories);
@@ -21,8 +20,8 @@ export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<Cha
     const handleMoveChannelToNewCategory = async (category: CategoriesEntity) => {
         const updateChannel: ApiUpdateChannelDescRequest = {
           category_id: category.id,
-          channel_id: channelId ?? '',
-          channel_label: currentChannel?.channel_label
+          channel_id: channel?.channel_id ?? '',
+          channel_label: channel?.channel_label
         }
         await dispatch(channelsActions.updateChannel(updateChannel)).then(() => {
             navigation.goBack()
@@ -30,7 +29,7 @@ export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<Cha
     }
 
     const listOtherCategories = useMemo(() => {
-        return listCategory.filter((category) => (category.id !== currentChannel.category_id))
+        return listCategory.filter((category) => (category.id !== channel.category_id))
     }, [listCategory])
 
     const CategoryList = useMemo(() => 
@@ -43,7 +42,7 @@ export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<Cha
 
     const menu: IMezonMenuSectionProps[] = [
 		{
-			title: t('changeCategory.label', { currentChannel: currentChannel?.category_name }),
+			title: t('changeCategory.label', { currentChannel: channel?.category_name }),
 			items: CategoryList,
 		}
 	];
