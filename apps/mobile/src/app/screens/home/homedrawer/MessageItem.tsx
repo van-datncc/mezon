@@ -297,7 +297,7 @@ const MessageItem = React.memo(
 		};
 
 		// Message welcome
-		if (message?.sender_id === '0' && !message?.content?.t) {
+		if (message?.sender_id === '0' && !message?.content?.t && message?.username === 'system') {
 			return <WelcomeMessage channelId={props.channelId} />;
 		}
 

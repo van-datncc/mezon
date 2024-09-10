@@ -44,14 +44,16 @@ export function MenuChannelStacks({}: any) {
 					},
 					headerTitleStyle: {
 						color: themeValue.textStrong
-					}
+					},
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen
 				name={APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL}
 				component={SearchMessageChannel}
 				options={{
-					headerShown: false
+					headerShown: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION} component={ChannelPermissionSetting} />
