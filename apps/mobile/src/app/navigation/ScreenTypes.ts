@@ -1,4 +1,4 @@
-import { EOpenSearchChannelFrom } from '@mezon/mobile-components';
+import { EOpenSearchChannelFrom, ICategoryChannelOption } from '@mezon/mobile-components';
 import { DirectEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
 import { ChannelThreads, IChannel, OptionEvent } from '@mezon/utils';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
@@ -191,7 +191,7 @@ type MenuClanStackParamList = {
 	[APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.NOTIFICATION_OVERRIDES]: undefined;
 	[APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING_DETAIL]: {
-		notifyChannelCategorySetting: NotiChannelCategorySettingEntity;
+		notifyChannelCategorySetting: NotiChannelCategorySettingEntity | ICategoryChannelOption;
 	};
 	[APP_SCREEN.MENU_CLAN.CATEGORY_SETTING]: {
 		categoryId: string;
