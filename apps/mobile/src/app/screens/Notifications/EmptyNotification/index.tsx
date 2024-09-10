@@ -1,4 +1,4 @@
-import { BellIcon, EmptyNotifyIcon } from "@mezon/mobile-components";
+import { BellIcon } from "@mezon/mobile-components";
 import { Block, size, useTheme } from "@mezon/mobile-ui";
 import { style } from "./EmptyNotification.styles";
 import { Text } from "react-native";

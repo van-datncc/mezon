@@ -81,7 +81,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, parentId, clanId, mode, 
 			default:
 				break;
 		}
-	}, []);
+	}, [onDeleteMessage, setCurrentMessageActionType]);
 
 	const onOpenImage = useCallback(
 		async (image: AttachmentEntity) => {
