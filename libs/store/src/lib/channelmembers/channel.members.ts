@@ -360,19 +360,20 @@ export const selectAllChannelMembers = createSelector(
 	],
 	(channelMembersState, getUsersClanState, payload) => {
 		const [channelId, isPrivate] = payload.split(',');
-		const members = isPrivate
-			? (channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
-				return {
-					...getUsersClanState.entities[memberId],
-					channelId,
-					userChannelId: channelId
-				};
-			}) as ChannelMembersEntity[]) || []
-			: Object.values(getUsersClanState.entities)?.map((member) => ({
-				...member,
-				channelId,
-				userChannelId: channelId
-			}));
+		const members =
+			isPrivate === 'true'
+				? (channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
+						return {
+							...getUsersClanState.entities[memberId],
+							channelId,
+							userChannelId: channelId
+						};
+					}) as ChannelMembersEntity[]) || []
+				: Object.values(getUsersClanState.entities)?.map((member) => ({
+						...member,
+						channelId,
+						userChannelId: channelId
+					}));
 		return members;
 	}
 );
