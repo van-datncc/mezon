@@ -15,7 +15,6 @@ import {
 	channelsActions,
 	getStoreAsync,
 	notificationSettingActions,
-	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
 	threadsActions,
@@ -48,9 +47,8 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const dispatch = useAppDispatch();
 	const { isCanManageThread, isCanManageChannel } = useUserPermission();
 	const { categorizedChannels } = useCategory();
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	useEffect(() => {
-		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id || currentChannelId }));
+		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
 	}, []);
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 
