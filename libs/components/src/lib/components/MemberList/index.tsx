@@ -1,13 +1,4 @@
-import {
-	ChannelMembersEntity,
-	ChannelsEntity,
-	selectAllUserClans,
-	selectChannelById,
-	selectCloseMenu,
-	selectCurrentChannel,
-	selectMemberIdsByChannelId,
-	useAppSelector
-} from '@mezon/store';
+import { ChannelMembersEntity, ChannelsEntity, selectAllChannelMembers, selectCloseMenu, selectCurrentChannel, useAppSelector } from '@mezon/store';
 import { memo } from 'react';
 import { useSelector } from 'react-redux';
 import ListMember from './listMember';
@@ -16,27 +7,13 @@ export type MemberListProps = { className?: string };
 
 function MemberList() {
 	const currentChannel = useAppSelector(selectCurrentChannel);
-	const parrentChannel = useAppSelector(selectChannelById(currentChannel?.parrent_id as string));
-	const listMemberIds = useAppSelector((state) => selectMemberIdsByChannelId(state, currentChannel?.id as string));
-	return <MemberListContent currentChannel={currentChannel} parrentChannel={parrentChannel} listMemberIds={listMemberIds} />;
+	return <MemberListContent currentChannel={currentChannel} />;
 }
 
 const MemberListContent = memo(
-	({
-		currentChannel,
-		listMemberIds,
-		parrentChannel
-	}: {
-		currentChannel: ChannelsEntity | null;
-		parrentChannel: ChannelsEntity | null;
-		listMemberIds: string[];
-	}) => {
-		const usersClan = useSelector(selectAllUserClans);
+	({ currentChannel }: { currentChannel: ChannelsEntity | null }) => {
 		const closeMenu = useSelector(selectCloseMenu);
-		const members =
-			currentChannel?.channel_private || parrentChannel?.channel_private
-				? usersClan.filter((item) => listMemberIds.includes(item.id))
-				: usersClan;
+		const members = useAppSelector((state) => selectAllChannelMembers(state, currentChannel?.id as string));
 		const onlineMembers = (members as ChannelMembersEntity[])
 			.filter((item) => {
 				return item.user?.online;
@@ -71,7 +48,7 @@ const MemberListContent = memo(
 		);
 	},
 	(prev, next) => {
-		return prev.currentChannel?.channel_private === next.currentChannel?.channel_private && prev.listMemberIds === next.listMemberIds;
+		return prev.currentChannel?.channel_private === next.currentChannel?.channel_private;
 	}
 );
 

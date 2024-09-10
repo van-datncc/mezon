@@ -7,7 +7,7 @@ import { RouteProp } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, Pressable, Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import ChannelsSearchTab from '../../ChannelsSearchTab';

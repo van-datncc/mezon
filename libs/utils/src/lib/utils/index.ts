@@ -10,7 +10,7 @@ import {
 	startOfDay,
 	subDays
 } from 'date-fns';
-import { ApiMessageAttachment, ApiMessageRef, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { TIME_COMBINE } from '../constant';
@@ -345,7 +345,7 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 		);
 	});
 
-export function findClanAvatarByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findClanAvatarByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.clan_avatar;
@@ -354,7 +354,7 @@ export function findClanAvatarByUserId(userId: string, data: ChannelUserListChan
 	return '';
 }
 
-export function findClanNickByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findClanNickByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.clan_nick;
@@ -363,7 +363,7 @@ export function findClanNickByUserId(userId: string, data: ChannelUserListChanne
 	return '';
 }
 
-export function findDisplayNameByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findDisplayNameByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.user.display_name;
@@ -372,7 +372,7 @@ export function findDisplayNameByUserId(userId: string, data: ChannelUserListCha
 	return '';
 }
 
-export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ChannelUserListChannelUser[]): SearchItemProps[] {
+export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ClanUserListClanUser[]): SearchItemProps[] {
 	return data.map((item) => {
 		const avatarClanFinding = findClanAvatarByUserId(item.id ?? '', dataUserClan);
 		const clanNickFinding = item?.clanNick;

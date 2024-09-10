@@ -45,7 +45,7 @@ export function MenuChannelStacks({}: any) {
 					headerTitleStyle: {
 						color: themeValue.textStrong
 					},
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen
@@ -53,7 +53,7 @@ export function MenuChannelStacks({}: any) {
 				component={SearchMessageChannel}
 				options={{
 					headerShown: false,
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION} component={ChannelPermissionSetting} />
