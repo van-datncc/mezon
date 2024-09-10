@@ -492,3 +492,37 @@ export const selectAllChannelMembers = createSelector(
 		return members;
 	}
 );
+
+export const selectMentionUsers = createSelector(
+	[
+		getChannelMembersState,
+		getUsersClanState,
+		selectGrouplMembers,
+		(state, channelId: string) => {
+			const channel = state.channels?.entities[channelId];
+			const parentChannel = state.channels?.entities[channel?.parrent_id];
+			const isPrivate = channel?.channel_private || parentChannel?.channel_private || '';
+			const isDm = state.direct?.currentDirectMessageId === channelId || '';
+			const parentId = parentChannel?.id || '';
+			return `${channelId},${isPrivate},${isDm},${parentId}`;
+		}
+	],
+	(channelMembersState, usersClanState, directs, payload) => {
+		const [channelId, isPrivate, isDm, parentId] = payload.split(',');
+		if (isDm) return directs;
+		const members = isPrivate
+			? (channelMembersState.memberChannels[parentId || channelId]?.ids?.map((memberId) => {
+					return {
+						...usersClanState.entities[memberId],
+						channelId,
+						userChannelId: channelId
+					};
+				}) as ChannelMembersEntity[]) || []
+			: Object.values(usersClanState.entities)?.map((member) => ({
+					...member,
+					channelId,
+					userChannelId: channelId
+				}));
+		return members;
+	}
+);

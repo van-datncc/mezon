@@ -1,4 +1,4 @@
-import { selectAllChannelMembers, useAppSelector } from '@mezon/store';
+import { selectAllChannelMembers, selectMentionUsers, useAppSelector } from '@mezon/store';
 import { useMemo } from 'react';
 
 export type useChannelMembersOptions = {
@@ -6,12 +6,14 @@ export type useChannelMembersOptions = {
 };
 
 export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) {
-	const members = useAppSelector((state) => selectAllChannelMembers(state, channelId as string));
+	const membersOfParent = useAppSelector((state) => selectMentionUsers(state, channelId as string));
+	const membersOfChild = useAppSelector((state) => selectAllChannelMembers(state, channelId as string));
 
 	return useMemo(
 		() => ({
-			members
+			membersOfParent,
+			membersOfChild
 		}),
-		[members]
+		[membersOfChild, membersOfParent]
 	);
 }

@@ -5,13 +5,13 @@ import { useThreads } from './useThreads';
 export function useChatChannel(channelId: string) {
 	const { threads } = useThreads();
 
-	const { members } = useChannelMembers({ channelId });
+	const { membersOfChild } = useChannelMembers({ channelId });
 
 	return useMemo(
 		() => ({
-			members,
+			membersOfChild,
 			threads
 		}),
-		[members, threads]
+		[membersOfChild, threads]
 	);
 }
