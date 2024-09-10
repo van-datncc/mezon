@@ -46,7 +46,7 @@ import {
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
-	ILineMention,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -223,8 +223,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	};
 
 	const addMemberToChannel = useCallback(
-		async (currentChannel: ChannelsEntity | null, mentions: ILineMention[], userClans: UsersClanEntity[], members: ChannelMembersEntity[]) => {
-			const userIds = uniqueUsers(mentions, userClans, members);
+		async (
+			currentChannel: ChannelsEntity | null,
+			mentions: IMentionOnMessage[],
+			userClans: UsersClanEntity[],
+			members: ChannelMembersEntity[]
+		) => {
+			console.log(currentChannel);
+			if (!currentChannel?.channel_private) return;
+			const userIds = uniqueUsers(mentions, members);
+
 			const body = {
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
@@ -305,7 +313,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					anonymousMessage,
 					mentionEveryone
 				);
-				addMemberToChannel(currentChannel, mentions, usersClan, members);
+				addMemberToChannel(currentChannel, mentionList, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(
@@ -340,7 +348,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						mentionEveryone
 					);
 				}
-				addMemberToChannel(currentChannel, mentions, usersClan, members);
+				addMemberToChannel(currentChannel, mentionList, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
