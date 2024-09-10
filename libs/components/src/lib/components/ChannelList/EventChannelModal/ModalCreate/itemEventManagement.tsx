@@ -1,13 +1,13 @@
 import { useEventManagement, useOnClickOutside } from '@mezon/core';
-import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
+import { eventManagementActions, EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
-import { compareDate, differenceTime } from '../timeFomatEvent';
+import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
 import ModalDelEvent from './modalDelEvent';
 import PanelEventItem from './panelEventItem';
 
@@ -72,8 +72,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const isSameDay = useMemo(() => {
 		return compareDate(new Date(), createTime || '');
 	}, [createTime]);
-
-	const time = useMemo(() => {
+	
+	const eventStatus = useMemo(() => {
 		if (event?.status) {
 			return event.status;
 		} else if (start) {
@@ -94,6 +94,20 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		return EEventStatus.UNKNOWN;
 	}, [start, event?.status]);
 
+	const dispath =  useDispatch()
+	const test = ()=> {
+		dispath(eventManagementActions.updateStatusEvent({
+			channel_id: "",
+			clan_id: "1823926896132362240",
+			description: "da",
+			end_time: "2024-09-09T23:00:00+07:00",
+			event_id: "1833351276469948416",
+			event_status: "ONGOING",
+			logo: "",
+			start_time: "2024-09-09T22:00:00+07:00",
+			title: "dsasd"
+	  }));
+	}
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
 	};
@@ -136,23 +150,25 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 			ref={panelRef}
 		>
 			{logo && <img src={logo} alt="logo" className="w-full max-h-[180px] object-cover" />}
+			<button onClick={ () =>test()}>
+				Test
+			</button>
 			<div className="p-4 border-b dark:border-slate-600 border-white">
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
-						{createTime && isSameDay && (
-							<div className="text-[#5765F2] rounded-full px-2 dark:bg-bgLightModeSecond bg-bgLightModeButton font-semibold">New</div>
-						)}
-						<Icons.IconEvents />
+						<Icons.IconEvents defaultSize={`font-semibold ${
+								eventStatus === EEventStatus.UPCOMING ? 'text-purple-500' : eventStatus === EEventStatus.ONGOING ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode'
+							}`}/>
 						<p
-							className={`font-semibold dark:text-zinc-400 text-colorTextLightMode ${
-								time === EEventStatus.UPCOMING ? 'text-purple-500' : time === EEventStatus.ONGOING ? 'text-blue-400' : ''
+							className={`font-semibold ${
+								eventStatus === EEventStatus.UPCOMING ? 'text-purple-500' : eventStatus === EEventStatus.ONGOING ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode'
 							}`}
 						>
-							{time === EEventStatus.UPCOMING
-								? 'Event will start in 10 minutes. Join in!'
-								: time === EEventStatus.ONGOING
+							{eventStatus === EEventStatus.UPCOMING
+								? '10 minutes left. Join in!'
+								: eventStatus === EEventStatus.ONGOING
 									? 'Event is taking place!'
-									: event?.start_event}
+									: timeFomat(event?.start_time || start)}
 						</p>
 					</div>
 					{event?.creator_id && (
@@ -214,10 +230,21 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							{checkOptionLocation && <Icons.IConShareEventLocation />}
 							Share
 						</button>
-						<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
-							<Icons.MuteBell defaultSize="size-4 text-white" />
-							Interested
-						</button>
+						<div>
+							{
+								eventStatus == EEventStatus.ONGOING && checkUserCreate
+								?
+								<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white" onClick={() => setOpenModalDelEvent(true)}>
+									End event
+								</button>
+								: eventStatus != EEventStatus.ONGOING ?
+								<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
+									<Icons.MuteBell defaultSize="size-4 text-white" />
+									Interested
+								</button>
+								: ''
+							}
+						</div>
 					</div>
 				)}
 			</div>

@@ -130,6 +130,14 @@ export const eventManagementSlice = createSlice({
 		},
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
+		},
+		updateStatusEvent: (state, action) => {			
+			eventManagementAdapter.updateOne(state, {
+				id : action.payload.event_id,
+				changes : {
+					status: action.payload.event_status
+				}
+			})
 		}
 	},
 	extraReducers: (builder) => {

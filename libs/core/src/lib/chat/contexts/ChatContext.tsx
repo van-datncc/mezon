@@ -7,6 +7,7 @@ import {
 	clansSlice,
 	directActions,
 	directSlice,
+	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
 	fetchListFriends,
@@ -57,7 +58,7 @@ import {
 	VoiceJoinedEvent,
 	VoiceLeavedEvent
 } from 'mezon-js';
-import { ApiMessageReaction } from 'mezon-js/api.gen';
+import { ApiCreateEventRequest, ApiMessageReaction } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -432,10 +433,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const oneventcreated = useCallback(
-		(eventCreatedEvent: any) => {
-			console.log(eventCreatedEvent);
-
-			// dispatch(eventManagementActions.updateStatusEvent(eventStatusNotification));
+		(eventCreatedEvent: ApiCreateEventRequest) => {
+			dispatch(eventManagementActions.updateStatusEvent(eventCreatedEvent));
 		},
 		[dispatch]
 	);
@@ -610,3 +609,4 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+
