@@ -220,7 +220,7 @@ export const channelMembers = createSlice({
 			if (!state.userRemoved) {
 				state.userRemoved = {};
 			}
-			state.userRemoved[channelId] = userId;
+			state.userRemoved = action.payload;
 			const channelEntity = state.memberChannels[channelId];
 			channelMembersAdapter.removeOne(channelEntity, userId);
 		},
@@ -444,9 +444,8 @@ export const selectGrouplMembers = createSelector([getDirectState, (state, group
 	}) as ChannelMembersEntity[];
 });
 
-export const selectUserRemovedByChannelId = (channelId: string) => (state: ChannelMembersState) => {
-	return state.userRemoved?.[channelId] ?? null;
-};
+export const selectUserRemovedByChannelId = createSelector(getChannelMembersState, (state: ChannelMembersState) => state.userRemoved);
+
 export const selectMemberStatusById = createSelector(
 	[
 		getUsersClanState,

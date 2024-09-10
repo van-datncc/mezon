@@ -41,8 +41,13 @@ type UserProfilePopupProps = {
 };
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
+	console.log('tagRoleId: ', tagRoleId);
+	console.log('tagRoleName: ', tagRoleName);
+	console.log('tagUserId: ', tagUserId);
+	console.log('tagUserName: ', tagUserName);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const getUserRemoved = useSelector(selectUserRemovedByChannelId(currentChannelId ?? ''));
+	const getUserRemoved = useSelector(selectUserRemovedByChannelId);
+	console.log('getUserRemoved: ', getUserRemoved);
 
 	const allUserIds = useAppSelector((state) => selectMemberIdsByChannelId(state, currentChannelId as string));
 	const allRoleIds = useSelector(selectAllRoleIds);
@@ -74,13 +79,13 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				type: MentionType.HERE
 			};
 		}
-		if (tagUserId && !checkUserIsExist && tagUserName !== '@here') {
+		if (tagUserId && !checkUserIsExist && tagUserName !== '@here' && mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 			return {
 				display: '@unknown_user',
 				type: MentionType.USER_NOT_EXIST
 			};
 		}
-		if (tagUserId && checkUserIsExist && tagUserName !== '@here') {
+		if (tagUserId && checkUserIsExist && tagUserName !== '@here' && mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
 			return {
 				display: tagUserName,
 				type: MentionType.USER_EXIST
@@ -184,8 +189,8 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 export default memo(MentionUser);
 
 const UserProfilePopup = ({ userID, channelId, mode, positionLeft, positionTop, positionBottom }: UserProfilePopupProps) => {
-	const getUserByUserId = useSelector(
-		selectChannelMemberByUserIds(channelId ?? '', [userID], mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? false : true)
+	const getUserByUserId = useAppSelector((state) =>
+		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
 	)[0];
 	const prioritizeName = getNameForPrioritize(
 		getUserByUserId.clan_nick ?? '',
