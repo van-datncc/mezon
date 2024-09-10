@@ -5,7 +5,7 @@ import Backdrop from '../../../../temp-ui/MezonBottomSheet/backdrop';
 import { EAdvancedPermissionSetting } from '../../types/channelPermission.enum';
 import { IAdvancedSettingBSProps } from '../../types/channelPermission.type';
 
-export const AdvancedSettingBS = memo(({ bottomSheetRef, channel, onDismiss, currentAdvancedPermissionType }: IAdvancedSettingBSProps) => {
+export const AdvancedSettingBS = memo(({ bottomSheetRef, channel, currentAdvancedPermissionType }: IAdvancedSettingBSProps) => {
 	const { themeValue } = useTheme();
 	return (
 		<BottomSheetModal
@@ -17,7 +17,6 @@ export const AdvancedSettingBS = memo(({ bottomSheetRef, channel, onDismiss, cur
 				overflow: 'hidden'
 			}}
 			backdropComponent={Backdrop}
-			onDismiss={onDismiss}
 			backgroundStyle={{ backgroundColor: themeValue.primary }}
 		>
 			<Block paddingHorizontal={size.s_14} flex={1}>

@@ -29,7 +29,6 @@ export interface IAddMemberOrRoleBSProps {
 export interface IAdvancedSettingBSProps {
 	bottomSheetRef: RefObject<BottomSheetModal>;
 	channel: ChannelsEntity;
-	onDismiss?: () => void;
 	currentAdvancedPermissionType?: EAdvancedPermissionSetting;
 }
 
@@ -40,4 +39,9 @@ export interface IAdvancedViewProps {
 
 export interface IBasicViewProps {
 	channel: ChannelsEntity;
+}
+
+export interface IAddMemberOrRoleContentProps {
+	channel: ChannelsEntity;
+	onDismiss?: () => void;
 }

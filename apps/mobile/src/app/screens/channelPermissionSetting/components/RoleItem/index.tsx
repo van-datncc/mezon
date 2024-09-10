@@ -15,7 +15,7 @@ export const RoleItem = memo(
 
 		const isEveryoneRole = useMemo(() => {
 			return role?.slug === 'everyone';
-		}, [role]);
+		}, [role?.slug]);
 
 		const deleteRole = async () => {
 			const body = {
