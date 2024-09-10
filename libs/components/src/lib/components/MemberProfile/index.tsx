@@ -1,6 +1,7 @@
-import { AvatarImage, Icons, ShortUserProfile } from '@mezon/components';
+import { AvatarImage, ShortUserProfile } from '@mezon/components';
 import { useChannelMembersActions, useEscapeKey, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useMemo, useRef, useState } from 'react';
@@ -208,7 +209,7 @@ function MemberProfile({
 				onClick={(e) => e.stopPropagation()}
 			>
 				<ShortUserProfile
-					userID={user?.user?.id || ''}
+					userID={user?.id || ''}
 					mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
 					avatar={avatar}
 					name={name}
@@ -292,7 +293,7 @@ function MemberProfile({
 				<div className="flex flex-col items-start h-full">
 					<div
 						ref={subNameRef}
-						className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start	 ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
+						className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start ${isFooter ? 'ml-1' : ''} ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
@@ -318,7 +319,7 @@ function MemberProfile({
 								<p
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
-                  ${isFooter ? 'top-[-7px] leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
+                  ${isFooter ? 'top-[-4px] leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
                   ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}

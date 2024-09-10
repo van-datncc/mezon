@@ -34,7 +34,7 @@ function useChannelSeen(channelId: string) {
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
 			dispatch(directActions.updateLastSeenTime(lastMessage));
 		}
-	}, [channelId, dispatch, lastMessage]);
+	}, [channelId, dispatch]);
 }
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {

@@ -131,7 +131,6 @@ export const fetchDirectMessage = createAsyncThunk(
 			fetchChannelsCached.clear(mezon, 100, 1, '', channelType);
 		}
 		const response = await fetchChannelsCached(mezon, 100, 1, '', channelType);
-
 		if (!response.channeldesc) {
 			return [];
 		}
@@ -184,6 +183,7 @@ interface members {
 	role_id?: string[] | undefined;
 	thread_id?: string | undefined;
 	user?: ApiUser | undefined;
+	user_id?: string;
 }
 
 export type StatusDMUnreadArgs = {
@@ -208,7 +208,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			);
 			const members = fetchChannelMembersResult.payload as members[];
 			if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
-				const userIds = members.map((member: any) => member.user.id);
+				const userIds = members.map((member) => member.user_id as string);
 				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));

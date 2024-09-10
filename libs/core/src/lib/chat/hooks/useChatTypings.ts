@@ -5,7 +5,8 @@ import {
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectTypingUserIdsByChannelId,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -18,10 +19,13 @@ interface UseChatTypingsOptions {
 	isDM?: boolean;
 }
 
-export function useChatTypings({ channelId, mode, isPublic, isDM = false }: UseChatTypingsOptions) {
+export function useChatTypings({ channelId, mode, isPublic, isDM }: UseChatTypingsOptions) {
 	const { userId } = useAuth();
-	const typingUsersIds = useSelector(selectTypingUserIdsByChannelId(channelId));
-	const typingUsers = useSelector(selectChannelMemberByUserIds(channelId, typingUsersIds?.filter((userID) => userID !== userId) || [], isDM));
+	const typingUsersIds = useAppSelector(selectTypingUserIdsByChannelId(channelId));
+	const typingUsers = useAppSelector((state) =>
+		selectChannelMemberByUserIds(state, channelId, typingUsersIds?.filter((userID) => userID !== userId).join('/'), isDM ? '1' : '')
+	);
+
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
