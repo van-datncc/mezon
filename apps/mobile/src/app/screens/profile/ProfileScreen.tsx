@@ -18,7 +18,7 @@ import { style } from './styles';
 
 export enum ETypeCustomUserStatus {
 	Save = 'Save',
-	Close = 'Close',
+	Close = 'Close'
 }
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
@@ -53,7 +53,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const firstFriendImageList = useMemo(() => {
 		return friendList?.slice?.(0, 5)?.map((friend) => ({
 			avatarUrl: friend?.user?.avatar_url,
-			username: friend?.user?.username || friend?.user?.display_name,
+			username: friend?.user?.username || friend?.user?.display_name
 		}));
 	}, [friendList]);
 
@@ -65,29 +65,26 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal);
 	};
 
-	const handleCustomUserStatus = (customStatus: string = '', type: ETypeCustomUserStatus) => {
+	const handleCustomUserStatus = (customStatus = '', type: ETypeCustomUserStatus) => {
 		userStatusBottomSheetRef?.current?.dismiss();
 		setIsVisibleAddStatusUserModal(false);
 		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: customStatus }));
 	};
 
-  const showUserStatusBottomSheet = () =>{
-    userStatusBottomSheetRef?.current?.present();
-  }
+	const showUserStatusBottomSheet = () => {
+		userStatusBottomSheetRef?.current?.present();
+	};
 
 	return (
 		<View style={styles.container}>
 			<View style={[styles.containerBackground, { backgroundColor: color }]}>
 				<View style={styles.backgroundListIcon}>
 					<TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
-						<Icons.SettingsIcon height={20} width={20} color={themeValue.textStrong} />
+						<Icons.SettingsIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 					</TouchableOpacity>
 				</View>
 
-				<TouchableOpacity
-					onPress={showUserStatusBottomSheet}
-					style={styles.viewImageProfile}
-				>
+				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
 					{user?.userProfile?.user?.avatar_url ? (
 						<Image source={{ uri: user?.userProfile?.user?.avatar_url }} style={styles.imgWrapper} />
 					) : (
@@ -109,12 +106,9 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 			<ScrollView style={styles.contentWrapper}>
 				<View style={styles.contentContainer}>
-					<TouchableOpacity
-						style={styles.viewInfo}
-						onPress={showUserStatusBottomSheet}
-					>
+					<TouchableOpacity style={styles.viewInfo} onPress={showUserStatusBottomSheet}>
 						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
-						<Icons.ChevronSmallDownIcon height={18} width={18} color={themeValue.text} />
+						<Icons.ChevronSmallDownIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
 					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
 					{userCustomStatus ? (
@@ -126,18 +120,18 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 								<Text style={styles.text}>{userCustomStatus}</Text>
 							</TouchableOpacity>
 							<Pressable onPress={() => handleCustomUserStatus('', ETypeCustomUserStatus.Close)} style={styles.closeBtnUserStatus}>
-								<CircleXIcon height={18} width={18} color={themeValue.text} />
+								<CircleXIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 							</Pressable>
 						</Block>
 					) : null}
 					<View style={styles.buttonList}>
 						<MezonButton viewContainerStyle={styles.button} onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}>
-							<Icons.ChatIcon height={20} width={20} color={'white'} />
+							<Icons.ChatIcon height={size.s_20} width={size.s_20} color={'white'} />
 							<Text style={styles.whiteText}>{t('addStatus')}</Text>
 						</MezonButton>
 
 						<MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
-							<Icons.PencilIcon height={18} width={18} color={'white'} />
+							<Icons.PencilIcon height={size.s_18} width={size.s_18} color={'white'} />
 							<Text style={styles.whiteText}>{t('editStatus')}</Text>
 						</MezonButton>
 					</View>
@@ -162,8 +156,13 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 				<TouchableOpacity style={[styles.contentContainer, styles.imgList]} onPress={() => navigateToFriendScreen()}>
 					<Text style={styles.textTitle}>{t('yourFriend')}</Text>
 
-					<MezonAvatar avatarUrl="" username="" height={30} width={30} stacks={firstFriendImageList} />
-					<Icons.ChevronSmallRightIcon width={18} height={18} style={{ marginLeft: size.s_4 }} color={themeValue.textStrong} />
+					<MezonAvatar avatarUrl="" username="" height={size.s_30} width={size.s_30} stacks={firstFriendImageList} />
+					<Icons.ChevronSmallRightIcon
+						width={size.s_18}
+						height={size.s_18}
+						style={{ marginLeft: size.s_4 }}
+						color={themeValue.textStrong}
+					/>
 				</TouchableOpacity>
 			</ScrollView>
 			<AddStatusUserModal

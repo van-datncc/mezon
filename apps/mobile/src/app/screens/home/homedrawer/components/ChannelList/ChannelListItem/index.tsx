@@ -1,18 +1,7 @@
-import {
-	Icons,
-	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save
-} from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	getStoreAsync,
-	selectCurrentChannelId,
-	selectVoiceChannelMembersByChannelId
-} from '@mezon/store-mobile';
+import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import { size, useTheme } from '@mezon/mobile-ui';
+import { selectIsUnreadChannelById } from '@mezon/store';
+import { channelsActions, getStoreAsync, selectCurrentChannelId, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -24,7 +13,6 @@ import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import ListChannelThread from '../ChannelListThread';
 import UserListVoiceChannel from '../ChannelListUserVoice';
 import { style } from './styles';
-import { selectIsUnreadChannelById } from '@mezon/store';
 
 interface IChannelListItemProps {
 	data: any;
@@ -46,7 +34,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
-	
+
 	const isActive = useMemo(() => {
 		return currentChanelId === props?.data?.id;
 	}, [currentChanelId, props?.data?.id]);
@@ -70,8 +58,10 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			const clanId = thread ? thread?.clan_id : props?.data?.clan_id;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			const store = await getStoreAsync();
-			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false })),
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave)
+			timeoutRef.current = setTimeout(() => {
+				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+			}, 10);
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		}
 	};
 
@@ -87,16 +77,28 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					{isUnRead && <View style={styles.dotIsNew} />}
 
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceLockIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+						<Icons.VoiceLockIcon
+							width={size.s_16}
+							height={size.s_16}
+							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+						/>
 					)}
 					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextLockIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+						<Icons.TextLockIcon
+							width={size.s_16}
+							height={size.s_16}
+							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+						/>
 					)}
 					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceNormalIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+						<Icons.VoiceNormalIcon
+							width={size.s_16}
+							height={size.s_16}
+							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+						/>
 					)}
 					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextIcon width={16} height={16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+						<Icons.TextIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 					)}
 					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
 						{props.data.channel_label}

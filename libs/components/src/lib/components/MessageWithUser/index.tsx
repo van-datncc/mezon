@@ -1,14 +1,5 @@
 import { useAuth } from '@mezon/core';
-import {
-	MessagesEntity,
-	selectCurrentChannelId,
-	selectDmGroupCurrentId,
-	selectIdMessageRefReply,
-	selectIdMessageToJump,
-	selectJumpPinMessageId,
-	selectUploadingStatus
-} from '@mezon/store';
-import { EUploadingStatus } from '@mezon/utils';
+import { MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectJumpPinMessageId } from '@mezon/store';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { ReactNode, useMemo, useState } from 'react';
@@ -57,8 +48,8 @@ function MessageWithUser({
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
-	const idMessageToJump = useSelector(selectIdMessageToJump);
+	// const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
+	// const idMessageToJump = useSelector(selectIdMessageToJump);
 
 	const userLogin = useAuth();
 	const isCombine = !message.isStartedMessageGroup;
@@ -70,7 +61,6 @@ function MessageWithUser({
 		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannelId : currentDmId),
 		[currentChannelId, currentDmId, mode]
 	);
-	const { statusUpload, count } = useSelector(selectUploadingStatus(currentDmOrChannelId ?? '', message.id));
 	// Computed values
 	const attachments = message.attachments ?? [];
 	const mentions = message.mentions ?? [];
@@ -81,15 +71,11 @@ function MessageWithUser({
 		return hasFailedAttachment && !isMeMessage && Object.keys(message.content).length === 0 && mentions.length === 0;
 	}, [hasFailedAttachment, isMeMessage, message.content, mentions]);
 
-	const shouldSkipAttachmentRender = useMemo(() => {
-		return hasFailedAttachment && !isMeMessage && Object.keys(message.content).length !== 0 && mentions.length !== 0;
-	}, [hasFailedAttachment, isMeMessage, message.content, mentions]);
-
 	const hasIncludeMention = useMemo(() => {
 		const userIdMention = userLogin.userProfile?.user?.id;
 		const mentionOnMessage = message.mentions;
 		let includesHere = false;
-		if (message.content.t) {
+		if (typeof message.content.t == 'string') {
 			includesHere = message.content.t?.includes('@here');
 		}
 		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
@@ -102,7 +88,7 @@ function MessageWithUser({
 	}, [message]);
 
 	const checkMessageHasReply = useMemo(() => {
-		return message.references && message.references?.length !== 0;
+		return message.references && message.references?.length !== 0 && message.references[0].message_ref_id !== undefined;
 	}, [message.references]);
 
 	const checkMessageIncludeMention = useMemo(() => {
@@ -172,17 +158,8 @@ function MessageWithUser({
 														isSearchMessage={isSearchMessage}
 													/>
 												)}
-												{statusUpload === EUploadingStatus.LOADING ? (
-													<div
-														className={`break-all w-full cursor-default gap-3 flex mt-[10px] py-3 pl-3 pr-3 rounded max-w-full dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2 relative`}
-													>
-														Uploading {count} {count === 1 ? 'file' : 'files'}!
-													</div>
-												) : (
-													!shouldSkipAttachmentRender && (
-														<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
-													)
-												)}
+
+												<MessageAttachment mode={mode} message={message} onContextMenu={onContextMenu} />
 											</div>
 										</div>
 									</div>

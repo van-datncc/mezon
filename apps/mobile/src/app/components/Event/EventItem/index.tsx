@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
-import { EventManagementEntity, selectChannelById, selectMemberByUserId } from '@mezon/store-mobile';
+import { size, useTheme } from '@mezon/mobile-ui';
+import { EventManagementEntity, selectChannelById, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { OptionEvent } from '@mezon/utils';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -19,7 +19,7 @@ interface IEventItemProps {
 export default function EventItem({ event, onPress, showActions = true }: IEventItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const userCreate = useSelector(selectMemberByUserId(event?.creator_id || ''));
+	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
 	const option = event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER;
 	const channelVoice = useSelector(selectChannelById(event?.channel_id));
 	// const channelFirst = useSelector(selectChannelFirst);
@@ -43,7 +43,7 @@ export default function EventItem({ event, onPress, showActions = true }: IEvent
 							/>
 						</View>
 						<View style={styles.inline}>
-							<Icons.GroupIcon height={10} width={10} color={themeValue.text} />
+							<Icons.GroupIcon height={size.s_10} width={size.s_10} color={themeValue.text} />
 							<Text style={styles.tinyText}>{event?.user_ids?.length}</Text>
 						</View>
 					</View>
@@ -55,12 +55,17 @@ export default function EventItem({ event, onPress, showActions = true }: IEvent
 					<EventLocation event={event} />
 				</View>
 
-				{showActions &&
+				{showActions && (
 					<View style={styles.inline}>
-						<MezonButton icon={<Icons.CheckmarkSmallIcon height={20} width={20} color={themeValue.text} />} title="Interested" fluid border />
-						<MezonButton icon={<Icons.ShareIcon height={20} width={20} color={themeValue.text} />} />
+						<MezonButton
+							icon={<Icons.CheckmarkSmallIcon height={size.s_20} width={size.s_20} color={themeValue.text} />}
+							title="Interested"
+							fluid
+							border
+						/>
+						<MezonButton icon={<Icons.ShareIcon height={size.s_20} width={size.s_20} color={themeValue.text} />} />
 					</View>
-				}
+				)}
 			</View>
 		</Pressable>
 	);

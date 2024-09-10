@@ -1,25 +1,28 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectIdMessageRefReply } from '@mezon/store';
-import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue } from '@mezon/utils';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useState } from 'react';
+import { referencesActions, selectDataReferences } from '@mezon/store';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
+import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
 export type ChannelMessageBoxProps = {
-	channelId: string;
+	channel: ApiChannelDescription;
 	clanId?: string;
 	mode: number;
 };
 
-export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
+export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
+	const channelId = useMemo(() => {
+		return channel.channel_id;
+	}, [channel.channel_id]);
 	const dispatch = useDispatch();
-	const { sendMessage, sendMessageTyping } = useChatSending({ channelId, mode });
+	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: channel, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
 
+	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const idMessageRefReply = useSelector(selectIdMessageRefReply(channelId));
 
 	const handleSend = useCallback(
 		(
@@ -54,13 +57,17 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 	}, [subPanelActive]);
 
 	const handleCloseReplyMessageBox = () => {
-		dispatch(referencesActions.setIdReferenceMessageReply({ channelId, idMessageRefReply: '' }));
+		dispatch(
+			referencesActions.setDataReferences({
+				channelId: channelId ?? '',
+				dataReferences: blankReferenceObj
+			})
+		);
 	};
 
 	useEscapeKey(handleCloseReplyMessageBox);
-
 	return (
-		<div className="mx-2 relative" role="button">
+		<div className="mx-4 relative" role="button">
 			{isEmojiOnChat && (
 				<div
 					onClick={(e) => {
@@ -68,12 +75,12 @@ export function ChannelMessageBox({ channelId, clanId, mode }: Readonly<ChannelM
 					}}
 					className="max-sbm:bottom-[60px] bottom-[76px] right-[10px] absolute bg"
 				>
-					<GifStickerEmojiPopup emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
+					<GifStickerEmojiPopup channelOrDirect={channel} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
-			{idMessageRefReply && <ReplyMessageBox channelId={channelId} idMessage={idMessageRefReply} />}
+			{dataReferences.message_ref_id && <ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} />}
 			<MessageBox
-				listMentions={UserMentionList({ channelID: channelId, channelMode: mode })}
+				listMentions={UserMentionList({ channelID: channelId ?? '', channelMode: mode })}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}

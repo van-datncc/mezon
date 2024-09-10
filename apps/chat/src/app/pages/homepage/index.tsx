@@ -15,6 +15,13 @@ function Homepage() {
 	const toggleSideBar = () => {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
+	let linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.61-win-x64.exe';
+	if (navigator.userAgent.includes('Mac')) {
+		linkDownload = 'https://cdn.mezon.vn/release/Mezon-1.1.61-arm64-mac.zip';
+	} else if (navigator.userAgent.includes('Linux')) {
+		linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.61-linux-amd64.deb';
+	}
+
 	return (
 		<div className="relative">
 			<div
@@ -37,12 +44,7 @@ function Homepage() {
 						</Link>
 					)}
 					<div className="mid flex gap-[40px] items-center font-semibold max-lg:hidden">
-						<a
-							href="https://cdn.mezon.vn/release/mezon-1.1.54-win-x64.exe"
-							target="_blank"
-							rel="noreferrer"
-							className="hover:underline cursor-pointer"
-						>
+						<a href={linkDownload} target="_blank" rel="noreferrer" className="hover:underline cursor-pointer">
 							Download
 						</a>
 						<div className="hover:underline cursor-pointer">Nitro</div>
@@ -89,17 +91,6 @@ function Homepage() {
 							</div>
 							<img src={BannerImg} alt="" className="object-cover w-6/12 block max-lg:hidden" />
 						</div>
-						<div className="flex justify-center mt-10">
-							<Link
-								to={'/mezon'}
-								className="max-md:w-7/12 max-sm:w-11/12 text-white bg-[#161cbb] px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] text-center hoverBoxShadow"
-								target="_blank"
-								rel="noreferrer"
-								style={{ borderRadius: '28px' }}
-							>
-								Open Mezon in your browser
-							</Link>
-						</div>
 						<div className="block2 flex justify-center items-center gap-[24px] mt-10 max-md:flex-col mb-10">
 							<a
 								style={{ borderRadius: '28px' }}
@@ -124,12 +115,12 @@ function Homepage() {
 							<a
 								style={{ borderRadius: '28px' }}
 								className="max-md:w-7/12 max-sm:w-11/12 flex items-center gap-2 justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
-								href="https://cdn.mezon.vn/release/mezon-1.1.54-win-x64.exe"
+								href={linkDownload}
 								target="_blank"
 								rel="noreferrer"
 							>
 								<Icons.WindowIcon className="text-black w-[35px]" />
-								<div>Download for Windows</div>
+								<div>Download for Desktop</div>
 							</a>
 						</div>
 					</div>

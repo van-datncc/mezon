@@ -10,17 +10,11 @@ import {
 	debounce,
 	getAttachmentUnique,
 	load,
-	save,
+	save
 } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	directActions,
-	getStoreAsync,
-	selectCurrentChannelId,
-	selectCurrentClan,
-	selectDirectsOpenlist,
-} from '@mezon/store-mobile';
+import { channelMetaActions } from '@mezon/store';
+import { channelsActions, directActions, getStoreAsync, selectCurrentChannelId, selectCurrentClan, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { ILinkOnMessage } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -35,7 +29,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import { styles } from './styles';
-import { channelMetaActions } from '@mezon/store';
 
 export const Sharing = ({ data, onClose }) => {
 	const listDM = useSelector(selectDirectsOpenlist);
@@ -81,9 +74,9 @@ export const Sharing = ({ data, onClose }) => {
 
 	const getFullFileName = useCallback(
 		(fileName: string) => {
-			return createUploadFilePath(session, currentClan.id, currentChannelId, fileName);
+			return createUploadFilePath(session, currentClan.id, currentChannelId, fileName, true);
 		},
-		[currentChannelId, currentClan.id, session],
+		[currentChannelId, currentClan.id, session]
 	);
 
 	function flattenData(categorizedChannels: any) {
@@ -97,7 +90,7 @@ export const Sharing = ({ data, onClose }) => {
 					result.push({
 						...channel,
 						category_id,
-						category_name,
+						category_name
 					});
 					channel.threads.forEach((thread: any) => {
 						const { id: thread_id } = thread;
@@ -106,7 +99,7 @@ export const Sharing = ({ data, onClose }) => {
 							...thread,
 							category_id,
 							category_name,
-							thread_id,
+							thread_id
 						});
 					});
 				}
@@ -124,12 +117,12 @@ export const Sharing = ({ data, onClose }) => {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const debouncedSetSearchText = useCallback(
 		debounce((text) => setSearchText(text), 300),
-		[],
+		[]
 	);
 
 	const generateChannelMatch = (data: any, DMList: any, searchText: string) => {
 		return [...DMList, ...data].filter((channel: { channel_label?: string | number }) =>
-			channel.channel_label?.toString()?.toLowerCase()?.includes(searchText?.toLowerCase()),
+			channel.channel_label?.toString()?.toLowerCase()?.includes(searchText?.toLowerCase())
 		);
 	};
 
@@ -146,8 +139,8 @@ export const Sharing = ({ data, onClose }) => {
 				directActions.joinDirectMessage({
 					directMessageId: channel.id,
 					channelName: channel.channel_label,
-					type: channel.type,
-				}),
+					type: channel.type
+				})
 			);
 		}
 
@@ -161,23 +154,25 @@ export const Sharing = ({ data, onClose }) => {
 				clanId: channelSelected?.clan_id,
 				channelId: channelSelected?.channel_id,
 				channelType: channelSelected?.type,
-				isPublic: false,
-			}),
+				isPublic: false
+			})
 		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
 			'0',
+			'0',
 			channelSelected.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			false,
+			false,
 			{
 				t: dataSend.text,
-				lk: dataSend.links || [],
+				lk: dataSend.links || []
 			},
 			[],
 			getAttachmentUnique(attachmentUpload) || [],
-			[],
+			[]
 		);
 	};
 
@@ -189,24 +184,26 @@ export const Sharing = ({ data, onClose }) => {
 				channelId: channelSelected.channel_id,
 				channelType: channelSelected.type,
 				isPublic: !channelSelected?.channel_private
-			}),
+			})
 		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
 			currentClan.id,
 			channelSelected.channel_id,
+			channelSelected.channel_id,
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
 			!channelSelected.channel_private,
+			channelSelected?.parrent_id ? !channelSelected.channel_private : false,
 			{
 				t: dataSend.text,
-				lk: dataSend.links || [],
+				lk: dataSend.links || []
 			},
 			[], //mentions
 			getAttachmentUnique(attachmentUpload) || [], //attachments
 			[], //references
 			false, //anonymous
-			false, //mentionEveryone
+			false //mentionEveryone
 		);
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channelSelected.channel_id, timestamp }));
@@ -228,7 +225,7 @@ export const Sharing = ({ data, onClose }) => {
 				const endIndex = i;
 				links.push({
 					s: startIndex,
-					e: endIndex,
+					e: endIndex
 				});
 			} else {
 				i++;
@@ -242,7 +239,7 @@ export const Sharing = ({ data, onClose }) => {
 		const { links } = processText(dataText);
 		const dataSend = {
 			text: dataText,
-			links,
+			links
 		};
 		// Send to DM message
 		if (channelSelected.type === ChannelType.CHANNEL_TYPE_GROUP || channelSelected.type === ChannelType.CHANNEL_TYPE_DM) {
@@ -258,16 +255,19 @@ export const Sharing = ({ data, onClose }) => {
 		const fileFormats = await Promise.all(
 			dataMedia.map(async (media) => {
 				const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
-				setAttachmentUpload((prev) => [...prev, { url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }]);
+				setAttachmentUpload((prev) => [
+					...prev,
+					{ url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }
+				]);
 				const fileData = await RNFS.readFile(media.contentUri || media?.filePath, 'base64');
 
 				return {
 					uri: media.contentUri || media?.filePath,
 					name: media?.fileName || media?.contentUri || media?.filePath,
 					type: media?.mimeType,
-					fileData,
+					fileData
 				};
-			}),
+			})
 		);
 		handleFiles(fileFormats);
 		// setAttachmentData({
@@ -297,13 +297,11 @@ export const Sharing = ({ data, onClose }) => {
 		(attachment: ApiMessageAttachment) => {
 			setAttachmentUpload([...attachmentUpload, attachment]);
 		},
-		[dispatch],
+		[dispatch]
 	);
 
 	function removeAttachmentByUrl(urlToRemove: string) {
-		setAttachmentUpload((prevAttachments) =>
-			prevAttachments.filter((attachment) => attachment.url !== urlToRemove)
-		);
+		setAttachmentUpload((prevAttachments) => prevAttachments.filter((attachment) => attachment.url !== urlToRemove));
 	}
 
 	return (

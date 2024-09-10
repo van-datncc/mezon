@@ -5,15 +5,17 @@ import {
 	RootState,
 	channelsActions,
 	getIsFowardAll,
+	getSelectedMessage,
 	selectAllChannelMembers,
 	selectAllDirectMessages,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
 	selectModeResponsive,
 	selectTheme,
+	toggleIsShowPopupForwardFalse,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -28,7 +30,6 @@ import {
 	removeDuplicatesById
 } from '@mezon/utils';
 import { Button, Label, Modal } from 'flowbite-react';
-import { getSelectedMessage, toggleIsShowPopupForwardFalse } from 'libs/store/src/lib/forwardMessage/forwardMessage.slice';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -59,7 +60,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const modeResponsive = useSelector(selectModeResponsive);
-	const membersInClan = useSelector(selectAllChannelMembers);
+	const membersInClan = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 	const isForwardAll = useSelector(getIsFowardAll);
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannelId : currentDmId) || '')
@@ -154,7 +155,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		dispatch(toggleIsShowPopupForwardFalse());
 	};
 
-	const usersClan = useSelector(selectAllUsesClan);
+	const usersClan = useSelector(selectAllUserClans);
 	const listMemSearch = useMemo(() => {
 		const listDMSearch = listDM.length
 			? listDM.map((itemDM: DirectEntity) => {

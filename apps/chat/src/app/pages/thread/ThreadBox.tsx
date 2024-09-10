@@ -61,9 +61,11 @@ const ThreadBox = () => {
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
+								parentId: thread.parrent_id as string,
 								channelId: thread.channel_id as string,
 								channelType: thread.type as number,
-								isPublic: !thread.channel_private
+								isPublic: !thread.channel_private,
+								isParentPublic: currentChannel ? !currentChannel.channel_private : false
 							})
 						);
 						await sendMessageThread(content, mentions, attachments, references, thread);
@@ -96,7 +98,7 @@ const ThreadBox = () => {
 					</div>
 				)}
 			</div>
-			<div className="flex-shrink-0 flex flex-col pb-4 px-4 dark:bg-bgPrimary bg-bgLightModeSecond h-auto relative">
+			<div className="flex-shrink-0 flex flex-col pb-4 px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}

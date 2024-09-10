@@ -1,8 +1,10 @@
+import { handleUploadFile } from '@mezon/transport';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
 	Direction_Mode,
 	EMessageCode,
+	EMimeTypes,
 	EmojiDataOptionals,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -10,7 +12,8 @@ import {
 	LoadingStatus,
 	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
-	checkSameDayByCreateTime
+	checkSameDayByCreateTime,
+	fetchAndCreateFiles
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -96,7 +99,7 @@ export interface MessagesState {
 	isFocused: boolean;
 	idMessageToJump: string;
 	channelDraftMessage: Record<string, ChannelDraftMessages>;
-	isJumpingToPresent: boolean;
+	isJumpingToPresent: Record<string, boolean>;
 	channelMessages: Record<
 		string,
 		EntityState<MessagesEntity, string> & {
@@ -105,6 +108,7 @@ export interface MessagesState {
 	>;
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
+	channelIdLastFetch: string;
 }
 export type FetchMessagesMeta = {
 	arg: {
@@ -220,6 +224,7 @@ export const fetchMessages = createAsyncThunk(
 				})
 			);
 		}
+		thunkAPI.dispatch(messagesActions.setChannelIdLastFetch({ channelId }));
 
 		const messages = response.messages.map((item) => {
 			return mapMessageChannelToEntity(item, response.last_seen_message?.id);
@@ -256,7 +261,7 @@ export const fetchMessages = createAsyncThunk(
 		}
 
 		if (isFetchingLatestMessages) {
-			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent(true));
+			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 		}
 
@@ -284,7 +289,7 @@ export const loadMoreMessage = createAsyncThunk(
 			// - loading
 			// - already have message to jump to
 			// Potential bug: if the idMessageToJump is not removed, the user will not be able to load more messages
-			if ((state.isJumpingToPresent && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
+			if ((state.isJumpingToPresent[channelId] && !fromMobile) || state.loadingStatus === 'loading' || state.idMessageToJump) {
 				return;
 			}
 
@@ -406,6 +411,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 
 type SendMessagePayload = {
 	clanId: string;
+	parentId: string;
 	channelId: string;
 	content: IMessageSendPayload;
 	mentions?: Array<ApiMessageMention>;
@@ -416,37 +422,82 @@ type SendMessagePayload = {
 	mode: number;
 	senderId: string;
 	isPublic: boolean;
+	isParentPublic: boolean;
+	avatar?: string;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
-	const { content, mentions, attachments, references, anonymous, mentionEveryone, channelId, mode, isPublic, clanId, senderId } = payload;
+	const {
+		content,
+		mentions,
+		attachments,
+		references,
+		anonymous,
+		mentionEveryone,
+		parentId,
+		channelId,
+		mode,
+		isPublic,
+		isParentPublic,
+		clanId,
+		senderId,
+		avatar
+	} = payload;
 	const id = Date.now().toString();
 
 	async function doSend() {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-		const session = mezon.sessionRef.current;
-		const client = mezon.clientRef.current;
-		const socket = mezon.socketRef.current;
+			const session = mezon.sessionRef.current;
+			const client = mezon.clientRef.current;
+			const socket = mezon.socketRef.current;
 
-		if (!client || !session || !socket || !channelId) {
-			throw new Error('Client is not initialized');
+			if (!client || !session || !socket || !channelId) {
+				throw new Error('Client is not initialized');
+			}
+
+			let uploadedFiles: ApiMessageAttachment[] = [];
+			// Check if there are attachments
+			if (attachments && attachments.length > 0) {
+				const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
+				const nonDirectAttachments = attachments.filter(
+					(att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon)
+				);
+
+				if (nonDirectAttachments.length > 0) {
+					const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
+					const uploadPromises = createdFiles.map((file, index) => {
+						return handleUploadFile(client, session, clanId, channelId, file.name, file, index);
+					});
+
+					const uploadedNonDirectFiles = await Promise.all(uploadPromises);
+					uploadedFiles = [...uploadedFiles, ...uploadedNonDirectFiles];
+				}
+
+				uploadedFiles = [...uploadedFiles, ...directLinks.map((link) => ({ url: link.url, filetype: link.filetype }))];
+			}
+
+			const res = await socket.writeChatMessage(
+				clanId,
+				parentId,
+				channelId,
+				mode,
+				isPublic,
+				isParentPublic,
+				content,
+				mentions,
+				uploadedFiles,
+				references,
+				anonymous,
+				mentionEveryone
+			);
+
+			return res;
+		} catch (error) {
+			console.error('Failed to send message:', error);
+			throw error;
 		}
-
-		const res = await socket.writeChatMessage(
-			clanId,
-			channelId,
-			mode,
-			isPublic,
-			content,
-			mentions,
-			attachments,
-			references,
-			anonymous,
-			mentionEveryone
-		);
-
-		return res;
 	}
 
 	async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
@@ -474,7 +525,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			create_time: new Date().toISOString(),
 			sender_id: senderId,
 			username: '',
-			avatar: '',
+			avatar: avatar,
 			isSending: true,
 			references: [],
 			isMe: true
@@ -539,16 +590,18 @@ export const updateTypingUsers = createAsyncThunk(
 
 export type SendMessageArgs = {
 	clanId: string;
+	parentId: string;
 	channelId: string;
 	mode: number;
 	isPublic: boolean;
+	isParentPublic: boolean;
 };
 
 export const sendTypingUser = createAsyncThunk(
 	'messages/sendTypingUser',
-	async ({ clanId, channelId, mode, isPublic }: SendMessageArgs, thunkAPI) => {
+	async ({ clanId, parentId, channelId, mode, isPublic, isParentPublic }: SendMessageArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic);
+		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, parentId, channelId, mode, isPublic, isParentPublic);
 		return ack;
 	}
 );
@@ -583,9 +636,10 @@ export const initialMessagesState: MessagesState = {
 	channelDraftMessage: {},
 	isFocused: false,
 	isViewingOlderMessagesByChannelId: {},
-	isJumpingToPresent: false,
+	isJumpingToPresent: {},
 	idMessageToJump: '',
-	newMesssageUpdateImage: { message_id: '' }
+	newMesssageUpdateImage: { message_id: '' },
+	channelIdLastFetch: ''
 };
 
 export type SetCursorChannelArgs = {
@@ -609,27 +663,28 @@ export const messagesSlice = createSlice({
 		setFirstMessageId: (state, action: PayloadAction<{ channelId: string; firstMessageId: string }>) => {
 			state.firstMessageId[action.payload.channelId] = action.payload.firstMessageId;
 		},
+		setChannelIdLastFetch: (state, action: PayloadAction<{ channelId: string }>) => {
+			state.channelIdLastFetch = action.payload.channelId;
+		},
 		setIdMessageToJump(state, action) {
 			state.idMessageToJump = action.payload;
-		},
-
-		setNewMessageToUpdateImage(state, action) {
-			const data = action.payload;
-			state.newMesssageUpdateImage = {
-				channel_id: data.channel_id,
-				message_id: data.message_id,
-				clan_id: data.clan_id,
-				mode: data.mode,
-				mentions: data.mentions,
-				content: data.content,
-				isMe: data.isMe
-			};
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
 
 			if (!channelId || !messageId) return state;
+			state.newMesssageUpdateImage = {
+				channel_id: action.payload.channel_id,
+				message_id: action.payload.id,
+				clan_id: action.payload.clan_id,
+				mode: action.payload.mode,
+				mentions: action.payload.mentions,
+				content: action.payload.content,
+				isMe: action.payload.isMe,
+				code: action.payload.code,
+				attachments: action.payload.attachments
+			};
 
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
@@ -811,8 +866,8 @@ export const messagesSlice = createSlice({
 		deleteChannelDraftMessage(state, action: PayloadAction<{ channelId: string }>) {
 			delete state.channelDraftMessage[action.payload.channelId];
 		},
-		setIsJumpingToPresent(state, action: PayloadAction<boolean>) {
-			state.isJumpingToPresent = action.payload;
+		setIsJumpingToPresent(state, action: PayloadAction<{ channelId: string; status: boolean }>) {
+			state.isJumpingToPresent[action.payload.channelId] = action.payload.status;
 		},
 		updateUserMessage: (state, action: PayloadAction<{ userId: string; clanId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanId, clanNick, clanAvt } = action.payload;
@@ -880,8 +935,9 @@ export const messagesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			})
-			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state) => {
-				state.isJumpingToPresent = true;
+			.addMatcher(isAnyOf(addNewMessage.fulfilled, addNewMessage.rejected), (state, action) => {
+				const channelId = action?.meta?.arg?.channel_id;
+				state.isJumpingToPresent[channelId] = true;
 			});
 	}
 });
@@ -1153,7 +1209,7 @@ export const selectIsMessageIdExist = (channelId: string, messageId: string) =>
 		return Boolean(state.channelMessages[channelId]?.entities[messageId]);
 	});
 
-export const selectIsJumpingToPresent = createSelector(getMessagesState, (state) => state.isJumpingToPresent);
+export const selectIsJumpingToPresent = (channelId: string) => createSelector(getMessagesState, (state) => state.isJumpingToPresent[channelId]);
 
 export const selectIdMessageToJump = createSelector(getMessagesState, (state: MessagesState) => state.idMessageToJump);
 export const selectNewMesssageUpdateImage = createSelector(getMessagesState, (state: MessagesState) => state.newMesssageUpdateImage);

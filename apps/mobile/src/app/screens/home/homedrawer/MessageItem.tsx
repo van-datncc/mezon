@@ -19,7 +19,7 @@ import {
 	MessagesEntity,
 	selectAllAccount,
 	selectAllRolesClan,
-	selectAllUsesClan,
+	selectAllUserClans,
 	selectIdMessageToJump,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -28,8 +28,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
-import { MessageAction } from './components';
-import { RenderTextMarkdownContent } from './constants';
+import { MessageAction, RenderTextMarkdownContent } from './components';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -90,7 +89,7 @@ const MessageItem = React.memo(
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const userProfile = useSelector(selectAllAccount);
 		const idMessageToJump = useSelector(selectIdMessageToJump);
-		const usersClan = useSelector(selectAllUsesClan);
+		const usersClan = useSelector(selectAllUserClans);
 		const rolesInClan = useSelector(selectAllRolesClan);
 
 		const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
@@ -336,7 +335,7 @@ const MessageItem = React.memo(
 						checkMessageTargetToMoved && styles.highlightMessageReply
 					]}
 				>
-					{!!messageReferences && (
+					{!!messageReferences && !!messageReferences?.message_ref_id && (
 						<MessageReferences
 							messageReferences={messageReferences}
 							preventAction={preventAction}

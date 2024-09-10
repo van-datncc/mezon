@@ -13,7 +13,7 @@ import {
 	setSelectedRoleId
 } from '@mezon/store';
 import { useDispatch, useSelector } from 'react-redux';
-import SettingUserClanProfileSave from '../../SettingProfile/SettingRightClanProfile/SettingUserClanProfileSave';
+import { SettingUserClanProfileSave } from '../../SettingProfile/SettingRightClanProfile/SettingUserClanProfileSave';
 import SettingListRole from './SettingListRole';
 import SettingValueDisplayRole from './SettingOptionRole';
 type EditNewRole = {

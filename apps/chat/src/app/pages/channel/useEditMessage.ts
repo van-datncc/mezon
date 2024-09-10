@@ -1,7 +1,16 @@
 import { useChatSending } from '@mezon/core';
-import { messagesActions, referencesActions, selectIdMessageRefEdit, selectOpenEditMessageState } from '@mezon/store';
+import {
+	messagesActions,
+	referencesActions,
+	selectChannelById,
+	selectDirectById,
+	selectIdMessageRefEdit,
+	selectOpenEditMessageState
+} from '@mezon/store';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { useProcessLink } from 'libs/core/src/lib/chat/hooks/useProcessLink';
+import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,8 +23,19 @@ export const useEditMessage = (channelId: string, channelLabel: string, mode: nu
 		return message.attachments;
 	}, [message.attachments]);
 
+	const selectedChannel = useSelector(selectChannelById(channelId));
+	const selectedDirect = useSelector(selectDirectById(channelId));
+
+	const currentDirectOrChannel = useMemo(() => {
+		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+			return selectedChannel;
+		} else {
+			return selectedDirect;
+		}
+	}, [mode, selectedChannel, selectedDirect]);
+
 	const dispatch = useDispatch();
-	const { editSendMessage, updateImageLinkMessage } = useChatSending({ channelId: channelId || '', mode });
+	const { editSendMessage, updateImageLinkMessage } = useChatSending({ channelOrDirect: currentDirectOrChannel, mode });
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 

@@ -8,15 +8,15 @@ import { useSelector } from 'react-redux';
 import { ModalSettingSave } from '../../ClanSettings/SettingRoleManagement';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingRightClanCard from '../SettingUserClanProfileCard';
-import SettingUserClanProfileSave from './SettingUserClanProfileSave';
+import { SettingUserClanProfileSave } from './SettingUserClanProfileSave';
 
-interface SettingRightClanEditProps {
+interface SettingUserClanProfileEditProps {
 	flagOption: boolean;
 	setFlagOption: (flagOption: boolean) => void;
 	clanId: string;
 }
 
-const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption, clanId, setFlagOption }) => {
+const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({ flagOption, clanId, setFlagOption }) => {
 	const { userProfile } = useAuth();
 	const { sessionRef, clientRef } = useMezon();
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId ?? '', userProfile?.user?.id ?? ''));
@@ -159,4 +159,4 @@ const SettingRightClanEdit: React.FC<SettingRightClanEditProps> = ({ flagOption,
 		</>
 	);
 };
-export default SettingRightClanEdit;
+export default SettingUserClanProfileEdit;

@@ -18,7 +18,7 @@ const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
 	};
 
 	return (
-		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[58px] border-b dark:border-gray-800 border-white">
+		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[60px] border-b-[1px] dark:border-bgTertiary border-bgLightTertiary">
 			<div className="flex flex-row items-center gap-2 pointer-events-none">
 				<Icons.ThreadIcon />
 				<span className="text-base font-semibold dark:text-white text-colorTextLightMode">

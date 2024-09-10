@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import MezonButton from '../../../temp-ui/MezonButton2';
+import MezonButton, { EMezonButtonTheme } from '../../../temp-ui/MezonButton2';
 import EventItem from '../../Event/EventItem';
 import { style } from './styles';
 
@@ -24,19 +24,23 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 		headerTitle: t('screens.eventPreview.headerTitle'),
 		headerTitleStyle: {
 			fontSize: Fonts.size.h7,
-			color: themeValue.textDisabled,
+			color: themeValue.textDisabled
 		},
 		headerLeft: () => (
 			<TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
-				<Icons.ArrowLargeLeftIcon height={18} width={18} color={themeValue.textStrong} />
+				<Icons.ArrowLargeLeftIcon height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
 			</TouchableOpacity>
 		),
 		headerRight: () => (
 			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
-				<Icons.CloseLargeIcon height={18} width={18} color={themeValue.textStrong} />
+				<Icons.CloseLargeIcon height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
 			</TouchableOpacity>
-		),
+		)
 	});
+	const convertToLocalTime = (utcDate) => {
+		const timezoneOffset = utcDate.getTimezoneOffset();
+		return new Date(utcDate.getTime() - timezoneOffset * 60000).toISOString();
+	};
 
 	function handleClose() {
 		onGoBack?.();
@@ -44,13 +48,12 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 	}
 
 	async function handleCreate() {
-		const timeValueStart = (startTime as Date).toISOString();
-		const timeValueEnd = (endTime as Date).toISOString();
-
+		const timeValueStart = convertToLocalTime(startTime);
+		const timeValueEnd = convertToLocalTime(endTime);
 		if (type === OptionEvent.OPTION_SPEAKER) {
-			await createEventManagement(currentClanId || '', channelId, title, title, timeValueStart, timeValueStart, description, '');
+			await createEventManagement(currentClanId || '', channelId, location, title, timeValueStart, timeValueStart, description, '');
 		} else {
-			await createEventManagement(currentClanId || '', channelId, title, title, timeValueStart, timeValueEnd, description, '');
+			await createEventManagement(currentClanId || '', channelId, location, title, timeValueStart, timeValueEnd, description, '');
 		}
 		onGoBack?.();
 		navigation.navigate(APP_SCREEN.HOME);
@@ -68,7 +71,7 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 						creator_id: myUser.userId,
 						title: title,
 						description: description,
-						channel_id: channelId,
+						channel_id: channelId
 					}}
 					showActions={false}
 				/>
@@ -84,7 +87,12 @@ export default function EventCreatorPreview({ navigation, route }: MenuClanScree
 			</View>
 
 			<View style={styles.btnWrapper}>
-				<MezonButton title={t('actions.create')} titleStyle={{ fontSize: Fonts.size.h7 }} type="success" onPress={handleCreate} />
+				<MezonButton
+					title={t('actions.create')}
+					titleStyle={{ fontSize: Fonts.size.h7 }}
+					type={EMezonButtonTheme.SUCCESS}
+					onPress={handleCreate}
+				/>
 			</View>
 		</View>
 	);

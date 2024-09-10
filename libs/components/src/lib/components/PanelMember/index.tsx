@@ -15,7 +15,7 @@ import {
 	selectCurrentClan,
 	selectDmGroupCurrent,
 	selectFriendStatus,
-	selectMemberByUserId,
+	selectMemberClanByUserId
 } from '@mezon/store';
 import { ChannelMembersEntity, EPermission, EUserSettings } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -44,7 +44,7 @@ type PanelMemberProps = {
 };
 
 const useCheckRoleAdminMember = (userId: string) => {
-	const userById = useSelector(selectMemberByUserId(userId));
+	const userById = useSelector(selectMemberClanByUserId(userId));
 	const RolesClan = useSelector(selectAllRolesClan);
 	const userRolesClan = useMemo(() => {
 		return userById?.role_id ? RolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];

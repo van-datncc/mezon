@@ -1,18 +1,17 @@
 import { Icons } from '@mezon/components';
-import { selectAllUsesClan } from '@mezon/store';
+import { useMemberContext } from '@mezon/core';
 import { Dropdown, Pagination } from 'flowbite-react';
 import { useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import MemberTopBar from './MemberTopBar';
 import TableMember from './TableMember';
 
 const MemberClan = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pageSize, setPageSize] = useState(5);
-	const usersClan = useSelector(selectAllUsesClan);
+	const { filteredMembers } = useMemberContext();
 	const totalPages = useMemo(() => {
-		return Math.ceil(usersClan.length / pageSize);
-	}, [usersClan.length, pageSize]);
+		return Math.ceil(filteredMembers.length / pageSize);
+	}, [filteredMembers.length, pageSize]);
 
 	const onPageChange = (page: number) => {
 		setCurrentPage(page);
@@ -28,7 +27,7 @@ const MemberClan = () => {
 			<div className="flex flex-col dark:bg-bgPrimary bg-bgLightMode rounded-lg dark:text-textDarkTheme text-textLightTheme">
 				<MemberTopBar />
 
-				<TableMember currentPage={currentPage} pageSize={pageSize} />
+				<TableMember dataMember={filteredMembers} currentPage={currentPage} pageSize={pageSize} />
 
 				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-[1px] dark:border-borderDivider border-buttonLightTertiary mb-2">
 					<div className={'flex flex-row items-center'}>
@@ -66,7 +65,7 @@ const MemberClan = () => {
 								10
 							</Dropdown.Item>
 						</Dropdown>
-						members of {usersClan.length}
+						members of {filteredMembers.length}
 					</div>
 					<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
 				</div>

@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { selectChannelById, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import {
 	MessagesEntity,
 	appActions,
@@ -15,7 +15,6 @@ import {
 } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useImage } from 'apps/mobile/src/app/hooks/useImage';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +22,7 @@ import { Alert, DeviceEventEmitter, Platform, Pressable, Text, View } from 'reac
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { useImage } from '../../../../../hooks/useImage';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType, EMessageBSToShow } from '../../enums';
 import { IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
@@ -37,17 +37,18 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const { userProfile } = useAuth();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '', isPublic = false  } = props;
+	const { type, onClose, onConfirmAction, message, mode, isOnlyEmojiPicker = false, user, senderDisplayName = '' } = props;
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 	const timeoutRef = useRef(null);
 	const [content, setContent] = useState<React.ReactNode>(<View />);
 	const { t } = useTranslation(['message']);
 	const { reactionMessageDispatch } = useChatReaction();
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
-
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 
 	const { isCanDeleteMessage, isCanManageThread } = useUserPermission();
 	const { downloadImage, saveImageToCameraRoll } = useImage();
@@ -139,22 +140,28 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		);
 	};
 
-	const handleActionPinMessage = () => {
+	const handleActionPinMessage = async () => {
 		if (message) onClose();
-		timeoutRef.current = setTimeout(() => {
-			onConfirmAction({
-				type: EMessageActionType.PinMessage
-			});
-		}, 500);
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.PinMessage
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0
+		);
 	};
 
 	const handleActionUnPinMessage = () => {
 		if (message) onClose();
-		timeoutRef.current = setTimeout(() => {
-			onConfirmAction({
-				type: EMessageActionType.UnPinMessage
-			});
-		}, 500);
+		timeoutRef.current = setTimeout(
+			() => {
+				onConfirmAction({
+					type: EMessageActionType.UnPinMessage
+				});
+			},
+			Platform.OS === 'ios' ? 500 : 0
+		);
 	};
 
 	const handleActionMarkUnRead = () => {
@@ -333,7 +340,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		const isHideCreateThread = isDM || !isCanManageThread;
 		const isHideDeleteMessage = !((isCanDeleteMessage && !isDM) || isMyMessage);
 
-		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
+		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
 		const listOfActionShouldHide = [
@@ -377,6 +384,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+			currentChannel?.parrent_id || '',
 			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (message?.clan_id ?? currentClanId),
 			message.channel_id ?? '',
 			messageId ?? '',
@@ -385,7 +393,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			1,
 			senderId ?? '',
 			false,
-			true
+			true,
+			parent ? !parent.channel_private : false
 		);
 		onClose();
 	};
@@ -424,7 +433,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					})}
 
 					<Pressable onPress={() => setIsShowEmojiPicker(true)} style={{ height: size.s_28, width: size.s_28 }}>
-						<Icons.ReactionIcon color={themeValue.text} />
+						<Icons.ReactionIcon color={themeValue.text} height={size.s_24} width={size.s_24} />
 					</Pressable>
 				</View>
 				<View style={styles.messageActionGroup}>
@@ -509,5 +518,14 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		}
 	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
 
-	return <View style={[styles.bottomSheetWrapper, { backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }]}>{content}</View>;
+	return (
+		<View
+			style={[
+				styles.bottomSheetWrapper,
+				{ backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }
+			]}
+		>
+			{content}
+		</View>
+	);
 });

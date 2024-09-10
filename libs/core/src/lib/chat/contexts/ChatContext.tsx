@@ -20,17 +20,20 @@ import {
 	notificationActions,
 	pinMessageActions,
 	reactionActions,
+	selectChannelsByClanId,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDmGroupCurrentId,
+	selectModeResponsive,
 	toastActions,
 	useAppDispatch,
+	useAppSelector,
 	usersClanActions,
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { NotificationCode } from '@mezon/utils';
+import { ModeResponsive, NotificationCode } from '@mezon/utils';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -82,6 +85,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const modeResponsive = useSelector(selectModeResponsive);
+	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
 
 	const clanIdActive = useMemo(() => {
@@ -156,13 +161,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const onlineStatus = channelStreamPresence.joins.map((join) => {
 					return { userId: join.user_id, status: true };
 				});
-				dispatch(channelMembersActions.setManyStatusUser(onlineStatus));
+				dispatch(usersClanActions.setManyStatusUser(onlineStatus));
 			}
 			if (channelStreamPresence.leaves.length > 0) {
 				const offlineStatus = channelStreamPresence.leaves.map((leave) => {
 					return { userId: leave.user_id, status: false };
 				});
-				dispatch(channelMembersActions.setManyStatusUser(offlineStatus));
+				dispatch(usersClanActions.setManyStatusUser(offlineStatus));
 			}
 		},
 		[dispatch]
@@ -246,7 +251,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndClanId({ userId: id, clanId: user.clan_id }));
+					dispatch(channelMembers.actions.removeUserByUserIdAndClan({ userId: id, channelIds: channels.map((item) => item.id) }));
+					dispatch(usersClanActions.remove(id));
 				}
 			});
 		},
@@ -268,9 +274,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(
 						channelsActions.joinChat({
 							clanId: userAdds.clan_id,
+							parentId: userAdds.parent_id,
 							channelId: userAdds.channel_id,
 							channelType: userAdds.channel_type,
-							isPublic: userAdds.is_public
+							isPublic: userAdds.is_public,
+							isParentPublic: userAdds.is_parent_public
 						})
 					);
 				}
@@ -294,6 +302,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserclanadded = useCallback(
 		(userJoinClan: AddClanUserEvent) => {
+			if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
+				return;
+			}
+			dispatch(
+				usersClanActions.add({
+					...userJoinClan,
+					id: userJoinClan?.user?.user_id
+				})
+			);
 			dispatch(channelMembersActions.addUserJoinClan(userJoinClan));
 		},
 		[dispatch]
@@ -302,7 +319,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
 			dispatch(
-				channelMembersActions.updateUserChannel({
+				usersClanActions.updateUserChannel({
 					userId: ClanProfileUpdates.user_id,
 					clanId: ClanProfileUpdates.clan_id,
 					clanNick: ClanProfileUpdates.clan_nick,
@@ -372,9 +389,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(
 						channelsActions.joinChat({
 							clanId: channelCreated.clan_id,
+							parentId: channelCreated.parent_id,
 							channelId: channelCreated.channel_id,
 							channelType: channelCreated.channel_type,
-							isPublic: !channelCreated.channel_private
+							isPublic: !channelCreated.channel_private,
+							isParentPublic: channelCreated.is_parent_public
 						})
 					);
 				}
