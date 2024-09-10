@@ -143,6 +143,7 @@ const ModalUserProfile = ({
 				isAnonymous={checkAnonymous}
 				userID={userID}
 				positionType={positionType}
+				isFooterProfile={isFooterProfile}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
