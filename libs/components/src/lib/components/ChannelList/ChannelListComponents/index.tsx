@@ -1,12 +1,12 @@
 import { useAppNavigation, useAppParams, useClans } from '@mezon/core';
-import { selectAllEventManagement, selectCurrentClanId, selectNumberEvent, selectShowNumEvent } from '@mezon/store';
+import { eventManagementActions, EventManagementOnGogoing, selectCurrentClanId, selectNumberEvent, selectOngoingEvent, selectShowNumEvent } from '@mezon/store';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import * as Icons from '../../../../../../ui/src/lib/Icons';
 import EventModal from '../EventChannelModal';
 
-const EventNotification = ({ event, onClose } : any) => (
+const EventNotification = ({ event, onClose } : {event : EventManagementOnGogoing, onClose : ()=> void}) => (
 	<div className='w-[90%] mx-auto my-2 text-sm'>
 	  <div className='flex justify-between'>
 		<div className='flex items-center'>
@@ -29,15 +29,14 @@ const EventNotification = ({ event, onClose } : any) => (
 export const Events = () => {
 	const { toMembersPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
+	const dispatch =  useDispatch()
 	const numberEventManagement = useSelector(selectNumberEvent);
-	const eventManagements = useSelector(selectAllEventManagement);
+	const ongoingEvent = useSelector(selectOngoingEvent)
 	
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
 	const [showModal, setShowModal] = useState(false);
-	const [showEventStart, setShowEventStart] = useState(true)
-	const [currentEvent, setCurrentEvent] = useState()
 	const closeModal = () => {
 		setShowModal(false);
 	};
@@ -50,14 +49,14 @@ export const Events = () => {
 	const memberPath = toMembersPage(currentClanId || '');
 
 	const handleCloseEvent = ()=> {
-		setShowEventStart(false)
+		dispatch(eventManagementActions.clearOngoingEvent(null))
 	}
 	return (
 		<>
 			{
-				showEventStart &&
+				ongoingEvent && 
 				<EventNotification
-					event={eventManagements[0]}
+					event={ongoingEvent}
 					onClose={handleCloseEvent}
         		/>
 			}

@@ -62,6 +62,19 @@ type CreateEventManagementyload = {
 	logo: string;
 };
 
+export type EventManagementOnGogoing = {
+	address: string;
+	channel_id: string;
+	clan_id: string;
+	description: string;
+	end_time: Date;
+	event_id: string;
+	event_status: string;
+	logo: string;
+	start_time: Date;
+	title: string;
+}
+  
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
 	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementyload, thunkAPI) => {
@@ -110,12 +123,14 @@ export interface EventManagementState extends EntityState<EventManagementEntity,
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	chooseEvent: EventManagementEntity | null;
+	ongoingEvent:  EventManagementOnGogoing | null;
 }
 
 export const initialEventManagementState: EventManagementState = eventManagementAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	chooseEvent: null
+	chooseEvent: null,
+	ongoingEvent: null
 });
 
 export const eventManagementSlice = createSlice({
@@ -138,6 +153,19 @@ export const eventManagementSlice = createSlice({
 					status: action.payload.event_status
 				}
 			})
+			
+			console.log(action.payload);
+			
+			if (action.payload.event_status === "ONGOING") {
+				state.ongoingEvent = action.payload
+			}
+			
+			if (action.payload.event_status === "FINISH") {
+				state.ongoingEvent = null
+			}
+		},
+		clearOngoingEvent: (state, action) => {
+			state.ongoingEvent = null
 		}
 	},
 	extraReducers: (builder) => {
@@ -177,3 +205,5 @@ export const selectEventManagementEntities = createSelector(getEventManagementSt
 export const selectNumberEvent = createSelector(selectAllEventManagement, (events) => events.length);
 
 export const selectChooseEvent = createSelector(getEventManagementState, (state) => state.chooseEvent);
+
+export const selectOngoingEvent = createSelector(getEventManagementState, (state) => state.ongoingEvent);

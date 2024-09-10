@@ -1,10 +1,10 @@
 import { useEventManagement, useOnClickOutside } from '@mezon/core';
-import { eventManagementActions, EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
+import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { OptionEvent } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
 import { compareDate, differenceTime, timeFomat } from '../timeFomatEvent';
@@ -93,21 +93,6 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 
 		return EEventStatus.UNKNOWN;
 	}, [start, event?.status]);
-
-	const dispath =  useDispatch()
-	const test = ()=> {
-		dispath(eventManagementActions.updateStatusEvent({
-			channel_id: "",
-			clan_id: "1823926896132362240",
-			description: "da",
-			end_time: "2024-09-09T23:00:00+07:00",
-			event_id: "1833351276469948416",
-			event_status: "ONGOING",
-			logo: "",
-			start_time: "2024-09-09T22:00:00+07:00",
-			title: "dsasd"
-	  }));
-	}
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
 	};
@@ -150,9 +135,6 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 			ref={panelRef}
 		>
 			{logo && <img src={logo} alt="logo" className="w-full max-h-[180px] object-cover" />}
-			<button onClick={ () =>test()}>
-				Test
-			</button>
 			<div className="p-4 border-b dark:border-slate-600 border-white">
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
