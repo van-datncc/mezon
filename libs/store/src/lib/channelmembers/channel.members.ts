@@ -411,11 +411,13 @@ export const selectMemberCustomStatusById = createSelector(
 export const selectChannelMemberByUserIds = (channelId: string, userIds: string[], isDm = true) =>
 	createSelector(getUsersClanState, getDirectState, (usersClanState, directs) => {
 		const users = isDm ? directs : usersClanState;
-		return userIds.map((userId) => {
+		const members: ChannelMembersEntity[] = [];
+		userIds.forEach((userId) => {
 			const userInfo = users.entities[isDm ? channelId : userId];
+			if (!userInfo) return;
 			if (isDm) {
 				const { usernames, channel_label } = userInfo as DirectEntity;
-				return {
+				members.push({
 					channelId,
 					userChannelId: channelId,
 					user: {
@@ -423,16 +425,17 @@ export const selectChannelMemberByUserIds = (channelId: string, userIds: string[
 						username: usernames,
 						display_name: channel_label
 					},
-					id: userInfo.id
-				} as ChannelMembersEntity;
+					id: userInfo?.id
+				} as ChannelMembersEntity);
 			}
-			return {
+			members.push({
 				channelId,
 				userChannelId: channelId,
 				...userInfo,
-				id: userInfo.id
-			} as ChannelMembersEntity;
+				id: userInfo?.id
+			} as ChannelMembersEntity);
 		});
+		return members;
 	});
 
 export const selectChannelMembersEntities = createSelector(getChannelMembersState, selectEntities);
