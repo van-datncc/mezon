@@ -43,7 +43,6 @@ type UserProfilePopupProps = {
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const getUserRemoved = useSelector(selectUserRemovedByChannelId(currentChannelId ?? ''));
-	console.log('getUserRemoved: ', getUserRemoved);
 
 	const allUserIds = useAppSelector((state) => selectMemberIdsByChannelId(state, currentChannelId as string));
 	const allRoleIds = useSelector(selectAllRoleIds);
