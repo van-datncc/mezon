@@ -414,7 +414,7 @@ export const selectChannelMemberByUserIds = (channelId: string, userIds: string[
 		return userIds.map((userId) => {
 			const userInfo = users.entities[isDm ? channelId : userId];
 			if (isDm) {
-				const { usernames, channel_label } = userInfo as DirectEntity;
+				const { usernames, channel_label } = userInfo as DirectEntity || {};
 				return {
 					channelId,
 					userChannelId: channelId,
@@ -423,14 +423,14 @@ export const selectChannelMemberByUserIds = (channelId: string, userIds: string[
 						username: usernames,
 						display_name: channel_label
 					},
-					id: userInfo.id
+					id: userInfo?.id
 				} as ChannelMembersEntity;
 			}
 			return {
 				channelId,
 				userChannelId: channelId,
 				...userInfo,
-				id: userInfo.id
+				id: userInfo?.id
 			} as ChannelMembersEntity;
 		});
 	});
