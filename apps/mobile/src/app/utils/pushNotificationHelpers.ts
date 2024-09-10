@@ -253,7 +253,7 @@ export const setupNotificationListeners = async (navigation) => {
 		name: 'mezon',
 		importance: AndroidImportance.HIGH,
 		vibration: true,
-		vibrationPattern: [300, 500],
+		vibrationPattern: [300, 500]
 	});
 
 	if (IS_ANDROID) {

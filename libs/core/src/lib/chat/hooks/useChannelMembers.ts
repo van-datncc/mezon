@@ -1,17 +1,22 @@
-import { selectAllChannelMembers, useAppSelector } from '@mezon/store';
+import { selectAllChannelMembers, selectChannelById, useAppSelector } from '@mezon/store';
+import { ChannelStreamMode } from 'mezon-js';
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 export type useChannelMembersOptions = {
 	channelId?: string | null;
+	mode: number;
 };
 
-export function useChannelMembers({ channelId }: useChannelMembersOptions = {}) {
-	const members = useAppSelector((state) => selectAllChannelMembers(state, channelId as string));
-
+export function useChannelMembers({ channelId, mode }: useChannelMembersOptions) {
+	const channel = useSelector(selectChannelById(channelId ?? ''));
+	const membersOfChild = useAppSelector((state) => (channelId ? selectAllChannelMembers(state, channelId as string) : null));
+	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel.parrent_id as string) : null));
 	return useMemo(
 		() => ({
-			members
+			membersOfParent: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? membersOfParent : membersOfChild,
+			membersOfChild
 		}),
-		[members]
+		[membersOfChild, membersOfParent, mode]
 	);
 }

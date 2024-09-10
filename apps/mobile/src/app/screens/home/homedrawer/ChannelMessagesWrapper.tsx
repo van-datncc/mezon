@@ -66,22 +66,25 @@ const ChannelMessagesWrapper = React.memo(({ channelId, parentId, clanId, mode, 
 		await socket.removeChatMessage(clanId || '', parentId || '', channelId, mode, isPublic, isParentPublic, messageId);
 	};
 
-	const onConfirmAction = useCallback((payload: IConfirmActionPayload) => {
-		const { type, message } = payload;
-		switch (type) {
-			case EMessageActionType.DeleteMessage:
-				onDeleteMessage(message?.id);
-				break;
-			case EMessageActionType.ForwardMessage:
-			case EMessageActionType.Report:
-			case EMessageActionType.PinMessage:
-			case EMessageActionType.UnPinMessage:
-				setCurrentMessageActionType(type);
-				break;
-			default:
-				break;
-		}
-	}, [onDeleteMessage, setCurrentMessageActionType]);
+	const onConfirmAction = useCallback(
+		(payload: IConfirmActionPayload) => {
+			const { type, message } = payload;
+			switch (type) {
+				case EMessageActionType.DeleteMessage:
+					onDeleteMessage(message?.id);
+					break;
+				case EMessageActionType.ForwardMessage:
+				case EMessageActionType.Report:
+				case EMessageActionType.PinMessage:
+				case EMessageActionType.UnPinMessage:
+					setCurrentMessageActionType(type);
+					break;
+				default:
+					break;
+			}
+		},
+		[onDeleteMessage, setCurrentMessageActionType]
+	);
 
 	const onOpenImage = useCallback(
 		async (image: AttachmentEntity) => {

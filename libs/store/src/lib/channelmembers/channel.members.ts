@@ -478,17 +478,17 @@ export const selectAllChannelMembers = createSelector(
 		if (isDm) return directs;
 		const members = isPrivate
 			? (channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
-				return {
-					...usersClanState.entities[memberId],
+					return {
+						...usersClanState.entities[memberId],
+						channelId,
+						userChannelId: channelId
+					};
+				}) as ChannelMembersEntity[]) || []
+			: Object.values(usersClanState.entities)?.map((member) => ({
+					...member,
 					channelId,
 					userChannelId: channelId
-				};
-			}) as ChannelMembersEntity[]) || []
-			: Object.values(usersClanState.entities)?.map((member) => ({
-				...member,
-				channelId,
-				userChannelId: channelId
-			}));
+				}));
 		return members;
 	}
 );
