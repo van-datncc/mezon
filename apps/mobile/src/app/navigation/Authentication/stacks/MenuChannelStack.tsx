@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import ChannelSetting from '../../../components/ChannelSetting';
 import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 import { ChannelPermissionSetting } from '../../../screens/channelPermissionSetting';
+import { AdvancedPermissionOverrides } from '../../../screens/channelPermissionSetting/AdvancedPermissionOverrides';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 type StackMenuChannelScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
@@ -57,6 +58,19 @@ export function MenuChannelStacks({}: any) {
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION} component={ChannelPermissionSetting} />
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES}
+				component={AdvancedPermissionOverrides}
+				options={{
+					headerTitle: t('menuChannelStack.permissionOverrides'),
+					headerStyle: {
+						backgroundColor: themeValue.secondary
+					},
+					headerTitleStyle: {
+						color: themeValue.textStrong
+					}
+				}}
+			/>
 		</Stack.Navigator>
 	);
 }

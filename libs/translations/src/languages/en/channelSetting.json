@@ -88,6 +88,19 @@
         "privateChannel": "Private Channel",
         "basicViewDescription": "By making a channel private, only select members and roles will be able to view this channel",
         "addMemberAndRoles": "Add members or roles",
-        "whoCanAccess": "Who can access"
+        "whoCanAccess": "Who can access",
+        "warningModal": {
+            "publicChannelTitle": "Make this channel open to everyone?",
+            "privateChannelTitle": "Make this channel private?",
+            "publicChannelContent": "{{channelLabel}} will become available to all members",
+            "privateChannelContent": "{{channelLabel}} will become private and visible to select members and roles",
+            "confirm": "Yes"
+        },
+        "bottomSheet": {
+            "addMembersOrRoles": "Add members or roles",
+            "add": "Add",
+            "roles": "ROLES",
+            "members": "MEMBERS"
+        }
     }
 }
