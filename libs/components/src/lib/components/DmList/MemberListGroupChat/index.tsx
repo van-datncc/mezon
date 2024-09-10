@@ -1,7 +1,6 @@
 import { useAppParams } from '@mezon/core';
-import { ChannelMembersEntity, selectMembersByChannelId } from '@mezon/store';
+import { ChannelMembersEntity, selectMembersByChannelId, useAppSelector } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
-import { useSelector } from 'react-redux';
 import MemberItem from '../../MemberList/MemberItem';
 
 export type MemberListProps = {
@@ -16,7 +15,7 @@ export type DataMemberCreate = {
 
 function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	const { directId } = useAppParams();
-	const rawMembers = useSelector(selectMembersByChannelId(directId as string));
+	const rawMembers = useAppSelector((state) => selectMembersByChannelId(state, directId as string));
 	const dataMemberCreate: DataMemberCreate = { createId: createId || '' };
 	return (
 		<div className="self-stretch h-[268px] flex-col justify-start items-start flex p-[24px] pt-[16px] pr-[24px] pb-[16px] pl-[16px] gap-[24px]">

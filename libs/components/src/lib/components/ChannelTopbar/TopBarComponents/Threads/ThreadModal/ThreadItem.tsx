@@ -1,6 +1,6 @@
 import { useAppNavigation, useChatMessages } from '@mezon/core';
 import { ChannelsEntity, selectMemberClanByUserId } from '@mezon/store';
-import { convertTimeMessage, IChannelMember } from '@mezon/utils';
+import { IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -88,7 +88,7 @@ const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps)
 				<div className="w-[120px]">
 					{avatarMembers && (
 						<Avatar.Group className="flex gap-3 justify-end items-center">
-							{previewAvatarList?.map((avatar) => <Avatar key={avatar} img={avatar} rounded size="xs" />)}
+							{previewAvatarList?.map((avatar, index) => <Avatar key={index} img={avatar} rounded size="xs" />)}
 							{avatarMembers && avatarMembers.length > 5 && (
 								<Avatar.Counter
 									total={avatarMembers?.length - 5 > 50 ? 50 : avatarMembers?.length - 5}

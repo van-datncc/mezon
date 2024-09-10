@@ -46,6 +46,7 @@ import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
 import { toastConfig } from '../configs/toastConfig';
+const MyStackComponent = lazy(() => import('./RootStack'));
 
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
@@ -146,7 +147,7 @@ const NavigationMain = () => {
 				}
 			}
 		},
-		[isFromFcmMobile],
+		[isFromFcmMobile, currentChannelId],
 	);
 
 	const messageLoaderBackground = useCallback(async () => {
@@ -177,7 +178,7 @@ const NavigationMain = () => {
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			return null;
 		} catch (error) {
-			alert('error messageLoaderBackground' + error.message);
+			// alert('error messageLoaderBackground' + error.message);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			console.log('error messageLoaderBackground', error);
 		}
@@ -250,7 +251,6 @@ const NavigationMain = () => {
 		[currentClanId],
 	);
 
-	const MyStackComponent = lazy(() => import('./RootStack'));
 
 	return (
 		<NavigationContainer>

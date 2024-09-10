@@ -109,7 +109,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				1,
 				messageEmoji?.sender_id ?? '',
 				false,
-				!currentChannel?.channel_private,
+				currentChannel ? !currentChannel.channel_private : false,
 				parent ? !parent.channel_private : false
 			);
 			setSubPanelActive(SubPanelName.NONE);

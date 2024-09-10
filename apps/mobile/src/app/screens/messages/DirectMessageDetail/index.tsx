@@ -34,7 +34,7 @@ function useChannelSeen(channelId: string) {
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
 			dispatch(directActions.updateLastSeenTime(lastMessage));
 		}
-	}, [channelId, dispatch, lastMessage]);
+	}, [channelId, dispatch]);
 }
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {
@@ -218,11 +218,13 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 						<View style={{ flex: 1 }}>
 							<ChannelMessagesWrapper
 								channelId={currentDmGroup.id}
+								parentId={''}
 								clanId={'0'}
 								mode={Number(
 									currentDmGroup?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP
 								)}
 								isPublic={false}
+								isParentPublic={false}
 								isDM={true}
 							/>
 						</View>
