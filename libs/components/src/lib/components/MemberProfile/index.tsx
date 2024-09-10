@@ -208,7 +208,7 @@ function MemberProfile({
 				onClick={(e) => e.stopPropagation()}
 			>
 				<ShortUserProfile
-					userID={user?.user?.id || ''}
+					userID={user?.id || ''}
 					mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
 					avatar={avatar}
 					name={name}

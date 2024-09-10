@@ -1,4 +1,4 @@
-import { IChannel, IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
+import { IChannelMember, LoadingStatus, RemoveChannelUsers } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
@@ -474,7 +474,15 @@ export const selectMemberStatusById = createSelector(
 	],
 	(usersClanState, directs, payload) => {
 		const [userId, currentDirectMessageId] = payload.split(',');
-		const user = usersClanState?.entities[userId] || directs.entities[currentDirectMessageId];
-		return user?.user?.online || (user as IChannel)?.is_online?.[0] || false;
+		const userClan = usersClanState.entities[userId];
+		const userGroup = directs.entities[currentDirectMessageId];
+		if (userClan) {
+			return userClan.user?.online;
+		}
+		const index = userGroup?.user_id?.findIndex((item) => item === userId) ?? -1;
+		if (index === -1) {
+			return false;
+		}
+		return userGroup?.is_online?.[index] || false;
 	}
 );
