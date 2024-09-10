@@ -348,36 +348,6 @@ export const getChannelMembersState = (rootState: { [CHANNEL_MEMBERS_FEATURE_KEY
 
 const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 
-export const selectAllChannelMembers = createSelector(
-	[
-		getChannelMembersState,
-		getUsersClanState,
-		(state, channelId: string) => {
-			const isPrivate = state.channels?.entities[channelId]?.channel_private;
-			//Todo: addtion parrent channel is private
-			return `${channelId},${isPrivate}`;
-		}
-	],
-	(channelMembersState, getUsersClanState, payload) => {
-		const [channelId, isPrivate] = payload.split(',');
-		const members =
-			isPrivate === 'true'
-				? (channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
-						return {
-							...getUsersClanState.entities[memberId],
-							channelId,
-							userChannelId: channelId
-						};
-					}) as ChannelMembersEntity[]) || []
-				: Object.values(getUsersClanState.entities)?.map((member) => ({
-						...member,
-						channelId,
-						userChannelId: channelId
-					}));
-		return members;
-	}
-);
-
 export const selectMemberByGoogleId = (googleId: string) =>
 	createSelector(getUsersClanState, (members) => {
 		return Object.values(members.entities).find((user) => user.user?.google_id === googleId);
@@ -416,11 +386,13 @@ export const selectChannelMemberByUserIds = createSelector(
 		const [channelId, userIds, isDm] = payload.split(',');
 		const users = isDm ? directs : usersClanState;
 		if (!userIds.trim()) return [];
-		return userIds.split('/')?.map((userId) => {
+		const members: ChannelMembersEntity[] = [];
+		userIds.split('/')?.forEach((userId) => {
 			const userInfo = users.entities[isDm ? channelId : userId];
-			if (isDm && userInfo) {
+			if (!userInfo) return;
+			if (isDm) {
 				const { usernames, channel_label } = userInfo as DirectEntity;
-				return {
+				members.push({
 					channelId,
 					userChannelId: channelId,
 					user: {
@@ -429,15 +401,17 @@ export const selectChannelMemberByUserIds = createSelector(
 						display_name: channel_label
 					},
 					id: userInfo.id
-				} as ChannelMembersEntity;
+				});
 			}
-			return {
+			members.push({
 				channelId,
 				userChannelId: channelId,
 				...userInfo,
 				id: userInfo?.id
-			} as ChannelMembersEntity;
+			} as ChannelMembersEntity);
 		});
+
+		return members as ChannelMembersEntity[];
 	}
 );
 
@@ -484,5 +458,38 @@ export const selectMemberStatusById = createSelector(
 			return false;
 		}
 		return userGroup?.is_online?.[index] || false;
+	}
+);
+
+export const selectAllChannelMembers = createSelector(
+	[
+		getChannelMembersState,
+		getUsersClanState,
+		selectGrouplMembers,
+		(state, channelId: string) => {
+			const channel = state.channels?.entities[channelId];
+			const parentChannel = state.channels?.entities[channel?.parrent_id];
+			const isPrivate = channel?.channel_private || parentChannel?.channel_private || '';
+			const isDm = state.direct?.currentDirectMessageId === channelId || '';
+			return `${channelId},${isPrivate},${isDm}`;
+		}
+	],
+	(channelMembersState, usersClanState, directs, payload) => {
+		const [channelId, isPrivate, isDm] = payload.split(',');
+		if (isDm) return directs;
+		const members = isPrivate
+			? (channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
+					return {
+						...usersClanState.entities[memberId],
+						channelId,
+						userChannelId: channelId
+					};
+				}) as ChannelMembersEntity[]) || []
+			: Object.values(usersClanState.entities)?.map((member) => ({
+					...member,
+					channelId,
+					userChannelId: channelId
+				}));
+		return members;
 	}
 );
