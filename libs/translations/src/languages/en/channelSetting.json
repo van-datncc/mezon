@@ -89,5 +89,9 @@
         "basicViewDescription": "By making a channel private, only select members and roles will be able to view this channel",
         "addMemberAndRoles": "Add members or roles",
         "whoCanAccess": "Who can access"
+    },
+    "changeCategory": {
+        "title": "Change Category",
+        "label": "MOVE FROM {{currentChannel}} TO"
     }
 }
