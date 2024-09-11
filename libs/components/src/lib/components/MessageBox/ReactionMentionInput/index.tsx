@@ -151,6 +151,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const [undoHistory, setUndoHistory] = useState<string[]>([]);
+	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
 	const currentDmOrChannelId = useMemo(
 		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
@@ -188,12 +190,49 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		callback(matches);
 	};
 
+	const onPaste = useCallback(
+		(event: any) => {
+			event.preventDefault();
+
+			setUndoHistory((prevHistory) => [...prevHistory, request?.valueTextInput || '']);
+
+			if (props.handlePaste) {
+				props.handlePaste(event);
+			}
+		},
+		[request, props]
+	);
+
 	const { trackEnterPress } = useEnterPressTracker();
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
-		const { key, ctrlKey, shiftKey } = event;
+		const { key, ctrlKey, shiftKey, metaKey } = event;
 		const isEnterKey = key === 'Enter';
 		const isComposing = event.nativeEvent.isComposing;
+
+		if ((ctrlKey || metaKey) && (key === 'z' || key === 'Z')) {
+			event.preventDefault();
+			if (undoHistory.length > 0) {
+				const previousValue = undoHistory[undoHistory.length - 1];
+				setRedoHistory((prevRedoHistory) => [request.valueTextInput, ...prevRedoHistory]);
+				setUndoHistory((prevUndoHistory) => prevUndoHistory.slice(0, prevUndoHistory.length - 1));
+				setRequestInput({
+					...request,
+					valueTextInput: previousValue
+				});
+			}
+		} else if ((ctrlKey || metaKey) && (key === 'y' || key === 'Y')) {
+			event.preventDefault();
+			if (redoHistory.length > 0) {
+				const nextValue = redoHistory[0];
+				setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request.valueTextInput]);
+				setRedoHistory((prevRedoHistory) => prevRedoHistory.slice(1));
+				setRequestInput({
+					...request,
+					valueTextInput: nextValue
+				});
+			}
+		}
 
 		if (isEnterKey && ctrlKey && shiftKey) {
 			event.preventDefault();
@@ -427,6 +466,8 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 
 	const onChangeMentionInput: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		dispatch(threadsActions.setMessageThreadError(''));
+		setUndoHistory((prevUndoHistory) => [...prevUndoHistory, request?.valueTextInput || '']);
+		setRedoHistory([]);
 		setRequestInput({ ...request, valueTextInput: newValue, content: newPlainTextValue, mentionRaw: mentions }, props.isThread);
 		if (mentions.some((mention) => mention.display === TITLE_MENTION_HERE)) {
 			setMentionEveryone(true);
@@ -600,7 +641,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				<span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>
 			)}
 			<MentionsInput
-				onPaste={props.handlePaste}
+				onPaste={onPaste}
 				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughs here..."
