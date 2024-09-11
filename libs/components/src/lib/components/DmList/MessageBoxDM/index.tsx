@@ -1,7 +1,7 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import { RootState, referencesActions, selectAttachmentByChannelId, selectDataReferences } from '@mezon/store';
-import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
+import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj, getBottomPopupClass } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,6 +30,8 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 	const hasAttachment = useMemo(() => {
 		return attachmentFilteredByChannelId?.files.length > 0;
 	}, [attachmentFilteredByChannelId]);
+
+	const bottomPopup = getBottomPopupClass(hasAttachment, dataReferences.message_ref_id ?? '');
 
 	const handleSend = useCallback(
 		(
@@ -81,7 +83,7 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className={`z-20 max-sbm:bottom-[60px] ${hasAttachment ? 'bottom-[320px]' : 'bottom-[76px]'}  right-[2px] absolute `}
+					className={`max-sbm:bottom-[60px] ${bottomPopup}  right-[2px] absolute `}
 				>
 					<GifStickerEmojiPopup channelOrDirect={direct} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
