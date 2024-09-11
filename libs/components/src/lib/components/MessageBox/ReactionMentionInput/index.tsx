@@ -222,7 +222,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
-	const addMemberToChannel = useCallback(
+	const addMemberToPrivateThread = useCallback(
 		async (
 			currentChannel: ChannelsEntity | null,
 			mentions: IMentionOnMessage[],
@@ -313,7 +313,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					anonymousMessage,
 					mentionEveryone
 				);
-				addMemberToChannel(currentChannel, mentionList, usersClan, membersOfChild);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(
@@ -348,7 +347,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						mentionEveryone
 					);
 				}
-				addMemberToChannel(currentChannel, mentionList, usersClan, membersOfChild);
+				addMemberToPrivateThread(currentChannel, mentionList, usersClan, membersOfChild);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
@@ -378,13 +377,12 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props,
 			threadCurrentChannel,
 			openThreadMessageState,
-			// getRefMessageReply,
 			dataReferences,
 			dispatch,
 			setSubPanelActive,
 			isPrivate,
 			mentionEveryone,
-			addMemberToChannel,
+			addMemberToPrivateThread,
 			currentChannel,
 			mentions,
 			usersClan,
