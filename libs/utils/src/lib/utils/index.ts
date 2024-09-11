@@ -1,3 +1,4 @@
+import { handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -10,13 +11,16 @@ import {
 	startOfDay,
 	subDays
 } from 'date-fns';
+import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
+import RNFS from 'react-native-fs';
 import { ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
 	EMarkdownType,
+	EMimeTypes,
 	ETokenMessage,
 	EmojiDataOptionals,
 	IEmojiOnMessage,
@@ -659,6 +663,62 @@ export async function fetchAndCreateFiles(fileData: ApiMessageAttachment[] | nul
 	);
 
 	return createdFiles;
+}
+
+export async function getWebUploadedAttachments(payload: {
+	attachments: ApiMessageAttachment[];
+	client: Client;
+	session: Session;
+	clanId: string;
+	channelId: string;
+}): Promise<ApiMessageAttachment[]> {
+	const { attachments, client, session, clanId, channelId } = payload;
+	if (!attachments || attachments?.length === 0) {
+		return [];
+	}
+	const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
+	const nonDirectAttachments = attachments.filter((att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon));
+
+	if (nonDirectAttachments.length > 0) {
+		const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
+		const uploadPromises = createdFiles.map((file, index) => {
+			return handleUploadFile(client, session, clanId, channelId, file.name, file, index);
+		});
+
+		return await Promise.all(uploadPromises);
+	}
+
+	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype }));
+}
+
+export async function getMobileUploadedAttachments(payload: {
+	attachments: ApiMessageAttachment[];
+	client: Client;
+	session: Session;
+	clanId: string;
+	channelId: string;
+}): Promise<ApiMessageAttachment[]> {
+	const { attachments, client, session, clanId, channelId } = payload;
+	if (!attachments || attachments?.length === 0) {
+		return [];
+	}
+	const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
+	const nonDirectAttachments = attachments.filter((att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon));
+
+	if (nonDirectAttachments.length > 0) {
+		const uploadPromises = nonDirectAttachments.map(async (att) => {
+			const fileData = await RNFS.readFile(att?.url || '', 'base64');
+			const formattedFile = {
+				type: att?.filetype,
+				uri: att?.url,
+				size: att?.size,
+				fileData
+			};
+			return await handleUploadFileMobile(client, session, clanId, channelId, att?.filename || '', formattedFile);
+		});
+		return await Promise.all(uploadPromises);
+	}
+	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype }));
 }
 
 export const blankReferenceObj: ApiMessageRef = {
