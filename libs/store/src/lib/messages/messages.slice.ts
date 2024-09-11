@@ -730,13 +730,14 @@ export const messagesSlice = createSlice({
 					break;
 				}
 				case 1: {
+					console.log(action.payload);
 					channelMessagesAdapter.updateOne(channelEntity, {
 						id: action.payload.id,
 						changes: {
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
-							hideEditted: action.payload.hideEditted,
+							hideEditted: action.payload.hide_editted,
 							update_time: action.payload.update_time
 						}
 					});

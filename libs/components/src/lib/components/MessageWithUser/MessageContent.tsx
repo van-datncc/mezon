@@ -82,7 +82,7 @@ const MessageText = ({
 			{' '}
 			{lines?.length > 0 ? (
 				<div className="flex w-full">
-					<div className="w-full">
+					<div className="w-fit max-w-full">
 						<MessageLine
 							isHideLinkOneImage={checkOneLinkImage}
 							isTokenClickAble={true}
