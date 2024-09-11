@@ -1,6 +1,5 @@
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
 import {
-	selectAllChannelMemberIds,
 	// selectAllChannelMemberIds,
 	selectAllRoleIds,
 	selectChannelMemberByUserIds,
@@ -50,16 +49,16 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
 	const getUserRemoved = useSelector(selectUserRemovedByChannelId(currentChannelId ?? ''));
+	// const allUserIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
+	const allRoleIds = useSelector(selectAllRoleIds);
 
 	console.log('getUserRemoved: ', getUserRemoved);
 
-	const allUserIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
-	console.log('allUserIds :', allUserIds);
-	const allRoleIds = useSelector(selectAllRoleIds);
+	// console.log('allUserIds :', allUserIds);
 
-	const checkUserIsExist = useMemo(() => {
-		return allUserIds.includes(tagUserId ?? '');
-	}, [allUserIds]);
+	// const checkUserIsExist = useMemo(() => {
+	// 	return allUserIds.includes(tagUserId ?? '');
+	// }, [allUserIds]);
 
 	const checkRoleIsExist = useMemo(() => {
 		return allRoleIds.includes(tagRoleId ?? '');
@@ -84,19 +83,19 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				type: MentionType.HERE
 			};
 		}
-		// if (tagUserId && tagUserName !== '@here') {
-		// 	return {
-		// 		display: '@unknowuser',
-		// 		type: MentionType.USER_NOT_EXIST
-		// 	};
-		// }
+		if (tagUserId === getUserRemoved && tagUserName !== '@here') {
+			return {
+				display: '@unknowuser',
+				type: MentionType.USER_NOT_EXIST
+			};
+		}
 		if (tagUserId && tagUserName !== '@here') {
 			return {
 				display: tagUserName,
 				type: MentionType.USER_EXIST
 			};
 		}
-	}, [tagUserName, tagRoleName, tagUserId, checkUserIsExist, checkRoleIsExist, tagRoleId]);
+	}, [tagUserName, tagRoleName, tagUserId, checkRoleIsExist, tagRoleId, getUserRemoved]);
 
 	const panelRef = useRef<HTMLButtonElement>(null);
 
