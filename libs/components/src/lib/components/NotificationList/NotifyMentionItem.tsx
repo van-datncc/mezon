@@ -110,7 +110,13 @@ function MentionTabContent({ message }: IMentionTabContent) {
 				/>
 
 				<div className="h-full">
-					<MessageHead message={message} isCombine={true} isShowFull={true} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+					<MessageHead
+						allowDisplayShortProfile={false}
+						message={message}
+						isCombine={true}
+						isShowFull={true}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
 					<MessageLine isEditted={false} content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} />
 					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
 				</div>

@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ChannelMembersEntity, ChannelsEntity, RolesClanEntity, UsersClanEntity } from '@mezon/store-mobile';
+import { ChannelMembersEntity, ChannelsEntity, PermissionUserEntity, RolesClanEntity, UsersClanEntity } from '@mezon/store-mobile';
 import { RefObject } from 'react';
-import { EAdvancedPermissionSetting } from './channelPermission.enum';
+import { EAdvancedPermissionSetting, EPermissionStatus } from './channelPermission.enum';
 
 export interface IMemberItemProps {
 	member: ChannelMembersEntity | UsersClanEntity;
@@ -44,4 +44,14 @@ export interface IBasicViewProps {
 export interface IAddMemberOrRoleContentProps {
 	channel: ChannelsEntity;
 	onDismiss?: () => void;
+}
+
+export interface IPermissionItemProps {
+	permission: PermissionUserEntity;
+	status?: EPermissionStatus;
+	onPermissionStatusChange?: (id: string, status: EPermissionStatus) => void;
+}
+
+export interface IPermissionSetting {
+	[id: string]: EPermissionStatus;
 }
