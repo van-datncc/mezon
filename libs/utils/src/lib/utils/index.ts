@@ -10,10 +10,10 @@ import {
 	startOfDay,
 	subDays
 } from 'date-fns';
-import { ApiMessageAttachment, ApiMessageRef, ApiRole, ChannelUserListChannelUser } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
-import { TIME_COMBINE } from '../constant';
+import { ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
 	EMarkdownType,
@@ -22,7 +22,6 @@ import {
 	IEmojiOnMessage,
 	IExtendedMessage,
 	IHashtagOnMessage,
-	ILineMention,
 	ILinkOnMessage,
 	ILinkVoiceRoomOnMessage,
 	IMarkdownOnMessage,
@@ -31,8 +30,7 @@ import {
 	IMessageWithUser,
 	MentionDataProps,
 	SearchItemProps,
-	SenderInfoOptionals,
-	UsersClanEntity
+	SenderInfoOptionals
 } from '../types';
 
 export const convertTimeString = (dateString: string) => {
@@ -86,21 +84,15 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 		ref.current.focus();
 	}
 };
+export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null) => {
+	const getListId = mentions
+		.map((item) => item.user_id)
+		.filter((user_id): user_id is string => user_id !== undefined && user_id !== ID_MENTION_HERE);
+	const uniqueUserIds = Array.from(new Set(getListId));
+	const memUserIds = userChannels?.map((member) => member?.user?.id);
+	const userIdsNotInChannel = uniqueUserIds.filter((user_id) => !memUserIds?.includes(user_id));
 
-export const uniqueUsers = (mentions: ILineMention[], userClans: UsersClanEntity[], userChannels: ChannelMembersEntity[]) => {
-	const userMentions = Array.from(new Set(mentions.map((user) => user.matchedText)));
-
-	const userMentionsFormat = userMentions.map((user) => user.substring(1));
-
-	const usersNotInChannels = userMentionsFormat.filter(
-		(username) => !userChannels.map((user) => user.user).some((user) => user?.username === username)
-	);
-
-	const userInClans = userClans.map((clan) => clan.user);
-
-	const userIds = userInClans.filter((user) => usersNotInChannels.includes(user?.username as string)).map((user) => user?.id as string);
-
-	return userIds;
+	return userIdsNotInChannel;
 };
 
 export const convertTimeMessage = (timestamp: number) => {
@@ -345,7 +337,7 @@ export const resizeFileImage = (file: File, maxWidth: number, maxHeight: number,
 		);
 	});
 
-export function findClanAvatarByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findClanAvatarByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.clan_avatar;
@@ -354,7 +346,7 @@ export function findClanAvatarByUserId(userId: string, data: ChannelUserListChan
 	return '';
 }
 
-export function findClanNickByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findClanNickByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.clan_nick;
@@ -363,7 +355,7 @@ export function findClanNickByUserId(userId: string, data: ChannelUserListChanne
 	return '';
 }
 
-export function findDisplayNameByUserId(userId: string, data: ChannelUserListChannelUser[]) {
+export function findDisplayNameByUserId(userId: string, data: ClanUserListClanUser[]) {
 	for (const item of data) {
 		if (item?.user?.id === userId) {
 			return item.user.display_name;
@@ -372,7 +364,7 @@ export function findDisplayNameByUserId(userId: string, data: ChannelUserListCha
 	return '';
 }
 
-export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ChannelUserListChannelUser[]): SearchItemProps[] {
+export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: ClanUserListClanUser[]): SearchItemProps[] {
 	return data.map((item) => {
 		const avatarClanFinding = findClanAvatarByUserId(item.id ?? '', dataUserClan);
 		const clanNickFinding = item?.clanNick;

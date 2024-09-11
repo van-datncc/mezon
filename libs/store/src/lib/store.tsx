@@ -128,7 +128,8 @@ const persistedChannelReducer = persistReducer(
 const persistedThreadReducer = persistReducer(
 	{
 		key: 'threads',
-		storage
+		storage,
+		blacklist: ['isShowCreateThread']
 	},
 	threadsReducer
 );

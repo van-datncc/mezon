@@ -1,6 +1,6 @@
 import { IS_TABLET } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { messagesActions, selectCurrentClanId } from '@mezon/store';
+import { messagesActions, selectChannelById, selectCurrentClanId } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -39,6 +39,7 @@ interface IChatMessageInputProps {
 	markdownsOnMessage?: MutableRefObject<IMarkdownOnMessage[]>;
 	voiceLinkRoomOnMessage?: MutableRefObject<ILinkVoiceRoomOnMessage[]>;
 	isShowCreateThread?: boolean;
+	parentId?: string;
 	isPublic?: boolean;
 }
 const inputWidthWhenHasInput = Dimensions.get('window').width * (IS_TABLET ? 0.8 : 0.72);
@@ -69,6 +70,7 @@ export const ChatMessageInput = memo(
 				markdownsOnMessage,
 				voiceLinkRoomOnMessage,
 				isShowCreateThread,
+				parentId,
 				isPublic
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>
@@ -78,6 +80,7 @@ export const ChatMessageInput = memo(
 			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
 			const currentClanId = useSelector(selectCurrentClanId);
+			const parent = useSelector(selectChannelById(channelId || ''));
 			const isAvailableSending = useMemo(() => {
 				return text?.length > 0 && text?.trim()?.length > 0;
 			}, [text]);
@@ -93,13 +96,33 @@ export const ChatMessageInput = memo(
 			}, [onSendSuccess, ref]);
 
 			const handleTyping = useCallback(async () => {
-				dispatch(messagesActions.sendTypingUser({ clanId: currentClanId || '', channelId, mode, isPublic }));
+				dispatch(
+					messagesActions.sendTypingUser({
+						clanId: currentClanId || '',
+						parentId: parentId,
+						channelId,
+						mode,
+						isPublic,
+						isParentPublic: parent ? !parent.channel_private : false
+					})
+				);
 			}, [channelId, currentClanId, dispatch, isPublic, mode]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
 			const handleDirectMessageTyping = useCallback(async () => {
-				await Promise.all([dispatch(messagesActions.sendTypingUser({ clanId: '0', channelId: channelId, mode: mode, isPublic: false }))]);
+				await Promise.all([
+					dispatch(
+						messagesActions.sendTypingUser({
+							clanId: '0',
+							parentId: parentId,
+							channelId: channelId,
+							mode: mode,
+							isPublic: false,
+							isParentPublic: parent ? !parent.channel_private : false
+						})
+					)
+				]);
 			}, [channelId, dispatch, mode]);
 
 			const handleDirectMessageTypingDebounced = useThrottledCallback(handleDirectMessageTyping, 1000);
