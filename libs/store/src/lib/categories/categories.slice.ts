@@ -64,7 +64,7 @@ export const deleteCategory = createAsyncThunk(
 	async ({ clanId, categoryId }: { clanId: string; categoryId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId);
+			const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId, clanId);
 			if (response) {
 				thunkAPI.dispatch(fetchCategories({ clanId }));
 				thunkAPI.dispatch(channelsActions.setCurrentChannelId(''));
