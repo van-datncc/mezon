@@ -190,20 +190,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		callback(matches);
 	};
 
-	const onPaste = useCallback(
-		(event: any) => {
-			event.preventDefault();
-
-			setUndoHistory((prevHistory) => [...prevHistory, request?.valueTextInput || '']);
-			setRedoHistory([]);
-
-			if (props.handlePaste) {
-				props.handlePaste(event);
-			}
-		},
-		[request, props]
-	);
-
 	const { trackEnterPress } = useEnterPressTracker();
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
@@ -642,7 +628,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				<span className="text-xs text-[#B91C1C] mt-1 ml-1">{messageThreadError}</span>
 			)}
 			<MentionsInput
-				onPaste={onPaste}
+				onPaste={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
 				placeholder="Write your thoughs here..."
