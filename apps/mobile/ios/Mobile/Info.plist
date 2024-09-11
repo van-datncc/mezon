@@ -50,15 +50,15 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
+	<string>Enable camera access to be able to take photos and videos then add them to your records</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
+	<string>Enable camera access to be able to take photos and videos then add them to your records</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
+	<string>Enable camera access to be able to take photos and videos then add them to your records</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<string>Allow Mezon to select photos so that they can be sent in the chat</string>
 	<key>UIAppFonts</key>

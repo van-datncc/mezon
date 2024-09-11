@@ -126,6 +126,7 @@ const ChannelMessagesWrapper = React.memo(({ channelId, parentId, clanId, mode, 
 				onMessageAction={onMessageAction}
 				setIsOnlyEmojiPicker={setIsOnlyEmojiPicker}
 				isDM={isDM}
+				isPublic={isPublic}
 			/>
 
 			<View>

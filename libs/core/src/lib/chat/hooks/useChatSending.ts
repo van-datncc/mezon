@@ -52,7 +52,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
 			anonymous?: boolean,
-			mentionEveryone?: boolean
+			mentionEveryone?: boolean,
+			isMobile?: boolean
 		) => {
 			await dispatch(
 				messagesActions.sendMessage({
@@ -69,7 +70,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					anonymous,
 					mentionEveryone,
 					senderId: currentUserId,
-					avatar: userProfile?.user?.avatar_url
+					avatar: userProfile?.user?.avatar_url,
+					isMobile
 				})
 			);
 			if (mode !== ChannelStreamMode.STREAM_MODE_CHANNEL) {
