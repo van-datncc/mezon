@@ -1,9 +1,9 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { RootState, referencesActions, selectDataReferences } from '@mezon/store';
+import { RootState, referencesActions, selectAttachmentByChannelId, selectDataReferences } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
@@ -22,15 +22,14 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
-	const messageBox = useRef<HTMLDivElement>(null);
 	const dataReferences = useSelector(selectDataReferences(directParamId ?? ''));
 	const dispatch = useDispatch();
 
-	const setMarginleft = useMemo(() => {
-		if (messageBox?.current?.getBoundingClientRect()) {
-			return window.innerWidth - messageBox?.current?.getBoundingClientRect().right + 10;
-		}
-	}, [messageBox.current?.getBoundingClientRect()]);
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(directParamId ?? ''));
+
+	const hasAttachment = useMemo(() => {
+		return attachmentFilteredByChannelId?.files.length > 0;
+	}, [attachmentFilteredByChannelId]);
 
 	const handleSend = useCallback(
 		(
@@ -76,18 +75,13 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 
 	useEscapeKey(handleCloseReplyMessageBox);
 	return (
-		<div className="mx-2 relative " role="button" ref={messageBox}>
+		<div className="mx-2 relative " role="button">
 			{isEmojiOnChat && (
 				<div
-					style={{
-						position: 'fixed',
-						bottom: '76px',
-						right: setMarginleft
-					}}
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className="z-20"
+					className={`z-20 max-sbm:bottom-[60px] ${hasAttachment ? 'bottom-[320px]' : 'bottom-[76px]'}  right-[2px] absolute `}
 				>
 					<GifStickerEmojiPopup channelOrDirect={direct} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>

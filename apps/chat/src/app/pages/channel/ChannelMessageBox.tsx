@@ -1,6 +1,6 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectDataReferences } from '@mezon/store';
+import { referencesActions, selectAttachmentByChannelId, selectDataReferences } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -23,6 +23,11 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(channelId ?? ''));
+
+	const hasAttachment = useMemo(() => {
+		return attachmentFilteredByChannelId?.files.length > 0;
+	}, [attachmentFilteredByChannelId]);
 
 	const handleSend = useCallback(
 		(
@@ -73,7 +78,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className="max-sbm:bottom-[60px] bottom-[76px] right-[10px] absolute bg"
+					className={`max-sbm:bottom-[60px] ${hasAttachment ? 'bottom-[320px]' : 'bottom-[76px]'}  right-[2px] absolute `}
 				>
 					<GifStickerEmojiPopup channelOrDirect={channel} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
