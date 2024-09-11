@@ -727,7 +727,7 @@ export const messagesSlice = createSlice({
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
-							hideEditted: action.payload.hideEditted,
+							hideEditted: action.payload.hide_editted,
 							update_time: action.payload.update_time
 						}
 					});
