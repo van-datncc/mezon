@@ -206,10 +206,10 @@ export const channelMembers = createSlice({
 		remove: (state, action: PayloadAction<{ channelId: string; userId: string }>) => {
 			const { channelId, userId } = action.payload;
 			const channelEntity = state.memberChannels[channelId];
-			// if (!state.userRemoved) {
-			// 	state.userRemoved = {};
-			// }
-			// state.userRemoved[channelId] = userId;
+			if (!state.userRemoved) {
+				state.userRemoved = {};
+			}
+			state.userRemoved[channelId] = userId;
 			if (channelEntity) {
 				const memberIds = (channelEntity.ids || []).filter((id) => id !== userId);
 				state.memberChannels[channelId].ids = memberIds;
@@ -264,6 +264,7 @@ export const channelMembers = createSlice({
 		},
 		removeUserByUserIdAndClan: (state, action: PayloadAction<{ userId: string; channelIds: string[] }>) => {
 			const { userId, channelIds } = action.payload;
+			console.log('action.payload - remove-clan', action.payload);
 			channelIds.forEach((channelId) => {
 				const channelEntity = state.memberChannels[channelId];
 				if (channelEntity) {

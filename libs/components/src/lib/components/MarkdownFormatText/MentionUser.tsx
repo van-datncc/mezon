@@ -1,10 +1,10 @@
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
 import {
+	selectAllChannelMemberIds,
 	// selectAllChannelMemberIds,
 	selectAllRoleIds,
 	selectChannelMemberByUserIds,
 	selectCurrentChannelId,
-	selectUserRemovedByChannelId,
 	useAppSelector
 } from '@mezon/store';
 import { MouseButton, getNameForPrioritize } from '@mezon/utils';
@@ -41,25 +41,17 @@ type UserProfilePopupProps = {
 };
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
-	// console.log('mode :', mode);
-	// console.log('tagRoleId: ', tagRoleId);
-	// console.log('tagRoleName: ', tagRoleName);
-	// console.log('tagUserId: ', tagUserId);
-	// console.log('tagUserName: ', tagUserName);
+	const allRoleIds = useSelector(selectAllRoleIds);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	const getUserRemoved = useSelector(selectUserRemovedByChannelId(currentChannelId ?? ''));
-	// const allUserIds = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
-	const allRoleIds = useSelector(selectAllRoleIds);
+	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
+	console.log('allUserIds :', allUserIdsInChannel);
 
-	console.log('getUserRemoved: ', getUserRemoved);
+	const checkUserIsExist = useMemo(() => {
+		return allUserIdsInChannel.indexOf(tagUserId ?? '') !== -1;
+	}, [allUserIdsInChannel, tagUserId]);
 
-	// console.log('allUserIds :', allUserIds);
-
-	// const checkUserIsExist = useMemo(() => {
-	// 	return allUserIds.includes(tagUserId ?? '');
-	// }, [allUserIds]);
-
+	console.log('checkUserIsExist :', checkUserIsExist);
 	const checkRoleIsExist = useMemo(() => {
 		return allRoleIds.includes(tagRoleId ?? '');
 	}, [allRoleIds, tagRoleId]);
@@ -83,7 +75,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				type: MentionType.HERE
 			};
 		}
-		if (tagUserId === getUserRemoved && tagUserName !== '@here') {
+		if (tagUserId && !checkUserIsExist && tagUserName !== '@here') {
 			return {
 				display: '@unknowuser',
 				type: MentionType.USER_NOT_EXIST
@@ -95,7 +87,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				type: MentionType.USER_EXIST
 			};
 		}
-	}, [tagUserName, tagRoleName, tagUserId, checkRoleIsExist, tagRoleId, getUserRemoved]);
+	}, [tagUserName, tagRoleName, tagUserId, checkRoleIsExist, tagRoleId, allUserIdsInChannel]);
 
 	const panelRef = useRef<HTMLButtonElement>(null);
 
