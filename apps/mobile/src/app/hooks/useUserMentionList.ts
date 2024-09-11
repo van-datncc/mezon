@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 function UseMentionList(channelID: string, channelMode?: number): MentionDataProps[] {
-	const { members } = useChannelMembers({ channelId: channelID });
+	const { membersOfParent: members } = useChannelMembers({ channelId: channelID, mode: channelMode });
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const { t } = useTranslation('clanRoles');
 

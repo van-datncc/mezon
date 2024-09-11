@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useCheckOwnerForUser } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { Block, Text, size, useTheme } from '@mezon/mobile-ui';
+import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
 	selectAllChannelMembers,
@@ -11,10 +11,12 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
+import { useNavigation } from '@react-navigation/native';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { MezonConfirm, MezonSwitch } from '../../../temp-ui';
 import { AddMemberOrRoleBS } from '../components/AddMemberOrRoleBS';
@@ -25,6 +27,7 @@ import { IBasicViewProps } from '../types/channelPermission.type';
 export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const { themeValue } = useTheme();
 	const { userId } = useAuth();
+	const navigation = useNavigation<any>();
 	const [checkClanOwner] = useCheckOwnerForUser();
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('channelSetting');
@@ -65,7 +68,9 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	};
 
 	const updateChannel = async () => {
-		await dispatch(
+		await setVisibleModalConfirm(false);
+		navigation?.goBack();
+		const response = await dispatch(
 			channelsActions.updateChannelPrivate({
 				channel_id: channel.id,
 				channel_private: isPrivateChannel ? 0 : 1,
@@ -73,6 +78,23 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				role_ids: []
 			})
 		);
+		if (response?.type === 'channels/updateChannelPrivate/fulfilled') {
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: 'Save Successfully',
+					leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
+				}
+			});
+		} else {
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: 'Save Fail',
+					leadingIcon: <Icons.ClockXIcon color={Colors.red} />
+				}
+			});
+		}
 	};
 
 	const closeModalConfirm = () => {
