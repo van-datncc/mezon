@@ -1,12 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { RootState, selectAllEventManagement } from '@mezon/store-mobile';
+import { RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId, selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
@@ -20,6 +20,12 @@ import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { style } from './styles';
+
+export type ChannelsPositionRef = {
+	current: {
+		[key: number]: number;
+	};
+};
 
 const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: any }) => {
 	const { themeValue } = useTheme();
@@ -38,7 +44,11 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const flashListRef = useRef(null);
-	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const channelsPositionRef = useRef<ChannelsPositionRef>({});
+	const currentChannel = useSelector(selectCurrentChannel);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const categoryOffsetsRef = useRef({});
+	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -60,31 +70,46 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		setCurrentPressedChannel(channel);
 	}, []);
 
-	// const onContentSizeChange = useCallback((w, h) => {
-	// 	if (categorizedChannels?.length && h > 0 && isLoading === 'loaded') {
-	// 		timeoutRef.current = setTimeout(() => {
-	// 			scrollToItemById?.(idCurrentCateByChannel);
-	// 		}, 300);
-	// 	}
-	// }, [idCurrentCateByChannel]);
+	const scrollToItemById = () => {
+		const positionChannel = channelsPositionRef.current[currentChannel?.id];
+		const categoryOffset = categoryOffsetsRef.current[currentChannel?.category_id];
+		const position = positionChannel + categoryOffset?.y;
+		if (position) {
+			flashListRef?.current?.scrollTo({
+				x: 0,
+				y: position,
+				animated: true
+			});
+		}
+	};
 
 	useEffect(() => {
-		return () => {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
-		};
-	}, []);
+		if (!hiddenBottomTab && currentClanId && categorizedChannels?.length) {
+			requestAnimationFrame(() => {
+				setTimeout(() => {
+					scrollToItemById();
+				}, 200);
+			});
+		}
+	}, [hiddenBottomTab, currentClanId, categorizedChannels?.length, isLoading]);
 
 	const renderItemChannelList = useCallback(
 		({ item }) => {
 			return (
-				<ChannelListSection
-					data={item}
-					onLongPressCategory={handleLongPressCategory}
-					onLongPressChannel={handleLongPressChannel}
-					onLongPressThread={handleLongPressThread}
-				/>
+				<View
+					onLayout={(event) => {
+						const { y, height } = event.nativeEvent.layout;
+						categoryOffsetsRef.current[item?.category_id] = { y, height, item };
+					}}
+				>
+					<ChannelListSection
+						channelsPositionRef={channelsPositionRef}
+						data={item}
+						onLongPressCategory={handleLongPressCategory}
+						onLongPressChannel={handleLongPressChannel}
+						onLongPressThread={handleLongPressThread}
+					/>
+				</View>
 			);
 		},
 		[handleLongPressCategory, handleLongPressChannel, handleLongPressThread]
@@ -110,13 +135,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 			}
 		});
 	};
-
-	// const scrollToItemById = (id) => {
-	// 	const index = categorizedChannels?.findIndex((item) => item?.category_id === id);
-	// 	if (index !== -1 && flashListRef?.current) {
-	// 		flashListRef?.current?.scrollToIndex({ index, animated: true });
-	// 	}
-	// };
 
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
@@ -150,14 +168,11 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
-				<FlatList
-					// onContentSizeChange={onContentSizeChange}
-					ref={flashListRef}
-					data={categorizedChannels || []}
-					keyExtractor={(item, index) => `${item.id}_${index.toString()}`}
-					renderItem={renderItemChannelList}
-					getItemLayout={(data, index) => ({ length: 40, offset: 40 * index, index })}
-				/>
+				<ScrollView ref={flashListRef} scrollEventThrottle={16}>
+					{categorizedChannels?.map((item) => {
+						return renderItemChannelList({ item });
+					})}
+				</ScrollView>
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
