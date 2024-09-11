@@ -193,7 +193,7 @@ const HomeDefaultHeader = React.memo(
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
 								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-									<Icons.ThreadPlusIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+									<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
 								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 									<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />

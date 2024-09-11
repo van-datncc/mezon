@@ -46,7 +46,7 @@ import {
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
-	ILineMention,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -138,7 +138,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 	const currentClanId = useSelector(selectCurrentClanId);
 
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const { members } = useChannelMembers({ channelId: currentChannelId });
+	const { membersOfChild } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
@@ -222,9 +222,17 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 		}
 	};
 
-	const addMemberToChannel = useCallback(
-		async (currentChannel: ChannelsEntity | null, mentions: ILineMention[], userClans: UsersClanEntity[], members: ChannelMembersEntity[]) => {
-			const userIds = uniqueUsers(mentions, userClans, members);
+	const addMemberToPrivateThread = useCallback(
+		async (
+			currentChannel: ChannelsEntity | null,
+			mentions: IMentionOnMessage[],
+			userClans: UsersClanEntity[],
+			membersOfChild: ChannelMembersEntity[] | null
+		) => {
+			if (!currentChannel?.channel_private) return;
+
+			const userIds = uniqueUsers(mentions, membersOfChild);
+
 			const body = {
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
@@ -305,7 +313,6 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 					anonymousMessage,
 					mentionEveryone
 				);
-				addMemberToChannel(currentChannel, mentions, usersClan, members);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(
@@ -340,7 +347,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 						mentionEveryone
 					);
 				}
-				addMemberToChannel(currentChannel, mentions, usersClan, members);
+				addMemberToPrivateThread(currentChannel, mentionList, usersClan, membersOfChild);
 				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue: '' }));
@@ -370,17 +377,16 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			props,
 			threadCurrentChannel,
 			openThreadMessageState,
-			// getRefMessageReply,
 			dataReferences,
 			dispatch,
 			setSubPanelActive,
 			isPrivate,
 			mentionEveryone,
-			addMemberToChannel,
+			addMemberToPrivateThread,
 			currentChannel,
 			mentions,
 			usersClan,
-			members,
+			membersOfChild,
 			currentChannelId,
 			valueThread?.content.t,
 			valueThread?.mentions,

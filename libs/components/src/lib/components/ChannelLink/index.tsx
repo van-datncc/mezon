@@ -1,4 +1,4 @@
-import { useMenu, useOnClickOutside } from '@mezon/core';
+import { useChannels, useMenu, useOnClickOutside } from '@mezon/core';
 import { channelsActions, notificationSettingActions, selectCloseMenu, threadsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, MouseButton } from '@mezon/utils';
@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
 import SettingChannel from '../ChannelSetting';
-import { DeleteModal } from '../ChannelSetting/Component/Modal/deleteChannelModal';
+import ModalConfirm from '../ModalConfirm';
 import PanelChannel from '../PanelChannel';
 
 export type ChannelLinkProps = {
@@ -104,7 +104,7 @@ function ChannelLink({
 		}
 	};
 
-	const handleDeleteChannel = () => {
+	const handleOpenModalConfirm = () => {
 		setShowModal(true);
 		setIsShowPanelChannel(false);
 	};
@@ -134,6 +134,18 @@ function ChannelLink({
 		[channel.status]
 	);
 	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
+
+	const { handleConfirmDeleteChannel } = useChannels();
+
+	const handleCloseModalShow = () => {
+		setShowModal(false);
+	};
+
+	const handleDeleteChannel = () => {
+		handleConfirmDeleteChannel(channel.channel_id as string, clanId as string);
+		handleCloseModalShow();
+	};
+
 	return (
 		<div
 			ref={panelRef}
@@ -248,7 +260,7 @@ function ChannelLink({
 			)}
 			{isShowPanelChannel && (
 				<PanelChannel
-					onDeleteChannel={handleDeleteChannel}
+					onDeleteChannel={handleOpenModalConfirm}
 					channel={channel}
 					coords={coords}
 					setOpenSetting={setOpenSetting}
@@ -257,10 +269,11 @@ function ChannelLink({
 			)}
 
 			{showModal && (
-				<DeleteModal
-					onClose={() => setShowModal(false)}
-					channelLabel={channel.channel_label || ''}
-					channelId={channel.channel_id as string}
+				<ModalConfirm
+					handleCancel={handleCloseModalShow}
+					handleConfirm={handleDeleteChannel}
+					title="delete"
+					modalName={`${channel.channel_label}`}
 				/>
 			)}
 		</div>

@@ -106,9 +106,13 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 		.then((result) => {
 			if (result.response === 0) {
 				setTimeout(() => {
+					const windows = App.BrowserWindow.getAllWindows();
+					windows.forEach((window) => {
+						window.removeAllListeners('close');
+					});
 					autoUpdater.quitAndInstall();
 					App.application.quit();
-				}, 5000);
+				}, 10000);
 			}
 		});
 });
