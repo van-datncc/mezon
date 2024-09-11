@@ -47,6 +47,7 @@ export const UsersClanSlice = createSlice({
 	initialState: initialUsersClanState,
 	reducers: {
 		add: UsersClanAdapter.addOne,
+		upsertMany: UsersClanAdapter.upsertMany,
 		remove: UsersClanAdapter.removeOne,
 		updateUserClan: (state, action: PayloadAction<{ userId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanNick, clanAvt } = action.payload;
