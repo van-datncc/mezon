@@ -392,7 +392,7 @@ export const selectChannelMemberByUserIds = createSelector(
 						display_name: channel_label
 					},
 					id: userInfo.id
-				});
+				} as ChannelMembersEntity);
 			} else {
 				members.push({
 					channelId,
