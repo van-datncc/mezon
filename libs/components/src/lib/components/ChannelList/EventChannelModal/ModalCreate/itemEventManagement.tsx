@@ -72,7 +72,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const isSameDay = useMemo(() => {
 		return compareDate(new Date(), createTime || '');
 	}, [createTime]);
-	
+
 	const eventStatus = useMemo(() => {
 		if (event?.status) {
 			return event.status;
@@ -120,17 +120,25 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		}
 	}, []);
 
+	const cssEventStatus = useMemo(() => {
+		return eventStatus === EEventStatus.UPCOMING
+			? 'text-purple-500'
+			: eventStatus === EEventStatus.ONGOING
+				? 'text-green-500'
+				: 'dark:text-zinc-400 text-colorTextLightMode';
+	}, [eventStatus]);
+
 	return (
 		<div
 			className="dark:bg-[#212529] bg-bgModifierHoverLight rounded-lg overflow-hidden"
 			onClick={
 				setOpenModalDetail && event
 					? () => {
-						setOpenModalDetail(true);
-						setChooseEvent(event);
-					}
+							setOpenModalDetail(true);
+							setChooseEvent(event);
+						}
 					: // eslint-disable-next-line @typescript-eslint/no-empty-function
-					() => { }
+						() => {}
 			}
 			ref={panelRef}
 		>
@@ -138,14 +146,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 			<div className="p-4 border-b dark:border-slate-600 border-white">
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
-						<Icons.IconEvents defaultSize={`font-semibold ${
-								eventStatus === EEventStatus.UPCOMING ? 'text-purple-500' : eventStatus === EEventStatus.ONGOING ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode'
-							}`}/>
-						<p
-							className={`font-semibold ${
-								eventStatus === EEventStatus.UPCOMING ? 'text-purple-500' : eventStatus === EEventStatus.ONGOING ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode'
-							}`}
-						>
+						<Icons.IconEvents defaultSize={`font-semibold ${cssEventStatus}`} />
+						<p className={`font-semibold ${cssEventStatus}`}>
 							{eventStatus === EEventStatus.UPCOMING
 								? '10 minutes left. Join in!'
 								: eventStatus === EEventStatus.ONGOING
@@ -212,21 +214,22 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							{checkOptionLocation && <Icons.IConShareEventLocation />}
 							Share
 						</button>
-						<div>
-							{
-								eventStatus == EEventStatus.ONGOING && checkUserCreate
-								?
-								<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white" onClick={() => setOpenModalDelEvent(true)}>
-									End event
-								</button>
-								: eventStatus != EEventStatus.ONGOING ?
-								<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
-									<Icons.MuteBell defaultSize="size-4 text-white" />
-									Interested
-								</button>
-								: ''
-							}
-						</div>
+
+						{eventStatus == EEventStatus.ONGOING && checkUserCreate ? (
+							<button
+								className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
+								onClick={() => setOpenModalDelEvent(true)}
+							>
+								End event
+							</button>
+						) : eventStatus != EEventStatus.ONGOING ? (
+							<button className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white">
+								<Icons.MuteBell defaultSize="size-4 text-white" />
+								Interested
+							</button>
+						) : (
+							<></>
+						)}
 					</div>
 				)}
 			</div>

@@ -29,7 +29,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 		selectedDateEnd: new Date(),
 		voiceChannel: voicesChannel[0]?.id || '',
 		logo: '',
-		description: '',
+		description: ''
 	});
 	const [buttonWork, setButtonWork] = useState(true);
 	const [option, setOption] = useState('');
@@ -70,7 +70,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
-
+		console.log('TIme Start :', timeValueStart);
 		await createEventManagement(
 			currentClanId || '',
 			voice,
@@ -79,7 +79,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 			timeValueStart,
 			choiceSpeaker ? timeValueStart : timeValueEnd,
 			contentSubmit.description,
-			contentSubmit.logo,
+			contentSubmit.logo
 		);
 		hanldeCloseModal();
 	};

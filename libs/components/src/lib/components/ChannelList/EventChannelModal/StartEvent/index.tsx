@@ -1,8 +1,9 @@
 import { Icons } from '@mezon/components';
 import { useClanRestriction } from '@mezon/core';
-import { selectAllEventManagement } from '@mezon/store';
+import { eventManagementActions, selectAllEventManagement, useAppDispatch } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { useSelector } from 'react-redux';
+import { EEventStatus } from '../ModalCreate/itemEventManagement';
 import ListEventManagement from './ListEventManagement';
 
 type StartEventModalProps = {
@@ -15,8 +16,27 @@ type StartEventModalProps = {
 const StartEventModal = (props: StartEventModalProps) => {
 	const { onClose, onOpenCreate, onOpenDetailItem, numberEventManagement } = props;
 	const allEventManagement = useSelector(selectAllEventManagement);
-	const [hasAdminPermission, {isClanOwner}] = useClanRestriction([EPermission.administrator]);
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+
+	const dispatch = useAppDispatch();
+	const onTesting = () => {
+		if (allEventManagement[0].status === EEventStatus.UPCOMING) {
+			const eventUpdate = {
+				event_id: '1833705844638748672',
+				event_status: EEventStatus.ONGOING
+			};
+			dispatch(eventManagementActions.updateStatusEvent(eventUpdate));
+		}
+
+		if (!allEventManagement[0].status) {
+			const eventUpdate = {
+				event_id: '1833705844638748672',
+				event_status: EEventStatus.UPCOMING
+			};
+			dispatch(eventManagementActions.updateStatusEvent(eventUpdate));
+		}
+	};
 	return (
 		<>
 			<div className="dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black flex justify-between items-center p-4">
@@ -34,6 +54,9 @@ const StartEventModal = (props: StartEventModalProps) => {
 						Create Event
 					</div>
 				</div>
+				<span className="text-5xl leading-3 dark:hover:text-white hover:text-black" onClick={onTesting}>
+					Testing
+				</span>
 				<span className="text-5xl leading-3 dark:hover:text-white hover:text-black" onClick={onClose}>
 					×
 				</span>
@@ -41,11 +64,7 @@ const StartEventModal = (props: StartEventModalProps) => {
 
 			{allEventManagement.length !== 0 ? (
 				<div className="dark:bg-[#313339] bg-white h-fit min-h-80 max-h-[80vh]  overflow-y-scroll hide-scrollbar p-4 gap-y-4 flex flex-col">
-					<ListEventManagement
-						allEventManagement={allEventManagement}
-						checkUserCreate={isClanOwner}
-						onOpenDetailItem={onOpenDetailItem}
-					/>
+					<ListEventManagement allEventManagement={allEventManagement} checkUserCreate={isClanOwner} onOpenDetailItem={onOpenDetailItem} />
 				</div>
 			) : (
 				<div className="dark:bg-[#313339] bg-white h-80 flex justify-center items-center">

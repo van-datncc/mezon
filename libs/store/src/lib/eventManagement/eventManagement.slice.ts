@@ -1,5 +1,6 @@
 import { IEventManagement, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { EEventStatus } from 'libs/components/src/lib/components/ChannelList/EventChannelModal/ModalCreate/itemEventManagement';
 import memoize from 'memoizee';
 import { ApiEventManagement } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
@@ -73,8 +74,8 @@ export type EventManagementOnGogoing = {
 	logo: string;
 	start_time: Date;
 	title: string;
-}
-  
+};
+
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
 	async ({ clan_id, channel_id, address, title, start_time, end_time, description, logo }: CreateEventManagementyload, thunkAPI) => {
@@ -123,7 +124,7 @@ export interface EventManagementState extends EntityState<EventManagementEntity,
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	chooseEvent: EventManagementEntity | null;
-	ongoingEvent:  EventManagementOnGogoing | null;
+	ongoingEvent: EventManagementOnGogoing | null;
 }
 
 export const initialEventManagementState: EventManagementState = eventManagementAdapter.getInitialState({
@@ -146,26 +147,24 @@ export const eventManagementSlice = createSlice({
 		setChooseEvent: (state, action) => {
 			state.chooseEvent = action.payload;
 		},
-		updateStatusEvent: (state, action) => {			
+		updateStatusEvent: (state, action) => {
 			eventManagementAdapter.updateOne(state, {
-				id : action.payload.event_id,
-				changes : {
+				id: action.payload.event_id,
+				changes: {
 					status: action.payload.event_status
 				}
-			})
-			
-			console.log(action.payload);
-			
-			if (action.payload.event_status === "ONGOING") {
-				state.ongoingEvent = action.payload
+			});
+
+			if (action.payload.event_status === EEventStatus.ONGOING && state.ongoingEvent === null) {
+				state.ongoingEvent = action.payload;
 			}
-			
-			if (action.payload.event_status === "FINISH") {
-				state.ongoingEvent = null
+
+			if (action.payload.event_status === EEventStatus.FINISHED && state.ongoingEvent?.event_id === action.payload.event_id) {
+				state.ongoingEvent = null;
 			}
 		},
 		clearOngoingEvent: (state, action) => {
-			state.ongoingEvent = null
+			state.ongoingEvent = null;
 		}
 	},
 	extraReducers: (builder) => {
