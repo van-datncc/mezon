@@ -7,3 +7,9 @@ export enum EAdvancedPermissionSetting {
 	AddRole,
 	AddMember
 }
+
+export enum EPermissionStatus {
+	None,
+	Allow,
+	Deny
+}

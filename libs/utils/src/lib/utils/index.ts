@@ -707,7 +707,8 @@ export async function getMobileUploadedAttachments(payload: {
 
 	if (nonDirectAttachments.length > 0) {
 		const uploadPromises = nonDirectAttachments.map(async (att) => {
-			const fileData = await RNFS.readFile(att?.url || '', 'base64');
+			// const fileData = await RNFS.readFile(att?.url || '', 'base64');
+			const fileData = att;
 			const formattedFile = {
 				type: att?.filetype,
 				uri: att?.url,

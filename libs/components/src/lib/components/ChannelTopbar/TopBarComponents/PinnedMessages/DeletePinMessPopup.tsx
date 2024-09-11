@@ -34,6 +34,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 								</div>
 								<span>
 									<MessageLine
+										isEditted={false}
 										isJumMessageEnabled={false}
 										isTokenClickAble={false}
 										content={JSON.parse(pinMessage.content || '')}

@@ -1,8 +1,9 @@
-import { Block, Metrics, useTheme } from '@mezon/mobile-ui';
+import { Metrics, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import { ActivityIndicator, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { getAspectRatioSize, useImageResolution } from 'react-native-zoom-toolkit';
+import { LoadingOverlay } from './LoadingOverlay';
 import { style } from './styles';
 
 const widthMedia = Metrics.screenWidth - 150;
@@ -34,27 +35,14 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 					styles.imageMessageRender,
 					{
 						width: imageSize.width,
-						height: imageSize.height
+						height: imageSize.height,
+						opacity: isUploading ? 0.5 : 1
 					}
 				]}
+				children={isUploading ? <LoadingOverlay /> : null}
 				source={{ uri: image?.url }}
 				resizeMode="contain"
 			/>
-			{isUploading && (
-				<Block
-					backgroundColor={'rgba(0,0,0,0.5)'}
-					flex={1}
-					position={'absolute'}
-					top={0}
-					left={0}
-					width={imageSize.width}
-					height={imageSize.height}
-					alignItems={'center'}
-					justifyContent={'center'}
-				>
-					<ActivityIndicator />
-				</Block>
-			)}
 		</TouchableOpacity>
 	);
 });
