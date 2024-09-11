@@ -702,17 +702,23 @@ export async function getMobileUploadedAttachments(payload: {
 	if (!attachments || attachments?.length === 0) {
 		return [];
 	}
-	const uploadPromises = attachments.map(async (att) => {
-		const fileData = await RNFS.readFile(att?.url || '', 'base64');
-		const formattedFile = {
-			type: att?.filetype,
-			uri: att?.url,
-			size: att?.size,
-			fileData
-		};
-		return await handleUploadFileMobile(client, session, clanId, channelId, att?.filename || '', formattedFile);
-	});
-	return await Promise.all(uploadPromises);
+	const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
+	const nonDirectAttachments = attachments.filter((att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon));
+
+	if (nonDirectAttachments.length > 0) {
+		const uploadPromises = nonDirectAttachments.map(async (att) => {
+			const fileData = await RNFS.readFile(att?.url || '', 'base64');
+			const formattedFile = {
+				type: att?.filetype,
+				uri: att?.url,
+				size: att?.size,
+				fileData
+			};
+			return await handleUploadFileMobile(client, session, clanId, channelId, att?.filename || '', formattedFile);
+		});
+		return await Promise.all(uploadPromises);
+	}
+	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype }));
 }
 
 export const blankReferenceObj: ApiMessageRef = {
