@@ -1,7 +1,7 @@
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessage, ChannelType } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest, ApiUser } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { channelsActions, fetchChannelsCached } from '../channels/channels.slice';
 import { hashtagDmActions } from '../channels/hashtagDm.slice';
@@ -177,12 +177,6 @@ interface JoinDirectMessagePayload {
 	isFetchingLatestMessages?: boolean;
 }
 interface members {
-	id: string;
-	channelId: string | undefined;
-	userChannelId: string | undefined;
-	role_id?: string[] | undefined;
-	thread_id?: string | undefined;
-	user?: ApiUser | undefined;
 	user_id?: string;
 }
 
