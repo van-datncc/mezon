@@ -10,7 +10,6 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
-import UseMentionList from '../../../../../../app/hooks/useUserMentionList';
 import { SeparatorWithLine } from '../../../../../components/Common';
 import MessageItem from '../../MessageItem';
 import { EMessageActionType } from '../../enums';
@@ -29,7 +28,6 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
 	const { params } = route;
 	const dispatch = useDispatch<AppDispatch>();
 	const { t } = useTranslation('message');
-	const listMentions = UseMentionList(params?.['directMessageId'] ? params?.['directMessageId'] : message?.channel_id || '');
 
 	const onConfirm = async () => {
 		switch (type) {

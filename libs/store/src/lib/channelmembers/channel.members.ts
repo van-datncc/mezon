@@ -379,7 +379,7 @@ export const selectChannelMemberByUserIds = createSelector(
 		if (!userIds.trim() || !users?.entities) return [];
 		const members: ChannelMembersEntity[] = [];
 		userIds.split('/')?.forEach((userId) => {
-			const userInfo = users.entities[isDm ? channelId : userId];
+			const userInfo = users?.entities[isDm ? channelId : userId];
 			if (!userInfo) return;
 			if (isDm) {
 				const { usernames, channel_label } = userInfo as DirectEntity;
@@ -407,7 +407,7 @@ export const selectChannelMemberByUserIds = createSelector(
 );
 
 export const selectGrouplMembers = createSelector([getDirectState, (state, groupId: string) => groupId], (directs, groupId) => {
-	const group = directs.entities[groupId];
+	const group = directs?.entities?.[groupId];
 	if (!group?.user_id) {
 		return [];
 	}
