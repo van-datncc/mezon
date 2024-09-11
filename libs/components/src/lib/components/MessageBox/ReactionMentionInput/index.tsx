@@ -195,6 +195,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			event.preventDefault();
 
 			setUndoHistory((prevHistory) => [...prevHistory, request?.valueTextInput || '']);
+			setRedoHistory([]);
 
 			if (props.handlePaste) {
 				props.handlePaste(event);
