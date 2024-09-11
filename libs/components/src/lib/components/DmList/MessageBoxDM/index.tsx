@@ -83,7 +83,7 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className={`max-sbm:bottom-[60px] ${bottomPopup}  right-[2px] absolute `}
+					className={`${bottomPopup}  right-[2px] absolute `}
 				>
 					<GifStickerEmojiPopup channelOrDirect={direct} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>

@@ -80,7 +80,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className={`max-sbm:bottom-[60px] ${bottomPopup}  right-[2px] absolute `}
+					className={` ${bottomPopup}  right-[2px] absolute `}
 				>
 					<GifStickerEmojiPopup channelOrDirect={channel} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
