@@ -167,71 +167,73 @@ function MyApp() {
 		<div className="flex h-screen overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
-				className={`w-[72px] overflow-y-auto py-4 px-3 dark:bg-bgTertiary bg-bgLightTertiary duration-100 hide-scrollbar flex flex-col items-center ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`w-[72px] max-h-[100%] relative overflow-y-auto dark:bg-bgTertiary bg-bgLightTertiary duration-100 hide-scrollbar ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
-				<div className="flex flex-col gap-3 ">
-					<SidebarTooltip titleTooltip="Direct Message">
-						<NavLink
-							to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
-							onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
-						>
-							<NavLinkComponent active={pathName?.includes('direct')}>
-								<div>
-									<Image
-										src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
-										alt={'logoMezon'}
-										width={48}
-										height={48}
-										className="clan w-full aspect-square object-cover"
+				<div className="absolute top-0 left-0 right-0 flex flex-col items-center py-4 px-3">
+					<div className="flex flex-col gap-3 ">
+						<SidebarTooltip titleTooltip="Direct Message">
+							<NavLink
+								to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
+								onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
+							>
+								<NavLinkComponent active={pathName?.includes('direct')}>
+									<div>
+										<Image
+											src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
+											alt={'logoMezon'}
+											width={48}
+											height={48}
+											className="clan w-full aspect-square object-cover"
+										/>
+										{quantityPendingRequest !== 0 && (
+											<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
+												{quantityPendingRequest}
+											</div>
+										)}
+									</div>
+								</NavLinkComponent>
+							</NavLink>
+						</SidebarTooltip>
+						{listUnreadDM.map(
+							(dmGroupChatUnread) =>
+								dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
+									<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
+										<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
+									</SidebarTooltip>
+								)
+						)}
+					</div>
+					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
+					<div className="flex flex-col gap-3 ">
+						{clans.map((clan: IClan) => {
+							return (
+								<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
+									<SidebarClanItem
+										linkClan={`/chat/clans/${clan.id}`}
+										option={clan}
+										active={!pathName?.includes('direct') && currentClanId === clan.clan_id}
+										pathname={pathName}
 									/>
-									{quantityPendingRequest !== 0 && (
-										<div className="absolute border-[4px] dark:border-bgPrimary border-[#ffffff] w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
-											{quantityPendingRequest}
-										</div>
-									)}
+								</SidebarTooltip>
+							);
+						})}
+					</div>
+					<div className="mt-3">
+						<SidebarTooltip titleTooltip="Add Clan">
+							<NavLinkComponent>
+								<div
+									className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
+									onClick={openCreateClanModal}
+								>
+									<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
+										<p className="text-2xl font-bold text-[#155EEF]">+</p>
+									</div>
 								</div>
 							</NavLinkComponent>
-						</NavLink>
-					</SidebarTooltip>
-					{listUnreadDM.map(
-						(dmGroupChatUnread) =>
-							dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-								<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-									<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
-								</SidebarTooltip>
-							)
-					)}
-				</div>
-				<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
-				<div className="flex flex-col gap-3 ">
-					{clans.map((clan: IClan) => {
-						return (
-							<SidebarTooltip key={clan.clan_id} titleTooltip={clan.clan_name}>
-								<SidebarClanItem
-									linkClan={`/chat/clans/${clan.id}`}
-									option={clan}
-									active={!pathName?.includes('direct') && currentClanId === clan.clan_id}
-									pathname={pathName}
-								/>
-							</SidebarTooltip>
-						);
-					})}
-				</div>
-				<div className="mt-3">
-					<SidebarTooltip titleTooltip="Add Clan">
-						<NavLinkComponent>
-							<div
-								className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
-								onClick={openCreateClanModal}
-							>
-								<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-									<p className="text-2xl font-bold text-[#155EEF]">+</p>
-								</div>
-							</div>
-						</NavLinkComponent>
-					</SidebarTooltip>
+						</SidebarTooltip>
+					</div>
 				</div>
 			</div>
 			<MainContent />

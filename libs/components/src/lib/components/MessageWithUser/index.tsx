@@ -31,6 +31,7 @@ export type MessageWithUserProps = {
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
 	popup?: JSX.Element;
 	isSearchMessage?: boolean;
+	allowDisplayShortProfile: boolean;
 };
 
 function MessageWithUser({
@@ -44,7 +45,8 @@ function MessageWithUser({
 	isHighlight,
 	popup,
 	isShowFull,
-	isSearchMessage
+	isSearchMessage,
+	allowDisplayShortProfile
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
@@ -147,7 +149,13 @@ function MessageWithUser({
 										mode={mode}
 									/>
 									<div className="w-full relative h-full">
-										<MessageHead message={message} isCombine={isCombine} isShowFull={isShowFull} mode={mode} />
+										<MessageHead
+											allowDisplayShortProfile={allowDisplayShortProfile}
+											message={message}
+											isCombine={isCombine}
+											isShowFull={isShowFull}
+											mode={mode}
+										/>
 										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
 											<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 												{isEditing && editor}

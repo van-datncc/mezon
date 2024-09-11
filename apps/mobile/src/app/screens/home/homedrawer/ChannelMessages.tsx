@@ -24,9 +24,10 @@ type ChannelMessagesProps = {
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
 	isDM?: boolean;
+	isPublic?: boolean;
 };
 
-const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker, isDM }: ChannelMessagesProps) => {
+const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker, isDM, isPublic }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -166,8 +167,8 @@ const ChannelMessages = React.memo(({ channelId, mode, onOpenImage, onMessageAct
 			{/*		<Icons.ArrowLargeDownIcon color={themeValue.textStrong} height={20} width={20} />*/}
 			{/*	</TouchableOpacity>*/}
 			{/*)}*/}
-
-			<MessageUserTyping channelId={channelId} isDM={isDM} />
+			
+			<MessageUserTyping channelId={channelId} isDM={isDM} isPublic={isPublic} mode={mode} />
 		</View>
 	);
 });
