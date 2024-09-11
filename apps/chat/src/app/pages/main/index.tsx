@@ -106,7 +106,7 @@ function MyApp() {
 
 	const handleKeyDown = useCallback(
 		(event: any) => {
-			if (event.ctrlKey && event.key === 'k') {
+			if (event.ctrlKey && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
 				openSearchModal();
 			}
