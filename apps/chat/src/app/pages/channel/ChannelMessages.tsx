@@ -50,10 +50,14 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	const onChatRender = useCallback(
 		(node: HTMLDivElement | null) => {
 			chatRef.current = node;
-			if (channelId && node) {
-				node.scrollTop = node.scrollHeight;
+			if (node) {
+				requestAnimationFrame(() => {
+					node.scrollTop = node.scrollHeight;
+				});
 			}
 		},
+		// the function needs to be re-created when channelId changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[channelId]
 	);
 
@@ -101,23 +105,6 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
 	const chatScrollRef = useChatScroll(chatRef, anchorRef, chatRefData, loadMoreMessage);
-
-	const messagesView = useMemo(() => {
-		return messages.map((messageId) => {
-			return (
-				<MemorizedChannelMessage
-					avatarDM={avatarDM}
-					userName={userName}
-					key={messageId}
-					messageId={messageId}
-					channelId={channelId}
-					isHighlight={messageId === idMessageNotified}
-					mode={mode}
-					channelLabel={channelLabel ?? ''}
-				/>
-			);
-		});
-	}, [messages, channelId, idMessageNotified, mode, channelLabel, avatarDM, userName]);
 
 	// Jump to message when user is jumping to message
 	useEffect(() => {
@@ -184,21 +171,40 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	return (
 		<MessageContextMenuProvider>
 			<div
-				className={classNames('dark:bg-bgPrimary pb-5 bg-bgLightPrimary overflow-y-scroll overflow-x-hidden h-full', {
-					customScrollLightMode: appearanceTheme === 'light'
-				})}
 				id="scrollLoading"
+				className={classNames(
+					'absolute top-0 left-0 bottom-0 right-0 overflow-auto overflow-anchor-none dark:bg-bgPrimary bg-bgLightPrimary',
+					{
+						customScrollLightMode: appearanceTheme === 'light'
+					}
+				)}
 				ref={onChatRender}
 			>
-				<div className="flex flex-col min-h-full justify-end">
+				<div className="min-h-[100%] overflow-anchor-none flex flex-col justify-end">
 					{shouldRenderLoadingBlock && isFetching && (
 						<p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>
 					)}
-					{messagesView}
-					{openModalAttachment && <MessageModalImage />}
+					<ol className="min-h-0 overflow-hidden">
+						{messages.map((messageId) => {
+							return (
+								<MemorizedChannelMessage
+									avatarDM={avatarDM}
+									userName={userName}
+									key={messageId}
+									messageId={messageId}
+									channelId={channelId}
+									isHighlight={messageId === idMessageNotified}
+									mode={mode}
+									channelLabel={channelLabel ?? ''}
+								/>
+							);
+						})}
+					</ol>
+					<div className="h-[30px] w-[1px] pointer-events-none"></div>
 				</div>
-				<div ref={anchorRef} className="anchor"></div>
 			</div>
+			{openModalAttachment && <MessageModalImage />}
+			{/* <div ref={anchorRef} className="anchor"></div> */}
 		</MessageContextMenuProvider>
 	);
 }
