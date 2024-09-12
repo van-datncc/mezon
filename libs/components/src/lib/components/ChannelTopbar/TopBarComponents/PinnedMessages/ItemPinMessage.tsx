@@ -56,7 +56,12 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 						</span>
 					</div>
 					<div className="leading-6">
-						<MessageLine content={JSON.parse(pinMessage.content || '')} isJumMessageEnabled={false} isTokenClickAble={false} />
+						<MessageLine
+							isEditted={false}
+							content={JSON.parse(pinMessage.content || '')}
+							isJumMessageEnabled={false}
+							isTokenClickAble={false}
+						/>
 					</div>
 					{message?.attachments?.length ? <ListPinAttachment attachments={message.attachments} /> : <></>}
 				</div>

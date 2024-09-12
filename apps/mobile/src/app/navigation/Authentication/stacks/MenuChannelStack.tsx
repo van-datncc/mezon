@@ -73,6 +73,7 @@ export function MenuChannelStacks({}: any) {
 					}
 				}}
 			/>
+			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES} component={AdvancedPermissionOverrides} />
 		</Stack.Navigator>
 	);
 }

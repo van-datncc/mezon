@@ -174,7 +174,8 @@ export const ChatMessageSending = memo(
 							attachmentDataRef || [],
 							reference,
 							false,
-							isMentionEveryOne
+							isMentionEveryOne,
+							true
 						);
 					}
 				}
