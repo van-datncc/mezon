@@ -166,7 +166,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	return (
 		<KeyboardAvoidingView style={styles.createChannelContainer}>
 			<ScrollView contentContainerStyle={{ flex: 1 }}>
-				<Formik innerRef={formikRef} initialValues={{ nameValueThread: null, isPrivate: false }} onSubmit={() => {}}>
+				<Formik innerRef={formikRef} initialValues={{ nameValueThread: null, isPrivate: false }}>
 					{({ setFieldValue, handleChange, handleBlur, handleSubmit, values, touched, errors }) => (
 						<View style={styles.createChannelContent}>
 							<View style={{ marginHorizontal: 20 }}>
