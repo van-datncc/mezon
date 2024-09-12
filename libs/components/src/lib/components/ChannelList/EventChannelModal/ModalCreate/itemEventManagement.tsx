@@ -31,7 +31,7 @@ export type ItemEventManagementProps = {
 export enum EEventStatus {
 	UPCOMING = 'UPCOMING',
 	ONGOING = 'ONGOING',
-	FINISHED = 'FINISHED',
+	COMPLETED = 'COMPLETED',
 	UNKNOWN = 'UNKNOWN'
 }
 

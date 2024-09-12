@@ -159,7 +159,7 @@ export const eventManagementSlice = createSlice({
 				state.ongoingEvent = action.payload;
 			}
 
-			if (action.payload.event_status === EEventStatus.FINISHED && state.ongoingEvent?.event_id === action.payload.event_id) {
+			if (action.payload.event_status === EEventStatus.COMPLETED && state.ongoingEvent?.event_id === action.payload.event_id) {
 				state.ongoingEvent = null;
 			}
 		},
