@@ -147,7 +147,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		return () => {
 			appStateSubscription.remove();
 		};
-	}, [dmGroupChatList]);
+	}, []);
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
