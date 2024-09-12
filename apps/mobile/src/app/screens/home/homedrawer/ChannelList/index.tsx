@@ -86,13 +86,15 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	};
 
 	useEffect(() => {
+		let idTimeOut;
 		if (!hiddenBottomTab && currentClanId && categorizedChannels?.length) {
-			requestAnimationFrame(() => {
-				setTimeout(() => {
-					scrollToItemById();
-				}, 200);
-			});
+			idTimeOut = setTimeout(() => {
+				scrollToItemById();
+			}, 200);
 		}
+		return () => {
+			clearTimeout(idTimeOut);
+		};
 	}, [hiddenBottomTab, currentClanId, categorizedChannels?.length, isLoading]);
 
 	const renderItemChannelList = useCallback(
@@ -103,6 +105,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 						const { y, height } = event.nativeEvent.layout;
 						categoryOffsetsRef.current[item?.category_id] = { y, height, item };
 					}}
+					key={item?.category_id}
 				>
 					<ChannelListSection
 						channelsPositionRef={channelsPositionRef}

@@ -46,9 +46,21 @@ const ChannelListSection = memo(
 
 		const handlePositionChannel = (item, event) => {
 			const { y } = event.nativeEvent.layout;
+			let threadY = 0;
+			const heightChannel = y;
+			if (item?.threads?.length) {
+				item?.threads.forEach((thread) => {
+					const threadHeight = 36;
+					threadY += threadHeight;
+					channelsPositionRef.current = {
+						...channelsPositionRef.current,
+						[`${thread.id}`]: y + threadY
+					};
+				});
+			}
 			channelsPositionRef.current = {
 				...channelsPositionRef.current,
-				[`${item.id}`]: y
+				[`${item.id}`]: heightChannel
 			};
 		};
 
