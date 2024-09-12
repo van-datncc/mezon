@@ -778,14 +778,3 @@ input:-webkit-autofill:active {
 .custom-member-list {
 	-ms-overflow-style: none;
 }
-
-#scrollLoading {
-	overflow-anchor: none;
-	& * {
-		overflow-anchor: none;
-	}
-	& > .anchor {
-		overflow-anchor: auto;
-		height: 1px;
-	}
-}
