@@ -15,6 +15,7 @@ type EmojiMarkupOpt = {
 
 export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, onlyEmoji, isOne }) => {
 	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'} inline-block relative -top-0.4 m-0`);
+	const appearanceTheme = useSelector(selectTheme);
 
 	const srcEmoji = useMemo(() => {
 		return getSrcEmoji(emojiId);
@@ -36,8 +37,6 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 			onDragStart={(e) => e.preventDefault()}
 		/>
 	);
-
-	const appearanceTheme = useSelector(selectTheme);
 
 	return (
 		<span onContextMenu={handleContextMenu}>
