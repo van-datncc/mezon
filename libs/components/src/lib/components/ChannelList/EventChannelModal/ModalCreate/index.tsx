@@ -70,7 +70,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
-		console.log('TIme Start :', timeValueStart);
+
 		await createEventManagement(
 			currentClanId || '',
 			voice,

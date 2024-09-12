@@ -76,9 +76,8 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 
 	const handleChangeTimeStart = (e: any) => {
 		const time = e.target.value;
-		console.log(time);
 		setContentSubmit((prev) => ({ ...prev, timeStart: time }));
-		// setErrorStart(!compareTime(timeStartDefault, time, true));
+		setErrorStart(!compareTime(timeStartDefault, time, true));
 	};
 
 	const handleChangeTimeEnd = (e: any) => {
