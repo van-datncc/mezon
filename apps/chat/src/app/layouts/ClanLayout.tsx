@@ -6,9 +6,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentVoiceChannel,
-	selectStatusMenu,
-	stickerSettingActions,
-	useAppDispatch
+	selectStatusMenu
 } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect } from 'react';
@@ -24,7 +22,6 @@ const ClanLayout = () => {
 	const userProfile = useSelector(selectAllAccount);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	const dispatch = useAppDispatch();
 
 	const { isShowCreateThread } = useThreads();
 	const { setIsShowMemberList } = useApp();
@@ -37,10 +34,6 @@ const ClanLayout = () => {
 			setIsShowMemberList(false);
 		}
 	}, [isShowCreateThread]);
-
-	useEffect(() => {
-		dispatch(stickerSettingActions.fetchStickerByClanId({ clanId: clanId || '' }));
-	}, [clanId, dispatch]);
 
 	return (
 		<MezonPolicyProvider clanId={clanId}>

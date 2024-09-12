@@ -36,9 +36,9 @@ export const ThreadHeader = memo(() => {
 	}, [currentDmGroup?.channel_label, currentChannel?.channel_label, currentChannel?.usernames]);
 
 	const isChannel = useMemo(() => {
-		return !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id)
-	}, [currentChannel?.channel_label, currentChannel?.parrent_id])
-	
+		return !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
+	}, [currentChannel?.channel_label, currentChannel?.parrent_id]);
+
 	return (
 		<View style={styles.channelLabelWrapper}>
 			<TouchableOpacity style={styles.iconBackHeader} onPress={() => navigation.goBack()}>
@@ -67,13 +67,15 @@ export const ThreadHeader = memo(() => {
 			) : (
 				<View style={styles.channelText}>
 					{currentChannel?.channel_private === ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
-						isChannel ? 
-							<Icons.TextLockIcon width={20} height={20} color={themeValue.text} /> : 
+						isChannel ? (
+							<Icons.TextLockIcon width={20} height={20} color={themeValue.text} />
+						) : (
 							<Icons.ThreadLockIcon width={20} height={20} color={themeValue.text} />
+						)
+					) : isChannel ? (
+						<Icons.TextIcon width={20} height={20} color={themeValue.text} />
 					) : (
-						isChannel ? 
-							<Icons.TextIcon width={20} height={20} color={themeValue.text} /> : 
-							<Icons.ThreadIcon width={20} height={20} color={themeValue.text} />
+						<Icons.ThreadIcon width={20} height={20} color={themeValue.text} />
 					)}
 					<Text numberOfLines={1} style={styles.channelLabel}>
 						{currentChannel?.channel_label || currentChannel?.usernames}
