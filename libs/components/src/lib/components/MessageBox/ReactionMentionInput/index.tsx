@@ -629,7 +629,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				onPaste={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
-				placeholder="Write your thoughs here..."
+				placeholder="Write your thoughts here..."
 				value={request?.valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={{
