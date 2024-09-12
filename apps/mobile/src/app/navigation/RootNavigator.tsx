@@ -86,7 +86,7 @@ const NavigationMain = () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentChannelId, isFromFcmMobile, isLoggedIn]);
+	}, [currentChannelId, isFromFcmMobile, isLoggedIn, currentClanId]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', async (state) => {
@@ -138,7 +138,8 @@ const NavigationMain = () => {
 	const handleAppStateChange = useCallback(
 		async (state: string) => {
 			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-			if (state === 'active') {
+			// Note: if currentClanId === 0 is current DM
+			if (state === 'active' && currentClanId !== '0') {
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
@@ -147,7 +148,7 @@ const NavigationMain = () => {
 				}
 			}
 		},
-		[isFromFcmMobile, currentChannelId]
+		[isFromFcmMobile, currentChannelId, currentClanId]
 	);
 
 	const messageLoaderBackground = useCallback(async () => {
