@@ -151,7 +151,7 @@ function ChannelLink({
 			ref={panelRef}
 			onMouseDown={(event) => handleMouseClick(event)}
 			role="button"
-			className={`relative group ${isUnReadChannel ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute before:bg-channelActiveColor before:top-3' : ''}`}
+			className={`relative group ${isUnReadChannel ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 		>
 			{channelType === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<span
