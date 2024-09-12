@@ -52,7 +52,7 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 			<View
 				style={{
 					height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-					backgroundColor: themeValue.secondary
+					backgroundColor: themeValue.tertiary
 				}}
 			/>
 			{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (
