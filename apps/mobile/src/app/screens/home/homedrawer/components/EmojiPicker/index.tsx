@@ -89,7 +89,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 
 	const { sendMessage } = useChatSending({
 		mode: dmMode || channelMode,
-		channelOrDirect: currentDirectMessage || currentChannel,
+		channelOrDirect: currentDirectMessage || currentChannel
 	});
 
 	const handleSend = useCallback(
@@ -99,7 +99,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>
 		) => {
-			sendMessage(content, mentions, attachments, references);
+			sendMessage(content, mentions, attachments, references, false, false, true);
 		},
 		[sendMessage]
 	);

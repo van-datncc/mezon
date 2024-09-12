@@ -225,7 +225,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
 					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndChannelId({ userId: userID, channelId: user.channel_id }));
+					dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 						dispatch(fetchDirectMessage({ noCache: true }));
 						dispatch(
@@ -283,6 +283,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					);
 				}
 			} else {
+				if (clanIdActive === userAdds.clan_id) {
+					const members = userAdds?.users
+						.filter((user) => user?.user_id)
+						.map((user) => ({
+							id: user.user_id,
+							user: { ...user, avatar_url: user.avatar, id: user.user_id }
+						}));
+					dispatch(usersClanActions.upsertMany(members));
+				}
+
 				dispatch(
 					channelMembersActions.fetchChannelMembers({
 						clanId: userAdds.clan_id || '',
@@ -305,13 +315,19 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
 				return;
 			}
-			dispatch(
-				usersClanActions.add({
-					...userJoinClan,
-					id: userJoinClan?.user?.user_id
-				})
-			);
-			dispatch(channelMembersActions.addUserJoinClan(userJoinClan));
+			if (userJoinClan?.user && clanIdActive === userJoinClan.clan_id) {
+				dispatch(
+					usersClanActions.add({
+						...userJoinClan,
+						id: userJoinClan.user.user_id,
+						user: {
+							...userJoinClan.user,
+							avatar_url: userJoinClan.user.avatar,
+							id: userJoinClan.user.user_id
+						}
+					})
+				);
+			}
 		},
 		[dispatch]
 	);

@@ -1,9 +1,11 @@
 import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
+import { ChangeCategory } from '../../../components/ChangeCategory';
 import ChannelSetting from '../../../components/ChannelSetting';
 import SearchMessageChannel from '../../../components/ThreadDetail/SearchMessageChannel';
 import { ChannelPermissionSetting } from '../../../screens/channelPermissionSetting';
+import { AdvancedPermissionOverrides } from '../../../screens/channelPermissionSetting/AdvancedPermissionOverrides';
 import { APP_SCREEN } from '../../ScreenTypes';
 
 type StackMenuChannelScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
@@ -45,7 +47,7 @@ export function MenuChannelStacks({}: any) {
 					headerTitleStyle: {
 						color: themeValue.textStrong
 					},
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen
@@ -53,10 +55,25 @@ export function MenuChannelStacks({}: any) {
 				component={SearchMessageChannel}
 				options={{
 					headerShown: false,
-					headerLeftLabelVisible: false,
+					headerLeftLabelVisible: false
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION} component={ChannelPermissionSetting} />
+			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY} component={ChangeCategory} />
+			<Stack.Screen
+				name={APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES}
+				component={AdvancedPermissionOverrides}
+				options={{
+					headerTitle: t('menuChannelStack.permissionOverrides'),
+					headerStyle: {
+						backgroundColor: themeValue.secondary
+					},
+					headerTitleStyle: {
+						color: themeValue.textStrong
+					}
+				}}
+			/>
+			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES} component={AdvancedPermissionOverrides} />
 		</Stack.Navigator>
 	);
 }

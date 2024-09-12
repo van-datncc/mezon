@@ -1,10 +1,8 @@
-import { handleUploadFile } from '@mezon/transport';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
 	Direction_Mode,
 	EMessageCode,
-	EMimeTypes,
 	EmojiDataOptionals,
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -13,7 +11,8 @@ import {
 	MessageTypeUpdateLink,
 	checkContinuousMessagesByCreateTimeMs,
 	checkSameDayByCreateTime,
-	fetchAndCreateFiles
+	getMobileUploadedAttachments,
+	getWebUploadedAttachments
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -424,6 +423,7 @@ type SendMessagePayload = {
 	isPublic: boolean;
 	isParentPublic: boolean;
 	avatar?: string;
+	isMobile?: boolean;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
@@ -441,7 +441,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		isParentPublic,
 		clanId,
 		senderId,
-		avatar
+		avatar,
+		isMobile = false
 	} = payload;
 	const id = Date.now().toString();
 
@@ -460,22 +461,11 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			let uploadedFiles: ApiMessageAttachment[] = [];
 			// Check if there are attachments
 			if (attachments && attachments.length > 0) {
-				const directLinks = attachments.filter((att) => att.url?.includes(EMimeTypes.tenor) || att.url?.includes(EMimeTypes.cdnmezon));
-				const nonDirectAttachments = attachments.filter(
-					(att) => !att.url?.includes(EMimeTypes.tenor) && !att.url?.includes(EMimeTypes.cdnmezon)
-				);
-
-				if (nonDirectAttachments.length > 0) {
-					const createdFiles = await fetchAndCreateFiles(nonDirectAttachments);
-					const uploadPromises = createdFiles.map((file, index) => {
-						return handleUploadFile(client, session, clanId, channelId, file.name, file, index);
-					});
-
-					const uploadedNonDirectFiles = await Promise.all(uploadPromises);
-					uploadedFiles = [...uploadedFiles, ...uploadedNonDirectFiles];
+				if (isMobile) {
+					uploadedFiles = await getMobileUploadedAttachments({ attachments, channelId, clanId, client, session });
+				} else {
+					uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
 				}
-
-				uploadedFiles = [...uploadedFiles, ...directLinks.map((link) => ({ url: link.url, filetype: link.filetype }))];
 			}
 
 			const res = await socket.writeChatMessage(
@@ -521,7 +511,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			channel_id: channelId,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
-			content: content,
+			content,
+			attachments,
 			create_time: new Date().toISOString(),
 			sender_id: senderId,
 			username: '',
@@ -736,7 +727,7 @@ export const messagesSlice = createSlice({
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
-							hideEditted: action.payload.hideEditted,
+							hideEditted: action.payload.hide_editted,
 							update_time: action.payload.update_time
 						}
 					});

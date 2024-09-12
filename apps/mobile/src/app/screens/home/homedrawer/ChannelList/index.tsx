@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import EventViewer from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
@@ -38,6 +39,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const bottomSheetChannelMenuRef = useRef<BottomSheetModal>(null);
 	const bottomSheetEventRef = useRef<BottomSheetModal>(null);
 	const bottomSheetInviteRef = useRef(null);
+	const bottomSheetNotifySettingRef = useRef<BottomSheetModal>(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
@@ -183,12 +185,16 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				<CategoryMenu inviteRef={bottomSheetInviteRef} category={currentPressedCategory} />
 			</MezonBottomSheet>
 
-			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent onDismiss={() => setCurrentPressedChannel(null)}>
-				<ChannelMenu inviteRef={bottomSheetInviteRef} channel={currentPressedChannel} />
+			<MezonBottomSheet ref={bottomSheetChannelMenuRef} heightFitContent>
+				<ChannelMenu inviteRef={bottomSheetInviteRef} notifySettingRef={bottomSheetNotifySettingRef} channel={currentPressedChannel} />
 			</MezonBottomSheet>
 
 			<MezonBottomSheet ref={bottomSheetEventRef} heightFitContent={allEventManagement?.length === 0}>
 				<EventViewer handlePressEventCreate={handlePressEventCreate} />
+			</MezonBottomSheet>
+
+			<MezonBottomSheet ref={bottomSheetNotifySettingRef} snapPoints={['50%']}>
+				<NotificationSetting channel={currentPressedChannel} />
 			</MezonBottomSheet>
 		</ChannelListContext.Provider>
 	);
