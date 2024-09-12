@@ -8,19 +8,22 @@ import {
 	selectDmGroupCurrentId,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
+	selectTheme,
 	selectValueInputSearchMessage,
-	useAppDispatch,
+	useAppDispatch
 } from '@mezon/store';
-import { SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
+import { SearchFilter, SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import SearchMessageChannelModal from './SearchMessageChannelModal';
 import SelectGroup from './SelectGroup';
-import SelectItem from './SelectItem';
-import darkMentionsInputStyle from './StyleSearchMessages';
+import darkMentionsInputStyle from './StyleSearchMessagesDark';
+import lightMentionsInputStyle from './StyleSearchMessagesLight';
+
 import { hasKeySearch, searchFieldName } from './constant';
+import SelectItemUser from './SelectItemUser';
 
 type SearchMessageChannelProps = {
 	mode?: ChannelStreamMode;
@@ -43,7 +46,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 
 	const userListData = UserMentionList({
 		channelID: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.id ?? '') : (currentDmGroupId ?? ''),
-		channelMode: mode,
+		channelMode: mode
 	});
 
 	const userListDataSearchByMention = userListData.map((user) => {
@@ -51,7 +54,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			id: user?.id ?? '',
 			display: user?.username ?? '',
 			avatarUrl: user?.avatarUrl ?? '',
-			subDisplay: user?.display,
+			subDisplay: user?.display
 		};
 	});
 
@@ -94,17 +97,17 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			filter.push(
 				{
 					field_name: 'content',
-					field_value: value,
+					field_value: value
 				},
 				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId as string },
+				{ field_name: 'clan_id', field_value: currentClanId as string }
 			);
 		}
 		for (const mention of mentions) {
 			const convertMention = mention.display.split(':');
 			filter.push(
 				{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
-				{ field_name: 'channel_id', field_value: currentChannel?.id },
+				{ field_name: 'channel_id', field_value: currentChannel?.id }
 			);
 		}
 		setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
@@ -139,8 +142,8 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 		dispatch(
 			searchMessagesActions.setValueInputSearch({
 				channelId: currentChannel?.id ?? '',
-				value: hasKeySearch(value ?? '') ? value : valueInputSearch + value,
-			}),
+				value: hasKeySearch(value ?? '') ? value : valueInputSearch + value
+			})
 		);
 		searchRef.current?.focus();
 	};
@@ -158,6 +161,8 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 		};
 	}, [valueInputSearch]);
 
+	const appearanceTheme = useSelector(selectTheme);
+
 	return (
 		<div className="relative" ref={inputRef}>
 			<div
@@ -169,7 +174,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					inputRef={searchRef}
 					placeholder="Search"
 					value={valueInputSearch ?? ''}
-					style={darkMentionsInputStyle}
+					style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 					onChange={handleChange}
 					className="w-full mr-[10px] dark:bg-transparent bg-transparent dark:text-white text-colorTextLightMode rounded-md focus-visible:!border-0 focus-visible:!outline-none focus-visible:[&>*]:!outline-none"
 					allowSpaceInQuery={true}
@@ -211,7 +216,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 							return `from:${display}`;
 						}}
 						renderSuggestion={(suggestion) => {
-							return <SelectItem title="from: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
+							return <SelectItemUser title="from: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
 						}}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					/>
@@ -224,7 +229,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 							return `mentions:${display}`;
 						}}
 						renderSuggestion={(suggestion) => {
-							return <SelectItem title="mentions: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
+							return <SelectItemUser title="mentions: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
 						}}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					/>
