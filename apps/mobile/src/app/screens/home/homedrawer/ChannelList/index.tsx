@@ -93,7 +93,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 			}, 200);
 		}
 		return () => {
-			clearTimeout(idTimeOut);
+			idTimeOut && clearTimeout(idTimeOut);
 		};
 	}, [hiddenBottomTab, currentClanId, categorizedChannels?.length, isLoading]);
 
