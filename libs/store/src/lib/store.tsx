@@ -179,7 +179,8 @@ const persistedRolesClanReducer = persistReducer(
 const persistedEventMngtReducer = persistReducer(
 	{
 		key: 'eventmanagement',
-		storage
+		storage,
+		blacklist: ['ongoingEvent']
 	},
 	eventManagementReducer
 );

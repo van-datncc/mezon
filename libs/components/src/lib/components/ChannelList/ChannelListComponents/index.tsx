@@ -103,13 +103,13 @@ const EventNotification = ({ event, handleOpenDetail }: { event: EventManagement
 				</div>
 				<Icons.CloseButton className="w-3 h-3 mt-2" onClick={handleCloseEvent} />
 			</div>
-			<p className="text-white mt-3 text-base font-medium">{event.title}</p>
+			<p className="text-channelActiveLightColor dark:text-channelActiveColor mt-3 text-base font-medium">{event.title}</p>
 			<div className="flex mt-2">
-				<Icons.Location />
-				<p className="ml-2 text-gray-200">{event.address}</p>
+				<Icons.Location defaultFill="text-channelActiveLightColor dark:text-channelActiveColor" />
+				<p className="ml-2 text-channelActiveLightColor dark:text-channelActiveColor">{event.address}</p>
 			</div>
 			<div className="text-center py-1 bg-green-700 mt-2 rounded select-none" onClick={handleOpenDetail}>
-				<p className="text-white font-medium">Event detail</p>
+				<p className=" text-channelActiveLightColor dark:text-channelActiveColor  font-medium">Event detail</p>
 			</div>
 		</div>
 	);
