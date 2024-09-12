@@ -44,7 +44,7 @@ const MemberListContent = memo(({ currentChannel }: { currentChannel: ChannelsEn
 							{ onlineSeparate: true },
 							...onlineMembers,
 							{
-								offlineSeparate: offlineMembers.length > 0
+								offlineSeparate: true
 							},
 							...offlineMembers
 						]}
