@@ -15,7 +15,7 @@ export const useStickyScroll = (
 	options?: IUseStickyScrollOptions
 ): IUseStickyScrollResponse => {
 	const [enabled, setEnabled] = useState<boolean>(options?.enabled ?? true);
-	const { setScrollEventHandler } = useScroll(targetRef, { debounce: 0 });
+	const { setScrollEventHandler } = useScroll(targetRef, { debounce: null });
 	const anchor = useAnchor(targetRef, anchorRef);
 
 	/**
@@ -56,19 +56,22 @@ export const useStickyScroll = (
 
 	useEffect(() => {
 		setScrollEventHandler(() => {
-			const target = targetRef?.current;
-			if (!target) {
-				return;
-			}
+			requestAnimationFrame(() => {
+				const target = targetRef?.current;
+				if (!target) {
+					return;
+				}
 
-			const { scrollTop, scrollHeight, clientHeight } = target;
-			const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+				const { scrollTop, scrollHeight, clientHeight } = target;
+				const isAtBottom = scrollTop + clientHeight >= scrollHeight;
 
-			if (isAtBottom) {
-				anchor.current.drop();
-			} else {
-				anchor.current.raise();
-			}
+				console.log('isAtBottom', isAtBottom);
+				if (isAtBottom) {
+					anchor.current.drop();
+				} else {
+					anchor.current.raise();
+				}
+			});
 		});
 	}, [targetRef, anchor, setScrollEventHandler]);
 
