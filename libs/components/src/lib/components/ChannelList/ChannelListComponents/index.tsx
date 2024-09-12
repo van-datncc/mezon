@@ -18,6 +18,7 @@ export const Events = () => {
 	const { currentURL } = useAppParams();
 	const numberEventManagement = useSelector(selectNumberEvent);
 	const ongoingEvent = useSelector(selectOngoingEvent);
+	const [openModalDetail, setOpenModalDetail] = useState(false);
 
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -32,11 +33,15 @@ export const Events = () => {
 		setClanShowNumEvent(false);
 	};
 
+	const handleOpenDetail = () => {
+		setShowModal(true);
+		setOpenModalDetail(true);
+	};
 	const memberPath = toMembersPage(currentClanId || '');
 
 	return (
 		<>
-			{ongoingEvent && <EventNotification event={ongoingEvent} />}
+			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 			<div
 				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded h-[34px] dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"
 				onClick={openModal}
@@ -72,12 +77,19 @@ export const Events = () => {
 					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Members</div>
 				</div>
 			</Link>
-			{showModal && <EventModal onClose={closeModal} numberEventManagement={numberEventManagement} />}
+			{showModal && (
+				<EventModal
+					onClose={closeModal}
+					numberEventManagement={numberEventManagement}
+					openModalDetail={openModalDetail}
+					setOpenModalDetail={setOpenModalDetail}
+				/>
+			)}
 		</>
 	);
 };
 
-const EventNotification = ({ event }: { event: EventManagementOnGogoing }) => {
+const EventNotification = ({ event, handleOpenDetail }: { event: EventManagementOnGogoing; handleOpenDetail: () => void }) => {
 	const dispatch = useDispatch();
 	const handleCloseEvent = () => {
 		dispatch(eventManagementActions.clearOngoingEvent(null));
@@ -96,7 +108,7 @@ const EventNotification = ({ event }: { event: EventManagementOnGogoing }) => {
 				<Icons.Location />
 				<p className="ml-2 text-gray-200">{event.address}</p>
 			</div>
-			<div className="text-center py-1 bg-green-700 mt-2 rounded">
+			<div className="text-center py-1 bg-green-700 mt-2 rounded select-none" onClick={handleOpenDetail}>
 				<p className="text-white font-medium">Event detail</p>
 			</div>
 		</div>
