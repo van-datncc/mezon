@@ -1,6 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { useAnimatedState, useTheme } from '@mezon/mobile-ui';
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { AppState, DeviceEventEmitter, Keyboard, Platform, View } from 'react-native';
 import { IModeKeyboardPicker } from './components';
@@ -15,7 +15,7 @@ interface IProps {
 }
 const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	const { themeValue } = useTheme();
-	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
+	const [heightKeyboardShow, setHeightKeyboardShow] = useAnimatedState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
@@ -52,7 +52,7 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 			<View
 				style={{
 					height: Platform.OS === 'ios' || typeKeyboardBottomSheet !== 'text' ? heightKeyboardShow : 0,
-					backgroundColor: themeValue.secondary
+					backgroundColor: themeValue.tertiary
 				}}
 			/>
 			{heightKeyboardShow !== 0 && typeKeyboardBottomSheet !== 'text' && (

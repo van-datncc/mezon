@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useChatSending } from '@mezon/core';
 import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons } from '@mezon/mobile-components';
-import { Block, baseColor, useTheme } from '@mezon/mobile-ui';
+import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, selectAttachmentByChannelId, selectChannelById, selectDmGroupCurrent } from '@mezon/store';
 import { referencesActions, selectAllRolesClan, useAppDispatch } from '@mezon/store-mobile';
 import {
@@ -17,8 +17,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { MutableRefObject, memo, useCallback, useMemo } from 'react';
-import { DeviceEventEmitter, InteractionManager, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { DeviceEventEmitter, InteractionManager, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve, IPayloadThreadSendMessage } from '../../../types';
@@ -196,15 +195,20 @@ export const ChatMessageSending = memo(
 
 		return (
 			<Block>
-				{isAvailableSending || !!attachmentDataRef?.length ? (
+				{(isAvailableSending || !!attachmentDataRef?.length) && (
 					<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
-						<Icons.SendMessageIcon width={18} height={18} color={baseColor.white} />
+						<Icons.SendMessageIcon width={size.s_18} height={size.s_18} color={baseColor.white} />
 					</View>
-				) : (
-					<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })} style={styles.btnIcon}>
-						<Icons.MicrophoneIcon width={22} height={22} color={themeValue.textStrong} />
-					</TouchableOpacity>
 				)}
+				{/*{isAvailableSending || !!attachmentDataRef?.length ? (*/}
+				{/*	<View onTouchEnd={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>*/}
+				{/*		<Icons.SendMessageIcon width={18} height={18} color={baseColor.white} />*/}
+				{/*	</View>*/}
+				{/*) : (*/}
+				{/*	<TouchableOpacity onPress={() => Toast.show({ type: 'info', text1: 'Updating...' })} style={styles.btnIcon}>*/}
+				{/*		<Icons.MicrophoneIcon width={22} height={22} color={themeValue.textStrong} />*/}
+				{/*	</TouchableOpacity>*/}
+				{/*)}*/}
 			</Block>
 		);
 	}
