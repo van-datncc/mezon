@@ -116,5 +116,9 @@
             "roles": "VAI TRÒ",
             "members": "THÀNH VIÊN"
         }
+    },
+    "changeCategory": {
+        "title": "Thay đổi Category",
+        "label": "CHUYỂN TỪ {{currentChannel}} TỚI"
     }
 }
