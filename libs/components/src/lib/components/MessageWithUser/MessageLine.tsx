@@ -123,12 +123,7 @@ const RenderContent = memo(
 
 				if (lastindex < s) {
 					formattedContent.push(
-						<PlainText
-							isEditted={isEditted}
-							isSearchMessage={isSearchMessage}
-							key={`plain-${lastindex}`}
-							text={t?.slice(lastindex, s) ?? ''}
-						/>
+						<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}`} text={t?.slice(lastindex, s) ?? ''} />
 					);
 				}
 
@@ -226,8 +221,14 @@ const RenderContent = memo(
 			});
 
 			if (t && lastindex < t?.length) {
+				formattedContent.push(<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />);
+			}
+
+			if (isEditted) {
 				formattedContent.push(
-					<PlainText isEditted={isEditted} isSearchMessage={isSearchMessage} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />
+					<p className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]">
+						(edited)
+					</p>
 				);
 			}
 
