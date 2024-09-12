@@ -7,6 +7,7 @@ import {
 	clansSlice,
 	directActions,
 	directSlice,
+	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
 	fetchListFriends,
@@ -57,7 +58,7 @@ import {
 	VoiceJoinedEvent,
 	VoiceLeavedEvent
 } from 'mezon-js';
-import { ApiMessageReaction } from 'mezon-js/api.gen';
+import { ApiCreateEventRequest, ApiMessageReaction } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -447,6 +448,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const oneventcreated = useCallback(
+		(eventCreatedEvent: ApiCreateEventRequest) => {
+			dispatch(eventManagementActions.updateStatusEvent(eventCreatedEvent));
+		},
+		[dispatch]
+	);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -491,6 +499,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onchannelupdated = onchannelupdated;
 
+			socket.oneventcreated = oneventcreated;
+
 			socket.onheartbeattimeout = onHeartbeatTimeout;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -513,7 +523,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
-			onvoiceleaved
+			onvoiceleaved,
+			oneventcreated
 		]
 	);
 
@@ -589,6 +600,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchanneldeleted,
 		onchannelupdated,
 		onHeartbeatTimeout,
+		oneventcreated,
 		setCallbackEventFn
 	]);
 

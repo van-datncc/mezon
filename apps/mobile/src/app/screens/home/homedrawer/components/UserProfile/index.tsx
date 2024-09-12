@@ -181,8 +181,8 @@ const UserProfile = React.memo(({ userId, user, onClose, checkAnonymous, message
 			<View style={[styles.backdrop, { backgroundColor: userById || user?.avatar_url ? color : Colors.titleReset }]}>
 				<View style={[styles.userAvatar]}>
 					<MezonAvatar
-						width={80}
-						height={80}
+						width={size.s_80}
+						height={size.s_80}
 						avatarUrl={userById?.clan_avatar || userById?.user?.avatar_url || user?.avatar_url}
 						username={userById?.clan_nick || user?.display_name || userById?.user?.username}
 						userStatus={userStatus}

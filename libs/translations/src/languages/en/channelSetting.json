@@ -117,5 +117,9 @@
             "roles": "ROLES",
             "members": "MEMBERS"
         }
+    },
+    "changeCategory": {
+        "title": "Change Category",
+        "label": "MOVE FROM {{currentChannel}} TO"
     }
 }

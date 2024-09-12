@@ -775,13 +775,8 @@ input:-webkit-autofill:active {
 	}
 }
 
-.custom-member-list::-webkit-scrollbar {
-	display: none;
-}
-
 .custom-member-list {
 	-ms-overflow-style: none;
-	scrollbar-width: none;
 }
 
 #scrollLoading {

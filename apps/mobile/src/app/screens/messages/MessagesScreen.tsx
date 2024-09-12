@@ -1,14 +1,14 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
-import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, selectAllClans, selectDirectsOpenlist, selectTypingUserIdsByChannelId } from '@mezon/store-mobile';
+import { Colors, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
+import { directActions, DirectEntity, getStoreAsync, RootState, selectAllClans, selectDirectsOpenlist, selectTypingUserIdsByChannelId } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { AppState, FlatList, Image, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
@@ -140,6 +140,27 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
+
+	useEffect(() => {
+		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
+
+		return () => {
+			appStateSubscription.remove();
+		};
+	}, []);
+
+	const handleAppStateChange = async (state: string) => {
+		if (state === 'active') {
+			try {
+				const store = await getStoreAsync();
+				await store.dispatch(
+					directActions.fetchDirectMessage({ noCache: true })
+				);
+			} catch (error) {
+				console.log('error messageLoaderBackground', error);
+			}
+		}
+	};
 
 	const sortDM = (a, b) => {
 		const timestampA = parseFloat(a.last_sent_message?.timestamp_seconds || '0');
