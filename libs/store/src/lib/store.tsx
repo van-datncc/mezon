@@ -249,6 +249,14 @@ const persistedChannelMetaReducer = persistReducer(
 	channelMetaReducer
 );
 
+const persistedsettingClanStickerReducer = persistReducer(
+	{
+		key: 'settingSticker',
+		storage
+	},
+	settingStickerReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -257,6 +265,7 @@ const reducer = {
 	clans: persistedClansReducer,
 	channels: persistedChannelReducer,
 	channelmeta: persistedChannelMetaReducer,
+	settingSticker: persistedsettingClanStickerReducer,
 	listchannelbyusers: persistedListchannelsByUserReducer,
 	listpermissionroleschannel: persistedPermissionRoleChannelReducer,
 	channelMembers: persistedChannelMembersReducer,
@@ -295,7 +304,6 @@ const reducer = {
 	[ERRORS_FEATURE_KEY]: errorsReducer,
 	[TOASTS_FEATURE_KEY]: toastsReducer,
 	integrationWebhook: integrationWebhookReducer,
-	settingSticker: settingStickerReducer,
 	adminApplication: adminApplicationReducer,
 	systemMessages: systemMessageReducer
 };
