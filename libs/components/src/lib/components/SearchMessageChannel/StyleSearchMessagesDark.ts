@@ -24,13 +24,9 @@ export default {
 		left: -7,
 		list: {
 			backgroundColor: '#111214',
-			// border: '1px solid rgba(0,0,0,0.15)',
 			fontSize: 14
 		},
 		item: {
-			// padding: '5px 15px',
-
-			// borderBottom: '1px solid rgba(0,0,0,0.15)',
 			'&focused': {
 				backgroundColor: '#282A2E'
 			}

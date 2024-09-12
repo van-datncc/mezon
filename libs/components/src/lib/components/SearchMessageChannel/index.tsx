@@ -163,6 +163,10 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 
 	const appearanceTheme = useSelector(selectTheme);
 
+	const handleFocus = () => {
+		console.log('focus');
+	};
+
 	return (
 		<div className="relative" ref={inputRef}>
 			<div
