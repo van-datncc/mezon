@@ -82,7 +82,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 				isDMGroup ? (
 					<MezonAvatar height={50} width={50} avatarUrl={''} username={''} stacks={stackUsers} />
 				) : (
-					<MezonAvatar height={100} width={100} avatarUrl={currenChannel?.channel_avatar[0]} username={currenChannel?.usernames} />
+					<MezonAvatar height={100} width={100} avatarUrl={currenChannel?.channel_avatar?.[0]} username={currenChannel?.usernames} />
 				)
 			) : (
 				<View style={styles.iconWelcomeMessage}>
@@ -134,9 +134,9 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 									</TouchableOpacity>
 								</View>
 							)}
-							<Pressable style={styles.blockButton}>
-								<Text style={styles.buttonText}>{t('pendingContent.block')}</Text>
-							</Pressable>
+							{/*<Pressable style={styles.blockButton}>*/}
+							{/*	<Text style={styles.buttonText}>{t('pendingContent.block')}</Text>*/}
+							{/*</Pressable>*/}
 						</View>
 					)}
 				</View>
