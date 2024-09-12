@@ -82,7 +82,8 @@ const MessageText = ({
 			{' '}
 			{lines?.length > 0 ? (
 				<div className="flex w-full">
-					<div className="w-fit max-w-full">
+					<div className="w-full">
+						{' '}
 						<MessageLine
 							isEditted={showEditted}
 							isHideLinkOneImage={checkOneLinkImage}
