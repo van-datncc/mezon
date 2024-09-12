@@ -42,7 +42,6 @@ interface IChatMessageInputProps {
 	parentId?: string;
 	isPublic?: boolean;
 }
-const inputWidthWhenHasInput = Dimensions.get('window').width * (IS_TABLET ? 0.8 : 0.72);
 
 export const ChatMessageInput = memo(
 	forwardRef(
@@ -71,7 +70,7 @@ export const ChatMessageInput = memo(
 				voiceLinkRoomOnMessage,
 				isShowCreateThread,
 				parentId,
-				isPublic,
+				isPublic
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>
 		) => {
@@ -156,8 +155,8 @@ export const ChatMessageInput = memo(
 			}, [handleDirectMessageTypingDebounced, handleTypingDebounced, mode]);
 
 			return (
-				<Block flex={1} flexDirection="row" justifyContent="flex-end" gap={size.s_10}>
-					<Block alignItems="center">
+				<Block flex={1} flexDirection="row" paddingHorizontal={size.s_6}>
+					<Block alignItems="center" flex={1}>
 						<TextInput
 							ref={ref}
 							autoFocus={isFocus}
@@ -171,13 +170,7 @@ export const ChatMessageInput = memo(
 							numberOfLines={3}
 							onChange={() => handleTypingMessage()}
 							{...textInputProps}
-							style={[
-								styles.inputStyle,
-								(text?.length > 0 || !isShowCreateThread) && {
-									width: isShowAttachControl && isShowCreateThread ? inputWidthWhenHasInput - size.s_50 : inputWidthWhenHasInput
-								},
-								{ height: Math.max(size.s_40, heightInput) }
-							]}
+							style={[styles.inputStyle, { height: Math.max(size.s_40, heightInput) }]}
 							children={renderTextContent(text)}
 							onContentSizeChange={(e) => {
 								if (e.nativeEvent.contentSize.height < size.s_40 * 2) setHeightInput(e.nativeEvent.contentSize.height);

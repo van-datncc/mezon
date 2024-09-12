@@ -123,8 +123,15 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [fetchMemberChannel, isMentionHashtagDMRef]);
 
 	useEffect(() => {
+		let timeout: NodeJS.Timeout;
 		if (directMessageId) {
-			directMessageLoader();
+			timeout = setTimeout(() => {
+				directMessageLoader();
+			}, 100)
+		}
+		
+		return () => {
+			timeout && clearTimeout(timeout);
 		}
 	}, [directMessageId]);
 
