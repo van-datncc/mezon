@@ -34,7 +34,7 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 					onDragStart={(e) => e.preventDefault()}
 				/>
 			) : (
-				<PlainText isEditted={false} text={emojiSyntax} />
+				<PlainText text={emojiSyntax} />
 			)}
 		</span>
 	);
