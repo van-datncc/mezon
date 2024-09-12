@@ -14,7 +14,6 @@ type EmojiMarkupOpt = {
 };
 
 export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, onlyEmoji, isOne }) => {
-	console.log('isOne: ', isOne);
 	const [className, setClassName] = useState<string>(`${onlyEmoji ? 'w-12' : 'w-6'} inline-block relative -top-0.4 m-0`);
 
 	const srcEmoji = useMemo(() => {
