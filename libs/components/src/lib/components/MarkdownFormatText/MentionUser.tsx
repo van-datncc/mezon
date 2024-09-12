@@ -1,10 +1,11 @@
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
 import {
-	selectAllChannelMemberIds,
 	// selectAllChannelMemberIds,
 	selectAllRoleIds,
 	selectChannelMemberByUserIds,
-	selectCurrentChannelId,
+	selectCurrentChannel,
+	selectUserRemovedByChannelId,
+	selectUserRemovedByClanId,
 	useAppSelector
 } from '@mezon/store';
 import { MouseButton, getNameForPrioritize } from '@mezon/utils';
@@ -41,17 +42,53 @@ type UserProfilePopupProps = {
 };
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
+	console.log('mode: ', mode);
+
 	const allRoleIds = useSelector(selectAllRoleIds);
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentChannel = useSelector(selectCurrentChannel);
 
-	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
-	console.log('allUserIds :', allUserIdsInChannel);
+	const isPrivateChannel = useMemo(() => {
+		if (currentChannel?.channel_private === 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}, [currentChannel?.channel_private]);
+	console.log('isPrivateChannel: ', isPrivateChannel);
 
-	const checkUserIsExist = useMemo(() => {
-		return allUserIdsInChannel.indexOf(tagUserId ?? '') !== -1;
-	}, [allUserIdsInChannel, tagUserId]);
+	const currentChannelId = useMemo(() => {
+		return currentChannel?.channel_id;
+	}, [currentChannel?.id]);
+	console.log('currentChannelId: ', currentChannelId);
 
-	console.log('checkUserIsExist :', checkUserIsExist);
+	const userRemoveIdInPrivateChannel = useSelector(selectUserRemovedByChannelId(currentChannel?.id ?? ' '));
+	const userRemoveIdInPublicChannel = useSelector(selectUserRemovedByClanId(currentChannel?.clan_id ?? ' '));
+
+	// const userRemove = useMemo(() => {
+	// 	if (userRemoveIdInPrivateChannel === userRemoveIdInPublicChannel) {
+	// 		return userRemoveIdInPrivateChannel;
+	// 	} else if (userRemoveIdInPrivateChannel === null && userRemoveIdInPublicChannel) {
+	// 		return userRemoveIdInPublicChannel;
+	// 	}
+	// }, [userRemoveIdInPrivateChannel, userRemoveIdInPublicChannel]);
+
+	// console.log('userRemove', userRemove);
+
+	// const getUserInPrivate = useAppSelector((state) =>
+	// 	selectChannelMemberByUserIds(state, currentChannelId ?? '', userRemove ?? '', mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
+	// )[0];
+
+	// console.log('getUserByUserId', getUserByUserId);
+
+	// const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
+	// console.log('allUserIds :', allUserIdsInChannel);
+
+	// const checkUserIsExist = useMemo(() => {
+	// 	return allUserIdsInChannel.indexOf(tagUserId ?? '') !== -1;
+	// }, [allUserIdsInChannel, tagUserId]);
+
+	// console.log('checkUserIsExist :', checkUserIsExist);
+
 	const checkRoleIsExist = useMemo(() => {
 		return allRoleIds.includes(tagRoleId ?? '');
 	}, [allRoleIds, tagRoleId]);
@@ -65,7 +102,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		}
 		if (tagRoleId && !checkRoleIsExist) {
 			return {
-				display: '@unknowrole',
+				display: '@unknownrole',
 				type: MentionType.ROLE_NOT_EXIST
 			};
 		}
@@ -75,19 +112,19 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				type: MentionType.HERE
 			};
 		}
-		if (tagUserId && !checkUserIsExist && tagUserName !== '@here') {
-			return {
-				display: '@unknowuser',
-				type: MentionType.USER_NOT_EXIST
-			};
-		}
+		// if (tagUserId === userRemove && tagUserName !== '@here') {
+		// 	return {
+		// 		display: '@unknownuser',
+		// 		type: MentionType.USER_NOT_EXIST
+		// 	};
+		// }
 		if (tagUserId && tagUserName !== '@here') {
 			return {
 				display: tagUserName,
 				type: MentionType.USER_EXIST
 			};
 		}
-	}, [tagUserName, tagRoleName, tagUserId, checkRoleIsExist, tagRoleId, allUserIdsInChannel]);
+	}, [tagUserName, tagRoleName, tagUserId, checkRoleIsExist, tagRoleId]);
 
 	const panelRef = useRef<HTMLButtonElement>(null);
 
