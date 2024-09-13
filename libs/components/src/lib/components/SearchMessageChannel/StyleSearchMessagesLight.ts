@@ -28,7 +28,7 @@ export default {
 			overflowY: 'scroll',
 			maxHeight: '500px',
 			scrollbarWidth: 'none',
-			'-ms-overflow-style': 'none'
+			msOverflowStyle: 'none'
 		},
 		item: {
 			'&focused': {

@@ -14,7 +14,7 @@ import {
 } from '@mezon/store';
 import { SearchFilter, SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { KeyboardEvent, memo, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import SearchMessageChannelModal from './SearchMessageChannelModal';
@@ -163,10 +163,6 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 
 	const appearanceTheme = useSelector(selectTheme);
 
-	const handleFocus = () => {
-		console.log('focus');
-	};
-
 	return (
 		<div className="relative" ref={inputRef}>
 			<div
@@ -214,26 +210,40 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 				>
 					<Mention
 						appendSpaceOnAdd={true}
-						data={userListDataSearchByMention ?? []}
+						data={userListDataSearchByMention}
 						trigger="from:"
 						displayTransform={(id: any, display: any) => {
 							return `from:${display}`;
 						}}
-						renderSuggestion={(suggestion) => {
-							return <SelectItemUser title="from: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
+						renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
+							return (
+								<SelectItemUser
+									isFocused={focused}
+									title="from: "
+									content={suggestion.display}
+									onClick={() => setIsShowSearchOptions('')}
+								/>
+							);
 						}}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					/>
 
 					<Mention
 						appendSpaceOnAdd={true}
-						data={userListDataSearchByMention ?? []}
+						data={userListDataSearchByMention}
 						trigger="mentions:"
 						displayTransform={(id: any, display: any) => {
 							return `mentions:${display}`;
 						}}
-						renderSuggestion={(suggestion) => {
-							return <SelectItemUser title="mentions: " content={suggestion.display} onClick={() => setIsShowSearchOptions('')} />;
+						renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
+							return (
+								<SelectItemUser
+									isFocused={focused}
+									title="mentions: "
+									content={suggestion.display}
+									onClick={() => setIsShowSearchOptions('')}
+								/>
+							);
 						}}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					/>
@@ -266,4 +276,4 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	);
 };
 
-export default SearchMessageChannel;
+export default memo(SearchMessageChannel);

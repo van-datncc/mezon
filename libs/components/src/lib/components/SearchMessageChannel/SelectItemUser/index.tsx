@@ -1,35 +1,27 @@
 import { Icons } from '@mezon/ui';
-import { useEffect, useRef, useState } from 'react';
+import { memo } from 'react';
 
 type SelectItemProps = {
 	title?: string;
 	content?: string;
 	onClick?: () => void;
+	isFocused?: boolean;
 };
 
-const SelectItemUser = ({ title, content, onClick }: SelectItemProps) => {
-	const buttonRef = useRef<HTMLButtonElement>(null);
-	const [backgroundColor, setBackgroundColor] = useState<string>('');
-
-	useEffect(() => {
-		if (buttonRef.current) {
-			const buttonStyle = window.getComputedStyle(buttonRef.current);
-			console.log(buttonStyle.backgroundColor);
-			setBackgroundColor(buttonStyle.backgroundColor);
-		}
-	}, []);
-
+const SelectItemUser = ({ title, content, onClick, isFocused }: SelectItemProps) => {
 	return (
-		<button ref={buttonRef} onClick={onClick} className="flex flex-row justify-between items-center group w-full cursor-pointer rounded  p-2">
+		<button onClick={onClick} className="flex flex-row justify-between items-center w-full cursor-pointer rounded relative p-2">
 			<div>
 				<span className="text-textPrimaryLight dark:text-textPrimary font-semibold">{title}</span>
 				<span className="text-textSecondary400 dark:text-textPrimary">{content}</span>
 			</div>
-			<div className="group-hover:opacity-100 opacity-0">
-				<Icons.Plus />
-			</div>
+			{isFocused && (
+				<div className="absolute right-2">
+					<Icons.Plus />
+				</div>
+			)}
 		</button>
 	);
 };
 
-export default SelectItemUser;
+export default memo(SelectItemUser);
