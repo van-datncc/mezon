@@ -24,12 +24,13 @@ export default {
 		left: -7,
 		list: {
 			backgroundColor: '#FFFFFF',
-			// border: '1px solid rgba(0,0,0,0.15)',
-			fontSize: 14
+			fontSize: 14,
+			overflowY: 'scroll',
+			maxHeight: '500px',
+			scrollbarWidth: 'none',
+			'-ms-overflow-style': 'none'
 		},
 		item: {
-			// padding: '5px 15px',
-			// borderBottom: '1px solid rgba(0,0,0,0.15)',
 			'&focused': {
 				backgroundColor: '#EBEBED'
 			}

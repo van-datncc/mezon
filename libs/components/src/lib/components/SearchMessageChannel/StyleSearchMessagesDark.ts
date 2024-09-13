@@ -24,7 +24,11 @@ export default {
 		left: -7,
 		list: {
 			backgroundColor: '#111214',
-			fontSize: 14
+			fontSize: 14,
+			overflowY: 'scroll',
+			maxHeight: '500px',
+			scrollbarWidth: 'none',
+			'-ms-overflow-style': 'none'
 		},
 		item: {
 			'&focused': {
