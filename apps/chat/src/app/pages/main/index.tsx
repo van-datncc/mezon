@@ -201,14 +201,15 @@ function MyApp() {
 								</NavLinkComponent>
 							</NavLink>
 						</SidebarTooltip>
-						{listUnreadDM.map(
-							(dmGroupChatUnread) =>
-								dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-									<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-										<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
-									</SidebarTooltip>
-								)
-						)}
+						{!!listUnreadDM?.length &&
+							listUnreadDM.map(
+								(dmGroupChatUnread) =>
+									dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
+										<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
+											<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
+										</SidebarTooltip>
+									)
+							)}
 					</div>
 					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
 					<div className="flex flex-col gap-3 ">

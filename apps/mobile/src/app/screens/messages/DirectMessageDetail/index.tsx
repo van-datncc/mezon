@@ -1,6 +1,7 @@
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
+import { directMetaActions } from '@mezon/store';
 import {
 	appActions,
 	channelMembersActions,
@@ -29,6 +30,7 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
 			dispatch(directActions.updateLastSeenTime(lastMessage));
+			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [channelId, dispatch]);
 }
