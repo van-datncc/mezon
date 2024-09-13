@@ -52,6 +52,9 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	const onChatRender = useCallback(
 		(node: HTMLDivElement | null) => {
 			chatRef.current = node;
+			if (node) {
+				node.scrollTo(0, Number.MAX_SAFE_INTEGER);
+			}
 		},
 		// the function needs to be re-created when channelId changes
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,7 +165,7 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 			const bottomOffsetToScroll = 100;
 			const isNearBottom = element?.scrollHeight - element?.scrollTop - element?.clientHeight < bottomOffsetToScroll;
 			if (isNearBottom) {
-				element.scrollTo(0, Number.MAX_SAFE_INTEGER);
+				element?.scrollTo(0, Number.MAX_SAFE_INTEGER);
 			}
 		}, 100);
 		return () => timeoutId && clearTimeout(timeoutId);
@@ -170,35 +173,37 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 
 	return (
 		<MessageContextMenuProvider>
-			<div
-				id="scrollLoading"
-				className={classNames(
-					'absolute top-0 left-0 bottom-0 right-0 overflow-auto overflow-anchor-none dark:bg-bgPrimary bg-bgLightPrimary',
-					{
-						customScrollLightMode: appearanceTheme === 'light'
-					}
-				)}
-				ref={onChatRender}
-			>
-				<div ref={listMessageRef} className="min-h-[100%] overflow-anchor-none flex flex-col justify-end">
-					{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
-					<div className="min-h-0 overflow-hidden">
-						{messages.map((messageId) => {
-							return (
-								<MemorizedChannelMessage
-									avatarDM={avatarDM}
-									userName={userName}
-									key={messageId}
-									messageId={messageId}
-									channelId={channelId}
-									isHighlight={messageId === idMessageNotified}
-									mode={mode}
-									channelLabel={channelLabel ?? ''}
-								/>
-							);
-						})}
+			<div className="w-full h-full relative">
+				<div
+					id="scrollLoading"
+					className={classNames(
+						'absolute top-0 left-0 bottom-0 right-0 overflow-y-visible overflow-x-hidden overflow-anchor-none dark:bg-bgPrimary bg-bgLightPrimary',
+						{
+							customScrollLightMode: appearanceTheme === 'light'
+						}
+					)}
+					ref={onChatRender}
+				>
+					<div ref={listMessageRef} className="min-h-[100%] overflow-anchor-none flex flex-col justify-end">
+						{isFetching && <p className="font-semibold text-center dark:text-textDarkTheme text-textLightTheme">Loading messages...</p>}
+						<div className="min-h-0 overflow-hidden">
+							{messages.map((messageId) => {
+								return (
+									<MemorizedChannelMessage
+										avatarDM={avatarDM}
+										userName={userName}
+										key={messageId}
+										messageId={messageId}
+										channelId={channelId}
+										isHighlight={messageId === idMessageNotified}
+										mode={mode}
+										channelLabel={channelLabel ?? ''}
+									/>
+								);
+							})}
+						</div>
+						<div className="h-[20px] w-[1px] pointer-events-none"></div>
 					</div>
-					<div className="h-[20px] w-[1px] pointer-events-none"></div>
 				</div>
 			</div>
 			{openModalAttachment && <MessageModalImage />}
