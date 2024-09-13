@@ -47,7 +47,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		padding: size.s_10,
 		borderBottomWidth: 2,
 		borderBottomColor: colors.border,
-		maxHeight: 60,
+		height: size.s_60,
 	},
 	tabHeaderItem: {
 		padding: size.s_4,
@@ -126,7 +126,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		height: 30,
+		height: size.s_30,
 	},
 	confirmDeleteEmoji: {
 		flexDirection: 'row',
