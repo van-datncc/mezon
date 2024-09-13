@@ -25,8 +25,9 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.ROLES, name: 'Roles' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
+	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' },
 	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
-	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' }
+	
 ];
 
 export const listItemSettingApp: ItemObjProps[] = [

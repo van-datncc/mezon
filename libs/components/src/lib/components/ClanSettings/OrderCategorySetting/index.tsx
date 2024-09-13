@@ -25,26 +25,31 @@ const CategoryOrderSetting = () => {
 	const handleDragEnter = (index: number) => {
 		dragOverItemIndex.current = index;
 		setHoveredIndex(index);
-	};
-
-	const handleDragEnd = () => {
-		if (dragItemIndex.current !== null && dragOverItemIndex.current !== null) {
+		
+		if(dragItemIndex.current !== null && dragOverItemIndex.current !== null) {
 			if (dragItemIndex.current > dragOverItemIndex.current) {
 				setDragBorderPosition(EDragBorderPositon.TOP);
 			} else if (dragItemIndex.current < dragOverItemIndex.current) {
 				setDragBorderPosition(EDragBorderPositon.BOTTOM);
 			}
+		}
+	};
 
+	const handleDragEnd = () => {
+		setDragBorderPosition(null);
+		setHoveredIndex(null);
+		
+		if (dragItemIndex.current !== null && dragOverItemIndex.current !== null) {
 			const copyCategoryList = [...categoryListState];
 			const [draggedItem] = copyCategoryList.splice(dragItemIndex.current, 1);
 			copyCategoryList.splice(dragOverItemIndex.current, 0, draggedItem);
 
 			setCategoryListState(copyCategoryList);
-			setHoveredIndex(null);
 			setHasChanged(true);
-			dragItemIndex.current = null;
-			dragOverItemIndex.current = null;
 		}
+		
+		dragItemIndex.current = null;
+		dragOverItemIndex.current = null;
 	};
 
 	const handleSave = () => {
@@ -83,8 +88,8 @@ const CategoryOrderSetting = () => {
 					${
 						hoveredIndex === index
 							? dragBorderPosition === EDragBorderPositon.BOTTOM
-								? 'border-b-4 border-b-green-500'
-								: 'border-t-4 border-t-green-500'
+								? 'border-b-4 border-b-green-500 dark:border-b-green-500'
+								: 'border-t-4 border-t-green-500 dark:border-t-green-500'
 							: ''
 					}`}
 					draggable
@@ -92,7 +97,7 @@ const CategoryOrderSetting = () => {
 					onDragEnter={() => handleDragEnter(index)}
 					onDragEnd={handleDragEnd}
 				>
-					<p className="p-2 truncate dark:text-textPrimary text-textPrimaryLight">{category.category_name}</p>
+					<p className="p-2 truncate dark:text-textPrimary text-textPrimaryLight uppercase">{category.category_name}</p>
 				</div>
 			))}
 			{hasChanged && (
