@@ -164,14 +164,14 @@ function MyApp() {
 	}, [totalClanNotify, totalUnreadDM]);
 
 	return (
-		<div className="flex h-screen overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
+		<div className="flex h-screen pl-[72px] overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
-				className={`w-[72px] max-h-[100%] relative overflow-y-auto dark:bg-bgTertiary bg-bgLightTertiary duration-100 hide-scrollbar ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
-				<div className="absolute top-0 left-0 right-0 flex flex-col items-center py-4 px-3">
+				<div className="top-0 left-0 right-0 flex flex-col h-screen items-center py-4 px-3 overflow-y-auto hide-scrollbar ">
 					<div className="flex flex-col gap-3 ">
 						<SidebarTooltip titleTooltip="Direct Message">
 							<NavLink

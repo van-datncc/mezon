@@ -489,7 +489,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		} else if (emojiPicked) {
 			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
-				textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})${' '}`);
+				textFieldEdit.insert(input, `::[${emojiKey}](${emojiValue})${' '}`);
 			}
 		}
 	}
@@ -629,7 +629,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				onPaste={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
-				placeholder="Write your thoughs here..."
+				placeholder="Write your thoughts here..."
 				value={request?.valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={{
@@ -704,7 +704,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				/>
 				<Mention
 					trigger=":"
-					markup="[__display__](__id__)"
+					markup="::[__display__](__id__)"
 					data={queryEmojis}
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;

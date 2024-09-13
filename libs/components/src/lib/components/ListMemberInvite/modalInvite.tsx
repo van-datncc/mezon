@@ -1,5 +1,5 @@
 import { useEscapeKey, useInvite } from '@mezon/core';
-import { selectChannelById, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import { selectChannelById, selectChannelFirst, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
@@ -14,7 +14,7 @@ export type ModalParam = {
 	onClose: () => void;
 	open: boolean;
 	// url:string;
-	channelID: string;
+	channelID?: string;
 	confirmButton?: () => void;
 };
 
@@ -25,13 +25,13 @@ const ModalInvite = (props: ModalParam) => {
 	const [urlInvite, setUrlInvite] = useState('');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { createLinkInviteUser } = useInvite();
-
-	const { onClose, channelID } = props;
-	const channel = useSelector(selectChannelById(channelID));
+	const firstChannel = useSelector(selectChannelFirst);
+	const { onClose } = props;
+	const channel = useSelector(selectChannelById(firstChannel.channel_id || ''));
 	const clan = useSelector(selectCurrentClan);
 
 	const handleOpenInvite = () => {
-		createLinkInviteUser(currentClanId ?? '', props.channelID ?? '', 10).then((res) => {
+		createLinkInviteUser(currentClanId ?? '', firstChannel.channel_id ?? '', 10).then((res) => {
 			if (res && res?.invite_link) {
 				setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
 			}
@@ -80,7 +80,7 @@ const ModalInvite = (props: ModalParam) => {
 			isInviteModal={true}
 		>
 			<div>
-				<ListMemberInvite url={urlInvite} channelID={props.channelID} />
+				<ListMemberInvite url={urlInvite} channelID={firstChannel.channel_id} />
 				<div className="relative ">
 					<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold">Or, send a clan invite link to a friend</p>
 					<input

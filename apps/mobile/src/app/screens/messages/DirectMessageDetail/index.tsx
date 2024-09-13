@@ -7,6 +7,7 @@ import {
 	clansActions,
 	directActions,
 	getStoreAsync,
+	messagesActions,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
@@ -123,9 +124,16 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [fetchMemberChannel, isMentionHashtagDMRef]);
 
 	useEffect(() => {
+		let timeout: NodeJS.Timeout;
 		if (directMessageId) {
-			directMessageLoader();
+			timeout = setTimeout(() => {
+				directMessageLoader();
+			}, 100);
 		}
+
+		return () => {
+			timeout && clearTimeout(timeout);
+		};
 	}, [directMessageId]);
 
 	useEffect(() => {
@@ -142,15 +150,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				const store = await getStoreAsync();
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-				await store.dispatch(
-					directActions.joinDirectMessage({
-						directMessageId: directMessageId,
-						type: dmType,
-						noCache: true,
-						isFetchingLatestMessages: true
-					})
-				);
-
+				store.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true }));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} catch (error) {

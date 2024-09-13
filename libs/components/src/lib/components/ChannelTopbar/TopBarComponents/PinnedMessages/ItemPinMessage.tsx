@@ -63,7 +63,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 							isTokenClickAble={false}
 						/>
 					</div>
-					{message?.attachments?.length ? <ListPinAttachment attachments={message.attachments} /> : <></>}
+					{message.attachments?.length ? <ListPinAttachment attachments={message.attachments} /> : <></>}
 				</div>
 			</div>
 			<div className="absolute h-fit flex gap-x-2 items-center opacity-0 right-2 top-2 group-hover/item-pinMess:opacity-100">
@@ -88,13 +88,14 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					contentString={contentString}
 					handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')}
 					closeModal={() => setOpenModalDelPin(false)}
+					attachments={message?.attachments ? message.attachments : []}
 				/>
 			)}
 		</div>
 	);
 };
 
-const ListPinAttachment = ({ attachments }: { attachments: ApiMessageAttachment[] }) => {
+export const ListPinAttachment = ({ attachments }: { attachments: ApiMessageAttachment[] }) => {
 	const gridClass = useMemo(() => {
 		let classGridParent = '';
 		let classGridChild = '';

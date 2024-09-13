@@ -1,8 +1,8 @@
 import { useChannels, useClanRestriction } from '@mezon/core';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, EPermission, IChannel } from '@mezon/utils';
+import { EPermission, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { EChannelSettingTab } from '.';
 import ModalConfirm from '../ModalConfirm';
 
@@ -22,6 +22,9 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
 	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
 	const canEditChannelPermissions = isClanOwner || hasAdminPermission || hasManageClanPermission;
+	const isThread = useMemo(() => {
+		return channel.parrent_id !== '0';
+	}, [channel]);
 
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
@@ -32,9 +35,33 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	const handleCloseModalShow = () => {
 		setShowModal(false);
 	};
+
 	const handleDeleteChannel = () => {
 		handleConfirmDeleteChannel(channel.channel_id as string, channel.clan_id as string);
 		handleCloseModalShow();
+	};
+
+	const renderIcon = () => {
+		if (isThread) {
+			if (isPrivate) {
+				return <Icons.ThreadIconLocker className="w-5 h-5 -mt-1 min-w-5 block dark:text-[#AEAEAE] text-colorTextLightMode" />;
+			}
+			return <Icons.ThreadIcon defaultSize="w-5 h-5 -mt-1 min-w-5" />;
+		}
+
+		if (channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
+			if (isPrivate) {
+				return <Icons.HashtagLocked defaultSize="w-5 h-5 -mt-1 min-w-5" />;
+			}
+			return <Icons.Hashtag defaultSize="w-5 h-5 -mt-1 min-w-5" />;
+		}
+
+		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
+			if (isPrivate) {
+				return <Icons.SpeakerLocked defaultSize="w-5 h-5 min-w-5" />;
+			}
+			return <Icons.Speaker defaultSize="w-5 h-5 min-w-5" />;
+		}
 	};
 
 	return (
@@ -43,36 +70,39 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 		>
 			<div className="w-170px flex flex-col">
 				<div className="flex justify-start max-w-[170px]">
-					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.SpeakerLocked defaultSize="w-5 h-5 min-w-5" />
-					)}
-					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.HashtagLocked defaultSize="w-5 h-5 -mt-1 min-w-5" />
-					)}
-					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && <Icons.Speaker defaultSize="w-5 5-5 min-w-5" />}
-					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.Hashtag defaultSize="w-5 h-5 -mt-1 min-w-5" />
-					)}
+					{renderIcon()}
 					<p className="text-[#84ADFF] font-bold text-sm tracking-wider max-w-[160px] overflow-x-hidden text-ellipsis uppercase one-line">
 						{channel.channel_label}
 					</p>
 				</div>
 
 				<ChannelSettingItemButton tabName={EChannelSettingTab.OVERVIEW} handleOnClick={handleButtonClick} selectedButton={selectedButton} />
-				<ChannelSettingItemButton tabName={EChannelSettingTab.CATEGORY} handleOnClick={handleButtonClick} selectedButton={selectedButton} />
-				{canEditChannelPermissions && (
-					<ChannelSettingItemButton
-						tabName={EChannelSettingTab.PREMISSIONS}
-						handleOnClick={handleButtonClick}
-						selectedButton={selectedButton}
-					/>
+				{!isThread && (
+					<>
+						<ChannelSettingItemButton
+							tabName={EChannelSettingTab.CATEGORY}
+							handleOnClick={handleButtonClick}
+							selectedButton={selectedButton}
+						/>
+						{canEditChannelPermissions && (
+							<ChannelSettingItemButton
+								tabName={EChannelSettingTab.PREMISSIONS}
+								handleOnClick={handleButtonClick}
+								selectedButton={selectedButton}
+							/>
+						)}
+						<ChannelSettingItemButton
+							tabName={EChannelSettingTab.INVITES}
+							handleOnClick={handleButtonClick}
+							selectedButton={selectedButton}
+						/>
+						<ChannelSettingItemButton
+							tabName={EChannelSettingTab.INTEGRATIONS}
+							handleOnClick={handleButtonClick}
+							selectedButton={selectedButton}
+						/>
+					</>
 				)}
-				<ChannelSettingItemButton tabName={EChannelSettingTab.INVITES} handleOnClick={handleButtonClick} selectedButton={selectedButton} />
-				<ChannelSettingItemButton
-					tabName={EChannelSettingTab.INTEGRATIONS}
-					handleOnClick={handleButtonClick}
-					selectedButton={selectedButton}
-				/>
 				<hr className="border-t border-solid dark:border-borderDefault my-4" />
 				<button
 					className={`p-2 dark:text-red-600 text-red-600 text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight dark:hover:bg-bgModalLight ${selectedButton === 'Delete' ? 'dark:bg-[#232E3B] bg-bgLightModeButton  ' : ''} w-[170px] text-left rounded-[5px]`}
@@ -80,7 +110,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 						setShowModal(true);
 					}}
 				>
-					Delete Channel
+					Delete {isThread ? 'Thread' : 'Channel'}
 				</button>
 			</div>
 			{showModal && (

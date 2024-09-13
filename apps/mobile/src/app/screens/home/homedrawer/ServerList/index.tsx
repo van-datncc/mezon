@@ -24,10 +24,7 @@ const ServerList = React.memo(() => {
 	return (
 		<View style={styles.wrapperServerList}>
 			<TouchableOpacity style={{ alignSelf: 'center' }} onPress={() => navigateToDM()}>
-				{theme === 'light' ? 
-					<LogoMezonLight width={50} height={50} /> :
-					<LogoMezonDark width={50} height={50} />
-				}
+				{theme === 'light' ? <LogoMezonLight width={50} height={50} /> : <LogoMezonDark width={50} height={50} />}
 				{quantityPendingRequest ? (
 					<View style={styles.badge}>
 						<Text style={styles.badgeText}>{quantityPendingRequest}</Text>

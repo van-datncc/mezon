@@ -74,6 +74,13 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 	const isClanOwner = checkClanOwner(id);
 	const namePrioritize = getNameForPrioritize(clanName, displayName, userName);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
+
+	const handleDelete = () => {
+		if (!isClanOwner) {
+			onDelete();
+		}
+	};
+
 	return (
 		<div className={`flex justify-between py-2 rounded`} key={id}>
 			<div className="flex gap-x-2 items-center">
@@ -89,7 +96,7 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 			</div>
 			<div className="flex items-center gap-x-2">
 				<p className="text-xs text-[#AEAEAE]">{isClanOwner && 'Clan Owner'}</p>
-				<div onClick={!isClanOwner ? () => onDelete() : () => {}} role="button">
+				<div onClick={handleDelete} role="button">
 					<Icons.EscIcon
 						defaultSize={`${isClanOwner ? 'cursor-not-allowed' : 'cursor-pointer'} size-[15px]`}
 						defaultFill={isClanOwner ? '#4C4D55' : '#AEAEAE'}

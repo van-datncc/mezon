@@ -23,7 +23,6 @@ import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	// const isMessageRead = useSelector(selectIsMessageRead);
 	const currentChannel = useSelector(selectChannelById(channelId));
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
@@ -35,9 +34,6 @@ function useChannelSeen(channelId: string) {
 				clanId: currentChannel?.clan_id ?? ''
 			})
 		);
-		// if (isMessageRead && channelId === currentChannel?.channel_id) {
-		// 	dispatch(notificationActions.setIsMessageRead(false));
-		// }
 	}, [channelId, currentChannel, dispatch]);
 }
 
