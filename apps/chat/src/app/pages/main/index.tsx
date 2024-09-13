@@ -24,7 +24,7 @@ import {
 	selectTotalUnreadDM
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, TIME_OF_SHOWING_FIRST_POPUP, electronBridge } from '@mezon/utils';
+import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, electronBridge, getPlatform } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
@@ -105,8 +105,10 @@ function MyApp() {
 	};
 
 	const handleKeyDown = useCallback(
-		(event: any) => {
-			if (event.ctrlKey && (event.key === 'k' || event.key === 'K')) {
+		(event: KeyboardEvent) => {
+			const platform = getPlatform();
+			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
+			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
 				openSearchModal();
 			}
