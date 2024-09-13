@@ -16,6 +16,10 @@
           "url": "https://cdn.mezon.vn/release/"
         }
       ],
+      "asarUnpack": [
+        "./node_modules/macos-notification-state/build/Release//*.node",
+        "./node_modules/windows-focus-assist/build/Release//*.node"
+      ],
       "mac": {
         "icon": "apps/desktop/src/assets/mac-icon.png",
         "appId": "mezon.ai",
@@ -48,8 +52,7 @@
         "include": "scripts/installer.nsh",
         "packElevateHelper": false,
         "runAfterFinish": true,
-        "createDesktopShortcut": true,
-        "deleteAppDataOnUninstall": false
+        "createDesktopShortcut": true
       },
       "msi": {
         "additionalWixArgs": [

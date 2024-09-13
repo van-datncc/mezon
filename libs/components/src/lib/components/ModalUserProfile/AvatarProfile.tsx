@@ -68,7 +68,7 @@ const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvata
 						<div className="dark:bg-bgPrimary bg-white w-[20px] h-[20px] rounded-full absolute top-[-11px] left-[16px] shadow-md"></div>
 						<div className="absolute w-fit max-w-full shadow-lg rounded-[12px] group">
 							<div className="relative dark:bg-bgPrimary bg-white px-[16px] py-[12px] w-fit max-w-full rounded-[12px] flex items-center justify-center">
-								<span className="text-left font-medium text-[14px] dark:text-white text-black w-full break-all overflow-hidden transition-all duration-300 hover:line-clamp-none line-clamp-2">
+								<span className="text-left font-medium text-[14px] dark:text-white text-black w-full break-words overflow-hidden transition-all duration-300 hover:line-clamp-none line-clamp-2">
 									{customStatus}
 								</span>
 								{isFooterProfile && (
