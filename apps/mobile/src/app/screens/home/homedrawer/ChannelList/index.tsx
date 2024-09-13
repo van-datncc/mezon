@@ -87,7 +87,13 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 	useEffect(() => {
 		let idTimeOut;
-		if (!hiddenBottomTab && currentClanId && categorizedChannels?.length) {
+		if (
+			!hiddenBottomTab &&
+			currentClanId &&
+			categorizedChannels?.length &&
+			channelsPositionRef.current[currentChannel?.id] &&
+			categoryOffsetsRef.current[currentChannel?.category_id]
+		) {
 			idTimeOut = setTimeout(() => {
 				scrollToItemById();
 			}, 200);
@@ -95,7 +101,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		return () => {
 			idTimeOut && clearTimeout(idTimeOut);
 		};
-	}, [hiddenBottomTab, currentClanId, categorizedChannels?.length, isLoading]);
+	}, [hiddenBottomTab, currentClanId, categorizedChannels?.length, channelsPositionRef.current, categoryOffsetsRef.current]);
 
 	const renderItemChannelList = useCallback(
 		({ item }) => {
@@ -173,8 +179,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					</TouchableOpacity>
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
-				<ScrollView ref={flashListRef} scrollEventThrottle={16}>
-					{categorizedChannels?.map((item) => {
+				<ScrollView ref={flashListRef} scrollEventThrottle={16} bounces={false}>
+					{categorizedChannels?.length && categorizedChannels?.map((item) => {
 						return renderItemChannelList({ item });
 					})}
 				</ScrollView>
