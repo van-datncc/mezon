@@ -1,6 +1,7 @@
 import { useAppParams } from '@mezon/core';
 import { ChannelMembersEntity, selectGrouplMembers, useAppSelector } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
+import { memo } from 'react';
 import MemberItem from '../../MemberList/MemberItem';
 
 export type MemberListProps = {
@@ -51,4 +52,4 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	);
 }
 
-export default MemberListGroupChat;
+export default memo(MemberListGroupChat);
