@@ -84,8 +84,8 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						key={`${role.id}_${index}`}
 						className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant"
 					>
-						<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
-							{hasPermissionEditRole ? (
+						{hasPermissionEditRole ? (
+							<button className="p-0.5 rounded-full bg-white h-fit" onClick={() => deleteRole(role.id)}>
 								<Tooltip
 									content="Remove role"
 									trigger="hover"
@@ -93,12 +93,12 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 									style={appearanceTheme === 'light' ? 'light' : 'dark'}
 									className="dark:!text-white !text-black"
 								>
-									<Icons.IconRemove className="text-transparent size-2" />
+									<Icons.IconRemove className="dark:text-channelActiveColor text-channelActiveLightColor size-2" />
 								</Tooltip>
-							) : (
-								<div className="size-2 bg-white rounded-full"></div>
-							)}
-						</button>
+							</button>
+						) : (
+							<div className="size-2 bg-white  rounded-full"></div>
+						)}
 						<span className="text-xs font-medium">{role.title}</span>
 					</span>
 				))}
