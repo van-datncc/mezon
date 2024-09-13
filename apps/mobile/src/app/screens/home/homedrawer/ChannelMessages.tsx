@@ -1,9 +1,8 @@
-// @ts-expect-error: Workaround for typing issues with ELoadMoreDirection
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { ActionEmitEvent, load, save, STORAGE_CHANNEL_CURRENT_CACHE } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectAllMessagesByChannelId, useAppSelector } from '@mezon/store';
-import { messagesActions, RootState, selectHasMoreMessageByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { messagesActions, RootState, useAppDispatch } from '@mezon/store-mobile';
 import { Direction_Mode } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -34,7 +33,6 @@ const ChannelMessages = React.memo(
 		const styles = style(themeValue);
 		const messages = useAppSelector((state) => selectAllMessagesByChannelId(state, channelId));
 		const isLoading = useSelector((state: RootState) => state?.messages?.loadingStatus);
-		const hasMoreMessage = useSelector(selectHasMoreMessageByChannelId(channelId));
 		const [isShowSkeleton, setIsShowSkeleton] = React.useState<boolean>(true);
 		const isLoadMore = useRef<boolean>(false);
 		const [, setTriggerRender] = useState<boolean>(false);
@@ -160,7 +158,6 @@ const ChannelMessages = React.memo(
 					renderItem={renderItem}
 					onLoadMore={onLoadMore}
 					isLoadMore={isLoadMore.current}
-					hasMoreMessage={hasMoreMessage}
 				/>
 
 				{/*{showScrollToBottomButton && (*/}

@@ -1,12 +1,14 @@
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
+import { directMetaActions } from '@mezon/store';
 import {
 	appActions,
 	channelMembersActions,
 	clansActions,
 	directActions,
 	getStoreAsync,
+	messagesActions,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
@@ -28,6 +30,7 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
 			dispatch(directActions.updateLastSeenTime(lastMessage));
+			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [channelId, dispatch]);
 }
@@ -123,9 +126,16 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [fetchMemberChannel, isMentionHashtagDMRef]);
 
 	useEffect(() => {
+		let timeout: NodeJS.Timeout;
 		if (directMessageId) {
-			directMessageLoader();
+			timeout = setTimeout(() => {
+				directMessageLoader();
+			}, 100);
 		}
+
+		return () => {
+			timeout && clearTimeout(timeout);
+		};
 	}, [directMessageId]);
 
 	useEffect(() => {
@@ -142,15 +152,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				const store = await getStoreAsync();
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-				await store.dispatch(
-					directActions.joinDirectMessage({
-						directMessageId: directMessageId,
-						type: dmType,
-						noCache: true,
-						isFetchingLatestMessages: true
-					})
-				);
-
+				store.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true }));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} catch (error) {

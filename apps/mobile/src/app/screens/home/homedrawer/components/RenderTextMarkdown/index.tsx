@@ -49,7 +49,7 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-export const markdownStyles = (colors: Attributes) =>
+export const markdownStyles = (colors: Attributes, isUnReadChannel: boolean) =>
 	StyleSheet.create({
 		heading1: {
 			fontWeight: 'bold'
@@ -70,7 +70,7 @@ export const markdownStyles = (colors: Attributes) =>
 			fontWeight: 'bold'
 		},
 		body: {
-			color: colors.textStrong,
+			color: isUnReadChannel ? colors.white : colors.text,
 			fontSize: size.medium
 		},
 		paragraph: {
@@ -114,6 +114,10 @@ export const markdownStyles = (colors: Attributes) =>
 		onlyIconEmojiInMessage: {
 			width: size.s_40,
 			height: size.s_40
+		},
+		emojiInMessageContain: {
+			height: size.s_16,
+			width: size.s_20
 		},
 		editedText: {
 			fontSize: size.small,
@@ -187,6 +191,7 @@ export type IMarkdownProps = {
 	directMessageId?: string;
 	isOpenLink?: boolean;
 	isOnlyContainEmoji?: boolean;
+	isUnReadChannel?: boolean;
 };
 
 /**
@@ -219,11 +224,13 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 
 		if (content?.startsWith(':')) {
 			return (
-				<FastImage
-					source={{ uri: payload }}
-					style={isOnlyContainEmoji ? styles.onlyIconEmojiInMessage : styles.iconEmojiInMessage}
-					resizeMode={'contain'}
-				/>
+				<View style={!isOnlyContainEmoji && styles.emojiInMessageContain}>
+					<FastImage
+						source={{ uri: payload }}
+						style={isOnlyContainEmoji ? styles.onlyIconEmojiInMessage : [styles.iconEmojiInMessage]}
+						resizeMode={'contain'}
+					/>
+				</View>
 			);
 		}
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
@@ -357,7 +364,8 @@ export const RenderTextMarkdownContent = React.memo(
 		isHiddenHashtag,
 		directMessageId,
 		isOpenLink = true,
-		isOnlyContainEmoji
+		isOnlyContainEmoji,
+		isUnReadChannel = false
 	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
@@ -458,7 +466,7 @@ export const RenderTextMarkdownContent = React.memo(
 		const renderMarkdown = () => (
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				style={{ ...(themeValue ? (markdownStyles(themeValue) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
+				style={{ ...(themeValue ? (markdownStyles(themeValue, isUnReadChannel) as StyleSheet.NamedStyles<any>) : {}), ...customStyle }}
 				rules={renderRulesCustom(isOnlyContainEmoji)}
 				onLinkPress={(url) => {
 					if (isOpenLink) {

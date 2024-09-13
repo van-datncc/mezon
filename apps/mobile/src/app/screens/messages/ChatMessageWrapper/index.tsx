@@ -16,8 +16,6 @@ interface IChatMessageWrapperProps {
 	currentClanId: string;
 }
 export const ChatMessageWrapper = memo(({ handleBack, directMessageId, isModeDM, currentClanId }: IChatMessageWrapperProps) => {
-	console.log('Tom log  => ChatMessageWrapper');
-
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const panelKeyboardRef = useRef(null);

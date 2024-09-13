@@ -16,7 +16,7 @@ import {
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
-	voiceActions,
+	voiceActions
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
@@ -36,7 +36,7 @@ import {
 	remove,
 	save,
 	setCurrentClanLoader,
-	setDefaultChannelLoader,
+	setDefaultChannelLoader
 } from '@mezon/mobile-components';
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
@@ -86,7 +86,7 @@ const NavigationMain = () => {
 			appStateSubscription.remove();
 			timeout && clearTimeout(timeout);
 		};
-	}, [currentChannelId, isFromFcmMobile, isLoggedIn]);
+	}, [currentChannelId, isFromFcmMobile, isLoggedIn, currentClanId]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', async (state) => {
@@ -124,8 +124,8 @@ const NavigationMain = () => {
 					channelId: currentChannelId,
 					noCache: true,
 					isFetchingLatestMessages: true,
-					isClearMessage: true,
-				}),
+					isClearMessage: true
+				})
 			);
 		}
 	}, [currentChannelId]);
@@ -138,7 +138,8 @@ const NavigationMain = () => {
 	const handleAppStateChange = useCallback(
 		async (state: string) => {
 			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-			if (state === 'active') {
+			// Note: if currentClanId === 0 is current DM
+			if (state === 'active' && currentClanId !== '0') {
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
@@ -147,7 +148,7 @@ const NavigationMain = () => {
 				}
 			}
 		},
-		[isFromFcmMobile, currentChannelId],
+		[isFromFcmMobile, currentChannelId, currentClanId]
 	);
 
 	const messageLoaderBackground = useCallback(async () => {
@@ -163,16 +164,16 @@ const NavigationMain = () => {
 						channelId: currentChannelId,
 						noCache: true,
 						isFetchingLatestMessages: true,
-						isClearMessage: true,
-					}),
+						isClearMessage: true
+					})
 				),
 				store.dispatch(
 					voiceActions.fetchVoiceChannelMembers({
 						clanId: currentClanId ?? '',
 						channelId: '',
-						channelType: ChannelType.CHANNEL_TYPE_VOICE,
-					}),
-				),
+						channelType: ChannelType.CHANNEL_TYPE_VOICE
+					})
+				)
 			];
 			await Promise.all(promise);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
@@ -248,9 +249,8 @@ const NavigationMain = () => {
 				store.dispatch(appActions.setLoadingMainMobile(false));
 			}
 		},
-		[currentClanId],
+		[currentClanId]
 	);
-
 
 	return (
 		<NavigationContainer>

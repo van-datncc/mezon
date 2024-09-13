@@ -1,6 +1,7 @@
 import {
 	FirstJoinPopup,
 	ForwardMessageModal,
+	MessageModalImage,
 	ModalCreateClan,
 	NavLinkComponent,
 	SearchModal,
@@ -18,13 +19,14 @@ import {
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
+	selectOpenModalAttachment,
 	selectStatusMenu,
 	selectTheme,
 	selectTotalClansNotify,
 	selectTotalUnreadDM
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, TIME_OF_SHOWING_FIRST_POPUP, electronBridge } from '@mezon/utils';
+import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, electronBridge, getPlatform } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
@@ -47,6 +49,7 @@ function MyApp() {
 	const totalClanNotify = useSelector(selectTotalClansNotify);
 	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
+	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const { setCloseMenu, setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
@@ -105,8 +108,10 @@ function MyApp() {
 	};
 
 	const handleKeyDown = useCallback(
-		(event: any) => {
-			if (event.ctrlKey && (event.key === 'k' || event.key === 'K')) {
+		(event: KeyboardEvent) => {
+			const platform = getPlatform();
+			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
+			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
 				openSearchModal();
 			}
@@ -164,14 +169,17 @@ function MyApp() {
 	}, [totalClanNotify, totalUnreadDM]);
 
 	return (
-		<div className="flex h-screen overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond" onClick={handleClick}>
+		<div
+			className="flex h-screen min-[480px]:pl-[72px] overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond"
+			onClick={handleClick}
+		>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
-				className={`w-[72px] max-h-[100%] relative overflow-y-auto dark:bg-bgTertiary bg-bgLightTertiary duration-100 hide-scrollbar ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
-				<div className="absolute top-0 left-0 right-0 flex flex-col items-center py-4 px-3">
+				<div className="top-0 left-0 right-0 flex flex-col h-screen items-center py-4 px-3 overflow-y-auto hide-scrollbar ">
 					<div className="flex flex-col gap-3 ">
 						<SidebarTooltip titleTooltip="Direct Message">
 							<NavLink
@@ -196,14 +204,15 @@ function MyApp() {
 								</NavLinkComponent>
 							</NavLink>
 						</SidebarTooltip>
-						{listUnreadDM.map(
-							(dmGroupChatUnread) =>
-								dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-									<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-										<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
-									</SidebarTooltip>
-								)
-						)}
+						{!!listUnreadDM?.length &&
+							listUnreadDM.map(
+								(dmGroupChatUnread) =>
+									dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
+										<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
+											<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
+										</SidebarTooltip>
+									)
+							)}
 					</div>
 					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
 					<div className="flex flex-col gap-3 ">
@@ -237,6 +246,7 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
+			{openModalAttachment && <MessageModalImage />}
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 			{isShowPopupQuickMess && <PopupQuickMess />}
 		</div>

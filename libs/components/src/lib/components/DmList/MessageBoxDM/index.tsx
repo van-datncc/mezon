@@ -14,8 +14,8 @@ interface DirectIdProps {
 }
 export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 	const directParamId = useMemo(() => {
-		return direct.channel_id;
-	}, [direct.channel_id]);
+		return direct?.channel_id ?? '';
+	}, [direct?.channel_id]);
 
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: direct, mode: mode });
 	// TODO: move selector to store

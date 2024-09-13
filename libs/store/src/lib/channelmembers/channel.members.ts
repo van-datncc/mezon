@@ -4,9 +4,11 @@ import * as Sentry from '@sentry/browser';
 import memoize from 'memoizee';
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
-import { USERS_CLANS_FEATURE_KEY, UsersClanState } from '../clanMembers/clan.members';
-import { DirectEntity, getDirectState } from '../direct/direct.slice';
+import { ChannelsEntity } from '../channels/channels.slice';
+import { USERS_CLANS_FEATURE_KEY, UsersClanState, selectEntitesUserClans } from '../clanMembers/clan.members';
+import { DirectEntity, selectDirectById, selectDirectMessageEntities } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { RootState } from '../store';
 
 const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 3;
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
@@ -82,6 +84,15 @@ export const fetchChannelMembers = createAsyncThunk(
 
 		if (noCache) {
 			fetchChannelMembersCached.clear(mezon, clanId, channelId, channelType);
+		}
+
+		const state = thunkAPI.getState() as RootState;
+		const currentChannel = state?.channels?.entities[channelId] || {};
+		const parentChannel = state?.channels?.entities[currentChannel.parrent_id || ''] as ChannelsEntity;
+
+		if (parentChannel?.channel_private && !state?.channelMembers?.entities?.[parentChannel.id]) {
+			const response = await fetchChannelMembersCached(mezon, clanId, parentChannel.id, channelType);
+			thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: parentChannel.id, members: response.channel_users ?? [] }));
 		}
 
 		const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
@@ -364,7 +375,7 @@ export const selectCustomUserStatus = createSelector(getChannelMembersState, (st
 export const selectMemberIdsByChannelId = createSelector(
 	[getChannelMembersState, (state, channelId: string) => channelId],
 	(getChannelMembersState, channelId) => {
-		return getChannelMembersState?.memberChannels[channelId]?.ids || [];
+		return getChannelMembersState?.memberChannels?.[channelId]?.ids;
 	}
 );
 
@@ -380,8 +391,8 @@ export const selectMemberCustomStatusById = createSelector(
 
 export const selectChannelMemberByUserIds = createSelector(
 	[
-		getUsersClanState,
-		getDirectState,
+		selectEntitesUserClans,
+		selectDirectMessageEntities,
 		(state, channelId: string, userIds?: string, isDm?: string) => {
 			return `${channelId},${userIds},${isDm}`;
 		}
@@ -389,20 +400,24 @@ export const selectChannelMemberByUserIds = createSelector(
 	(usersClanState, directs, payload) => {
 		const [channelId, userIds, isDm] = payload.split(',');
 		const users = isDm ? directs : usersClanState;
-		if (!userIds.trim() || !users?.entities) return [];
+		if (!userIds.trim() || !users) return [];
 		const members: ChannelMembersEntity[] = [];
 		userIds.split('/')?.forEach((userId) => {
-			const userInfo = users?.entities[isDm ? channelId : userId];
+			const userInfo = users[isDm ? channelId : userId];
 			if (!userInfo) return;
 			if (isDm) {
-				const { usernames, channel_label } = userInfo as DirectEntity;
+				const { usernames, channel_label, user_id } = userInfo as DirectEntity;
+				const currentUserIndex = Array.isArray(user_id) && user_id.findIndex((id) => id === userId);
+				const names = channel_label?.split(',');
+				const displayName = currentUserIndex && currentUserIndex !== -1 && names?.[currentUserIndex];
+
 				members.push({
 					channelId,
 					userChannelId: channelId,
 					user: {
 						...userInfo,
 						username: usernames,
-						display_name: channel_label
+						display_name: displayName || channel_label
 					},
 					id: userInfo.id
 				} as ChannelMembersEntity);
@@ -419,8 +434,7 @@ export const selectChannelMemberByUserIds = createSelector(
 	}
 );
 
-export const selectGrouplMembers = createSelector([getDirectState, (state, groupId: string) => groupId], (directs, groupId) => {
-	const group = directs?.entities?.[groupId];
+export const selectGrouplMembers = createSelector([selectDirectById, (state, groupId: string) => groupId], (group, groupId) => {
 	if (!group?.user_id) {
 		return [];
 	}
@@ -454,7 +468,7 @@ export const selectUserRemovedByClanId = (clanId: string) =>
 export const selectMemberStatusById = createSelector(
 	[
 		getUsersClanState,
-		getDirectState,
+		selectDirectMessageEntities,
 		(state, userId: string) => {
 			return `${userId},${state?.direct.currentDirectMessageId}`;
 		}
@@ -462,7 +476,7 @@ export const selectMemberStatusById = createSelector(
 	(usersClanState, directs, payload) => {
 		const [userId, currentDirectMessageId] = payload.split(',');
 		const userClan = usersClanState.entities[userId];
-		const userGroup = directs.entities[currentDirectMessageId];
+		const userGroup = directs?.[currentDirectMessageId];
 		if (userClan) {
 			return userClan.user?.online;
 		}
@@ -476,7 +490,7 @@ export const selectMemberStatusById = createSelector(
 
 export const selectAllChannelMembers = createSelector(
 	[
-		getChannelMembersState,
+		selectMemberIdsByChannelId,
 		getUsersClanState,
 		selectGrouplMembers,
 		(state, channelId: string) => {
@@ -487,23 +501,25 @@ export const selectAllChannelMembers = createSelector(
 			return `${channelId},${isPrivate},${isDm}`;
 		}
 	],
-	(channelMembersState, usersClanState, directs, payload) => {
+	(channelMembers, usersClanState, directs, payload) => {
 		const [channelId, isPrivate, isDm] = payload.split(',');
-		if (isDm) return directs;
-		const members = isPrivate
-			? (channelMembersState.memberChannels[channelId]?.ids?.map((memberId) => {
-					return {
-						...usersClanState.entities[memberId],
-						channelId,
-						userChannelId: channelId
-					};
-				}) as ChannelMembersEntity[]) || []
-			: Object.values(usersClanState.entities)?.map((member) => ({
-					...member,
-					channelId,
-					userChannelId: channelId
-				}));
-		return members;
+		let membersOfChannel: ChannelMembersEntity[] = [];
+		if (isDm) return directs || [];
+
+		if (!usersClanState?.ids?.length) return membersOfChannel;
+
+		const members = isPrivate ? { ids: channelMembers } : usersClanState;
+
+		if (!members?.ids) return membersOfChannel;
+		const ids = members.ids || [];
+
+		membersOfChannel = ids.map((id) => ({
+			...usersClanState.entities[id],
+			channelId,
+			userChannelId: channelId
+		}));
+
+		return membersOfChannel;
 	}
 );
 

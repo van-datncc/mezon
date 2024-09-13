@@ -14,6 +14,7 @@ type MessageLineProps = {
 	isHideLinkOneImage?: boolean;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
+	isEditted: boolean;
 };
 
 const MessageLine = ({
@@ -24,23 +25,12 @@ const MessageLine = ({
 	isOnlyContainEmoji,
 	isSearchMessage,
 	isTokenClickAble,
-	isHideLinkOneImage
+	isHideLinkOneImage,
+	isEditted
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
-	// const [maxWidth, setMaxWidth] = useState(window.innerWidth - 600);
 
-	// useEffect(() => {
-	// 	const handleResize = () => {
-	// 		setMaxWidth(window.innerWidth - 600);
-	// 	};
-
-	// 	window.addEventListener('resize', handleResize);
-
-	// 	return () => {
-	// 		window.removeEventListener('resize', handleResize);
-	// 	};
-	// }, []);
 	return (
 		<div
 			onClick={
@@ -61,7 +51,7 @@ const MessageLine = ({
 				mode={mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL}
 				allChannelVoice={allChannelVoice}
 				isSearchMessage={isSearchMessage}
-				// parentWidth={maxWidth}
+				isEditted={isEditted}
 			/>
 		</div>
 	);
@@ -79,6 +69,7 @@ interface RenderContentProps {
 	isTokenClickAble: boolean;
 	isJumMessageEnabled: boolean;
 	parentWidth?: number;
+	isEditted: boolean;
 }
 
 interface ElementToken {
@@ -102,7 +93,8 @@ const RenderContent = memo(
 		parentWidth,
 		isOnlyContainEmoji,
 		isTokenClickAble,
-		isHideLinkOneImage
+		isHideLinkOneImage,
+		isEditted
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
@@ -173,6 +165,7 @@ const RenderContent = memo(
 				if (element.kindOf === ETokenMessage.EMOJIS) {
 					formattedContent.push(
 						<EmojiMarkup
+							isOne={Number(t?.length) - 1 === Number(element?.e) - Number(element.s) ? true : false}
 							key={`emoji-${index}-${s}-${element.emojiid}`}
 							emojiSyntax={contentInElement ?? ''}
 							onlyEmoji={isOnlyContainEmoji ?? false}
@@ -243,6 +236,17 @@ const RenderContent = memo(
 				formattedContent.push(<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}-end`} text={t.slice(lastindex)} />);
 			}
 
+			if (isEditted) {
+				formattedContent.push(
+					<p
+						key={`edited-status-${lastindex}-end`}
+						className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]"
+					>
+						(edited)
+					</p>
+				);
+			}
+
 			return formattedContent;
 		}, [elements, t, mode]);
 
@@ -254,7 +258,6 @@ const RenderContent = memo(
 								whiteSpace: 'nowrap',
 								overflow: 'hidden',
 								textOverflow: 'ellipsis'
-								// maxWidth: parentWidth
 							}
 						: {
 								whiteSpace: 'pre-line'

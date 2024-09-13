@@ -64,7 +64,7 @@ import {
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -124,7 +124,7 @@ export type MentionReactInputProps = {
 	readonly mode?: number;
 };
 
-function MentionReactInput(props: MentionReactInputProps): ReactElement {
+const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
 	const { directId } = useParams();
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
@@ -489,7 +489,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			return;
 		} else if (emojiPicked) {
 			for (const [emojiKey, emojiValue] of Object.entries(emojiPicked)) {
-				textFieldEdit.insert(input, `[${emojiKey}](${emojiValue})${' '}`);
+				textFieldEdit.insert(input, `::[${emojiKey}](${emojiValue})${' '}`);
 			}
 		}
 	}
@@ -629,7 +629,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				onPaste={props.handlePaste}
 				id="editorReactMention"
 				inputRef={editorRef}
-				placeholder="Write your thoughs here..."
+				placeholder="Write your thoughts here..."
 				value={request?.valueTextInput ?? ''}
 				onChange={onChangeMentionInput}
 				style={{
@@ -704,7 +704,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 				/>
 				<Mention
 					trigger=":"
-					markup="[__display__](__id__)"
+					markup="::[__display__](__id__)"
 					data={queryEmojis}
 					displayTransform={(id: any, display: any) => {
 						return `${display}`;
@@ -721,7 +721,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
 		</div>
 	);
-}
+});
 
 export default MentionReactInput;
 

@@ -2,6 +2,7 @@ import { DirectMessageBox, DmTopbar, FileUploadByDnD, GifStickerEmojiPopup, Memb
 import { useApp, useAppNavigation, useAppParams, useChatMessages, useDragAndDrop, useGifsStickersEmoji, useThreads } from '@mezon/core';
 import {
 	directActions,
+	directMetaActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
@@ -27,6 +28,7 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directActions.updateLastSeenTime(lastMessage));
+			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [channelId, dispatch, lastMessage]);
 }
@@ -192,9 +194,10 @@ export default function DirectMessage() {
 							/>
 						</div>
 					</div>
+					<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
 					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && (
 						<div
-							className={`dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_60px)] hide-scrollbar ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
+							className={`dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_60px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
 						>
 							<MemberListGroupChat directMessageId={directId} createId={currentDmGroup?.creator_id} />
 						</div>
