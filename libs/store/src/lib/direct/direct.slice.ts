@@ -104,7 +104,8 @@ export const openDirectMessage = createAsyncThunk(
 	async ({ channelId, clanId }: { channelId: string; clanId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const dmChannel = selectDirectById(channelId)(getDirectRootState(thunkAPI)) || {};
+			const state = getDirectRootState(thunkAPI);
+			const dmChannel = selectDirectById(state, channelId) || {};
 			if (dmChannel?.active !== ActiveDm.OPEN_DM && clanId === '0') {
 				await mezon.client.openDirectMess(mezon.session, { channel_id: channelId });
 			}
@@ -415,7 +416,7 @@ export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, (di
 	});
 });
 
-export const selectDirectById = (id: string) => createSelector(selectDirectMessageEntities, (clansEntities) => clansEntities[id]);
+export const selectDirectById = createSelector([selectDirectMessageEntities, (state, id) => id], (clansEntities, id) => clansEntities?.[id]);
 
 export const selectTotalUnreadDM = createSelector(selectDirectsUnreadlist, (listUnreadDM) => {
 	return listUnreadDM.reduce((total, count) => total + (count.count_mess_unread ?? 0), 0);

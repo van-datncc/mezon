@@ -1,6 +1,7 @@
 import {
 	FirstJoinPopup,
 	ForwardMessageModal,
+	MessageModalImage,
 	ModalCreateClan,
 	NavLinkComponent,
 	SearchModal,
@@ -18,13 +19,14 @@ import {
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
+	selectOpenModalAttachment,
 	selectStatusMenu,
 	selectTheme,
 	selectTotalClansNotify,
 	selectTotalUnreadDM
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, TIME_OF_SHOWING_FIRST_POPUP, electronBridge } from '@mezon/utils';
+import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, electronBridge, getPlatform } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
@@ -47,6 +49,7 @@ function MyApp() {
 	const totalClanNotify = useSelector(selectTotalClansNotify);
 	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
+	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const { setCloseMenu, setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
@@ -105,8 +108,10 @@ function MyApp() {
 	};
 
 	const handleKeyDown = useCallback(
-		(event: any) => {
-			if (event.ctrlKey && (event.key === 'k' || event.key === 'K')) {
+		(event: KeyboardEvent) => {
+			const platform = getPlatform();
+			const prefixKey = platform === Platform.MACOS ? 'metaKey' : 'ctrlKey';
+			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
 				openSearchModal();
 			}
@@ -237,6 +242,7 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
+			{openModalAttachment && <MessageModalImage />}
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 			{isShowPopupQuickMess && <PopupQuickMess />}
 		</div>

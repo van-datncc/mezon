@@ -143,11 +143,13 @@ export const UsersClanSlice = createSlice({
 export const usersClanReducer = UsersClanSlice.reducer;
 export const usersClanActions = { ...UsersClanSlice.actions, fetchUsersClan };
 
-const { selectAll, selectById } = UsersClanAdapter.getSelectors();
+const { selectAll, selectById, selectEntities } = UsersClanAdapter.getSelectors();
 
 export const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
 
 export const selectAllUserClans = createSelector(getUsersClanState, selectAll);
+
+export const selectEntitesUserClans = createSelector(getUsersClanState, selectEntities);
 
 export const selectMemberClanByUserId = (userId: string) => createSelector(getUsersClanState, (state) => selectById(state, userId));
 

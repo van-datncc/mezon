@@ -111,7 +111,6 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 						window.removeAllListeners('close');
 					});
 					autoUpdater.quitAndInstall();
-					App.application.quit();
 				}, 10000);
 			}
 		});
