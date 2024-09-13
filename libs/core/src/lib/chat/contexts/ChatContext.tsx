@@ -412,6 +412,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
+			console.log('------');
+			console.log('e - Reaction:', e);
 			if (e.count > 0) {
 				dispatch(reactionActions.setReactionDataSocket(mapReactionToEntity(e)));
 			}
