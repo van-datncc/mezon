@@ -42,6 +42,7 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 									listProfile={true}
 									dataMemberCreate={dataMemberCreate}
 									directMessageId={directMessageId}
+									isOffline={!user.user?.online}
 								/>
 							</div>
 						))}

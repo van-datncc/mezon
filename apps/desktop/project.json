@@ -52,7 +52,8 @@
         "include": "scripts/installer.nsh",
         "packElevateHelper": false,
         "runAfterFinish": true,
-        "createDesktopShortcut": true
+        "createDesktopShortcut": true,
+        "deleteAppDataOnUninstall": false
       },
       "msi": {
         "additionalWixArgs": [
@@ -106,6 +107,16 @@
           },
           {
             "glob": "apps/chat/src/assets/firebase-messaging-sw.js",
+            "input": "./",
+            "output": "./"
+          },
+          {
+            "glob": "apps/desktop/index.html",
+            "input": "./",
+            "output": "./"
+          },
+          {
+            "glob": "apps/desktop/package.json",
             "input": "./",
             "output": "./"
           }
@@ -172,7 +183,7 @@
           "packElevateHelper": false,
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": [
@@ -241,7 +252,7 @@
           "include": "scripts/installer.nsh",
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": [
