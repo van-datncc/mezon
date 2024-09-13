@@ -79,6 +79,7 @@ export default class App {
 		App.mainWindow.setMinimumSize(950, 500);
 		App.mainWindow.setMenu(null);
 		App.mainWindow.center();
+		App.mainWindow.webContents.openDevTools();
 
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
