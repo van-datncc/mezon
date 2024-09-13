@@ -52,7 +52,8 @@
         "include": "scripts/installer.nsh",
         "packElevateHelper": false,
         "runAfterFinish": true,
-        "createDesktopShortcut": true
+        "createDesktopShortcut": true,
+        "deleteAppDataOnUninstall": false
       },
       "msi": {
         "additionalWixArgs": [
@@ -182,7 +183,7 @@
           "packElevateHelper": false,
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": [
@@ -251,7 +252,7 @@
           "include": "scripts/installer.nsh",
           "runAfterFinish": true,
           "createDesktopShortcut": true,
-          "deleteAppDataOnUninstall": true
+          "deleteAppDataOnUninstall": false
         },
         "msi": {
           "additionalWixArgs": [
