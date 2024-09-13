@@ -6,7 +6,8 @@ import {
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDirectById,
-	selectMemberClanByUserId
+	selectMemberClanByUserId,
+	useAppSelector
 } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
@@ -27,7 +28,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 	const userId = useAuth();
 	const [channelLabel, setChannelLabel] = useState('');
 	const currentChannel = useSelector(selectCurrentChannel);
-	const direct = useSelector(selectDirectById(message.channel_id));
+	const direct = useAppSelector((state) => selectDirectById(state, message.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 

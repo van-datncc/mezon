@@ -1,8 +1,7 @@
 import { AvatarImage, NavLinkComponent } from '@mezon/components';
-import { DirectEntity, selectDirectById } from '@mezon/store';
+import { DirectEntity, selectDirectById, useAppSelector } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { useLayoutEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 
 export type DirectMessUnreadProp = {
@@ -11,7 +10,7 @@ export type DirectMessUnreadProp = {
 
 function DirectUnreads({ directMessage }: DirectMessUnreadProp) {
 	const [countMessUnread, setCountMessUnread] = useState<number>();
-	const currentDirect = useSelector(selectDirectById(directMessage.id));
+	const currentDirect = useAppSelector((state) => selectDirectById(state, directMessage.id));
 
 	useLayoutEffect(() => {
 		if (currentDirect?.count_mess_unread) {

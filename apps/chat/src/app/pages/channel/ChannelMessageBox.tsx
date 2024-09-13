@@ -3,7 +3,7 @@ import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core'
 import { referencesActions, selectAttachmentByChannelId, selectDataReferences } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj, getBottomPopupClass } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 
@@ -105,3 +105,6 @@ ChannelMessageBox.Skeleton = () => {
 		</div>
 	);
 };
+
+const MemoizedChannelMessageBox = memo(ChannelMessageBox) as unknown as typeof ChannelMessageBox & { Skeleton: typeof ChannelMessageBox.Skeleton };
+export default MemoizedChannelMessageBox;

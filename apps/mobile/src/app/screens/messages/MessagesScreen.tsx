@@ -1,8 +1,17 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
-import { Colors, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { directActions, DirectEntity, getStoreAsync, RootState, selectAllClans, selectDirectsOpenlist, selectTypingUserIdsByChannelId } from '@mezon/store-mobile';
+import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
+import { useAppSelector } from '@mezon/store';
+import {
+	DirectEntity,
+	RootState,
+	directActions,
+	getStoreAsync,
+	selectAllClans,
+	selectDirectsOpenlist,
+	selectTypingUserIdsByChannelId
+} from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
@@ -28,7 +37,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { directMessage, navigation, onLongPress } = props;
-	const hasUserTyping = useSelector(selectTypingUserIdsByChannelId(directMessage?.channel_id.toString()));
+	const hasUserTyping = useAppSelector((state) => selectTypingUserIdsByChannelId(state, directMessage?.channel_id));
 	const { t } = useTranslation('message');
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id?.[0] : '');
 	const redirectToMessageDetail = () => {
@@ -153,9 +162,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		if (state === 'active') {
 			try {
 				const store = await getStoreAsync();
-				await store.dispatch(
-					directActions.fetchDirectMessage({ noCache: true })
-				);
+				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			} catch (error) {
 				console.log('error messageLoaderBackground', error);
 			}

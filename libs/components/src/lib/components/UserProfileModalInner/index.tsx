@@ -152,6 +152,7 @@ const UserProfileModalInner = ({ openModal, userId, notify, onClose }: UserProfi
 							username={displayUsername || notify?.content?.username}
 							userToDisplay={userById}
 							customStatus={userCustomStatus}
+							userID={userId}
 							styleAvatar="w-[120px] h-[120px] rounded-full"
 						/>
 						{isSelf ? (

@@ -85,7 +85,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const { directId } = useAppParams();
 	const [channelID, setChannelID] = useState('');
-	const direct = useSelector(selectDirectById(directId || ''));
+	const direct = useAppSelector((state) => selectDirectById(state, directId));
 
 	useEffect(() => {
 		if (direct !== undefined) {
