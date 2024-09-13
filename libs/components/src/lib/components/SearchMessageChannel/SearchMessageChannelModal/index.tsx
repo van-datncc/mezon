@@ -36,8 +36,8 @@ const SearchMessageChannelModal = ({
 			: [];
 	}, [usersClan, valueDisplay]);
 
-	const [index, setIndex] = useState(0); // Store the current selected index
-	const totalOptions = searchOptions.length; // Store the total number of options
+	const [index, setIndex] = useState(0);
+	const totalOptions = searchOptions.length;
 
 	const handleKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'ArrowDown') {
@@ -64,7 +64,7 @@ const SearchMessageChannelModal = ({
 
 	return (
 		<div
-			className={`absolute left-0 top-10 pb-3 ${valueDisplay ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch min-h-heightModalSearch shadow`}
+			className={`absolute left-0 top-10 pb-3 ${valueDisplay ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch shadow`}
 			tabIndex={0}
 		>
 			{valueDisplay && (
