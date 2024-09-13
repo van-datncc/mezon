@@ -170,7 +170,7 @@ function MyApp() {
 
 	return (
 		<div
-			className="flex h-screen min-[480px]:pl-[72px] overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond"
+			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
 			onClick={handleClick}
 		>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
