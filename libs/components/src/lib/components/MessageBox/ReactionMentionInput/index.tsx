@@ -64,7 +64,7 @@ import {
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { KeyboardEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -124,7 +124,7 @@ export type MentionReactInputProps = {
 	readonly mode?: number;
 };
 
-function MentionReactInput(props: MentionReactInputProps): ReactElement {
+const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
 	const { directId } = useParams();
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
@@ -721,7 +721,7 @@ function MentionReactInput(props: MentionReactInputProps): ReactElement {
 			{!props.isThread && <GifStickerEmojiButtons activeTab={SubPanelName.NONE} currentClanId={props.currentClanId} />}
 		</div>
 	);
-}
+});
 
 export default MentionReactInput;
 

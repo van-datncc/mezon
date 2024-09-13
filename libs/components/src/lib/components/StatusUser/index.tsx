@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/components';
-import { selectCurrentChannelId, selectDmGroupCurrentId, selectTypingUserIdsByChannelId } from '@mezon/store';
+import { selectCurrentChannelId, selectDmGroupCurrentId, selectTypingUserIdsByChannelId, useAppSelector } from '@mezon/store';
 import { OfflineStatus } from 'libs/ui/src/lib/Icons';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
@@ -21,20 +21,20 @@ const StatusUser = memo((props: StatusUserProps) => {
 	const { status, isMemberChannel, isMemberDMGroup, isListDm, directMessageValue, userId = '', isTyping = true, sizeStatusIcon } = props;
 	const currentDMChannelID = useSelector(selectDmGroupCurrentId);
 	const currentChannelID = useSelector(selectCurrentChannelId);
-	const typingListMemberDMIds = useSelector(selectTypingUserIdsByChannelId(currentDMChannelID || ''));
-	const typingListMemberChannelIds = useSelector(selectTypingUserIdsByChannelId(currentChannelID || ''));
-	const typingListDMIds = useSelector(selectTypingUserIdsByChannelId(directMessageValue?.dmID || ''));
+	const typingListMemberDMIds = useAppSelector((state) => selectTypingUserIdsByChannelId(state, currentDMChannelID || ''));
+	const typingListMemberChannelIds = useAppSelector((state) => selectTypingUserIdsByChannelId(state, currentChannelID || ''));
+	const typingListDMIds = useAppSelector((state) => selectTypingUserIdsByChannelId(state, directMessageValue?.dmID || ''));
 	const checkDmGroup = Number(directMessageValue?.type) === ChannelType.CHANNEL_TYPE_GROUP;
 
 	const checkTypingUser = useMemo(() => {
 		switch (true) {
 			case isMemberDMGroup:
-				return typingListMemberDMIds?.includes(userId);
+				return typingListMemberDMIds?.some((item) => item.id === userId);
 			case isMemberChannel:
-				return typingListMemberChannelIds?.includes(userId);
+				return typingListMemberChannelIds?.some((item) => item.id === userId);
 
 			case isListDm:
-				return typingListDMIds?.some((id) => directMessageValue?.userId?.includes(id));
+				return typingListDMIds?.some((item) => directMessageValue?.userId?.includes(item.id));
 
 			default:
 				return false;

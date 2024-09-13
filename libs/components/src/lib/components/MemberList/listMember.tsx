@@ -49,7 +49,7 @@ const ListMember = (props: ListMemberProps) => {
 	};
 
 	return (
-		<List height={height} itemCount={lisMembers.length} itemSize={58} width={'100%'} className="custom-member-list thread-scroll">
+		<List height={height} itemCount={lisMembers.length} itemSize={48} width={'100%'} className="custom-member-list thread-scroll">
 			{Row}
 		</List>
 	);

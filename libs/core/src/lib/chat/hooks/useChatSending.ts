@@ -1,11 +1,10 @@
-import { directActions, messagesActions, selectAllAccount, selectChannelById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectAllAccount, selectChannelById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useChatMessages } from './useChatMessages';
 import { useProcessLink } from './useProcessLink';
 
 export type UseChatSendingOptions = {
@@ -43,8 +42,6 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 	const dispatch = useAppDispatch();
 	const { clientRef, sessionRef, socketRef } = useMezon();
-	const { lastMessage } = useChatMessages({ channelId: channelIdOrDirectId ?? '' });
-
 	const sendMessage = React.useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -74,13 +71,6 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					isMobile
 				})
 			);
-			if (mode !== ChannelStreamMode.STREAM_MODE_CHANNEL) {
-				const timestamp = Date.now() / 1000;
-				dispatch(directActions.setDirectLastSeenTimestamp({ channelId: channelIdOrDirectId ?? '', timestamp }));
-				if (lastMessage) {
-					dispatch(directActions.updateLastSeenTime(lastMessage));
-				}
-			}
 		},
 		[dispatch, channelIdOrDirectId, getClanId, mode, isPublic, currentUserId]
 	);

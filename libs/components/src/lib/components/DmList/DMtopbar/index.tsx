@@ -67,7 +67,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								: (currentDmGroup?.channel_avatar?.at(0) ?? '')
 						}
 						name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
-						status={currentDmGroup.is_online?.some(Boolean)}
+						status={currentDmGroup?.is_online?.some(Boolean)}
 						isHideStatus={true}
 						isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
 						key={currentDmGroup?.channel_id}
