@@ -1,5 +1,5 @@
 import { ELoadMoreDirection, IBeforeRenderCb, useChatScroll } from '@mezon/chat-scroll';
-import { MessageContextMenuProvider, MessageModalImage } from '@mezon/components';
+import { MessageContextMenuProvider } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import {
 	messagesActions,
@@ -13,7 +13,6 @@ import {
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotified,
-	selectOpenModalAttachment,
 	selectTheme,
 	useAppDispatch,
 	useAppSelector
@@ -62,7 +61,6 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 	);
 
 	const dispatch = useAppDispatch();
-	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const loadMoreMessage = useCallback(
 		async (direction: ELoadMoreDirection, cb: IBeforeRenderCb) => {
@@ -206,7 +204,6 @@ function ChannelMessages({ channelId, channelLabel, type, avatarDM, userName, mo
 					</div>
 				</div>
 			</div>
-			{openModalAttachment && <MessageModalImage />}
 		</MessageContextMenuProvider>
 	);
 }

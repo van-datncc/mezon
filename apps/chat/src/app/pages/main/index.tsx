@@ -1,6 +1,7 @@
 import {
 	FirstJoinPopup,
 	ForwardMessageModal,
+	MessageModalImage,
 	ModalCreateClan,
 	NavLinkComponent,
 	SearchModal,
@@ -18,6 +19,7 @@ import {
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
+	selectOpenModalAttachment,
 	selectStatusMenu,
 	selectTheme,
 	selectTotalClansNotify,
@@ -47,6 +49,7 @@ function MyApp() {
 	const totalClanNotify = useSelector(selectTotalClansNotify);
 	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
+	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
 	const { setCloseMenu, setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
@@ -239,6 +242,7 @@ function MyApp() {
 				</div>
 			</div>
 			<MainContent />
+			{openModalAttachment && <MessageModalImage />}
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 			{isShowPopupQuickMess && <PopupQuickMess />}
 		</div>
