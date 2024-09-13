@@ -47,7 +47,8 @@ export const style = (colors: Attributes) =>
 			borderRadius: 40,
 			alignItems: 'center',
 			paddingHorizontal: size.s_12,
-			flexDirection: 'row'
+			flexDirection: 'row',
+			justifyContent: 'space-between'
 		},
 
 		searchInput: {
@@ -57,7 +58,8 @@ export const style = (colors: Attributes) =>
 			color: colors.textStrong,
 			paddingVertical: size.s_6,
 			paddingHorizontal: size.s_12,
-			fontSize: size.medium
+			fontSize: size.medium,
+			flex: 1
 		},
 
 		statusTyping: {
