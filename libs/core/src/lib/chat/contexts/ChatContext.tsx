@@ -528,21 +528,38 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		]
 	);
 
+	const showErrorToast = useCallback(
+		(message: string) => {
+			dispatch(toastActions.addToast({ message, type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+		},
+		[dispatch]
+	);
+
+	const handleReconnect = useCallback(
+		(socketType: string) => async () => {
+			showErrorToast(socketType);
+			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
+			try {
+				const socket = await reconnect(clanIdActive ?? '');
+				if (!socket) {
+					showErrorToast(errorMessage);
+					return;
+				}
+				setCallbackEventFn(socket as Socket);
+			} catch (error) {
+				showErrorToast(errorMessage);
+			}
+		},
+		[clanIdActive, reconnect, showErrorToast, setCallbackEventFn]
+	);
+
 	const ondisconnect = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket disconnected', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect(clanIdActive ?? '').then((socket) => {
-			if (!socket) return;
-			setCallbackEventFn(socket as Socket);
-		});
-	}, [dispatch, reconnect, clanIdActive, setCallbackEventFn]);
+		handleReconnect('Socket disconnected');
+	}, [handleReconnect]);
 
 	const onHeartbeatTimeout = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket hearbeat timeout', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect(clanIdActive ?? '').then((socket) => {
-			if (!socket) return;
-			setCallbackEventFn(socket as Socket);
-		});
-	}, [clanIdActive, dispatch, reconnect, setCallbackEventFn]);
+		handleReconnect('Socket hearbeat timeout');
+	}, [handleReconnect]);
 
 	useEffect(() => {
 		const socket = socketRef.current;
