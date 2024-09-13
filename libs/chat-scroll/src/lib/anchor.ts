@@ -1,71 +1,122 @@
-import { useEffect, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 
-export const useAnchor = (targetRef: React.MutableRefObject<Element>, anchorRef: React.MutableRefObject<Element>) => {
-	const anchor = useRef<{
-		observer: IntersectionObserver | null;
-		parentElement: Element | null;
-		anchorElement: Element | null;
-		anchored: boolean;
-		setup: (targetElement: Element, anchorElement: Element) => IntersectionObserver | null;
-		drop: () => void;
-		raise: () => void;
-		clean: () => void;
-	}>({
-		observer: null,
-		anchored: false,
-		parentElement: null,
-		anchorElement: null,
-		setup: function (targetElement, anchorElement) {
-			this.parentElement = targetElement;
-			this.anchorElement = anchorElement;
-			if (this.observer) {
-				this.clean();
-			}
+const MAX_RESIZE_TIME = 5;
+const UI_STABLE_TIME = 1000;
 
-			if (!this.parentElement || !this.anchorElement) {
-				return null;
+const createResizeObserver = (listenersMap: Map<Element, (entry: ResizeObserverEntry) => void>) => {
+	const expectedSize = new WeakMap<ResizeObserverEntry, DOMRectReadOnly>();
+	return new ResizeObserver((entries) => {
+		entries.forEach((entry) => {
+			const previousHeight = expectedSize.get(entry)?.height;
+			expectedSize.set(entry, entry.contentRect);
+			if (previousHeight === entry.contentRect.height) {
+				return;
 			}
-
-			this.observer = new IntersectionObserver(
-				(entries) => {
-					entries.forEach((entry) => {
-						if (!entry.isIntersecting) {
-							requestAnimationFrame(() => {
-								this.anchorElement?.scrollIntoView();
-							});
-						}
-					});
-				},
-				{
-					root: this.parentElement,
-					rootMargin: '0px',
-					threshold: 1.0
-				}
-			);
-			return this.observer;
-		},
-		drop: function () {
-			if (!this.anchored && this.observer && this.anchorElement) {
-				this.observer?.observe(this.anchorElement);
-				this.anchored = true;
+			const handler = listenersMap.get(entry.target);
+			if (handler) {
+				handler(entry);
 			}
-		},
-		raise: function () {
-			if (this.anchored && this.observer && this.anchorElement) {
-				this.observer.unobserve(this.anchorElement);
-				this.anchored = false;
-			}
-		},
-		clean: function () {
-			this.observer?.disconnect();
-			this.observer = null;
-		}
+		});
 	});
+};
 
-	useEffect(() => {
-		const observer = anchor.current.setup(targetRef?.current, anchorRef?.current);
-		return () => observer?.disconnect();
-	}, [targetRef, anchorRef]);
+export const useAnchor = (containerRef: React.MutableRefObject<Element>, contentRef: React.MutableRefObject<Element>) => {
+	const anchor = useRef<{
+		resizeObserver: ResizeObserver;
+		listenersMap: Map<Element, (entry: ResizeObserverEntry) => void>;
+		enabled: boolean;
+		isStable: boolean;
+		enable: () => void;
+		disable: () => void;
+		isAtBottom: (element: Element) => boolean;
+	} | null>(null);
+	if (anchor.current === null) {
+		const listenersMap = new Map<Element, (entry: ResizeObserverEntry) => void>();
+		anchor.current = {
+			resizeObserver: createResizeObserver(listenersMap),
+			listenersMap: listenersMap,
+			isStable: false,
+			enabled: true,
+			enable: () => anchor.current && (anchor.current.enabled = true),
+			disable: () => {
+				anchor.current && (anchor.current.enabled = false);
+			},
+			isAtBottom: (element: Element) => {
+				if (!element) {
+					return false;
+				}
+				return element.scrollHeight - element.scrollTop - element.clientHeight < 1;
+			}
+		};
+	}
+
+	const scrollToBottomIfNeeded = useCallback(() => {
+		const element = containerRef.current;
+		if (!element) {
+			return;
+		}
+		const isAtBottom = anchor.current?.isAtBottom(element);
+		if (isAtBottom) {
+			return;
+		}
+		containerRef.current.scrollTo(0, Number.MAX_SAFE_INTEGER);
+	}, [containerRef]);
+
+	useLayoutEffect(() => {
+		const containerElement = containerRef?.current;
+		const contentElement = contentRef?.current;
+		let resizeTimeoutId: NodeJS.Timeout | null = null;
+		let resizeHandlerId: number | null = null;
+		let wheelHandler: (() => void) | null = null;
+		const cleanUp = () => {
+			resizeTimeoutId && clearTimeout(resizeTimeoutId);
+			resizeHandlerId && cancelAnimationFrame(resizeHandlerId);
+			contentElement && anchor.current?.resizeObserver?.unobserve(contentElement);
+			containerElement && wheelHandler && containerElement.removeEventListener('wheel', wheelHandler);
+		};
+
+		if (containerElement && contentElement && anchor.current) {
+			scrollToBottomIfNeeded();
+			const { resizeObserver, listenersMap } = anchor.current;
+			anchor.current.isStable = false;
+			let resizeTime = 0;
+			listenersMap.set(contentElement, () => {
+				if (!anchor.current) {
+					return;
+				}
+
+				if (anchor.current.isStable || !anchor.current.enabled) {
+					return;
+				}
+
+				// handle scroll to bottom if the content is resized during browser painting
+				if (resizeTime < MAX_RESIZE_TIME) {
+					resizeHandlerId = requestAnimationFrame(() => {
+						scrollToBottomIfNeeded();
+						resizeTime++;
+						// assume the UI is stable after a certain time
+						resizeTimeoutId && clearTimeout(resizeTimeoutId);
+						resizeTimeoutId = setTimeout(() => {
+							if (anchor.current) {
+								anchor.current.isStable = true;
+							}
+						}, UI_STABLE_TIME);
+					});
+				}
+			});
+
+			resizeObserver.observe(contentElement, { box: 'border-box' });
+
+			wheelHandler = () => {
+				cleanUp();
+			};
+
+			// When user wheel the chat, disable the sticky scroll behavior
+			// Use passive mode to ensure that the wheel is uncanceled and does not block the rendering
+			containerElement.addEventListener('wheel', wheelHandler, { passive: true });
+		}
+		return () => cleanUp();
+	}, [containerRef, contentRef, scrollToBottomIfNeeded]);
 
 	return anchor;
 };
