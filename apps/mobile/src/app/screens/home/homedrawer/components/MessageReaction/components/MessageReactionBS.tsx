@@ -6,7 +6,7 @@ import { IDetailReactionBottomSheet } from '../../../types';
 import { MessageReactionContent } from './MessageReactionContent';
 
 export const MessageReactionBS = memo((props: IDetailReactionBottomSheet) => {
-	const { bottomSheetRef, allReactionDataOnOneMessage, emojiSelectedId, userId, onClose, removeEmoji, onShowUserInformation } = props;
+	const { bottomSheetRef, channelId, allReactionDataOnOneMessage, emojiSelectedId, userId, onClose, removeEmoji, onShowUserInformation } = props;
 	const { themeValue } = useTheme();
 
 	return (
@@ -29,6 +29,7 @@ export const MessageReactionBS = memo((props: IDetailReactionBottomSheet) => {
 					userId={userId}
 					removeEmoji={removeEmoji}
 					onShowUserInformation={onShowUserInformation}
+					channelId={channelId}
 				/>
 			</Block>
 		</BottomSheetModal>

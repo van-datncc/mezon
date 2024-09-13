@@ -1,34 +1,49 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectMemberClanByUserId } from '@mezon/store-mobile';
-import React from 'react';
+import { selectAllChannelMembers, selectMemberClanByUserId, useAppSelector } from '@mezon/store-mobile';
+import React, { useMemo } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { style } from '../styles';
 
-export const ReactionMember = React.memo((props: { userId: string; onSelectUserId: (userId: string) => void }) => {
+interface IReactionMemberProps {
+	userId: string;
+	onSelectUserId: (userId: string) => void;
+	channelId?: string;
+}
+
+export const ReactionMember = React.memo((props: IReactionMemberProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { userId, onSelectUserId } = props;
+	const { userId, onSelectUserId, channelId } = props;
+	const channelMemberList = useAppSelector((state) => selectAllChannelMembers(state, channelId || ''));
 	const user = useSelector(selectMemberClanByUserId(userId || ''));
+
+	const reactionMember = useMemo(() => {
+		if (user) {
+			return user;
+		}
+		return channelMemberList?.find((member) => member?.id === userId);
+	}, [user, channelMemberList, userId]);
+
 	const showUserInformation = () => {
-		onSelectUserId(user?.user?.id);
+		onSelectUserId(userId);
 	};
 
 	return (
-		<TouchableOpacity style={styles.memberWrapper} onPress={() => showUserInformation()}>
+		<TouchableOpacity style={styles.memberWrapper} onPress={showUserInformation}>
 			<View style={styles.imageWrapper}>
-				{user?.user?.avatar_url ? (
+				{reactionMember?.user?.avatar_url ? (
 					<View>
-						<Image source={{ uri: user?.user?.avatar_url }} resizeMode="cover" style={styles.image} />
+						<Image source={{ uri: reactionMember?.user?.avatar_url }} resizeMode="cover" style={styles.image} />
 					</View>
 				) : (
 					<View style={styles.avatarBoxDefault}>
-						<Text style={styles.textAvatarBoxDefault}>{user?.user?.username?.charAt(0)?.toUpperCase()}</Text>
+						<Text style={styles.textAvatarBoxDefault}>{reactionMember?.user?.username?.charAt(0)?.toUpperCase()}</Text>
 					</View>
 				)}
 			</View>
-			<Text style={styles.memberName}>{user?.user?.display_name}</Text>
-			<Text style={styles.mentionText}>@{user?.user?.username}</Text>
+			<Text style={styles.memberName}>{reactionMember?.user?.display_name}</Text>
+			{reactionMember?.user?.username ? <Text style={styles.mentionText}>@{reactionMember?.user?.username}</Text> : null}
 		</TouchableOpacity>
 	);
 });

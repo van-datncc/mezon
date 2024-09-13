@@ -154,6 +154,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 				removeEmoji={removeEmoji}
 				onShowUserInformation={onShowUserInformation}
 				userId={userId}
+				channelId={message?.channel_id}
 			/>
 
 			<UserInformationBottomSheet userId={selectedUserId} onClose={onCloseUserInformationBottomSheet} />

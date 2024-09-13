@@ -15,10 +15,11 @@ interface IMessageReactionContentProps {
 	userId: string | null;
 	removeEmoji?: (emoji: EmojiDataOptionals) => void;
 	onShowUserInformation?: (userId: string) => void;
+	channelId?: string;
 }
 
 export const MessageReactionContent = memo((props: IMessageReactionContentProps) => {
-	const { allReactionDataOnOneMessage, emojiSelectedId, userId, onShowUserInformation, removeEmoji } = props;
+	const { allReactionDataOnOneMessage, emojiSelectedId, channelId, userId, onShowUserInformation, removeEmoji } = props;
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation('message');
@@ -127,7 +128,7 @@ export const MessageReactionContent = memo((props: IMessageReactionContentProps)
 						}
 						return (
 							<View key={`${emojiKeyList[index]}`}>
-								<ReactionMember userId={sender.sender_id} onSelectUserId={onShowUserInformation} />
+								<ReactionMember userId={sender.sender_id} channelId={channelId} onSelectUserId={onShowUserInformation} />
 							</View>
 						);
 					})}

@@ -63,6 +63,7 @@ export interface IDetailReactionBottomSheet {
 	onClose: () => void;
 	removeEmoji?: (emoji: EmojiDataOptionals) => void;
 	onShowUserInformation?: (userId: string) => void;
+	channelId?: string;
 }
 export interface IPayloadThreadSendMessage {
 	content: IMessageSendPayload;
