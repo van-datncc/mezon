@@ -48,7 +48,7 @@ export enum ModalType {
 }
 
 export const profileElemHeight = 358;
-export const profileElemWidth = 325;
+export const profileElemWidth = 320;
 
 function MemberProfile({
 	avatar,
@@ -72,9 +72,7 @@ function MemberProfile({
 	userNameAva,
 	hideLongName
 }: MemberProfileProps) {
-	const left = useRef(0);
-	const top = useRef(0);
-	const coords = useRef<Coords>({
+	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
 		distanceToBottom: 0
@@ -100,21 +98,13 @@ function MemberProfile({
 		const windowWidth = window.innerWidth;
 		const windowHeight = window.innerHeight;
 
-		const distanceToBottom = windowHeight - mouseY;
-
 		// adjust mouseX if it is less than 200px(panel width) from the right edge of the browser
 		const adjustedMouseX = mouseX > windowWidth - 200 ? mouseX - 200 : mouseX;
 
 		if (event.button === MouseButton.LEFT) {
 			// handle show profile item
 			const rect = panelRef.current?.getBoundingClientRect() as DOMRect;
-			const distanceToBottom = windowHeight - rect.bottom;
-			if (distanceToBottom < profileElemHeight) {
-				top.current = rect.top - profileElemHeight;
-			} else {
-				top.current = rect.top;
-			}
-			left.current = rect.left - profileElemWidth;
+			setCoords({ distanceToBottom: windowHeight - rect.bottom, mouseX: windowWidth - rect.left, mouseY: rect.top - rect.height });
 
 			if (modalState.current.profileItem) {
 				closeModal(ModalType.ProfileItem);
@@ -125,7 +115,8 @@ function MemberProfile({
 		}
 
 		if (event.button === MouseButton.RIGHT) {
-			coords.current = { mouseX: adjustedMouseX, mouseY, distanceToBottom };
+			const distanceToBottom = windowHeight - mouseY;
+			setCoords({ mouseX: adjustedMouseX, mouseY, distanceToBottom });
 			if (modalState.current.pannelMember) {
 				closeModal(ModalType.PannelMember);
 			} else {
@@ -198,32 +189,24 @@ function MemberProfile({
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		if (!listProfile) return;
 		modalState.current.profileItem = true;
+
 		return (
-			<div
-				className={`dark:bg-black bg-gray-200 mt-[10px] rounded-lg flex flex-col z-10 opacity-100 shortUserProfile fixed  left-5 sbm:left-[185px] md:left-auto w-[300px] max-w-[89vw]`}
-				style={{
-					top: `${top.current}px`,
-					left: `${left.current}px`
-				}}
-				onMouseDown={(e) => e.stopPropagation()}
-				onClick={(e) => e.stopPropagation()}
-			>
-				<ShortUserProfile
-					userID={user?.id || ''}
-					mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
-					avatar={avatar}
-					name={name}
-				/>
-			</div>
+			<ShortUserProfile
+				userID={user?.id || ''}
+				mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
+				avatar={avatar}
+				name={name}
+				coords={coords}
+			/>
 		);
-	});
+	}, [coords]);
 
 	const [openPanelMember, closePanelMember] = useModal(() => {
 		if (isHiddenAvatarPanel) return;
 		modalState.current.pannelMember = true;
 		return (
 			<PanelMember
-				coords={coords.current}
+				coords={coords}
 				onClose={() => closeModal(ModalType.PannelMember)}
 				member={user}
 				onRemoveMember={handleClickRemoveMember}
@@ -235,7 +218,7 @@ function MemberProfile({
 				onOpenProfile={openUserProfile}
 			/>
 		);
-	});
+	}, [coords]);
 
 	const [openUserProfile, closeUserProfile] = useModal(() => {
 		modalState.current.userProfile = true;

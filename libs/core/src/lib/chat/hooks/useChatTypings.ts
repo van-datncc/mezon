@@ -21,9 +21,20 @@ interface UseChatTypingsOptions {
 
 export function useChatTypings({ channelId, mode, isPublic, isDM }: UseChatTypingsOptions) {
 	const { userId } = useAuth();
-	const typingUsersIds = useAppSelector(selectTypingUserIdsByChannelId(channelId));
+	const typingUsersIds = useAppSelector((state) => selectTypingUserIdsByChannelId(state, channelId));
 	const typingUsers = useAppSelector((state) =>
-		selectChannelMemberByUserIds(state, channelId, typingUsersIds?.filter((userID) => userID !== userId).join('/'), isDM ? '1' : '')
+		selectChannelMemberByUserIds(
+			state,
+			channelId,
+			typingUsersIds?.length
+				? typingUsersIds
+					?.filter((item) => item.id !== userId)
+					.map((item) => item.id)
+					.splice(0, 2) // only handle <= 2 items because business logic only show several user typing
+					.join('/')
+				: '',
+			isDM ? '1' : ''
+		)
 	);
 
 	const currentClanId = useSelector(selectCurrentClanId);

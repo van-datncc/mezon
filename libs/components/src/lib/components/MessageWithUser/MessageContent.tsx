@@ -79,7 +79,6 @@ const MessageText = ({
 
 	return (
 		<>
-			{' '}
 			{lines?.length > 0 ? (
 				<div className="flex w-full">
 					<div className="w-full">
