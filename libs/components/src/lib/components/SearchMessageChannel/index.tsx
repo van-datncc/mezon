@@ -265,6 +265,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			</div>
 			{isShowSearchMessageModal && !hasKeySearch(valueInputSearch ?? '') && (
 				<SearchMessageChannelModal
+					theme={appearanceTheme}
 					hasKeySearch={hasKeySearch(valueInputSearch ?? '')}
 					valueInputSearch={valueInputSearch}
 					valueDisplay={valueDisplay}
