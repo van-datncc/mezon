@@ -231,7 +231,7 @@ const ReactionDetail = React.memo((props: IDetailReactionBottomSheet) => {
 								</Pressable>
 							) : (
 								<Pressable onPress={() => setShowConfirmDeleteEmoji(true)}>
-									<TrashIcon />
+									<TrashIcon color={themeValue.white}/>
 								</Pressable>
 							)}
 						</View>

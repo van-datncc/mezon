@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
-import { useAppSelector } from '@mezon/store';
+import { selectIsUnreadDMById, useAppSelector } from '@mezon/store';
 import {
 	DirectEntity,
 	RootState,
@@ -38,6 +38,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 	const styles = style(themeValue);
 	const { directMessage, navigation, onLongPress } = props;
 	const hasUserTyping = useAppSelector((state) => selectTypingUserIdsByChannelId(state, directMessage?.channel_id));
+	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
 	const { t } = useTranslation('message');
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id?.[0] : '');
 	const redirectToMessageDetail = () => {
@@ -63,7 +64,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		if (!text) {
 			return (
-				<Text style={[styles.defaultText, styles.lastMessage]} numberOfLines={1}>
+				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]} numberOfLines={1}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
 					{': '}
 					{'attachment '}
@@ -74,7 +75,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		return (
 			<View style={styles.contentMessage}>
-				<Text style={[styles.defaultText, styles.lastMessage]}>
+				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')} {': '}
 				</Text>
 				{!!content && (
@@ -82,6 +83,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 						isOpenLink={false}
 						isHiddenHashtag={true}
 						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
+						isUnReadChannel={isUnReadChannel}
 					/>
 				)}
 			</View>

@@ -33,7 +33,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	bottomSheetWrapper: {
 		flex: 1,
-		backgroundColor: Colors.bgCharcoal,
+		backgroundColor: colors.secondary,
 		width: '100%',
 		borderTopRightRadius: 8,
 		borderTopLeftRadius: 8,
@@ -46,7 +46,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		width: '100%',
 		padding: size.s_10,
 		borderBottomWidth: 2,
-		borderBottomColor: Colors.borderPrimary,
+		borderBottomColor: colors.border,
 		maxHeight: 60,
 	},
 	tabHeaderItem: {
@@ -58,7 +58,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		marginRight: 7,
 	},
 	activeTab: {
-		backgroundColor: Colors.secondary,
+		backgroundColor: colors.border,
 	},
 	originEmojiColor: {
 		color: Colors.white,
@@ -103,7 +103,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	},
 	memberName: {
 		marginLeft: size.s_12,
-		color: Colors.white,
+		color: colors.white,
 	},
 	mentionText: {
 		color: Colors.bgGrayDark,
@@ -142,7 +142,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		fontSize: size.label
 	},
 	emojiText: {
-		color: Colors.tertiary,
+		color: colors.text,
 		fontSize: size.label
 	},
 	noActionsWrapper: {

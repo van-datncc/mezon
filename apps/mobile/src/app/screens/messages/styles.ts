@@ -145,7 +145,9 @@ export const style = (colors: Attributes) =>
 		},
 
 		channelLabel: {
-			fontSize: size.s_14,
+			fontSize: size.s_15,
+			color: colors.white,
+			fontWeight: '500',
 			flex: 1
 		},
 		avatarWrapper: {
