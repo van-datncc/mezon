@@ -1,6 +1,6 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
-import { selectChannelMemberByUserIds, selectCurrentChannelId, useAppSelector } from '@mezon/store';
+import { selectChannelMemberByUserIds, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
 import { MouseButton, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo, useRef, useState } from 'react';
@@ -30,6 +30,7 @@ type UserProfilePopupProps = {
 	positionLeft: number;
 	positionTop: number;
 	positionBottom: boolean;
+	isDm?: boolean;
 };
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
@@ -59,6 +60,9 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 	const panelRef = useRef<HTMLButtonElement>(null);
 
+	const currentDirectId = useSelector(selectDmGroupCurrentId);
+	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));
+	const channelId = isDM ? currentDirectId : currentChannelId;
 	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.stopPropagation();
 		e.preventDefault();
@@ -105,11 +109,12 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 			{showProfileUser && (
 				<UserProfilePopup
 					userID={tagUserId ?? ''}
-					channelId={currentChannelId ?? ''}
+					channelId={channelId ?? ''}
 					mode={mode}
 					positionLeft={positionLeft}
 					positionTop={positionTop}
 					positionBottom={positionBottom}
+					isDm={isDM}
 				/>
 			)}
 			{displayToken?.type === MentionType.ROLE_EXIST && (
@@ -131,7 +136,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
 					ref={panelRef}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
+					// onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
 					style={{ textDecoration: 'none' }}
 					className={`font-medium px-0.1 rounded-sm
 				${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
@@ -146,7 +151,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 export default memo(MentionUser);
 
-const UserProfilePopup = ({ userID, channelId, mode, positionLeft, positionTop, positionBottom }: UserProfilePopupProps) => {
+const UserProfilePopup = ({ userID, channelId, mode, positionLeft, positionTop, positionBottom, isDm }: UserProfilePopupProps) => {
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
 	)[0];
@@ -173,7 +178,13 @@ const UserProfilePopup = ({ userID, channelId, mode, positionLeft, positionTop, 
 			}}
 			onMouseDown={(e) => e.stopPropagation()}
 		>
-			<ShortUserProfile userID={userID} mode={mode} avatar={updatedUserByUserId.prioritizeAvt} name={updatedUserByUserId.prioritizeName} />
+			<ShortUserProfile
+				isDM={isDm}
+				userID={userID}
+				mode={mode}
+				avatar={updatedUserByUserId.prioritizeAvt}
+				name={updatedUserByUserId.prioritizeName}
+			/>
 		</div>
 	);
 };

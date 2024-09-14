@@ -48,6 +48,7 @@ const ClanLayout = () => {
 					avatar={userProfile?.user?.avatar_url || ''}
 					userId={userProfile?.user?.id || ''}
 					channelCurrent={currentChannel}
+					isDM={false}
 				/>
 			</div>
 			<div
@@ -61,7 +62,7 @@ const ClanLayout = () => {
 					<ThreadsMain />
 				</div>
 			)}
-			<Setting />
+			<Setting isDM={false} />
 		</MezonPolicyProvider>
 	);
 };

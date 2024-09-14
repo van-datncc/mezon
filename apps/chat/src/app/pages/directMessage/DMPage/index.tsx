@@ -214,6 +214,7 @@ export default function DirectMessage() {
 								showNote={true}
 								showPopupLeft={true}
 								avatar={currentDmGroup?.channel_avatar?.[0]}
+								isDM={true}
 							/>
 						</div>
 					)}

@@ -7,15 +7,16 @@ import ItemStatus from './ItemStatus';
 
 type StatusProfileProps = {
 	userById: ChannelMembersEntity | null;
+	isDM?: boolean;
 };
 
-const StatusProfile = ({ userById }: StatusProfileProps) => {
+const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const dispatch = useAppDispatch();
 	const user = userById?.user;
 	const handleCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
 	};
-	const userCustomStatus = useMemberCustomStatus(user?.id || '');
+	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
 
 	return (
 		<>
