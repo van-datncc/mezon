@@ -154,8 +154,8 @@ const RenderContent = memo(
 					} else {
 						formattedContent.push(
 							<PlainText
-								isSearchMessage={isSearchMessage}
-								key={`useDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
+								isSearchMessage={false}
+								key={`userDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
 								text={contentInElement ?? ''}
 							/>
 						);
@@ -176,7 +176,7 @@ const RenderContent = memo(
 					} else {
 						formattedContent.push(
 							<PlainText
-								isSearchMessage={isSearchMessage}
+								isSearchMessage={false}
 								key={`roleDeleted-${index}-${s}-${contentInElement}-${element.user_id}-${element.role_id}`}
 								text={contentInElement ?? ''}
 							/>

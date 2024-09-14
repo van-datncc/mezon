@@ -63,10 +63,6 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));
 	const channelId = isDM ? currentDirectId : currentChannelId;
-	const dispatchUserIdToShowProfile = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-		e.stopPropagation();
-		e.preventDefault();
-	};
 
 	const [showProfileUser, setIsShowPanelChannel] = useState(false);
 	const [positionBottom, setPositionBottom] = useState(false);
