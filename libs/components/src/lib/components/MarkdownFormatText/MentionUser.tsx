@@ -1,13 +1,6 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { useEscapeKey, useOnClickOutside } from '@mezon/core';
-import {
-	// selectAllChannelMemberIds,
-	selectAllRoleIds,
-	selectChannelMemberByUserIds,
-	selectCurrentChannel,
-	selectUserRemovedByChannelId,
-	selectUserRemovedByClanId,
-	useAppSelector
-} from '@mezon/store';
+import { selectChannelMemberByUserIds, selectCurrentChannelId, useAppSelector } from '@mezon/store';
 import { MouseButton, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo, useRef, useState } from 'react';
@@ -27,9 +20,7 @@ type ChannelHashtagProps = {
 enum MentionType {
 	HERE = 'HERE',
 	ROLE_EXIST = 'ROLE_EXIST',
-	ROLE_NOT_EXIST = 'ROLE_NOT_EXIST',
-	USER_EXIST = 'USER_EXIST',
-	USER_NOT_EXIST = 'USER_NOT_EXIST'
+	USER_EXIST = 'USER_EXIST'
 }
 
 type UserProfilePopupProps = {
@@ -42,89 +33,29 @@ type UserProfilePopupProps = {
 };
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
-	console.log('mode: ', mode);
-
-	const allRoleIds = useSelector(selectAllRoleIds);
-	const currentChannel = useSelector(selectCurrentChannel);
-
-	const isPrivateChannel = useMemo(() => {
-		if (currentChannel?.channel_private === 1) {
-			return true;
-		} else {
-			return false;
-		}
-	}, [currentChannel?.channel_private]);
-	console.log('isPrivateChannel: ', isPrivateChannel);
-
-	const currentChannelId = useMemo(() => {
-		return currentChannel?.channel_id;
-	}, [currentChannel?.id]);
-	console.log('currentChannelId: ', currentChannelId);
-
-	const userRemoveIdInPrivateChannel = useSelector(selectUserRemovedByChannelId(currentChannel?.id ?? ' '));
-	const userRemoveIdInPublicChannel = useSelector(selectUserRemovedByClanId(currentChannel?.clan_id ?? ' '));
-
-	// const userRemove = useMemo(() => {
-	// 	if (userRemoveIdInPrivateChannel === userRemoveIdInPublicChannel) {
-	// 		return userRemoveIdInPrivateChannel;
-	// 	} else if (userRemoveIdInPrivateChannel === null && userRemoveIdInPublicChannel) {
-	// 		return userRemoveIdInPublicChannel;
-	// 	}
-	// }, [userRemoveIdInPrivateChannel, userRemoveIdInPublicChannel]);
-
-	// console.log('userRemove', userRemove);
-
-	// const getUserInPrivate = useAppSelector((state) =>
-	// 	selectChannelMemberByUserIds(state, currentChannelId ?? '', userRemove ?? '', mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
-	// )[0];
-
-	// console.log('getUserByUserId', getUserByUserId);
-
-	// const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId as string));
-	// console.log('allUserIds :', allUserIdsInChannel);
-
-	// const checkUserIsExist = useMemo(() => {
-	// 	return allUserIdsInChannel.indexOf(tagUserId ?? '') !== -1;
-	// }, [allUserIdsInChannel, tagUserId]);
-
-	// console.log('checkUserIsExist :', checkUserIsExist);
-
-	const checkRoleIsExist = useMemo(() => {
-		return allRoleIds.includes(tagRoleId ?? '');
-	}, [allRoleIds, tagRoleId]);
-
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const displayToken = useMemo(() => {
-		if (tagRoleId && checkRoleIsExist) {
+		if (tagRoleId) {
 			return {
 				display: tagRoleName,
 				type: MentionType.ROLE_EXIST
 			};
 		}
-		if (tagRoleId && !checkRoleIsExist) {
-			return {
-				display: '@unknownrole',
-				type: MentionType.ROLE_NOT_EXIST
-			};
-		}
+
 		if (tagUserName === '@here') {
 			return {
 				display: '@here',
 				type: MentionType.HERE
 			};
 		}
-		// if (tagUserId === userRemove && tagUserName !== '@here') {
-		// 	return {
-		// 		display: '@unknownuser',
-		// 		type: MentionType.USER_NOT_EXIST
-		// 	};
-		// }
+
 		if (tagUserId && tagUserName !== '@here') {
 			return {
 				display: tagUserName,
 				type: MentionType.USER_EXIST
 			};
 		}
-	}, [tagUserName, tagRoleName, tagUserId, checkRoleIsExist, tagRoleId]);
+	}, [tagUserName, tagRoleName, tagUserId, tagRoleId]);
 
 	const panelRef = useRef<HTMLButtonElement>(null);
 
@@ -209,8 +140,6 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					{displayToken.display}
 				</button>
 			)}
-			{displayToken?.type === MentionType.USER_NOT_EXIST && <span>{displayToken.display}</span>}
-			{displayToken?.type === MentionType.ROLE_NOT_EXIST && <span>{displayToken.display}</span>}
 		</>
 	);
 };

@@ -41,8 +41,6 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 		}
 	>;
 	dmGroupUsers?: ChannelUserListChannelUser[];
-	userRemovedChannel?: Record<string, string>;
-	userRemovedClan?: Record<string, string>;
 }
 
 export const mapUserIdToEntity = (userId: string, username: string, online: boolean) => {
@@ -219,10 +217,7 @@ export const channelMembers = createSlice({
 		remove: (state, action: PayloadAction<{ channelId: string; userId: string }>) => {
 			const { channelId, userId } = action.payload;
 			const channelEntity = state.memberChannels[channelId];
-			if (!state.userRemovedChannel) {
-				state.userRemovedChannel = {};
-			}
-			state.userRemovedChannel[channelId] = userId;
+
 			if (channelEntity) {
 				const memberIds = (channelEntity.ids || []).filter((id) => id !== userId);
 				state.memberChannels[channelId].ids = memberIds;
@@ -277,10 +272,7 @@ export const channelMembers = createSlice({
 		},
 		removeUserByUserIdAndClan: (state, action: PayloadAction<{ userId: string; channelIds: string[]; clanId: string }>) => {
 			const { userId, channelIds, clanId } = action.payload;
-			if (!state.userRemovedClan) {
-				state.userRemovedClan = {};
-			}
-			state.userRemovedClan[clanId] = userId;
+
 			channelIds.forEach((channelId) => {
 				const channelEntity = state.memberChannels[channelId];
 				if (channelEntity) {
@@ -456,15 +448,6 @@ export const selectGrouplMembers = createSelector([selectDirectById, (state, gro
 	}) as ChannelMembersEntity[];
 });
 
-export const selectUserRemovedInChannel = createSelector(getChannelMembersState, (state: ChannelMembersState) => state.userRemovedChannel);
-
-export const selectUserRemovedByChannelId = (channelId: string) =>
-	createSelector(selectUserRemovedInChannel, (userRemovedInChannel = {}) => userRemovedInChannel[channelId] || null);
-export const selectUserRemovedInClan = createSelector(getChannelMembersState, (state: ChannelMembersState) => state.userRemovedClan);
-
-export const selectUserRemovedByClanId = (clanId: string) =>
-	createSelector(selectUserRemovedInClan, (userRemovedInClan = {}) => userRemovedInClan[clanId] || null);
-
 export const selectMemberStatusById = createSelector(
 	[
 		getUsersClanState,
@@ -538,7 +521,7 @@ export const selectAllChannelMemberIds = createSelector(
 	],
 	(channelMembersState, usersClanState, directs, payload) => {
 		const [channelId, isPrivate, isDm] = payload.split(',');
-		if (isDm) return directs.map((dm) => dm.user_id);
+		if (isDm) return directs.map((dm) => dm.id);
 		const memberIds = isPrivate ? channelMembersState.memberChannels[channelId]?.ids || [] : Object.keys(usersClanState.entities);
 		return memberIds;
 	}
