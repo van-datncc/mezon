@@ -256,7 +256,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
 					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndClan({ userId: id, channelIds: channels.map((item) => item.id) }));
+					dispatch(
+						channelMembers.actions.removeUserByUserIdAndClan({
+							userId: id,
+							channelIds: channels.map((item) => item.id),
+							clanId: user.clan_id
+						})
+					);
 					dispatch(usersClanActions.remove(id));
 				}
 			});
