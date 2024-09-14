@@ -14,13 +14,15 @@ const SettingRightUser = ({
 	name,
 	avatar,
 	currentDisplayName,
-	aboutMe
+	aboutMe,
+	isDM
 }: {
 	onClanProfileClick?: () => void;
 	name: string;
 	avatar: string;
 	currentDisplayName: string;
 	aboutMe: string;
+	isDM: boolean;
 }) => {
 	const [editAboutUser, setEditAboutUser] = useState(aboutMe);
 	const { sessionRef, clientRef } = useMezon();
@@ -176,7 +178,7 @@ const SettingRightUser = ({
 				</div>
 				<div className="flex-1  text-white">
 					<p className="mt-[20px] dark:text-[#CCCCCC] text-black font-semibold tracking-wide text-sm">PREVIEW</p>
-					<SettingUserClanProfileCard profiles={editProfile} />
+					<SettingUserClanProfileCard profiles={editProfile} isDM={isDM} />
 				</div>
 			</div>
 			{(urlImage !== avatar && flags) ||
