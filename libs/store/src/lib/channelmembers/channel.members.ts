@@ -20,6 +20,9 @@ export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
 	name?: string;
 }
+interface IMetadata {
+	status: string;
+}
 
 export interface ChannelMemberAvatar {
 	avatar: string;
@@ -372,8 +375,26 @@ export const selectMemberOnlineStatusById = createSelector(
 );
 
 export const selectMemberCustomStatusById = createSelector(
-	[selectCustomUserStatus, (state, userId: string) => userId],
-	(selectCustomUserStatus, userId) => selectCustomUserStatus?.[userId] || ''
+	[
+		getUsersClanState,
+		selectDirectMessageEntities,
+		(state, userId: string, isDM?: boolean) => {
+			return `${userId},${state?.direct.currentDirectMessageId},${isDM}`;
+		}
+	],
+	(usersClanState, directs, payload) => {
+		const [userId, currentDirectMessageId, isDM] = payload.split(',');
+		const userClan = usersClanState.entities[userId];
+		const userGroup = directs?.[currentDirectMessageId];
+		if (userClan && (isDM === 'false' || 'undefined')) {
+			return (userClan?.user?.metadata as any)?.status || '';
+		}
+		const index = userGroup?.user_id?.findIndex((item) => item === userId) ?? -1;
+		if (index === -1) {
+			return false;
+		}
+		return JSON.parse(userGroup?.metadata?.[index] || '{}')?.status || '';
+	}
 );
 
 export const selectChannelMemberByUserIds = createSelector(
