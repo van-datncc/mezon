@@ -136,7 +136,6 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (event) => handleMouseClick(event) : () => {}}
 					ref={panelRef}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					// onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => dispatchUserIdToShowProfile(e) : () => {}}
 					style={{ textDecoration: 'none' }}
 					className={`font-medium px-0.1 rounded-sm
 				${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
