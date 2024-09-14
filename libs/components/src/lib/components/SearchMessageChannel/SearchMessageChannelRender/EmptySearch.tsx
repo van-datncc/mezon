@@ -1,5 +1,5 @@
 const EmptySearch = () => {
-	const imagePath = `/images/empty-search.svg`;
+	const imagePath = `assets/images/empty-search.svg`;
 	return (
 		<div className="flex flex-col flex-1 h-full p-4 bg-bgLightSecondary dark:bg-bgSecondary overflow-y-auto">
 			<div className="m-auto">
