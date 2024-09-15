@@ -105,11 +105,6 @@ const SettingRightUser = ({
 		setFlags(true);
 	};
 
-	const handleClanProfileButtonClick = () => {
-		if (onClanProfileClick) {
-			onClanProfileClick();
-		}
-	};
 	const handleRemoveButtonClick = () => {
 		setFlagsRemoveAvartar(true);
 		setFlags(true);
@@ -120,6 +115,7 @@ const SettingRightUser = ({
 		setFlags(true);
 	};
 	const appearanceTheme = useSelector(selectTheme);
+
 	return (
 		<>
 			<div className="flex-1 flex z-0 gap-x-8 sbm:flex-row flex-col">
@@ -139,6 +135,7 @@ const SettingRightUser = ({
 							maxLength={32}
 						/>
 					</div>
+
 					<div className="mt-8">
 						<p className="font-semibold tracking-wide text-sm">AVATAR</p>
 						<div className="flex mt-[10px] gap-x-5">
