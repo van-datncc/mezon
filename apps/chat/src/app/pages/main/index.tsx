@@ -209,7 +209,11 @@ function MyApp() {
 								(dmGroupChatUnread) =>
 									dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
 										<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-											<DirectUnreads key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} />
+											<DirectUnreads
+												key={dmGroupChatUnread.id}
+												directMessage={dmGroupChatUnread}
+												countMessUnread={dmGroupChatUnread?.count_mess_unread || 0}
+											/>
 										</SidebarTooltip>
 									)
 							)}

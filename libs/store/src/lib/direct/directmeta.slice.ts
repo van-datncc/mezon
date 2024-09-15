@@ -1,6 +1,6 @@
-import { directAdapter, DirectEntity, MessagesEntity } from '@mezon/store-mobile';
+import { DirectEntity, MessagesEntity } from '@mezon/store-mobile';
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ChannelMessage } from 'mezon-js';
 
 export const DIRECT_META_FEATURE_KEY = 'directmeta';
@@ -57,9 +57,9 @@ export const directMetaSlice = createSlice({
 		updateDMSocket: (state, action: PayloadAction<ChannelMessage>) => {
 			const payload = action.payload;
 			const timestamp = Date.now() / 1000;
-			const dmChannel = directAdapter.getSelectors().selectById(state, payload.channel_id);
-			
-			directAdapter.updateOne(state, {
+			const dmChannel = directMetaAdapter.getSelectors().selectById(state, payload.channel_id);
+
+			directMetaAdapter.updateOne(state, {
 				id: payload.channel_id,
 				changes: {
 					last_sent_message: {
@@ -70,9 +70,9 @@ export const directMetaSlice = createSlice({
 					}
 				}
 			});
-			
+
 			if (payload.clan_id === '0' && dmChannel?.active !== ActiveDm.OPEN_DM) {
-				directAdapter.updateOne(state, {
+				directMetaAdapter.updateOne(state, {
 					id: payload.channel_id,
 					changes: {
 						active: ActiveDm.OPEN_DM
@@ -93,7 +93,7 @@ export const directMetaSlice = createSlice({
 			}
 		},
 		setDirectLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			directAdapter.updateOne(state, {
+			directMetaAdapter.updateOne(state, {
 				id: action.payload.channelId,
 				changes: {
 					count_mess_unread: 0
@@ -103,7 +103,7 @@ export const directMetaSlice = createSlice({
 		updateLastSeenTime: (state, action: PayloadAction<MessagesEntity>) => {
 			const payload = action.payload;
 			const timestamp = Date.now() / 1000;
-			directAdapter.updateOne(state, {
+			directMetaAdapter.updateOne(state, {
 				id: payload.channel_id,
 				changes: {
 					last_seen_message: {
