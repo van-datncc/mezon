@@ -522,7 +522,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(coffeeEvent: ApiGiveCoffeeEvent) => {
 			dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
 			if (userId === coffeeEvent.receiver_id) {
-				setReceiverId(coffeeEvent.receiver_id ?? '');
+				setReceiverId(coffeeEvent.sender_id ?? '');
 				setTriggerDate(Date.now());
 			}
 		},
