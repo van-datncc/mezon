@@ -78,7 +78,7 @@ autoUpdater.on('update-available', (info: UpdateInfo) => {
 			type: 'info',
 			buttons: ['Download', 'Cancel'],
 			title: 'Updates available',
-			message: `There is a new update for the app ${info.version}!! Do you want to download??`
+			message: `The current version is ${app.getVersion()}. There is a new update for the app ${info.version}. Do you want to download?`
 		})
 		.then((result) => {
 			if (result.response === 0) {
@@ -101,7 +101,7 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 			type: 'info',
 			buttons: ['Install now', 'Cancel'],
 			title: 'Mezon install',
-			message: `Install mezon version ${info.version} now.`
+			message: `The current version is ${app.getVersion()}. Install ${info.version} now.`
 		})
 		.then((result) => {
 			if (result.response === 0) {

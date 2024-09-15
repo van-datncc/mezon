@@ -1,6 +1,6 @@
 {
     "name": "@mezon/desktop",
-    "version": "1.0.0",
+    "version": "1.1.73",
     "dependencies": {
         "electron-log": "^5.2.0",
         "electron-store": "8.2.0",
