@@ -84,11 +84,16 @@ export const Routes = () => {
 							path: '/mezon',
 							element: <InitialRoutes />
 						},
-						{
-							path: '/',
-							loader: loaderWithStore(loginLoader),
-							element: <Homepage />
-						},
+						isElectron()
+							? {
+									path: '/',
+									element: <InitialRoutes />
+								}
+							: {
+									path: '/',
+									loader: loaderWithStore(loginLoader),
+									element: <Homepage />
+								},
 						{
 							path: '/application-directory',
 							element: <AppDirectory />
