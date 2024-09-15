@@ -50,7 +50,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					)}
 					label=""
 					placement="right-start"
-					className="dark:!bg-bgSecondary600 !bg-white border-none ml-2 py-[6px] px-[8px] w-[200px]"
+					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px]"
 				>
 					<ItemStatus children="Online" startIcon={<Icons.OnlineStatus />} />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
