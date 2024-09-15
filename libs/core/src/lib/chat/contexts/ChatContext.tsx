@@ -36,6 +36,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ModeResponsive, NotificationCode } from '@mezon/utils';
+import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -574,21 +575,37 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		]
 	);
 
-	const ondisconnect = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket disconnected', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect(clanIdActive ?? '').then((socket) => {
-			if (!socket) return;
-			setCallbackEventFn(socket as Socket);
-		});
-	}, [dispatch, reconnect, clanIdActive, setCallbackEventFn]);
+	const handleReconnect = useCallback(
+		async (socketType: string) => {
+			dispatch(toastActions.addToast({ message: socketType, type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
+			try {
+				const socket = await reconnect(clanIdActive ?? '');
+				if (!socket) {
+					dispatch(toastActions.addToast({ message: errorMessage, type: 'error', id: 'SOCKET_CONNECTION_NULL' }));
+					return;
+				}
+				setCallbackEventFn(socket as Socket);
+			} catch (error) {
+				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', id: 'SOCKET_CONNECTION_WARN' }));
+			}
+		},
+		[dispatch, clanIdActive, reconnect, setCallbackEventFn]
+	);
 
-	const onHeartbeatTimeout = useCallback(() => {
-		dispatch(toastActions.addToast({ message: 'Socket hearbeat timeout', type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		reconnect(clanIdActive ?? '').then((socket) => {
-			if (!socket) return;
-			setCallbackEventFn(socket as Socket);
-		});
-	}, [clanIdActive, dispatch, reconnect, setCallbackEventFn]);
+	const ondisconnect = useCallback(
+		debounce(() => {
+			handleReconnect('Socket disconnected');
+		}, 300),
+		[handleReconnect]
+	);
+
+	const onHeartbeatTimeout = useCallback(
+		debounce(() => {
+			handleReconnect('Socket hearbeat timeout');
+		}, 300),
+		[handleReconnect]
+	);
 
 	useEffect(() => {
 		const socket = socketRef.current;
