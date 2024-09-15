@@ -26,8 +26,8 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (lastMessage) {
 			const timestamp = Date.now() / 1000;
-			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-			dispatch(directActions.updateLastSeenTime(lastMessage));
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [channelId, dispatch, lastMessage]);
