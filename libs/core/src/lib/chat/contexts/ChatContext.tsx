@@ -38,6 +38,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ModeResponsive, NotificationCode } from '@mezon/utils';
+import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -139,9 +140,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
-				dispatch(directActions.updateDMSocket(message));
+				dispatch(directMetaActions.updateDMSocket(message));
 				dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
-				dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
+				dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
 			} else {
 				dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			}
@@ -258,7 +259,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
 					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 				} else {
-					dispatch(channelMembers.actions.removeUserByUserIdAndClan({ userId: id, channelIds: channels.map((item) => item.id) }));
+					dispatch(
+						channelMembers.actions.removeUserByUserIdAndClan({
+							userId: id,
+							channelIds: channels.map((item) => item.id),
+							clanId: user.clan_id
+						})
+					);
 					dispatch(usersClanActions.remove(id));
 				}
 			});
@@ -413,6 +420,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onmessagereaction = useCallback(
 		(e: ApiMessageReaction) => {
+			console.log('------');
+			console.log('e - Reaction:', e);
 			if (e.count > 0) {
 				dispatch(reactionActions.setReactionDataSocket(mapReactionToEntity(e)));
 			}
@@ -587,38 +596,37 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		]
 	);
 
-	const showErrorToast = useCallback(
-		(message: string) => {
-			dispatch(toastActions.addToast({ message, type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
-		},
-		[dispatch]
-	);
-
 	const handleReconnect = useCallback(
-		(socketType: string) => async () => {
-			showErrorToast(socketType);
+		async (socketType: string) => {
+			dispatch(toastActions.addToast({ message: socketType, type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
 			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 			try {
 				const socket = await reconnect(clanIdActive ?? '');
 				if (!socket) {
-					showErrorToast(errorMessage);
+					dispatch(toastActions.addToast({ message: errorMessage, type: 'error', id: 'SOCKET_CONNECTION_NULL' }));
 					return;
 				}
 				setCallbackEventFn(socket as Socket);
 			} catch (error) {
-				showErrorToast(errorMessage);
+				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', id: 'SOCKET_CONNECTION_WARN' }));
 			}
 		},
-		[clanIdActive, reconnect, showErrorToast, setCallbackEventFn]
+		[dispatch, clanIdActive, reconnect, setCallbackEventFn]
 	);
 
-	const ondisconnect = useCallback(() => {
-		handleReconnect('Socket disconnected');
-	}, [handleReconnect]);
+	const ondisconnect = useCallback(
+		debounce(() => {
+			handleReconnect('Socket disconnected');
+		}, 300),
+		[handleReconnect]
+	);
 
-	const onHeartbeatTimeout = useCallback(() => {
-		handleReconnect('Socket hearbeat timeout');
-	}, [handleReconnect]);
+	const onHeartbeatTimeout = useCallback(
+		debounce(() => {
+			handleReconnect('Socket hearbeat timeout');
+		}, 300),
+		[handleReconnect]
+	);
 
 	useEffect(() => {
 		const socket = socketRef.current;

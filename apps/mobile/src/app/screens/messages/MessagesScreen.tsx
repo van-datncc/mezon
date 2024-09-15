@@ -151,6 +151,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
+	const searchInputRef = useRef(null);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -210,6 +211,13 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 		setDirectMessageSelected(directMessage);
 	}, []);
 
+	const clearTextInput = () => {
+		if (searchInputRef?.current) {
+			searchInputRef.current.clear();
+			setSearchText('');
+		}
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.headerWrapper}>
@@ -223,11 +231,17 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			<View style={styles.searchMessage}>
 				<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
 				<TextInput
+					ref={searchInputRef}
 					placeholder={t('common:searchPlaceHolder')}
 					placeholderTextColor={themeValue.text}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
+				{!!searchText?.length && (
+					<Pressable onPress={clearTextInput}>
+						<Icons.CircleXIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+					</Pressable>
+				)}
 			</View>
 			{clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ? (
 				<UserEmptyMessage

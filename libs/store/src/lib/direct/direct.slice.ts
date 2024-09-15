@@ -217,71 +217,10 @@ export const directSlice = createSlice({
 		setDmGroupCurrentType: (state, action: PayloadAction<number>) => {
 			state.currentDirectMessageType = action.payload;
 		},
-		updateDMSocket: (state, action: PayloadAction<ChannelMessage>) => {
-			const payload = action.payload;
-			const timestamp = Date.now() / 1000;
-			const dmChannel = directAdapter.getSelectors().selectById(state, payload.channel_id);
-
-			directAdapter.updateOne(state, {
-				id: payload.channel_id,
-				changes: {
-					last_sent_message: {
-						content: payload.content,
-						id: payload.id,
-						sender_id: payload.sender_id,
-						timestamp_seconds: timestamp
-					}
-				}
-			});
-
-			if (payload.clan_id === '0' && dmChannel?.active !== ActiveDm.OPEN_DM) {
-				directAdapter.updateOne(state, {
-					id: payload.channel_id,
-					changes: {
-						active: ActiveDm.OPEN_DM
-					}
-				});
-			}
-		},
-		updateLastSeenTime: (state, action: PayloadAction<MessagesEntity>) => {
-			const payload = action.payload;
-			const timestamp = Date.now() / 1000;
-			directAdapter.updateOne(state, {
-				id: payload.channel_id,
-				changes: {
-					last_seen_message: {
-						content: payload.content,
-						id: payload.id,
-						sender_id: payload.sender_id,
-						timestamp_seconds: timestamp
-					}
-				}
-			});
-		},
 		setAllStatusDMUnread: (state, action: PayloadAction<StatusDMUnreadArgs[]>) => {
 			for (const i of action.payload) {
 				state.statusDMChannelUnread[i.dmId] = i.isUnread;
 			}
-		},
-		setCountMessUnread: (state, action: PayloadAction<{ channelId: string }>) => {
-			const { channelId } = action.payload;
-			const entity = state.entities[channelId];
-			if (entity) {
-				directAdapter.updateOne(state, {
-					id: channelId,
-					changes: {
-						count_mess_unread: (entity.count_mess_unread || 0) + 1
-					}
-				});
-			}
-		},
-		setDirectLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
-			directAdapter.updateOne(state, {
-				id: action.payload.channelId,
-				changes: {
-					count_mess_unread: 0
-				}
-			});
 		},
 		removeByDirectID: (state, action: PayloadAction<string>) => {
 			directAdapter.removeOne(state, action.payload);

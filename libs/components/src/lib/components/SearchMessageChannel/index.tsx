@@ -12,7 +12,7 @@ import {
 	selectValueInputSearchMessage,
 	useAppDispatch
 } from '@mezon/store';
-import { SearchFilter, SIZE_PAGE_SEARCH } from '@mezon/utils';
+import { SearchFilter, searchMentionsHashtag, SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { KeyboardEvent, memo, useEffect, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc, SuggestionDataItem } from 'react-mentions';
@@ -163,6 +163,10 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 
 	const appearanceTheme = useSelector(selectTheme);
 
+	const handleSearchUserMention = (search: string, callback: any) => {
+		callback(searchMentionsHashtag(search, userListDataSearchByMention));
+	};
+
 	return (
 		<div className="relative" ref={inputRef}>
 			<div
@@ -210,7 +214,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 				>
 					<Mention
 						appendSpaceOnAdd={true}
-						data={userListDataSearchByMention}
+						data={handleSearchUserMention}
 						trigger="from:"
 						displayTransform={(id: any, display: any) => {
 							return `from:${display}`;
@@ -218,6 +222,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 						renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
 							return (
 								<SelectItemUser
+									search={search}
 									isFocused={focused}
 									title="from: "
 									content={suggestion.display}
@@ -238,6 +243,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 						renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
 							return (
 								<SelectItemUser
+									search={search}
 									isFocused={focused}
 									title="mentions: "
 									content={suggestion.display}

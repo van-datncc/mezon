@@ -28,8 +28,8 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		if (lastMessage) {
 			const timestamp = Date.now() / 1000;
-			dispatch(directActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
-			dispatch(directActions.updateLastSeenTime(lastMessage));
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
+			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [channelId, dispatch]);
@@ -164,12 +164,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			}
 		}
 	};
-
-	useEffect(() => {
-		if (from && from === APP_SCREEN.HOME) {
-			dispatch(directActions.fetchDirectMessage({ noCache: true }));
-		}
-	}, [from]);
 
 	const handleBack = useCallback(() => {
 		if (APP_SCREEN.MESSAGES.NEW_GROUP === from) {
