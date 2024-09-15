@@ -35,7 +35,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					renderTrigger={() => (
 						<ItemStatus
 							disabled={true}
-							children={`Token Available: ${Number(tokenInWallet) + Number(getTokenSocket)}`}
+							children={`Token: ${Number(tokenInWallet) + Number(getTokenSocket)}`}
 							startIcon={<Icons.Check />}
 						/>
 					)}

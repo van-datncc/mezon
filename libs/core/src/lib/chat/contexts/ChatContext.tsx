@@ -511,7 +511,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const uniqueId = `token_${receiver.id}_${Date.now()}}`;
 			dispatch(
 				toastActions.addToast({
-					message: `+1 token from: ${name}`,
+					message: `+1 token from ${name}`,
 					type: 'success',
 					id: uniqueId
 				})
