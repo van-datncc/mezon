@@ -1,6 +1,7 @@
-import { DirectEntity } from '@mezon/store-mobile';
-import { IChannel, LoadingStatus } from '@mezon/utils';
-import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { DirectEntity, MessagesEntity } from '@mezon/store-mobile';
+import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
+import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { ChannelMessage } from 'mezon-js';
 
 export const DIRECT_META_FEATURE_KEY = 'directmeta';
 
@@ -52,6 +53,67 @@ export const directMetaSlice = createSlice({
 			if (channel) {
 				channel.lastSentTimestamp = action.payload.timestamp;
 			}
+		},
+		updateDMSocket: (state, action: PayloadAction<ChannelMessage>) => {
+			const payload = action.payload;
+			const timestamp = Date.now() / 1000;
+			const dmChannel = directMetaAdapter.getSelectors().selectById(state, payload.channel_id);
+
+			directMetaAdapter.updateOne(state, {
+				id: payload.channel_id,
+				changes: {
+					last_sent_message: {
+						content: payload.content,
+						id: payload.id,
+						sender_id: payload.sender_id,
+						timestamp_seconds: timestamp
+					}
+				}
+			});
+
+			if (payload.clan_id === '0' && dmChannel?.active !== ActiveDm.OPEN_DM) {
+				directMetaAdapter.updateOne(state, {
+					id: payload.channel_id,
+					changes: {
+						active: ActiveDm.OPEN_DM
+					}
+				});
+			}
+		},
+		setCountMessUnread: (state, action: PayloadAction<{ channelId: string }>) => {
+			const { channelId } = action.payload;
+			const entity = state.entities[channelId];
+			if (entity) {
+				directMetaAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						count_mess_unread: (entity.count_mess_unread || 0) + 1
+					}
+				});
+			}
+		},
+		setDirectLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
+			directMetaAdapter.updateOne(state, {
+				id: action.payload.channelId,
+				changes: {
+					count_mess_unread: 0
+				}
+			});
+		},
+		updateLastSeenTime: (state, action: PayloadAction<MessagesEntity>) => {
+			const payload = action.payload;
+			const timestamp = Date.now() / 1000;
+			directMetaAdapter.updateOne(state, {
+				id: payload.channel_id,
+				changes: {
+					last_seen_message: {
+						content: payload.content,
+						id: payload.id,
+						sender_id: payload.sender_id,
+						timestamp_seconds: timestamp
+					}
+				}
+			});
 		},
 		setDirectMetaLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
 			const channel = state.dmMetadata.entities[action.payload.channelId];
