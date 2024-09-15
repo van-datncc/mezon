@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
 	channelMembers,
 	channelMembersActions,
@@ -14,6 +15,7 @@ import {
 	fetchListFriends,
 	fetchMessages,
 	friendsActions,
+	giveCoffeeActions,
 	listChannelsByUserActions,
 	mapMessageChannelToEntity,
 	mapNotificationToEntity,
@@ -60,7 +62,7 @@ import {
 	VoiceJoinedEvent,
 	VoiceLeavedEvent
 } from 'mezon-js';
-import { ApiCreateEventRequest, ApiMessageReaction } from 'mezon-js/api.gen';
+import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -330,7 +332,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
 				return;
 			}
-			// dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 			if (userJoinClan?.user && clanIdActive === userJoinClan.clan_id) {
 				const createTime = new Date(userJoinClan.user.create_time_second * 1000).toISOString();
 				dispatch(
@@ -490,6 +491,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const oncoffeegiven = useCallback(
+		(coffeeEvent: ApiGiveCoffeeEvent) => {
+			dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
+
+			if (userId === coffeeEvent.receiver_id) {
+				const uniqueId = `token_${coffeeEvent.message_ref_id}_${Date.now()}`;
+				dispatch(
+					toastActions.addToast({
+						message: `+1 token from:`,
+						type: 'success',
+						id: uniqueId // Each toast will now have a unique ID
+					})
+				);
+			}
+		},
+		[dispatch, userId]
+	);
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -539,6 +557,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.oneventcreated = oneventcreated;
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
+
+			socket.oncoffeegiven = oncoffeegiven;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -562,7 +582,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
-			oneventcreated
+			oneventcreated,
+			oncoffeegiven
 		]
 	);
 
@@ -633,6 +654,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onclanprofileupdated = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.oncoffeegiven = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -659,7 +682,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelupdated,
 		onHeartbeatTimeout,
 		oneventcreated,
-		setCallbackEventFn
+		setCallbackEventFn,
+		oncoffeegiven
 	]);
 
 	useEffect(() => {

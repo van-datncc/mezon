@@ -6,6 +6,8 @@ import {
 	MessagesEntity,
 	directActions,
 	gifsStickerEmojiActions,
+	giveCoffeeActions,
+	// giveCoffeeActions,
 	messagesActions,
 	pinMessageActions,
 	reactionActions,
@@ -328,6 +330,30 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			);
 		});
 
+		builder.when(checkPos && message?.isMe === false, (builder) => {
+			builder.addMenuItem(
+				'giveAcoffee', // id
+				'Give A Coffee', // lable
+
+				async () => {
+					try {
+						dispatch(
+							giveCoffeeActions.updateGiveCoffee({
+								channel_id: message.channel_id,
+								clan_id: message.clan_id,
+								message_ref_id: message.id,
+								receiver_id: message.sender_id,
+								sender_id: userId,
+								token_count: 1
+							})
+						);
+					} catch (error) {
+						console.error('Failed to give cofffee message', error);
+					}
+				}
+			);
+		});
+
 		builder.when(enableViewReactionItem, (builder) => {
 			builder.addMenuItem(
 				'viewReaction',
@@ -519,6 +545,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [
 		dispatch,
 		messageId,
+		message?.isMe,
 		enableViewReactionItem,
 		enableEditMessageItem,
 		enableCreateThreadItem,
