@@ -1,10 +1,10 @@
 import { useAccount } from '@mezon/core';
-import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, selectTheme, selectUpdateToken, useAppDispatch } from '@mezon/store';
+import { channelMembersActions, selectCurrentChannelId, selectCurrentClanId, selectTheme, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
 import { fileTypeImage, resizeFileImage } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingUserClanProfileCard, { Profilesform } from '../SettingUserClanProfileCard';
@@ -15,9 +15,7 @@ const SettingRightUser = ({
 	avatar,
 	currentDisplayName,
 	aboutMe,
-	isDM,
-	wallet,
-	userId
+	isDM
 }: {
 	onClanProfileClick?: () => void;
 	name: string;
@@ -25,8 +23,6 @@ const SettingRightUser = ({
 	currentDisplayName: string;
 	aboutMe: string;
 	isDM: boolean;
-	wallet?: string;
-	userId?: string;
 }) => {
 	const [editAboutUser, setEditAboutUser] = useState(aboutMe);
 	const { sessionRef, clientRef } = useMezon();
@@ -42,8 +38,6 @@ const SettingRightUser = ({
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 
 	const [valueDisplayName, setValueDisplayName] = useState<string>(currentDisplayName || '');
-
-	const getTokenSocket = useSelector(selectUpdateToken(userId ?? ''));
 
 	const handleUpdateUser = async () => {
 		if (name || urlImage || valueDisplayName || editAboutUser) {
@@ -121,20 +115,11 @@ const SettingRightUser = ({
 		setFlags(true);
 	};
 	const appearanceTheme = useSelector(selectTheme);
-	const tokenInWallet = useMemo(() => {
-		const parse = JSON.parse(wallet ?? '').value;
-		return parse;
-	}, [wallet]);
 
 	return (
 		<>
 			<div className="flex-1 flex z-0 gap-x-8 sbm:flex-row flex-col">
 				<div className="flex-1 dark:text-[#CCCCCC] text-black">
-					<div className="mb-1">
-						<span className="font-semibold tracking-wide text-sm ">TOKEN AVAILABLE:</span>
-						<span className=" text-green-500 ml-2">{Number(tokenInWallet) + Number(getTokenSocket)}</span>
-					</div>
-
 					<div>
 						<label htmlFor="inputField" className="font-semibold tracking-wide text-sm">
 							DISPLAY NAME

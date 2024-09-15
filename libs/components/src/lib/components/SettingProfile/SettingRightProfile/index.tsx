@@ -56,8 +56,6 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 						currentDisplayName={userProfile?.user?.display_name || ''}
 						aboutMe={userProfile?.user?.about_me || ''}
 						isDM={isDM}
-						wallet={userProfile?.wallet ?? '0'}
-						userId={userProfile?.user?.id ?? ''}
 					/>
 				) : (
 					<SettingRightClan />

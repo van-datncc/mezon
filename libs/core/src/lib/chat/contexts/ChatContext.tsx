@@ -29,6 +29,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDmGroupCurrentId,
+	selectMemberClanByUserId,
 	selectModeResponsive,
 	toastActions,
 	useAppDispatch,
@@ -37,7 +38,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ModeResponsive, NotificationCode } from '@mezon/utils';
+import { ModeResponsive, NotificationCode, getNameForPrioritize } from '@mezon/utils';
 import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
@@ -64,7 +65,7 @@ import {
 	VoiceLeavedEvent
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
@@ -499,20 +500,30 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch]
 	);
+	const [receiverId, setReceiverId] = useState('');
+	const receiver = useSelector(selectMemberClanByUserId(receiverId));
+	const [triggerDate, setTriggerDate] = useState<number>(Date.now());
 
+	useEffect(() => {
+		if (receiver) {
+			const name = getNameForPrioritize(receiver?.clan_nick ?? '', receiver.user?.display_name ?? '', receiver.user?.username ?? '');
+
+			const uniqueId = `token_${receiver.id}_${Date.now()}}`;
+			dispatch(
+				toastActions.addToast({
+					message: `+1 token from: ${name}`,
+					type: 'success',
+					id: uniqueId
+				})
+			);
+		}
+	}, [receiver, dispatch, triggerDate]);
 	const oncoffeegiven = useCallback(
 		(coffeeEvent: ApiGiveCoffeeEvent) => {
 			dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
-
 			if (userId === coffeeEvent.receiver_id) {
-				const uniqueId = `token_${coffeeEvent.message_ref_id}_${Date.now()}`;
-				dispatch(
-					toastActions.addToast({
-						message: `+1 token from:`,
-						type: 'success',
-						id: uniqueId // Each toast will now have a unique ID
-					})
-				);
+				setReceiverId(coffeeEvent.receiver_id ?? '');
+				setTriggerDate(Date.now());
 			}
 		},
 		[dispatch, userId]
