@@ -165,12 +165,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		}
 	};
 
-	useEffect(() => {
-		if (from && from === APP_SCREEN.HOME) {
-			dispatch(directActions.fetchDirectMessage({ noCache: true }));
-		}
-	}, [from]);
-
 	const handleBack = useCallback(() => {
 		if (APP_SCREEN.MESSAGES.NEW_GROUP === from) {
 			navigation.navigate(APP_SCREEN.MESSAGES.HOME);
