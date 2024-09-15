@@ -137,9 +137,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
-				dispatch(directActions.updateDMSocket(message));
+				dispatch(directMetaActions.updateDMSocket(message));
 				dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
-				dispatch(directActions.setCountMessUnread({ channelId: message.channel_id }));
+				dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
 			} else {
 				dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			}
