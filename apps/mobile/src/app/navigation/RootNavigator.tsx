@@ -46,6 +46,7 @@ import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
 import { toastConfig } from '../configs/toastConfig';
+import { useTokenToast } from '../hooks/useTokenToast';
 const MyStackComponent = lazy(() => import('./RootStack'));
 
 const NavigationMain = () => {
@@ -56,7 +57,8 @@ const NavigationMain = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
-
+	useTokenToast()
+	
 	useEffect(() => {
 		const timer = setTimeout(async () => {
 			setIsReadyForUse(true);
