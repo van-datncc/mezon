@@ -26,12 +26,14 @@ const ModalInvite = (props: ModalParam) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { createLinkInviteUser } = useInvite();
 	const firstChannel = useSelector(selectChannelFirst);
-	const { onClose } = props;
-	const channel = useSelector(selectChannelById(firstChannel.channel_id || ''));
+	const { onClose, channelID } = props;
+
+	const idCreateInvite = (channelID === firstChannel.channel_id ? firstChannel.channel_id : channelID) as string;
+	const channel = useSelector(selectChannelById(idCreateInvite));
 	const clan = useSelector(selectCurrentClan);
 
 	const handleOpenInvite = () => {
-		createLinkInviteUser(currentClanId ?? '', firstChannel.channel_id ?? '', 10).then((res) => {
+		createLinkInviteUser(currentClanId ?? '', idCreateInvite, 10).then((res) => {
 			if (res && res?.invite_link) {
 				setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
 			}
