@@ -58,7 +58,6 @@ export const giveCoffeeSlice = createSlice({
 		add: giveCoffeeAdapter.addOne,
 		remove: giveCoffeeAdapter.removeOne,
 		setTokenFromSocket: (state, action: PayloadAction<{ userId: string | undefined; coffeeEvent: ApiGiveCoffeeEvent }>) => {
-			console.log(action.payload);
 			const { userId, coffeeEvent } = action.payload;
 
 			if (!userId) return;

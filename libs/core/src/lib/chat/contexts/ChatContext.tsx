@@ -25,13 +25,13 @@ import {
 	pinMessageActions,
 	reactionActions,
 	selectChannelById,
+	selectChannelMemberByUserIds,
 	selectChannelsByClanId,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDirectById,
 	selectDmGroupCurrentId,
-	selectMemberClanByUserId,
 	selectMessageByMessageId,
 	selectModeResponsive,
 	toastActions,
@@ -501,16 +501,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch]
 	);
-	const [receiverId, setReceiverId] = useState('');
-	const receiver = useSelector(selectMemberClanByUserId(receiverId));
+	const [senderId, setSenderId] = useState('');
+
 	const [triggerDate, setTriggerDate] = useState<number>(Date.now());
+	const getUserByUserId = useAppSelector((state) =>
+		selectChannelMemberByUserIds(state, channelId ? (channelId ?? '') : (directId ?? ''), senderId, directId ? '1' : '')
+	)[0];
 
 	useEffect(() => {
-		console.log(receiver);
-		if (receiver) {
-			const name = getNameForPrioritize(receiver?.clan_nick ?? '', receiver.user?.display_name ?? '', receiver.user?.username ?? '');
+		if (getUserByUserId) {
+			console.log(getUserByUserId);
+			const name = getNameForPrioritize(
+				getUserByUserId?.clan_nick ?? '',
+				getUserByUserId.user?.display_name ?? '',
+				getUserByUserId.user?.username ?? ''
+			);
 
-			const uniqueId = `token_${receiver.id}_${Date.now()}}`;
+			const uniqueId = `token_${getUserByUserId.id}_${Date.now()}}`;
 			dispatch(
 				toastActions.addToast({
 					message: `+1 token from ${name}`,
@@ -518,8 +525,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					id: uniqueId
 				})
 			);
+			setSenderId('');
 		}
-	}, [receiver, dispatch, triggerDate]);
+	}, [getUserByUserId, dispatch, triggerDate]);
+
 	const [messageIdCoffee, setMessageIdCoffee] = useState('');
 	const [channelIdCoffee, setChannelIdCoffee] = useState('');
 	const messageCoffee = useSelector(selectMessageByMessageId(messageIdCoffee ?? ''));
@@ -563,6 +572,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, [triggerDate]);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
+		console.log('coffeeEvent :', coffeeEvent);
 		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
 
 		if (coffeeEvent?.message_ref_id) {
@@ -570,7 +580,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setChannelIdCoffee(coffeeEvent.channel_id ?? '');
 		}
 		if (userId === coffeeEvent.receiver_id) {
-			setReceiverId(coffeeEvent.sender_id ?? '');
+			setSenderId(coffeeEvent.sender_id ?? '');
 			setTriggerDate(Date.now());
 		}
 	}, []);
