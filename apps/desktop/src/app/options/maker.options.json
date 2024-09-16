@@ -2,12 +2,15 @@
 	"$schema": "../../../../../node_modules/nx-electron/src/validation/maker.schema.json",
 	"asar": true,
 	"files": [
-		"!**/node_modules/**"
+		"node_modules/electron-log/**",
+    "node_modules/electron-store/**",
+    "node_modules/electron-updater/**",
+    "node_modules/node-machine-id/**",
+    "node_modules/push-receiver-v2/**",
+    "node_modules/tslib/**"
 	],
 	"extraFiles": [
 		{
-			"from": "apps/desktop/node_modules/",
-			"to": "resources/app/node_modules/",
 			"filter": [
 				"!**/*.d.ts",
 				"!**/*.map",
