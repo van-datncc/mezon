@@ -15,7 +15,6 @@ import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
-import RNFS from 'react-native-fs';
 import { ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
@@ -688,7 +687,7 @@ export async function getWebUploadedAttachments(payload: {
 		return await Promise.all(uploadPromises);
 	}
 
-	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype }));
+	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype, filename: link.filename }));
 }
 
 export async function getMobileUploadedAttachments(payload: {

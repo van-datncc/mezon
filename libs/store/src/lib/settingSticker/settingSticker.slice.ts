@@ -118,9 +118,11 @@ export const stickerSettingActions = {
 
 export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: SettingClanStickerState }): SettingClanStickerState =>
 	rootState[SETTING_CLAN_STICKER];
-const { selectAll, selectEntities } = stickerAdapter.getSelectors();
+const { selectAll, selectEntities, selectById } = stickerAdapter.getSelectors();
 export const selectAllStickerSuggestion = createSelector(getStickerSettingState, selectAll);
 export const selectStickerSuggestionEntities = createSelector(getStickerSettingState, selectEntities);
+export const selectOneStickerInfor = (stickerId: string) => createSelector(getStickerSettingState, (state) => selectById(state, stickerId));
+
 export const hasGrandchildModal = createSelector(getStickerSettingState, (state) => state.hasGrandchildModal);
 export const selectStickerByClanId = (clanId: string) =>
 	createSelector(selectAllStickerSuggestion, (stickers) => {
