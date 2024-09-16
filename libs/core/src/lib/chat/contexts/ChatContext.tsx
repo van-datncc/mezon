@@ -27,10 +27,12 @@ import {
 	selectChannelsByClanId,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectCurrentClan,
 	selectCurrentClanId,
 	selectDmGroupCurrentId,
 	selectMemberClanByUserId,
 	selectModeResponsive,
+	stickerSettingActions,
 	toastActions,
 	useAppDispatch,
 	useAppSelector,
@@ -57,6 +59,9 @@ import {
 	Notification,
 	Socket,
 	StatusPresenceEvent,
+	StickerCreateEvent,
+	StickerDeleteEvent,
+	StickerUpdateEvent,
 	StreamPresenceEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
@@ -92,6 +97,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentClan = useSelector(selectCurrentClan);
 	const modeResponsive = useSelector(selectModeResponsive);
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
@@ -363,6 +369,53 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[clanIdActive, currentChannel?.channel_private, dispatch]
 	);
 
+	const onstickercreated = useCallback(
+		(stickerCreated: StickerCreateEvent) => {
+			if (userId !== stickerCreated.creator_id) {
+				console.log('stickerCreated: ', stickerCreated);
+
+				dispatch(
+					stickerSettingActions.add({
+						category: stickerCreated.category,
+						clan_id: stickerCreated.clan_id,
+						creator_id: stickerCreated.creator_id,
+						id: stickerCreated.sticker_id,
+						shortname: stickerCreated.shortname,
+						source: stickerCreated.source,
+						logo: stickerCreated.logo,
+						clan_name: stickerCreated.clan_name
+					})
+				);
+			}
+		},
+		[dispatch, userId]
+	);
+
+	const onstickerdeleted = useCallback(
+		(stickerDeleted: StickerDeleteEvent) => {
+			if (userId !== stickerDeleted.user_id) {
+				dispatch(stickerSettingActions.remove(stickerDeleted.sticker_id));
+			}
+		},
+		[userId, dispatch]
+	);
+
+	const onstickerupdated = useCallback(
+		(stickerUpdated: StickerUpdateEvent) => {
+			if (userId !== stickerUpdated.user_id) {
+				dispatch(
+					stickerSettingActions.update({
+						id: stickerUpdated.sticker_id,
+						changes: {
+							shortname: stickerUpdated.shortname
+						}
+					})
+				);
+			}
+		},
+		[userId, dispatch]
+	);
+
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
 			dispatch(
@@ -455,6 +508,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onclandeleted = useCallback(
 		(clanDelete: ClanDeletedEvent) => {
 			dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+			dispatch(stickerSettingActions.removeStickersByClanId(clanDelete.clan_id));
 			if (clanDelete.deletor !== userId && currentClanId === clanDelete.clan_id) {
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
@@ -560,6 +614,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onuserchanneladded = onuserchanneladded;
 
+			socket.onstickercreated = onstickercreated;
+
+			socket.onstickerdeleted = onstickerdeleted;
+
+			socket.onstickerupdated = onstickerupdated;
+
 			socket.onuserclanadded = onuserclanadded;
 
 			socket.onclanprofileupdated = onclanprofileupdated;
@@ -597,6 +657,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onclandeleted,
 			onuserchanneladded,
 			onuserclanadded,
+			onstickercreated,
+			onstickerdeleted,
+			onstickerupdated,
 			onclanprofileupdated,
 			oncustomstatus,
 			onstatuspresence,
@@ -672,6 +735,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstickercreated = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstickerdeleted = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstickerupdated = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onclanprofileupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oncoffeegiven = () => {};
@@ -689,6 +758,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onclandeleted,
 		onuserchanneladded,
 		onuserclanadded,
+		onstickerupdated,
+		onstickerdeleted,
+		onstickercreated,
 		onclanprofileupdated,
 		oncustomstatus,
 		onstatuspresence,

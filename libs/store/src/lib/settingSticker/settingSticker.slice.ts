@@ -28,7 +28,7 @@ export const initialSettingClanStickerState: SettingClanStickerState = stickerAd
 	hasGrandchildModal: false
 });
 
-export const fetchStickerByClanId = createAsyncThunk('settingClanSticker/fetchClanSticker', async (_, thunkAPI) => {
+export const fetchStickerByUserId = createAsyncThunk('settingClanSticker/fetchClanSticker', async (_, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const response = await mezon.socketRef.current?.listStickersByUserId();
@@ -48,7 +48,7 @@ export const createSticker = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const res = await mezon.client.addClanSticker(mezon.session, form.request);
 			if (res) {
-				thunkAPI.dispatch(fetchStickerByClanId());
+				thunkAPI.dispatch(fetchStickerByUserId());
 			} else {
 				return thunkAPI.rejectWithValue({});
 			}
@@ -65,7 +65,7 @@ export const updateSticker = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
 			if (res) {
-				thunkAPI.dispatch(fetchStickerByClanId());
+				thunkAPI.dispatch(fetchStickerByUserId());
 			}
 		} catch (error) {
 			return thunkAPI.rejectWithValue({ error });
@@ -73,12 +73,21 @@ export const updateSticker = createAsyncThunk(
 	}
 );
 
+export const removeStickersByClanId = createAsyncThunk('settingClanSticker/removeStickersByClanId', async (clanId: string, thunkAPI) => {
+	const state = thunkAPI.getState() as { settingSticker: SettingClanStickerState };
+	const stickersToRemove = state.settingSticker.entities;
+	const stickerIdsToRemove = Object.values(stickersToRemove)
+		.filter((sticker) => sticker?.clan_id === clanId)
+		.map((sticker) => sticker?.id) as string[];
+	thunkAPI.dispatch(stickerSettingActions.removeMany(stickerIdsToRemove));
+});
+
 export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker', async (data: { stickerId: string; clan_id: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const res = await mezon.client.deleteClanStickerById(mezon.session, data.stickerId, data.clan_id);
 		if (res) {
-			thunkAPI.dispatch(fetchStickerByClanId());
+			thunkAPI.dispatch(fetchStickerByUserId());
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue({ error });
@@ -89,6 +98,10 @@ export const settingClanStickerSlice = createSlice({
 	name: SETTING_CLAN_STICKER,
 	initialState: initialSettingClanStickerState,
 	reducers: {
+		add: stickerAdapter.addOne,
+		remove: stickerAdapter.removeOne,
+		update: stickerAdapter.updateOne,
+		removeMany: stickerAdapter.removeMany,
 		openModalInChild: (state) => {
 			state.hasGrandchildModal = true;
 		},
@@ -98,14 +111,14 @@ export const settingClanStickerSlice = createSlice({
 	},
 	extraReducers(builder) {
 		builder
-			.addCase(fetchStickerByClanId.fulfilled, (state: SettingClanStickerState, actions) => {
+			.addCase(fetchStickerByUserId.fulfilled, (state: SettingClanStickerState, actions) => {
 				state.loadingStatus = 'loaded';
 				stickerAdapter.setAll(state, actions.payload);
 			})
-			.addCase(fetchStickerByClanId.pending, (state: SettingClanStickerState) => {
+			.addCase(fetchStickerByUserId.pending, (state: SettingClanStickerState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchStickerByClanId.rejected, (state: SettingClanStickerState, action) => {
+			.addCase(fetchStickerByUserId.rejected, (state: SettingClanStickerState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -113,7 +126,9 @@ export const settingClanStickerSlice = createSlice({
 });
 
 export const stickerSettingActions = {
-	fetchStickerByClanId
+	...settingClanStickerSlice.actions,
+	fetchStickerByUserId,
+	removeStickersByClanId
 };
 
 export const getStickerSettingState = (rootState: { [SETTING_CLAN_STICKER]: SettingClanStickerState }): SettingClanStickerState =>
@@ -127,4 +142,4 @@ export const selectStickerByClanId = (clanId: string) =>
 		return stickers.filter((sticker) => sticker.clan_id === clanId);
 	});
 export const settingStickerReducer = settingClanStickerSlice.reducer;
-export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByClanId };
+export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByUserId };
