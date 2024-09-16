@@ -189,6 +189,12 @@
     "webpack-cli": "^5.1.4",
     "webpack-merge": "^5.10.0"
   },
+  "optionalDependencies": {
+    "@nx/nx-darwin-arm64": "18.2.2",
+    "@nx/nx-darwin-x64": "18.2.2",
+    "@nx/nx-linux-x64-gnu": "18.2.2",
+    "@nx/nx-win32-x64-msvc": "18.2.2"
+  },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": "eslint --fix"
   },
@@ -200,7 +206,9 @@
     "tls": false
   },
   "engines": {
-    "node": "18.x"
+    "node": "18.x",
+    "yarn": ">=1.22.4 <2",
+    "npm": "Please use yarn instead of NPM to install dependencies"
   },
   "author": "Mezon App <mezon@ncc.asia>"
 }
