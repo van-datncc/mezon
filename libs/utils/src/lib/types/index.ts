@@ -807,3 +807,10 @@ export enum EEventStatus {
 	COMPLETED = 'COMPLETED',
 	UNKNOWN = 'UNKNOWN'
 }
+
+export enum TypeCheck {
+	TYPECLAN = 0,
+	TYPECATEGORY = 1,
+	TYPECHANNEL = 2,
+	TYPETHREAD = 3
+}
