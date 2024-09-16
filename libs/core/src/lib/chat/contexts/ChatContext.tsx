@@ -510,7 +510,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	useEffect(() => {
 		if (getUserByUserId) {
-			console.log(getUserByUserId);
 			const name = getNameForPrioritize(
 				getUserByUserId?.clan_nick ?? '',
 				getUserByUserId.user?.display_name ?? '',
@@ -572,7 +571,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	}, [triggerDate]);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
-		console.log('coffeeEvent :', coffeeEvent);
 		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
 
 		if (coffeeEvent?.message_ref_id) {
