@@ -178,7 +178,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 							emoji.emojiId ?? '',
 							emoji.emoji ?? '',
 							1,
-							userId.userId ?? '',
+							message.sender_id ?? '',
 							false
 						)
 					}
