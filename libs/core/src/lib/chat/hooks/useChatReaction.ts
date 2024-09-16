@@ -1,16 +1,12 @@
-import { giveCoffeeActions, reactionActions, useAppDispatch } from '@mezon/store';
-import { EMOJI_GIVE_COFFEE } from '@mezon/utils';
+import { reactionActions, useAppDispatch } from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
-import { useAuth } from '../../auth/hooks/useAuth';
-
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
 
 export function useChatReaction() {
 	const dispatch = useAppDispatch();
-	const { userId } = useAuth();
 	const reactionMessageDispatch = useCallback(
 		async (
 			id: string,
@@ -27,18 +23,6 @@ export function useChatReaction() {
 			is_public: boolean,
 			is_parent_public: boolean
 		) => {
-			if (emoji_id === EMOJI_GIVE_COFFEE.emoji_id) {
-				dispatch(
-					giveCoffeeActions.updateGiveCoffee({
-						channel_id: channelId,
-						clan_id: clanId,
-						message_ref_id: messageId,
-						receiver_id: message_sender_id,
-						sender_id: userId,
-						token_count: 0
-					})
-				);
-			}
 			return dispatch(
 				reactionActions.writeMessageReaction({
 					id,
