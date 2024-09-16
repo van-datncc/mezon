@@ -3,8 +3,9 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		typingLabel: {
-			paddingVertical: size.s_6,
-			fontSize: size.s_14,
+			paddingBottom: size.s_2,
+			paddingLeft: size.s_2,
+			fontSize: size.s_12,
 			color: colors.text
 		},
     threeDot: { width: 30, height: 20 }

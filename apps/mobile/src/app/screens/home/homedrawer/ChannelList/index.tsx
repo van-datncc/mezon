@@ -73,9 +73,9 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, []);
 
 	const scrollToItemById = ({ channelId = '', categoryId = '' }) => {
-		const positionChannel = channelsPositionRef.current[channelId || currentChannel?.id];
-		const categoryOffset = categoryOffsetsRef.current[categoryId || currentChannel?.category_id];
-		const position = positionChannel + categoryOffset?.y;
+		const positionChannel = channelsPositionRef?.current?.[channelId || currentChannel?.id];
+		const categoryOffset = categoryOffsetsRef?.current?.[categoryId || currentChannel?.category_id];
+		const position = (positionChannel || 0) + (categoryOffset?.y || 0);
 		if (position) {
 			flashListRef?.current?.scrollTo({
 				x: 0,

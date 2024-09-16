@@ -15,6 +15,11 @@ export const getMessageActions = (t: TFunction): IMessageAction[] => {
 			type: EMessageActionType.ForwardAllMessages,
 		},
 		{
+			id: 16,
+			title: t('message:actions.giveACoffee'),
+			type: EMessageActionType.GiveACoffee,
+		},
+		{
 			id: 3,
 			title: t('message:actions.editMessage'),
 			type: EMessageActionType.EditMessage,
