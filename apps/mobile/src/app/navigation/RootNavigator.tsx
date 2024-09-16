@@ -16,8 +16,6 @@ import {
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
-	selectMemberClanByUserId,
-	selectTokenSocket,
 	voiceActions
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -25,8 +23,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ChatContextProvider, useAuth } from '@mezon/core';
-import { IWithError, getNameForPrioritize } from '@mezon/utils';
+import { ChatContextProvider } from '@mezon/core';
+import { IWithError } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	ActionEmitEvent,
@@ -48,6 +46,7 @@ import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
 import { toastConfig } from '../configs/toastConfig';
+import { useTokenToast } from '../hooks/useTokenToast';
 const MyStackComponent = lazy(() => import('./RootStack'));
 
 const NavigationMain = () => {
@@ -58,21 +57,8 @@ const NavigationMain = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
-	const { userId } = useAuth()
-	const tokenSocket = useSelector(selectTokenSocket(userId ?? ''));
-	const receiver = useSelector(selectMemberClanByUserId(tokenSocket?.receiver_id ?? ''));
-
-	useEffect(() => {
-		if (!!userId && !!tokenSocket && userId === tokenSocket?.receiver_id) {
-			const name = getNameForPrioritize(receiver?.clan_nick ?? '', receiver?.user?.display_name ?? '', receiver?.user?.username ?? '');
-
-			Toast.show({
-				type: 'info',
-				text1: `+1 token from ${name}`,
-			});
-		}
-	}, [tokenSocket?.receiver_id, receiver])
-
+	useTokenToast()
+	
 	useEffect(() => {
 		const timer = setTimeout(async () => {
 			setIsReadyForUse(true);
