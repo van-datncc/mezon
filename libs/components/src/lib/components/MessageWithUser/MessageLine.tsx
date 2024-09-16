@@ -140,7 +140,7 @@ const RenderContent = memo(
 				}
 
 				if (element.kindOf === ETokenMessage.MENTIONS && element.user_id) {
-					if (allUserIdsInChannel.indexOf(element.user_id) !== -1) {
+					if (allUserIdsInChannel.indexOf(element.user_id) !== -1 || contentInElement === '@here') {
 						formattedContent.push(
 							<MentionUser
 								isTokenClickAble={isTokenClickAble}
@@ -162,6 +162,7 @@ const RenderContent = memo(
 					}
 				}
 				if (element.kindOf === ETokenMessage.MENTIONS && element.role_id) {
+					console.log(contentInElement);
 					if (allRolesInClan.indexOf(element.role_id) !== -1) {
 						formattedContent.push(
 							<MentionUser
