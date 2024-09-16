@@ -58,6 +58,7 @@ import {
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
+	RoleEvent,
 	Socket,
 	StatusPresenceEvent,
 	StickerCreateEvent,
@@ -583,6 +584,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		},
 		[dispatch, userId]
 	);
+	// todo: Thái mai làm
+	const onroleevent = useCallback((coffeeEvent: RoleEvent) => {
+		console.log('coffeeEvent: ', coffeeEvent);
+	}, []);
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -640,6 +645,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onheartbeattimeout = onHeartbeatTimeout;
 
 			socket.oncoffeegiven = oncoffeegiven;
+
+			socket.onroleevent = onroleevent;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -667,7 +674,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onvoicejoined,
 			onvoiceleaved,
 			oneventcreated,
-			oncoffeegiven
+			oncoffeegiven,
+			onroleevent
 		]
 	);
 
@@ -748,6 +756,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onclanprofileupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oncoffeegiven = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onroleevent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -778,7 +788,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onHeartbeatTimeout,
 		oneventcreated,
 		setCallbackEventFn,
-		oncoffeegiven
+		oncoffeegiven,
+		onroleevent
 	]);
 
 	useEffect(() => {
