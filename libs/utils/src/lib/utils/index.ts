@@ -695,7 +695,7 @@ export async function getWebUploadedAttachments(payload: {
 		return await Promise.all(uploadPromises);
 	}
 
-	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype }));
+	return directLinks.map((link) => ({ url: link.url, filetype: link.filetype, filename: link.filename }));
 }
 
 export async function getMobileUploadedAttachments(payload: {
