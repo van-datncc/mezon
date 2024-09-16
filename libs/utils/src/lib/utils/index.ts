@@ -752,3 +752,56 @@ export const getBottomPopupClass = (hasAttachment: boolean, messageRefId: string
 	}
 	return '';
 };
+
+export const handleShowShortProfile = (
+	ref: React.RefObject<HTMLElement>,
+	WIDTH_PANEL_PROFILE: number,
+	HEIGHT_PANEL_PROFILE: number,
+	setIsShowPanelChannel: (show: boolean) => void,
+	setPosShortProfile: (position: { top: number | string; bottom: number | string; left: number | string; right: number | string }) => void
+) => {
+	setIsShowPanelChannel(true);
+
+	const rect = ref.current?.getBoundingClientRect() || { height: 0, left: 0, right: 0, top: 0, bottom: 0 };
+
+	const heightOfMention = rect.height;
+	const offSetLeftMention = rect.left;
+	const offSetRightMention = rect.right;
+	const offSetTopMention = rect.top;
+	const offSetBottomMention = rect.bottom;
+
+	// Window dimensions
+	const windowHeight = window.innerHeight;
+	const windowWidth = window.innerWidth;
+
+	let topComputed: number | string;
+	let bottomComputed: number | string;
+	let rightComputed: number | string;
+	let leftComputed: number | string;
+
+	// Determine left position
+	if (windowWidth - offSetRightMention > WIDTH_PANEL_PROFILE) {
+		leftComputed = offSetRightMention + 10;
+		rightComputed = 'auto';
+	} else {
+		leftComputed = 'auto';
+		rightComputed = windowWidth - offSetLeftMention + 10;
+	}
+
+	// Determine top position
+	if (windowHeight - offSetBottomMention > HEIGHT_PANEL_PROFILE) {
+		topComputed = offSetTopMention - heightOfMention + 3;
+		bottomComputed = 'auto';
+	} else {
+		topComputed = offSetBottomMention - HEIGHT_PANEL_PROFILE + 3;
+		bottomComputed = 'auto';
+	}
+
+	// Update panel position
+	setPosShortProfile({
+		top: topComputed,
+		bottom: bottomComputed,
+		left: leftComputed,
+		right: rightComputed
+	});
+};

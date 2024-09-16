@@ -50,9 +50,6 @@ function MessageWithUser({
 }: Readonly<MessageWithUserProps>) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 
-	// const idMessageRefReply = useSelector(selectIdMessageRefReply(currentChannelId ?? ''));
-	// const idMessageToJump = useSelector(selectIdMessageToJump);
-
 	const userLogin = useAuth();
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = false;
