@@ -800,3 +800,10 @@ export enum EUploadingStatus {
 export enum EFailAttachment {
 	FAIL_ATTACHMENT = 'failAttachment'
 }
+
+export enum EEventStatus {
+	UPCOMING = 'UPCOMING',
+	ONGOING = 'ONGOING',
+	COMPLETED = 'COMPLETED',
+	UNKNOWN = 'UNKNOWN'
+}

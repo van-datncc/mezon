@@ -96,21 +96,6 @@ const NavigationMain = () => {
 	}, [currentChannelId, isFromFcmMobile, isLoggedIn, currentClanId]);
 
 	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', async (state) => {
-			if (state === 'active') {
-				await notifee.cancelAllNotifications();
-			}
-			if (state === 'background') {
-				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, 'false');
-				dispatch(appActions.setIsFromFCMMobile(false));
-			}
-		});
-		return () => {
-			appStateSubscription.remove();
-		};
-	}, []);
-
-	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
 			refreshMessageInitApp();
 			authLoader();
