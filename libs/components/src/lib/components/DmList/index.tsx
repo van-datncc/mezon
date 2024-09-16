@@ -89,9 +89,9 @@ function DirectMessageList() {
 				</div>
 			</div>
 			<div
-				className={`flex-1 overflow-y-scroll font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+				className={`flex-1 font-medium text-gray-300 pl-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			>
-				<div className="flex flex-col gap-1 text-[#AEAEAE] py-1 text-center relative">
+				<div className="flex flex-col gap-1 text-[#AEAEAE] text-center relative">
 					<ListDMChannel listDM={sortedFilteredDataDM} />
 				</div>
 			</div>

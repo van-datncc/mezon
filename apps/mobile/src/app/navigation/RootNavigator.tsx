@@ -46,6 +46,7 @@ import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
 import { toastConfig } from '../configs/toastConfig';
+import { useTokenToast } from '../hooks/useTokenToast';
 const MyStackComponent = lazy(() => import('./RootStack'));
 
 const NavigationMain = () => {
@@ -56,7 +57,8 @@ const NavigationMain = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
-
+	useTokenToast()
+	
 	useEffect(() => {
 		const timer = setTimeout(async () => {
 			setIsReadyForUse(true);
@@ -94,21 +96,6 @@ const NavigationMain = () => {
 			timeout && clearTimeout(timeout);
 		};
 	}, [currentChannelId, isFromFcmMobile, isLoggedIn, currentClanId]);
-
-	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', async (state) => {
-			if (state === 'active') {
-				await notifee.cancelAllNotifications();
-			}
-			if (state === 'background') {
-				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, 'false');
-				dispatch(appActions.setIsFromFCMMobile(false));
-			}
-		});
-		return () => {
-			appStateSubscription.remove();
-		};
-	}, []);
 
 	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
