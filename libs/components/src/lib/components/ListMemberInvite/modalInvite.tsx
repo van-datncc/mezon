@@ -2,7 +2,7 @@ import { useEscapeKey, useInvite } from '@mezon/core';
 import { selectChannelById, selectChannelFirst, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import isElectron from 'is-electron';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ListMemberInvite from '.';
 
@@ -28,19 +28,17 @@ const ModalInvite = (props: ModalParam) => {
 	const firstChannel = useSelector(selectChannelFirst);
 	const { onClose, channelID } = props;
 
-	const idCreateInvite = useMemo(() => {
-		return (channelID === firstChannel.channel_id ? firstChannel.channel_id : channelID) as string;
-	}, [channelID, firstChannel.channel_id]);
-
-	const channel = useSelector(selectChannelById(idCreateInvite));
+	const channel = useSelector(selectChannelById(channelID as string));
 	const clan = useSelector(selectCurrentClan);
 
 	const handleOpenInvite = () => {
-		createLinkInviteUser(currentClanId ?? '', idCreateInvite, 10).then((res) => {
-			if (res && res?.invite_link) {
-				setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
+		createLinkInviteUser(currentClanId ?? '', (channelID === firstChannel.channel_id ? firstChannel.channel_id : channelID) as string, 10).then(
+			(res) => {
+				if (res && res?.invite_link) {
+					setUrlInvite((isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin) + '/invite/' + res.invite_link);
+				}
 			}
-		});
+		);
 	};
 
 	useEffect(() => {
