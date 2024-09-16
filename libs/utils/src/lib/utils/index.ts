@@ -383,18 +383,26 @@ export function addAttributesSearchList(data: SearchItemProps[], dataUserClan: C
 }
 
 export function filterListByName(listSearch: SearchItemProps[], searchText: string, isSearchByUsername: boolean): SearchItemProps[] {
-	return listSearch.filter((item: SearchItemProps) => {
+	const result = listSearch.filter((item: SearchItemProps) => {
 		if (isSearchByUsername) {
 			const searchName = normalizeString(searchText.slice(1));
+			const itemDisplayName = item.displayName ? normalizeString(item.displayName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
-			return itemName.includes(searchName);
+			const itemPrioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
+			
+			return itemName.includes(searchName) || itemDisplayName.includes(searchName) || itemPrioritizeName.includes(searchName);
 		} else {
+			
 			const searchUpper = normalizeString(searchText.startsWith('#') ? searchText.substring(1) : searchText);
 			const prioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
-			return prioritizeName.includes(searchUpper) || itemName.includes(searchUpper);
+			const itemDisplayName = item.displayName ? normalizeString(item.displayName) : '';
+			
+			return prioritizeName.includes(searchUpper) || itemName.includes(searchUpper) || itemDisplayName.includes(searchUpper);
 		}
 	});
+	
+	return result
 }
 
 export function sortFilteredList(filteredList: SearchItemProps[], searchText: string, isSearchByUsername: boolean): SearchItemProps[] {

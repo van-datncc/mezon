@@ -7,7 +7,10 @@ import {
 	selectAllDirectMessages,
 	selectAllUsersByUser,
 	selectTheme,
-	useAppDispatch
+	useAppDispatch,
+	selectAllUserClans,
+	selectEntitesUserClans,
+	selectAllUsesInAllClansEntities
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import {
@@ -35,9 +38,10 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const accountId = userProfile?.user?.id ?? '';
 	const { toDmGroupPageFromMainApp, toChannelPage, navigate } = useAppNavigation();
 	const { createDirectMessageWithUser } = useDirect();
+	const allClanUsersEntities = useSelector(selectEntitesUserClans);
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listChannels = useSelector(selectAllChannelsByUser);
-	const listUserInClan = useSelector(selectAllUsersByUser);
+	const allUsesInAllClansEntities = useSelector(selectAllUsesInAllClansEntities);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP && groupChat.active === 1);
 	const listDM = dmGroupChatList.filter(
 		(groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM && groupChat.channel_avatar && groupChat.active === 1
@@ -80,9 +84,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 			: [];
 		const listSearch = [...listDMSearch, ...listGroupSearch];
 		const removeDuplicate = removeDuplicatesById(listSearch.filter((item) => item?.id !== accountId));
-		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, listUserInClan as any);
+		const addPropsIntoSearchList = addAttributesSearchList(removeDuplicate, Object.values(allUsesInAllClansEntities) as any);
 		return addPropsIntoSearchList;
-	}, [accountId, listDM, listGroup, listUserInClan]);
+	}, [accountId, listDM, listGroup, allUsesInAllClansEntities]);
 
 	const listChannelSearch = useMemo(() => {
 		const list = listChannels.map((item) => {
@@ -106,21 +110,23 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	}, [listChannels]);
 
 	const listMemberSearch = useMemo(() => {
-		const list = listUserInClan.map((item) => {
-			return {
-				id: item?.id ?? '',
-				prioritizeName: item?.display_name ?? '',
-				name: item?.username ?? '',
-				avatarUser: item?.avatar_url ?? '',
-				displayName: item?.display_name ?? '',
+		const list: SearchItemProps[] = [];
+		for(let userId in allUsesInAllClansEntities) {
+			const user = allUsesInAllClansEntities[userId];
+			list.push({
+				id: user?.id ?? '',
+				prioritizeName: allClanUsersEntities[user?.id]?.clan_nick ?? user?.display_name ?? '',
+				name: user?.username ?? '',
+				avatarUser: user?.avatar_url ?? '',
+				displayName: user?.display_name ?? '',
 				lastSentTimeStamp: '0',
 				idDM: '',
 				typeChat: TypeSearch.Dm_Type,
 				type: ChannelType.CHANNEL_TYPE_DM
-			};
-		});
-		return list;
-	}, [listUserInClan]);
+			})
+		}
+		return list as SearchItemProps[];
+	}, [allUsesInAllClansEntities]);
 
 	const handleSelectMem = useCallback(
 		async (user: any) => {
@@ -193,7 +199,12 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		!listDirectSearch.filter((item: SearchItemProps) => item.prioritizeName && item.prioritizeName.indexOf(normalizeSearchText) > -1).length;
 
 	const totalLists = useMemo(() => {
-		const list = listDirectSearch.concat(listChannelSearch);
+		const list = listMemberSearch.concat(listChannelSearch);
+		listDirectSearch.forEach(dm => {
+			if(dm.type === ChannelType.CHANNEL_TYPE_DM && !allUsesInAllClansEntities[dm?.id || '0']) {
+				list.push(dm)
+			}
+		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
 		return sortedList;
 	}, [listDirectSearch, listChannelSearch]);
