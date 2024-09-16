@@ -77,29 +77,17 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 
 	return (
 		<div className="relative inline-block">
-			{checkImage ? (
-				<Tooltip content={selectSticker?.shortname}>
-					<img
-						onContextMenu={handleContextMenu}
-						className={`max-w-[100%] h-[150px] object-cover object-left-top my-2 rounded cursor-default`}
-						src={attachmentData.url?.toString()}
-						alt={attachmentData.url}
-						onClick={() => handleClick(attachmentData.url || '')}
-						style={imgStyle}
-						onError={handleImageError}
-					/>
-				</Tooltip>
-			) : (
+			<Tooltip content={selectSticker?.shortname} className={`${checkImage ? '' : 'hidden'}`}>
 				<img
 					onContextMenu={handleContextMenu}
-					className={`max-w-[100%] h-[150px] object-cover object-left-top my-2 rounded ${!isDimensionsValid ? 'cursor-pointer' : 'cursor-default'}`}
+					className={`max-w-[100%] h-[150px] object-cover object-left-top my-2 rounded cursor-default`}
 					src={attachmentData.url?.toString()}
 					alt={attachmentData.url}
 					onClick={() => handleClick(attachmentData.url || '')}
 					style={imgStyle}
 					onError={handleImageError}
 				/>
-			)}
+			</Tooltip>
 		</div>
 	);
 });
