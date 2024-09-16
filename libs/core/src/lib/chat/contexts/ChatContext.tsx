@@ -41,6 +41,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { ModeResponsive, NotificationCode, getNameForPrioritize } from '@mezon/utils';
+import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
@@ -679,6 +680,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (!socket) {
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'error', id: 'SOCKET_CONNECTION_NULL' }));
 					return;
+				}
+				if (isElectron()) {
+					window.location.reload();
 				}
 				setCallbackEventFn(socket as Socket);
 			} catch (error) {
