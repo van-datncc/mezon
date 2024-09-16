@@ -1,10 +1,18 @@
 import { useChannels, useMenu, useOnClickOutside } from '@mezon/core';
-import { channelsActions, notificationSettingActions, selectCloseMenu, threadsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	channelsActions,
+	notificationSettingActions,
+	selectCloseMenu,
+	selectTheme,
+	threadsActions,
+	useAppDispatch,
+	voiceActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, MouseButton } from '@mezon/utils';
-import { Spinner } from 'flowbite-react';
+import { Spinner, Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import React, { memo, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
@@ -150,7 +158,10 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			handleConfirmDeleteChannel(channel.channel_id as string, clanId as string);
 			handleCloseModalShow();
 		};
-
+		const appearanceTheme = useSelector(selectTheme);
+		const isLightMode = useMemo(() => {
+			return appearanceTheme === 'light';
+		}, [appearanceTheme]);
 		return (
 			<div
 				ref={panelRef}
@@ -216,14 +227,26 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				{isShowSettingChannel ? (
 					numberNotification !== 0 ? (
 						<>
-							<Icons.AddPerson
-								className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block dark:text-white text-black `}
-								onClick={handleCreateLinkInvite}
-							/>
-							<Icons.SettingProfile
-								className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block dark:text-white text-black `}
-								onClick={handleOpenCreate}
-							/>
+							<div className="absolute ml-auto w-4 h-4 top-[6px] right-8">
+								<div className="relative">
+									<Tooltip content="Create Invite" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+										<Icons.AddPerson
+											className={`w-4 h-4 cursor-pointer hidden group-hover:block dark:text-white text-black `}
+											onClick={handleCreateLinkInvite}
+										/>
+									</Tooltip>
+								</div>
+							</div>
+							<div className="absolute ml-auto w-4 h-4 top-[6px]  right-3">
+								<div className="relative">
+									<Tooltip content="Edit Channel" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+										<Icons.SettingProfile
+											className={`w-4 h-4 cursor-pointer hidden group-hover:block dark:text-white text-black `}
+											onClick={handleOpenCreate}
+										/>
+									</Tooltip>
+								</div>
+							</div>
 							<div
 								className={`absolute ml-auto w-4 h-4 text-white right-3 group-hover:hidden bg-red600 rounded-full text-xs text-center top-2`}
 							>
@@ -232,22 +255,41 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						</>
 					) : (
 						<>
-							<Icons.AddPerson
-								className={`absolute ml-auto w-4 h-4 top-[6px] hidden group-hover:block dark:group-hover:text-white group-hover:text-black ${isActive ? 'dark:text-white text-black' : 'text-transparent'} right-8 cursor-pointer`}
-								onClick={handleCreateLinkInvite}
-							/>
-							<Icons.SettingProfile
-								className={`absolute ml-auto w-4 h-4 top-[6px] right-3 ${isActive ? 'dark:text-white text-black' : 'text-transparent'} hidden group-hover:block dark:group-hover:text-white group-hover:text-black cursor-pointer`}
-								onClick={handleOpenCreate}
-							/>
+							<div className="absolute ml-auto w-4 h-4 top-[6px] right-8">
+								<div className="relative">
+									<Tooltip content="Create Invite" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+										<Icons.AddPerson
+											className={`w-4 h-4 hidden group-hover:block dark:group-hover:text-white group-hover:text-black ${isActive ? 'dark:text-white text-black' : 'text-transparent'} right-8 cursor-pointer`}
+											onClick={handleCreateLinkInvite}
+										/>
+									</Tooltip>
+								</div>
+							</div>
+							<div className="absolute ml-auto w-4 h-4 top-[6px]  right-3">
+								<div className="relative">
+									<Tooltip content="Edit Channel" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+										<Icons.SettingProfile
+											className={`w-4 h-4 ${isActive ? 'dark:text-white text-black' : 'text-transparent'} hidden group-hover:block dark:group-hover:text-white group-hover:text-black cursor-pointer`}
+											onClick={handleOpenCreate}
+										/>
+									</Tooltip>
+								</div>
+							</div>
 						</>
 					)
 				) : (
 					<>
-						<Icons.AddPerson
-							className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block dark:group-hover:text-white group-hover:text-black  ${isActive ? 'dark:text-white text-black' : 'text-transparent'} hidden right-3 cursor-pointer`}
-							onClick={handleCreateLinkInvite}
-						/>
+						<div className="absolute ml-auto w-4 h-4 top-[6px]  right-3">
+							<div className="relative">
+								<Tooltip content="Create Invite" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+									<Icons.AddPerson
+										className={`w-4 h-4 group-hover:block dark:group-hover:text-white group-hover:text-black  ${isActive ? 'dark:text-white text-black' : 'text-transparent'} hidden right-3 cursor-pointer`}
+										onClick={handleCreateLinkInvite}
+									/>
+								</Tooltip>
+							</div>
+						</div>
+
 						{numberNotification !== 0 && (
 							<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs">
 								{numberNotification}
