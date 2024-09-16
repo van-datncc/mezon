@@ -2,7 +2,7 @@ import { useEscapeKey, useInvite } from '@mezon/core';
 import { selectChannelById, selectChannelFirst, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import isElectron from 'is-electron';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ListMemberInvite from '.';
 
@@ -28,7 +28,10 @@ const ModalInvite = (props: ModalParam) => {
 	const firstChannel = useSelector(selectChannelFirst);
 	const { onClose, channelID } = props;
 
-	const idCreateInvite = (channelID === firstChannel.channel_id ? firstChannel.channel_id : channelID) as string;
+	const idCreateInvite = useMemo(() => {
+		return (channelID === firstChannel.channel_id ? firstChannel.channel_id : channelID) as string;
+	}, [channelID, firstChannel.channel_id]);
+
 	const channel = useSelector(selectChannelById(idCreateInvite));
 	const clan = useSelector(selectCurrentClan);
 
@@ -93,8 +96,8 @@ const ModalInvite = (props: ModalParam) => {
 					/>
 					<button
 						className="absolute right-0 bottom-0 mb-1 text-white font-semibold text-sm px-8 py-1.5
-        				shadow outline-none focus:outline-none ease-linear transition-all duration-150
-        			  bg-primary hover:bg-blue-800 text-[16px] leading-6 rounded mr-[8px]"
+								shadow outline-none focus:outline-none ease-linear transition-all duration-150
+								bg-primary hover:bg-blue-800 text-[16px] leading-6 rounded mr-[8px]"
 						onClick={() => {
 							handleCopyToClipboard(urlInvite);
 							onClose();
