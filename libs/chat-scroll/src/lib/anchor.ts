@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 
 const MAX_RESIZE_TIME = 5;
 const UI_STABLE_TIME = 1000;
@@ -59,18 +59,8 @@ export const useAnchor = (containerRef: React.MutableRefObject<Element>, content
 		if (isAtBottom) {
 			return;
 		}
-		containerRef.current?.scrollTo(0, Number.MAX_SAFE_INTEGER);
+		containerRef.current.scrollTo(0, Number.MAX_SAFE_INTEGER);
 	}, [containerRef]);
-
-	useEffect(() => {
-		let timeoutId: NodeJS.Timeout | null = null;
-		timeoutId = setTimeout(() => {
-			scrollToBottomIfNeeded();
-		}, 0);
-		return () => {
-			timeoutId && clearTimeout(timeoutId);
-		};
-	}, [scrollToBottomIfNeeded]);
 
 	useLayoutEffect(() => {
 		const containerElement = containerRef?.current;
@@ -86,6 +76,7 @@ export const useAnchor = (containerRef: React.MutableRefObject<Element>, content
 		};
 
 		if (containerElement && contentElement && anchor.current) {
+			scrollToBottomIfNeeded();
 			const { resizeObserver, listenersMap } = anchor.current;
 			anchor.current.isStable = false;
 			let resizeTime = 0;

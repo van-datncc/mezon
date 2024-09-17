@@ -1,6 +1,7 @@
-import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
+import * as Icons from '../../../../../../ui/src/lib/Icons';
+
 interface ChannelTypeProps {
 	type: ChannelType;
 	onChange: (value: number) => void;
@@ -8,7 +9,7 @@ interface ChannelTypeProps {
 	disable?: boolean;
 }
 
-const iconMap: Partial<Record<ChannelType, JSX.Element>> = {
+const iconMap = {
 	[ChannelType.CHANNEL_TYPE_TEXT]: <Icons.Hashtag defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_VOICE]: <Icons.Speaker defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_FORUM]: <Icons.Forum defaultSize="w-6 h-6" />,
@@ -16,10 +17,10 @@ const iconMap: Partial<Record<ChannelType, JSX.Element>> = {
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: <Icons.Hashtag defaultSize="w-6 h-6" />,
 	[ChannelType.CHANNEL_TYPE_GROUP]: <Icons.Hashtag defaultSize="w-6 h-6" />,
-	[ChannelType.CHANNEL_TYPE_THREAD]: <Icons.ThreadIcon defaultSize="w-6 h-6" />
+	[ChannelType.CHANNEL_TYPE_THREAD]: <Icons.ThreadIcon defaultSize="w-6 h-6" />,
 };
 
-const labelMap: Partial<Record<ChannelType, string>> = {
+const labelMap = {
 	[ChannelType.CHANNEL_TYPE_TEXT]: 'Text',
 	[ChannelType.CHANNEL_TYPE_VOICE]: 'Voice',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Forum',
@@ -27,10 +28,10 @@ const labelMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_THREAD]: 'Thread',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
-	[ChannelType.CHANNEL_TYPE_GROUP]: ''
+	[ChannelType.CHANNEL_TYPE_GROUP]: '',
 };
 
-const descriptionMap: Partial<Record<ChannelType, string>> = {
+const descriptionMap = {
 	[ChannelType.CHANNEL_TYPE_TEXT]: 'Send messages, images, GIFs, emoji, opinions, and puns',
 	[ChannelType.CHANNEL_TYPE_VOICE]: 'Hang out together with voice, video, and screen share',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Create a space for organized discussions',
@@ -38,7 +39,7 @@ const descriptionMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_THREAD]: 'Thread',
 	// 2 lines below only get index
 	[ChannelType.CHANNEL_TYPE_DM]: '',
-	[ChannelType.CHANNEL_TYPE_GROUP]: ''
+	[ChannelType.CHANNEL_TYPE_GROUP]: '',
 };
 
 export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChange, error, disable }) => {
