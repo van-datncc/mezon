@@ -14,6 +14,7 @@ import {
 	selectDmGroupCurrent,
 	useAppDispatch
 } from '@mezon/store-mobile';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -55,6 +56,10 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const isModeDM = useMemo(() => {
 		return currentDmGroup?.user_id?.length === 1;
 	}, [currentDmGroup?.user_id?.length]);
+
+	const isTypeDMGroup = useMemo(() => {
+		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP;
+	}, [currentDmGroup?.type]);
 
 	const dmType = useMemo(() => {
 		return currentDmGroup?.type;
@@ -185,7 +190,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 					<Icons.ArrowLargeLeftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />
 				</Pressable>
 				<Pressable style={styles.channelTitle} onPress={() => navigateToThreadDetail()}>
-					{!isModeDM ? (
+					{isTypeDMGroup ? (
 						<View style={styles.groupAvatar}>
 							<Icons.GroupIcon width={18} height={18} />
 						</View>

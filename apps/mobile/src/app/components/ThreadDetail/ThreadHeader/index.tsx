@@ -48,7 +48,7 @@ export const ThreadHeader = memo(() => {
 			{isDMThread ? (
 				<View style={styles.avatarWrapper}>
 					<View>
-						{currentChannel?.channel_avatar?.length > 1 ? (
+						{currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP ? (
 							<View style={[styles.groupAvatar, styles.avatarSize]}>
 								<Icons.GroupIcon color={baseColor.white} />
 							</View>
