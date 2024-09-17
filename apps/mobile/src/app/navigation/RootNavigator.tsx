@@ -65,7 +65,7 @@ const NavigationMain = () => {
 		}, 500);
 
 		const timerScrollToActive = setTimeout(async () => {
-			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL);
+			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { timeout: 100 });
 		}, 4000);
 		return () => {
 			clearTimeout(timer);
