@@ -6,18 +6,15 @@ import { getAspectRatioSize, useImageResolution } from 'react-native-zoom-toolki
 import { style } from './styles';
 
 const widthMedia = Metrics.screenWidth - 150;
+const heightMedia = Metrics.screenHeight * 0.3;
 
 export const RenderImageChat = React.memo(({ image, index, disable, onPress, onLongPress }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	// Gets the resolution of your image
-	const { isFetching, resolution } = useImageResolution({ uri: image.url });
-	if (isFetching || resolution === undefined) {
-		return null;
-	}
+	const { resolution } = useImageResolution({ uri: image.url });
 
 	const imageSize = getAspectRatioSize({
-		aspectRatio: resolution.width / resolution.height,
+		aspectRatio: (resolution?.width || 1) / (resolution?.height || 1),
 		width: widthMedia
 	});
 
@@ -33,8 +30,8 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 				style={[
 					styles.imageMessageRender,
 					{
-						width: imageSize.width,
-						height: imageSize.height,
+						width: (!imageSize?.height && !isUploading) ? widthMedia : imageSize.width * 0.8,
+						height: (!imageSize?.height && !isUploading) ? heightMedia : imageSize.height * 0.8,
 						opacity: isUploading ? 0.5 : 1
 					}
 				]}
@@ -46,7 +43,7 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 					) : null
 				}
 				source={{ uri: image?.url }}
-				resizeMode="contain"
+				resizeMode={(!imageSize?.height && !isUploading) ? 'cover' : 'contain'}
 			/>
 		</TouchableOpacity>
 	);
