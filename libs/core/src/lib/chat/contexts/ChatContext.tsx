@@ -599,7 +599,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				})
 			);
 		}
-	}, [triggerDate]);
+	}, [triggerDate, dispatch]);
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
@@ -608,7 +608,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setMessageIdCoffee(coffeeEvent.message_ref_id ?? '');
 			setChannelIdCoffee(coffeeEvent.channel_id ?? '');
 		}
-		if (userId === coffeeEvent.receiver_id) {
+		if (userId === coffeeEvent.sender_id) {
 			setTriggerDate(Date.now());
 		}
 	}, []);
