@@ -1,5 +1,5 @@
-import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion, selectHashtagDMByDirectId } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion } from '@mezon/store';
+import { selectAllHashtagDm, useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { FC, memo, useEffect, useMemo } from 'react';
@@ -95,7 +95,7 @@ export interface MentionHashtagSuggestionsProps {
 
 const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSelect, directMessageId, mode }) => {
 	const channels = useSelector(selectAllChannels);
-	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directMessageId || ''));
+	const commonChannelDms = useSelector(selectAllHashtagDm);
 	const listChannelsMention = useMemo(() => {
 		let channelsMention = [];
 		LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
