@@ -13,8 +13,6 @@ import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
 
-const categoriesEmoji = ['Recent', 'Custom', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
-
 const filterEmojiData = (emojis: IEmoji[]) => {
 	return emojis.map(({ id, src, shortname, category }) => ({
 		id,
@@ -25,6 +23,7 @@ const filterEmojiData = (emojis: IEmoji[]) => {
 };
 
 export function useEmojiSuggestion() {
+	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
 	const userId = useAuth();
 	function filterEmojisByUserId(emojis: EmojiStorage[], userId: string): EmojiStorage[] {
 		return emojis.filter((emojiItem) => emojiItem.senderId === userId);
@@ -41,13 +40,13 @@ export function useEmojiSuggestion() {
 			};
 		});
 	}
-	const emojiMetadata = useSelector(selectAllEmojiSuggestion);
 	const emojiRecentData = localStorage.getItem('recentEmojis');
 	const emojisRecentDataParse = emojiRecentData ? JSON.parse(emojiRecentData) : [];
 	const emojiFiltered = filterEmojisByUserId(emojisRecentDataParse, userId.userId ?? '');
 	const reversedEmojisRecentDataParse = emojiFiltered.reverse();
 
 	const emojiConverted = convertedEmojiRecent(reversedEmojisRecentDataParse, emojiMetadata);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const emojiCombine = [...emojiMetadata, ...emojiConverted];
 	const emojis = useMemo(() => filterEmojiData(emojiCombine), [emojiCombine]);
 	const isEmojiListShowed = useSelector(selectEmojiListStatus);
@@ -94,6 +93,17 @@ export function useEmojiSuggestion() {
 		[dispatch]
 	);
 
+	const categoriesEmoji = ['Recent', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+	const categoryEmoji = emojiMetadata
+		.map((emoji) => ({
+			id: emoji.clan_id,
+			clan_name: emoji.clan_name,
+			clan_logo: emoji.logo
+		}))
+		.filter((emoji, index, self) => emoji.id !== '0' && index === self.findIndex((s) => s.id === emoji.id));
+	const clanNames = categoryEmoji.map((emoji) => emoji.clan_name || '');
+	categoriesEmoji.splice(1, 0, ...clanNames);
+
 	return useMemo(
 		() => ({
 			emojiPicked,
@@ -102,6 +112,7 @@ export function useEmojiSuggestion() {
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
 			categoriesEmoji,
+			categoryEmoji,
 			setAddEmojiActionChatbox,
 			addEmojiState,
 			setShiftPressed,
@@ -122,7 +133,9 @@ export function useEmojiSuggestion() {
 			shiftPressedState,
 			emojis,
 			emojiConverted,
-			setSuggestionEmojiObjPicked
+			setSuggestionEmojiObjPicked,
+			categoriesEmoji,
+			categoryEmoji
 		]
 	);
 }

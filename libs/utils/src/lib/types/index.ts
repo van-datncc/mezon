@@ -366,10 +366,14 @@ export type IReaction = ApiMessageReaction & {
 };
 
 export type IEmoji = {
-	id: string;
-	src: string;
-	category: string;
-	shortname: string;
+	category?: string;
+	creator_id?: string;
+	id?: string;
+	shortname?: string;
+	src?: string;
+	logo?: string;
+	clan_name?: string;
+	clan_id?: string;
 };
 
 export type IChannelUser = ChannelDescription & {

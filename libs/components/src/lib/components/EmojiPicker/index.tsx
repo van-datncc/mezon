@@ -4,7 +4,6 @@ import {
 	referencesActions,
 	selectChannelById,
 	selectCurrentChannel,
-	selectCurrentClan,
 	selectDirectById,
 	selectMessageByMessageId,
 	selectModeResponsive,
@@ -29,14 +28,12 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const dispatch = useDispatch();
 
 	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
-
-	const { categoriesEmoji, emojis, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
+	const { categoryEmoji, categoriesEmoji, emojis, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const reactionPlaceActive = useSelector(selectReactionPlaceActive);
-	const currentClan = useSelector(selectCurrentClan);
 	const modeResponsive = useAppSelector(selectModeResponsive);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
@@ -54,17 +51,15 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		}
 	}, [valueInputToCheckHandleSearch]);
 
-	const ClanLogo = () => {
-		return currentClan?.logo ? (
-			<img src={currentClan?.logo} className="w-7 h-7 rounded-full" />
-		) : (
-			<div className="dark:text-textDarkTheme text-textLightTheme">{currentClan?.clan_name?.charAt(0).toUpperCase()}</div>
-		);
-	};
-
 	const categoryIcons = [
 		<Icons.ClockHistory defaultSize="w-7 h-7" />,
-		modeResponsive === ModeResponsive.MODE_CLAN ? <ClanLogo /> : <Icons.PenEdit className="w-7 h-7 text-colorNeutral" />,
+		...categoryEmoji.map((emoji) =>
+			emoji.clan_logo !== '' ? (
+				<img src={emoji.clan_logo} className="w-7 h-7 rounded-full" alt={emoji.clan_name} />
+			) : (
+				<div className="dark:text-textDarkTheme text-textLightTheme">{emoji.clan_name?.charAt(0).toUpperCase()}</div>
+			)
+		),
 		<Icons.Smile defaultSize="w-7 h-7" />,
 		<Icons.TheLeaf defaultSize="w-7 h-7" />,
 		<Icons.Bowl defaultSize="w-7 h-7" />,
@@ -277,9 +272,6 @@ type DisplayByCategoriesProps = {
 };
 
 function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiHover, onClickAddButton, showAddButton }: DisplayByCategoriesProps) {
-	const currentClan = useAppSelector(selectCurrentClan);
-	const modeResponsive = useAppSelector(selectModeResponsive);
-
 	const getEmojisByCategories = (emojis: any[], categoryParam: string) => {
 		const filteredEmojis = emojis
 			.filter((emoji) => emoji?.category?.includes(categoryParam))
@@ -289,15 +281,8 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 			}));
 		return filteredEmojis;
 	};
+
 	const emojisByCategoryName = getEmojisByCategories(emojisData, categoryName ?? '');
-
-	const displayCategoryName = (categoryName: string) => {
-		if (modeResponsive === ModeResponsive.MODE_DM) {
-			return categoryName;
-		}
-
-		return categoryName === EEmojiCategory.CUSTOM ? currentClan?.clan_name : categoryName;
-	};
 
 	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
 	return (
@@ -306,7 +291,7 @@ function DisplayByCategories({ emojisData, categoryName, onEmojiSelect, onEmojiH
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
 				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
 			>
-				<p className={'uppercase text-left truncate'}>{displayCategoryName(categoryName || '')}</p>
+				<p className={'uppercase text-left truncate'}>{categoryName}</p>
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
 					{' '}
 					<Icons.ArrowRight />

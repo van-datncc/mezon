@@ -3,14 +3,7 @@ import { useChatTypings, useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadDMById } from '@mezon/store';
-import {
-	DirectEntity,
-	RootState,
-	directActions,
-	getStoreAsync,
-	selectAllClans,
-	selectDirectsOpenlist
-} from '@mezon/store-mobile';
+import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import { ChannelType } from 'mezon-js';
@@ -68,7 +61,10 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		if (!text) {
 			return (
-				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]} numberOfLines={1}>
+				<Text
+					style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]}
+					numberOfLines={1}
+				>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
 					{': '}
 					{'attachment '}
