@@ -13,7 +13,7 @@ export default function Direct() {
 	const statusMenu = useSelector(selectStatusMenu);
 
 	useEffect(() => {
-		dispatch(clansActions.setCurrentClanId(''));
+		dispatch(clansActions.setCurrentClanId('0'));
 		const recentEmojis = localStorage.getItem('recentEmojis');
 		if (!recentEmojis) {
 			localStorage.setItem('recentEmojis', JSON.stringify([]));

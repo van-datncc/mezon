@@ -138,11 +138,13 @@ export const directMetaReducer = directMetaSlice.reducer;
 export const directMetaActions = {
 	...directMetaSlice.actions
 };
-const { selectAll } = directMetaAdapter.getSelectors();
+const { selectAll, selectEntities } = directMetaAdapter.getSelectors();
 
 export const getDirectMetaState = (rootState: { [DIRECT_META_FEATURE_KEY]: DirectMetaState }): DirectMetaState => rootState[DIRECT_META_FEATURE_KEY];
 
 export const selectAllDirectMetaMessages = createSelector(getDirectMetaState, selectAll);
+
+export const selectEntitiesDirectMeta = createSelector(getDirectMetaState, selectEntities);
 
 export const selectIsUnreadDMById = (channelId: string) =>
 	createSelector(getDirectMetaState, (state) => {
