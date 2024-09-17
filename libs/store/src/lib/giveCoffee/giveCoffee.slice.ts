@@ -63,7 +63,7 @@ export const giveCoffeeSlice = createSlice({
 			if (!userId) return;
 
 			state.tokenUpdate[userId] = state.tokenUpdate[userId] ?? 0;
-			state.tokenSocket[userId] = coffeeEvent ?? {}
+			state.tokenSocket[userId] = coffeeEvent ?? {};
 
 			if (userId === coffeeEvent.receiver_id) {
 				state.tokenUpdate[userId] += 1;
@@ -128,4 +128,4 @@ export const selectTokenSocket = (userId: string) =>
 	createSelector(getCoffeeState, (state) => {
 		const tokenSocket = state?.tokenSocket || {};
 		return tokenSocket[userId];
-	});	
+	});

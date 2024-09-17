@@ -32,7 +32,7 @@ export const MessageUserTyping = React.memo(({ channelId, isDM, mode, isPublic }
 	}
 	return (
 		<Block
-			flexDirection='row'
+			flexDirection="row"
 			width={'100%'}
 			paddingVertical={size.s_4}
 			paddingHorizontal={size.s_10}

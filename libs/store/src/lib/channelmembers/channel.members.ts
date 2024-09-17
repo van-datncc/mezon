@@ -448,7 +448,6 @@ export const selectChannelMemberByUserIds = createSelector(
 					},
 					id: userId
 				} as ChannelMembersEntity);
-
 			} else {
 				members.push({
 					channelId,

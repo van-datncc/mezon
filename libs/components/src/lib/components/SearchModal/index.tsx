@@ -5,12 +5,10 @@ import {
 	messagesActions,
 	selectAllChannelsByUser,
 	selectAllDirectMessages,
-	selectAllUsersByUser,
-	selectTheme,
-	useAppDispatch,
-	selectAllUserClans,
+	selectAllUsesInAllClansEntities,
 	selectEntitesUserClans,
-	selectAllUsesInAllClansEntities
+	selectTheme,
+	useAppDispatch
 } from '@mezon/store';
 import { InputField } from '@mezon/ui';
 import {
@@ -111,7 +109,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const listMemberSearch = useMemo(() => {
 		const list: SearchItemProps[] = [];
-		for(let userId in allUsesInAllClansEntities) {
+		for (const userId in allUsesInAllClansEntities) {
 			const user = allUsesInAllClansEntities[userId];
 			list.push({
 				id: user?.id ?? '',
@@ -123,7 +121,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				idDM: '',
 				typeChat: TypeSearch.Dm_Type,
 				type: ChannelType.CHANNEL_TYPE_DM
-			})
+			});
 		}
 		return list as SearchItemProps[];
 	}, [allUsesInAllClansEntities]);
@@ -200,9 +198,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const totalLists = useMemo(() => {
 		const list = listMemberSearch.concat(listChannelSearch);
-		listDirectSearch.forEach(dm => {
-			if(dm.type === ChannelType.CHANNEL_TYPE_DM && !allUsesInAllClansEntities[dm?.id || '0']) {
-				list.push(dm)
+		listDirectSearch.forEach((dm) => {
+			if (dm.type === ChannelType.CHANNEL_TYPE_DM && !allUsesInAllClansEntities[dm?.id || '0']) {
+				list.push(dm);
 			}
 		});
 		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);

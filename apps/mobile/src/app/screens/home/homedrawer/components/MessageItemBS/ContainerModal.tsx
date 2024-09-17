@@ -13,7 +13,7 @@ import {
 	setIsForwardAll,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { getSrcEmoji } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, getSrcEmoji } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -92,6 +92,13 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 					token_count: 1
 				};
 				dispatch(giveCoffeeActions.updateGiveCoffee(coffeeEvent));
+				handleReact(
+					mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
+					message.id,
+					EMOJI_GIVE_COFFEE.emoji_id,
+					EMOJI_GIVE_COFFEE.emoji,
+					userProfile?.user?.id
+				);
 			}
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
