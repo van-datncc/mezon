@@ -32,9 +32,10 @@ export const MessageUserTyping = React.memo(({ channelId, isDM, mode, isPublic }
 	}
 	return (
 		<Block
-			flexDirection='row'
+			flexDirection="row"
 			width={'100%'}
-			paddingHorizontal={size.s_14}
+			paddingVertical={size.s_4}
+			paddingHorizontal={size.s_10}
 			position={'absolute'}
 			bottom={0}
 			backgroundColor={themeValue.secondary}

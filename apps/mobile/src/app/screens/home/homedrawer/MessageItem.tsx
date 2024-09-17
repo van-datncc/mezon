@@ -369,7 +369,7 @@ const MessageItem = React.memo(
 						/>
 						<Pressable
 							style={[styles.rowMessageBox]}
-							delayLongPress={Platform.OS === 'ios' ? 300 : 100}
+							delayLongPress={300}
 							onPressIn={handlePressIn}
 							onPressOut={handlePressOut}
 							onLongPress={() => {
