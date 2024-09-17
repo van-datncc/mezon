@@ -203,7 +203,7 @@ const MessageItem = React.memo(
 			[usersClan, rolesInClan, onMessageAction]
 		);
 
-		const jumpToChannel = async (channelId: string, clanId: string) => {
+		const jumpToChannel = async (channelId: string, clanId: string, channelCateId: string) => {
 			const store = await getStoreAsync();
 			// TODO: do we need to jump to message here?
 			store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId }));
@@ -214,12 +214,14 @@ const MessageItem = React.memo(
 					noFetchMembers: false
 				})
 			);
+			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelCateId });
 		};
 
 		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
 			try {
 				const type = channel?.type;
 				const channelId = channel?.channel_id;
+				const channelCateId = channel?.category_id;
 				const clanId = channel?.clan_id;
 
 				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
@@ -232,7 +234,7 @@ const MessageItem = React.memo(
 					});
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-					await jumpToChannel(channelId, clanId);
+					await jumpToChannel(channelId, clanId, channelCateId);
 				}
 			} catch (error) {
 				console.log(error);

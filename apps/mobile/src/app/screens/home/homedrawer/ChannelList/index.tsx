@@ -50,7 +50,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const categoryOffsetsRef = useRef({});
-	const hiddenBottomTab = useSelector(selectHiddenBottomTabMobile);
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -75,7 +74,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const scrollToItemById = ({ channelId = '', categoryId = '' }) => {
 		const positionChannel = channelsPositionRef?.current?.[channelId || currentChannel?.id];
 		const categoryOffset = categoryOffsetsRef?.current?.[categoryId || currentChannel?.category_id];
-		const position = (positionChannel || 0) + (categoryOffset?.y || 0);
+		const position = (positionChannel || 0) + (categoryOffset?.y || 100);
 		if (position) {
 			flashListRef?.current?.scrollTo({
 				x: 0,
@@ -86,12 +85,16 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	};
 
 	useEffect(() => {
+		let timer: NodeJS.Timeout;
 		const activeChannel = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, (props) => {
-			const { channelId = '', categoryId = '' } = props || {};
-			scrollToItemById({ channelId, categoryId });
+			const { channelId = '', categoryId = '', timeout = 2000 } = props || {};
+			timer = setTimeout(() => {
+				scrollToItemById({ channelId, categoryId });
+			}, timeout);
 		});
 		return () => {
 			activeChannel.remove();
+			timer && clearTimeout(timer);
 		};
 	}, [currentClanId, categorizedChannels?.length, channelsPositionRef.current, categoryOffsetsRef.current]);
 
