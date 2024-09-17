@@ -52,7 +52,7 @@ const ClanLayout = () => {
 				/>
 			</div>
 			<div
-				className={`flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
+				className={`flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible z-10 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'group' : ''}`}
 			>
 				<ChannelTopbar channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 				<Outlet />
