@@ -6,12 +6,10 @@ import {
 	selectCategoryIdSortChannel,
 	selectCurrentChannelId,
 	selectCurrentClan,
-	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -131,15 +129,10 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 		}
 	}, [location]);
 
-	const appearanceTheme = useSelector(selectTheme);
-	const isLightMode = useMemo(() => {
-		return appearanceTheme === 'light';
-	}, [appearanceTheme]);
-
 	return (
 		<div>
 			{category.category_name && (
-				<div className="flex flex-row px-2 relative gap-1 items-center" onMouseDown={handleMouseClick} ref={panelRef} role={'button'}>
+				<div className="flex flex-row px-2 relative gap-1" onMouseDown={handleMouseClick} ref={panelRef} role={'button'}>
 					<button
 						onClick={() => {
 							handleToggleCategory();
@@ -149,29 +142,19 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 						{isShowCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 						<span className="one-line">{category.category_name}</span>
 					</button>
-					<Tooltip content="Sort channel" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
-						<button
-							onClick={handleSortByName}
-							className="focus-visible:outline-none dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black h-full flex items-center"
-						>
-							<Icons.UpDownIcon />
-						</button>
-					</Tooltip>
+					<button
+						onClick={handleSortByName}
+						className="focus-visible:outline-none dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black"
+					>
+						<Icons.UpDownIcon />
+					</button>
 					<UserRestrictionZone policy={isShowCreateChannel}>
-						<Tooltip
-							className="h-fit"
-							content="Create channel"
-							trigger="hover"
-							animation="duration-500"
-							style={isLightMode ? 'light' : 'dark'}
+						<button
+							className="focus-visible:outline-none dark:text-channelTextLabely text-colorTextLightMode dark:hover:text-white hover:text-black"
+							onClick={() => handleOpenCreateChannelModal(category)}
 						>
-							<button
-								className="focus-visible:outline-none dark:text-channelTextLabely text-colorTextLightMode dark:hover:text-white hover:text-black h-full flex items-center"
-								onClick={() => handleOpenCreateChannelModal(category)}
-							>
-								<Icons.Plus />
-							</button>
-						</Tooltip>
+							<Icons.Plus />
+						</button>
 					</UserRestrictionZone>
 
 					{isShowPanelCategory && (
