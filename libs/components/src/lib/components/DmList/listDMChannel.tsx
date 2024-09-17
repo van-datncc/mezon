@@ -15,7 +15,7 @@ const ListDMChannel = (props: ListDMChannelProps) => {
 	const [height, setHeight] = useState(window.innerHeight - heightAroundComponent);
 
 	useEffect(() => {
-		const handleResize = () => setHeight(window.innerHeight);
+		const handleResize = () => setHeight(window.innerHeight - heightAroundComponent);
 		window.addEventListener('resize', handleResize);
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
