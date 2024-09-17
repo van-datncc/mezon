@@ -22,43 +22,39 @@ const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
 		<TouchableOpacity onPress={handleOnPress} style={{ marginBottom: size.s_20 }}>
 			{channelData?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 				<Block flexDirection="row" gap={size.s_10} alignItems="center">
-					{channelData?.channel_label && Number(channelData?.parrent_id)
-						? channelData?.channel_private
-							? (
-								<Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
-							) : (
-								<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
-							)
-						: channelData?.channel_private
-							? (
-								<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
-							) : (
-								<Icons.TextIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
-							)}
+					{channelData?.channel_label && Number(channelData?.parrent_id) ? (
+						channelData?.channel_private ? (
+							<Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+						) : (
+							<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+						)
+					) : channelData?.channel_private ? (
+						<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+					) : (
+						<Icons.TextIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+					)}
 					<Block>
 						<Block flexDirection="row" alignItems="center" gap={size.s_6} marginBottom={size.s_6}>
 							<Text style={styles.channelName}>{channelData?.channel_label}</Text>
 						</Block>
-						<Text style={styles.categoryChannel}>{channelData?.category_name}</Text>
+						{channelData?.category_name && <Text style={styles.categoryChannel}>{channelData?.category_name}</Text>}
 					</Block>
 				</Block>
 			) : null}
 			{channelData?.type === ChannelType.CHANNEL_TYPE_VOICE ? (
 				<Block flexDirection="row" gap={size.s_10} alignItems="center" justifyContent="space-between">
 					<Block flexDirection="row" gap={size.s_10} alignItems="center">
-						{channelData?.channel_private
-							? (
-								<Icons.VoiceNormalIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
-							)
-							: (
-								<Icons.VoiceLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
-							)}
+						{channelData?.channel_private ? (
+							<Icons.VoiceNormalIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+						) : (
+							<Icons.VoiceLockIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+						)}
 						<Block>
 							<Block flexDirection="row" alignItems="center" gap={size.s_6} marginBottom={size.s_6}>
 								<Text style={styles.channelName}>{channelData?.channel_label}</Text>
 								<LockIcon width={10} height={10} color={Colors.textGray} />
 							</Block>
-							<Text style={styles.categoryChannel}>{channelData?.category_name}</Text>
+							{channelData?.category_name && <Text style={styles.categoryChannel}>{channelData?.category_name}</Text>}
 						</Block>
 					</Block>
 					<Block style={styles.joinChannelBtn}>

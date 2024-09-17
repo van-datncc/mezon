@@ -1,10 +1,11 @@
 import {
+	ActionEmitEvent,
+	ChannelTypeHeader,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	getUpdateOrAddClanChannelCache,
 	load,
-	save,
-	ActionEmitEvent
+	save
 } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
@@ -13,7 +14,7 @@ import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Linking, ScrollView, Text, View } from 'react-native';
+import { DeviceEventEmitter, FlatList, Keyboard, Linking, Text, View } from 'react-native';
 import { StatusVoiceChannel } from '../../screens/home/homedrawer/components/ChannelList/ChannelListItem';
 import { linkGoogleMeet } from '../../utils/helpers';
 import ChannelItem from '../ChannelItem';
@@ -40,6 +41,21 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 				?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT),
 		[listChannelSearch]
 	);
+	const combinedListChannel = useMemo(() => {
+		const textChannels = listTextChannelAndThreads?.map((channel) => ({
+			...channel
+		}));
+		const voiceChannels = listVoiceChannel?.map((channel) => ({
+			...channel
+		}));
+
+		return [
+			{ title: t('textChannels'), type: ChannelTypeHeader },
+			...textChannels,
+			{ title: t('voiceChannels'), type: ChannelTypeHeader },
+			...voiceChannels
+		];
+	}, [listTextChannelAndThreads, listVoiceChannel]);
 
 	const handleRouteData = async (channelData: ChannelThreads) => {
 		if (channelData?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -69,38 +85,28 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 		}
 	};
 
+	const renderItem = ({ item }) => {
+		if (item?.type === ChannelTypeHeader) {
+			return <Text style={styles.title}>{item.title}</Text>;
+		}
+		return <ChannelItem onPress={handleRouteData} channelData={item} key={item?.id} />;
+	};
+
 	return (
 		<View style={styles.container}>
 			{listChannelSearch?.length > 0 ? (
-				<ScrollView
-					keyboardDismissMode={'interactive'}
-					keyboardShouldPersistTaps={'handled'}
-					contentContainerStyle={{ paddingBottom: size.s_50 }}
-					showsVerticalScrollIndicator={false}
-				>
-					<>
-						<Block>
-							{listTextChannelAndThreads?.length > 0 ? (
-								<Block>
-									<Text style={styles.title}>{t('textChannels')}</Text>
-									{listTextChannelAndThreads?.map((channel) => (
-										<ChannelItem onPress={handleRouteData} channelData={channel} key={channel?.id} />
-									))}
-								</Block>
-							) : null}
-						</Block>
-						<Block>
-							{listVoiceChannel?.length > 0 ? (
-								<Block>
-									<Text style={styles.title}>{t('voiceChannels')}</Text>
-									{listVoiceChannel?.map((channel) => (
-										<ChannelItem onPress={handleRouteData} channelData={channel} key={channel?.id} />
-									))}
-								</Block>
-							) : null}
-						</Block>
-					</>
-				</ScrollView>
+				<Block paddingBottom={size.s_100}>
+					<FlatList
+						data={combinedListChannel}
+						renderItem={renderItem}
+						keyExtractor={(item) => (item?.id ? item?.id.toString() : item.title)}
+						onScrollBeginDrag={Keyboard.dismiss}
+						keyboardShouldPersistTaps={'handled'}
+						contentContainerStyle={{ paddingBottom: size.s_50 }}
+						showsVerticalScrollIndicator={false}
+						removeClippedSubviews={true}
+					/>
+				</Block>
 			) : (
 				<EmptySearchPage />
 			)}

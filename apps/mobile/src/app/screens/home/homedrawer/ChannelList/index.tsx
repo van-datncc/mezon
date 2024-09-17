@@ -137,7 +137,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 			params: {
-				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList
+				openSearchChannelFrom: EOpenSearchChannelFrom.ChannelList,
+				currentChannel
 			}
 		});
 	};
