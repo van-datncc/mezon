@@ -27,8 +27,8 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 			}
 			timer.current = setTimeout(() => {
 				setTypeKeyboardBottomSheet(type);
-				bottomPickerRef.current?.collapse();
-			}, 0);
+				bottomPickerRef.current?.expand();
+			}, 100);
 		} else {
 			setTypeKeyboardBottomSheet('text');
 			bottomPickerRef.current?.forceClose();
