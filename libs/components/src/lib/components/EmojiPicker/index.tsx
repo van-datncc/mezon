@@ -29,7 +29,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const dispatch = useDispatch();
 
 	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
-	console.log('messageEmoji: ', messageEmoji);
 
 	const { categoriesEmoji, emojis, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
