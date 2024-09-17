@@ -106,12 +106,12 @@ export const removeChannelRole = createAsyncThunk(
 	async ({ channelId, clanId, roleId, channelType }: removeChannelRolePayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteRoleChannelDesc(mezon.session, { channel_id: channelId, role_id: roleId });
+			const response = await mezon.client.deleteRoleChannelDesc(mezon.session, { clan_id: clanId, channel_id: channelId, role_id: roleId });
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
 			const body = {
-				clanId: '',
+				clanId: clanId,
 				channelId: channelId,
 				noCache: true,
 				channelType: channelType ?? 0,
