@@ -41,7 +41,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode, getNameForPrioritize } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
 import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
@@ -506,27 +506,134 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const [triggerDate, setTriggerDate] = useState<number>(Date.now());
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(state, channelId ? (channelId ?? '') : (directId ?? ''), senderId, directId ? '1' : '')
-	)[0];
+	);
+	console.log(getUserByUserId);
+	const a = [
+		{
+			channelId: '1834863127015985152',
+			userChannelId: '1834863127015985152',
+			user: {
+				clan_id: '0',
+				parrent_id: '0',
+				channel_id: '1834863127015985152',
+				category_id: '0',
+				type: 2,
+				creator_id: '1775730015049093120',
+				channel_label: 'Nguyễn Nam Phong,131123,User_1',
+				channel_private: 1,
+				channel_avatar: [
+					'https://cdn.mezon.vn/1775732550744936448/1775791967452532736/1775730015049093000/312Screenshot_2023_10_08_022006.WEBP',
+					'https://cdn.mezon.vn/1775731152322039808/1820659489792069632/mezon_logo.png',
+					''
+				],
+				user_id: ['1775730015049093120', '1775731111020728320', '1783746483959369728'],
+				last_sent_message: {
+					id: '1835690363034013696',
+					timestamp_seconds: 1726497662,
+					sender_id: '1784059393956909056',
+					content: '{"t":"345"}',
+					attachment: '[]',
+					referece: '[]',
+					mention: '[]'
+				},
+				last_seen_message: {
+					id: '1835690363034013696',
+					timestamp_seconds: 1726531977
+				},
+				is_online: [true, false, true],
+				active: 1,
+				usernames: 'phong.nguyennam,thai.phamquoc,vklfehrWSZ,',
+				creator_name: 'Nguyễn Nam Phong',
+				create_time_seconds: 1726300434,
+				update_time_seconds: 1726300434,
+				metadata: ['{"status": "hello world!!!"}', '{"status": "hello world!!!!123456"}', '{"status": "hello world!!!"}'],
+				about_me: ['', 'sfasdfafadfadfdfs123eeq', ''],
+				id: '1834863127015985152',
+				username: 'phong.nguyennam,thai.phamquoc,vklfehrWSZ,',
+				display_name: 'Nguyễn Nam Phong,131123,User_1'
+			},
+			id: '1834863127015985152'
+		}
+	];
+	const b = [
+		{
+			channelId: '1775732550778490880',
+			userChannelId: '1775732550778490880',
+			user: {
+				avatar_url: 'https://cdn.mezon.vn/1775732550744936448/1775791967452532736/1775730015049093000/312Screenshot_2023_10_08_022006.WEBP',
+				create_time: '2024-04-04T03:40:01Z',
+				display_name: 'Nguyễn Nam Phong',
+				edge_count: 10,
+				google_id: '105215360543579473129',
+				id: '1775730015049093120',
+				lang_tag: 'en',
+				update_time: '2024-09-17T00:35:42Z',
+				username: 'phong.nguyennam',
+				metadata: {
+					status: 'hello world!!!'
+				}
+			},
+			role_id: ['1832978181389291520'],
+			clan_nick: 'Nguyễn Nam Phong',
+			clan_avatar: 'https://cdn.mezon.vn/1775732550744936448/1775730015049093120/1775730015049093000/143000002.WEBP',
+			id: '1775730015049093120'
+		}
+	];
+	const getUserInfoById = (data: any, userId: string) => {
+		if (!data || data.length === 0) {
+			return null; // Kiểm tra nếu dữ liệu không hợp lệ
+		}
+
+		// Tìm người dùng có `userId` tương ứng
+		const user = data.find((item: any) => item.user.id === userId);
+
+		if (user) {
+			return {
+				displayName: user.user.display_name || 'Unknown Display Name', // Kiểm tra trường hợp undefined
+				username: user.user.username || 'Unknown Username', // Kiểm tra trường hợp undefined
+				clanNick: user.clan_nick || 'No Clan Nick' // Kiểm tra nếu có clan_nick
+			};
+		} else {
+			return null; // Nếu không tìm thấy user_id
+		}
+	};
 
 	useEffect(() => {
-		if (getUserByUserId) {
-			const name = getNameForPrioritize(
-				getUserByUserId?.clan_nick ?? '',
-				getUserByUserId.user?.display_name ?? '',
-				getUserByUserId.user?.username ?? ''
-			);
+		const senderInforDm = getUserInfoById(getUserByUserId, senderId);
+		console.log('senderInforDm :', senderInforDm);
+		// const senderInforChannel = getUserByUserId[0];
+		// console.log('senderInforChannel :', senderInforChannel);
 
-			const uniqueId = `token_${getUserByUserId.id}_${Date.now()}}`;
-			dispatch(
-				toastActions.addToast({
-					message: `+1 token from ${name}`,
-					type: 'success',
-					id: uniqueId
-				})
-			);
-			setSenderId('');
-		}
-	}, [getUserByUserId, dispatch, triggerDate]);
+		// if (senderInforDm) {
+		// 	const name = getNameForPrioritize('', senderInforDm.displayName ?? '', senderInforDm.username ?? '');
+
+		// 	const uniqueId = `token_${getUserByUserId[0].id}_${Date.now()}}`;
+		// 	dispatch(
+		// 		toastActions.addToast({
+		// 			message: `+1 token from ${name}`,
+		// 			type: 'success',
+		// 			id: uniqueId
+		// 		})
+		// 	);
+		// 	setSenderId('');
+		// } else {
+		// 	const name = getNameForPrioritize(
+		// 		senderInforChannel?.clan_nick ?? '',
+		// 		senderInforChannel?.user?.display_name ?? '',
+		// 		senderInforChannel?.user?.username ?? ''
+		// 	);
+
+		// 	const uniqueId = `token_${Date.now()}}`;
+		// 	dispatch(
+		// 		toastActions.addToast({
+		// 			message: `+1 token from ${name}`,
+		// 			type: 'success',
+		// 			id: uniqueId
+		// 		})
+		// 	);
+		// 	setSenderId('');
+		// }
+	}, [senderId]);
 
 	const [messageIdCoffee, setMessageIdCoffee] = useState('');
 	const [channelIdCoffee, setChannelIdCoffee] = useState('');
@@ -572,6 +679,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oncoffeegiven = useCallback((coffeeEvent: ApiGiveCoffeeEvent) => {
 		dispatch(giveCoffeeActions.setTokenFromSocket({ userId, coffeeEvent }));
+		console.log('coffeeEvent :', coffeeEvent);
 
 		if (coffeeEvent?.message_ref_id) {
 			setMessageIdCoffee(coffeeEvent.message_ref_id ?? '');
