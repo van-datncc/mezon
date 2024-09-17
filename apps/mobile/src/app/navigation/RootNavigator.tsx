@@ -21,7 +21,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider } from '@mezon/core';
 import { IWithError } from '@mezon/utils';
@@ -46,18 +46,15 @@ import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import SplashScreen from '../components/SplashScreen';
 import { toastConfig } from '../configs/toastConfig';
-import { useTokenToast } from '../hooks/useTokenToast';
 const MyStackComponent = lazy(() => import('./RootStack'));
 
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const hasInternet = useSelector(selectHasInternetMobile);
-	const dispatch = useDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
-	useTokenToast();
 
 	useEffect(() => {
 		const timer = setTimeout(async () => {
