@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { EOpenSearchChannelFrom, Icons, hasNonEmptyChannels, ActionEmitEvent } from '@mezon/mobile-components';
+import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId, selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
@@ -73,9 +73,9 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, []);
 
 	const scrollToItemById = ({ channelId = '', categoryId = '' }) => {
-		const positionChannel = channelsPositionRef.current[channelId || currentChannel?.id];
-		const categoryOffset = categoryOffsetsRef.current[categoryId || currentChannel?.category_id];
-		const position = positionChannel + categoryOffset?.y;
+		const positionChannel = channelsPositionRef?.current?.[channelId || currentChannel?.id];
+		const categoryOffset = categoryOffsetsRef?.current?.[categoryId || currentChannel?.category_id];
+		const position = (positionChannel || 0) + (categoryOffset?.y || 0);
 		if (position) {
 			flashListRef?.current?.scrollTo({
 				x: 0,
@@ -172,9 +172,10 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				</View>
 				{isLoading === 'loading' && !hasNonEmptyChannels(categorizedChannels || []) && <ChannelListSkeleton numberSkeleton={6} />}
 				<ScrollView ref={flashListRef} scrollEventThrottle={16} bounces={false}>
-					{!!categorizedChannels?.length && categorizedChannels?.map((item) => {
-						return renderItemChannelList({ item });
-					})}
+					{!!categorizedChannels?.length &&
+						categorizedChannels?.map((item) => {
+							return renderItemChannelList({ item });
+						})}
 				</ScrollView>
 			</View>
 

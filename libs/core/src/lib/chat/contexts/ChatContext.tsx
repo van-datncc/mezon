@@ -28,11 +28,13 @@ import {
 	selectChannelsByClanId,
 	selectCurrentChannel,
 	selectCurrentChannelId,
+	selectCurrentClan,
 	selectCurrentClanId,
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectMessageByMessageId,
 	selectModeResponsive,
+	stickerSettingActions,
 	toastActions,
 	useAppDispatch,
 	useAppSelector,
@@ -41,6 +43,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
+import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
@@ -57,8 +60,12 @@ import {
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
+	RoleEvent,
 	Socket,
 	StatusPresenceEvent,
+	StickerCreateEvent,
+	StickerDeleteEvent,
+	StickerUpdateEvent,
 	StreamPresenceEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
@@ -94,6 +101,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentClan = useSelector(selectCurrentClan);
 	const modeResponsive = useSelector(selectModeResponsive);
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
@@ -365,6 +373,53 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[clanIdActive, currentChannel?.channel_private, dispatch]
 	);
 
+	const onstickercreated = useCallback(
+		(stickerCreated: StickerCreateEvent) => {
+			if (userId !== stickerCreated.creator_id) {
+				console.log('stickerCreated: ', stickerCreated);
+
+				dispatch(
+					stickerSettingActions.add({
+						category: stickerCreated.category,
+						clan_id: stickerCreated.clan_id,
+						creator_id: stickerCreated.creator_id,
+						id: stickerCreated.sticker_id,
+						shortname: stickerCreated.shortname,
+						source: stickerCreated.source,
+						logo: stickerCreated.logo,
+						clan_name: stickerCreated.clan_name
+					})
+				);
+			}
+		},
+		[dispatch, userId]
+	);
+
+	const onstickerdeleted = useCallback(
+		(stickerDeleted: StickerDeleteEvent) => {
+			if (userId !== stickerDeleted.user_id) {
+				dispatch(stickerSettingActions.remove(stickerDeleted.sticker_id));
+			}
+		},
+		[userId, dispatch]
+	);
+
+	const onstickerupdated = useCallback(
+		(stickerUpdated: StickerUpdateEvent) => {
+			if (userId !== stickerUpdated.user_id) {
+				dispatch(
+					stickerSettingActions.update({
+						id: stickerUpdated.sticker_id,
+						changes: {
+							shortname: stickerUpdated.shortname
+						}
+					})
+				);
+			}
+		},
+		[userId, dispatch]
+	);
+
 	const onclanprofileupdated = useCallback(
 		(ClanProfileUpdates: ClanProfileUpdatedEvent) => {
 			dispatch(
@@ -455,6 +510,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onclandeleted = useCallback(
 		(clanDelete: ClanDeletedEvent) => {
 			dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+			dispatch(stickerSettingActions.removeStickersByClanId(clanDelete.clan_id));
 			if (clanDelete.deletor !== userId && currentClanId === clanDelete.clan_id) {
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
@@ -556,7 +612,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			setTriggerDate(Date.now());
 		}
 	}, []);
-
+	// todo: Thái mai làm
+	const onroleevent = useCallback((coffeeEvent: RoleEvent) => {
+		console.log('coffeeEvent: ', coffeeEvent);
+	}, []);
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -589,6 +648,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onuserchanneladded = onuserchanneladded;
 
+			socket.onstickercreated = onstickercreated;
+
+			socket.onstickerdeleted = onstickerdeleted;
+
+			socket.onstickerupdated = onstickerupdated;
+
 			socket.onuserclanadded = onuserclanadded;
 
 			socket.onclanprofileupdated = onclanprofileupdated;
@@ -608,6 +673,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onheartbeattimeout = onHeartbeatTimeout;
 
 			socket.oncoffeegiven = oncoffeegiven;
+
+			socket.onroleevent = onroleevent;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -626,13 +693,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onclandeleted,
 			onuserchanneladded,
 			onuserclanadded,
+			onstickercreated,
+			onstickerdeleted,
+			onstickerupdated,
 			onclanprofileupdated,
 			oncustomstatus,
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
 			oneventcreated,
-			oncoffeegiven
+			oncoffeegiven,
+			onroleevent
 		]
 	);
 
@@ -645,6 +716,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (!socket) {
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'error', id: 'SOCKET_CONNECTION_NULL' }));
 					return;
+				}
+				if (isElectron()) {
+					window.location.reload();
 				}
 				setCallbackEventFn(socket as Socket);
 			} catch (error) {
@@ -701,9 +775,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstickercreated = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstickerdeleted = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onstickerupdated = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onclanprofileupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oncoffeegiven = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onroleevent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -718,6 +800,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onclandeleted,
 		onuserchanneladded,
 		onuserclanadded,
+		onstickerupdated,
+		onstickerdeleted,
+		onstickercreated,
 		onclanprofileupdated,
 		oncustomstatus,
 		onstatuspresence,
@@ -731,7 +816,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onHeartbeatTimeout,
 		oneventcreated,
 		setCallbackEventFn,
-		oncoffeegiven
+		oncoffeegiven,
+		onroleevent
 	]);
 
 	useEffect(() => {
