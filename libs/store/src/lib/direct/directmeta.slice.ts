@@ -1,6 +1,6 @@
 import { DirectEntity, MessagesEntity } from '@mezon/store-mobile';
 import { ActiveDm, IChannel, LoadingStatus } from '@mezon/utils';
-import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessage } from 'mezon-js';
 
 export const DIRECT_META_FEATURE_KEY = 'directmeta';

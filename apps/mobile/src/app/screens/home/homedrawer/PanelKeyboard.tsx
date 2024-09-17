@@ -38,11 +38,11 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	useImperativeHandle(ref, () => ({
 		onShowKeyboardBottomSheet
 	}));
-	
+
 	useEffect(() => {
 		return () => {
 			timer?.current && clearTimeout(timer.current);
-		}
+		};
 	}, []);
 
 	return (

@@ -57,8 +57,8 @@ const NavigationMain = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isFromFcmMobile = useSelector(selectIsFromFCMMobile);
 	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
-	useTokenToast()
-	
+	useTokenToast();
+
 	useEffect(() => {
 		const timer = setTimeout(async () => {
 			setIsReadyForUse(true);

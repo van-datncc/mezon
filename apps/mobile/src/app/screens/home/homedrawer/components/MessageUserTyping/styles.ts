@@ -1,4 +1,4 @@
-import { Attributes, Colors, size, verticalScale } from '@mezon/mobile-ui';
+import { Attributes, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
@@ -8,5 +8,5 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_14,
 			color: colors.text
 		},
-    threeDot: { width: 30, height: 20 }
+		threeDot: { width: 30, height: 20 }
 	});

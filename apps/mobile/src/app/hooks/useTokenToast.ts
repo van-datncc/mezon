@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 
 export const useTokenToast = () => {
-	const { userId } = useAuth()
+	const { userId } = useAuth();
 	const tokenSocket = useSelector(selectTokenSocket(userId ?? ''));
 	const receiver = useSelector(selectMemberClanByUserId(tokenSocket?.receiver_id ?? ''));
 
@@ -16,8 +16,8 @@ export const useTokenToast = () => {
 
 			Toast.show({
 				type: 'info',
-				text1: `+1 token from ${name}`,
+				text1: `+1 token from ${name}`
 			});
 		}
-	}, [tokenSocket?.receiver_id, receiver])
+	}, [tokenSocket?.receiver_id, receiver]);
 };
