@@ -38,7 +38,7 @@ export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
 	async ({ clanId, repace = false, channelId }: GetRolePayload, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.listRoles(clanId || '', 100, 1, '');
+		const response = await mezon.socketRef.current?.listRoles(clanId || '', 500, 1, '');
 		if (!response?.roles?.roles) {
 			return [];
 		}

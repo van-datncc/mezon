@@ -1,4 +1,4 @@
-import { selectAllChannels, selectHashtagDMByDirectId, selectNumberMemberVoiceChannel } from '@mezon/store';
+import { selectAllChannels, selectAllHashtagDm, selectNumberMemberVoiceChannel } from '@mezon/store';
 import { HighlightMatchBold } from '@mezon/ui';
 import { SearchItemProps, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -40,7 +40,7 @@ const SuggestItem = ({
 }: SuggestItemProps) => {
 	const allChannels = useSelector(selectAllChannels);
 	const { directId } = useParams();
-	const commonChannels = useSelector(selectHashtagDMByDirectId(directId || ''));
+	const commonChannels = useSelector(selectAllHashtagDm);
 	const [specificChannel, setSpecificChannel] = useState<any>(null);
 	const numberMembersVoice = useSelector(selectNumberMemberVoiceChannel(channelId as string));
 	const checkVoiceStatus = useMemo(() => {

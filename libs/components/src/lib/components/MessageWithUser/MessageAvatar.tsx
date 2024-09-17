@@ -1,10 +1,11 @@
-import { AvatarImage, ModalUserProfile, useMessageContextMenu } from '@mezon/components';
+import { AvatarImage, ModalUserProfile } from '@mezon/components';
 import { useGetPriorityNameFromUserClan, useOnClickOutside } from '@mezon/core';
-import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, IMessageWithUser, WIDTH_PANEL_PROFILE, handleShowShortProfile } from '@mezon/utils';
+import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
+
 type IMessageAvatarProps = {
 	message: IMessageWithUser;
 	isCombine: boolean;
@@ -30,26 +31,15 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode, allowD
 		clanAvatar,
 		userClanAvatar
 	);
-	const { posShortProfile, setPosShortProfile } = useMessageContextMenu();
 
 	const { messageHour } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [positionTop, setPositionTop] = useState<number | null>(null);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
-	const handleMouseClick = () => {
-		handleShowShortProfile(
-			panelRef,
-			WIDTH_PANEL_PROFILE,
-			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM,
-			setIsShowPanelChannel,
-			setPosShortProfile
-		);
-	};
-
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
-
 	const isAnonymous = useMemo(() => senderId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
+	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	if (message.references?.length === 0 && isCombine && !isShowFull) {
 		return (
@@ -59,54 +49,57 @@ const MessageAvatar = ({ message, isCombine, isEditing, isShowFull, mode, allowD
 		);
 	}
 
+	const handleOpenShortUser = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+		const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
+		if (window.innerHeight - e.clientY > heightPanel) {
+			setPositionTop(e.clientY);
+		} else {
+			setPositionTop(window.innerHeight - heightPanel);
+		}
+		setIsShowPanelChannel(!isShowPanelChannel);
+	};
 	return (
-		<div className="relative group">
-			<div className="pt-1" ref={panelRef} onMouseDown={handleMouseClick}>
-				<AvatarImage
-					onContextMenu={(e) => {
-						e.preventDefault();
-						e.stopPropagation();
-					}}
-					alt={username ?? ''}
-					userName={username}
-					src={
-						(mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+		<>
+			{isShowPanelChannel && allowDisplayShortProfile && (
+				<div
+					className={`fixed z-50 le left-[406px] max-[480px]:left-16 max-[700px]:left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out`}
+					style={{ top: `${positionTop}px` }}
+					ref={panelRef}
+				>
+					<ModalUserProfile
+						userID={senderId}
+						classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
+						message={message}
+						mode={mode}
+						positionType={''}
+						avatar={userClanAvatar || pendingUserAvatar}
+						name={userClanNickname || userDisplayName || username}
+						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? true : false}
+					/>
+				</div>
+			)}
+
+			<AvatarImage
+				onContextMenu={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+				}}
+				alt={username ?? ''}
+				userName={username}
+				data-popover-target="popover-content"
+				src={
+					(mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+						? pendingClanAvatar
 							? pendingClanAvatar
-								? pendingClanAvatar
-								: pendingUserAvatar
-							: pendingUserAvatar) || avatarSender
-					}
-					className="min-w-10 min-h-10"
-					classNameText="font-semibold"
-					isAnonymous={isAnonymous}
-				/>
-			</div>
-			<div className="relative">
-				{isShowPanelChannel && allowDisplayShortProfile && (
-					<div
-						className={`dark:bg-black bg-gray-200 mt-[10px] w-[300px] max-w-[89vw] rounded-lg flex flex-col z-10 fixed left-5 sbm:left-0 md:left-[409px] transition-opacity duration-300 ease-in-out ${isLoading ? 'opacity-0 invisible' : 'opacity-100 visible'}`}
-						style={{
-							left: posShortProfile.left,
-							top: posShortProfile.top,
-							bottom: posShortProfile.bottom,
-							right: posShortProfile.right
-						}}
-						onMouseDown={(e) => e.stopPropagation()}
-					>
-						<ModalUserProfile
-							userID={senderId}
-							classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
-							message={message}
-							mode={mode}
-							positionType={''}
-							avatar={userClanAvatar || pendingUserAvatar}
-							name={userClanNickname || userDisplayName || username}
-							isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? true : false}
-						/>
-					</div>
-				)}
-			</div>
-		</div>
+							: pendingUserAvatar
+						: pendingUserAvatar) || avatarSender
+				}
+				className="min-w-10 min-h-10"
+				classNameText="font-semibold"
+				isAnonymous={isAnonymous}
+				onClick={handleOpenShortUser}
+			/>
+		</>
 	);
 };
 
