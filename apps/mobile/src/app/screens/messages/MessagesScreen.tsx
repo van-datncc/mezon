@@ -1,17 +1,9 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useMemberStatus } from '@mezon/core';
+import { useChatTypings, useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadDMById, useAppSelector } from '@mezon/store';
-import {
-	DirectEntity,
-	RootState,
-	directActions,
-	getStoreAsync,
-	selectAllClans,
-	selectDirectsOpenlist,
-	selectTypingUserIdsByChannelId
-} from '@mezon/store-mobile';
+import { selectIsUnreadDMById } from '@mezon/store';
+import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
@@ -37,7 +29,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const { directMessage, navigation, onLongPress } = props;
-	const hasUserTyping = useAppSelector((state) => selectTypingUserIdsByChannelId(state, directMessage?.channel_id));
+	const { typingUsers } = useChatTypings({ channelId: directMessage?.channel_id, mode: directMessage?.type, isPublic: false, isDM: true });
 	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
 	const { t } = useTranslation('message');
 	const userStatus = useMemberStatus(directMessage?.user_id?.length === 1 ? directMessage?.user_id?.[0] : '');
@@ -64,7 +56,10 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		if (!text) {
 			return (
-				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]} numberOfLines={1}>
+				<Text
+					style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]}
+					numberOfLines={1}
+				>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
 					{': '}
 					{'attachment '}
@@ -113,7 +108,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 							<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>
 						</View>
 					)}
-					{hasUserTyping?.length > 0 ? (
+					{typingUsers?.length > 0 ? (
 						<View style={[styles.statusTyping, userStatus ? styles.online : styles.offline]}>
 							<LottieView
 								source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}

@@ -17,6 +17,7 @@ jobs:
           echo "NODE_ENV: ${{ env.NODE_ENV }}"
           echo "Node version: $(node -v)"
           echo "Installing dependencies"
+          source ~/.bashrc
           yarn
       - name: Build
         run: |

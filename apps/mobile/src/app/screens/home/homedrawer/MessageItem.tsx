@@ -25,7 +25,7 @@ import {
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Animated, DeviceEventEmitter, Linking, Platform, Pressable, View } from 'react-native';
+import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction, RenderTextMarkdownContent } from './components';
@@ -369,7 +369,7 @@ const MessageItem = React.memo(
 						/>
 						<Pressable
 							style={[styles.rowMessageBox]}
-							delayLongPress={Platform.OS === 'ios' ? 300 : 100}
+							delayLongPress={300}
 							onPressIn={handlePressIn}
 							onPressOut={handlePressOut}
 							onLongPress={() => {

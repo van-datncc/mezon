@@ -45,7 +45,8 @@ const UserProfileModalInner = ({ openModal, userId, directId, notify, onClose, i
 	const dispatch = useAppDispatch();
 	const userProfileRef = useRef<HTMLDivElement | null>(null);
 	const modeResponsive = useAppSelector(selectModeResponsive);
-	const isClanView = useSelector(selectCurrentClanId);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const isClanView = currentClanId && currentClanId !== '0';
 	const clanUser = useSelector(selectMemberClanByUserId(userId as string));
 	const directUser = useSelector((state) => selectMembeGroupByUserId(state, directId, userId as string));
 	const userById = ((isClanView ? clanUser : directUser) || user) as ChannelMembersEntity;

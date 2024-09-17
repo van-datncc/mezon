@@ -168,7 +168,8 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
 
-	const isClanView = useSelector(selectCurrentClanId);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const isClanView = currentClanId && currentClanId !== '0';
 	const currentDMId = useSelector(selectDmGroupCurrentId);
 	const userClan = useSelector(selectMemberClanByUserId(sender.sender_id));
 	const userDirect = useAppSelector((state) => selectMembeGroupByUserId(state, currentDMId as string, sender.sender_id));
