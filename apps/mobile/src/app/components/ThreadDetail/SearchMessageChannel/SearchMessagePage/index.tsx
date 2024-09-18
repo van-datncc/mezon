@@ -96,7 +96,7 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 	const renderContent = () => {
 		switch (activeTab) {
 			case ACTIVE_TAB.MESSAGES:
-				return <MessagesSearchTab messageSearchByChannelId={messageSearchByChannelId} currentChannel={currentChannel} />;
+				return <MessagesSearchTab messageSearchByChannelId={messageSearchByChannelId} />;
 			case ACTIVE_TAB.MEMBER:
 				return <MembersSearchTab listMemberSearch={membersSearch} />;
 			case ACTIVE_TAB.CHANNEL:

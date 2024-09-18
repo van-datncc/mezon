@@ -1,12 +1,4 @@
-import {
-	ActionEmitEvent,
-	ChannelTypeHeader,
-	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	load,
-	save
-} from '@mezon/mobile-components';
+import { ActionEmitEvent, ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
@@ -58,36 +50,36 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 	}, [listTextChannel, listVoiceChannel]);
 
 	const handleRouteData = async (channelData: ChannelThreads) => {
+		if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
+			const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
+			await Linking.openURL(urlVoice);
+			navigation.navigate(APP_SCREEN.HOME);
+			navigation.dispatch(DrawerActions.openDrawer());
+		}
 		const clanId = channelData?.clan_id;
 		const store = await getStoreAsync();
+		// Join clan
 		if (currentClanId !== clanId) {
-			store.dispatch(clansActions.joinClan({ clanId: clanId }));
-			store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+			requestAnimationFrame(async () => {
+				store.dispatch(clansActions.joinClan({ clanId: clanId }));
+				store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+			});
 		}
-		if (channelData?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
-				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
-				await Linking.openURL(urlVoice);
-				navigation.navigate(APP_SCREEN.HOME);
-				navigation.dispatch(DrawerActions.openDrawer());
-				return;
-			}
-		} else {
+		if (channelData?.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 			navigation.navigate('HomeDefault');
 			navigation.dispatch(DrawerActions.closeDrawer());
 			const channelId = channelData?.channel_id;
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
-			if (!channelsCache?.includes(channelId)) {
-				save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
-			}
+
 			timeoutRef.current = setTimeout(async () => {
 				requestAnimationFrame(async () => {
 					await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 					DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { channelId: channelId, categoryId: channelData?.category_id });
 				});
 			}, 0);
+
+			// Set cache
+			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		}
 	};
 
