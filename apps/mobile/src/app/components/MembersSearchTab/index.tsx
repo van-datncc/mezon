@@ -36,13 +36,13 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 						data={listMemberSearch}
 						keyboardShouldPersistTaps={'handled'}
 						onScrollBeginDrag={Keyboard.dismiss}
-						renderItem={({ item }) => (
+						renderItem={({ item, index }) => (
 							<MemberItem
 								onPress={(user) => {
 									setSelectedUser(user);
 								}}
 								user={item as any}
-								key={item?.user?.id}
+								key={`${item?.user?.id}_member_search_${index}}`}
 							/>
 						)}
 						estimatedItemSize={100}

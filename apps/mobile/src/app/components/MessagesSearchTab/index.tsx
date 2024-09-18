@@ -83,6 +83,19 @@ const MessagesSearchTab = React.memo(({ currentChannel }: { currentChannel: ICha
 		}
 	};
 
+	const renderMessageItem = (message: MessagesEntity, index: number) => (
+		<Block key={`${message?.id}_${index}`} marginVertical={size.s_10}>
+			<MessageItem message={message} messageId={message.id} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} preventAction />
+		</Block>
+	);
+
+	const renderGroupItem = ({ item }) => (
+		<Block>
+			<Text style={styles.groupMessageLabel}>{`# ${item?.label}`}</Text>
+			{item?.messages?.map(renderMessageItem)}
+		</Block>
+	);
+
 	return (
 		<Block style={styles.container}>
 			<Block height={'100%'} width={'100%'} paddingBottom={size.s_100}>
@@ -91,21 +104,7 @@ const MessagesSearchTab = React.memo(({ currentChannel }: { currentChannel: ICha
 					data={searchMessages}
 					keyboardShouldPersistTaps={'handled'}
 					onScrollBeginDrag={Keyboard.dismiss}
-					renderItem={({ item }) => (
-						<Block>
-							<Text style={styles.groupMessageLabel}>{`# ${item?.label}`}</Text>
-							{item?.messages?.map((message) => (
-								<Block key={message?.id} marginVertical={size.s_10}>
-									<MessageItem
-										message={message as MessagesEntity}
-										messageId={message.id}
-										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-										preventAction
-									/>
-								</Block>
-							))}
-						</Block>
-					)}
+					renderItem={renderGroupItem}
 					estimatedItemSize={100}
 					removeClippedSubviews={true}
 					onEndReached={loadMoreMessages}
