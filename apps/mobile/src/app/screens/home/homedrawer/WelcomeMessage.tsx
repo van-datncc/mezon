@@ -28,8 +28,8 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	}, [currenChannel?.parrent_id]);
 
 	const isThreadPrivate = useMemo(() => {
-		return currenChannel?.parrent_id !== '0' && currenChannel?.channel_private === ChannelStatusEnum.isPrivate;
-	}, [currenChannel?.parrent_id, currenChannel?.channel_private]);
+		return currenChannel ? currenChannel.channel_private : false;
+	}, [currenChannel?.channel_private]);
 
 	const isDM = useMemo(() => {
 		return currenChannel?.clan_id === '0';
