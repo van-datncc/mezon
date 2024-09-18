@@ -4,12 +4,24 @@ import { MezonSuspense, SocketStatus, useMezon } from '@mezon/transport';
 import { SubPanelName } from '@mezon/utils';
 import { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
-const MainLayout = () => {
-	const dispatch = useDispatch();
+const GlobalEventListener = () => {
 	const { socketStatus } = useMezon();
 	const { handleReconnect } = useContext(ChatContext);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		const handleNavigateToPath = (_: unknown, path: string) => {
+			navigate(path);
+		};
+
+		window.electron?.on('navigate-to-path', handleNavigateToPath);
+
+		return () => {
+			window.electron?.removeListener('navigate-to-path', handleNavigateToPath);
+		};
+	}, [navigate]);
 
 	useEffect(() => {
 		const handleVisibilityChange = () => {
@@ -25,8 +37,12 @@ const MainLayout = () => {
 		};
 	}, [handleReconnect, socketStatus]);
 
-	const { setSubPanelActive } = useGifsStickersEmoji();
+	return null;
+};
 
+const MainLayout = () => {
+	const dispatch = useDispatch();
+	const { setSubPanelActive } = useGifsStickersEmoji();
 	const handleClickingOutside = () => {
 		setSubPanelActive(SubPanelName.NONE);
 		dispatch(reactionActions.setUserReactionPanelState(false));
@@ -40,6 +56,7 @@ const MainLayout = () => {
 			}}
 		>
 			<Outlet />
+			<GlobalEventListener />
 		</div>
 	);
 };
