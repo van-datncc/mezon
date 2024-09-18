@@ -227,7 +227,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 						</TouchableOpacity>
 					</Block>
 				) : (
-					<AddMemberBS ref={bottomSheetRef} memberList={unAssignedMemberList} role={clanRole} onClose={onClose} />
+					<AddMemberBS bottomSheetRef={bottomSheetRef} memberList={unAssignedMemberList} role={clanRole} onClose={onClose} />
 				)}
 			</Block>
 		</TouchableWithoutFeedback>
