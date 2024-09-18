@@ -13,14 +13,12 @@ interface MediaPlayerProps {
 
 function HLSPlayer({ src }: MediaPlayerProps) {
     const videoRef = useRef<HTMLVideoElement | null>(null);
-    const audioRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
         const videoElement = videoRef.current;
-        const audioElement = audioRef.current;
 
-        if (src.endsWith('.m3u8') && videoElement) {
-            // HLS for video
+        if (videoElement) {
+            // Check if HLS is supported
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(src);
@@ -43,25 +41,20 @@ function HLSPlayer({ src }: MediaPlayerProps) {
                         console.error('Error playing video:', error);
                     });
                 });
-            }
-        } else if (audioElement) {
-            // MP3 or other audio
-            audioElement.src = src;
-            audioElement.addEventListener('loadedmetadata', () => {
-                audioElement.play().catch((error) => {
-                    console.error('Error playing audio:', error);
+            } else {
+                // Fallback for other video formats
+                videoElement.src = src;
+                videoElement.addEventListener('loadedmetadata', () => {
+                    videoElement.play().catch((error) => {
+                        console.error('Error playing video:', error);
+                    });
                 });
-            });
+            }
         }
     }, [src]);
 
-    // Determine if the source is for video or audio
-    const isVideo = src.endsWith('.m3u8') || src.endsWith('.mp4');
-
-    return isVideo ? (
+    return (
         <video ref={videoRef} controls autoPlay playsInline style={{ width: '100%' }} />
-    ) : (
-        <audio ref={audioRef} controls autoPlay style={{ width: '100%' }} />
     );
 }
 
