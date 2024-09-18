@@ -47,7 +47,7 @@ function DMListItem({ directMessage }: DirectMessProp) {
 		e.stopPropagation();
 		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
 		if (directId === currentDmGroupId) {
-			navigate(`/chat/direct`);
+			navigate(`/chat/direct/friends`);
 		}
 	};
 
