@@ -192,8 +192,10 @@ const HomeDefaultHeader = React.memo(
 						</TouchableOpacity>
 						{!!currentChannel?.channel_label && (
 							<View style={styles.channelContainer}>
-								{!!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
-									<Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+								{currentChannel?.channel_private === ChannelStatusEnum.isPrivate && !!Number(currentChannel?.parrent_id)  ? (
+									<Icons.ThreadLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
+								) : !!currentChannel?.channel_label && !!Number(currentChannel?.parrent_id) ? (
+								  <Icons.ThreadIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
 								) : currentChannel?.channel_private === ChannelStatusEnum.isPrivate &&
 								  currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ? (
 									<Icons.TextLockIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />

@@ -369,7 +369,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const messageActionList = useMemo(() => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
-		const isHideCreateThread = isDM || !isCanManageThread;
+		const isHideCreateThread = isDM || !isCanManageThread || currentChannel.parrent_id !== "0";
 		const isHideDeleteMessage = !((isCanDeleteMessage && !isDM) || isMyMessage);
 
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
