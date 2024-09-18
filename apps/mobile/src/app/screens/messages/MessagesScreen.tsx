@@ -2,18 +2,11 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChatTypings, useMemberStatus } from '@mezon/core';
 import { Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadDMById, useAppSelector } from '@mezon/store';
-import {
-	DirectEntity,
-	RootState,
-	directActions,
-	getStoreAsync,
-	selectAllClans,
-	selectDirectsOpenlist,
-	selectTypingUserIdsByChannelId
-} from '@mezon/store-mobile';
+import { selectIsUnreadDMById } from '@mezon/store';
+import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlist } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
+import { ChannelType } from 'mezon-js';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +41,10 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 		});
 	};
 
+	const isTypeDMGroup = useMemo(() => {
+		return Number(directMessage?.type) === ChannelType.CHANNEL_TYPE_GROUP;
+	}, [directMessage?.type]);
+
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
 		const usernameList = (directMessage?.channel_label || directMessage?.usernames)?.split?.(',') || [];
@@ -64,7 +61,10 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 		if (!text) {
 			return (
-				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]} numberOfLines={1}>
+				<Text
+					style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.text }]}
+					numberOfLines={1}
+				>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
 					{': '}
 					{'attachment '}
@@ -100,7 +100,7 @@ const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation:
 
 	return (
 		<TouchableOpacity style={styles.messageItem} onPress={() => redirectToMessageDetail()} onLongPress={onLongPress}>
-			{directMessage?.channel_avatar?.length > 1 ? (
+			{isTypeDMGroup ? (
 				<View style={styles.groupAvatar}>
 					<Icons.GroupIcon />
 				</View>

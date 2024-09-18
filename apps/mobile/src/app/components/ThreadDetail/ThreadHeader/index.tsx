@@ -9,6 +9,7 @@ import { ChannelType } from 'mezon-js';
 import { memo, useContext, useMemo, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { MezonAvatar, MezonBottomSheet } from '../../../temp-ui';
 import MenuCustomDm from '../../MenuCustomDm';
 import { threadDetailContext } from '../MenuThreadDetail';
@@ -39,16 +40,27 @@ export const ThreadHeader = memo(() => {
 		return !!currentChannel?.channel_label && !Number(currentChannel?.parrent_id);
 	}, [currentChannel?.channel_label, currentChannel?.parrent_id]);
 
+	const handlebackMessageDetail = () => {
+		if (isDMThread) {
+			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
+				params: { directMessageId: currentChannel?.id }
+			});
+		} else {
+			navigation.goBack();
+		}
+	};
+
 	return (
 		<View style={styles.channelLabelWrapper}>
-			<TouchableOpacity style={styles.iconBackHeader} onPress={() => navigation.goBack()}>
+			<TouchableOpacity style={styles.iconBackHeader} onPress={handlebackMessageDetail}>
 				<Icons.ArrowLargeLeftIcon color={themeValue.text} height={20} width={20} />
 			</TouchableOpacity>
 
 			{isDMThread ? (
 				<View style={styles.avatarWrapper}>
 					<View>
-						{currentChannel?.channel_avatar?.length > 1 ? (
+						{currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP ? (
 							<View style={[styles.groupAvatar, styles.avatarSize]}>
 								<Icons.GroupIcon color={baseColor.white} />
 							</View>
