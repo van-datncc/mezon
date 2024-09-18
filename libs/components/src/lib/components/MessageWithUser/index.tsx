@@ -114,14 +114,14 @@ function MessageWithUser({
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
 		{ 'dark:bg-[#383B47]': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38]': checkMessageIncludeMention || checkJumpPinMessage },
+		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': checkMessageIncludeMention || checkJumpPinMessage },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
 		{ 'dark:bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38]': hasIncludeMention },
+		{ 'bg-[#403D38]': hasIncludeMention },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
