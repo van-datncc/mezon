@@ -8,13 +8,15 @@ import {
 	save
 } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
+import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, FlatList, Keyboard, Linking, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { StatusVoiceChannel } from '../../screens/home/homedrawer/components/ChannelList/ChannelListItem';
 import { linkGoogleMeet } from '../../utils/helpers';
 import ChannelItem from '../ChannelItem';
@@ -22,10 +24,11 @@ import EmptySearchPage from '../EmptySearchPage';
 import style from './ChannelsSearchTab.styles';
 
 type ChannelsSearchTabProps = {
-	listChannelSearch: ChannelThreads[];
+	listChannelSearch: ChannelUsersEntity[];
 };
 const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 	const { t } = useTranslation(['searchMessageChannel']);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const timeoutRef = useRef<any>();
@@ -34,15 +37,12 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_VOICE),
 		[listChannelSearch]
 	);
-	const listTextChannelAndThreads = useMemo(
-		() =>
-			listChannelSearch
-				?.flatMap((channel) => [channel, ...(channel?.threads || [])])
-				?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT),
+	const listTextChannel = useMemo(
+		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT),
 		[listChannelSearch]
 	);
 	const combinedListChannel = useMemo(() => {
-		const textChannels = listTextChannelAndThreads?.map((channel) => ({
+		const textChannels = listTextChannel?.map((channel) => ({
 			...channel
 		}));
 		const voiceChannels = listVoiceChannel?.map((channel) => ({
@@ -55,21 +55,27 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 			{ title: t('voiceChannels'), type: ChannelTypeHeader },
 			...voiceChannels
 		];
-	}, [listTextChannelAndThreads, listVoiceChannel]);
+	}, [listTextChannel, listVoiceChannel]);
 
 	const handleRouteData = async (channelData: ChannelThreads) => {
+		const clanId = channelData?.clan_id;
+		const store = await getStoreAsync();
+		if (currentClanId !== clanId) {
+			store.dispatch(clansActions.joinClan({ clanId: clanId }));
+			store.dispatch(clansActions.changeCurrentClan({ clanId: clanId }));
+		}
 		if (channelData?.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${channelData?.meeting_code}`;
 				await Linking.openURL(urlVoice);
+				navigation.navigate(APP_SCREEN.HOME);
+				navigation.dispatch(DrawerActions.openDrawer());
 				return;
 			}
 		} else {
 			navigation.navigate('HomeDefault');
 			navigation.dispatch(DrawerActions.closeDrawer());
-			const store = await getStoreAsync();
 			const channelId = channelData?.channel_id;
-			const clanId = channelData?.clan_id;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			const channelsCache = load(STORAGE_CHANNEL_CURRENT_CACHE) || [];
