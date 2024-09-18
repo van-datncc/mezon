@@ -116,7 +116,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 						<Icons.ChevronSmallDownIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
 					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
-					<Block flexDirection='row' alignItems='center' gap={size.s_10}>
+					<Block flexDirection='row' alignItems='center' gap={size.s_10} marginTop={size.s_10}>
               <CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
               <Text style={styles.text}>{`${t('token')} ${Number(tokenInWallet) + Number(getTokenSocket)}`}</Text>
           </Block>
