@@ -16,7 +16,8 @@
         "files": "Files",
         "saveImage": "Lưu ảnh",
         "copyMediaLink": "Sao chép đường dẫn media",
-        "giveACoffee": "Give A Coffee"
+        "giveACoffee": "Give A Coffee",
+        "resend": "Gửi lại"
     },
     "chatBox": {
         "replyingTo": "Đang phản hổi",
