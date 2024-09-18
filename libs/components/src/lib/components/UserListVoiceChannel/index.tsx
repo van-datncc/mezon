@@ -1,4 +1,4 @@
-import { selectVoiceChannelMembersByChannelId } from '@mezon/store';
+import { selectStreamMembersByChannelId, selectVoiceChannelMembersByChannelId } from '@mezon/store';
 import { IChannelMember } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import UserListItem from './UserListItemVoiceChannel';
@@ -9,7 +9,10 @@ export type UserListVoiceChannelProps = {
 
 function UserListVoiceChannel({ channelID }: UserListVoiceChannelProps) {
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(channelID));
-	return voiceChannelMember?.map((item: IChannelMember, index: number) => {
+	const streamChannelMember = useSelector(selectStreamMembersByChannelId(channelID));
+	const listMember = voiceChannelMember || streamChannelMember;
+
+	return listMember?.map((item: IChannelMember, index: number) => {
 		return (
 			<div key={item.id}>
 				<UserListItem user={item} channelID={channelID} />

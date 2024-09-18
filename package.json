@@ -58,6 +58,7 @@
     "flowbite": "^2.2.1",
     "flowbite-react": "^0.7.2",
     "fs": "^0.0.1-security",
+    "hls.js": "^1.5.15",
     "i18next": "^23.11.4",
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-http-backend": "^2.5.1",

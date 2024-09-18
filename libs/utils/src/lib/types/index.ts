@@ -237,6 +237,23 @@ export type IVoice = {
 	last_screenshot: string;
 };
 
+export type IUserStream = {
+	user_id: string;
+	clan_id: string;
+	clan_name: string;
+	participant: string;
+	stream_channel_id: string;
+	stream_channel_label: string;
+	last_screenshot: string;
+};
+
+export type IChannelsStream = {
+	channel_id: string;
+	clan_id: string;
+	is_streaming: boolean;
+	streaming_url: string;
+};
+
 export interface CategoryNameProps {
 	ChannelType: string | undefined;
 	channelStatus: string | undefined;
