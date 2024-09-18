@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent, EOpenSearchChannelFrom, Icons, hasNonEmptyChannels } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId, selectHiddenBottomTabMobile } from '@mezon/store-mobile';
+import { RootState, selectAllEventManagement, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
