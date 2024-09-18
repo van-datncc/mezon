@@ -17,7 +17,8 @@
         "files": "Files",
         "saveImage": "Save Image",
         "copyMediaLink": "Copy Media Link",
-        "giveACoffee": "Give A Coffee"
+        "giveACoffee": "Give A Coffee",
+        "resend": "Resend"
     },
     "chatBox": {
         "replyingTo": "Replying to",
