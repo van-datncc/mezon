@@ -4,6 +4,7 @@ import {
 	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
+	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClanId,
@@ -25,6 +26,7 @@ import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
+import SettingChannel from '../ChannelSetting';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -90,7 +92,9 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 			<div className="items-center h-full ml-auto flex">
 				<div className="justify-end items-center gap-2 flex">
 					<div className="hidden sbm:flex">
-						<div className="relative justify-start items-center gap-[15px] flex mr-4">
+						<div className="relative justify-start items-center gap-3 flex mr-4">
+							<InviteBtn isLightMode={appearanceTheme === 'light'} />
+							<ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />
 							<ThreadButton isLightMode={appearanceTheme === 'light'} />
 							<MuteButton isLightMode={appearanceTheme === 'light'} />
 							<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -113,6 +117,75 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 				</div>
 			</div>
 		</>
+	);
+}
+
+function ChannelSettingBtn({ isLightMode }: { isLightMode: boolean }) {
+	const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
+	const ChannelSettingRef = useRef<HTMLDivElement | null>(null);
+	const currentChannel = useSelector(selectCurrentChannel) as IChannel;
+	const handleShowChannelSetting = () => {
+		setIsOpenSetting(!isOpenSetting);
+	};
+
+	useOnClickOutside(ChannelSettingRef, () => setIsOpenSetting(false));
+	useEscapeKey(() => setIsOpenSetting(false));
+
+	return (
+		<div className="relative leading-5 h-5" ref={ChannelSettingRef}>
+			<Tooltip
+				className={`${isOpenSetting && 'hidden'}`}
+				content="Channel setting"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
+				<button className="focus-visible:outline-none" onClick={handleShowChannelSetting} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.SettingProfile
+						className={`w-6 h-6hover:text-black dark:hover:text-white size-6 dark:text-[#B5BAC1] text-colorTextLightMode cursor-pointer`}
+					/>
+				</button>
+			</Tooltip>
+			{isOpenSetting && (
+				<SettingChannel
+					onClose={() => {
+						setIsOpenSetting(false);
+					}}
+					channel={currentChannel}
+				/>
+			)}
+		</div>
+	);
+}
+
+function InviteBtn({ isLightMode }: { isLightMode: boolean }) {
+	const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+	const InviteBtnRef = useRef<HTMLDivElement | null>(null);
+	const currentChannel = useSelector(selectCurrentChannel) as IChannel;
+
+	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
+		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={currentChannel.id} />
+	));
+
+	useOnClickOutside(InviteBtnRef, () => setIsOpenModal(false));
+	useEscapeKey(() => setIsOpenModal(false));
+
+	return (
+		<div className="relative leading-5 h-5" ref={InviteBtnRef}>
+			<Tooltip
+				className={`${isOpenModal && 'hidden'}`}
+				content="Invite Friends"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
+				<button className="focus-visible:outline-none" onClick={openInviteChannelModal} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.AddPerson
+						className={`w-6 h-6hover:text-black dark:hover:text-white size-6 dark:text-[#B5BAC1] text-colorTextLightMode cursor-pointer`}
+					/>
+				</button>
+			</Tooltip>
+		</div>
 	);
 }
 
