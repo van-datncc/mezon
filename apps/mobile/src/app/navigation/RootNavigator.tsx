@@ -101,12 +101,6 @@ const NavigationMain = () => {
 		}
 	}, [isLoggedIn, hasInternet]);
 
-	useEffect(() => {
-		if (currentClanId) {
-			switchClanLoader();
-		}
-	}, [currentClanId]);
-
 	const refreshMessageInitApp = useCallback(async () => {
 		const store = await getStoreAsync();
 		if (currentChannelId) {
@@ -176,10 +170,6 @@ const NavigationMain = () => {
 		}
 	}, [currentChannelId]);
 
-	const switchClanLoader = async () => {
-		const store = await getStoreAsync();
-		await Promise.all([store.dispatch(emojiSuggestionActions.fetchEmoji({ clanId: currentClanId || '0', noCache: true }))]);
-	};
 	const authLoader = useCallback(async () => {
 		const store = await getStoreAsync();
 		try {
@@ -219,6 +209,7 @@ const NavigationMain = () => {
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 				promises.push(store.dispatch(directActions.fetchDirectMessage({})));
+				promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji()));
 				const results = await Promise.all(promises);
 
 				if (!isFromFCM) {

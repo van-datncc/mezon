@@ -1,8 +1,16 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useChatReaction, useUserPermission } from '@mezon/core';
+import { useAuth, useChatReaction, useChatSending, useUserPermission } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { giveCoffeeActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import {
+	giveCoffeeActions,
+	messagesActions,
+	selectChannelById,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectDmGroupCurrent,
+	useAppDispatch
+} from '@mezon/store';
 import {
 	MessagesEntity,
 	appActions,
@@ -49,6 +57,12 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
+	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
+
+	const { sendMessage } = useChatSending({
+		mode,
+		channelOrDirect: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel : currentDmGroup
+	});
 
 	const { isCanDeleteMessage, isCanManageThread } = useUserPermission();
 	const { downloadImage, saveImageToCameraRoll } = useImage();
@@ -195,6 +209,25 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		Toast.show({ type: 'info', text1: 'Updating...' });
 	};
 
+	const handleResendMessage = async () => {
+		dispatch(
+			messagesActions.remove({
+				channelId: message.channel_id,
+				messageId: message.id
+			})
+		);
+		await sendMessage(
+			message.content,
+			message.mentions,
+			message.attachments,
+			message.references,
+			false,
+			message?.isMentionEveryone || false,
+			true
+		);
+		onClose();
+	};
+
 	const handleActionMention = () => {
 		onClose();
 		const payload: IMessageActionNeedToResolve = {
@@ -322,6 +355,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.ForwardAllMessages:
 				handleForwardAllMessages();
 				break;
+			case EMessageActionType.ResendMessage:
+				handleResendMessage();
+				break;
 			default:
 				break;
 		}
@@ -361,6 +397,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				return <Icons.FlagIcon color={baseColor.red} height={size.s_14} width={size.s_14} />;
 			case EMessageActionType.GiveACoffee:
 				return <Icons.GiftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />;
+			case EMessageActionType.ResendMessage:
+				return <Icons.ChatMarkUnreadIcon color={themeValue.text} />;
 			default:
 				return <View />;
 		}
@@ -368,8 +406,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 	const messageActionList = useMemo(() => {
 		const isMyMessage = userProfile?.user?.id === message?.user?.id;
+		const isMessageError = message?.isError;
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
-		const isHideCreateThread = isDM || !isCanManageThread || currentChannel.parrent_id !== "0";
+		const isHideCreateThread = isDM || !isCanManageThread || currentChannel.parrent_id !== '0';
 		const isHideDeleteMessage = !((isCanDeleteMessage && !isDM) || isMyMessage);
 
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage, EMessageActionType.DeleteMessage];
@@ -379,7 +418,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
 			!isShowForwardAll() && EMessageActionType.ForwardAllMessages,
 			isHideCreateThread && EMessageActionType.CreateThread,
-			isHideDeleteMessage && EMessageActionType.DeleteMessage
+			isHideDeleteMessage && EMessageActionType.DeleteMessage,
+			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,
+			isMyMessage && EMessageActionType.GiveACoffee
 		];
 
 		let availableMessageActions: IMessageAction[] = [];
@@ -399,6 +440,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
 		const frequentActionList = [
+			EMessageActionType.ResendMessage,
 			EMessageActionType.GiveACoffee,
 			EMessageActionType.EditMessage,
 			EMessageActionType.Reply,
