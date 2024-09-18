@@ -3,7 +3,7 @@ import { MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectJ
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import ModalUserProfile from '../ModalUserProfile';
@@ -56,21 +56,24 @@ function MessageWithUser({
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 
-	const handleOpenShortUser = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-		const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
-		if (window.innerHeight - e.clientY > heightPanel) {
-			setPositionShortUser({
-				top: e.clientY,
-				left: 366 + e.currentTarget.offsetWidth
-			});
-		} else {
-			setPositionShortUser({
-				top: window.innerHeight - heightPanel,
-				left: 366 + e.currentTarget.offsetWidth
-			});
-		}
-		setIsShowPanelChannel(!isShowPanelChannel);
-	};
+	const handleOpenShortUser = useCallback(
+		(e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+			const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
+			if (window.innerHeight - e.clientY > heightPanel) {
+				setPositionShortUser({
+					top: e.clientY,
+					left: 366 + e.currentTarget.offsetWidth
+				});
+			} else {
+				setPositionShortUser({
+					top: window.innerHeight - heightPanel,
+					left: 366 + e.currentTarget.offsetWidth
+				});
+			}
+			setIsShowPanelChannel(!isShowPanelChannel);
+		},
+		[message.message_id]
+	);
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	const userLogin = useAuth();
