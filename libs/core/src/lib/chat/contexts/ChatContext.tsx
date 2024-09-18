@@ -28,7 +28,6 @@ import {
 	selectChannelsByClanId,
 	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectCurrentClan,
 	selectCurrentClanId,
 	selectDirectById,
 	selectDmGroupCurrentId,
@@ -43,7 +42,6 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
-import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
 import {
 	AddClanUserEvent,
@@ -87,6 +85,7 @@ type ChatContextProviderProps = {
 
 export type ChatContextValue = {
 	setCallbackEventFn: (socket: Socket) => void;
+	handleReconnect: (socketType: string) => void;
 };
 
 const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue);
@@ -101,7 +100,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const currentClan = useSelector(selectCurrentClan);
 	const modeResponsive = useSelector(selectModeResponsive);
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
@@ -709,20 +707,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const handleReconnect = useCallback(
 		async (socketType: string) => {
-			dispatch(toastActions.addToast({ message: socketType, type: 'error', id: 'SOCKET_CONNECTION_ERROR' }));
+			dispatch(toastActions.addToast({ message: socketType, type: 'info' }));
 			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 			try {
 				const socket = await reconnect(clanIdActive ?? '');
 				if (!socket) {
-					dispatch(toastActions.addToast({ message: errorMessage, type: 'error', id: 'SOCKET_CONNECTION_NULL' }));
+					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning' }));
 					return;
 				}
-				if (isElectron()) {
-					window.location.reload();
-				}
+				window.location.reload();
 				setCallbackEventFn(socket as Socket);
 			} catch (error) {
-				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', id: 'SOCKET_CONNECTION_WARN' }));
+				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning' }));
 			}
 		},
 		[dispatch, clanIdActive, reconnect, setCallbackEventFn]
@@ -730,14 +726,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const ondisconnect = useCallback(
 		debounce(() => {
-			handleReconnect('Socket disconnected');
+			handleReconnect('Socket disconnected, attempting to reconnect...');
 		}, 300),
 		[handleReconnect]
 	);
 
 	const onHeartbeatTimeout = useCallback(
 		debounce(() => {
-			handleReconnect('Socket hearbeat timeout');
+			handleReconnect('Socket hearbeat timeout, attempting to reconnect...');
 		}, 300),
 		[handleReconnect]
 	);
@@ -830,7 +826,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const value = React.useMemo<ChatContextValue>(
 		() => ({
 			// add logic code
-			setCallbackEventFn
+			setCallbackEventFn,
+			handleReconnect
 		}),
 		[setCallbackEventFn]
 	);
