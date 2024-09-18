@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useEscapeKey, useOnClickOutside, useThreads } from '@mezon/core';
+import { useAppNavigation, useAppParams, useAuth, useEscapeKey, useOnClickOutside, useThreads, useUserRestriction } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
@@ -7,6 +7,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
+	selectCurrentClan,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
@@ -20,7 +21,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel } from '@mezon/utils';
+import { EPermission, IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -83,7 +84,13 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
-
+	const { userProfile } = useAuth();
+	const currentClan = useSelector(selectCurrentClan);
+	const hasAdminPermission = useUserRestriction([EPermission.administrator]);
+	const hasClanPermission = useUserRestriction([EPermission.manageClan]);
+	const hasChannelManagePermission = useUserRestriction([EPermission.manageChannel]);
+	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
+	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -94,7 +101,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="hidden sbm:flex">
 						<div className="relative justify-start items-center gap-3 flex mr-4">
 							<InviteBtn isLightMode={appearanceTheme === 'light'} />
-							<ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />
+							{isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
 							<ThreadButton isLightMode={appearanceTheme === 'light'} />
 							<MuteButton isLightMode={appearanceTheme === 'light'} />
 							<PinButton isLightMode={appearanceTheme === 'light'} />
