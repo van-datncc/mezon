@@ -14,7 +14,7 @@ import {
 } from '@mezon/store';
 import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useEffect, useMemo, useRef } from 'react';
+import { DragEvent, memo, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
@@ -36,7 +36,7 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [dispatch, channelId, lastMessage]);
 }
-export default function DirectMessage() {
+const DirectMessage = () => {
 	// TODO: move selector to store
 	const { clanId, directId, type } = useAppParams();
 	const defaultChannelId = useSelector(selectDefaultChannelIdByClanId(clanId || ''));
@@ -226,4 +226,6 @@ export default function DirectMessage() {
 			</div>
 		</>
 	);
-}
+};
+
+export default memo(DirectMessage);
