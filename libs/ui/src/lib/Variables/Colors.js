@@ -35,6 +35,7 @@ module.exports = {
 	bgModalDark: 'rgba(0, 0, 0, 0.7)',
 	bgAvatarDark: '#F7E4F0',
 	bgIconDark: '#949BA4',
+	bgAccent: 'color-mix( in oklab, hsl(227 calc(1 * 6.5%) 27.3% / 1) 100%, black 0% )',
 
 	/* background light*/
 	bgLightPrimary: '#FFFFFF',
