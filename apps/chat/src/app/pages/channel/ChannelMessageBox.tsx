@@ -93,12 +93,17 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 
 			<div className="absolute bottom-[calc(100%-10px)] left-0 right-0">
 				{isViewingOldMessage && (
-					<div className={classNames('relative z-0 px-2 text-sm bg-bgAccent rounded-md', dataReferences.message_ref_id ? 'top-[8px]' : '')}>
+					<div
+						className={classNames(
+							'relative z-0 px-2 py-1 text-sm bg-bgAccent rounded-md',
+							dataReferences.message_ref_id ? 'top-[8px]' : ''
+						)}
+					>
 						<ChannelJumpToPresent channelId={channelId ?? ''} className="pb-[10px]" />
 					</div>
 				)}
 				{dataReferences.message_ref_id && (
-					<div className="relative z-1">
+					<div className="relative z-1 pb-[4px]">
 						<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
 					</div>
 				)}
