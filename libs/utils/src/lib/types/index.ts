@@ -242,9 +242,8 @@ export type IUserStream = {
 	clan_id: string;
 	clan_name: string;
 	participant: string;
-	stream_channel_id: string;
-	stream_channel_label: string;
-	last_screenshot: string;
+	streaming_channel_id: string;
+	streaming_channel_label: string;
 };
 
 export type IChannelsStream = {

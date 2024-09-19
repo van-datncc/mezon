@@ -1,5 +1,5 @@
 import { AvatarImage, Icons } from '@mezon/components';
-import { selectMemberClanByGoogleId } from '@mezon/store-mobile';
+import { selectMemberClanByGoogleId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { IChannelMember, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import Hls from 'hls.js';
@@ -111,8 +111,14 @@ function UserListStreamChannel({ memberJoin }: UserListStreamChannelProps) {
 
 function UserItem({ user }: { user: IChannelMember }) {
     const member = useSelector(selectMemberClanByGoogleId(user.user_id ?? ''));
-    const name = getNameForPrioritize(member?.clan_nick, member?.user?.display_name, member?.user?.username);
-    const avatar = getAvatarForPrioritize(member?.clan_avatar, member?.user?.avatar_url);
+    const userStream = useAppSelector(selectMemberClanByUserId(user.user_id ?? ''));
+    const clanNick = member ? member?.clan_nick : userStream?.clan_nick;
+    const displayName = member ? member?.user?.display_name : userStream?.user?.display_name;
+    const userName = member ? member?.user?.username : userStream?.user?.username;
+    const name = getNameForPrioritize(clanNick, displayName, userName);
+    const clanAvatar = member ? member?.clan_avatar : userStream?.clan_avatar;
+    const avatarUrl = member ? member?.user?.avatar_url : userStream?.user?.avatar_url;
+    const avatar = getAvatarForPrioritize(clanAvatar, avatarUrl);
 
     const checkUrl = (url: string | undefined) => {
         if (url !== undefined && url !== '') return true;
@@ -123,15 +129,15 @@ function UserItem({ user }: { user: IChannelMember }) {
 
     useEffect(() => {
         const getColor = async () => {
-            if (checkUrl(member?.user?.avatar_url)) {
-                const url = member?.user?.avatar_url;
+            if (checkUrl(avatarUrl)) {
+                const url = avatarUrl;
                 const colorImg = await getColorAverageFromURL(url || '');
                 if (colorImg) setColor(colorImg);
             }
         };
 
         getColor();
-    }, [member?.user?.avatar_url]);
+    }, [avatarUrl]);
     return (
         <div
             className="relative w-full h-full flex p-1 justify-center items-center gap-3 cursor-pointer rounded-lg"
@@ -139,23 +145,18 @@ function UserItem({ user }: { user: IChannelMember }) {
         >
             <div className="w-14 h-14 rounded-full">
                 <div className="w-14 h-14">
-                    {member ? (
-                        <AvatarImage
-                            alt={member?.user?.username || ''}
-                            userName={member?.user?.username}
-                            className="min-w-14 min-h-14 max-w-14 max-h-14"
-                            src={avatar}
-                        />
+                    {member || userStream ? (
+                        <AvatarImage alt={userName || ''} userName={userName} className="min-w-14 min-h-14 max-w-14 max-h-14" src={avatar} />
                     ) : (
                         <Icons.AvatarUser />
                     )}
                 </div>
             </div>
-            <div className='absolute left-1 bottom-1'>
-                {member ? (
+            <div className="absolute left-1 bottom-1">
+                {member || userStream ? (
                     <NameComponent id="" name={name || ''} />
                 ) : (
-                    <p className="text-sm font-medium dark:text-[#AEAEAE] text-colorTextLightMode">{user.participant} (guest)</p>
+                    <p className="text-sm font-medium dark:text-[#AEAEAE] text-colorTextLightMode">{user.participant}</p>
                 )}
             </div>
         </div>

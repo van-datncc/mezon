@@ -40,11 +40,10 @@ export const fetchStreamChannelMembers = createAsyncThunk(
 			return {
 				user_id: channelRes.user_id || '',
 				clan_id: clanId,
-				stream_channel_id: channelRes.channel_id || '',
+				streaming_channel_id: channelRes.channel_id || '',
 				clan_name: '',
 				participant: channelRes.participant || '',
-				stream_channel_label: '',
-				last_screenshot: '',
+				streaming_channel_label: '',
 				id: channelRes.id || ''
 			};
 		});
@@ -140,5 +139,5 @@ export const selectUsersStreamEntities = createSelector(getUsersStreamState, sel
 export const selectStreamMembersByChannelId = (channelId: string) =>
 	createSelector(selectUsersStreamEntities, (entities) => {
 		const streamMembers = Object.values(entities);
-		return streamMembers.filter((member) => member && member.stream_channel_id === channelId);
+		return streamMembers.filter((member) => member && member.streaming_channel_id === channelId);
 	});

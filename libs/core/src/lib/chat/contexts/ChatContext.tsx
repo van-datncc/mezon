@@ -5,6 +5,7 @@ import {
 	channelMetaActions,
 	channelsActions,
 	channelsSlice,
+	channelsStreamActions,
 	clansSlice,
 	directActions,
 	directMetaActions,
@@ -40,6 +41,7 @@ import {
 	useAppDispatch,
 	useAppSelector,
 	usersClanActions,
+	usersStreamActions,
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -67,6 +69,10 @@ import {
 	StickerDeleteEvent,
 	StickerUpdateEvent,
 	StreamPresenceEvent,
+	StreamingEndedEvent,
+	StreamingJoinedEvent,
+	StreamingLeavedEvent,
+	StreamingStartedEvent,
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
@@ -130,6 +136,47 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
 			dispatch(voiceActions.remove(voice.id));
+		},
+		[dispatch]
+	);
+
+	const onstreamingchanneljoined = useCallback(
+		(user: StreamingJoinedEvent) => {
+			if (user) {
+				dispatch(
+					usersStreamActions.add({
+						...user
+					})
+				);
+			}
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelleaved = useCallback(
+		(user: StreamingLeavedEvent) => {
+			dispatch(usersStreamActions.remove(user.id));
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelstarted = useCallback(
+		(channel: StreamingStartedEvent) => {
+			if (channel) {
+				dispatch(
+					channelsStreamActions.add({
+						...channel,
+						id: channel.channel_id
+					})
+				);
+			}
+		},
+		[dispatch]
+	);
+
+	const onstreamingchannelended = useCallback(
+		(channel: StreamingEndedEvent) => {
+			dispatch(usersStreamActions.remove(channel.channel_id));
 		},
 		[dispatch]
 	);
@@ -678,6 +725,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onvoiceleaved = onvoiceleaved;
 
+			socket.onstreamingchanneljoined = onstreamingchanneljoined;
+
+			socket.onstreamingchannelleaved = onstreamingchannelleaved;
+
+			socket.onstreamingchannelstarted = onstreamingchannelstarted;
+
+			socket.onstreamingchannelended = onstreamingchannelended;
+
 			socket.onchannelmessage = onchannelmessage;
 
 			socket.onchannelpresence = onchannelpresence;
@@ -757,6 +812,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onstatuspresence,
 			onvoicejoined,
 			onvoiceleaved,
+			onstreamingchanneljoined,
+			onstreamingchannelleaved,
+			onstreamingchannelstarted,
+			onstreamingchannelended,
 			oneventcreated,
 			oncoffeegiven,
 			onroleevent
@@ -811,43 +870,43 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => {};
+			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => {};
+			socket.onuserchannelremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => {};
+			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclandeleted = () => {};
+			socket.onclandeleted = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => {};
+			socket.onuserchanneladded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => {};
+			socket.onuserclanadded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickercreated = () => {};
+			socket.onstickercreated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerdeleted = () => {};
+			socket.onstickerdeleted = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerupdated = () => {};
+			socket.onstickerupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => {};
+			socket.onclanprofileupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncoffeegiven = () => {};
+			socket.oncoffeegiven = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onroleevent = () => {};
+			socket.onroleevent = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -871,6 +930,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		socketRef,
 		onvoicejoined,
 		onvoiceleaved,
+		onstreamingchanneljoined,
+		onstreamingchannelleaved,
+		onstreamingchannelstarted,
+		onstreamingchannelended,
 		onerror,
 		onchannelcreated,
 		onchanneldeleted,
@@ -904,3 +967,4 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+
