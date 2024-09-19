@@ -66,7 +66,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom, onChan
 				<ArrowLeftIcon width={20} height={20} color={Colors.textGray} />
 			</TouchableOpacity>
 			<View style={styles.searchBox}>
-				<Block marginRight={size.s_10}>
+				<Block marginRight={size.s_6}>
 					<Icons.MagnifyingIcon width={20} height={20} color={Colors.textGray} />
 				</Block>
 				<TextInput
@@ -75,7 +75,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom, onChan
 					onChangeText={handleTextChange}
 					style={styles.input}
 					placeholderTextColor={themeValue.text}
-					placeholder={!currentChannel?.channel_label ? t('search') : `${t('in')} ${currentChannel?.channel_label}`}
+					placeholder={t('search')}
 					autoFocus
 				></TextInput>
 				{!!textInput?.length ? (
