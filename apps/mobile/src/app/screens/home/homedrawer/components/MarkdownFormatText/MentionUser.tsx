@@ -1,15 +1,27 @@
-import { ChannelMembersEntity, UsersClanEntity } from '@mezon/store';
+import {
+	ChannelMembersEntity,
+	selectAllChannelMembers,
+	selectAllUserClans,
+	selectCurrentChannelId,
+	selectDmGroupCurrentId,
+	useAppSelector,
+	UsersClanEntity
+} from '@mezon/store';
 import { ChannelStreamMode } from 'mezon-js/client';
+import { useSelector } from 'react-redux';
 
 type IMentionUser = {
 	tagName: string;
 	roleId: string;
 	tagUserId: string;
 	mode: number;
-	usersClan: any;
-	usersInChannel: any;
 };
-export const MentionUser = ({ tagName, tagUserId, roleId, mode, usersClan, usersInChannel }: IMentionUser) => {
+export const MentionUser = ({ tagName, tagUserId, roleId, mode }: IMentionUser) => {
+	const usersClan = useAppSelector(selectAllUserClans);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
+	const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentDmGroupId || (currentChannelId as string)));
+
 	if (roleId) {
 		return `[${tagName}](@role${roleId})`;
 	}

@@ -1,15 +1,14 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
-import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities } from '@mezon/store-mobile';
+import { useAppSelector } from '@mezon/store';
+import { ChannelsEntity, selectChannelsEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
-import { useSelector } from 'react-redux';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { EmojiMarkup } from '../MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
@@ -369,9 +368,6 @@ export const RenderTextMarkdownContent = React.memo(
 	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
-		const usersClan = useAppSelector(selectAllUserClans);
-		const currentChannelId = useSelector(selectCurrentChannelId);
-		const usersInChannel = useAppSelector((state) => selectAllChannelMembers(state, currentChannelId as string));
 		const channelsEntities = useAppSelector(selectChannelsEntities);
 
 		if (isMessageReply) {
@@ -394,7 +390,7 @@ export const RenderTextMarkdownContent = React.memo(
 
 		let lastIndex = 0;
 
-		const contentRender = useMemo(() => {
+		const contentRender = () => {
 			let formattedContent = '';
 
 			elements.forEach((element) => {
@@ -422,9 +418,7 @@ export const RenderTextMarkdownContent = React.memo(
 						tagName: contentInElement,
 						roleId: element.role_id || '',
 						tagUserId: element.user_id,
-						mode,
-						usersClan,
-						usersInChannel
+						mode
 					});
 				}
 				if (element.kindOf === ETokenMessage.EMOJIS) {
@@ -458,7 +452,7 @@ export const RenderTextMarkdownContent = React.memo(
 				formattedContent += ` [${translate('edited')}](${EDITED_FLAG})`;
 			}
 			return formattedContent;
-		}, [elements, t, mode]);
+		};
 
 		const renderMarkdown = () => (
 			<Markdown
@@ -494,7 +488,7 @@ export const RenderTextMarkdownContent = React.memo(
 					}
 				}}
 			>
-				{formatBlockCode(contentRender?.trim(), isMessageReply)}
+				{formatBlockCode(contentRender()?.trim(), isMessageReply)}
 			</Markdown>
 		);
 
