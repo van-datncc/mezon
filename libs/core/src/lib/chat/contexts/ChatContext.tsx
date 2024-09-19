@@ -152,6 +152,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(directMetaActions.updateDMSocket(message));
 				dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 				dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+				if (mess.isMe) {
+					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
+				}
 			} else {
 				dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			}
@@ -712,13 +715,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			try {
 				const socket = await reconnect(clanIdActive ?? '');
 				if (!socket) {
-					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning' }));
+					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 					return;
 				}
-				window.location.reload();
+
+				if (window && navigator) {
+					if (navigator.onLine) {
+						window.location.reload();
+					} else {
+						dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+					}
+				}
+
 				setCallbackEventFn(socket as Socket);
 			} catch (error) {
-				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning' }));
+				dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 			}
 		},
 		[dispatch, clanIdActive, reconnect, setCallbackEventFn]

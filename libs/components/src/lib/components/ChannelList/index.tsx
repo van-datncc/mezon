@@ -1,7 +1,7 @@
 import { useCategory, useEscapeKey } from '@mezon/core';
 import { channelsActions, selectCurrentClan, selectTheme, useAppDispatch } from '@mezon/store';
 import { ICategoryChannel } from '@mezon/utils';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import CategorizedChannels from './CategorizedChannels';
@@ -9,7 +9,7 @@ import { Events } from './ChannelListComponents';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
-function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: number }) {
+function ChannelList() {
 	const dispatch = useAppDispatch();
 	const { categorizedChannels } = useCategory();
 	const appearanceTheme = useSelector(selectTheme);
@@ -43,4 +43,4 @@ function ChannelList({ channelCurrentType }: { readonly channelCurrentType?: num
 	);
 }
 
-export default ChannelList;
+export default memo(ChannelList);
