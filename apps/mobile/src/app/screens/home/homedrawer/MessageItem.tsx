@@ -20,6 +20,7 @@ import {
 	selectAllAccount,
 	selectAllRolesClan,
 	selectAllUserClans,
+	selectHasInternetMobile,
 	selectIdMessageToJump,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -91,6 +92,7 @@ const MessageItem = React.memo(
 		const idMessageToJump = useSelector(selectIdMessageToJump);
 		const usersClan = useSelector(selectAllUserClans);
 		const rolesInClan = useSelector(selectAllRolesClan);
+		const hasInternet = useSelector(selectHasInternetMobile);
 
 		const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 		const hasIncludeMention = useMemo(() => {
@@ -392,7 +394,7 @@ const MessageItem = React.memo(
 								createTime={message?.create_time}
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-							<Block opacity={message.isError ? 0.6 : 1}>
+							<Block opacity={message.isError || (message.isSending && !hasInternet) ? 0.6 : 1}>
 								<RenderTextMarkdownContent
 									content={{
 										...(typeof message.content === 'object' ? message.content : {}),

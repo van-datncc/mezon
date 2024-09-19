@@ -42,10 +42,6 @@ const ChannelMessages = React.memo(
 		const timeOutRef = useRef(null);
 
 		useEffect(() => {
-			if (flatListRef.current) {
-				flatListRef.current.scrollToEnd({ animated: true });
-			}
-
 			return () => {
 				if (timeOutRef?.current) clearTimeout(timeOutRef.current);
 			};
