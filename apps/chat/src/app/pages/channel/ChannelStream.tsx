@@ -54,7 +54,16 @@ function HLSPlayer({ src }: MediaPlayerProps) {
     }, [src]);
 
     return (
-        <video ref={videoRef} controls autoPlay playsInline style={{ width: '100%' }} />
+        <video
+            ref={videoRef}
+            controls
+            autoPlay
+            playsInline
+            muted
+            style={{ width: '100%' }}
+            controlsList="nodownload noremoteplayback noplaybackrate"
+            disablePictureInPicture
+        />
     );
 }
 
@@ -124,7 +133,10 @@ function UserItem({ user }: { user: IChannelMember }) {
         getColor();
     }, [member?.user?.avatar_url]);
     return (
-        <div className="relative w-full h-full flex p-1 justify-center items-center gap-3 cursor-pointer rounded-lg" style={{ backgroundColor: color }}>
+        <div
+            className="relative w-full h-full flex p-1 justify-center items-center gap-3 cursor-pointer rounded-lg"
+            style={{ backgroundColor: color ? color : 'grey' }}
+        >
             <div className="w-14 h-14 rounded-full">
                 <div className="w-14 h-14">
                     {member ? (
