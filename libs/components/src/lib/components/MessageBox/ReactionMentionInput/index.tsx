@@ -17,6 +17,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
+	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectAttachmentByChannelId,
@@ -26,7 +27,6 @@ import {
 	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
-	selectHashtagDMByDirectId,
 	selectIdMessageRefEdit,
 	selectIsFocused,
 	selectIsSearchMessage,
@@ -66,7 +66,6 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import textFieldEdit from 'text-field-edit';
 import { Icons, ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
@@ -124,7 +123,6 @@ export type MentionReactInputProps = {
 };
 
 const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
-	const { directId } = useParams();
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const roleList = getRoleList(rolesInClan);
 	const { channels } = useChannels();
@@ -132,7 +130,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 	const dispatch = useAppDispatch();
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { setSubPanelActive } = useGifsStickersEmoji();
-	const commonChannelDms = useSelector(selectHashtagDMByDirectId(directId || ''));
+	const commonChannelDms = useSelector(selectAllHashtagDm);
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
 

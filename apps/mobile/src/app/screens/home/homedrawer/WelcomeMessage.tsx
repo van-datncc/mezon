@@ -5,6 +5,7 @@ import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { friendsActions, selectChannelById, selectDmGroupCurrent, selectFriendStatus, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
+import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +26,10 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const isChannel = useMemo(() => {
 		return currenChannel?.parrent_id === '0';
 	}, [currenChannel?.parrent_id]);
+
+	const isThreadPrivate = useMemo(() => {
+		return currenChannel ? currenChannel.channel_private : false;
+	}, [currenChannel?.channel_private]);
 
 	const isDM = useMemo(() => {
 		return currenChannel?.clan_id === '0';
@@ -88,8 +93,12 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 			) : (
 				<View style={styles.iconWelcomeMessage}>
 					{isChannel ? (
+						currenChannel?.channel_private === ChannelStatusEnum.isPrivate ? 
+						<Icons.TextLockIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} /> :
 						<Icons.TextIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
 					) : (
+						isThreadPrivate ? 
+						<Icons.ThreadLockIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} /> :
 						<Icons.ThreadIcon width={size.s_50} height={size.s_50} color={themeValue.textStrong} />
 					)}
 				</View>

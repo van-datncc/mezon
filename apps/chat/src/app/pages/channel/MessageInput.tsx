@@ -1,6 +1,6 @@
 import { CustomModalMentions, SuggestItem, UserMentionList } from '@mezon/components';
-import { useAppParams, useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { selectAllRolesClan, selectChannelDraftMessage, selectHashtagDMByDirectId, selectTheme, useAppSelector } from '@mezon/store';
+import { useChannels, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
+import { selectAllHashtagDm, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
 import {
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -193,8 +193,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			setTitleMention('Emoji matching');
 		}
 	};
-	const { directId } = useAppParams();
-	const commonChannels = useSelector(selectHashtagDMByDirectId(directId || ''));
+	const commonChannels = useSelector(selectAllHashtagDm);
 
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const commonChannelsMention: ChannelsMentionProps[] = useMemo(() => {
