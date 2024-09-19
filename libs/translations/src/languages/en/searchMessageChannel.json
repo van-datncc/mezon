@@ -7,5 +7,6 @@
   "members": "Members",
   "channels": "Channels",
   "media": "Media",
-  "pins": "Pins"
+  "pins": "Pins",
+  "in": "in:"
 }
