@@ -162,7 +162,6 @@ type StatusFriendProps = {
 
 const StatusFriend = memo((props: StatusFriendProps) => {
 	const { userName = '' } = props;
-	console.log('userName: ', userName);
 	const userID = useSelector(selectUserIdCurrentDm);
 	const checkAddFriend = useSelector(selectFriendStatus(userID[0] || ''));
 	const { acceptFriend, deleteFriend, addFriend } = useFriends();
