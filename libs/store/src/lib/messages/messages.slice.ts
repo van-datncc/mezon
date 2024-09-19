@@ -1188,7 +1188,7 @@ export const selectLastSeenMessage = (channelId: string, messageId: string) =>
 
 export const selectIsViewingOlderMessagesByChannelId = (channelId: string) =>
 	createSelector(getMessagesState, (state) => {
-		return state.isViewingOlderMessagesByChannelId[channelId] || false;
+		return (state.isViewingOlderMessagesByChannelId[channelId] && state.channelMessages[channelId]?.ids.length) || false;
 	});
 
 export const selectMessageIsLoading = createSelector(getMessagesState, (state) => state.loadingStatus === 'loading');
@@ -1346,7 +1346,6 @@ const handleLimitMessage = (
 
 const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelId: string) => {
 	const channelLastMessage = state.lastMessageByChannel[channelId];
-
 	if (!channelLastMessage) {
 		return false;
 	}
