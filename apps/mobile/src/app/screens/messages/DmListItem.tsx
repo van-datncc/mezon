@@ -46,6 +46,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	}, [directMessage]);
 
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
+		if (!content) return null;
 		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
 		const lastMessageSender = otherMemberList.find((it) => it.userId === directMessage?.last_sent_message?.sender_id);
 		const isUnread = Boolean(lastMessageSender) && isUnReadChannel;
@@ -79,7 +80,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	};
 
 	const lastMessageTime = useMemo(() => {
-		if (directMessage?.last_sent_message?.content) {
+		if (directMessage?.last_sent_message?.timestamp_seconds) {
 			const timestamp = Number(directMessage?.last_sent_message?.timestamp_seconds);
 			return moment.unix(timestamp).format('DD/MM/YYYY HH:mm');
 		}
@@ -124,7 +125,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 					{lastMessageTime ? <Text style={[styles.defaultText, styles.dateTime]}>{lastMessageTime}</Text> : null}
 				</View>
 
-				{lastMessageTime ? getLastMessageContent(directMessage?.last_sent_message?.content) : null}
+				{getLastMessageContent(directMessage?.last_sent_message?.content)}
 			</View>
 		</TouchableOpacity>
 	);
