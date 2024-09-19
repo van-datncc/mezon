@@ -266,10 +266,6 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 		return previous;
 	}, [listDirectSearch, previousChannels, totalListsSorted]);
 
-	console.log('totalListsSorted', totalListsSorted);
-	console.log('listDirectSearch', listDirectSearch);
-	console.log('listPrevious', listPrevious);
-
 	// Define a function to get the list to use based on the search text
 	const getListToUse = (
 		normalizeSearchText: string,
