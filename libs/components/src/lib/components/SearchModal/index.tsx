@@ -118,7 +118,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				avatarUser: user?.avatar_url ?? '',
 				displayName: user?.display_name ?? '',
 				lastSentTimeStamp: '0',
-				idDM: '',
+				idDM: undefined,
 				typeChat: TypeSearch.Dm_Type,
 				type: ChannelType.CHANNEL_TYPE_DM
 			});
@@ -128,17 +128,18 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const handleSelectMem = useCallback(
 		async (user: any) => {
-			if (user?.idDM) {
-				dispatch(directActions.openDirectMessage({ channelId: user.idDM || '', clanId: '0' }));
+			const foundDirect = listDirectSearch.find((item) => item.id === user.id);
+			if (foundDirect !== undefined) {
+				dispatch(directActions.openDirectMessage({ channelId: foundDirect.idDM || '', clanId: '0' }));
 				const result = await dispatch(
 					directActions.joinDirectMessage({
-						directMessageId: user.idDM,
+						directMessageId: foundDirect.idDM ?? '',
 						channelName: '',
-						type: user?.type ?? ChannelType.CHANNEL_TYPE_DM
+						type: foundDirect?.type ?? ChannelType.CHANNEL_TYPE_DM
 					})
 				);
 				if (result) {
-					navigate(toDmGroupPageFromMainApp(user.idDM, user?.type ?? ChannelType.CHANNEL_TYPE_DM));
+					navigate(toDmGroupPageFromMainApp(foundDirect.idDM ?? '', user?.type ?? ChannelType.CHANNEL_TYPE_DM));
 				}
 			} else {
 				const response = await createDirectMessageWithUser(user.id);
@@ -199,11 +200,15 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	const totalLists = useMemo(() => {
 		const list = listMemberSearch.concat(listChannelSearch);
 		listDirectSearch.forEach((dm) => {
-			if (dm.type === ChannelType.CHANNEL_TYPE_DM && !allUsesInAllClansEntities[dm?.id || '0']) {
+			if (
+				dm.type === ChannelType.CHANNEL_TYPE_DM ||
+				(dm.type === ChannelType.CHANNEL_TYPE_GROUP && !allUsesInAllClansEntities[dm?.id || '0'])
+			) {
 				list.push(dm);
 			}
 		});
-		const sortedList = list.slice().sort((a, b) => b.lastSentTimeStamp - a.lastSentTimeStamp);
+		const removeDuplicateList = removeDuplicatesById(list.filter((item) => item?.id !== accountId));
+		const sortedList = removeDuplicateList.slice().sort((a: any, b: any) => b.lastSentTimeStamp - a.lastSentTimeStamp);
 		return sortedList;
 	}, [listDirectSearch, listChannelSearch]);
 
