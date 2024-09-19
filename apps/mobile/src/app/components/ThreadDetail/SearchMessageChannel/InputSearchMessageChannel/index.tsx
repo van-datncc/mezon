@@ -1,4 +1,4 @@
-import { AngleLeft, ArrowLeftIcon, EOpenSearchChannelFrom, FilterSearchIcon, Icons, IOption } from '@mezon/mobile-components';
+import { AngleLeft, ArrowLeftIcon, EOpenSearchChannelFrom, FilterSearchIcon, Icons, IOption, IUerMention } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
@@ -11,16 +11,19 @@ import ListOptionSearch from '../ListOptionSearch';
 import { style } from './InputSearchMessageChannel.styles';
 import { useRef } from 'react';
 import { useEffect } from 'react';
+import { IChannel } from '@mezon/utils';
+import { DirectEntity } from '@mezon/store-mobile';
 
 type InputSearchMessageChannelProps = {
 	onChangeText: (value: string) => void;
 	openSearchChannelFrom: EOpenSearchChannelFrom;
   onChangeOptionFilter: (option: IOption) => void;
   inputValue: string;
-  userMention: any
+  userMention: IUerMention;
+  currentChannel: IChannel | DirectEntity
 };
 
-const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom, onChangeOptionFilter , inputValue, userMention}: InputSearchMessageChannelProps) => {
+const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom, onChangeOptionFilter , inputValue, userMention, currentChannel}: InputSearchMessageChannelProps) => {
 	const [textInput, setTextInput] = useState<string>(inputValue);
 	const [isIconClear, setIsIconClear] = useState<boolean>(false);
 	const [isVisibleToolTip, setIsVisibleToolTip] = useState<boolean>(false);
@@ -63,16 +66,16 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom, onChan
 				<ArrowLeftIcon width={20} height={20} color={Colors.textGray} />
 			</TouchableOpacity>
 			<View style={styles.searchBox}>
-				<View>
+				<Block marginRight={size.s_10}>
 					<Icons.MagnifyingIcon width={20} height={20} color={Colors.textGray} />
-				</View>
+				</Block>
 				<TextInput
           ref={inputSearchRef}
 					value={textInput}
 					onChangeText={handleTextChange}
 					style={styles.input}
-					placeholderTextColor={Colors.textGray}
-					placeholder={t('search')}
+					placeholderTextColor={themeValue.text}
+					placeholder={!currentChannel?.channel_label ? t('search') : `${t('in')} ${currentChannel?.channel_label}`}
 					autoFocus
 				></TextInput>
 				{!!textInput?.length ? (

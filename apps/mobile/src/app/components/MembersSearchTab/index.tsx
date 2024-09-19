@@ -12,7 +12,6 @@ import style from './MembersSearchTab.styles';
 type MembersSearchTabProps = {
 	listMemberSearch: {
 		avatarUser: string;
-		displayName: string;
 		id: string;
 		name: string;
 		typeChat?: number;
