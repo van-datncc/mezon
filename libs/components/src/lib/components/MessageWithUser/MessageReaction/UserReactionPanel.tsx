@@ -181,12 +181,12 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 				<AvatarImage
 					className="w-8 h-8"
 					alt="user avatar"
-					userName={user?.clan_nick || user?.user?.username}
+					userName={user?.clan_nick || user?.user?.display_name || user?.user?.username}
 					src={user?.clan_avatar || user?.user?.avatar_url}
 				/>
 			</div>
 
-			<NameComponent id={sender.sender_id ?? ''} name={user?.clan_nick || user?.user?.display_name} />
+			<NameComponent id={sender.sender_id ?? ''} name={user?.clan_nick || user?.user?.display_name || user?.user?.username} />
 			<p className="text-xs absolute right-8 dark:text-textDarkTheme text-textLightTheme">{sender.count}</p>
 			{sender.sender_id === userId.userId && sender.count && sender.count > 0 && (
 				<div onClick={handleRemoveEmojiSender} className="right-1 absolute cursor-pointer">
