@@ -1,6 +1,12 @@
 import { ACTIVE_TAB } from '@mezon/mobile-components';
 import { Block } from '@mezon/mobile-ui';
-import { DirectEntity, selectAllChannelsByUser, selectAllUsersByUser, selectTotalResultSearchMessage } from '@mezon/store-mobile';
+import {
+	DirectEntity,
+	selectAllChannelsByUser,
+	selectAllUsersByUser,
+	selectMessageSearchByChannelId,
+	selectTotalResultSearchMessage
+} from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects } from '@mezon/utils';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,10 +30,11 @@ export function normalizeString(str: string): string {
 }
 function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
-	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MESSAGES);
+	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
 	const listChannels = useSelector(selectAllChannelsByUser);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
+	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
 
 	const normalizeSearchText = useMemo(() => {
 		return normalizeString(searchText);
@@ -40,7 +47,7 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 				return normalizeString(channel?.channel_label).includes(normalizeSearchText);
 			}) || []
 		).sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'channel_label'));
-	}, [listChannels, searchText]);
+	}, [listChannels, searchText, normalizeSearchText]);
 
 	const listMembers = useMemo(() => {
 		return allUsesInAllClans?.map((itemUserClan) => ({
@@ -61,14 +68,10 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 				return normalizeString(member?.user?.username)?.includes(normalizeSearchText);
 			})
 			.sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'display_name'));
-	}, [listMembers, searchText]);
+	}, [listMembers, searchText, normalizeSearchText]);
 
 	const TabList = useMemo(() => {
 		return [
-			{
-				title: 'Messages',
-				quantitySearch: totalResult
-			},
 			{
 				title: t('members'),
 				quantitySearch: searchText && membersSearch?.length
@@ -76,6 +79,10 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 			{
 				title: t('channels'),
 				quantitySearch: searchText && channelsSearch?.length
+			},
+			{
+				title: t('Messages'),
+				quantitySearch: totalResult
 			}
 		];
 	}, [channelsSearch, membersSearch, searchText, t, totalResult]);
@@ -87,7 +94,7 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 	const renderContent = () => {
 		switch (activeTab) {
 			case ACTIVE_TAB.MESSAGES:
-				return <MessagesSearchTab currentChannel={currentChannel} />;
+				return <MessagesSearchTab messageSearchByChannelId={messageSearchByChannelId} />;
 			case ACTIVE_TAB.MEMBER:
 				return <MembersSearchTab listMemberSearch={membersSearch} />;
 			case ACTIVE_TAB.CHANNEL:

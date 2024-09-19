@@ -63,8 +63,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom, onChan
 					navigation.goBack();
 				}}
 			>
-				{openSearchChannelFrom === EOpenSearchChannelFrom.ActionMenu && <AngleLeft width={20} height={20} color={Colors.textGray} />}
-				{openSearchChannelFrom === EOpenSearchChannelFrom.ChannelList && <ArrowLeftIcon width={20} height={20} color={Colors.textGray} />}
+				<ArrowLeftIcon width={20} height={20} color={Colors.textGray} />
 			</TouchableOpacity>
 			<View style={styles.searchBox}>
 				<Block marginRight={size.s_10}>
@@ -76,7 +75,7 @@ const InputSearchMessageChannel = ({ onChangeText, openSearchChannelFrom, onChan
 					onChangeText={handleTextChange}
 					style={styles.input}
 					placeholderTextColor={themeValue.text}
-					placeholder={openSearchChannelFrom === EOpenSearchChannelFrom.ChannelList ? t('search') : `${t('in')} ${currentChannel?.channel_label}`}
+					placeholder={!currentChannel?.channel_label ? t('search') : `${t('in')} ${currentChannel?.channel_label}`}
 					autoFocus
 				></TextInput>
 				{!!textInput?.length ? (
