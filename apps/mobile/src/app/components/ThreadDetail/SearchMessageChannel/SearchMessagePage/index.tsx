@@ -36,39 +36,23 @@ function SearchMessagePage({ searchText, currentChannel }: ISearchMessagePagePro
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
 	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
 
-	const normalizeSearchText = useMemo(() => {
-		return normalizeString(searchText);
-	}, [searchText]);
-
 	const channelsSearch = useMemo(() => {
 		if (!searchText) return listChannels;
 		return (
 			listChannels?.filter((channel) => {
-				return normalizeString(channel?.channel_label).includes(normalizeSearchText);
+				return channel?.channel_label?.toLowerCase().includes(searchText?.toLowerCase());
 			}) || []
 		).sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'channel_label'));
-	}, [listChannels, searchText, normalizeSearchText]);
+	}, [listChannels, searchText]);
 
-	const listMembers = useMemo(() => {
-		return allUsesInAllClans?.map((itemUserClan) => ({
-			id: itemUserClan?.id ?? '',
-			name: itemUserClan?.display_name ?? '',
-			avatarUser: itemUserClan?.avatar_url ?? '',
-			user: {
-				username: itemUserClan?.display_name ?? '',
-				avatar_url: itemUserClan?.avatar_url ?? '',
-				id: itemUserClan?.id ?? ''
-			}
-		}));
-	}, [allUsesInAllClans]);
 	const membersSearch = useMemo(() => {
-		if (!searchText) return listMembers;
-		return listMembers
+		if (!searchText) return allUsesInAllClans;
+		return allUsesInAllClans
 			?.filter((member) => {
-				return normalizeString(member?.user?.username)?.includes(normalizeSearchText);
+				return member?.username?.toLowerCase()?.includes(searchText?.toLowerCase());
 			})
 			.sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'display_name'));
-	}, [listMembers, searchText, normalizeSearchText]);
+	}, [allUsesInAllClans, searchText]);
 
 	const TabList = useMemo(() => {
 		return [
