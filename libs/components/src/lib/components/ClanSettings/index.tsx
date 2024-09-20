@@ -57,7 +57,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 	const currentClanId = useSelector(selectCurrentClanId) as string;
 	const currentChannelId = useSelector(selectCurrentChannelId) as string;
 	useEffect(() => {
-		dispatch(fetchWebhooks({ channelId: 'asdasdasdasdasasd', clanId: currentClanId }));
+		dispatch(fetchWebhooks({ channelId: currentChannelId, clanId: currentClanId }));
 	});
 
 	useEffect(() => {
