@@ -1,6 +1,6 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
 import { reactionActions, selectAllNotification, selectTotalUnreadDM } from '@mezon/store';
-import { MezonSuspense, SocketStatus, useMezon } from '@mezon/transport';
+import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 const GlobalEventListener = () => {
-	const { socketStatus } = useMezon();
 	const { handleReconnect } = useContext(ChatContext);
 	const navigate = useNavigate();
 	const allNotify = useSelector(selectAllNotification);
@@ -20,9 +19,7 @@ const GlobalEventListener = () => {
 		const handleNavigateToPath = (_: unknown, path: string) => {
 			navigate(path);
 		};
-
 		window.electron?.on('navigate-to-path', handleNavigateToPath);
-
 		return () => {
 			window.electron?.removeListener('navigate-to-path', handleNavigateToPath);
 		};
@@ -31,19 +28,17 @@ const GlobalEventListener = () => {
 	useEffect(() => {
 		const reconnectSocket = debounce(() => {
 			if (document.visibilityState === 'visible') {
-				if (socketStatus.current === SocketStatus.CONNECT_FAILURE) {
-					handleReconnect('Socket disconnected, attempting to reconnect...');
-				}
+				handleReconnect('Socket disconnected, attempting to reconnect...');
 			}
 		}, 100);
 
-		document.addEventListener('visibilitychange', reconnectSocket);
+		window.addEventListener('focus', reconnectSocket);
 		window.addEventListener('online', reconnectSocket);
 		return () => {
-			document.removeEventListener('visibilitychange', reconnectSocket);
+			window.removeEventListener('focus', reconnectSocket);
 			window.removeEventListener('online', reconnectSocket);
 		};
-	}, [handleReconnect, socketStatus]);
+	}, [handleReconnect]);
 
 	useEffect(() => {
 		const notificationCount = allNotify.length + totalUnreadDM + quantityPendingRequest;
