@@ -21,6 +21,7 @@
         "./node_modules/windows-focus-assist/build/Release//*.node"
       ],
       "mac": {
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
         "icon": "apps/desktop/src/assets/mac-icon.png",
         "appId": "mezon.ai",
         "target": [
@@ -151,6 +152,7 @@
         "outputPath": "dist/packages",
         "prepackageOnly": true,
         "mac": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "icon": "apps/desktop/src/assets/mac-icon.png",
           "appId": "mezon.ai",
           "target": [
@@ -221,6 +223,7 @@
         "sourcePath": "dist/apps",
         "outputPath": "dist/executables",
         "mac": {
+          "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
           "icon": "apps/desktop/src/assets/mac-icon.png",
           "appId": "mezon.ai",
           "target": [
