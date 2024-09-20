@@ -2,6 +2,7 @@ import { Icons } from '@mezon/components';
 import { version } from '@mezon/package-js';
 import { selectIsLogin } from '@mezon/store';
 import { Image } from '@mezon/ui';
+import { getPlatform } from '@mezon/utils';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -12,28 +13,28 @@ import SideBar from './sidebar';
 function Homepage() {
 	const isLogin = useSelector(selectIsLogin);
 	const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
-
+	const platform = getPlatform();
 	const toggleSideBar = () => {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
 
 	const IconByOS: React.JSX.Element = useMemo(() => {
-		if (navigator.userAgent.includes('Mac')) {
+		if (platform === 'MacOS') {
 			return <Icons.MacIcon className="text-black w-[35px]" />;
-		} else if (navigator.userAgent.includes('Linux')) {
+		} else if (platform === 'Linux') {
 			return <Icons.LinuxIcon className="text-black w-[35px]" />;
 		}
 		return <Icons.WindowIcon className="text-black w-[35px]" />;
-	}, []);
+	}, [platform]);
 
 	const downloadUrl: string = useMemo(() => {
-		if (navigator.userAgent.includes('Mac')) {
+		if (platform === 'MacOS') {
 			return `https://cdn.mezon.vn/release/Mezon-${version}-arm64-mac.zip`;
-		} else if (navigator.userAgent.includes('Linux')) {
+		} else if (platform === 'Linux') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-linux-amd64.deb`;
 		}
 		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
-	}, []);
+	}, [platform]);
 
 	return (
 		<div className="relative">
