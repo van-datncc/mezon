@@ -31,7 +31,7 @@
     "build:desktop": "yarn install:desktop && yarn build:desktop:app && yarn build:desktop:renderer",
     "package:desktop": "nx run desktop:package",
     "make:desktop": "nx run desktop:make",
-    "release:desktop": "yarn build:desktop && yarn package:desktop && yarn make:desktop",
+    "release:desktop": "yarn build:desktop --verbose && yarn package:desktop --verbose && yarn make:desktop --verbose",
     "prepare": "husky"
   },
   "private": true,
