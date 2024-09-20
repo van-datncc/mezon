@@ -21,9 +21,7 @@ import {
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
 	selectStatusMenu,
-	selectTheme,
-	selectTotalClansNotify,
-	selectTotalUnreadDM
+	selectTheme
 } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
@@ -45,8 +43,6 @@ function MyApp() {
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
-	const totalClanNotify = useSelector(selectTotalClansNotify);
-	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 

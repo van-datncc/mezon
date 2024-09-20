@@ -106,6 +106,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setCoords({ mouseX, mouseY, distanceToBottom });
 				setIsShowPanelChannel((s) => !s);
 			}
+
 			dispatch(notificationActions.removeNotificationsByChannelId(channel.channel_id ?? ''));
 		};
 
