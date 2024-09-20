@@ -165,10 +165,16 @@ function MyApp() {
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 
 	useEffect(() => {
-		if (isElectron()) {
-			electronBridge?.setBadgeCount(allNotify.length + totalUnreadDM);
+		const notificationCount = allNotify.length + totalUnreadDM + quantityPendingRequest;
+		if (notificationCount > 0) {
+			document.title = `Mezon (${notificationCount}) Notification${notificationCount > 1 ? 's' : ''}`;
+		} else {
+			document.title = 'Mezon';
 		}
-	}, [allNotify.length, totalUnreadDM]);
+		if (isElectron()) {
+			electronBridge?.setBadgeCount(notificationCount);
+		}
+	}, [allNotify.length, totalUnreadDM, quantityPendingRequest]);
 
 	return (
 		<div
