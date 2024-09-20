@@ -22,10 +22,14 @@ jobs:
         run: |
           cp apps/chat/prod.env apps/chat/.env
 
-      - name: Release Desktop
+      # - name: Release Desktop
+      #   run: |
+      #     security unlock-keychain -p $KEYCHAIN_PASSWORD login.keychain
+      #     yarn release:desktop
+      #   env:
+      #     USE_HARD_LINKS: false
+      #     KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+
+      - name: Push to MinIO
         run: |
-          security unlock-keychain -p $KEYCHAIN_PASSWORD login.keychain
-          yarn release:desktop
-        env:
-          USE_HARD_LINKS: false
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          mc ls mezon-app/mezon/release
