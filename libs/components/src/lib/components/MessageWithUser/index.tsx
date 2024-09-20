@@ -160,9 +160,7 @@ function MessageWithUser({
 						<div className="relative rounded-sm overflow-visible">
 							<div className={childDivClass}></div>
 							<div className={parentDivClass}>
-								{checkMessageHasReply && (
-									<MessageReply message={message} mode={mode} allowDisplayShortProfile={allowDisplayShortProfile} />
-								)}
+								{checkMessageHasReply && <MessageReply message={message} mode={mode} onClick={handleOpenShortUser} />}
 								<div
 									className={`justify-start gap-4 inline-flex w-full relative h-fit overflow-visible ${isSearchMessage ? '' : 'pr-12'}`}
 								>
