@@ -23,6 +23,9 @@ jobs:
           cp apps/chat/prod.env apps/chat/.env
 
       - name: Release Desktop
-        run: yarn release:desktop
+        run: |
+          security unlock-keychain -p $KEYCHAIN_PASSWORD login.keychain
+          yarn release:desktop
         env:
           USE_HARD_LINKS: false
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
