@@ -2,8 +2,7 @@ name: Release Mezon App for ARM MacOS
 
 on: 
   release:
-    tags:
-      - *
+    types: [published]
 
 jobs:
   release:
