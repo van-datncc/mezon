@@ -1,16 +1,20 @@
-import { ChatContext, ChatContextProvider, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions } from '@mezon/store';
+import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
+import { reactionActions, selectAllNotification, selectTotalUnreadDM } from '@mezon/store';
 import { MezonSuspense, SocketStatus, useMezon } from '@mezon/transport';
-import { SubPanelName } from '@mezon/utils';
+import { SubPanelName, electronBridge } from '@mezon/utils';
+import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
 import { useContext, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 const GlobalEventListener = () => {
 	const { socketStatus } = useMezon();
 	const { handleReconnect } = useContext(ChatContext);
 	const navigate = useNavigate();
+	const allNotify = useSelector(selectAllNotification);
+	const totalUnreadDM = useSelector(selectTotalUnreadDM);
+	const { quantityPendingRequest } = useFriends();
 
 	useEffect(() => {
 		const handleNavigateToPath = (_: unknown, path: string) => {
@@ -40,6 +44,18 @@ const GlobalEventListener = () => {
 			window.removeEventListener('online', reconnectSocket);
 		};
 	}, [handleReconnect, socketStatus]);
+
+	useEffect(() => {
+		const notificationCount = allNotify.length + totalUnreadDM + quantityPendingRequest;
+		if (notificationCount > 0) {
+			document.title = `Mezon (${notificationCount}) Notification${notificationCount > 1 ? 's' : ''}`;
+		} else {
+			document.title = 'Mezon';
+		}
+		if (isElectron()) {
+			electronBridge?.setBadgeCount(notificationCount);
+		}
+	}, [allNotify.length, totalUnreadDM, quantityPendingRequest]);
 
 	return null;
 };
