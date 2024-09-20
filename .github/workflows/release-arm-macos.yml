@@ -1,8 +1,9 @@
 name: Release Mezon App for ARM MacOS
 
 on: 
-  push:
-    branches: [cicd]
+  release:
+    tags:
+      - *
 
 jobs:
   release:
@@ -22,14 +23,16 @@ jobs:
         run: |
           cp apps/chat/prod.env apps/chat/.env
 
-      # - name: Release Desktop
-      #   run: |
-      #     security unlock-keychain -p $KEYCHAIN_PASSWORD login.keychain
-      #     yarn release:desktop
-      #   env:
-      #     USE_HARD_LINKS: false
-      #     KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      - name: Release Desktop
+        run: |
+          security unlock-keychain -p $KEYCHAIN_PASSWORD login.keychain
+          yarn release:desktop
+        env:
+          USE_HARD_LINKS: false
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 
       - name: Push to MinIO
         run: |
-          mc ls mezon-app/mezon/release
+          mc cp dist/executables/latest-mac.yml mezon-app/mezon/release/latest-mac.yml
+          mc cp dist/executables/mezon-*-mac-arm64.dmg mezon-app/mezon/release/
+          mc cp dist/executables/mezon-*-mac-arm64.zip mezon-app/mezon/release/
