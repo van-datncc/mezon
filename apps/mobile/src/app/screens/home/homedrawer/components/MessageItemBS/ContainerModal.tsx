@@ -78,8 +78,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		if (messagePosition === -1) return false;
 		return (
 			message?.isStartedMessageGroup &&
-			messagePosition < convertedAllMessagesEntities?.length - 1 &&
-			!convertedAllMessagesEntities[messagePosition + 1]?.isStartedMessageGroup
+			messagePosition < (convertedAllMessagesEntities?.length || 0 - 1) &&
+			!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
 		);
 	};
 
