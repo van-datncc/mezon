@@ -1,7 +1,8 @@
 import { Icons } from '@mezon/components';
+import { version } from '@mezon/package-js';
 import { selectIsLogin } from '@mezon/store';
 import { Image } from '@mezon/ui';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import DancingRobot from '../../../assets/dancing-robot.gif';
@@ -15,12 +16,24 @@ function Homepage() {
 	const toggleSideBar = () => {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
-	let linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.61-win-x64.exe';
-	if (navigator.userAgent.includes('Mac')) {
-		linkDownload = 'https://cdn.mezon.vn/release/Mezon-1.1.61-arm64-mac.zip';
-	} else if (navigator.userAgent.includes('Linux')) {
-		linkDownload = 'https://cdn.mezon.vn/release/mezon-1.1.61-linux-amd64.deb';
-	}
+
+	const IconByOS: React.JSX.Element = useMemo(() => {
+		if (navigator.userAgent.includes('Mac')) {
+			return <Icons.MacIcon className="text-black w-[35px]" />;
+		} else if (navigator.userAgent.includes('Linux')) {
+			return <Icons.LinuxIcon className="text-black w-[35px]" />;
+		}
+		return <Icons.WindowIcon className="text-black w-[35px]" />;
+	}, []);
+
+	const downloadUrl: string = useMemo(() => {
+		if (navigator.userAgent.includes('Mac')) {
+			return `https://cdn.mezon.vn/release/Mezon-${version}-arm64-mac.zip`;
+		} else if (navigator.userAgent.includes('Linux')) {
+			return `https://cdn.mezon.vn/release/mezon-${version}-linux-amd64.deb`;
+		}
+		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
+	}, []);
 
 	return (
 		<div className="relative">
@@ -104,11 +117,11 @@ function Homepage() {
 							<a
 								style={{ borderRadius: '28px' }}
 								className="max-md:w-7/12 max-sm:w-11/12 flex items-center gap-2 justify-center text-black bg-white px-[32px] py-[16px] text-[20px] font-semibold leading-[24px] cursor-pointer hoverBoxShadow"
-								href={linkDownload}
+								href={downloadUrl}
 								target="_blank"
 								rel="noreferrer"
 							>
-								<Icons.WindowIcon className="text-black w-[35px]" />
+								{IconByOS}
 								<div>Download for Desktop</div>
 							</a>
 						</div>
