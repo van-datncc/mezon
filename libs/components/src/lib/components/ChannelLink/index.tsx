@@ -1,5 +1,13 @@
 import { useChannels, useMenu, useOnClickOutside } from '@mezon/core';
-import { channelsActions, notificationSettingActions, selectCloseMenu, threadsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	channelsActions,
+	notificationActions,
+	notificationSettingActions,
+	selectCloseMenu,
+	threadsActions,
+	useAppDispatch,
+	voiceActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, MouseButton } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
@@ -98,6 +106,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setCoords({ mouseX, mouseY, distanceToBottom });
 				setIsShowPanelChannel((s) => !s);
 			}
+			dispatch(notificationActions.removeNotificationsByChannelId(channel.channel_id ?? ''));
 		};
 
 		useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
