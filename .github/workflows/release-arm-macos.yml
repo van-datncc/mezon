@@ -24,3 +24,5 @@ jobs:
 
       - name: Release Desktop
         run: yarn release:desktop
+        env:
+          USE_HARD_LINKS: false
