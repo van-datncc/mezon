@@ -28,36 +28,17 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	return (
 		<div className={`flex flex-row items-center relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}>
 			<div className="absolute flex text-zinc-400 text-lg pb-0">
-				{closeMenu ? (
-					statusMenu ? (
-						<>
-							{isPrivate === ChannelStatusEnum.isPrivate && (isChannelVoice || isChannelStream) && (
-								<Icons.SpeakerLocked defaultSize="w-6 h-6" />
-							)}
-							{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
-							{isPrivate === undefined && (isChannelVoice || isChannelStream) && (
-								<Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
-							)}
-							{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
-						</>
-					) : (
-						<div className="flex items-end" onClick={() => setStatusMenu(true)} role="button">
-							<Icons.OpenMenu />
-						</div>
-					)
-				) : (
-					<>
-						{isPrivate === ChannelStatusEnum.isPrivate && (isChannelVoice || isChannelStream) && (
-							<Icons.SpeakerLocked defaultSize="w-6 h-6" />
-						)}
-						{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
-						{isPrivate === undefined && (isChannelVoice || isChannelStream) && <Icons.Speaker defaultSize="w-6 h-6" />}
-						{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
-					</>
+				{closeMenu && !statusMenu && (
+					<div className="flex items-end" onClick={() => setStatusMenu(true)} role="button">
+						<Icons.OpenMenu />
+					</div>
 				)}
-				{isPrivate === ChannelStatusEnum.isPrivate && isChannelVoice && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
+
+				{isPrivate === ChannelStatusEnum.isPrivate && (isChannelVoice || isChannelStream) && <Icons.SpeakerLocked defaultSize="w-6 h-6" />}
 				{isPrivate === ChannelStatusEnum.isPrivate && isChannelText && <Icons.HashtagLocked defaultSize="w-6 h-6 " />}
-				{isPrivate === undefined && isChannelVoice && <Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />}
+				{isPrivate === undefined && (isChannelVoice || isChannelStream) && (
+					<Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
+				)}
 				{isPrivate === undefined && isChannelText && <Icons.Hashtag defaultSize="w-6 h-6" />}
 			</div>
 
