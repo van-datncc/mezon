@@ -1,6 +1,6 @@
 import { useAuth, useOnClickOutside } from '@mezon/core';
 import { MessagesEntity, selectCurrentChannelId, selectDmGroupCurrentId, selectJumpPinMessageId } from '@mezon/store';
-import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM } from '@mezon/utils';
+import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_CHANNEL_LIST_BOX, WIDTH_CLAN_SIDE_BAR } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
@@ -62,12 +62,12 @@ function MessageWithUser({
 			if (window.innerHeight - e.clientY > heightPanel) {
 				setPositionShortUser({
 					top: e.clientY,
-					left: 366 + e.currentTarget.offsetWidth
+					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
 				});
 			} else {
 				setPositionShortUser({
 					top: window.innerHeight - heightPanel,
-					left: 366 + e.currentTarget.offsetWidth
+					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
 				});
 			}
 			setIsShowPanelChannel(!isShowPanelChannel);
