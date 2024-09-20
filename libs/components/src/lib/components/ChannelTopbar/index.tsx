@@ -97,33 +97,35 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLabel channel={channel} />
 			</div>
-			<div className="items-center h-full ml-auto flex">
-				<div className="justify-end items-center gap-2 flex">
-					<div className="hidden sbm:flex">
-						<div className="relative justify-start items-center gap-3 flex mr-4">
-							<InviteBtn isLightMode={appearanceTheme === 'light'} />
-							{isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
-							<ThreadButton isLightMode={appearanceTheme === 'light'} />
-							<MuteButton isLightMode={appearanceTheme === 'light'} />
-							<PinButton isLightMode={appearanceTheme === 'light'} />
-							<div onClick={() => setTurnOffThreadMessage()}>
-								<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+			{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+				<div className="items-center h-full ml-auto flex">
+					<div className="justify-end items-center gap-2 flex">
+						<div className="hidden sbm:flex">
+							<div className="relative justify-start items-center gap-[15px] flex mr-4">
+								<InviteBtn isLightMode={appearanceTheme === 'light'} />
+								{isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
+								<ThreadButton isLightMode={appearanceTheme === 'light'} />
+								<MuteButton isLightMode={appearanceTheme === 'light'} />
+								<PinButton isLightMode={appearanceTheme === 'light'} />
+								<div onClick={() => setTurnOffThreadMessage()}>
+									<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+								</div>
 							</div>
+							<SearchMessageChannel mode={mode} />
 						</div>
-						<SearchMessageChannel mode={mode} />
-					</div>
-					<div
-						className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
-						id="inBox"
-					>
-						<InboxButton isLightMode={appearanceTheme === 'light'} />
-						<HelpButton isLightMode={appearanceTheme === 'light'} />
-					</div>
-					<div className="sbm:hidden mr-5">
-						<ChannelListButton />
+						<div
+							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] sbm:left-auto sbm:right-0 ${isChannelVoice ? 'bg-[#1E1E1E]' : 'dark:bg-bgPrimary bg-bgLightPrimary'}`}
+							id="inBox"
+						>
+							<InboxButton isLightMode={appearanceTheme === 'light'} />
+							<HelpButton isLightMode={appearanceTheme === 'light'} />
+						</div>
+						<div className="sbm:hidden mr-5">
+							<ChannelListButton />
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 		</>
 	);
 }
