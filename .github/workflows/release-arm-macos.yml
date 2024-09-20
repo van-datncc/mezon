@@ -16,6 +16,10 @@ jobs:
       - name: Install package
         run: |
           yarn
-      
+          
+      - name: Change prod environment
+        run: |
+          cp apps/chat/prod.env apps/chat/.env
+
       - name: Release Desktop
-        run: yarn release:desktop
+        run: yarn release:desktop --verbose
