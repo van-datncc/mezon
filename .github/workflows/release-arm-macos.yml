@@ -6,7 +6,7 @@ on:
 
 jobs:
   release:
-    run-on: build-arm-mac
+    runs-on: build-arm-mac
     name: Release Mezon App for ARM MacOS
     environment: production
     steps:
