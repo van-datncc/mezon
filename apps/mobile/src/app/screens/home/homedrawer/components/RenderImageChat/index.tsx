@@ -27,6 +27,7 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 	return (
 		<TouchableOpacity disabled={isUploading || disable} activeOpacity={0.8} key={index} onPress={() => onPress(image)} onLongPress={onLongPress}>
 			<FastImage
+				fallback={true}
 				style={[
 					styles.imageMessageRender,
 					{
@@ -42,7 +43,10 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 						</Block>
 					) : null
 				}
-				source={{ uri: image?.url }}
+				source={{
+					uri: image?.url,
+					priority: FastImage.priority.high,
+				}}
 				resizeMode={(!imageSize?.height && !isUploading) ? 'cover' : 'contain'}
 			/>
 		</TouchableOpacity>
