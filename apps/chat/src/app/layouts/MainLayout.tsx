@@ -48,7 +48,7 @@ const GlobalEventListener = () => {
 	useEffect(() => {
 		const notificationCount = allNotify.length + totalUnreadDM + quantityPendingRequest;
 		if (notificationCount > 0) {
-			document.title = `Mezon (${notificationCount}) Notification${notificationCount > 1 ? 's' : ''}`;
+			document.title = `Mezon (${notificationCount})`;
 		} else {
 			document.title = 'Mezon';
 		}
