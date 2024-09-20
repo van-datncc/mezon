@@ -12,6 +12,7 @@ import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@me
 import {
 	getIsShowPopupForward,
 	selectAllClans,
+	selectAllNotification,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
@@ -152,6 +153,7 @@ function MyApp() {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const allNotify = useSelector(selectAllNotification);
 
 	useEffect(() => {
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -164,9 +166,9 @@ function MyApp() {
 
 	useEffect(() => {
 		if (isElectron()) {
-			electronBridge?.setBadgeCount(totalClanNotify + totalUnreadDM);
+			electronBridge?.setBadgeCount(allNotify.length + totalUnreadDM);
 		}
-	}, [totalClanNotify, totalUnreadDM]);
+	}, [allNotify.length, totalUnreadDM]);
 
 	return (
 		<div

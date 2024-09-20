@@ -1,10 +1,17 @@
 import { GifStickerEmojiPopup, Icons } from '@mezon/components';
 import { useApp, useGifsStickersEmoji, useThreads } from '@mezon/core';
-import { selectCloseMenu, selectCurrentChannel, selectPositionEmojiButtonSmile, selectReactionTopState, selectStatusMenu } from '@mezon/store';
+import {
+	notificationActions,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectPositionEmojiButtonSmile,
+	selectReactionTopState,
+	selectStatusMenu
+} from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
 const ChannelLayout = () => {
@@ -31,7 +38,10 @@ const ChannelLayout = () => {
 	} else {
 		topPositionEmojiPanel = `${positionOfSmileButton.top - 100}px`;
 	}
-
+	const dispatch = useDispatch();
+	useEffect(() => {
+		dispatch(notificationActions.removeNotificationsByChannelId(currentChannel?.channel_id ?? ''));
+	}, [currentChannel?.channel_id]);
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible">
 			{isChannelVoice ? (
