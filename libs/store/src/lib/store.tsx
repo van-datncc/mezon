@@ -262,6 +262,14 @@ const persistedsettingClanStickerReducer = persistReducer(
 	settingStickerReducer
 );
 
+const persistednotificationReducer = persistReducer(
+	{
+		key: 'notification',
+		storage
+	},
+	notificationReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	account: accountReducer,
@@ -299,7 +307,7 @@ const reducer = {
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
-	notification: notificationReducer,
+	notification: persistednotificationReducer,
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	channelsstream: channelsStreamReducer,
