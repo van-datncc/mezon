@@ -1,3 +1,4 @@
+import { useMyRole } from '@mezon/core';
 import {
 	permissionRoleChannelActions,
 	RolesClanEntity,
@@ -38,8 +39,10 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	const listPermissionRoleChannel = useSelector(selectAllPermissionRoleChannel);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const rolesInChannel = useSelector(selectRolesByChannelId(channelId));
+	const { maxPermissionId } = useMyRole();
 	const [listRole, setListRole] = useState<RolesClanEntity[]>([]);
 	const dispatch = useAppDispatch();
+
 	const rolesNotInChannel = useMemo(() => {
 		const roleInChannelIds = new Set(rolesInChannel.map((roleInChannel) => roleInChannel.id));
 		return rolesClan.filter((role) => !roleInChannelIds.has(role.id));
@@ -105,7 +108,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 				channelId: channelId,
 				roleId: roleId || '',
 				permission: permissionsArray,
-				maxPermissionId: ''
+				maxPermissionId: maxPermissionId
 			})
 		);
 	};
