@@ -83,19 +83,20 @@ export const deleteNotify = createAsyncThunk('notification/deleteNotify', async 
 	return response;
 });
 
-export const setAllLastSeenTimeStampChannelThunk = createAsyncThunk(
-	'notification/setAllLastSeenTimeStampChannel',
-	async (payload: LastSeenTimeStampChannelArgs[], thunkAPI) => {
-		thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannel(payload));
-	}
-);
+// export const setAllLastSeenTimeStampChannelThunk = createAsyncThunk(
+// 	'notification/setAllLastSeenTimeStampChannel',
+// 	async (payload: LastSeenTimeStampChannelArgs[], thunkAPI) => {
+// 		console.log('setAllLastSeenTimeStampChannelThunk', payload);
+// 		thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannel(payload));
+// 	}
+// );
 
-export const setLastSeenTimeStampChannelThunk = createAsyncThunk(
-	'notification/setLastSeenTimeStampChannel',
-	async (payload: LastSeenTimeStampChannelArgs, thunkAPI) => {
-		thunkAPI.dispatch(notificationActions.setLastSeenTimeStampChannel(payload));
-	}
-);
+// export const setLastSeenTimeStampChannelThunk = createAsyncThunk(
+// 	'notification/setLastSeenTimeStampChannel',
+// 	async (payload: LastSeenTimeStampChannelArgs, thunkAPI) => {
+// 		thunkAPI.dispatch(notificationActions.setLastSeenTimeStampChannel(payload));
+// 	}
+// );
 
 export const initialNotificationState: NotificationState = notificationAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -241,9 +242,9 @@ export const notificationReducer = notificationSlice.reducer;
 export const notificationActions = {
 	...notificationSlice.actions,
 	fetchListNotification,
-	deleteNotify,
-	setAllLastSeenTimeStampChannelThunk,
-	setLastSeenTimeStampChannelThunk
+	deleteNotify
+	// setAllLastSeenTimeStampChannelThunk,
+	// setLastSeenTimeStampChannelThunk
 };
 
 const { selectAll, selectEntities } = notificationAdapter.getSelectors();
