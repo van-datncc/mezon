@@ -260,7 +260,6 @@ export const fetchChannels = createAsyncThunk(
 						clanId: channelText.clan_id ?? ''
 					};
 				});
-			// thunkAPI.dispatch(notificationActions.setAllLastSeenTimeStampChannelThunk(lastSeenTimeStampInit));
 
 			const lastChannelMessages =
 				response.channeldesc?.map((channel) => ({
