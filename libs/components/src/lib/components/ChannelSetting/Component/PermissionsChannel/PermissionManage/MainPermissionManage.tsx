@@ -7,7 +7,7 @@ import {
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
-import { EPermissionId, EVERYONE_ROLE_ID, EVERYONE_ROLE_TITLE } from '@mezon/utils';
+import { EPermissionId, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { ApiPermissionUpdate } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -126,7 +126,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	useEffect(() => {
 		const roleExists = listRole.some((role) => role.id === EVERYONE_ROLE_ID);
 		if (!roleExists) {
-			setListRole([{ id: EVERYONE_ROLE_ID, title: EVERYONE_ROLE_TITLE }, ...rolesInChannel]);
+			setListRole([...rolesInChannel]);
 		}
 	}, [rolesInChannel, listRole]);
 
