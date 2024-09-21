@@ -145,7 +145,6 @@ export const notificationSlice = createSlice({
 				? Object.values(state.specificNotifications).filter((notification) => notification?.content?.channel_id !== channelId)
 				: [];
 			state.specificNotifications = remainingNotifications;
-			// const resetCount = state.entities ? Object.values(state.entities).find(()=>{})
 		},
 
 		setNotiListUnread(state, action) {
@@ -302,18 +301,5 @@ export const selectCountNotifyByClanId = (clanId: string) =>
 export const selectTotalClansNotify = createSelector(getNotificationState, (state) => {
 	return Object.values(state.quantityNotifyClans).reduce((totalNotifyCount, notifyCount) => totalNotifyCount + notifyCount, 0);
 });
-
-// export const selectSpecificNotifications = createSelector(selectAllNotification, (notifications) =>
-// 	notifications.filter((notification) => notification.code !== undefined && [-9, -11, -2].includes(notification.code))
-// );
-
-// export const selectSpecificNotifications = createSelector(selectAllNotification, (notifications) =>
-// 	notifications.filter(
-// 		(notification) =>
-// 			notification.code === NotificationCode.USER_MENTIONED ||
-// 			notification.code === NotificationCode.FRIEND_REQUEST ||
-// 			(notification.code === NotificationCode.USER_REPLIED && notification?.content?.update_time?.seconds > after)
-// 	)
-// );
 
 export const selectSpecificNotifications = createSelector(getNotificationState, (state: NotificationState) => state.specificNotifications);
