@@ -124,8 +124,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	}, [permissions, currentRoleId]);
 
 	useEffect(() => {
-		const roleExists = listRole.some((role) => role.id === EVERYONE_ROLE_ID);
-		if (!roleExists) {
+		if (listRole.length === 0) {
 			setListRole([...rolesInChannel]);
 		}
 	}, [rolesInChannel, listRole]);
