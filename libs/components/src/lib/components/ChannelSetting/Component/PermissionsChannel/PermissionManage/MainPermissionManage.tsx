@@ -101,7 +101,12 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	const handleSave = async (roleId: string, permissionsArray: ApiPermissionUpdate[]) => {
 		setPermissions({});
 		await dispatch(
-			permissionRoleChannelActions.setPermissionRoleChannel({ channelId: channelId, roleId: roleId || '', permission: permissionsArray })
+			permissionRoleChannelActions.setPermissionRoleChannel({
+				channelId: channelId,
+				roleId: roleId || '',
+				permission: permissionsArray,
+				maxPermissionId: ''
+			})
 		);
 	};
 

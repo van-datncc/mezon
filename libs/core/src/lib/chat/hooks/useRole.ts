@@ -12,8 +12,16 @@ export function useRoles() {
 	);
 
 	const createRole = React.useCallback(
-		async (clan_id: string, clanId: string, title: string, add_user_ids: string[], active_permission_ids: string[]) => {
-			const response = await dispatch(rolesClanActions.fetchCreateRole({ clan_id, title, add_user_ids, active_permission_ids }));
+		async (clanId: string, title: string, addUserIds: string[], activePermissionIds: string[]) => {
+			const response = await dispatch(
+				rolesClanActions.fetchCreateRole({
+					clanId,
+					title,
+					addUserIds,
+					activePermissionIds,
+					maxPermissionId: ''
+				})
+			);
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
 			return response?.payload;
 		},
@@ -23,22 +31,23 @@ export function useRoles() {
 	const updateRole = React.useCallback(
 		async (
 			clanId: string,
-			role_id: string,
+			roleId: string,
 			title: string,
-			add_user_ids: string[],
-			active_permission_ids: string[],
-			remove_user_ids: string[],
-			remove_permission_ids: string[]
+			addUserIds: string[],
+			activePermissionIds: string[],
+			removeUserIds: string[],
+			removePermissionIds: string[]
 		) => {
 			const response = await dispatch(
 				rolesClanActions.fetchUpdateRole({
-					role_id,
+					roleId,
 					title,
-					add_user_ids,
-					active_permission_ids,
-					remove_user_ids,
-					remove_permission_ids,
-					clanId
+					addUserIds,
+					activePermissionIds,
+					removeUserIds,
+					removePermissionIds,
+					clanId,
+					maxPermissionId: ''
 				})
 			);
 			await dispatch(rolesClanActions.fetchRolesClan({ clanId }));
