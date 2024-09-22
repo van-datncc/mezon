@@ -13,6 +13,7 @@ import { EVERYONE_ROLE_ID } from '@mezon/utils';
 import { ApiPermissionUpdate } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { TypeChoose } from './ItemPermission';
 import ListPermission, { ListPermissionHandle } from './ListPermission';
 import ListRoleMember from './ListRoleMember';
 
@@ -81,7 +82,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 				}
 			}
 		},
-		[currentRoleId, listPermissionRoleChannel, permissions, setIsPrivateChannel]
+		[listPermissionRoleChannel, permissions]
 	);
 
 	const handleSelectRole = useCallback(
@@ -100,6 +101,17 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 
 	const handleSave = async (roleId: string, permissionsArray: ApiPermissionUpdate[]) => {
 		setPermissions({});
+		const intersection = listPermission.filter((x) => {
+			return !permissionsArray.some((y) => x.id === y.permission_id);
+		});
+		intersection.forEach((p) => {
+			const matchingRoleChannel = listPermissionRoleChannel.find((roleChannel) => roleChannel.permission_id === p.id);
+			permissionsArray.push({
+				permission_id: p.id,
+				slug: p.slug,
+				type: matchingRoleChannel ? (matchingRoleChannel.active ? TypeChoose.Tick : TypeChoose.Remove) : TypeChoose.Or
+			});
+		});
 		await dispatch(
 			permissionRoleChannelActions.setPermissionRoleChannel({
 				channelId: channelId,
@@ -113,7 +125,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	useEffect(() => {
 		const hasPermissionsListChanged = permissionsLength !== 0;
 		setPermissionsListHasChanged(hasPermissionsListChanged);
-	}, [permissions]);
+	}, [permissions, permissionsLength, setPermissionsListHasChanged]);
 
 	useEffect(() => {
 		const permissionsArray: ApiPermissionUpdate[] = [];
