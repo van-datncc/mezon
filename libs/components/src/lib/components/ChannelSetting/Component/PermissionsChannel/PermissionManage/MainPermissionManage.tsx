@@ -5,14 +5,14 @@ import {
 	selectAllPermissionRoleChannel,
 	selectAllRolesClan,
 	selectAllUserClans,
+	selectPermissionChannel,
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
-import { EPermissionId, EVERYONE_ROLE_ID } from '@mezon/utils';
+import { EVERYONE_ROLE_ID } from '@mezon/utils';
 import { ApiPermissionUpdate } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { TypeChoose } from './ItemPermission';
 import ListPermission, { ListPermissionHandle } from './ListPermission';
 import ListRoleMember from './ListRoleMember';
 
@@ -36,6 +36,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 		return Object.keys(permissions).length;
 	}, [permissions]);
 	const [currentRoleId, setCurrentRoleId] = useState<string>(EVERYONE_ROLE_ID);
+	const listPermission = useSelector(selectPermissionChannel);
 	const listPermissionRoleChannel = useSelector(selectAllPermissionRoleChannel);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const rolesInChannel = useSelector(selectRolesByChannelId(channelId));
@@ -54,10 +55,6 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 	const handleSelect = useCallback(
 		(id: string, option: number, active?: boolean) => {
 			const matchingRoleChannel = listPermissionRoleChannel.find((roleChannel) => roleChannel.permission_id === id);
-
-			if (id === EPermissionId.VIEW_CHANNEL && currentRoleId === EVERYONE_ROLE_ID) {
-				setIsPrivateChannel(option === TypeChoose.Remove);
-			}
 
 			if (active !== undefined) {
 				if (matchingRoleChannel && matchingRoleChannel.active === active) {
@@ -123,7 +120,8 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 		for (const permission_id in permissions) {
 			permissionsArray.push({
 				permission_id,
-				type: permissions[permission_id]
+				type: permissions[permission_id],
+				slug: listPermission.filter((p) => p.id === permission_id).at(0)?.slug
 			});
 		}
 		saveTriggerRef.current = async () => {
@@ -148,7 +146,7 @@ const MainPermissionManage: React.FC<MainPermissionManageProps> = ({
 					onSelect={handleSelectRole}
 					canChange={permissionsLength === 0}
 				/>
-				<ListPermission onSelect={handleSelect} ref={listPermissionRef} />
+				<ListPermission listPermission={listPermission} onSelect={handleSelect} ref={listPermissionRef} />
 			</div>
 		)
 	);
