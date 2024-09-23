@@ -21,7 +21,9 @@ jobs:
           nvm use 18
           node -v
           yarn
-
+        env:
+          NVM_HOME: 'C:\Users\Administrator\AppData\Roaming\nvm'
+          NVM_SYMLINK: 'C:\Program Files\nodejs'
       - name: Change prod environment
         run: |
           cp apps/chat/prod.env apps/chat/.env
