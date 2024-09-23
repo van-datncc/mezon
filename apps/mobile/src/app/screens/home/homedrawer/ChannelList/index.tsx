@@ -81,7 +81,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				const positionChannel = channelsPositionRef?.current?.[channelId || currentChannel?.id];
 				const categoryOffset = categoryOffsetsRef?.current?.[categoryId || currentChannel?.category_id];
 				const position = (positionChannel || 0) + (categoryOffset?.y || 100);
-				if (position) {
+				if (position && categorizedChannels.length) {
 					flashListRef?.current?.scrollTo({
 						x: 0,
 						y: position,
@@ -94,7 +94,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 			activeChannel.remove();
 			timer && clearTimeout(timer);
 		};
-	}, [currentChannel, currentClanId, categorizedChannels.length]);
+	}, [currentClanId]);
 
 	const renderItemChannelList = useCallback(
 		({ item }) => {
