@@ -2,7 +2,7 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useUserPermission } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClan } from '@mezon/store-mobile';
+import { categoriesActions, selectCurrentClan, selectIsShowEmptyCategory, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { EProfileTab } from 'apps/mobile/src/app/screens/settings/ProfileSetting';
 import { MutableRefObject, useCallback, useState } from 'react';
@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, reserve } from '../../../../../../../app/temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu, MezonOption, reserve } from '../../../../../../../app/temp-ui';
 import DeleteClanModal from '../../../../../../components/DeleteClanModal';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import MezonButtonIcon from '../../../../../../temp-ui/MezonButtonIcon';
@@ -30,7 +30,11 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const { dismiss } = useBottomSheetModal();
+	const dispatch = useAppDispatch();
 
+	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
+	const [showEmptyCategories, setShowEmptyCategories] = useState<boolean>(isShowEmptyCategory ?? true);
+	
 	const handleOpenInvite = () => {
 		inviteRef?.current.present();
 		dismiss();
@@ -138,6 +142,26 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		},
 	];
 
+	const optionData = [
+		{
+			title: t('menu.optionShowEmptyCategories.show'),
+			value: true,
+		},
+		{
+			title: t('menu.optionShowEmptyCategories.hide'),
+			value: false,
+		},
+	];
+	
+	function handleToggleEmptyCategories(value: boolean) {
+		if (value) {
+			dispatch(categoriesActions.setShowEmptyCategory());
+		} else {
+			dispatch(categoriesActions.setHideEmptyCategory());
+		}
+		setShowEmptyCategories(value);
+	}
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
@@ -171,7 +195,13 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 					/>
 				</ScrollView>
 				<View>
-					<MezonMenu menu={menu} />
+					<MezonMenu menu={menu} marginVertical={0} />
+					<MezonOption
+						title={t('menu.optionShowEmptyCategories.title')}
+						data={optionData}
+						value={showEmptyCategories}
+						onChange={handleToggleEmptyCategories}
+					/>
 				</View>
 			</View>
 			<DeleteClanModal
