@@ -15,13 +15,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+      - name: Check shell
+        run: |
+          ipconfig /all
       - name: Install package
         run: |
           nvm use 18
           node -v
           yarn
-        shell: cmd
+
       - name: Change prod environment
         run: |
           cp apps/chat/prod.env apps/chat/.env
