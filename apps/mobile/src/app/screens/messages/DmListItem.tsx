@@ -38,7 +38,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 
 	const otherMemberList = useMemo(() => {
 		const userIdList = directMessage.user_id;
-		const usernameList = directMessage?.usernames?.split?.(',') || [];
+		const usernameList = directMessage?.channel_label?.split?.(',') || [];
 
 		return usernameList?.map((username, index) => ({
 			userId: userIdList?.[index],
