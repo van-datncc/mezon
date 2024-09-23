@@ -24,15 +24,17 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 		const activeRole: RolesClanEntity[] = [];
 		const notUserRole: RolesClanEntity[] = [];
 		RolesClan.map((role) => {
-			if (role.id !== EVERYONE_ROLE_ID) {
-				const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === userId);
-				if (checkHasRole) {
-					activeRole.push(role);
-				} else {
-					notUserRole.push(role);
-				}
+			if (role.id === EVERYONE_ROLE_ID) {
+				return;
+			}
+			const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === userId);
+			if (checkHasRole) {
+				activeRole.push(role);
+			} else {
+				notUserRole.push(role);
 			}
 		});
+
 		return {
 			active: activeRole,
 			notUserRole: notUserRole
