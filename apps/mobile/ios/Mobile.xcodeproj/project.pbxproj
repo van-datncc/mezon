@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,6 +18,7 @@
 		CE049B18D263E78C0E28DB71 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF63FBD8F416D85DC93F4BD /* ExpoModulesProvider.swift */; };
 		E9BFF0C32C37AC0F003C310E /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9BFF0C22C37AC0F003C310E /* SplashScreen.storyboard */; };
 		E9DEDF952BF7326A003F6572 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */; };
+		E9F6D0FE2CA1037D00AC2DDC /* MezonSharing.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E9F6D0F42CA1037D00AC2DDC /* MezonSharing.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EB8EF22644D89E2389CBE23D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F430D579619E0B5CFD2D20E7 /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,13 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = Mobile;
 		};
+		E9F6D0FC2CA1037D00AC2DDC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E9F6D0F32CA1037D00AC2DDC;
+			remoteInfo = MezonSharing;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,6 +46,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				E9F6D0FE2CA1037D00AC2DDC /* MezonSharing.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 1;
@@ -63,19 +72,29 @@
 		CC2EF50EB870283F95A556F6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Mobile/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DEA8E515101E02E04AB5E543 /* Pods-Mobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mobile.release.xcconfig"; path = "Target Support Files/Pods-Mobile/Pods-Mobile.release.xcconfig"; sourceTree = "<group>"; };
 		E2115CBEE435D659E16F2226 /* Pods-Mobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mobile.debug.xcconfig"; path = "Target Support Files/Pods-Mobile/Pods-Mobile.debug.xcconfig"; sourceTree = "<group>"; };
-		E9066E532C18376200405832 /* MezonDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MezonDebug.entitlements; sourceTree = "<group>"; };
 		E94005A02C17F0A300D5CF58 /* Mobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Mobile.entitlements; path = Mobile/Mobile.entitlements; sourceTree = "<group>"; };
 		E9953BD42BF602930070F1CC /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		E9B83E6A2C18346C00AE249D /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
-		E9B83E6D2C18346C00AE249D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
-		E9B83E6F2C18346C00AE249D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E9B83E772C18349600AE249D /* MezonRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MezonRelease.entitlements; sourceTree = "<group>"; };
 		E9BFF0C22C37AC0F003C310E /* SplashScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SplashScreen.storyboard; sourceTree = "<group>"; };
 		E9C22F3A2BF59D4200BCBA90 /* MobileRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = MobileRelease.entitlements; path = Mobile/MobileRelease.entitlements; sourceTree = "<group>"; };
 		E9DEDF942BF7326A003F6572 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E9F6D0F42CA1037D00AC2DDC /* MezonSharing.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MezonSharing.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F430D579619E0B5CFD2D20E7 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Mobile-MobileTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E9F6D0FF2CA1037D00AC2DDC /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E9F6D0F32CA1037D00AC2DDC /* MezonSharing */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E9F6D0F52CA1037D00AC2DDC /* MezonSharing */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E9F6D0FF2CA1037D00AC2DDC /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = MezonSharing; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		00E356EB1AD99517003FC87E /* Frameworks */ = {
@@ -91,6 +110,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E3B23803055DCF57B5EA3BF /* libPods-Mobile.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9F6D0F12CA1037D00AC2DDC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,7 +190,7 @@
 				13B07FAE1A68108700A75B9A /* Mobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* MobileTests */,
-				E9B83E692C18346C00AE249D /* Mezon */,
+				E9F6D0F52CA1037D00AC2DDC /* MezonSharing */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -180,6 +206,7 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* Mobile.app */,
 				00E356EE1AD99517003FC87E /* MobileTests.xctest */,
+				E9F6D0F42CA1037D00AC2DDC /* MezonSharing.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -210,18 +237,6 @@
 				87E379A998DEB943BCA4AD29 /* MobileTests */,
 			);
 			name = ExpoModulesProviders;
-			sourceTree = "<group>";
-		};
-		E9B83E692C18346C00AE249D /* Mezon */ = {
-			isa = PBXGroup;
-			children = (
-				E9066E532C18376200405832 /* MezonDebug.entitlements */,
-				E9B83E772C18349600AE249D /* MezonRelease.entitlements */,
-				E9B83E6A2C18346C00AE249D /* ShareViewController.swift */,
-				E9B83E6C2C18346C00AE249D /* MainInterface.storyboard */,
-				E9B83E6F2C18346C00AE249D /* Info.plist */,
-			);
-			path = Mezon;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -268,11 +283,34 @@
 			buildRules = (
 			);
 			dependencies = (
+				E9F6D0FD2CA1037D00AC2DDC /* PBXTargetDependency */,
 			);
 			name = Mobile;
 			productName = Mobile;
 			productReference = 13B07F961A680F5B00A75B9A /* Mobile.app */;
 			productType = "com.apple.product-type.application";
+		};
+		E9F6D0F32CA1037D00AC2DDC /* MezonSharing */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9F6D1002CA1037D00AC2DDC /* Build configuration list for PBXNativeTarget "MezonSharing" */;
+			buildPhases = (
+				E9F6D0F02CA1037D00AC2DDC /* Sources */,
+				E9F6D0F12CA1037D00AC2DDC /* Frameworks */,
+				E9F6D0F22CA1037D00AC2DDC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E9F6D0F52CA1037D00AC2DDC /* MezonSharing */,
+			);
+			name = MezonSharing;
+			packageProductDependencies = (
+			);
+			productName = MezonSharing;
+			productReference = E9F6D0F42CA1037D00AC2DDC /* MezonSharing.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -280,7 +318,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -289,6 +327,9 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
+					};
+					E9F6D0F32CA1037D00AC2DDC = {
+						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
@@ -307,6 +348,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* Mobile */,
 				00E356ED1AD99517003FC87E /* MobileTests */,
+				E9F6D0F32CA1037D00AC2DDC /* MezonSharing */,
 			);
 		};
 /* End PBXProject section */
@@ -328,6 +370,13 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				E9BFF0C32C37AC0F003C310E /* SplashScreen.storyboard in Resources */,
 				72F27102A63F9EE6833F91E0 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9F6D0F22CA1037D00AC2DDC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -549,6 +598,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E9F6D0F02CA1037D00AC2DDC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -557,18 +613,12 @@
 			target = 13B07F861A680F5B00A75B9A /* Mobile */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		E9B83E6C2C18346C00AE249D /* MainInterface.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E9B83E6D2C18346C00AE249D /* Base */,
-			);
-			name = MainInterface.storyboard;
-			sourceTree = "<group>";
+		E9F6D0FD2CA1037D00AC2DDC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E9F6D0F32CA1037D00AC2DDC /* MezonSharing */;
+			targetProxy = E9F6D0FC2CA1037D00AC2DDC /* PBXContainerItemProxy */;
 		};
-/* End PBXVariantGroup section */
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
@@ -859,6 +909,107 @@
 			};
 			name = Release;
 		};
+		E9F6D1012CA1037D00AC2DDC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = MezonSharing/MezonSharingDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = E9Y2J54ZH3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MezonSharing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MezonSharing;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile.MezonSharing;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon share";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E9F6D1022CA1037D00AC2DDC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = MezonSharing/MezonSharingRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = E9Y2J54ZH3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MezonSharing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MezonSharing;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = mezon.mobile.MezonSharing;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "mezon share";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -885,6 +1036,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E9F6D1002CA1037D00AC2DDC /* Build configuration list for PBXNativeTarget "MezonSharing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9F6D1012CA1037D00AC2DDC /* Debug */,
+				E9F6D1022CA1037D00AC2DDC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
