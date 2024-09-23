@@ -1,7 +1,7 @@
 import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById } from '@mezon/store';
-import { channelsActions, getStoreAsync, selectCurrentChannelId, selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
+import { channelsActions, getStoreAsync, selectCurrentChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -31,7 +31,6 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const styles = style(themeValue);
 	const currentChanelId = useSelector(selectCurrentChannelId);
 	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
-	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.channel_id));
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
 
@@ -123,7 +122,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			{!!props?.data?.threads?.length && (
 				<ListChannelThread threads={props?.data?.threads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />
 			)}
-			{!!voiceChannelMember?.length && <UserListVoiceChannel userListVoice={voiceChannelMember} />}
+			<UserListVoiceChannel channelId={props?.data?.channel_id} />
 		</View>
 	);
 });

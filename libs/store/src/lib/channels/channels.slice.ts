@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/browser';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
+import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { directActions } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -107,6 +108,7 @@ export const joinChannel = createAsyncThunk(
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
+			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
 
@@ -319,7 +321,7 @@ export const channelsSlice = createSlice({
 		openCreateNewModalChannel: (state, action: PayloadAction<boolean>) => {
 			state.isOpenCreateNewChannel = action.payload;
 		},
-		getCurrentCategory: (state, action: PayloadAction<ICategory>) => {
+		setCurrentCategory: (state, action: PayloadAction<ICategory>) => {
 			state.currentCategory = action.payload;
 		},
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
