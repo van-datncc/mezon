@@ -2,7 +2,15 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChannelMembersActions } from '@mezon/core';
 import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaultChannelLoader } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { channelsActions, clansActions, getStoreAsync, selectAllClans, selectCurrentClan, selectCurrentVoiceChannelId, useAppDispatch } from '@mezon/store-mobile';
+import {
+	channelsActions,
+	clansActions,
+	getStoreAsync,
+	selectAllClans,
+	selectCurrentClan,
+	selectCurrentVoiceChannelId,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +20,15 @@ import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { MezonConfirm } from '../../temp-ui';
 import { styles } from './DeleteClanModal.styles';
 
-const DeleteClanModal = ({ isVisibleModal, visibleChange, isLeaveClan = false }: { isVisibleModal: boolean; isLeaveClan?: boolean; visibleChange: (isVisible: boolean) => void }) => {
+const DeleteClanModal = ({
+	isVisibleModal,
+	visibleChange,
+	isLeaveClan = false
+}: {
+	isVisibleModal: boolean;
+	isLeaveClan?: boolean;
+	visibleChange: (isVisible: boolean) => void;
+}) => {
 	const { dismiss } = useBottomSheetModal();
 	const currentClan = useSelector(selectCurrentClan);
 	const { t } = useTranslation(['deleteClan']);
@@ -25,23 +41,23 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange, isLeaveClan = false }:
 	const { userProfile } = useAuth();
 
 	const currentClanName = useMemo(() => {
-		return currentClan?.clan_name
-	}, [currentClan?.clan_name])
+		return currentClan?.clan_name;
+	}, [currentClan?.clan_name]);
 
 	const onConfirm = async () => {
-		if (!!isLeaveClan) {
-			await removeMemberClan({ 
-					channelId: currentChannelId, 
-					clanId: currentClan?.clan_id, 
-					userIds: [userProfile?.user?.id] 
-				});
+		if (isLeaveClan) {
+			await removeMemberClan({
+				channelId: currentChannelId,
+				clanId: currentClan?.clan_id,
+				userIds: [userProfile?.user?.id]
+			});
 		} else {
 			await dispatch(clansActions.deleteClan({ clanId: currentClan?.clan_id || '' }));
 		}
 
 		dismiss();
 		const store = await getStoreAsync();
-		
+
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		const indexClanJoin = currentClan?.clan_id === clans[0]?.clan_id ? 1 : 0;
 		if (clans?.[indexClanJoin]) {
@@ -62,24 +78,24 @@ const DeleteClanModal = ({ isVisibleModal, visibleChange, isLeaveClan = false }:
 			onVisibleChange={visibleChange}
 			confirmText={t('deleteClanModal.confirm')}
 			title={isLeaveClan ? t('deleteClanModal.titleLeaveClan') : t('deleteClanModal.title')}
-			children={(
+			children={
 				<Text style={[styles.contentText, { color: themeValue.text }]}>
-					{
-						t(isLeaveClan 
-							? 'deleteClanModal.descriptionLeaveClan' 
-							: 'deleteClanModal.description', 
-							{ currentClan: currentClanName }
-						)
+					{t(isLeaveClan ? 'deleteClanModal.descriptionLeaveClan' : 'deleteClanModal.description', { currentClan: currentClanName })
 						.split(currentClanName)
 						.reduce((acc, part, index) => {
 							if (index === 0) {
 								return [part];
 							}
-							return [...acc, <Text key={index} style={{ fontWeight: 'bold' }}>{currentClanName}</Text>, part];
-						}, [])
-					}
+							return [
+								...acc,
+								<Text key={index} style={{ fontWeight: 'bold' }}>
+									{currentClanName}
+								</Text>,
+								part
+							];
+						}, [])}
 				</Text>
-			)}
+			}
 			onConfirm={onConfirm}
 		/>
 	);

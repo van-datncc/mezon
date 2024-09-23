@@ -35,7 +35,7 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const [showEmptyCategories, setShowEmptyCategories] = useState<boolean>(isShowEmptyCategory ?? true);
-	
+
 	const handleOpenInvite = () => {
 		inviteRef?.current.present();
 		dismiss();
@@ -47,19 +47,19 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		dismiss();
 	};
 
-  const handelOpenNotifications = useCallback(() => {
-    navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING });
+	const handelOpenNotifications = useCallback(() => {
+		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING });
 		dismiss();
-  },[])
+	}, []);
 	const watchMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
-			title: t('menu.watchMenu.markAsRead'),
+			title: t('menu.watchMenu.markAsRead')
 		},
 		{
 			onPress: () => reserve(),
-			title: t('menu.watchMenu.browseChannels'),
-		},
+			title: t('menu.watchMenu.browseChannels')
+		}
 	];
 
 	const organizationMenu: IMezonMenuItemProps[] = [
@@ -72,27 +72,27 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 				dismiss();
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
 			},
-			title: t('menu.organizationMenu.createCategory'),
+			title: t('menu.organizationMenu.createCategory')
 		},
 		{
 			onPress: () => {
 				dismiss();
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT });
 			},
-			title: t('menu.organizationMenu.createEvent'),
-		},
+			title: t('menu.organizationMenu.createEvent')
+		}
 	];
 
 	const optionsMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => {
 				dismiss();
-				navigation.navigate(APP_SCREEN.SETTINGS.STACK, { 
-										screen: APP_SCREEN.SETTINGS.PROFILE, 
-										params: { profileTab: EProfileTab.ClanProfile } 
-									});
+				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+					screen: APP_SCREEN.SETTINGS.PROFILE,
+					params: { profileTab: EProfileTab.ClanProfile }
+				});
 			},
-			title: t('menu.optionsMenu.editServerProfile'),
+			title: t('menu.optionsMenu.editServerProfile')
 		},
 		// {
 		// 	title: t('menu.optionsMenu.showAllChannels'),
@@ -122,7 +122,7 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 			},
 			isShow: !isClanOwner,
 			title: t('menu.optionsMenu.leaveServer'),
-			textStyle: { color: 'red' },
+			textStyle: { color: 'red' }
 		},
 		{
 			onPress: () => {
@@ -130,8 +130,8 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 			},
 			isShow: isClanOwner,
 			title: t('menu.optionsMenu.deleteClan'),
-			textStyle: { color: 'red' },
-		},
+			textStyle: { color: 'red' }
+		}
 	];
 
 	const menu: IMezonMenuSectionProps[] = [
@@ -139,24 +139,24 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		// 	items: watchMenu,
 		// },
 		{
-			items: organizationMenu,
+			items: organizationMenu
 		},
 		{
-			items: optionsMenu,
-		},
+			items: optionsMenu
+		}
 	];
 
 	const optionData = [
 		{
 			title: t('menu.optionShowEmptyCategories.show'),
-			value: true,
+			value: true
 		},
 		{
 			title: t('menu.optionShowEmptyCategories.hide'),
-			value: false,
-		},
+			value: false
+		}
 	];
-	
+
 	function handleToggleEmptyCategories(value: boolean) {
 		if (value) {
 			dispatch(categoriesActions.setShowEmptyCategory());

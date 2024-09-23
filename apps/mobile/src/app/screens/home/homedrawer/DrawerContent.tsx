@@ -15,7 +15,7 @@ const ChannelListWrapper = React.memo(() => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const { categorizedChannels: categorizedChannelsRaw } = useCategory();
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
-	
+
 	const categorizedChannels = useMemo(() => {
 		return categorizedChannelsRaw.map((item) => {
 			if (!isShowEmptyCategory && item?.channels?.length === 0) {
@@ -23,14 +23,18 @@ const ChannelListWrapper = React.memo(() => {
 			}
 			return {
 				...item,
-				channels: cleanChannelData(item.channels),
+				channels: cleanChannelData(item.channels)
 			};
 		});
 	}, [categorizedChannelsRaw, isShowEmptyCategory]);
-	
+
 	return (
 		<>
-			{clansLoadingStatus === 'loaded' && !clans?.length ? <UserEmptyClan /> : <MemoizedChannelList categorizedChannels={categorizedChannels} />}
+			{clansLoadingStatus === 'loaded' && !clans?.length ? (
+				<UserEmptyClan />
+			) : (
+				<MemoizedChannelList categorizedChannels={categorizedChannels} />
+			)}
 		</>
 	);
 });

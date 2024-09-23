@@ -14,10 +14,9 @@ interface IMezonOptionProps extends Omit<IMezonMenuSectionProps, 'items'> {
 
 export default function MezonOption({ data, onChange, value, ...menuProps }: IMezonOptionProps) {
 	const [currentValue, setCurrentValue] = useState<number | string | boolean>(value || 0);
-  useEffect(()=>{
-    setCurrentValue(value)
-  },[value])
-
+	useEffect(() => {
+		setCurrentValue(value);
+	}, [value]);
 
 	function handleChange(value: number | string | boolean) {
 		setCurrentValue(value);
@@ -29,13 +28,20 @@ export default function MezonOption({ data, onChange, value, ...menuProps }: IMe
 				{
 					items: data.map(({ value, disabled, ...props }) => ({
 						...props,
-						component: <MezonRadioButton checked={value === currentValue} onChange={() => handleChange(value)} noSwitchFalse disabled={disabled} />,
-						onPress: () => !disabled && handleChange(value),
+						component: (
+							<MezonRadioButton
+								checked={value === currentValue}
+								onChange={() => handleChange(value)}
+								noSwitchFalse
+								disabled={disabled}
+							/>
+						),
+						onPress: () => !disabled && handleChange(value)
 					})),
-					...menuProps,
-				},
+					...menuProps
+				}
 			] satisfies IMezonMenuSectionProps[],
-		[data, currentValue],
+		[data, currentValue]
 	);
 
 	return (

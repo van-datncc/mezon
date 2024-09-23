@@ -6,15 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import {
-	IMezonMenuItemProps,
-	IMezonMenuSectionProps,
-	MezonImagePicker,
-	MezonInput,
-	MezonMenu,
-	MezonOption,
-	reserve
-} from '../../../temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonImagePicker, MezonInput, MezonMenu, MezonOption, reserve } from '../../../temp-ui';
 import { validInput } from '../../../utils/validate';
 import DeleteClanModal from '../../DeleteClanModal';
 import { ErrorInput } from '../../ErrorInput';
@@ -33,14 +25,14 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	const [loading, setLoading] = useState<boolean>(false);
 	const { isClanOwner } = useUserPermission();
 	const [isCheckValid, setIsCheckValid] = useState<boolean>();
-	const [errorMessage, setErrorMessage] = useState<string>('')
-		
+	const [errorMessage, setErrorMessage] = useState<string>('');
+
 	const handleCheckDuplicateClanname = async () => {
 		const store = await getStoreAsync();
 		const isDuplicate = await store.dispatch(checkDuplicateNameClan(clanName?.trim()));
 		return isDuplicate?.payload || false;
 	};
-	  
+
 	useEffect(() => {
 		if (clanName === currentClan?.clan_name) {
 			setIsCheckValid(banner !== (currentClan?.banner || ''));
@@ -55,19 +47,18 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 	const disabled = useMemo(() => {
 		return !isClanOwner;
-	}, [isClanOwner])
-
+	}, [isClanOwner]);
 
 	navigation.setOptions({
 		headerBackTitleVisible: false,
 		headerRight: () => {
-			if (disabled) return <View />
+			if (disabled) return <View />;
 			return (
 				<Pressable onPress={handleSave} disabled={loading || !isCheckValid}>
 					<Text style={{ ...styles.headerActionTitle, opacity: loading || !isCheckValid ? 0.5 : 1 }}>{t('header.save')}</Text>
 				</Pressable>
-			)
-		},
+			);
+		}
 	});
 
 	async function handleSave() {
@@ -80,19 +71,19 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 			setLoading(false);
 			return;
 		}
-	
+
 		await updateClan({
 			banner: banner || (currentClan?.banner ?? ''),
 			clan_name: clanName?.trim() || (currentClan?.clan_name ?? ''),
 			clan_id: currentClan?.clan_id ?? '',
 			creator_id: currentClan?.creator_id ?? '',
-			logo: currentClan?.logo ?? '',
+			logo: currentClan?.logo ?? ''
 		});
 
 		setLoading(false);
 		Toast.show({
 			type: 'info',
-			text1: t('toast.saveSuccess'),
+			text1: t('toast.saveSuccess')
 		});
 
 		navigation.goBack();
@@ -115,8 +106,8 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 			expandable: true,
 			previewValue: '5 mins',
 			disabled: disabled,
-			onPress: () => reserve(),
-		},
+			onPress: () => reserve()
+		}
 	];
 
 	const systemMessageMenu: IMezonMenuItemProps[] = [
@@ -126,7 +117,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 			component: <Text style={{ color: 'white', fontSize: 11 }}>general</Text>,
 			onPress: () => reserve(),
 			disabled: disabled
-		},
+		}
 		// {
 		// 	title: t('menu.systemMessage.sendRandomWelcome'),
 		// 	component: <MezonSwitch disabled={disabled} />,
@@ -159,27 +150,27 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 			textStyle: { color: 'red' },
 			onPress: () => {
 				setIsVisibleDeleteModal(true);
-			},
-		},
+			}
+		}
 	];
 
 	const generalMenu: IMezonMenuSectionProps[] = [
 		{
 			items: inactiveMenu,
 			title: t('menu.inactive.title'),
-			bottomDescription: t('menu.inactive.description'),
+			bottomDescription: t('menu.inactive.description')
 		},
 		{
 			items: systemMessageMenu,
 			title: t('menu.systemMessage.title'),
-			bottomDescription: t('menu.systemMessage.description'),
-		},
+			bottomDescription: t('menu.systemMessage.description')
+		}
 	];
 
 	const dangerMenu: IMezonMenuSectionProps[] = [
 		{
-			items: deleteMenu,
-		},
+			items: deleteMenu
+		}
 	];
 
 	const optionData = [
@@ -192,7 +183,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 			title: t('fields.defaultNotification.onlyMentions'),
 			value: 1,
 			disabled: disabled
-		},
+		}
 	];
 
 	return (
@@ -218,9 +209,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 					bottomDescription={t('fields.defaultNotification.description')}
 					data={optionData}
 				/>
-				{isClanOwner && (
-					<MezonMenu menu={dangerMenu} />
-				)}
+				{isClanOwner && <MezonMenu menu={dangerMenu} />}
 			</ScrollView>
 			{isClanOwner && (
 				<DeleteClanModal

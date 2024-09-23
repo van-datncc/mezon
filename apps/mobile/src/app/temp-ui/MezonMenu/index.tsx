@@ -11,7 +11,9 @@ interface IMezonMenu {
 export default function MezonMenu({ menu, marginVertical = size.s_18 }: IMezonMenu) {
 	return (
 		<Block gap={size.s_12} paddingBottom={size.s_18} marginVertical={marginVertical}>
-			{menu.map((item, index) => <MezonMenuSection key={index.toString()} {...item} />)}
+			{menu.map((item, index) => (
+				<MezonMenuSection key={index.toString()} {...item} />
+			))}
 		</Block>
 	);
 }
@@ -19,9 +21,8 @@ export default function MezonMenu({ menu, marginVertical = size.s_18 }: IMezonMe
 export const reserve = () => {
 	Toast.show({
 		type: 'info',
-		text1: 'Coming soon',
+		text1: 'Coming soon'
 	});
 };
 
 export { IMezonMenuItemProps, IMezonMenuSectionProps };
-
