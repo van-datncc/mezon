@@ -10,7 +10,6 @@ interface IUserListVoiceChannelProps {
 
 export default memo(function ChannelListUserVoice({ channelId }: IUserListVoiceChannelProps) {
 	const voiceChannelMember = useSelector(selectVoiceChannelMembersByChannelId(channelId));
-	console.log('log  => voiceChannelMember', voiceChannelMember);
 
 	return (
 		<View>
