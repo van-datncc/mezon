@@ -18,6 +18,7 @@ jobs:
       
       - name: Install package
         run: |
+          $profile
           nvm use 18
           node -v
           yarn
