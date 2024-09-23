@@ -21,6 +21,7 @@ jobs:
           nvm use 18
           node -v
           yarn
+        shell: cmd
       - name: Change prod environment
         run: |
           cp apps/chat/prod.env apps/chat/.env
