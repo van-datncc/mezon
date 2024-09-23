@@ -10,7 +10,7 @@ on:
 jobs:
   release:
     runs-on: mezon-build-windows
-    name: Release Mezon App for ARM MacOS
+    name: Release Mezon App for Windows
     environment: production
     steps:
       - name: Checkout
@@ -18,13 +18,9 @@ jobs:
       
       - name: Install package
         run: |
-          $profile
           nvm use 18
           node -v
           yarn
-        env:
-          NVM_HOME: 'C:\Users\Administrator\AppData\Roaming\nvm'
-          NVM_SYMLINK: 'C:\Program Files\nodejs'
       - name: Change prod environment
         run: |
           cp apps/chat/prod.env apps/chat/.env
