@@ -1,5 +1,4 @@
 import { useClans, useUserPermission } from '@mezon/core';
-import { debounce } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { checkDuplicateNameClan, getStoreAsync } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
@@ -34,7 +33,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	const [loading, setLoading] = useState<boolean>(false);
 	const { isClanOwner } = useUserPermission();
 	const [isCheckValid, setIsCheckValid] = useState<boolean>();
-	const [errorMessage, setErrorMessage] = useState<string>(t('menu.serverName.errorMessage'))
+	const [errorMessage, setErrorMessage] = useState<string>('')
 		
 	const handleCheckDuplicateClanname = async () => {
 		const store = await getStoreAsync();
@@ -42,31 +41,16 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 		return isDuplicate?.payload || false;
 	};
 	  
-	
-	const validateClanName = debounce(async () => {
-		let isValid = true;
-
+	useEffect(() => {
 		if (clanName === currentClan?.clan_name) {
 			setIsCheckValid(banner !== (currentClan?.banner || ''));
 			return;
+		} else {
+			if (!validInput(clanName)) {
+				setErrorMessage(t('menu.serverName.errorMessage'));
+			}
+			setIsCheckValid(validInput(clanName));
 		}
-	
-		if (!validInput(clanName)) {
-			setErrorMessage(t('menu.serverName.errorMessage'));
-			isValid = false;
-		}
-		
-		const isDuplicateClan = await handleCheckDuplicateClanname();
-		if (isDuplicateClan) {
-			setErrorMessage(t('menu.serverName.duplicateNameMessage'));
-			isValid = false;
-		}
-	
-		setIsCheckValid(isValid);
-	}, 300);
-  
-	useEffect(() => {
-		validateClanName();
 	}, [clanName, banner]);
 
 	const disabled = useMemo(() => {
@@ -89,6 +73,14 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	async function handleSave() {
 		setLoading(true);
 
+		const isDuplicateClan = await handleCheckDuplicateClanname();
+		if (isDuplicateClan) {
+			setErrorMessage(t('menu.serverName.duplicateNameMessage'));
+			setIsCheckValid(false);
+			setLoading(false);
+			return;
+		}
+	
 		await updateClan({
 			banner: banner || (currentClan?.banner ?? ''),
 			clan_name: clanName?.trim() || (currentClan?.clan_name ?? ''),
@@ -216,7 +208,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 						maxCharacter={64}
 						disabled={disabled}
 					/>
-					{!isCheckValid && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
+					{!isCheckValid && !!errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
 				</View>
 
 				<MezonMenu menu={generalMenu} />
