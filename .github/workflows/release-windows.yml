@@ -20,8 +20,6 @@ jobs:
           ipconfig /all
       - name: Install package
         run: |
-          nvm use 18
-          node -v
           yarn
 
       - name: Change prod environment
