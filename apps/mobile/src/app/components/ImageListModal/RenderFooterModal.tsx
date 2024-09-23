@@ -27,7 +27,7 @@ export const RenderFooterModal = memo((props: IRenderFooterModalProps) => {
 	useEffect(() => {
 		if (imageSelected?.id) {
 			const index = allImageList?.findIndex((file) => file?.id === imageSelected?.id);
-			if (index !== -1 && flatListRef.current && visible) {
+			if (index >= 0 && flatListRef.current && visible) {
 				flatListRef.current.scrollToIndex({
 					animated: true,
 					viewPosition: 0.5,
