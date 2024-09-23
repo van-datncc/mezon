@@ -1,4 +1,5 @@
 import { useClans, useUserPermission } from '@mezon/core';
+import { debounce } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { checkDuplicateNameClan, getStoreAsync } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
@@ -17,6 +18,7 @@ import {
 } from '../../../temp-ui';
 import { validInput } from '../../../utils/validate';
 import DeleteClanModal from '../../DeleteClanModal';
+import { ErrorInput } from '../../ErrorInput';
 import { style } from './styles';
 
 export const { width } = Dimensions.get('window');
@@ -26,20 +28,45 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	const styles = style(themeValue);
 	const { currentClan, updateClan } = useClans();
 	const { t } = useTranslation(['clanOverviewSetting']);
-	const { t: tClan } = useTranslation(['clan']);
 	const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
 	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
 	const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
 	const [loading, setLoading] = useState<boolean>(false);
 	const { isClanOwner } = useUserPermission();
 	const [isCheckValid, setIsCheckValid] = useState<boolean>();
+	const [errorMessage, setErrorMessage] = useState<string>(t('menu.serverName.errorMessage'))
+		
+	const handleCheckDuplicateClanname = async () => {
+		const store = await getStoreAsync();
+		const isDuplicate = await store.dispatch(checkDuplicateNameClan(clanName?.trim()));
+		return isDuplicate?.payload || false;
+	};
+	  
+	
+	const validateClanName = debounce(async () => {
+		let isValid = true;
 
-	useEffect(() => {
-		if (clanName === currentClan?.clan_name && banner === (currentClan?.banner || '')) {
-			setIsCheckValid(false)
-			return
+		if (clanName === currentClan?.clan_name) {
+			setIsCheckValid(banner !== (currentClan?.banner || ''));
+			return;
 		}
-		setIsCheckValid(validInput(clanName));
+	
+		if (!validInput(clanName)) {
+			setErrorMessage(t('menu.serverName.errorMessage'));
+			isValid = false;
+		}
+		
+		const isDuplicateClan = await handleCheckDuplicateClanname();
+		if (isDuplicateClan) {
+			setErrorMessage(t('menu.serverName.duplicateNameMessage'));
+			isValid = false;
+		}
+	
+		setIsCheckValid(isValid);
+	}, 300);
+  
+	useEffect(() => {
+		validateClanName();
 	}, [clanName, banner]);
 
 	const disabled = useMemo(() => {
@@ -61,16 +88,6 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 	async function handleSave() {
 		setLoading(true);
-		const store = await getStoreAsync();
-		const isDuplicate = await store.dispatch(checkDuplicateNameClan(clanName?.trim()));
-		if (isDuplicate?.payload) {
-			Toast.show({
-				type: 'error',
-				text1: tClan('duplicateNameMessage')
-			});
-			setLoading(false);
-			return;
-		}
 
 		await updateClan({
 			banner: banner || (currentClan?.banner ?? ''),
@@ -192,7 +209,14 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 				<MezonImagePicker defaultValue={banner} height={200} width={width - 40} onLoad={handleLoad} showHelpText autoUpload />
 
 				<View style={{ marginVertical: 10 }}>
-					<MezonInput value={clanName} onTextChange={setClanName} label={t('menu.serverName.title')} disabled={disabled} />
+					<MezonInput
+						label={t('menu.serverName.title')}
+						onTextChange={setClanName}
+						value={clanName}
+						maxCharacter={64}
+						disabled={disabled}
+					/>
+					{!isCheckValid && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
 				</View>
 
 				<MezonMenu menu={generalMenu} />
