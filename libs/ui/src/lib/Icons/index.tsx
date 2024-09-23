@@ -4297,8 +4297,8 @@ export function Stream({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
 		>
 			<path
-				fill-rule="evenodd"
-				clip-rule="evenodd"
+				fillRule="evenodd"
+				clipRule="evenodd"
 				d="M22 5C22 3.89543 21.1046 3 20 3H4C2.89543 3 2 3.89543 2 5V17C2 18.1046 2.89543 19 4 19H20C21.1046 19 22 18.1046 22 17V5ZM10.5145 7.14251C10.2056 6.95715 9.82081 6.9523 9.5073 7.1298C9.19379 7.30731 9 7.63973 9 8V14C9 14.3603 9.19379 14.6927 9.5073 14.8702C9.82081 15.0477 10.2056 15.0429 10.5145 14.8575L15.5145 11.8575C15.8157 11.6768 16 11.3513 16 11C16 10.6487 15.8157 10.3232 15.5145 10.1425L10.5145 7.14251Z"
 				fill="currentColor"
 			/>
