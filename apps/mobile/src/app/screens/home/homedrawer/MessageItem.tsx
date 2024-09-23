@@ -173,6 +173,7 @@ const MessageItem = React.memo(
 				}, 3000);
 			} else {
 				setShowHighlightReply(false);
+				timeoutRef.current && clearTimeout(timeoutRef.current);
 			}
 			return () => {
 				timeoutRef.current && clearTimeout(timeoutRef.current);
