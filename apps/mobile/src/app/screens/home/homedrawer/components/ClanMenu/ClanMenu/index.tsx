@@ -26,6 +26,7 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 	const { t } = useTranslation(['clanMenu']);
 	const { themeValue } = useTheme();
 	const [isVisibleDeleteModal, setIsVisibleDeleteModal] = useState<boolean>(false);
+	const [isLeaveClan, setIsLeaveClan] = useState<boolean>(false);
 	const styles = style(themeValue);
 
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
@@ -110,12 +111,15 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		// 	onPress: () => reserve(),
 		// 	title: t('menu.optionsMenu.reportServer'),
 		// },
-		// {
-		// 	onPress: () => reserve(),
-		// 	isShow: !isClanOwner,
-		// 	title: t('menu.optionsMenu.leaveServer'),
-		// 	textStyle: { color: 'red' },
-		// },
+		{
+			onPress: () => {
+				setIsVisibleDeleteModal(true);
+				setIsLeaveClan(true);
+			},
+			isShow: !isClanOwner,
+			title: t('menu.optionsMenu.leaveServer'),
+			textStyle: { color: 'red' },
+		},
 		{
 			onPress: () => {
 				setIsVisibleDeleteModal(true);
@@ -179,6 +183,7 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 				visibleChange={(isVisible) => {
 					setIsVisibleDeleteModal(isVisible);
 				}}
+				isLeaveClan={isLeaveClan}
 			></DeleteClanModal>
 		</View>
 	);
