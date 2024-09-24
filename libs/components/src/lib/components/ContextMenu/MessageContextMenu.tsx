@@ -81,12 +81,17 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const checkSenderMessage = useMemo(() => {
 		return message?.sender_id === userId;
 	}, [message?.sender_id, userId]);
-	const mode =
-		modeResponsive === ModeResponsive.MODE_CLAN
-			? ChannelStreamMode.STREAM_MODE_CHANNEL
-			: currentDm?.type === ChannelType.CHANNEL_TYPE_DM
-				? ChannelStreamMode.STREAM_MODE_DM
-				: ChannelStreamMode.STREAM_MODE_GROUP;
+	const mode = useMemo(() => {
+		if (modeResponsive === ModeResponsive.MODE_CLAN) {
+			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+		}
+
+		if (currentDm?.type === ChannelType.CHANNEL_TYPE_DM) {
+			return ChannelStreamMode.STREAM_MODE_DM;
+		}
+
+		return ChannelStreamMode.STREAM_MODE_GROUP;
+	}, [modeResponsive, currentDm?.type]);
 
 	const checkMessageHasText = useMemo(() => {
 		return message?.content.t !== '';
