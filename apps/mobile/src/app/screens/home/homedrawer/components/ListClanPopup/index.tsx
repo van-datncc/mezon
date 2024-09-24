@@ -9,6 +9,9 @@ import {
 } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync, selectAllClans } from '@mezon/store-mobile';
+import { useNavigation } from '@react-navigation/native';
+import useTabletLandscape from 'apps/mobile/src/app/hooks/useTabletLandscape';
+import { APP_SCREEN } from 'apps/mobile/src/app/navigation/ScreenTypes';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -22,6 +25,8 @@ export const ListClanPopup = React.memo(() => {
 	const clans = useSelector(selectAllClans);
 	const [isVisibleCreateClanModal, setIsVisibleCreateClanModal] = useState<boolean>(false);
 	const timerRef = useRef(null);
+	const navigation = useNavigation();
+	const isTabletLandscape = useTabletLandscape();
 
 	useEffect(() => {
 		return () => {
@@ -43,6 +48,7 @@ export const ListClanPopup = React.memo(() => {
 		promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
 		promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
 		const results = await Promise.all(promises);
+		if (isTabletLandscape) navigation.navigate(APP_SCREEN.HOME as never);
 
 		const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
 		if (channelResp) {
