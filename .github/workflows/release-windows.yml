@@ -15,9 +15,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Check shell
-        run: |
-          ipconfig /all
+
       - name: Install package
         run: |
           yarn
@@ -29,11 +27,8 @@ jobs:
       - name: Release Desktop
         run: |
           yarn release:desktop
-        # env:
-        #   USE_HARD_LINKS: false
 
-      # - name: Push to MinIO
-      #   run: |
-      #     mc cp dist/executables/latest-mac.yml mezon-app/mezon/release/latest-mac.yml
-      #     mc cp dist/executables/mezon-*-mac-arm64.dmg mezon-app/mezon/release/
-      #     mc cp dist/executables/mezon-*-mac-arm64.zip mezon-app/mezon/release/
+      - name: Push to MinIO
+        run: |
+          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/latest.yml mezon/mezon/release/latest-test.yml'"
+          powershell "& 'c:\Program Files\Git\bin\bash.exe' -c 'mc cp ./dist/executables/mezon-*-win-x64.exe mezon/mezon/release/'"
