@@ -3,6 +3,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { PermissionRoleChannel } from 'mezon-js';
 import { ApiPermission, ApiPermissionUpdate } from 'mezon-js/api.gen';
 import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { RootState } from '../store';
 
 export const LIST_PERMISSION_ROLE_CHANNEL_FEATURE_KEY = 'listpermissionroleschannel';
 
@@ -36,6 +37,10 @@ export const fetchPermissionRoleChannel = createAsyncThunk(
 	'permissionrolechannel/fetchPermissionRoleChannel',
 	async ({ channelId, roleId, userId }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const state = thunkAPI.getState() as RootState;
+		const userId = state?.account?.userProfile?.user?.id;
+		if (!userId) return [];
+
 		const response = await mezon.socketRef.current?.getPermissionByRoleIdChannelId(roleId, channelId, userId);
 		if (!response?.permission_role_channel) {
 			return [];
