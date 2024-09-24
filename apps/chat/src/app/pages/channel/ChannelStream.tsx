@@ -1,5 +1,12 @@
 import { AvatarImage, Icons, getColorAverageFromURL } from '@mezon/components';
-import { selectMemberClanByGoogleId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import {
+	selectMemberClanByGoogleId,
+	selectMemberClanByUserId,
+	selectStatusStream,
+	useAppDispatch,
+	useAppSelector,
+	videoStreamActions
+} from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
 import { IChannelMember, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import Hls from 'hls.js';
@@ -12,6 +19,8 @@ interface MediaPlayerProps {
 
 function HLSPlayer({ src }: MediaPlayerProps) {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const isPlaying = useSelector(selectStatusStream);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const videoElement = videoRef.current;
@@ -19,29 +28,22 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 		let retryCount = 0;
 		const maxRetries = 10;
 
-		if (videoElement) {
+		if (isPlaying && videoElement) {
 			if (Hls.isSupported()) {
 				hls = new Hls({
 					lowLatencyMode: true,
 					enableWorker: true,
 					maxBufferLength: 30,
 					maxBufferSize: 60 * 1000 * 1000
-					// backBufferLength: 90,
-					// liveBackBufferLength: 0,
-					// liveSyncDuration: 0.5,
-					// liveMaxLatencyDuration: 5,
-					// liveDurationInfinity: true,
-					// highBufferWatchdogPeriod: 1,
-					// manifestLoadingTimeOut: 15000
 				});
 
 				hls.on(Hls.Events.ERROR, (event, data) => {
-					console.error(`HLS error detected:`, data);
+					// console.error(`HLS error detected:`, data);
 					if (data.fatal && hls) {
 						switch (data.type) {
 							case Hls.ErrorTypes.NETWORK_ERROR:
 								if (retryCount < maxRetries) {
-									console.log('Network error, retrying...', retryCount);
+									// console.log('Network error, retrying...', retryCount);
 									retryCount++;
 									setTimeout(() => {
 										if (hls) {
@@ -50,22 +52,28 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 										}
 									}, 2000);
 								} else {
-									console.error('Max retries reached, giving up.');
+									// console.error('Max retries reached, giving up.');
+									setIsLoading(false);
 								}
 								break;
 							case Hls.ErrorTypes.MEDIA_ERROR:
 								if (hls) {
-									console.warn('Media error, attempting recovery...');
+									// console.warn('Media error, attempting recovery...');
 									hls.recoverMediaError();
 								}
 								break;
 							default:
 								if (hls) {
-									console.error('Fatal error occurred, destroying hls instance.');
+									// console.error('Fatal error occurred, destroying hls instance.');
 									hls.destroy();
 								}
 								break;
 						}
+					}
+
+					if (data.fatal && data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+						videoElement.pause();
+						setIsLoading(true);
 					}
 				});
 
@@ -73,47 +81,45 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 				hls.attachMedia(videoElement);
 				hls.on(Hls.Events.MANIFEST_PARSED, () => {
 					videoElement.play().catch((error) => {
-						console.error('Error playing video:', error);
+						// console.error('Error playing video:', error);
 					});
-				});
-			} else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-				// Native HLS support
-				videoElement.src = src;
-				videoElement.addEventListener('loadedmetadata', () => {
-					videoElement.play().catch((error) => {
-						console.error('Error playing video:', error);
-					});
+					setIsLoading(false);
 				});
 			} else {
-				// Fallback if not HLS
 				videoElement.src = src;
 				videoElement.addEventListener('loadedmetadata', () => {
 					videoElement.play().catch((error) => {
-						console.error('Error playing video:', error);
+						// console.error('Error playing video:', error);
 					});
+					setIsLoading(false);
 				});
 			}
 		}
 
-		// Cleanup khi unmount component
 		return () => {
 			if (hls) {
 				hls.destroy();
 			}
 		};
-	}, [src]);
+	}, [isPlaying, src]);
 
 	return (
-		<video
-			ref={videoRef}
-			controls
-			autoPlay
-			playsInline
-			muted
-			style={{ width: '100%' }}
-			controlsList="nodownload noremoteplayback noplaybackrate"
-			disablePictureInPicture
-		/>
+		<div style={{ position: 'relative', width: '100%' }}>
+			<video
+				ref={videoRef}
+				autoPlay
+				playsInline
+				controls={false}
+				style={{ width: '100%' }}
+				controlsList="nodownload noremoteplayback noplaybackrate"
+				disablePictureInPicture
+			/>
+			{isLoading && (
+				<div className="absolute top-0 left-0 w-full h-full bg-black flex justify-center items-center text-white text-xl z-50">
+					Loading...
+				</div>
+			)}
+		</div>
 	);
 }
 
@@ -208,10 +214,40 @@ function UserItem({ user }: { user: IChannelMember }) {
 type ChannelStreamProps = {
 	hlsUrl?: string;
 	memberJoin: IChannelMember[];
+	currentStreamId: string;
+	channelName?: string;
 };
 
-export default function ChannelStream({ hlsUrl, memberJoin }: ChannelStreamProps) {
-	return (
+export default function ChannelStream({ hlsUrl, memberJoin, currentStreamId, channelName }: ChannelStreamProps) {
+	const [showScreenJoin, setShowScreenJoin] = useState(false);
+	const dispatch = useAppDispatch();
+
+	const handleLeaveChannel = async () => {
+		if (currentStreamId) {
+			dispatch(videoStreamActions.stopStream());
+		}
+		// dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
+		setShowScreenJoin(true);
+	};
+
+	const handleJoinChannel = async () => {
+		// dispatch(usersStreamActions.add({}));
+		dispatch(videoStreamActions.startStream(currentStreamId));
+		setShowScreenJoin(false);
+	};
+
+	return showScreenJoin ? (
+		<div className="w-full h-full bg-black flex justify-center items-center">
+			<div className="flex flex-col justify-center items-center gap-4">
+				{memberJoin.length > 0 && <UserListStreamChannel memberJoin={memberJoin}></UserListStreamChannel>}
+				<div className="text-3xl font-bold">{channelName}</div>
+				{memberJoin.length ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in stream</div>}
+				<button className="bg-green-700 rounded-3xl p-2" onClick={handleJoinChannel}>
+					Join stream
+				</button>
+			</div>
+		</div>
+	) : (
 		<div className="w-full flex flex-col gap-6">
 			{hlsUrl ? (
 				<div className="min-h-40 items-center flex justify-center">
@@ -224,6 +260,11 @@ export default function ChannelStream({ hlsUrl, memberJoin }: ChannelStreamProps
 			)}
 			<div className="w-full flex gap-2 justify-center">
 				<UserListStreamChannel memberJoin={memberJoin}></UserListStreamChannel>
+			</div>
+			<div className="flex justify-center items-center">
+				<button onClick={handleLeaveChannel} className="bg-red-600 flex justify-center items-center rounded-full p-3">
+					<Icons.EndCall defaultSize="w-6 h-6" />
+				</button>
 			</div>
 		</div>
 	);

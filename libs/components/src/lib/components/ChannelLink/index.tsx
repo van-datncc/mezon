@@ -4,15 +4,18 @@ import {
 	notificationActions,
 	notificationSettingActions,
 	selectCloseMenu,
+	selectCurrentChannel,
+	selectCurrentStreamId,
 	threadsActions,
 	useAppDispatch,
+	videoStreamActions,
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, MouseButton } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
@@ -75,6 +78,8 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			setOpenSetting(true);
 			setIsShowPanelChannel(false);
 		};
+		const currentChannel = useSelector(selectCurrentChannel);
+		const currentStreamId = useSelector(selectCurrentStreamId);
 
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
@@ -137,6 +142,13 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			if (closeMenu) {
 				setStatusMenu(false);
 			}
+			if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				if (currentStreamId !== channel.id) {
+					dispatch(videoStreamActions.startStream(channel.id));
+				}
+			} else {
+				dispatch(channelsActions.setCurrentChannelId(channel.id));
+			}
 		};
 
 		const openModalJoinVoiceChannel = useCallback(
@@ -160,6 +172,12 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			handleConfirmDeleteChannel(channel.channel_id as string, clanId as string);
 			handleCloseModalShow();
 		};
+
+		useEffect(() => {
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				dispatch(videoStreamActions.startStream(currentChannel?.id));
+			}
+		}, [channel.id, channel.type, currentChannel?.id, currentChannel?.type, dispatch]);
 
 		return (
 			<div
