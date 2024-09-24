@@ -31,8 +31,8 @@ jobs:
         env:
           USE_HARD_LINKS: false
 
-      # - name: Push to MinIO
-      #   run: |
-      #     mc cp dist/executables/latest-mac.yml mezon-app/mezon/release/latest-mac.yml
-      #     mc cp dist/executables/mezon-*-mac-arm64.dmg mezon-app/mezon/release/
-      #     mc cp dist/executables/mezon-*-mac-arm64.zip mezon-app/mezon/release/
+      - name: Push to MinIO
+        run: |
+          mc cp dist/executables/latest-linux.yml mezon/mezon/release/latest-linux.yml
+          mc cp dist/executables/mezon-*-linux-amd64.deb mezon/mezon/release/
+
