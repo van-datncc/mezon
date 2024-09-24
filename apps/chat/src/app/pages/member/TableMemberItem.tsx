@@ -40,50 +40,6 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	}, [userId, rolesClanEntity]);
 
 	const { searchQuery } = useMemberContext();
-	const dispatch = useAppDispatch();
-	const { updateRole } = useRoles();
-
-	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
-		if (userRolesClan.usersRole[role.id]) {
-			await updateRole(role.clan_id || '', role.id, role.title || '', [], [], [userId], []);
-			return;
-		}
-		await updateRole(role.clan_id || '', role.id, role.title || '', [userId], [], [], []);
-		await dispatch(
-			usersClanActions.addRoleIdUser({
-				id: role.id,
-				userId: userId
-			})
-		);
-	};
-
-	const ListOptionRole = () => {
-		const roleElements = [];
-		for (const key in rolesClanEntity) {
-			if (key !== EVERYONE_ROLE_ID) {
-				roleElements.push(
-					<div className="flex gap-2 items-center h-6 justify-between px-2" key={key}>
-						<div className="text-transparent size-3 rounded-full bg-white" />
-						<span className="text-xs font-medium px-1 truncate flex-1" style={{ lineHeight: '15px' }}>
-							{rolesClanEntity[key].title}
-						</span>
-						<div className="relative flex flex-row justify-center">
-							<input
-								checked={!!userRolesClan.usersRole[key]}
-								type="checkbox"
-								className={`peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none`}
-								onChange={() => handleAddRoleMemberList(rolesClanEntity[key])}
-								key={key}
-							/>
-							<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4 pointer-events-none" />
-						</div>
-					</div>
-				);
-			}
-		}
-
-		return <>{roleElements}</>;
-	};
 
 	return (
 		<div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0">
@@ -141,7 +97,9 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					<Tooltip
 						content={
 							<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
-								<div className="flex flex-col gap-1 max-w-72">{<ListOptionRole />}</div>
+								<div className="flex flex-col gap-1 max-w-72">
+									{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
+								</div>
 							</div>
 						}
 						trigger="click"
@@ -162,4 +120,59 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	);
 };
 
+const ListOptionRole = ({
+	rolesClanEntity,
+	userRolesClan,
+	userId
+}: {
+	rolesClanEntity: Record<string, RolesClanEntity>;
+	userRolesClan: {
+		usersRole: Record<string, string>;
+		length: number;
+	};
+	userId: string;
+}) => {
+	const dispatch = useAppDispatch();
+	const { updateRole } = useRoles();
+
+	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
+		if (userRolesClan.usersRole[role.id]) {
+			await updateRole(role.clan_id || '', role.id, role.title || '', [], [], [userId], []);
+			return;
+		}
+		await updateRole(role.clan_id || '', role.id, role.title || '', [userId], [], [], []);
+		await dispatch(
+			usersClanActions.addRoleIdUser({
+				id: role.id,
+				userId: userId
+			})
+		);
+	};
+
+	const roleElements = [];
+	for (const key in rolesClanEntity) {
+		if (key !== EVERYONE_ROLE_ID) {
+			roleElements.push(
+				<div className="flex gap-2 items-center h-6 justify-between px-2" key={key}>
+					<div className="text-transparent size-3 rounded-full bg-white" />
+					<span className="text-xs font-medium px-1 truncate flex-1" style={{ lineHeight: '15px' }}>
+						{rolesClanEntity[key].title}
+					</span>
+					<div className="relative flex flex-row justify-center">
+						<input
+							checked={!!userRolesClan.usersRole[key]}
+							type="checkbox"
+							className={`peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none`}
+							onChange={() => handleAddRoleMemberList(rolesClanEntity[key])}
+							key={key}
+						/>
+						<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4 pointer-events-none" />
+					</div>
+				</div>
+			);
+		}
+	}
+
+	return <>{roleElements}</>;
+};
 export default TableMemberItem;
