@@ -113,8 +113,8 @@ const Notifications = () => {
 
 	const handleOnPressNotify = async (notify: INotification) => {
 		const store = await getStoreAsync();
+		navigation.navigate(APP_SCREEN.HOME as never);
 		requestAnimationFrame(async () => {
-			navigation.navigate(APP_SCREEN.HOME as never);
 			store.dispatch(
 				channelsActions.joinChannel({
 					clanId: notify?.content?.clan_id ?? '',
