@@ -42,10 +42,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	const { updateRole } = useRoles();
 
 	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
-		console.log('Remove Role', !!userRolesClan.usersRole[role.id]);
-
 		if (userRolesClan.usersRole[role.id]) {
-			console.log('Remove Role', role.id);
 			await updateRole(role.clan_id || '', role.id, role.title || '', [], [], [userId], []);
 			return;
 		}
