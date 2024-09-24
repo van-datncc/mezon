@@ -245,12 +245,12 @@ const NavigationMain = () => {
 	);
 
 	return (
-		<NavigationContainer>
-			<Suspense fallback={<SplashScreen />}>
+		<Suspense fallback={<SplashScreen />}>
+			<NavigationContainer>
 				<NetInfoComp />
 				{isReadyForUse && <MyStackComponent />}
-			</Suspense>
-		</NavigationContainer>
+			</NavigationContainer>
+		</Suspense>
 	);
 };
 
