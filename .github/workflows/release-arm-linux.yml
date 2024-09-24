@@ -1,11 +1,8 @@
 name: Release Mezon App for Linux
 
 on: 
-  # release:
-  #   types: [published]
-  push:
-    branches:
-      - cicd-linux
+  release:
+    types: [published]
 
 jobs:
   release:
@@ -33,6 +30,6 @@ jobs:
 
       - name: Push to MinIO
         run: |
-          mc cp dist/executables/latest-linux.yml mezon/mezon/release/latest-linux-test.yml
-          mc cp dist/executables/mezon-*-linux-amd64.deb mezon/mezon/release/mezon-test-linux-amd64.deb
+          mc cp dist/executables/latest-linux.yml mezon/mezon/release/latest-linux.yml
+          mc cp dist/executables/mezon-*-linux-amd64.deb mezon/mezon/release/
 
