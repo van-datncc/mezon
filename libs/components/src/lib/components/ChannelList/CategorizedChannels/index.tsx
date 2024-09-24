@@ -5,6 +5,7 @@ import {
 	defaultNotificationCategoryActions,
 	selectCategoryIdSortChannel,
 	selectChannelMetaEntities,
+	selectCtrlKSelectedChannelId,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	useAppDispatch
@@ -66,6 +67,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const location = useLocation();
 	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasChannelManagePermission || hasClanPermission;
+	const ctrlKSelectedChannelId = useSelector(selectCtrlKSelectedChannelId);
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -190,7 +192,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 			<div className="mt-[5px] space-y-0.5 text-contentTertiary">
 				{category?.channels
 					?.filter((channel: IChannel) => {
-						return isShowAllCategoryChannels || isUnreadChannel(channel.id);
+						return isShowAllCategoryChannels || isUnreadChannel(channel.id) || channel.id === ctrlKSelectedChannelId;
 					})
 					.map((channel: IChannel) => {
 						return (
