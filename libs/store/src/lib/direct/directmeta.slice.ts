@@ -32,8 +32,8 @@ export const initialDirectMetaState: DirectMetaState = directMetaAdapter.getInit
 });
 
 function extractDMMeta(channel: DirectEntity): DMMeta {
-	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds);
-	const lastSentTimestamp = Number(channel.last_sent_message?.timestamp_seconds);
+	const lastSeenTimestamp = Number(channel?.last_seen_message?.timestamp_seconds);
+	const lastSentTimestamp = Number(channel?.last_sent_message?.timestamp_seconds);
 
 	return {
 		id: channel.id,
