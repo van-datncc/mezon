@@ -832,6 +832,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 			try {
 				const socket = await reconnectWithTimeout(clanIdActive ?? '');
+
+				if (socket === 'RECONNECTING') return;
+
 				if (!socket) {
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
 					return;

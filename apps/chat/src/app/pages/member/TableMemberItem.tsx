@@ -1,8 +1,8 @@
 import { AvatarImage } from '@mezon/components';
-import { useMemberContext, useRoles } from '@mezon/core';
+import { useClanRestriction, useMemberContext, useRoles } from '@mezon/core';
 import { RolesClanEntity, selectRolesClanEntities, selectTheme, useAppDispatch, usersClanActions } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
-import { EVERYONE_ROLE_ID } from '@mezon/utils';
+import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -40,6 +40,10 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	}, [userId, rolesClanEntity]);
 
 	const { searchQuery } = useMemberContext();
+
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
+	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const hasPermissionEditRole = isClanOwner || hasAdminPermission || hasClanPermission;
 
 	return (
 		<div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0">
@@ -93,24 +97,25 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					) : (
 						'-'
 					)}
-
-					<Tooltip
-						content={
-							<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
-								<div className="flex flex-col gap-1 max-w-72">
-									{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
+					{hasPermissionEditRole && (
+						<Tooltip
+							content={
+								<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
+									<div className="flex flex-col gap-1 max-w-72">
+										{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
+									</div>
 								</div>
-							</div>
-						}
-						trigger="click"
-						arrow={false}
-					>
-						<Tooltip content="Add Role">
-							<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
-								+
-							</span>
+							}
+							trigger="click"
+							arrow={false}
+						>
+							<Tooltip content="Add Role">
+								<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
+									+
+								</span>
+							</Tooltip>
 						</Tooltip>
-					</Tooltip>
+					)}
 				</span>
 			</div>
 			<div className="flex-3 p-1 text-center">
