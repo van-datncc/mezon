@@ -391,4 +391,3 @@ export const selectMembersByRoleID = (roleID: string) => {
 	});
 };
 export const selectAllRoleIds = createSelector(selectAllRolesClan, (roles) => roles.map((role) => role.id));
-export const selectAllARoleLength = createSelector(selectAllRolesClan, (roles) => roles.length - 1);

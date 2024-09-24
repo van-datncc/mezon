@@ -1,6 +1,6 @@
 import { AvatarImage } from '@mezon/components';
 import { useMemberContext, useRoles } from '@mezon/core';
-import { RolesClanEntity, selectAllARoleLength, selectRolesClanEntities, selectTheme, useAppDispatch, usersClanActions } from '@mezon/store';
+import { RolesClanEntity, selectRolesClanEntities, selectTheme, useAppDispatch, usersClanActions } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { EVERYONE_ROLE_ID } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
@@ -18,24 +18,26 @@ type TableMemberItemProps = {
 };
 
 const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime, displayName }: TableMemberItemProps) => {
-	const RolesClanEntity = useSelector(selectRolesClanEntities);
-	const allRoleLength = useSelector(selectAllARoleLength);
+	const rolesClanEntity = useSelector(selectRolesClanEntities);
+
 	const appearanceTheme = useSelector(selectTheme);
 	const userRolesClan = useMemo(() => {
 		const activeRole: Record<string, string> = {};
 		let userRoleLength = 0;
-		Object.entries(RolesClanEntity).forEach(([key, role]) => {
-			const checkHasRole = role.role_user_list?.role_users?.some((listUser) => listUser.id === userId);
+
+		for (const key in rolesClanEntity) {
+			const checkHasRole = rolesClanEntity[key].role_user_list?.role_users?.some((listUser) => listUser.id === userId);
 			if (checkHasRole) {
-				activeRole[role.id] = role.id;
+				activeRole[key] = key;
 				userRoleLength++;
 			}
-		});
+		}
+
 		return {
 			usersRole: activeRole,
 			length: userRoleLength
 		};
-	}, [userId, RolesClanEntity]);
+	}, [userId, rolesClanEntity]);
 
 	const { searchQuery } = useMemberContext();
 	const dispatch = useAppDispatch();
@@ -53,6 +55,34 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 				userId: userId
 			})
 		);
+	};
+
+	const ListOptionRole = () => {
+		const roleElements = [];
+		for (const key in rolesClanEntity) {
+			if (key !== EVERYONE_ROLE_ID) {
+				roleElements.push(
+					<div className="flex gap-2 items-center h-6 justify-between px-2" key={key}>
+						<div className="text-transparent size-3 rounded-full bg-white" />
+						<span className="text-xs font-medium px-1 truncate flex-1" style={{ lineHeight: '15px' }}>
+							{rolesClanEntity[key].title}
+						</span>
+						<div className="relative flex flex-row justify-center">
+							<input
+								checked={!!userRolesClan.usersRole[key]}
+								type="checkbox"
+								className={`peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none`}
+								onChange={() => handleAddRoleMemberList(rolesClanEntity[key])}
+								key={key}
+							/>
+							<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4 pointer-events-none" />
+						</div>
+					</div>
+				);
+			}
+		}
+
+		return <>{roleElements}</>;
 	};
 
 	return (
@@ -78,7 +108,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 				<span className={'inline-flex items-center'}>
 					{userRolesClan?.length ? (
 						<>
-							<RoleNameCard roleName={RolesClanEntity[`${Object.keys(userRolesClan.usersRole)[0]}`].title || ''} />
+							<RoleNameCard roleName={rolesClanEntity[`${Object.keys(userRolesClan.usersRole)[0]}`].title || ''} />
 							{userRolesClan.length > 1 && (
 								<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
 									<Tooltip
@@ -87,8 +117,8 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 												{Object.keys(userRolesClan.usersRole)
 													.slice(1)
 													.map((userRole) => (
-														<div className={'my-0.5'} key={RolesClanEntity[`${userRole}`].id}>
-															<RoleNameCard roleName={RolesClanEntity[`${userRole}`].title || ''} />
+														<div className={'my-0.5'} key={rolesClanEntity[`${userRole}`].id}>
+															<RoleNameCard roleName={rolesClanEntity[`${userRole}`].title || ''} />
 														</div>
 													))}
 											</div>
@@ -111,29 +141,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					<Tooltip
 						content={
 							<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
-								<div className="flex flex-col gap-1 max-w-72">
-									{Object.entries(RolesClanEntity).map(([key, role]) => {
-										if (role.id !== EVERYONE_ROLE_ID)
-											return (
-												<div className="flex gap-2 items-center h-6 justify-between px-2" key={key}>
-													<div className="text-transparent size-3 rounded-full bg-white" />
-													<span className="text-xs font-medium px-1 truncate flex-1" style={{ lineHeight: '15px' }}>
-														{role.title}
-													</span>
-													<div className="relative flex flex-row justify-center">
-														<input
-															checked={!!userRolesClan.usersRole[role.id]}
-															type="checkbox"
-															className={`peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none`}
-															onChange={() => handleAddRoleMemberList(role)}
-															key={role.id}
-														/>
-														<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4 pointer-events-none" />
-													</div>
-												</div>
-											);
-									})}
-								</div>
+								<div className="flex flex-col gap-1 max-w-72">{<ListOptionRole />}</div>
 							</div>
 						}
 						trigger="click"
