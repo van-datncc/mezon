@@ -1,7 +1,7 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { UsersClanEntity, selectAllUserClans, useAppSelector } from '@mezon/store-mobile';
-import { memo, useMemo, useState } from 'react';
-import { FlatList } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { MezonInput } from '../../../../temp-ui';
 import { normalizeString } from '../../../../utils/helpers';
 import { SeparatorWithLine } from '../../../Common';
@@ -29,18 +29,26 @@ export const MemberList = memo((props: IMemberListProps) => {
 		});
 	}, [searchMemberText, clanUserList]);
 
+	const renderMemberItem = useCallback(
+		({ item }) => {
+			return <UserItem userID={item.id} onMemberSelect={onMemberSelect} />;
+		},
+		[onMemberSelect]
+	);
+
 	return (
 		<Block backgroundColor={themeValue.secondary} flex={1}>
 			<Block paddingHorizontal={size.s_12}>
 				<MezonInput value={searchMemberText} onTextChange={setSearchMemberText} placeHolder={'Search Member'} />
 			</Block>
-			<FlatList
+			<FlashList
 				data={filteredMemberList}
 				keyExtractor={(item) => item.id}
 				ItemSeparatorComponent={SeparatorWithLine}
-				renderItem={({ item }) => {
-					return <UserItem userID={item.id} onMemberSelect={onMemberSelect} />;
-				}}
+				renderItem={renderMemberItem}
+				estimatedItemSize={180}
+				removeClippedSubviews={true}
+				keyboardShouldPersistTaps={'handled'}
 			/>
 		</Block>
 	);
