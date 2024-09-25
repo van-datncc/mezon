@@ -1,7 +1,8 @@
-import { CrossIcon, Icons } from '@mezon/mobile-components';
+import { CrossIcon, getUpdateOrAddClanChannelCache, Icons, save, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store';
-import { createNewChannel, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
+import { channelsActions, createNewChannel, getStoreAsync, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
+import { DrawerActions } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useMemo, useState } from 'react';
@@ -53,6 +54,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 
 	async function handleCreateChannel() {
 		if (!validInput(channelName)) return;
+		const store = await getStoreAsync();
 
 		const body: ApiCreateChannelDescRequest = {
 			clan_id: currentClanId?.toString(),
@@ -63,17 +65,31 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 		};
 		dispatch(appActions.setLoadingMainMobile(true));
 		const newChannelCreatedId = await dispatch(createNewChannel(body));
-		const error = (newChannelCreatedId as any).error;
+		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
+		const channelID = payload.channel_id;
+		const clanID = payload.clan_id;
+		if (newChannelCreatedId && channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING) {
+			navigation.navigate('HomeDefault' as any);
+			navigation.dispatch(DrawerActions.closeDrawer());
+			requestAnimationFrame(async () => {
+				await store.dispatch(channelsActions.joinChannel({ clanId: clanID ?? '', channelId: channelID, noFetchMembers: false }));
+				dispatch(appActions.setLoadingMainMobile(false));
+			});
+			const dataSave = getUpdateOrAddClanChannelCache(clanID, channelID);
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			setChannelName('');
+		} else {
+			setChannelName('');
+			navigation.navigate(APP_SCREEN.HOME);
+			dispatch(appActions.setLoadingMainMobile(false));
+		}
 
+		const error = (newChannelCreatedId as any).error;
 		if (newChannelCreatedId && error) {
 			Toast.show({
 				type: 'info',
 				text1: error.message
 			});
-			dispatch(appActions.setLoadingMainMobile(false));
-		} else {
-			setChannelName('');
-			navigation.navigate(APP_SCREEN.HOME);
 			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	}
@@ -106,12 +122,20 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 		{
 			title: t('fields.channelType.text.title'),
 			description: t('fields.channelType.text.description'),
-			value: ChannelType.CHANNEL_TYPE_TEXT
+			value: ChannelType.CHANNEL_TYPE_TEXT,
+			icon: <Icons.VoiceNormalIcon height={20} width={20} color={themeValue.textStrong} />
 		},
 		{
 			title: t('fields.channelType.voice.title'),
 			description: t('fields.channelType.voice.description'),
-			value: ChannelType.CHANNEL_TYPE_VOICE
+			value: ChannelType.CHANNEL_TYPE_VOICE,
+			icon: <Icons.TextIcon height={20} width={20} color={themeValue.textStrong} />
+		},
+		{
+			title: t('fields.channelType.voice.title'),
+			description: t('fields.channelType.voice.description'),
+			value: ChannelType.CHANNEL_TYPE_STREAMING,
+			icon: <Icons.StreamIcon height={20} width={20} color={themeValue.textStrong} />
 		}
 	];
 
@@ -130,6 +154,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 					errorMessage={t('fields.channelName.errorMessage')}
 					placeHolder={t('fields.channelName.placeholder')}
 				/>
+
 				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} value={channelType} />
 				<MezonMenu menu={menuPrivate} />
 			</ScrollView>
