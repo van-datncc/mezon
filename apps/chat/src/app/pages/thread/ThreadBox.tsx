@@ -36,8 +36,8 @@ const ThreadBox = () => {
 	const createThread = useCallback(
 		async (value: ThreadValue) => {
 			const isDuplicate = await dispatch(checkDuplicateThread(value.nameValueThread));
-			if (isDuplicate?.payload == false) {
-				toast('Tên thread đã tồn tại');
+			if (isDuplicate?.payload === false) {
+				toast('Thread name already exists');
 				return;
 			}
 			const body: ApiCreateChannelDescRequest = {

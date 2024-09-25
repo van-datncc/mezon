@@ -70,15 +70,14 @@ export const checkDuplicateThread = createAsyncThunk('thread/duplicateNameCthrea
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(thread_name, '', TypeCheck.TYPETHREAD);
-		console.log('data ', isDuplicateName);
 		if (isDuplicateName?.type === TypeCheck.TYPETHREAD) {
 			return isDuplicateName.exist;
 		}
 		return;
 	} catch (error: any) {
-		toast.error('error');
 		Sentry.captureException(error);
 		const errmsg = await error.json();
+		toast.error(errmsg.message);
 		return thunkAPI.rejectWithValue(errmsg.message);
 	}
 });
