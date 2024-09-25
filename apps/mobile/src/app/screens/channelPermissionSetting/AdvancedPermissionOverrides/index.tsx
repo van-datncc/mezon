@@ -1,9 +1,10 @@
 import { Icons, isEqual } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { permissionRoleChannelActions, selectAllPermissionRoleChannel, selectPermissionChannel, useAppDispatch } from '@mezon/store-mobile';
+import { selectAllPermissionRoleChannel, selectPermissionChannel, useAppDispatch } from '@mezon/store-mobile';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, TouchableOpacity } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../../navigation/ScreenTypes';
 import { MezonConfirm } from '../../../temp-ui';
@@ -13,7 +14,7 @@ import { IPermissionSetting } from '../types/channelPermission.type';
 
 type AdvancedPermissionOverrides = typeof APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES;
 export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelScreenProps<AdvancedPermissionOverrides>) => {
-	const { channelId, roleId } = route.params;
+	const { channelId, id, type } = route.params;
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['channelSetting']);
@@ -22,6 +23,7 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 	const [originChannelPermissionValues, setOriginChannelPermissionValues] = useState<IPermissionSetting>();
 	const [currentChannelPermissionValues, setCurrentChannelPermissionValues] = useState<IPermissionSetting>();
 	const [visibleConfirmModal, setVisibleConfirmModal] = useState(false);
+	console.log('channelPermissionList:', channelPermissionList);
 
 	const isSettingNotChange = useMemo(() => {
 		return isEqual(originChannelPermissionValues, currentChannelPermissionValues);
@@ -35,13 +37,32 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 			return acc;
 		}, []);
 
-		await dispatch(
-			permissionRoleChannelActions.setPermissionRoleChannel({
-				channelId: channelId,
-				roleId: roleId || '',
-				permission: changedPermissionValueList
-			})
-		);
+		// const response = await dispatch(
+		// 	permissionRoleChannelActions.setPermissionRoleChannel({
+		// 		channelId: channelId,
+		// 		roleId: roleId || '',
+		// 		permission: changedPermissionValueList
+		// 	})
+		// );
+		// const isError = response?.meta?.requestStatus === ERequestStatus.Rejected;
+		const isError = true;
+		if (isError) {
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: 'Save Failed',
+					leadingIcon: <Icons.CloseIcon color={Colors.red} />
+				}
+			});
+		} else {
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: 'Save Successfully',
+					leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
+				}
+			});
+		}
 		if (visibleConfirmModal) {
 			navigation.goBack();
 		}
@@ -125,11 +146,11 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 		}
 	}, [changedChannelPermissionList, channelPermissionList]);
 
-	useEffect(() => {
-		if (channelId && roleId) {
-			dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId, roleId }));
-		}
-	}, [channelId, dispatch, roleId]);
+	// useEffect(() => {
+	// 	if (channelId && roleId) {
+	// 		dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId, roleId }));
+	// 	}
+	// }, [channelId, dispatch, roleId]);
 
 	return (
 		<Block flex={1} backgroundColor={themeValue.secondary} paddingHorizontal={size.s_18} gap={size.s_18}>

@@ -13,13 +13,16 @@ export function useUserPermission() {
 
 	const maxPermissionLevel = useMemo(() => {
 		if (hasAdministrator) {
-			return 1;
+			return 4;
 		}
 		if (hasManageClan) {
+			return 3;
+		}
+		if (hasManageChannel || hasViewChannel) {
 			return 2;
 		}
-		return 3;
-	}, [hasAdministrator, hasManageClan]);
+		return 1;
+	}, [hasAdministrator, hasManageClan, hasManageChannel, hasViewChannel]);
 
 	const userPermissionsStatus = {
 		hasAdministrator,

@@ -4,7 +4,9 @@ import { channelUsersActions, selectCurrentClanId, useAppDispatch } from '@mezon
 import { memo, useMemo } from 'react';
 import { TouchableOpacity } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { EOverridePermissionType, ERequestStatus } from '../../types/channelPermission.enum';
 import { IRoleItemProps } from '../../types/channelPermission.type';
 
 export const RoleItem = memo(
@@ -24,12 +26,30 @@ export const RoleItem = memo(
 				roleId: role?.id || '',
 				channelType: channel?.type
 			};
-			await dispatch(channelUsersActions.removeChannelRole(body));
+			const response = await dispatch(channelUsersActions.removeChannelRole(body));
+			const isError = response?.meta?.requestStatus === ERequestStatus.Rejected;
+			if (isError) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: 'Save Failed',
+						leadingIcon: <Icons.CloseIcon color={Colors.red} />
+					}
+				});
+			} else {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: 'Save Successfully',
+						leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
+					}
+				});
+			}
 		};
 
 		const onPressRoleItem = () => {
 			if (isAdvancedSetting) {
-				onPress && onPress(role?.id);
+				onPress && onPress(role?.id, EOverridePermissionType.Role);
 				return;
 			}
 			onSelectRoleChange(!isChecked, role?.id);

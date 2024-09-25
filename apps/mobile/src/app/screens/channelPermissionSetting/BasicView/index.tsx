@@ -12,16 +12,17 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { MezonConfirm, MezonSwitch } from '../../../temp-ui';
 import { AddMemberOrRoleBS } from '../components/AddMemberOrRoleBS';
 import { MemberItem } from '../components/MemberItem';
 import { RoleItem } from '../components/RoleItem';
+import { EOverridePermissionType } from '../types/channelPermission.enum';
 import { IBasicViewProps } from '../types/channelPermission.type';
 
 export const BasicView = memo(({ channel }: IBasicViewProps) => {
@@ -38,25 +39,34 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const allClanMembers = useSelector(selectAllUserClans);
 
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const listOfChannelMember = useAppSelector((state) => selectAllChannelMembers(state, channel.channel_id as string));
+	const listOfChannelMember = useAppSelector((state) => selectAllChannelMembers(state, channel?.channel_id as string));
 
 	const clanOwner = useMemo(() => {
 		return allClanMembers?.find((member) => checkClanOwner(member?.user?.id));
 	}, [allClanMembers, checkClanOwner]);
 
 	const availableMemberList = useMemo(() => {
-		if (isPrivateChannel) {
+		if (channel?.channel_private) {
 			return listOfChannelMember;
 		}
 		return [clanOwner];
-	}, [listOfChannelMember, isPrivateChannel, clanOwner]);
+	}, [listOfChannelMember, channel?.channel_private, clanOwner]);
 
 	const availableRoleList = useMemo(() => {
-		if (isPrivateChannel) {
+		if (channel?.channel_private) {
 			return listOfChannelRole?.filter((role) => typeof role?.role_channel_active === 'number' && role?.role_channel_active === 1);
 		}
 		return [everyoneRole];
-	}, [listOfChannelRole, isPrivateChannel, everyoneRole]);
+	}, [listOfChannelRole, channel?.channel_private, everyoneRole]);
+
+	const combineWhoCanAccessList = useMemo(() => {
+		return [
+			{ headerTitle: t('channelPermission.roles'), isShowHeader: availableRoleList?.length },
+			...availableRoleList.map((role) => ({ ...role, type: EOverridePermissionType.Role })),
+			{ headerTitle: t('channelPermission.members'), isShowHeader: availableMemberList?.length },
+			...availableMemberList.map((member) => ({ ...member, type: EOverridePermissionType.Member }))
+		];
+	}, [availableMemberList, availableRoleList, t]);
 
 	const onPrivateChannelChange = useCallback((value: boolean) => {
 		setIsPrivateChannel(value);
@@ -90,8 +100,8 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 			Toast.show({
 				type: 'success',
 				props: {
-					text2: 'Save Fail',
-					leadingIcon: <Icons.ClockXIcon color={Colors.red} />
+					text2: 'Save Failed',
+					leadingIcon: <Icons.CloseIcon color={Colors.red} />
 				}
 			});
 		}
@@ -101,13 +111,37 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		setIsPrivateChannel(!isPrivateChannel);
 	};
 
+	const renderWhoCanAccessItem = useCallback(
+		({ item }) => {
+			const { type, headerTitle, isShowHeader } = item;
+			if (!type && headerTitle && isShowHeader) {
+				return (
+					<Block paddingTop={size.s_12} paddingLeft={size.s_12}>
+						<Text color={themeValue.white} h4>
+							{headerTitle}:
+						</Text>
+					</Block>
+				);
+			}
+			switch (type) {
+				case EOverridePermissionType.Member:
+					return <MemberItem member={item} channelId={channel?.channel_id} />;
+				case EOverridePermissionType.Role:
+					return <RoleItem role={item} channel={channel} />;
+				default:
+					return <Block />;
+			}
+		},
+		[channel, themeValue]
+	);
+
 	useEffect(() => {
 		if (channel?.channel_private !== undefined) {
 			setIsPrivateChannel(Boolean(channel?.channel_private));
 		}
 	}, [channel?.channel_private]);
 	return (
-		<ScrollView>
+		<Block flex={1}>
 			<TouchableOpacity onPress={() => onPrivateChannelChange(!isPrivateChannel)}>
 				<Block
 					flexDirection="row"
@@ -149,18 +183,17 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				</Block>
 			)}
 
-			<Block gap={size.s_10} marginBottom={size.s_10}>
+			<Block gap={size.s_10} marginBottom={size.s_10} flex={1}>
 				<Text color={themeValue.textDisabled}>{t('channelPermission.whoCanAccess')}</Text>
-				<Block backgroundColor={themeValue.primary} borderRadius={size.s_14}>
-					{availableRoleList?.map((role) => {
-						return <RoleItem key={role?.id} role={role} channel={channel} />;
-					})}
-				</Block>
-
-				<Block backgroundColor={themeValue.primary} borderRadius={size.s_14}>
-					{availableMemberList?.map((member) => {
-						return <MemberItem key={member?.id} member={member} channelId={channel?.channel_id} />;
-					})}
+				<Block backgroundColor={themeValue.primary} borderRadius={size.s_14} flex={1}>
+					<FlashList
+						data={combineWhoCanAccessList}
+						keyboardShouldPersistTaps={'handled'}
+						renderItem={renderWhoCanAccessItem}
+						estimatedItemSize={20}
+						keyExtractor={(item) => `${item?.id}_${item?.headerTitle}`}
+						removeClippedSubviews={true}
+					/>
 				</Block>
 			</Block>
 
@@ -183,6 +216,6 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				hasBackdrop={true}
 			/>
 			<AddMemberOrRoleBS bottomSheetRef={bottomSheetRef} channel={channel} />
-		</ScrollView>
+		</Block>
 	);
 });

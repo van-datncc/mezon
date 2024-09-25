@@ -153,7 +153,8 @@ type MenuChannelStackParamList = {
 	};
 	[APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES]: {
 		channelId: string;
-		roleId: string;
+		id: string;
+		type?: number;
 	};
 };
 
