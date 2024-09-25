@@ -11,22 +11,24 @@ export interface MaxPermissionRoleChannelState extends EntityState<ApiPermission
 	error?: string | null;
 }
 
-export const maxPermissionRoleChannelAdapter = createEntityAdapter({
+const maxPermissionRoleChannelAdapter = createEntityAdapter({
 	selectId: (permission: ApiPermission) => permission.id || ''
 });
 
-type fetchMaxPermissionChannelsArgs = {
+type FetchMaxPermissionChannelsArgs = {
 	channelId: string;
 	clanId: string;
 };
 
+/**
+ * @deprecated use overriddenPolicies instead
+ */
 export const fetchMaxPermissionRoleChannel = createAsyncThunk(
 	'permissionrolechannel/fetchMaxPermissionRoleChannel',
-	async ({ clanId, channelId }: fetchMaxPermissionChannelsArgs, thunkAPI) => {
+	async ({ clanId, channelId }: FetchMaxPermissionChannelsArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const response = await mezon.socketRef.current?.listUserPermissionInChannel(clanId, channelId);
-			console.log('permissionrolechannel: ', response);
 			if (response && response.permissions.permissions) {
 				await thunkAPI.dispatch(maxPermissionRoleChannelActions.setMaxPermissionChannel(response.permissions.permissions));
 				return response?.permissions.permissions;
@@ -38,12 +40,15 @@ export const fetchMaxPermissionRoleChannel = createAsyncThunk(
 	}
 );
 
-export const initialMaxPermissionRoleChannelState: MaxPermissionRoleChannelState = maxPermissionRoleChannelAdapter.getInitialState({
+const initialMaxPermissionRoleChannelState: MaxPermissionRoleChannelState = maxPermissionRoleChannelAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	channelPermissions: [],
 	error: null
 });
 
+/**
+ * @deprecated use overriddenPolicies instead
+ */
 export const maxPermissionRoleChannelSlice = createSlice({
 	name: MAX_PERMISSION_ROLE_CHANNEL_FEATURE_KEY,
 	initialState: initialMaxPermissionRoleChannelState,
@@ -72,8 +77,8 @@ export const maxPermissionRoleChannelSlice = createSlice({
 	}
 });
 
-/*
- * Export reducer for store configuration.
+/**
+ * @deprecated use overriddenPolicies instead
  */
 export const maxPermissionRoleChannelReducer = maxPermissionRoleChannelSlice.reducer;
 
@@ -82,10 +87,18 @@ export const maxPermissionRoleChannelActions = {
 	fetchMaxPermissionRoleChannel
 };
 
-const { selectAll, selectEntities } = maxPermissionRoleChannelAdapter.getSelectors();
+const { selectAll } = maxPermissionRoleChannelAdapter.getSelectors();
 
+/**
+ * @deprecated use overriddenPolicies instead
+ * @param rootState
+ * @returns
+ */
 export const getMaxPermissionRoleChannelState = (rootState: {
 	[MAX_PERMISSION_ROLE_CHANNEL_FEATURE_KEY]: MaxPermissionRoleChannelState;
 }): MaxPermissionRoleChannelState => rootState[MAX_PERMISSION_ROLE_CHANNEL_FEATURE_KEY];
 
+/**
+ * @deprecated use overriddenPolicies instead
+ */
 export const selectAllMaxPermissionRoleChannel = createSelector(getMaxPermissionRoleChannelState, selectAll);
