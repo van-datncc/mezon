@@ -73,7 +73,6 @@ export const checkDuplicateThread = createAsyncThunk('thread/duplicateNameCthrea
 		if (isDuplicateName?.type === TypeCheck.TYPETHREAD) {
 			return isDuplicateName.exist;
 		}
-		return;
 	} catch (error: any) {
 		Sentry.captureException(error);
 		const errmsg = await error.json();
