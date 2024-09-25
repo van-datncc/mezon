@@ -46,6 +46,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		if (response) {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 				await thunkAPI.dispatch(
 					channelsActions.joinChat({
