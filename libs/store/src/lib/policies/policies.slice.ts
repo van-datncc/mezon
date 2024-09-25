@@ -12,6 +12,7 @@ export const POLICIES_FEATURE_KEY = 'policies';
 
 export interface PermissionUserEntity extends IPermissionUser {
 	id: string; // Primary ID
+	max_level_permission?: number;
 }
 
 export const mapPermissionUserToEntity = (userPermissions: ApiPermission) => {
@@ -113,6 +114,18 @@ export const getPoliciesState = (rootState: { [POLICIES_FEATURE_KEY]: PoliciesSt
 export const getPoliciesDefaultState = (rootState: { ['policiesDefaultSlice']: PoliciesState }): PoliciesState => rootState['policiesDefaultSlice'];
 
 export const selectAllPermissionsUser = createSelector(getPoliciesState, selectAll);
+
+export const selectUserMaxPermissionLevel = createSelector(selectAllPermissionsUser, (userPermissions) => {
+	let maxPermissionLevel: number | null = null;
+	for (const permission of userPermissions) {
+		if (Number.isInteger(permission?.max_level_permission)) {
+			const permissionLevel = permission.max_level_permission as number;
+			maxPermissionLevel = maxPermissionLevel === null ? permissionLevel : Math.max(maxPermissionLevel, permissionLevel);
+		}
+	}
+
+	return maxPermissionLevel ?? null;
+});
 
 export const selectAllPermissionsDefault = createSelector(getPoliciesDefaultState, selectAll);
 
