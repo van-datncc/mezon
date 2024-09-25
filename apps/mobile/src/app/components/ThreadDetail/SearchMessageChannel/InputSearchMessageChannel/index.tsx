@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, EOpenSearchChannelFrom, FilterSearchIcon, Icons, IOption, IUerMention } from '@mezon/mobile-components';
+import { ArrowLeftIcon, FilterSearchIcon, Icons, IOption, IUerMention } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { NativeSyntheticEvent, Pressable, Text, TextInput, TextInputKeyPressEventData, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import ListOptionSearch from '../ListOptionSearch';
@@ -19,7 +19,7 @@ type InputSearchMessageChannelProps = {
 	userMention: IUerMention;
 	currentChannel: IChannel | DirectEntity;
 	optionFilter: IOption;
-	onKeyPress: (e) => void;
+	onKeyPress: (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
 };
 
 const InputSearchMessageChannel = ({
@@ -92,10 +92,10 @@ const InputSearchMessageChannel = ({
 					onChangeText={handleTextChange}
 					style={styles.input}
 					placeholderTextColor={themeValue.text}
-					placeholder={(optionFilter?.title || userMention?.display) ? '' : t('search')}
+					placeholder={optionFilter?.title || userMention?.display ? '' : t('search')}
 					autoFocus
 				></TextInput>
-				{!!textInput?.length ? (
+				{textInput?.length ? (
 					<Pressable onPress={() => clearTextInput()}>
 						<CircleXIcon height={18} width={18} color={themeValue.text} />
 					</Pressable>

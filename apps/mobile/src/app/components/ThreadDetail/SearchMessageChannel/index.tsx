@@ -24,6 +24,8 @@ type SearchMessageChannelProps = {
 	route: MuteThreadDetailRouteProp;
 };
 
+const Backspace = 'Backspace';
+
 export const SearchMessageChannelContext = createContext(null);
 
 const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
@@ -94,7 +96,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		}
 	};
 	const handleKeyPress = (e) => {
-		if (e.nativeEvent.key === 'Backspace' && !searchText?.length) {
+		if (e.nativeEvent.key === Backspace && !searchText?.length) {
 			setUserMention(null);
 			setOptionFilter(null);
 		}

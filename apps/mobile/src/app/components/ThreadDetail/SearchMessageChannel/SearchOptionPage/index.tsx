@@ -38,7 +38,9 @@ function SearchOptionPage({ searchText, onSelect, optionFilter }: ISeachOptionPa
 
 		const searchTextUserMention = searchText;
 		if (searchTextUserMention) {
-			return userListDataSearchByMention?.filter((user) => user?.display?.toLowerCase().includes(searchTextUserMention?.toLowerCase()?.trim()));
+			return userListDataSearchByMention?.filter((user) =>
+				user?.display?.toLowerCase()?.trim().includes(searchTextUserMention?.toLowerCase()?.trim())
+			);
 		}
 		return userListDataSearchByMention;
 	}, [searchText, userListDataSearchByMention]);
