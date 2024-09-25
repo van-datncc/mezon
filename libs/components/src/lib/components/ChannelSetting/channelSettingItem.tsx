@@ -63,6 +63,13 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 			}
 			return <Icons.Speaker defaultSize="w-5 h-5 min-w-5" />;
 		}
+
+		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (isPrivate) {
+				return <Icons.SpeakerLocked defaultSize="w-5 h-5 min-w-5" />;
+			}
+			return <Icons.Stream defaultSize="w-5 h-5 min-w-5" />;
+		}
 	};
 
 	return (
