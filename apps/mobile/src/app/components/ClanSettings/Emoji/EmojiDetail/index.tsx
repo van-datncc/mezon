@@ -17,7 +17,7 @@ import { style } from './styles';
 
 type ServerDetailProps = {
 	item: ClanEmoji;
-	onSwipeOpen?: () => void;
+	onSwipeOpen?: (item: ClanEmoji) => void;
 };
 
 const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: Ref<SwipeableMethods>) => {
@@ -60,6 +60,10 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 		}
 	};
 
+	const handleSwipableWillOpen = () => {
+		onSwipeOpen(item);
+	};
+
 	const handleBlur = () => {
 		setIsFocused(false);
 		if (!emojiName) {
@@ -91,7 +95,7 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 	};
 
 	return (
-		<Swipeable ref={ref} onSwipeableWillOpen={onSwipeOpen} enabled={hasDeleteOrEditPermission} renderRightActions={RightAction}>
+		<Swipeable ref={ref} onSwipeableWillOpen={handleSwipableWillOpen} enabled={hasDeleteOrEditPermission} renderRightActions={RightAction}>
 			<Pressable style={styles.container} onPress={focusTextInput}>
 				<View style={styles.emojiItem}>
 					<FastImage style={styles.emoji} resizeMode={'contain'} source={{ uri: item.src }} />
