@@ -5,7 +5,11 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		wrapperServerList: {
 			paddingTop: size.s_20,
-			flex: 1
+		},
+		
+		wrapperLogo: {
+			alignSelf: 'center',
+			marginHorizontal: size.s_10,
 		},
 
 		badge: {

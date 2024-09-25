@@ -210,6 +210,8 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: colors.border,
 		backgroundColor: colors.secondary,
+		paddingHorizontal: size.s_14,
+		paddingVertical: size.s_8,
 	},
 	lineActiveClan: {
 		backgroundColor: Colors.azureBlue,
@@ -238,9 +240,7 @@ export const style = (colors: Attributes) => StyleSheet.create({
 		top: size.s_6,
 	},
 	iconBar: {
-		paddingLeft: size.s_14,
 		paddingRight: size.s_14,
-		paddingVertical: size.s_14,
 	},
 	wrapperServerList: {
 		height: '100%',
@@ -468,9 +468,9 @@ export const style = (colors: Attributes) => StyleSheet.create({
 	iconWelcomeMessage: {
 		backgroundColor: colors.primary,
 		marginBottom: size.s_10,
-		width: 70,
-		height: 70,
-		borderRadius: 50,
+		width: size.s_70,
+		height: size.s_70,
+		borderRadius: size.s_50,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},

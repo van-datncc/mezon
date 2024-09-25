@@ -98,7 +98,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 
 	return (
         <View style={styles.containerMessages}>
-            <View style={styles.containerServerlist}>
+            <View>
                 <ServerList />
             </View>
 
