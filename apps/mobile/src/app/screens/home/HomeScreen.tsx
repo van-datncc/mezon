@@ -38,8 +38,8 @@ const HomeScreen = React.memo((props: any) => {
 				swipeEdgeWidth: Metrics.screenWidth,
 				swipeMinDistance: 5,
 				drawerStyle: {
-					width: '100%',
-				},
+					width: '100%'
+				}
 			}}
 			screenListeners={{
 				state: (e) => {
@@ -49,7 +49,7 @@ const HomeScreen = React.memo((props: any) => {
 					} else {
 						dispatch(appActions.setHiddenBottomTabMobile(true));
 					}
-				},
+				}
 			}}
 			drawerContent={() => <LeftDrawerContent />}
 		>
@@ -61,7 +61,7 @@ const HomeScreen = React.memo((props: any) => {
 					swipeEdgeWidth: Metrics.screenWidth,
 					keyboardDismissMode: 'none',
 					swipeMinDistance: 5,
-					headerShown: false,
+					headerShown: false
 				}}
 			/>
 		</Drawer.Navigator>

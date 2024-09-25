@@ -3,19 +3,19 @@ import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes, isTablet: boolean) =>
 	StyleSheet.create({
-		containerMessages: { 
-			flex: 1, 
-			flexDirection: 'row', 
+		containerMessages: {
+			flex: 1,
+			flexDirection: 'row',
 			backgroundColor: colors.tertiary
 		},
 
-		containerServerlist: { 
+		containerServerlist: {
 			paddingHorizontal: size.s_10
 		},
 
 		container: {
 			backgroundColor: isTablet ? colors.primary : colors.secondary,
-			flex: 1,
+			flex: 1
 		},
 
 		containerDetailMessage: {
@@ -30,7 +30,7 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 			paddingHorizontal: size.s_18
 		},
 
-		friendsWrapper:  {
+		friendsWrapper: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: size.s_4,

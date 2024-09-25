@@ -132,9 +132,7 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 				/>
 				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} value={channelType} />
 
-				{channelType !== ChannelType.CHANNEL_TYPE_VOICE &&
-					<MezonMenu menu={menuPrivate} />
-				}
+				{channelType !== ChannelType.CHANNEL_TYPE_VOICE && <MezonMenu menu={menuPrivate} />}
 			</ScrollView>
 		</View>
 	);

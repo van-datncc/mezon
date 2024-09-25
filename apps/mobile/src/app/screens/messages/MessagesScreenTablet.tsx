@@ -1,7 +1,16 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, appActions, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlist, useAppDispatch } from '@mezon/store-mobile';
+import {
+	DirectEntity,
+	RootState,
+	appActions,
+	directActions,
+	getStoreAsync,
+	selectAllClans,
+	selectDirectsOpenlist,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,7 +40,7 @@ const sortDMItem = (notSortedArr: IChannel[]): IChannel[] => {
 
 const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 	const { themeValue } = useTheme();
-    const isTabletLandscape = useTabletLandscape();
+	const isTabletLandscape = useTabletLandscape();
 	const styles = style(themeValue, isTabletLandscape);
 	const [searchText, setSearchText] = useState<string>('');
 	const directsOpenList = useSelector(selectDirectsOpenlist);
@@ -41,16 +50,16 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 	const clans = useSelector(selectAllClans);
 	const bottomSheetDMMessageRef = useRef<BottomSheetModal>(null);
 	const searchInputRef = useRef(null);
-    const dispatch = useAppDispatch()
-    const [directMessageId, setDirectMessageId] = useState<string>()
+	const dispatch = useAppDispatch();
+	const [directMessageId, setDirectMessageId] = useState<string>();
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
-        dispatch(appActions.setHiddenBottomTabMobile(true));
+		dispatch(appActions.setHiddenBottomTabMobile(true));
 
 		return () => {
 			appStateSubscription.remove();
-            dispatch(appActions.setHiddenBottomTabMobile(false));
+			dispatch(appActions.setHiddenBottomTabMobile(false));
 		};
 	}, []);
 
@@ -92,89 +101,88 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 		}
 	};
 
-    const handleFriendsPress = () => {
-        setDirectMessageId('')
-    }
+	const handleFriendsPress = () => {
+		setDirectMessageId('');
+	};
 
 	return (
-        <View style={styles.containerMessages}>
-            <View>
-                <ServerList />
-            </View>
+		<View style={styles.containerMessages}>
+			<View>
+				<ServerList />
+			</View>
 
-            <View style={styles.container}>
-                <View style={styles.headerWrapper}>
-                    <Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
-                    <Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
-                        <Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-                        <Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
-                    </Pressable>
-                </View>
+			<View style={styles.container}>
+				<View style={styles.headerWrapper}>
+					<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
+					<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
+						<Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+						<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
+					</Pressable>
+				</View>
 
-                <View style={styles.searchMessage}>
-                    <Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
-                    <TextInput
-                        ref={searchInputRef}
-                        placeholder={t('common:searchPlaceHolder')}
-                        placeholderTextColor={themeValue.text}
-                        style={styles.searchInput}
-                        onChangeText={(text) => typingSearchDebounce(text)}
-                    />
-                    {!!searchText?.length && (
-                        <Pressable onPress={clearTextInput}>
-                            <Icons.CircleXIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
-                        </Pressable>
-                    )}
-                </View>
-                
-                <Pressable onPress={handleFriendsPress} style={[styles.friendsWrapper, !directMessageId && { backgroundColor: themeValue.secondary }]}>
-                    <Icons.FriendIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-                    <Text style={styles.headerTitle}>{t('dmMessage:friends')}</Text>
-                </Pressable>
+				<View style={styles.searchMessage}>
+					<Icons.MagnifyingIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+					<TextInput
+						ref={searchInputRef}
+						placeholder={t('common:searchPlaceHolder')}
+						placeholderTextColor={themeValue.text}
+						style={styles.searchInput}
+						onChangeText={(text) => typingSearchDebounce(text)}
+					/>
+					{!!searchText?.length && (
+						<Pressable onPress={clearTextInput}>
+							<Icons.CircleXIcon height={size.s_20} width={size.s_20} color={themeValue.text} />
+						</Pressable>
+					)}
+				</View>
 
-                {clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ? (
-                    <UserEmptyMessage
-                        onPress={() => {
-                            navigateToAddFriendScreen();
-                        }}
-                    />
-                ) : (
-                    <FlatList
-                        data={filteredDataDM}
-                        style={styles.dmMessageListContainer}
-                        showsVerticalScrollIndicator={false}
-                        keyExtractor={(dm) => dm.id.toString()}
-                        ItemSeparatorComponent={SeparatorWithSpace}
-                        renderItem={({ item }) => (
-                            <DmListItem 
-                                directMessage={item} 
-                                navigation={navigation} 
-                                key={item.id} 
-                                onLongPress={() => handleLongPress(item)} 
-                                onPress={setDirectMessageId} 
-                                directMessageId={directMessageId}
-                            />
-                        )}
-                    />
-                )}
+				<Pressable
+					onPress={handleFriendsPress}
+					style={[styles.friendsWrapper, !directMessageId && { backgroundColor: themeValue.secondary }]}
+				>
+					<Icons.FriendIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+					<Text style={styles.headerTitle}>{t('dmMessage:friends')}</Text>
+				</Pressable>
 
-                <Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
-                    <Icons.MessagePlusIcon width={size.s_22} height={size.s_22} />
-                </Pressable>
+				{clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ? (
+					<UserEmptyMessage
+						onPress={() => {
+							navigateToAddFriendScreen();
+						}}
+					/>
+				) : (
+					<FlatList
+						data={filteredDataDM}
+						style={styles.dmMessageListContainer}
+						showsVerticalScrollIndicator={false}
+						keyExtractor={(dm) => dm.id.toString()}
+						ItemSeparatorComponent={SeparatorWithSpace}
+						renderItem={({ item }) => (
+							<DmListItem
+								directMessage={item}
+								navigation={navigation}
+								key={item.id}
+								onLongPress={() => handleLongPress(item)}
+								onPress={setDirectMessageId}
+								directMessageId={directMessageId}
+							/>
+						)}
+					/>
+				)}
 
-                <MezonBottomSheet ref={bottomSheetDMMessageRef} snapPoints={['40%', '60%']}>
-                    <MessageMenu messageInfo={directMessageSelected} />
-                </MezonBottomSheet>
-            </View>
+				<Pressable style={styles.addMessage} onPress={() => navigateToNewMessageScreen()}>
+					<Icons.MessagePlusIcon width={size.s_22} height={size.s_22} />
+				</Pressable>
 
-            <View style={styles.containerDetailMessage}>
-                {!!directMessageId ?
-                    <DirectMessageDetailTablet directMessageId={directMessageId} />
-                    :
-                    <FriendsTablet navigation={navigation} />
-                }
-            </View>
-        </View>
+				<MezonBottomSheet ref={bottomSheetDMMessageRef} snapPoints={['40%', '60%']}>
+					<MessageMenu messageInfo={directMessageSelected} />
+				</MezonBottomSheet>
+			</View>
+
+			<View style={styles.containerDetailMessage}>
+				{directMessageId ? <DirectMessageDetailTablet directMessageId={directMessageId} /> : <FriendsTablet navigation={navigation} />}
+			</View>
+		</View>
 	);
 };
 

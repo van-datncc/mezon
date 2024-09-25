@@ -20,7 +20,7 @@ const ServerList = React.memo(() => {
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 	const dispatch = useAppDispatch();
-	
+
 	const navigateToDM = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.HOME);
 		if (isTabletLandscape) {
