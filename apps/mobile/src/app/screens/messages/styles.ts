@@ -42,7 +42,7 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 		},
 
 		headerTitle: {
-			fontSize: size.s_18,
+			fontSize: isTablet ? size.s_16 : size.s_18,
 			color: colors.textStrong
 		},
 
@@ -59,7 +59,7 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 		},
 
 		addFriendText: {
-			fontSize: size.label,
+			fontSize: isTablet ? size.medium : size.label,
 			color: colors.textStrong
 		},
 
