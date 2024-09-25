@@ -133,6 +133,10 @@ export const notificationSlice = createSlice({
 			state.specificNotifications = remainingNotifications;
 		},
 
+		removeAllNotificattionChannel: (state) => {
+			state.specificNotifications = [];
+		},
+
 		setNotiListUnread(state, action) {
 			const storedIds = localStorage.getItem('notiUnread');
 			const ids = storedIds ? JSON.parse(storedIds) : [];
