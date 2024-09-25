@@ -50,6 +50,7 @@ import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessa
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
 import { channelsStreamReducer } from './stream/channelsStream.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
+import { videoStreamReducer } from './stream/videoStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slide';
 import { threadsReducer } from './threads/threads.slice';
 import { toastListenerMiddleware } from './toasts/toasts.listener';
@@ -332,6 +333,7 @@ const reducer = {
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	channelsstream: channelsStreamReducer,
+	videostream: videoStreamReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,

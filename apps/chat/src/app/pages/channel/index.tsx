@@ -9,8 +9,6 @@ import {
 	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectStatusMenu,
-	selectStreamChannelByChannelId,
-	selectStreamMembersByChannelId,
 	useAppDispatch
 } from '@mezon/store';
 import { EPermission, TIME_OFFSET } from '@mezon/utils';
@@ -19,7 +17,6 @@ import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
-import ChannelStream from './ChannelStream';
 import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
@@ -83,8 +80,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
-	const streamChannelMember = useSelector(selectStreamMembersByChannelId(channelId));
-	const channelStream = useSelector(selectStreamChannelByChannelId(channelId));
 
 	useChannelSeen(currentChannel?.id || '');
 
@@ -102,42 +97,42 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [isShowMemberList, setIsShowCreateThread]);
 
-	return currentChannel.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
-		<ChannelStream key={channelId} hlsUrl={channelStream?.streaming_url} memberJoin={streamChannelMember}></ChannelStream>
-	) : (
-		<>
-			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
-			<div
-				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
-				id="mainChat"
-				onDragEnter={handleDragEnter}
-			>
-				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
-					<div
-						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
-					>
+	return (
+		currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+			<>
+				{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+				<div
+					className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
+					id="mainChat"
+					onDragEnter={handleDragEnter}
+				>
+					<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 						<div
-							className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
-							ref={messagesContainerRef}
+							className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
 						>
-							<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+							<div
+								className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
+								ref={messagesContainerRef}
+							>
+								<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+							</div>
+							<ChannelMainContentText channelId={currentChannel?.id as string} />
 						</div>
-						<ChannelMainContentText channelId={currentChannel?.id as string} />
+						{isShowMemberList && (
+							<div
+								onContextMenu={(event) => event.preventDefault()}
+								className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+								id="memberList"
+							>
+								<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+								<MemberList />
+							</div>
+						)}
+						{isSearchMessage && <SearchMessageChannel />}
 					</div>
-					{isShowMemberList && (
-						<div
-							onContextMenu={(event) => event.preventDefault()}
-							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
-							id="memberList"
-						>
-							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
-							<MemberList />
-						</div>
-					)}
-					{isSearchMessage && <SearchMessageChannel />}
 				</div>
-			</div>
-		</>
+			</>
+		)
 	);
 };
 

@@ -179,7 +179,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstreamingchannelended = useCallback(
 		(channel: StreamingEndedEvent) => {
-			dispatch(usersStreamActions.remove(channel.channel_id));
+			dispatch(channelsStreamActions.remove(channel.channel_id));
 		},
 		[dispatch]
 	);
@@ -572,6 +572,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(notificationActions.removeAllNotificattionChannel());
 			}
 		},
 		[currentClanId, dispatch, navigate, userId]
@@ -582,6 +583,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelDeleted) {
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(notificationActions.removeNotificationsByChannelId(channelDeleted.channel_id));
 			}
 		},
 		[dispatch]
