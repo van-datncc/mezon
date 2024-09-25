@@ -1,4 +1,4 @@
-import { Attributes, baseColor, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, size } from '@mezon/mobile-ui';
 import { Dimensions, StyleSheet } from 'react-native';
 const { width } = Dimensions.get('screen');
 
@@ -47,6 +47,11 @@ export const style = (colors: Attributes) =>
 			fontWeight: 'bold',
 			fontSize: size.s_14,
 			marginBottom: size.s_4
+		},
+		deleteText: {
+			color: Colors.white,
+			fontWeight: 'bold',
+			fontSize: size.s_14
 		},
 		emoji: {
 			height: size.s_30,
