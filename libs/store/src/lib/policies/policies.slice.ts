@@ -14,9 +14,9 @@ export interface PermissionUserEntity extends IPermissionUser {
 	id: string; // Primary ID
 }
 
-export const mapPermissionUserToEntity = (PermissionsUserRes: ApiPermission) => {
-	const id = (PermissionsUserRes as unknown as any).id;
-	return { ...PermissionsUserRes, id };
+export const mapPermissionUserToEntity = (userPermissions: ApiPermission) => {
+	const id = (userPermissions as unknown as any).id;
+	return { ...userPermissions, id };
 };
 
 export interface PoliciesState extends EntityState<PermissionUserEntity, string> {
@@ -69,10 +69,7 @@ export const initialPoliciesState: PoliciesState = policiesAdapter.getInitialSta
 export const policiesSlice = createSlice({
 	name: POLICIES_FEATURE_KEY,
 	initialState: initialPoliciesState,
-	reducers: {
-		add: policiesAdapter.addOne,
-		remove: policiesAdapter.removeOne
-	},
+	reducers: {},
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchPermissionsUser.pending, (state: PoliciesState) => {
@@ -82,7 +79,6 @@ export const policiesSlice = createSlice({
 				policiesAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
-
 			.addCase(fetchPermissionsUser.rejected, (state: PoliciesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
@@ -114,9 +110,9 @@ const { selectAll } = policiesAdapter.getSelectors();
 
 export const getPoliciesState = (rootState: { [POLICIES_FEATURE_KEY]: PoliciesState }): PoliciesState => rootState[POLICIES_FEATURE_KEY];
 
-export const selectAllPermissionsUser = createSelector(getPoliciesState, selectAll);
-
 export const getPoliciesDefaultState = (rootState: { ['policiesDefaultSlice']: PoliciesState }): PoliciesState => rootState['policiesDefaultSlice'];
+
+export const selectAllPermissionsUser = createSelector(getPoliciesState, selectAll);
 
 export const selectAllPermissionsDefault = createSelector(getPoliciesDefaultState, selectAll);
 

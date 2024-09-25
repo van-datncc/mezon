@@ -40,6 +40,7 @@ export * from './lib/permissionChannel/maxPermissionRoleChannel.slice';
 export * from './lib/permissionChannel/permissionChannel.slice';
 export * from './lib/permissionChannel/permissionRoleChannel.slice';
 export * from './lib/pinMessages/pinMessage.slice';
+export * from './lib/policies/overriddenPolicies.slice';
 export * from './lib/policies/policies.slice';
 export * from './lib/reactionMessage/reactionMessage.slice';
 export * from './lib/roleclan/roleclan.slice';

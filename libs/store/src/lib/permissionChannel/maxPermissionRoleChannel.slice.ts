@@ -26,11 +26,11 @@ export const fetchMaxPermissionRoleChannel = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const response = await mezon.socketRef.current?.listUserPermissionInChannel(clanId, channelId);
+			console.log('permissionrolechannel: ', response);
 			if (response && response.permissions.permissions) {
 				await thunkAPI.dispatch(maxPermissionRoleChannelActions.setMaxPermissionChannel(response.permissions.permissions));
 				return response?.permissions.permissions;
 			}
-			console.log('response: ', response);
 			return thunkAPI.rejectWithValue([]);
 		} catch (error) {
 			return thunkAPI.rejectWithValue([]);
