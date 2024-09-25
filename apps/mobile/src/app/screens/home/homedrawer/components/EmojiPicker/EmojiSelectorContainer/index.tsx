@@ -90,19 +90,21 @@ export default function EmojiSelectorContainer({
 	const dispatch = useDispatch();
 
 	const cateIcon = useMemo(() => {
-		const clanEmojis = categoryEmoji.map((item) =>
-			currentClan?.logo ? (
-				<View style={{ height: 24, width: 24, borderRadius: 12, overflow: 'hidden' }}>
-					<MezonClanAvatar alt={item?.clan_name} image={item?.clan_logo} />
-				</View>
-			) : (
-				<PenIcon color={themeValue.textStrong} />
-			)
-		);
+		const clanEmojis = categoryEmoji?.length
+			? categoryEmoji?.map((item) =>
+					item?.clan_logo ? (
+						<View style={styles.clanLogo}>
+							<MezonClanAvatar alt={item?.clan_name} image={item?.clan_logo} />
+						</View>
+					) : (
+						<PenIcon color={themeValue.textStrong} />
+					)
+				)
+			: [];
 		return [
 			<Icons.ClockIcon color={themeValue.textStrong} />,
 			...clanEmojis,
-			<SmilingFaceIcon height={24} width={24} color={themeValue.textStrong} />,
+			<SmilingFaceIcon height={size.s_24} width={size.s_24} color={themeValue.textStrong} />,
 			<LeafIcon color={themeValue.textStrong} />,
 			<BowlIcon color={themeValue.textStrong} />,
 			<GameControllerIcon color={themeValue.textStrong} />,
