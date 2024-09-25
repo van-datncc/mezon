@@ -8,7 +8,7 @@ import {
 	videoStreamActions
 } from '@mezon/store';
 import { NameComponent } from '@mezon/ui';
-import { IChannelMember, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { IChannelMember, IStreamInfo, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import Hls from 'hls.js';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,6 +21,7 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const isPlaying = useSelector(selectStatusStream);
 	const [isLoading, setIsLoading] = useState(true);
+	const [isMuted, setIsMuted] = useState(false);
 
 	useEffect(() => {
 		const videoElement = videoRef.current;
@@ -38,12 +39,10 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 				});
 
 				hls.on(Hls.Events.ERROR, (event, data) => {
-					// console.error(`HLS error detected:`, data);
 					if (data.fatal && hls) {
 						switch (data.type) {
 							case Hls.ErrorTypes.NETWORK_ERROR:
 								if (retryCount < maxRetries) {
-									// console.log('Network error, retrying...', retryCount);
 									retryCount++;
 									setTimeout(() => {
 										if (hls) {
@@ -52,19 +51,16 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 										}
 									}, 2000);
 								} else {
-									// console.error('Max retries reached, giving up.');
 									setIsLoading(false);
 								}
 								break;
 							case Hls.ErrorTypes.MEDIA_ERROR:
 								if (hls) {
-									// console.warn('Media error, attempting recovery...');
 									hls.recoverMediaError();
 								}
 								break;
 							default:
 								if (hls) {
-									// console.error('Fatal error occurred, destroying hls instance.');
 									hls.destroy();
 								}
 								break;
@@ -81,7 +77,11 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 				hls.attachMedia(videoElement);
 				hls.on(Hls.Events.MANIFEST_PARSED, () => {
 					videoElement.play().catch((error) => {
-						// console.error('Error playing video:', error);
+						// Check if the video is muted due to autoplay restrictions
+						if (error.name === 'NotAllowedError') {
+							setIsMuted(true);
+							videoElement.muted = true; // Muted if autoplay is blocked
+						}
 					});
 					setIsLoading(false);
 				});
@@ -89,7 +89,10 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 				videoElement.src = src;
 				videoElement.addEventListener('loadedmetadata', () => {
 					videoElement.play().catch((error) => {
-						// console.error('Error playing video:', error);
+						if (error.name === 'NotAllowedError') {
+							setIsMuted(true);
+							videoElement.muted = true; // Muted if autoplay is blocked
+						}
 					});
 					setIsLoading(false);
 				});
@@ -102,6 +105,14 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 			}
 		};
 	}, [isPlaying, src]);
+
+	const handleToggleMute = () => {
+		const videoElement = videoRef.current;
+		if (videoElement) {
+			videoElement.muted = !videoElement.muted;
+			setIsMuted(videoElement.muted);
+		}
+	};
 
 	return (
 		<div style={{ position: 'relative', width: '100%' }}>
@@ -118,6 +129,11 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 				<div className="absolute top-0 left-0 w-full h-full bg-black flex justify-center items-center text-white text-xl z-50">
 					Loading...
 				</div>
+			)}
+			{isMuted && (
+				<button onClick={handleToggleMute} className="absolute bottom-5 left-5 bg-gray-800 text-white px-4 py-2 rounded">
+					Turn on sound
+				</button>
 			)}
 		</div>
 	);
@@ -214,16 +230,16 @@ function UserItem({ user }: { user: IChannelMember }) {
 type ChannelStreamProps = {
 	hlsUrl?: string;
 	memberJoin: IChannelMember[];
-	currentStreamId: string;
+	currentStreamInfo: IStreamInfo | null;
 	channelName?: string;
 };
 
-export default function ChannelStream({ hlsUrl, memberJoin, currentStreamId, channelName }: ChannelStreamProps) {
+export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, channelName }: ChannelStreamProps) {
 	const [showScreenJoin, setShowScreenJoin] = useState(false);
 	const dispatch = useAppDispatch();
 
 	const handleLeaveChannel = async () => {
-		if (currentStreamId) {
+		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
 		// dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
@@ -232,7 +248,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamId, cha
 
 	const handleJoinChannel = async () => {
 		// dispatch(usersStreamActions.add({}));
-		dispatch(videoStreamActions.startStream(currentStreamId));
+		dispatch(videoStreamActions.startStream(currentStreamInfo as IStreamInfo));
 		setShowScreenJoin(false);
 	};
 

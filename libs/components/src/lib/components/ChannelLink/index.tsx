@@ -3,9 +3,10 @@ import {
 	channelsActions,
 	notificationActions,
 	notificationSettingActions,
+	selectClanById,
 	selectCloseMenu,
 	selectCurrentChannel,
-	selectCurrentStreamId,
+	selectCurrentStreamInfo,
 	threadsActions,
 	useAppDispatch,
 	videoStreamActions,
@@ -64,6 +65,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const { hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner } = permissions;
 
 		const dispatch = useAppDispatch();
+		const clanById = useSelector(selectClanById(clanId || ''));
 		const [openSetting, setOpenSetting] = useState(false);
 		const [showModal, setShowModal] = useState(false);
 		const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
@@ -79,7 +81,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			setIsShowPanelChannel(false);
 		};
 		const currentChannel = useSelector(selectCurrentChannel);
-		const currentStreamId = useSelector(selectCurrentStreamId);
+		const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
@@ -143,8 +145,15 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setStatusMenu(false);
 			}
 			if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-				if (currentStreamId !== channel.id) {
-					dispatch(videoStreamActions.startStream(channel.id));
+				if (currentStreamInfo?.streamId !== channel.id) {
+					dispatch(
+						videoStreamActions.startStream({
+							clanId: clanId || '',
+							clanName: clanById.clan_name || '',
+							streamId: channel.channel_id || '',
+							streamName: channel.channel_label || ''
+						})
+					);
 				}
 			} else {
 				dispatch(channelsActions.setCurrentChannelId(channel.id));
@@ -175,9 +184,16 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		useEffect(() => {
 			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-				dispatch(videoStreamActions.startStream(currentChannel?.id));
+				dispatch(
+					videoStreamActions.startStream({
+						clanId: clanId || '',
+						clanName: clanById.clan_name || '',
+						streamId: channel.channel_id || '',
+						streamName: channel.channel_label || ''
+					})
+				);
 			}
-		}, [channel.id, channel.type, currentChannel?.id, currentChannel?.type, dispatch]);
+		}, [channel.channel_id, channel.channel_label, channel.id, channel.type, clanById.clan_name, clanId, currentChannel?.type, dispatch]);
 
 		return (
 			<div

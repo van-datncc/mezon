@@ -27,6 +27,7 @@ const Direct = () => {
 			>
 				<ClanHeader type={'direct'} />
 				<DirectMessageList />
+				{/* <StreamInfo /> */}
 				<FooterProfile
 					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
 					status={userProfile?.user?.online}
