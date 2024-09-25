@@ -120,7 +120,7 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		[dispatch]
 	);
 
-	const categoriesEmoji = ['Frequency', 'Recent', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+	const categoriesEmoji = ['frequency', 'Recent', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 	const categoryEmoji = emojiMetadata
 		.map((emoji) => ({
 			id: emoji.clan_id,
