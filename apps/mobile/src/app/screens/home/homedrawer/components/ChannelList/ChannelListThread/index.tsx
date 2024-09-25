@@ -13,33 +13,26 @@ type IListChannelThreadProps = {
 	onLongPress?: (thread: ChannelThreads) => void;
 };
 
-enum IThreadActiveType {
-	active = 1
-}
-
 const ListChannelThread = React.memo(({ threads, onPress, onLongPress }: IListChannelThreadProps) => {
 	const styles = style(useTheme().themeValue);
 	const currentChanelId = useSelector(selectCurrentChannelId);
 	return (
 		<View style={styles.containerThreadList}>
-			{!!threads?.length &&
-				threads
-					.filter((thread) => thread?.active === IThreadActiveType.active)
-					.map((thread, index) => {
-						const isFirstThread = threads.indexOf(thread) === 0;
-						const isActive = currentChanelId === thread.channel_id;
+			{threads.map((thread, index) => {
+				const isFirstThread = threads.indexOf(thread) === 0;
+				const isActive = currentChanelId === thread.channel_id;
 
-						return (
-							<ChannelListThreadItem
-								key={`${thread?.id}_channel_thread_item${index}`}
-								thread={thread}
-								isActive={isActive}
-								isFirstThread={isFirstThread}
-								onPress={onPress}
-								onLongPress={onLongPress}
-							/>
-						);
-					})}
+				return (
+					<ChannelListThreadItem
+						key={`${thread?.id}_channel_thread_item${index}`}
+						thread={thread}
+						isActive={isActive}
+						isFirstThread={isFirstThread}
+						onPress={onPress}
+						onLongPress={onLongPress}
+					/>
+				);
+			})}
 		</View>
 	);
 });

@@ -26,6 +26,10 @@ export enum StatusVoiceChannel {
 	No_Active = 0
 }
 
+enum IThreadActiveType {
+	Active = 1
+}
+
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
@@ -37,6 +41,12 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const isActive = useMemo(() => {
 		return currentChanelId === props?.data?.id;
 	}, [currentChanelId, props?.data?.id]);
+
+	const dataThreads = useMemo(() => {
+		return !props?.data?.threads
+			? []
+			: props?.data?.threads.filter((thread: { active: IThreadActiveType }) => thread?.active === IThreadActiveType.Active);
+	}, [props?.data?.threads]);
 
 	useEffect(() => {
 		return () => {
@@ -119,9 +129,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 				<ChannelBadgeUnread channelId={props.data?.channel_id} />
 			</TouchableOpacity>
 
-			{!!props?.data?.threads?.length && (
-				<ListChannelThread threads={props?.data?.threads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />
-			)}
+			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />}
 			<UserListVoiceChannel channelId={props?.data?.channel_id} />
 		</View>
 	);
