@@ -18,21 +18,24 @@ const ListChannelThread = React.memo(({ threads, onPress, onLongPress }: IListCh
 	const currentChanelId = useSelector(selectCurrentChannelId);
 	return (
 		<View style={styles.containerThreadList}>
-			{threads.map((thread, index) => {
-				const isFirstThread = threads.indexOf(thread) === 0;
-				const isActive = currentChanelId === thread.channel_id;
+			{!!threads?.length &&
+				threads
+					.filter((thread) => thread?.active === 1)
+					.map((thread, index) => {
+						const isFirstThread = threads.indexOf(thread) === 0;
+						const isActive = currentChanelId === thread.channel_id;
 
-				return (
-					<ChannelListThreadItem
-						key={`${thread?.id}_channel_thread_item${index}`}
-						thread={thread}
-						isActive={isActive}
-						isFirstThread={isFirstThread}
-						onPress={onPress}
-						onLongPress={onLongPress}
-					/>
-				);
-			})}
+						return (
+							<ChannelListThreadItem
+								key={`${thread?.id}_channel_thread_item${index}`}
+								thread={thread}
+								isActive={isActive}
+								isFirstThread={isFirstThread}
+								onPress={onPress}
+								onLongPress={onLongPress}
+							/>
+						);
+					})}
 		</View>
 	);
 });
