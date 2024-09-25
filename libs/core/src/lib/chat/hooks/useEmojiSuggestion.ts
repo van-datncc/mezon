@@ -63,8 +63,8 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		if (isMobile) {
 			fetchRecentEmojis();
 		} else {
-			const emojiRecentStorage = localStorage.getItem('recentEmojis')
-			setEmojiRecentData(emojiRecentStorage)
+			const emojiRecentStorage = localStorage.getItem('recentEmojis');
+			setEmojiRecentData(emojiRecentStorage);
 		}
 	}, []);
 
@@ -120,7 +120,7 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 		[dispatch]
 	);
 
-	const categoriesEmoji = ['Recent', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
+	const categoriesEmoji = ['Frequency', 'Recent', 'People', 'Nature', 'Food', 'Activities', 'Travel', 'Objects', 'Symbols', 'Flags'];
 	const categoryEmoji = emojiMetadata
 		.map((emoji) => ({
 			id: emoji.clan_id,
