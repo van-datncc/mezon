@@ -46,7 +46,7 @@ export const ListClanPopup = React.memo(() => {
 		if (channelResp) {
 			await setDefaultChannelLoader(channelResp.payload, clanId);
 		}
-	}, []);
+	}, [isTabletLandscape]);
 
 	return (
 		<View style={styles.clansBox}>

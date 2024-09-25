@@ -12,6 +12,7 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import useTabletLandscape from 'apps/mobile/src/app/hooks/useTabletLandscape';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -37,7 +38,8 @@ export type ChannelsPositionRef = {
 
 const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: any }) => {
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+	const isTabletLandscape = useTabletLandscape();
+	const styles = style(themeValue, isTabletLandscape);
 	const isLoading = useSelector((state: RootState) => state?.channels?.loadingStatus);
 	const { t } = useTranslation(['searchMessageChannel']);
 	const allEventManagement = useSelector(selectAllEventManagement);

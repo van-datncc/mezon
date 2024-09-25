@@ -2,6 +2,16 @@ import { Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+  container: {
+    flex: 1, 
+    flexDirection: 'row',
+  },
+  containerDrawerContent: {
+    flex: 1, 
+  },
+  containerHomeDefault: {
+    flex: 2, 
+  },
   drawerHeaderLeft: {
     marginLeft: 14,
     marginRight: 8
