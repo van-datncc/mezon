@@ -76,6 +76,7 @@ import {
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
+	VoiceEndedEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent
 } from 'mezon-js';
@@ -119,6 +120,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			return '0';
 		}
 	}, [clanId, currentClanId]);
+
+	const onvoiceended = useCallback(
+		(voice: VoiceEndedEvent) => {
+			if (voice) {
+				dispatch(voiceActions.voiceEnded(voice?.voice_channel_id));
+			}
+		},
+		[dispatch]
+	);
 
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
@@ -728,6 +738,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
 
+			socket.onvoiceended = onvoiceended;
+
 			socket.onvoiceleaved = onvoiceleaved;
 
 			socket.onstreamingchanneljoined = onstreamingchanneljoined;
@@ -815,6 +827,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onclanprofileupdated,
 			oncustomstatus,
 			onstatuspresence,
+			onvoiceended,
 			onvoicejoined,
 			onvoiceleaved,
 			onstreamingchanneljoined,
@@ -938,6 +951,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		oncustomstatus,
 		onstatuspresence,
 		socketRef,
+		onvoiceended,
 		onvoicejoined,
 		onvoiceleaved,
 		onstreamingchanneljoined,
