@@ -458,7 +458,17 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	}, [t, userProfile, message, listPinMessages]);
 
 	const renderUserInformation = () => {
-		return <UserProfile userId={user?.id} user={user} message={message} checkAnonymous={checkAnonymous} showAction={!isDM} />;
+		return (
+			<UserProfile
+				userId={user?.id}
+				user={user}
+				message={message}
+				checkAnonymous={checkAnonymous}
+				showAction={!isDM}
+				currentChannel={isDM ? currentDmGroup : currentChannel}
+				showRole={!isDM}
+			/>
+		);
 	};
 
 	const handleReact = async (mode, messageId, emoji_id: string, emoji: string, senderId) => {
