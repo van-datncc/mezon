@@ -26,7 +26,8 @@ export default function EventItem({ event, onPress, showActions = true, start }:
 	const eventStatus = useMemo(() => {
 		if (event?.status) {
 			return event.status;
-		} else if (start) {
+		}
+		if (start) {
 			const currentTime = Date.now();
 			const startTimeLocal = new Date(start);
 			const startTimeUTC = startTimeLocal.getTime() + startTimeLocal.getTimezoneOffset() * 60000;
