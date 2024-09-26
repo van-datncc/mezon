@@ -1,6 +1,7 @@
 name: Deploy Mezon FE Prod
-on:
-  workflow_dispatch:
+on: 
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -46,25 +47,20 @@ jobs:
     needs:
       - build
     steps:
+      - name: Clear www folder
+        run: |
+          echo "Clearing /var/www/mezon-fe/"
+          rm -rf /var/www/mezon-fe/*
+
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: mezon-fe-prod
-          path: /var/www/mezon-fe/assets/svg/
+          path: /var/www/mezon-fe/
         
       - name: Extract and check files
         run: |
-          cd /var/www/mezon-fe/assets/svg/
+          cd /var/www/mezon-fe/
           ls -la
           unzip mezon-fe-prod.zip
-          ls -la
 
-      # - name: Clear www folder
-      #   run: |
-      #     echo "Clearing /var/www/mezon-fe/"
-      #     rm -rf /var/www/mezon-fe/*
-
-      # - name: Copy files to www
-      #   run: |
-      #     echo "Copying files to /var/www/mezon-fe/"
-      #     cp -r ./dist/apps/chat/* /var/www/mezon-fe/
