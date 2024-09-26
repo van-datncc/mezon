@@ -46,6 +46,7 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 		if (response) {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE) {
 				await thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -190,6 +191,16 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 				thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: directMessageId }));
+			thunkAPI.dispatch(
+				channelsActions.joinChat({
+					clanId: '0',
+					parentId: '0',
+					channelId: directMessageId,
+					channelType: type ?? 0,
+					isPublic: false,
+					isParentPublic: false
+				})
+			);
 		} catch (error) {
 			console.log(error);
 			return thunkAPI.rejectWithValue([]);

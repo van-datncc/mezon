@@ -76,6 +76,7 @@ import {
 	UserChannelAddedEvent,
 	UserChannelRemovedEvent,
 	UserClanRemovedEvent,
+	VoiceEndedEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent
 } from 'mezon-js';
@@ -119,6 +120,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			return '0';
 		}
 	}, [clanId, currentClanId]);
+
+	const onvoiceended = useCallback(
+		(voice: VoiceEndedEvent) => {
+			if (voice) {
+				dispatch(voiceActions.voiceEnded(voice?.voice_channel_id));
+			}
+		},
+		[dispatch]
+	);
 
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
@@ -179,7 +189,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstreamingchannelended = useCallback(
 		(channel: StreamingEndedEvent) => {
-			dispatch(usersStreamActions.remove(channel.channel_id));
+			dispatch(channelsStreamActions.remove(channel.channel_id));
 		},
 		[dispatch]
 	);
@@ -572,6 +582,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(notificationActions.removeAllNotificattionChannel());
 			}
 		},
 		[currentClanId, dispatch, navigate, userId]
@@ -582,6 +593,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelDeleted) {
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(notificationActions.removeNotificationsByChannelId(channelDeleted.channel_id));
 			}
 		},
 		[dispatch]
@@ -726,6 +738,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
 
+			socket.onvoiceended = onvoiceended;
+
 			socket.onvoiceleaved = onvoiceleaved;
 
 			socket.onstreamingchanneljoined = onstreamingchanneljoined;
@@ -813,6 +827,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onclanprofileupdated,
 			oncustomstatus,
 			onstatuspresence,
+			onvoiceended,
 			onvoicejoined,
 			onvoiceleaved,
 			onstreamingchanneljoined,
@@ -936,6 +951,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		oncustomstatus,
 		onstatuspresence,
 		socketRef,
+		onvoiceended,
 		onvoicejoined,
 		onvoiceleaved,
 		onstreamingchanneljoined,

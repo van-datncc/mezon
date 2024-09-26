@@ -1,6 +1,6 @@
 import { ChannelTypeHeader, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelUsersEntity, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
+import { ChannelUsersEntity, channelsActions, clansActions, getStoreAsync, selectCurrentClanId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -69,6 +69,12 @@ const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps) => {
 			navigation.navigate('HomeDefault');
 			navigation.dispatch(DrawerActions.closeDrawer());
 			const channelId = channelData?.channel_id;
+
+			timeoutRef.current = setTimeout(async () => {
+				requestAnimationFrame(async () => {
+					await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+				});
+			}, 0);
 
 			// Set cache
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);

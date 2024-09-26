@@ -174,10 +174,10 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 							marginVertical={size.s_16}
 						>
 							<Block flexDirection="row" gap={size.s_14} alignItems="center">
-								<Icons.CirclePlusPrimaryIcon />
+								<Icons.CirclePlusPrimaryIcon color={themeValue.text}/>
 								<Text color={themeValue.text}>{t('channelPermission.addMemberAndRoles')}</Text>
 							</Block>
-							<Icons.ChevronSmallRightIcon />
+							<Icons.ChevronSmallRightIcon color={themeValue.text}/>
 						</Block>
 					</TouchableOpacity>
 				</Block>

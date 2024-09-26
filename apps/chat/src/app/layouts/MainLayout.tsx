@@ -32,7 +32,7 @@ const GlobalEventListener = () => {
 	useEffect(() => {
 		const reconnectSocket = debounce(() => {
 			if (document.visibilityState === 'visible') {
-				handleReconnect('Socket disconnected, attempting to reconnect...');
+				handleReconnect('Socket disconnected event, attempting to reconnect...');
 			}
 		}, 100);
 

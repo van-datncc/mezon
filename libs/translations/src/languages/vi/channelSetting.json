@@ -2,7 +2,8 @@
     "fields": {
         "channelName": {
             "title": "Tên channel",
-            "placeholder": "Nhập tên channel"
+            "placeholder": "Nhập tên channel",
+            "errorMessage": "Vui lòng nhập tên kênh hợp lệ (tối đa 64 ký tự, chỉ từ, số, _ hoặc -)."
         },
         "threadName": {
             "title": "Tên Thread",

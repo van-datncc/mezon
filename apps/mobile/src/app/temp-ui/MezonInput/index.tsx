@@ -23,6 +23,7 @@ interface IMezonInputProps {
 	prefixIcon?: ReactNode;
 	postfixIcon?: ReactNode;
 	disabled?: boolean;
+	isValid?: boolean;
 }
 
 export default function MezonInput({
@@ -41,7 +42,8 @@ export default function MezonInput({
 	titleStyle,
 	postfixIcon,
 	prefixIcon,
-	disabled = false
+	disabled = false,
+	isValid = true
 }: IMezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -115,7 +117,7 @@ export default function MezonInput({
 					</View>
 				)}
 			</View>
-			{!isCheckValid && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
+			{(!isCheckValid || !isValid) && errorMessage && <ErrorInput style={styles.errorInput} errorMessage={errorMessage} />}
 		</View>
 	);
 }

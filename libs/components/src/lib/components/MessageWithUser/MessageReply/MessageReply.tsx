@@ -6,6 +6,7 @@ import { IMessageWithUser } from '@mezon/utils';
 import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
+import { ChannelStreamMode } from 'mezon-js';
 import MessageLine from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
 type MessageReplyProps = {
@@ -15,7 +16,7 @@ type MessageReplyProps = {
 };
 
 // TODO: refactor component for message lines
-const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
+const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) => {
 	const {
 		senderIdMessageRef,
 		messageContentRef,
@@ -47,7 +48,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
 		messageUsernameSenderRef ?? '',
 		senderIdMessageRef ?? ''
 	);
-
+	const isDM = mode === ChannelStreamMode.STREAM_MODE_DM || mode == ChannelStreamMode.STREAM_MODE_GROUP;
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
 			{message.references?.length ? (
@@ -63,7 +64,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick }) => {
 								onClick={onClick}
 								className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide whitespace-nowrap"
 							>
-								{nameShowed}
+								{isDM ? messageDisplayNameSenderRef || messageUsernameSenderRef : nameShowed}
 							</span>
 							{hasAttachmentInMessageRef ? (
 								<div className=" flex flex-row items-center">
