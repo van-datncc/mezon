@@ -244,7 +244,7 @@ const UserProfile = React.memo(
 
 					{isShowUserContent && (
 						<View style={[styles.roleGroup]}>
-							{userById?.user?.about_me && (
+							{!!userById?.user?.about_me && (
 								<Block padding={size.s_16}>
 									<Text style={[styles.aboutMe]}>{t('aboutMe.headerTitle')}</Text>
 									<Text style={[styles.aboutMeText]}>{userById?.user?.about_me}</Text>
