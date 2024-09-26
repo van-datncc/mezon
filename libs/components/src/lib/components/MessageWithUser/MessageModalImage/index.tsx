@@ -32,7 +32,7 @@ const MessageModalImage = () => {
 	const [urlImg, setUrlImg] = useState(attachment);
 	const [currentIndexAtt, setCurrentIndexAtt] = useState(-1);
 	const { showMessageContextMenu, setPositionShow, setImageURL } = useMessageContextMenu();
-	console.log('Image :', attachments);
+
 	const mode = useSelector(selectModeAttachment);
 	const messageId = useSelector(selectMessageIdAttachment);
 	const dispatch = useDispatch();
