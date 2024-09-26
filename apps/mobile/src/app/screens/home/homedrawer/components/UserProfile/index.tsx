@@ -169,8 +169,8 @@ const UserProfile = React.memo(
 			deleteFriend(targetUser?.user?.username, targetUser?.user?.id);
 		};
 		const isChannelOwner = useMemo(() => {
-			return currentChannel?.creator_id === userProfile.user?.id;
-		}, [currentChannel?.creator_id, userProfile.user?.id]);
+			return currentChannel?.creator_id === userProfile?.user?.id;
+		}, [currentChannel?.creator_id, userProfile?.user?.id]);
 
 		const isShowUserContent = useMemo(() => {
 			return !!userById?.user?.about_me || (showRole && userRolesClan?.length) || showAction || (isDMGroup && isChannelOwner && !isCheckOwner);
