@@ -18,7 +18,7 @@ const StreamInfo = () => {
         dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
     };
 
-    const streamAddress = `${currentStreamInfo?.streamName + '/' + currentStreamInfo?.clanName}`;
+    const streamAddress = `${currentStreamInfo?.streamName + ' / ' + currentStreamInfo?.clanName}`;
 
     return (
         <div
