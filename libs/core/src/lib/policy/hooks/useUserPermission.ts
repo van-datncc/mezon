@@ -1,19 +1,9 @@
-import { selectCurrentClan, selectUserMaxPermissionLevel } from '@mezon/store';
+import { selectUserMaxPermissionLevel } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useAuth } from '../../auth/hooks/useAuth';
+import { useIsClanOwner } from './useIsClanOwner';
 import { usePermissionsLevel } from './usePermissionsLevel';
-
-const useIsClanOwner = () => {
-	const currentClan = useSelector(selectCurrentClan);
-	const { userProfile } = useAuth();
-
-	const isClanOwner = useMemo(() => {
-		return currentClan?.creator_id === userProfile?.user?.id;
-	}, [currentClan, userProfile]);
-	return isClanOwner;
-};
 
 export function useUserPermission() {
 	const isClanOwner = useIsClanOwner();
@@ -44,24 +34,25 @@ export function useUserPermission() {
 	}, [isAllowed]);
 
 	const composedActions = useMemo(() => {
-		const { hasAdministrator, hasManageClan, hasManageThread, hasManageChannel, hasViewChannel, hasDeleteMessage, hasSendMessage } =
-			userPermissionsStatus;
-		const isClanOwnerOrAdmin = isClanOwner || hasAdministrator;
+		const { hasManageClan, hasManageThread, hasManageChannel, hasViewChannel, hasDeleteMessage, hasSendMessage } = userPermissionsStatus;
 
 		return {
-			isCanManageThread: isClanOwnerOrAdmin || hasManageThread,
-			isCanManageChannel: isClanOwnerOrAdmin || hasManageThread || hasManageChannel,
-			isCanManageClan: isClanOwnerOrAdmin || hasManageClan,
-			isCanDeleteMessage: isClanOwnerOrAdmin || hasDeleteMessage,
-			isCanViewChannel: isClanOwnerOrAdmin || hasSendMessage || hasViewChannel || hasManageChannel || hasManageClan || hasManageThread,
-			isCanManageEvent: isClanOwnerOrAdmin || hasManageClan,
-			isCanEditRole: isClanOwnerOrAdmin || hasManageClan
+			isCanManageThread: hasManageThread,
+			isCanManageChannel: hasManageChannel,
+			isCanManageClan: hasManageClan,
+			isCanDeleteMessage: hasDeleteMessage,
+			isCanSendMessage: hasSendMessage,
+			isCanViewChannel: hasViewChannel,
+			isCanManageEvent: hasManageClan,
+			isCanEditRole: hasManageClan
 		};
-	}, [isClanOwner, userPermissionsStatus]);
+	}, [userPermissionsStatus]);
 
 	return {
-		isClanOwner,
 		userPermissionsStatus,
+		// @deprecated
+		// TODO: remove
+		isClanOwner,
 		maxPermissionLevel,
 		...composedActions
 	};
