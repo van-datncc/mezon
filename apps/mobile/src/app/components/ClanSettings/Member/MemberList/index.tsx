@@ -1,3 +1,4 @@
+import { debounce } from '@mezon/mobile-components';
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { UsersClanEntity, selectAllUserClans, useAppSelector } from '@mezon/store-mobile';
 import { FlashList } from '@shopify/flash-list';
@@ -15,6 +16,7 @@ export const MemberList = memo((props: IMemberListProps) => {
 	const { onMemberSelect } = props;
 	const { themeValue } = useTheme();
 	const [searchMemberText, setSearchMemberText] = useState('');
+	const debouncedSetSearchText = debounce((text) => setSearchMemberText(text), 300);
 	const clanUserList = useAppSelector(selectAllUserClans);
 
 	const filteredMemberList = useMemo(() => {
@@ -39,7 +41,7 @@ export const MemberList = memo((props: IMemberListProps) => {
 	return (
 		<Block backgroundColor={themeValue.secondary} flex={1}>
 			<Block paddingHorizontal={size.s_12}>
-				<MezonInput value={searchMemberText} onTextChange={setSearchMemberText} placeHolder={'Search Member'} />
+				<MezonInput onTextChange={debouncedSetSearchText} placeHolder={'Search Member'} />
 			</Block>
 			<FlashList
 				data={filteredMemberList}
