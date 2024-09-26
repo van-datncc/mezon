@@ -1,5 +1,5 @@
+import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { CircleXIcon } from 'libs/mobile-components/src/lib/icons2';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { StyleProp, Text, TextInput, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { ErrorInput } from '../../components/ErrorInput';
@@ -12,7 +12,7 @@ interface IMezonInputProps {
 	titleStyle?: StyleProp<TextStyle>;
 	titleUppercase?: boolean;
 	textarea?: boolean;
-	value: string;
+	value?: string;
 	onTextChange?: (value: string) => void;
 	maxCharacter?: number;
 	inputWrapperStyle?: StyleProp<ViewStyle>;
@@ -104,7 +104,7 @@ export default function MezonInput({
 
 					{!textarea && value?.length > 0 && !disabled && (
 						<TouchableOpacity onPress={handleClearBtn} style={styles.clearBtn}>
-							<CircleXIcon height={size.s_18} width={size.s_18} color={themeValue.text} />
+							<Icons.CircleXIcon color={themeValue.white} />
 						</TouchableOpacity>
 					)}
 				</View>

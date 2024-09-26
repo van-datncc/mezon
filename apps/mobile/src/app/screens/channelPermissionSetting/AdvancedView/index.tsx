@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { MemberItem } from '../components/MemberItem';
@@ -21,6 +20,9 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	const allUserInChannel = useSelector(selectAllUserChannel);
 
 	const listOfRoleAndMemberInChannel = useMemo(() => {
+		if (!listOfChannelRole?.length || !allUserInChannel?.length) {
+			return [];
+		}
 		return [
 			{ headerTitle: t('channelPermission.roles'), isShowHeader: listOfChannelRole?.length },
 			...listOfChannelRole.map((role) => ({
@@ -84,8 +86,8 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	);
 
 	return (
-		<ScrollView>
-			<Block flex={1}>
+		<Block flex={1}>
+			{listOfRoleAndMemberInChannel.length ? (
 				<FlashList
 					data={listOfRoleAndMemberInChannel}
 					keyboardShouldPersistTaps={'handled'}
@@ -94,9 +96,13 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 					keyExtractor={(item) => `${item?.id}_${item?.headerTitle}`}
 					removeClippedSubviews={true}
 				/>
+			) : (
+				<Block alignItems="center" flex={1} justifyContent="center">
+					<Text color={themeValue.textDisabled}>Don't have Role and Member to override permission</Text>
+				</Block>
+			)}
 
-				{/* <AdvancedSettingBS bottomSheetRef={bottomSheetRef} channel={channel} currentAdvancedPermissionType={currentAdvancedPermissionType} /> */}
-			</Block>
-		</ScrollView>
+			{/* <AdvancedSettingBS bottomSheetRef={bottomSheetRef} channel={channel} currentAdvancedPermissionType={currentAdvancedPermissionType} /> */}
+		</Block>
 	);
 });

@@ -1,6 +1,6 @@
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
-import { Icons } from '@mezon/mobile-components';
-import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
+import { debounce, Icons } from '@mezon/mobile-components';
+import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
 import {
 	channelUsersActions,
 	selectAllChannelMembers,
@@ -27,6 +27,7 @@ import { RoleItem } from '../RoleItem';
 export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOrRoleContentProps) => {
 	const { themeValue } = useTheme();
 	const [searchText, setSearchText] = useState('');
+	const debouncedSetSearchText = debounce((text) => setSearchText(text), 300);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const everyoneRole = useSelector(selectEveryoneRole);
 	const dispatch = useAppDispatch();
@@ -214,7 +215,7 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 			</Block>
 
 			<Block paddingVertical={size.s_16}>
-				<MezonInput value={searchText} onTextChange={setSearchText} placeHolder={'Search Roles & Members'} />
+				<MezonInput onTextChange={debouncedSetSearchText} placeHolder={'Search Roles & Members'} />
 			</Block>
 			<Block flex={1} paddingBottom={size.s_10}>
 				<BottomSheetFlatList
