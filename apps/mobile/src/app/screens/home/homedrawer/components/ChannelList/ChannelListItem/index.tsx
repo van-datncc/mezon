@@ -1,6 +1,6 @@
 import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadChannelById } from '@mezon/store';
+import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { channelsActions, getStoreAsync, selectCurrentChannelId } from '@mezon/store-mobile';
 import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
@@ -35,7 +35,8 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const currentChanelId = useSelector(selectCurrentChannelId);
-	const isUnRead = useSelector(selectIsUnreadChannelById(props?.data?.id));
+	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
+
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
 	const isTabletLandscape = useTabletLandscape();
