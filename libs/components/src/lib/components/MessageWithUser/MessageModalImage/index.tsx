@@ -32,7 +32,7 @@ const MessageModalImage = () => {
 	const [urlImg, setUrlImg] = useState(attachment);
 	const [currentIndexAtt, setCurrentIndexAtt] = useState(-1);
 	const { showMessageContextMenu, setPositionShow, setImageURL } = useMessageContextMenu();
-
+	console.log('Image :', attachments);
 	const mode = useSelector(selectModeAttachment);
 	const messageId = useSelector(selectMessageIdAttachment);
 	const dispatch = useDispatch();
@@ -191,7 +191,7 @@ const MessageModalImage = () => {
 					<img
 						src={urlImg}
 						alt={urlImg}
-						className={`object-contain rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-full'}`}
+						className={`object-scale-down rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-full'}`}
 						onDragStart={handleDrag}
 						onWheel={handleWheel}
 						onMouseUp={handleMouseUp}
