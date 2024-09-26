@@ -1,5 +1,5 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadChannelById, selectLastChannelTimestamp } from '@mezon/store';
+import { selectIsUnreadChannelById, selectLastChannelTimestamp, useAppSelector } from '@mezon/store';
 import { selectNotificationMentionCountByChannelId } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -27,7 +27,8 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 
-	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
+	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
+
 	const numberNotification = useChannelBadgeCount(thread.id);
 
 	const onPressThreadItem = () => {
