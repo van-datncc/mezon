@@ -62,7 +62,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
-								src={messageSender.clan_avatar ?? messageSender?.user?.avatar_url}
+								src={messageSender?.clan_avatar ?? messageSender?.user?.avatar_url}
 							/>
 						</div>
 
