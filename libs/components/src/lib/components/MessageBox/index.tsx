@@ -1,10 +1,10 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useReference } from '@mezon/core';
-import { referencesActions, selectAllMaxPermissionRoleChannel, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
+import { useChannelRestriction, useReference } from '@mezon/core';
+import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
+import { EOverriddenPermission, IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { Fragment, ReactElement, memo, useCallback, useEffect, useState } from 'react';
+import { Fragment, ReactElement, memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import * as Icons from '../../../../../ui/src/lib/Icons';
 import FileSelectionButton from './FileSelectionButton';
@@ -31,14 +31,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
 	const appearanceTheme = useSelector(selectTheme);
-	const listPermissionRoleChannel = useSelector(selectAllMaxPermissionRoleChannel);
-	const [hasPermissionEdit, setHasPermissionEdit] = useState(true);
-	useEffect(() => {
-		if (listPermissionRoleChannel.at(1)?.active !== 1) {
-			setHasPermissionEdit(false);
-		}
-	}, [listPermissionRoleChannel]);
-
+	const { maxChannelPermissions } = useChannelRestriction(currentChannelId ?? '');
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 
 	const onConvertToFiles = useCallback((content: string) => {
@@ -131,7 +124,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
 					currentChannelId={currentChannelId || ''}
-					hasPermissionEdit={hasPermissionEdit}
+					hasPermissionEdit={maxChannelPermissions[EOverriddenPermission.sendMessage]}
 				/>
 
 				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md `}>
@@ -148,7 +141,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 							handleConvertToFile={onConvertToFiles}
 							currentClanId={currentClanId}
 							mode={props.mode}
-							hasPermissionEdit={hasPermissionEdit}
+							hasPermissionEdit={maxChannelPermissions[EOverriddenPermission.sendMessage]}
 						/>
 					</div>
 				</div>
