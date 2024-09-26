@@ -43,7 +43,7 @@ const StreamInfo = () => {
                     className="opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hover:rounded-md p-1"
                     onClick={handleLeaveChannel}
                 >
-                    <Icons.EndCall className=" w-5 h-5" />
+                    <Icons.EndCall className="w-5 h-5" />
                 </button>
             </div>
         </div>
