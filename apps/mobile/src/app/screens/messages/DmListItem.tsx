@@ -29,7 +29,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 
 	const redirectToMessageDetail = () => {
 		if (isTabletLandscape) {
-			onPress && onPress(directMessage?.id)
+			onPress && onPress(directMessage?.id);
 		} else {
 			navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 				screen: APP_SCREEN.MESSAGES.MESSAGE_DETAIL,
@@ -95,11 +95,9 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 	}, [directMessage]);
 
 	return (
-		<TouchableOpacity 
-			style={[styles.messageItem, 
-					isTabletLandscape && directMessageId === directMessage?.id && { backgroundColor: themeValue.secondary }
-				]} 
-			onPress={() => redirectToMessageDetail()} 
+		<TouchableOpacity
+			style={[styles.messageItem, isTabletLandscape && directMessageId === directMessage?.id && { backgroundColor: themeValue.secondary }]}
+			onPress={() => redirectToMessageDetail()}
 			onLongPress={onLongPress}
 		>
 			{isTypeDMGroup ? (
@@ -133,7 +131,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 			<View style={{ flex: 1 }}>
 				<View style={styles.messageContent}>
 					<Text numberOfLines={1} style={[styles.defaultText, styles.channelLabel]}>
-						{directMessage?.channel_label || directMessage?.usernames}
+						{(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
 					</Text>
 					{lastMessageTime ? <Text style={[styles.defaultText, styles.dateTime]}>{lastMessageTime}</Text> : null}
 				</View>
