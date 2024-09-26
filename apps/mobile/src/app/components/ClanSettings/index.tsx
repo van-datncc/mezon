@@ -13,7 +13,7 @@ type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.SETTINGS;
 export default function ClanSetting({ navigation, route }: MenuClanScreenProps<ClanSettingsScreen>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { inviteRef } = route.params;
+	const { inviteRef } = route?.params || {};
 	const { t } = useTranslation(['clanSetting']);
 	const { isCanEditRole } = useUserPermission();
 
