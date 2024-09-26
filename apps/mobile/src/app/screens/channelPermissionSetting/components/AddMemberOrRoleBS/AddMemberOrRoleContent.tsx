@@ -126,23 +126,13 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 		}
 		const response = await Promise.all(promise);
 		const isError = response?.some((data) => data?.meta?.requestStatus === ERequestStatus.Rejected);
-		if (isError) {
-			Toast.show({
-				type: 'success',
-				props: {
-					text2: 'Save Failed',
-					leadingIcon: <Icons.CloseIcon color={Colors.red} />
-				}
-			});
-		} else {
-			Toast.show({
-				type: 'success',
-				props: {
-					text2: 'Save Successfully',
-					leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
-				}
-			});
-		}
+		Toast.show({
+			type: 'success',
+			props: {
+				text2: isError ? t('channelPermission.toast.failed') : t('channelPermission.toast.success'),
+				leadingIcon: isError ? <Icons.CloseIcon color={Colors.red} /> : <Icons.CheckmarkLargeIcon color={Colors.green} />
+			}
+		});
 		onDismiss && onDismiss();
 	};
 

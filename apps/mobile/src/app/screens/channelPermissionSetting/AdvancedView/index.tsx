@@ -91,7 +91,6 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 					data={listOfRoleAndMemberInChannel}
 					keyboardShouldPersistTaps={'handled'}
 					renderItem={renderItem}
-					estimatedItemSize={20}
 					keyExtractor={(item) => `${item?.id}_${item?.headerTitle}`}
 					removeClippedSubviews={true}
 				/>

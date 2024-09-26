@@ -22,7 +22,7 @@ import { MezonConfirm, MezonSwitch } from '../../../temp-ui';
 import { AddMemberOrRoleBS } from '../components/AddMemberOrRoleBS';
 import { MemberItem } from '../components/MemberItem';
 import { RoleItem } from '../components/RoleItem';
-import { EOverridePermissionType } from '../types/channelPermission.enum';
+import { EOverridePermissionType, ERequestStatus } from '../types/channelPermission.enum';
 import { IBasicViewProps } from '../types/channelPermission.type';
 
 export const BasicView = memo(({ channel }: IBasicViewProps) => {
@@ -88,23 +88,14 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				role_ids: []
 			})
 		);
-		if (response?.type === 'channels/updateChannelPrivate/fulfilled') {
-			Toast.show({
-				type: 'success',
-				props: {
-					text2: t('channelPermission.toast.failed'),
-					leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
-				}
-			});
-		} else {
-			Toast.show({
-				type: 'success',
-				props: {
-					text2: t('channelPermission.toast.success'),
-					leadingIcon: <Icons.CloseIcon color={Colors.red} />
-				}
-			});
-		}
+		const isError = ERequestStatus.Rejected === response?.meta?.requestStatus;
+		Toast.show({
+			type: 'success',
+			props: {
+				text2: isError ? t('channelPermission.toast.failed') : t('channelPermission.toast.success'),
+				leadingIcon: isError ? <Icons.CloseIcon color={Colors.red} /> : <Icons.CheckmarkLargeIcon color={Colors.green} />
+			}
+		});
 	};
 
 	const closeModalConfirm = () => {
@@ -190,7 +181,6 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 						data={combineWhoCanAccessList}
 						keyboardShouldPersistTaps={'handled'}
 						renderItem={renderWhoCanAccessItem}
-						estimatedItemSize={20}
 						keyExtractor={(item) => `${item?.id}_${item?.headerTitle}`}
 						removeClippedSubviews={true}
 					/>

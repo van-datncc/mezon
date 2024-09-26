@@ -30,23 +30,13 @@ export const RoleItem = memo(
 			};
 			const response = await dispatch(channelUsersActions.removeChannelRole(body));
 			const isError = response?.meta?.requestStatus === ERequestStatus.Rejected;
-			if (isError) {
-				Toast.show({
-					type: 'success',
-					props: {
-						text2: t('channelPermission.toast.failed'),
-						leadingIcon: <Icons.CloseIcon color={Colors.red} />
-					}
-				});
-			} else {
-				Toast.show({
-					type: 'success',
-					props: {
-						text2: t('channelPermission.toast.success'),
-						leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
-					}
-				});
-			}
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: isError ? t('channelPermission.toast.failed') : t('channelPermission.toast.success'),
+					leadingIcon: isError ? <Icons.CloseIcon color={Colors.red} /> : <Icons.CheckmarkLargeIcon color={Colors.green} />
+				}
+			});
 		};
 
 		const onPressRoleItem = () => {
