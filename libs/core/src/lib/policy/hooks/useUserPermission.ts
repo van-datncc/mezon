@@ -1,10 +1,9 @@
-import { selectCurrentClan } from '@mezon/store';
+import { selectCurrentClan, selectUserMaxPermissionLevel } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { usePermissionsLevel } from './usePermissionsLevel';
-import { useUserPolicy } from './useUserPolicy';
 
 const useIsClanOwner = () => {
 	const currentClan = useSelector(selectCurrentClan);
@@ -17,9 +16,8 @@ const useIsClanOwner = () => {
 };
 
 export function useUserPermission() {
-	const currentClan = useSelector(selectCurrentClan);
 	const isClanOwner = useIsClanOwner();
-	const { maxPermissionLevel } = useUserPolicy(currentClan?.id ?? '');
+	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 	const permissionLevel = usePermissionsLevel();
 
 	const isAllowed = useCallback(
@@ -55,7 +53,6 @@ export function useUserPermission() {
 			isCanManageChannel: isClanOwnerOrAdmin || hasManageThread || hasManageChannel,
 			isCanManageClan: isClanOwnerOrAdmin || hasManageClan,
 			isCanDeleteMessage: isClanOwnerOrAdmin || hasDeleteMessage,
-			isCanSendMessage: isClanOwnerOrAdmin || hasSendMessage || hasManageChannel || hasManageClan || hasManageThread,
 			isCanViewChannel: isClanOwnerOrAdmin || hasSendMessage || hasViewChannel || hasManageChannel || hasManageClan || hasManageThread,
 			isCanManageEvent: isClanOwnerOrAdmin || hasManageClan,
 			isCanEditRole: isClanOwnerOrAdmin || hasManageClan

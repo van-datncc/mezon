@@ -27,7 +27,7 @@ export enum StatusVoiceChannel {
 	No_Active = 0
 }
 
-enum IThreadActiveType {
+export enum IThreadActiveType {
 	Active = 1
 }
 
