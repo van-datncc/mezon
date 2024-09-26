@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectIsUnreadChannelById } from '@mezon/store';
+import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { notificationActions, selectCountByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
@@ -24,7 +24,7 @@ export type ThreadLinkRef = {
 
 const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
 	const numberNotification = useSelector(selectCountByChannelId(thread.id));
-	const isUnReadChannel = useSelector(selectIsUnreadChannelById(thread.id));
+	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 
