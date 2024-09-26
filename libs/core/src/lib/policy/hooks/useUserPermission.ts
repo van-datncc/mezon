@@ -50,6 +50,9 @@ export function useUserPermission() {
 
 	return {
 		userPermissionsStatus,
+		// @deprecated
+		// TODO: remove
+		isClanOwner,
 		maxPermissionLevel,
 		...composedActions
 	};
