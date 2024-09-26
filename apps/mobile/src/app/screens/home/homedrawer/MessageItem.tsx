@@ -464,6 +464,7 @@ const MessageItem = React.memo(
 					messageId={props?.messageId}
 					isEdited={message?.hideEditted}
 					isSending={message?.isSending}
+					isMe={message?.isMe}
 				/>
 			</Animated.View>
 		);

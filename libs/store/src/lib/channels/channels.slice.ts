@@ -110,7 +110,22 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
 			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
+			const parrentChannel = selectChannelById(channel?.parrent_id ?? '')(getChannelsRootState(thunkAPI));
+
 			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
+
+			if (channel) {
+				thunkAPI.dispatch(
+					channelsActions.joinChat({
+						clanId: channel.clan_id ?? '',
+						parentId: channel.parrent_id ?? '',
+						channelId: channel.channel_id ?? '',
+						channelType: channel.type ?? 0,
+						isPublic: channel ? !channel.channel_private : false,
+						isParentPublic: parrentChannel ? !parrentChannel.channel_private : false
+					})
+				);
+			}
 
 			return channel;
 		} catch (error) {

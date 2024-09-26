@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useAppParams, useAuth, useCheckAlonePermission, useClanRestriction, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, useClanRestriction, useReference, useThreads } from '@mezon/core';
 import {
 	MessagesEntity,
 	directActions,
@@ -101,8 +101,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
 	const [delMessage] = useClanRestriction([EPermission.manageChannel]);
 	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
-	const [hasViewChannelPermission] = useClanRestriction([EPermission.viewChannel]);
-	const isAlone = useCheckAlonePermission();
+	const [canViewChannelAndSendMessage] = useClanRestriction([EPermission.viewChannel, EPermission.sendMessage]);
 	const { type } = useAppParams();
 
 	const [createThread] = useClanRestriction([EPermission.manageChannel]);
@@ -400,7 +399,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when(checkPos && !(hasViewChannelPermission && isAlone), (builder) => {
+		builder.when(checkPos && canViewChannelAndSendMessage, (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',
