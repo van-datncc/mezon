@@ -56,7 +56,6 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	const renderItem = useCallback(
 		({ item }) => {
 			const { type, headerTitle, isShowHeader, role, member } = item;
-			console.log('------item', item);
 			if (!type && headerTitle && isShowHeader) {
 				return (
 					<Block paddingTop={size.s_12} paddingLeft={size.s_12}>
@@ -98,7 +97,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 				/>
 			) : (
 				<Block alignItems="center" flex={1} justifyContent="center">
-					<Text color={themeValue.textDisabled}>Don't have Role and Member to override permission</Text>
+					<Text color={themeValue.textDisabled}>{t('channelPermission.roleAndMemberEmpty')}</Text>
 				</Block>
 			)}
 

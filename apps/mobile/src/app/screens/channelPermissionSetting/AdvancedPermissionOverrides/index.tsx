@@ -60,7 +60,7 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 			Toast.show({
 				type: 'success',
 				props: {
-					text2: 'Save Failed',
+					text2: t('channelPermission.toast.failed'),
 					leadingIcon: <Icons.CloseIcon color={Colors.red} />
 				}
 			});
@@ -68,7 +68,7 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 			Toast.show({
 				type: 'success',
 				props: {
-					text2: 'Save Successfully',
+					text2: t('channelPermission.toast.success'),
 					leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
 				}
 			});

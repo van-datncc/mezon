@@ -3,6 +3,7 @@ import { Icons, OwnerIcon } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { channelUsersActions, useAppDispatch } from '@mezon/store-mobile';
 import { memo, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import FastImage from 'react-native-fast-image';
@@ -17,6 +18,7 @@ export const MemberItem = memo(
 		const isClanOwner = checkClanOwner(member?.user?.id);
 		const { themeValue } = useTheme();
 		const dispatch = useAppDispatch();
+		const { t } = useTranslation('channelSetting');
 
 		const disabled = useMemo(() => {
 			return !isCheckbox && !isAdvancedSetting;
@@ -29,13 +31,12 @@ export const MemberItem = memo(
 			};
 			const response = await dispatch(channelUsersActions.removeChannelUsers(body));
 			const isError = response?.meta?.requestStatus === ERequestStatus.Rejected;
-			console.log('sdfsdf', response);
 
 			if (isError) {
 				Toast.show({
 					type: 'success',
 					props: {
-						text2: 'Save Failed',
+						text2: t('channelPermission.toast.failed'),
 						leadingIcon: <Icons.CloseIcon color={Colors.red} />
 					}
 				});
@@ -43,7 +44,7 @@ export const MemberItem = memo(
 				Toast.show({
 					type: 'success',
 					props: {
-						text2: 'Save Successfully',
+						text2: t('channelPermission.toast.success'),
 						leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
 					}
 				});

@@ -2,6 +2,7 @@ import { Icons } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { channelUsersActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Toast from 'react-native-toast-message';
@@ -14,6 +15,7 @@ export const RoleItem = memo(
 		const { themeValue } = useTheme();
 		const currentClanId = useSelector(selectCurrentClanId);
 		const dispatch = useAppDispatch();
+		const { t } = useTranslation('channelSetting');
 
 		const isEveryoneRole = useMemo(() => {
 			return role?.slug === 'everyone';
@@ -32,7 +34,7 @@ export const RoleItem = memo(
 				Toast.show({
 					type: 'success',
 					props: {
-						text2: 'Save Failed',
+						text2: t('channelPermission.toast.failed'),
 						leadingIcon: <Icons.CloseIcon color={Colors.red} />
 					}
 				});
@@ -40,7 +42,7 @@ export const RoleItem = memo(
 				Toast.show({
 					type: 'success',
 					props: {
-						text2: 'Save Successfully',
+						text2: t('channelPermission.toast.success'),
 						leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
 					}
 				});

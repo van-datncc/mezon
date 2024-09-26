@@ -92,7 +92,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 			Toast.show({
 				type: 'success',
 				props: {
-					text2: 'Save Successfully',
+					text2: t('channelPermission.toast.failed'),
 					leadingIcon: <Icons.CheckmarkLargeIcon color={Colors.green} />
 				}
 			});
@@ -100,7 +100,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 			Toast.show({
 				type: 'success',
 				props: {
-					text2: 'Save Failed',
+					text2: t('channelPermission.toast.success'),
 					leadingIcon: <Icons.CloseIcon color={Colors.red} />
 				}
 			});
@@ -174,10 +174,10 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 							marginVertical={size.s_16}
 						>
 							<Block flexDirection="row" gap={size.s_14} alignItems="center">
-								<Icons.CirclePlusPrimaryIcon color={themeValue.text}/>
+								<Icons.CirclePlusPrimaryIcon color={themeValue.text} />
 								<Text color={themeValue.text}>{t('channelPermission.addMemberAndRoles')}</Text>
 							</Block>
-							<Icons.ChevronSmallRightIcon color={themeValue.text}/>
+							<Icons.ChevronSmallRightIcon color={themeValue.text} />
 						</Block>
 					</TouchableOpacity>
 				</Block>
