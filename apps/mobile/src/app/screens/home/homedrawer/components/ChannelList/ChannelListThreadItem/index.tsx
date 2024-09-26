@@ -48,17 +48,16 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 			style={[styles.channelListLink]}
 		>
 			<View style={[styles.threadItem]}>
-				{isActive && (
-					<View
-						style={[
-							styles.threadItemActive,
-							isFirstThread && styles.threadFirstItemActive,
-							{ backgroundColor: theme === 'light' ? themeValue.secondaryWeight : themeValue.secondaryLight }
-						]}
-					/>
-				)}
-				{isFirstThread ? <ShortCornerIcon /> : <LongCornerIcon />}
-				<Text style={[styles.titleThread, isUnReadChannel && styles.channelListItemTitleActive]} numberOfLines={1}>
+				{isFirstThread ? <ShortCornerIcon width={size.s_12} height={size.s_12} /> : <LongCornerIcon width={size.s_12} height={size.s_36} />}
+				<Text style={[
+						styles.titleThread, 
+						isUnReadChannel && styles.channelListItemTitleActive, 
+						isActive && { backgroundColor: theme === 'light' ? 
+											themeValue.secondaryWeight : 
+											themeValue.secondaryLight 
+						}]} 
+					numberOfLines={1}
+				>
 					{thread?.channel_label}
 				</Text>
 			</View>
