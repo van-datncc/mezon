@@ -25,7 +25,7 @@ function usePermissionChecker(permissions: string[], channelId?: string) {
 	const checkPermission = useCallback(
 		(permission: string) => {
 			// If the permission is an overridden permission for a channel
-			if (Object.values(EOverriddenPermission).includes(permission as any)) {
+			if (Object.values(EOverriddenPermission).includes(permission as EOverriddenPermission)) {
 				// If no channelId is provided, the check fails for overridden permissions
 				if (!channelId) {
 					return false;

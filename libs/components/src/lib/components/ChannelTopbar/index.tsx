@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useAuth, useEscapeKey, useOnClickOutside, useThreads, useUserRestriction } from '@mezon/core';
+import { useAppNavigation, useAppParams, useEscapeKey, useOnClickOutside, usePermissionChecker, useThreads } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
@@ -7,7 +7,6 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
-	selectCurrentClan,
 	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
@@ -85,13 +84,8 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
-	const { userProfile } = useAuth();
-	const currentClan = useSelector(selectCurrentClan);
-	const hasAdminPermission = useUserRestriction([EPermission.administrator]);
-	const hasClanPermission = useUserRestriction([EPermission.manageClan]);
-	const hasChannelManagePermission = useUserRestriction([EPermission.manageChannel]);
-	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
-	const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
+	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
+	const isShowSettingChannel = hasChannelManagePermission;
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">

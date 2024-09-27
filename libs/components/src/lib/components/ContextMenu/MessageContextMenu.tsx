@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useAppParams, useAuth, useClanRestriction, usePermissionChecker, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import {
 	MessagesEntity,
 	directActions,
@@ -58,6 +58,18 @@ type MessageContextMenuProps = {
 	activeMode: number | undefined;
 };
 
+const useIsOwnerGroupDM = () => {
+	const { userProfile } = useAuth();
+	const { directId } = useAppParams();
+	const currentGroupDM = useSelector(selectDmGroupCurrent(directId as string));
+
+	const isOwnerGroupDM = useMemo(() => {
+		return currentGroupDM?.creator_id === userProfile?.user?.id;
+	}, [currentGroupDM?.creator_id, userProfile?.user?.id]);
+
+	return isOwnerGroupDM;
+};
+
 function MessageContextMenu({ id, elementTarget, messageId, activeMode }: MessageContextMenuProps) {
 	const { setOpenThreadMessageState } = useReference();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
@@ -78,7 +90,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
-	const [checkAdmintrator, { isClanOwner, isOwnerGroupDM }] = useClanRestriction([EPermission.administrator]);
+	const isOwnerGroupDM = useIsOwnerGroupDM();
 	const isMyMessage = useMemo(() => {
 		return message?.sender_id === userId;
 	}, [message?.sender_id, userId]);
@@ -106,7 +118,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		[EOverriddenPermission.manageThread, EOverriddenPermission.deleteMessage, EOverriddenPermission.sendMessage],
 		message?.channel_id ?? ''
 	);
-	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
+	const [removeReaction] = usePermissionChecker([EPermission.manageChannel]);
 	const { type } = useAppParams();
 
 	const [enableCopyLinkItem, setEnableCopyLinkItem] = useState<boolean>(false);
@@ -257,10 +269,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const [enableRemoveOneReactionItem, enableRemoveAllReactionsItem] = useMemo(() => {
 		if (!checkPos) return [false, false];
-		const enableOne = (isClanOwner || checkAdmintrator || removeReaction) && enableViewReactionItem;
-		const enableAll = (isClanOwner || checkAdmintrator || removeReaction) && enableViewReactionItem;
+		const enableOne = removeReaction && enableViewReactionItem;
+		const enableAll = removeReaction && enableViewReactionItem;
 		return [enableOne, enableAll];
-	}, [isClanOwner, checkAdmintrator, enableViewReactionItem, removeReaction]);
+	}, [enableViewReactionItem, removeReaction]);
 
 	const enableCreateThreadItem = useMemo(() => {
 		if (!checkPos) return false;
