@@ -2,8 +2,8 @@ import { selectMaxPermissionForChannel, selectUserMaxPermissionLevel } from '@me
 import { EOverriddenPermission, EPermission } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useIsClanOwner } from './useIsClanOwner';
-import { usePermissionsLevel } from './usePermissionsLevel';
+import { useIsClanOwner } from '../useIsClanOwner';
+import { usePermissionsLevel } from './usePermissionsLevels';
 
 function usePermissionChecker(permissions: EPermission[]): boolean[];
 function usePermissionChecker(permissions: Array<EPermission | EOverriddenPermission>, channelId: string): boolean[];
@@ -16,7 +16,7 @@ function usePermissionChecker(permissions: string[], channelId?: string) {
 	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 
 	// Get the overridden permissions for a specific channel (if channelId is provided)
-	const overridenPermissions = useSelector(selectMaxPermissionForChannel(channelId ?? ''));
+	const overriddenPermissions = useSelector(selectMaxPermissionForChannel(channelId ?? ''));
 
 	// Check if the user is a Clan Owner, which grants all permissions
 	const isClanOwner = useIsClanOwner();
@@ -31,7 +31,7 @@ function usePermissionChecker(permissions: string[], channelId?: string) {
 					return false;
 				}
 				// Return the overridden permission for the specific channel
-				return overridenPermissions[permission as unknown as EOverriddenPermission];
+				return overriddenPermissions[permission as unknown as EOverriddenPermission];
 			}
 
 			// If user's max permission level is not defined, return false
@@ -42,7 +42,7 @@ function usePermissionChecker(permissions: string[], channelId?: string) {
 			// Check if the user's max permission level is high enough for the permission
 			return permissionLevels[permission as EPermission] <= (maxPermissionLevel as number);
 		},
-		[channelId, maxPermissionLevel, overridenPermissions, permissionLevels]
+		[channelId, maxPermissionLevel, overriddenPermissions, permissionLevels]
 	);
 
 	const results = useMemo(() => {
