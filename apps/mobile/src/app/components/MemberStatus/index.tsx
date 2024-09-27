@@ -116,6 +116,7 @@ export const MemberListStatus = React.memo(() => {
 								keyExtractor={(user, index) => `channelOnlineMember[${user?.id}][${index}]`}
 								renderItem={renderMemberItem}
 								estimatedItemSize={size.s_80}
+								nestedScrollEnabled
 							/>
 						</View>
 					</View>
@@ -129,6 +130,7 @@ export const MemberListStatus = React.memo(() => {
 								keyExtractor={(user, index) => `channelOfflineMember[${user?.id}][${index}]`}
 								renderItem={renderMemberItem}
 								estimatedItemSize={size.s_80}
+								nestedScrollEnabled
 							/>
 						</View>
 					</View>
