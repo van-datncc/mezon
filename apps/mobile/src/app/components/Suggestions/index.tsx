@@ -32,7 +32,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(
 		}, [messageActionNeedToResolve]);
 
 		const filterMentionList = debounce(() => {
-			if (keyword === null || !listMentions?.length) {
+			if (!listMentions?.length) {
 				setListMentionData([]);
 				return;
 			}
@@ -124,7 +124,7 @@ const HashtagSuggestions: FC<MentionHashtagSuggestionsProps> = ({ keyword, onSel
 	}, [channels, commonChannelDms, mode]);
 
 	const filterChannelsMention = debounce(() => {
-		if (keyword === null) {
+		if (!listChannelsMention?.length) {
 			setChannelsMentionData([]);
 			return;
 		}
