@@ -31,7 +31,11 @@ export interface ChannelsEntity extends IChannel {
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
-	return { ...channelRes, id: channelRes.channel_id || '', status: channelRes.meeting_code ? 1 : 0 };
+	return {
+		...channelRes,
+		id: channelRes.channel_id || '',
+		status: channelRes.meeting_code ? 1 : 0
+	};
 };
 
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
@@ -266,22 +270,11 @@ export const fetchChannels = createAsyncThunk(
 			fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
 		}
 		const response = await fetchChannelsCached(mezon, 500, 1, clanId, channelType);
-		console.log('response: ', response);
 		if (!response.channeldesc) {
 			return [];
 		}
 
 		if (Date.now() - response.time < 100) {
-			const lastSeenTimeStampInit = response.channeldesc
-				.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_TEXT)
-				.map((channelText) => {
-					return {
-						channelId: channelText.channel_id ?? '',
-						lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp_seconds || 0),
-						clanId: channelText.clan_id ?? ''
-					};
-				});
-
 			const lastChannelMessages =
 				response.channeldesc?.map((channel) => ({
 					...channel.last_sent_message,
@@ -294,9 +287,7 @@ export const fetchChannels = createAsyncThunk(
 		}
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
-		console.log('channels: ', channels);
 		const meta = channels.map((ch) => extractChannelMeta(ch));
-
 		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
 	}
@@ -350,8 +341,7 @@ export const channelsSlice = createSlice({
 			if (payload.channel_private !== 1) {
 				const channel = mapChannelToEntity({
 					...payload,
-					type: payload.channel_type,
-					last_seen_message: { timestamp_seconds: Date.now() / 1000 }
+					type: payload.channel_type
 				});
 				channelsAdapter.addOne(state, channel);
 			}

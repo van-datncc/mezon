@@ -554,10 +554,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
-			console.log('channelCreated: ', channelCreated);
 			if (channelCreated && channelCreated.channel_private === 0) {
+				const timestamp = Date.now() / 1000;
 				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(
+					channelMetaActions.updateBulkChannelMetadata([
+						{
+							id: channelCreated.channel_id,
+							lastSeenTimestamp: timestamp,
+							lastSentTimestamp: timestamp,
+							lastSeenPinMessage: '',
+							clanId: channelCreated.clan_id ?? ''
+						}
+					])
+				);
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(
 						channelsActions.joinChat({

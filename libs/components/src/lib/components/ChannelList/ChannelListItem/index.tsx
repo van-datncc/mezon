@@ -22,7 +22,6 @@ export type ChannelListItemRef = {
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props: ChannelListItemProp, ref) => {
 	const { channel, isActive, permissions } = props;
-
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, channel.id));
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channel.channel_id ?? ''));
