@@ -1,7 +1,7 @@
 import { size, useTheme } from '@mezon/mobile-ui';
 import { ChevronSmallRightIcon } from 'libs/mobile-components/src/lib/icons2';
 import { ReactNode } from 'react';
-import { StyleProp, Text, TextStyle, TouchableOpacity, View } from 'react-native';
+import { StyleProp, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { style } from './styles';
 
 export interface IMezonMenuItemProps {
@@ -16,6 +16,7 @@ export interface IMezonMenuItemProps {
 	disabled?: boolean;
 	description?: string;
 	previewValue?: string;
+	styleBtn?: ViewStyle;
 }
 export default function MezonMenuItem({
 	isLast,
@@ -28,7 +29,8 @@ export default function MezonMenuItem({
 	disabled = false,
 	description,
 	isShow = true,
-	previewValue
+	previewValue,
+	styleBtn
 }: IMezonMenuItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -41,7 +43,7 @@ export default function MezonMenuItem({
 				onPress={() => {
 					onPress && onPress();
 				}}
-				style={styles.btn}
+				style={[styles.btn, styleBtn]}
 			>
 				{icon}
 				<View style={[styles.btnTitleWrapper, disabled && styles.disable, !isLast && styles.borderBottom]}>
