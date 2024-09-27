@@ -13,11 +13,9 @@ import { Outlet, useNavigate } from 'react-router-dom';
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
 	const navigate = useNavigate();
-	// const allNotify = useSelector(selectSpecificNotifications);
 
 	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
 	const allNotificationReplyMentionAllClan = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
-	console.log('allNotificationReplyMentionAllClan: ', allNotificationReplyMentionAllClan);
 
 	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();

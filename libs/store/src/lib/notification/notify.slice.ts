@@ -306,7 +306,7 @@ export const selectCountByClanId = (clanId: string) =>
 		(notifications) => notifications.filter((notification) => notification.content.clan_id === clanId).length
 	);
 
-/////////////// New update
+/////////////// New update 27/09/2024 ///////////////
 export const selectMentionAndReplyByClanId = (clanId: string) =>
 	createSelector(selectAllNotification, (notifications) =>
 		notifications.filter(
