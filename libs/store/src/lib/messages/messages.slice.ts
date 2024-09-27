@@ -672,17 +672,6 @@ export const messagesSlice = createSlice({
 			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
 
 			if (!channelId || !messageId) return state;
-			state.newMesssageUpdateImage = {
-				channel_id: action.payload.channel_id,
-				message_id: action.payload.id,
-				clan_id: action.payload.clan_id,
-				mode: action.payload.mode,
-				mentions: action.payload.mentions,
-				content: action.payload.content,
-				isMe: action.payload.isMe,
-				code: action.payload.code,
-				attachments: action.payload.attachments
-			};
 
 			if (!state.channelMessages[channelId]) {
 				state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({

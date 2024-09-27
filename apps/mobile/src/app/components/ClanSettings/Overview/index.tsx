@@ -64,12 +64,14 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	async function handleSave() {
 		setLoading(true);
 
-		const isDuplicateClan = await handleCheckDuplicateClanname();
-		if (isDuplicateClan) {
-			setErrorMessage(t('menu.serverName.duplicateNameMessage'));
-			setIsCheckValid(false);
-			setLoading(false);
-			return;
+		if (banner === currentClan?.banner) {
+			const isDuplicateClan = await handleCheckDuplicateClanname();
+			if (isDuplicateClan) {
+				setErrorMessage(t('menu.serverName.duplicateNameMessage'));
+				setIsCheckValid(false);
+				setLoading(false);
+				return;
+			}
 		}
 
 		await updateClan({
@@ -188,7 +190,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 	return (
 		<Block flex={1} backgroundColor={themeValue.secondary}>
-			<ScrollView contentContainerStyle={styles.container}>
+			<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps={'handled'}>
 				<MezonImagePicker defaultValue={banner} height={200} width={width - 40} onLoad={handleLoad} showHelpText autoUpload />
 
 				<View style={{ marginVertical: 10 }}>
