@@ -300,7 +300,7 @@ function MemberProfile({
 						{!isHideStatus && (
 							<>
 								{customStatus && (isFooter || isListFriend) ? (
-									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode line-clamp-1`}>
+									<span className={`text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1`}>
 										{customStatus}
 									</span>
 								) : (
