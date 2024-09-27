@@ -1,5 +1,5 @@
 import { AvatarImage } from '@mezon/components';
-import { useClanRestriction, useMemberContext, useRoles } from '@mezon/core';
+import { useMemberContext, usePermissionChecker, useRoles } from '@mezon/core';
 import { RolesClanEntity, selectRolesClanEntities, selectTheme, useAppDispatch, usersClanActions } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
@@ -41,9 +41,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 
 	const { searchQuery } = useMemberContext();
 
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasPermissionEditRole = isClanOwner || hasAdminPermission || hasClanPermission;
+	const [hasAdminPermission] = usePermissionChecker([EPermission.administrator, EPermission.manageClan]);
 
 	return (
 		<div className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0">
@@ -97,7 +95,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					) : (
 						'-'
 					)}
-					{hasPermissionEditRole && (
+					{hasAdminPermission && (
 						<Tooltip
 							content={
 								<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
