@@ -97,7 +97,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 							isHideStatus={false}
 							classParent="memberProfile"
 							positionType={MemberProfileType.FOOTER_PROFILE}
-							customStatus={userCustomStatus || userStatusProfile}
+							customStatus={userCustomStatus}
 						/>
 					</div>
 					{showModalFooterProfile && (
@@ -120,7 +120,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 			{showModalCustomStatus && (
 				<ModalCustomStatus
 					setCustomStatus={setCustomStatus}
-					customStatus={userCustomStatus || userStatusProfile}
+					customStatus={userCustomStatus || ''}
 					handleSaveCustomStatus={handleSaveCustomStatus}
 					name={name}
 					openModal={showModalCustomStatus}
