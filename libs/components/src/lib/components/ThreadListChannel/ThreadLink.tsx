@@ -1,6 +1,6 @@
 import { useOnClickOutside } from '@mezon/core';
-import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
-import { notificationActions, selectCountByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
+import { notificationActions, useAppDispatch } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
 import React, { memo, useImperativeHandle, useRef, useState } from 'react';
@@ -23,11 +23,12 @@ export type ThreadLinkRef = {
 };
 
 const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
-	const numberNotification = useSelector(selectCountByChannelId(thread.id));
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(thread.channel_id ?? ''));
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(thread.clan_id ?? '', thread.id, getLastSeenChannel ?? 0)).length;
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);
 	const [openSetting, setOpenSetting] = useState(false);

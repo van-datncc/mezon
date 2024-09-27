@@ -316,22 +316,24 @@ export const selectMentionAndReplyByClanId = (clanId: string) =>
 		)
 	);
 
-export const selectMentionAndReplyUnreadByChanneld = (channelId: string, lastSeenStamp: number) =>
-	createSelector(selectAllNotification, (notifications) =>
-		notifications.filter((notification) => {
+export const selectMentionAndReplyUnreadByChanneld = (clanId: string, channelId: string, lastSeenStamp: number) =>
+	createSelector(selectAllNotification, (notifications) => {
+		const clanFilteredNotifications = notifications.filter((notification) => notification.content.clan_id === clanId);
+
+		const filteredNotifications = clanFilteredNotifications.filter(
+			(notification) => notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED
+		);
+
+		return filteredNotifications.filter((notification) => {
 			if (!notification.create_time) {
 				return false;
 			}
 
 			const timeCreate = new Date(notification.create_time).getTime() / 1000;
 
-			return (
-				notification.content.channel_id === channelId &&
-				(notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED) &&
-				lastSeenStamp < timeCreate
-			);
-		})
-	);
+			return notification.content.channel_id === channelId && lastSeenStamp < timeCreate;
+		});
+	});
 
 export const selectMentionAndReplyUnreadByClanId = (clanId: string, listLastSeen: ChannelMetaEntity[]) =>
 	createSelector(selectAllNotification, (notifications) => {
