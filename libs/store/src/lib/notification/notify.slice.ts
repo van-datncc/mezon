@@ -1,3 +1,4 @@
+import { ChannelMetaEntity } from '@mezon/store-mobile';
 import { INotification, LoadingStatus, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
@@ -187,7 +188,7 @@ export const notificationSlice = createSlice({
 			})
 			.addCase(fetchListNotification.fulfilled, (state: NotificationState, action: PayloadAction<INotification[] | null>) => {
 				if (action.payload !== null) {
-					notificationAdapter.setAll(state, action.payload);
+					notificationAdapter.addMany(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {
 					state.loadingStatus = 'not loaded';
@@ -242,6 +243,7 @@ export const getNotificationState = (rootState: { [NOTIFICATION_FEATURE_KEY]: No
 export const selectAllNotification = createSelector(getNotificationState, selectAll);
 
 export const selectNotificationEntities = createSelector(getNotificationState, selectEntities);
+
 export const selectNotificationByCode = (code: number) =>
 	createSelector(selectAllNotification, (notifications) => notifications.filter((notification) => notification.code === code));
 
@@ -303,3 +305,79 @@ export const selectCountByClanId = (clanId: string) =>
 		selectSpecificNotifications,
 		(notifications) => notifications.filter((notification) => notification.content.clan_id === clanId).length
 	);
+
+/////////////// New update
+export const selectMentionAndReplyByClanId = (clanId: string) =>
+	createSelector(selectAllNotification, (notifications) =>
+		notifications.filter(
+			(notification) =>
+				notification.content.clan_id === clanId &&
+				(notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED)
+		)
+	);
+
+export const selectMentionAndReplyUnreadByChanneld = (channelId: string, lastSeenStamp: number) =>
+	createSelector(selectAllNotification, (notifications) =>
+		notifications.filter((notification) => {
+			if (!notification.create_time) {
+				return false;
+			}
+
+			const timeCreate = new Date(notification.create_time).getTime() / 1000;
+
+			return (
+				notification.content.channel_id === channelId &&
+				(notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED) &&
+				lastSeenStamp < timeCreate
+			);
+		})
+	);
+
+export const selectMentionAndReplyUnreadByClanId = (clanId: string, listLastSeen: ChannelMetaEntity[]) =>
+	createSelector(selectAllNotification, (notifications) => {
+		const filteredNotifications = notifications.filter(
+			(notification) =>
+				notification.content.clan_id === clanId &&
+				(notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED)
+		);
+		const lastSeenMap = new Map<string, number>();
+		listLastSeen.forEach((channel) => {
+			lastSeenMap.set(channel.id, channel.lastSeenTimestamp ?? 0);
+		});
+
+		return filteredNotifications.filter((notification) => {
+			if (!notification.create_time) {
+				return false;
+			}
+
+			const notificationTimestamp = new Date(notification.create_time).getTime() / 1000;
+			const channelId = notification.content.channel_id;
+
+			const lastSeen = lastSeenMap.get(channelId) ?? 0;
+
+			return lastSeen > 0 && notificationTimestamp > lastSeen;
+		});
+	});
+export const selectMentionAndReplyUnreadAllClan = (listLastSeenAllClan: ChannelMetaEntity[]) =>
+	createSelector(selectAllNotification, (notifications) => {
+		const filteredNotifications = notifications.filter(
+			(notification) => notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED
+		);
+		const lastSeenMap = new Map<string, number>();
+		listLastSeenAllClan.forEach((channel) => {
+			lastSeenMap.set(channel.id, channel.lastSeenTimestamp ?? 0);
+		});
+
+		return filteredNotifications.filter((notification) => {
+			if (!notification.create_time) {
+				return false;
+			}
+
+			const notificationTimestamp = new Date(notification.create_time).getTime() / 1000;
+			const channelId = notification.content.channel_id;
+
+			const lastSeen = lastSeenMap.get(channelId) ?? 0;
+
+			return lastSeen > 0 && notificationTimestamp > lastSeen;
+		});
+	});

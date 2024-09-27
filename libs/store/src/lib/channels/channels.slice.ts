@@ -239,7 +239,8 @@ function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
 		id: channel.id,
 		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
-		lastSeenPinMessage: channel.last_pin_message || ''
+		lastSeenPinMessage: channel.last_pin_message || '',
+		clanId: channel.clan_id ?? ''
 	};
 }
 
@@ -293,6 +294,7 @@ export const fetchChannels = createAsyncThunk(
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
 		const meta = channels.map((ch) => extractChannelMeta(ch));
+
 		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
 	}

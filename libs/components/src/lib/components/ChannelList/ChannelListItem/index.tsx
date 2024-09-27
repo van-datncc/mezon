@@ -1,4 +1,4 @@
-import { selectCountByChannelId, selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
+import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
 import { ChannelThreads } from '@mezon/utils';
 import React, { Fragment, memo, useImperativeHandle, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -22,8 +22,12 @@ export type ChannelListItemRef = {
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props: ChannelListItemProp, ref) => {
 	const { channel, isActive, permissions } = props;
+
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, channel.id));
-	const numberNotification = useSelector(selectCountByChannelId(channel.id));
+
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channel.channel_id ?? ''));
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(channel.id, getLastSeenChannel ?? 0)).length;
+
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />
 	));

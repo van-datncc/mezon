@@ -1,4 +1,4 @@
-import { selectCountByClanId } from '@mezon/store-mobile';
+import { selectAllChannelLastSeenTimestampByClanId, selectMentionAndReplyUnreadByClanId } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan } from '@mezon/utils';
 import { useSelector } from 'react-redux';
@@ -13,14 +13,17 @@ export type SidebarClanItemProps = {
 };
 
 const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItemProps) => {
-	const numberOfNotifyClan = useSelector(selectCountByClanId(option.clan_id ?? ''));
 	const currentClanPath = pathname.split('/channels')[0];
 	const isSameClan = currentClanPath === linkClan;
 	const handleClick = (e: React.MouseEvent) => {
 		if (isSameClan) {
-			e.preventDefault(); // Prevent redirect if it's the same Clan
+			e.preventDefault();
 		}
 	};
+
+	const getAllChannelLastSeenTimeStamp = useSelector(selectAllChannelLastSeenTimestampByClanId(option.clan_id ?? ''));
+	const notiUnreadClan = useSelector(selectMentionAndReplyUnreadByClanId(option.clan_id ?? '', getAllChannelLastSeenTimeStamp)) || 0;
+
 	return (
 		<div className="relative">
 			<NavLink to={linkClan} onClick={handleClick}>
@@ -43,9 +46,9 @@ const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItem
 					)}
 				</NavLinkComponent>
 			</NavLink>
-			{numberOfNotifyClan ? (
+			{notiUnreadClan.length ? (
 				<div className="w-[20px] h-[20px] flex items-center justify-center text-[13px] font-medium rounded-full bg-colorDanger absolute bottom-[-3px] right-[-3px] border-[2px] border-solid dark:border-bgPrimary border-white">
-					{numberOfNotifyClan}
+					{notiUnreadClan.length}
 				</div>
 			) : (
 				<></>
