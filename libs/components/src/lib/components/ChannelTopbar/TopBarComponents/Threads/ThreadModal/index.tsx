@@ -1,4 +1,4 @@
-import { useAppNavigation, useChannelRestriction, useReference, useThreads } from '@mezon/core';
+import { useAppNavigation, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, selectTheme, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
@@ -24,7 +24,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const allUsesClan = useSelector(selectAllUserClans);
 	const appearanceTheme = useSelector(selectTheme);
-	const { maxChannelPermissions } = useChannelRestriction(currentChannel?.id ?? '');
+	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
 
 	const avatarMembers = useMemo(() => allUsesClan?.map((member) => member?.user?.avatar_url), [allUsesClan]);
 
@@ -49,7 +49,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 						<span className="text-base font-semibold cursor-default dark:text-white text-black">Threads</span>
 					</div>
 					<SearchThread />
-					{maxChannelPermissions[EOverriddenPermission.manageThread] && (
+					{canManageThread && (
 						<div className="flex flex-row items-center gap-4">
 							<Button
 								onClick={handleCreateThread}
