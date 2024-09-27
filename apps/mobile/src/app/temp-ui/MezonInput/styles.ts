@@ -48,7 +48,7 @@ export const style = (colors: Attributes) =>
 		clearBtn: {
 			borderRadius: 10,
 			zIndex: 100,
-			marginRight: size.s_10,
+			marginRight: size.s_10
 		},
 
 		lineCountWrapper: {

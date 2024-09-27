@@ -16,7 +16,7 @@ export interface IMezonMenuItemProps {
 	disabled?: boolean;
 	description?: string;
 	previewValue?: string;
-  styleBtn?: ViewStyle;
+	styleBtn?: ViewStyle;
 }
 export default function MezonMenuItem({
 	isLast,
@@ -30,7 +30,7 @@ export default function MezonMenuItem({
 	description,
 	isShow = true,
 	previewValue,
-  styleBtn
+	styleBtn
 }: IMezonMenuItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);

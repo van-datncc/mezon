@@ -190,10 +190,7 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 	return (
 		<Block flex={1} backgroundColor={themeValue.secondary}>
-			<ScrollView 
-				contentContainerStyle={styles.container} 
-				keyboardShouldPersistTaps={'handled'}
-			>
+			<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps={'handled'}>
 				<MezonImagePicker defaultValue={banner} height={200} width={width - 40} onLoad={handleLoad} showHelpText autoUpload />
 
 				<View style={{ marginVertical: 10 }}>

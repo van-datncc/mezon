@@ -1,6 +1,6 @@
-import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
+import { GifStickerEmojiPopup, Icons, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
+import { referencesActions, selectAnonymousMode, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
 import classNames from 'classnames';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -23,7 +23,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	const dispatch = useDispatch();
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: channel, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
-
+	const anonymousMode = useSelector(selectAnonymousMode);
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 
@@ -112,6 +112,11 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 				currentClanId={clanId}
 				mode={mode}
 			/>
+			{anonymousMode && (
+				<div className="absolute -top-3 -right-3 rotate-45 anonymousAnimation">
+					<Icons.HatIcon defaultSize="w-7 h-7 dark:fill-white fill-black " />
+				</div>
+			)}
 		</div>
 	);
 }
