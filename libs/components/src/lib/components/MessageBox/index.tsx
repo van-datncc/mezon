@@ -1,5 +1,5 @@
 import { AttachmentPreviewThumbnail, MentionReactInput } from '@mezon/components';
-import { useChannelRestriction, useReference } from '@mezon/core';
+import { usePermissionChecker, useReference } from '@mezon/core';
 import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EOverriddenPermission, IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
@@ -31,7 +31,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
 	const appearanceTheme = useSelector(selectTheme);
-	const { maxChannelPermissions } = useChannelRestriction(currentChannelId ?? '');
+	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], currentChannelId ?? '');
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 
 	const onConvertToFiles = useCallback((content: string) => {
@@ -124,7 +124,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				<FileSelectionButton
 					currentClanId={currentClanId || ''}
 					currentChannelId={currentChannelId || ''}
-					hasPermissionEdit={maxChannelPermissions[EOverriddenPermission.sendMessage]}
+					hasPermissionEdit={canSendMessage}
 				/>
 
 				<div className={`w-full dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md `}>
@@ -141,7 +141,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 							handleConvertToFile={onConvertToFiles}
 							currentClanId={currentClanId}
 							mode={props.mode}
-							hasPermissionEdit={maxChannelPermissions[EOverriddenPermission.sendMessage]}
+							hasPermissionEdit={canSendMessage}
 						/>
 					</div>
 				</div>

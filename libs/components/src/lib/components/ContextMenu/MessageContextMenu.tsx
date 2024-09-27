@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useAppParams, useAuth, useChannelRestriction, useClanRestriction, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, useClanRestriction, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import {
 	MessagesEntity,
 	directActions,
@@ -101,8 +101,11 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const checkMessageInPinnedList = useMemo(() => {
 		return listPinMessages.some((pinMessage) => pinMessage.message_id === messageId);
 	}, [listPinMessages]);
-	const { maxChannelPermissions } = useChannelRestriction(message?.channel_id);
-	const [pinMessage] = useClanRestriction([EPermission.manageChannel]);
+
+	const [canManageThread, canDeleteMessage, canSendMessage] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EOverriddenPermission.deleteMessage, EOverriddenPermission.sendMessage],
+		message?.channel_id ?? ''
+	);
 	const [removeReaction] = useClanRestriction([EPermission.manageChannel]);
 	const { type } = useAppParams();
 
@@ -264,9 +267,9 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		if (activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP) {
 			return false;
 		} else {
-			return maxChannelPermissions[EOverriddenPermission.manageThread];
+			return canManageThread;
 		}
-	}, [checkPos, activeMode, maxChannelPermissions]);
+	}, [checkPos, activeMode, canManageThread]);
 
 	const enableDelMessageItem = useMemo(() => {
 		if (!checkPos) return false;
@@ -275,10 +278,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			return isMyMessage || isOwnerGroupDM;
 		}
 		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return maxChannelPermissions[EOverriddenPermission.deleteMessage];
+			return canDeleteMessage;
 		}
 		return isMyMessage;
-	}, [activeMode, type, maxChannelPermissions, isMyMessage, checkPos, isOwnerGroupDM]);
+	}, [activeMode, type, canDeleteMessage, isMyMessage, checkPos, isOwnerGroupDM]);
 
 	const checkElementIsImage = elementTarget instanceof HTMLImageElement;
 
@@ -388,7 +391,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when(checkPos && maxChannelPermissions[EOverriddenPermission.sendMessage], (builder) => {
+		builder.when(checkPos && canSendMessage, (builder) => {
 			builder.addMenuItem(
 				'reply',
 				'Reply',
