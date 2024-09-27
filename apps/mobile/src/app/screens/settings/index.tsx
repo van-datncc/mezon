@@ -318,7 +318,10 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 
 	return (
 		<View style={styles.settingContainer}>
-			<ScrollView contentContainerStyle={styles.settingScroll}>
+			<ScrollView 
+				contentContainerStyle={styles.settingScroll} 
+				keyboardShouldPersistTaps={'handled'}
+			>
 				<MezonSearch 
 					value={searchText}
 					isShowCancel={isShowCancel}
