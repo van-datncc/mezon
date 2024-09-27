@@ -109,7 +109,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const handleLeaveClan = async () => {
 		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
 		toggleLeaveClanPopup();
-		navigate('/mezon');
+		navigate('/chat/direct/friends');
 	};
 
 	const toggleShowEmptyCategory = () => {

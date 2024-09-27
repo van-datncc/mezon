@@ -1,4 +1,4 @@
-import { useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
+import { useAuth, useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelMembersActions,
@@ -15,7 +15,7 @@ import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MemberProfile from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
@@ -76,6 +76,11 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 
 	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
 
+	const myProfile = useAuth();
+	const isMe = useMemo(() => {
+		return userId === myProfile.userId;
+	}, [myProfile.userId, userId]);
+
 	return (
 		<>
 			<button
@@ -92,12 +97,12 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 					<div className="pointer-events-none">
 						<MemberProfile
 							name={name}
-							status={status}
+							status={isMe ? true : status}
 							avatar={avatar}
 							isHideStatus={false}
 							classParent="memberProfile"
 							positionType={MemberProfileType.FOOTER_PROFILE}
-							customStatus={userCustomStatus || userStatusProfile}
+							customStatus={userCustomStatus}
 						/>
 					</div>
 					{showModalFooterProfile && (
@@ -120,7 +125,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 			{showModalCustomStatus && (
 				<ModalCustomStatus
 					setCustomStatus={setCustomStatus}
-					customStatus={userCustomStatus || userStatusProfile}
+					customStatus={userCustomStatus || ''}
 					handleSaveCustomStatus={handleSaveCustomStatus}
 					name={name}
 					openModal={showModalCustomStatus}

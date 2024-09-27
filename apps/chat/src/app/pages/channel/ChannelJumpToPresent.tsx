@@ -19,12 +19,13 @@ export function ChannelJumpToPresent({ channelId, className }: ChannelTypingProp
 
 	return (
 		<div
-			className={classNames('w-full h-full opacity-95 cursor-pointer dark:text-white text-black flex items-center justify-between', className)}
+			className={classNames('w-full h-full opacity-95 cursor-pointer text-white flex items-center justify-between', className)}
 			onClick={handleJumpToPresent}
 		>
 			<div>You're viewing older messages</div>
 			<div className="flex items-center gap-1">
-				Jump to present<Icons.ArrowDown></Icons.ArrowDown>
+				Jump to present
+				<Icons.JumpToPresentArrow className="w-4 h-4 text-white" />
 			</div>
 		</div>
 	);
