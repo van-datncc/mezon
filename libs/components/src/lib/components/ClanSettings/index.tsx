@@ -21,7 +21,7 @@ export type ModalSettingProps = {
 
 const ClanSetting = (props: ModalSettingProps) => {
 	const { onClose, initialSetting } = props;
-	const [currentSettingId, setCurrentSettingId] = useState<string>(initialSetting ? initialSetting : listItemSetting[0].id);
+	const [currentSettingId, setCurrentSettingId] = useState<string>(() => (initialSetting ? initialSetting : listItemSetting[0].id));
 	const currentSetting = useMemo(() => {
 		return listItemSetting.find((item) => item.id === currentSettingId);
 	}, [currentSettingId]);
