@@ -2,7 +2,7 @@ import { ACTIVE_TAB, IUerMention } from '@mezon/mobile-components';
 import { Block } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
-	selectAllChannels,
+	selectAllInfoChannels,
 	selectAllUsersByUser,
 	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage
@@ -27,7 +27,7 @@ interface ISearchMessagePageProps {
 function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMessagePage }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
-	const listChannels = useSelector(selectAllChannels);
+	const listChannels = useSelector(selectAllInfoChannels);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
 	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannel?.channel_id as string));
