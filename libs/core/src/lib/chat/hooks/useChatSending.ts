@@ -1,4 +1,11 @@
-import { messagesActions, selectAllAccount, selectChannelById, selectNewMesssageUpdateImage, useAppDispatch } from '@mezon/store';
+import {
+	messagesActions,
+	selectAllAccount,
+	selectAnonymousMode,
+	selectChannelById,
+	selectNewMesssageUpdateImage,
+	useAppDispatch
+} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -40,6 +47,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const userProfile = useSelector(selectAllAccount);
 	const currentUserId = userProfile?.user?.id || '';
 	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
+	const anonymousMode = useSelector(selectAnonymousMode);
 	const dispatch = useAppDispatch();
 	const { clientRef, sessionRef, socketRef } = useMezon();
 	const sendMessage = React.useCallback(
@@ -76,17 +84,19 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
-		dispatch(
-			messagesActions.sendTypingUser({
-				clanId: getClanId || '',
-				parentId: parentId ?? '',
-				channelId: channelIdOrDirectId ?? '',
-				mode,
-				isPublic: isPublic,
-				isParentPublic: isParentPublic
-			})
-		);
-	}, [channelIdOrDirectId, getClanId, dispatch, isPublic, mode]);
+		if (!anonymousMode) {
+			dispatch(
+				messagesActions.sendTypingUser({
+					clanId: getClanId || '',
+					parentId: parentId ?? '',
+					channelId: channelIdOrDirectId ?? '',
+					mode,
+					isPublic: isPublic,
+					isParentPublic: isParentPublic
+				})
+			);
+		}
+	}, [channelIdOrDirectId, getClanId, dispatch, isPublic, mode, anonymousMode]);
 
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(

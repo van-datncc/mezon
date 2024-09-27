@@ -25,7 +25,7 @@ import {
 	selectStatusMenu,
 	selectTheme
 } from '@mezon/store';
-import { selectStreamChannelByChannelId, selectStreamMembersByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { accountActions, selectStreamChannelByChannelId, selectStreamMembersByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -117,6 +117,9 @@ function MyApp() {
 			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
 				openSearchModal();
+			}
+			if (event[prefixKey] && event.shiftKey && event.key === 'Enter') {
+				dispatch(accountActions.setAnonymousMode());
 			}
 		},
 		[openSearchModal]
