@@ -266,6 +266,7 @@ export const fetchChannels = createAsyncThunk(
 			fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
 		}
 		const response = await fetchChannelsCached(mezon, 500, 1, clanId, channelType);
+		console.log('response: ', response);
 		if (!response.channeldesc) {
 			return [];
 		}
@@ -293,6 +294,7 @@ export const fetchChannels = createAsyncThunk(
 		}
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
+		console.log('channels: ', channels);
 		const meta = channels.map((ch) => extractChannelMeta(ch));
 
 		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
@@ -346,7 +348,11 @@ export const channelsSlice = createSlice({
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
 			const payload = action.payload;
 			if (payload.channel_private !== 1) {
-				const channel = mapChannelToEntity({ ...payload, type: payload.channel_type });
+				const channel = mapChannelToEntity({
+					...payload,
+					type: payload.channel_type,
+					last_seen_message: { timestamp_seconds: Date.now() / 1000 }
+				});
 				channelsAdapter.addOne(state, channel);
 			}
 		},

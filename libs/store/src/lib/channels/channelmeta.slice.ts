@@ -165,20 +165,3 @@ export const selectAllChannelLastSeenTimestampByClanId = (clanId: string) =>
 	createSelector(selectAllChannelMeta, (channelMetas) =>
 		channelMetas.filter((channelMeta) => channelMeta.lastSeenTimestamp && channelMeta.clanId === clanId)
 	);
-
-const data = [
-	{
-		id: '1775732550778490880',
-		lastSeenTimestamp: 1727411054,
-		lastSentTimestamp: 1727411015,
-		lastSeenPinMessage: '',
-		clanId: '1775732550744936448'
-	},
-	{
-		id: '1775732794433998848',
-		lastSeenTimestamp: 1727403361,
-		lastSentTimestamp: 1727316224,
-		lastSeenPinMessage: '',
-		clanId: '1775732550744936448'
-	}
-];
