@@ -117,7 +117,12 @@
             "add": "Add",
             "roles": "ROLES",
             "members": "MEMBERS"
-        }
+        },
+        "toast": {
+            "success": "Save Successfully",
+            "failed": "Save Failed"
+        },
+        "roleAndMemberEmpty": "There are no Roles and Members to override permissions"
     },
     "changeCategory": {
         "title": "Change Category",
