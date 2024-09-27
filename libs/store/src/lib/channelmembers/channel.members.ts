@@ -380,14 +380,17 @@ export const selectMemberCustomStatusById = createSelector(
 	[
 		getUsersClanState,
 		selectDirectMessageEntities,
-		(state, userId: string, isDM?: boolean) => {
-			return `${userId},${state?.direct.currentDirectMessageId},${isDM}`;
+		(state: RootState, userId: string, isDM?: boolean) => {
+			return `${userId},${state?.direct.currentDirectMessageId},${isDM},${state?.account?.userProfile?.user?.id},${state.channelMembers.customStatusUser?.[userId]}`;
 		}
 	],
 	(usersClanState, directs, payload) => {
-		const [userId, currentDirectMessageId, isDM] = payload.split(',');
+		const [userId, currentDirectMessageId, isDM, myId, currentUserCustomStatus] = payload.split(',');
 		const userClan = usersClanState.entities[userId];
 		const userGroup = directs?.[currentDirectMessageId];
+		if (userId === myId) {
+			return currentUserCustomStatus || false;
+		}
 		if (userClan && (isDM === 'false' || 'undefined')) {
 			return (userClan?.user?.metadata as any)?.status || '';
 		}

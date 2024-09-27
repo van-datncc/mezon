@@ -90,7 +90,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 				{isViewingOldMessage && (
 					<div
 						className={classNames(
-							'relative z-0 px-2 py-1 text-sm bg-bgAccent dark:bg-bgDarkAccent rounded-md',
+							'relative z-0 px-2 py-1 text-sm bg-[#6d6f78] dark:bg-bgDarkAccent font-semibold rounded-md',
 							dataReferences.message_ref_id ? 'top-[8px]' : ''
 						)}
 					>
