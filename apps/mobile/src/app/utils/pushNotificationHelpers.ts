@@ -181,12 +181,16 @@ export const navigateToNotification = async (store: any, notification: any, navi
 					await Promise.all([
 						store.dispatch(clansActions.joinClan({ clanId: clanId })),
 						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
-						store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }))
+						store.dispatch(
+							channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
+						)
 					]);
 				};
 				await joinAndChangeClan(store, clanId);
 			} else {
-				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+				store.dispatch(
+					channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
+				);
 			}
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			setTimeout(() => {
