@@ -112,7 +112,7 @@ const Notifications = () => {
 	};
 
 	const handleOnPressNotify = async (notify: INotification) => {
-		if (notify?.content?.channel_id) {
+		if (!notify?.content?.channel_id) {
 			return;
 		}
 		const store = await getStoreAsync();
