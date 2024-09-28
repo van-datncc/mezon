@@ -17,7 +17,7 @@ import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice'
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
-import { ChannelMetaEntity } from './channelmeta.slice';
+import { ChannelMetaEntity, channelMetaActions } from './channelmeta.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -290,8 +290,8 @@ export const fetchChannels = createAsyncThunk(
 		}
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
-		// const meta = channels.map((ch) => extractChannelMeta(ch));
-		// thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
+		const meta = channels.map((ch) => extractChannelMeta(ch));
+		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
 	}
 );
@@ -341,17 +341,21 @@ export const channelsSlice = createSlice({
 		},
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
 			const payload = action.payload;
+
+			const timestamp = Date.now() / 1000;
 			if (payload.parent_id !== '0' && payload.channel_private !== 1) {
 				const channel = mapChannelToEntity({
 					...payload,
 					type: payload.channel_type,
-					active: 1
+					active: 1,
+					last_seen_message: { timestamp_seconds: timestamp }
 				});
 				channelsAdapter.addOne(state, channel);
 			} else if (payload.parent_id === '0' && payload.channel_private !== 1) {
 				const channel = mapChannelToEntity({
 					...payload,
-					type: payload.channel_type
+					type: payload.channel_type,
+					last_seen_message: { timestamp_seconds: timestamp }
 				});
 				channelsAdapter.addOne(state, channel);
 			}
