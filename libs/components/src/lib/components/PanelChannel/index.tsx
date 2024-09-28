@@ -1,4 +1,4 @@
-import { useChannelRestriction, useClanRestriction, useEscapeKey } from '@mezon/core';
+import { useEscapeKey, usePermissionChecker } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
@@ -186,8 +186,10 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		}
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
 
-	const { maxChannelPermissions } = useChannelRestriction(currentChannelId ?? '');
-	const [hasManageChannelPermission] = useClanRestriction([EPermission.manageChannel]);
+	const [canManageThread, canManageChannel] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EPermission.manageChannel],
+		currentChannelId ?? ''
+	);
 
 	useEscapeKey(() => setIsShowPanelChannel(false));
 
@@ -279,7 +281,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{hasManageChannelPermission && (
+					{canManageChannel && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Channel" />
 							{channel.type === typeChannel.text && <ItemPanel children="Create Text Channel" onClick={handleOpenCreateChannelModal} />}
@@ -333,7 +335,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 						)}
 					</GroupPanels>
 
-					{maxChannelPermissions[EOverriddenPermission.manageThread] && (
+					{canManageThread && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
 							<ItemPanel children="Create Thread" />

@@ -1,5 +1,5 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo } from '@mezon/components';
-import { MezonPolicyProvider, useApp, useThreads } from '@mezon/core';
+import { useApp, useThreads } from '@mezon/core';
 import { selectAllAccount, selectCloseMenu, selectCurrentChannel, selectCurrentClan, selectStatusMenu, selectStatusStream } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect } from 'react';
@@ -29,7 +29,7 @@ const ClanLayout = () => {
 	}, [isShowCreateThread]);
 
 	return (
-		<MezonPolicyProvider clanId={clanId}>
+		<>
 			<div
 				className={` flex-col flex max-w-[272px] dark:bg-bgSecondary bg-bgLightSecondary relative overflow-hidden min-w-widthMenuMobile sbm:min-w-[272px] ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}
 			>
@@ -59,7 +59,7 @@ const ClanLayout = () => {
 				</div>
 			)}
 			<Setting isDM={false} />
-		</MezonPolicyProvider>
+		</>
 	);
 };
 
