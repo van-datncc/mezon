@@ -47,7 +47,6 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 			}
 		};
 	});
-
 	return (
 		<Fragment>
 			<ChannelLink

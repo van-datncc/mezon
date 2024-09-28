@@ -13,7 +13,7 @@ import {
 } from '@mezon/store';
 import { IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
+import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -40,13 +40,16 @@ const ThreadBox = () => {
 				toast('Thread name already exists');
 				return;
 			}
-			const body: ApiCreateChannelDescRequest = {
+			const timestamp = Date.now() / 1000;
+			const body: any = {
 				clan_id: currentClanId?.toString(),
 				channel_label: value.nameValueThread,
 				channel_private: value.isPrivate,
 				parrent_id: currentChannelId as string,
 				category_id: currentChannel?.category_id,
-				type: ChannelType.CHANNEL_TYPE_TEXT
+				type: ChannelType.CHANNEL_TYPE_TEXT,
+				lastSeenTimestamp: timestamp,
+				lastSentTimestamp: timestamp
 			};
 
 			const thread = await dispatch(createNewChannel(body));

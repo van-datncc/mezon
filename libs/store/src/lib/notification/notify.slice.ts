@@ -294,17 +294,17 @@ export const selectTotalClansNotify = createSelector(getNotificationState, (stat
 
 export const selectSpecificNotifications = createSelector(getNotificationState, (state: NotificationState) => state.specificNotifications);
 
-export const selectCountByChannelId = (channelId: string) =>
-	createSelector(
-		selectSpecificNotifications,
-		(notifications) => notifications.filter((notification) => notification.content.channel_id === channelId).length
-	);
+// export const selectCountByChannelId = (channelId: string) =>
+// 	createSelector(
+// 		selectSpecificNotifications,
+// 		(notifications) => notifications.filter((notification) => notification.content.channel_id === channelId).length
+// 	);
 
-export const selectCountByClanId = (clanId: string) =>
-	createSelector(
-		selectSpecificNotifications,
-		(notifications) => notifications.filter((notification) => notification.content.clan_id === clanId).length
-	);
+// export const selectCountByClanId = (clanId: string) =>
+// 	createSelector(
+// 		selectSpecificNotifications,
+// 		(notifications) => notifications.filter((notification) => notification.content.clan_id === clanId).length
+// 	);
 
 /////////////// New update 27/09/2024 ///////////////
 export const selectMentionAndReplyByClanId = (clanId: string) =>

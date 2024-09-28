@@ -28,7 +28,10 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 	const dispatch = useAppDispatch();
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(thread.channel_id ?? ''));
-	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(thread.clan_id ?? '', thread.id, getLastSeenChannel ?? 0)).length;
+	const numberNotification = useSelector(
+		selectMentionAndReplyUnreadByChanneld(thread.clan_id ?? '', thread.channel_id ?? '', getLastSeenChannel ?? 0)
+	).length;
+
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);
 	const [openSetting, setOpenSetting] = useState(false);
@@ -121,7 +124,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 				<DeleteModal onClose={() => setShowModal(false)} channelLabel={thread.channel_label || ''} channelId={thread.channel_id as string} />
 			)}
 
-			{numberNotification !== 0 && (
+			{numberNotification > 0 && (
 				<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs font-medium">
 					{numberNotification}
 				</div>

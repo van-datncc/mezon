@@ -556,16 +556,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated && channelCreated.channel_private === 0) {
 				const timestamp = Date.now() / 1000;
-				dispatch(channelsActions.createChannelSocket(channelCreated));
+
+				const extendChannelCreated = {
+					...channelCreated,
+					last_seen_message: { timestamp_seconds: timestamp },
+					last_sent_message: { timestamp_seconds: timestamp }
+				};
+				dispatch(channelsActions.createChannelSocket(extendChannelCreated));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
 				dispatch(
 					channelMetaActions.updateBulkChannelMetadata([
 						{
-							id: channelCreated.channel_id,
-							lastSeenTimestamp: timestamp,
-							lastSentTimestamp: timestamp,
+							id: extendChannelCreated.channel_id,
+							lastSeenTimestamp: extendChannelCreated.last_seen_message.timestamp_seconds,
+							lastSentTimestamp: extendChannelCreated.last_sent_message.timestamp_seconds,
 							lastSeenPinMessage: '',
-							clanId: channelCreated.clan_id ?? ''
+							clanId: extendChannelCreated.clan_id ?? ''
 						}
 					])
 				);
