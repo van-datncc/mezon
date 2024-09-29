@@ -70,14 +70,16 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI)
 	const path = window.location.pathname;
 
 	let channelId = null;
-
+	let clanId = null;
 	if (currentChannelId && RegExp(currentChannelId).test(path)) {
+		clanId = currentClanId;
 		channelId = currentChannelId;
 	} else if (currentDirectId && RegExp(currentDirectId).test(path)) {
+		clanId = '0';
 		channelId = currentDirectId;
 	}
 
-	channelId && thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: channelId, isFetchingLatestMessages: true }));
+	channelId && thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId || '', channelId: channelId, isFetchingLatestMessages: true }));
 
 	thunkAPI.dispatch(clansActions.fetchClans());
 	if (!isClanView) {
