@@ -114,6 +114,7 @@ export const notificationSlice = createSlice({
 				state.specificNotifications.push(action.payload);
 			}
 		},
+
 		remove: notificationAdapter.removeOne,
 		setMessageNotifiedId(state, action) {
 			state.messageNotifiedId = action.payload;
