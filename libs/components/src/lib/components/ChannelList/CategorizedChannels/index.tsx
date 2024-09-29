@@ -1,4 +1,4 @@
-import { useAuth, useCategory, useEscapeKey, useOnClickOutside, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
+import { useAuth, useCategory, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
 import {
 	categoriesActions,
 	channelsActions,
@@ -84,8 +84,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 		}
 	};
 
-	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
-
 	const handleToggleCategory = () => {
 		setIsShowAllCategoryChannels(!isShowAllCategoryChannels);
 	};
@@ -123,10 +121,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const isUnreadChannel = (channelId: string) => {
 		return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
 	};
-
-	useOnClickOutside(panelRef, () => setIsShowPanelCategory(false));
-
-	useEscapeKey(() => setIsShowPanelCategory(false));
 
 	useEffect(() => {
 		const focusChannel = location.state?.focusChannel ?? {};

@@ -11,7 +11,7 @@ import ThreadModalContent from './ThreadModalContent';
 type ThreadItemProps = {
 	thread: ChannelsEntity;
 	avatarMembers?: (string | undefined)[];
-	setIsShowThread: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsShowThread: () => void;
 };
 
 const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps) => {
@@ -61,7 +61,7 @@ const ThreadItem = ({ thread, avatarMembers, setIsShowThread }: ThreadItemProps)
 
 	const handleLinkThread = (channelId: string, clanId: string) => {
 		navigate(toChannelPage(channelId, clanId));
-		setIsShowThread(false);
+		setIsShowThread();
 	};
 
 	return (

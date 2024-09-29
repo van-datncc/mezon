@@ -1,5 +1,5 @@
-import { useCategory, useEscapeKey } from '@mezon/core';
-import { channelsActions, selectCurrentClan, selectIsShowEmptyCategory, selectTheme, useAppDispatch } from '@mezon/store';
+import { useCategory } from '@mezon/core';
+import { selectCurrentClan, selectIsShowEmptyCategory, selectTheme } from '@mezon/store';
 import { ICategoryChannel } from '@mezon/utils';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -10,7 +10,6 @@ export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
-	const dispatch = useAppDispatch();
 	const { categorizedChannels } = useCategory();
 	const appearanceTheme = useSelector(selectTheme);
 	const currentClan = useSelector(selectCurrentClan);
@@ -23,8 +22,6 @@ function ChannelList() {
 			return <CategorizedChannels key={category.id} category={category} />;
 		});
 	}, [categorizedChannels, isShowEmptyCategory]);
-
-	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
 
 	return (
 		<div
