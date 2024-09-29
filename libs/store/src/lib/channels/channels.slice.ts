@@ -31,7 +31,11 @@ export interface ChannelsEntity extends IChannel {
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
-	return { ...channelRes, id: channelRes.channel_id || '', status: channelRes.meeting_code ? 1 : 0 };
+	return {
+		...channelRes,
+		id: channelRes.channel_id || '',
+		status: channelRes.meeting_code ? 1 : 0
+	};
 };
 
 export interface ChannelsState extends EntityState<ChannelsEntity, string> {
@@ -236,11 +240,15 @@ type fetchChannelsArgs = {
 };
 
 function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
+	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds ?? channel.last_sent_message?.timestamp_seconds);
+	const finalLastSeenTimestamp = isNaN(lastSeenTimestamp) ? Number(channel.last_sent_message?.timestamp_seconds) : lastSeenTimestamp;
+
 	return {
 		id: channel.id,
-		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
+		lastSeenTimestamp: finalLastSeenTimestamp,
 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
-		lastSeenPinMessage: channel.last_pin_message || ''
+		lastSeenPinMessage: channel.last_pin_message || '',
+		clanId: channel.clan_id ?? ''
 	};
 }
 
@@ -271,16 +279,6 @@ export const fetchChannels = createAsyncThunk(
 		}
 
 		if (Date.now() - response.time < 100) {
-			const lastSeenTimeStampInit = response.channeldesc
-				.filter((channel) => channel.type === ChannelType.CHANNEL_TYPE_TEXT)
-				.map((channelText) => {
-					return {
-						channelId: channelText.channel_id ?? '',
-						lastSeenTimeStamp: Number(channelText.last_seen_message?.timestamp_seconds || 0),
-						clanId: channelText.clan_id ?? ''
-					};
-				});
-
 			const lastChannelMessages =
 				response.channeldesc?.map((channel) => ({
 					...channel.last_sent_message,
@@ -344,8 +342,22 @@ export const channelsSlice = createSlice({
 		},
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
 			const payload = action.payload;
-			if (payload.channel_private !== 1) {
-				const channel = mapChannelToEntity({ ...payload, type: payload.channel_type });
+
+			const timestamp = Date.now() / 1000;
+			if (payload.parent_id !== '0' && payload.channel_private !== 1) {
+				const channel = mapChannelToEntity({
+					...payload,
+					type: payload.channel_type,
+					active: 1,
+					last_seen_message: { timestamp_seconds: timestamp }
+				});
+				channelsAdapter.addOne(state, channel);
+			} else if (payload.parent_id === '0' && payload.channel_private !== 1) {
+				const channel = mapChannelToEntity({
+					...payload,
+					type: payload.channel_type,
+					last_seen_message: { timestamp_seconds: timestamp }
+				});
 				channelsAdapter.addOne(state, channel);
 			}
 		},
@@ -364,15 +376,7 @@ export const channelsSlice = createSlice({
 				}
 			});
 		},
-		updateChannelThreadSocket: (state, action) => {
-			const payload = action.payload;
-			channelsAdapter.updateOne(state, {
-				id: payload.channel_id,
-				changes: {
-					last_sent_message: payload
-				}
-			});
-		},
+
 		updateChannelPrivateSocket: (state, action: PayloadAction<ChannelUpdatedEvent>) => {
 			const payload = action.payload;
 			const entity = state.entities[payload.channel_id];

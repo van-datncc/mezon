@@ -11,6 +11,7 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
+	channelMetaActions,
 	channelUsersActions,
 	emojiSuggestionActions,
 	messagesActions,
@@ -240,6 +241,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 	const addMemberToPrivateThread = useCallback(
 		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[], membersOfChild: ChannelMembersEntity[] | null) => {
 			if (!currentChannel?.channel_private) return;
+			const timestamp = Date.now() / 1000;
 
 			const userIds = uniqueUsers(mentions, membersOfChild);
 
@@ -251,6 +253,17 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 			};
 			if (userIds.length > 0) {
 				await dispatch(channelUsersActions.addChannelUsers(body));
+				dispatch(
+					channelMetaActions.updateBulkChannelMetadata([
+						{
+							id: currentChannel.channel_id ?? '',
+							lastSeenTimestamp: timestamp,
+							lastSentTimestamp: timestamp,
+							lastSeenPinMessage: '',
+							clanId: currentChannel.clan_id ?? ''
+						}
+					])
+				);
 			}
 		},
 		[dispatch]

@@ -1,3 +1,4 @@
+import { notificationActions } from '@mezon/store';
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -96,7 +97,6 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listClanDescs(mezon.session, LIMIT_CLAN_ITEM, 1, '');
-
 		if (!response.clandesc) {
 			return [];
 		}
@@ -104,6 +104,13 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 		const clans = response.clandesc.map(mapClanToEntity);
 		const meta = clans.map((clan) => extractClanMeta(clan));
 		thunkAPI.dispatch(clansActions.updateBulkClanMetadata(meta));
+
+		clans.forEach((clan) => {
+			if (clan.clan_id) {
+				thunkAPI.dispatch(notificationActions.fetchListNotification({ clanId: clan.clan_id ?? '' }));
+			}
+		});
+
 		return clans;
 	} catch (error: any) {
 		const errmsg = await error.json();

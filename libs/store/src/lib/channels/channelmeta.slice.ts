@@ -11,6 +11,7 @@ export interface ChannelMetaEntity {
 	lastSeenTimestamp: number;
 	lastSentTimestamp: number;
 	lastSeenPinMessage: string;
+	clanId: string;
 }
 
 export interface ChannelMetaState extends EntityState<ChannelMetaEntity, string> {
@@ -159,3 +160,8 @@ export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selec
 	}
 	return false;
 });
+
+export const selectAllChannelLastSeenTimestampByClanId = (clanId: string) =>
+	createSelector(selectAllChannelMeta, (channelMetas) =>
+		channelMetas.filter((channelMeta) => channelMeta.lastSeenTimestamp && channelMeta.clanId === clanId)
+	);
