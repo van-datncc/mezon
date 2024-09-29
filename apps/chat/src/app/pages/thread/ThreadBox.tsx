@@ -80,7 +80,13 @@ const ThreadBox = () => {
 								isParentPublic: currentChannel ? !currentChannel.channel_private : false
 							})
 						);
-						await dispatch(messagesActions.fetchMessages({ channelId: thread.channel_id as string, isFetchingLatestMessages: true }));
+						await dispatch(
+							messagesActions.fetchMessages({
+								clanId: currentClanId || '',
+								channelId: thread.channel_id as string,
+								isFetchingLatestMessages: true
+							})
+						);
 						await sendMessageThread(content, mentions, attachments, references, thread);
 					}
 				} else {
@@ -105,6 +111,7 @@ const ThreadBox = () => {
 				{threadCurrentChannel && (
 					<div className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChatThread h-heightMessageViewChatThread">
 						<ChannelMessages
+							clanId={currentClanId || ''}
 							channelId={threadCurrentChannel.channel_id as string}
 							channelLabel={threadCurrentChannel.channel_label}
 							type={ChannelType.CHANNEL_TYPE_THREAD}

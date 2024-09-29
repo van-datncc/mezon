@@ -94,7 +94,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 							dataReferences.message_ref_id ? 'top-[8px]' : ''
 						)}
 					>
-						<ChannelJumpToPresent channelId={channelId ?? ''} className="pb-[10px]" />
+						<ChannelJumpToPresent clanId={clanId || ''} channelId={channelId ?? ''} className="pb-[10px]" />
 					</div>
 				)}
 				{dataReferences.message_ref_id && (

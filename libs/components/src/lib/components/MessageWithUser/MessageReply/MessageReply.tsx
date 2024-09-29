@@ -36,10 +36,10 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 		(e: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => {
 			e.stopPropagation();
 			if (messageIdRef) {
-				dispatch(messagesActions.jumpToMessage({ messageId: messageIdRef, channelId: message?.channel_id }));
+				dispatch(messagesActions.jumpToMessage({ clanId: message?.clan_id || '', messageId: messageIdRef, channelId: message?.channel_id }));
 			}
 		},
-		[dispatch, message?.channel_id, messageIdRef]
+		[dispatch, message?.channel_id, message?.clan_id, messageIdRef]
 	);
 
 	const markUpOnReplyParent = useRef<HTMLDivElement | null>(null);
