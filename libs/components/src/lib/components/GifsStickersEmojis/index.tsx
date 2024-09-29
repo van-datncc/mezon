@@ -1,9 +1,9 @@
-import { useAppParams, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
+import { useAppParams, useGifsStickersEmoji } from '@mezon/core';
 import { selectIdMessageRefReaction } from '@mezon/store';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
@@ -40,7 +40,10 @@ const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: GifSticker
 		setSubPanelActive(tab);
 	};
 
-	useEscapeKey(() => setSubPanelActive(SubPanelName.NONE));
+	const closePannel = useCallback(() => {
+		setSubPanelActive(SubPanelName.NONE);
+	}, []);
+
 	const emojiRefParentDiv = useRef<HTMLDivElement>(null);
 
 	const handleCloseSetting = () => {
@@ -97,23 +100,28 @@ const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: GifSticker
 				<div className="w-full min-h-[400px] text-center md:w-[500px]" ref={emojiRefParentDiv}>
 					{subPanelActive === SubPanelName.GIFS && (
 						<div className="flex h-full pr-1 w-full md:w-[500px]">
-							<TenorGifCategories activeTab={SubPanelName.EMOJI} channelOrDirect={channelOrDirect} mode={mod} />
+							<TenorGifCategories activeTab={SubPanelName.EMOJI} channelOrDirect={channelOrDirect} mode={mod} onClose={closePannel} />
 						</div>
 					)}
 
 					{subPanelActive === SubPanelName.STICKERS && (
 						<div className="flex h-full pr-2 w-full md:w-[500px]">
-							<ImageSquare channel={channelOrDirect} mode={mod} />
+							<ImageSquare channel={channelOrDirect} mode={mod} onClose={closePannel} />
 						</div>
 					)}
 					{subPanelActive === SubPanelName.EMOJI && (
 						<div className="flex h-full pr-2 w-full md:w-[500px] sbm:w-[312px]">
-							<EmojiPickerComp onClickAddButton={handleOpenSetting} />
+							<EmojiPickerComp onClickAddButton={handleOpenSetting} onClose={closePannel} />
 						</div>
 					)}
 					{isShowEmojiPicker() && (
 						<div className="flex h-full pr-2 w-full md:w-[500px]">
-							<EmojiPickerComp mode={mode} messageEmojiId={idMessageRefReaction} onClickAddButton={handleOpenSetting} />
+							<EmojiPickerComp
+								mode={mode}
+								messageEmojiId={idMessageRefReaction}
+								onClickAddButton={handleOpenSetting}
+								onClose={closePannel}
+							/>
 						</div>
 					)}
 				</div>

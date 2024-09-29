@@ -316,4 +316,14 @@ export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, sel
 		});
 });
 
+export const selectDirectsOpenlistOrder = createSelector(selectDirectsOpenlist, (data) => {
+	return data
+		.sort((a, b) => {
+			const timestampA = a.last_sent_message?.timestamp_seconds || a.create_time_seconds || 0;
+			const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
+			return timestampB - timestampA;
+		})
+		.map((dm) => dm.id);
+});
+
 export const selectDirectById = createSelector([selectDirectMessageEntities, (state, id) => id], (clansEntities, id) => clansEntities?.[id]);

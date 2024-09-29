@@ -1,14 +1,13 @@
-import { useEscapeKey } from '@mezon/core';
 import { selectCurrentClanId, selectStickerByClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
 import { Button, Modal } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
-import { useState } from 'react';
+import { RefObject, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Icons } from '../../../components';
 import ModalSticker, { EGraphicType } from './ModalEditSticker';
 import SettingStickerItem from './SettingStickerItem';
 
-const SettingSticker = () => {
+const SettingSticker = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> }) => {
 	const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
 	const [editSticker, setEditSticker] = useState<ClanSticker | null>(null);
 	const currentClanId = useSelector(selectCurrentClanId) || '';
@@ -21,17 +20,18 @@ const SettingSticker = () => {
 
 		setShowModalSticker(true);
 	};
-	const handleCloseModal = () => {
+	const handleCloseModal = useCallback(() => {
 		setShowModalSticker(false);
 		setEditSticker(null);
-		dispatch(settingClanStickerActions.closeModalInChild());
-	};
+		setTimeout(() => {
+			dispatch(settingClanStickerActions.closeModalInChild());
+			parentRef?.current?.focus();
+		}, 0);
+	}, []);
 	const handleOpenModalUpload = () => {
 		setShowModalSticker(true);
 		dispatch(settingClanStickerActions.openModalInChild());
 	};
-
-	useEscapeKey(handleCloseModal);
 
 	return (
 		<>
