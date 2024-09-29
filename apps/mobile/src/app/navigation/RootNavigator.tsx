@@ -172,7 +172,7 @@ const NavigationMain = () => {
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			console.log('error messageLoaderBackground', error);
 		}
-	}, [currentChannelId]);
+	}, [currentChannelId, currentClanId]);
 
 	const authLoader = useCallback(async () => {
 		const store = await getStoreAsync();

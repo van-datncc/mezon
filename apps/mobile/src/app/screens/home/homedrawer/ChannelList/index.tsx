@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { EOpenSearchChannelFrom, hasNonEmptyChannels, Icons } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelsActions,
@@ -189,6 +189,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 						categorizedChannels?.map((item) => {
 							return renderItemChannelList({ item });
 						})}
+					<Block height={80} />
 				</ScrollView>
 			</View>
 
