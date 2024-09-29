@@ -47,6 +47,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
+import * as Sentry from '@sentry/browser';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -851,7 +852,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			timerIdRef.current = setTimeout(async () => {
 				if (socketRef.current?.isOpen()) return;
-				dispatch(toastActions.addToast({ message: socketType, type: 'info' }));
 				const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 				try {
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
@@ -874,6 +874,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					setCallbackEventFn(socket as Socket);
 				} catch (error) {
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+					Sentry.captureException(error);
 				}
 			}, 5000);
 		},
