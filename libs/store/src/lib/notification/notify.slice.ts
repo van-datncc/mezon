@@ -1,4 +1,4 @@
-import { ChannelMetaEntity } from '@mezon/store-mobile';
+import { ChannelMetaEntity } from '@mezon/store';
 import { INotification, LoadingStatus, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
@@ -294,7 +294,7 @@ export const selectTotalClansNotify = createSelector(getNotificationState, (stat
 
 export const selectSpecificNotifications = createSelector(getNotificationState, (state: NotificationState) => state.specificNotifications);
 
-/////////////// New update 27/09/2024 ///////////////
+/////////////// New update ///////////////
 export const selectMentionAndReplyByClanId = (clanId: string) =>
 	createSelector(selectAllNotification, (notifications) =>
 		notifications.filter(
