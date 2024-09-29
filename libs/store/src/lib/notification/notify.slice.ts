@@ -20,8 +20,6 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	messageNotifiedId: string;
-	isMessageRead: boolean;
-	newNotificationStatus: boolean;
 	quantityNotifyChannels: Record<string, number>;
 	quantityNotifyClans: Record<string, number>;
 	lastSeenTimeStampChannels: Record<string, number>;
@@ -89,8 +87,6 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	notificationMentions: [],
 	error: null,
 	messageNotifiedId: '',
-	isMessageRead: false,
-	newNotificationStatus: false,
 	quantityNotifyChannels: {},
 	lastSeenTimeStampChannels: {},
 	quantityNotifyClans: {},
@@ -122,9 +118,6 @@ export const notificationSlice = createSlice({
 		setMessageNotifiedId(state, action) {
 			state.messageNotifiedId = action.payload;
 		},
-		setIsMessageRead(state, action) {
-			state.isMessageRead = action.payload;
-		},
 
 		removeNotificationsByChannelId: (state, action: PayloadAction<string>) => {
 			const channelId = action.payload;
@@ -138,17 +131,6 @@ export const notificationSlice = createSlice({
 			state.specificNotifications = [];
 		},
 
-		setNotiListUnread(state, action) {
-			const storedIds = localStorage.getItem('notiUnread');
-			const ids = storedIds ? JSON.parse(storedIds) : [];
-			ids.push(action.payload.id);
-			localStorage.setItem('notiUnread', JSON.stringify(ids));
-		},
-
-		setStatusNoti(state) {
-			const ids = localStorage.getItem('notiUnread');
-			state.newNotificationStatus = !state.newNotificationStatus;
-		},
 		setAllLastSeenTimeStampChannel: (state, action: PayloadAction<LastSeenTimeStampChannelArgs[]>) => {
 			for (const i of action.payload) {
 				state.lastSeenTimeStampChannels[i.channelId] = i.lastSeenTimeStamp;
@@ -165,17 +147,7 @@ export const notificationSlice = createSlice({
 			const quantityNotifyClan = countNotifyByClanId(state, action.payload.clanId);
 			state.quantityNotifyClans[action.payload.clanId] = quantityNotifyClan;
 		},
-		setReadNotiStatus(state, action: PayloadAction<string[]>) {
-			const storedIds = localStorage.getItem('notiUnread');
-			const ids = storedIds ? JSON.parse(storedIds) : [];
 
-			if (ids && ids?.length > 0) {
-				const updatedIdsList = ids.filter((id: string) => !action.payload.includes(id));
-				localStorage.setItem('notiUnread', JSON.stringify(updatedIdsList));
-			} else {
-				console.log('No unread notification');
-			}
-		},
 		setIsShowInbox(state, action: PayloadAction<boolean>) {
 			state.isShowInbox = action.payload;
 		}
@@ -272,10 +244,6 @@ export const selectNotificationMessages = createSelector(selectAllNotification, 
 
 export const selectMessageNotified = createSelector(getNotificationState, (state: NotificationState) => state.messageNotifiedId);
 
-export const selectIsMessageRead = createSelector(getNotificationState, (state: NotificationState) => state.isMessageRead);
-
-export const selectNewNotificationStatus = createSelector(getNotificationState, (state: NotificationState) => state.newNotificationStatus);
-
 export const selectIsShowInbox = createSelector(getNotificationState, (state: NotificationState) => state.isShowInbox);
 
 export const selectCountNotifyByChannelId = (channelId: string) =>
@@ -295,6 +263,17 @@ export const selectTotalClansNotify = createSelector(getNotificationState, (stat
 export const selectSpecificNotifications = createSelector(getNotificationState, (state: NotificationState) => state.specificNotifications);
 
 /////////////// New update ///////////////
+export const selectAllNotificationExcludeMentionAndReply = createSelector(selectAllNotification, (notifications) =>
+	notifications.filter(
+		(notification) => notification.code !== NotificationCode.USER_REPLIED && notification.code !== NotificationCode.USER_MENTIONED
+	)
+);
+export const selectAllNotificationMentionAndReply = createSelector(selectAllNotification, (notifications) =>
+	notifications.filter(
+		(notification) => notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED
+	)
+);
+
 export const selectMentionAndReplyByClanId = (clanId: string) =>
 	createSelector(selectAllNotification, (notifications) =>
 		notifications.filter(
