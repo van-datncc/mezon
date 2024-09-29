@@ -125,8 +125,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [channelDraftMessage.draftContent?.t]);
 
 	const originalContent = useMemo(() => {
-		return message.content.t;
-	}, [message.content.t]);
+		return message.content?.t;
+	}, [message.content?.t]);
 
 	const onSend = (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
