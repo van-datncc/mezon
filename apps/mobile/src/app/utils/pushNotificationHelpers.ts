@@ -7,7 +7,7 @@ import {
 	save,
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
+import {appActions, channelsActions, clansActions, getStoreAsync, messagesActions} from '@mezon/store-mobile';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -186,8 +186,26 @@ export const navigateToNotification = async (store: any, notification: any, navi
 						)
 					]);
 				};
+				store.dispatch(
+					messagesActions.fetchMessages({
+						channelId: channelId,
+						noCache: true,
+						isFetchingLatestMessages: true,
+						isClearMessage: true,
+						clanId: clanId ?? ''
+					})
+				);
 				await joinAndChangeClan(store, clanId);
 			} else {
+				store.dispatch(
+					messagesActions.fetchMessages({
+						channelId: channelId,
+						noCache: true,
+						isFetchingLatestMessages: true,
+						isClearMessage: true,
+						clanId: clanId ?? ''
+					})
+				);
 				store.dispatch(
 					channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
 				);
