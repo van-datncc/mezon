@@ -17,7 +17,6 @@ import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice'
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
-import { ChannelMetaEntity, channelMetaActions } from './channelmeta.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -239,18 +238,18 @@ type fetchChannelsArgs = {
 	noCache?: boolean;
 };
 
-function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
-	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds ?? channel.last_sent_message?.timestamp_seconds);
-	const finalLastSeenTimestamp = isNaN(lastSeenTimestamp) ? Number(channel.last_sent_message?.timestamp_seconds) : lastSeenTimestamp;
-
-	return {
-		id: channel.id,
-		lastSeenTimestamp: finalLastSeenTimestamp,
-		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
-		lastSeenPinMessage: channel.last_pin_message || '',
-		clanId: channel.clan_id ?? ''
-	};
-}
+// function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
+// 	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds ?? channel.last_sent_message?.timestamp_seconds);
+// 	const finalLastSeenTimestamp = isNaN(lastSeenTimestamp) ? Number(channel.last_sent_message?.timestamp_seconds) : lastSeenTimestamp;
+// 	console.log('channel', channel);
+// 	return {
+// 		id: channel.id,
+// 		lastSeenTimestamp: finalLastSeenTimestamp,
+// 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
+// 		lastSeenPinMessage: channel.last_pin_message || '',
+// 		clanId: channel.clan_id ?? ''
+// 	};
+// }
 
 export const fetchChannelsCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, limit: number, state: number, clanId: string, channelType: number) => {
@@ -291,8 +290,8 @@ export const fetchChannels = createAsyncThunk(
 		}
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
-		const meta = channels.map((ch) => extractChannelMeta(ch));
-		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
+		// const meta = channels.map((ch) => extractChannelMeta(ch));
+		// thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
 	}
 );
@@ -343,20 +342,18 @@ export const channelsSlice = createSlice({
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
 			const payload = action.payload;
 
-			const timestamp = Date.now() / 1000;
+			// const timestamp = Date.now() / 1000;
 			if (payload.parent_id !== '0' && payload.channel_private !== 1) {
 				const channel = mapChannelToEntity({
 					...payload,
 					type: payload.channel_type,
-					active: 1,
-					last_seen_message: { timestamp_seconds: timestamp }
+					active: 1
 				});
 				channelsAdapter.addOne(state, channel);
 			} else if (payload.parent_id === '0' && payload.channel_private !== 1) {
 				const channel = mapChannelToEntity({
 					...payload,
-					type: payload.channel_type,
-					last_seen_message: { timestamp_seconds: timestamp }
+					type: payload.channel_type
 				});
 				channelsAdapter.addOne(state, channel);
 			}

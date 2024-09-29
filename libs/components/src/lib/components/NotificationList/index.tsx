@@ -11,6 +11,7 @@ import { INotification, NotificationEntity, sortNotificationsByDate } from '@mez
 import { Tooltip } from 'flowbite-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { FixedSizeList } from 'react-window';
 import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
@@ -59,15 +60,26 @@ function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 
 	const appearanceTheme = useSelector(selectTheme);
 
+	const getUnreadChannelIds = useMemo(() => {
+		const channelIds = unReadReplyAndMentionList.map((item) => item.content.channel_id);
+		return Array.from(new Set(channelIds));
+	}, [unReadReplyAndMentionList]);
+
 	const handleMarkAllAsRead = useCallback(() => {
+		const timestamp = Date.now() / 1000;
+		getUnreadChannelIds.forEach((channelId: string) => {
+			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+		});
 		dispatch(notificationActions.removeAllNotificattionChannel());
-		dispatch(channelMetaActions.removeUnreadAllChannel());
 		dispatch(directMetaActions.removeUnreadAllDm());
-	}, []);
+	}, [getUnreadChannelIds, dispatch]);
 
 	const isShowMarkAllAsRead = useMemo(() => {
 		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;
 	}, [unReadReplyAndMentionList, currentTabNotify]);
+
+	const ITEM_HEIGHT = 140;
+	const itemCount = getAllMentionAndReply.length;
 
 	return (
 		<div className="absolute top-8 right-0 z-[99999999] rounded-lg dark:shadow-shadowBorder shadow-shadowInbox w-[480px]">
@@ -145,20 +157,16 @@ function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 					)}
 
 					{currentTabNotify === InboxType.MENTIONS && (
-						<div>
-							{getAllMentionAndReply.length > 0 ? (
-								getAllMentionAndReply.map((notification: INotification, index: number) => (
-									<NotificationChannel
-										key={`mention-${notification?.id}-${index}`}
-										isUnreadTab={false}
-										unreadListConverted={[]}
-										notification={notification}
-									/>
-								))
-							) : (
-								<EmptyNotification isEmptyMentions />
-							)}
-						</div>
+						<FixedSizeList
+							className={`${appearanceTheme === 'light' ? 'lightModeScrollBarMention' : ''}`}
+							height={1000}
+							itemCount={itemCount}
+							itemSize={ITEM_HEIGHT}
+							width={'100%'}
+							itemData={getAllMentionAndReply}
+						>
+							{Row}
+						</FixedSizeList>
 					)}
 				</div>
 			</div>
@@ -167,6 +175,21 @@ function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 }
 
 export default NotificationList;
+
+const Row = ({ index, style, data }: { index: number; style: React.CSSProperties; data: INotification[] }) => {
+	const notification = data[index];
+
+	return (
+		<div style={style}>
+			<NotificationChannel
+				key={`mention-${notification?.id}-${index}`}
+				isUnreadTab={false}
+				unreadListConverted={[]}
+				notification={notification}
+			/>
+		</div>
+	);
+};
 
 function InboxButton() {
 	return (
