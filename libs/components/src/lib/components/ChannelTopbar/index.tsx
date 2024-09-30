@@ -317,10 +317,6 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
 
-	const handleSetIsShowInbox = useCallback(() => {
-		dispatch(notificationActions.setIsShowInbox(false));
-	}, []);
-
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
@@ -329,7 +325,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 					{getNotificationMentionAndReplyUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList onClose={handleSetIsShowInbox} unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} />}
+			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} />}
 		</div>
 	);
 }

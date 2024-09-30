@@ -238,19 +238,6 @@ type fetchChannelsArgs = {
 	noCache?: boolean;
 };
 
-// function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
-// 	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds ?? channel.last_sent_message?.timestamp_seconds);
-// 	const finalLastSeenTimestamp = isNaN(lastSeenTimestamp) ? Number(channel.last_sent_message?.timestamp_seconds) : lastSeenTimestamp;
-// 	console.log('channel', channel);
-// 	return {
-// 		id: channel.id,
-// 		lastSeenTimestamp: finalLastSeenTimestamp,
-// 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
-// 		lastSeenPinMessage: channel.last_pin_message || '',
-// 		clanId: channel.clan_id ?? ''
-// 	};
-// }
-
 export const fetchChannelsCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, limit: number, state: number, clanId: string, channelType: number) => {
 		const response = await mezon.client.listChannelDescs(mezon.session, limit, state, '', clanId, channelType);
@@ -290,8 +277,6 @@ export const fetchChannels = createAsyncThunk(
 		}
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
-		// const meta = channels.map((ch) => extractChannelMeta(ch));
-		// thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
 	}
 );

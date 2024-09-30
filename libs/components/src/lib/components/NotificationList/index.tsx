@@ -21,7 +21,6 @@ export type MemberListProps = { className?: string };
 
 export type NotificationProps = {
 	unReadReplyAndMentionList: NotificationEntity[];
-	onClose?: () => void;
 };
 
 const InboxType = {
@@ -36,7 +35,7 @@ const tabDataNotify = [
 	{ title: 'Mentions', value: InboxType.MENTIONS }
 ];
 
-function NotificationList({ unReadReplyAndMentionList, onClose }: NotificationProps) {
+function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 	const dispatch = useDispatch();
 
 	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.INDIVIDUAL);
@@ -82,8 +81,12 @@ function NotificationList({ unReadReplyAndMentionList, onClose }: NotificationPr
 	const ITEM_HEIGHT = 140;
 	const itemCount = getAllMentionAndReply.length;
 	const modalRef = useRef<HTMLDivElement>(null);
-	useEscapeKeyClose(modalRef, () => onClose);
-	useOnClickOutside(modalRef, () => onClose);
+	const handleHideInbox = useCallback(() => {
+		dispatch(notificationActions.setIsShowInbox(false));
+	}, []);
+
+	useEscapeKeyClose(modalRef, handleHideInbox);
+	useOnClickOutside(modalRef, handleHideInbox);
 
 	return (
 		<div
