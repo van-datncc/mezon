@@ -83,7 +83,6 @@ export const initialNotificationState: NotificationState = notificationAdapter.g
 	lastSeenTimeStampChannels: {},
 	quantityNotifyClans: {},
 	isShowInbox: false
-	// specificNotifications: []
 });
 
 export const notificationSlice = createSlice({
