@@ -26,6 +26,7 @@ import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
@@ -86,6 +87,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 	const appearanceTheme = useSelector(selectTheme);
 	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
 	const isShowSettingChannel = hasChannelManagePermission;
+	const param = useParams();
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -96,8 +98,8 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								<InviteBtn isLightMode={appearanceTheme === 'light'} />
-								{isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
+								{param.channelId && <InviteBtn isLightMode={appearanceTheme === 'light'} />}
+								{param.channelId && isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
