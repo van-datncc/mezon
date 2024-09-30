@@ -3,7 +3,7 @@ import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, select
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { useMemo, useRef } from 'react';
+import { RefObject, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -13,9 +13,10 @@ import ThreadItem from './ThreadItem';
 
 type ThreadsProps = {
 	onClose: () => void;
+	rootRef?: RefObject<HTMLElement>;
 };
 
-const ThreadModal = ({ onClose }: ThreadsProps) => {
+const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
@@ -42,7 +43,7 @@ const ThreadModal = ({ onClose }: ThreadsProps) => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose, rootRef);
 
 	return (
 		<div

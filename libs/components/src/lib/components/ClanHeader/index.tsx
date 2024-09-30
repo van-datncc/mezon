@@ -137,7 +137,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				</div>
 			) : (
 				<div className={`h-[60px] relative bg-gray-950`}>
-					<div ref={modalRef} tabIndex={-1} className={`relative h-[60px] top-0`} onClick={handleShowModalClan}>
+					<div className={`relative h-[60px] top-0`} onClick={handleShowModalClan}>
 						<div
 							className={`cursor-pointer w-full p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-[#35373C] hover:bg-[#E2E7F6] shadow border-b-[1px] dark:border-bgTertiary border-bgLightSecondary`}
 						>
@@ -148,6 +148,8 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 						</div>
 						{isShowModalPanelClan && (
 							<div
+								ref={modalRef}
+								tabIndex={-1}
 								onClick={(e) => e.stopPropagation()}
 								className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[68px] z-[9999] transform translate-x-[-50%] shadow-xl"
 							>
