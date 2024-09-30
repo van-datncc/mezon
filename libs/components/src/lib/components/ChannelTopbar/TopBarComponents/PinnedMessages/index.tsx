@@ -15,7 +15,7 @@ const PinnedMessages = ({ onClose }: PinnedMessagesProps) => {
 	useOnClickOutside(modalRef, onClose);
 
 	return (
-		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999]">
+		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999] animate-scale_up origin-top-right">
 			<div className="flex flex-col rounded-md w-[420px] max-h-[80vh] overflow-hidden dark:shadow-shadowBorder shadow-shadowInbox">
 				<div className="dark:bg-bgTertiary bg-bgLightTertiary flex flex-row items-center justify-between p-[16px] h-12">
 					<div className="flex flex-row items-center pr-[16px] gap-4">

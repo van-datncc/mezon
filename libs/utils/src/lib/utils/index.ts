@@ -813,8 +813,8 @@ export const handleShowShortProfile = (
 
 export const sortNotificationsByDate = (notifications: NotificationEntity[]) => {
 	return notifications.sort((a, b) => {
-		const dateA = new Date(a.create_time || '').getTime();
-		const dateB = new Date(b.create_time || '').getTime();
+		const dateA = a.create_time ? new Date(a.create_time).getTime() : 0;
+		const dateB = b.create_time ? new Date(b.create_time).getTime() : 0;
 		return dateB - dateA;
 	});
 };
