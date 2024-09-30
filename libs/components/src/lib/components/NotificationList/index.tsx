@@ -70,7 +70,6 @@ function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 		getUnreadChannelIds.forEach((channelId: string) => {
 			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		});
-		dispatch(notificationActions.removeAllNotificattionChannel());
 		dispatch(directMetaActions.removeUnreadAllDm());
 	}, [getUnreadChannelIds, dispatch]);
 
