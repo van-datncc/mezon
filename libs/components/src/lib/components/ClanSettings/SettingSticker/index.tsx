@@ -51,7 +51,7 @@ const SettingSticker = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> })
 					</div>
 					<Button label="upload sticker" className="capitalize" onClick={handleOpenModalUpload}></Button>
 				</div>
-				<div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] gap-x-[calc((100%_-_116px_*_4)/3)] md:gap-x-[calc((100%_-_116px_*_6)/5)]">
+				<div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] max-sbm:justify-evenly md:gap-x-[calc((100%_-_116px_*_4)/3)] gap-x-[calc((100%_-_116px_*_3)/2)]">
 					{listSticker.map((sticker) => (
 						<SettingStickerItem key={sticker.id} sticker={sticker} updateSticker={handleUpdateSticker} />
 					))}
