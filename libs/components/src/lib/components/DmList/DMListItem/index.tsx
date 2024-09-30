@@ -25,9 +25,10 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage.id));
 
 	const handleCloseClick = async (e: React.MouseEvent, directId: string) => {
+		const timestamp = Date.now() / 1000;
 		e.stopPropagation();
 		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
-		dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: 0 }));
+		dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
 		if (directId === currentDmGroupId) {
 			navigateToFriends();
 		}

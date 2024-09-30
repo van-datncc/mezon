@@ -1,14 +1,20 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectAllChannelMeta, selectAnyUnreadChannel, selectMentionAndReplyUnreadAllClan, selectTotalUnreadDM } from '@mezon/store';
+import { reactionActions, selectAllChannelMeta, selectAnyUnreadChannel, selectMentionAndReplyUnreadAllClan } from '@mezon/store';
 
-import { useAppSelector } from '@mezon/store-mobile';
+import { DirectMetaEntity, selectAllDirectMessageByLastSeenTimestamp, selectAllDirectMetaMessages, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
+
+function removeUndefinedAndEmpty(obj: Record<string, DirectMetaEntity[]>) {
+	return Object.fromEntries(
+		Object.entries(obj).filter(([key, value]) => key !== 'undefined' && !(typeof value === 'object' && Object.keys(value).length === 0))
+	);
+}
 
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
@@ -17,7 +23,23 @@ const GlobalEventListener = () => {
 	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
 	const allNotificationReplyMentionAllClan = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
 
-	const totalUnreadDM = useSelector(selectTotalUnreadDM);
+	const allLastSeenChannelAllDirect = useSelector(selectAllDirectMetaMessages);
+	const getAllDirectMessageUnread = useSelector(selectAllDirectMessageByLastSeenTimestamp(allLastSeenChannelAllDirect));
+	const filterDirectUnread = removeUndefinedAndEmpty(getAllDirectMessageUnread);
+	console.log('filterDirectUnread: ', filterDirectUnread);
+
+	const allCountDirectUnread = useMemo(() => {
+		let length = 0;
+
+		for (const key in filterDirectUnread) {
+			if (key !== 'undefined') {
+				length += filterDirectUnread[key].length;
+			}
+		}
+
+		return length;
+	}, [filterDirectUnread]);
+
 	const { quantityPendingRequest } = useFriends();
 
 	const hasUnreadChannel = useAppSelector((state) => selectAnyUnreadChannel(state));
@@ -48,7 +70,7 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = allNotificationReplyMentionAllClan.length + totalUnreadDM + quantityPendingRequest;
+		const notificationCount = allNotificationReplyMentionAllClan.length + allCountDirectUnread + quantityPendingRequest;
 
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
@@ -63,7 +85,7 @@ const GlobalEventListener = () => {
 				document.title = 'Mezon';
 			}
 		}
-	}, [allNotificationReplyMentionAllClan.length, totalUnreadDM, quantityPendingRequest, hasUnreadChannel]);
+	}, [allNotificationReplyMentionAllClan.length, allCountDirectUnread, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };

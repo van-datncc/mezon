@@ -1,3 +1,4 @@
+import { DirectMetaEntity } from '@mezon/store-mobile';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
@@ -110,12 +111,18 @@ export interface MessagesState {
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
 	channelIdLastFetch: string;
+	directMessageUnread: Record<string, ChannelMessage[]>;
 }
 export type FetchMessagesMeta = {
 	arg: {
 		channelId: string;
 		direction?: Direction_Mode;
 	};
+};
+export type DirectTimeStampArg = {
+	directId: string;
+	lastSeenTimestamp: number;
+	lastSentTimestamp: number;
 };
 
 type FetchMessagesPayloadAction = {
@@ -164,12 +171,13 @@ type fetchMessageChannelPayload = {
 	direction?: number;
 	isFetchingLatestMessages?: boolean;
 	isClearMessage?: boolean;
+	directTimeStamp?: DirectTimeStampArg;
 };
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
 	async (
-		{ clanId, channelId, noCache, messageId, direction, isFetchingLatestMessages, isClearMessage }: fetchMessageChannelPayload,
+		{ clanId, channelId, noCache, messageId, direction, isFetchingLatestMessages, isClearMessage, directTimeStamp }: fetchMessageChannelPayload,
 		thunkAPI
 	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -183,6 +191,19 @@ export const fetchMessages = createAsyncThunk(
 			return {
 				messages: []
 			};
+		}
+
+		if (directTimeStamp && directTimeStamp.directId !== undefined) {
+			const messages = response.messages;
+			const filteredMessages = messages.filter((message) => {
+				const updateTimeSeconds = message.update_time_seconds;
+				return (
+					updateTimeSeconds !== undefined &&
+					directTimeStamp.lastSeenTimestamp < updateTimeSeconds &&
+					updateTimeSeconds <= directTimeStamp.lastSentTimestamp
+				);
+			});
+			thunkAPI.dispatch(messagesActions.setDirectMessageUnread({ directId: directTimeStamp.directId, message: filteredMessages }));
 		}
 
 		if (Date.now() - response.time > 1000) {
@@ -645,7 +666,8 @@ export const initialMessagesState: MessagesState = {
 	isJumpingToPresent: {},
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' },
-	channelIdLastFetch: ''
+	channelIdLastFetch: '',
+	directMessageUnread: {}
 };
 
 export type SetCursorChannelArgs = {
@@ -890,6 +912,13 @@ export const messagesSlice = createSlice({
 						entities: updatedEntities
 					};
 				}
+			}
+		},
+
+		setDirectMessageUnread(state, action: PayloadAction<{ directId: string; message: ChannelMessage[] }>) {
+			const { directId, message } = action.payload;
+			if (directId && message.length > 0) {
+				state.directMessageUnread[directId] = message;
 			}
 		}
 	},
@@ -1361,3 +1390,37 @@ const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelI
 
 	return false;
 };
+
+export const selectAllDirectMessageUnread = createSelector(getMessagesState, (state) => state.directMessageUnread);
+
+export const selectAllDirectMessageByLastSeenTimestamp = (lastSeenTime: DirectMetaEntity[]) =>
+	createSelector([selectAllDirectMessageUnread], (unreadMessages) => {
+		const filteredMessages: Record<string, DirectMetaEntity[]> = {};
+
+		Object.entries(unreadMessages).forEach(([directId, messages]) => {
+			const lastSeenEntry = lastSeenTime.find((channel) => channel.id === directId);
+			if (lastSeenEntry) {
+				const { last_seen_message, last_sent_message } = lastSeenEntry;
+
+				if (last_sent_message) {
+					filteredMessages[directId] = messages.filter((message) => {
+						const { update_time_seconds } = message;
+						if (
+							last_seen_message &&
+							last_seen_message.timestamp_seconds &&
+							last_sent_message &&
+							last_sent_message.timestamp_seconds &&
+							update_time_seconds
+						) {
+							return (
+								last_seen_message.timestamp_seconds < update_time_seconds &&
+								update_time_seconds <= last_sent_message.timestamp_seconds
+							);
+						}
+					});
+				}
+			}
+		});
+
+		return filteredMessages;
+	});
