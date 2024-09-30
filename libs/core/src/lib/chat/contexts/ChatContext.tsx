@@ -191,6 +191,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onstreamingchannelended = useCallback(
 		(channel: StreamingEndedEvent) => {
 			dispatch(channelsStreamActions.remove(channel.channel_id));
+			dispatch(usersStreamActions.streamEnded(channel?.channel_id));
 		},
 		[dispatch]
 	);
