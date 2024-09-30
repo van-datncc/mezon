@@ -31,7 +31,7 @@ export const initialSettingClanStickerState: SettingClanStickerState = stickerAd
 export const fetchStickerByUserId = createAsyncThunk('settingClanSticker/fetchClanSticker', async (_, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.listStickersByUserId();
+		const response = await mezon.client.getListStickersByUserId(mezon.session);
 
 		if (response) {
 			return response.stickers ?? [];

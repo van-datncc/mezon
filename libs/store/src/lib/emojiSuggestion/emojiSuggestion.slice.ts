@@ -39,7 +39,7 @@ type EmojiObjPickedArgs = {
 
 export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async (_, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-	const response = await mezon.socketRef.current?.listClanEmojiByUserId();
+	const response = await mezon.client.getListEmojisByUserId(mezon.session);
 	if (!response?.emoji_list) {
 		throw new Error('Emoji list is undefined or null');
 	}

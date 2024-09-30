@@ -25,7 +25,8 @@ export const fetchUserChannels = createAsyncThunk(
 	async ({ channelId }: { channelId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const response = await mezon.socketRef.current?.listUsersAddChannelByChannelId(channelId, 500);
+			const response = await mezon.client.listUsersAddChannelByChannelId(mezon.session, channelId, 500);
+			console.log(response);
 
 			if (response) {
 				return response ?? [];
