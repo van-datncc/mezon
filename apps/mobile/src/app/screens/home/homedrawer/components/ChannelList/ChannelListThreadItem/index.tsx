@@ -49,8 +49,8 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 						isActive && { backgroundColor: theme === 'light' ? themeValue.secondaryWeight : themeValue.secondaryLight }
 					]}
 					activeOpacity={1}
-					onPress={() => onPressThreadItem()}
-					onLongPress={() => onLongPressThreadItem()}
+					onPress={onPressThreadItem}
+					onLongPress={onLongPressThreadItem}
 				>
 					<Text style={[styles.titleThread, isUnReadChannel && styles.channelListItemTitleActive]}>{thread?.channel_label}</Text>
 				</TouchableOpacity>
