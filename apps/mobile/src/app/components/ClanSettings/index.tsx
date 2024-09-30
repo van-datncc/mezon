@@ -1,6 +1,8 @@
-import { useUserPermission } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
+import { EPermission } from '@mezon/utils';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView } from 'react-native';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
@@ -15,7 +17,15 @@ export default function ClanSetting({ navigation, route }: MenuClanScreenProps<C
 	const styles = style(themeValue);
 	const { inviteRef } = route?.params || {};
 	const { t } = useTranslation(['clanSetting']);
-	const { isCanEditRole } = useUserPermission();
+	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
+
+	const isCanEditRole = useMemo(() => {
+		return hasAdminPermission || isClanOwner || hasManageClanPermission;
+	}, [hasAdminPermission, hasManageClanPermission, isClanOwner]);
 
 	navigation.setOptions({
 		headerLeft: () => (
