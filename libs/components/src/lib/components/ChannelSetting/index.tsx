@@ -1,8 +1,8 @@
-import { useEscapeKey } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { fetchUserChannels, fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SettingCategoryChannel from './Component/CategoryChannel';
 import IntegrationsChannel from './Component/IntegrationsChannel';
@@ -43,18 +43,27 @@ const SettingChannel = (props: ModalSettingProps) => {
 
 	const closeMenu = useSelector(selectCloseMenu);
 
-	const [openModalAdd, setOpenModalAdd] = useState(false);
+	const openModalAdd = useRef(false);
 
-	const handleClose = () => {
-		if (!openModalAdd) {
+	const handleClose = useCallback(() => {
+		if (!openModalAdd.current) {
 			onClose();
 		}
-	};
+	}, []);
 
-	useEscapeKey(handleClose);
+	const modalRef = useRef<HTMLDivElement>(null);
+
+	useEscapeKeyClose(modalRef, handleClose);
+	useOnClickOutside(modalRef, handleClose);
 
 	return (
-		<div className="flex fixed inset-0  w-screen z-30 cursor-default" onMouseDown={(event) => event.stopPropagation()} role="button">
+		<div
+			ref={modalRef}
+			tabIndex={-1}
+			className="flex fixed inset-0  w-screen z-30 cursor-default"
+			onMouseDown={(event) => event.stopPropagation()}
+			role="button"
+		>
 			<div className="flex text-gray- w-screen relative text-white">
 				<div className="h-fit absolute top-5 right-5 block sbm:hidden z-[1]">
 					<div
@@ -81,7 +90,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 				/>
 				{currentSetting === EChannelSettingTab.OVERVIEW && <OverviewChannel channel={channel} />}
 				{currentSetting === EChannelSettingTab.PREMISSIONS && (
-					<PermissionsChannel channel={channel} setOpenModalAdd={setOpenModalAdd} openModalAdd={openModalAdd} />
+					<PermissionsChannel channel={channel} openModalAdd={openModalAdd} parentRef={modalRef} />
 				)}
 				{currentSetting === EChannelSettingTab.INVITES && <InvitesChannel />}
 				{currentSetting === EChannelSettingTab.INTEGRATIONS && <IntegrationsChannel currentChannel={channel} />}

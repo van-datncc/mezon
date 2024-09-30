@@ -41,7 +41,7 @@ function useChannelSeen(channelId: string) {
 	}, [channelId, dispatch, lastMessage]);
 }
 
-export const DirectMessageDetailTablet = ({ directMessageId }: {directMessageId?: string}) => {
+export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId?: string }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const navigation = useNavigation<any>();
@@ -162,7 +162,13 @@ export const DirectMessageDetailTablet = ({ directMessageId }: {directMessageId?
 				const store = await getStoreAsync();
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
 				store.dispatch(
-					messagesActions.fetchMessages({ channelId: directMessageId, noCache: true, isFetchingLatestMessages: true, isClearMessage: true })
+					messagesActions.fetchMessages({
+						channelId: directMessageId,
+						noCache: true,
+						isFetchingLatestMessages: true,
+						isClearMessage: true,
+						clanId: '0'
+					})
 				);
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
@@ -206,9 +212,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: {directMessageId?
                     <VideoIcon /> */}
 				</View>
 			</View>
-			{directMessageId && (
-				<ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={currentClanId} />
-			)}
+			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={currentClanId} />}
 		</SafeAreaView>
 	);
 };

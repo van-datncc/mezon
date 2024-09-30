@@ -1,9 +1,9 @@
-import { useAppNavigation, usePermissionChecker, useReference, useThreads } from '@mezon/core';
+import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, selectTheme, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -12,10 +12,10 @@ import SearchThread from './SearchThread';
 import ThreadItem from './ThreadItem';
 
 type ThreadsProps = {
-	setIsShowThread: React.Dispatch<React.SetStateAction<boolean>>;
+	onClose: () => void;
 };
 
-const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
+const ThreadModal = ({ onClose }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
@@ -33,15 +33,23 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 		if (currentChannel && currentChannel?.parrent_id !== '0') {
 			navigate(toChannelPage(currentChannel.parrent_id as string, currentChannel.clan_id as string));
 		}
-		setIsShowThread(false);
+		onClose();
 		setIsShowCreateThread(true, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
 		dispatch(threadsActions.setNameThreadError(''));
 		dispatch(threadsActions.setMessageThreadError(''));
 		dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: false }));
 	};
 
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose);
+
 	return (
-		<div className="absolute top-8 right-0 rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-[99999999]">
+		<div
+			ref={modalRef}
+			tabIndex={-1}
+			className="absolute top-8 right-0 rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-[99999999] animate-scale_up origin-top-right"
+		>
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] max-h-[80vh] lg:w-[540px]  shadow-sm overflow-hidden">
 				<div className="dark:bg-bgTertiary bg-bgLightTertiary flex flex-row items-center justify-between p-[16px] h-12">
 					<div className="flex flex-row items-center border-r-[1px] dark:border-r-[#6A6A6A] border-r-[#E1E1E1] pr-[16px] gap-4">
@@ -58,7 +66,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 							>
 								Create
 							</Button>
-							<button onClick={() => setIsShowThread(false)}>
+							<button onClick={onClose}>
 								<Icons.Close defaultSize="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode" />
 							</button>
 						</div>
@@ -74,7 +82,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 									avatarMembers={thread.channel_private !== 1 ? avatarMembers : []}
 									thread={thread}
 									key={thread.id}
-									setIsShowThread={setIsShowThread}
+									setIsShowThread={onClose}
 								/>
 							))}
 						</GroupThreads>
@@ -86,7 +94,7 @@ const ThreadModal = ({ setIsShowThread }: ThreadsProps) => {
 									avatarMembers={thread.channel_private !== 1 ? avatarMembers : []}
 									thread={thread}
 									key={thread.id}
-									setIsShowThread={setIsShowThread}
+									setIsShowThread={onClose}
 								/>
 							))}
 						</GroupThreads>

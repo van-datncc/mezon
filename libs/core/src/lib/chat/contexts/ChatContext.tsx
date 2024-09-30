@@ -47,6 +47,7 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
+import * as Sentry from '@sentry/browser';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -226,9 +227,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			}
 			dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
-			dispatch(notificationActions.setIsMessageRead(true));
-			// remove: setChannelLastSentTimestamp for fix re-render currentChannel when receive new message
-			// dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
 		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId]
 	);
@@ -269,8 +267,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		async (notification: Notification) => {
 			if (currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
-				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
-				dispatch(notificationActions.setStatusNoti());
 			}
 			if (currentChannel?.channel_id === (notification as any).channel_id) {
 				const timestamp = Date.now() / 1000;
@@ -359,7 +355,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (user) {
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_DM || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 					dispatch(fetchDirectMessage({ noCache: true }));
-					dispatch(fetchMessages({ channelId: userAdds?.channel_id, noCache: false, isFetchingLatestMessages: false }));
+					dispatch(
+						fetchMessages({ clanId: userAdds.clan_id, channelId: userAdds?.channel_id, noCache: false, isFetchingLatestMessages: false })
+					);
 				}
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
@@ -555,8 +553,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated && channelCreated.channel_private === 0) {
-				dispatch(channelsActions.createChannelSocket(channelCreated));
+				const timestamp = Date.now() / 1000;
+
+				const extendChannelCreated = {
+					...channelCreated,
+					last_seen_message: { timestamp_seconds: timestamp },
+					last_sent_message: { timestamp_seconds: timestamp }
+				};
+				dispatch(channelsActions.createChannelSocket(extendChannelCreated));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(
+					channelMetaActions.updateBulkChannelMetadata([
+						{
+							id: extendChannelCreated.channel_id,
+							lastSeenTimestamp: extendChannelCreated.last_seen_message.timestamp_seconds,
+							lastSentTimestamp: extendChannelCreated.last_sent_message.timestamp_seconds,
+							lastSeenPinMessage: '',
+							clanId: extendChannelCreated.clan_id ?? ''
+						}
+					])
+				);
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(
 						channelsActions.joinChat({
@@ -582,7 +598,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
-				dispatch(notificationActions.removeAllNotificattionChannel());
 			}
 		},
 		[currentClanId, dispatch, navigate, userId]
@@ -593,7 +608,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelDeleted) {
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
-				dispatch(notificationActions.removeNotificationsByChannelId(channelDeleted.channel_id));
 			}
 		},
 		[dispatch]
@@ -849,7 +863,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			timerIdRef.current = setTimeout(async () => {
 				if (socketRef.current?.isOpen()) return;
-				dispatch(toastActions.addToast({ message: socketType, type: 'info' }));
 				const errorMessage = 'Cannot reconnect to the socket. Please restart the app.';
 				try {
 					const socket = await reconnectWithTimeout(clanIdActive ?? '');
@@ -872,6 +885,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					setCallbackEventFn(socket as Socket);
 				} catch (error) {
 					dispatch(toastActions.addToast({ message: errorMessage, type: 'warning', autoClose: false }));
+					Sentry.captureException(error);
 				}
 			}, 5000);
 		},

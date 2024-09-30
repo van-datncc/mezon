@@ -112,6 +112,9 @@ const Notifications = () => {
 	};
 
 	const handleOnPressNotify = async (notify: INotification) => {
+		if (!notify?.content?.channel_id) {
+			return;
+		}
 		const store = await getStoreAsync();
 		navigation.navigate(APP_SCREEN.HOME as never);
 		requestAnimationFrame(async () => {

@@ -1,4 +1,4 @@
-import { useAuth, useChannelMembersActions, useEscapeKey, useOnClickOutside, usePermissionChecker } from '@mezon/core';
+import { useAuth, useChannelMembersActions, useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	categoriesActions,
 	hasGrandchildModal,
@@ -11,7 +11,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -48,6 +48,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const [openServerSettings, setOpenServerSettings] = useState(false);
 	const [isShowModalPanelClan, setIsShowModalPanelClan] = useState<boolean>(false);
 	const hasChildModal = useSelector(hasGrandchildModal);
+	const hasChildModalRef = useRef(false);
+	if (hasChildModal) {
+		hasChildModalRef.current = true;
+	} else {
+		hasChildModalRef.current = false;
+	}
 	const [openNotiSettingModal, closeNotiSettingModal] = useModal(() => <ModalNotificationSetting onClose={closeNotiSettingModal} open={true} />);
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const [isShowLeaveClanPopup, setIsShowLeaveClanPopup] = useState(false);
@@ -94,12 +100,12 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 
 	useOnClickOutside(modalRef, () => setIsShowModalPanelClan(false));
 
-	useEscapeKey(() => {
+	const closeModalClan = useCallback(() => {
 		setIsShowModalPanelClan(false);
-		if (!hasChildModal) {
+		if (!hasChildModalRef.current) {
 			setOpenServerSettings(false);
 		}
-	});
+	}, []);
 
 	const handleLeaveClan = async () => {
 		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
@@ -114,6 +120,9 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			dispatch(categoriesActions.setShowEmptyCategory());
 		}
 	};
+
+	useEscapeKeyClose(modalRef, closeModalClan);
+
 	return (
 		<>
 			{type === 'direct' ? (
@@ -128,7 +137,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				</div>
 			) : (
 				<div className={`h-[60px] relative bg-gray-950`}>
-					<div ref={modalRef} className={`relative h-[60px] top-0`} onClick={handleShowModalClan}>
+					<div ref={modalRef} tabIndex={-1} className={`relative h-[60px] top-0`} onClick={handleShowModalClan}>
 						<div
 							className={`cursor-pointer w-full p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-[#35373C] hover:bg-[#E2E7F6] shadow border-b-[1px] dark:border-bgTertiary border-bgLightSecondary`}
 						>
@@ -223,12 +232,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			)}
 
 			{openServerSettings && (
-				<ClanSetting
-					onClose={() => {
-						setOpenServerSettings(false);
-					}}
-					initialSetting={canManageClan ? ItemSetting.OVERVIEW : ItemSetting.CATEGORY_ORDER}
-				/>
+				<ClanSetting onClose={closeModalClan} initialSetting={canManageClan ? ItemSetting.OVERVIEW : ItemSetting.CATEGORY_ORDER} />
 			)}
 
 			<ModalCreateCategory openCreateCate={openCreateCate} onClose={onClose} onCreateCategory={handleCreateCate} />

@@ -1,10 +1,10 @@
 import { AvatarImage, ShortUserProfile } from '@mezon/components';
-import { useChannelMembersActions, useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
@@ -143,17 +143,12 @@ function MemberProfile({
 		}
 	};
 
-	const handleClickOutSide = () => {
+	const handleClickOutSide = useCallback(() => {
 		closeModal(ModalType.ProfileItem);
 		closeModal(ModalType.PannelMember);
-	};
+	}, []);
 
 	useOnClickOutside(panelRef, handleClickOutSide);
-
-	useEscapeKey(() => {
-		closeModal(ModalType.ProfileItem);
-		closeModal(ModalType.PannelMember);
-	});
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 
@@ -200,6 +195,7 @@ function MemberProfile({
 				name={name}
 				coords={coords}
 				isDM={isDM}
+				closeProfileItem={() => closeModal(ModalType.ProfileItem)}
 			/>
 		);
 	}, [coords]);
@@ -237,7 +233,7 @@ function MemberProfile({
 		);
 	});
 
-	const closeModal = (modalType: ModalType) => {
+	const closeModal = useCallback((modalType: ModalType) => {
 		switch (modalType) {
 			case ModalType.ProfileItem:
 				closeProfileItem();
@@ -250,7 +246,7 @@ function MemberProfile({
 				break;
 		}
 		modalState.current[modalType] = false;
-	};
+	}, []);
 
 	const resetModalState = () => {
 		closeModal(ModalType.ProfileItem);
@@ -330,7 +326,7 @@ function MemberProfile({
 									title={name}
 								>
 									<span
-										className={`one-line ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
+										className={`one-line leading-none ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
 									>
 										{!isHiddenAvatarPanel && name}
 									</span>

@@ -1,4 +1,4 @@
-import { useEscapeKey } from '@mezon/core';
+import { useEscapeKeyClose } from '@mezon/core';
 import { createSticker, emojiSuggestionActions, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Button, Icons, InputField } from '@mezon/ui';
@@ -159,11 +159,12 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 		return !(editingGraphic.fileName && editingGraphic.shortname && editingGraphic.shortname !== graphic?.shortname);
 	}, [editingGraphic.fileName, editingGraphic.shortname, graphic?.shortname]);
 
-	useEscapeKey(handleCloseModal);
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, handleCloseModal);
 
 	return (
 		<>
-			<div className={'relative w-full h-[468px] flex flex-col dark:bg-bgPrimary text-textPrimary '}>
+			<div ref={modalRef} tabIndex={-1} className={'relative w-full h-[468px] flex flex-col dark:bg-bgPrimary text-textPrimary '}>
 				<div className={`w-full flex-1 flex flex-col overflow-hidden overflow-y-auto gap-4`}>
 					<div className={`flex flex-col gap-2 items-center select-none dark:text-textPrimary text-textPrimaryLight`}>
 						<p className="text-2xl font-semibold dark:text-bgTextarea text-textPrimaryLight">Upload a file</p>

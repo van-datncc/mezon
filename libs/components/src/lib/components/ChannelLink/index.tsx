@@ -1,7 +1,6 @@
-import { useChannels, useMenu, useOnClickOutside } from '@mezon/core';
+import { useChannels, useMenu } from '@mezon/core';
 import {
 	channelsActions,
-	notificationActions,
 	notificationSettingActions,
 	selectClanById,
 	selectCloseMenu,
@@ -113,11 +112,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setCoords({ mouseX, mouseY, distanceToBottom });
 				setIsShowPanelChannel((s) => !s);
 			}
-
-			dispatch(notificationActions.removeNotificationsByChannelId(channel.channel_id ?? ''));
 		};
-
-		useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 		const handleVoiceChannel = (id: string) => {
 			if (channel.status === StatusVoiceChannel.Active) {

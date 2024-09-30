@@ -180,7 +180,7 @@ function MyApp() {
 		>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
-				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`select-none fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
