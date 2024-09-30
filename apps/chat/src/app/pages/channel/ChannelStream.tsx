@@ -21,9 +21,13 @@ interface MediaPlayerProps {
 
 function HLSPlayer({ src }: MediaPlayerProps) {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const containerRef = useRef<HTMLDivElement | null>(null);
 	const isPlaying = useSelector(selectStatusStream);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isMuted, setIsMuted] = useState(false);
+	const [volume, setVolume] = useState(1);
+	const [isFullscreen, setIsFullscreen] = useState(false);
+	const [mediaError, setMediaError] = useState(false);
 
 	useEffect(() => {
 		const videoElement = videoRef.current;
@@ -37,7 +41,7 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 					lowLatencyMode: true,
 					enableWorker: true,
 					maxBufferLength: 30,
-					maxBufferSize: 60 * 1000 * 1000
+					maxBufferSize: 60 * 1000 * 1000,
 				});
 
 				hls.on(Hls.Events.ERROR, (event, data) => {
@@ -57,8 +61,18 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 								}
 								break;
 							case Hls.ErrorTypes.MEDIA_ERROR:
-								if (hls) {
-									hls.recoverMediaError();
+								if (!mediaError) {
+									setMediaError(true);
+									videoElement.pause();
+									hls.destroy();
+									setIsLoading(true);
+									setTimeout(() => {
+										if (hls) {
+											hls.loadSource(src);
+											hls.attachMedia(videoElement);
+											setMediaError(false);
+										}
+									}, 5000);
 								}
 								break;
 							default:
@@ -79,10 +93,9 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 				hls.attachMedia(videoElement);
 				hls.on(Hls.Events.MANIFEST_PARSED, () => {
 					videoElement.play().catch((error) => {
-						// Check if the video is muted due to autoplay restrictions
 						if (error.name === 'NotAllowedError') {
 							setIsMuted(true);
-							videoElement.muted = true; // Muted if autoplay is blocked
+							videoElement.muted = true;
 						}
 					});
 					setIsLoading(false);
@@ -93,7 +106,7 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 					videoElement.play().catch((error) => {
 						if (error.name === 'NotAllowedError') {
 							setIsMuted(true);
-							videoElement.muted = true; // Muted if autoplay is blocked
+							videoElement.muted = true;
 						}
 					});
 					setIsLoading(false);
@@ -106,37 +119,88 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 				hls.destroy();
 			}
 		};
-	}, [isPlaying, src]);
+	}, [isPlaying, mediaError, src]);
 
 	const handleToggleMute = () => {
 		const videoElement = videoRef.current;
 		if (videoElement) {
-			videoElement.muted = !videoElement.muted;
+			videoElement.muted = !isMuted;
 			setIsMuted(videoElement.muted);
 		}
 	};
 
+	const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const newVolume = parseFloat(event.target.value);
+		const videoElement = videoRef.current;
+		if (videoElement) {
+			videoElement.volume = newVolume;
+			setVolume(newVolume);
+			if (newVolume > 0) {
+				videoElement.muted = false;
+				setIsMuted(false);
+			} else {
+				videoElement.muted = true;
+				setIsMuted(true);
+			}
+		}
+	};
+
+	const handleFullscreen = () => {
+		const containerElement = containerRef.current;
+		if (containerElement) {
+			if (!document.fullscreenElement) {
+				containerElement
+					.requestFullscreen()
+					.then(() => {
+						setIsFullscreen(true);
+					}).catch((err) => {
+						console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+					});
+			} else {
+				document.exitFullscreen().then(() => {
+					setIsFullscreen(false);
+				});
+			}
+		}
+	};
+
 	return (
-		<div style={{ position: 'relative', width: '100%' }}>
-			<video
-				ref={videoRef}
-				autoPlay
-				playsInline
-				controls={false}
-				style={{ width: '100%' }}
-				controlsList="nodownload noremoteplayback noplaybackrate"
-				disablePictureInPicture
-			/>
+		<div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
+			<video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%' }} controls={false} className="custom-video" />
+
 			{isLoading && (
 				<div className="absolute top-0 left-0 w-full h-full bg-black flex justify-center items-center text-white text-xl z-50">
 					Loading...
 				</div>
 			)}
-			{isMuted && (
-				<button onClick={handleToggleMute} className="absolute bottom-5 left-5 bg-gray-800 text-white px-4 py-2 rounded">
-					Turn on sound
+			<div className="absolute bottom-5 left-5 flex items-center gap-1">
+				<button onClick={handleToggleMute} className=" bg-gray-800 text-white px-4 py-2 rounded">
+					{isMuted ? (
+						<Icons.MutedVolum defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+					) : (
+						<Icons.UnMutedVolum defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+					)}
 				</button>
-			)}
+
+				<div className="flex items-center">
+					<input
+						type="range"
+						min="0"
+						max="1"
+						step="0.01"
+						value={isMuted ? 0 : volume}
+						onChange={handleVolumeChange}
+						className="volume-slider"
+					/>
+				</div>
+			</div>
+			<button onClick={handleFullscreen} className="absolute bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded">
+				{isFullscreen ? (
+					<Icons.ExitFullScreen defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+				) : (
+					<Icons.FullScreen defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+				)}
+			</button>
 		</div>
 	);
 }
@@ -241,7 +305,6 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 	const streamPlay = useSelector(selectStatusStream);
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
-	const [currentMemberJoin, setCurrentMemberJoin] = useState(memberJoin);
 
 	const handleLeaveChannel = async () => {
 		if (currentStreamInfo) {
@@ -251,21 +314,19 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 	};
 
 	const handleJoinChannel = async () => {
-		// dispatch(usersStreamActions.add({}));
 		dispatch(videoStreamActions.startStream(currentStreamInfo as IStreamInfo));
-		setCurrentMemberJoin(memberJoin);
 	};
 
 	return !streamPlay ? (
 		<div className="w-full h-full bg-black flex justify-center items-center">
 			<div className="flex flex-col justify-center items-center gap-4 w-full">
 				<div className="w-full flex gap-2 justify-center p-2">
-					{currentMemberJoin.length > 0 && <UserListStreamChannel memberJoin={currentMemberJoin} memberMax={3}></UserListStreamChannel>}
+					{memberJoin.length > 0 && <UserListStreamChannel memberJoin={memberJoin} memberMax={3}></UserListStreamChannel>}
 				</div>
 				<div className="max-w-[350px] text-center text-3xl font-bold">
 					{channelName && channelName.length > 20 ? `${channelName.substring(0, 20)}...` : channelName}
 				</div>
-				{currentMemberJoin.length ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in stream</div>}
+				{memberJoin.length ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in stream</div>}
 				<button className="bg-green-700 rounded-3xl p-2 hover:bg-green-600" onClick={handleJoinChannel}>
 					Join stream
 				</button>
@@ -279,13 +340,13 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 						<HLSPlayer src={hlsUrl} />
 					</div>
 				) : (
-					<div className="w-[70%] dark:text-[#AEAEAE] text-colorTextLightMode dark:bg-bgSecondary600 bg-channelTextareaLight min-h-[500px] text-5xl flex justify-center items-center">
+					<div className="w-[70%] dark:text-[#AEAEAE] text-colorTextLightMode dark:bg-bgSecondary600 bg-channelTextareaLight min-h-[300px] text-5xl flex justify-center items-center text-center">
 						<span>No stream today</span>
 					</div>
 				)}
 			</div>
 			<div className="w-full flex gap-2 justify-center p-2">
-				<UserListStreamChannel memberJoin={currentMemberJoin}></UserListStreamChannel>
+				<UserListStreamChannel memberJoin={memberJoin}></UserListStreamChannel>
 			</div>
 			<div className="flex justify-center items-center">
 				<button onClick={handleLeaveChannel} className="bg-red-600 flex justify-center items-center rounded-full p-3 hover:bg-red-500">

@@ -18,7 +18,9 @@ export interface UsersStreamState extends EntityState<UsersStreamEntity, string>
 	streamChannelMember: IChannelMember[];
 }
 
-export const userStreamAdapter = createEntityAdapter<UsersStreamEntity>();
+export const userStreamAdapter = createEntityAdapter({
+	selectId: (user: UsersStreamEntity) => user.user_id || ''
+});
 
 type fetchStreamChannelMembersPayload = {
 	clanId: string;
