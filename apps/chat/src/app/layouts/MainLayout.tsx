@@ -1,20 +1,20 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
 import { reactionActions, selectAllChannelMeta, selectAnyUnreadChannel, selectMentionAndReplyUnreadAllClan } from '@mezon/store';
 
-import { DirectMetaEntity, selectAllDirectMessageByLastSeenTimestamp, selectAllDirectMetaMessages, useAppSelector } from '@mezon/store-mobile';
+import { selectAllDirectMessageByLastSeenTimestamp, selectAllDirectMetaMessages, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
-import { SubPanelName, electronBridge } from '@mezon/utils';
+import { SubPanelName, electronBridge, removeUndefinedAndEmpty } from '@mezon/utils';
 import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
 import { useContext, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 
-function removeUndefinedAndEmpty(obj: Record<string, DirectMetaEntity[]>) {
-	return Object.fromEntries(
-		Object.entries(obj).filter(([key, value]) => key !== 'undefined' && !(typeof value === 'object' && Object.keys(value).length === 0))
-	);
-}
+// function removeUndefinedAndEmpty(obj: Record<string, DirectMetaEntity[]>) {
+// 	return Object.fromEntries(
+// 		Object.entries(obj).filter(([key, value]) => key !== 'undefined' && !(typeof value === 'object' && Object.keys(value).length === 0))
+// 	);
+// }
 
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
@@ -26,7 +26,6 @@ const GlobalEventListener = () => {
 	const allLastSeenChannelAllDirect = useSelector(selectAllDirectMetaMessages);
 	const getAllDirectMessageUnread = useSelector(selectAllDirectMessageByLastSeenTimestamp(allLastSeenChannelAllDirect));
 	const filterDirectUnread = removeUndefinedAndEmpty(getAllDirectMessageUnread);
-	console.log('filterDirectUnread: ', filterDirectUnread);
 
 	const allCountDirectUnread = useMemo(() => {
 		let length = 0;

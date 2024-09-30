@@ -818,3 +818,9 @@ export const sortNotificationsByDate = (notifications: NotificationEntity[]) => 
 		return dateB - dateA;
 	});
 };
+
+export function removeUndefinedAndEmpty(obj: Record<string, any[]>) {
+	return Object.fromEntries(
+		Object.entries(obj).filter(([key, value]) => key !== 'undefined' && !(typeof value === 'object' && Object.keys(value).length === 0))
+	);
+}

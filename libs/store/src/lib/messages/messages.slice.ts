@@ -697,7 +697,7 @@ export const messagesSlice = createSlice({
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel, mode } = action.payload;
 
 			if (!channelId || !messageId) return state;
 
@@ -707,6 +707,18 @@ export const messagesSlice = createSlice({
 				});
 			}
 			const channelEntity = state.channelMessages[channelId];
+
+			if (
+				(mode === ChannelStreamMode.STREAM_MODE_DM && !isMe && !isCurrentChannel) ||
+				(mode === ChannelStreamMode.STREAM_MODE_GROUP && !isMe && !isCurrentChannel)
+			) {
+				console.log(action.payload);
+				if (state.directMessageUnread[channelId]) {
+					state.directMessageUnread[channelId].push(action.payload);
+				} else {
+					state.directMessageUnread[channelId] = [action.payload];
+				}
+			}
 			switch (code) {
 				case 0: {
 					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
@@ -1394,33 +1406,36 @@ const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelI
 export const selectAllDirectMessageUnread = createSelector(getMessagesState, (state) => state.directMessageUnread);
 
 export const selectAllDirectMessageByLastSeenTimestamp = (lastSeenTime: DirectMetaEntity[]) =>
-	createSelector([selectAllDirectMessageUnread], (unreadMessages) => {
+	createSelector(selectAllDirectMessageUnread, (unreadMessages) => {
 		const filteredMessages: Record<string, DirectMetaEntity[]> = {};
 
-		Object.entries(unreadMessages).forEach(([directId, messages]) => {
-			const lastSeenEntry = lastSeenTime.find((channel) => channel.id === directId);
-			if (lastSeenEntry) {
-				const { last_seen_message, last_sent_message } = lastSeenEntry;
+		if (unreadMessages) {
+			Object.entries(unreadMessages).forEach(([directId, messages]) => {
+				const lastSeenEntry = lastSeenTime.find((channel) => channel.id === directId);
+				if (lastSeenEntry) {
+					const { last_seen_message, last_sent_message } = lastSeenEntry;
+					if (last_sent_message) {
+						filteredMessages[directId] = messages.filter((message) => {
+							const { update_time_seconds } = message;
+							const effectiveUpdateTime = update_time_seconds !== undefined ? update_time_seconds : last_sent_message.timestamp_seconds;
 
-				if (last_sent_message) {
-					filteredMessages[directId] = messages.filter((message) => {
-						const { update_time_seconds } = message;
-						if (
-							last_seen_message &&
-							last_seen_message.timestamp_seconds &&
-							last_sent_message &&
-							last_sent_message.timestamp_seconds &&
-							update_time_seconds
-						) {
-							return (
-								last_seen_message.timestamp_seconds < update_time_seconds &&
-								update_time_seconds <= last_sent_message.timestamp_seconds
-							);
-						}
-					});
+							if (
+								last_seen_message &&
+								last_seen_message.timestamp_seconds &&
+								last_sent_message &&
+								last_sent_message.timestamp_seconds &&
+								effectiveUpdateTime
+							) {
+								return (
+									last_seen_message.timestamp_seconds < effectiveUpdateTime &&
+									effectiveUpdateTime <= last_sent_message.timestamp_seconds
+								);
+							}
+						});
+					}
 				}
-			}
-		});
+			});
+		}
 
 		return filteredMessages;
 	});
