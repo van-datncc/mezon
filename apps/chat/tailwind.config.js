@@ -162,7 +162,7 @@ module.exports = {
             transform: "scale(1,1)"
           }
         },
-        flyIn:{
+        fly_in:{
           '0%':{
             opacity: 0.5,
             transform: 'translateX(20px)'
@@ -188,7 +188,7 @@ module.exports = {
       spin: 'spin 1s linear infinite',
       faded_input: 'faded_input 0.05s ease-in-out forwards',
       scale_up : 'scale_up 0.15s ease-in-out forwards',
-      flyIn : 'flyIn 0.2s ease-in-out forwards',
+      fly_in : 'fly_in 0.2s ease-in-out forwards',
     },
     screens: {
       ssm: "430px",
