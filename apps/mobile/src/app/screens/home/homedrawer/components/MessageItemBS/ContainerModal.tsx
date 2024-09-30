@@ -335,9 +335,9 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			case EMessageActionType.MarkUnRead:
 				handleActionMarkUnRead();
 				break;
-			case EMessageActionType.Mention:
-				handleActionMention();
-				break;
+			// case EMessageActionType.Mention:
+			// 	handleActionMention();
+			// 	break;
 			case EMessageActionType.CopyMessageLink:
 				handleActionCopyMessageLink();
 				break;
@@ -386,8 +386,8 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				return <Icons.PinIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.MarkUnRead:
 				return <Icons.ChatMarkUnreadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
-			case EMessageActionType.Mention:
-				return <Icons.AtIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
+			// case EMessageActionType.Mention:
+			// 	return <Icons.AtIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.SaveImage:
 				return <Icons.DownloadIcon color={themeValue.text} width={size.s_24} height={size.s_24} />;
 			case EMessageActionType.CopyMediaLink:

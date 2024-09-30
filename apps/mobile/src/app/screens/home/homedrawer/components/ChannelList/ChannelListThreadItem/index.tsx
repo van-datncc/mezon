@@ -40,26 +40,20 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 	};
 
 	return (
-		<TouchableOpacity
-			key={thread.id}
-			activeOpacity={1}
-			onPress={() => onPressThreadItem()}
-			onLongPress={() => onLongPressThreadItem()}
-			style={[styles.channelListLink]}
-		>
+		<View key={thread.id} style={[styles.channelListLink]}>
 			<View style={[styles.threadItem]}>
-				{isFirstThread ? <ShortCornerIcon width={size.s_12} height={size.s_12} /> : <LongCornerIcon width={size.s_12} height={size.s_36} />}
-				<Text style={[
-						styles.titleThread, 
-						isUnReadChannel && styles.channelListItemTitleActive, 
-						isActive && { backgroundColor: theme === 'light' ? 
-											themeValue.secondaryWeight : 
-											themeValue.secondaryLight 
-						}]} 
-					numberOfLines={1}
+				{isFirstThread ? <ShortCornerIcon width={size.s_12} height={size.s_16} /> : <LongCornerIcon width={size.s_12} height={size.s_36} />}
+				<TouchableOpacity
+					style={[
+						styles.boxThread,
+						isActive && { backgroundColor: theme === 'light' ? themeValue.secondaryWeight : themeValue.secondaryLight }
+					]}
+					activeOpacity={1}
+					onPress={() => onPressThreadItem()}
+					onLongPress={() => onLongPressThreadItem()}
 				>
-					{thread?.channel_label}
-				</Text>
+					<Text style={[styles.titleThread, isUnReadChannel && styles.channelListItemTitleActive]}>{thread?.channel_label}</Text>
+				</TouchableOpacity>
 			</View>
 
 			{numberNotification > 0 && (
@@ -67,6 +61,6 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 					<Text style={styles.channelDot}>{numberNotification}</Text>
 				</View>
 			)}
-		</TouchableOpacity>
+		</View>
 	);
 }
