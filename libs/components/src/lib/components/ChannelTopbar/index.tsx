@@ -3,18 +3,18 @@ import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
+	selectAllChannelMeta,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
-	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
-	selectNewNotificationStatus,
+	selectMentionAndReplyUnreadAllClan,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -23,7 +23,7 @@ import { Icons } from '@mezon/ui';
 import { EPermission, IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import SettingChannel from '../ChannelSetting';
@@ -310,50 +310,22 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const dispatch = useAppDispatch();
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
-	const newNotificationStatus = useSelector(selectNewNotificationStatus);
-	const currentClanId = useSelector(selectCurrentClanId);
-
-	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
-
-	const notiUnreadList = useMemo(() => {
-		return localStorage.getItem('notiUnread');
-	}, [newNotificationStatus]);
-
-	useEffect(() => {
-		const updateNotiUnread = () => {
-			setNotiIdsUnread(notiUnreadList ? JSON.parse(notiUnreadList) : []);
-		};
-		updateNotiUnread();
-		const handleStorageChange = (event: StorageEvent) => {
-			if (event.key === 'notiUnread') {
-				updateNotiUnread();
-			}
-		};
-		window.addEventListener('storage', handleStorageChange);
-
-		return () => {
-			window.removeEventListener('storage', handleStorageChange);
-		};
-	}, [newNotificationStatus]);
+	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
+	const getNotificationMentionAndReplyUnread = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
 
 	const handleShowInbox = () => {
-		dispatch(notificationActions.fetchListNotification({ clanId: currentClanId as string }));
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
-
-	const handleSetIsShowInbox = useCallback(() => {
-		dispatch(notificationActions.setIsShowInbox(false));
-	}, []);
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
-					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
+					{getNotificationMentionAndReplyUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList unReadList={notiIdsUnread} onClose={handleSetIsShowInbox} />}
+			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} />}
 		</div>
 	);
 }

@@ -227,9 +227,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 			}
 			dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
-			dispatch(notificationActions.setIsMessageRead(true));
-			// remove: setChannelLastSentTimestamp for fix re-render currentChannel when receive new message
-			// dispatch(channelsActions.updateChannelThreadSocket({ ...message, timestamp }));
 		},
 		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId]
 	);
@@ -270,8 +267,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		async (notification: Notification) => {
 			if (currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
-				dispatch(notificationActions.setNotiListUnread(mapNotificationToEntity(notification)));
-				dispatch(notificationActions.setStatusNoti());
 			}
 			if (currentChannel?.channel_id === (notification as any).channel_id) {
 				const timestamp = Date.now() / 1000;
@@ -603,7 +598,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
-				dispatch(notificationActions.removeAllNotificattionChannel());
 			}
 		},
 		[currentClanId, dispatch, navigate, userId]
@@ -614,7 +608,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (channelDeleted) {
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
-				dispatch(notificationActions.removeNotificationsByChannelId(channelDeleted.channel_id));
 			}
 		},
 		[dispatch]
