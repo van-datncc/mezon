@@ -41,7 +41,7 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 					lowLatencyMode: true,
 					enableWorker: true,
 					maxBufferLength: 30,
-					maxBufferSize: 60 * 1000 * 1000,
+					maxBufferSize: 60 * 1000 * 1000
 				});
 
 				hls.on(Hls.Events.ERROR, (event, data) => {
@@ -153,7 +153,8 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 					.requestFullscreen()
 					.then(() => {
 						setIsFullscreen(true);
-					}).catch((err) => {
+					})
+					.catch((err) => {
 						console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
 					});
 			} else {
@@ -176,9 +177,9 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 			<div className="absolute bottom-5 left-5 flex items-center gap-1">
 				<button onClick={handleToggleMute} className=" bg-gray-800 text-white px-4 py-2 rounded">
 					{isMuted ? (
-						<Icons.MutedVolum defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+						<Icons.MutedVolum defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 					) : (
-						<Icons.UnMutedVolum defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+						<Icons.UnMutedVolum defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 					)}
 				</button>
 
@@ -196,9 +197,9 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 			</div>
 			<button onClick={handleFullscreen} className="absolute bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded">
 				{isFullscreen ? (
-					<Icons.ExitFullScreen defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+					<Icons.ExitFullScreen defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 				) : (
-					<Icons.FullScreen defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+					<Icons.FullScreen defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 				)}
 			</button>
 		</div>
