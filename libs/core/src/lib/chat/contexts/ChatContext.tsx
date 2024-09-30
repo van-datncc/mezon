@@ -11,6 +11,7 @@ import {
 	directActions,
 	directMetaActions,
 	directSlice,
+	emojiSuggestionActions,
 	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
@@ -60,6 +61,7 @@ import {
 	ClanDeletedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
+	EventEmoji,
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
@@ -310,7 +312,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
 					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				} else {
 					dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -337,7 +339,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						navigate(`/chat/direct/friends`);
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				} else {
 					dispatch(
 						channelMembers.actions.removeUserByUserIdAndClan({
@@ -366,7 +368,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				}
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(
@@ -460,6 +462,39 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						clan_name: stickerCreated.clan_name
 					})
 				);
+			}
+		},
+		[dispatch, userId]
+	);
+
+	const oneventemoji = useCallback(
+		(eventEmoji: EventEmoji) => {
+			if (userId !== eventEmoji.user_id) {
+				if (eventEmoji.action === 0) {
+					dispatch(
+						emojiSuggestionActions.add({
+							category: eventEmoji.clan_name,
+							clan_id: eventEmoji.clan_id,
+							creator_id: eventEmoji.user_id,
+							id: eventEmoji.id,
+							shortname: eventEmoji.short_name,
+							src: eventEmoji.source,
+							logo: eventEmoji.logo,
+							clan_name: eventEmoji.clan_name
+						})
+					);
+				} else if (eventEmoji.action === 1) {
+					dispatch(
+						emojiSuggestionActions.update({
+							id: eventEmoji.id,
+							changes: {
+								shortname: eventEmoji.short_name
+							}
+						})
+					);
+				} else if (eventEmoji.action === 2) {
+					dispatch(emojiSuggestionActions.remove(eventEmoji.id));
+				}
 			}
 		},
 		[dispatch, userId]
@@ -566,7 +601,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					last_sent_message: { timestamp_seconds: timestamp }
 				};
 				dispatch(channelsActions.createChannelSocket(extendChannelCreated));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				dispatch(
 					channelMetaActions.updateBulkChannelMetadata([
 						{
@@ -597,12 +632,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onclandeleted = useCallback(
 		(clanDelete: ClanDeletedEvent) => {
-			dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+			dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 			dispatch(stickerSettingActions.removeStickersByClanId(clanDelete.clan_id));
 			if (clanDelete.deletor !== userId && currentClanId === clanDelete.clan_id) {
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				dispatch(notificationActions.removeAllNotificattionChannel());
 			}
 		},
@@ -613,7 +648,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelDeleted: ChannelDeletedEvent) => {
 			if (channelDeleted) {
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				dispatch(notificationActions.removeNotificationsByChannelId(channelDeleted.channel_id));
 			}
 		},
@@ -630,7 +665,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
 						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
-						dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+						dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
@@ -799,6 +834,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onstickercreated = onstickercreated;
 
+			socket.oneventemoji = oneventemoji;
+
 			socket.onstickerdeleted = onstickerdeleted;
 
 			socket.onstickerupdated = onstickerupdated;
@@ -843,6 +880,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onuserchanneladded,
 			onuserclanadded,
 			onstickercreated,
+			oneventemoji,
 			onstickerdeleted,
 			onstickerupdated,
 			onclanprofileupdated,
@@ -942,6 +980,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstickercreated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.oneventemoji = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstickerdeleted = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstickerupdated = () => {};
@@ -968,6 +1008,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onstickerupdated,
 		onstickerdeleted,
 		onstickercreated,
+		oneventemoji,
 		onclanprofileupdated,
 		oncustomstatus,
 		onstatuspresence,

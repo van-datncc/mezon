@@ -149,7 +149,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
-			thunkAPI.dispatch(fetchListChannelsByUser());
+			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
