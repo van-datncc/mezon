@@ -1,4 +1,4 @@
-import { useAppNavigation, useEscapeKey } from '@mezon/core';
+import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
 import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { AlertTitleTextWarning, Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
@@ -107,11 +107,18 @@ export const CreateNewChannelModal = () => {
 		setIsInputError(isValid ?? false);
 	}, []);
 
-	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
-
+	const modalRef = useRef<HTMLDivElement>(null);
+	const handleClose = useCallback(() => {
+		dispatch(channelsActions.openCreateNewModalChannel(false));
+	}, [isOpenModal]);
+	useEscapeKeyClose(modalRef, handleClose);
 	return (
 		isOpenModal && (
-			<div className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center">
+			<div
+				ref={modalRef}
+				tabIndex={-1}
+				className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
+			>
 				<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative">
 					<div className="self-stretch md:h-96 flex-col justify-start items-start flex">
 						<div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">

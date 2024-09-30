@@ -1,4 +1,4 @@
-import { useEscapeKey, usePermissionChecker } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
@@ -26,7 +26,7 @@ import {
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import GroupPanels from './GroupPanels';
@@ -191,7 +191,12 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		currentChannelId ?? ''
 	);
 
-	useEscapeKey(() => setIsShowPanelChannel(false));
+	const handClosePannel = useCallback(() => {
+		setIsShowPanelChannel(false);
+	}, []);
+
+	useEscapeKeyClose(panelRef, handClosePannel);
+	useOnClickOutside(panelRef, handClosePannel);
 
 	const handleOpenCreateChannelModal = () => {
 		dispatch(channelsActions.setCurrentCategory(currentCategory));
@@ -201,8 +206,9 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	return (
 		<div
 			ref={panelRef}
+			tabIndex={-1}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
-			className="fixed top-full dark:bg-bgProfileBody bg-white rounded-sm shadow z-20 w-[200px] py-[10px] px-[10px]"
+			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm shadow z-20 w-[200px] py-[10px] px-[10px]"
 		>
 			<GroupPanels>
 				<ItemPanel children="Mark As Read" />

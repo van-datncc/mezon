@@ -1,5 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { useEscapeKey, useOnClickOutside } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { selectChannelMemberByUserIds, selectCurrentChannelId, selectDmGroupCurrentId, useAppSelector } from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -29,6 +29,7 @@ type UserProfilePopupProps = {
 	mode?: number;
 	positionShortUser: { top: number; left: number } | null;
 	isDm?: boolean;
+	onClose: () => void;
 };
 
 const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble, tagUserId, tagRoleName, tagRoleId }: ChannelHashtagProps) => {
@@ -85,11 +86,10 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		[tagRoleId]
 	);
 
-	const handleClickOutside = () => {
+	const handleClickOutside = useCallback(() => {
 		setIsShowPanelChannel(false);
-	};
+	}, []);
 	useOnClickOutside(mentionRef, handleClickOutside);
-	useEscapeKey(() => setIsShowPanelChannel(false));
 
 	return (
 		<>
@@ -100,6 +100,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					mode={mode}
 					isDm={isDM}
 					positionShortUser={positionShortUser}
+					onClose={handleClickOutside}
 				/>
 			)}
 
@@ -136,7 +137,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 export default memo(MentionUser);
 
-const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser }: UserProfilePopupProps) => {
+const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, onClose }: UserProfilePopupProps) => {
 	const getUserByUserId = useAppSelector((state) =>
 		selectChannelMemberByUserIds(state, channelId ?? '', userID, mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : '1')
 	)[0];
@@ -154,8 +155,11 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser }: 
 	};
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
+	useEscapeKeyClose(panelRef, onClose);
+
 	return (
 		<div
+			tabIndex={-1}
 			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out`}
 			style={{
 				top: `${positionShortUser?.top}px`,

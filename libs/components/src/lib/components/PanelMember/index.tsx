@@ -4,6 +4,7 @@ import {
 	useAuth,
 	useChannelMembersActions,
 	useDirect,
+	useEscapeKeyClose,
 	useFriends,
 	useMessageValue,
 	usePermissionChecker,
@@ -172,9 +173,12 @@ const PanelMember = ({
 		}
 	};
 
+	useEscapeKeyClose(panelRef, onClose);
+
 	return (
 		<div
 			ref={panelRef}
+			tabIndex={-1}
 			onMouseDown={(e) => e.stopPropagation()}
 			style={{
 				left: coords.mouseX,
@@ -182,7 +186,7 @@ const PanelMember = ({
 				top: positionTop ? 'auto' : coords.mouseY,
 				boxShadow: 'rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px'
 			}}
-			className="fixed top-full dark:bg-bgProfileBody bg-bgLightPrimary z-20 w-[200px] py-[10px] px-[10px] border border-slate-300 dark:border-none rounded"
+			className="outline-none fixed top-full dark:bg-bgProfileBody bg-bgLightPrimary z-20 w-[200px] py-[10px] px-[10px] border border-slate-300 dark:border-none rounded"
 			onClick={(e) => {
 				e.stopPropagation();
 				onClose();

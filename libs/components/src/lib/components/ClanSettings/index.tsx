@@ -1,6 +1,7 @@
+import { useEscapeKeyClose } from '@mezon/core';
 import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DeleteClanModal from '../DeleteClanModal';
 import { ExitSetting } from '../SettingProfile';
@@ -44,11 +45,11 @@ const ClanSetting = (props: ModalSettingProps) => {
 			case ItemSetting.INTEGRATIONS:
 				return <Integrations currentChannel={currentChannel} />;
 			case ItemSetting.EMOJI:
-				return <SettingEmoji />;
+				return <SettingEmoji parentRef={modalRef} />;
 			case ItemSetting.NOTIFICATION_SOUND:
 				return <NotificationSoundSetting />;
 			case ItemSetting.STICKERS:
-				return <SettingSticker />;
+				return <SettingSticker parentRef={modalRef} />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
 		}
@@ -64,8 +65,12 @@ const ClanSetting = (props: ModalSettingProps) => {
 			setIsShowDeletePopup(true);
 		}
 	}, [currentSettingId]);
+
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, onClose);
+
 	return (
-		<div className="  flex fixed inset-0  w-screen z-30">
+		<div ref={modalRef} tabIndex={-1} className="  flex fixed inset-0  w-screen z-30">
 			<div className="flex flex-row w-screen">
 				<div className="z-50 h-fit absolute top-5 right-5 block sbm:hidden">
 					<div

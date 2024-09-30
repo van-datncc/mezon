@@ -1,4 +1,4 @@
-import { useEscapeKey, useMenu, useOnClickOutside } from '@mezon/core';
+import { useMenu, useOnClickOutside } from '@mezon/core';
 import {
 	DirectEntity,
 	appActions,
@@ -181,8 +181,10 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 		setIsShowPinMessage(!isShowPinMessage);
 	};
 
-	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
-	useEscapeKey(() => setIsShowPinMessage(false));
+	const handleClose = useCallback(() => {
+		setIsShowPinMessage(false);
+	}, []);
+
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip
@@ -196,7 +198,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 					<Icons.PinRight isWhite={isShowPinMessage} />
 				</button>
 			</Tooltip>
-			{isShowPinMessage && <PinnedMessages />}
+			{isShowPinMessage && <PinnedMessages onClose={handleClose} />}
 		</div>
 	);
 }
