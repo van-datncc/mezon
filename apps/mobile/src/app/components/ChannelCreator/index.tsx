@@ -68,6 +68,17 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;
 		const clanID = payload.clan_id;
+
+		const error = (newChannelCreatedId as any).error;
+		if (newChannelCreatedId && error) {
+			Toast.show({
+				type: 'info',
+				text1: t('fields.channelName.duplicateChannelName')
+			});
+			dispatch(appActions.setLoadingMainMobile(false));
+			return;
+		}
+
 		if (newChannelCreatedId && channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			navigation.navigate('HomeDefault' as any);
 			navigation.dispatch(DrawerActions.closeDrawer());
@@ -81,15 +92,6 @@ export default function ChannelCreator({ navigation, route }: MenuClanScreenProp
 		}
 		setChannelName('');
 		dispatch(appActions.setLoadingMainMobile(false));
-
-		const error = (newChannelCreatedId as any).error;
-		if (newChannelCreatedId && error) {
-			Toast.show({
-				type: 'info',
-				text1: error.message
-			});
-			dispatch(appActions.setLoadingMainMobile(false));
-		}
 	}
 
 	function handleClose() {
