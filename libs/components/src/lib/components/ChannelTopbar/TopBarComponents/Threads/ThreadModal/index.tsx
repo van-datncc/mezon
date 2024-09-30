@@ -48,7 +48,7 @@ const ThreadModal = ({ onClose }: ThreadsProps) => {
 		<div
 			ref={modalRef}
 			tabIndex={-1}
-			className="absolute top-8 right-0 rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-[99999999] animate-scale origin-top-right"
+			className="absolute top-8 right-0 rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-[99999999] animate-scale_up origin-top-right"
 		>
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] max-h-[80vh] lg:w-[540px]  shadow-sm overflow-hidden">
 				<div className="dark:bg-bgTertiary bg-bgLightTertiary flex flex-row items-center justify-between p-[16px] h-12">

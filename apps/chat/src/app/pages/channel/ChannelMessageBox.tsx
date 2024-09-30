@@ -77,7 +77,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className={`right-[2px] absolute z-10 animate-scale origin-bottom-right`}
+					className={`right-[2px] absolute z-10 animate-scale_up origin-bottom-right`}
 					style={{
 						bottom: chatboxRef.current ? `${chatboxRef.current.offsetHeight}px` : ''
 					}}
