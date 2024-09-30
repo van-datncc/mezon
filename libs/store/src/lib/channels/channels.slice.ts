@@ -327,7 +327,6 @@ export const channelsSlice = createSlice({
 		createChannelSocket: (state, action: PayloadAction<ChannelCreatedEvent>) => {
 			const payload = action.payload;
 
-			// const timestamp = Date.now() / 1000;
 			if (payload.parent_id !== '0' && payload.channel_private !== 1) {
 				const channel = mapChannelToEntity({
 					...payload,
