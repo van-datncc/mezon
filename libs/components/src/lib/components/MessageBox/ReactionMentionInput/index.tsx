@@ -749,23 +749,21 @@ const useEnterPressTracker = () => {
 	};
 
 	const trackEnterPress = () => {
-		setEnterCount((prev) => {
-			const newCount = prev + 1;
-
-			if (newCount >= 8) {
-				resetEnterCount();
-				handleOpenPopupQuickMess();
-				return 0;
-			}
-
-			return newCount;
-		});
+		setEnterCount((prev) => prev + 1);
 
 		if (timerRef.current) {
 			clearTimeout(timerRef.current);
 		}
+
 		timerRef.current = setTimeout(resetEnterCount, 1000);
 	};
+
+	useEffect(() => {
+		if (enterCount >= 8) {
+			resetEnterCount();
+			handleOpenPopupQuickMess();
+		}
+	}, [enterCount, handleOpenPopupQuickMess]);
 
 	return { trackEnterPress };
 };
