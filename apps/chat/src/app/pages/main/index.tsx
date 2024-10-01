@@ -10,26 +10,31 @@ import {
 } from '@mezon/components';
 import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	accountActions,
 	clansActions,
 	getIsShowPopupForward,
 	selectAllClans,
+	selectAllDirectMessageByLastSeenTimestamp,
+	selectAllDirectMetaMessages,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
-	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
 	selectStatusMenu,
-	selectTheme
+	selectStreamChannelByChannelId,
+	selectStreamMembersByChannelId,
+	selectTheme,
+	useAppDispatch
 } from '@mezon/store';
-import { accountActions, selectStreamChannelByChannelId, selectStreamMembersByChannelId, useAppDispatch } from '@mezon/store-mobile';
+
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
+import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, removeUndefinedAndEmpty } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -46,7 +51,22 @@ function MyApp() {
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
-	const listUnreadDM = useSelector(selectDirectsUnreadlist);
+
+	const allLastSeenChannelAllDirect = useSelector(selectAllDirectMetaMessages);
+	const getAllDirectMessageUnread = useSelector(selectAllDirectMessageByLastSeenTimestamp(allLastSeenChannelAllDirect));
+	const filterDirectUnread = removeUndefinedAndEmpty(getAllDirectMessageUnread);
+
+	const listUnreadDM = useMemo(() => {
+		return Object.entries(filterDirectUnread).map(([directId, messages]) => {
+			const lastSentMessage = messages[messages.length - 1];
+			return {
+				id: directId,
+				length: messages.length,
+				senderLastMessage: lastSentMessage?.sender_id
+			};
+		});
+	}, [filterDirectUnread]);
+
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
@@ -214,17 +234,15 @@ function MyApp() {
 								</NavLinkComponent>
 							</NavLink>
 						</SidebarTooltip>
-						{!!listUnreadDM?.length &&
+						{listUnreadDM?.length > 0 &&
 							listUnreadDM.map(
 								(dmGroupChatUnread) =>
-									dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-										<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-											<DirectUnreads
-												key={dmGroupChatUnread.id}
-												directMessage={dmGroupChatUnread}
-												countMessUnread={dmGroupChatUnread?.count_mess_unread || 0}
-											/>
-										</SidebarTooltip>
+									dmGroupChatUnread?.senderLastMessage !== userId && (
+										<DirectUnreads
+											key={dmGroupChatUnread.id}
+											directId={dmGroupChatUnread.id}
+											countMessUnread={dmGroupChatUnread.length}
+										/>
 									)
 							)}
 					</div>

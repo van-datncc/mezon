@@ -1,5 +1,5 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
-import { Attributes, baseColor, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
