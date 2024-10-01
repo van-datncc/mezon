@@ -1,4 +1,4 @@
-import { AvatarImage } from '@mezon/components';
+import { AvatarImage, Coords, ModalRemoveMemberClan, PanelMember } from '@mezon/components';
 import { useChannelMembersActions, useMemberContext, useOnClickOutside, usePermissionChecker, useRoles } from '@mezon/core';
 import {
 	RolesClanEntity,
@@ -6,15 +6,13 @@ import {
 	selectCurrentClanId,
 	selectRolesClanEntities,
 	selectTheme,
+	selectUserMaxPermissionLevel,
 	useAppDispatch,
 	usersClanActions
 } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { ChannelMembersEntity, EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { Coords } from 'libs/components/src/lib/components/ChannelLink';
-import ModalRemoveMemberClan from 'libs/components/src/lib/components/MemberProfile/ModalRemoveMemberClan';
-import PanelMember from 'libs/components/src/lib/components/PanelMember';
 import { MouseEvent, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -206,6 +204,8 @@ const ListOptionRole = ({
 }) => {
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
+	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 
 	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
 		if (userRolesClan.usersRole[role.id]) {
@@ -223,7 +223,7 @@ const ListOptionRole = ({
 
 	const roleElements = [];
 	for (const key in rolesClanEntity) {
-		if (key !== EVERYONE_ROLE_ID) {
+		if (key !== EVERYONE_ROLE_ID && (isClanOwner || Number(maxPermissionLevel) > Number(rolesClanEntity[key]?.max_level_permission))) {
 			roleElements.push(
 				<div className="flex gap-2 items-center h-6 justify-between px-2" key={key}>
 					<div className="text-transparent size-3 rounded-full bg-white" />
@@ -245,6 +245,6 @@ const ListOptionRole = ({
 		}
 	}
 
-	return <>{roleElements}</>;
+	return roleElements.length ? roleElements : <span className="text-gray-500">No roles available.</span>;
 };
 export default TableMemberItem;

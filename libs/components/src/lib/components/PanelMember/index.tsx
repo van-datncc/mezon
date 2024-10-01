@@ -66,7 +66,6 @@ const useCheckRoleAdminMember = (userId: string) => {
 			role?.permission_list?.permissions?.some((permission) => permission.slug === 'administrator' && permission.active === 1)
 		);
 	}, [userRolesClan]);
-
 	return hasAdminRole;
 };
 
@@ -88,8 +87,8 @@ const PanelMember = ({
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
 	const { removeMemberChannel } = useChannelMembersActions();
-	const hasAdminRole = useCheckRoleAdminMember(member?.user?.id ?? '');
-	const isClanOwner = useClanOwnerChecker(member?.user?.id ?? '');
+	const [hasClanOwnerPermission, hasAdminPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.administrator]);
+	const memberIsClanOwner = useClanOwnerChecker(member?.user?.id ?? '');
 	const { directId } = useAppParams();
 
 	useEffect(() => {
@@ -116,7 +115,6 @@ const PanelMember = ({
 		};
 	}, [directMessageValue]);
 
-	const [canManageClan] = usePermissionChecker([EPermission.manageClan]);
 	const hasAddFriend = useSelector(
 		selectFriendStatus(
 			directMessageValue && directMessageValue.type !== ChannelType.CHANNEL_TYPE_GROUP ? directMessageValue.userId[0] : member?.user?.id || ''
@@ -233,7 +231,7 @@ const PanelMember = ({
 						)}
 						{directMessageValue && <ItemPanelMember children="Close DM" />}
 					</GroupPanelMember>
-					{isMemberDMGroup && !isSelf && dataMemberCreate?.createId === userProfile?.user?.id && (
+					{isMemberDMGroup && dataMemberCreate?.createId === userProfile?.user?.id && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Remove From Group" onClick={handleRemoveMemberChannel} danger />
 							<ItemPanelMember children="Make Group Owner" danger />
@@ -242,7 +240,7 @@ const PanelMember = ({
 
 					{!isMemberDMGroup && (
 						<GroupPanelMember>
-							{!directMessageValue && <ItemPanelMember children="Mute" type="checkbox" />}
+							{!isSelf && !directMessageValue && <ItemPanelMember children="Mute" type="checkbox" />}
 							{isSelf && (
 								<>
 									<ItemPanelMember children="Deafen" type="checkbox" />
@@ -330,7 +328,7 @@ const PanelMember = ({
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{canManageClan && !hasAdminRole && !isClanOwner && (
+					{!isSelf && (hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner)) && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />

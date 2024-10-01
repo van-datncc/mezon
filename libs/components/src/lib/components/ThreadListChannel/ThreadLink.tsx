@@ -1,6 +1,6 @@
 import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel, MouseButton } from '@mezon/utils';
+import { IChannel } from '@mezon/utils';
 import React, { memo, useImperativeHandle, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -53,12 +53,9 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
 		const windowHeight = window.innerHeight;
-
-		if (event.button === MouseButton.RIGHT) {
-			const distanceToBottom = windowHeight - event.clientY;
-			setCoords({ mouseX, mouseY, distanceToBottom });
-			setIsShowPanelChannel((s) => !s);
-		}
+		const distanceToBottom = windowHeight - event.clientY;
+		setCoords({ mouseX, mouseY, distanceToBottom });
+		setIsShowPanelChannel((s) => !s);
 	};
 
 	const handleDeleteChannel = () => {
@@ -71,7 +68,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			className="flex flex-row items-center h-[34px] relative "
 			ref={panelRef}
 			role={'button'}
-			onMouseDown={(event) => handleMouseClick(event)}
+			onContextMenu={(event) => handleMouseClick(event)}
 		>
 			{isFirstThread ? (
 				<span className="absolute top-2 left-0">
@@ -102,6 +99,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 					coords={coords}
 					setOpenSetting={setOpenSetting}
 					setIsShowPanelChannel={setIsShowPanelChannel}
+					rootRef={panelRef}
 				/>
 			)}
 

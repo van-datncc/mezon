@@ -22,13 +22,12 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 	return activeRoles
 		.filter((role) => role.creator_id !== RoleEveryOne.TRUE)
 		.map((role) => {
-			console.log(role);
 			const hasPermissionEdit = isClanOwner || Number(userMaxPermissionLevel) > Number(role.max_level_permission);
 			return (
 				<tr key={role.id} className="h-14 dark:text-white text-black group dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton">
 					<td>
 						<p
-							className="inline-flex items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5"
+							className="inline-flex gap-1 items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5"
 							onClick={() => {
 								setShowModal(false);
 							}}
@@ -81,7 +80,8 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 												setShowModal(true);
 												handleRoleClick(role.id);
 											}
-										: () => {}
+										: // eslint-disable-next-line @typescript-eslint/no-empty-function
+											() => {}
 								}
 							>
 								<Tooltip
