@@ -81,7 +81,8 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			flexDirection: 'row',
 			alignItems: 'flex-start',
 			justifyContent: 'flex-start',
-			width: '100%'
+			width: '100%',
+			lineHeight: size.s_20
 		},
 		code_block: {
 			color: colors.text,
@@ -288,7 +289,7 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 			}
 			const urlFormat = payload?.replace(/##voice%22|#%22|%22/g, '');
 			const parentId = urlFormat?.split('_')?.[6];
-			const channelLabel = content?.slice(1);
+			const channelLabel = content?.startsWith('@') ? content.slice(1) : content;
 			const isThread = !['0', undefined].includes(parentId);
 			const isChannel = '0' === parentId;
 			const isMentionRole = payload?.startsWith(TYPE_MENTION.userRoleMention);
