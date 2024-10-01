@@ -1,4 +1,4 @@
-import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
