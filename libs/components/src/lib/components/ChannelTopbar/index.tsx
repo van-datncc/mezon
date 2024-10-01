@@ -5,7 +5,6 @@ import {
 	searchMessagesActions,
 	selectAllChannelMeta,
 	selectCloseMenu,
-	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectDefaultNotificationCategory,
@@ -27,7 +26,6 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import SettingChannel from '../ChannelSetting';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -98,8 +96,6 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								{param.channelId && <InviteBtn isLightMode={appearanceTheme === 'light'} />}
-								{param.channelId && isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -123,60 +119,6 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 				</div>
 			)}
 		</>
-	);
-}
-
-function ChannelSettingBtn({ isLightMode }: { isLightMode: boolean }) {
-	const [isOpenSetting, setIsOpenSetting] = useState<boolean>(false);
-	const ChannelSettingRef = useRef<HTMLDivElement | null>(null);
-	const currentChannel = useSelector(selectCurrentChannel) as IChannel;
-	const handleShowChannelSetting = () => {
-		setIsOpenSetting(!isOpenSetting);
-	};
-
-	const handleClose = useCallback(() => {
-		setIsOpenSetting(false);
-	}, []);
-
-	return (
-		<div className="relative leading-5 h-5" ref={ChannelSettingRef}>
-			<Tooltip
-				className={`${isOpenSetting && 'hidden'}`}
-				content="Channel setting"
-				trigger="hover"
-				animation="duration-500"
-				style={isLightMode ? 'light' : 'dark'}
-			>
-				<button className="focus-visible:outline-none" onClick={handleShowChannelSetting} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.SettingProfile
-						className={`w-6 h-6hover:text-black dark:hover:text-white size-6 dark:text-[#B5BAC1] text-colorTextLightMode cursor-pointer`}
-					/>
-				</button>
-			</Tooltip>
-			{isOpenSetting && <SettingChannel onClose={handleClose} channel={currentChannel} />}
-		</div>
-	);
-}
-
-function InviteBtn({ isLightMode }: { isLightMode: boolean }) {
-	const InviteBtnRef = useRef<HTMLDivElement | null>(null);
-	const currentChannel = useSelector(selectCurrentChannel) as IChannel;
-
-	const [openInviteChannelModal, closeInviteChannelModal] = useModal(
-		() => <ModalInvite onClose={closeInviteChannelModal} open={true} channelID={currentChannel.id} />,
-		[currentChannel?.id]
-	);
-
-	return (
-		<div className="relative leading-5 h-5" ref={InviteBtnRef}>
-			<Tooltip content="Invite Friends" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
-				<button className="focus-visible:outline-none" onClick={openInviteChannelModal} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.AddPerson
-						className={`w-6 h-6 hover:text-black dark:hover:text-white size-6 dark:text-[#B5BAC1] text-colorTextLightMode cursor-pointer`}
-					/>
-				</button>
-			</Tooltip>
-		</div>
 	);
 }
 
