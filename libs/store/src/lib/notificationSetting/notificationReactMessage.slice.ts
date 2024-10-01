@@ -62,7 +62,7 @@ export const setNotifiReactMessage = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '' }));
+		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
 		return response;
 	}
 );
@@ -79,7 +79,7 @@ export const deleteNotifiReactMessage = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '' }));
+		thunkAPI.dispatch(getNotifiReactMessage({ channelId: channel_id || '', noCache: true }));
 		return response;
 	}
 );

@@ -171,7 +171,10 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 					type="radio"
 					name="NotificationSetting"
 					defaultNotifi={true}
-					checked={getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT}
+					checked={
+						getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT ||
+						getNotificationChannelSelected?.notification_setting_type === undefined
+					}
 					subText={defaultNotifiName}
 					onClick={() => setNotification(ENotificationTypes.DEFAULT)}
 				/>
