@@ -2,7 +2,7 @@ import { IEmoji } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ClanEmoji } from 'mezon-js';
 import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
 
@@ -38,7 +38,8 @@ type EmojiObjPickedArgs = {
 };
 
 export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async (_, thunkAPI) => {
-	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
 	const response = await mezon.client.getListEmojisByUserId(mezon.session);
 	if (!response?.emoji_list) {
 		throw new Error('Emoji list is undefined or null');

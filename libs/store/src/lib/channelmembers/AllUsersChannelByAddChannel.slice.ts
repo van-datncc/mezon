@@ -1,7 +1,7 @@
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState } from '../clanMembers/clan.members';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 import { ChannelMembersEntity } from './channel.members';
 
 export const ALL_USERS_BY_ADD_CHANNEL = 'allUsersByAddChannel';
@@ -24,7 +24,7 @@ export const fetchUserChannels = createAsyncThunk(
 	'allUsersByAddChannel/fetchUserChannels',
 	async ({ channelId }: { channelId: string }, thunkAPI) => {
 		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.listUsersAddChannelByChannelId(mezon.session, channelId, 500);
 			console.log(response);
 

@@ -3,7 +3,7 @@ import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, cre
 
 import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
-import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx } from '../helpers';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
 
@@ -30,8 +30,9 @@ export const initialSettingClanStickerState: SettingClanStickerState = stickerAd
 
 export const fetchStickerByUserId = createAsyncThunk('settingClanSticker/fetchClanSticker', async (_, thunkAPI) => {
 	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.getListStickersByUserId(mezon.session);
+		console.log(response);
 
 		if (response) {
 			return response.stickers ?? [];
