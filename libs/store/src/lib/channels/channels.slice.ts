@@ -17,6 +17,7 @@ import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice'
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
+import { ChannelMetaEntity, channelMetaActions } from './channelmeta.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -27,6 +28,19 @@ export const CHANNELS_FEATURE_KEY = 'channels';
  */
 export interface ChannelsEntity extends IChannel {
 	id: string; // Primary ID
+}
+
+function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
+	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds ?? channel.last_sent_message?.timestamp_seconds);
+	const finalLastSeenTimestamp = isNaN(lastSeenTimestamp) ? Number(channel.last_sent_message?.timestamp_seconds) : lastSeenTimestamp;
+
+	return {
+		id: channel.id,
+		lastSeenTimestamp: finalLastSeenTimestamp,
+		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
+		lastSeenPinMessage: channel.last_pin_message || '',
+		clanId: channel.clan_id ?? ''
+	};
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
@@ -277,6 +291,8 @@ export const fetchChannels = createAsyncThunk(
 		}
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
+		const meta = channels.map((ch) => extractChannelMeta(ch));
+		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
 	}
 );
