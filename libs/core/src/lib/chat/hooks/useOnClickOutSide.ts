@@ -21,13 +21,17 @@ export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(
 		};
 
 		if (el) {
-			document.addEventListener('mousedown', listener);
-			document.addEventListener('touchstart', listener);
+			const isTouchDevice = 'ontouchstart' in window || navigator?.maxTouchPoints > 0;
+			if (isTouchDevice) {
+				document.addEventListener('touchstart', listener);
+			} else {
+				document.addEventListener('mousedown', listener);
+			}
 		}
 
 		return () => {
 			document.removeEventListener('mousedown', listener);
 			document.removeEventListener('touchstart', listener);
 		};
-	}, [ref, handler]); // Reload only if ref or handler changes
+	}, [ref, handler]); // Reload only if ref, handler, or rootElement changes
 };
