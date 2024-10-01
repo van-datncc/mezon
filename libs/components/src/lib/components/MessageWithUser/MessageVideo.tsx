@@ -20,6 +20,13 @@ function MessageVideo({ attachmentData }: MessageImage) {
 			videoRef.current.requestFullscreen();
 		}
 	};
+	const handleTogglePlay = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+		if (e.currentTarget.paused) {
+			e.currentTarget.play();
+		} else {
+			e.currentTarget.pause();
+		}
+	};
 	return (
 		<div className="relative overflow-hidden w-full h-full max-w-fit rounded-lg">
 			<video
@@ -29,6 +36,7 @@ function MessageVideo({ attachmentData }: MessageImage) {
 				className={`${showControl ? 'max-w-full h-[150px]' : 'w-[162px] h-auto'} object-contain`}
 				ref={videoRef}
 				onCanPlay={(e) => handleOnCanPlay(e)}
+				onClick={(e) => handleTogglePlay(e)}
 			></video>
 			{!showControl && (
 				<div className="bottom-1 right-1 absolute w-4 h-4 rounded overflow-hidden cursor-pointer z-10" onClick={handleShowFullVideo}>
