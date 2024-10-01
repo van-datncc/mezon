@@ -1,9 +1,10 @@
 import { LoadingStatus } from '@mezon/utils';
-import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
 
 import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
 
@@ -28,20 +29,36 @@ export const initialSettingClanStickerState: SettingClanStickerState = stickerAd
 	hasGrandchildModal: false
 });
 
-export const fetchStickerByUserId = createAsyncThunk('settingClanSticker/fetchClanSticker', async (_, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.getListStickersByUserId(mezon.session);
-		console.log(response);
-
-		if (response) {
-			return response.stickers ?? [];
+export const fetchStickerByUserIdCached = memoizeAndTrack(
+	async (mezon: MezonValueContext) => {
+		const response = await mezon.client.getListEmojisByUserId(mezon.session);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: 1000 * 60 * 3,
+		normalizer: (args) => {
+			return args[0]?.session?.username || '';
 		}
-		throw new Error('Emoji list is undefined or null');
-	} catch (error) {
-		return thunkAPI.rejectWithValue([]);
 	}
-});
+);
+
+export const fetchStickerByUserId = createAsyncThunk(
+	'settingClanSticker/fetchClanSticker',
+	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.getListStickersByUserId(mezon.session);
+
+			if (response) {
+				return response.stickers ?? [];
+			}
+			throw new Error('Emoji list is undefined or null');
+		} catch (error) {
+			return thunkAPI.rejectWithValue([]);
+		}
+	}
+);
 export const createSticker = createAsyncThunk(
 	'settingClanSticker/createSticker',
 	async (form: { request: ApiClanStickerAddRequest; clanId: string }, thunkAPI) => {
@@ -49,7 +66,7 @@ export const createSticker = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const res = await mezon.client.addClanSticker(mezon.session, form.request);
 			if (res) {
-				thunkAPI.dispatch(fetchStickerByUserId());
+				thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
 			} else {
 				return thunkAPI.rejectWithValue({});
 			}
@@ -66,7 +83,7 @@ export const updateSticker = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
 			if (res) {
-				thunkAPI.dispatch(fetchStickerByUserId());
+				thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
 			}
 		} catch (error) {
 			return thunkAPI.rejectWithValue({ error });
@@ -88,7 +105,7 @@ export const deleteSticker = createAsyncThunk('settingClanSticker/deleteSticker'
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const res = await mezon.client.deleteClanStickerById(mezon.session, data.stickerId, data.clan_id);
 		if (res) {
-			thunkAPI.dispatch(fetchStickerByUserId());
+			thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
 		}
 	} catch (error) {
 		return thunkAPI.rejectWithValue({ error });

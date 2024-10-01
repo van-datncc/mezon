@@ -1,7 +1,8 @@
 import { LoadingStatus } from '@mezon/utils';
-import { EntityState, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState } from '@reduxjs/toolkit';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState } from '../clanMembers/clan.members';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 import { ChannelMembersEntity } from './channel.members';
 
 export const ALL_USERS_BY_ADD_CHANNEL = 'allUsersByAddChannel';
@@ -20,13 +21,31 @@ export const initialUserChannelState: UsersByAddChannelState = UserChannelAdapte
 	error: null
 });
 
+export const fetchUserChannelsCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, channelId: string, limit: number) => {
+		const response = await mezon.client.listUsersAddChannelByChannelId(mezon.session, channelId, limit);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: 1000 * 60 * 3,
+		normalizer: (args) => {
+			return args[2] + args[1] + args[0]?.session?.username || '';
+		}
+	}
+);
+
 export const fetchUserChannels = createAsyncThunk(
 	'allUsersByAddChannel/fetchUserChannels',
-	async ({ channelId }: { channelId: string }, thunkAPI) => {
+	async ({ channelId, noCache }: { channelId: string; noCache?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			if (noCache) {
+				fetchUserChannelsCached.clear(mezon, channelId, 500);
+			}
+
 			const response = await mezon.client.listUsersAddChannelByChannelId(mezon.session, channelId, 500);
-			console.log(response);
 
 			if (response) {
 				return response ?? [];
