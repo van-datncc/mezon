@@ -107,7 +107,7 @@ const NavigationMain = () => {
 					noCache: true,
 					isFetchingLatestMessages: true,
 					isClearMessage: true,
-					clanId: currentClanId,
+					clanId: currentClanId
 				})
 			);
 		}
@@ -148,7 +148,7 @@ const NavigationMain = () => {
 						noCache: true,
 						isFetchingLatestMessages: true,
 						isClearMessage: true,
-						clanId: currentClanId,
+						clanId: currentClanId
 					})
 				),
 				store.dispatch(

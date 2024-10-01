@@ -57,7 +57,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		}
 	}, [tagUserName, tagRoleName, tagUserId, tagRoleId]);
 
-	const mentionRef = useRef<HTMLButtonElement>(null);
+	const mentionRef = useRef<HTMLSpanElement>(null);
 
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const isDM = Boolean(mode && [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode));
@@ -90,8 +90,10 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 		setIsShowPanelChannel(false);
 	}, []);
 
+	useOnClickOutside(mentionRef, handleClickOutside);
+
 	return (
-		<>
+		<span ref={mentionRef}>
 			{showProfileUser && (
 				<UserProfilePopup
 					userID={tagUserId ?? ''}
@@ -119,8 +121,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 			{displayToken?.type === MentionType.USER_EXIST && (
 				<button
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
-					ref={mentionRef}
+					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					style={{ textDecoration: 'none' }}
 					className={`font-medium px-0.1 rounded-sm
@@ -130,7 +131,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 					{displayToken.display}
 				</button>
 			)}
-		</>
+		</span>
 	);
 };
 
@@ -155,7 +156,6 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, on
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
 	useEscapeKeyClose(panelRef, onClose);
-	useOnClickOutside(panelRef, onClose);
 
 	return (
 		<div
