@@ -234,13 +234,13 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 									<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-									<Icons.Speaker defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+									<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
 									<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-									<Icons.Stream defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+									<Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 							</div>
 							<p

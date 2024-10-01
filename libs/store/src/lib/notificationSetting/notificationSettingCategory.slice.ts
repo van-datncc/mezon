@@ -2,7 +2,7 @@ import { IChannelCategorySetting, IDefaultNotificationCategory, LoadingStatus } 
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiNotificationSetting } from 'mezon-js/api.gen';
 import { ApiNotificationChannelCategorySetting } from 'mezon-js/dist/api.gen';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 export const DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY = 'defaultnotificationcategory';
 
@@ -84,7 +84,7 @@ export const setDefaultNotificationCategory = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '' }));
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
 		return response;
 	}
 );
@@ -103,7 +103,7 @@ export const deleteDefaultNotificationCategory = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '' }));
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
 		return response;
 	}
 );
@@ -121,7 +121,7 @@ export const setMuteCategory = createAsyncThunk(
 			return thunkAPI.rejectWithValue([]);
 		}
 		thunkAPI.dispatch(fetchChannelCategorySetting({ clanId: clan_id || '' }));
-		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '' }));
+		thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: category_id || '', noCache: true }));
 		return response;
 	}
 );
@@ -188,7 +188,7 @@ export const fetchChannelCategorySettingCached = memoizeAndTrack(
 export const fetchChannelCategorySetting = createAsyncThunk(
 	'channelCategorySetting/fetchChannelCategorySetting',
 	async ({ clanId, noCache }: fetchChannelCategorySettingPayload, thunkAPI) => {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
 			fetchChannelCategorySettingCached.clear(mezon, clanId);
 		}

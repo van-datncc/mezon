@@ -8,7 +8,7 @@ import {
 	SidebarClanItem,
 	SidebarTooltip
 } from '@mezon/components';
-import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
 	clansActions,
 	getIsShowPopupForward,
@@ -83,6 +83,10 @@ function MyApp() {
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
+
+	const { toMembersPage } = useAppNavigation();
+	const { currentURL } = useAppParams();
+	const memberPath = toMembersPage(currentClanId || '');
 
 	useEffect(() => {
 		const handleSizeWidth = () => {
@@ -277,7 +281,7 @@ function MyApp() {
 			<MainContent />
 
 			<div
-				className={`fixed h-[calc(100vh_-_60px)] w-[calc(100vw_-_344px)] right-0 bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
+				className={`fixed h-[calc(100vh_-_60px)] w-[calc(100vw_-_344px)] right-0 bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
 			>
 				<ChannelStream
 					key={currentStreamInfo?.streamId}
