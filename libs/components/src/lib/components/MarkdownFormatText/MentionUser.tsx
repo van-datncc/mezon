@@ -89,7 +89,6 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 	const handleClickOutside = useCallback(() => {
 		setIsShowPanelChannel(false);
 	}, []);
-	useOnClickOutside(mentionRef, handleClickOutside);
 
 	return (
 		<>
@@ -120,7 +119,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 			{displayToken?.type === MentionType.USER_EXIST && (
 				<button
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
+					onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
 					ref={mentionRef}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					style={{ textDecoration: 'none' }}
@@ -156,6 +155,7 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, on
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
 	useEscapeKeyClose(panelRef, onClose);
+	useOnClickOutside(panelRef, onClose);
 
 	return (
 		<div

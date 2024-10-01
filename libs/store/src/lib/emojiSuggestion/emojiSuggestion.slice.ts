@@ -102,9 +102,11 @@ export const emojiSuggestionSlice = createSlice({
 	name: EMOJI_SUGGESTION_FEATURE_KEY,
 	initialState: initialEmojiSuggestionState,
 	reducers: {
-		add: emojiSuggestionAdapter.addOne,
+		add: (state, action: PayloadAction<any>) => {
+			emojiSuggestionAdapter.addOne(state, action.payload);
+		},
 		remove: emojiSuggestionAdapter.removeOne,
-
+		update: emojiSuggestionAdapter.updateOne,
 		setSuggestionEmojiPicked: (state, action: PayloadAction<string>) => {
 			state.emojiPicked = action.payload;
 		},

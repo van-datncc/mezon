@@ -205,7 +205,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
 				</button>
 			</Tooltip>
-			{isShowThread && <ThreadModal onClose={handleClose} />}
+			{isShowThread && <ThreadModal onClose={handleClose} rootRef={threadRef} />}
 		</div>
 	);
 }
@@ -269,7 +269,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 					)}
 				</button>
 			</Tooltip>
-			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} />}
+			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} rootRef={notiRef} />}
 		</div>
 	);
 }
@@ -303,7 +303,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 					)}
 				</button>
 			</Tooltip>
-			{isShowPinMessage && <PinnedMessages onClose={handleClose} />}
+			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleClose} />}
 		</div>
 	);
 }
@@ -327,7 +327,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 					{getNotificationMentionAndReplyUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} />}
+			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} rootRef={inboxRef} />}
 		</div>
 	);
 }

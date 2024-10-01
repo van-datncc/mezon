@@ -1,18 +1,19 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
-import { useRef } from 'react';
+import { RefObject, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ListPinMessage from './ListPinMessage';
 
 type PinnedMessagesProps = {
 	onClose: () => void;
+	rootRef?: RefObject<HTMLElement>;
 };
 
-const PinnedMessages = ({ onClose }: PinnedMessagesProps) => {
+const PinnedMessages = ({ onClose, rootRef }: PinnedMessagesProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose, rootRef);
 
 	return (
 		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999] animate-scale_up origin-top-right">
