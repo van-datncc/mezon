@@ -80,7 +80,8 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 												setShowModal(true);
 												handleRoleClick(role.id);
 											}
-										: () => {}
+										: // eslint-disable-next-line @typescript-eslint/no-empty-function
+											() => {}
 								}
 							>
 								<Tooltip
