@@ -133,7 +133,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					<ActivityIndicator color={themeValue.white} />
 				)}
 
-				<ChannelBadgeUnread channelId={props.data?.channel_id} clanId={props.data?.clan_id} />
+				{!!isUnRead && <ChannelBadgeUnread channelId={props.data?.channel_id} clanId={props.data?.clan_id} />}
 			</TouchableOpacity>
 
 			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />}
