@@ -1,5 +1,5 @@
 import { AvatarImage, NavLinkComponent, SidebarTooltip } from '@mezon/components';
-import { directActions, selectDirectById, useAppDispatch, useAppSelector } from '@mezon/store';
+import { directActions, directMetaActions, messagesActions, selectDirectById, useAppDispatch, useAppSelector } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { NavLink, useNavigate } from 'react-router-dom';
 
@@ -20,17 +20,22 @@ function DirectUnreads({ countMessUnread, directId }: DirectMessUnreadProp) {
 				type: directMessage.type
 			})
 		);
-
+		const timestamp = Date.now() / 1000;
+		dispatch(messagesActions.setDirectMessageUnread({ directId: directId, message: [] }));
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
+		if (directMessage.active === undefined) {
+			dispatch(directActions.setActiveDirect({ directId: directId }));
+		}
 		navigate(`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`);
 	};
 	return (
-		<SidebarTooltip key={directMessage.id} titleTooltip={directMessage.channel_label}>
+		<SidebarTooltip key={directMessage.id} titleTooltip={directMessage?.channel_label}>
 			<NavLink to="#" onClick={handleClick}>
 				<NavLinkComponent>
 					<div>
 						<AvatarImage
-							alt={directMessage.usernames || ''}
-							userName={directMessage.usernames}
+							alt={directMessage?.usernames || ''}
+							userName={directMessage?.usernames}
 							className="min-w-12 min-h-12 max-w-12 max-h-12"
 							src={
 								directMessage.type === ChannelType.CHANNEL_TYPE_DM

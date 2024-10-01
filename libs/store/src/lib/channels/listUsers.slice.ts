@@ -35,7 +35,6 @@ export const fetchListUsersByUser = createAsyncThunk('usersByUser/fetchListUsers
 		return [];
 	}
 	const users = response?.users.map(mapUsersToEntity);
-	console.log('users', users);
 	return users;
 });
 

@@ -707,18 +707,6 @@ export const messagesSlice = createSlice({
 				});
 			}
 			const channelEntity = state.channelMessages[channelId];
-
-			if (
-				(mode === ChannelStreamMode.STREAM_MODE_DM && !isMe && !isCurrentChannel) ||
-				(mode === ChannelStreamMode.STREAM_MODE_GROUP && !isMe && !isCurrentChannel)
-			) {
-				console.log(action.payload);
-				if (state.directMessageUnread[channelId]) {
-					state.directMessageUnread[channelId].push(action.payload);
-				} else {
-					state.directMessageUnread[channelId] = [action.payload];
-				}
-			}
 			switch (code) {
 				case 0: {
 					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
@@ -927,10 +915,15 @@ export const messagesSlice = createSlice({
 			}
 		},
 
-		setDirectMessageUnread(state, action: PayloadAction<{ directId: string; message: ChannelMessage[] }>) {
+		setDirectMessageUnread(state, action: PayloadAction<{ directId: string; message: ChannelMessage[] | ChannelMessage }>) {
 			const { directId, message } = action.payload;
-			if (directId && message.length > 0) {
-				state.directMessageUnread[directId] = message;
+
+			if (directId) {
+				if (!Array.isArray(message)) {
+					state.directMessageUnread[directId] = [...(state.directMessageUnread[directId] || []), message];
+				} else {
+					state.directMessageUnread[directId] = message;
+				}
 			}
 		}
 	},

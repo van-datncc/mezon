@@ -10,12 +10,6 @@ import { useContext, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 
-// function removeUndefinedAndEmpty(obj: Record<string, DirectMetaEntity[]>) {
-// 	return Object.fromEntries(
-// 		Object.entries(obj).filter(([key, value]) => key !== 'undefined' && !(typeof value === 'object' && Object.keys(value).length === 0))
-// 	);
-// }
-
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
 	const navigate = useNavigate();

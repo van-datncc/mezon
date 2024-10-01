@@ -47,7 +47,6 @@ export const fetchRolesClan = createAsyncThunk(
 		if (repace) {
 			thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId ?? ''));
 		}
-		console.log('listRoles', response.roles.roles.map(mapRolesClanToEntity));
 		return response.roles.roles.map(mapRolesClanToEntity);
 	}
 );

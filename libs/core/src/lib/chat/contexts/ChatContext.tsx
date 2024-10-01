@@ -216,11 +216,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(directMetaActions.updateDMSocket(message));
 
 				const isClanView = currentClanId && currentClanId !== '0';
-				const isNotCurrentDirect = isClanView || !currentDirectId || (currentDirectId && !RegExp(currentDirectId).test(message?.channel_id));
+				const isFriendPageView = window.location.pathname === '/chat/direct/friends';
+				const isNotCurrentDirect =
+					isFriendPageView || isClanView || !currentDirectId || (currentDirectId && !RegExp(currentDirectId).test(message?.channel_id));
 				if (isNotCurrentDirect) {
 					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+					dispatch(messagesActions.setDirectMessageUnread({ directId: message.channel_id, message: message }));
 				}
 				if (mess.isMe) {
 					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));

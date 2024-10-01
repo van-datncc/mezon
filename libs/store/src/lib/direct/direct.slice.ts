@@ -258,6 +258,15 @@ export const directSlice = createSlice({
 		},
 		removeByDirectID: (state, action: PayloadAction<string>) => {
 			directAdapter.removeOne(state, action.payload);
+		},
+
+		setActiveDirect: (state, action: PayloadAction<{ directId: string }>) => {
+			directAdapter.updateOne(state, {
+				id: action.payload.directId,
+				changes: {
+					active: 1
+				}
+			});
 		}
 	},
 	extraReducers: (builder) => {

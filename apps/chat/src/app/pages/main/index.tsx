@@ -52,18 +52,14 @@ function MyApp() {
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
-	// const listUnreadDM = useSelector(selectDirectsUnreadlist);
-	// console.log('listUnreadDM :', listUnreadDM);
 
 	const allLastSeenChannelAllDirect = useSelector(selectAllDirectMetaMessages);
 	const getAllDirectMessageUnread = useSelector(selectAllDirectMessageByLastSeenTimestamp(allLastSeenChannelAllDirect));
 	const filterDirectUnread = removeUndefinedAndEmpty(getAllDirectMessageUnread);
-	console.log('filterDirectUnread :', filterDirectUnread);
 
 	const listUnreadDM = useMemo(() => {
 		return Object.entries(filterDirectUnread).map(([directId, messages]) => {
 			const lastSentMessage = messages[messages.length - 1];
-			// console.log('lastSentMessage :', lastSentMessage);
 			return {
 				id: directId,
 				length: messages.length,
@@ -71,8 +67,6 @@ function MyApp() {
 			};
 		});
 	}, [filterDirectUnread]);
-
-	console.log('unreadDMArray', listUnreadDM);
 
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
