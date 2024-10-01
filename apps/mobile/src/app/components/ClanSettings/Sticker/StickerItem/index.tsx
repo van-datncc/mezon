@@ -1,4 +1,4 @@
-import {  usePermissionChecker } from "@mezon/core";
+import { useClanRestriction } from "@mezon/core";
 import { Icons } from "@mezon/mobile-components";
 import { baseColor, size, useTheme } from "@mezon/mobile-ui";
 import { deleteSticker, updateSticker, useAppDispatch } from "@mezon/store";
@@ -39,12 +39,9 @@ export default function StickerSettingItem({ data, clanID }: IStickerItem) {
     const dispatch = useAppDispatch();
     const { t } = useTranslation(["clanStickerSetting"])
 	const currentUserId = useAppSelector(selectCurrentUserId);
-    
-    const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
-        EPermission.administrator,
-        EPermission.manageClan,
-        EPermission.clanOwner
-    ]);
+
+	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
+	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
     const hasDeleteOrEditPermission = useMemo(() => {
 		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === data.creator_id;
 	}, [hasAdminPermission, isClanOwner, hasManageClanPermission, currentUserId, data.creator_id]);

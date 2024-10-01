@@ -89,7 +89,6 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 	const handleClickOutside = useCallback(() => {
 		setIsShowPanelChannel(false);
 	}, []);
-	useOnClickOutside(mentionRef, handleClickOutside);
 
 	return (
 		<>
@@ -111,7 +110,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				<span
 					className={`font-medium px-0.1 rounded-sm 'cursor-text'
 					${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
-	
+
 					 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 				>
 					{displayToken.display}
@@ -120,7 +119,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 			{displayToken?.type === MentionType.USER_EXIST && (
 				<button
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
+					onClick={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
 					ref={mentionRef}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					style={{ textDecoration: 'none' }}
@@ -156,11 +155,12 @@ const UserProfilePopup = ({ userID, channelId, mode, isDm, positionShortUser, on
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
 	useEscapeKeyClose(panelRef, onClose);
+	useOnClickOutside(panelRef, onClose);
 
 	return (
 		<div
 			tabIndex={-1}
-			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out`}
+			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out animate-fly_in`}
 			style={{
 				top: `${positionShortUser?.top}px`,
 				left: `${positionShortUser?.left}px`

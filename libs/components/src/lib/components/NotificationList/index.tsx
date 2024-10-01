@@ -10,7 +10,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { INotification, NotificationEntity, sortNotificationsByDate } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FixedSizeList } from 'react-window';
 import EmptyNotification from './EmptyNotification';
@@ -21,6 +21,7 @@ export type MemberListProps = { className?: string };
 
 export type NotificationProps = {
 	unReadReplyAndMentionList: NotificationEntity[];
+	rootRef?: RefObject<HTMLElement>;
 };
 
 const InboxType = {
@@ -35,7 +36,7 @@ const tabDataNotify = [
 	{ title: 'Mentions', value: InboxType.MENTIONS }
 ];
 
-function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
+function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationProps) {
 	const dispatch = useDispatch();
 
 	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.INDIVIDUAL);
@@ -85,7 +86,7 @@ function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 	}, []);
 
 	useEscapeKeyClose(modalRef, handleHideInbox);
-	useOnClickOutside(modalRef, handleHideInbox);
+	useOnClickOutside(modalRef, handleHideInbox, rootRef);
 
 	return (
 		<div

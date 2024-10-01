@@ -1,4 +1,3 @@
-import { useOnClickOutside } from '@mezon/core';
 import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
@@ -66,8 +65,6 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 		setShowModal(true);
 		setIsShowPanelChannel(false);
 	};
-
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
 		<div

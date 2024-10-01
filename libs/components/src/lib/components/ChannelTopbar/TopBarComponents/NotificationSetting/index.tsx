@@ -13,12 +13,12 @@ import {
 import { ENotificationTypes, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
-import { useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { notiLabels, notificationTypesList } from '../../../PanelChannel';
 import ItemPanel from '../../../PanelChannel/ItemPanel';
 
-const NotificationSetting = ({ onClose }: { onClose: () => void }) => {
+const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRef?: RefObject<HTMLElement> }) => {
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -122,7 +122,7 @@ const NotificationSetting = ({ onClose }: { onClose: () => void }) => {
 	};
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose, rootRef);
 
 	return (
 		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999]">
