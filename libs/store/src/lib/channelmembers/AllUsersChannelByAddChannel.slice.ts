@@ -7,6 +7,8 @@ import { ChannelMembersEntity } from './channel.members';
 
 export const ALL_USERS_BY_ADD_CHANNEL = 'allUsersByAddChannel';
 
+const ADD_CHANNEL_USERS_CACHE_TIME = 1000 * 60 * 3;
+
 export interface UsersByAddChannelState extends EntityState<string, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
@@ -28,7 +30,7 @@ export const fetchUserChannelsCached = memoizeAndTrack(
 	},
 	{
 		promise: true,
-		maxAge: 1000 * 60 * 3,
+		maxAge: ADD_CHANNEL_USERS_CACHE_TIME,
 		normalizer: (args) => {
 			return args[2] + args[1] + args[0]?.session?.username || '';
 		}

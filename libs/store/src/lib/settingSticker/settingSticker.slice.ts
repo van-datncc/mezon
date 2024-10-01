@@ -8,6 +8,8 @@ import { memoizeAndTrack } from '../memoize';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
 
+const STICKER_CLAN_CACHE_TIME = 1000 * 60 * 3;
+
 export interface SettingClanStickerState extends EntityState<ClanSticker, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
@@ -36,7 +38,7 @@ export const fetchStickerByUserIdCached = memoizeAndTrack(
 	},
 	{
 		promise: true,
-		maxAge: 1000 * 60 * 3,
+		maxAge: STICKER_CLAN_CACHE_TIME,
 		normalizer: (args) => {
 			return args[0]?.session?.username || '';
 		}

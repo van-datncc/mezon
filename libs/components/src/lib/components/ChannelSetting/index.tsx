@@ -38,7 +38,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		dispatch(fetchWebhooks({ channelId: channel.channel_id as string, clanId: clanId }));
-		dispatch(fetchUserChannels({ channelId: channel.channel_id as string, noCache: false }));
+		dispatch(fetchUserChannels({ channelId: channel.channel_id as string }));
 	}, [channel.channel_id, dispatch]);
 
 	const closeMenu = useSelector(selectCloseMenu);
