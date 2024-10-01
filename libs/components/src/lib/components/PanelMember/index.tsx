@@ -12,6 +12,8 @@ import {
 	useSettingFooter
 } from '@mezon/core';
 import {
+	directMetaActions,
+	messagesActions,
 	selectAllRolesClan,
 	selectCurrentChannel,
 	selectCurrentClan,
@@ -22,8 +24,8 @@ import {
 import { ChannelMembersEntity, EPermission, EUserSettings } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
@@ -80,6 +82,7 @@ const PanelMember = ({
 	dataMemberCreate,
 	onOpenProfile
 }: PanelMemberProps) => {
+	const dispatch = useDispatch();
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -177,6 +180,15 @@ const PanelMember = ({
 	useEscapeKeyClose(panelRef, onClose);
 	useOnClickOutside(panelRef, onClose);
 
+	const handleMarkAsRead = useCallback(
+		(directId: string) => {
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
+			dispatch(messagesActions.setDirectMessageUnread({ directId: directId, message: [] }));
+		},
+		[dispatch]
+	);
+
 	return (
 		<div
 			ref={panelRef}
@@ -199,6 +211,7 @@ const PanelMember = ({
 			) : (
 				<>
 					<GroupPanelMember>
+						<ItemPanelMember children="Mark As Read" onClick={() => handleMarkAsRead(directMessageValue?.dmID ?? '')} />
 						<ItemPanelMember children="Profile" onClick={handleOpenProfile} />
 						{directMessageValue ? (
 							checkDm && <ItemPanelMember children="Call" />
