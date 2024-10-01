@@ -110,8 +110,7 @@ const persistedMessageReducer = persistReducer(
 	{
 		key: 'messages',
 		storage,
-		blacklist: ['typingUsers', 'isSending'],
-		transforms: [transformJumpingError]
+		blacklist: ['typingUsers', 'isSending']
 	},
 	messagesReducer
 );
@@ -261,7 +260,8 @@ const persistedChannelMetaReducer = persistReducer(
 const persistedsettingClanStickerReducer = persistReducer(
 	{
 		key: 'settingSticker',
-		storage
+		storage,
+		blacklist: ['hasGrandchildModal']
 	},
 	settingStickerReducer
 );

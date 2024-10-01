@@ -4,7 +4,7 @@ import { Icons, InputField } from '@mezon/ui';
 import { GROUP_CHAT_MAXIMUM_MEMBERS } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import EmptySearchFriends from './EmptySearchFriends';
@@ -14,11 +14,12 @@ type CreateMessageGroupProps = {
 	onClose: () => void;
 	classNames?: string;
 	currentDM?: DirectEntity;
+	rootRef?: RefObject<HTMLElement>;
 };
 
 const ITEM_HEIGHT = 40;
 
-const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGroupProps) => {
+const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateMessageGroupProps) => {
 	const dispatch = useAppDispatch();
 	const { navigate, toDmGroupPage } = useAppNavigation();
 	const friends = useSelector(selectAllFriends);
@@ -199,7 +200,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM }: CreateMessageGro
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose, rootRef);
 
 	return (
 		<div

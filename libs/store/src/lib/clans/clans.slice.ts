@@ -100,7 +100,7 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 		if (!response.clandesc) {
 			return [];
 		}
-		thunkAPI.dispatch(fetchListChannelsByUser());
+		thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 		const clans = response.clandesc.map(mapClanToEntity);
 		const meta = clans.map((clan) => extractClanMeta(clan));
 		thunkAPI.dispatch(clansActions.updateBulkClanMetadata(meta));
