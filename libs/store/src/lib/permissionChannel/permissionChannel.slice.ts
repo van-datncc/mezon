@@ -27,7 +27,7 @@ export const addChannelUsers = createAsyncThunk(
 				repace: true
 			};
 			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
-			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
+			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId, noCache: true }));
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();
@@ -62,7 +62,7 @@ export const removeChannelUsers = createAsyncThunk(
 					repace: true
 				};
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
-				thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
+				thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId, noCache: true }));
 			}
 			return response;
 		} catch (error: any) {
