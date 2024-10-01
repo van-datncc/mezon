@@ -24,7 +24,7 @@ const Setting = ({ isDM }: settingProps) => {
 		setIsShowSettingFooterStatus(false);
 		setIsShowSettingFooterInitTab('Account');
 		setIsUserProfile(true);
-	}, [isShowSettingFooter.status]);
+	}, [isShowSettingFooter?.status]);
 
 	useEffect(() => {
 		setCurrentSetting(isShowSettingFooter?.initTab || 'Account');
