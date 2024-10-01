@@ -32,7 +32,6 @@ export const style = (colors: Attributes) =>
 			paddingLeft: size.s_6,
 			paddingTop: size.s_2,
 			paddingBottom: size.s_6,
-			top: size.s_16,
 			borderRadius: size.s_10,
 			marginBottom: size.s_6
 		},
@@ -65,7 +64,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			borderRadius: size.s_18,
-			top: size.s_14
+			top: -size.s_2
 		},
 
 		channelDot: {

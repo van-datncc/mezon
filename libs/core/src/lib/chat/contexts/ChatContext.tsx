@@ -217,11 +217,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(directMetaActions.updateDMSocket(message));
 
 				const isClanView = currentClanId && currentClanId !== '0';
-				const isNotCurrentDirect = isClanView || !currentDirectId || (currentDirectId && !RegExp(currentDirectId).test(message?.channel_id));
+				const isFriendPageView = window.location.pathname === '/chat/direct/friends';
+				const isNotCurrentDirect =
+					isFriendPageView || isClanView || !currentDirectId || (currentDirectId && !RegExp(currentDirectId).test(message?.channel_id));
 				if (isNotCurrentDirect) {
 					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+					dispatch(messagesActions.setDirectMessageUnread({ directId: message.channel_id, message: message }));
 				}
 				if (mess.isMe) {
 					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
@@ -946,45 +949,45 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => { };
+			socket.onchannelmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => { };
+			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => { };
+			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => { };
+			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => { };
+			socket.oncustomstatus = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => { };
+			socket.onstatuspresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => { };
+			socket.ondisconnect = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => { };
+			socket.onuserchannelremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => { };
+			socket.onuserclanremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclandeleted = () => { };
+			socket.onclandeleted = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => { };
+			socket.onuserchanneladded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => { };
+			socket.onuserclanadded = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickercreated = () => { };
+			socket.onstickercreated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oneventemoji = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstickerdeleted = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerupdated = () => { };
+			socket.onstickerupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => { };
+			socket.onclanprofileupdated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncoffeegiven = () => { };
+			socket.oncoffeegiven = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onroleevent = () => { };
+			socket.onroleevent = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -1047,4 +1050,3 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 const ChatContextConsumer = ChatContext.Consumer;
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-

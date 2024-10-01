@@ -1,6 +1,7 @@
-import { useEscapeKeyClose } from '@mezon/core';
+import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
 import { fetchWebhooks, selectCloseMenu, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DeleteClanModal from '../DeleteClanModal';
@@ -31,6 +32,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 		setCurrentSettingId(settingItem.id);
 	};
 
+	const [canManageClan] = usePermissionChecker([EPermission.manageClan]);
+
 	const [menu, setMenu] = useState(true);
 	const closeMenu = useSelector(selectCloseMenu);
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
@@ -57,8 +60,10 @@ const ClanSetting = (props: ModalSettingProps) => {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId) as string;
 	useEffect(() => {
-		dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
-	});
+		if (canManageClan) {
+			dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
+		}
+	}, [canManageClan, currentClanId, dispatch]);
 
 	useEffect(() => {
 		if (currentSettingId === ItemSetting.DELETE_SERVER) {

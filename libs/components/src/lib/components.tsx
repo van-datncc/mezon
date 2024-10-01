@@ -1,4 +1,4 @@
-export { default as ChannelLink } from './components/ChannelLink';
+export { default as ChannelLink, Coords } from './components/ChannelLink';
 export { default as ChannelList } from './components/ChannelList';
 export { default as ChannelTopbar } from './components/ChannelTopbar';
 export { default as ThreadHeader } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/ThreadHeader';
@@ -44,9 +44,9 @@ export { default as MessageModalImage } from './components/MessageWithUser/Messa
 export { default as MessageReaction } from './components/MessageWithUser/MessageReaction/MessageReaction';
 export { default as ReactionBottom } from './components/MessageWithUser/MessageReaction/ReactionBottom';
 export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
-export { default as ModalNotificationSetting } from './components/notificationSetting';
 export { default as SearchModal } from './components/SearchModal';
 export { default as ToastController } from './components/ToastController/ToastController';
+export { default as ModalNotificationSetting } from './components/notificationSetting';
 
 export { Icons } from '@mezon/ui';
 export * from './components/AvatarImage/AvatarImage';
@@ -80,6 +80,7 @@ export * from './components/Firebase/firebase';
 
 export { AnchorScroll } from './components/AnchorScroll/AnchorScroll';
 export { default as ModalDeleteMess } from './components/DeleteMessageModal/ModalDeleteMess';
+export { default as ModalRemoveMemberClan } from './components/MemberProfile/ModalRemoveMemberClan';
 export { default as useProcessMention } from './components/MessageBox/ReactionMentionInput/useProcessMention';
+export { default as PanelMember } from './components/PanelMember';
 export * from './components/ThumbnailAttachmentRender';
-

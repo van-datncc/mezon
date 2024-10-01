@@ -1,6 +1,6 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
-import { Colors, size, Text, useTheme } from '@mezon/mobile-ui';
+import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { messagesActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
 import { MezonAvatar } from 'apps/mobile/src/app/temp-ui';
