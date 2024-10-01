@@ -22,13 +22,9 @@ const GlobalEventListener = () => {
 	const filterDirectUnread = removeUndefinedAndEmpty(getAllDirectMessageUnread);
 
 	const allCountDirectUnread = useMemo(() => {
-		let length = 0;
-
-		for (const key in filterDirectUnread) {
-			if (key !== 'undefined') {
-				length += filterDirectUnread[key].length;
-			}
-		}
+		const length = Object.keys(filterDirectUnread)
+			.filter((key) => key !== 'undefined')
+			.reduce((acc, key) => acc + filterDirectUnread[key].length, 0);
 
 		return length;
 	}, [filterDirectUnread]);
