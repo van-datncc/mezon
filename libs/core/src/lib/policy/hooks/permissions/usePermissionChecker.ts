@@ -43,8 +43,6 @@ function usePermissionChecker(permissions: string[], channelId?: string) {
 				return overriddenPermissions[permission as unknown as EOverriddenPermission];
 			}
 
-			console.log({ maxPermissionLevel, permissionLevels });
-
 			// If user's max permission level is not defined, return false
 			if (Number.isNaN(maxPermissionLevel)) {
 				return false;

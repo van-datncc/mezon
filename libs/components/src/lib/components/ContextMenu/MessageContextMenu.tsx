@@ -286,7 +286,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 
 	const enableDelMessageItem = useMemo(() => {
 		if (!checkPos) return false;
-		console.log({ type, activeMode, canDeleteMessage });
 		if (isMyMessage) {
 			return true;
 		}
