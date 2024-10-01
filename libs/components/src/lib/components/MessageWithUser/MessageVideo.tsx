@@ -5,10 +5,11 @@ import { Icons } from '../../components';
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
 };
+export const MIN_WIDTH_VIDEO_SHOW = 162;
 
 function MessageVideo({ attachmentData }: MessageImage) {
 	const handleOnCanPlay = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-		if (e.currentTarget.offsetWidth < 162) {
+		if (e.currentTarget.offsetWidth < MIN_WIDTH_VIDEO_SHOW) {
 			setShowControl(false);
 		}
 	};
@@ -33,7 +34,7 @@ function MessageVideo({ attachmentData }: MessageImage) {
 				src={attachmentData.url}
 				controls={showControl}
 				autoPlay={false}
-				className={`${showControl ? 'max-w-full h-[150px]' : 'w-[162px] h-auto'} object-contain`}
+				className={`${showControl ? 'max-w-full h-[150px]' : `w-[${MIN_WIDTH_VIDEO_SHOW}px] h-auto`} object-contain`}
 				ref={videoRef}
 				onCanPlay={(e) => handleOnCanPlay(e)}
 				onClick={(e) => handleTogglePlay(e)}
