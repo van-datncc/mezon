@@ -26,7 +26,7 @@ import {
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import GroupPanels from './GroupPanels';
@@ -38,6 +38,7 @@ type PanelChannel = {
 	onDeleteChannel: () => void;
 	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
+	rootRef?: RefObject<HTMLElement>;
 };
 
 const typeChannel = {
@@ -65,7 +66,7 @@ export const notificationTypesList = [
 	}
 ];
 
-const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel }: PanelChannel) => {
+const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel, rootRef }: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -196,7 +197,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
-	// useOnClickOutside(panelRef, handClosePannel);
+	useOnClickOutside(panelRef, handClosePannel, rootRef);
 
 	const handleOpenCreateChannelModal = () => {
 		dispatch(channelsActions.setCurrentCategory(currentCategory));
