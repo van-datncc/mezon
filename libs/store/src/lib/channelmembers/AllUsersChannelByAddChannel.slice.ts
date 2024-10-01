@@ -45,7 +45,7 @@ export const fetchUserChannels = createAsyncThunk(
 				fetchUserChannelsCached.clear(mezon, channelId, 500);
 			}
 
-			const response = await mezon.client.listUsersAddChannelByChannelId(mezon.session, channelId, 500);
+			const response = await fetchUserChannelsCached(mezon, channelId, 500);
 
 			if (response) {
 				return response ?? [];

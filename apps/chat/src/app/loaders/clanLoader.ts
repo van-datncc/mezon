@@ -12,7 +12,7 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	if (!clanId) {
 		throw new Error('Clan ID null');
 	}
-	dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true }));
+	dispatch(emojiSuggestionActions.fetchEmoji({ noCache: false }));
 	dispatch(clansActions.joinClan({ clanId }));
 	dispatch(clansActions.changeCurrentClan({ clanId }));
 	dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));

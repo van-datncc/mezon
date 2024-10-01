@@ -58,7 +58,7 @@ export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ noCache 
 	if (noCache) {
 		fetchEmojiCached.clear(mezon);
 	}
-	const response = await mezon.client.getListEmojisByUserId(mezon.session);
+	const response = await fetchEmojiCached(mezon);
 
 	if (!response?.emoji_list) {
 		throw new Error('Emoji list is undefined or null');

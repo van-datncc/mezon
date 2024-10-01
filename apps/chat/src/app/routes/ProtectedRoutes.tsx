@@ -10,7 +10,7 @@ const ProtectedRoutes = () => {
 	const isLogin = isLoginLoader && isLoginStore;
 	const dispatch = useAppDispatch();
 	useEffect(() => {
-		dispatch(stickerSettingActions.fetchStickerByUserId({ noCache: true }));
+		dispatch(stickerSettingActions.fetchStickerByUserId({ noCache: false }));
 	}, [dispatch]);
 	if (!isLogin) {
 		return <Navigate to={redirect || '/guess/login'} replace />;

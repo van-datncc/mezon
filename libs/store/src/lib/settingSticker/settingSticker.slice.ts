@@ -31,7 +31,7 @@ export const initialSettingClanStickerState: SettingClanStickerState = stickerAd
 
 export const fetchStickerByUserIdCached = memoizeAndTrack(
 	async (mezon: MezonValueContext) => {
-		const response = await mezon.client.getListEmojisByUserId(mezon.session);
+		const response = await mezon.client.getListStickersByUserId(mezon.session);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -48,7 +48,11 @@ export const fetchStickerByUserId = createAsyncThunk(
 	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.getListStickersByUserId(mezon.session);
+			if (noCache) {
+				fetchStickerByUserIdCached.clear(mezon);
+			}
+
+			const response = await fetchStickerByUserIdCached(mezon);
 
 			if (response) {
 				return response.stickers ?? [];
