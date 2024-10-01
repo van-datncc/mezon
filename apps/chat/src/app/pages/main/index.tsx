@@ -42,6 +42,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import ChannelStream from '../channel/ChannelStream';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
+import DirectUnreads from './directUnreads';
 
 function MyApp() {
 	const elementHTML = document.documentElement;
@@ -71,7 +72,7 @@ function MyApp() {
 		});
 	}, [filterDirectUnread]);
 
-	// console.log('unreadDMArray', listUnreadDM);
+	console.log('unreadDMArray', listUnreadDM);
 
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -236,19 +237,17 @@ function MyApp() {
 								</NavLinkComponent>
 							</NavLink>
 						</SidebarTooltip>
-						{/* {listUnreadDM?.length &&
+						{listUnreadDM?.length &&
 							listUnreadDM.map(
 								(dmGroupChatUnread) =>
 									dmGroupChatUnread?.senderLastMessage !== userId && (
-										<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={'a'}>
-											<DirectUnreads
-												key={dmGroupChatUnread.id}
-												directMessage={dmGroupChatUnread}
-												countMessUnread={dmGroupChatUnread.length}
-											/>
-										</SidebarTooltip>
+										<DirectUnreads
+											key={dmGroupChatUnread.id}
+											directId={dmGroupChatUnread.id}
+											countMessUnread={dmGroupChatUnread.length}
+										/>
 									)
-							)} */}
+							)}
 					</div>
 					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
 					<div className="flex flex-col gap-3 ">
