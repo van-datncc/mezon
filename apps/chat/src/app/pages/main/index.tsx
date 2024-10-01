@@ -237,7 +237,7 @@ function MyApp() {
 								</NavLinkComponent>
 							</NavLink>
 						</SidebarTooltip>
-						{listUnreadDM?.length &&
+						{listUnreadDM?.length > 0 &&
 							listUnreadDM.map(
 								(dmGroupChatUnread) =>
 									dmGroupChatUnread?.senderLastMessage !== userId && (

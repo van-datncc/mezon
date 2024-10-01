@@ -1,6 +1,5 @@
 import { AvatarImage, NavLinkComponent, SidebarTooltip } from '@mezon/components';
-import { directActions, selectDirectById, useAppDispatch } from '@mezon/store';
-import { useAppSelector } from '@mezon/store-mobile';
+import { directActions, selectDirectById, useAppDispatch, useAppSelector } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { NavLink, useNavigate } from 'react-router-dom';
 
