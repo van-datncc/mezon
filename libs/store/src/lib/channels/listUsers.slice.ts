@@ -30,11 +30,12 @@ export interface ListUsersRootState {
 export const fetchListUsersByUser = createAsyncThunk('usersByUser/fetchListUsersByUser', async (_, thunkAPI) => {
 	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-	const response = await mezon.socketRef.current?.listUserClansByUserId();
-	if (!response?.user) {
+	const response = await mezon.client.listUserClansByUserId(mezon.session);
+	if (!response?.users) {
 		return [];
 	}
-	const users = response?.user.map(mapUsersToEntity);
+	const users = response?.users.map(mapUsersToEntity);
+	console.log('users', users);
 	return users;
 });
 

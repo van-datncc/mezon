@@ -40,13 +40,14 @@ export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
 	async ({ clanId, repace = false, channelId }: GetRolePayload, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const response = await mezon.socketRef.current?.listRoles(clanId || '', 500, 1, '');
+		const response = await mezon.client.listRoles(mezon.session, clanId || '', '500', '1', '');
 		if (!response?.roles?.roles) {
 			return [];
 		}
 		if (repace) {
 			thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId ?? ''));
 		}
+		console.log('listRoles', response.roles.roles.map(mapRolesClanToEntity));
 		return response.roles.roles.map(mapRolesClanToEntity);
 	}
 );

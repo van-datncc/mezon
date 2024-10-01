@@ -7,6 +7,7 @@ import {
 	useEscapeKeyClose,
 	useFriends,
 	useMessageValue,
+	useOnClickOutside,
 	usePermissionChecker,
 	useSettingFooter
 } from '@mezon/core';
@@ -174,6 +175,7 @@ const PanelMember = ({
 	};
 
 	useEscapeKeyClose(panelRef, onClose);
+	useOnClickOutside(panelRef, onClose);
 
 	return (
 		<div

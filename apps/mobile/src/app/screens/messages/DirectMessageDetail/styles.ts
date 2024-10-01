@@ -51,8 +51,8 @@ export const style = (colors: Attributes) =>
 		},
 		statusCircle: {
 			position: 'absolute',
-			width: size.s_10,
-			height: size.s_10,
+			width: size.s_12,
+			height: size.s_12,
 			borderRadius: 10,
 			bottom: 0,
 			right: -2,
