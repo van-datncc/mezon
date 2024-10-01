@@ -1,7 +1,7 @@
 import { IChannelUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelDescription } from 'mezon-js';
-import { MezonValueContext, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
 export const LIST_CHANNELS_USER_FEATURE_KEY = 'listchannelbyusers';
@@ -45,7 +45,7 @@ export const fetchListChannelsByUserCached = memoizeAndTrack(
 export const fetchListChannelsByUser = createAsyncThunk(
 	'channelsByUser/fetchListChannelsByUser',
 	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
 			fetchListChannelsByUserCached.clear(mezon);
 		}
