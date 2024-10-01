@@ -1,4 +1,4 @@
-import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
+import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
@@ -188,7 +188,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 
 	const [canManageThread, canManageChannel] = usePermissionChecker(
 		[EOverriddenPermission.manageThread, EPermission.manageChannel],
-		currentChannelId ?? ''
+		channel?.channel_id ?? ''
 	);
 
 	const handClosePannel = useCallback(() => {
@@ -196,7 +196,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
-	useOnClickOutside(panelRef, handClosePannel);
+	// useOnClickOutside(panelRef, handClosePannel);
 
 	const handleOpenCreateChannelModal = () => {
 		dispatch(channelsActions.setCurrentCategory(currentCategory));
