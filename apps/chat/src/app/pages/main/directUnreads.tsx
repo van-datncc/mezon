@@ -23,7 +23,7 @@ function DirectUnreads({ countMessUnread, directId }: DirectMessUnreadProp) {
 		const timestamp = Date.now() / 1000;
 		dispatch(messagesActions.setDirectMessageUnread({ directId: directId, message: [] }));
 		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
-		if (directMessage.active === undefined) {
+		if (!directMessage?.active) {
 			dispatch(directActions.setActiveDirect({ directId: directId }));
 		}
 		navigate(`/chat/direct/message/${directMessage.channel_id}/${directMessage.type}`);
@@ -38,7 +38,7 @@ function DirectUnreads({ countMessUnread, directId }: DirectMessUnreadProp) {
 							userName={directMessage?.usernames}
 							className="min-w-12 min-h-12 max-w-12 max-h-12"
 							src={
-								directMessage.type === ChannelType.CHANNEL_TYPE_DM
+								directMessage?.type === ChannelType.CHANNEL_TYPE_DM
 									? directMessage?.channel_avatar?.at(0)
 									: 'assets/images/avatar-group.png'
 							}

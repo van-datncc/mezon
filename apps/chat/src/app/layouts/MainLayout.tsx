@@ -59,7 +59,7 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = allNotificationReplyMentionAllClan.length + allCountDirectUnread + quantityPendingRequest;
+		const notificationCount = allNotificationReplyMentionAllClan?.length ?? 0 + allCountDirectUnread + quantityPendingRequest;
 
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
@@ -74,7 +74,7 @@ const GlobalEventListener = () => {
 				document.title = 'Mezon';
 			}
 		}
-	}, [allNotificationReplyMentionAllClan.length, allCountDirectUnread, quantityPendingRequest, hasUnreadChannel]);
+	}, [allNotificationReplyMentionAllClan?.length ?? 0, allCountDirectUnread, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };

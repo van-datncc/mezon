@@ -10,9 +10,11 @@ import {
 } from '@mezon/components';
 import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	accountActions,
 	clansActions,
 	getIsShowPopupForward,
 	selectAllClans,
+	selectAllDirectMessageByLastSeenTimestamp,
 	selectAllDirectMetaMessages,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -23,15 +25,12 @@ import {
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
 	selectStatusMenu,
-	selectTheme
-} from '@mezon/store';
-import {
-	accountActions,
-	selectAllDirectMessageByLastSeenTimestamp,
 	selectStreamChannelByChannelId,
 	selectStreamMembersByChannelId,
+	selectTheme,
 	useAppDispatch
-} from '@mezon/store-mobile';
+} from '@mezon/store';
+
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, removeUndefinedAndEmpty } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
