@@ -47,7 +47,7 @@ export const fetchEmojiCached = memoizeAndTrack(
 	},
 	{
 		promise: true,
-		maxAge: 1000 * 60 * 3,
+		maxAge: EMOJI_SUGGESTION_CACHE_TIME,
 		normalizer: (args) => {
 			return args[0]?.session?.username || '';
 		}
