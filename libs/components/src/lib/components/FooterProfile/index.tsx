@@ -1,4 +1,4 @@
-import { useAuth, useMemberCustomStatus, useOnClickOutside, useSettingFooter } from '@mezon/core';
+import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelMembersActions,
@@ -37,12 +37,9 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const appearanceTheme = useSelector(selectTheme);
 	const userProfile = useSelector(selectAllAccount);
-	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '').status;
-	/// TODo dây có custom r
+	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '{}')?.status;
 	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
-
-	const profileRef = useRef<HTMLDivElement | null>(null);
 
 	const checkTypeChannel = channelCurrent?.type === ChannelType.CHANNEL_TYPE_VOICE;
 
@@ -54,10 +51,6 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 
 	const handleClickFooterProfile = () => {
 		dispatch(userClanProfileActions.setShowModalFooterProfile(!showModalFooterProfile));
-	};
-
-	const handleCloseModalFooterProfile = () => {
-		dispatch(userClanProfileActions.setShowModalFooterProfile(false));
 	};
 
 	const handleCloseModalCustomStatus = () => {
@@ -74,26 +67,23 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 		handleCloseModalCustomStatus();
 	};
 
-	useOnClickOutside(profileRef, handleCloseModalFooterProfile);
-
 	const myProfile = useAuth();
 	const isMe = useMemo(() => {
 		return userId === myProfile.userId;
 	}, [myProfile.userId, userId]);
 
+	const rootRef = useRef<HTMLButtonElement>(null);
+
 	return (
 		<>
 			<button
+				ref={rootRef}
 				className={`flex items-center justify-between px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
 			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
-				<div
-					className={`footer-profile min-w-[142px] ${appearanceTheme === 'light' && 'lightMode'}`}
-					ref={profileRef}
-					onClick={handleClickFooterProfile}
-				>
+				<div className={`footer-profile min-w-[142px] ${appearanceTheme === 'light' && 'lightMode'}`} onClick={handleClickFooterProfile}>
 					<div className="pointer-events-none">
 						<MemberProfile
 							name={name}
@@ -106,7 +96,14 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 						/>
 					</div>
 					{showModalFooterProfile && (
-						<ModalFooterProfile userId={userId ?? ''} avatar={avatar} name={name} isDM={isDM} userStatusProfile={userStatusProfile} />
+						<ModalFooterProfile
+							userId={userId ?? ''}
+							avatar={avatar}
+							name={name}
+							isDM={isDM}
+							userStatusProfile={userStatusProfile}
+							rootRef={rootRef}
+						/>
 					)}
 				</div>
 				<div className="flex items-center gap-2">

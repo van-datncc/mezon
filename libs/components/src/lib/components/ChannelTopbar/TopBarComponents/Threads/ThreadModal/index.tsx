@@ -3,7 +3,7 @@ import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, select
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { useMemo, useRef } from 'react';
+import { RefObject, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -13,9 +13,10 @@ import ThreadItem from './ThreadItem';
 
 type ThreadsProps = {
 	onClose: () => void;
+	rootRef?: RefObject<HTMLElement>;
 };
 
-const ThreadModal = ({ onClose }: ThreadsProps) => {
+const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
@@ -42,10 +43,14 @@ const ThreadModal = ({ onClose }: ThreadsProps) => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose, rootRef);
 
 	return (
-		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-[99999999]">
+		<div
+			ref={modalRef}
+			tabIndex={-1}
+			className="absolute top-8 right-0 rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-[99999999] animate-scale_up origin-top-right"
+		>
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] max-h-[80vh] lg:w-[540px]  shadow-sm overflow-hidden">
 				<div className="dark:bg-bgTertiary bg-bgLightTertiary flex flex-row items-center justify-between p-[16px] h-12">
 					<div className="flex flex-row items-center border-r-[1px] dark:border-r-[#6A6A6A] border-r-[#E1E1E1] pr-[16px] gap-4">

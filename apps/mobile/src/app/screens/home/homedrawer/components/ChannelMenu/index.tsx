@@ -1,5 +1,5 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCategory, useUserPermission } from '@mezon/core';
+import { useCategory, usePermissionChecker } from '@mezon/core';
 import {
 	ENotificationActive,
 	ENotificationChannelId,
@@ -20,7 +20,7 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelThreads } from '@mezon/utils';
+import { ChannelThreads, EOverriddenPermission, EPermission } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +45,10 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useAppDispatch();
-	const { isCanManageThread, isCanManageChannel } = useUserPermission();
+	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
+		[EOverriddenPermission.manageThread, EPermission.manageChannel],
+		channel?.channel_id ?? ''
+	);
 	const { categorizedChannels } = useCategory();
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));

@@ -1,5 +1,5 @@
 import { AvatarImage, ShortUserProfile } from '@mezon/components';
-import { useChannelMembersActions, useOnClickOutside } from '@mezon/core';
+import { useChannelMembersActions } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType, MouseButton } from '@mezon/utils';
@@ -142,13 +142,6 @@ function MemberProfile({
 			setOpenModalRemoveMember(false);
 		}
 	};
-
-	const handleClickOutSide = useCallback(() => {
-		closeModal(ModalType.ProfileItem);
-		closeModal(ModalType.PannelMember);
-	}, []);
-
-	useOnClickOutside(panelRef, handleClickOutSide);
 
 	const isFooter = useMemo(() => positionType === MemberProfileType.FOOTER_PROFILE, [positionType]);
 

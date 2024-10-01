@@ -1,4 +1,4 @@
-import { useEscapeKeyClose } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
@@ -34,6 +34,7 @@ const ShortUserProfile = ({ userID, message, mode, positionType, avatar, name, c
 	}, [coords?.distanceToBottom]);
 
 	useEscapeKeyClose(profileRef, closeProfileItem);
+	useOnClickOutside(profileRef, closeProfileItem);
 
 	return (
 		<div

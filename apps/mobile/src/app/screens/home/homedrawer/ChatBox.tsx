@@ -52,44 +52,44 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	}, []);
 
 	return (
-		<Block>
-			{canSendMessage || isDM ? (
-				<Block
-					backgroundColor={themeValue.secondary}
-					borderTopWidth={1}
-					borderTopColor={themeValue.border}
-					flexDirection="column"
-					justifyContent="space-between"
-				>
-					{messageActionNeedToResolve && (
-						<ActionMessageSelected
-							messageActionNeedToResolve={messageActionNeedToResolve}
-							onClose={() => setMessageActionNeedToResolve(null)}
-						/>
-					)}
-					<ChatBoxBottomBar
+		<Block paddingBottom={size.s_10}>
+			<Block
+				backgroundColor={themeValue.secondary}
+				borderTopWidth={1}
+				borderTopColor={themeValue.border}
+				flexDirection="column"
+				justifyContent="space-between"
+			>
+				{messageActionNeedToResolve && (
+					<ActionMessageSelected
 						messageActionNeedToResolve={messageActionNeedToResolve}
-						onDeleteMessageActionNeedToResolve={deleteMessageActionNeedToResolve}
-						channelId={props?.channelId}
-						mode={props?.mode}
-						hiddenIcon={props?.hiddenIcon}
-						messageAction={props?.messageAction}
-						onShowKeyboardBottomSheet={props?.onShowKeyboardBottomSheet}
+						onClose={() => setMessageActionNeedToResolve(null)}
 					/>
-				</Block>
-			) : (
-				<Block>
-					<Block backgroundColor={themeValue.charcoal} padding={size.s_12} borderRadius={size.s_20} marginHorizontal={size.s_10}>
-						<Text
-							style={{
-								color: themeValue.textDisabled
-							}}
-						>
-							{t('noSendMessagePermission')}
-						</Text>
+				)}
+				{!canSendMessage && !isDM && (
+					<Block position={'absolute'} zIndex={10} width={'100%'} top={size.s_8} left={-1}>
+						<Block backgroundColor={themeValue.charcoal} padding={size.s_16} borderRadius={size.s_20} marginHorizontal={size.s_6}>
+							<Text
+								style={{
+									color: themeValue.textDisabled
+								}}
+							>
+								{t('noSendMessagePermission')}
+							</Text>
+						</Block>
 					</Block>
-				</Block>
-			)}
+				)}
+
+				<ChatBoxBottomBar
+					messageActionNeedToResolve={messageActionNeedToResolve}
+					onDeleteMessageActionNeedToResolve={deleteMessageActionNeedToResolve}
+					channelId={props?.channelId}
+					mode={props?.mode}
+					hiddenIcon={props?.hiddenIcon}
+					messageAction={props?.messageAction}
+					onShowKeyboardBottomSheet={props?.onShowKeyboardBottomSheet}
+				/>
+			</Block>
 		</Block>
 	);
 });

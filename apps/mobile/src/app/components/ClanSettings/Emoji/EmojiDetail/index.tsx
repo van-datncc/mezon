@@ -1,11 +1,11 @@
-import { useClanRestriction } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
-import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
+import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, selectCurrentUserId, selectMemberClanByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { ClanEmoji } from 'mezon-js';
 import { MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
-import { forwardRef, Ref, useMemo, useRef, useState } from 'react';
+import { Ref, forwardRef, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -30,8 +30,11 @@ const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps, ref: R
 	const [isFocused, setIsFocused] = useState(false);
 	const textInputRef = useRef<TextInput>(null);
 	const currentUserId = useAppSelector(selectCurrentUserId);
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasManageClanPermission] = useClanRestriction([EPermission.manageClan]);
+	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
 	const hasDeleteOrEditPermission = useMemo(() => {
 		return hasAdminPermission || isClanOwner || hasManageClanPermission || currentUserId === item.creator_id;
 	}, [hasAdminPermission, isClanOwner, hasManageClanPermission, currentUserId, item.creator_id]);

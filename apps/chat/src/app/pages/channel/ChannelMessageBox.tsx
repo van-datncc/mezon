@@ -60,16 +60,16 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
 
-	const handleCloseReplyMessageBox = () => {
+	const handleCloseReplyMessageBox = useCallback(() => {
 		dispatch(
 			referencesActions.setDataReferences({
 				channelId: channelId ?? '',
 				dataReferences: blankReferenceObj
 			})
 		);
-	};
+	}, [dataReferences.message_ref_id]);
 
-	useEscapeKey(handleCloseReplyMessageBox);
+	useEscapeKey(handleCloseReplyMessageBox, { preventEvent: !dataReferences.message_ref_id });
 	return (
 		<div className="mx-4 relative" role="button" ref={chatboxRef}>
 			{isEmojiOnChat && (
@@ -77,7 +77,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					onClick={(e) => {
 						e.stopPropagation();
 					}}
-					className={`right-[2px] absolute z-10`}
+					className={`right-[2px] absolute z-10 animate-scale_up origin-bottom-right`}
 					style={{
 						bottom: chatboxRef.current ? `${chatboxRef.current.offsetHeight}px` : ''
 					}}
