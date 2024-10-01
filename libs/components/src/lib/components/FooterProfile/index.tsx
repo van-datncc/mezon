@@ -37,8 +37,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const appearanceTheme = useSelector(selectTheme);
 	const userProfile = useSelector(selectAllAccount);
-	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '').status;
-	/// TODo dây có custom r
+	const userStatusProfile = JSON.parse(userProfile?.user?.metadata || '{}')?.status;
 	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 
