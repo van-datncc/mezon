@@ -1,4 +1,4 @@
-import { size, useTheme } from '@mezon/mobile-ui';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
 import { ChannelThreads } from '@mezon/utils';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -37,7 +37,15 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 	return (
 		<View key={thread.id} style={[styles.channelListLink]}>
 			<View style={[styles.threadItem]}>
-				{isFirstThread ? <ShortCornerIcon width={size.s_12} height={size.s_12} /> : <LongCornerIcon width={size.s_12} height={size.s_36} />}
+				{isFirstThread ? (
+					<Block top={-size.s_14}>
+						<ShortCornerIcon width={size.s_12} height={size.s_16} />
+					</Block>
+				) : (
+					<Block top={-size.s_20}>
+						<LongCornerIcon width={size.s_12} height={size.s_36} />
+					</Block>
+				)}
 				<TouchableOpacity
 					style={[
 						styles.boxThread,
@@ -59,8 +67,8 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 				</TouchableOpacity>
 			</View>
 
-			{numberNotification > 0 && (
-				<View style={[styles.channelDotWrapper, isFirstThread && { top: size.s_4 }]}>
+			{numberNotification > 0 && isUnReadChannel && (
+				<View style={[styles.channelDotWrapper]}>
 					<Text style={styles.channelDot}>{numberNotification}</Text>
 				</View>
 			)}
