@@ -1,4 +1,4 @@
-import { useAppParams, useChatReaction, useClanRestriction, useEmojiSuggestion, useGifsStickersEmoji } from '@mezon/core';
+import { useAppParams, useChatReaction, useEmojiSuggestion, useEscapeKeyClose, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
 import {
 	reactionActions,
 	referencesActions,
@@ -22,6 +22,7 @@ export type EmojiCustomPanelOptions = {
 	mode?: number;
 	isReaction?: boolean;
 	onClickAddButton?: () => void;
+	onClose: () => void;
 };
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
@@ -197,9 +198,14 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		};
 	}, []);
 
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEscapeKeyClose(modalRef, props.onClose);
+
 	return (
 		<div
-			className={`flex max-h-full max-sm:h-32 max-sbm:h-full flex-row w-full md:w-[500px] max-sm:ml-1 ${props.isReaction && 'border border-black rounded overflow-hidden'}`}
+			ref={modalRef}
+			tabIndex={-1}
+			className={`outline-none flex max-h-full max-sm:h-32 max-sbm:h-full flex-row w-full md:w-[500px] max-sm:ml-1 ${props.isReaction && 'border border-black rounded overflow-hidden'}`}
 		>
 			<div
 				className={`w-11 max-sm:gap-x-1
@@ -324,18 +330,15 @@ const EmojisPanel: React.FC<DisplayByCategoriesProps> = ({
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestion();
 	const appearanceTheme = useSelector(selectTheme);
-	const [hasAdminPermission, { isClanOwner }] = useClanRestriction([EPermission.administrator]);
-	const [hasClanPermission] = useClanRestriction([EPermission.manageClan]);
-	const hasClanManagementPermission = hasAdminPermission || isClanOwner || hasClanPermission;
+	const [hasClanPermission] = usePermissionChecker([EPermission.manageClan]);
 	const isShowAddButton = useMemo(() => {
-		return hasClanManagementPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
-	}, [hasClanManagementPermission, categoryName, showAddButton]);
+		return hasClanPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
+	}, [hasClanPermission, categoryName, showAddButton]);
 
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
 		>
-			{' '}
 			{emojisData
 				.filter((item) => !!item.id)
 				.map((item, index) => (

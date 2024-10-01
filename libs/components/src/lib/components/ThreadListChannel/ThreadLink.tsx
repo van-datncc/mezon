@@ -1,6 +1,4 @@
-import { useOnClickOutside } from '@mezon/core';
-import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
-import { notificationActions, selectCountByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
 import React, { memo, useImperativeHandle, useRef, useState } from 'react';
@@ -23,10 +21,13 @@ export type ThreadLinkRef = {
 };
 
 const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
-	const numberNotification = useSelector(selectCountByChannelId(thread.id));
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
-	const dispatch = useAppDispatch();
+
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(thread.channel_id ?? ''));
+	const numberNotification = useSelector(
+		selectMentionAndReplyUnreadByChanneld(thread.clan_id ?? '', thread.channel_id ?? '', getLastSeenChannel ?? 0)
+	).length;
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);
@@ -58,15 +59,12 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
 		}
-		dispatch(notificationActions.removeNotificationsByChannelId(thread.channel_id ?? ''));
 	};
 
 	const handleDeleteChannel = () => {
 		setShowModal(true);
 		setIsShowPanelChannel(false);
 	};
-
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
 		<div
@@ -120,7 +118,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 				<DeleteModal onClose={() => setShowModal(false)} channelLabel={thread.channel_label || ''} channelId={thread.channel_id as string} />
 			)}
 
-			{numberNotification !== 0 && (
+			{numberNotification > 0 && (
 				<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs font-medium">
 					{numberNotification}
 				</div>

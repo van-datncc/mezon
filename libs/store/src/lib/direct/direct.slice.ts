@@ -176,7 +176,9 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 		try {
 			thunkAPI.dispatch(directActions.setDmGroupCurrentId(directMessageId));
 			thunkAPI.dispatch(directActions.setDmGroupCurrentType(type ?? ChannelType.CHANNEL_TYPE_DM));
-			thunkAPI.dispatch(messagesActions.fetchMessages({ channelId: directMessageId, noCache, isFetchingLatestMessages, isClearMessage }));
+			thunkAPI.dispatch(
+				messagesActions.fetchMessages({ clanId: '0', channelId: directMessageId, noCache, isFetchingLatestMessages, isClearMessage })
+			);
 			const fetchChannelMembersResult = await thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: '',
@@ -312,6 +314,16 @@ export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, sel
 				last_seen_message: { ...dm.last_seen_message, ...found.last_seen_message }
 			};
 		});
+});
+
+export const selectDirectsOpenlistOrder = createSelector(selectDirectsOpenlist, (data) => {
+	return data
+		.sort((a, b) => {
+			const timestampA = a.last_sent_message?.timestamp_seconds || a.create_time_seconds || 0;
+			const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
+			return timestampB - timestampA;
+		})
+		.map((dm) => dm.id);
 });
 
 export const selectDirectById = createSelector([selectDirectMessageEntities, (state, id) => id], (clansEntities, id) => clansEntities?.[id]);

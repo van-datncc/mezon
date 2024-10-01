@@ -1,4 +1,4 @@
-import { useEscapeKey, useMenu, useOnClickOutside } from '@mezon/core';
+import { useMenu } from '@mezon/core';
 import {
 	DirectEntity,
 	appActions,
@@ -175,14 +175,16 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 
 function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isShowPinMessage, setIsShowPinMessage] = useState<boolean>(false);
-	const threadRef = useRef<HTMLDivElement | null>(null);
+	const threadRef = useRef<HTMLDivElement>(null);
 
 	const handleShowPinMessage = () => {
 		setIsShowPinMessage(!isShowPinMessage);
 	};
 
-	useOnClickOutside(threadRef, () => setIsShowPinMessage(false));
-	useEscapeKey(() => setIsShowPinMessage(false));
+	const handleClose = useCallback(() => {
+		setIsShowPinMessage(false);
+	}, []);
+
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip
@@ -196,7 +198,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 					<Icons.PinRight isWhite={isShowPinMessage} />
 				</button>
 			</Tooltip>
-			{isShowPinMessage && <PinnedMessages />}
+			{isShowPinMessage && <PinnedMessages onClose={handleClose} rootRef={threadRef} />}
 		</div>
 	);
 }
@@ -206,17 +208,17 @@ const AddMemberToGroupDm = ({ currentDmGroup, appearanceTheme }: { currentDmGrou
 	const handleOpenAddToGroupModal = () => {
 		setOpenAddToGroup(!openAddToGroup);
 	};
-	const modalAddMemRef = useRef<HTMLDivElement | null>(null);
-	useOnClickOutside(modalAddMemRef, () => setOpenAddToGroup(false));
+	const rootRef = useRef<HTMLDivElement>(null);
 	return (
-		<div onClick={handleOpenAddToGroupModal} ref={modalAddMemRef}>
+		<div onClick={handleOpenAddToGroupModal} ref={rootRef} className="cursor-pointer">
 			{openAddToGroup && (
-				<div className="relative top-4 cursor-pointer">
+				<div className="relative top-4">
 					<CreateMessageGroup
 						currentDM={currentDmGroup}
 						isOpen={openAddToGroup}
 						onClose={handleOpenAddToGroupModal}
 						classNames="right-0 left-auto"
+						rootRef={rootRef}
 					/>
 				</div>
 			)}

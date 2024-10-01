@@ -4278,6 +4278,18 @@
     lodash.merge "^4.6.2"
     postcss-selector-parser "6.0.10"
 
+"@tanstack/react-virtual@^3.10.8":
+  version "3.10.8"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-virtual/-/react-virtual-3.10.8.tgz#bf4b06f157ed298644a96ab7efc1a2b01ab36e3c"
+  integrity sha512-VbzbVGSsZlQktyLrP5nxE+vE1ZR+U0NFAWPbJLoG2+DKPwd2D7dVICTVIIaYlJqX1ZCEnYDbaOpmMwbsyhBoIA==
+  dependencies:
+    "@tanstack/virtual-core" "3.10.8"
+
+"@tanstack/virtual-core@3.10.8":
+  version "3.10.8"
+  resolved "https://registry.yarnpkg.com/@tanstack/virtual-core/-/virtual-core-3.10.8.tgz#975446a667755222f62884c19e5c3c66d959b8b4"
+  integrity sha512-PBu00mtt95jbKFi6Llk9aik8bnR3tR/oQP1o3TSi+iG//+Q2RTIzCEgKkHG8BB86kxMNW6O8wku+Lmi+QFR6jA==
+
 "@testing-library/dom@^9.0.0":
   version "9.3.4"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-9.3.4.tgz#50696ec28376926fec0a1bf87d9dbac5e27f60ce"
@@ -12427,17 +12439,17 @@ metro@0.80.12, metro@^0.80.3:
     ws "^7.5.10"
     yargs "^17.6.2"
 
-mezon-js-protobuf@^1.5.70:
-  version "1.5.71"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.5.71.tgz#f7d138c141388adaf3567b77552a0cb350397188"
-  integrity sha512-emjr6wuCdEe7bHsLSmCfCOkUvTRnIjlpqX0RSjUu7911glrfNWzLKg7pVB07C7AllYCRjAOVZdzfUgxEOR9i3A==
+mezon-js-protobuf@^1.5.73:
+  version "1.5.73"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.5.73.tgz#dbe18885759ce90d31312efd2595ab859379eb47"
+  integrity sha512-NcAfoaEYMPwfAe5Rqm6TIIhR/XxpVq2uBy2DT9qknbyipgH6tNmzNdyFg/+GNSaO5eKywvevmNuGUcGBiSKfSw==
   dependencies:
     "@scarf/scarf" "^1.1.1"
 
-mezon-js@^2.9.4:
-  version "2.9.5"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.9.5.tgz#310ec7eb936ac1c96a114c4b8ad6d3d2ab0671bd"
-  integrity sha512-Fa/IJd74qAJhIYG0ppwppuX8sFQtLGLpVUgbPCzPlBsPU4P2jct8ZHuji+mSieV9o6CtSuAHTZNSz0ah/ZFQ1A==
+mezon-js@^2.9.11:
+  version "2.9.11"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.9.11.tgz#1b72691b37031264a561425836617ef97dceb99e"
+  integrity sha512-g6pRGGtQHdgq7CIa2udeGt/DzZ+gB3dUWfr6mRBcYN5j0WHZWTbpwKJaN7eetToDFnjj2YfSoNkSOuUuJ+pCUQ==
   dependencies:
     "@scarf/scarf" "^1.1.1"
     base64-arraybuffer "^1.0.2"

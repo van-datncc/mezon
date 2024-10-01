@@ -1,8 +1,9 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useUserPermission } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { categoriesActions, selectCurrentClan, selectIsShowEmptyCategory, useAppDispatch } from '@mezon/store-mobile';
+import { EPermission } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { EProfileTab } from 'apps/mobile/src/app/screens/settings/ProfileSetting';
 import { MutableRefObject, useCallback, useState } from 'react';
@@ -40,7 +41,7 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		inviteRef?.current.present();
 		dismiss();
 	};
-	const { isClanOwner } = useUserPermission();
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 
 	const handleOpenSettings = () => {
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS, params: { inviteRef: inviteRef } });
@@ -51,16 +52,6 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING });
 		dismiss();
 	}, []);
-	const watchMenu: IMezonMenuItemProps[] = [
-		{
-			onPress: () => reserve(),
-			title: t('menu.watchMenu.markAsRead')
-		},
-		{
-			onPress: () => reserve(),
-			title: t('menu.watchMenu.browseChannels')
-		}
-	];
 
 	const organizationMenu: IMezonMenuItemProps[] = [
 		// {

@@ -1,8 +1,7 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useChannelRestriction, useDragAndDrop, useSearchMessages, useThreads } from '@mezon/core';
+import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
-	notificationActions,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -25,22 +24,15 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		dispatch(
-			notificationActions.setLastSeenTimeStampChannel({
-				channelId,
-				lastSeenTimeStamp: timestamp + TIME_OFFSET,
-				clanId: currentChannel?.clan_id ?? ''
-			})
-		);
 	}, [channelId, currentChannel, dispatch]);
 }
 
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const isShowMemberList = useSelector(selectIsShowMemberList);
-	const { maxChannelPermissions } = useChannelRestriction(channelId);
+	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 
-	if (!maxChannelPermissions[EOverriddenPermission.sendMessage]) {
+	if (!canSendMessage) {
 		return (
 			<div className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line">
 				You do not have permission to send messages in this channel.

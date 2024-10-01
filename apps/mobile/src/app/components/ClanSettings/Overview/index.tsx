@@ -1,6 +1,7 @@
-import { useClans, useUserPermission } from '@mezon/core';
+import { useClans, usePermissionChecker } from '@mezon/core';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { checkDuplicateNameClan, getStoreAsync } from '@mezon/store-mobile';
+import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
@@ -23,7 +24,11 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
 	const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
 	const [loading, setLoading] = useState<boolean>(false);
-	const { isClanOwner } = useUserPermission();
+	const [hasAdminPermission, hasManageClanPermission, clanOwnerPermission] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>();
 	const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -46,8 +51,8 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	}, [clanName, banner]);
 
 	const disabled = useMemo(() => {
-		return !isClanOwner;
-	}, [isClanOwner]);
+		return !(hasAdminPermission || hasManageClanPermission || clanOwnerPermission);
+	}, [clanOwnerPermission, hasAdminPermission, hasManageClanPermission]);
 
 	navigation.setOptions({
 		headerBackTitleVisible: false,
@@ -64,12 +69,14 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 	async function handleSave() {
 		setLoading(true);
 
-		const isDuplicateClan = await handleCheckDuplicateClanname();
-		if (isDuplicateClan) {
-			setErrorMessage(t('menu.serverName.duplicateNameMessage'));
-			setIsCheckValid(false);
-			setLoading(false);
-			return;
+		if (banner === currentClan?.banner) {
+			const isDuplicateClan = await handleCheckDuplicateClanname();
+			if (isDuplicateClan) {
+				setErrorMessage(t('menu.serverName.duplicateNameMessage'));
+				setIsCheckValid(false);
+				setLoading(false);
+				return;
+			}
 		}
 
 		await updateClan({
@@ -188,8 +195,16 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 
 	return (
 		<Block flex={1} backgroundColor={themeValue.secondary}>
-			<ScrollView contentContainerStyle={styles.container}>
-				<MezonImagePicker defaultValue={banner} height={200} width={width - 40} onLoad={handleLoad} showHelpText autoUpload />
+			<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps={'handled'}>
+				<MezonImagePicker
+					disabled={disabled}
+					defaultValue={banner}
+					height={200}
+					width={width - 40}
+					onLoad={handleLoad}
+					showHelpText
+					autoUpload
+				/>
 
 				<View style={{ marginVertical: 10 }}>
 					<MezonInput
@@ -209,9 +224,9 @@ export default function ClanOverviewSetting({ navigation }: MenuClanScreenProps<
 					bottomDescription={t('fields.defaultNotification.description')}
 					data={optionData}
 				/>
-				{isClanOwner && <MezonMenu menu={dangerMenu} />}
+				{!disabled && <MezonMenu menu={dangerMenu} />}
 			</ScrollView>
-			{isClanOwner && (
+			{!disabled && (
 				<DeleteClanModal
 					isVisibleModal={isVisibleDeleteModal}
 					visibleChange={(isVisible) => {

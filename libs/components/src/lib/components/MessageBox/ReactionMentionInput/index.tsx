@@ -11,6 +11,7 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
+	channelMetaActions,
 	channelUsersActions,
 	emojiSuggestionActions,
 	messagesActions,
@@ -20,6 +21,7 @@ import {
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectAllUserClans,
+	selectAnonymousMode,
 	selectAttachmentByChannelId,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -134,7 +136,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 	const commonChannelDms = useSelector(selectAllHashtagDm);
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const currentClanId = useSelector(selectCurrentClanId);
-
+	const anonymousMode = useSelector(selectAnonymousMode);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const { membersOfChild } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
@@ -219,16 +221,6 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 			}
 		}
 
-		if (isEnterKey && ctrlKey && shiftKey) {
-			event.preventDefault();
-			if (request?.valueTextInput !== '' || openThreadMessageState) {
-				if (props.currentClanId) {
-					handleSend(true);
-				}
-				return;
-			}
-		}
-
 		switch (key) {
 			case 'Enter': {
 				if (shiftKey || isComposing) {
@@ -236,7 +228,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 				} else {
 					event.preventDefault();
 					trackEnterPress();
-					handleSend(false);
+					handleSend(anonymousMode);
 					return;
 				}
 			}
@@ -249,6 +241,7 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 	const addMemberToPrivateThread = useCallback(
 		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[], membersOfChild: ChannelMembersEntity[] | null) => {
 			if (!currentChannel?.channel_private) return;
+			const timestamp = Date.now() / 1000;
 
 			const userIds = uniqueUsers(mentions, membersOfChild);
 
@@ -260,6 +253,17 @@ const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => 
 			};
 			if (userIds.length > 0) {
 				await dispatch(channelUsersActions.addChannelUsers(body));
+				dispatch(
+					channelMetaActions.updateBulkChannelMetadata([
+						{
+							id: currentChannel.channel_id ?? '',
+							lastSeenTimestamp: timestamp,
+							lastSentTimestamp: timestamp,
+							lastSeenPinMessage: '',
+							clanId: currentChannel.clan_id ?? ''
+						}
+					])
+				);
 			}
 		},
 		[dispatch]

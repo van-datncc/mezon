@@ -1,4 +1,4 @@
-import { useAuth, useCategory, useEscapeKey, useOnClickOutside, UserRestrictionZone, useUserRestriction } from '@mezon/core';
+import { useAuth, useCategory, usePermissionChecker, UserRestrictionZone } from '@mezon/core';
 import {
 	categoriesActions,
 	channelsActions,
@@ -36,9 +36,11 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const hasAdminPermission = useUserRestriction([EPermission.administrator]);
-	const hasClanPermission = useUserRestriction([EPermission.manageClan]);
-	const hasChannelManagePermission = useUserRestriction([EPermission.manageChannel]);
+	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.manageChannel
+	]);
 	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
 	const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
 	const permissions = useMemo(
@@ -82,8 +84,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 		}
 	};
 
-	useEscapeKey(() => dispatch(channelsActions.openCreateNewModalChannel(false)));
-
 	const handleToggleCategory = () => {
 		setIsShowAllCategoryChannels(!isShowAllCategoryChannels);
 	};
@@ -121,10 +121,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const isUnreadChannel = (channelId: string) => {
 		return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
 	};
-
-	useOnClickOutside(panelRef, () => setIsShowPanelCategory(false));
-
-	useEscapeKey(() => setIsShowPanelCategory(false));
 
 	useEffect(() => {
 		const focusChannel = location.state?.focusChannel ?? {};

@@ -25,7 +25,7 @@ import {
 	selectStatusMenu,
 	selectTheme
 } from '@mezon/store';
-import { selectStreamChannelByChannelId, selectStreamMembersByChannelId, useAppDispatch } from '@mezon/store-mobile';
+import { accountActions, selectStreamChannelByChannelId, selectStreamMembersByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -118,6 +118,9 @@ function MyApp() {
 				event.preventDefault();
 				openSearchModal();
 			}
+			if (event[prefixKey] && event.shiftKey && event.key === 'Enter') {
+				dispatch(accountActions.setAnonymousMode());
+			}
 		},
 		[openSearchModal]
 	);
@@ -177,7 +180,7 @@ function MyApp() {
 		>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
-				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`select-none fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>

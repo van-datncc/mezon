@@ -1,9 +1,10 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useUserPermission } from '@mezon/core';
+import { usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectAllEventManagement } from '@mezon/store-mobile';
-import React, { useRef, useState } from 'react';
+import { EPermission } from '@mezon/utils';
+import React, { useMemo, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet, MezonTab } from '../../temp-ui';
@@ -19,7 +20,15 @@ export default function EventViewer({ handlePressEventCreate }: { handlePressEve
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const [currentEvent, setCurrentEvent] = useState<EventManagementEntity>();
 	const bottomSheetDetail = useRef<BottomSheetModal>(null);
-	const { isCanManageEvent } = useUserPermission();
+	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
+		EPermission.administrator,
+		EPermission.manageClan,
+		EPermission.clanOwner
+	]);
+
+	const isCanManageEvent = useMemo(() => {
+		return hasAdminPermission || isClanOwner || hasManageClanPermission;
+	}, [hasAdminPermission, hasManageClanPermission, isClanOwner]);
 
 	function handlePress(event: EventManagementEntity) {
 		setCurrentEvent(event);

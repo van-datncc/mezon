@@ -1,5 +1,6 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectAnyUnreadChannel, selectSpecificNotifications, selectTotalUnreadDM } from '@mezon/store';
+import { reactionActions, selectAllChannelMeta, selectAnyUnreadChannel, selectMentionAndReplyUnreadAllClan, selectTotalUnreadDM } from '@mezon/store';
+
 import { useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge } from '@mezon/utils';
@@ -12,7 +13,9 @@ import { Outlet, useNavigate } from 'react-router-dom';
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
 	const navigate = useNavigate();
-	const allNotify = useSelector(selectSpecificNotifications);
+
+	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
+	const allNotificationReplyMentionAllClan = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
 
 	const totalUnreadDM = useSelector(selectTotalUnreadDM);
 	const { quantityPendingRequest } = useFriends();
@@ -45,7 +48,7 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = allNotify.length + totalUnreadDM + quantityPendingRequest;
+		const notificationCount = allNotificationReplyMentionAllClan.length + totalUnreadDM + quantityPendingRequest;
 
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
@@ -60,7 +63,7 @@ const GlobalEventListener = () => {
 				document.title = 'Mezon';
 			}
 		}
-	}, [allNotify.length, totalUnreadDM, quantityPendingRequest, hasUnreadChannel]);
+	}, [allNotificationReplyMentionAllClan.length, totalUnreadDM, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };

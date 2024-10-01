@@ -27,6 +27,7 @@ export * from './lib/chat/hooks/useClanProfileSetting';
 export * from './lib/chat/hooks/useClans';
 export * from './lib/chat/hooks/useClickUpToEdit';
 export * from './lib/chat/hooks/useDMInvite';
+
 export * from './lib/chat/hooks/useDeleteMessage';
 export * from './lib/chat/hooks/useDirect';
 export * from './lib/chat/hooks/useDirectMembers';
@@ -34,6 +35,7 @@ export * from './lib/chat/hooks/useDragAndDrop';
 export * from './lib/chat/hooks/useEditMessage';
 export * from './lib/chat/hooks/useEmojiSuggestion';
 export * from './lib/chat/hooks/useEscapeKey';
+export * from './lib/chat/hooks/useEscapeKeyClose';
 export * from './lib/chat/hooks/useEventManagement';
 export * from './lib/chat/hooks/useFormatDate';
 export * from './lib/chat/hooks/useFriends';
@@ -60,3 +62,4 @@ export * from './lib/chat/hooks/useSilentSendMess';
 export * from './lib/chat/hooks/useThreadMessage';
 export * from './lib/chat/hooks/useThreads';
 export * from './lib/policy';
+
