@@ -4421,29 +4421,83 @@ export function HatIcon({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 export function FullScreen({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 	return (
 		<svg
-			width="800px"
-			height="800px"
-			viewBox="0 0 24 24"
-			className={`${defaultSize} ${defaultFill}`}
-			fill="none"
+			aria-hidden="true"
+			role="img"
 			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
 		>
 			<path
-				d="M23 4C23 2.34315 21.6569 1 20 1H16C15.4477 1 15 1.44772 15 2C15 2.55228 15.4477 3 16 3H20C20.5523 3 21 3.44772 21 4V8C21 8.55228 21.4477 9 22 9C22.5523 9 23 8.55228 23 8V4Z"
-				fill="#0F0F0F"
-			/>
+				fill="currentColor"
+				d="M4 6c0-1.1.9-2 2-2h3a1 1 0 0 0 0-2H6a4 4 0 0 0-4 4v3a1 1 0 0 0 2 0V6ZM4 18c0 1.1.9 2 2 2h3a1 1 0 1 1 0 2H6a4 4 0 0 1-4-4v-3a1 1 0 1 1 2 0v3ZM18 4a2 2 0 0 1 2 2v3a1 1 0 1 0 2 0V6a4 4 0 0 0-4-4h-3a1 1 0 1 0 0 2h3ZM20 18a2 2 0 0 1-2 2h-3a1 1 0 1 0 0 2h3a4 4 0 0 0 4-4v-3a1 1 0 1 0-2 0v3Z"
+			></path>
+		</svg>
+	);
+}
+
+export function ExitFullScreen({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+	return (
+		<svg
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+		>
 			<path
-				d="M23 16C23 15.4477 22.5523 15 22 15C21.4477 15 21 15.4477 21 16V20C21 20.5523 20.5523 21 20 21H16C15.4477 21 15 21.4477 15 22C15 22.5523 15.4477 23 16 23H20C21.6569 23 23 21.6569 23 20V16Z"
-				fill="#0F0F0F"
-			/>
+				fill="currentColor"
+				d="M8 6a2 2 0 0 1-2 2H3a1 1 0 0 0 0 2h3a4 4 0 0 0 4-4V3a1 1 0 0 0-2 0v3ZM8 18a2 2 0 0 0-2-2H3a1 1 0 1 1 0-2h3a4 4 0 0 1 4 4v3a1 1 0 1 1-2 0v-3ZM18 8a2 2 0 0 1-2-2V3a1 1 0 1 0-2 0v3a4 4 0 0 0 4 4h3a1 1 0 1 0 0-2h-3ZM16 18c0-1.1.9-2 2-2h3a1 1 0 1 0 0-2h-3a4 4 0 0 0-4 4v3a1 1 0 1 0 2 0v-3Z"
+			></path>
+		</svg>
+	);
+}
+
+export function MutedVolum({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+	return (
+		<svg
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+		>
 			<path
-				d="M4 21H8C8.55228 21 9 21.4477 9 22C9 22.5523 8.55228 23 8 23H4C2.34315 23 1 21.6569 1 20V16C1 15.4477 1.44772 15 2 15C2.55228 15 3 15.4477 3 16V20C3 20.5523 3.44772 21 4 21Z"
-				fill="#0F0F0F"
-			/>
+				fill="currentColor"
+				d="M12 3a1 1 0 0 0-1-1h-.06a1 1 0 0 0-.74.32L5.92 7H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2.92l4.28 4.68a1 1 0 0 0 .74.32H11a1 1 0 0 0 1-1V3ZM22.7 8.3a1 1 0 0 0-1.4 0L19 10.58l-2.3-2.3a1 1 0 1 0-1.4 1.42L17.58 12l-2.3 2.3a1 1 0 0 0 1.42 1.4L19 13.42l2.3 2.3a1 1 0 0 0 1.4-1.42L20.42 12l2.3-2.3a1 1 0 0 0 0-1.4Z"
+			></path>
+		</svg>
+	);
+}
+
+export function UnMutedVolum({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+	return (
+		<svg
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+		>
 			<path
-				d="M1 8C1 8.55228 1.44772 9 2 9C2.55228 9 3 8.55228 3 8L3 4C3 3.44772 3.44772 3 4 3H8C8.55228 3 9 2.55228 9 2C9 1.44772 8.55228 1 8 1H4C2.34315 1 1 2.34315 1 4V8Z"
-				fill="#0F0F0F"
-			/>
+				fill="currentColor"
+				d="M12 3a1 1 0 0 0-1-1h-.06a1 1 0 0 0-.74.32L5.92 7H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2.92l4.28 4.68a1 1 0 0 0 .74.32H11a1 1 0 0 0 1-1V3ZM15.1 20.75c-.58.14-1.1-.33-1.1-.92v-.03c0-.5.37-.92.85-1.05a7 7 0 0 0 0-13.5A1.11 1.11 0 0 1 14 4.2v-.03c0-.6.52-1.06 1.1-.92a9 9 0 0 1 0 17.5Z"
+			></path>
+			<path
+				fill="currentColor"
+				d="M15.16 16.51c-.57.28-1.16-.2-1.16-.83v-.14c0-.43.28-.8.63-1.02a3 3 0 0 0 0-5.04c-.35-.23-.63-.6-.63-1.02v-.14c0-.63.59-1.1 1.16-.83a5 5 0 0 1 0 9.02Z"
+			></path>
 		</svg>
 	);
 }

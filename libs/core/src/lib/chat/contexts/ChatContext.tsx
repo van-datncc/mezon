@@ -168,7 +168,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstreamingchannelleaved = useCallback(
 		(user: StreamingLeavedEvent) => {
-			dispatch(usersStreamActions.remove(user.id));
+			dispatch(usersStreamActions.remove(user.streaming_user_id));
 		},
 		[dispatch]
 	);
@@ -193,6 +193,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onstreamingchannelended = useCallback(
 		(channel: StreamingEndedEvent) => {
 			dispatch(channelsStreamActions.remove(channel.channel_id));
+			dispatch(usersStreamActions.streamEnded(channel?.channel_id));
 		},
 		[dispatch]
 	);
@@ -551,7 +552,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
-			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent.user_id, customStatus: statusEvent.status }));
+			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent?.user_id, customStatus: statusEvent?.status }));
 		},
 		[dispatch]
 	);
@@ -733,7 +734,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onroleevent = useCallback((roleEvent: RoleEvent) => {
 		const handleRoleEvent = async () => {
-			if (roleEvent.status === 0) {
+			if (roleEvent?.status === 0) {
 				if (userId !== roleEvent.user_id) {
 					dispatch(
 						rolesClanActions.add({
@@ -754,7 +755,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
 					}
 				}
-			} else if (roleEvent.status === 1) {
+			} else if (roleEvent?.status === 1) {
 				if (userId !== roleEvent.user_id) {
 					if (roleEvent?.role?.role_user_list?.role_users) {
 						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
@@ -769,7 +770,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(rolesClanActions.update(roleEvent.role));
 				}
-			} else if (roleEvent.status === 2) {
+			} else if (roleEvent?.status === 2) {
 				if (userId !== roleEvent.user_id) {
 					const isUserResult = await dispatch(
 						rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })

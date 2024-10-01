@@ -73,7 +73,7 @@ export const setDefaultNotificationClan = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(getDefaultNotificationClan({ clanId: clan_id || '' }));
+		thunkAPI.dispatch(getDefaultNotificationClan({ clanId: clan_id || '', noCache: true }));
 		return response;
 	}
 );
