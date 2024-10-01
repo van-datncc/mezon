@@ -1,18 +1,18 @@
-import { codeBlockRegex, codeBlockRegexGlobal, Icons, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
-import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
+import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
-import { Linking, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
+import FontAwesome from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { EmojiMarkup } from '../MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
-
 interface ElementToken {
 	s?: number;
 	e?: number;
@@ -76,13 +76,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			marginTop: 0,
 			marginBottom: 0,
 			paddingTop: 0,
-			paddingBottom: 0,
-			flexWrap: 'wrap',
-			flexDirection: 'row',
-			alignItems: 'flex-start',
-			justifyContent: 'flex-start',
-			width: '100%',
-			lineHeight: size.s_20
+			paddingBottom: 0
 		},
 		code_block: {
 			color: colors.text,
@@ -108,7 +102,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			lineHeight: size.s_20
 		},
 		link: {
-			color: Colors.linkText,
+			color: colors.textLink,
 			textDecorationLine: 'none',
 			lineHeight: size.s_17
 		},
@@ -160,37 +154,6 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
 			backgroundColor: colors.darkMossGreen
-		},
-		blockLinkWrapper: {
-			height: size.s_10,
-			width: 'auto'
-		},
-		pseudoBlockLinkElement: {
-			opacity: 0,
-			flexDirection: 'row',
-			alignItems: 'center',
-			justifyContent: 'center',
-			paddingHorizontal: 2,
-			borderRadius: 4,
-			gap: size.s_2
-		},
-		blockLinkContent: {
-			position: 'absolute',
-			top: -size.s_4,
-			left: 0,
-			backgroundColor: colors.midnightBlue,
-			flexDirection: 'row',
-			alignItems: 'center',
-			justifyContent: 'center',
-			paddingHorizontal: 2,
-			borderRadius: 4,
-			gap: size.s_2
-		},
-		linkTextColor: {
-			color: Colors.linkText
-		},
-		roleTextColor: {
-			color: Colors.jungleGreen
 		}
 	});
 
@@ -272,62 +235,32 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 		if (payload.startsWith(TYPE_MENTION.userMention) || payload.startsWith(TYPE_MENTION.hashtag)) {
 			if (payload.includes(TYPE_MENTION.voiceChannel)) {
 				return (
-					<TouchableWithoutFeedback key={node.key} onPress={() => openUrl(node.attributes.href, onLinkPress)} style={{ flex: 1 }}>
-						<View style={[styles.blockLinkWrapper]}>
-							<View style={styles.pseudoBlockLinkElement}>
-								<Icons.VoiceNormalIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />
-								{children}
-							</View>
-
-							<View style={styles.blockLinkContent}>
-								<Icons.VoiceNormalIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />
-								{children}
-							</View>
-						</View>
-					</TouchableWithoutFeedback>
+					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+						<Text>
+							<FontAwesome name="volume-2" size={14} color={baseColor.gray} />{' '}
+						</Text>
+						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
+					</Text>
 				);
 			}
-			const urlFormat = payload?.replace(/##voice%22|#%22|%22/g, '');
-			const parentId = urlFormat?.split('_')?.[6];
-			const channelLabel = content?.startsWith('@') ? content.slice(1) : content;
-			const isThread = !['0', undefined].includes(parentId);
-			const isChannel = '0' === parentId;
-			const isMentionRole = payload?.startsWith(TYPE_MENTION.userRoleMention);
-			const isUserMention = !isThread && !isChannel && !isMentionRole;
 			return (
-				<TouchableWithoutFeedback key={node.key} onPress={() => openUrl(node.attributes.href, onLinkPress)} style={{ flex: 1 }}>
-					<View
-						style={[
-							styles.blockLinkWrapper,
-							styles.mention,
-							content?.includes?.('# unknown') && styles.unknownChannel,
-							isMentionRole && styles.roleMention
-						]}
-					>
-						{/* fake space */}
-						<View style={styles.pseudoBlockLinkElement}>
-							{isThread && <Icons.ThreadIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />}
-							{isMentionRole && <Icons.AtIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />}
-							{isChannel && <Icons.HashIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />}
-							{isUserMention && <Icons.AtIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />}
-							<Text>{channelLabel}</Text>
-						</View>
-
-						<View style={[styles.blockLinkContent, isMentionRole && styles.roleMention]}>
-							{isThread && <Icons.ThreadIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />}
-							{isMentionRole && <Icons.AtIcon height={size.s_15} width={size.s_15} color={Colors.jungleGreen} />}
-							{isChannel && <Icons.HashIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />}
-							{isUserMention && <Icons.AtIcon height={size.s_15} width={size.s_15} color={Colors.linkText} />}
-							<Text style={[styles.linkTextColor, isMentionRole && styles.roleTextColor]}>{channelLabel}</Text>
-						</View>
-					</View>
-				</TouchableWithoutFeedback>
+				<Text
+					key={node.key}
+					style={[
+						styles.mention,
+						content?.includes?.('# unknown') && styles.unknownChannel,
+						payload?.startsWith(TYPE_MENTION.userRoleMention) && styles.roleMention
+					]}
+					onPress={() => openUrl(node.attributes.href, onLinkPress)}
+				>
+					{content}
+				</Text>
 			);
 		}
 		return (
-			<TouchableWithoutFeedback key={node.key} onPress={() => openUrl(node.attributes.href, onLinkPress)} style={styles.blocklink}>
-				<View style={[styles.image]}>{children}</View>
-			</TouchableWithoutFeedback>
+			<Text key={node.key} style={[styles.link]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+				{children}
+			</Text>
 		);
 	},
 	image: (node, children, parent, styles, allowedImageHandlers, defaultImageHandler) => {
