@@ -32,6 +32,7 @@ import {
 	IMessageSendPayload,
 	IMessageWithUser,
 	MentionDataProps,
+	NotificationEntity,
 	SearchItemProps,
 	SenderInfoOptionals
 } from '../types';
@@ -573,11 +574,20 @@ export const processText = (inputString: string) => {
 	return { links, markdowns, voiceRooms };
 };
 
-export function addMention(obj: IMessageSendPayload, mentionValue: IMentionOnMessage[]): IExtendedMessage {
-	const updatedObj: IExtendedMessage = {
-		...obj,
-		mentions: mentionValue
-	};
+export function addMention(obj: IMessageSendPayload | string, mentionValue: IMentionOnMessage[]): IExtendedMessage {
+	let updatedObj: IExtendedMessage;
+
+	if (typeof obj !== 'object' || obj === null || !('t' in obj)) {
+		updatedObj = {
+			t: String(obj),
+			mentions: []
+		};
+	} else {
+		updatedObj = {
+			...obj,
+			mentions: mentionValue
+		};
+	}
 
 	return updatedObj;
 }
@@ -798,5 +808,13 @@ export const handleShowShortProfile = (
 		bottom: bottomComputed,
 		left: leftComputed,
 		right: rightComputed
+	});
+};
+
+export const sortNotificationsByDate = (notifications: NotificationEntity[]) => {
+	return notifications.sort((a, b) => {
+		const dateA = a.create_time ? new Date(a.create_time).getTime() : 0;
+		const dateB = b.create_time ? new Date(b.create_time).getTime() : 0;
+		return dateB - dateA;
 	});
 };

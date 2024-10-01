@@ -3,18 +3,18 @@ import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
+	selectAllChannelMeta,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
-	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
-	selectNewNotificationStatus,
+	selectMentionAndReplyUnreadAllClan,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -23,9 +23,10 @@ import { Icons } from '@mezon/ui';
 import { EPermission, IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import SettingChannel from '../ChannelSetting';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
@@ -86,6 +87,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 	const appearanceTheme = useSelector(selectTheme);
 	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
 	const isShowSettingChannel = hasChannelManagePermission;
+	const param = useParams();
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -96,8 +98,8 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								<InviteBtn isLightMode={appearanceTheme === 'light'} />
-								{isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
+								{param.channelId && <InviteBtn isLightMode={appearanceTheme === 'light'} />}
+								{param.channelId && isShowSettingChannel && <ChannelSettingBtn isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -203,7 +205,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 					<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
 				</button>
 			</Tooltip>
-			{isShowThread && <ThreadModal onClose={handleClose} />}
+			{isShowThread && <ThreadModal onClose={handleClose} rootRef={threadRef} />}
 		</div>
 	);
 }
@@ -267,7 +269,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 					)}
 				</button>
 			</Tooltip>
-			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} />}
+			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} rootRef={notiRef} />}
 		</div>
 	);
 }
@@ -301,7 +303,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 					)}
 				</button>
 			</Tooltip>
-			{isShowPinMessage && <PinnedMessages onClose={handleClose} />}
+			{isShowPinMessage && <PinnedMessages rootRef={pinRef} onClose={handleClose} />}
 		</div>
 	);
 }
@@ -310,50 +312,22 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const dispatch = useAppDispatch();
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
-	const newNotificationStatus = useSelector(selectNewNotificationStatus);
-	const currentClanId = useSelector(selectCurrentClanId);
-
-	const [notiIdsUnread, setNotiIdsUnread] = useState<string[]>();
-
-	const notiUnreadList = useMemo(() => {
-		return localStorage.getItem('notiUnread');
-	}, [newNotificationStatus]);
-
-	useEffect(() => {
-		const updateNotiUnread = () => {
-			setNotiIdsUnread(notiUnreadList ? JSON.parse(notiUnreadList) : []);
-		};
-		updateNotiUnread();
-		const handleStorageChange = (event: StorageEvent) => {
-			if (event.key === 'notiUnread') {
-				updateNotiUnread();
-			}
-		};
-		window.addEventListener('storage', handleStorageChange);
-
-		return () => {
-			window.removeEventListener('storage', handleStorageChange);
-		};
-	}, [newNotificationStatus]);
+	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
+	const getNotificationMentionAndReplyUnread = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
 
 	const handleShowInbox = () => {
-		dispatch(notificationActions.fetchListNotification({ clanId: currentClanId as string }));
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
-
-	const handleSetIsShowInbox = useCallback(() => {
-		dispatch(notificationActions.setIsShowInbox(false));
-	}, []);
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
-					{notiIdsUnread && notiIdsUnread.length > 0 && <RedDot />}
+					{getNotificationMentionAndReplyUnread.length > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList unReadList={notiIdsUnread} onClose={handleSetIsShowInbox} />}
+			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} rootRef={inboxRef} />}
 		</div>
 	);
 }

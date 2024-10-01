@@ -1,7 +1,8 @@
 import { Icons } from '@mezon/components';
-import { usePermissionChecker } from '@mezon/core';
+import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
 import { selectAllEventManagement } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
+import { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ListEventManagement from './ListEventManagement';
 
@@ -17,9 +18,16 @@ const StartEventModal = (props: StartEventModalProps) => {
 	const allEventManagement = useSelector(selectAllEventManagement);
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 
+	const modalRef = useRef<HTMLDivElement | null>(null);
+	useEscapeKeyClose(modalRef, onClose);
+
 	return (
 		<>
-			<div className="dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black flex justify-between items-center p-4">
+			<div
+				ref={modalRef}
+				tabIndex={-1}
+				className="outline-none dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black flex justify-between items-center p-4"
+			>
 				<div className="flex items-center gap-x-4">
 					<div className="gap-x-2 flex items-center">
 						<Icons.IconEvents />

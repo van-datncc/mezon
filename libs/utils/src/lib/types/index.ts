@@ -5,7 +5,6 @@ import {
 	ChannelType,
 	HashtagDm,
 	Notification,
-	NotificationChannelCategorySetting,
 	NotificationType,
 	NotifiReactMessage,
 	PermissionRoleChannel
@@ -35,6 +34,7 @@ import {
 	ClanUserListClanUser,
 	RoleUserListRoleUser
 } from 'mezon-js/api.gen';
+import { ApiNotificationChannelCategorySetting } from 'mezon-js/dist/api.gen';
 import { MentionItem } from 'react-mentions';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from './messageLine';
 
@@ -91,7 +91,7 @@ export type IDefaultNotificationCategory = ApiNotificationSetting & {
 export type IDefaultNotification = ApiNotificationSetting & {
 	id: string;
 };
-export type IChannelCategorySetting = NotificationChannelCategorySetting & {
+export type IChannelCategorySetting = ApiNotificationChannelCategorySetting & {
 	id: string;
 };
 export type IHashtagDm = HashtagDm & {

@@ -1,6 +1,4 @@
-import { useOnClickOutside } from '@mezon/core';
 import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
-import { notificationActions, useAppDispatch } from '@mezon/store-mobile';
 import { Icons } from '@mezon/ui';
 import { IChannel, MouseButton } from '@mezon/utils';
 import React, { memo, useImperativeHandle, useRef, useState } from 'react';
@@ -25,7 +23,6 @@ export type ThreadLinkRef = {
 const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
-	const dispatch = useAppDispatch();
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(thread.channel_id ?? ''));
 	const numberNotification = useSelector(
@@ -62,15 +59,12 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 			setCoords({ mouseX, mouseY, distanceToBottom });
 			setIsShowPanelChannel((s) => !s);
 		}
-		dispatch(notificationActions.removeNotificationsByChannelId(thread.channel_id ?? ''));
 	};
 
 	const handleDeleteChannel = () => {
 		setShowModal(true);
 		setIsShowPanelChannel(false);
 	};
-
-	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
 	return (
 		<div
