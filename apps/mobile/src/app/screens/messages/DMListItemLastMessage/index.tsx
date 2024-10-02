@@ -38,18 +38,13 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 	let lastIndex = 0;
 	const formatEmojiInText = useMemo(() => {
 		let formattedContent = '';
-		elements.forEach((element) => {
-			const s = element.s ?? 0;
-			const e = element.e ?? 0;
-
-			console.log('>last ', lastIndex, s);
-
+		elements.forEach(({ s = 0, e = 0, kindOf, emojiid }) => {
 			const contentInElement = t?.substring?.(s, e);
 			if (lastIndex < s) {
 				formattedContent += t?.slice?.(lastIndex, s)?.toString() ?? '';
 			}
-			if (element.kindOf === ETokenMessage.EMOJIS) {
-				formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: element.emojiid });
+			if (kindOf === ETokenMessage.EMOJIS) {
+				formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: emojiid });
 			}
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 			lastIndex = e;
