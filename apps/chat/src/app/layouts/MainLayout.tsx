@@ -59,8 +59,7 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = allNotificationReplyMentionAllClan?.length ?? 0 + allCountDirectUnread + quantityPendingRequest;
-
+		const notificationCount = (allNotificationReplyMentionAllClan?.length ?? 0) + allCountDirectUnread + quantityPendingRequest;
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
 				electronBridge?.setBadgeCount(null);
@@ -68,13 +67,9 @@ const GlobalEventListener = () => {
 			}
 			electronBridge?.setBadgeCount(notificationCount);
 		} else {
-			if (notificationCount > 0) {
-				document.title = `(${notificationCount}) Mezon`;
-			} else {
-				document.title = 'Mezon';
-			}
+			document.title = notificationCount > 0 ? `(${notificationCount}) Mezon` : 'Mezon';
 		}
-	}, [allNotificationReplyMentionAllClan?.length ?? 0, allCountDirectUnread, quantityPendingRequest, hasUnreadChannel]);
+	}, [allNotificationReplyMentionAllClan.length, allCountDirectUnread, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };

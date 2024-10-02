@@ -114,15 +114,15 @@ export default function EmojiSelectorContainer({
 			<RibbonIcon color={themeValue.textStrong} />
 		];
 	}, [themeValue]);
-
+	
 	const categoriesWithIcons = useMemo(
 		() =>
 			categoriesEmoji.map((category, index) => ({
 				displayName: category === 'Custom' && currentClan?.clan_name ? currentClan?.clan_name : category,
 				name: category,
 				icon: cateIcon[index],
-				emojis: emojis.reduce((acc, emoji) => {
-					if (emoji.category.includes(category)) {
+				emojis: emojis?.reduce((acc, emoji) => {
+					if (emoji?.category?.includes?.(category)) {
 						acc.push({
 							...emoji,
 							category: category

@@ -1,5 +1,6 @@
 import { useAppParams, useChatReaction, useEmojiSuggestion, useEscapeKeyClose, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
 import {
+	emojiSuggestionActions,
 	reactionActions,
 	referencesActions,
 	selectChannelById,
@@ -112,6 +113,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSubPanelActive(SubPanelName.NONE);
 			dispatch(referencesActions.setIdReferenceMessageReaction(''));
 		} else if (subPanelActive === SubPanelName.EMOJI) {
+			dispatch(emojiSuggestionActions.setSuggestionEmojiObjPicked({ shortName: '', id: '', isReset: true }));
+
 			setAddEmojiActionChatbox(!addEmojiState);
 			setSuggestionEmojiObjPicked(emojiId, emojiPicked);
 			if (!shiftPressedState) {

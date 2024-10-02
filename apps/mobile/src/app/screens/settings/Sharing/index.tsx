@@ -14,7 +14,6 @@ import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/t
 import { ILinkOnMessage } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
@@ -256,7 +255,7 @@ export const Sharing = ({ data, onClose }) => {
 		// });
 	};
 
-	const handleFiles = (files: any) => {
+	const handleFiles = async (files: any) => {
 		const session = mezon.sessionRef.current;
 		const client = mezon.clientRef.current;
 		if (!files || !client || !session || !currentClan.id) {
@@ -267,17 +266,9 @@ export const Sharing = ({ data, onClose }) => {
 			return handleUploadFileMobile(client, session, currentClan.id, currentChannelId, file.name, file);
 		});
 
-		Promise.all(promises).then((attachments) => {
-			attachments.forEach((attachment) => handleFinishUpload({ ...attachment, size: attachment.size || 100 }));
-		});
+		const response = await Promise.all(promises);
+		setAttachmentUpload(response);
 	};
-
-	const handleFinishUpload = useCallback(
-		(attachment: ApiMessageAttachment) => {
-			setAttachmentUpload([...attachmentUpload, attachment]);
-		},
-		[dispatch]
-	);
 
 	function removeAttachmentByUrl(urlToRemove: string) {
 		setAttachmentUpload((prevAttachments) => prevAttachments.filter((attachment) => attachment.url !== urlToRemove));
