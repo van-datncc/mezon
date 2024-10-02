@@ -212,7 +212,7 @@ const NavigationMain = () => {
 					}
 				}
 
-				promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser()));
+				promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser({ noCache: true })));
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 				promises.push(store.dispatch(directActions.fetchDirectMessage({})));
