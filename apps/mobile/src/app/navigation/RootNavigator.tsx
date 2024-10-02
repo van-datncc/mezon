@@ -107,7 +107,7 @@ const NavigationMain = () => {
 					noCache: true,
 					isFetchingLatestMessages: true,
 					isClearMessage: true,
-					clanId: currentClanId,
+					clanId: currentClanId
 				})
 			);
 		}
@@ -148,7 +148,7 @@ const NavigationMain = () => {
 						noCache: true,
 						isFetchingLatestMessages: true,
 						isClearMessage: true,
-						clanId: currentClanId,
+						clanId: currentClanId
 					})
 				),
 				store.dispatch(
@@ -216,7 +216,7 @@ const NavigationMain = () => {
 				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 				promises.push(store.dispatch(directActions.fetchDirectMessage({})));
-				promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji()));
+				promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
 				const results = await Promise.all(promises);
 
 				if (!isFromFCM) {

@@ -9171,10 +9171,19 @@ flowbite@2.3.0:
     "@popperjs/core" "^2.9.3"
     mini-svg-data-uri "^1.4.3"
 
-flowbite@^2.0.0, flowbite@^2.2.1:
+flowbite@^2.0.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/flowbite/-/flowbite-2.5.1.tgz#b2075c6a91b047e7514a41ec4c5437a7eaaf69e0"
   integrity sha512-7jP1jy9c3QP7y+KU9lc8ueMkTyUdMDvRP+lteSWgY5TigSZjf9K1kqZxmqjhbx2gBnFQxMl1GAjVThCa8cEpKA==
+  dependencies:
+    "@popperjs/core" "^2.9.3"
+    flowbite-datepicker "^1.3.0"
+    mini-svg-data-uri "^1.4.3"
+
+flowbite@^2.2.1:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/flowbite/-/flowbite-2.5.2.tgz#4a14b87ad3f2abd8bcd7b0fb52a6b06fd7a74685"
+  integrity sha512-kwFD3n8/YW4EG8GlY3Od9IoKND97kitO+/ejISHSqpn3vw2i5K/+ZI8Jm2V+KC4fGdnfi0XZ+TzYqQb4Q1LshA==
   dependencies:
     "@popperjs/core" "^2.9.3"
     flowbite-datepicker "^1.3.0"
@@ -12439,17 +12448,17 @@ metro@0.80.12, metro@^0.80.3:
     ws "^7.5.10"
     yargs "^17.6.2"
 
-mezon-js-protobuf@^1.5.73:
-  version "1.5.73"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.5.73.tgz#dbe18885759ce90d31312efd2595ab859379eb47"
-  integrity sha512-NcAfoaEYMPwfAe5Rqm6TIIhR/XxpVq2uBy2DT9qknbyipgH6tNmzNdyFg/+GNSaO5eKywvevmNuGUcGBiSKfSw==
+mezon-js-protobuf@^1.5.78:
+  version "1.5.78"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.5.78.tgz#ef223dc8ac4a2c131d52befb7784670a8a26cdce"
+  integrity sha512-cYxegQin0Z1+7c5aaugiPuFaZPFWpRgouDVyLzwgLfdrwmzugcOzNwR3JCxZHpb2gyuZFof3SRna1X32tQkhgA==
   dependencies:
     "@scarf/scarf" "^1.1.1"
 
-mezon-js@^2.9.11:
-  version "2.9.11"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.9.11.tgz#1b72691b37031264a561425836617ef97dceb99e"
-  integrity sha512-g6pRGGtQHdgq7CIa2udeGt/DzZ+gB3dUWfr6mRBcYN5j0WHZWTbpwKJaN7eetToDFnjj2YfSoNkSOuUuJ+pCUQ==
+mezon-js@^2.9.16:
+  version "2.9.16"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.9.16.tgz#6a24fbc51f8f9bdab180dfa7de64550994ff13f0"
+  integrity sha512-3se6oMiPeCSwgaHqSodkh88WH7QnrfsB5kZbBnSGOWcGAnxc+bFbFHIG8obed+AVtlEPsJFSRGDFCIwJ3+gGhA==
   dependencies:
     "@scarf/scarf" "^1.1.1"
     base64-arraybuffer "^1.0.2"

@@ -105,6 +105,10 @@ const MessageItem = React.memo(
 		const hasInternet = useSelector(selectHasInternetMobile);
 
 		const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+		const checkSystem = useMemo(() => {
+			return message?.sender_id === '0' && message?.username?.toLowerCase() === 'system';
+		}, [message?.sender_id, message?.username]);
+
 		const hasIncludeMention = useMemo(() => {
 			return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
 		}, [message?.content?.t, userProfile]);
@@ -203,7 +207,7 @@ const MessageItem = React.memo(
 			if (preventAction) return;
 			setIsOnlyEmojiPicker(false);
 
-			if (!checkAnonymous) {
+			if (!checkAnonymous && !checkSystem) {
 				onMessageAction({
 					type: EMessageBSToShow.UserInformation,
 					user: message?.user,

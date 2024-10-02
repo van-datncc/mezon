@@ -12,7 +12,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel, MouseButton } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -68,7 +68,6 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const [openSetting, setOpenSetting] = useState(false);
 		const [showModal, setShowModal] = useState(false);
 		const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
-		const panelRef = useRef<HTMLDivElement | null>(null);
 		const channelLinkRef = useRef<HTMLAnchorElement | null>(null);
 		const [coords, setCoords] = useState<Coords>({
 			mouseX: 0,
@@ -101,17 +100,15 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			const mouseY = event.clientY;
 			const windowHeight = window.innerHeight;
 
-			if (event.button === MouseButton.RIGHT) {
-				await dispatch(
-					notificationSettingActions.getNotificationSetting({
-						channelId: channel.channel_id || '',
-						isCurrentChannel: isActive
-					})
-				);
-				const distanceToBottom = windowHeight - event.clientY;
-				setCoords({ mouseX, mouseY, distanceToBottom });
-				setIsShowPanelChannel((s) => !s);
-			}
+			await dispatch(
+				notificationSettingActions.getNotificationSetting({
+					channelId: channel.channel_id || '',
+					isCurrentChannel: isActive
+				})
+			);
+			const distanceToBottom = windowHeight - event.clientY;
+			setCoords({ mouseX, mouseY, distanceToBottom });
+			setIsShowPanelChannel((s) => !s);
 		};
 
 		const handleVoiceChannel = (id: string) => {
@@ -192,8 +189,7 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		return (
 			<div
-				ref={panelRef}
-				onMouseDown={(event) => handleMouseClick(event)}
+				onContextMenu={handleMouseClick}
 				role="button"
 				className={`relative group ${isUnReadChannel || (numberNotification && numberNotification > 0) ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 			>
@@ -234,13 +230,13 @@ const ChannelLink = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 									<Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
-									<Icons.Speaker defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+									<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_TEXT && (
 									<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-									<Icons.Stream defaultSize="w-5 5-5 dark:text-channelTextLabel" />
+									<Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
 							</div>
 							<p
