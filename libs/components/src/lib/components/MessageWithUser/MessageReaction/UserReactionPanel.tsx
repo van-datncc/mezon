@@ -94,22 +94,24 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 				 		${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emojiId={emojiShowPanel.emojiId} emojiName={emojiShowPanel.emoji ?? ''} count={count} />
-						{senderList.map((sender: SenderInfoOptionals, index: number) => {
-							if (sender.count && sender.count > 0) {
-								return (
-									<Fragment key={`${index}_${sender.sender_id}`}>
-										<SenderItem
-											sender={sender}
-											emojiShowPanel={emojiShowPanel}
-											userId={userId}
-											removeEmojiSender={removeEmojiSender}
-											hideSenderOnPanel={hideSenderOnPanel}
-										/>
-									</Fragment>
-								);
-							}
-							return null;
-						})}
+						<div className="max-h-40 overflow-y-auto hide-scrollbar">
+							{senderList.map((sender: SenderInfoOptionals, index: number) => {
+								if (sender.count && sender.count > 0) {
+									return (
+										<Fragment key={`${index}_${sender.sender_id}`}>
+											<SenderItem
+												sender={sender}
+												emojiShowPanel={emojiShowPanel}
+												userId={userId}
+												removeEmojiSender={removeEmojiSender}
+												hideSenderOnPanel={hideSenderOnPanel}
+											/>
+										</Fragment>
+									);
+								}
+								return null;
+							})}
+						</div>
 					</div>
 				</div>
 			)}
