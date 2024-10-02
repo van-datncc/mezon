@@ -4476,3 +4476,24 @@ export function LowVolume(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+
+export function AppChannelIcon({ fill, ...props }: ClassIconProps) {
+	return (
+		<svg
+			className="icon icon-tabler icon-tabler-apps"
+			fill={fill === 'dark' ? '#AEAEAE' : '#535353'}
+			height="24"
+			viewBox="0 0 24 24"
+			width="24"
+			xmlns="http://www.w3.org/2000/svg"
+			{...props}
+		>
+			<path d="M0 0h24v24H0z" fill="none" stroke="none" />
+			<rect height="6" rx="1" width="6" x="4" y="4" />
+			<rect height="6" rx="1" width="6" x="4" y="14" />
+			<rect height="6" rx="1" width="6" x="14" y="14" />
+			<line x1="14" x2="20" y1="7" y2="7" fill={fill} />
+			<line x1="17" x2="17" y1="4" y2="10" fill={fill} />
+		</svg>
+	);
+}
