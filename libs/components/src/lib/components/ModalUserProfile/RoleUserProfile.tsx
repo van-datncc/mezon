@@ -77,7 +77,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		<div className="flex flex-col">
 			<div className="font-bold tracking-wider text-sm pt-2">ROLES</div>
 			<div className="mt-2 flex flex-wrap gap-2">
-				{userRolesClan.map((role, index) => (
+				{userRolesClan.slice(0, 6).map((role, index) => (
 					<span
 						key={`${role.id}_${index}`}
 						className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-700 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant"
@@ -100,6 +100,28 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						<span className="text-xs font-medium">{role.title}</span>
 					</span>
 				))}
+				{userRolesClan.length > 6 && (
+					<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
+						<Tooltip
+							content={
+								<div className={'flex flex-col items-start'}>
+									{userRolesClan.slice(6, -1).map((userRole) => (
+										<div className={'my-0.5'} key={userRole.id}>
+											<span className="text-xs font-medium">{userRole.title}</span>
+										</div>
+									))}
+								</div>
+							}
+							trigger={'hover'}
+							style={appearanceTheme === 'light' ? 'light' : 'dark'}
+							className="dark:!text-white !text-black"
+						>
+							<span className="text-xs font-medium px-1 cursor-pointer" style={{ lineHeight: '15px' }}>
+								+ {userRolesClan.length - 6}
+							</span>
+						</Tooltip>
+					</span>
+				)}
 				<UserRestrictionZone policy={hasPermissionEditRole}>
 					<Tooltip
 						content={<AddRolesComp addRole={addRole} filteredListRoleBySearch={filteredListRoleBySearch} setSearchTerm={setSearchTerm} />}
