@@ -293,9 +293,6 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 	);
 
 	const handleDeleteChannel = async () => {
-		if (channel?.parrent_id !== '0') {
-			await dispatch(channelsActions.setCurrentChannelId(channel?.parrent_id));
-		}
 		await dispatch(
 			channelsActions.deleteChannel({
 				channelId: channel?.channel_id,
@@ -304,6 +301,15 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 		);
 		navigation.navigate(APP_SCREEN.HOME);
 		navigation.dispatch(DrawerActions.openDrawer());
+		if (channel?.parrent_id !== '0') {
+			await dispatch(
+				channelsActions.joinChannel({
+					clanId: channel?.clan_id,
+					channelId: channel?.parrent_id,
+					noFetchMembers: false
+				})
+			);
+		}
 	};
 
 	const handleDeleteModalVisibleChange = (visible: boolean) => {
