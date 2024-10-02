@@ -31,12 +31,9 @@ export interface ChannelsEntity extends IChannel {
 }
 
 function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
-	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds ?? channel.last_sent_message?.timestamp_seconds);
-	const finalLastSeenTimestamp = isNaN(lastSeenTimestamp) ? Number(channel.last_sent_message?.timestamp_seconds) : lastSeenTimestamp;
-
 	return {
 		id: channel.id,
-		lastSeenTimestamp: finalLastSeenTimestamp,
+		lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds) ?? 0,
 		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
 		lastSeenPinMessage: channel.last_pin_message || '',
 		clanId: channel.clan_id ?? ''
