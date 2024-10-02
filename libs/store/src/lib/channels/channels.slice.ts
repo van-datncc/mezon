@@ -648,6 +648,5 @@ export const selectPreviousChannels = createSelector(getChannelsState, (state) =
 
 export const selectAppChannelById = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {
-		console.log('check selector: ', state.appChannelsList, ' \n select: ', state.appChannelsList[channelId]);
 		return state.appChannelsList[channelId];
 	});
