@@ -6,10 +6,12 @@ export const style = (colors: Attributes) =>
 		dmMessageContainer: {
 			flex: 1,
 			height: size.s_17,
-			flexDirection: 'row'
+			flexDirection: 'row',
+			alignItems: 'flex-end'
 		},
 		message: {
-			fontSize: size.small
+			fontSize: size.small,
+			color: colors.text
 		},
 		emoji: {
 			height: size.s_17,
