@@ -5,7 +5,6 @@ import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { categoriesActions, selectCurrentClan, selectIsShowEmptyCategory, useAppDispatch } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { EProfileTab } from 'apps/mobile/src/app/screens/settings/ProfileSetting';
 import { MutableRefObject, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -15,6 +14,7 @@ import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonMenu
 import DeleteClanModal from '../../../../../../components/DeleteClanModal';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../navigation/ScreenTypes';
 import MezonButtonIcon from '../../../../../../temp-ui/MezonButtonIcon';
+import { EProfileTab } from '../../../../../settings/ProfileSetting';
 import ClanMenuInfo from '../ClanMenuInfo';
 import { style } from './styles';
 

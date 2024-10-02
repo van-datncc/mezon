@@ -23,7 +23,7 @@ const RegisterSchema = Yup.object().shape({
 		.min(10, 'Must be exactly 10 digits')
 		.max(10, 'Must be exactly 10 digits')
 		.matches(/^\d+$/, 'Must be only digits')
-		.required('Please enter your mobile number'),
+		.required('Please enter your mobile number')
 });
 const RegisterScreen = () => {
 	const styles = style(useTheme().themeValue);
@@ -45,7 +45,7 @@ const RegisterScreen = () => {
 							email: '',
 							password: '',
 							confirmPassword: '',
-							mobile: '',
+							mobile: ''
 						}}
 						validationSchema={RegisterSchema}
 						onSubmit={(values) => {

@@ -1,11 +1,10 @@
 import { selectAllChannels, selectAllHashtagDm, selectNumberMemberVoiceChannel } from '@mezon/store';
-import { HighlightMatchBold } from '@mezon/ui';
+import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { SearchItemProps, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Icons } from '../../../components';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 type SuggestItemProps = {
