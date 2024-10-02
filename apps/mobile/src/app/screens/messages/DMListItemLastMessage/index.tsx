@@ -35,9 +35,10 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 		return `[${shortname}](${srcEmoji})`;
 	};
 
-	let lastIndex = 0;
 	const formatEmojiInText = useMemo(() => {
 		let formattedContent = '';
+		let lastIndex = 0;
+
 		elements.forEach(({ s = 0, e = 0, kindOf, emojiid }) => {
 			const contentInElement = t?.substring?.(s, e);
 			if (lastIndex < s) {
@@ -46,14 +47,14 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 			if (kindOf === ETokenMessage.EMOJIS) {
 				formattedContent += EmojiMarkup({ shortname: contentInElement, emojiid: emojiid });
 			}
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 			lastIndex = e;
 		});
 		if (lastIndex < t?.length) {
 			formattedContent += t?.slice?.(lastIndex)?.toString();
 		}
+
 		return formattedContent;
-	}, []);
+	}, [elements, t]);
 
 	const convertTextToEmoji = () => {
 		const parts = formatEmojiInText.split(splitEmojisRegex);
