@@ -148,10 +148,14 @@ export const emojiSuggestionSlice = createSlice({
 
 		setSuggestionEmojiObjPicked: (state, action: PayloadAction<EmojiObjPickedArgs>) => {
 			const { shortName, id, isReset } = action.payload;
-			if (!state.emojiObjPicked || isReset) {
+
+			if (!state.emojiObjPicked) {
 				state.emojiObjPicked = {};
 			}
-			if (!state.emojiObjPicked[shortName]) {
+
+			if (isReset) {
+				state.emojiObjPicked = {};
+			} else if (shortName !== '' && id !== '') {
 				state.emojiObjPicked[shortName] = id;
 			}
 		}
