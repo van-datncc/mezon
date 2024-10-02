@@ -42,7 +42,8 @@ const ListRoleMember = memo((props: ListRoleMemberProps) => {
 					permissionRoleChannelActions.fetchPermissionRoleChannel({
 						channelId: channelId,
 						roleId: listManageInChannel[0].id,
-						userId: ''
+						userId: '',
+						noCache: true
 					})
 				);
 			} else {
@@ -50,7 +51,8 @@ const ListRoleMember = memo((props: ListRoleMemberProps) => {
 					permissionRoleChannelActions.fetchPermissionRoleChannel({
 						channelId: channelId,
 						roleId: '',
-						userId: listManageInChannel[0].id
+						userId: listManageInChannel[0].id,
+						noCache: true
 					})
 				);
 			}
@@ -62,9 +64,13 @@ const ListRoleMember = memo((props: ListRoleMemberProps) => {
 			setSelectedItemId(item.id);
 			onSelect(item.id, item.type);
 			if (item.type === 0) {
-				dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: item.id, userId: '' }));
+				dispatch(
+					permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: item.id, userId: '', noCache: true })
+				);
 			} else {
-				dispatch(permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: '', userId: item.id }));
+				dispatch(
+					permissionRoleChannelActions.fetchPermissionRoleChannel({ channelId: channelId, roleId: '', userId: item.id, noCache: true })
+				);
 			}
 		}
 	};
