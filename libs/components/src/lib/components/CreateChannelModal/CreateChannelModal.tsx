@@ -15,24 +15,28 @@ import { CreateChannelButton } from './CreateChannelButton';
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();
 	const InputRef = useRef<ChannelNameModalRef>(null);
+	const appUrlInputRef = useRef<ChannelNameModalRef>(null);
 	const [isInputError, setIsInputError] = useState<boolean>(true);
-
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentCategory = useSelector((state: RootState) => state.channels.currentCategory);
 	const isOpenModal = useSelector((state: RootState) => state.channels.isOpenCreateNewChannel);
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
+	const [validate, setValidate] = useState(true);
+	const [channelName, setChannelName] = useState('');
+	const [appUrl, setAppUrl] = useState<string>('');
+	const [isErrorType, setIsErrorType] = useState<string>('');
+	const [isErrorName, setIsErrorName] = useState<string>('');
+	const [isPrivate, setIsPrivate] = useState<number>(0);
+	const [channelType, setChannelType] = useState<number>(-1);
+	const navigate = useNavigate();
+	const { toChannelPage } = useAppNavigation();
+	const isAppChannel = channelType === ChannelType.CHANNEL_TYPE_APP;
 
 	useEffect(() => {
 		if (isLoading === 'loaded') {
 			dispatch(channelsActions.openCreateNewModalChannel(false));
 		}
 	}, [dispatch, isLoading]);
-
-	const [isErrorType, setIsErrorType] = useState<string>('');
-	const [isErrorName, setIsErrorName] = useState<string>('');
-
-	const navigate = useNavigate();
-	const { toChannelPage } = useAppNavigation();
 
 	const handleSubmit = async () => {
 		if (channelType === -1) {
@@ -54,7 +58,8 @@ export const CreateNewChannelModal = () => {
 			type: channelType,
 			channel_label: channelName,
 			channel_private: isPrivate,
-			category_id: currentCategory?.category_id
+			category_id: currentCategory?.category_id,
+			...(isAppChannel && { app_url: appUrl })
 		};
 
 		const newChannelCreatedId = await dispatch(createNewChannel(body));
@@ -76,22 +81,20 @@ export const CreateNewChannelModal = () => {
 		dispatch(channelsActions.openCreateNewModalChannel(false));
 	};
 
-	const [channelName, setChannelName] = useState('');
 	const handleChannelNameChange = (value: string) => {
 		setIsErrorName('');
 		setChannelName(value);
 	};
-	const [validate, setValidate] = useState(true);
+
 	const checkValidate = (check: boolean) => {
 		setValidate(check);
 	};
 
-	const [channelType, setChannelType] = useState<number>(-1);
 	const onChangeChannelType = (value: number) => {
 		setIsErrorType('');
 		setChannelType(value);
 	};
-	const [isPrivate, setIsPrivate] = useState<number>(0);
+
 	const onChangeToggle = (value: number) => {
 		setIsPrivate(value);
 	};
@@ -112,6 +115,10 @@ export const CreateNewChannelModal = () => {
 		dispatch(channelsActions.openCreateNewModalChannel(false));
 	}, [isOpenModal]);
 	useEscapeKeyClose(modalRef, handleClose);
+
+	const handleChangeAppUrl = (value: string) => {
+		setAppUrl(value);
+	};
 	return (
 		isOpenModal && (
 			<div
@@ -119,7 +126,9 @@ export const CreateNewChannelModal = () => {
 				tabIndex={-1}
 				className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 			>
-				<div className="z-60 w-full h-full sm:w-4/5 sm:max-h-[570px] md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative">
+				<div
+					className={`z-60 w-full h-full sm:w-4/5 ${isAppChannel ? 'sm:max-h-[700px]' : 'sm:max-h-[570px]'}  md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative shadow-lg`}
+				>
 					<div className="self-stretch md:h-96 flex-col justify-start items-start flex">
 						<div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">
 							<div className="self-stretch h-14 flex-col justify-center items-start gap-1 flex">
@@ -162,8 +171,8 @@ export const CreateNewChannelModal = () => {
 										error={isErrorType}
 									/>
 									<ChannelTypeComponent
-										disable={true}
-										type={ChannelType.CHANNEL_TYPE_ANNOUNCEMENT}
+										disable={false}
+										type={ChannelType.CHANNEL_TYPE_APP}
 										onChange={onChangeChannelType}
 										error={isErrorType}
 									/>
@@ -177,7 +186,21 @@ export const CreateNewChannelModal = () => {
 								channelNameProps="What is channel's name?"
 								error={isErrorName}
 								onHandleChangeValue={handleChangeValue}
+								placeholder={"Enter the channel's name"}
+								shouldValidate={true}
 							/>
+							{channelType === ChannelType.CHANNEL_TYPE_APP && (
+								<div className={'mt-2 w-full'}>
+									<ChannelNameTextField
+										ref={appUrlInputRef}
+										onChange={handleChangeAppUrl}
+										type={channelType}
+										channelNameProps="What is app's URL?"
+										placeholder={"Enter the app's URL"}
+										shouldValidate={false}
+									/>
+								</div>
+							)}
 							{channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
 								<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
 							)}

@@ -2,6 +2,7 @@ import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/
 import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
+	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -10,6 +11,7 @@ import {
 	selectStatusMenu,
 	useAppDispatch
 } from '@mezon/store';
+import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
@@ -71,6 +73,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
+	const appChannel = useSelector(selectAppChannelById(channelId));
 
 	useChannelSeen(currentChannel?.id || '');
 
@@ -88,7 +91,15 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [isShowMemberList, setIsShowCreateThread]);
 
-	return (
+	return currentChannel.type === ChannelType.CHANNEL_TYPE_APP ? (
+		appChannel?.url ? (
+			<iframe src={appChannel?.url} className={'w-full h-full'}></iframe>
+		) : (
+			<div className={'w-full h-full flex items-center justify-center'}>
+				<Loading />
+			</div>
+		)
+	) : (
 		currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
 			<>
 				{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
