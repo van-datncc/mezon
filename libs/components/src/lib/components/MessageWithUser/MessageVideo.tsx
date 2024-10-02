@@ -46,7 +46,7 @@ function MessageVideo({ attachmentData }: MessageImage) {
 			></video>
 			{!showControl && (
 				<div className="bottom-1 right-1 absolute w-4 h-4 rounded overflow-hidden cursor-pointer z-10" onClick={handleShowFullVideo}>
-					<Icons.FullScreen defaultSize="w-4 h-4" defaultFill="text-channelTextLabel" />
+					<Icons.FullScreen className="w-4 h-4 dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
 				</div>
 			)}
 		</div>
