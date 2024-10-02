@@ -45,8 +45,8 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 	}, [originSettingValue, currentSettingValue]);
 
 	const currentCategoryName = useMemo(() => {
-		return channel?.category_name
-	}, [channel?.category_name])
+		return channel?.category_name;
+	}, [channel?.category_name]);
 
 	navigation.setOptions({
 		headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
@@ -293,6 +293,9 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 	);
 
 	const handleDeleteChannel = async () => {
+		if (channel?.parrent_id !== '0') {
+			await dispatch(channelsActions.setCurrentChannelId(channel?.parrent_id));
+		}
 		await dispatch(
 			channelsActions.deleteChannel({
 				channelId: channel?.channel_id,
