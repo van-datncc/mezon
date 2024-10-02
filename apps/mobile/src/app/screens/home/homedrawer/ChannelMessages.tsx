@@ -132,7 +132,7 @@ const ChannelMessages = React.memo(
 					/>
 				);
 			},
-			[jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction, messages]
+			[messages, jumpToRepliedMessage, mode, channelId, onOpenImage, onMessageAction, setIsOnlyEmojiPicker]
 		);
 
 		const checkChannelCacheLoading = useMemo(() => {

@@ -28,8 +28,6 @@ export const ActionRow = React.memo(() => {
 		[EOverriddenPermission.manageThread, EPermission.manageChannel],
 		currentChannel?.channel_id ?? ''
 	);
-	console.log('log  => isCanManageThread', isCanManageThread);
-	console.log('log  => isCanManageChannel', isCanManageChannel);
 	const { statusMute } = useStatusMuteChannel();
 
 	useEffect(() => {

@@ -37,16 +37,19 @@ export const ListClanPopup = React.memo(() => {
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			save(STORAGE_CLAN_ID, clanId);
 			store.dispatch(clansActions.setCurrentClanId(clanId));
-			const promises = [];
-			promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
-			promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
-			promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
-			const results = await Promise.all(promises);
 
-			const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
-			if (channelResp) {
-				await setDefaultChannelLoader(channelResp.payload, clanId);
-			}
+			requestAnimationFrame(async () => {
+				const promises = [];
+				promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
+				promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
+				promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
+				const results = await Promise.all(promises);
+
+				const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
+				if (channelResp) {
+					await setDefaultChannelLoader(channelResp.payload, clanId);
+				}
+			});
 		},
 		[isTabletLandscape]
 	);

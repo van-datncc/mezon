@@ -48,6 +48,8 @@ const ChannelListMessage = React.memo(
 				renderItem={renderItem}
 				removeClippedSubviews={false}
 				keyExtractor={keyExtractor}
+				windowSize={20}
+				initialNumToRender={20}
 				onEndReached={
 					messages?.length && !isCannotLoadMore
 						? () => {

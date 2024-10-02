@@ -160,7 +160,9 @@ const MessageItem = React.memo(
 		}, [message.content]);
 
 		const isEdited = useMemo(() => {
-			if (message?.update_time) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-expect-error
+			if (message?.update_time && !message.isError && !message.isErrorRetry) {
 				const updateDate = new Date(message?.update_time);
 				const createDate = new Date(message?.create_time);
 				return updateDate > createDate;
@@ -423,7 +425,9 @@ const MessageItem = React.memo(
 								createTime={message?.create_time}
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-							<Block opacity={message.isError || (message.isSending && !hasInternet) ? 0.6 : 1}>
+							{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+							{/*@ts-expect-error*/}
+							<Block opacity={message.isError || (message.isSending && !hasInternet) || message?.isErrorRetry ? 0.6 : 1}>
 								{isInviteLink ? (
 									<RenderMessageInvite content={contentMessage} />
 								) : (
