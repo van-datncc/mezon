@@ -100,7 +100,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 					borderWidth: 1
 				}
 			]}
-			onPress={() => redirectToMessageDetail()}
+			onPress={redirectToMessageDetail}
 			onLongPress={onLongPress}
 		>
 			{isTypeDMGroup ? (
