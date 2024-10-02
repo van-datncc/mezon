@@ -10,10 +10,10 @@ import {
 } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ClanSetting from '../ClanSettings';
 import { ItemSetting } from '../ClanSettings/ItemObj';
 import ModalInvite from '../ListMemberInvite/modalInvite';
@@ -34,6 +34,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const dispatch = useAppDispatch();
+	const params = useParams();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [isClanOwner, canManageClan] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
 	const { removeMemberClan } = useChannelMembersActions();
@@ -80,6 +81,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		await dispatch(categoriesActions.createNewCategory(body));
 		onClose();
 	};
+
 	const handleInputFocus = () => {
 		openSearchModal();
 		inputRef.current?.blur();
@@ -109,7 +111,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 		if (!hasChildModalRef.current) {
 			setOpenServerSettings(false);
 		}
-	}, [isShowModalPanelClan]);
+	}, []);
 
 	const handleLeaveClan = async () => {
 		await removeMemberClan({ channelId: currentChannelId, clanId: currentClan?.clan_id as string, userIds: [userProfile?.user?.id as string] });
@@ -124,6 +126,20 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			dispatch(categoriesActions.setShowEmptyCategory());
 		}
 	};
+
+	const closeAllModals = useCallback(() => {
+		setOpenServerSettings(false);
+		setOpenCreateCate(false);
+		closeInviteClanModal();
+		closeNotiSettingModal();
+	}, [closeInviteClanModal, closeNotiSettingModal]);
+
+	useEffect(() => {
+		if (params?.clanId) {
+			closeAllModals();
+		}
+	}, [closeAllModals, params]);
+
 	return (
 		<>
 			{type === 'direct' ? (
