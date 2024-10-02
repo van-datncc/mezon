@@ -90,7 +90,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				clan_id: currentClanId || ''
 			};
 			isSticker
-				? await dispatch(updateSticker({ stickerId: graphic.id, request: updateData, clan_id: currentClanId }))
+				? await dispatch(updateSticker({ stickerId: graphic.id, request: updateData }))
 				: await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: updateData, emojiId: graphic.id }));
 			handleCloseModal();
 			return;

@@ -1,7 +1,6 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	channelMetaActions,
-	directMetaActions,
 	notificationActions,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
@@ -70,7 +69,6 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 		getUnreadChannelIds.forEach((channelId: string) => {
 			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		});
-		dispatch(directMetaActions.removeUnreadAllDm());
 	}, [getUnreadChannelIds, dispatch]);
 
 	const isShowMarkAllAsRead = useMemo(() => {

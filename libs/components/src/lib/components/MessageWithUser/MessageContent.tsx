@@ -1,6 +1,6 @@
 import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, isValidEmojiData } from '@mezon/utils';
 import { useMemo } from 'react';
-import MessageLine from './MessageLine';
+import { MessageLine } from './MessageLine';
 import { useMessageParser } from './useMessageParser';
 
 type IMessageContentProps = {

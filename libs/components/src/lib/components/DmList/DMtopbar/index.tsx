@@ -18,7 +18,7 @@ import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import { HelpButton, InboxButton } from '../../ChannelTopbar';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
-import MemberProfile from '../../MemberProfile';
+import { MemberProfile } from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
 import CreateMessageGroup from '../CreateMessageGroup';
 import LabelDm from './labelDm';

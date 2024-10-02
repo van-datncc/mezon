@@ -12,14 +12,14 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import useTabletLandscape from 'apps/mobile/src/app/hooks/useTabletLandscape';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
-import EventViewer from '../../../../components/Event';
+import { EventViewer } from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
+import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
 import { MezonBottomSheet } from '../../../../temp-ui';
 import { InviteToChannel } from '../components';

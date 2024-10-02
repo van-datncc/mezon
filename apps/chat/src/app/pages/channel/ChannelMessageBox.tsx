@@ -1,6 +1,7 @@
-import { GifStickerEmojiPopup, Icons, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
+import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import { referencesActions, selectAnonymousMode, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
 import classNames from 'classnames';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';

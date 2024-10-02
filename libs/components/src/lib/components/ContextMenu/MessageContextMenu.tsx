@@ -45,6 +45,7 @@ import {
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalDeleteMess from '../DeleteMessageModal/ModalDeleteMess';
 import { ModalAddPinMess } from '../PinMessModal';
@@ -125,7 +126,9 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableOpenLinkItem, setEnableOpenLinkItem] = useState<boolean>(false);
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
-	const [isOPenDeleteMessageModal, setIsOPenDeleteMessageModal] = useState<boolean>(false);
+	const [isOPenDeleteMessageModal, isCloseDeleteMessageModal] = useModal(() => {
+		return <ModalDeleteMess mess={currentMessage} closeModal={isCloseDeleteMessageModal} mode={mode} />;
+	}, [currentMessage]);
 	const appearanceTheme = useSelector(selectTheme);
 
 	const isShowForwardAll = useMemo(() => {
@@ -494,12 +497,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 
 		builder.when(enableDelMessageItem, (builder) => {
-			builder.addMenuItem(
-				'deleteMessage',
-				'Delete Message',
-				() => setIsOPenDeleteMessageModal(true),
-				<Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />
-			);
+			builder.addMenuItem('deleteMessage', 'Delete Message', isOPenDeleteMessageModal, <Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
 		builder.when(enableReportMessageItem, (builder) => {
@@ -594,15 +592,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 					handlePinMessage={handlePinMessage}
 					mode={activeMode || 0}
 					channelLabel={currentChannel?.channel_label || ''}
-				/>
-			)}
-			{isOPenDeleteMessageModal && (
-				<ModalDeleteMess
-					mess={currentMessage}
-					closeModal={() => {
-						setIsOPenDeleteMessageModal(false);
-					}}
-					mode={mode}
 				/>
 			)}
 		</>

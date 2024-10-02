@@ -1,4 +1,3 @@
-import { MemberProfile } from '@mezon/components';
 import {
 	directActions,
 	directMetaActions,
@@ -13,6 +12,7 @@ import { ChannelMembersEntity, MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { MemberProfile } from '../../MemberProfile';
 export type DirectMessProp = {
 	id: string;
 	currentDmGroupId: string;

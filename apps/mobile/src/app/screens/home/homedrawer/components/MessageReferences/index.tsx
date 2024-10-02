@@ -3,11 +3,11 @@ import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { messagesActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
-import { MezonAvatar } from 'apps/mobile/src/app/temp-ui';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
+import { MezonAvatar } from '../../../../../temp-ui';
 import { RenderTextMarkdownContent } from '../RenderTextMarkdown';
 import { style } from './styles';
 

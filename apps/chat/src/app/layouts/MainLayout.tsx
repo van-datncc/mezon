@@ -1,12 +1,12 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
 import { reactionActions, selectAllChannelMeta, selectAnyUnreadChannel, selectMentionAndReplyUnreadAllClan } from '@mezon/store';
 
-import { selectAllDirectMessageByLastSeenTimestamp, selectAllDirectMetaMessages, useAppSelector } from '@mezon/store-mobile';
+import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
-import { SubPanelName, electronBridge, removeUndefinedAndEmpty } from '@mezon/utils';
+import { SubPanelName, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
 import debounce from 'lodash.debounce';
-import { useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 
@@ -17,17 +17,7 @@ const GlobalEventListener = () => {
 	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
 	const allNotificationReplyMentionAllClan = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
 
-	const allLastSeenChannelAllDirect = useSelector(selectAllDirectMetaMessages);
-	const getAllDirectMessageUnread = useSelector(selectAllDirectMessageByLastSeenTimestamp(allLastSeenChannelAllDirect));
-	const filterDirectUnread = removeUndefinedAndEmpty(getAllDirectMessageUnread);
-
-	const allCountDirectUnread = useMemo(() => {
-		const length = Object.keys(filterDirectUnread)
-			.filter((key) => key !== 'undefined')
-			.reduce((acc, key) => acc + filterDirectUnread[key].length, 0);
-
-		return length;
-	}, [filterDirectUnread]);
+	const totalUnreadMessages = useSelector(selectTotalUnreadDM);
 
 	const { quantityPendingRequest } = useFriends();
 
@@ -59,8 +49,7 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = allNotificationReplyMentionAllClan?.length ?? 0 + allCountDirectUnread + quantityPendingRequest;
-
+		const notificationCount = (allNotificationReplyMentionAllClan?.length ?? 0) + totalUnreadMessages + quantityPendingRequest;
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
 				electronBridge?.setBadgeCount(null);
@@ -68,13 +57,9 @@ const GlobalEventListener = () => {
 			}
 			electronBridge?.setBadgeCount(notificationCount);
 		} else {
-			if (notificationCount > 0) {
-				document.title = `(${notificationCount}) Mezon`;
-			} else {
-				document.title = 'Mezon';
-			}
+			document.title = notificationCount > 0 ? `(${notificationCount}) Mezon` : 'Mezon';
 		}
-	}, [allNotificationReplyMentionAllClan?.length ?? 0, allCountDirectUnread, quantityPendingRequest, hasUnreadChannel]);
+	}, [allNotificationReplyMentionAllClan.length, totalUnreadMessages, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };
