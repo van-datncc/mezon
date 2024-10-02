@@ -8,7 +8,8 @@ import {
 	setDefaultChannelLoader,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_CLAN_ID,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	validLinkInviteRegex
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import {
@@ -46,6 +47,7 @@ import { InfoUserMessage } from './components/InfoUserMessage';
 import { MessageAttachment } from './components/MessageAttachment';
 import { MessageReferences } from './components/MessageReferences';
 import { NewMessageRedLine } from './components/NewMessageRedLine';
+import RenderMessageInvite from './components/RenderMessageInvite';
 import { IMessageActionNeedToResolve, IMessageActionPayload } from './types';
 import WelcomeMessage from './WelcomeMessage';
 
@@ -89,6 +91,11 @@ const MessageItem = React.memo(
 		const previousMessage: MessagesEntity = props?.previousMessage;
 		const navigation = useNavigation<any>();
 		const [showHighlightReply, setShowHighlightReply] = useState(false);
+		const { t: contentMessage, lk = [] } = message?.content || {};
+
+		const isInviteLink = useMemo(() => {
+			return Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
+		}, [contentMessage, lk]);
 
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const userProfile = useSelector(selectAllAccount);
@@ -253,8 +260,8 @@ const MessageItem = React.memo(
 					await Linking.openURL(urlVoice);
 				} else if (type === ChannelType.CHANNEL_TYPE_TEXT) {
 					handleChangeClan(clanId);
-					DeviceEventEmitter.emit(ActionEmitEvent.ON_MENTION_HASHTAG_DM, {
-						isMentionHashtagDM: true
+					DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+						isFetchMemberChannelDM: true
 					});
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
@@ -417,22 +424,26 @@ const MessageItem = React.memo(
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
 							<Block opacity={message.isError || (message.isSending && !hasInternet) ? 0.6 : 1}>
-								<RenderTextMarkdownContent
-									content={{
-										...(typeof message.content === 'object' ? message.content : {}),
-										mentions: message.mentions,
-										...(checkOneLinkImage ? { t: '' } : {})
-									}}
-									isEdited={isEdited}
-									translate={t}
-									onMention={onMention}
-									onChannelMention={onChannelMention}
-									isNumberOfLine={isNumberOfLine}
-									isMessageReply={false}
-									mode={mode}
-									directMessageId={channelId}
-									isOnlyContainEmoji={isOnlyContainEmoji}
-								/>
+								{isInviteLink ? (
+									<RenderMessageInvite content={contentMessage} />
+								) : (
+									<RenderTextMarkdownContent
+										content={{
+											...(typeof message.content === 'object' ? message.content : {}),
+											mentions: message.mentions,
+											...(checkOneLinkImage ? { t: '' } : {})
+										}}
+										isEdited={isEdited}
+										translate={t}
+										onMention={onMention}
+										onChannelMention={onChannelMention}
+										isNumberOfLine={isNumberOfLine}
+										isMessageReply={false}
+										mode={mode}
+										directMessageId={channelId}
+										isOnlyContainEmoji={isOnlyContainEmoji}
+									/>
+								)}
 							</Block>
 							{message.isError && <Text style={{ color: 'red' }}>{t('unableSendMessage')}</Text>}
 							{!preventAction ? (
