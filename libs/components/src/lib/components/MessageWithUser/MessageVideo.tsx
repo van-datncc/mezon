@@ -6,6 +6,7 @@ export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
 };
 export const MIN_WIDTH_VIDEO_SHOW = 162;
+export const DEFAULT_HEIGHT_VIDEO_SHOW = 150;
 
 function MessageVideo({ attachmentData }: MessageImage) {
 	const handleOnCanPlay = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
@@ -34,7 +35,11 @@ function MessageVideo({ attachmentData }: MessageImage) {
 				src={attachmentData.url}
 				controls={showControl}
 				autoPlay={false}
-				className={`${showControl ? 'max-w-full h-[150px]' : `w-[${MIN_WIDTH_VIDEO_SHOW}px] h-auto`} object-contain`}
+				className={`object-contain`}
+				style={{
+					width: showControl ? 'auto' : MIN_WIDTH_VIDEO_SHOW,
+					height: showControl ? DEFAULT_HEIGHT_VIDEO_SHOW : `auto`
+				}}
 				ref={videoRef}
 				onCanPlay={(e) => handleOnCanPlay(e)}
 				onClick={(e) => handleTogglePlay(e)}
