@@ -1,5 +1,13 @@
 import { useChannelMembersOnlineStatus, useInvite } from '@mezon/core';
-import { ActionEmitEvent, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, remove, save, setDefaultChannelLoader } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	STORAGE_CHANNEL_CURRENT_CACHE,
+	STORAGE_CLAN_ID,
+	inviteLinkRegex,
+	remove,
+	save,
+	setDefaultChannelLoader
+} from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
@@ -17,7 +25,6 @@ import { DeviceEventEmitter, Text, TouchableOpacity, TouchableWithoutFeedback, V
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../../../../../app/navigation/ScreenTypes';
 import { MezonAvatar } from '../../../../../../../app/temp-ui';
-import { inviteLinkRegex } from '../../../../../../../app/utils/helpers';
 import { style } from '../RenderMessageInvite.styles';
 
 export const extractInviteIdFromUrl = (url: string): string | null => {

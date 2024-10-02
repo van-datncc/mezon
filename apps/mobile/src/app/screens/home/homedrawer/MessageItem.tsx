@@ -8,7 +8,8 @@ import {
 	setDefaultChannelLoader,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_CLAN_ID,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	validLinkInviteRegex
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import {
@@ -28,7 +29,7 @@ import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, DeviceEventEmitter, Linking, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { linkGoogleMeet, validLinkInviteRegex } from '../../../utils/helpers';
+import { linkGoogleMeet } from '../../../utils/helpers';
 import { MessageAction, RenderTextMarkdownContent } from './components';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';

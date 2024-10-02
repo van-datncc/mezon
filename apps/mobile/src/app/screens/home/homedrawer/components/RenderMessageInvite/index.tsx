@@ -1,6 +1,6 @@
 import { urlRegex } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import LinkInvite from './LinkInvite';
 import { style } from './RenderMessageInvite.styles';
@@ -12,7 +12,7 @@ interface IRenderMessageInviteProps {
 function RenderMessageInvite({ content }: IRenderMessageInviteProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const parts = content?.split(urlRegex);
+	const parts = useMemo(() => content?.split(urlRegex), [content]);
 
 	return (
 		<View>

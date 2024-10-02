@@ -2,10 +2,12 @@ import { useInvite } from '@mezon/core';
 import {
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_CLAN_ID,
+	inviteLinkRegex,
 	remove,
 	save,
 	setCurrentClanLoader,
-	setDefaultChannelLoader
+	setDefaultChannelLoader,
+	validLinkInviteRegex
 } from '@mezon/mobile-components';
 import { Block, size } from '@mezon/mobile-ui';
 import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
@@ -14,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { ErrorInput } from '../../../../../components/ErrorInput';
 import { MezonInput, MezonModal } from '../../../../../temp-ui';
-import { inviteLinkRegex, validLinkInviteRegex } from '../../../../../utils/helpers';
 import { styles } from './JoinClanModal.styles';
 
 type JoinClanModalProps = {
