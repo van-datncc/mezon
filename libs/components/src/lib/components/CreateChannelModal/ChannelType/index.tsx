@@ -14,7 +14,7 @@ const labelMap: Partial<Record<ChannelType, string>> = {
 	[ChannelType.CHANNEL_TYPE_TEXT]: 'Text',
 	[ChannelType.CHANNEL_TYPE_VOICE]: 'Voice',
 	[ChannelType.CHANNEL_TYPE_FORUM]: 'Forum',
-	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Apps',
+	[ChannelType.CHANNEL_TYPE_ANNOUNCEMENT]: 'Announcement',
 	[ChannelType.CHANNEL_TYPE_APP]: 'Apps',
 	[ChannelType.CHANNEL_TYPE_STREAMING]: 'Stream',
 	// 2 lines below only get index
