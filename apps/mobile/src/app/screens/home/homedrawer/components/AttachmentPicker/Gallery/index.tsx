@@ -96,7 +96,6 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				return requestResult === 'granted' || requestResult === 'limited';
 			} else if (result === 'limited') {
 				await iosRefreshGallerySelection();
-			} else {
 			}
 			return result === 'granted' || result === 'limited';
 		}

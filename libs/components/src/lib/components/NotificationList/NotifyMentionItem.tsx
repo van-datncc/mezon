@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageAttachment from '../MessageWithUser/MessageAttachment';
 import MessageHead from '../MessageWithUser/MessageHead';
-import MessageLine from '../MessageWithUser/MessageLine';
+import { MessageLine } from '../MessageWithUser/MessageLine';
 import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
 import { useMessageParser } from '../MessageWithUser/useMessageParser';
 export type NotifyMentionProps = {

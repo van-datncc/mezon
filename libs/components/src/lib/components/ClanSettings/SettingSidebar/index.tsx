@@ -1,7 +1,7 @@
 import { usePermissionChecker } from '@mezon/core';
 import { authActions, selectCurrentClan, useAppDispatch } from '@mezon/store';
+import { LogoutModal } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
-import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
