@@ -3,7 +3,7 @@ import { ChannelThreads } from '@mezon/utils';
 import React, { Fragment, memo, useImperativeHandle, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import ChannelLink, { ChannelLinkRef } from '../../ChannelLink';
+import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
 import ModalInvite from '../../ListMemberInvite/modalInvite';
 import ThreadListChannel, { ListThreadChannelRef } from '../../ThreadListChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';

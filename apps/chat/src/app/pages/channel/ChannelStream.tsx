@@ -1,4 +1,4 @@
-import { AvatarImage, Icons, getColorAverageFromURL } from '@mezon/components';
+import { AvatarImage, getColorAverageFromURL } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import {
 	selectMemberClanByGoogleId,
@@ -10,6 +10,7 @@ import {
 	usersStreamActions,
 	videoStreamActions
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { IChannelMember, IStreamInfo, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import Hls from 'hls.js';

@@ -1,4 +1,3 @@
-import { AvatarImage, Icons } from '@mezon/components';
 import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
 import {
 	reactionActions,
@@ -11,11 +10,12 @@ import {
 	selectMemberClanByUserId,
 	useAppSelector
 } from '@mezon/store';
-import { NameComponent } from '@mezon/ui';
+import { Icons, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 type UserReactionPanelProps = {
 	emojiShowPanel: EmojiDataOptionals;

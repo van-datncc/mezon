@@ -1,6 +1,6 @@
+import { Icons } from '@mezon/ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
-import { Icons } from '../../components';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;

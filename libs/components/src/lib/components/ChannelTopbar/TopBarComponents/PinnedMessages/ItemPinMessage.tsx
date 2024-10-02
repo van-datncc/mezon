@@ -3,8 +3,8 @@ import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClan
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import MemberProfile from '../../../MemberProfile';
-import MessageLine from '../../../MessageWithUser/MessageLine';
+import { MemberProfile } from '../../../MemberProfile';
+import { MessageLine } from '../../../MessageWithUser/MessageLine';
 import { ModalDeletePinMess } from './DeletePinMessPopup';
 
 type ItemPinMessageProps = {
