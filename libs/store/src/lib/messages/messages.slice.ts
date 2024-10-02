@@ -1,4 +1,3 @@
-import { DirectMetaEntity } from '@mezon/store-mobile';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
@@ -1395,40 +1394,3 @@ const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelI
 
 	return false;
 };
-
-export const selectAllDirectMessageUnread = createSelector(getMessagesState, (state) => state.directMessageUnread);
-
-export const selectAllDirectMessageByLastSeenTimestamp = (lastSeenTime: DirectMetaEntity[]) =>
-	createSelector(selectAllDirectMessageUnread, (unreadMessages) => {
-		const filteredMessages: Record<string, DirectMetaEntity[]> = {};
-
-		if (unreadMessages) {
-			Object.entries(unreadMessages).forEach(([directId, messages]) => {
-				const lastSeenEntry = lastSeenTime.find((channel) => channel.id === directId);
-				if (lastSeenEntry) {
-					const { last_seen_message, last_sent_message } = lastSeenEntry;
-					if (last_sent_message) {
-						filteredMessages[directId] = messages.filter((message) => {
-							const { update_time_seconds } = message;
-							const effectiveUpdateTime = update_time_seconds !== undefined ? update_time_seconds : last_sent_message.timestamp_seconds;
-
-							if (
-								last_seen_message &&
-								last_seen_message.timestamp_seconds &&
-								last_sent_message &&
-								last_sent_message.timestamp_seconds &&
-								effectiveUpdateTime
-							) {
-								return (
-									last_seen_message.timestamp_seconds < effectiveUpdateTime &&
-									effectiveUpdateTime <= last_sent_message.timestamp_seconds
-								);
-							}
-						});
-					}
-				}
-			});
-		}
-
-		return filteredMessages;
-	});

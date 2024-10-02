@@ -149,28 +149,6 @@ export const fetchDirectMessage = createAsyncThunk(
 		});
 		const channels = sorted.map(mapDmGroupToEntity);
 		thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
-
-		channels
-			.filter((channel) => {
-				return !isNaN(Number(channel?.last_seen_message?.timestamp_seconds)) && !isNaN(Number(channel?.last_sent_message?.timestamp_seconds));
-			})
-			.forEach((channel) => {
-				thunkAPI.dispatch(
-					messagesActions.fetchMessages({
-						clanId: '0',
-						channelId: channel.channel_id ?? '',
-						noCache,
-						isFetchingLatestMessages: false,
-						isClearMessage: false,
-						directTimeStamp: {
-							directId: channel.channel_id as string,
-							lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
-							lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds)
-						}
-					})
-				);
-			});
-
 		return channels;
 	}
 );
@@ -324,10 +302,9 @@ export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirec
 
 export const selectListDMUnread = createSelector(selectAllDirectMessages, getDirectState, (directMessages, state) => {
 	return directMessages.filter((dm) => {
-		return state.statusDMChannelUnread[dm.channel_id ?? ''];
+		return state.statusDMChannelUnread[dm.channel_id ?? ''] && dm.count_mess_unread && dm.count_mess_unread > 0;
 	});
 });
-
 export const selectListStatusDM = createSelector(getDirectState, (state) => state.statusDMChannelUnread);
 
 export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, selectEntitiesDirectMeta, (directMessages, directMetaEntities) => {
