@@ -1,6 +1,6 @@
 import { useChatSending, useEscapeKeyClose, useGifs, useGifsStickersEmoji } from '@mezon/core';
+import { Loading } from '@mezon/ui';
 import { IGifCategory, IMessageSendPayload, SubPanelName } from '@mezon/utils';
-import { Loading } from 'libs/ui/src/lib/Loading';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import FeaturedGifs from './FeaturedGifs';

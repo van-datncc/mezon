@@ -1,4 +1,3 @@
-import { DirectMetaEntity } from '@mezon/store-mobile';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
@@ -31,6 +30,7 @@ import * as Sentry from '@sentry/browser';
 import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
+import { DirectMetaEntity } from '../direct/directmeta.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';

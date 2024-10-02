@@ -1,8 +1,8 @@
-import { AvatarImage } from '@mezon/components';
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
+import { AvatarImage } from '../AvatarImage/AvatarImage';
 import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
 

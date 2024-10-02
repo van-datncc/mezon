@@ -17,7 +17,7 @@ import { Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import MemberProfile from '../MemberProfile';
+import { MemberProfile } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalFooterProfile from './ModalFooterProfile';
 

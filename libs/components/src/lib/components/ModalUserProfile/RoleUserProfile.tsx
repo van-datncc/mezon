@@ -1,4 +1,3 @@
-import { Icons } from '@mezon/components';
 import { usePermissionChecker, useRoles, UserRestrictionZone } from '@mezon/core';
 import {
 	RolesClanEntity,
@@ -11,6 +10,7 @@ import {
 	useAppSelector,
 	usersClanActions
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react';
