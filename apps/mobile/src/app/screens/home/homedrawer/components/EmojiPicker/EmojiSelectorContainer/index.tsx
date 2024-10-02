@@ -114,7 +114,7 @@ export default function EmojiSelectorContainer({
 			<RibbonIcon color={themeValue.textStrong} />
 		];
 	}, [themeValue]);
-	
+
 	const categoriesWithIcons = useMemo(
 		() =>
 			categoriesEmoji.map((category, index) => ({

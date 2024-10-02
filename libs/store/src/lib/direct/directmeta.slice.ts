@@ -126,13 +126,7 @@ export const directMetaSlice = createSlice({
 				channel.notifiCount = 0;
 			}
 		},
-		removeUnreadAllDm: (state) => {
-			Object.values(state.dmMetadata.entities).forEach((channel) => {
-				if (channel && channel.lastSeenTimestamp < channel.lastSentTimestamp) {
-					channel.lastSentTimestamp = 0;
-				}
-			});
-		},
+
 		setDirectMetaEntities: (state, action: PayloadAction<IChannel[]>) => {
 			const channels = action.payload;
 			if (channels) {
