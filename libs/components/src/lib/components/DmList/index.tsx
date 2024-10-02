@@ -58,7 +58,7 @@ const CreateMessageGroupModal = memo(() => {
 			<Tooltip content="Create DM" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 				<Icons.Plus className="w-4 h-4" />
 			</Tooltip>
-			{isOpen && <CreateMessageGroup onClose={handleCloseModal} isOpen={isOpen} />}
+			{isOpen && <CreateMessageGroup onClose={handleCloseModal} isOpen={isOpen} rootRef={buttonPlusRef} />}
 		</div>
 	);
 });

@@ -1,9 +1,9 @@
 import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference, useThreads } from '@mezon/core';
-import { searchMessagesActions, selectAllUserClans, selectCurrentChannel, selectTheme, threadsActions, useAppDispatch } from '@mezon/store';
+import { searchMessagesActions, selectCurrentChannel, selectTheme, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { useMemo, useRef } from 'react';
+import { RefObject, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -13,20 +13,19 @@ import ThreadItem from './ThreadItem';
 
 type ThreadsProps = {
 	onClose: () => void;
+	rootRef?: RefObject<HTMLElement>;
 };
 
-const ThreadModal = ({ onClose }: ThreadsProps) => {
+const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 	const { setIsShowCreateThread, threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
 	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const allUsesClan = useSelector(selectAllUserClans);
+
 	const appearanceTheme = useSelector(selectTheme);
 	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
-
-	const avatarMembers = useMemo(() => allUsesClan?.map((member) => member?.user?.avatar_url), [allUsesClan]);
 
 	const handleCreateThread = () => {
 		setOpenThreadMessageState(false);
@@ -42,7 +41,7 @@ const ThreadModal = ({ onClose }: ThreadsProps) => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose);
+	useOnClickOutside(modalRef, onClose, rootRef);
 
 	return (
 		<div
@@ -78,24 +77,14 @@ const ThreadModal = ({ onClose }: ThreadsProps) => {
 					{threadChannelOnline.length > 0 && (
 						<GroupThreads title={`${threadChannelOnline.length} joined threads`}>
 							{threadChannelOnline.map((thread) => (
-								<ThreadItem
-									avatarMembers={thread.channel_private !== 1 ? avatarMembers : []}
-									thread={thread}
-									key={thread.id}
-									setIsShowThread={onClose}
-								/>
+								<ThreadItem thread={thread} key={thread.id} setIsShowThread={onClose} />
 							))}
 						</GroupThreads>
 					)}
 					{threadChannelOld.length > 0 && (
 						<GroupThreads title="order threads">
 							{threadChannelOld.map((thread) => (
-								<ThreadItem
-									avatarMembers={thread.channel_private !== 1 ? avatarMembers : []}
-									thread={thread}
-									key={thread.id}
-									setIsShowThread={onClose}
-								/>
+								<ThreadItem thread={thread} key={thread.id} setIsShowThread={onClose} />
 							))}
 						</GroupThreads>
 					)}

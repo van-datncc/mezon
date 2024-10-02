@@ -7,10 +7,13 @@ import {
 	useEscapeKeyClose,
 	useFriends,
 	useMessageValue,
+	useOnClickOutside,
 	usePermissionChecker,
 	useSettingFooter
 } from '@mezon/core';
 import {
+	directMetaActions,
+	messagesActions,
 	selectAllRolesClan,
 	selectCurrentChannel,
 	selectCurrentClan,
@@ -21,8 +24,8 @@ import {
 import { ChannelMembersEntity, EPermission, EUserSettings } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
@@ -63,7 +66,6 @@ const useCheckRoleAdminMember = (userId: string) => {
 			role?.permission_list?.permissions?.some((permission) => permission.slug === 'administrator' && permission.active === 1)
 		);
 	}, [userRolesClan]);
-
 	return hasAdminRole;
 };
 
@@ -79,13 +81,14 @@ const PanelMember = ({
 	dataMemberCreate,
 	onOpenProfile
 }: PanelMemberProps) => {
+	const dispatch = useDispatch();
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState<boolean>(false);
 	const { removeMemberChannel } = useChannelMembersActions();
-	const hasAdminRole = useCheckRoleAdminMember(member?.user?.id ?? '');
-	const isClanOwner = useClanOwnerChecker(member?.user?.id ?? '');
+	const [hasClanOwnerPermission, hasAdminPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.administrator]);
+	const memberIsClanOwner = useClanOwnerChecker(member?.user?.id ?? '');
 	const { directId } = useAppParams();
 
 	useEffect(() => {
@@ -112,7 +115,6 @@ const PanelMember = ({
 		};
 	}, [directMessageValue]);
 
-	const [canManageClan] = usePermissionChecker([EPermission.manageClan]);
 	const hasAddFriend = useSelector(
 		selectFriendStatus(
 			directMessageValue && directMessageValue.type !== ChannelType.CHANNEL_TYPE_GROUP ? directMessageValue.userId[0] : member?.user?.id || ''
@@ -174,6 +176,16 @@ const PanelMember = ({
 	};
 
 	useEscapeKeyClose(panelRef, onClose);
+	useOnClickOutside(panelRef, onClose);
+
+	const handleMarkAsRead = useCallback(
+		(directId: string) => {
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
+			dispatch(messagesActions.setDirectMessageUnread({ directId: directId, message: [] }));
+		},
+		[dispatch]
+	);
 
 	return (
 		<div
@@ -197,6 +209,7 @@ const PanelMember = ({
 			) : (
 				<>
 					<GroupPanelMember>
+						<ItemPanelMember children="Mark As Read" onClick={() => handleMarkAsRead(directMessageValue?.dmID ?? '')} />
 						<ItemPanelMember children="Profile" onClick={handleOpenProfile} />
 						{directMessageValue ? (
 							checkDm && <ItemPanelMember children="Call" />
@@ -218,7 +231,7 @@ const PanelMember = ({
 						)}
 						{directMessageValue && <ItemPanelMember children="Close DM" />}
 					</GroupPanelMember>
-					{isMemberDMGroup && !isSelf && dataMemberCreate?.createId === userProfile?.user?.id && (
+					{isMemberDMGroup && dataMemberCreate?.createId === userProfile?.user?.id && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Remove From Group" onClick={handleRemoveMemberChannel} danger />
 							<ItemPanelMember children="Make Group Owner" danger />
@@ -227,7 +240,7 @@ const PanelMember = ({
 
 					{!isMemberDMGroup && (
 						<GroupPanelMember>
-							{!directMessageValue && <ItemPanelMember children="Mute" type="checkbox" />}
+							{!isSelf && !directMessageValue && <ItemPanelMember children="Mute" type="checkbox" />}
 							{isSelf && (
 								<>
 									<ItemPanelMember children="Deafen" type="checkbox" />
@@ -315,7 +328,7 @@ const PanelMember = ({
 							<ItemPanelMember children={`Mute @${name}`} />
 						</GroupPanelMember>
 					)}
-					{canManageClan && !hasAdminRole && !isClanOwner && (
+					{!isSelf && (hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner)) && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Move View" />
 							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />

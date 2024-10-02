@@ -10,9 +10,8 @@ import {
 import { Icons } from '@mezon/ui';
 import { INotification, NotificationEntity, sortNotificationsByDate } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FixedSizeList } from 'react-window';
 import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
@@ -21,6 +20,7 @@ export type MemberListProps = { className?: string };
 
 export type NotificationProps = {
 	unReadReplyAndMentionList: NotificationEntity[];
+	rootRef?: RefObject<HTMLElement>;
 };
 
 const InboxType = {
@@ -35,7 +35,7 @@ const tabDataNotify = [
 	{ title: 'Mentions', value: InboxType.MENTIONS }
 ];
 
-function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
+function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationProps) {
 	const dispatch = useDispatch();
 
 	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.INDIVIDUAL);
@@ -77,15 +77,13 @@ function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;
 	}, [unReadReplyAndMentionList, currentTabNotify]);
 
-	const ITEM_HEIGHT = 140;
-	const itemCount = getAllMentionAndReply.length;
 	const modalRef = useRef<HTMLDivElement>(null);
 	const handleHideInbox = useCallback(() => {
 		dispatch(notificationActions.setIsShowInbox(false));
 	}, []);
 
 	useEscapeKeyClose(modalRef, handleHideInbox);
-	useOnClickOutside(modalRef, handleHideInbox);
+	useOnClickOutside(modalRef, handleHideInbox, rootRef);
 
 	return (
 		<div
@@ -167,16 +165,20 @@ function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 					)}
 
 					{currentTabNotify === InboxType.MENTIONS && (
-						<FixedSizeList
-							className={`${appearanceTheme === 'light' ? 'lightModeScrollBarMention' : ''}`}
-							height={1000}
-							itemCount={itemCount}
-							itemSize={ITEM_HEIGHT}
-							width={'100%'}
-							itemData={getAllMentionAndReply}
-						>
-							{Row}
-						</FixedSizeList>
+						<div>
+							{getAllMentionAndReply.length > 0 ? (
+								getAllMentionAndReply.map((notification: INotification, index: number) => (
+									<NotificationChannel
+										key={`mention-${notification?.id}-${index}`}
+										isUnreadTab={false}
+										unreadListConverted={[]}
+										notification={notification}
+									/>
+								))
+							) : (
+								<EmptyNotification isEmptyMentions />
+							)}
+						</div>
 					)}
 				</div>
 			</div>
@@ -185,21 +187,6 @@ function NotificationList({ unReadReplyAndMentionList }: NotificationProps) {
 }
 
 export default NotificationList;
-
-const Row = ({ index, style, data }: { index: number; style: React.CSSProperties; data: INotification[] }) => {
-	const notification = data[index];
-
-	return (
-		<div style={style}>
-			<NotificationChannel
-				key={`mention-${notification?.id}-${index}`}
-				isUnreadTab={false}
-				unreadListConverted={[]}
-				notification={notification}
-			/>
-		</div>
-	);
-};
 
 function InboxButton() {
 	return (

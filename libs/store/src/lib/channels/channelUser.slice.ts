@@ -1,7 +1,8 @@
 import { IChannelUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelDescription } from 'mezon-js';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const LIST_CHANNELS_USER_FEATURE_KEY = 'listchannelbyusers';
 
@@ -27,17 +28,36 @@ export interface ListChannelsByUserRootState {
 	[LIST_CHANNELS_USER_FEATURE_KEY]: ListChannelsByUserState;
 }
 
-export const fetchListChannelsByUser = createAsyncThunk('channelsByUser/fetchListChannelsByUser', async (_, thunkAPI) => {
-	const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-
-	const response = await mezon.socketRef.current?.listChannelByUserId();
-	if (!response?.channeldesc) {
-		return [];
+export const fetchListChannelsByUserCached = memoizeAndTrack(
+	async (mezon: MezonValueContext) => {
+		const response = await mezon.client.listChannelByUserId(mezon.session);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: 1000 * 60 * 3,
+		normalizer: (args) => {
+			return args[0].session.username || '';
+		}
 	}
+);
 
-	const channels = response.channeldesc.map(mapChannelsByUserToEntity);
-	return channels;
-});
+export const fetchListChannelsByUser = createAsyncThunk(
+	'channelsByUser/fetchListChannelsByUser',
+	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchListChannelsByUserCached.clear(mezon);
+		}
+		const response = await fetchListChannelsByUserCached(mezon);
+		if (!response?.channeldesc) {
+			return [];
+		}
+
+		const channels = response.channeldesc.map(mapChannelsByUserToEntity);
+		return channels;
+	}
+);
 
 export const initialListChannelsByUserState: ListChannelsByUserState = listChannelsByUserAdapter.getInitialState({
 	loadingStatus: 'not loaded',

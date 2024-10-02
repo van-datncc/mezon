@@ -28,7 +28,7 @@ export const ChannelHashtag = ({ channelHashtagId, directMessageId, mode, hashta
 
 	const channel = getChannelById(channelHashtagId);
 
-	const dataPress = `${channel.type}_${channel.channel_id}_${channel.clan_id}_${channel.status}_${channel.meeting_code}_${channel.category_id}_${channel.parrent_id}`;
+	const dataPress = `${channel.type}_${channel.channel_id}_${channel.clan_id}_${channel.status}_${channel.meeting_code}_${channel.category_id}`;
 
 	if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
 		return `[${channel.channel_label}](##voice${JSON.stringify(dataPress)})`;

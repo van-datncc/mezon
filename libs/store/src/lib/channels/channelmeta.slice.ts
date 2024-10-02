@@ -125,7 +125,7 @@ export const selectIsUnreadChannelById = createSelector(
 		const channel = state?.entities[channelId];
 		const inactiveMuteSetting = settings?.[channelId]?.action !== enableMute;
 		// unread last seen timestamp is less than last sent timestamp
-		return inactiveMuteSetting && channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
+		return inactiveMuteSetting && channel?.lastSeenTimestamp <= channel?.lastSentTimestamp;
 	}
 );
 
@@ -138,7 +138,7 @@ export const selectLastChannelTimestamp = (channelId: string) =>
 export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selectEntiteschannelCategorySetting], (state, settings) => {
 	if (state.lastSentChannelId && settings?.[state.lastSentChannelId]?.action !== enableMute) {
 		const lastSentChannel = state?.entities?.[state.lastSentChannelId];
-		if (lastSentChannel?.lastSeenTimestamp && lastSentChannel?.lastSeenTimestamp < lastSentChannel?.lastSentTimestamp) {
+		if (lastSentChannel?.lastSeenTimestamp && lastSentChannel?.lastSeenTimestamp <= lastSentChannel?.lastSentTimestamp) {
 			return true;
 		}
 	}
@@ -146,7 +146,7 @@ export const selectAnyUnreadChannel = createSelector([getChannelMetaState, selec
 	for (let index = 0; index < state?.ids?.length; index++) {
 		const channel = state?.entities?.[state?.ids[index]];
 		if (settings?.[channel?.id]?.action === enableMute) continue;
-		if (channel?.lastSeenTimestamp && channel?.lastSeenTimestamp < channel?.lastSentTimestamp) {
+		if (channel?.lastSeenTimestamp && channel?.lastSeenTimestamp <= channel?.lastSentTimestamp) {
 			return true;
 		}
 	}

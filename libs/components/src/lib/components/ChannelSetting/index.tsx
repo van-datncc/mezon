@@ -1,7 +1,7 @@
-import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import { fetchUserChannels, fetchWebhooks, selectCloseMenu, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel } from '@mezon/utils';
+import { EPermission, IChannel } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import SettingCategoryChannel from './Component/CategoryChannel';
@@ -36,8 +36,15 @@ const SettingChannel = (props: ModalSettingProps) => {
 	};
 	const clanId = useSelector(selectCurrentClanId) as string;
 	const dispatch = useAppDispatch();
+	const [canManageClan] = usePermissionChecker([EPermission.manageClan]);
+
 	useEffect(() => {
-		dispatch(fetchWebhooks({ channelId: channel.channel_id as string, clanId: clanId }));
+		if (canManageClan) {
+			dispatch(fetchWebhooks({ channelId: channel.channel_id as string, clanId: clanId }));
+		}
+	}, [channel.channel_id, canManageClan, dispatch, clanId]);
+
+	useEffect(() => {
 		dispatch(fetchUserChannels({ channelId: channel.channel_id as string }));
 	}, [channel.channel_id, dispatch]);
 

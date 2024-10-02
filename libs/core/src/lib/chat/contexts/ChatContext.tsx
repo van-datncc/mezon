@@ -11,6 +11,7 @@ import {
 	directActions,
 	directMetaActions,
 	directSlice,
+	emojiSuggestionActions,
 	eventManagementActions,
 	fetchChannelMembers,
 	fetchDirectMessage,
@@ -60,6 +61,7 @@ import {
 	ClanDeletedEvent,
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
+	EventEmoji,
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
@@ -166,7 +168,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstreamingchannelleaved = useCallback(
 		(user: StreamingLeavedEvent) => {
-			dispatch(usersStreamActions.remove(user.id));
+			dispatch(usersStreamActions.remove(user.streaming_user_id));
 		},
 		[dispatch]
 	);
@@ -191,6 +193,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onstreamingchannelended = useCallback(
 		(channel: StreamingEndedEvent) => {
 			dispatch(channelsStreamActions.remove(channel.channel_id));
+			dispatch(usersStreamActions.streamEnded(channel?.channel_id));
 		},
 		[dispatch]
 	);
@@ -214,11 +217,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(directMetaActions.updateDMSocket(message));
 
 				const isClanView = currentClanId && currentClanId !== '0';
-				const isNotCurrentDirect = isClanView || !currentDirectId || (currentDirectId && !RegExp(currentDirectId).test(message?.channel_id));
+				const isFriendPageView = window.location.pathname === '/chat/direct/friends';
+				const isNotCurrentDirect =
+					isFriendPageView || isClanView || !currentDirectId || (currentDirectId && !RegExp(currentDirectId).test(message?.channel_id));
 				if (isNotCurrentDirect) {
 					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+					dispatch(messagesActions.setDirectMessageUnread({ directId: message.channel_id, message: message }));
 				}
 				if (mess.isMe) {
 					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
@@ -305,7 +311,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(directSlice.actions.removeByDirectID(user.channel_id));
 					dispatch(channelsSlice.actions.removeByChannelID(user.channel_id));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				} else {
 					dispatch(channelMembers.actions.remove({ userId: userID, channelId: user.channel_id }));
 					if (user.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -332,7 +338,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						navigate(`/chat/direct/friends`);
 					}
 					dispatch(clansSlice.actions.removeByClanID(user.clan_id));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				} else {
 					dispatch(
 						channelMembers.actions.removeUserByUserIdAndClan({
@@ -361,7 +367,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
-					dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				}
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(
@@ -460,6 +466,39 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	const oneventemoji = useCallback(
+		(eventEmoji: EventEmoji) => {
+			if (userId !== eventEmoji.user_id) {
+				if (eventEmoji.action === 0) {
+					dispatch(
+						emojiSuggestionActions.add({
+							category: eventEmoji.clan_name,
+							clan_id: eventEmoji.clan_id,
+							creator_id: eventEmoji.user_id,
+							id: eventEmoji.id,
+							shortname: eventEmoji.short_name,
+							src: eventEmoji.source,
+							logo: eventEmoji.logo,
+							clan_name: eventEmoji.clan_name
+						})
+					);
+				} else if (eventEmoji.action === 1) {
+					dispatch(
+						emojiSuggestionActions.update({
+							id: eventEmoji.id,
+							changes: {
+								shortname: eventEmoji.short_name
+							}
+						})
+					);
+				} else if (eventEmoji.action === 2) {
+					dispatch(emojiSuggestionActions.remove(eventEmoji.id));
+				}
+			}
+		},
+		[dispatch, userId]
+	);
+
 	const onstickerdeleted = useCallback(
 		(stickerDeleted: StickerDeleteEvent) => {
 			if (userId !== stickerDeleted.user_id) {
@@ -516,7 +555,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
-			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent.user_id, customStatus: statusEvent.status }));
+			dispatch(channelMembersActions.setCustomStatusUser({ userId: statusEvent?.user_id, customStatus: statusEvent?.status }));
 		},
 		[dispatch]
 	);
@@ -561,7 +600,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					last_sent_message: { timestamp_seconds: timestamp }
 				};
 				dispatch(channelsActions.createChannelSocket(extendChannelCreated));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 				dispatch(
 					channelMetaActions.updateBulkChannelMetadata([
 						{
@@ -592,12 +631,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onclandeleted = useCallback(
 		(clanDelete: ClanDeletedEvent) => {
-			dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+			dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 			dispatch(stickerSettingActions.removeStickersByClanId(clanDelete.clan_id));
 			if (clanDelete.deletor !== userId && currentClanId === clanDelete.clan_id) {
 				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 			}
 		},
 		[currentClanId, dispatch, navigate, userId]
@@ -607,7 +646,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		(channelDeleted: ChannelDeletedEvent) => {
 			if (channelDeleted) {
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 			}
 		},
 		[dispatch]
@@ -623,7 +662,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.updateChannelPrivateSocket(channelUpdated));
 					if (channelUpdated.creator_id !== userId) {
 						dispatch(channelsActions.fetchChannels({ clanId: channelUpdated.clan_id, noCache: true }));
-						dispatch(listChannelsByUserActions.fetchListChannelsByUser());
+						dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
@@ -698,7 +737,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onroleevent = useCallback((roleEvent: RoleEvent) => {
 		const handleRoleEvent = async () => {
-			if (roleEvent.status === 0) {
+			if (roleEvent?.status === 0) {
 				if (userId !== roleEvent.user_id) {
 					dispatch(
 						rolesClanActions.add({
@@ -719,7 +758,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
 					}
 				}
-			} else if (roleEvent.status === 1) {
+			} else if (roleEvent?.status === 1) {
 				if (userId !== roleEvent.user_id) {
 					if (roleEvent?.role?.role_user_list?.role_users) {
 						dispatch(usersClanActions.fetchUsersClan({ clanId: roleEvent.role.clan_id || '' }));
@@ -734,7 +773,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 					dispatch(rolesClanActions.update(roleEvent.role));
 				}
-			} else if (roleEvent.status === 2) {
+			} else if (roleEvent?.status === 2) {
 				if (userId !== roleEvent.user_id) {
 					const isUserResult = await dispatch(
 						rolesClanActions.updatePermissionUserByRoleId({ roleId: roleEvent.role.id || '', userId: userId || '' })
@@ -792,6 +831,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onstickercreated = onstickercreated;
 
+			socket.oneventemoji = oneventemoji;
+
 			socket.onstickerdeleted = onstickerdeleted;
 
 			socket.onstickerupdated = onstickerupdated;
@@ -836,6 +877,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onuserchanneladded,
 			onuserclanadded,
 			onstickercreated,
+			oneventemoji,
 			onstickerdeleted,
 			onstickerupdated,
 			onclanprofileupdated,
@@ -935,6 +977,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstickercreated = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.oneventemoji = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstickerdeleted = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onstickerupdated = () => {};
@@ -961,6 +1005,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onstickerupdated,
 		onstickerdeleted,
 		onstickercreated,
+		oneventemoji,
 		onclanprofileupdated,
 		oncustomstatus,
 		onstatuspresence,

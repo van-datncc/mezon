@@ -149,6 +149,28 @@ export const fetchDirectMessage = createAsyncThunk(
 		});
 		const channels = sorted.map(mapDmGroupToEntity);
 		thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
+
+		channels
+			.filter((channel) => {
+				return !isNaN(Number(channel?.last_seen_message?.timestamp_seconds)) && !isNaN(Number(channel?.last_sent_message?.timestamp_seconds));
+			})
+			.forEach((channel) => {
+				thunkAPI.dispatch(
+					messagesActions.fetchMessages({
+						clanId: '0',
+						channelId: channel.channel_id ?? '',
+						noCache,
+						isFetchingLatestMessages: false,
+						isClearMessage: false,
+						directTimeStamp: {
+							directId: channel.channel_id as string,
+							lastSeenTimestamp: Number(channel.last_seen_message?.timestamp_seconds),
+							lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds)
+						}
+					})
+				);
+			});
+
 		return channels;
 	}
 );
@@ -236,6 +258,15 @@ export const directSlice = createSlice({
 		},
 		removeByDirectID: (state, action: PayloadAction<string>) => {
 			directAdapter.removeOne(state, action.payload);
+		},
+
+		setActiveDirect: (state, action: PayloadAction<{ directId: string }>) => {
+			directAdapter.updateOne(state, {
+				id: action.payload.directId,
+				changes: {
+					active: 1
+				}
+			});
 		}
 	},
 	extraReducers: (builder) => {

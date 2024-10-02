@@ -1,5 +1,14 @@
 import { useAppParams, useMenu } from '@mezon/core';
-import { channelsActions, directActions, selectCloseMenu, selectStatusStream, selectTheme, useAppDispatch } from '@mezon/store';
+import {
+	channelsActions,
+	directActions,
+	directMetaActions,
+	messagesActions,
+	selectCloseMenu,
+	selectStatusStream,
+	selectTheme,
+	useAppDispatch
+} from '@mezon/store';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -42,6 +51,9 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 	const joinToChatAndNavigate = useCallback(
 		async (DMid: string, type: number) => {
 			dispatch(channelsActions.setPreviousChannels({ channelId: DMid }));
+			const timestamp = Date.now() / 1000;
+			dispatch(messagesActions.setDirectMessageUnread({ directId: DMid, message: [] }));
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: DMid, timestamp: timestamp }));
 			const result = await dispatch(
 				directActions.joinDirectMessage({
 					directMessageId: DMid,
@@ -97,7 +109,8 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 								id={listDM[virtualRow.index]}
 								isActive={isActive}
 								navigateToFriends={() => navigate(`/chat/direct/friends`)}
-								joinToChatAndNavigate={joinToChatAndNavigate}
+								// eslint-disable-next-line @typescript-eslint/no-empty-function
+								joinToChatAndNavigate={isActive ? () => {} : joinToChatAndNavigate}
 							/>
 						</div>
 					);

@@ -18,6 +18,7 @@ import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice'
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
+import { ChannelMetaEntity, channelMetaActions } from './channelmeta.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -28,6 +29,19 @@ export const CHANNELS_FEATURE_KEY = 'channels';
  */
 export interface ChannelsEntity extends IChannel {
 	id: string; // Primary ID
+}
+
+function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
+	const lastSeenTimestamp = Number(channel.last_seen_message?.timestamp_seconds ?? channel.last_sent_message?.timestamp_seconds);
+	const finalLastSeenTimestamp = isNaN(lastSeenTimestamp) ? Number(channel.last_sent_message?.timestamp_seconds) : lastSeenTimestamp;
+
+	return {
+		id: channel.id,
+		lastSeenTimestamp: finalLastSeenTimestamp,
+		lastSentTimestamp: Number(channel.last_sent_message?.timestamp_seconds),
+		lastSeenPinMessage: channel.last_pin_message || '',
+		clanId: channel.clan_id ?? ''
+	};
 }
 
 export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
@@ -116,7 +130,7 @@ export const joinChannel = createAsyncThunk(
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
-			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
+			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId, noCache: true }));
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			const parrentChannel = selectChannelById(channel?.parrent_id ?? '')(getChannelsRootState(thunkAPI));
 
@@ -150,7 +164,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
-			thunkAPI.dispatch(fetchListChannelsByUser());
+			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -216,7 +230,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 		const clanID = selectClanId()(getChannelsRootState(thunkAPI)) || '';
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: clanID, noCache: true }));
-			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId: clanID, channelId: body.channel_id }));
+			thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId: clanID, channelId: body.channel_id, noCache: true }));
 			thunkAPI.dispatch(
 				channelMembersActions.fetchChannelMembers({
 					clanId: clanID,
@@ -280,6 +294,8 @@ export const fetchChannels = createAsyncThunk(
 		}
 
 		const channels = response.channeldesc.map(mapChannelToEntity);
+		const meta = channels.map((ch) => extractChannelMeta(ch));
+		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
 	}
 );
