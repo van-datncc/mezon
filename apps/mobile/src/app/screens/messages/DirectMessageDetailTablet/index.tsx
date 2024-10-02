@@ -51,7 +51,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const isMentionHashtagDMRef = useRef(false);
+	const isFetchMemberChannelDmRef = useRef(false);
 	const isModeDM = useMemo(() => {
 		return currentDmGroup?.user_id?.length === 1;
 	}, [currentDmGroup?.user_id?.length]);
@@ -118,8 +118,8 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 	}, [currentChannel?.clan_id, directMessageId, dmType]);
 
 	useEffect(() => {
-		const onMentionHashtagDM = DeviceEventEmitter.addListener(ActionEmitEvent.ON_MENTION_HASHTAG_DM, ({ isMentionHashtagDM }) => {
-			isMentionHashtagDMRef.current = isMentionHashtagDM;
+		const onMentionHashtagDM = DeviceEventEmitter.addListener(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, ({ isFetchMemberChannelDM }) => {
+			isFetchMemberChannelDM.current = isFetchMemberChannelDM;
 		});
 		return () => {
 			onMentionHashtagDM.remove();
@@ -128,11 +128,11 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 
 	useEffect(() => {
 		return () => {
-			if (!isMentionHashtagDMRef.current) {
+			if (!isFetchMemberChannelDmRef.current) {
 				fetchMemberChannel();
 			}
 		};
-	}, [fetchMemberChannel, isMentionHashtagDMRef]);
+	}, [fetchMemberChannel, isFetchMemberChannelDmRef]);
 
 	useEffect(() => {
 		let timeout: NodeJS.Timeout;

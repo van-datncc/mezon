@@ -45,8 +45,8 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 	}, [originSettingValue, currentSettingValue]);
 
 	const currentCategoryName = useMemo(() => {
-		return channel?.category_name
-	}, [channel?.category_name])
+		return channel?.category_name;
+	}, [channel?.category_name]);
 
 	navigation.setOptions({
 		headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
@@ -301,6 +301,15 @@ export default function ChannelSetting({ navigation, route }: MenuChannelScreenP
 		);
 		navigation.navigate(APP_SCREEN.HOME);
 		navigation.dispatch(DrawerActions.openDrawer());
+		if (channel?.parrent_id !== '0') {
+			await dispatch(
+				channelsActions.joinChannel({
+					clanId: channel?.clan_id,
+					channelId: channel?.parrent_id,
+					noFetchMembers: false
+				})
+			);
+		}
 	};
 
 	const handleDeleteModalVisibleChange = (visible: boolean) => {

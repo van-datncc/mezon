@@ -26,7 +26,7 @@ export const ActionRow = React.memo(() => {
 	const [isChannel, setIsChannel] = useState<boolean>();
 	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
 		[EOverriddenPermission.manageThread, EPermission.manageChannel],
-		currentChannel.channel_id ?? ''
+		currentChannel?.channel_id ?? ''
 	);
 	const { statusMute } = useStatusMuteChannel();
 

@@ -55,7 +55,8 @@ export const markdownDefaultUrlRegex = /^\[.*?\]\(https?:\/\/[^\s]+\)$/;
 export const splitBlockCodeRegex =
 	/(```[\s\S]*?```)|(https?:\/\/[^\s]+)|(<#\d+>)|(@[\w.]+)|(\w+)|(\s+)|(\[.*?\]\(https?:\/\/[^\s]+\))|(:[a-zA-Z0-9_]+:)/g;
 export const urlRegex = /(https?:\/\/[^\s]+)/g;
-
+export const validLinkInviteRegex = /https:\/\/mezon\.ai\/invite\/[0-9]{19}/;
+export const inviteLinkRegex = /https:\/\/mezon\.ai\/invite\/([0-9]{19})/;
 export const pushAttachmentToCache = (attachment: any, channelId: string | number) => {
 	const allCachedAttachment = load(STORAGE_KEY_TEMPORARY_ATTACHMENT) || {};
 
