@@ -1,4 +1,4 @@
-import { selectAllChannelLastSeenTimestampByClanId, selectMentionAndReplyUnreadByClanId } from '@mezon/store';
+import { selectBadgeCountByClanId } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan } from '@mezon/utils';
 import { useSelector } from 'react-redux';
@@ -21,8 +21,7 @@ const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItem
 		}
 	};
 
-	const getAllChannelLastSeenTimeStamp = useSelector(selectAllChannelLastSeenTimestampByClanId(option.clan_id ?? ''));
-	const notiUnreadClan = useSelector(selectMentionAndReplyUnreadByClanId(option.clan_id ?? '', getAllChannelLastSeenTimeStamp)) || 0;
+	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
 
 	return (
 		<div className="relative">
@@ -46,9 +45,9 @@ const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItem
 					)}
 				</NavLinkComponent>
 			</NavLink>
-			{notiUnreadClan.length ? (
+			{badgeCountClan > 0 ? (
 				<div className="w-[20px] h-[20px] flex items-center justify-center text-[13px] font-medium rounded-full bg-colorDanger absolute bottom-[-3px] right-[-3px] border-[2px] border-solid dark:border-bgPrimary border-white">
-					{notiUnreadClan.length}
+					{badgeCountClan}
 				</div>
 			) : (
 				<></>

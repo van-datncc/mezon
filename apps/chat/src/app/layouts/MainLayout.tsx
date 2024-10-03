@@ -1,5 +1,5 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectAllChannelMeta, selectAnyUnreadChannel, selectMentionAndReplyUnreadAllClan } from '@mezon/store';
+import { reactionActions, selectAnyUnreadChannel, selectBadgeCountAllClan } from '@mezon/store';
 
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
@@ -14,8 +14,7 @@ const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
 	const navigate = useNavigate();
 
-	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
-	const allNotificationReplyMentionAllClan = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
+	const allNotificationReplyMentionAllClan = useSelector(selectBadgeCountAllClan);
 
 	const totalUnreadMessages = useSelector(selectTotalUnreadDM);
 
@@ -49,7 +48,7 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = (allNotificationReplyMentionAllClan?.length ?? 0) + totalUnreadMessages + quantityPendingRequest;
+		const notificationCount = (allNotificationReplyMentionAllClan ?? 0) + totalUnreadMessages + quantityPendingRequest;
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
 				electronBridge?.setBadgeCount(null);
@@ -59,7 +58,7 @@ const GlobalEventListener = () => {
 		} else {
 			document.title = notificationCount > 0 ? `(${notificationCount}) Mezon` : 'Mezon';
 		}
-	}, [allNotificationReplyMentionAllClan.length, totalUnreadMessages, quantityPendingRequest, hasUnreadChannel]);
+	}, [allNotificationReplyMentionAllClan, totalUnreadMessages, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };

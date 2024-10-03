@@ -110,7 +110,7 @@ export const notificationSlice = createSlice({
 			})
 			.addCase(fetchListNotification.fulfilled, (state: NotificationState, action: PayloadAction<INotification[] | null>) => {
 				if (action.payload !== null) {
-					notificationAdapter.addMany(state, action.payload);
+					notificationAdapter.setAll(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {
 					state.loadingStatus = 'not loaded';
@@ -218,28 +218,4 @@ export const selectMentionAndReplyUnreadByClanId = (clanId: string, listLastSeen
 
 			return notificationTimestamp > lastSeen;
 		});
-	});
-export const selectMentionAndReplyUnreadAllClan = (listLastSeenAllClan: ChannelMetaEntity[]) =>
-	createSelector(selectAllNotification, (notifications) => {
-		const filteredNotifications = notifications.filter(
-			(notification) => notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED
-		);
-		const lastSeenMap = new Map<string, number>();
-		listLastSeenAllClan.forEach((channel) => {
-			lastSeenMap.set(channel.id, channel.lastSeenTimestamp ?? 0);
-		});
-
-		const result = filteredNotifications.filter((notification) => {
-			if (!notification.create_time) {
-				return false;
-			}
-
-			const notificationTimestamp = new Date(notification.create_time).getTime() / 1000;
-			const channelId = notification.content.channel_id;
-
-			const lastSeen = lastSeenMap.get(channelId) ?? 0;
-
-			return notificationTimestamp > lastSeen;
-		});
-		return result;
 	});

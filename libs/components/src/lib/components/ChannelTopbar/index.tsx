@@ -3,17 +3,18 @@ import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
-	selectAllChannelMeta,
+	selectAllChannelLastSeenTimestampByClanId,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
+	selectCurrentClan,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
-	selectMentionAndReplyUnreadAllClan,
+	selectMentionAndReplyUnreadByClanId,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -254,8 +255,12 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const dispatch = useAppDispatch();
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
-	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
-	const getNotificationMentionAndReplyUnread = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
+	const currentClan = useSelector(selectCurrentClan);
+
+	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
+	const getNotificationMentionAndReplyUnread = useSelector(
+		selectMentionAndReplyUnreadByClanId(currentClan?.clan_id ?? '', allLastSeenChannelAllChannelInClan)
+	);
 
 	const handleShowInbox = () => {
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
@@ -266,7 +271,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
-					{getNotificationMentionAndReplyUnread.length > 0 && <RedDot />}
+					{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 				</button>
 			</Tooltip>
 			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} rootRef={inboxRef} />}
