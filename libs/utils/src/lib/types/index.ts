@@ -716,6 +716,9 @@ export type SearchItemProps = {
 	icon?: string;
 	channelId?: string;
 	channel_private?: number;
+	parrent_id?: string;
+	clanId?: string;
+	meeting_code?: string;
 };
 
 export enum EEmojiCategory {
