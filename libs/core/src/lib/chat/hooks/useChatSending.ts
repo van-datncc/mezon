@@ -40,7 +40,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const parent = useSelector(selectChannelById(parentId || ''));
 
 	const isParentPublic = useMemo(() => {
-		return !parent?.channel_private;
+		return parent ? !parent.channel_private : false;
 	}, [parent?.channel_private]);
 
 	const userProfile = useSelector(selectAllAccount);

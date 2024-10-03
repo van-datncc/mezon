@@ -6,12 +6,12 @@ export const style = (colors: Attributes) =>
 		pinMessageItemWrapper: {
 			flexDirection: 'row',
 			gap: size.s_10,
-			marginVertical: Metrics.size.s,
+			marginBottom: size.s_10,
 			justifyContent: 'space-between',
 			alignItems: 'center',
-			backgroundColor: colors.secondary,
+			backgroundColor: colors.secondaryLight,
 			padding: Metrics.size.l,
-			borderRadius: 10
+			borderRadius: size.s_10
 		},
 		pinMessageItemBox: {
 			flex: 1

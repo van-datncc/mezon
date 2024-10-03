@@ -5,13 +5,15 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectMemberClanByUserId,
+	selectRolesClanEntities,
 	selectTheme,
+	selectUserMaxPermissionLevel,
 	useAppDispatch,
 	useAppSelector,
 	usersClanActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission } from '@mezon/utils';
+import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -39,9 +41,18 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		return !isRoleInUserRoles;
 	});
 
+	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
+	const rolesClanEntity = useSelector(selectRolesClanEntities);
+
 	const filteredListRoleBySearch = useMemo(() => {
 		return activeRolesWithoutUserRoles?.filter((role) => {
-			return role.slug !== 'everyone' && !userById.role_id?.includes(role.id) && role.title?.toLowerCase().includes(searchTerm.toLowerCase());
+			return (
+				role.id !== EVERYONE_ROLE_ID &&
+				!userById.role_id?.includes(role.id) &&
+				role.title?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+				(isClanOwner || Number(maxPermissionLevel) > Number(rolesClanEntity[role.id]?.max_level_permission))
+			);
 		});
 	}, [activeRolesWithoutUserRoles, searchTerm]);
 

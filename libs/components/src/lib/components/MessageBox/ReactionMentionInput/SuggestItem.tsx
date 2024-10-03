@@ -88,7 +88,7 @@ const SuggestItem = ({
 		}
 
 		return null;
-	}, [specificChannel?.channel_id]);
+	}, [specificChannel, theme]);
 
 	useEffect(() => {
 		if (channel) {

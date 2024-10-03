@@ -16,7 +16,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useRef, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
-import { HelpButton, InboxButton } from '../../ChannelTopbar';
+import { HelpButton } from '../../ChannelTopbar';
 import PinnedMessages from '../../ChannelTopbar/TopBarComponents/PinnedMessages';
 import { MemberProfile } from '../../MemberProfile';
 import SearchMessageChannel from '../../SearchMessageChannel';
@@ -136,10 +136,10 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 							}
 						/>
 						<div
-							className={`gap-4 relative flex  w-[82px] h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
+							className={`gap-4 relative flex  w-fit h-8 justify-center items-center left-[345px] ssm:left-auto ssm:right-0`}
 							id="inBox"
 						>
-							<InboxButton />
+							{/* <InboxButton /> */}
 							<HelpButton />
 						</div>
 					</div>

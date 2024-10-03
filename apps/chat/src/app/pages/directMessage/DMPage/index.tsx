@@ -54,6 +54,7 @@ function useChannelSeen(channelId: string) {
 		}
 	}, [dispatch, channelId, lastMessage]);
 }
+
 const DirectMessage = () => {
 	// TODO: move selector to store
 	const { clanId, directId, type } = useAppParams();
