@@ -73,8 +73,9 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 						width: '300px',
 						height: '200px',
 						background: '#8D72C5',
-						filter: 'blur(100px)',
-						borderRadius: '50%'
+						filter: 'blur(50px)',
+						borderRadius: '50%',
+						mixBlendMode: 'color-dodge'
 					}}
 				></div>
 			)}

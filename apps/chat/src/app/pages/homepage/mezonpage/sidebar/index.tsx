@@ -73,7 +73,8 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 						height: '200px',
 						background: '#8D72C5',
 						filter: 'blur(100px)',
-						borderRadius: '50%'
+						borderRadius: '50%',
+						mixBlendMode: 'color-dodge'
 					}}
 				></div>
 			</div>

@@ -10,7 +10,7 @@ import { SideBarMezon } from './sidebar';
 function MezonPage() {
 	const platform = getPlatform();
 	const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
-	const [backgroundImage, setBackgroundImage] = useState({ url: '', position: '' });
+	const [backgroundImage, setBackgroundImage] = useState('');
 
 	const homeRef = useRef<HTMLDivElement>(null);
 	const isVisible = useIntersectionObserver(homeRef, { threshold: 0.1 });
@@ -30,16 +30,16 @@ function MezonPage() {
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
-			setBackgroundImage({ url: 'url(../../../assets/hero-header-bg-mobile.png)', position: 'center top' });
+			setBackgroundImage('url(../../../assets/hero-header-bg-mobile.png)');
 		} else {
-			setBackgroundImage({ url: 'url(../../../assets/hero-header-bg-desktop.png)', position: 'center' });
+			setBackgroundImage('url(../../../assets/hero-header-bg-desktop.png)');
 		}
 	};
 
 	const backgroundImageStyle = {
-		backgroundImage: backgroundImage.url,
+		backgroundImage: backgroundImage,
 		backgroundRepeat: 'no-repeat',
-		backgroundPosition: backgroundImage.position
+		backgroundPosition: 'center top'
 	};
 
 	const scrollToSection = (id: string, event: React.MouseEvent) => {
@@ -84,7 +84,7 @@ function MezonPage() {
 
 				<div className="container w-10/12 max-lg:w-full max-md:px-[16px] max-md:mt-[72px]" id="home" ref={homeRef}>
 					<div
-						className={`pb-[36px] max-md:mt-[36px] md:py-[120px] flex flex-col gap-[48px] max-md:gap-[32px] md:px-[32px] transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+						className={`max-md:pb-[36px] max-md:mt-[36px] md:mt-[120px] md:pb-[120px] flex flex-col gap-[48px] max-md:gap-[32px] md:px-[32px] transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
 						style={backgroundImageStyle}
 					>
 						<div className="flex flex-col items-center justify-center gap-[24px] m-auto text-center w-full max-w-full md:max-w-[662px]">
@@ -120,6 +120,22 @@ function MezonPage() {
 				</div>
 
 				{sideBarIsOpen && <SideBarMezon sideBarIsOpen={sideBarIsOpen} toggleSideBar={toggleSideBar} scrollToSection={scrollToSection} />}
+
+				{!sideBarIsOpen && (
+					<div
+						className="hidden md:block"
+						style={{
+							position: 'absolute',
+							top: 0,
+							width: '400px',
+							height: '400px',
+							background: '#8D72C5',
+							filter: 'blur(170px)',
+							borderRadius: '50%',
+							mixBlendMode: 'color-dodge'
+						}}
+					></div>
+				)}
 			</div>
 
 			<Layout sideBarIsOpen={sideBarIsOpen} />

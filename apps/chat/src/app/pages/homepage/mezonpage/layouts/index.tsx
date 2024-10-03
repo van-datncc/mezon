@@ -297,8 +297,9 @@ export const Layout = memo((props: LayoutProps) => {
 										width: '400px',
 										height: '400px',
 										background: '#8D72C5',
-										filter: 'blur(250px)',
-										borderRadius: '50%'
+										filter: 'blur(190px)',
+										borderRadius: '50%',
+										mixBlendMode: 'color-dodge'
 									}}
 								></div>
 							)}
@@ -317,8 +318,9 @@ export const Layout = memo((props: LayoutProps) => {
 									width: '300px',
 									height: '300px',
 									background: '#8D72C5',
-									filter: 'blur(205px)',
-									borderRadius: '50%'
+									filter: 'blur(140px)',
+									borderRadius: '50%',
+									mixBlendMode: 'color-dodge'
 								}}
 							></div>
 							<div
@@ -330,8 +332,9 @@ export const Layout = memo((props: LayoutProps) => {
 									width: '300px',
 									height: '300px',
 									background: '#8D72C5',
-									filter: 'blur(150px)',
-									borderRadius: '50%'
+									filter: 'blur(130px)',
+									borderRadius: '50%',
+									mixBlendMode: 'color-dodge'
 								}}
 							></div>
 
@@ -344,8 +347,9 @@ export const Layout = memo((props: LayoutProps) => {
 									width: '300px',
 									height: '300px',
 									background: '#8D72C5',
-									filter: 'blur(150px)',
-									borderRadius: '50%'
+									filter: 'blur(130px)',
+									borderRadius: '50%',
+									mixBlendMode: 'color-dodge'
 								}}
 							></div>
 
@@ -358,8 +362,9 @@ export const Layout = memo((props: LayoutProps) => {
 									width: '300px',
 									height: '300px',
 									background: '#8D72C5',
-									filter: 'blur(150px)',
-									borderRadius: '50%'
+									filter: 'blur(130px)',
+									borderRadius: '50%',
+									mixBlendMode: 'color-dodge'
 								}}
 							></div>
 						</div>
