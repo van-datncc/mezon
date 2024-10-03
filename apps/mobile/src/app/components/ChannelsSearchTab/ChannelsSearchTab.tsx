@@ -46,7 +46,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 			...listTextChannel,
 			{ title: t('voiceChannels'), type: ChannelTypeHeader },
 			...listVoiceChannel,
-			{ title: 'streamChannel', type: ChannelTypeHeader },
+			{ title: t('streamingChannels'), type: ChannelTypeHeader },
 			...listStreamingChannel
 		];
 	}, [listTextChannel, listVoiceChannel, listStreamingChannel, t]);
