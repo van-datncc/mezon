@@ -156,7 +156,8 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
 			backgroundColor: colors.darkMossGreen
-		}
+		},
+		threadIcon: { marginBottom: size.s_2 }
 	});
 
 const styleMessageReply = (colors: Attributes) =>
@@ -260,10 +261,10 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 					<View>
 						<Pressable
 							key={node.key}
-							style={[styles.voiceChannel, { top: size.s_4 }]}
+							style={[styles.voiceChannel, { top: size.s_4, alignItems: 'flex-end' }]}
 							onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}
 						>
-							<Text>
+							<Text style={styles.threadIcon}>
 								<ThreadIcon height={size.s_14} width={size.s_14} color={Colors.textLink} />
 							</Text>
 							<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
