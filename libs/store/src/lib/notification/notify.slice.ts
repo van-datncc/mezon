@@ -110,7 +110,7 @@ export const notificationSlice = createSlice({
 			})
 			.addCase(fetchListNotification.fulfilled, (state: NotificationState, action: PayloadAction<INotification[] | null>) => {
 				if (action.payload !== null) {
-					notificationAdapter.addMany(state, action.payload);
+					notificationAdapter.setAll(state, action.payload);
 					state.loadingStatus = 'loaded';
 				} else {
 					state.loadingStatus = 'not loaded';
