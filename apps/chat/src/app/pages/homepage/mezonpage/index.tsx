@@ -1,5 +1,5 @@
-import { Icons } from '@mezon/components';
 import { version } from '@mezon/package-js';
+import { Icons } from '@mezon/ui';
 import { getPlatform } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import Footer from './footer';
@@ -65,21 +65,30 @@ function MezonPage() {
 	}, []);
 
 	return (
-		<div className="relative" style={{ background: '#0B0E2D', fontFamily: 'Inter' }}>
+		<div
+			className="relative"
+			style={{
+				background: '#0B0E2D',
+				fontFamily: 'Inter'
+			}}
+		>
 			<div
 				className="layout relative flex flex-col items-center text-textDarkTheme"
 				style={{
-					background: 'linear-gradient(219.23deg, #030320 -15.28%, #0F0F63 49.98%, #04041C 115.23%)'
+					background: 'linear-gradient(rgba(3, 3, 32, 0) -15.28%, rgb(15, 15, 99) -93.02%, rgba(3, 3, 32, 0) 105.23%)'
 				}}
 			>
-				<HeaderMezon sideBarIsOpen={sideBarIsOpen} toggleSideBar={toggleSideBar} scrollToSection={scrollToSection} />
+				{!sideBarIsOpen && <HeaderMezon toggleSideBar={toggleSideBar} scrollToSection={scrollToSection} />}
 
 				<div className="container w-10/12 max-lg:w-full max-md:px-[16px] max-md:mt-[72px]" id="home">
-					<div className="pb-[36px] max-md:mt-[36px] md:py-[120px] flex flex-col gap-[48px] max-md:gap-[32px]" style={backgroundImageStyle}>
+					<div
+						className="pb-[36px] max-md:mt-[36px] md:py-[120px] flex flex-col gap-[48px] max-md:gap-[32px] md:px-[32px]"
+						style={backgroundImageStyle}
+					>
 						<div className="flex flex-col items-center justify-center gap-[24px] m-auto text-center w-full max-w-full md:max-w-[662px]">
 							<h1
 								style={{ fontFamily: 'Poppins' }}
-								className="tracking-[-.02em] text-center text-[60px] max-md:text-[36px] font-black leading-[72px] max-md:leading-[48px] font-semibold text-[#F4F7F9] max-md:text-[#FFFFFF]"
+								className="tracking-[-.02em] text-center text-[60px] max-md:text-[36px] font-black leading-[72px] max-md:leading-[48px] font-semibold text-[#F4F7F9] max-md:text-textDarkTheme"
 							>
 								Your clan & your world
 							</h1>
@@ -90,14 +99,19 @@ function MezonPage() {
 							</div>
 						</div>
 						<div className="flex justify-center items-center gap-[12px]">
-							<a className="" href="https://apps.apple.com/vn/app/mezon/id6502750046" target="_blank" rel="noreferrer">
-								<Icons.AppStoreBadge className="max-md:w-[96px]" />
+							<a className="cursor-pointer" href="https://apps.apple.com/vn/app/mezon/id6502750046" target="_blank" rel="noreferrer">
+								<Icons.AppStoreBadge className="max-w-full" />
 							</a>
-							<a className="" href="https://play.google.com/store/apps/details?id=com.mezon.mobile" target="_blank" rel="noreferrer">
-								<Icons.GooglePlayBadge className="max-md:w-[108px]" />
+							<a
+								className="cursor-pointer"
+								href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
+								target="_blank"
+								rel="noreferrer"
+							>
+								<Icons.GooglePlayBadge className="max-w-full" />
 							</a>
-							<a className="" href={downloadUrl} target="_blank" rel="noreferrer">
-								<Icons.MicrosoftBadge className="max-md:w-[108px]" />
+							<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+								<Icons.MicrosoftBadge className="max-w-full" />
 							</a>
 						</div>
 					</div>

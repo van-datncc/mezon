@@ -1,5 +1,4 @@
-import { Icons } from '@mezon/components';
-import { Image } from '@mezon/ui';
+import { Icons, Image } from '@mezon/ui';
 import { memo } from 'react';
 
 type LayoutProps = {
@@ -10,19 +9,17 @@ export const Layout = memo((props: LayoutProps) => {
 	const { sideBarIsOpen } = props;
 	return (
 		<div>
-			<section
-				id="overview"
-				className="flex flex-col items-center"
-				style={{ background: 'linear-gradient(219.23deg, rgb(3, 3, 32) -15.28%, rgb(15, 15, 99) 49.98%, rgb(4, 4, 28) 115.23%)' }}
-			>
-				<div className="w-10/12 pt-96 pb-96 flex flex-col gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px]  pl-[16px] max-lg:pr-[16px]">
-					<div className="pl-[32px] pr-[32px] flex flex-col gap-[20px] text-center max-lg:pl-0 max-lg:pr-0">
+			<section id="overview" className="flex flex-col items-center">
+				<div
+					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'} overflow-hidden`}
+				>
+					<div className="md:px-[32px] flex flex-col gap-[20px] text-center">
 						<div className="text-[36px] leading-[44px] font-semibold text-[#F4F7F9]">Overview</div>
 						<div className="text-[20px] leading-[30px] font-normal text-[#8FA7BF]">
 							Mezon is a communication platform <br /> that combines chat features with blockchain technology.{' '}
 						</div>
 					</div>
-					<div className="pl-[32px] pr-[32px] flex items-stretch gap-[64px] max-lg:flex-col max-lg:pl-0 max-lg:pr-0 max-lg:gap-[32px]">
+					<div className="md:px-[32px] flex items-stretch gap-[64px] max-lg:flex-col max-lg:gap-[32px]">
 						<div
 							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
@@ -98,24 +95,18 @@ export const Layout = memo((props: LayoutProps) => {
 					</div>
 				</div>
 			</section>
-			<section
-				id="features"
-				className="flex flex-col items-center"
-				style={{
-					background: 'linear-gradient(219.23deg, #030320 -15.28%, #0F0F63 49.98%, #04041C 115.23%)'
-				}}
-			>
+			<section id="features" className="flex flex-col items-center">
 				<div
-					className={`w-10/12 max-lg:w-full max-lg:px-[32px] max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} overflow-hidden`}
+					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} overflow-hidden`}
 				>
 					<h2
 						style={{ fontFamily: 'Poppins' }}
-						className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9]"
+						className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9] md:px-[32px]"
 					>
 						Our features
 					</h2>
 
-					<div className="mt-[64px] max-md:mt-[32px] flex flex-col gap-[48px]">
+					<div className="md:px-[32px] mt-[64px] max-md:mt-[32px] flex flex-col gap-[48px]">
 						<div
 							className="rounded-[20px] border p-[64px] bg-[#0B0E2D] border-[#4465FF4D] flex flex-col gap-[52px] max-md:rounded-[12px] max-md:py-[32px] max-md:px-[16px] max-md:gap-[20px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
@@ -309,13 +300,27 @@ export const Layout = memo((props: LayoutProps) => {
 					{!sideBarIsOpen && (
 						<div>
 							<div
+								className="hidden md:block"
+								style={{
+									position: 'absolute',
+									top: '8%',
+									left: '50%',
+									transform: 'translate(-50%, -50%)',
+									width: '300px',
+									height: '300px',
+									background: '#8D72C5',
+									opacity: '0.01',
+									borderRadius: '50%'
+								}}
+							></div>
+							<div
 								className="hidden max-md:block"
 								style={{
 									position: 'absolute',
 									top: 0,
 									right: '50%',
-									width: '400px',
-									height: '400px',
+									width: '300px',
+									height: '300px',
 									background: '#8D72C5',
 									opacity: '0.02',
 									borderRadius: '50%'
@@ -328,8 +333,8 @@ export const Layout = memo((props: LayoutProps) => {
 									position: 'absolute',
 									bottom: 0,
 									right: '50%',
-									width: '400px',
-									height: '400px',
+									width: '300px',
+									height: '300px',
 									background: '#8D72C5',
 									opacity: '0.02',
 									borderRadius: '50%'
@@ -342,8 +347,8 @@ export const Layout = memo((props: LayoutProps) => {
 									position: 'absolute',
 									top: '50%',
 									left: '50%',
-									width: '400px',
-									height: '400px',
+									width: '300px',
+									height: '300px',
 									background: '#8D72C5',
 									opacity: '0.02',
 									borderRadius: '50%'

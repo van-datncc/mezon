@@ -8,7 +8,7 @@ import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
-import MessageLine from '../MessageLine';
+import { MessageLine } from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
 type MessageReplyProps = {
 	message: IMessageWithUser;

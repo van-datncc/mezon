@@ -1,10 +1,10 @@
 import { usePermissionChecker } from '@mezon/core';
 import { deleteSticker, selectCurrentClanId, selectCurrentUserId, selectMemberClanByUserId, useAppDispatch, useAppSelector } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Icons } from '../../../components';
 
 type SettingEmojiListProps = {
 	updateSticker: (sticker: ClanSticker) => void;

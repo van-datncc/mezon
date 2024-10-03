@@ -1,14 +1,13 @@
-import { ModalErrorTypeUpload, ModalOverData } from '@mezon/components';
 import { useAppNavigation, useClans } from '@mezon/core';
 import { checkDuplicateNameClan, selectAllAccount, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { InputField, Modal } from '@mezon/ui';
+import { Icons, InputField, Modal } from '@mezon/ui';
 import { DEBOUNCE_TYPING_TIME, LIMIT_SIZE_UPLOAD_IMG, ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
-import * as Icons from '../../../../../ui/src/lib/Icons';
+import { ModalErrorTypeUpload, ModalOverData } from '../ModalError';
 
 export type ModalCreateClansProps = {
 	open: boolean;

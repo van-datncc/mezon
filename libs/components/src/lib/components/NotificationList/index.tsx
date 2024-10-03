@@ -1,7 +1,6 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	channelMetaActions,
-	directMetaActions,
 	notificationActions,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
@@ -12,7 +11,6 @@ import { INotification, NotificationEntity, sortNotificationsByDate } from '@mez
 import { Tooltip } from 'flowbite-react';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FixedSizeList } from 'react-window';
 import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
@@ -71,15 +69,12 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 		getUnreadChannelIds.forEach((channelId: string) => {
 			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		});
-		dispatch(directMetaActions.removeUnreadAllDm());
 	}, [getUnreadChannelIds, dispatch]);
 
 	const isShowMarkAllAsRead = useMemo(() => {
 		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;
 	}, [unReadReplyAndMentionList, currentTabNotify]);
 
-	const ITEM_HEIGHT = 140;
-	const itemCount = getAllMentionAndReply.length;
 	const modalRef = useRef<HTMLDivElement>(null);
 	const handleHideInbox = useCallback(() => {
 		dispatch(notificationActions.setIsShowInbox(false));
@@ -168,16 +163,20 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 					)}
 
 					{currentTabNotify === InboxType.MENTIONS && (
-						<FixedSizeList
-							className={`${appearanceTheme === 'light' ? 'lightModeScrollBarMention' : ''}`}
-							height={1000}
-							itemCount={itemCount}
-							itemSize={ITEM_HEIGHT}
-							width={'100%'}
-							itemData={getAllMentionAndReply}
-						>
-							{Row}
-						</FixedSizeList>
+						<div>
+							{getAllMentionAndReply.length > 0 ? (
+								getAllMentionAndReply.map((notification: INotification, index: number) => (
+									<NotificationChannel
+										key={`mention-${notification?.id}-${index}`}
+										isUnreadTab={false}
+										unreadListConverted={[]}
+										notification={notification}
+									/>
+								))
+							) : (
+								<EmptyNotification isEmptyMentions />
+							)}
+						</div>
 					)}
 				</div>
 			</div>
@@ -186,21 +185,6 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 }
 
 export default NotificationList;
-
-const Row = ({ index, style, data }: { index: number; style: React.CSSProperties; data: INotification[] }) => {
-	const notification = data[index];
-
-	return (
-		<div style={style}>
-			<NotificationChannel
-				key={`mention-${notification?.id}-${index}`}
-				isUnreadTab={false}
-				unreadListConverted={[]}
-				notification={notification}
-			/>
-		</div>
-	);
-};
 
 function InboxButton() {
 	return (

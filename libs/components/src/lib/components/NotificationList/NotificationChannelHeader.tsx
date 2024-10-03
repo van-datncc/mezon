@@ -1,5 +1,5 @@
-import { Icons } from '@mezon/components';
 import { selectClanById, selectTheme, useAppSelector } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { INotification, TNotificationChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useSelector } from 'react-redux';

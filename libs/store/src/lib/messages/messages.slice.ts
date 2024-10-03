@@ -110,12 +110,18 @@ export interface MessagesState {
 	isViewingOlderMessagesByChannelId: Record<string, boolean>;
 	newMesssageUpdateImage: MessageTypeUpdateLink;
 	channelIdLastFetch: string;
+	directMessageUnread: Record<string, ChannelMessage[]>;
 }
 export type FetchMessagesMeta = {
 	arg: {
 		channelId: string;
 		direction?: Direction_Mode;
 	};
+};
+export type DirectTimeStampArg = {
+	directId: string;
+	lastSeenTimestamp: number;
+	lastSentTimestamp: number;
 };
 
 type FetchMessagesPayloadAction = {
@@ -164,12 +170,13 @@ type fetchMessageChannelPayload = {
 	direction?: number;
 	isFetchingLatestMessages?: boolean;
 	isClearMessage?: boolean;
+	directTimeStamp?: DirectTimeStampArg;
 };
 
 export const fetchMessages = createAsyncThunk(
 	'messages/fetchMessages',
 	async (
-		{ clanId, channelId, noCache, messageId, direction, isFetchingLatestMessages, isClearMessage }: fetchMessageChannelPayload,
+		{ clanId, channelId, noCache, messageId, direction, isFetchingLatestMessages, isClearMessage, directTimeStamp }: fetchMessageChannelPayload,
 		thunkAPI
 	): Promise<FetchMessagesPayloadAction> => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -183,6 +190,19 @@ export const fetchMessages = createAsyncThunk(
 			return {
 				messages: []
 			};
+		}
+
+		if (directTimeStamp && directTimeStamp.directId !== undefined) {
+			const messages = response.messages;
+			const filteredMessages = messages.filter((message) => {
+				const updateTimeSeconds = message.update_time_seconds;
+				return (
+					updateTimeSeconds !== undefined &&
+					directTimeStamp.lastSeenTimestamp < updateTimeSeconds &&
+					updateTimeSeconds <= directTimeStamp.lastSentTimestamp
+				);
+			});
+			thunkAPI.dispatch(messagesActions.setDirectMessageUnread({ directId: directTimeStamp.directId, message: filteredMessages }));
 		}
 
 		if (Date.now() - response.time > 1000) {
@@ -645,7 +665,8 @@ export const initialMessagesState: MessagesState = {
 	isJumpingToPresent: {},
 	idMessageToJump: '',
 	newMesssageUpdateImage: { message_id: '' },
-	channelIdLastFetch: ''
+	channelIdLastFetch: '',
+	directMessageUnread: {}
 };
 
 export type SetCursorChannelArgs = {
@@ -675,7 +696,7 @@ export const messagesSlice = createSlice({
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel } = action.payload;
+			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, isCurrentChannel, mode } = action.payload;
 
 			if (!channelId || !messageId) return state;
 
@@ -889,6 +910,18 @@ export const messagesSlice = createSlice({
 						...channel,
 						entities: updatedEntities
 					};
+				}
+			}
+		},
+
+		setDirectMessageUnread(state, action: PayloadAction<{ directId: string; message: ChannelMessage[] | ChannelMessage }>) {
+			const { directId, message } = action.payload;
+
+			if (directId) {
+				if (!Array.isArray(message)) {
+					state.directMessageUnread[directId] = [...(state.directMessageUnread[directId] || []), message];
+				} else {
+					state.directMessageUnread[directId] = message;
 				}
 			}
 		}

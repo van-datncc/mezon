@@ -8,8 +8,9 @@ import {
 	SidebarClanItem,
 	SidebarTooltip
 } from '@mezon/components';
-import { useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
+	accountActions,
 	clansActions,
 	getIsShowPopupForward,
 	selectAllClans,
@@ -23,9 +24,12 @@ import {
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
 	selectStatusMenu,
-	selectTheme
+	selectStreamChannelByChannelId,
+	selectStreamMembersByChannelId,
+	selectTheme,
+	useAppDispatch
 } from '@mezon/store';
-import { accountActions, selectStreamChannelByChannelId, selectStreamMembersByChannelId, useAppDispatch } from '@mezon/store-mobile';
+
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -46,6 +50,7 @@ function MyApp() {
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
+
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
@@ -62,6 +67,10 @@ function MyApp() {
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
+
+	const { toMembersPage } = useAppNavigation();
+	const { currentURL } = useAppParams();
+	const memberPath = toMembersPage(currentClanId || '');
 
 	useEffect(() => {
 		const handleSizeWidth = () => {
@@ -258,7 +267,7 @@ function MyApp() {
 			<MainContent />
 
 			<div
-				className={`fixed h-[calc(100vh_-_60px)] w-[calc(100vw_-_344px)] right-0 bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
+				className={`fixed h-[calc(100vh_-_60px)] w-[calc(100vw_-_344px)] right-0 bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
 			>
 				<ChannelStream
 					key={currentStreamInfo?.streamId}

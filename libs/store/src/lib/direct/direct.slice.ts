@@ -236,6 +236,15 @@ export const directSlice = createSlice({
 		},
 		removeByDirectID: (state, action: PayloadAction<string>) => {
 			directAdapter.removeOne(state, action.payload);
+		},
+
+		setActiveDirect: (state, action: PayloadAction<{ directId: string }>) => {
+			directAdapter.updateOne(state, {
+				id: action.payload.directId,
+				changes: {
+					active: 1
+				}
+			});
 		}
 	},
 	extraReducers: (builder) => {
@@ -293,10 +302,9 @@ export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirec
 
 export const selectListDMUnread = createSelector(selectAllDirectMessages, getDirectState, (directMessages, state) => {
 	return directMessages.filter((dm) => {
-		return state.statusDMChannelUnread[dm.channel_id ?? ''];
+		return state.statusDMChannelUnread[dm.channel_id ?? ''] && dm.count_mess_unread && dm.count_mess_unread > 0;
 	});
 });
-
 export const selectListStatusDM = createSelector(getDirectState, (state) => state.statusDMChannelUnread);
 
 export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, selectEntitiesDirectMeta, (directMessages, directMetaEntities) => {

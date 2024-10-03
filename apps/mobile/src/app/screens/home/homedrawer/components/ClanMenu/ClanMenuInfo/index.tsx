@@ -1,10 +1,10 @@
 import { CircleIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectMembersClanCount, selectMembersClanOnlineCount } from '@mezon/store-mobile';
-import { MezonBadge } from 'apps/mobile/src/app/temp-ui';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { MezonBadge } from '../../../../../../temp-ui';
 import { style } from './styles';
 
 interface ClanMenuInfoProps {

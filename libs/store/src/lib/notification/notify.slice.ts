@@ -1,8 +1,8 @@
-import { ChannelMetaEntity } from '@mezon/store';
 import { INotification, LoadingStatus, NotificationCode, NotificationEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import memoizee from 'memoizee';
 import { Notification } from 'mezon-js';
+import { ChannelMetaEntity } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 export const NOTIFICATION_FEATURE_KEY = 'notification';
 const LIST_STICKER_CACHED_TIME = 1000 * 60 * 3;

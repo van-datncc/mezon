@@ -15,7 +15,7 @@ import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, Mou
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import CategorySetting from '../../CategorySetting';
+import { CategorySetting } from '../../CategorySetting';
 import { Coords } from '../../ChannelLink';
 import ModalConfirm from '../../ModalConfirm';
 import PanelCategory from '../../PanelCategory';

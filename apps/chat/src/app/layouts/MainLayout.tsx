@@ -1,7 +1,7 @@
 import { ChatContext, ChatContextProvider, useFriends, useGifsStickersEmoji } from '@mezon/core';
-import { reactionActions, selectAllChannelMeta, selectAnyUnreadChannel, selectMentionAndReplyUnreadAllClan, selectTotalUnreadDM } from '@mezon/store';
+import { reactionActions, selectAllChannelMeta, selectAnyUnreadChannel, selectMentionAndReplyUnreadAllClan } from '@mezon/store';
 
-import { useAppSelector } from '@mezon/store-mobile';
+import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
@@ -17,7 +17,8 @@ const GlobalEventListener = () => {
 	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
 	const allNotificationReplyMentionAllClan = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
 
-	const totalUnreadDM = useSelector(selectTotalUnreadDM);
+	const totalUnreadMessages = useSelector(selectTotalUnreadDM);
+
 	const { quantityPendingRequest } = useFriends();
 
 	const hasUnreadChannel = useAppSelector((state) => selectAnyUnreadChannel(state));
@@ -48,8 +49,7 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = allNotificationReplyMentionAllClan.length + totalUnreadDM + quantityPendingRequest;
-
+		const notificationCount = (allNotificationReplyMentionAllClan?.length ?? 0) + totalUnreadMessages + quantityPendingRequest;
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
 				electronBridge?.setBadgeCount(null);
@@ -57,13 +57,9 @@ const GlobalEventListener = () => {
 			}
 			electronBridge?.setBadgeCount(notificationCount);
 		} else {
-			if (notificationCount > 0) {
-				document.title = `(${notificationCount}) Mezon`;
-			} else {
-				document.title = 'Mezon';
-			}
+			document.title = notificationCount > 0 ? `(${notificationCount}) Mezon` : 'Mezon';
 		}
-	}, [allNotificationReplyMentionAllClan.length, totalUnreadDM, quantityPendingRequest, hasUnreadChannel]);
+	}, [allNotificationReplyMentionAllClan.length, totalUnreadMessages, quantityPendingRequest, hasUnreadChannel]);
 
 	return null;
 };

@@ -1,21 +1,36 @@
-import { usePermissionChecker } from '@mezon/core';
+import { useAuth, usePermissionChecker } from '@mezon/core';
+import { EventManagementEntity, selectUserMaxPermissionLevel } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { Coords } from '../../../ChannelLink';
 import ItemPanel from '../../../PanelChannel/ItemPanel';
 
 type PanelEventItemProps = {
 	coords: Coords;
-	checkUserCreate: boolean;
-	onHandle: (e: any) => void;
+	event?: EventManagementEntity;
+	onHandle: (e: unknown) => void;
 	setOpenModalDelEvent: React.Dispatch<React.SetStateAction<boolean>>;
 	onClose: () => void;
 };
 
 function PanelEventItem(props: PanelEventItemProps) {
-	const { coords, checkUserCreate, onHandle, setOpenModalDelEvent, onClose } = props;
+	const { coords, event, onHandle, setOpenModalDelEvent, onClose } = props;
+	const { userProfile } = useAuth();
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
+	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 
-	const [hasClanPermission] = usePermissionChecker([EPermission.manageClan]);
-	const isShow = checkUserCreate || hasClanPermission;
+	const canModifyEvent = useMemo(() => {
+		if (isClanOwner) {
+			return true;
+		}
+		const isEventICreated = event?.creator_id === userProfile?.user?.id;
+		if (isEventICreated) {
+			return true;
+		}
+
+		return Number(userMaxPermissionLevel) > Number(event?.max_permission);
+	}, [event?.creator_id, event?.max_permission, isClanOwner, userMaxPermissionLevel, userProfile?.user?.id]);
 
 	const handleDeleteEvent = async () => {
 		setOpenModalDelEvent(true);
@@ -32,7 +47,7 @@ function PanelEventItem(props: PanelEventItemProps) {
 			}}
 			onClick={onHandle}
 		>
-			{isShow && (
+			{canModifyEvent && (
 				<>
 					<ItemPanel children="Start Event" />
 					<ItemPanel children="Edit Event" />

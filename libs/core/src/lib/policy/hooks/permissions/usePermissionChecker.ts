@@ -1,6 +1,12 @@
-import { selectMaxPermissionForChannel, selectUserMaxPermissionLevel } from '@mezon/store';
+import {
+	overriddenPoliciesActions,
+	selectCurrentClanId,
+	selectMaxPermissionForChannel,
+	selectUserMaxPermissionLevel,
+	useAppDispatch
+} from '@mezon/store';
 import { EOverriddenPermission, EPermission } from '@mezon/utils';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useIsClanOwner } from '../useIsClanOwner';
 import { usePermissionsLevel } from './usePermissionsLevels';
@@ -9,6 +15,9 @@ function usePermissionChecker(permissions: EPermission[]): boolean[];
 function usePermissionChecker(permissions: Array<EPermission | EOverriddenPermission>, channelId: string): boolean[];
 
 function usePermissionChecker(permissions: string[], channelId?: string) {
+	const currentClanId = useSelector(selectCurrentClanId);
+	const dispatch = useAppDispatch();
+
 	// Retrieve the permission levels for different permission types
 	const permissionLevels = usePermissionsLevel();
 
@@ -34,6 +43,14 @@ function usePermissionChecker(permissions: string[], channelId?: string) {
 				return overriddenPermissions[permission as unknown as EOverriddenPermission];
 			}
 
+			if (permission === EPermission.clanOwner) {
+				return isClanOwner;
+			}
+
+			if (isClanOwner) {
+				return true;
+			}
+
 			// If user's max permission level is not defined, return false
 			if (Number.isNaN(maxPermissionLevel)) {
 				return false;
@@ -42,18 +59,19 @@ function usePermissionChecker(permissions: string[], channelId?: string) {
 			// Check if the user's max permission level is high enough for the permission
 			return permissionLevels[permission as EPermission] <= (maxPermissionLevel as number);
 		},
-		[channelId, maxPermissionLevel, overriddenPermissions, permissionLevels]
+		[channelId, isClanOwner, maxPermissionLevel, overriddenPermissions, permissionLevels]
 	);
 
 	const results = useMemo(() => {
-		// If the user is a Clan Owner, they automatically have all permissions
-		if (isClanOwner) {
-			return permissions.map(() => true);
-		}
-
 		// Map through the permissions array and check each one
 		return permissions.map((permission) => checkPermission(permission));
-	}, [isClanOwner, permissions, checkPermission]);
+	}, [permissions, checkPermission]);
+
+	useEffect(() => {
+		if (currentClanId && channelId && !Object.keys(overriddenPermissions).length) {
+			dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: currentClanId, channelId }));
+		}
+	}, [channelId, currentClanId, dispatch, overriddenPermissions]);
 
 	// Return the result array where each entry represents if the user has that permission
 	return results;

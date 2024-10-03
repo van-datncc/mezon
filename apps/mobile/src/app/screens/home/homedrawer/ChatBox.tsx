@@ -52,7 +52,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 	}, []);
 
 	return (
-		<Block paddingBottom={size.s_10}>
+		<Block>
 			<Block
 				backgroundColor={themeValue.secondary}
 				borderTopWidth={1}
@@ -67,7 +67,7 @@ export const ChatBox = memo((props: IChatBoxProps) => {
 					/>
 				)}
 				{!canSendMessage && !isDM && (
-					<Block position={'absolute'} zIndex={10} width={'100%'} top={size.s_8} left={-1}>
+					<Block position={'absolute'} zIndex={10} width={'100%'} top={size.s_6} left={-1}>
 						<Block backgroundColor={themeValue.charcoal} padding={size.s_16} borderRadius={size.s_20} marginHorizontal={size.s_6}>
 							<Text
 								style={{

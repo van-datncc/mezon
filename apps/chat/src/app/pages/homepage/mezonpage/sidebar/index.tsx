@@ -1,5 +1,4 @@
-import { Icons } from '@mezon/components';
-import { Image } from '@mezon/ui';
+import { Icons, Image } from '@mezon/ui';
 import debounce from 'lodash.debounce';
 import { memo, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -43,7 +42,7 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 
 	return (
 		<div
-			className={`fixed h-full z-50 w-full bg-[#0B0E2D] transform transition-transform duration-300 ease-in-out ${sideBarIsOpen ? 'translate-x-0' : 'translate-x-full'}`}
+			className={`fixed h-full z-50 w-full bg-[#0B0E2D] transform transition-transform duration-300 ease-in-out ${sideBarIsOpen ? 'translate-x-0' : '-translate-x-full'}`}
 		>
 			<div
 				ref={headerSideBarRef}
@@ -111,15 +110,15 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 			<div ref={footerSideBarRef} className="container w-full py-[48px] absolute bottom-0">
 				<div className="flex flex-col gap-[24px] max-lg:px-[32px]">
 					<div className="flex items-center gap-[24px]">
-						<Link className="" to={'/'}>
-							<Icons.LinkInIcon />
-						</Link>
-						<Link className="" to={'/'}>
-							<Icons.FacebookIcon />
-						</Link>
-						<Link className="" to={'/'}>
-							<Icons.GithubIcon />
-						</Link>
+						<a href="#link" className="cursor-pointer">
+							<Image src={`assets/instagram.svg`} alt={'linkedIn'} />
+						</a>
+						<a href="#facebook" className="cursor-pointer">
+							<Image src={`assets/facebook.svg`} alt={'facebook'} />
+						</a>
+						<a href="#github" className="cursor-pointer">
+							<Image src={`assets/twitter.svg`} alt={'twitter'} />
+						</a>
 					</div>
 					<div className="font-normal text-[16px] leading-[24px] text-[#7C92AF]">© 2024 Mezon. All rights reserved.</div>
 				</div>

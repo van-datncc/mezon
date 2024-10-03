@@ -1,4 +1,3 @@
-import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
 import { RootState, referencesActions, selectDataReferences } from '@mezon/store';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
@@ -6,6 +5,10 @@ import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMess
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
+import { GifStickerEmojiPopup } from '../../GifsStickersEmojis';
+import { MessageBox } from '../../MessageBox';
+import { ReplyMessageBox } from '../../ReplyMessageBox';
+import { UserMentionList } from '../../UserMentionList';
 
 interface DirectIdProps {
 	// directParamId: string;
