@@ -61,7 +61,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					<div className="leading-6">
 						<MessageLine
 							isEditted={false}
-							content={JSON.parse(pinMessage.content || '')}
+							content={JSON.parse(pinMessage.content || '{}')}
 							isJumMessageEnabled={false}
 							isTokenClickAble={false}
 						/>
