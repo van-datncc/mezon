@@ -75,7 +75,7 @@ function MezonPage() {
 			}}
 		>
 			<div
-				className="layout relative flex flex-col items-center text-textDarkTheme"
+				className="layout relative flex flex-col items-center text-textDarkTheme overflow-hidden"
 				style={{
 					background: 'linear-gradient(rgba(3, 3, 32, 0) -15.28%, rgb(15, 15, 99) -93.02%, rgba(3, 3, 32, 0) 105.23%)'
 				}}
@@ -130,7 +130,7 @@ function MezonPage() {
 							width: '400px',
 							height: '400px',
 							background: '#8D72C5',
-							filter: 'blur(170px)',
+							filter: 'blur(200px)',
 							borderRadius: '50%',
 							mixBlendMode: 'color-dodge'
 						}}

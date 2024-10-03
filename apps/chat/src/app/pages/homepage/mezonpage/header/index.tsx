@@ -22,7 +22,7 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 							height={32}
 							className="aspect-square object-cover"
 						/>
-						<div className="font-semibold text-[22.15px] leading-[26.58px]" style={{ fontFamily: 'Poppins' }}>
+						<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em]" style={{ fontFamily: 'Poppins' }}>
 							mezon
 						</div>
 					</Link>
@@ -52,7 +52,7 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 				</div>
 				<div className="w-fit">
 					<Link
-						className="hidden md:block px-[16px] py-[10px] bg-[#1024D4] rounded-lg text-[#F4F7F9] font-semibold hover:bg-[#0C1AB2] focus:bg-[#281FB5]"
+						className="hidden md:block px-[16px] py-[10px] bg-[#1024D4] rounded-lg text-[#F4F7F9] text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5]"
 						style={{ boxShadow: '0px 0px 0px 1px #1018282E inset' }}
 						to={'/mezon'}
 					>

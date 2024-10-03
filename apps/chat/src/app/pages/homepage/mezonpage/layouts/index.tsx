@@ -12,7 +12,7 @@ export const Layout = memo((props: LayoutProps) => {
 		<div>
 			<section id="overview" className="flex flex-col items-center">
 				<div
-					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[64px] max-md:gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'} overflow-hidden`}
+					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[64px] max-md:gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'}`}
 				>
 					<div className="md:px-[32px] flex flex-col gap-[20px] text-center">
 						<div className="text-[36px] leading-[44px] font-semibold text-[#F4F7F9]">Overview</div>
@@ -102,7 +102,7 @@ export const Layout = memo((props: LayoutProps) => {
 			</section>
 			<section id="feature" className="flex flex-col items-center">
 				<div
-					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} overflow-hidden`}
+					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} ${sideBarIsOpen ? 'overflow-hidden' : ''}`}
 				>
 					<h2
 						style={{ fontFamily: 'Poppins' }}
@@ -357,12 +357,12 @@ export const Layout = memo((props: LayoutProps) => {
 								className="hidden max-md:block"
 								style={{
 									position: 'absolute',
-									top: '50%',
-									left: '50%',
-									width: '300px',
-									height: '300px',
+									top: '40%',
+									right: 0,
+									width: '200px',
+									height: '400px',
 									background: '#8D72C5',
-									filter: 'blur(130px)',
+									filter: 'blur(100px)',
 									borderRadius: '50%',
 									mixBlendMode: 'color-dodge'
 								}}
