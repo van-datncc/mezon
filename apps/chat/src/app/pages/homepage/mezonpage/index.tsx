@@ -1,17 +1,19 @@
 import { version } from '@mezon/package-js';
 import { Icons } from '@mezon/ui';
 import { getPlatform } from '@mezon/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Footer from './footer';
 import { HeaderMezon } from './header';
-import { Layout } from './layouts';
+import { Layout, useIntersectionObserver } from './layouts';
 import { SideBarMezon } from './sidebar';
 
 function MezonPage() {
+	const platform = getPlatform();
 	const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
 	const [backgroundImage, setBackgroundImage] = useState({ url: '', position: '' });
 
-	const platform = getPlatform();
+	const homeRef = useRef<HTMLDivElement>(null);
+	const isVisible = useIntersectionObserver(homeRef, { threshold: 0.1 });
 
 	const toggleSideBar = () => {
 		setSideBarIsOpen(!sideBarIsOpen);
@@ -80,9 +82,9 @@ function MezonPage() {
 			>
 				{!sideBarIsOpen && <HeaderMezon sideBarIsOpen={sideBarIsOpen} toggleSideBar={toggleSideBar} scrollToSection={scrollToSection} />}
 
-				<div className="container w-10/12 max-lg:w-full max-md:px-[16px] max-md:mt-[72px]" id="home">
+				<div className="container w-10/12 max-lg:w-full max-md:px-[16px] max-md:mt-[72px]" id="home" ref={homeRef}>
 					<div
-						className="pb-[36px] max-md:mt-[36px] md:py-[120px] flex flex-col gap-[48px] max-md:gap-[32px] md:px-[32px]"
+						className={`pb-[36px] max-md:mt-[36px] md:py-[120px] flex flex-col gap-[48px] max-md:gap-[32px] md:px-[32px] transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
 						style={backgroundImageStyle}
 					>
 						<div className="flex flex-col items-center justify-center gap-[24px] m-auto text-center w-full max-w-full md:max-w-[662px]">
