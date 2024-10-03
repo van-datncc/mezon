@@ -65,7 +65,6 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 				.catch((error) => {});
 		}
 	}, [dispatch, inviteID]);
-	const isDisableJoinClan = useMemo(() => clans?.some((clan) => clan?.clan_id === clanInvite?.clan_id), [clans, clanInvite]);
 
 	const handleJoinClanInvite = async () => {
 		const store = await getStoreAsync();
@@ -122,8 +121,7 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 						</View>
 					</View>
 					<TouchableOpacity
-						disabled={isDisableJoinClan}
-						style={[styles.inviteClanBtn, { opacity: isDisableJoinClan ? 0.5 : 1 }]}
+						style={styles.inviteClanBtn}
 						onPress={() => {
 							handleJoinClanInvite();
 						}}
