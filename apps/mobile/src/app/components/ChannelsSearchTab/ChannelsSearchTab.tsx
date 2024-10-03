@@ -25,7 +25,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const timeoutRef = useRef<any>();
+	const timeoutRef = useRef<NodeJS.Timeout>();
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 	const listVoiceChannel = useMemo(
@@ -36,21 +36,20 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_TEXT),
 		[listChannelSearch]
 	);
+	const listStreamingChannel = useMemo(
+		() => listChannelSearch?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_STREAMING),
+		[listChannelSearch]
+	);
 	const combinedListChannel = useMemo(() => {
-		const textChannels = listTextChannel?.map((channel) => ({
-			...channel
-		}));
-		const voiceChannels = listVoiceChannel?.map((channel) => ({
-			...channel
-		}));
-
 		return [
 			{ title: t('textChannels'), type: ChannelTypeHeader },
-			...textChannels,
+			...listTextChannel,
 			{ title: t('voiceChannels'), type: ChannelTypeHeader },
-			...voiceChannels
+			...listVoiceChannel,
+			{ title: 'streamChannel', type: ChannelTypeHeader },
+			...listStreamingChannel
 		];
-	}, [listTextChannel, listVoiceChannel]);
+	}, [listTextChannel, listVoiceChannel, listStreamingChannel, t]);
 
 	const handleRouteData = async (channelData: ChannelThreads) => {
 		if (channelData?.status === StatusVoiceChannel.Active && channelData?.meeting_code) {
