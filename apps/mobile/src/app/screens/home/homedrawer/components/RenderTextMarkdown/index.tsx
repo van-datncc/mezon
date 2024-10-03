@@ -1,11 +1,11 @@
-import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
-import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, ThreadIcon, urlRegex } from '@mezon/mobile-components';
+import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
@@ -42,7 +42,9 @@ export const TYPE_MENTION = {
 	userMention: '@',
 	hashtag: '#',
 	voiceChannel: '##voice',
-	userRoleMention: '@role'
+	userRoleMention: '@role',
+	thread: '#thread',
+	stream: '#stream'
 };
 /**
  * custom style for markdown
@@ -237,10 +239,36 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 				return (
 					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 						<Text>
-							<FontAwesome name="volume-2" size={14} color={baseColor.gray} />{' '}
+							<FontAwesome name="volume-2" size={size.s_14} color={Colors.textLink} />{' '}
 						</Text>
 						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>
+				);
+			}
+			if (payload.includes(TYPE_MENTION.stream)) {
+				return (
+					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}>
+						<Text>
+							<FontAwesome name="youtube" size={size.s_14} color={Colors.textLink} />{' '}
+						</Text>
+						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
+					</Text>
+				);
+			}
+			if (payload.includes(TYPE_MENTION.thread)) {
+				return (
+					<View>
+						<Pressable
+							key={node.key}
+							style={[styles.voiceChannel, { top: size.s_4 }]}
+							onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}
+						>
+							<Text>
+								<ThreadIcon height={size.s_14} width={size.s_14} color={Colors.textLink} />
+							</Text>
+							<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
+						</Pressable>
+					</View>
 				);
 			}
 			return (
