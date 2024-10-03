@@ -82,9 +82,7 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI)
 	channelId && thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId || '', channelId: channelId, isFetchingLatestMessages: true }));
 
 	thunkAPI.dispatch(clansActions.fetchClans());
-	if (!isClanView) {
-		thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
-	}
+	thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 
 	if (isClanView && currentClanId) {
 		thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
