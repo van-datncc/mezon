@@ -42,8 +42,8 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 							Overview
 						</a>
 						<a
-							href="#features"
-							onClick={(event) => scrollToSection('features', event)}
+							href="#feature"
+							onClick={(event) => scrollToSection('feature', event)}
 							className="border-b-2 border-transparent hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg shadow-none focus:shadow-[0px_0px_0px_4px_#678FFF] text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px]"
 						>
 							Features
@@ -73,8 +73,9 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 						width: '300px',
 						height: '200px',
 						background: '#8D72C5',
-						filter: 'blur(100px)',
-						borderRadius: '50%'
+						filter: 'blur(50px)',
+						borderRadius: '50%',
+						mixBlendMode: 'color-dodge'
 					}}
 				></div>
 			)}

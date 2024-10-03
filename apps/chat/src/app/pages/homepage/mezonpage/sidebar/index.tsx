@@ -73,7 +73,8 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 						height: '200px',
 						background: '#8D72C5',
 						filter: 'blur(100px)',
-						borderRadius: '50%'
+						borderRadius: '50%',
+						mixBlendMode: 'color-dodge'
 					}}
 				></div>
 			</div>
@@ -103,8 +104,8 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 					Overview
 				</a>
 				<a
-					href="#features"
-					onClick={(event) => scrollToSection('features', event)}
+					href="#feature"
+					onClick={(event) => scrollToSection('feature', event)}
 					className="text-center px-[16px] py-[10px] text-[#F4F7F9] font-semibold text-base hover:bg-[#0C1AB2] hover:rounded-[8px] focus:rounded-[8px] focus:bg-[#281FB5]"
 				>
 					Features
