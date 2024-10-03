@@ -592,27 +592,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
 			if (channelCreated && channelCreated.channel_private === 0) {
-				const timestamp = Date.now() / 1000;
-
-				const extendChannelCreated = {
-					...channelCreated,
-					last_seen_message: { timestamp_seconds: timestamp },
-					last_sent_message: { timestamp_seconds: timestamp }
-				};
-				dispatch(channelsActions.createChannelSocket(extendChannelCreated));
+				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
-				dispatch(
-					channelMetaActions.updateBulkChannelMetadata([
-						{
-							id: extendChannelCreated.channel_id,
-							lastSeenTimestamp: extendChannelCreated.last_seen_message.timestamp_seconds,
-							lastSentTimestamp: extendChannelCreated.last_sent_message.timestamp_seconds,
-							lastSeenPinMessage: '',
-							clanId: extendChannelCreated.clan_id ?? ''
-						}
-					])
-				);
+
 				if (channelCreated.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
+					const now = Math.floor(Date.now() / 1000);
+					const extendChannelCreated = {
+						...channelCreated,
+						last_seen_message: { timestamp_seconds: 0 },
+						last_sent_message: { timestamp_seconds: now }
+					};
 					dispatch(
 						channelsActions.joinChat({
 							clanId: channelCreated.clan_id,
@@ -622,6 +611,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							isPublic: !channelCreated.channel_private,
 							isParentPublic: channelCreated.is_parent_public
 						})
+					);
+					dispatch(
+						channelMetaActions.updateBulkChannelMetadata([
+							{
+								id: extendChannelCreated.channel_id,
+								lastSeenTimestamp: extendChannelCreated.last_seen_message.timestamp_seconds,
+								lastSentTimestamp: extendChannelCreated.last_sent_message.timestamp_seconds,
+								lastSeenPinMessage: '',
+								clanId: extendChannelCreated.clan_id ?? ''
+							}
+						])
 					);
 				}
 			}

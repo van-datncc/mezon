@@ -114,7 +114,6 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
 			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId }));
-
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ clanId: clanId, channelId, messageId }));
 			} else {
@@ -156,6 +155,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
+
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
@@ -287,7 +287,10 @@ export const fetchChannels = createAsyncThunk(
 			thunkAPI.dispatch(messagesActions.setManyLastMessages(lastChannelMessagesTruthy as ApiChannelMessageHeaderWithChannel[]));
 		}
 
-		const channels = response.channeldesc.map(mapChannelToEntity);
+		const channels = response.channeldesc.map((channel) => ({
+			...mapChannelToEntity(channel),
+			last_seen_message: channel.last_seen_message ? channel.last_seen_message : { timestamp_seconds: 0 }
+		}));
 		const meta = channels.map((ch) => extractChannelMeta(ch));
 		thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata(meta));
 		return channels;
