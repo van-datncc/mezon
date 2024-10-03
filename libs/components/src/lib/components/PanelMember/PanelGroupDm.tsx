@@ -3,7 +3,6 @@ import {
 	deleteChannel,
 	directMetaActions,
 	fetchDirectMessage,
-	messagesActions,
 	removeMemberChannel,
 	selectCurrentUserId,
 	useAppDispatch,
@@ -54,7 +53,6 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 	const handleMarkAsRead = useCallback(
 		(directId: string) => {
 			const timestamp = Date.now() / 1000;
-			dispatch(messagesActions.setDirectMessageUnread({ directId: directId, message: [] }));
 			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
 		},
 		[dispatch]

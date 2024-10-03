@@ -224,7 +224,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
-					dispatch(messagesActions.setDirectMessageUnread({ directId: message.channel_id, message: message }));
 				}
 				if (mess.isMe) {
 					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
