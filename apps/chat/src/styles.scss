@@ -51,6 +51,22 @@
 	font-display: swap;
 }
 
+@font-face {
+	font-family: 'Poppins';
+	font-style: normal;
+	font-weight: normal;
+	src: url('./assets//fonts/Poppins-Regular.woff2') format('woff2');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: normal;
+	src: url('./assets//fonts/Inter-Regular.woff2') format('woff2');
+	font-display: swap;
+}
+
 /* You can add global styles to this file, and also import other style files */
 :root {
 	--white-500: #ffffff;

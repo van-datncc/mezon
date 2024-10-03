@@ -8,7 +8,7 @@ import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 import { ChannelStreamMode } from 'mezon-js';
 import { useSelector } from 'react-redux';
-import MessageLine from '../MessageLine';
+import { MessageLine } from '../MessageLine';
 import { useMessageParser } from '../useMessageParser';
 type MessageReplyProps = {
 	message: IMessageWithUser;
@@ -62,7 +62,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
-								src={isDM ? messageSender?.user?.avatar_url : messageSender?.clan_avatar}
+								src={isDM ? messageSender?.user?.avatar_url : messageSender?.clan_avatar || messageSender?.user?.avatar_url}
 							/>
 						</div>
 

@@ -1,11 +1,12 @@
+import { Icons } from '@mezon/ui';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
-import { Icons } from '../../components';
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
 };
 export const MIN_WIDTH_VIDEO_SHOW = 162;
+export const DEFAULT_HEIGHT_VIDEO_SHOW = 150;
 
 function MessageVideo({ attachmentData }: MessageImage) {
 	const handleOnCanPlay = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
@@ -34,14 +35,18 @@ function MessageVideo({ attachmentData }: MessageImage) {
 				src={attachmentData.url}
 				controls={showControl}
 				autoPlay={false}
-				className={`${showControl ? 'max-w-full h-[150px]' : `w-[${MIN_WIDTH_VIDEO_SHOW}px] h-auto`} object-contain`}
+				className={`object-contain`}
+				style={{
+					width: showControl ? 'auto' : MIN_WIDTH_VIDEO_SHOW,
+					height: showControl ? DEFAULT_HEIGHT_VIDEO_SHOW : `auto`
+				}}
 				ref={videoRef}
 				onCanPlay={(e) => handleOnCanPlay(e)}
 				onClick={(e) => handleTogglePlay(e)}
 			></video>
 			{!showControl && (
 				<div className="bottom-1 right-1 absolute w-4 h-4 rounded overflow-hidden cursor-pointer z-10" onClick={handleShowFullVideo}>
-					<Icons.FullScreen defaultSize="w-4 h-4" defaultFill="text-channelTextLabel" />
+					<Icons.FullScreen className="w-4 h-4 dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
 				</div>
 			)}
 		</div>

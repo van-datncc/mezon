@@ -1,6 +1,7 @@
 import {
 	FirstJoinPopup,
 	ForwardMessageModal,
+	MessageContextMenuProvider,
 	MessageModalImage,
 	ModalCreateClan,
 	NavLinkComponent,
@@ -13,13 +14,14 @@ import {
 	accountActions,
 	clansActions,
 	getIsShowPopupForward,
+	selectAllChannelMemberIds,
 	selectAllClans,
-	selectAllDirectMessageByLastSeenTimestamp,
-	selectAllDirectMetaMessages,
+	selectAllRoleIds,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
+	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
 	selectIsShowPopupQuickMess,
@@ -28,13 +30,14 @@ import {
 	selectStreamChannelByChannelId,
 	selectStreamMembersByChannelId,
 	selectTheme,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 
 import { Image } from '@mezon/ui';
-import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform, removeUndefinedAndEmpty } from '@mezon/utils';
+import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -52,21 +55,7 @@ function MyApp() {
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
 
-	const allLastSeenChannelAllDirect = useSelector(selectAllDirectMetaMessages);
-	const getAllDirectMessageUnread = useSelector(selectAllDirectMessageByLastSeenTimestamp(allLastSeenChannelAllDirect));
-	const filterDirectUnread = removeUndefinedAndEmpty(getAllDirectMessageUnread);
-
-	const listUnreadDM = useMemo(() => {
-		return Object.entries(filterDirectUnread).map(([directId, messages]) => {
-			const lastSentMessage = messages[messages.length - 1];
-			return {
-				id: directId,
-				length: messages.length,
-				senderLastMessage: lastSentMessage?.sender_id
-			};
-		});
-	}, [filterDirectUnread]);
-
+	const listUnreadDM = useSelector(selectDirectsUnreadlist);
 	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 
@@ -196,6 +185,8 @@ function MyApp() {
 	const handleClickToJoinClan = () => {
 		dispatch(clansActions.joinClan({ clanId: '0' }));
 	};
+	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannel?.id as string));
+	const allRolesInClan = useSelector(selectAllRoleIds);
 
 	return (
 		<div
@@ -234,15 +225,17 @@ function MyApp() {
 								</NavLinkComponent>
 							</NavLink>
 						</SidebarTooltip>
-						{listUnreadDM?.length > 0 &&
+						{!!listUnreadDM?.length &&
 							listUnreadDM.map(
 								(dmGroupChatUnread) =>
-									dmGroupChatUnread?.senderLastMessage !== userId && (
-										<DirectUnreads
-											key={dmGroupChatUnread.id}
-											directId={dmGroupChatUnread.id}
-											countMessUnread={dmGroupChatUnread.length}
-										/>
+									dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
+										<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
+											<DirectUnreads
+												key={dmGroupChatUnread.id}
+												directMessage={dmGroupChatUnread}
+												countMessUnread={dmGroupChatUnread?.count_mess_unread || 0}
+											/>
+										</SidebarTooltip>
 									)
 							)}
 					</div>
@@ -290,7 +283,11 @@ function MyApp() {
 					currentStreamInfo={currentStreamInfo}
 				/>
 			</div>
-			{openModalAttachment && <MessageModalImage />}
+			{openModalAttachment && (
+				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
+					<MessageModalImage />
+				</MessageContextMenuProvider>
+			)}
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 			{isShowPopupQuickMess && <PopupQuickMess />}
 		</div>

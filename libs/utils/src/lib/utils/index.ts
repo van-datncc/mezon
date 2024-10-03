@@ -410,7 +410,7 @@ export function filterListByName(listSearch: SearchItemProps[], searchText: stri
 
 export function sortFilteredList(filteredList: SearchItemProps[], searchText: string, isSearchByUsername: boolean): SearchItemProps[] {
 	return filteredList.sort((a: SearchItemProps, b: SearchItemProps) => {
-		if (searchText === '' || searchText.startsWith('@' || searchText.startsWith('#'))) {
+		if (searchText === '' || searchText.startsWith('@')) {
 			return (b.lastSentTimeStamp || 0) - (a.lastSentTimeStamp || 0);
 		} else if (searchText.startsWith('#')) {
 			return compareObjects(a, b, searchText.substring(1), 'prioritizeName');

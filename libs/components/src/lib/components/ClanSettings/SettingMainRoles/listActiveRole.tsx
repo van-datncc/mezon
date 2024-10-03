@@ -1,6 +1,6 @@
-import { Icons } from '@mezon/components';
 import { useClanOwner } from '@mezon/core';
 import { RolesClanEntity, selectTheme, selectUserMaxPermissionLevel } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { RoleEveryOne, SlugPermission } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ApiPermission } from 'mezon-js/api.gen';

@@ -1,4 +1,3 @@
-import { DirectMetaEntity } from '@mezon/store-mobile';
 import {
 	ApiChannelMessageHeaderWithChannel,
 	ChannelDraftMessages,
@@ -191,19 +190,6 @@ export const fetchMessages = createAsyncThunk(
 			return {
 				messages: []
 			};
-		}
-
-		if (directTimeStamp && directTimeStamp.directId !== undefined) {
-			const messages = response.messages;
-			const filteredMessages = messages.filter((message) => {
-				const updateTimeSeconds = message.update_time_seconds;
-				return (
-					updateTimeSeconds !== undefined &&
-					directTimeStamp.lastSeenTimestamp < updateTimeSeconds &&
-					updateTimeSeconds <= directTimeStamp.lastSentTimestamp
-				);
-			});
-			thunkAPI.dispatch(messagesActions.setDirectMessageUnread({ directId: directTimeStamp.directId, message: filteredMessages }));
 		}
 
 		if (Date.now() - response.time > 1000) {
@@ -913,18 +899,6 @@ export const messagesSlice = createSlice({
 					};
 				}
 			}
-		},
-
-		setDirectMessageUnread(state, action: PayloadAction<{ directId: string; message: ChannelMessage[] | ChannelMessage }>) {
-			const { directId, message } = action.payload;
-
-			if (directId) {
-				if (!Array.isArray(message)) {
-					state.directMessageUnread[directId] = [...(state.directMessageUnread[directId] || []), message];
-				} else {
-					state.directMessageUnread[directId] = message;
-				}
-			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -1395,40 +1369,3 @@ const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelI
 
 	return false;
 };
-
-export const selectAllDirectMessageUnread = createSelector(getMessagesState, (state) => state.directMessageUnread);
-
-export const selectAllDirectMessageByLastSeenTimestamp = (lastSeenTime: DirectMetaEntity[]) =>
-	createSelector(selectAllDirectMessageUnread, (unreadMessages) => {
-		const filteredMessages: Record<string, DirectMetaEntity[]> = {};
-
-		if (unreadMessages) {
-			Object.entries(unreadMessages).forEach(([directId, messages]) => {
-				const lastSeenEntry = lastSeenTime.find((channel) => channel.id === directId);
-				if (lastSeenEntry) {
-					const { last_seen_message, last_sent_message } = lastSeenEntry;
-					if (last_sent_message) {
-						filteredMessages[directId] = messages.filter((message) => {
-							const { update_time_seconds } = message;
-							const effectiveUpdateTime = update_time_seconds !== undefined ? update_time_seconds : last_sent_message.timestamp_seconds;
-
-							if (
-								last_seen_message &&
-								last_seen_message.timestamp_seconds &&
-								last_sent_message &&
-								last_sent_message.timestamp_seconds &&
-								effectiveUpdateTime
-							) {
-								return (
-									last_seen_message.timestamp_seconds < effectiveUpdateTime &&
-									effectiveUpdateTime <= last_sent_message.timestamp_seconds
-								);
-							}
-						});
-					}
-				}
-			});
-		}
-
-		return filteredMessages;
-	});

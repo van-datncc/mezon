@@ -1,7 +1,7 @@
 import { usePermissionChecker } from '@mezon/core';
 import { authActions, selectCurrentClan, useAppDispatch } from '@mezon/store';
+import { LogoutModal } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
-import { LogoutModal } from 'libs/ui/src/lib/LogOutButton';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -22,16 +22,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const navigate = useNavigate();
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
 		const filteredListItem = sidebarItem.listItem.filter((item) => {
-			if (
-				[
-					ItemSetting.ROLES,
-					ItemSetting.OVERVIEW,
-					ItemSetting.EMOJI,
-					ItemSetting.NOTIFICATION_SOUND,
-					ItemSetting.INTEGRATIONS,
-					ItemSetting.STICKERS
-				].includes(item.id)
-			) {
+			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS].includes(item.id)) {
 				return hasClanPermission;
 			}
 			return true;

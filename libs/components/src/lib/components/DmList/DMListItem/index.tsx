@@ -1,18 +1,10 @@
-import { MemberProfile } from '@mezon/components';
-import {
-	directActions,
-	directMetaActions,
-	messagesActions,
-	selectDirectById,
-	selectIsUnreadDMById,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store';
+import { directActions, directMetaActions, selectDirectById, selectIsUnreadDMById, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelMembersEntity, MemberProfileType } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { MemberProfile } from '../../MemberProfile';
 export type DirectMessProp = {
 	id: string;
 	currentDmGroupId: string;
@@ -37,7 +29,6 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
 		const timestamp = Date.now() / 1000;
 		dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
-		dispatch(messagesActions.setDirectMessageUnread({ directId: directId, message: [] }));
 
 		if (directId === currentDmGroupId) {
 			navigateToFriends();

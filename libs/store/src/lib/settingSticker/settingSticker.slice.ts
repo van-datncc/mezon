@@ -19,7 +19,6 @@ export interface SettingClanStickerState extends EntityState<ClanSticker, string
 export interface UpdateStickerArgs {
 	request: MezonUpdateClanStickerByIdBody;
 	stickerId: string;
-	clan_id: string;
 }
 export const stickerAdapter = createEntityAdapter({
 	selectId: (sticker: ClanSticker) => sticker.id || ''
@@ -82,20 +81,17 @@ export const createSticker = createAsyncThunk(
 	}
 );
 
-export const updateSticker = createAsyncThunk(
-	'settingClanSticker/updateSticker',
-	async ({ request, stickerId, clan_id }: UpdateStickerArgs, thunkAPI) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
-			if (res) {
-				thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
-			}
-		} catch (error) {
-			return thunkAPI.rejectWithValue({ error });
+export const updateSticker = createAsyncThunk('settingClanSticker/updateSticker', async ({ request, stickerId }: UpdateStickerArgs, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
+		if (res) {
+			thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
 		}
+	} catch (error) {
+		return thunkAPI.rejectWithValue({ error });
 	}
-);
+});
 
 export const removeStickersByClanId = createAsyncThunk('settingClanSticker/removeStickersByClanId', async (clanId: string, thunkAPI) => {
 	const state = thunkAPI.getState() as { settingSticker: SettingClanStickerState };

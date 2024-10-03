@@ -1,4 +1,3 @@
-import { Icons } from '@mezon/components';
 import { useFriends, useMenu } from '@mezon/core';
 import {
 	FriendsEntity,
@@ -12,7 +11,7 @@ import {
 	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
-import { Button, Image, InputField } from '@mezon/ui';
+import { Button, Icons, Image, InputField } from '@mezon/ui';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import FriendList from './FriendsList';
