@@ -2,8 +2,9 @@ import { Icons } from '@mezon/components';
 import { version } from '@mezon/package-js';
 import { getPlatform } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
+import Footer from './footer';
 import { HeaderMezon } from './header';
-import { OurFeatures } from './layouts/OurFeatures';
+import { Layout } from './layouts';
 import { SideBarMezon } from './sidebar';
 
 function MezonPage() {
@@ -105,7 +106,8 @@ function MezonPage() {
 				{sideBarIsOpen && <SideBarMezon sideBarIsOpen={sideBarIsOpen} toggleSideBar={toggleSideBar} scrollToSection={scrollToSection} />}
 			</div>
 
-			<OurFeatures sideBarIsOpen={sideBarIsOpen} />
+			<Layout sideBarIsOpen={sideBarIsOpen} />
+			<Footer downloadUrl={downloadUrl}></Footer>
 		</div>
 	);
 }
