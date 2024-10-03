@@ -216,7 +216,7 @@ export const selectMentionAndReplyUnreadByClanId = (clanId: string, listLastSeen
 
 			const lastSeen = lastSeenMap.get(channelId) ?? 0;
 
-			return lastSeen > 0 && notificationTimestamp > lastSeen;
+			return notificationTimestamp > lastSeen;
 		});
 	});
 export const selectMentionAndReplyUnreadAllClan = (listLastSeenAllClan: ChannelMetaEntity[]) =>
@@ -229,7 +229,7 @@ export const selectMentionAndReplyUnreadAllClan = (listLastSeenAllClan: ChannelM
 			lastSeenMap.set(channel.id, channel.lastSeenTimestamp ?? 0);
 		});
 
-		return filteredNotifications.filter((notification) => {
+		const result = filteredNotifications.filter((notification) => {
 			if (!notification.create_time) {
 				return false;
 			}
@@ -239,6 +239,7 @@ export const selectMentionAndReplyUnreadAllClan = (listLastSeenAllClan: ChannelM
 
 			const lastSeen = lastSeenMap.get(channelId) ?? 0;
 
-			return lastSeen > 0 && notificationTimestamp > lastSeen;
+			return notificationTimestamp > lastSeen;
 		});
+		return result;
 	});
