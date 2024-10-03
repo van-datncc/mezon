@@ -22,16 +22,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const navigate = useNavigate();
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
 		const filteredListItem = sidebarItem.listItem.filter((item) => {
-			if (
-				[
-					ItemSetting.ROLES,
-					ItemSetting.OVERVIEW,
-					ItemSetting.EMOJI,
-					ItemSetting.NOTIFICATION_SOUND,
-					ItemSetting.INTEGRATIONS,
-					ItemSetting.STICKERS
-				].includes(item.id)
-			) {
+			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS].includes(item.id)) {
 				return hasClanPermission;
 			}
 			return true;
