@@ -10,7 +10,34 @@ export const Layout = memo((props: LayoutProps) => {
 
 	return (
 		<div>
-			<section id="overview" className="flex flex-col items-center">
+			<section id="overview" className="flex flex-col items-center relative">
+				<div
+					className="max-lg:hidden"
+					style={{
+						position: 'absolute',
+						left: 0,
+						top: 0,
+						width: '400px',
+						height: '400px',
+						background: '#8D72C5',
+						filter: 'blur(130px)',
+						mixBlendMode: 'color-dodge',
+						transform: 'translateY(50%)'
+					}}
+				></div>
+				<div
+					className="max-lg:hidden"
+					style={{
+						position: 'absolute',
+						right: 0,
+						width: '400px',
+						height: '400px',
+						background: '#8D72C5',
+						filter: 'blur(130px)',
+						mixBlendMode: 'color-dodge',
+						transform: 'translateY(50%)'
+					}}
+				></div>
 				<div
 					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[64px] max-md:gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'} overflow-hidden`}
 				>
@@ -74,7 +101,7 @@ export const Layout = memo((props: LayoutProps) => {
 						</AnimatedSection>
 						<AnimatedSection
 							delay={600}
-							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
+							className="relative border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
 							<Image src={`assets/vision-for-the-future.svg`} alt={'visionForTheFuture'} width={48} height={48} />
@@ -98,6 +125,19 @@ export const Layout = memo((props: LayoutProps) => {
 							</div>
 						</AnimatedSection>
 					</div>
+					<div
+						className="hidden max-lg:block"
+						style={{
+							position: 'absolute',
+							right: 0,
+							bottom: '0px',
+							width: '300px',
+							height: '300px',
+							background: '#8D72C5',
+							mixBlendMode: 'color-dodge',
+							filter: 'blur(100px)'
+						}}
+					></div>
 				</div>
 			</section>
 			<section id="feature" className="flex flex-col items-center">
