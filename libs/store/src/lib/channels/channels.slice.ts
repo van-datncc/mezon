@@ -3,6 +3,7 @@ import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntity
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiChannelAppResponse } from 'mezon-js/dist/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
@@ -61,6 +62,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 	selectedChannelId?: string | null;
 	previousChannels: string[];
+	appChannelsList: Record<string, ApiChannelAppResponse>;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -268,12 +270,13 @@ export const fetchChannels = createAsyncThunk(
 	async ({ clanId, channelType = ChannelType.CHANNEL_TYPE_TEXT, noCache }: fetchChannelsArgs, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		if (noCache) {
-			fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
+			await fetchChannelsCached.clear(mezon, 500, 1, clanId, channelType);
 		}
 		const response = await fetchChannelsCached(mezon, 500, 1, clanId, channelType);
 		if (!response.channeldesc) {
 			return [];
 		}
+		thunkAPI.dispatch(fetchAppChannels({ clanId: clanId, noCache: Boolean(noCache) }));
 
 		if (Date.now() - response.time < 100) {
 			const lastChannelMessages =
@@ -297,6 +300,36 @@ export const fetchChannels = createAsyncThunk(
 	}
 );
 
+export const fetchAppChannelCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, clanId: string) => {
+		const response = await mezon.client.listChannelApps(mezon.session, clanId);
+		return response;
+	},
+	{
+		promise: true,
+		maxAge: LIST_CHANNEL_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[0].session.username;
+		}
+	}
+);
+
+type RequestType = {
+	clanId: string;
+	noCache: boolean;
+};
+
+export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', async ({ clanId, noCache }: RequestType, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	if (noCache) {
+		await fetchAppChannelCached.clear(mezon, clanId);
+	}
+
+	const response = await fetchAppChannelCached(mezon, clanId);
+	const appChannelEntities = response.channel_apps;
+	return appChannelEntities || [];
+});
+
 export const initialChannelsState: ChannelsState = channelsAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	socketStatus: 'not loaded',
@@ -308,7 +341,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	idChannelSelected: JSON.parse(localStorage.getItem('remember_channel') || '{}'),
 	modeResponsive: ModeResponsive.MODE_DM,
 	quantityNotifyChannels: {},
-	previousChannels: []
+	previousChannels: [],
+	appChannelsList: {}
 });
 
 export const channelsSlice = createSlice({
@@ -462,6 +496,15 @@ export const channelsSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+
+		builder.addCase(fetchAppChannels.fulfilled, (state: ChannelsState, action: PayloadAction<ApiChannelAppResponse[]>) => {
+			state.appChannelsList = action.payload.reduce<Record<string, ApiChannelAppResponse>>((acc, appChannel) => {
+				if (appChannel.channel_id) {
+					acc[appChannel.channel_id] = appChannel;
+				}
+				return acc;
+			}, {});
+		});
 	}
 });
 
@@ -498,7 +541,8 @@ export const channelsActions = {
 	createNewChannel,
 	deleteChannel,
 	updateChannel,
-	updateChannelPrivate
+	updateChannelPrivate,
+	fetchAppChannels
 };
 
 /*
@@ -600,3 +644,8 @@ export const selectIdChannelSelectedByClanId = (clanId: string) =>
 export const selectAllIdChannelSelected = createSelector(getChannelsState, (state) => state.idChannelSelected);
 
 export const selectPreviousChannels = createSelector(getChannelsState, (state) => state.previousChannels);
+
+export const selectAppChannelById = (channelId: string) =>
+	createSelector(getChannelsState, (state) => {
+		return state.appChannelsList[channelId];
+	});

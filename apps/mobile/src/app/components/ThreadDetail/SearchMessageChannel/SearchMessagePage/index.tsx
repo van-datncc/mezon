@@ -11,9 +11,9 @@ import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mez
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import ChannelsSearchTab from '../../../ChannelsSearchTab';
-import EmptySearchPage from '../../../EmptySearchPage';
-import MembersSearchTab from '../../../MembersSearchTab';
+import { ChannelsSearchTab } from '../../../ChannelsSearchTab';
+import { EmptySearchPage } from '../../../EmptySearchPage';
+import MembersSearchTab from '../../../MembersSearchTab/MembersSearchTab';
 import MessagesSearchTab from '../../../MessagesSearchTab';
 import HeaderTabSearch from './HeaderTabSearch';
 

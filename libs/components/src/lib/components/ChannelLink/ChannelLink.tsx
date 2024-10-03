@@ -6,6 +6,7 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentStreamInfo,
+	selectTheme,
 	threadsActions,
 	useAppDispatch,
 	videoStreamActions,
@@ -74,6 +75,8 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			mouseY: 0,
 			distanceToBottom: 0
 		});
+		const theme = useSelector(selectTheme);
+
 		const handleOpenCreate = () => {
 			setOpenSetting(true);
 			setIsShowPanelChannel(false);
@@ -238,6 +241,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 								{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
 									<Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
 								)}
+								{channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />}
 							</div>
 							<p
 								className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${isActive || isUnReadChannel || (numberNotification && numberNotification > 0) ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}

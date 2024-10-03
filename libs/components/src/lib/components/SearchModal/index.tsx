@@ -160,13 +160,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const handleSelectChannel = useCallback(
 		async (channel: any) => {
-			if (channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
+			if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) {
+				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
+				window.open(urlVoice, '_blank', 'noreferrer');
+			} else {
 				dispatch(categoriesActions.setCtrlKSelectedChannelId(channel.id));
 				const channelUrl = toChannelPage(channel.id, channel.clanId);
 				navigate(channelUrl, { state: { focusChannel: { id: channel?.id, parentId: channel?.parrent_id } } });
-			} else {
-				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
-				window.open(urlVoice, '_blank', 'noreferrer');
 			}
 			onClose();
 		},
