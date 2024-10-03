@@ -51,7 +51,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 
 	const { searchQuery } = useMemberContext();
 
-	const [hasAdminPermission] = usePermissionChecker([EPermission.administrator, EPermission.manageClan]);
+	const [hasAdminPermission, hasClanPermission] = usePermissionChecker([EPermission.administrator, EPermission.manageClan]);
 
 	const itemRef = useRef<HTMLDivElement>(null);
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
@@ -153,25 +153,26 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 						) : (
 							'-'
 						)}
-						{hasAdminPermission && (
-							<Tooltip
-								content={
-									<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
-										<div className="flex flex-col gap-1 max-w-72">
-											{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
+						{hasAdminPermission ||
+							(hasClanPermission && (
+								<Tooltip
+									content={
+										<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
+											<div className="flex flex-col gap-1 max-w-72">
+												{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
+											</div>
 										</div>
-									</div>
-								}
-								trigger="click"
-								arrow={false}
-							>
-								<Tooltip content="Add Role">
-									<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
-										+
-									</span>
+									}
+									trigger="click"
+									arrow={false}
+								>
+									<Tooltip content="Add Role">
+										<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
+											+
+										</span>
+									</Tooltip>
 								</Tooltip>
-							</Tooltip>
-						)}
+							))}
 					</span>
 				</div>
 				<div className="flex-3 p-1 text-center">
