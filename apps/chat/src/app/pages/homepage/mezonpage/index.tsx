@@ -84,7 +84,7 @@ function MezonPage() {
 
 				<div className="container w-10/12 max-lg:w-full max-md:px-[16px] max-md:mt-[72px]" id="home" ref={homeRef}>
 					<div
-						className={`max-md:pb-[36px] max-md:mt-[36px] md:mt-[120px] md:pb-[120px] flex flex-col gap-[48px] max-md:gap-[32px] md:px-[32px] transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+						className={`max-md:pb-[36px] max-md:mt-[36px] md:mt-[200px] md:pb-[120px] flex flex-col gap-[48px] max-md:gap-[32px] md:px-[32px] transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
 						style={backgroundImageStyle}
 					>
 						<div className="flex flex-col items-center justify-center gap-[24px] m-auto text-center w-full max-w-full md:max-w-[662px]">

@@ -175,8 +175,11 @@ export const Layout = memo((props: LayoutProps) => {
 							<div className="flex max-md:flex-wrap gap-[48px] w-full">
 								<AnimatedSection
 									delay={0}
-									className="w-[50%] flex flex-col max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] pb-0 h-fit gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D]"
-									style={{ background: 'linear-gradient(142.48deg, #0A052C 44.04%, #221192 124.62%)' }}
+									className="w-[50%] flex flex-col max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] pb-0 h-fit gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px]"
+									style={{
+										background:
+											window.innerWidth > 768 ? 'linear-gradient(142.48deg, #0A052C 44.04%, #221192 124.62%)' : '#0B0E2D'
+									}}
 								>
 									<h3
 										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
@@ -195,7 +198,9 @@ export const Layout = memo((props: LayoutProps) => {
 								<AnimatedSection
 									delay={300}
 									className="w-[50%] flex flex-col max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] pb-0 gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D]"
-									style={{ background: 'linear-gradient(192.5deg, #0A052C 27.1%, #221192 137.4%)' }}
+									style={{
+										background: window.innerWidth > 768 ? 'linear-gradient(192.5deg, #0A052C 27.1%, #221192 137.4%)' : '#0B0E2D'
+									}}
 								>
 									<h3
 										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
@@ -228,7 +233,9 @@ export const Layout = memo((props: LayoutProps) => {
 								<AnimatedSection
 									delay={0}
 									className={`w-[50%] flex flex-col max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D] ${sideBarIsOpen ? 'unset' : 'relative'}`}
-									style={{ background: 'linear-gradient(38.57deg, #0A052C 47.53%, #221192 124.01%)' }}
+									style={{
+										background: window.innerWidth > 768 ? 'linear-gradient(38.57deg, #0A052C 47.53%, #221192 124.01%)' : '#0B0E2D'
+									}}
 								>
 									<h3
 										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
@@ -283,7 +290,10 @@ export const Layout = memo((props: LayoutProps) => {
 								<AnimatedSection
 									delay={300}
 									className="w-[50%] flex flex-col items-center max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D] max-md:shadow-[0px_4px_90px_16px_#22119280_inset] max-md:bg-[#0B0E2D]"
-									style={{ background: 'linear-gradient(315.97deg, #0A052C 52.65%, #221192 113.54%)' }}
+									style={{
+										background:
+											window.innerWidth > 768 ? 'linear-gradient(315.97deg, #0A052C 52.65%, #221192 113.54%)' : '#0B0E2D'
+									}}
 								>
 									<h3
 										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
@@ -423,8 +433,8 @@ interface IconCardProps {
 const IconCard: React.FC<IconCardProps> = ({ icon, label }) => {
 	return (
 		<div
-			className="flex items-center gap-[16px] p-[16px] border rounded-[8px] bg-[#0A052C] border-[#4465FF4D] w-fit max-md:rounded-[5px] max-md:border-[0.63px] max-md:p-[10px] h-[64px] max-md:h-[40px]"
-			style={{ boxShadow: '0px 4px 24px 16px #22119266 inset' }}
+			className="flex items-center gap-[16px] p-[16px] max-md:gap-[10px] border rounded-[8px] bg-[#0A052C] border-[#4465FF4D] w-fit max-md:rounded-[5px] max-md:border-[0.63px] max-md:p-[10px] h-[64px] max-md:h-[40px]
+				shadow-[0px_4px_24px_16px_#22119266_inset] max-md:shadow-[0px_2.5px_15px_10px_#22119266_inset]"
 		>
 			{icon}
 			<span className="font-normal leading-[37.33px] text-[24px] text-[#92B8FF] max-md:text-[15px] max-md:leading-[23.33px] whitespace-nowrap">
@@ -445,7 +455,7 @@ const IconGrid: React.FC = () => {
 	];
 
 	return (
-		<div className="flex items-center justify-center flex-wrap gap-[23px] max-md:gap-[12px]">
+		<div className="flex items-center justify-center flex-wrap gap-[23px] max-md:gap-[20px]">
 			{items.map((item, index) => (
 				<IconCard key={index} icon={item.icon} label={item.label} />
 			))}
