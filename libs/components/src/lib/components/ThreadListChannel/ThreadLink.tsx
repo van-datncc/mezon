@@ -2,7 +2,7 @@ import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAnd
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
 import React, { memo, useImperativeHandle, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Coords, classes } from '../ChannelLink';
 import SettingChannel from '../ChannelSetting';
@@ -21,6 +21,7 @@ export type ThreadLinkRef = {
 };
 
 const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, isFirstThread, isActive, handleClick }: ThreadLinkProps, ref) => {
+	const dispatch = useDispatch();
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 

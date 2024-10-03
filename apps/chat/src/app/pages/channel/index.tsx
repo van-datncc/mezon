@@ -2,12 +2,15 @@ import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/
 import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
+	clansActions,
 	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
+	selectLastChannelTimestamp,
+	selectMentionAndReplyUnreadByChanneld,
 	selectStatusMenu,
 	useAppDispatch
 } from '@mezon/store';
@@ -23,9 +26,18 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
+
+	const numberNotification = useSelector(
+		selectMentionAndReplyUnreadByChanneld(currentChannel.clan_id ?? '', currentChannel.channel_id ?? '', getLastSeenChannel ?? 0)
+	).length;
+
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		if (numberNotification && numberNotification > 0) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		}
 	}, [channelId, currentChannel, dispatch]);
 }
 

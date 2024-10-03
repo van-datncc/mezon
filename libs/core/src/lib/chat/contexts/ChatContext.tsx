@@ -7,6 +7,7 @@ import {
 	channelsActions,
 	channelsSlice,
 	channelsStreamActions,
+	clansActions,
 	clansSlice,
 	directActions,
 	directMetaActions,
@@ -272,7 +273,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		async (notification: Notification) => {
 			if (currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
+				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
+					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
+				}
 			}
+
 			if (currentChannel?.channel_id === (notification as any).channel_id) {
 				const timestamp = Date.now() / 1000;
 				dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: (notification as any).channel_id, timestamp: timestamp }));
