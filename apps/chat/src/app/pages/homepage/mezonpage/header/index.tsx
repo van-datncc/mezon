@@ -3,23 +3,15 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 
 type HeaderProps = {
+	sideBarIsOpen: boolean;
 	toggleSideBar: () => void;
 	scrollToSection: (id: string, event: React.MouseEvent) => void;
 };
 
 export const HeaderMezon = memo((props: HeaderProps) => {
-	const { toggleSideBar, scrollToSection } = props;
+	const { sideBarIsOpen, toggleSideBar, scrollToSection } = props;
 	return (
-		<div
-			className={`header max-md:fixed z-50 w-10/12 max-lg:w-full max-md:border-b-[1px] max-md:border-[#4465FF4D] max-md:bg-[#0B0E2D]`}
-			style={
-				{
-					// backgroundImage: 'url(../../../assets/bg-ellipse-header.png)',
-					// backgroundRepeat: 'no-repeat',
-					// backgroundPosition: 'center'
-				}
-			}
-		>
+		<div className={`header max-md:fixed z-50 w-10/12 max-lg:w-full max-md:border-b-[1px] max-md:border-[#4465FF4D] max-md:bg-[#0B0E2D]`}>
 			<div className="flex items-center justify-between md:px-[32px] max-md:px-[16px] max-md:py-[14px] h-[80px] max-md:h-[72px]">
 				<div className="flex items-center gap-[40px]">
 					<Link to={'/mezon'} className="flex items-center gap-[4.92px]">
@@ -69,6 +61,23 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 					<Icons.HomepageMenu className="hidden w-[40px] max-md:block" onClick={toggleSideBar} />
 				</div>
 			</div>
+
+			{!sideBarIsOpen && (
+				<div
+					className="hidden max-md:block"
+					style={{
+						position: 'absolute',
+						top: '-50%',
+						left: '50%',
+						transform: 'translate(-50%, -50%)',
+						width: '300px',
+						height: '200px',
+						background: '#8D72C5',
+						filter: 'blur(100px)',
+						borderRadius: '50%'
+					}}
+				></div>
+			)}
 		</div>
 	);
 });

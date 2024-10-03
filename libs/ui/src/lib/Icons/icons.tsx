@@ -4571,7 +4571,7 @@ export function UploadImageIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function AppStoreBadge(props: React.HTMLAttributes<SVGElement>) {
+export function MicrosoftBadge(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="147" height="44" viewBox="0 0 147 44" fill="none" {...props}>
 			<rect x="0.716919" y="0.5" width="145.066" height="43" rx="4.5" fill="black" />
@@ -4620,7 +4620,7 @@ export function AppStoreBadge(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function MicrosoftBadge(props: React.HTMLAttributes<SVGElement>) {
+export function AppStoreBadge(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="133" height="44" viewBox="0 0 133 44" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
 			<rect x="1.21692" y="0.5" width="131" height="43" rx="6.5" fill="black" />

@@ -78,7 +78,7 @@ function MezonPage() {
 					background: 'linear-gradient(rgba(3, 3, 32, 0) -15.28%, rgb(15, 15, 99) -93.02%, rgba(3, 3, 32, 0) 105.23%)'
 				}}
 			>
-				{!sideBarIsOpen && <HeaderMezon toggleSideBar={toggleSideBar} scrollToSection={scrollToSection} />}
+				{!sideBarIsOpen && <HeaderMezon sideBarIsOpen={sideBarIsOpen} toggleSideBar={toggleSideBar} scrollToSection={scrollToSection} />}
 
 				<div className="container w-10/12 max-lg:w-full max-md:px-[16px] max-md:mt-[72px]" id="home">
 					<div

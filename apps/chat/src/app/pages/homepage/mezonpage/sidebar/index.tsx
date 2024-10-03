@@ -46,12 +46,7 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 		>
 			<div
 				ref={headerSideBarRef}
-				className="flex items-center justify-between pt-[14px] pr-[16px] pb-[14px] pl-[16px] border-b border-b-[#4465FF4D] h-[72px]"
-				style={{
-					backgroundImage: 'url(../../../assets/bg-ellipse-header.png)',
-					backgroundRepeat: 'no-repeat',
-					backgroundPosition: 'center'
-				}}
+				className="flex items-center justify-between pt-[14px] pr-[16px] pb-[14px] pl-[16px] border-b border-b-[#4465FF4D] h-[72px] relative"
 			>
 				<Link to={'/mezon'} className="flex gap-[4.92px] items-center">
 					<Image
@@ -66,6 +61,21 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 					</div>
 				</Link>
 				<Icons.MenuClose className="w-[20px] max-lg:block" onClick={toggleSideBar} />
+
+				<div
+					className="hidden max-md:block"
+					style={{
+						position: 'absolute',
+						top: '-50%',
+						left: '50%',
+						transform: 'translate(-50%, -50%)',
+						width: '300px',
+						height: '200px',
+						background: '#8D72C5',
+						filter: 'blur(100px)',
+						borderRadius: '50%'
+					}}
+				></div>
 			</div>
 
 			<div
