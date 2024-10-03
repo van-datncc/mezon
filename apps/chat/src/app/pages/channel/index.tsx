@@ -35,10 +35,13 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+	}, [channelId, currentChannel, dispatch, numberNotification]);
+
+	useEffect(() => {
 		if (numberNotification && numberNotification > 0) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
-	}, [channelId, currentChannel, dispatch]);
+	}, [numberNotification]);
 }
 
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {

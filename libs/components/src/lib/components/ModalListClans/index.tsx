@@ -22,7 +22,6 @@ const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItem
 	};
 
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
-	console.log('badgeCountClan: ', badgeCountClan);
 
 	return (
 		<div className="relative">

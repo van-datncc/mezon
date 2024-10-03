@@ -1,9 +1,11 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	channelMetaActions,
+	clansActions,
 	notificationActions,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
+	selectCurrentClan,
 	selectTheme
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -44,6 +46,7 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 
 	const getNotificationExcludeMentionAndReplyUnread = useSelector(selectAllNotificationExcludeMentionAndReply);
 	const getAllNotificationMentionAndReply = useSelector(selectAllNotificationMentionAndReply);
+	const currentClan = useSelector(selectCurrentClan);
 
 	const getExcludeMentionAndReply = useMemo(() => {
 		return sortNotificationsByDate(getNotificationExcludeMentionAndReplyUnread);
@@ -69,7 +72,10 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 		getUnreadChannelIds.forEach((channelId: string) => {
 			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		});
-	}, [getUnreadChannelIds, dispatch]);
+		if (currentClan?.badge_count && currentClan?.badge_count > 0) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
+		}
+	}, [getUnreadChannelIds, dispatch, currentClan?.badge_count]);
 
 	const isShowMarkAllAsRead = useMemo(() => {
 		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;
