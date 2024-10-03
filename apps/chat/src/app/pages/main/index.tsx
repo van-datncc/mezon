@@ -1,6 +1,7 @@
 import {
 	FirstJoinPopup,
 	ForwardMessageModal,
+	MessageContextMenuProvider,
 	MessageModalImage,
 	ModalCreateClan,
 	NavLinkComponent,
@@ -13,7 +14,9 @@ import {
 	accountActions,
 	clansActions,
 	getIsShowPopupForward,
+	selectAllChannelMemberIds,
 	selectAllClans,
+	selectAllRoleIds,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
@@ -27,7 +30,8 @@ import {
 	selectStreamChannelByChannelId,
 	selectStreamMembersByChannelId,
 	selectTheme,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 
 import { Image } from '@mezon/ui';
@@ -181,6 +185,8 @@ function MyApp() {
 	const handleClickToJoinClan = () => {
 		dispatch(clansActions.joinClan({ clanId: '0' }));
 	};
+	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannel?.id as string));
+	const allRolesInClan = useSelector(selectAllRoleIds);
 
 	return (
 		<div
@@ -277,7 +283,11 @@ function MyApp() {
 					currentStreamInfo={currentStreamInfo}
 				/>
 			</div>
-			{openModalAttachment && <MessageModalImage />}
+			{openModalAttachment && (
+				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
+					<MessageModalImage />
+				</MessageContextMenuProvider>
+			)}
 			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 			{isShowPopupQuickMess && <PopupQuickMess />}
 		</div>
