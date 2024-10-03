@@ -3,7 +3,7 @@ import { ChannelType } from 'mezon-js';
 import React, { useContext, useRef, useState } from 'react';
 import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import MediaChannel from '../../MediaChannel';
+import MediaChannel from '../../MediaChannel/MediaChannel';
 import { MemberListStatus } from '../../MemberStatus';
 import PinMessage from '../../PinMessage';
 import AssetsHeader from '../AssetsHeader';

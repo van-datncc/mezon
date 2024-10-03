@@ -11,11 +11,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import LoadingModal from '../../../components/LoadingModal';
+import LoadingModal from '../../../components/LoadingModal/LoadingModal';
 import Button from '../../../components/auth/Button';
-import FooterAuth from '../../../components/auth/FooterAuth';
-import LoginSocial from '../../../components/auth/LoginSocial';
-import TextInputUser from '../../../components/auth/TextInput';
+import { FooterAuth } from '../../../components/auth/FooterAuth';
+import { LoginSocial } from '../../../components/auth/LoginSocial';
+import { TextInputUser } from '../../../components/auth/TextInput';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
 const LoginSchema = Yup.object().shape({
