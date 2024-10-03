@@ -303,7 +303,6 @@ export const fetchChannels = createAsyncThunk(
 export const fetchAppChannelCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, clanId: string) => {
 		const response = await mezon.client.listChannelApps(mezon.session, clanId);
-		console.log('check app channel: ', response);
 		return response;
 	},
 	{
