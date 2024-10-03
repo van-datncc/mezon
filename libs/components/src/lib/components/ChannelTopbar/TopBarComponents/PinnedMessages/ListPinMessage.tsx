@@ -42,10 +42,12 @@ const ListPinMessage = ({
 						.slice()
 						.reverse()
 						.map((pinMessage) => {
+							console.log(pinMessage);
 							// Parse content if it's a JSON string
 							let contentString = pinMessage.content;
 							if (typeof contentString === 'string') {
 								try {
+									console.log(contentString);
 									const contentObject = JSON.parse(contentString);
 									contentString = contentObject.t;
 								} catch (e) {
