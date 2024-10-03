@@ -51,7 +51,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 
 	const { searchQuery } = useMemberContext();
 
-	const [hasAdminPermission, hasClanPermission] = usePermissionChecker([EPermission.administrator, EPermission.manageClan]);
+	const [hasClanPermission] = usePermissionChecker([EPermission.manageClan]);
 
 	const itemRef = useRef<HTMLDivElement>(null);
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
@@ -153,7 +153,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 						) : (
 							'-'
 						)}
-						{(hasAdminPermission || hasClanPermission) && (
+						{hasClanPermission && (
 							<Tooltip
 								content={
 									<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
