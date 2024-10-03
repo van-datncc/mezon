@@ -38,7 +38,7 @@ const overriddenPoliciesSlice = createSlice({
 interface FetchMaxPermissionChannelsArgs {
 	channelId: string;
 	clanId: string;
-	noCache: boolean;
+	noCache?: boolean;
 }
 
 /**

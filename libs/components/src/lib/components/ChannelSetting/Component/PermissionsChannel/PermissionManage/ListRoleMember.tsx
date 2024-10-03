@@ -42,8 +42,7 @@ const ListRoleMember = memo((props: ListRoleMemberProps) => {
 					permissionRoleChannelActions.fetchPermissionRoleChannel({
 						channelId: channelId,
 						roleId: listManageInChannel[0].id,
-						userId: '',
-						noCache: true
+						userId: ''
 					})
 				);
 			} else {
@@ -51,8 +50,7 @@ const ListRoleMember = memo((props: ListRoleMemberProps) => {
 					permissionRoleChannelActions.fetchPermissionRoleChannel({
 						channelId: channelId,
 						roleId: '',
-						userId: listManageInChannel[0].id,
-						noCache: true
+						userId: listManageInChannel[0].id
 					})
 				);
 			}

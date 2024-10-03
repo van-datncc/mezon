@@ -30,7 +30,7 @@ type fetchChannelsArgs = {
 	roleId: string;
 	channelId: string;
 	userId: string;
-	noCache: boolean;
+	noCache?: boolean;
 };
 
 export const fetchPermissionRoleChannelCached = memoizeAndTrack(
@@ -59,7 +59,6 @@ export const fetchPermissionRoleChannel = createAsyncThunk(
 		if (!response || !response.permission_role_channel) {
 			return [];
 		}
-		console.log('response', response);
 		return response.permission_role_channel.map((permission) => {
 			return {
 				...mapPermissionRoleChannelToEntity(permission, channelId, roleId),
