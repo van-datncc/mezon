@@ -9,22 +9,14 @@ import {
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import {
-	channelsActions,
-	clansActions,
-	getStoreAsync,
-	inviteActions,
-	selectCurrentChannelId,
-	selectCurrentClanId,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, getStoreAsync, inviteActions, selectCurrentChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { APP_SCREEN } from '../../../../../../../app/navigation/ScreenTypes';
 import { MezonAvatar } from '../../../../../../../app/temp-ui';
+import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { style } from '../RenderMessageInvite.styles';
 
 export const extractInviteIdFromUrl = (url: string): string | null => {
@@ -47,7 +39,6 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { onlineMembers, offlineMembers } = useChannelMembersOnlineStatus({ channelId: currentChannelId });
 	const { inviteUser } = useInvite();
-	const currentClanId = useSelector(selectCurrentClanId);
 	const navigation = useNavigation<any>();
 	const inviteID = useMemo(() => extractInviteIdFromUrl(content), [content]);
 	const dispatch = useAppDispatch();
@@ -67,26 +58,30 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 
 	const handleJoinClanInvite = async () => {
 		const store = await getStoreAsync();
-		inviteUser(inviteID || '').then(async (res) => {
-			const { clan_id } = res || {};
-			if (currentClanId !== clan_id) {
-				requestAnimationFrame(async () => {
-					navigation.navigate(APP_SCREEN.HOME);
-					navigation.dispatch(DrawerActions.openDrawer());
-					DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
-						isFetchMemberChannelDM: true
+		store.dispatch(appActions.setLoadingMainMobile(true));
+		inviteUser(inviteID || '')
+			.then(async (res) => {
+				if (res && res?.clan_id) {
+					requestAnimationFrame(async () => {
+						navigation.navigate(APP_SCREEN.HOME);
+						navigation.dispatch(DrawerActions.openDrawer());
+						DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+							isFetchMemberChannelDM: true
+						});
+						await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+						store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
+						save(STORAGE_CLAN_ID, res?.clan_id);
+						await store.dispatch(clansActions.fetchClans());
+						store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
+						const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
+						await setDefaultChannelLoader(respChannel?.payload, res?.clan_id);
+						store.dispatch(appActions.setLoadingMainMobile(false));
 					});
-					await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-					store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
-					save(STORAGE_CLAN_ID, res?.clan_id);
-					store.dispatch(clansActions.setCurrentClanId(clan_id));
-					store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
-
-					const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id, noCache: true }));
-					await setDefaultChannelLoader(respChannel.payload, res?.clan_id);
-				});
-			}
-		});
+				}
+			})
+			.catch((error) => {
+				store.dispatch(appActions.setLoadingMainMobile(false));
+			});
 	};
 
 	return (

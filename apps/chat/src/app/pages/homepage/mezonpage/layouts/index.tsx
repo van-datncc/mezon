@@ -1,5 +1,5 @@
 import { Icons, Image } from '@mezon/ui';
-import { memo } from 'react';
+import { RefObject, memo, useEffect, useRef, useState } from 'react';
 
 type LayoutProps = {
 	sideBarIsOpen: boolean;
@@ -7,11 +7,39 @@ type LayoutProps = {
 
 export const Layout = memo((props: LayoutProps) => {
 	const { sideBarIsOpen } = props;
+
 	return (
 		<div>
-			<section id="overview" className="flex flex-col items-center">
+			<section id="overview" className="flex flex-col items-center relative">
 				<div
-					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'} overflow-hidden`}
+					className="max-lg:hidden"
+					style={{
+						position: 'absolute',
+						left: 0,
+						top: 0,
+						width: '400px',
+						height: '400px',
+						background: '#8D72C5',
+						filter: 'blur(130px)',
+						mixBlendMode: 'color-dodge',
+						transform: 'translateY(50%)'
+					}}
+				></div>
+				<div
+					className="max-lg:hidden"
+					style={{
+						position: 'absolute',
+						right: 0,
+						width: '400px',
+						height: '400px',
+						background: '#8D72C5',
+						filter: 'blur(130px)',
+						mixBlendMode: 'color-dodge',
+						transform: 'translateY(50%)'
+					}}
+				></div>
+				<div
+					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[64px] max-md:gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'}`}
 				>
 					<div className="md:px-[32px] flex flex-col gap-[20px] text-center">
 						<div className="text-[36px] leading-[44px] font-semibold text-[#F4F7F9]">Overview</div>
@@ -20,7 +48,8 @@ export const Layout = memo((props: LayoutProps) => {
 						</div>
 					</div>
 					<div className="md:px-[32px] flex items-stretch gap-[64px] max-lg:flex-col max-lg:gap-[32px]">
-						<div
+						<AnimatedSection
+							delay={0}
 							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
@@ -43,8 +72,10 @@ export const Layout = memo((props: LayoutProps) => {
 									users can engage in peer-to-peer transactions and earn rewards.
 								</div>
 							</div>
-						</div>
-						<div
+						</AnimatedSection>
+
+						<AnimatedSection
+							delay={300}
 							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
@@ -67,9 +98,10 @@ export const Layout = memo((props: LayoutProps) => {
 									communities. This fosters innovation and customization within the platform.
 								</div>
 							</div>
-						</div>
-						<div
-							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
+						</AnimatedSection>
+						<AnimatedSection
+							delay={600}
+							className="relative border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
 							<Image src={`assets/vision-for-the-future.svg`} alt={'visionForTheFuture'} width={48} height={48} />
@@ -91,13 +123,26 @@ export const Layout = memo((props: LayoutProps) => {
 									platform that prioritizes both user engagement and developer creativity.
 								</div>
 							</div>
-						</div>
+						</AnimatedSection>
 					</div>
+					<div
+						className="hidden max-lg:block"
+						style={{
+							position: 'absolute',
+							right: 0,
+							bottom: '0px',
+							width: '300px',
+							height: '300px',
+							background: '#8D72C5',
+							mixBlendMode: 'color-dodge',
+							filter: 'blur(100px)'
+						}}
+					></div>
 				</div>
 			</section>
-			<section id="features" className="flex flex-col items-center">
+			<section id="feature" className="flex flex-col items-center">
 				<div
-					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} overflow-hidden`}
+					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} ${sideBarIsOpen ? 'overflow-hidden' : ''}`}
 				>
 					<h2
 						style={{ fontFamily: 'Poppins' }}
@@ -128,9 +173,13 @@ export const Layout = memo((props: LayoutProps) => {
 
 						<div className={`flex flex-col gap-[48px] ${sideBarIsOpen ? 'unset' : 'relative'}`}>
 							<div className="flex max-md:flex-wrap gap-[48px] w-full">
-								<div
-									className="w-[50%] flex flex-col max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] pb-0 h-fit gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D]"
-									style={{ background: 'linear-gradient(142.48deg, #0A052C 44.04%, #221192 124.62%)' }}
+								<AnimatedSection
+									delay={0}
+									className="w-[50%] flex flex-col max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] pb-0 h-fit gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px]"
+									style={{
+										background:
+											window.innerWidth > 768 ? 'linear-gradient(142.48deg, #0A052C 44.04%, #221192 124.62%)' : '#0B0E2D'
+									}}
 								>
 									<h3
 										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
@@ -145,11 +194,13 @@ export const Layout = memo((props: LayoutProps) => {
 										Decentralized <br></br> Token-Based Economy
 									</h3>
 									<Image src={`../../../assets/multiple-block.png`} alt={'blockDecentralized'} />
-								</div>
-
-								<div
+								</AnimatedSection>
+								<AnimatedSection
+									delay={300}
 									className="w-[50%] flex flex-col max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] pb-0 gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D]"
-									style={{ background: 'linear-gradient(192.5deg, #0A052C 27.1%, #221192 137.4%)' }}
+									style={{
+										background: window.innerWidth > 768 ? 'linear-gradient(192.5deg, #0A052C 27.1%, #221192 137.4%)' : '#0B0E2D'
+									}}
 								>
 									<h3
 										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
@@ -175,13 +226,16 @@ export const Layout = memo((props: LayoutProps) => {
 									>
 										<Image src={`../../../assets/multiple-conversation-reply.png`} alt={'conversationReply'} />
 									</div>
-								</div>
+								</AnimatedSection>
 							</div>
 
 							<div className="flex max-md:flex-wrap gap-[48px] w-full">
-								<div
+								<AnimatedSection
+									delay={0}
 									className={`w-[50%] flex flex-col max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D] ${sideBarIsOpen ? 'unset' : 'relative'}`}
-									style={{ background: 'linear-gradient(38.57deg, #0A052C 47.53%, #221192 124.01%)' }}
+									style={{
+										background: window.innerWidth > 768 ? 'linear-gradient(38.57deg, #0A052C 47.53%, #221192 124.01%)' : '#0B0E2D'
+									}}
 								>
 									<h3
 										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
@@ -231,11 +285,15 @@ export const Layout = memo((props: LayoutProps) => {
 										alt={'sword'}
 										className="absolute md:top-[25%] right-[0] max-md:bottom-[0] max-md:right-[0] max-md:w-[95px] max-md:h-[95px]"
 									/>
-								</div>
+								</AnimatedSection>
 
-								<div
+								<AnimatedSection
+									delay={300}
 									className="w-[50%] flex flex-col items-center max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D] max-md:shadow-[0px_4px_90px_16px_#22119280_inset] max-md:bg-[#0B0E2D]"
-									style={{ background: 'linear-gradient(315.97deg, #0A052C 52.65%, #221192 113.54%)' }}
+									style={{
+										background:
+											window.innerWidth > 768 ? 'linear-gradient(315.97deg, #0A052C 52.65%, #221192 113.54%)' : '#0B0E2D'
+									}}
 								>
 									<h3
 										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
@@ -275,12 +333,12 @@ export const Layout = memo((props: LayoutProps) => {
 											Create Clan
 										</button>
 									</div>
-								</div>
+								</AnimatedSection>
 							</div>
 
 							{!sideBarIsOpen && (
 								<div
-									className="md:block"
+									className="hidden md:block"
 									style={{
 										position: 'absolute',
 										top: '50%',
@@ -289,8 +347,9 @@ export const Layout = memo((props: LayoutProps) => {
 										width: '400px',
 										height: '400px',
 										background: '#8D72C5',
-										opacity: '0.01',
-										borderRadius: '50%'
+										filter: 'blur(190px)',
+										borderRadius: '50%',
+										mixBlendMode: 'color-dodge'
 									}}
 								></div>
 							)}
@@ -309,8 +368,9 @@ export const Layout = memo((props: LayoutProps) => {
 									width: '300px',
 									height: '300px',
 									background: '#8D72C5',
-									opacity: '0.01',
-									borderRadius: '50%'
+									filter: 'blur(140px)',
+									borderRadius: '50%',
+									mixBlendMode: 'color-dodge'
 								}}
 							></div>
 							<div
@@ -322,8 +382,9 @@ export const Layout = memo((props: LayoutProps) => {
 									width: '300px',
 									height: '300px',
 									background: '#8D72C5',
-									opacity: '0.02',
-									borderRadius: '50%'
+									filter: 'blur(130px)',
+									borderRadius: '50%',
+									mixBlendMode: 'color-dodge'
 								}}
 							></div>
 
@@ -336,8 +397,9 @@ export const Layout = memo((props: LayoutProps) => {
 									width: '300px',
 									height: '300px',
 									background: '#8D72C5',
-									opacity: '0.02',
-									borderRadius: '50%'
+									filter: 'blur(130px)',
+									borderRadius: '50%',
+									mixBlendMode: 'color-dodge'
 								}}
 							></div>
 
@@ -345,13 +407,14 @@ export const Layout = memo((props: LayoutProps) => {
 								className="hidden max-md:block"
 								style={{
 									position: 'absolute',
-									top: '50%',
-									left: '50%',
-									width: '300px',
-									height: '300px',
+									top: '40%',
+									right: 0,
+									width: '200px',
+									height: '400px',
 									background: '#8D72C5',
-									opacity: '0.02',
-									borderRadius: '50%'
+									filter: 'blur(100px)',
+									borderRadius: '50%',
+									mixBlendMode: 'color-dodge'
 								}}
 							></div>
 						</div>
@@ -370,8 +433,8 @@ interface IconCardProps {
 const IconCard: React.FC<IconCardProps> = ({ icon, label }) => {
 	return (
 		<div
-			className="flex items-center gap-[16px] p-[16px] border rounded-[8px] bg-[#0A052C] border-[#4465FF4D] w-fit max-md:rounded-[5px] max-md:border-[0.63px] max-md:p-[10px] h-[64px] max-md:h-[40px]"
-			style={{ boxShadow: '0px 4px 24px 16px #22119266 inset' }}
+			className="flex items-center gap-[16px] p-[16px] max-md:gap-[10px] border rounded-[8px] bg-[#0A052C] border-[#4465FF4D] w-fit max-md:rounded-[5px] max-md:border-[0.63px] max-md:p-[10px] h-[64px] max-md:h-[40px]
+				shadow-[0px_4px_24px_16px_#22119266_inset] max-md:shadow-[0px_2.5px_15px_10px_#22119266_inset]"
 		>
 			{icon}
 			<span className="font-normal leading-[37.33px] text-[24px] text-[#92B8FF] max-md:text-[15px] max-md:leading-[23.33px] whitespace-nowrap">
@@ -392,10 +455,67 @@ const IconGrid: React.FC = () => {
 	];
 
 	return (
-		<div className="flex items-center justify-center flex-wrap gap-[23px] max-md:gap-[12px]">
+		<div className="flex items-center justify-center flex-wrap gap-[23px] max-md:gap-[20px]">
 			{items.map((item, index) => (
 				<IconCard key={index} icon={item.icon} label={item.label} />
 			))}
+		</div>
+	);
+};
+
+interface IntersectionOptions {
+	root?: Element | null;
+	rootMargin?: string;
+	threshold?: number | number[];
+}
+
+export const useIntersectionObserver = (elementRef: RefObject<Element>, options: IntersectionOptions): boolean => {
+	const [isVisible, setIsVisible] = useState<boolean>(false);
+	const [hasAnimated, setHasAnimated] = useState<boolean>(false);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver((entries) => {
+			const [entry] = entries;
+			if (entry.isIntersecting && !hasAnimated) {
+				setIsVisible(true);
+				setHasAnimated(true);
+			}
+		}, options);
+
+		if (elementRef.current) {
+			observer.observe(elementRef.current);
+		}
+
+		return () => {
+			if (elementRef.current) {
+				observer.unobserve(elementRef.current);
+			}
+		};
+	}, [elementRef, options, hasAnimated]);
+
+	return isVisible;
+};
+
+interface AnimatedSectionProps {
+	children: React.ReactNode;
+	delay: number;
+	className?: string;
+	style?: React.CSSProperties;
+}
+
+export const AnimatedSection: React.FC<AnimatedSectionProps> = ({ children, delay, className, style }) => {
+	const sectionRef = useRef<HTMLDivElement>(null);
+	const isVisible = useIntersectionObserver(sectionRef, { threshold: 0.1 });
+
+	return (
+		<div
+			ref={sectionRef}
+			className={`${className} transition-transform duration-700 ease-in-out ${
+				isVisible ? `translate-y-0 opacity-100` : 'translate-y-[20%] opacity-0'
+			}`}
+			style={{ transitionDelay: `${delay}ms`, ...style }}
+		>
+			{children}
 		</div>
 	);
 };

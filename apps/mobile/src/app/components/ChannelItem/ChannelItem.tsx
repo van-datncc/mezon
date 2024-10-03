@@ -64,6 +64,23 @@ export const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProp
 					</Block>
 				</Block>
 			) : null}
+			{channelData?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+				<Block flexDirection="row" gap={size.s_10} alignItems="center" justifyContent="space-between">
+					<Block flexDirection="row" gap={size.s_10} alignItems="center">
+						<Icons.StreamIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+						<Block>
+							<Block flexDirection="row" alignItems="center" gap={size.s_6} marginBottom={size.s_6}>
+								<Text style={styles.channelName}>{channelData?.channel_label}</Text>
+							</Block>
+							{!!channelData?.clan_name && <Text style={styles.categoryChannel}>{channelData?.clan_name}</Text>}
+						</Block>
+					</Block>
+					<Block style={styles.joinChannelBtn}>
+						<Icons.VoiceNormalIcon width={size.s_20} height={size.s_20} color={Colors.textGray} />
+						<Text style={styles.joinChannelBtnText}>{t('joinChannel')}</Text>
+					</Block>
+				</Block>
+			) : null}
 		</TouchableOpacity>
 	);
 });

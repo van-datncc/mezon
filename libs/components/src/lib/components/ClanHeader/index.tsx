@@ -179,9 +179,7 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 				/>
 			)}
 
-			{openServerSettings && (
-				<ClanSetting onClose={closeModalClan} initialSetting={canManageClan ? ItemSetting.OVERVIEW : ItemSetting.CATEGORY_ORDER} />
-			)}
+			{openServerSettings && <ClanSetting onClose={closeModalClan} initialSetting={canManageClan ? ItemSetting.OVERVIEW : ItemSetting.EMOJI} />}
 
 			<ModalCreateCategory openCreateCate={openCreateCate} onClose={onClose} onCreateCategory={handleCreateCate} />
 		</>

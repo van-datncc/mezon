@@ -44,15 +44,7 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 		<div
 			className={`fixed h-full z-50 w-full bg-[#0B0E2D] transform transition-transform duration-300 ease-in-out ${sideBarIsOpen ? 'translate-x-0' : '-translate-x-full'}`}
 		>
-			<div
-				ref={headerSideBarRef}
-				className="flex items-center justify-between pt-[14px] pr-[16px] pb-[14px] pl-[16px] border-b border-b-[#4465FF4D] h-[72px]"
-				style={{
-					backgroundImage: 'url(../../../assets/bg-ellipse-header.png)',
-					backgroundRepeat: 'no-repeat',
-					backgroundPosition: 'center'
-				}}
-			>
+			<div ref={headerSideBarRef} className="flex items-center justify-between pt-[14px] pr-[16px] pb-[14px] pl-[16px] h-[72px] relative">
 				<Link to={'/mezon'} className="flex gap-[4.92px] items-center">
 					<Image
 						src={`assets/images/mezon-logo-black.svg`}
@@ -66,6 +58,22 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 					</div>
 				</Link>
 				<Icons.MenuClose className="w-[20px] max-lg:block" onClick={toggleSideBar} />
+
+				<div
+					className="hidden max-md:block"
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: '50%',
+						transform: 'translate(-50%, -50%)',
+						width: '300px',
+						height: '200px',
+						background: '#8D72C5',
+						filter: 'blur(70px)',
+						borderRadius: '50%',
+						mixBlendMode: 'color-dodge'
+					}}
+				></div>
 			</div>
 
 			<div
@@ -93,8 +101,8 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 					Overview
 				</a>
 				<a
-					href="#features"
-					onClick={(event) => scrollToSection('features', event)}
+					href="#feature"
+					onClick={(event) => scrollToSection('feature', event)}
 					className="text-center px-[16px] py-[10px] text-[#F4F7F9] font-semibold text-base hover:bg-[#0C1AB2] hover:rounded-[8px] focus:rounded-[8px] focus:bg-[#281FB5]"
 				>
 					Features
