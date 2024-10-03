@@ -9,16 +9,7 @@ import {
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import {
-	appActions,
-	channelsActions,
-	clansActions,
-	getStoreAsync,
-	inviteActions,
-	selectAllClans,
-	selectCurrentChannelId,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, getStoreAsync, inviteActions, selectCurrentChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +44,6 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 	const dispatch = useAppDispatch();
 	const [clanInvite, setClanInvite] = useState(null);
 	const { t } = useTranslation('linkMessageInvite');
-	const clans = useSelector(selectAllClans);
 
 	useEffect(() => {
 		if (inviteID) {
