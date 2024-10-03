@@ -1,6 +1,6 @@
 import { BellIcon, CheckIcon, Icons, isEqual, LinkIcon, TrashIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, selectChannelById, useAppDispatch } from '@mezon/store-mobile';
+import { channelsActions, selectAllChannels, selectChannelById, useAppDispatch } from '@mezon/store-mobile';
 import { DrawerActions } from '@react-navigation/native';
 import { ApiUpdateChannelDescRequest } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
@@ -25,13 +25,15 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { channelId } = route.params;
-	const { t } = useTranslation(['channelSetting']);
+	const { t } = useTranslation(['channelSetting', 'channelCreator']);
 	const { t: t1 } = useTranslation(['screenStack']);
 	const dispatch = useAppDispatch();
 	const channel = useSelector(selectChannelById(channelId || ''));
 	const isChannel = useMemo(() => channel?.parrent_id === '0', [channel?.parrent_id]);
 	const [isVisibleDeleteChannelModal, setIsVisibleDeleteChannelModal] = useState<boolean>(false);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>(true);
+	const [isCheckDuplicateNameChannel, setIsCheckDuplicateNameChannel] = useState<boolean>(false);
+	const channelsClan = useSelector(selectAllChannels);
 	const [originSettingValue, setOriginSettingValue] = useState<IChannelSettingValue>({
 		channelName: '',
 		channelTopic: ''
@@ -77,11 +79,15 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	}, [currentSettingValue?.channelName]);
 
 	const handleSaveChannelSetting = async () => {
+		const isCheckNameChannelValue =
+			!!channelsClan?.length && channelsClan?.some((channel) => channel?.channel_label === currentSettingValue?.channelName);
+		setIsCheckDuplicateNameChannel(isCheckNameChannelValue);
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: channel.channel_id || '',
 			channel_label: currentSettingValue?.channelName,
 			category_id: channel.category_id
 		};
+		if (isCheckNameChannelValue || !isCheckValid) return;
 		await dispatch(channelsActions.updateChannel(updateChannel));
 		navigation?.goBack();
 		Toast.show({
@@ -328,9 +334,15 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					value={currentSettingValue.channelName}
 					onTextChange={(text) => handleUpdateValue({ channelName: text })}
 					maxCharacter={64}
-					errorMessage={t('fields.channelName.errorMessage')}
+					errorMessage={
+						isCheckDuplicateNameChannel
+							? t('channelCreator:fields.channelName.duplicateChannelName')
+							: !isCheckValid
+								? t('fields.channelName.errorMessage')
+								: ''
+					}
 					placeHolder={t('fields.channelName.placeholder')}
-					isValid={isCheckValid}
+					isValid={!isCheckDuplicateNameChannel && isCheckValid}
 				/>
 
 				{isChannel && (
