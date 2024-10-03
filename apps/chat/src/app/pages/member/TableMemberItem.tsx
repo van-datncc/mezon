@@ -153,26 +153,25 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 						) : (
 							'-'
 						)}
-						{hasAdminPermission ||
-							(hasClanPermission && (
-								<Tooltip
-									content={
-										<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
-											<div className="flex flex-col gap-1 max-w-72">
-												{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
-											</div>
+						{(hasAdminPermission || hasClanPermission) && (
+							<Tooltip
+								content={
+									<div className="max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
+										<div className="flex flex-col gap-1 max-w-72">
+											{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
 										</div>
-									}
-									trigger="click"
-									arrow={false}
-								>
-									<Tooltip content="Add Role">
-										<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
-											+
-										</span>
-									</Tooltip>
+									</div>
+								}
+								trigger="click"
+								arrow={false}
+							>
+								<Tooltip content="Add Role">
+									<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
+										+
+									</span>
 								</Tooltip>
-							))}
+							</Tooltip>
+						)}
 					</span>
 				</div>
 				<div className="flex-3 p-1 text-center">
