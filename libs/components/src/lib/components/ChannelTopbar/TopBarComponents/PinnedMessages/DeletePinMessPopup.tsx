@@ -44,7 +44,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 										isEditted={false}
 										isJumMessageEnabled={false}
 										isTokenClickAble={false}
-										content={JSON.parse(pinMessage.content || '')}
+										content={JSON.parse(pinMessage.content || '{}')}
 									/>
 								</span>
 								{attachments?.length ? <ListPinAttachment attachments={attachments} /> : <></>}
