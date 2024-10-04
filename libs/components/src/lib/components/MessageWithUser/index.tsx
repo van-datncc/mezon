@@ -122,7 +122,7 @@ function MessageWithUser({
 
 	const checkMessageHasReply = useMemo(() => {
 		if (message.references && message.references.length > 0) {
-			return message.references[0]?.message_ref_id !== undefined;
+			return true;
 		}
 		return false;
 	}, [message.references]);
