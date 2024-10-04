@@ -29,14 +29,14 @@ export function EventLocation({ event }: IEventLocation) {
 		<View style={styles.container}>
 			{option === OptionEvent.OPTION_SPEAKER && (
 				<TouchableOpacity style={styles.inline} onPress={joinVoiceChannel}>
-					<Icons.VoiceNormalIcon height={16} width={16} color={themeValue.text} />
+					<Icons.VoiceNormalIcon height={16} width={16} color={themeValue.textStrong} />
 					<Text style={styles.smallText}>{channelVoice?.channel_label}</Text>
 				</TouchableOpacity>
 			)}
 
 			{option === OptionEvent.OPTION_LOCATION && (
 				<View style={styles.inline}>
-					<Icons.LocationIcon height={16} width={16} color={themeValue.text} />
+					<Icons.LocationIcon height={16} width={16} color={themeValue.textStrong} />
 					<Text style={styles.smallText}>{event?.address}</Text>
 				</View>
 			)}
