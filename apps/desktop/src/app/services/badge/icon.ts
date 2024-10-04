@@ -1,32 +1,41 @@
-import { nativeImage } from 'electron';
-import sharp from 'sharp';
-
 export class BadgeIconGenerator {
-	async generate(badgeNumber: number | null): Promise<Electron.NativeImage> {
-		let svgString: string;
+	private mainWindow: Electron.BrowserWindow;
+	private MAX_WIN_COUNT = 99;
+	constructor(mainWindow: Electron.BrowserWindow) {
+		this.mainWindow = mainWindow;
+	}
 
-		if (badgeNumber === null) {
-			svgString = `<svg width="320" height="320" xmlns="http://www.w3.org/2000/svg">
-							<circle cx="160" cy="160" r="160" fill="red" />
-							<circle cx="160" cy="160" r="20" fill="white" />
-						</svg>`;
-		} else {
-			svgString =
-				badgeNumber <= 9
-					? `<svg width="320" height="320" xmlns="http://www.w3.org/2000/svg">
-							<circle cx="160" cy="160" r="160" fill="red" />
-							<text x="160" y="230" font-size="200" font-weight="bold" text-anchor="middle" fill="white" font-family="Arial">${badgeNumber}</text>
-						</svg>`
-					: `<svg width="400" height="320" xmlns="http://www.w3.org/2000/svg">
-							<rect width="100%" height="100%" rx="140" fill="red" />
-							<text x="200" y="220" font-size="200" font-weight="bold" text-anchor="middle" fill="white" font-family="Arial">
-							 9+
-							</text>
-						</svg>`;
+	generate(count: number): Promise<string> {
+		const small = count > this.MAX_WIN_COUNT;
+		const text = count > this.MAX_WIN_COUNT ? `'99+'` : `'${count}'`;
+		return this.mainWindow.webContents.executeJavaScript(`window.drawBadge = function ${this.drawBadge}; window.drawBadge(${text}, ${small});`);
+	}
+
+	drawBadge(text: string, small: boolean) {
+		const scale = 2; // should rely display dpi
+		const size = (small ? 20 : 16) * scale;
+		const canvas = document.createElement('canvas');
+		canvas.setAttribute('width', `${size}`);
+		canvas.setAttribute('height', `${size}`);
+		const ctx = canvas.getContext('2d');
+
+		if (!ctx) {
+			return null;
 		}
 
-		const svgBuffer = Buffer.from(svgString);
-		const pngBuffer = await sharp(svgBuffer).png().toBuffer();
-		return nativeImage.createFromBuffer(pngBuffer);
+		// circle
+		ctx.fillStyle = '#FF1744'; // Material Red A400
+		ctx.beginPath();
+		ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+		ctx.fill();
+
+		// text
+		ctx.fillStyle = '#ffffff';
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.font = 11 * scale + 'px sans-serif';
+		ctx.fillText(text, size / 2, size / 2, size);
+
+		return canvas.toDataURL();
 	}
 }
