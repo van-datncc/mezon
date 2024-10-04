@@ -24,6 +24,7 @@ import {
 	selectDirectsUnreadlist,
 	selectDmGroupCurrentId,
 	selectDmGroupCurrentType,
+	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
 	selectOpenModalAttachment,
 	selectStatusMenu,
@@ -171,6 +172,7 @@ function MyApp() {
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isShowChatStream = useSelector(selectIsShowChatStream);
 
 	useEffect(() => {
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -273,7 +275,7 @@ function MyApp() {
 			<MainContent />
 
 			<div
-				className={`fixed h-[calc(100vh_-_60px)] w-[calc(100vw_-_344px)] right-0 bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
+				className={`fixed h-[calc(100vh_-_60px)] ${isShowChatStream ? 'w-[calc(100vw_-_832px)] right-[488px]' : 'w-[calc(100vw_-_344px)] right-0'} bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
 			>
 				<ChannelStream
 					key={currentStreamInfo?.streamId}
