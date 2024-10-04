@@ -2,17 +2,19 @@ import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	channelMetaActions,
 	clansActions,
+	messagesActions,
 	notificationActions,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
 	selectCurrentClan,
-	selectTheme
+	selectTheme,
+	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, NotificationEntity, sortNotificationsByDate } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import EmptyNotification from './EmptyNotification';
 import NotificationChannel from './NotificationChannel';
 import NotificationItem from './NotificationItem';
@@ -36,8 +38,43 @@ const tabDataNotify = [
 	{ title: 'Mentions', value: InboxType.MENTIONS }
 ];
 
+type ListCreatimeMessage = {
+	channelId: string;
+	messageId: string;
+	createdTime: number;
+};
+
+const createMessageArray = (unReadReplyAndMentionListArr: NotificationEntity[]): ListCreatimeMessage[] => {
+	const sortedMessages = unReadReplyAndMentionListArr
+		.filter((noti) => noti.create_time)
+		.sort((a, b) => {
+			const dateA = new Date(a.create_time!).getTime();
+			const dateB = new Date(b.create_time!).getTime();
+			return dateB - dateA;
+		});
+
+	const notis = sortedMessages.map((noti) => ({
+		channelId: noti.content.channel_id,
+		messageId: noti.content.message_id,
+		createdTime: new Date(noti.create_time!).getTime()
+	}));
+
+	return notis;
+};
+
+const getMessageLastest = (listCreatimeMessage: ListCreatimeMessage[]) => {
+	const channelMap = new Map<string, { channelId: string; messageId: string; createdTime: number }>();
+	listCreatimeMessage.forEach((createdTime) => {
+		const existingMessage = channelMap.get(createdTime.channelId);
+		if (!existingMessage || createdTime.createdTime > existingMessage.createdTime) {
+			channelMap.set(createdTime.channelId, createdTime);
+		}
+	});
+	return Array.from(channelMap.values());
+};
+
 function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationProps) {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.INDIVIDUAL);
 	const handleChangeTab = (valueTab: string) => {
@@ -62,20 +99,30 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 
 	const appearanceTheme = useSelector(selectTheme);
 
-	const getUnreadChannelIds = useMemo(() => {
-		const channelIds = unReadReplyAndMentionList.map((item) => item.content.channel_id);
-		return Array.from(new Set(channelIds));
+	const getListCreatedTime = useMemo(() => {
+		return createMessageArray(unReadReplyAndMentionList);
 	}, [unReadReplyAndMentionList]);
+
+	const getLastestMessage = useMemo(() => {
+		return getMessageLastest(getListCreatedTime);
+	}, [getListCreatedTime]);
 
 	const handleMarkAllAsRead = useCallback(() => {
 		const timestamp = Date.now() / 1000;
-		getUnreadChannelIds.forEach((channelId: string) => {
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+		getLastestMessage.forEach((list: ListCreatimeMessage) => {
+			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: list.channelId, timestamp }));
+			dispatch(
+				messagesActions.updateLastSeenMessage({
+					clanId: currentClan?.clan_id ?? '',
+					channelId: list.channelId ?? '',
+					messageId: list.messageId ?? ''
+				})
+			);
 		});
 		if (currentClan?.badge_count && currentClan?.badge_count > 0) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
 		}
-	}, [getUnreadChannelIds, dispatch, currentClan?.badge_count]);
+	}, [getLastestMessage, dispatch, currentClan?.badge_count]);
 
 	const isShowMarkAllAsRead = useMemo(() => {
 		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;

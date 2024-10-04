@@ -166,20 +166,9 @@ export const selectAllNotificationMentionAndReply = createSelector(selectAllNoti
 	)
 );
 
-export const selectMentionAndReplyByClanId = (clanId: string) =>
-	createSelector(selectAllNotification, (notifications) =>
-		notifications.filter(
-			(notification) =>
-				notification.content.clan_id === clanId &&
-				(notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED)
-		)
-	);
-
 export const selectMentionAndReplyUnreadByChanneld = (clanId: string, channelId: string, lastSeenStamp: number) =>
 	createSelector(selectAllNotification, (notifications) => {
-		const clanFilteredNotifications = notifications.filter((notification) => notification.content.clan_id === clanId);
-
-		const filteredNotifications = clanFilteredNotifications.filter(
+		const filteredNotifications = notifications.filter(
 			(notification) => notification.code === NotificationCode.USER_REPLIED || notification.code === NotificationCode.USER_MENTIONED
 		);
 

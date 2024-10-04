@@ -54,7 +54,9 @@ const GlobalEventListener = () => {
 				electronBridge?.setBadgeCount(null);
 				return;
 			}
-			electronBridge?.setBadgeCount(notificationCount);
+			if (notificationCount > 0) {
+				electronBridge?.setBadgeCount(notificationCount);
+			}
 		} else {
 			document.title = notificationCount > 0 ? `(${notificationCount}) Mezon` : 'Mezon';
 		}
