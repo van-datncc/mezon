@@ -5,7 +5,7 @@ import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChan
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
@@ -261,7 +261,7 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 					<View>
 						<Pressable
 							key={node.key}
-							style={[styles.voiceChannel, { top: size.s_4, alignItems: 'flex-end' }]}
+							style={[styles.voiceChannel, { top: Platform.OS === 'android' ? size.s_4 : size.s_2, alignItems: 'flex-end' }]}
 							onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}
 						>
 							<Text style={styles.threadIcon}>
