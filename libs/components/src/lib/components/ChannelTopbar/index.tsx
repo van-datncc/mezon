@@ -109,7 +109,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
 								<div onClick={() => setTurnOffThreadMessage()}>
-									<ChannelListButton isLightMode={appearanceTheme === 'light'} />a
+									<ChannelListButton isLightMode={appearanceTheme === 'light'} />
 								</div>
 							</div>
 							<SearchMessageChannel mode={mode} />
@@ -122,7 +122,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 							<HelpButton isLightMode={appearanceTheme === 'light'} />
 						</div>
 						<div className="sbm:hidden mr-5">
-							<ChannelListButton />b
+							<ChannelListButton />
 						</div>
 					</div>
 				) : (
