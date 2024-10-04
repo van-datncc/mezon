@@ -125,6 +125,9 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
 						<Icons.StreamIcon height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
 					)}
+					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_APP && (
+						<Icons.AppChannelIcon height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
+					)}
 					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
 						{props.data.channel_label}
 					</Text>
