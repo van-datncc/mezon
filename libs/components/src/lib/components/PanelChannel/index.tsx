@@ -4,6 +4,7 @@ import {
 	SetNotificationPayload,
 	channelMetaActions,
 	channelsActions,
+	clansActions,
 	messagesActions,
 	notificationSettingActions,
 	selectCategoryById,
@@ -11,6 +12,8 @@ import {
 	selectCurrentClan,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
+	selectLastChannelTimestamp,
+	selectMentionAndReplyUnreadByChanneld,
 	selectSelectedChannelNotificationSetting,
 	useAppDispatch
 } from '@mezon/store';
@@ -83,6 +86,11 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
+
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channel?.channel_id ?? ''));
+	const numberNotification = useSelector(
+		selectMentionAndReplyUnreadByChanneld(channel?.clan_id ?? '', channel?.channel_id ?? '', getLastSeenChannel ?? 0)
+	).length;
 
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -210,8 +218,6 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 
 	const handleMarkAsRead = useCallback(() => {
 		if (isUnread) {
-			const timestamp = Date.now() / 1000;
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
 			dispatch(
 				messagesActions.updateLastSeenMessage({
 					clanId: channel.clan_id ?? '',
@@ -219,6 +225,9 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 					messageId: channel.last_sent_message?.id ?? ''
 				})
 			);
+			const timestamp = Date.now() / 1000;
+			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+			dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
 	}, []);
 
