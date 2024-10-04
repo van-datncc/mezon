@@ -1,17 +1,19 @@
 import {
 	channelMetaActions,
 	clansActions,
+	messagesActions,
 	selectClanById,
 	selectLastChannelTimestamp,
 	selectMentionAndReplyUnreadByChanneld,
 	selectTheme,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, TIME_OFFSET, TNotificationChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 type NotificationChannelHeaderProps = {
 	itemUnread?: TNotificationChannel;
@@ -22,27 +24,27 @@ type NotificationChannelHeaderProps = {
 };
 
 const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notification, onDeleteNotification }: NotificationChannelHeaderProps) => {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const clan = useAppSelector(selectClanById(clan_id as string));
 	const appearanceTheme = useSelector(selectTheme);
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(itemUnread?.channel_id ?? ''));
-
 	const numberNotification = useSelector(
 		selectMentionAndReplyUnreadByChanneld(itemUnread?.clan_id ?? '', itemUnread?.channel_id ?? '', getLastSeenChannel ?? 0)
 	).length;
 
-	const handleMarkAsRead = useCallback(
-		(itemUnread: TNotificationChannel) => {
-			console.log(itemUnread);
-			const timestamp = Date.now() / 1000;
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-			// if (numberNotification && numberNotification > 0) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
-			// }
-		},
-		[dispatch]
-	);
+	const handleMarkAsRead = useCallback(() => {
+		dispatch(
+			messagesActions.updateLastSeenMessage({
+				clanId: itemUnread?.clan_id ?? '',
+				channelId: itemUnread?.channel_id ?? '',
+				messageId: itemUnread?.notifications[0].content.message_id
+			})
+		);
+		const timestamp = Date.now() / 1000;
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+		dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
+	}, [dispatch]);
 
 	return (
 		<div className="flex justify-between">
@@ -107,7 +109,7 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 						>
 							<button
 								className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-								onClick={() => handleMarkAsRead}
+								onClick={handleMarkAsRead}
 							>
 								✔
 							</button>{' '}
