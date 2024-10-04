@@ -13,6 +13,7 @@ type ChannelListItemProp = {
 	channel: ChannelThreads;
 	isActive: boolean;
 	permissions: IChannelLinkPermission;
+	isCollapsed: boolean;
 };
 
 export type ChannelListItemRef = {
@@ -21,7 +22,7 @@ export type ChannelListItemRef = {
 };
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props: ChannelListItemProp, ref) => {
-	const { channel, isActive, permissions } = props;
+	const { channel, isActive, permissions, isCollapsed } = props;
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, channel.id));
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channel.channel_id ?? ''));
@@ -62,7 +63,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 				isActive={isActive}
 				permissions={permissions}
 			/>
-			{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} />}
+			{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} isCollapsed={isCollapsed} />}
 			<UserListVoiceChannel channelID={channel.channel_id ?? ''} channelType={channel?.type} />
 		</Fragment>
 	);
