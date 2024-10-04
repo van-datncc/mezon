@@ -1159,7 +1159,7 @@ export const PinRight: React.FC<IconProps> = ({ isWhite }) => {
 	);
 };
 
-export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '#AEAEAE', isWhite = false }) => {
+export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '', isWhite = false }) => {
 	return (
 		<svg
 			x="0"
@@ -1169,7 +1169,7 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defau
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} ${defaultSize}`}
+			className={`${defaultFill ? defaultFill : `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} ${defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -5020,6 +5020,25 @@ export function MacAppStoreDesktop(props: React.HTMLAttributes<SVGElement>) {
 				d="M127.176 13.2399C127.034 13.7218 126.728 14.1385 126.31 14.4174C125.893 14.6962 125.39 14.8193 124.891 14.7652C124.544 14.7743 124.199 14.7078 123.88 14.5702C123.561 14.4326 123.275 14.2272 123.044 13.9683C122.812 13.7094 122.639 13.4032 122.538 13.0709C122.436 12.7386 122.408 12.3882 122.456 12.044C122.41 11.6987 122.438 11.3476 122.539 11.0143C122.64 10.681 122.812 10.3733 123.043 10.1122C123.273 9.85099 123.557 9.64239 123.875 9.50048C124.193 9.35857 124.538 9.28667 124.887 9.28964C126.353 9.28964 127.238 10.2918 127.238 11.9473V12.3104H123.516V12.3687C123.499 12.5622 123.524 12.7569 123.587 12.9404C123.65 13.124 123.751 13.2922 123.884 13.4344C124.016 13.5766 124.176 13.6896 124.355 13.7662C124.533 13.8427 124.726 13.8812 124.92 13.879C125.169 13.9089 125.421 13.8641 125.644 13.7503C125.867 13.6365 126.052 13.4588 126.174 13.2399L127.176 13.2399ZM123.516 11.5409H126.178C126.192 11.364 126.168 11.1862 126.108 11.0191C126.048 10.852 125.954 10.6993 125.832 10.5707C125.71 10.442 125.562 10.3404 125.398 10.2723C125.234 10.2042 125.058 10.1711 124.881 10.1752C124.701 10.1729 124.522 10.2067 124.356 10.2745C124.189 10.3424 124.037 10.4429 123.91 10.5702C123.783 10.6975 123.683 10.8489 123.615 11.0156C123.547 11.1824 123.513 11.361 123.516 11.5409H123.516Z"
 				fill="white"
 			/>
+		</svg>
+	);
+}
+
+export function Chat({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+	return (
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={` ${defaultSize} ${defaultFill ? defaultFill : 'dark:hover:text-white hover:text-black dark:text-channelTextLabel text-colorTextLightMode'}`}
+		>
+			<path fill="currentColor" d="M12 22a10 10 0 1 0-8.45-4.64c.13.19.11.44-.04.61l-2.06 2.37A1 1 0 0 0 2.2 22H12Z"></path>
 		</svg>
 	);
 }
