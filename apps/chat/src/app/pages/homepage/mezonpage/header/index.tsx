@@ -5,13 +5,19 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-type HeaderProps = {
+interface HeaderProps {
 	sideBarIsOpen: boolean;
 	toggleSideBar: () => void;
 	scrollToSection: (id: string, event: React.MouseEvent) => void;
-};
+}
 
-export const HeaderMezon = memo((props: HeaderProps) => {
+interface NavLinkProps {
+	href: string;
+	section: string;
+	label: string;
+}
+
+const HeaderMezon = memo((props: HeaderProps) => {
 	const isLogin = useSelector(selectIsLogin);
 	const { sideBarIsOpen, toggleSideBar, scrollToSection } = props;
 	const refHeader = useRef<HTMLDivElement>(null);
@@ -36,6 +42,16 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 		handleScroll();
 	}, [sideBarIsOpen, handleScroll]);
 
+	const NavLink: React.FC<NavLinkProps> = ({ href, section, label }) => (
+		<a
+			href={href}
+			onClick={(event) => scrollToSection(section, event)}
+			className="border-b-2 border-transparent shadow-none text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px] hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg focus:shadow-[0px_0px_0px_4px_#678FFF]"
+		>
+			{label}
+		</a>
+	);
+
 	return (
 		<div
 			className={`layout fixed flex flex-col items-center w-full ${isScrolled ? 'bg-[#0B0E2D4D] z-50 shadow-[0px_4px_12px_0px_#0B0E2D26] backdrop-blur-[24px]' : ''} h-[80px] max-md:h-[72px]`}
@@ -51,32 +67,12 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 								height={32}
 								className="aspect-square object-cover"
 							/>
-							<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em]" style={{ fontFamily: 'Poppins' }}>
-								mezon
-							</div>
+							<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em] font-['Poppins']">mezon</div>
 						</Link>
 						<div className="hidden md:flex items-center gap-[32px]">
-							<a
-								href="#home"
-								onClick={(event) => scrollToSection('home', event)}
-								className="border-b-2 border-transparent hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg shadow-none focus:shadow-[0px_0px_0px_4px_#678FFF] text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px]"
-							>
-								Home
-							</a>
-							<a
-								href="#overview"
-								onClick={(event) => scrollToSection('overview', event)}
-								className="border-b-2 border-transparent hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg shadow-none focus:shadow-[0px_0px_0px_4px_#678FFF] text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px]"
-							>
-								Overview
-							</a>
-							<a
-								href="#feature"
-								onClick={(event) => scrollToSection('feature', event)}
-								className="border-b-2 border-transparent hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg shadow-none focus:shadow-[0px_0px_0px_4px_#678FFF] text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px]"
-							>
-								Features
-							</a>
+							<NavLink href="#home" section="home" label="Home" />
+							<NavLink href="#overview" section="overview" label="Overview" />
+							<NavLink href="#feature" section="feature" label="Features" />
 						</div>
 					</div>
 					<div className="w-fit">
@@ -91,23 +87,11 @@ export const HeaderMezon = memo((props: HeaderProps) => {
 				</div>
 
 				{!sideBarIsOpen && (
-					<div
-						className="hidden max-md:block"
-						style={{
-							position: 'absolute',
-							top: 0,
-							left: '50%',
-							transform: 'translate(-50%, -50%)',
-							width: '300px',
-							height: '200px',
-							background: '#1024D4',
-							filter: 'blur(75px)',
-							borderRadius: '50%',
-							mixBlendMode: 'color-dodge'
-						}}
-					></div>
+					<div className="hidden max-md:block absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[200px] bg-[#1024D4] rounded-[50%] filter blur-[75px] mix-blend-color-dodge"></div>
 				)}
 			</div>
 		</div>
 	);
 });
+
+export default HeaderMezon;

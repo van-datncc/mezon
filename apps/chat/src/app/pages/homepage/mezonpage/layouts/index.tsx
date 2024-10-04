@@ -1,43 +1,18 @@
 import { Icons, Image } from '@mezon/ui';
 import { RefObject, memo, useEffect, useRef, useState } from 'react';
 
-type LayoutProps = {
+interface LayoutProps {
 	sideBarIsOpen: boolean;
-};
+}
 
-export const Layout = memo((props: LayoutProps) => {
+const Layout = memo((props: LayoutProps) => {
 	const { sideBarIsOpen } = props;
 
 	return (
 		<div>
 			<section id="overview" className="flex flex-col items-center relative">
-				<div
-					className="max-lg:hidden"
-					style={{
-						position: 'absolute',
-						left: 0,
-						top: 0,
-						width: '400px',
-						height: '400px',
-						background: '#8D72C5',
-						filter: 'blur(130px)',
-						mixBlendMode: 'color-dodge',
-						transform: 'translateY(50%)'
-					}}
-				></div>
-				<div
-					className="max-lg:hidden"
-					style={{
-						position: 'absolute',
-						right: 0,
-						width: '400px',
-						height: '400px',
-						background: '#8D72C5',
-						filter: 'blur(130px)',
-						mixBlendMode: 'color-dodge',
-						transform: 'translateY(50%)'
-					}}
-				></div>
+				<div className="max-lg:hidden absolute top-0 left-0 transform translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
+				<div className="max-lg:hidden absolute right-0 transform translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
 				<div
 					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[64px] max-md:gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'}`}
 				>
@@ -125,29 +100,14 @@ export const Layout = memo((props: LayoutProps) => {
 							</div>
 						</AnimatedSection>
 					</div>
-					<div
-						className="hidden max-lg:block"
-						style={{
-							position: 'absolute',
-							right: 0,
-							bottom: '0px',
-							width: '300px',
-							height: '300px',
-							background: '#8D72C5',
-							mixBlendMode: 'color-dodge',
-							filter: 'blur(100px)'
-						}}
-					></div>
+					<div className="hidden max-lg:block absolute right-0 bottom-0 w-[300px] h-[300px] bg-[#8D72C5] filter blur-[100px] mix-blend-color-dodge"></div>
 				</div>
 			</section>
 			<section id="feature" className="flex flex-col items-center">
 				<div
 					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} ${sideBarIsOpen ? 'overflow-hidden' : ''}`}
 				>
-					<h2
-						style={{ fontFamily: 'Poppins' }}
-						className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9] md:px-[32px]"
-					>
+					<h2 className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9] md:px-[32px] font-['Poppins']">
 						Our features
 					</h2>
 
@@ -337,86 +297,17 @@ export const Layout = memo((props: LayoutProps) => {
 							</div>
 
 							{!sideBarIsOpen && (
-								<div
-									className="hidden md:block"
-									style={{
-										position: 'absolute',
-										top: '50%',
-										left: '50%',
-										transform: 'translate(-50%, -50%)',
-										width: '400px',
-										height: '400px',
-										background: '#8D72C5',
-										filter: 'blur(190px)',
-										borderRadius: '50%',
-										mixBlendMode: 'color-dodge'
-									}}
-								></div>
+								<div className="hidden md:block absolute top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[190px] mix-blend-color-dodge"></div>
 							)}
 						</div>
 					</div>
 
 					{!sideBarIsOpen && (
 						<div>
-							<div
-								className="hidden md:block"
-								style={{
-									position: 'absolute',
-									top: '8%',
-									left: '50%',
-									transform: 'translate(-50%, -50%)',
-									width: '300px',
-									height: '300px',
-									background: '#8D72C5',
-									filter: 'blur(140px)',
-									borderRadius: '50%',
-									mixBlendMode: 'color-dodge'
-								}}
-							></div>
-							<div
-								className="hidden max-md:block"
-								style={{
-									position: 'absolute',
-									top: 0,
-									right: '50%',
-									width: '300px',
-									height: '300px',
-									background: '#8D72C5',
-									filter: 'blur(130px)',
-									borderRadius: '50%',
-									mixBlendMode: 'color-dodge'
-								}}
-							></div>
-
-							<div
-								className="hidden max-md:block"
-								style={{
-									position: 'absolute',
-									bottom: 0,
-									right: '50%',
-									width: '300px',
-									height: '300px',
-									background: '#8D72C5',
-									filter: 'blur(130px)',
-									borderRadius: '50%',
-									mixBlendMode: 'color-dodge'
-								}}
-							></div>
-
-							<div
-								className="hidden max-md:block"
-								style={{
-									position: 'absolute',
-									top: '40%',
-									right: 0,
-									width: '200px',
-									height: '400px',
-									background: '#8D72C5',
-									filter: 'blur(100px)',
-									borderRadius: '50%',
-									mixBlendMode: 'color-dodge'
-								}}
-							></div>
+							<div className="hidden md:block absolute top-[8%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[140px] mix-blend-color-dodge"></div>
+							<div className="hidden max-md:block absolute top-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
+							<div className="hidden max-md:block absolute bottom-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
+							<div className="hidden max-md:block absolute top-[40%] right-0 w-[200px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[100px] mix-blend-color-dodge"></div>
 						</div>
 					)}
 				</div>
@@ -424,6 +315,8 @@ export const Layout = memo((props: LayoutProps) => {
 		</div>
 	);
 });
+
+export default Layout;
 
 interface IconCardProps {
 	icon: JSX.Element;
