@@ -159,7 +159,6 @@ function MessageWithUser({
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
-	console.log('Message :', message);
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
