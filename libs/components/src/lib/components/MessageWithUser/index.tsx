@@ -122,7 +122,7 @@ function MessageWithUser({
 
 	const checkMessageHasReply = useMemo(() => {
 		if (message.references && message.references.length > 0) {
-			return message.references[0]?.message_ref_id !== undefined;
+			return true;
 		}
 		return false;
 	}, [message.references]);
@@ -159,6 +159,7 @@ function MessageWithUser({
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
+	console.log('Message :', message);
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
