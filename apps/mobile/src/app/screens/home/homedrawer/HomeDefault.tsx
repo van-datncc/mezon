@@ -6,9 +6,12 @@ import {
 	RootState,
 	channelMembersActions,
 	channelMetaActions,
+	clansActions,
 	selectAllClans,
 	selectChannelById,
 	selectCurrentChannel,
+	selectLastChannelTimestamp,
+	selectMentionAndReplyUnreadByChanneld,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, TIME_OFFSET } from '@mezon/utils';
@@ -31,13 +34,15 @@ import LicenseAgreement from './components/LicenseAgreement';
 import StreamingRoom from './components/StreamingRoom';
 import { style } from './styles';
 
-function useChannelSeen(channelId: string) {
+function useChannelSeen(channelId: string, clanId: string) {
 	const dispatch = useAppDispatch();
-	const currentChannel = useSelector(selectChannelById(channelId));
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(clanId ?? '', channelId ?? '', getLastSeenChannel ?? 0)).length;
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-	}, [channelId, currentChannel, dispatch]);
+		dispatch(clansActions.updateClanBadgeCount({ clanId: clanId ?? '', count: numberNotification * -1 }));
+	}, [channelId, clanId, dispatch, numberNotification]);
 }
 
 const HomeDefault = React.memo((props: any) => {
@@ -55,7 +60,7 @@ const HomeDefault = React.memo((props: any) => {
 	const panelKeyboardRef = useRef(null);
 	const prevChannelIdRef = useRef<string>();
 
-	useChannelSeen(currentChannel?.channel_id || '');
+	useChannelSeen(currentChannel?.channel_id || '', currentChannel?.clan_id || '');
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
