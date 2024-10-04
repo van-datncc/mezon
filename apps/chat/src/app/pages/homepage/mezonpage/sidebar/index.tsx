@@ -1,6 +1,8 @@
+import { selectIsLogin } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
 import debounce from 'lodash.debounce';
 import { memo, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 type SideBarProps = {
@@ -10,6 +12,7 @@ type SideBarProps = {
 };
 
 export const SideBarMezon = memo((props: SideBarProps) => {
+	const isLogin = useSelector(selectIsLogin);
 	const { sideBarIsOpen, toggleSideBar, scrollToSection } = props;
 
 	const [bodySideBarRef, setBodySideBarRef] = useState(0);
@@ -108,10 +111,10 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 					Features
 				</a>
 				<Link
-					className="text-center px-[16px] py-[10px] rounded-[8px] bg-[#1024D4] text-[#F4F7F9] font-semibold text-base hover:bg-[#0C1AB2] focus:bg-[#281FB5]"
+					className="text-center px-[16px] py-[10px] rounded-[8px] bg-[#1024D4] text-[#F4F7F9] font-semibold text-base hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
 					to={'/mezon'}
 				>
-					Login
+					{isLogin ? 'Open Mezon' : 'Login'}
 				</Link>
 			</div>
 

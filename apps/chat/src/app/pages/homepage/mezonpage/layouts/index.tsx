@@ -224,7 +224,7 @@ export const Layout = memo((props: LayoutProps) => {
 											width: '100%'
 										}}
 									>
-										<Image src={`../../../assets/multiple-conversation-reply.png`} alt={'conversationReply'} />
+										<Image className="w-full" src={`../../../assets/multiple-conversation-reply.png`} alt={'conversationReply'} />
 									</div>
 								</AnimatedSection>
 							</div>
@@ -329,7 +329,7 @@ export const Layout = memo((props: LayoutProps) => {
 											</span>
 											<span className="font-normal text-[9.9px] leading-[11.88px] text-[#5865F2]">Community Guidelines.</span>
 										</div>
-										<button className="border-0 p-[7.43px] rounded-[618.32px] bg-[#4477FC] text-center font-semibold text-[11.14px] leading-[13.37px] text-[#FFFFFF]">
+										<button className="border-0 p-[7.43px] rounded-[618.32px] bg-[#4477FC] text-center font-semibold text-[11.14px] leading-[13.37px] text-[#FFFFFF] cursor-default">
 											Create Clan
 										</button>
 									</div>

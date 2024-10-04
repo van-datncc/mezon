@@ -9,8 +9,8 @@ const Footer = ({ downloadUrl }: FooterProps) => {
 				className="bg-[#0A052C] relative flex flex-col items-center bg-no-repeat"
 				style={{ backgroundImage: 'url(../../../assets/ellipse.svg)' }}
 			>
-				<div className="pt-[64px] pb-[48px] flex flex-col w-10/12 max-lg:w-full">
-					<div className="w-full pr-[32px] pl-[32px] flex justify-between gap-[48px] max-lg:flex-col">
+				<div className="pt-[64px] pb-[48px] max-md:py-[48px] flex flex-col w-10/12 max-lg:w-full">
+					<div className="w-full px-[32px] max-md:px-[16px] flex justify-between gap-[48px] max-lg:flex-col">
 						<div className="flex flex-col gap-[24px] max-w-[320px]">
 							<div className="flex items-center gap-[5px]">
 								<Image
@@ -122,12 +122,12 @@ const Footer = ({ downloadUrl }: FooterProps) => {
 					</div>
 				</div>
 			</div>
-			<div className="bg-[#0B0E2D] pt-[48px] pb-[48px] flex flex-col items-center">
-				<div className="w-10/12 pl-[32px] pr-[32px] flex items-center gap-[32px] justify-between max-lg:gap-[24px] max-lg:w-full max-lg:flex-col-reverse max-lg:items-start">
+			<div className="bg-[#0B0E2D] py-[48px] max-md:py-[24px] flex flex-col items-center">
+				<div className="w-10/12 px-[32px] max-md:px-[16px] flex items-center gap-[32px] justify-between max-lg:gap-[24px] max-lg:w-full max-lg:flex-col-reverse max-lg:items-start">
 					<div className="text-[16px] leading-[24px] font-normal text-[#7C92AF]">© 2024 Mezon. All rights reserved.</div>
 					<div className="flex items-center gap-[24px]">
 						<a href="#" target="_blank" rel="noreferrer">
-							<Image src={`assets/instagram.svg`} alt={'instagram'} />
+							<Image src={`assets/instagram.svg`} alt={'linkedIn'} />
 						</a>
 						<a href="#" target="_blank" rel="noreferrer">
 							<Image src={`assets/facebook.svg`} alt={'facebook'} />
