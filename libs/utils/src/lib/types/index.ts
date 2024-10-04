@@ -1,7 +1,6 @@
 import {
 	ChannelDescription,
 	ChannelMessage,
-	ChannelStreamMode,
 	ChannelType,
 	HashtagDm,
 	Notification,
@@ -757,19 +756,6 @@ export enum ETypeLinkMedia {
 	IMAGE_PREFIX = 'image',
 	VIDEO_PREFIX = 'video'
 }
-
-export type MessageTypeUpdateLink = {
-	id?: string;
-	channel_id?: string;
-	message_id?: string;
-	clan_id?: string;
-	mode?: ChannelStreamMode;
-	content?: IMessageSendPayload;
-	mentions?: ApiMessageMention[];
-	isMe?: boolean;
-	code?: number;
-	attachments?: ApiMessageAttachment[];
-};
 
 export type RequestInput = {
 	valueTextInput: string;
