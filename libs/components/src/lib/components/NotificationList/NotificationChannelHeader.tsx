@@ -27,22 +27,15 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 	const appearanceTheme = useSelector(selectTheme);
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(itemUnread?.channel_id ?? ''));
-
 	const numberNotification = useSelector(
 		selectMentionAndReplyUnreadByChanneld(itemUnread?.clan_id ?? '', itemUnread?.channel_id ?? '', getLastSeenChannel ?? 0)
 	).length;
 
-	const handleMarkAsRead = useCallback(
-		(itemUnread: TNotificationChannel) => {
-			console.log(itemUnread);
-			const timestamp = Date.now() / 1000;
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-			// if (numberNotification && numberNotification > 0) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
-			// }
-		},
-		[dispatch]
-	);
+	const handleMarkAsRead = useCallback(() => {
+		const timestamp = Date.now() / 1000;
+		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+		dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
+	}, [dispatch, numberNotification]);
 
 	return (
 		<div className="flex justify-between">
@@ -107,7 +100,7 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 						>
 							<button
 								className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-								onClick={() => handleMarkAsRead}
+								onClick={handleMarkAsRead}
 							>
 								✔
 							</button>{' '}
