@@ -80,7 +80,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 		}
 
 		if (newChannelCreatedId && channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING) {
-			navigation.navigate('HomeDefault' as any);
+			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 			navigation.dispatch(DrawerActions.closeDrawer());
 			requestAnimationFrame(async () => {
 				await store.dispatch(channelsActions.joinChannel({ clanId: clanID ?? '', channelId: channelID, noFetchMembers: false }));
