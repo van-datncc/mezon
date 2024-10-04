@@ -1,4 +1,4 @@
-import { useFriends, useMenu } from '@mezon/core';
+import { useEscapeKey, useFriends, useMenu } from '@mezon/core';
 import {
 	FriendsEntity,
 	RootState,
@@ -246,6 +246,7 @@ const FriendsPage = () => {
 };
 
 const RequestFailedPopup = ({ togglePopup }: { togglePopup: () => void }) => {
+	useEscapeKey(togglePopup);
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
 			<div onClick={togglePopup} className="fixed inset-0 bg-black opacity-50" />
