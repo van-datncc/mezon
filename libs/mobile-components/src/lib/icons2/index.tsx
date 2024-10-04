@@ -1,4 +1,4 @@
-import { ClipPath, Defs, G, Mask, Path, Svg, SvgProps } from 'react-native-svg';
+import { ClipPath, Defs, G, Mask, Path, Rect, Svg, SvgProps } from 'react-native-svg';
 
 export const ActivityIcon = ({ width, height, color = 'white', ...props }: SvgProps) => (
 	<Svg viewBox="0 0 72 72" fill={color} width={width} height={height} {...props}>
@@ -1505,6 +1505,16 @@ export function StreamIcon({ width = 24, height = 24, color = 'white', ...props 
 				fill={color}
 			/>
 			<Path d="M8 20a1 1 0 100 2h8a1 1 0 100-2H8z" fill="currentColor" />
+		</Svg>
+	);
+}
+
+export function AppChannelIcon({ width = 20, height = 20, color = 'white', ...props }) {
+	return (
+		<Svg height={height} viewBox="0 0 24 24" width={width} fill={color}>
+			<Rect height="8" rx="1" width="8" x="2" y="2" />
+			<Rect height="8" rx="1" width="8" x="2" y="14" />
+			<Rect height="8" rx="1" width="8" x="14" y="14" />
 		</Svg>
 	);
 }

@@ -25,19 +25,21 @@ const SuggestItem = ({ channelId, avatarUrl, name, subText, isDisplayDefaultAvat
 	const styles = style(themeValue);
 	const emojiSrc = emojiId ? getSrcEmoji(emojiId) : '';
 	const { t } = useTranslation(['clan']);
-	const { isChannelPrivate, isChannelText, isThread, isChannelVoice, isChannelStream } = useMemo(() => {
+	const { isChannelPrivate, isChannelText, isThread, isChannelVoice, isChannelStream, isChannelApp } = useMemo(() => {
 		const isChannelPrivate = channel?.channel_private === ChannelStatusEnum.isPrivate;
 		const isChannelText = channel?.type === ChannelType.CHANNEL_TYPE_TEXT;
 		const isThread = channel?.parrent_id !== '0';
 		const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 		const isChannelStream = channel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
+		const isChannelApp = channel?.type === ChannelType.CHANNEL_TYPE_APP;
 
 		return {
 			isChannelPrivate,
 			isChannelText,
 			isThread,
 			isChannelVoice,
-			isChannelStream
+			isChannelStream,
+			isChannelApp
 		};
 	}, [channel]);
 
@@ -81,6 +83,9 @@ const SuggestItem = ({ channelId, avatarUrl, name, subText, isDisplayDefaultAvat
 				{isChannelPrivate && isChannelVoice && <Icons.VoiceLockIcon width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />}
 				{!isChannelPrivate && isChannelStream && (
 					<Icons.StreamIcon style={styles.streamIcon} height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
+				)}
+				{!isChannelPrivate && isChannelApp && (
+					<Icons.AppChannelIcon style={styles.streamIcon} height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
 				)}
 				{isRoleUser || name.startsWith('here') ? (
 					<Text style={[styles.roleText, name.startsWith('here') && styles.textHere]}>{`@${name}`}</Text>
