@@ -7,9 +7,8 @@ export class BadgeIconGenerator {
 
 	generate(count: number): Promise<string> {
 		const small = count > this.MAX_WIN_COUNT;
-		return this.mainWindow.webContents.executeJavaScript(
-			`window.drawBadge = function ${this.drawBadge}; window.drawBadge('${count}', ${small});`
-		);
+		const text = count > this.MAX_WIN_COUNT ? `'99+'` : `'${count}'`;
+		return this.mainWindow.webContents.executeJavaScript(`window.drawBadge = function ${this.drawBadge}; window.drawBadge(${text}, ${small});`);
 	}
 
 	drawBadge(text: string, small: boolean) {
