@@ -1,4 +1,4 @@
-import { useAppNavigation, usePermissionChecker, useThreads } from '@mezon/core';
+import { useAppNavigation, useAppParams, usePermissionChecker, useThreads } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
@@ -8,8 +8,10 @@ import {
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
+	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
+	selectIsShowChatStream,
 	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
@@ -84,16 +86,22 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
+	const isShowChatStream = useSelector(selectIsShowChatStream);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
 	const isShowSettingChannel = hasChannelManagePermission;
 	const param = useParams();
+	const { toMembersPage } = useAppNavigation();
+	const { currentURL } = useAppParams();
+	const memberPath = toMembersPage(currentClanId || '');
+
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLabel channel={channel} />
 			</div>
-			{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-				<div className="items-center h-full ml-auto flex">
+			<div className="items-center h-full ml-auto flex">
+				{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING ? (
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
@@ -101,7 +109,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
 								<div onClick={() => setTurnOffThreadMessage()}>
-									<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+									<ChannelListButton isLightMode={appearanceTheme === 'light'} />a
 								</div>
 							</div>
 							<SearchMessageChannel mode={mode} />
@@ -114,11 +122,13 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 							<HelpButton isLightMode={appearanceTheme === 'light'} />
 						</div>
 						<div className="sbm:hidden mr-5">
-							<ChannelListButton />
+							<ChannelListButton />b
 						</div>
 					</div>
-				</div>
-			)}
+				) : (
+					!isShowChatStream && memberPath !== currentURL && <ChatButton isLightMode={appearanceTheme === 'light'} />
+				)}
+			</div>
 		</>
 	);
 }
@@ -321,6 +331,22 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 			>
 				<button onClick={handleClick}>
 					<Icons.MemberList isWhite={isActive} />
+				</button>
+			</Tooltip>
+		</div>
+	);
+}
+
+function ChatButton({ isLightMode }: { isLightMode?: boolean }) {
+	const dispatch = useDispatch();
+	const handleClick = () => {
+		dispatch(appActions.setIsShowChatStream(true));
+	};
+	return (
+		<div className="relative leading-5 h-5">
+			<Tooltip className="w-max" content="Show Chat" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+				<button onClick={handleClick}>
+					<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
 				</button>
 			</Tooltip>
 		</div>

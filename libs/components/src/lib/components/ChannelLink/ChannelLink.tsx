@@ -1,11 +1,13 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
+	appActions,
 	channelsActions,
 	notificationSettingActions,
 	selectClanById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentStreamInfo,
+	selectStatusStream,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
@@ -83,6 +85,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		};
 		const currentChannel = useSelector(selectCurrentChannel);
 		const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+		const playStream = useSelector(selectStatusStream);
 
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
@@ -141,7 +144,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				setStatusMenu(false);
 			}
 			if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-				if (currentStreamInfo?.streamId !== channel.id) {
+				if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
 					dispatch(
 						videoStreamActions.startStream({
 							clanId: clanId || '',
@@ -150,6 +153,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 							streamName: channel?.channel_label || ''
 						})
 					);
+					dispatch(appActions.setIsShowChatStream(false));
 				}
 			} else {
 				dispatch(channelsActions.setCurrentChannelId(channel.id));
@@ -177,9 +181,12 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			handleConfirmDeleteChannel(channel.channel_id as string, clanId as string);
 			handleCloseModalShow();
 		};
-
 		useEffect(() => {
-			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (
+				currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING &&
+				currentStreamInfo?.clanId !== clanId &&
+				currentStreamInfo?.streamId !== currentChannel.channel_id
+			) {
 				dispatch(
 					videoStreamActions.startStream({
 						clanId: clanId || '',
@@ -188,8 +195,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						streamName: currentChannel?.channel_label || ''
 					})
 				);
+				dispatch(appActions.setIsShowChatStream(false));
 			}
-		}, [clanById?.clan_name, clanId, currentChannel, currentChannel?.type, dispatch]);
+		}, [clanById?.clan_name, clanId, currentChannel, currentChannel?.type, currentStreamInfo?.clanId, currentStreamInfo?.streamId, dispatch]);
 
 		return (
 			<div

@@ -1159,7 +1159,7 @@ export const PinRight: React.FC<IconProps> = ({ isWhite }) => {
 	);
 };
 
-export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '#AEAEAE', isWhite = false }) => {
+export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '', isWhite = false }) => {
 	return (
 		<svg
 			x="0"
@@ -1169,7 +1169,7 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defau
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} ${defaultSize}`}
+			className={`${defaultFill ? defaultFill : `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} ${defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -4910,6 +4910,25 @@ export function VoiceIcon(props: React.HTMLAttributes<SVGElement>) {
 				d="M9.33334 30.6667C9.33334 29.9303 9.9303 29.3333 10.6667 29.3333H21.3333C22.0697 29.3333 22.6667 29.9303 22.6667 30.6667C22.6667 31.403 22.0697 32 21.3333 32H10.6667C9.9303 32 9.33334 31.403 9.33334 30.6667Z"
 				fill="#92B8FF"
 			/>
+		</svg>
+	);
+}
+
+export function Chat({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+	return (
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			className={` ${defaultSize} ${defaultFill ? defaultFill : 'dark:hover:text-white hover:text-black dark:text-channelTextLabel text-colorTextLightMode'}`}
+		>
+			<path fill="currentColor" d="M12 22a10 10 0 1 0-8.45-4.64c.13.19.11.44-.04.61l-2.06 2.37A1 1 0 0 0 2.2 22H12Z"></path>
 		</svg>
 	);
 }
