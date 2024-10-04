@@ -130,7 +130,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	useEffect(() => {
 		return () => {
 			if (!isFetchMemberChannelDmRef.current) {
-				fetchMemberChannel();
+				requestAnimationFrame(async () => {
+					await fetchMemberChannel();
+				});
 			}
 		};
 	}, [fetchMemberChannel, isFetchMemberChannelDmRef]);
@@ -139,14 +141,16 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		let timeout: NodeJS.Timeout;
 		if (directMessageId) {
 			timeout = setTimeout(() => {
-				directMessageLoader();
+				requestAnimationFrame(async () => {
+					await directMessageLoader();
+				});
 			}, 100);
 		}
 
 		return () => {
 			timeout && clearTimeout(timeout);
 		};
-	}, [directMessageId]);
+	}, [directMessageId, directMessageLoader]);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);

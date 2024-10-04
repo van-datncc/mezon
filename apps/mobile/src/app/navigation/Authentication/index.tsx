@@ -88,7 +88,9 @@ export const Authentication = () => {
 						const store = await getStoreAsync();
 						store.dispatch(appActions.setLoadingMainMobile(true));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
-						await navigateToNotification(store, remoteMessage, navigation);
+						requestAnimationFrame(async () => {
+							await navigateToNotification(store, remoteMessage, navigation);
+						});
 					}
 				});
 			}
