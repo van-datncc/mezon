@@ -1,8 +1,11 @@
 import { Icons, Image } from '@mezon/ui';
+import { getPlatform } from '@mezon/utils';
 interface FooterProps {
 	downloadUrl: string;
 }
 const Footer = ({ downloadUrl }: FooterProps) => {
+	const platform = getPlatform();
+
 	return (
 		<div>
 			<div
@@ -110,22 +113,19 @@ const Footer = ({ downloadUrl }: FooterProps) => {
 						<div className="flex flex-col gap-[16px]">
 							<div className="text-[14px] leading-[20px] font-semibold text-[#F5F5F6]">Get the app</div>
 							<div className="flex flex-col gap-[16px]">
-								<div className="flex gap-[16px] max-md:flex-col">
-									<a href="https://apps.apple.com/vn/app/mezon/id6502750046" target="_blank" rel="noreferrer">
-										<Icons.AppStoreBadge className="max-w-full h-[40px] w-fit" />
-									</a>
-									<a href="https://play.google.com/store/apps/details?id=com.mezon.mobile" target="_blank" rel="noreferrer">
-										<Icons.GooglePlayBadge className="max-w-full h-[40px] w-fit" />
-									</a>
-								</div>
-								<div className="flex gap-[16px] max-md:flex-col">
-									<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
-										<Icons.MacAppStoreDesktop className="max-w-full h-[40px] w-fit max-md:order-2" />
-									</a>
-									<a href={downloadUrl} target="_blank" rel="noreferrer">
-										<Icons.MicrosoftBadge className="max-w-full h-[40px] w-fit" />
-									</a>
-								</div>
+								<a href="https://apps.apple.com/vn/app/mezon/id6502750046" target="_blank" rel="noreferrer">
+									<Image src={`assets/app-store.svg`} alt={'appStore'} className="max-w-[135px]" />
+								</a>
+								<a href="https://play.google.com/store/apps/details?id=com.mezon.mobile" target="_blank" rel="noreferrer">
+									<Image src={`assets/google-play.svg`} alt={'googlePlay'} className="max-w-[135px]" />
+								</a>
+								<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+									{platform === 'MacOS' ? (
+										<Icons.MacAppStoreDesktop className="max-w-full h-[40px] w-fit" />
+									) : (
+										<Image src={`assets/microsoft.svg`} alt={'microsoft'} className="max-w-[135px]" />
+									)}
+								</a>
 							</div>
 						</div>
 					</div>

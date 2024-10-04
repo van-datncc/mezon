@@ -74,7 +74,7 @@ function MezonPage() {
 			}}
 		>
 			<div
-				className="layout relative flex flex-col items-center text-textDarkTheme overflow-hidden"
+				className="layout relative flex flex-col items-center text-textDarkTheme overflow-hidden scroll-smooth"
 				style={{
 					background: 'linear-gradient(rgba(3, 3, 32, 0) -15.28%, rgb(15, 15, 99) -93.02%, rgba(3, 3, 32, 0) 105.23%)'
 				}}
@@ -96,33 +96,25 @@ function MezonPage() {
 								<div>Customize your own space to talk, play, and hang out.</div>
 							</div>
 						</div>
-						<div className="flex justify-center items-center gap-[12px] max-md:flex-col">
-							<div className="flex justify-center items-center gap-[12px]">
-								<a
-									className="cursor-pointer"
-									href="https://apps.apple.com/vn/app/mezon/id6502750046"
-									target="_blank"
-									rel="noreferrer"
-								>
-									<Icons.AppStoreBadge className="max-w-full max-md:h-[32px] max-md:w-[96px]" />
-								</a>
-								<a
-									className="cursor-pointer"
-									href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
-									target="_blank"
-									rel="noreferrer"
-								>
-									<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
-								</a>
-							</div>
-							<div className="flex justify-center items-center gap-[12px]">
-								<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
-									<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full max-md:order-2" />
-								</a>
-								<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+						<div className="flex justify-center items-center gap-[12px]">
+							<a className="cursor-pointer" href="https://apps.apple.com/vn/app/mezon/id6502750046" target="_blank" rel="noreferrer">
+								<Icons.AppStoreBadge className="max-w-full max-md:h-[32px] max-md:w-[98px]" />
+							</a>
+							<a
+								className="cursor-pointer"
+								href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
+								target="_blank"
+								rel="noreferrer"
+							>
+								<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
+							</a>
+							<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+								{platform === 'MacOS' ? (
+									<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />
+								) : (
 									<Icons.MicrosoftBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
-								</a>
-							</div>
+								)}
+							</a>
 						</div>
 					</div>
 				</div>

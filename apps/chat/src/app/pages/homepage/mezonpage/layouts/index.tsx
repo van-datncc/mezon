@@ -28,7 +28,7 @@ const Layout = memo((props: LayoutProps) => {
 							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
-							<Image src={`assets/blockchain-intergration.svg`} alt={'blockChainIntergration'} width={48} height={48} />
+							<Image src={`assets/blockchain-intergration.svg`} alt={'blockChainIntergration'} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
 									className="text-[20px] leading-[30px] font-semibold"
@@ -54,7 +54,7 @@ const Layout = memo((props: LayoutProps) => {
 							className="border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
-							<Image src={`assets/developer-empowerment.svg`} alt={'developerEmpowerment'} width={48} height={48} />
+							<Image src={`assets/developer-empowerment.svg`} alt={'developerEmpowerment'} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
 									className="text-[20px] leading-[30px] font-semibold"
@@ -79,7 +79,7 @@ const Layout = memo((props: LayoutProps) => {
 							className="relative border-[1px] p-[32px] max-lg:pr-[16px] max-lg:pl-[16px] flex flex-col items-center gap-[16px] border-[#4465FF4D] rounded-[12px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
-							<Image src={`assets/vision-for-the-future.svg`} alt={'visionForTheFuture'} width={48} height={48} />
+							<Image src={`assets/vision-for-the-future.svg`} alt={'visionForTheFuture'} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
 									className="text-[20px] leading-[30px] font-semibold"
@@ -116,18 +116,7 @@ const Layout = memo((props: LayoutProps) => {
 							className="rounded-[20px] border p-[64px] bg-[#0B0E2D] border-[#4465FF4D] flex flex-col gap-[52px] max-md:rounded-[12px] max-md:py-[32px] max-md:px-[16px] max-md:gap-[20px]"
 							style={{ boxShadow: '0px 4px 90px 16px #22119280 inset' }}
 						>
-							<h3
-								className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px] px-[20px]"
-								style={{
-									background: 'linear-gradient(#1D5AFA, #F8E4F0)',
-									WebkitBackgroundClip: 'text',
-									backgroundClip: 'text',
-									color: 'transparent',
-									fontFamily: 'Poppins'
-								}}
-							>
-								Comprehensive Communication Tools
-							</h3>
+							<HeaderFeature content="Comprehensive Communication Tools" className="px-[20px]" />
 							<IconGrid />
 						</div>
 
@@ -141,18 +130,13 @@ const Layout = memo((props: LayoutProps) => {
 											window.innerWidth > 768 ? 'linear-gradient(142.48deg, #0A052C 44.04%, #221192 124.62%)' : '#0B0E2D'
 									}}
 								>
-									<h3
-										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
-										style={{
-											background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
-											WebkitBackgroundClip: 'text',
-											backgroundClip: 'text',
-											color: 'transparent',
-											fontFamily: 'Poppins'
-										}}
-									>
-										Decentralized <br></br> Token-Based Economy
-									</h3>
+									<HeaderFeature
+										content={
+											<>
+												Decentralized <br></br> Token-Based Economy
+											</>
+										}
+									/>
 									<Image src={`../../../assets/multiple-block.png`} alt={'blockDecentralized'} />
 								</AnimatedSection>
 								<AnimatedSection
@@ -162,28 +146,14 @@ const Layout = memo((props: LayoutProps) => {
 										background: window.innerWidth > 768 ? 'linear-gradient(192.5deg, #0A052C 27.1%, #221192 137.4%)' : '#0B0E2D'
 									}}
 								>
-									<h3
-										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
-										style={{
-											background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
-											WebkitBackgroundClip: 'text',
-											backgroundClip: 'text',
-											color: 'transparent',
-											fontFamily: 'Poppins'
-										}}
-									>
-										Advanced Developer <br></br> API Platform
-									</h3>
-									<div
-										className={`${sideBarIsOpen ? 'unset' : 'relative'}`}
-										style={{
-											display: 'flex',
-											flexDirection: 'column',
-											alignItems: 'center',
-											justifyContent: 'center',
-											width: '100%'
-										}}
-									>
+									<HeaderFeature
+										content={
+											<>
+												Advanced Developer <br></br> API Platform
+											</>
+										}
+									/>
+									<div className={`${sideBarIsOpen ? 'unset' : 'relative'} flex flex-col items-center justify-center w-full`}>
 										<Image className="w-full" src={`../../../assets/multiple-conversation-reply.png`} alt={'conversationReply'} />
 									</div>
 								</AnimatedSection>
@@ -197,43 +167,18 @@ const Layout = memo((props: LayoutProps) => {
 										background: window.innerWidth > 768 ? 'linear-gradient(38.57deg, #0A052C 47.53%, #221192 124.01%)' : '#0B0E2D'
 									}}
 								>
-									<h3
-										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
-										style={{
-											background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
-											WebkitBackgroundClip: 'text',
-											backgroundClip: 'text',
-											color: 'transparent',
-											fontFamily: 'Poppins'
-										}}
-									>
-										Gaming & Entertainment
-									</h3>
+									<HeaderFeature content="Gaming & Entertainment" />
 									<div className="flex flex-col gap-[23px] max-md:gap-[12px] max-md:items-center">
-										<div
-											className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
-											style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
-										>
-											<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
-												Game Rooms & Channels
-											</span>
-										</div>
-										<div
-											className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
-											style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
-										>
-											<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
-												Developer-Driven Game Creation
-											</span>
-										</div>
-										<div
-											className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
-											style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
-										>
-											<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
-												Token-Driven Gaming Economy
-											</span>
-										</div>
+										{['Game Rooms & Channels', 'Developer-Driven Game Creation', 'Token-Driven Gaming Economy'].map((text) => (
+											<div
+												className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
+												style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
+											>
+												<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
+													{text}
+												</span>
+											</div>
+										))}
 									</div>
 									<Image
 										src={`../../../assets/cube.png`}
@@ -255,18 +200,7 @@ const Layout = memo((props: LayoutProps) => {
 											window.innerWidth > 768 ? 'linear-gradient(315.97deg, #0A052C 52.65%, #221192 113.54%)' : '#0B0E2D'
 									}}
 								>
-									<h3
-										className="text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px]"
-										style={{
-											background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
-											WebkitBackgroundClip: 'text',
-											backgroundClip: 'text',
-											color: 'transparent',
-											fontFamily: 'Poppins'
-										}}
-									>
-										Customizable & Scalable <br></br> Platform
-									</h3>
+									<HeaderFeature content="Customizable & Scalable Platform" />
 									<div className="flex flex-col gap-[12px] p-[19.23px] rounded-[12px] border border-[#445FA34D] bg-[#0D0935] max-md:border-[1.2px] max-w-[241.39px]">
 										<div className="font-semibold text-[12.38px] text-center leading-[14.85px] text-[#FFFFFF]">
 											Customize Your Clan
@@ -317,6 +251,25 @@ const Layout = memo((props: LayoutProps) => {
 });
 
 export default Layout;
+
+interface HeaderFeatureProps {
+	content: React.ReactNode;
+	className?: string;
+}
+
+export const HeaderFeature: React.FC<HeaderFeatureProps> = ({ content, className }) => {
+	return (
+		<h3
+			className={`text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px] text-transparent font-['Poppins'] bg-[linear-gradient(349.47deg,_#1D5AFA_-9.25%,_#F8E4F0_90.24%)] ${className}`}
+			style={{
+				WebkitBackgroundClip: 'text',
+				backgroundClip: 'text'
+			}}
+		>
+			{content}
+		</h3>
+	);
+};
 
 interface IconCardProps {
 	icon: JSX.Element;
