@@ -309,6 +309,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				)}
 				{isShowPanelChannel && (
 					<PanelChannel
+						isUnread={isUnReadChannel}
 						onDeleteChannel={handleOpenModalConfirm}
 						channel={channel}
 						coords={coords}

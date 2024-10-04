@@ -2,7 +2,9 @@ import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mez
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
+	channelMetaActions,
 	channelsActions,
+	messagesActions,
 	notificationSettingActions,
 	selectCategoryById,
 	selectCurrentChannelId,
@@ -21,7 +23,8 @@ import {
 	FOR_24_HOURS,
 	FOR_3_HOURS,
 	FOR_8_HOURS,
-	IChannel
+	IChannel,
+	TIME_OFFSET
 } from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
@@ -39,6 +42,7 @@ type PanelChannel = {
 	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	rootRef?: RefObject<HTMLElement>;
+	isUnread?: boolean;
 };
 
 const typeChannel = {
@@ -66,7 +70,7 @@ export const notificationTypesList = [
 	}
 ];
 
-const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel, rootRef }: PanelChannel) => {
+const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, isUnread }: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -204,6 +208,20 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 	};
 
+	const handleMarkAsRead = useCallback(() => {
+		if (isUnread) {
+			const timestamp = Date.now() / 1000;
+			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+			dispatch(
+				messagesActions.updateLastSeenMessage({
+					clanId: channel.clan_id ?? '',
+					channelId: channel.channel_id ?? '',
+					messageId: channel.last_sent_message?.id ?? ''
+				})
+			);
+		}
+	}, []);
+
 	return (
 		<div
 			ref={panelRef}
@@ -212,7 +230,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm shadow z-20 w-[200px] py-[10px] px-[10px]"
 		>
 			<GroupPanels>
-				<ItemPanel children="Mark As Read" />
+				<ItemPanel onClick={handleMarkAsRead} children="Mark As Read" />
 			</GroupPanels>
 			<GroupPanels>
 				<ItemPanel children="Invite People" />
