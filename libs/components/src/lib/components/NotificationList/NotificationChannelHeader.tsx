@@ -1,7 +1,4 @@
 import {
-	channelMetaActions,
-	clansActions,
-	messagesActions,
 	selectClanById,
 	selectLastChannelTimestamp,
 	selectMentionAndReplyUnreadByChanneld,
@@ -10,7 +7,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { INotification, TIME_OFFSET, TNotificationChannel } from '@mezon/utils';
+import { INotification, TNotificationChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -33,18 +30,7 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 		selectMentionAndReplyUnreadByChanneld(itemUnread?.clan_id ?? '', itemUnread?.channel_id ?? '', getLastSeenChannel ?? 0)
 	).length;
 
-	const handleMarkAsRead = useCallback(() => {
-		dispatch(
-			messagesActions.updateLastSeenMessage({
-				clanId: itemUnread?.clan_id ?? '',
-				channelId: itemUnread?.channel_id ?? '',
-				messageId: itemUnread?.notifications[0].content.message_id
-			})
-		);
-		const timestamp = Date.now() / 1000;
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-		dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
-	}, [dispatch]);
+	const handleMarkAsRead = useCallback(() => {}, [dispatch]);
 
 	return (
 		<div className="flex justify-between">
