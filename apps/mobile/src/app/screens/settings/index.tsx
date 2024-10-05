@@ -13,8 +13,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../temp-ui';
-import MezonSearch from '../../temp-ui/MezonSearch';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, reserve } from '../../componentUI';
+import MezonSearch from '../../componentUI/MezonSearch';
 import { style } from './styles';
 
 export const Settings = ({ navigation }: { navigation: any }) => {

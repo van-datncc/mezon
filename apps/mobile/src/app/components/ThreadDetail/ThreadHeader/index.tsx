@@ -11,7 +11,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { MezonAvatar, MezonBottomSheet } from '../../../temp-ui';
+import { MezonAvatar, MezonBottomSheet } from '../../../componentUI';
 import MenuCustomDm from '../../MenuCustomDm';
 import { threadDetailContext } from '../MenuThreadDetail';
 import { style } from './styles';

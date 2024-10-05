@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonOption, MezonSwitch, reserve } from '../../temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu, MezonOption, MezonSwitch, reserve } from '../../componentUI';
 import { CategoryChannel } from './CategoryChannel';
 import { style } from './ClanNotificationSetting.styles';
 

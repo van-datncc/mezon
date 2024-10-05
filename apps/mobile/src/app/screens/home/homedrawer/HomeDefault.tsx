@@ -25,7 +25,7 @@ import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
+import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
 import PanelKeyboard from './PanelKeyboard';

@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { ErrorInput } from '../../../../../components/ErrorInput';
-import { MezonInput, MezonModal } from '../../../../../temp-ui';
+import { MezonInput, MezonModal } from '../../../../../componentUI';
 import { styles } from './JoinClanModal.styles';
 
 type JoinClanModalProps = {

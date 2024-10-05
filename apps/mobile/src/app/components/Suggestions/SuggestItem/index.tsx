@@ -4,7 +4,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store';
 import { ChannelStatusEnum, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
 import { style } from './SuggestItem.styles';
@@ -20,7 +20,7 @@ type SuggestItemProps = {
 	channel?: ChannelsEntity;
 };
 
-const SuggestItem = ({ channelId, avatarUrl, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiId, channel }: SuggestItemProps) => {
+const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiId, channel }: SuggestItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const emojiSrc = emojiId ? getSrcEmoji(emojiId) : '';
@@ -99,6 +99,6 @@ const SuggestItem = ({ channelId, avatarUrl, name, subText, isDisplayDefaultAvat
 			<Text style={styles.subText}>{subText}</Text>
 		</View>
 	);
-};
+});
 
 export default SuggestItem;
