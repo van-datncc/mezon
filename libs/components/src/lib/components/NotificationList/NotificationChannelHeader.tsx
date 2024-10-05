@@ -1,7 +1,8 @@
-import { selectClanById, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
+import { markAsReadProcessing, selectChannelById, selectClanById, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, TNotificationChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
+import { ApiMarkAsReadRequest } from 'mezon-js/api.gen';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -16,18 +17,36 @@ type NotificationChannelHeaderProps = {
 const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notification, onDeleteNotification }: NotificationChannelHeaderProps) => {
 	const dispatch = useAppDispatch();
 	const clan = useAppSelector(selectClanById(clan_id as string));
+
+	const channelId = useMemo(() => {
+		return itemUnread?.channel_id ? itemUnread.channel_id : '';
+	}, [itemUnread?.channel_id]);
+
+	const getChannel = useSelector(selectChannelById(channelId));
+
 	const appearanceTheme = useSelector(selectTheme);
 
 	const numberNotification = useMemo(() => {
 		return itemUnread?.notifications.length;
 	}, [itemUnread?.notifications.length]);
 
-	const handleMarkAsRead = useCallback(() => {
-		// const timestamp = Date.now() / 1000;
-		// dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-		// dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
-		// dispatch(channelsActions.updateChannelBadgeCount({ channelId: itemUnread?.channel_id ?? '', count: numberNotification * -1 }));
-	}, [dispatch]);
+	const handleMarkAsRead = useCallback(async () => {
+		const body: ApiMarkAsReadRequest = {
+			clan_id: clan_id ?? '',
+			category_id: getChannel.category_id ?? '',
+			channel_id: channelId ?? ''
+		};
+		const result = await dispatch(markAsReadProcessing(body));
+		console.log('result :', result);
+		return result.payload;
+	}, []);
+
+	// const handleMarkAsRead2 = useCallback(() => {
+	// 	const timestamp = Date.now() / 1000;
+	// 	dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+	// 	dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
+	// 	dispatch(channelsActions.updateChannelBadgeCount({ channelId: itemUnread?.channel_id ?? '', count: numberNotification * -1 }));
+	// }, [dispatch]);
 
 	return (
 		<div className="flex justify-between">
