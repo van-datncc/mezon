@@ -1,12 +1,11 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
-	channelMetaActions,
-	clansActions,
-	messagesActions,
 	notificationActions,
+	selectAllChannelLastSeenTimestampByClanId,
 	selectAllNotificationExcludeMentionAndReply,
 	selectAllNotificationMentionAndReply,
 	selectCurrentClan,
+	selectMentionAndReplyUnreadByClanId,
 	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
@@ -22,7 +21,6 @@ import NotificationItem from './NotificationItem';
 export type MemberListProps = { className?: string };
 
 export type NotificationProps = {
-	unReadReplyAndMentionList: NotificationEntity[];
 	rootRef?: RefObject<HTMLElement>;
 };
 
@@ -73,17 +71,19 @@ const getMessageLastest = (listCreatimeMessage: ListCreatimeMessage[]) => {
 	return Array.from(channelMap.values());
 };
 
-function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationProps) {
+function NotificationList({ rootRef }: NotificationProps) {
+	const currentClan = useSelector(selectCurrentClan);
+	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
+	const unReadReplyAndMentionList = useSelector(selectMentionAndReplyUnreadByClanId(allLastSeenChannelAllChannelInClan));
 	const dispatch = useAppDispatch();
 
-	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.INDIVIDUAL);
+	const [currentTabNotify, setCurrentTabNotify] = useState(InboxType.MENTIONS);
 	const handleChangeTab = (valueTab: string) => {
 		setCurrentTabNotify(valueTab);
 	};
 
 	const getNotificationExcludeMentionAndReplyUnread = useSelector(selectAllNotificationExcludeMentionAndReply);
 	const getAllNotificationMentionAndReply = useSelector(selectAllNotificationMentionAndReply);
-	const currentClan = useSelector(selectCurrentClan);
 
 	const getExcludeMentionAndReply = useMemo(() => {
 		return sortNotificationsByDate(getNotificationExcludeMentionAndReplyUnread);
@@ -108,20 +108,14 @@ function NotificationList({ unReadReplyAndMentionList, rootRef }: NotificationPr
 	}, [getListCreatedTime]);
 
 	const handleMarkAllAsRead = useCallback(() => {
-		const timestamp = Date.now() / 1000;
-		getLastestMessage.forEach((list: ListCreatimeMessage) => {
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: list.channelId, timestamp }));
-			dispatch(
-				messagesActions.updateLastSeenMessage({
-					clanId: currentClan?.clan_id ?? '',
-					channelId: list.channelId ?? '',
-					messageId: list.messageId ?? ''
-				})
-			);
-		});
-		if (currentClan?.badge_count && currentClan?.badge_count > 0) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
-		}
+		// const timestamp = Date.now() / 1000;
+		// getLastestMessage.forEach((list: ListCreatimeMessage) => {
+		// 	dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: list.channelId, timestamp }));
+		// 	dispatch(channelsActions.updateChannelBadgeCount({ channelId: list.channelId ?? '', count: 0, isReset: true }));
+		// });
+		// if (currentClan?.badge_count && currentClan?.badge_count > 0) {
+		// 	dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
+		// }
 	}, [getLastestMessage, dispatch, currentClan?.badge_count]);
 
 	const isShowMarkAllAsRead = useMemo(() => {

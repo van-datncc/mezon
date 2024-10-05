@@ -5,7 +5,7 @@ import { IExtendedMessage } from '@mezon/utils';
 import { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components';
-import MezonAvatar from '../../../temp-ui/MezonAvatar';
+import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { style } from './PinMessageItem.styles';
 
 interface IPinMessageItemProps {

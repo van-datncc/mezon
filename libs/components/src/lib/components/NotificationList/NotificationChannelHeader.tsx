@@ -1,18 +1,8 @@
-import {
-	channelMetaActions,
-	clansActions,
-	messagesActions,
-	selectClanById,
-	selectLastChannelTimestamp,
-	selectMentionAndReplyUnreadByChanneld,
-	selectTheme,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store';
+import { selectClanById, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { INotification, TIME_OFFSET, TNotificationChannel } from '@mezon/utils';
+import { INotification, TNotificationChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 type NotificationChannelHeaderProps = {
@@ -28,22 +18,15 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 	const clan = useAppSelector(selectClanById(clan_id as string));
 	const appearanceTheme = useSelector(selectTheme);
 
-	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(itemUnread?.channel_id ?? ''));
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(itemUnread?.clan_id ?? '', itemUnread?.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useMemo(() => {
+		return itemUnread?.notifications.length;
+	}, [itemUnread?.notifications.length]);
 
 	const handleMarkAsRead = useCallback(() => {
-		dispatch(
-			messagesActions.updateLastSeenMessage({
-				clanId: itemUnread?.clan_id ?? '',
-				channelId: itemUnread?.channel_id ?? '',
-				messageId: itemUnread?.notifications[0].content.message_id
-			})
-		);
-		const timestamp = Date.now() / 1000;
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-		dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
+		// const timestamp = Date.now() / 1000;
+		// dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+		// dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
+		// dispatch(channelsActions.updateChannelBadgeCount({ channelId: itemUnread?.channel_id ?? '', count: numberNotification * -1 }));
 	}, [dispatch]);
 
 	return (

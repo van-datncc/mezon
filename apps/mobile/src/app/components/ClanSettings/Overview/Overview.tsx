@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonImagePicker, MezonInput, MezonMenu, MezonOption, reserve } from '../../../temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonImagePicker, MezonInput, MezonMenu, MezonOption, reserve } from '../../../componentUI';
 import { validInput } from '../../../utils/validate';
 import DeleteClanModal from '../../DeleteClanModal';
 import { ErrorInput } from '../../ErrorInput';

@@ -10,7 +10,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { MezonConfirm, MezonInput } from '../../../temp-ui';
+import { MezonConfirm, MezonInput } from '../../../componentUI';
 
 enum EActionType {
 	permissions,

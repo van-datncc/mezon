@@ -12,7 +12,7 @@ import { AddStatusUserModal } from '../../components/AddStatusUserModal';
 import { CustomStatusUser } from '../../components/CustomStatusUser';
 import { useMixImageColor } from '../../hooks/useMixImageColor';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { MezonAvatar, MezonButton } from '../../temp-ui';
+import { MezonAvatar, MezonButton } from '../../componentUI';
 import { style } from './styles';
 
 export enum ETypeCustomUserStatus {

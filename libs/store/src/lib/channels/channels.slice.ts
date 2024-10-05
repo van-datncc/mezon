@@ -45,7 +45,8 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 	return {
 		...channelRes,
 		id: channelRes.channel_id || '',
-		status: channelRes.meeting_code ? 1 : 0
+		status: channelRes.meeting_code ? 1 : 0,
+		badgeCount: channelRes.count_mess_unread ? channelRes.count_mess_unread : 0
 	};
 };
 
@@ -445,6 +446,18 @@ export const channelsSlice = createSlice({
 			state.previousChannels.unshift(action.payload.channelId);
 			if (state.previousChannels.length > 3) {
 				state.previousChannels.pop();
+			}
+		},
+		updateChannelBadgeCount: (state: ChannelsState, action: PayloadAction<{ channelId: string; count: number; isReset?: boolean }>) => {
+			const { channelId, count, isReset = false } = action.payload;
+			const entity = state.entities[channelId];
+			if (entity) {
+				channelsAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						count_mess_unread: isReset ? 0 : (entity.count_mess_unread ?? 0) + count
+					}
+				});
 			}
 		}
 	},
