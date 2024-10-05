@@ -1,4 +1,3 @@
-import { notificationActions } from '@mezon/store';
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -74,7 +73,6 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 		thunkAPI.dispatch(policiesActions.fetchPermission());
 		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId }));
 		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId }));
-		thunkAPI.dispatch(notificationActions.fetchListNotification({ clanId: clanId ?? '' }));
 		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
 		thunkAPI.dispatch(
 			voiceActions.fetchVoiceChannelMembers({

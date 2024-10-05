@@ -265,7 +265,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				)}
 
 				{isShowSettingChannel ? (
-					numberNotification !== 0 ? (
+					numberNotification && numberNotification > 0 ? (
 						<>
 							<Icons.AddPerson
 								className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block dark:text-white text-black `}

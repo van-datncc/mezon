@@ -173,12 +173,9 @@ export const selectMentionAndReplyUnreadByChanneld = (channelId: string, lastSee
 				return false;
 			}
 			const timeCreate = new Date(notification.create_time).getTime() / 1000;
-			console.log('timeCreate :', timeCreate);
-			console.log('lastSeenStamp :', lastSeenStamp);
-			console.log('timeCreate > lastSeenStamp', timeCreate > lastSeenStamp, channelId);
+
 			return notification.content.channel_id === channelId && lastSeenStamp < timeCreate;
 		});
-		console.log('result :', result, channelId, lastSeenStamp);
 
 		return result;
 	});

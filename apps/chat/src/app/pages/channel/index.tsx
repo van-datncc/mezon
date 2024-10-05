@@ -2,6 +2,7 @@ import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/
 import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
+	channelsActions,
 	clansActions,
 	selectAppChannelById,
 	selectChannelById,
@@ -9,15 +10,13 @@ import {
 	selectCurrentChannel,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
-	selectLastChannelTimestamp,
-	selectMentionAndReplyUnreadByChanneld,
 	selectStatusMenu,
 	useAppDispatch
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useEffect, useRef } from 'react';
+import { DragEvent, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -26,8 +25,10 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
-	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
-	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(currentChannel.channel_id ?? '', getLastSeenChannel ?? 0)).length;
+	// const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
+	const numberNotification = useMemo(() => {
+		return currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
+	}, [currentChannel.count_mess_unread]);
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
@@ -36,6 +37,7 @@ function useChannelSeen(channelId: string) {
 
 	useEffect(() => {
 		if (numberNotification && numberNotification > 0) {
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
 	}, [numberNotification]);
