@@ -3,7 +3,6 @@ import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
-	selectAllChannelLastSeenTimestampByClanId,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
@@ -16,7 +15,6 @@ import {
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
-	selectMentionAndReplyUnreadByClanId,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -267,14 +265,15 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const inboxRef = useRef<HTMLDivElement | null>(null);
 	const currentClan = useSelector(selectCurrentClan);
 
-	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
-	const getNotificationMentionAndReplyUnread = useSelector(
-		selectMentionAndReplyUnreadByClanId(currentClan?.clan_id ?? '', allLastSeenChannelAllChannelInClan)
-	);
-
 	const handleShowInbox = () => {
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
+
+	useEffect(() => {
+		if (isShowInbox) {
+			dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '' }));
+		}
+	}, [isShowInbox]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
@@ -284,7 +283,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 					{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} rootRef={inboxRef} />}
+			{isShowInbox && <NotificationList rootRef={inboxRef} />}
 		</div>
 	);
 }

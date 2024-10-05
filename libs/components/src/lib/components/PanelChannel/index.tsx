@@ -9,8 +9,6 @@ import {
 	selectCurrentClan,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
-	selectLastChannelTimestamp,
-	selectMentionAndReplyUnreadByChanneld,
 	selectSelectedChannelNotificationSetting,
 	useAppDispatch
 } from '@mezon/store';
@@ -28,7 +26,7 @@ import {
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import GroupPanels from './GroupPanels';
@@ -83,10 +81,9 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
 
-	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channel?.channel_id ?? ''));
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(channel?.clan_id ?? '', channel?.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useMemo(() => {
+		return channel.count_mess_unread ? channel.count_mess_unread : 0;
+	}, [channel.count_mess_unread]);
 
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -212,7 +209,14 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 	};
 
-	const handleMarkAsRead = useCallback(() => {}, []);
+	const handleMarkAsRead = useCallback(() => {
+		if (isUnread) {
+			// const timestamp = Date.now() / 1000;
+			// dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+			// dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
+			// dispatch(channelsActions.updateChannelBadgeCount({ channelId: channel?.channel_id ?? '', count: numberNotification * -1 }));
+		}
+	}, []);
 
 	return (
 		<div
