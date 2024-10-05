@@ -31,8 +31,9 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../../app/temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../componentUI';
 import { style } from './styles';
+import {ChannelStreamMode, ChannelType} from "mezon-js";
 
 interface IChannelMenuProps {
 	inviteRef: MutableRefObject<any>;
@@ -78,13 +79,14 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
 
 	const handleMarkAsRead = useCallback(() => {
-		// dispatch(
-		// 	messagesActions.updateLastSeenMessage({
-		// 		clanId: channel.clan_id,
-		// 		channelId: channel.channel_id,
-		// 		messageId: channel?.last_sent_message?.id
-		// 	})
-		// );
+		dispatch(
+			messagesActions.updateLastSeenMessage({
+				clanId: channel.clan_id,
+				channelId: channel.channel_id,
+				messageId: channel?.last_sent_message?.id,
+				mode: channel.type
+			})
+		);
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
 		dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));

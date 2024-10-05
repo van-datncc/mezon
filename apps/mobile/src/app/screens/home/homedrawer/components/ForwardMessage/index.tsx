@@ -22,7 +22,7 @@ import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../../../components/Common';
-import { MezonInput } from '../../../../../temp-ui';
+import { MezonInput } from '../../../../../componentUI';
 import { styles } from './styles';
 
 interface IForwardIObject {

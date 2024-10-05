@@ -21,7 +21,7 @@ import { EventViewer } from '../../../../components/Event';
 import ChannelListSkeleton from '../../../../components/Skeletons/ChannelListSkeleton';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../navigation/ScreenTypes';
-import { MezonBottomSheet } from '../../../../temp-ui';
+import { MezonBottomSheet } from '../../../../componentUI';
 import { InviteToChannel } from '../components';
 import CategoryMenu from '../components/CategoryMenu';
 import ChannelListHeader from '../components/ChannelList/ChannelListHeader';

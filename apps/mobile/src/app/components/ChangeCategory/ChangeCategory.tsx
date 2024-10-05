@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
-import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu } from '../../temp-ui';
+import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonMenu } from '../../componentUI';
 
 type ChangeCategory = typeof APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY;
 export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<ChangeCategory>) => {

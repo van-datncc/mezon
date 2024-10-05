@@ -6,7 +6,7 @@ import React from 'react';
 import { Platform, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useImage } from '../../hooks/useImage';
-import { MezonClanAvatar } from '../../temp-ui';
+import { MezonClanAvatar } from '../../componentUI';
 import { style } from './styles';
 
 interface IRenderFooterModalProps {

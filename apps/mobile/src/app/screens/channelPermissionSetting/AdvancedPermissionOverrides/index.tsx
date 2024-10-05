@@ -8,7 +8,7 @@ import { ScrollView, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../../navigation/ScreenTypes';
-import { MezonConfirm } from '../../../temp-ui';
+import { MezonConfirm } from '../../../componentUI';
 import { PermissionItem } from '../components/PermissionItem';
 import { EOverridePermissionType, EPermissionStatus, ERequestStatus } from '../types/channelPermission.enum';
 import { IPermissionSetting } from '../types/channelPermission.type';

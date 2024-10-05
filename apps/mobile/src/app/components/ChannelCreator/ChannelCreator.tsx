@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch } from '../../componentUI';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch } from '../../temp-ui';
 import { validInput } from '../../utils/validate';
 import { style } from './styles';
 

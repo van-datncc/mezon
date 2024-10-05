@@ -2,7 +2,7 @@ import { Block } from '@mezon/mobile-ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ETypeCustomUserStatus } from '../../screens/profile/ProfileScreen';
-import { IMezonOptionData, MezonInput, MezonModal, MezonOption } from '../../temp-ui';
+import { IMezonOptionData, MezonInput, MezonModal, MezonOption } from '../../componentUI';
 import { styles } from './AddStatusUserModal.styles';
 
 export interface IAddStatusUserModalProps {
