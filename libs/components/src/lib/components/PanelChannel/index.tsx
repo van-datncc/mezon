@@ -2,9 +2,7 @@ import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mez
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
-	channelMetaActions,
 	channelsActions,
-	clansActions,
 	notificationSettingActions,
 	selectCategoryById,
 	selectCurrentChannelId,
@@ -23,8 +21,7 @@ import {
 	FOR_24_HOURS,
 	FOR_3_HOURS,
 	FOR_8_HOURS,
-	IChannel,
-	TIME_OFFSET
+	IChannel
 } from '@mezon/utils';
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
@@ -214,17 +211,10 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 
 	const handleMarkAsRead = useCallback(() => {
 		if (isUnread) {
-			// dispatch(
-			// 	messagesActions.updateLastSeenMessage({
-			// 		clanId: channel.clan_id ?? '',
-			// 		channelId: channel.channel_id ?? '',
-			// 		messageId: channel.last_sent_message?.id ?? ''
-			// 	})
-			// );
-			const timestamp = Date.now() / 1000;
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-			dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channel?.channel_id ?? '', count: numberNotification * -1 }));
+			// const timestamp = Date.now() / 1000;
+			// dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
+			// dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
+			// dispatch(channelsActions.updateChannelBadgeCount({ channelId: channel?.channel_id ?? '', count: numberNotification * -1 }));
 		}
 	}, []);
 

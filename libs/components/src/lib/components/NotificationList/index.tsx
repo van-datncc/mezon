@@ -1,8 +1,5 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
-	channelMetaActions,
-	channelsActions,
-	clansActions,
 	notificationActions,
 	selectAllChannelLastSeenTimestampByClanId,
 	selectAllNotificationExcludeMentionAndReply,
@@ -111,21 +108,14 @@ function NotificationList({ rootRef }: NotificationProps) {
 	}, [getListCreatedTime]);
 
 	const handleMarkAllAsRead = useCallback(() => {
-		const timestamp = Date.now() / 1000;
-		getLastestMessage.forEach((list: ListCreatimeMessage) => {
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: list.channelId, timestamp }));
-			// dispatch(
-			// 	messagesActions.updateLastSeenMessage({
-			// 		clanId: currentClan?.clan_id ?? '',
-			// 		channelId: list.channelId ?? '',
-			// 		messageId: list.messageId ?? ''
-			// 	})
-			// );
-			dispatch(channelsActions.updateChannelBadgeCount({ channelId: list.channelId ?? '', count: 0, isReset: true }));
-		});
-		if (currentClan?.badge_count && currentClan?.badge_count > 0) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
-		}
+		// const timestamp = Date.now() / 1000;
+		// getLastestMessage.forEach((list: ListCreatimeMessage) => {
+		// 	dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: list.channelId, timestamp }));
+		// 	dispatch(channelsActions.updateChannelBadgeCount({ channelId: list.channelId ?? '', count: 0, isReset: true }));
+		// });
+		// if (currentClan?.badge_count && currentClan?.badge_count > 0) {
+		// 	dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
+		// }
 	}, [getLastestMessage, dispatch, currentClan?.badge_count]);
 
 	const isShowMarkAllAsRead = useMemo(() => {
