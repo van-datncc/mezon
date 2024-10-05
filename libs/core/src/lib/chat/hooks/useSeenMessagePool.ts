@@ -30,7 +30,20 @@ export function useSeenMessagePool() {
 	}, []);
 
 	const markMessageAsSeen = useCallback((message: IMessage) => {
-		console.log('not implemented');
+		// if message is sending, do not mark as seen
+		if (message.isSending) {
+			return;
+		}
+
+		seenMessagePool.addSeenMessage({
+			clanId: message.clan_id || '',
+			channelId: message.channel_id || '',
+			channelLabel: message.channel_label,
+			messageId: message.id || '',
+			messageCreatedAt: message.create_time_seconds ? +message.create_time_seconds : 0,
+			messageSeenAt: +Date.now(),
+			mode: message.mode as number
+		});
 	}, []);
 
 	return useMemo(
