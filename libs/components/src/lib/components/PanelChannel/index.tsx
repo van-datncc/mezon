@@ -88,9 +88,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channel?.channel_id ?? ''));
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(channel?.clan_id ?? '', channel?.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(channel?.channel_id ?? '', getLastSeenChannel ?? 0)).length;
 
 	const handleEditChannel = () => {
 		setOpenSetting(true);

@@ -29,9 +29,7 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 	const appearanceTheme = useSelector(selectTheme);
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(itemUnread?.channel_id ?? ''));
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(itemUnread?.clan_id ?? '', itemUnread?.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(itemUnread?.channel_id ?? '', getLastSeenChannel ?? 0)).length;
 
 	const handleMarkAsRead = useCallback(() => {
 		dispatch(

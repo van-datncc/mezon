@@ -268,9 +268,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const currentClan = useSelector(selectCurrentClan);
 
 	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
-	const getNotificationMentionAndReplyUnread = useSelector(
-		selectMentionAndReplyUnreadByClanId(currentClan?.clan_id ?? '', allLastSeenChannelAllChannelInClan)
-	);
+	const getNotificationMentionAndReplyUnread = useSelector(selectMentionAndReplyUnreadByClanId(allLastSeenChannelAllChannelInClan));
 
 	const handleShowInbox = () => {
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));

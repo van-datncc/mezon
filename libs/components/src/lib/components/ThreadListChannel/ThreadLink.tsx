@@ -26,9 +26,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(thread.channel_id ?? ''));
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(thread.clan_id ?? '', thread.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(thread.channel_id ?? '', getLastSeenChannel ?? 0)).length;
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);

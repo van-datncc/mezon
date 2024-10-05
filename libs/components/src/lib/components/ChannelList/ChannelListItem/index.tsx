@@ -26,7 +26,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, channel.id));
 
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channel.channel_id ?? ''));
-	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(channel.clan_id ?? '', channel.id, getLastSeenChannel ?? 0)).length;
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(channel.id, getLastSeenChannel ?? 0)).length;
 
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />

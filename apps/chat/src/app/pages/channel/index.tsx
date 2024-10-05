@@ -27,10 +27,7 @@ function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
-
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(currentChannel.clan_id ?? '', currentChannel.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(currentChannel.channel_id ?? '', getLastSeenChannel ?? 0)).length;
 
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
