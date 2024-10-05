@@ -128,7 +128,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 					onTextChange={(newValue) => onValueChange({ displayName: newValue })}
 					placeHolder={clanProfileValue?.username}
 					maxCharacter={32}
-					label={t('fields.displayName.label')}
+					label={t('fields.clanName.label')}
 				/>
 			</View>
 
