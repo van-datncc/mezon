@@ -26,7 +26,7 @@ import {
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
-import { ChannelMessage, ChannelStreamMode } from 'mezon-js';
+import { ChannelMessage } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -261,7 +261,8 @@ export const fetchMessages = createAsyncThunk(
 					channelLabel: lastMessage.channel_label,
 					messageId: lastMessage.id,
 					messageCreatedAt: lastMessage.create_time_seconds ? +lastMessage.create_time_seconds : 0,
-					messageSeenAt: 0
+					messageSeenAt: 0,
+					mode: lastMessage.mode as number
 				});
 			}
 		}
@@ -391,15 +392,16 @@ type UpdateMessageArgs = {
 	clanId: string;
 	channelId: string;
 	messageId: string;
+	mode: number;
 };
 
 export const updateLastSeenMessage = createAsyncThunk(
 	'messages/updateLastSeenMessage',
-	async ({ clanId, channelId, messageId }: UpdateMessageArgs, thunkAPI) => {
+	async ({ clanId, channelId, messageId, mode }: UpdateMessageArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, messageId, now);
+			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, mode, messageId, now);
 		} catch (e) {
 			Sentry.captureException(e);
 			console.error('Error updating last seen message', e);
