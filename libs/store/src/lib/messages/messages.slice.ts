@@ -630,7 +630,8 @@ export type SetUserTypingArgs = {
 	isTyping: boolean;
 };
 
-const channelMessagesAdapter = createEntityAdapter<MessagesEntity>({
+const channelMessagesAdapter = createEntityAdapter({
+	selectId: (message: MessagesEntity) => message.id,
 	sortComparer: orderMessageByTimeMsAscending
 });
 
@@ -740,6 +741,21 @@ export const messagesSlice = createSlice({
 							update_time: action.payload.update_time
 						}
 					});
+					const replyList = handleUpdateReplyMessage(channelEntity, action.payload.id);
+					if (replyList.length > 0) {
+						const updates: { id: string; changes: MessagesEntity }[] = replyList.map((message) => {
+							return {
+								id: message.id,
+								changes: {
+									...message,
+									references: message.references?.length
+										? [{ ...message.references[0], content: JSON.stringify(action.payload.content) }]
+										: []
+								}
+							};
+						});
+						channelMessagesAdapter.updateMany(channelEntity, updates);
+					}
 					break;
 				}
 				case 2: {
@@ -1366,4 +1382,11 @@ const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelI
 	}
 
 	return false;
+};
+
+const handleUpdateReplyMessage = (channelEntity: EntityState<MessagesEntity, string> & { id: string }, message_ref_id: string) => {
+	return channelMessagesAdapter
+		.getSelectors()
+		.selectAll(channelEntity)
+		.filter((message) => message.references?.[0]?.message_ref_id === message_ref_id);
 };

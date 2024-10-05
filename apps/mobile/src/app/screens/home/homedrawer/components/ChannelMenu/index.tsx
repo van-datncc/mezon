@@ -16,7 +16,6 @@ import {
 	channelsActions,
 	clansActions,
 	getStoreAsync,
-	messagesActions,
 	notificationSettingActions,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
