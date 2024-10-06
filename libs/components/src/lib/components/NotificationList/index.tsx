@@ -1,9 +1,5 @@
-import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
+import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside } from '@mezon/core';
 import {
-	channelMetaActions,
-	channelsActions,
-	clansActions,
-	markAsReadProcessing,
 	notificationActions,
 	selectAllChannelLastSeenTimestampByClanId,
 	selectAllNotificationExcludeMentionAndReply,
@@ -14,9 +10,8 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { INotification, NotificationEntity, sortNotificationsByDate } from '@mezon/utils';
+import { INotification, sortNotificationsByDate } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ApiMarkAsReadRequest } from 'mezon-js/api.gen';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyNotification from './EmptyNotification';
@@ -47,35 +42,6 @@ type ListCreatimeMessage = {
 	createdTime: number;
 };
 
-const createMessageArray = (unReadReplyAndMentionListArr: NotificationEntity[]): ListCreatimeMessage[] => {
-	const sortedMessages = unReadReplyAndMentionListArr
-		.filter((noti) => noti.create_time)
-		.sort((a, b) => {
-			const dateA = new Date(a.create_time!).getTime();
-			const dateB = new Date(b.create_time!).getTime();
-			return dateB - dateA;
-		});
-
-	const notis = sortedMessages.map((noti) => ({
-		channelId: noti.content.channel_id,
-		messageId: noti.content.message_id,
-		createdTime: new Date(noti.create_time!).getTime()
-	}));
-
-	return notis;
-};
-
-const getMessageLastest = (listCreatimeMessage: ListCreatimeMessage[]) => {
-	const channelMap = new Map<string, { channelId: string; messageId: string; createdTime: number }>();
-	listCreatimeMessage.forEach((createdTime) => {
-		const existingMessage = channelMap.get(createdTime.channelId);
-		if (!existingMessage || createdTime.createdTime > existingMessage.createdTime) {
-			channelMap.set(createdTime.channelId, createdTime);
-		}
-	});
-	return Array.from(channelMap.values());
-};
-
 function NotificationList({ rootRef }: NotificationProps) {
 	const currentClan = useSelector(selectCurrentClan);
 	const allLastSeenChannelAllChannelInClan = useSelector(selectAllChannelLastSeenTimestampByClanId(currentClan?.clan_id ?? ''));
@@ -104,31 +70,7 @@ function NotificationList({ rootRef }: NotificationProps) {
 
 	const appearanceTheme = useSelector(selectTheme);
 
-	const getListCreatedTime = useMemo(() => {
-		return createMessageArray(unReadReplyAndMentionList);
-	}, [unReadReplyAndMentionList]);
-
-	const getLastestMessage = useMemo(() => {
-		return getMessageLastest(getListCreatedTime);
-	}, [getListCreatedTime]);
-
-	const handleMarkAllAsRead = useCallback(async () => {
-		console.log('mark all as read inbox tab');
-		const body: ApiMarkAsReadRequest = {
-			clan_id: currentClan?.clan_id ?? ''
-		};
-		const result = await dispatch(markAsReadProcessing(body));
-		if (result.payload) {
-			const timestamp = Date.now() / 1000;
-			getLastestMessage.forEach((list: ListCreatimeMessage) => {
-				dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: list.channelId, timestamp }));
-				dispatch(channelsActions.updateChannelBadgeCount({ channelId: list.channelId ?? '', count: 0, isReset: true }));
-			});
-			if (currentClan?.badge_count && currentClan?.badge_count > 0) {
-				dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
-			}
-		}
-	}, []);
+	const { handleMarkAsReadClan } = useMarkAsRead();
 
 	const isShowMarkAllAsRead = useMemo(() => {
 		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;
@@ -169,7 +111,7 @@ function NotificationList({ rootRef }: NotificationProps) {
 								placement="top"
 							>
 								<button
-									onClick={handleMarkAllAsRead}
+									onClick={handleMarkAsReadClan}
 									className="flex items-center p-1 rounded-sm justify-center dark:bg-bgTertiary bg-bgLightModeButton"
 								>
 									<Icons.MarkAllAsRead className="w-5 h-5" />
