@@ -45,13 +45,12 @@ import { NavLink, useLocation } from 'react-router-dom';
 import ChannelStream from '../channel/ChannelStream';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
-import DirectUnreads from './directUnreads';
+import DirectUnread from './directUnreads';
 
 function MyApp() {
 	const elementHTML = document.documentElement;
 	const clans = useSelector(selectAllClans);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { userId } = useAuth();
 	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
@@ -228,18 +227,11 @@ function MyApp() {
 							</NavLink>
 						</SidebarTooltip>
 						{!!listUnreadDM?.length &&
-							listUnreadDM.map(
-								(dmGroupChatUnread) =>
-									dmGroupChatUnread?.last_sent_message?.sender_id !== userId && (
-										<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
-											<DirectUnreads
-												key={dmGroupChatUnread.id}
-												directMessage={dmGroupChatUnread}
-												countMessUnread={dmGroupChatUnread?.count_mess_unread || 0}
-											/>
-										</SidebarTooltip>
-									)
-							)}
+							listUnreadDM.map((dmGroupChatUnread) => (
+								<SidebarTooltip key={dmGroupChatUnread.id} titleTooltip={dmGroupChatUnread.channel_label}>
+									<DirectUnread directMessage={dmGroupChatUnread} />
+								</SidebarTooltip>
+							))}
 					</div>
 					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary duration-100 w-2/3"></div>
 					<div className="flex flex-col gap-3 ">
