@@ -25,7 +25,6 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
-	// const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
 	const numberNotification = useMemo(() => {
 		return currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
 	}, [currentChannel.count_mess_unread]);

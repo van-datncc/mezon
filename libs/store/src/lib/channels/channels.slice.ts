@@ -2,7 +2,7 @@ import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus,
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
-import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest, ApiMarkAsReadRequest } from 'mezon-js/api.gen';
 import { ApiChannelAppResponse } from 'mezon-js/dist/api.gen';
 import { fetchCategories } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
@@ -338,6 +338,27 @@ export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', as
 	const appChannelEntities = response.channel_apps;
 	return appChannelEntities || [];
 });
+
+export const markAsReadProcessing = createAsyncThunk(
+	'channels/markAsRead',
+	async ({ clan_id, category_id, channel_id }: ApiMarkAsReadRequest, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.markAsRead(mezon.session, {
+				clan_id,
+				category_id,
+				channel_id
+			});
+			if (!response) {
+				return thunkAPI.rejectWithValue([]);
+			}
+			return response;
+		} catch (error: any) {
+			const errmsg = await error.json();
+			return thunkAPI.rejectWithValue(errmsg.message);
+		}
+	}
+);
 
 export const initialChannelsState: ChannelsState = channelsAdapter.getInitialState({
 	loadingStatus: 'not loaded',

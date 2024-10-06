@@ -33,7 +33,6 @@ import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../componentUI';
 import { style } from './styles';
-import {ChannelStreamMode, ChannelType} from "mezon-js";
 
 interface IChannelMenuProps {
 	inviteRef: MutableRefObject<any>;

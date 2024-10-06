@@ -4,8 +4,8 @@ import { PinMessageEntity } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
+import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components';
 import { style } from './PinMessageItem.styles';
 
 interface IPinMessageItemProps {
