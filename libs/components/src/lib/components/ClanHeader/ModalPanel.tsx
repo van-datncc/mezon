@@ -1,7 +1,7 @@
 import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
-import React, { RefObject } from 'react';
+import React, { RefObject, useEffect } from 'react';
 import ItemModal from './ItemModal';
 
 type ModalPanelProps = {
@@ -34,7 +34,11 @@ const ModalPanel: React.FC<ModalPanelProps> = ({
 	useOnClickOutside(rootRef, () => setIsShowModalPanelClan(false));
 
 	const { handleMarkAsReadClan, statusMarkAsReadClan } = useMarkAsRead();
-
+	useEffect(() => {
+		if (statusMarkAsReadClan === 'success' || statusMarkAsReadClan === 'error') {
+			setIsShowModalPanelClan(false);
+		}
+	}, [statusMarkAsReadClan]);
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}

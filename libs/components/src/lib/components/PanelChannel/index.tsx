@@ -206,7 +206,11 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	};
 
 	const { handleMarkAsReadChannel, statusMarkAsReadChannel } = useMarkAsRead();
-
+	useEffect(() => {
+		if (statusMarkAsReadChannel === 'success' || statusMarkAsReadChannel === 'error') {
+			setIsShowPanelChannel(false);
+		}
+	}, [statusMarkAsReadChannel]);
 	return (
 		<div
 			ref={panelRef}

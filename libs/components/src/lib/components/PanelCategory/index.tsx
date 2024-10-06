@@ -135,6 +135,11 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 	useOnClickOutside(panelRef, handClosePannel);
 
 	const { handleMarkAsReadCategory, statusMarkAsReadCategory } = useMarkAsRead();
+	useEffect(() => {
+		if (statusMarkAsReadCategory === 'success' || statusMarkAsReadCategory === 'error') {
+			setIsShowPanelChannel(false);
+		}
+	}, [statusMarkAsReadCategory]);
 
 	return (
 		<div

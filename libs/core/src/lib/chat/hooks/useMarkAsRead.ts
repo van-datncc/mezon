@@ -143,31 +143,17 @@ export function useMarkAsRead() {
 }
 
 function getChannelsWithBadgeCountCategory(cat: ICategoryChannel) {
-	const allChannelsAndThreads = cat.channels.map((channel: any) => {
-		const threads = channel.threads.map((thread: ChannelsEntity) => ({
-			clan_id: thread.clan_id,
-			channel_id: thread.channel_id,
-			count_mess_unread: thread.count_mess_unread
-		}));
-
-		return [
-			{
-				clan_id: channel.clan_id,
-				channel_id: channel.channel_id,
-				count_mess_unread: channel.count_mess_unread
-			},
-			...threads
-		];
+	const allChannelsAndThreads = cat.channels.flatMap((channel: any) => {
+		const threads = channel.threads || [];
+		return [channel, ...threads];
 	});
 
-	const channelsWithBadge = allChannelsAndThreads
-		.flat()
-		.filter(
-			(item: ChannelsEntity) =>
-				item?.last_seen_message?.timestamp_seconds &&
-				item?.last_sent_message?.timestamp_seconds &&
-				item.last_seen_message?.timestamp_seconds < item.last_sent_message?.timestamp_seconds
-		);
+	const channelsWithBadge = allChannelsAndThreads.filter(
+		(item: ChannelsEntity) =>
+			item?.last_seen_message?.timestamp_seconds &&
+			item?.last_sent_message?.timestamp_seconds &&
+			item.last_seen_message.timestamp_seconds <= item.last_sent_message.timestamp_seconds
+	);
 
 	return channelsWithBadge;
 }
@@ -179,7 +165,7 @@ function getChannelsWithBadgeCountClan(channels: ChannelsEntity[]) {
 			(item: ChannelsEntity) =>
 				item?.last_seen_message?.timestamp_seconds &&
 				item?.last_sent_message?.timestamp_seconds &&
-				item.last_seen_message?.timestamp_seconds < item.last_sent_message?.timestamp_seconds
+				item.last_seen_message?.timestamp_seconds <= item.last_sent_message?.timestamp_seconds
 		);
 
 	return channelsWithBadge;
