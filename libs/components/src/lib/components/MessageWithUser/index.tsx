@@ -231,6 +231,7 @@ function MessageWithUser({
 					ref={panelRef}
 				>
 					<ModalUserProfile
+						onClose={() => setIsShowPanelChannel(false)}
 						userID={shortUserId}
 						classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
 						message={message}

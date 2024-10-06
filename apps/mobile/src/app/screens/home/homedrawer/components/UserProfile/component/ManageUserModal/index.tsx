@@ -17,8 +17,8 @@ import { Modal, ScrollView, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import { toastConfig } from '../../../../../../../configs/toastConfig';
 import { IMezonMenuSectionProps, MezonAvatar, MezonMenu, MezonModal } from '../../../../../../../componentUI';
+import { toastConfig } from '../../../../../../../configs/toastConfig';
 import KickUserClanModal from '../KickUserClanModal';
 import { EActionSettingUserProfile, IProfileSetting } from '../UserSettingProfile';
 

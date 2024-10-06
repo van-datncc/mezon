@@ -35,7 +35,6 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId, timestamp: timestamp }));
 		}
 	}, [channelId, dispatch, lastMessage]);
 }
@@ -47,7 +46,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const from = route.params?.from;
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
-	const dispatch = useAppDispatch();
 	useChannelSeen(directMessageId || '');
 
 	const currentChannel = useSelector(selectCurrentChannel);

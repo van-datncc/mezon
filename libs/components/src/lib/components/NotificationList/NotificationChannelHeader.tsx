@@ -1,8 +1,9 @@
-import { selectClanById, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
+import { useMarkAsRead } from '@mezon/core';
+import { selectChannelById, selectClanById, selectTheme, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, TNotificationChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 type NotificationChannelHeaderProps = {
@@ -14,20 +15,16 @@ type NotificationChannelHeaderProps = {
 };
 
 const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notification, onDeleteNotification }: NotificationChannelHeaderProps) => {
-	const dispatch = useAppDispatch();
 	const clan = useAppSelector(selectClanById(clan_id as string));
+	const channelId = useMemo(() => {
+		return itemUnread?.channel_id ? itemUnread.channel_id : '';
+	}, [itemUnread?.channel_id]);
+
+	const getChannel = useSelector(selectChannelById(channelId));
+
 	const appearanceTheme = useSelector(selectTheme);
 
-	const numberNotification = useMemo(() => {
-		return itemUnread?.notifications.length;
-	}, [itemUnread?.notifications.length]);
-
-	const handleMarkAsRead = useCallback(() => {
-		// const timestamp = Date.now() / 1000;
-		// dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-		// dispatch(clansActions.updateClanBadgeCount({ clanId: itemUnread?.clan_id ?? '', count: numberNotification * -1 }));
-		// dispatch(channelsActions.updateChannelBadgeCount({ channelId: itemUnread?.channel_id ?? '', count: numberNotification * -1 }));
-	}, [dispatch]);
+	const { handleMarkAsReadChannel } = useMarkAsRead();
 
 	return (
 		<div className="flex justify-between">
@@ -92,7 +89,7 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 						>
 							<button
 								className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-								onClick={handleMarkAsRead}
+								onClick={() => handleMarkAsReadChannel(getChannel)}
 							>
 								✔
 							</button>{' '}
