@@ -69,7 +69,6 @@ export function useMarkAsRead() {
 
 			try {
 				const result = await actionMarkAsRead(body);
-				console.log('Mark as read success:', result);
 
 				setStatusMarkAsReadChannel('success');
 				resetCountChannelBadge(channel);
@@ -90,7 +89,7 @@ export function useMarkAsRead() {
 
 			setStatusMarkAsReadCategory('pending');
 			try {
-				// const result = await actionMarkAsRead(body);
+				const result = await actionMarkAsRead(body);
 				const allChannelsAndThreads = getChannelsWithBadgeCountCategory(category);
 				setStatusMarkAsReadCategory('success');
 				allChannelsAndThreads.forEach((channel: ChannelsEntity) => {
@@ -111,7 +110,7 @@ export function useMarkAsRead() {
 
 		setStatusMarkAsReadClan('pending');
 		try {
-			// const result = await actionMarkAsRead(body);
+			const result = await actionMarkAsRead(body);
 			const allChannelsAndThreads = getChannelsWithBadgeCountClan(channelsInClan);
 			setStatusMarkAsReadClan('success');
 			allChannelsAndThreads.forEach((channel: ChannelsEntity) => {
