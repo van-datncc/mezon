@@ -1,4 +1,4 @@
-import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
+import { useEscapeKeyClose, useMarkAsRead, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
@@ -26,7 +26,7 @@ import {
 import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
-import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
 import GroupPanels from './GroupPanels';
@@ -80,10 +80,6 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
-
-	const numberNotification = useMemo(() => {
-		return channel.count_mess_unread ? channel.count_mess_unread : 0;
-	}, [channel.count_mess_unread]);
 
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -209,14 +205,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 		dispatch(channelsActions.openCreateNewModalChannel(true));
 	};
 
-	const handleMarkAsRead = useCallback(() => {
-		if (isUnread) {
-			// const timestamp = Date.now() / 1000;
-			// dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel?.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-			// dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
-			// dispatch(channelsActions.updateChannelBadgeCount({ channelId: channel?.channel_id ?? '', count: numberNotification * -1 }));
-		}
-	}, []);
+	const { handleMarkAsReadChannel, statusMarkAsReadChannel } = useMarkAsRead();
 
 	return (
 		<div
@@ -226,7 +215,12 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm shadow z-20 w-[200px] py-[10px] px-[10px]"
 		>
 			<GroupPanels>
-				<ItemPanel onClick={handleMarkAsRead} children="Mark As Read" />
+				<ItemPanel
+					onClick={statusMarkAsReadChannel === 'pending' ? undefined : () => handleMarkAsReadChannel(channel)}
+					disabled={statusMarkAsReadChannel === 'pending'}
+				>
+					{statusMarkAsReadChannel === 'pending' ? 'Processing...' : 'Mark As Read'}
+				</ItemPanel>
 			</GroupPanels>
 			<GroupPanels>
 				<ItemPanel children="Invite People" />

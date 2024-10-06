@@ -1,5 +1,9 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
+	channelMetaActions,
+	channelsActions,
+	clansActions,
+	markAsReadProcessing,
 	notificationActions,
 	selectAllChannelLastSeenTimestampByClanId,
 	selectAllNotificationExcludeMentionAndReply,
@@ -12,6 +16,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { INotification, NotificationEntity, sortNotificationsByDate } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
+import { ApiMarkAsReadRequest } from 'mezon-js/api.gen';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyNotification from './EmptyNotification';
@@ -107,16 +112,23 @@ function NotificationList({ rootRef }: NotificationProps) {
 		return getMessageLastest(getListCreatedTime);
 	}, [getListCreatedTime]);
 
-	const handleMarkAllAsRead = useCallback(() => {
-		// const timestamp = Date.now() / 1000;
-		// getLastestMessage.forEach((list: ListCreatimeMessage) => {
-		// 	dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: list.channelId, timestamp }));
-		// 	dispatch(channelsActions.updateChannelBadgeCount({ channelId: list.channelId ?? '', count: 0, isReset: true }));
-		// });
-		// if (currentClan?.badge_count && currentClan?.badge_count > 0) {
-		// 	dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
-		// }
-	}, [getLastestMessage, dispatch, currentClan?.badge_count]);
+	const handleMarkAllAsRead = useCallback(async () => {
+		console.log('mark all as read inbox tab');
+		const body: ApiMarkAsReadRequest = {
+			clan_id: currentClan?.clan_id ?? ''
+		};
+		const result = await dispatch(markAsReadProcessing(body));
+		if (result.payload) {
+			const timestamp = Date.now() / 1000;
+			getLastestMessage.forEach((list: ListCreatimeMessage) => {
+				dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: list.channelId, timestamp }));
+				dispatch(channelsActions.updateChannelBadgeCount({ channelId: list.channelId ?? '', count: 0, isReset: true }));
+			});
+			if (currentClan?.badge_count && currentClan?.badge_count > 0) {
+				dispatch(clansActions.updateClanBadgeCount({ clanId: currentClan?.clan_id ?? '', count: currentClan?.badge_count * -1 }));
+			}
+		}
+	}, []);
 
 	const isShowMarkAllAsRead = useMemo(() => {
 		return unReadReplyAndMentionList.length > 0 && currentTabNotify === InboxType.UNREADS;
