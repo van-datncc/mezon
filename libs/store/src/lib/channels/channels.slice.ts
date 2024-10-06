@@ -97,6 +97,13 @@ type JoinChatPayload = {
 export const joinChat = createAsyncThunk(
 	'channels/joinChat',
 	async ({ clanId, parentId, channelId, channelType, isPublic, isParentPublic }: JoinChatPayload, thunkAPI) => {
+		if (
+			channelType !== ChannelType.CHANNEL_TYPE_TEXT &&
+			channelType !== ChannelType.CHANNEL_TYPE_DM &&
+			channelType !== ChannelType.CHANNEL_TYPE_GROUP
+		) {
+			return null;
+		}
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const channel = await mezon.socketRef.current?.joinChat(clanId, parentId, channelId, channelType, isPublic, isParentPublic);

@@ -14,7 +14,7 @@ import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
-import { MezonAvatar } from '../../../../../../../app/temp-ui';
+import { MezonAvatar } from '../../../../../../componentUI';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { style } from '../RenderMessageInvite.styles';
 
