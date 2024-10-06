@@ -547,17 +547,6 @@ export const channelsSlice = createSlice({
 				return acc;
 			}, {});
 		});
-		builder
-			.addCase(markAsReadProcessing.pending, (state: ChannelsState) => {
-				state.loadingStatus = 'loading';
-			})
-			.addCase(markAsReadProcessing.fulfilled, (state: ChannelsState) => {
-				state.loadingStatus = 'loaded';
-			})
-			.addCase(markAsReadProcessing.rejected, (state: ChannelsState, action) => {
-				state.loadingStatus = 'error';
-				state.error = action.error.message;
-			});
 	}
 });
 

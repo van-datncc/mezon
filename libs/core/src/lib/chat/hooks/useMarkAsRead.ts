@@ -160,13 +160,27 @@ function getChannelsWithBadgeCountCategory(cat: ICategoryChannel) {
 		];
 	});
 
-	const channelsWithBadge = allChannelsAndThreads.flat().filter((item: ChannelsEntity) => item?.count_mess_unread && item?.count_mess_unread > 0);
+	const channelsWithBadge = allChannelsAndThreads
+		.flat()
+		.filter(
+			(item: ChannelsEntity) =>
+				item?.last_seen_message?.timestamp_seconds &&
+				item?.last_sent_message?.timestamp_seconds &&
+				item.last_seen_message?.timestamp_seconds < item.last_sent_message?.timestamp_seconds
+		);
 
 	return channelsWithBadge;
 }
 
 function getChannelsWithBadgeCountClan(channels: ChannelsEntity[]) {
-	const channelsWithBadge = channels.flat().filter((item: ChannelsEntity) => item?.count_mess_unread && item?.count_mess_unread > 0);
+	const channelsWithBadge = channels
+		.flat()
+		.filter(
+			(item: ChannelsEntity) =>
+				item?.last_seen_message?.timestamp_seconds &&
+				item?.last_sent_message?.timestamp_seconds &&
+				item.last_seen_message?.timestamp_seconds < item.last_sent_message?.timestamp_seconds
+		);
 
 	return channelsWithBadge;
 }
