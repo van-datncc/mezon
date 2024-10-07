@@ -21,6 +21,7 @@ export interface AppState {
 	error?: string | null;
 	isShowMemberList: boolean;
 	isShowChatStream: boolean;
+	chatStreamWidth: number;
 	isShowMemberListDM: boolean;
 	isUseProfileDM: boolean;
 	initialPath?: string;
@@ -41,6 +42,7 @@ export const initialAppState: AppState = {
 	themeApp: 'dark',
 	isShowMemberList: true,
 	isShowChatStream: false,
+	chatStreamWidth: 0,
 	isShowMemberListDM: true,
 	isUseProfileDM: true,
 	initialPath: '/',
@@ -106,6 +108,9 @@ export const appSlice = createSlice({
 		},
 		setIsShowChatStream: (state, action) => {
 			state.isShowChatStream = action.payload;
+		},
+		setChatStreamWidth: (state, action) => {
+			state.chatStreamWidth = action.payload;
 		},
 		setInitialPath: (state, action) => {
 			state.initialPath = action.payload;
@@ -185,6 +190,8 @@ export const selectError = createSelector(getAppState, (state: AppState) => stat
 export const selectIsShowMemberList = createSelector(getAppState, (state: AppState) => state.isShowMemberList);
 
 export const selectIsShowChatStream = createSelector(getAppState, (state: AppState) => state.isShowChatStream);
+
+export const selectChatStreamWidth = createSelector(getAppState, (state: AppState) => state.chatStreamWidth);
 
 export const selectInitialPath = createCachedSelector(getAppState, (state: AppState) => state.initialPath);
 

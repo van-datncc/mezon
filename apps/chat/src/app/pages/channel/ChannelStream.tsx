@@ -414,7 +414,9 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 			<div className="flex flex-col justify-center gap-2 w-full bg-black">
 				<div className="relative min-h-40 items-center flex justify-center">
 					{hlsUrl ? (
-						<div className={`transition-all duration-300 h-full w-${showMembers && !isShowChatStream ? '[70%]' : '[100%]'}`}>
+						<div
+							className={`transition-all duration-300 h-full max-sm:w-full w-${showMembers && !isShowChatStream ? '[70%]' : '[100%]'}`}
+						>
 							<HLSPlayer src={hlsUrl} />
 						</div>
 					) : (
