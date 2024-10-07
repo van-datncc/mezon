@@ -8,6 +8,7 @@ import {
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
+	selectFetchChannelStatus,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectStatusMenu,
@@ -25,6 +26,8 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
+	const statusFetchChannel = useSelector(selectFetchChannelStatus);
+
 	const numberNotification = useMemo(() => {
 		return currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
 	}, [currentChannel.count_mess_unread]);
@@ -35,11 +38,13 @@ function useChannelSeen(channelId: string) {
 	}, [channelId, currentChannel, dispatch, numberNotification]);
 
 	useEffect(() => {
+		if (!statusFetchChannel) return;
+		const numberNotification = currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
-	}, [numberNotification]);
+	}, [currentChannel.id, statusFetchChannel]);
 }
 
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
@@ -122,7 +127,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 			>
 				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 					<div
-						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
+						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && 'hidden'} z-10`}
 					>
 						<div
 							className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}

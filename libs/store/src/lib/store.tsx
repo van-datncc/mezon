@@ -77,7 +77,7 @@ const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
 		storage,
-		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile', 'isShowChatStream']
+		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile', 'isShowChatStream', 'chatStreamWidth']
 	},
 	appReducer
 );

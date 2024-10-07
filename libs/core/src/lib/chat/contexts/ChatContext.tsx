@@ -26,6 +26,8 @@ import {
 	mapReactionToEntity,
 	messagesActions,
 	notificationActions,
+	overriddenPoliciesActions,
+	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
 	reactionActions,
@@ -63,10 +65,12 @@ import {
 	ClanProfileUpdatedEvent,
 	CustomStatusEvent,
 	EventEmoji,
+	EventUserPermissionChannel,
 	LastPinMessageEvent,
 	MessageTypingEvent,
 	Notification,
 	RoleEvent,
+	SetPermissionChannelEvent,
 	Socket,
 	StatusPresenceEvent,
 	StickerCreateEvent,
@@ -85,9 +89,10 @@ import {
 	VoiceLeavedEvent
 } from 'mezon-js';
 import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'mezon-js/api.gen';
+import { ApiPermissionUpdate } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
@@ -269,9 +274,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const location = useLocation();
+	const isFriendPageView = location.pathname === '/chat/direct/friends';
+	const isDirectViewPage = location.pathname.includes('/chat/direct/message/');
+
 	const onnotification = useCallback(
 		async (notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') {
+			if (
+				(currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') ||
+				isDirectViewPage ||
+				isFriendPageView
+			) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
@@ -289,7 +302,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
-		[currentChannel?.channel_id, dispatch]
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, location.pathname]
 	);
 
 	const onpinmessage = useCallback(
@@ -672,9 +685,43 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 				}
+				if (channelUpdated.app_url) {
+					dispatch(channelsActions.fetchAppChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+				}
 			}
 		},
 		[dispatch, userId]
+	);
+
+	const onsetpermissionchannel = useCallback(
+		(setPermission: SetPermissionChannelEvent) => {
+			if (userId !== setPermission.caller) {
+				const permissionRoleChannels: ApiPermissionUpdate[] = setPermission.permission_updates
+					.filter((permission: ApiPermissionUpdate) => permission.type !== 0)
+					.map((permission: ApiPermissionUpdate) => ({
+						permission_id: permission.permission_id,
+						active: permission.type === 1 ? true : permission.type === 2 ? false : undefined
+					}));
+
+				dispatch(
+					permissionRoleChannelActions.updatePermission({
+						roleId: setPermission.role_id,
+						channelId: setPermission.channel_id,
+						permissionRole: permissionRoleChannels
+					})
+				);
+			}
+		},
+		[dispatch, userId]
+	);
+
+	const onuserpermissionchannel = useCallback(
+		(userPermission: EventUserPermissionChannel) => {
+			if (userId === userPermission.user_id && channelId === userPermission.channel_id) {
+				dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId || '', channelId, noCache: true }));
+			}
+		},
+		[dispatch, userId, channelId, clanId]
 	);
 
 	const oneventcreated = useCallback(
@@ -856,6 +903,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onchannelupdated = onchannelupdated;
 
+			socket.onsetpermissionchannel = onsetpermissionchannel;
+
+			socket.onuserpermissionchannel = onuserpermissionchannel;
+
 			socket.oneventcreated = oneventcreated;
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
@@ -871,6 +922,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onchannelmessage,
 			onchannelpresence,
 			onchannelupdated,
+			onsetpermissionchannel,
+			onuserpermissionchannel,
 			onerror,
 			onmessagereaction,
 			onmessagetyping,
@@ -960,8 +1013,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onnotification = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
-			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.oncustomstatus = () => {};
@@ -1026,6 +1077,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchannelcreated,
 		onchanneldeleted,
 		onchannelupdated,
+		onsetpermissionchannel,
+		onuserpermissionchannel,
 		onHeartbeatTimeout,
 		oneventcreated,
 		setCallbackEventFn,

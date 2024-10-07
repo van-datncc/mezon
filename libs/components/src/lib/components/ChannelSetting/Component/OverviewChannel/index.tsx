@@ -1,8 +1,9 @@
-import { channelsActions, useAppDispatch } from '@mezon/store';
+import { channelsActions, selectAppChannelById, useAppDispatch } from '@mezon/store';
 import { InputField, TextArea } from '@mezon/ui';
-import { IChannel, ValidateSpecialCharacters } from '@mezon/utils';
-import { ApiUpdateChannelDescRequest } from 'mezon-js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { IChannel, ValidateSpecialCharacters, ValidateURL } from '@mezon/utils';
+import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 
 export type OverviewChannelProps = {
@@ -11,52 +12,81 @@ export type OverviewChannelProps = {
 
 const OverviewChannel = (props: OverviewChannelProps) => {
 	const { channel } = props;
+	const channelApp = useSelector(selectAppChannelById(channel?.id) || {});
+	const [appUrlInit, setAppUrlInit] = useState(channelApp?.url || '');
+	const [appUrl, setAppUrl] = useState(appUrlInit);
 	const dispatch = useAppDispatch();
 	const [channelLabelInit, setChannelLabelInit] = useState(channel.channel_label);
 	const [topicInit, setTopicInit] = useState('');
-
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [topic, setTopic] = useState(topicInit);
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
 	const [checkValidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(channelLabelInit || ''));
+	const [checkValidateUrl, setCheckValidateUrl] = useState(!ValidateURL().test(appUrlInit || ''));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
 	const isThread = channel.parrent_id !== '0';
 	const label = useMemo(() => {
 		return isThread ? 'thread' : 'channel';
 	}, [isThread]);
 
-	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setTopic(e.target.value);
-		setCountCharacterTopic(1024 - e.target.value.length);
-	};
+	const handleChangeTextArea = useCallback(
+		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+			setTopic(e.target.value);
+			setCountCharacterTopic(1024 - e.target.value.length);
+		},
+		[topic, countCharacterTopic]
+	);
 
-	const handleDisplayChannelLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setChannelLabel(value);
-		const regex = ValidateSpecialCharacters();
-		if (regex.test(value) && value !== '') {
-			setCheckValidate(false);
-		} else {
-			setCheckValidate(true);
-		}
-	};
+	const handleDisplayChannelLabel = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			setChannelLabel(value);
+			const regex = ValidateSpecialCharacters();
+			if (regex.test(value) && value !== '') {
+				setCheckValidate(false);
+			} else {
+				setCheckValidate(true);
+			}
+		},
+		[channelLabel, checkValidate]
+	);
 
-	const handleReset = () => {
+	const handleDisplayAppUrl = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			setAppUrl(value);
+			const regex = ValidateURL();
+			if (regex.test(value) && value !== '') {
+				setCheckValidateUrl(false);
+			} else {
+				setCheckValidateUrl(true);
+			}
+		},
+		[appUrl, checkValidateUrl]
+	);
+
+	const handleReset = useCallback(() => {
 		setTopic(topicInit);
 		setChannelLabel(channelLabelInit);
-	};
+		setAppUrl(appUrlInit);
+	}, [topicInit, channelLabelInit, appUrlInit]);
 
-	const handleSave = async () => {
+	const handleSave = useCallback(async () => {
+		const updatedChannelLabel = channelLabel === channelLabelInit ? '' : channelLabel;
+		const updatedAppUrl = appUrl === appUrlInit ? '' : appUrl;
+
 		setChannelLabelInit(channelLabel);
+		setAppUrlInit(appUrl);
 		setTopicInit(topic);
+
 		const updateChannel: ApiUpdateChannelDescRequest = {
 			channel_id: channel.channel_id || '',
-			channel_label: channelLabel,
+			channel_label: updatedChannelLabel,
 			category_id: channel.category_id,
-			app_url: ''
+			app_url: updatedAppUrl
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
-	};
+	}, [channelLabel, channelLabelInit, appUrl, appUrlInit, topic, channel, dispatch]);
 
 	useEffect(() => {
 		const textArea = textAreaRef.current;
@@ -84,6 +114,24 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 						Please enter a valid {label} name (max 64 characters, only words, numbers, _ or -).
 					</p>
 				)}
+
+				{channel.type === ChannelType.CHANNEL_TYPE_APP && (
+					<>
+						<hr className="border-t border-solid dark:border-borderDefault my-10" />
+						<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">App URL</p>
+						<InputField
+							type="text"
+							placeholder={appUrl}
+							value={appUrl}
+							onChange={handleDisplayAppUrl}
+							className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
+						/>
+						{checkValidateUrl && (
+							<p className="text-[#e44141] text-xs italic font-thin">Please enter a valid URL (e.g., https://example.com).</p>
+						)}
+					</>
+				)}
+
 				<hr className="border-t border-solid dark:border-borderDefault my-10" />
 				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">{label} Topic</p>
 				<div className="relative">
@@ -99,7 +147,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
 				</div>
 			</div>
-			{(channelLabelInit !== channelLabel || topicInit !== topic) && !checkValidate && (
+			{(channelLabelInit !== channelLabel || appUrlInit !== appUrl || topicInit !== topic) && !checkValidate && !checkValidateUrl && (
 				<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 			)}
 		</div>
