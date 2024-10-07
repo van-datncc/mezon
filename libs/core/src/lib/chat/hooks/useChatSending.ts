@@ -1,11 +1,4 @@
-import {
-	messagesActions,
-	selectAllAccount,
-	selectAnonymousMode,
-	selectChannelById,
-	selectNewMesssageUpdateImage,
-	useAppDispatch
-} from '@mezon/store';
+import { messagesActions, selectAllAccount, selectAnonymousMode, selectChannelById, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -40,12 +33,11 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	const parent = useSelector(selectChannelById(parentId || ''));
 
 	const isParentPublic = useMemo(() => {
-		return !parent?.channel_private;
+		return parent ? !parent.channel_private : false;
 	}, [parent?.channel_private]);
 
 	const userProfile = useSelector(selectAllAccount);
 	const currentUserId = userProfile?.user?.id || '';
-	const newMessageUpdateImage = useSelector(selectNewMesssageUpdateImage);
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const dispatch = useAppDispatch();
 	const { clientRef, sessionRef, socketRef } = useMezon();

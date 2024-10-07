@@ -1,7 +1,9 @@
-import { selectClanById, selectTheme, useAppSelector } from '@mezon/store';
+import { useMarkAsRead } from '@mezon/core';
+import { selectChannelById, selectClanById, selectTheme, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { INotification, TNotificationChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 type NotificationChannelHeaderProps = {
@@ -9,20 +11,20 @@ type NotificationChannelHeaderProps = {
 	notification?: INotification;
 	isUnreadTab?: boolean;
 	clan_id?: string;
-	onMarkAsRead?: () => void;
 	onDeleteNotification?: () => void;
 };
 
-const NotificationChannelHeader = ({
-	itemUnread,
-	isUnreadTab,
-	clan_id,
-	notification,
-	onMarkAsRead,
-	onDeleteNotification
-}: NotificationChannelHeaderProps) => {
+const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notification, onDeleteNotification }: NotificationChannelHeaderProps) => {
 	const clan = useAppSelector(selectClanById(clan_id as string));
+	const channelId = useMemo(() => {
+		return itemUnread?.channel_id ? itemUnread.channel_id : '';
+	}, [itemUnread?.channel_id]);
+
+	const getChannel = useSelector(selectChannelById(channelId));
+
 	const appearanceTheme = useSelector(selectTheme);
+
+	const { handleMarkAsReadChannel } = useMarkAsRead();
 
 	return (
 		<div className="flex justify-between">
@@ -87,7 +89,7 @@ const NotificationChannelHeader = ({
 						>
 							<button
 								className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
-								onClick={onMarkAsRead}
+								onClick={() => handleMarkAsReadChannel(getChannel)}
 							>
 								✔
 							</button>{' '}

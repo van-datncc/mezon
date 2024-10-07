@@ -13,7 +13,6 @@ import {
 } from '@mezon/core';
 import {
 	directMetaActions,
-	messagesActions,
 	selectAllRolesClan,
 	selectCurrentChannel,
 	selectCurrentClan,
@@ -181,8 +180,7 @@ const PanelMember = ({
 	const handleMarkAsRead = useCallback(
 		(directId: string) => {
 			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectMetaLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
-			dispatch(messagesActions.setDirectMessageUnread({ directId: directId, message: [] }));
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: directId, timestamp: timestamp }));
 		},
 		[dispatch]
 	);

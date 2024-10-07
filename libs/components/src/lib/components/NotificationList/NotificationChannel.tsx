@@ -37,14 +37,6 @@ const NotificationChannel = ({ unreadListConverted, isUnreadTab, notification }:
 
 	const groupedUnreadArray = Object.values(groupedUnread);
 
-	const handleMarkAsRead = useCallback(
-		(itemUnread: TNotificationChannel) => {
-			const timestamp = Date.now() / 1000;
-			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: itemUnread.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-		},
-		[dispatch]
-	);
-
 	const handleDeleteNotification = useCallback(
 		(notification: INotification) => {
 			const timestamp = Date.now() / 1000;
@@ -64,12 +56,7 @@ const NotificationChannel = ({ unreadListConverted, isUnreadTab, notification }:
 			{groupedUnreadArray.length > 0 &&
 				groupedUnreadArray.map((itemUnread, index) => (
 					<div key={itemUnread.channel_id} className="flex flex-col gap-2 py-3 px-3 w-full">
-						<NotificationChannelHeader
-							onMarkAsRead={() => handleMarkAsRead(itemUnread)}
-							isUnreadTab={isUnreadTab}
-							itemUnread={itemUnread}
-							clan_id={itemUnread.clan_id}
-						/>
+						<NotificationChannelHeader isUnreadTab={isUnreadTab} itemUnread={itemUnread} clan_id={itemUnread.clan_id} />
 						{itemUnread.notifications.map((notification) => (
 							<NotifyMentionItem isUnreadTab={false} notify={notification} key={`mention-${notification.id}-${index}`} />
 						))}

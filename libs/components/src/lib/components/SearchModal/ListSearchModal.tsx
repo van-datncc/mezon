@@ -1,35 +1,38 @@
 import { SearchItemProps, TypeSearch } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { memo } from 'react';
-import SuggestItem from '../MessageBox/ReactionMentionInput/SuggestItem';
+import { useContext, useMemo } from 'react';
+import { SuggestItem } from '../../components';
+import { ListGroupSearchModalContext } from './ListGroupSearchModalContext';
 
 type ListSearchModalProps = {
 	listSearch: SearchItemProps[];
 	searchText: string;
-	itemRef: React.MutableRefObject<HTMLDivElement | null>;
-	idActive: string;
-	handleSelect: (type: boolean, item: SearchItemProps) => Promise<void>;
-	setIdActive: React.Dispatch<React.SetStateAction<string>>;
-	isSearchByUsername?: boolean;
+	focusItemId: string;
+	onMouseEnter: (item: SearchItemProps) => void;
+	onItemClick: (item: SearchItemProps) => void;
 };
 
 const ListSearchModal = (props: ListSearchModalProps) => {
-	const { listSearch, itemRef, searchText, idActive, handleSelect, setIdActive, isSearchByUsername } = props;
+	const { listSearch, searchText, focusItemId, onItemClick, onMouseEnter } = props;
+	const { itemRefs } = useContext(ListGroupSearchModalContext) ?? {};
+
+	const searchingUser = useMemo(() => {
+		return searchText.startsWith('@');
+	}, [searchText]);
 
 	return (
 		listSearch.length > 0 &&
 		listSearch.map((item: SearchItemProps) => {
-			const isTypeChannel = item.typeChat === TypeSearch.Channel_Type;
+			const isChannel = item.typeChat === TypeSearch.Channel_Type;
 			return (
 				<div
-					ref={itemRef}
 					key={item.id}
-					onClick={() => handleSelect(isTypeChannel, item)}
-					onMouseEnter={() => setIdActive(item.id ?? '')}
-					onMouseLeave={() => setIdActive(item.id ?? '')}
-					className={`${idActive === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+					ref={(element) => item?.id && itemRefs && (itemRefs[item.id] = element)}
+					onClick={() => onItemClick(item)}
+					onMouseEnter={() => onMouseEnter(item)}
+					className={`${focusItemId === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 				>
-					{isTypeChannel ? (
+					{isChannel ? (
 						<SuggestItem
 							display={item?.prioritizeName}
 							symbol={item.icon}
@@ -46,11 +49,11 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							display={item?.prioritizeName}
 							avatarUrl={item?.avatarUser}
 							showAvatar
-							valueHightLight={isSearchByUsername ? searchText.slice(1) : searchText}
+							valueHightLight={searchingUser ? searchText.slice(1) : searchText}
 							subText={item.type === ChannelType.CHANNEL_TYPE_DM ? item?.name : ''}
 							wrapSuggestItemStyle="gap-x-1"
 							subTextStyle="text-[13px]"
-							isHightLight={!isSearchByUsername}
+							isHightLight={!searchingUser}
 							emojiId=""
 						/>
 					)}
@@ -60,4 +63,4 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 	);
 };
 
-export default memo(ListSearchModal);
+export default ListSearchModal;

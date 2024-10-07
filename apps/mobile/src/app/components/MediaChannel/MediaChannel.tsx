@@ -1,6 +1,6 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectAttachmentPhoto } from '@mezon/store-mobile';
-import { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { Dimensions, Platform, ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { EmptySearchPage } from '../EmptySearchPage';
@@ -8,7 +8,7 @@ import { ImageListModal } from '../ImageListModal';
 import { style } from './MediaChannel.styles';
 import { MediaItem } from './MediaItem';
 
-const MediaChannel = () => {
+const MediaChannel = memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const attachments = useSelector(selectAttachmentPhoto());
@@ -48,6 +48,6 @@ const MediaChannel = () => {
 			{visibleImageModal && <ImageListModal visible={visibleImageModal} onClose={onCloseModalImage} imageSelected={imageSelected} />}
 		</View>
 	);
-};
+});
 
 export default MediaChannel;

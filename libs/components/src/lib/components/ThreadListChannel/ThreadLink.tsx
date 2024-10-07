@@ -1,8 +1,7 @@
-import { selectIsUnreadChannelById, selectLastChannelTimestamp, selectMentionAndReplyUnreadByChanneld, useAppSelector } from '@mezon/store';
+import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
-import React, { memo, useImperativeHandle, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { memo, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Coords, classes } from '../ChannelLink';
 import SettingChannel from '../ChannelSetting';
@@ -24,10 +23,9 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadChannelById(state, thread.id));
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 
-	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(thread.channel_id ?? ''));
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(thread.clan_id ?? '', thread.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
+	const numberNotification = useMemo(() => {
+		return thread.count_mess_unread ? thread.count_mess_unread : 0;
+	}, [thread.count_mess_unread]);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);

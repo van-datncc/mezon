@@ -53,7 +53,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_DM || mode == ChannelStreamMode.STREAM_MODE_GROUP;
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
-			{message.references?.length ? (
+			{message.references?.[0].message_ref_id ? (
 				<div className="rounded flex flex-row gap-1 items-center justify-start w-fit text-[14px] ml-5 mb-[-5px] mt-1 replyMessage">
 					<Icons.ReplyCorner />
 					<div className="flex flex-row gap-1 mb-2 pr-12 items-center w-full">
@@ -62,7 +62,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
-								src={isDM ? messageSender?.user?.avatar_url : messageSender?.clan_avatar}
+								src={isDM ? messageSender?.user?.avatar_url : messageSender?.clan_avatar || messageSender?.user?.avatar_url}
 							/>
 						</div>
 

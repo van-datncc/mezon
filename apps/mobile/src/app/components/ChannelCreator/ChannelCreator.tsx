@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch } from '../../componentUI';
 import { APP_SCREEN, MenuClanScreenProps } from '../../navigation/ScreenTypes';
-import { IMezonMenuSectionProps, MezonInput, MezonMenu, MezonOption, MezonSwitch } from '../../temp-ui';
 import { validInput } from '../../utils/validate';
 import { style } from './styles';
 
@@ -80,7 +80,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 		}
 
 		if (newChannelCreatedId && channelType !== ChannelType.CHANNEL_TYPE_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING) {
-			navigation.navigate('HomeDefault' as any);
+			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 			navigation.dispatch(DrawerActions.closeDrawer());
 			requestAnimationFrame(async () => {
 				await store.dispatch(channelsActions.joinChannel({ clanId: clanID ?? '', channelId: channelID, noFetchMembers: false }));

@@ -1,19 +1,20 @@
-import { useAppNavigation, usePermissionChecker, useThreads } from '@mezon/core';
+import { useAppNavigation, useAppParams, usePermissionChecker, useThreads } from '@mezon/core';
 import {
 	appActions,
 	notificationActions,
 	searchMessagesActions,
-	selectAllChannelMeta,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
+	selectCurrentClan,
+	selectCurrentClanId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
+	selectIsShowChatStream,
 	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectLastPinMessageByChannelId,
 	selectLastSeenPinMessageChannelById,
-	selectMentionAndReplyUnreadAllClan,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -83,16 +84,22 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
 	const { setTurnOffThreadMessage } = useThreads();
 	const appearanceTheme = useSelector(selectTheme);
+	const isShowChatStream = useSelector(selectIsShowChatStream);
+	const currentClanId = useSelector(selectCurrentClanId);
 	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
 	const isShowSettingChannel = hasChannelManagePermission;
 	const param = useParams();
+	const { toMembersPage } = useAppNavigation();
+	const { currentURL } = useAppParams();
+	const memberPath = toMembersPage(currentClanId || '');
+
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
 				<ChannelLabel channel={channel} />
 			</div>
-			{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-				<div className="items-center h-full ml-auto flex">
+			<div className="items-center h-full ml-auto flex">
+				{channel?.type !== ChannelType.CHANNEL_TYPE_STREAMING ? (
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
@@ -116,8 +123,10 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 							<ChannelListButton />
 						</div>
 					</div>
-				</div>
-			)}
+				) : (
+					!isShowChatStream && memberPath !== currentURL && <ChatButton isLightMode={appearanceTheme === 'light'} />
+				)}
+			</div>
 		</>
 	);
 }
@@ -137,7 +146,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
 			<Tooltip
-				className={`${isShowThread && 'hidden'}`}
+				className={`${isShowThread && 'hidden'}  flex justify-center items-center`}
 				content="Threads"
 				trigger="hover"
 				animation="duration-500"
@@ -157,32 +166,32 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+
 	useEffect(() => {
-		if (
-			getNotificationChannelSelected?.active === 1 &&
-			getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE
-		) {
-			setIsMuteBell(true);
-		} else if (getNotificationChannelSelected?.id !== '0' && getNotificationChannelSelected?.active !== 1) {
-			setIsMuteBell(true);
-		} else if (getNotificationChannelSelected?.id === '0') {
+		const shouldMuteBell = (): boolean => {
 			if (
-				defaultNotificationCategory?.notification_setting_type &&
-				defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE
+				getNotificationChannelSelected?.active === 1 &&
+				getNotificationChannelSelected?.notification_setting_type === NotificationType.NOTHING_MESSAGE
 			) {
-				setIsMuteBell(true);
-			} else if (
-				defaultNotificationClan?.notification_setting_type &&
-				defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE
-			) {
-				setIsMuteBell(true);
-			} else {
-				setIsMuteBell(false);
+				return true;
 			}
-		} else {
-			setIsMuteBell(false);
-		}
+
+			if (getNotificationChannelSelected?.id !== '0' && getNotificationChannelSelected?.active !== 1) {
+				return true;
+			}
+
+			if (getNotificationChannelSelected?.id === '0') {
+				if (defaultNotificationCategory?.notification_setting_type === NotificationType.NOTHING_MESSAGE) {
+					return true;
+				}
+				return defaultNotificationClan?.notification_setting_type === NotificationType.NOTHING_MESSAGE;
+			}
+
+			return false;
+		};
+		setIsMuteBell(shouldMuteBell());
 	}, [getNotificationChannelSelected, defaultNotificationCategory, defaultNotificationClan]);
+
 	const [isShowNotificationSetting, setIsShowNotificationSetting] = useState<boolean>(false);
 	const notiRef = useRef<HTMLDivElement | null>(null);
 
@@ -197,7 +206,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	return (
 		<div className="relative leading-5 h-5" ref={notiRef}>
 			<Tooltip
-				className={`${isShowNotificationSetting && 'hidden'} w-[164px]`}
+				className={`${isShowNotificationSetting && 'hidden'} w-[164px] flex justify-center items-center`}
 				content="Notification Settings"
 				trigger="hover"
 				animation="duration-500"
@@ -232,7 +241,7 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 	return (
 		<div className="relative leading-5 h-5" ref={pinRef}>
 			<Tooltip
-				className={`${isShowPinMessage && 'hidden'} w-[142px]`}
+				className={`${isShowPinMessage && 'hidden'} w-[142px]  flex justify-center items-center`}
 				content="Pinned Messages"
 				trigger="hover"
 				animation="duration-500"
@@ -254,22 +263,27 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 	const dispatch = useAppDispatch();
 	const isShowInbox = useSelector(selectIsShowInbox);
 	const inboxRef = useRef<HTMLDivElement | null>(null);
-	const allLastSeenChannelAllClan = useSelector(selectAllChannelMeta);
-	const getNotificationMentionAndReplyUnread = useSelector(selectMentionAndReplyUnreadAllClan(allLastSeenChannelAllClan));
+	const currentClan = useSelector(selectCurrentClan);
 
 	const handleShowInbox = () => {
 		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
 	};
+
+	useEffect(() => {
+		if (isShowInbox) {
+			dispatch(notificationActions.fetchListNotification({ clanId: currentClan?.clan_id ?? '' }));
+		}
+	}, [isShowInbox]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
 			<Tooltip content={isShowInbox ? '' : 'Inbox'} trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
 				<button className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
-					{getNotificationMentionAndReplyUnread.length > 0 && <RedDot />}
+					{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 				</button>
 			</Tooltip>
-			{isShowInbox && <NotificationList unReadReplyAndMentionList={getNotificationMentionAndReplyUnread} rootRef={inboxRef} />}
+			{isShowInbox && <NotificationList rootRef={inboxRef} />}
 		</div>
 	);
 }
@@ -307,9 +321,31 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<Tooltip content="Members" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+			<Tooltip
+				content="Members"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+				className={'flex justify-center items-center'}
+			>
 				<button onClick={handleClick}>
 					<Icons.MemberList isWhite={isActive} />
+				</button>
+			</Tooltip>
+		</div>
+	);
+}
+
+function ChatButton({ isLightMode }: { isLightMode?: boolean }) {
+	const dispatch = useDispatch();
+	const handleClick = () => {
+		dispatch(appActions.setIsShowChatStream(true));
+	};
+	return (
+		<div className="relative leading-5 h-5">
+			<Tooltip className="w-max" content="Show Chat" trigger="hover" animation="duration-500" style={isLightMode ? 'light' : 'dark'}>
+				<button onClick={handleClick}>
+					<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
 				</button>
 			</Tooltip>
 		</div>

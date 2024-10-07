@@ -1,3 +1,4 @@
+import { ChatContext } from '@mezon/core';
 import { CloseIcon, debounce, getAttachmentUnique, PenIcon, save, SearchIcon, SendIcon, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { channelMetaActions, selectAllChannelsByUser, selectClansEntities } from '@mezon/store';
@@ -14,14 +15,14 @@ import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/t
 import { ILinkOnMessage } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
-import { MezonAvatar } from '../../../temp-ui';
+import { MezonAvatar } from '../../../componentUI';
 import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import { styles } from './styles';
@@ -51,6 +52,7 @@ export const Sharing = ({ data, onClose }) => {
 	const inputSearchRef = useRef<any>();
 	const session = mezon.sessionRef.current;
 	const [attachmentUpload, setAttachmentUpload] = useState<any>([]);
+	const { handleReconnect } = useContext(ChatContext);
 
 	const dataMedia = useMemo(() => {
 		return data.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
@@ -63,6 +65,10 @@ export const Sharing = ({ data, onClose }) => {
 			}
 		}
 	}, [data]);
+
+	useEffect(() => {
+		handleReconnect('Initial reconnect attempt');
+	}, []);
 
 	useEffect(() => {
 		if (searchText) {
