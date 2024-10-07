@@ -1,12 +1,19 @@
 import { useChannelMembersActions } from '@mezon/core';
 import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { MemberProfileType, MouseButton } from '@mezon/utils';
+import {
+	HEIGHT_PANEL_PROFILE,
+	HEIGHT_PANEL_PROFILE_DM,
+	MemberProfileType,
+	MouseButton,
+	WIDTH_CHANNEL_LIST_BOX,
+	WIDTH_PANEL_PROFILE
+} from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { AvatarImage, ShortUserProfile } from '../../components';
+import { AvatarImage, ModalUserProfile } from '../../components';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
@@ -86,6 +93,7 @@ export function MemberProfile({
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
 	const userProfile = useSelector(selectAllAccount);
+	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -105,15 +113,19 @@ export function MemberProfile({
 
 		if (event.button === MouseButton.LEFT) {
 			// handle show profile item
-			const rect = panelRef.current?.getBoundingClientRect() as DOMRect;
-			setCoords({ distanceToBottom: windowHeight - rect.bottom, mouseX: windowWidth - rect.left, mouseY: rect.top - rect.height });
-
-			if (modalState.current.profileItem) {
-				closeModal(ModalType.ProfileItem);
+			const heightPanel = isDM ? HEIGHT_PANEL_PROFILE_DM : HEIGHT_PANEL_PROFILE;
+			if (window.innerHeight - event.clientY > heightPanel) {
+				setPositionShortUser({
+					top: event.clientY,
+					left: window.innerWidth - WIDTH_CHANNEL_LIST_BOX - WIDTH_PANEL_PROFILE
+				});
 			} else {
-				resetModalState();
-				openProfileItem();
+				setPositionShortUser({
+					top: window.innerHeight - heightPanel,
+					left: window.innerWidth - WIDTH_CHANNEL_LIST_BOX - WIDTH_PANEL_PROFILE
+				});
 			}
+			openProfileItem();
 		}
 
 		if (event.button === MouseButton.RIGHT) {
@@ -179,19 +191,27 @@ export function MemberProfile({
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		if (!listProfile) return;
 		modalState.current.profileItem = true;
-
 		return (
-			<ShortUserProfile
-				userID={user?.id || ''}
-				mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
-				avatar={avatar}
-				name={name}
-				coords={coords}
-				isDM={isDM}
-				closeProfileItem={() => closeModal(ModalType.ProfileItem)}
-			/>
+			<div
+				className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in`}
+				style={{
+					top: `${positionShortUser?.top}px`,
+					left: `${positionShortUser?.left}px`
+				}}
+			>
+				<ModalUserProfile
+					onClose={closeProfileItem}
+					userID={user?.id || ''}
+					classBanner="rounded-tl-lg rounded-tr-lg h-[105px]"
+					mode={isMemberDMGroup ? ChannelStreamMode.STREAM_MODE_GROUP : undefined}
+					positionType={positionType}
+					avatar={avatar}
+					name={name}
+					isDM={isDM}
+				/>
+			</div>
 		);
-	}, [coords]);
+	}, [positionShortUser]);
 
 	const [openPanelMember, closePanelMember] = useModal(() => {
 		if (isHiddenAvatarPanel) return;
