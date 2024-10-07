@@ -671,6 +671,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 				} else {
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
+					if (channelUpdated.app_url !== '') {
+						dispatch(channelsActions.fetchAppChannels({ clanId: channelUpdated.clan_id, noCache: true }));
+					}
 				}
 			}
 		},
