@@ -1,10 +1,30 @@
 import { Icons, Image } from '@mezon/ui';
 import { getPlatform } from '@mezon/utils';
+import { useEffect, useRef, useState } from 'react';
 interface FooterProps {
 	downloadUrl: string;
 }
 const Footer = ({ downloadUrl }: FooterProps) => {
 	const platform = getPlatform();
+	const [isOpen, setIsOpen] = useState(false);
+	const dropdownRef = useRef<HTMLDivElement>(null);
+
+	const toggleDropdown = () => {
+		setIsOpen(!isOpen);
+	};
+
+	const handleClickOutside = (event: MouseEvent) => {
+		if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+			setIsOpen(false);
+		}
+	};
+
+	useEffect(() => {
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, []);
 
 	return (
 		<div>
@@ -119,13 +139,33 @@ const Footer = ({ downloadUrl }: FooterProps) => {
 								<a href="https://play.google.com/store/apps/details?id=com.mezon.mobile" target="_blank" rel="noreferrer">
 									<Image src={`assets/google-play.svg`} alt={'googlePlay'} className="max-w-[135px]" />
 								</a>
-								<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
-									{platform === 'MacOS' ? (
-										<Icons.MacAppStoreDesktop className="max-w-full h-[40px] w-fit" />
-									) : (
+								{platform === 'MacOS' ? (
+									<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
+										<button onClick={toggleDropdown}>
+											<Icons.MacAppStoreDesktop className="max-w-full h-[40px] w-fit" />
+										</button>
+
+										{isOpen && (
+											<div className="absolute mt-[8px]">
+												<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
+													<Icons.MacAppleSilicon className="max-w-full h-[40px] w-fit" />
+												</a>
+												<a
+													className="cursor-pointer leading-[0px] block mt-[4px]"
+													href={downloadUrl}
+													target="_blank"
+													rel="noreferrer"
+												>
+													<Icons.MacAppleIntel className="max-w-full h-[40px] w-fit" />
+												</a>
+											</div>
+										)}
+									</div>
+								) : (
+									<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
 										<Image src={`assets/microsoft.svg`} alt={'microsoft'} className="max-w-[135px]" />
-									)}
-								</a>
+									</a>
+								)}
 							</div>
 						</div>
 					</div>
