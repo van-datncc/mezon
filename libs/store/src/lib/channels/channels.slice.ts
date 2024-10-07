@@ -323,12 +323,12 @@ export const fetchAppChannelCached = memoizeAndTrack(
 	}
 );
 
-type RequestType = {
+type fetchAppChannelsArgs = {
 	clanId: string;
 	noCache: boolean;
 };
 
-export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', async ({ clanId, noCache }: RequestType, thunkAPI) => {
+export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', async ({ clanId, noCache }: fetchAppChannelsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
 		await fetchAppChannelCached.clear(mezon, clanId);
@@ -432,6 +432,7 @@ export const channelsSlice = createSlice({
 				id: payload.channel_id,
 				changes: {
 					channel_label: payload.channel_label,
+					app_url: payload.app_url,
 					status: payload.status,
 					meeting_code: payload.meeting_code
 				}
