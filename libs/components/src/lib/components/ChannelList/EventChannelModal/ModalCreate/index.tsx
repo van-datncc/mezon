@@ -108,7 +108,6 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const handleUpdate = async () => {
 		const title = choiceLocation ? contentSubmit.titleEvent : '';
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
-		console.log(contentSubmit.timeEnd);
 
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
 		const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
