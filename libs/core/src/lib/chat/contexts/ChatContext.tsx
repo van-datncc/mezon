@@ -92,7 +92,7 @@ import { ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction } from 'm
 import { ApiPermissionUpdate } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
@@ -274,9 +274,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
+	const location = useLocation();
+	const isFriendPageView = location.pathname === '/chat/direct/friends';
+	const isDirectViewPage = location.pathname.includes('/chat/direct/message/');
+
 	const onnotification = useCallback(
 		async (notification: Notification) => {
-			if (currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') {
+			if (
+				(currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') ||
+				isDirectViewPage ||
+				isFriendPageView
+			) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
@@ -294,7 +302,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
-		[currentChannel?.channel_id, dispatch]
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, location.pathname]
 	);
 
 	const onpinmessage = useCallback(

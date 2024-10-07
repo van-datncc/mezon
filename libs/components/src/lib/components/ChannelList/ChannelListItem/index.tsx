@@ -26,7 +26,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 
 	const numberNotification = useMemo(() => {
 		return channel.count_mess_unread ? channel.count_mess_unread : 0;
-	}, [channel.count_mess_unread]);
+	}, [channel.channel_id, channel.count_mess_unread]);
 
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(() => (
 		<ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel.id} />
