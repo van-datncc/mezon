@@ -25,11 +25,28 @@ export type ItemEventManagementProps = {
 	createTime?: string;
 	isReviewEvent?: boolean;
 	setOpenModalDetail?: (status: boolean) => void;
+	openModelUpdate?: () => void;
+	onEventUpdateId?: (id: string) => void;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
-	const { topic, voiceChannel, titleEvent, option, address, logo, logoRight, start, end, event, isReviewEvent, setOpenModalDetail } = props;
-	const { setChooseEvent, deleteEventManagement } = useEventManagement();
+	const {
+		topic,
+		voiceChannel,
+		titleEvent,
+		option,
+		address,
+		logo,
+		logoRight,
+		start,
+		end,
+		event,
+		isReviewEvent,
+		setOpenModalDetail,
+		openModelUpdate,
+		onEventUpdateId
+	} = props;
+	const { setChooseEvent, deleteEventManagement, updateEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
 	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
@@ -212,7 +229,13 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					event={event}
 					coords={coords}
 					onHandle={handleStopPropagation}
+					setOpenModalUpdateEvent={openModelUpdate}
 					setOpenModalDelEvent={setOpenModalDelEvent}
+					onTrigerEventUpdateId={() => {
+						if (onEventUpdateId) {
+							onEventUpdateId(event?.id || '');
+						}
+					}}
 					onClose={() => setOpenPanel(false)}
 				/>
 			)}
