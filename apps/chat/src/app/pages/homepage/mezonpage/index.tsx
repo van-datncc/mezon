@@ -111,7 +111,7 @@ function MezonPage() {
 			}}
 		>
 			<div
-				className="layout relative flex flex-col items-center text-textDarkTheme overflow-hidden scroll-smooth"
+				className="layout relative flex flex-col items-center text-textDarkTheme overflow-visibile scroll-smooth"
 				style={{
 					background: 'linear-gradient(rgba(3, 3, 32, 0) -15.28%, rgb(15, 15, 99) -93.02%, rgba(3, 3, 32, 0) 105.23%)'
 				}}
@@ -145,33 +145,33 @@ function MezonPage() {
 							>
 								<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
 							</a>
-							{platform === 'MacOS' ? (
-								<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
-									<button onClick={toggleDropdown}>
-										<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />
-									</button>
+							{/* {platform === 'MacOS' ? ( */}
+							<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
+								<button onClick={toggleDropdown}>
+									<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />
+								</button>
 
-									{isOpen && (
-										<div className="absolute mt-[8px]">
-											<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
-												<Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" />
-											</a>
-											<a
-												className="cursor-pointer leading-[0px] block mt-[4px]"
-												href={downloadUrl}
-												target="_blank"
-												rel="noreferrer"
-											>
-												<Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" />
-											</a>
-										</div>
-									)}
-								</div>
-							) : (
+								{isOpen && (
+									<div className="absolute mt-[8px]">
+										<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
+											<Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" />
+										</a>
+										<a
+											className="cursor-pointer leading-[0px] block mt-[4px]"
+											href={downloadUrl}
+											target="_blank"
+											rel="noreferrer"
+										>
+											<Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" />
+										</a>
+									</div>
+								)}
+							</div>
+							{/* ) : (
 								<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
 									<Icons.MicrosoftBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
 								</a>
-							)}
+							)} */}
 						</div>
 					</div>
 				</div>
