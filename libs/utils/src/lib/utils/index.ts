@@ -304,7 +304,7 @@ export const ValidateSpecialCharacters = () => {
 };
 
 export const ValidateURL = () => {
-	return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?$/;
+	return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/[^\s]*)?$/;
 };
 
 export const checkSameDayByCreateTimeMs = (unixTime1: number, unixTime2: number) => {
