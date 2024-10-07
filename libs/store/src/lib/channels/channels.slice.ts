@@ -64,6 +64,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	selectedChannelId?: string | null;
 	previousChannels: string[];
 	appChannelsList: Record<string, ApiChannelAppResponse>;
+	fetchChannelSuccess: boolean;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -372,7 +373,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	modeResponsive: ModeResponsive.MODE_DM,
 	quantityNotifyChannels: {},
 	previousChannels: [],
-	appChannelsList: {}
+	appChannelsList: {},
+	fetchChannelSuccess: false
 });
 
 export const channelsSlice = createSlice({
@@ -487,6 +489,7 @@ export const channelsSlice = createSlice({
 					}
 				});
 			}
+			state.fetchChannelSuccess = false;
 		}
 	},
 	extraReducers: (builder) => {
@@ -496,6 +499,7 @@ export const channelsSlice = createSlice({
 			})
 			.addCase(fetchChannels.fulfilled, (state: ChannelsState, action: PayloadAction<ChannelsEntity[]>) => {
 				channelsAdapter.setAll(state, action.payload);
+				state.fetchChannelSuccess = true;
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchChannels.rejected, (state: ChannelsState, action) => {
@@ -691,3 +695,5 @@ export const selectAppChannelById = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {
 		return state.appChannelsList[channelId];
 	});
+
+export const selectFetchChannelStatus = createSelector(getChannelsState, (state) => state.fetchChannelSuccess);
