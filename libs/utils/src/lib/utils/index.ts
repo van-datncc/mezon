@@ -303,6 +303,10 @@ export const ValidateSpecialCharacters = () => {
 	return /^(?![_\-\s])(?:(?!')[a-zA-Z0-9\p{L}\p{N}\p{Emoji_Presentation}_\-\s]){1,64}$/u;
 };
 
+export const ValidateURL = () => {
+	return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?$/;
+};
+
 export const checkSameDayByCreateTimeMs = (unixTime1: number, unixTime2: number) => {
 	const date1 = fromUnixTime(unixTime1 / 1000);
 	const date2 = fromUnixTime(unixTime2 / 1000);

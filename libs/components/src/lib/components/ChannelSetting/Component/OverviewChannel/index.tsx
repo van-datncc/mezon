@@ -1,6 +1,6 @@
 import { channelsActions, selectAppChannelById, useAppDispatch } from '@mezon/store';
 import { InputField, TextArea } from '@mezon/ui';
-import { IChannel, ValidateSpecialCharacters } from '@mezon/utils';
+import { IChannel, ValidateSpecialCharacters, ValidateURL } from '@mezon/utils';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -22,6 +22,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [topic, setTopic] = useState(topicInit);
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
 	const [checkValidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(channelLabelInit || ''));
+	const [checkValidateUrl, setCheckValidateUrl] = useState(!ValidateURL().test(appUrlInit || ''));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
 	const isThread = channel.parrent_id !== '0';
 	const label = useMemo(() => {
@@ -47,6 +48,12 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const handleDisplayAppUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setAppUrl(value);
+		const regex = ValidateURL();
+		if (regex.test(value) && value !== '') {
+			setCheckValidateUrl(false);
+		} else {
+			setCheckValidateUrl(true);
+		}
 	};
 
 	const handleReset = () => {
@@ -110,6 +117,9 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 							onChange={handleDisplayAppUrl}
 							className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
 						/>
+						{checkValidateUrl && (
+							<p className="text-[#e44141] text-xs italic font-thin">Please enter a valid URL (e.g., https://example.com).</p>
+						)}
 					</>
 				)}
 
@@ -128,7 +138,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
 				</div>
 			</div>
-			{(channelLabelInit !== channelLabel || appUrlInit !== appUrl || topicInit !== topic) && !checkValidate && (
+			{(channelLabelInit !== channelLabel || appUrlInit !== appUrl || topicInit !== topic) && !checkValidate && !checkValidateUrl && (
 				<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
 			)}
 		</div>
