@@ -249,5 +249,5 @@ export const selectOngoingEvent = createSelector(getEventManagementState, (state
 export const selectEventById = (eventId: string) =>
 	createSelector(getEventManagementState, (state) => {
 		const entities = selectEventManagementEntities({ eventmanagement: state });
-		return entities[eventId] || null; // Trả về event hoặc null nếu không tìm thấy
+		return entities[eventId] || null;
 	});
