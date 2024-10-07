@@ -8,7 +8,6 @@ import React, { useMemo } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
-import FontAwesome from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
 import CustomIcon from '../../../../../../assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -241,7 +240,7 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 				return (
 					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
 						<Text>
-							<FontAwesome name="volume-2" size={size.s_14} color={Colors.textLink} />{' '}
+							<CustomIcon name="volume-up" size={size.s_14} color={Colors.textLink} style={{ marginTop: 10 }} />{' '}
 						</Text>
 						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>
@@ -251,7 +250,7 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 				return (
 					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}>
 						<Text>
-							<FontAwesome name="youtube" size={size.s_14} color={Colors.textLink} />{' '}
+							<CustomIcon name="stream-video" size={size.s_14} color={Colors.textLink} />{' '}
 						</Text>
 						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>
@@ -484,7 +483,6 @@ export const RenderTextMarkdownContent = React.memo(
 			if (isEdited) {
 				formattedContent += ` [${translate('edited')}](${EDITED_FLAG})`;
 			}
-			console.log('>format: ', formattedContent);
 			return formattedContent;
 		}, [elements, t, mode]);
 
