@@ -6,7 +6,6 @@ export class BadgeIconGenerator {
 	}
 
 	generate(count: number | null): Promise<string> {
-		count = 10; // SET TO CHECK UI / null show dot
 		const small = count > this.MAX_WIN_COUNT;
 		const text = count > this.MAX_WIN_COUNT ? `'9+'` : `'${count ? count : '•'}'`;
 		return this.mainWindow.webContents.executeJavaScript(`window.drawBadge = function ${this.drawBadge}; window.drawBadge(${text}, ${small});`);
