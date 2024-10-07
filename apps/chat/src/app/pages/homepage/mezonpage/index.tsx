@@ -15,6 +15,9 @@ function MezonPage() {
 	const homeRef = useRef<HTMLDivElement>(null);
 	const isVisible = useIntersectionObserver(homeRef, { threshold: 0.1 });
 
+	const [isOpen, setIsOpen] = useState(false);
+	const dropdownRef = useRef<HTMLDivElement>(null);
+
 	const toggleSideBar = () => {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
@@ -27,6 +30,8 @@ function MezonPage() {
 		}
 		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
 	}, [platform]);
+
+	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.zip`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
@@ -59,6 +64,23 @@ function MezonPage() {
 		});
 	};
 
+	const toggleDropdown = () => {
+		setIsOpen(!isOpen);
+	};
+
+	const handleClickOutside = (event: MouseEvent) => {
+		if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+			setIsOpen(false);
+		}
+	};
+
+	useEffect(() => {
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, []);
+
 	useEffect(() => {
 		updateBackgroundImage();
 		window.addEventListener('resize', updateBackgroundImage);
@@ -74,7 +96,7 @@ function MezonPage() {
 			}}
 		>
 			<div
-				className="layout relative flex flex-col items-center text-textDarkTheme overflow-hidden scroll-smooth"
+				className="layout relative flex flex-col items-center text-textDarkTheme overflow-visibile scroll-smooth"
 				style={{
 					background: 'linear-gradient(rgba(3, 3, 32, 0) -15.28%, rgb(15, 15, 99) -93.02%, rgba(3, 3, 32, 0) 105.23%)'
 				}}
@@ -108,13 +130,28 @@ function MezonPage() {
 							>
 								<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
 							</a>
-							<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
-								{platform === 'MacOS' ? (
+							{/* {platform === 'MacOS' ? ( */}
+							<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
+								<button onClick={toggleDropdown}>
 									<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />
-								) : (
-									<Icons.MicrosoftBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
+								</button>
+
+								{isOpen && (
+									<div className="absolute mt-[8px]">
+										<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
+											<Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" />
+										</a>
+										<a
+											className="cursor-pointer leading-[0px] block mt-[4px]"
+											href={universalUrl}
+											target="_blank"
+											rel="noreferrer"
+										>
+											<Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" />
+										</a>
+									</div>
 								)}
-							</a>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -127,7 +164,7 @@ function MezonPage() {
 			</div>
 
 			<Layout sideBarIsOpen={sideBarIsOpen} />
-			<Footer downloadUrl={downloadUrl}></Footer>
+			<Footer downloadUrl={downloadUrl} universalUrl={universalUrl}></Footer>
 		</div>
 	);
 }
