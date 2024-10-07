@@ -2,7 +2,7 @@ import { channelsActions, selectAppChannelById, useAppDispatch } from '@mezon/st
 import { InputField, TextArea } from '@mezon/ui';
 import { IChannel, ValidateSpecialCharacters, ValidateURL } from '@mezon/utils';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 
@@ -29,40 +29,49 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		return isThread ? 'thread' : 'channel';
 	}, [isThread]);
 
-	const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setTopic(e.target.value);
-		setCountCharacterTopic(1024 - e.target.value.length);
-	};
+	const handleChangeTextArea = useCallback(
+		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+			setTopic(e.target.value);
+			setCountCharacterTopic(1024 - e.target.value.length);
+		},
+		[topic, countCharacterTopic]
+	);
 
-	const handleDisplayChannelLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setChannelLabel(value);
-		const regex = ValidateSpecialCharacters();
-		if (regex.test(value) && value !== '') {
-			setCheckValidate(false);
-		} else {
-			setCheckValidate(true);
-		}
-	};
+	const handleDisplayChannelLabel = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			setChannelLabel(value);
+			const regex = ValidateSpecialCharacters();
+			if (regex.test(value) && value !== '') {
+				setCheckValidate(false);
+			} else {
+				setCheckValidate(true);
+			}
+		},
+		[channelLabel, checkValidate]
+	);
 
-	const handleDisplayAppUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setAppUrl(value);
-		const regex = ValidateURL();
-		if (regex.test(value) && value !== '') {
-			setCheckValidateUrl(false);
-		} else {
-			setCheckValidateUrl(true);
-		}
-	};
+	const handleDisplayAppUrl = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			setAppUrl(value);
+			const regex = ValidateURL();
+			if (regex.test(value) && value !== '') {
+				setCheckValidateUrl(false);
+			} else {
+				setCheckValidateUrl(true);
+			}
+		},
+		[appUrl, checkValidateUrl]
+	);
 
-	const handleReset = () => {
+	const handleReset = useCallback(() => {
 		setTopic(topicInit);
 		setChannelLabel(channelLabelInit);
 		setAppUrl(appUrlInit);
-	};
+	}, [topicInit, channelLabelInit, appUrlInit]);
 
-	const handleSave = async () => {
+	const handleSave = useCallback(async () => {
 		const updatedChannelLabel = channelLabel === channelLabelInit ? '' : channelLabel;
 		const updatedAppUrl = appUrl === appUrlInit ? '' : appUrl;
 
@@ -77,7 +86,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 			app_url: updatedAppUrl
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel));
-	};
+	}, [channelLabel, channelLabelInit, appUrl, appUrlInit, topic, channel, dispatch]);
 
 	useEffect(() => {
 		const textArea = textAreaRef.current;
