@@ -1,5 +1,5 @@
 import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
+import { useDragAndDrop, useMarkAsRead, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
 	channelsActions,
@@ -92,8 +92,11 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const appChannel = useSelector(selectAppChannelById(channelId));
+	const { handleClearBadge } = useMarkAsRead();
 
-	useChannelSeen(currentChannel?.id || '');
+	useEffect(() => {
+		handleClearBadge(currentChannel);
+	}, [channelId]);
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
