@@ -155,6 +155,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
+			color: colors.textRoleLink,
 			backgroundColor: colors.darkMossGreen
 		},
 		threadIcon: { marginBottom: size.s_2 }
