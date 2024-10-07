@@ -1,5 +1,5 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useCategory, usePermissionChecker } from '@mezon/core';
+import { useCategory, useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import {
 	ENotificationActive,
 	ENotificationChannelId,
@@ -12,19 +12,15 @@ import {
 } from '@mezon/mobile-components';
 import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
 import {
-	channelMetaActions,
 	channelsActions,
-	clansActions,
 	getStoreAsync,
 	notificationSettingActions,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
-	selectLastChannelTimestamp,
-	selectMentionAndReplyUnreadByChanneld,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelThreads, EOverriddenPermission, EPermission, TIME_OFFSET } from '@mezon/utils';
+import { ChannelThreads, EOverriddenPermission, EPermission } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -53,10 +49,6 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 		[EOverriddenPermission.manageThread, EPermission.manageChannel],
 		channel?.channel_id ?? ''
 	);
-	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channel?.channel_id ?? ''));
-	const numberNotification = useSelector(
-		selectMentionAndReplyUnreadByChanneld(channel?.clan_id ?? '', channel?.channel_id ?? '', getLastSeenChannel ?? 0)
-	).length;
 
 	const { categorizedChannels } = useCategory();
 	useEffect(() => {
@@ -76,19 +68,10 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const { dismiss } = useBottomSheetModal();
 
 	const navigation = useNavigation<AppStackScreenProps<StackMenuClanScreen>['navigation']>();
+	const { handleMarkAsReadChannel } = useMarkAsRead();
 
 	const handleMarkAsRead = useCallback(() => {
-		dispatch(
-			messagesActions.updateLastSeenMessage({
-				clanId: channel.clan_id,
-				channelId: channel.channel_id,
-				messageId: channel?.last_sent_message?.id,
-				mode: channel.type
-			})
-		);
-		const timestamp = Date.now() / 1000;
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: channel.channel_id ?? '', timestamp: timestamp + TIME_OFFSET }));
-		dispatch(clansActions.updateClanBadgeCount({ clanId: channel?.clan_id ?? '', count: numberNotification * -1 }));
+		handleMarkAsReadChannel(channel);
 		dismiss();
 	}, [channel.channel_id, channel?.clan_id]);
 
