@@ -1,15 +1,16 @@
-import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, ThreadIcon, urlRegex } from '@mezon/mobile-components';
+import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Markdown from 'react-native-markdown-display';
 import FontAwesome from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
+import CustomIcon from '../../../../../../assets/CustomIcon';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { EmojiMarkup } from '../MarkdownFormatText/EmojiMarkup';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
@@ -258,18 +259,12 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 			}
 			if (payload.includes(TYPE_MENTION.thread)) {
 				return (
-					<View>
-						<Pressable
-							key={node.key}
-							style={[styles.voiceChannel, { top: Platform.OS === 'android' ? size.s_4 : size.s_2, alignItems: 'flex-end' }]}
-							onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}
-						>
-							<Text style={styles.threadIcon}>
-								<ThreadIcon height={size.s_14} width={size.s_14} color={Colors.textLink} />
-							</Text>
-							<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
-						</Pressable>
-					</View>
+					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}>
+						<Text>
+							<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} />
+						</Text>
+						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
+					</Text>
 				);
 			}
 			return (
@@ -489,6 +484,7 @@ export const RenderTextMarkdownContent = React.memo(
 			if (isEdited) {
 				formattedContent += ` [${translate('edited')}](${EDITED_FLAG})`;
 			}
+			console.log('>format: ', formattedContent);
 			return formattedContent;
 		}, [elements, t, mode]);
 
