@@ -22,31 +22,16 @@ function MezonPage() {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
 
-	const getArchitecture = () => {
-		const userAgent = navigator.userAgent;
-
-		if (/Macintosh/.test(userAgent)) {
-			if (/ARM/.test(userAgent)) {
-				return 'arm64';
-			} else {
-				return 'universal';
-			}
-		}
-		return 'other';
-	};
-	const architecture = getArchitecture();
 	const downloadUrl: string = useMemo(() => {
 		if (platform === 'MacOS') {
-			if (architecture === 'arm64') {
-				return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.zip`;
-			} else {
-				return `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.zip`;
-			}
+			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.zip`;
 		} else if (platform === 'Linux') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-linux-amd64.deb`;
 		}
 		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
 	}, [platform]);
+
+	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.zip`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
@@ -158,7 +143,7 @@ function MezonPage() {
 										</a>
 										<a
 											className="cursor-pointer leading-[0px] block mt-[4px]"
-											href={downloadUrl}
+											href={universalUrl}
 											target="_blank"
 											rel="noreferrer"
 										>
@@ -167,11 +152,6 @@ function MezonPage() {
 									</div>
 								)}
 							</div>
-							{/* ) : (
-								<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
-									<Icons.MicrosoftBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
-								</a>
-							)} */}
 						</div>
 					</div>
 				</div>
@@ -184,7 +164,7 @@ function MezonPage() {
 			</div>
 
 			<Layout sideBarIsOpen={sideBarIsOpen} />
-			<Footer downloadUrl={downloadUrl}></Footer>
+			<Footer downloadUrl={downloadUrl} universalUrl={universalUrl}></Footer>
 		</div>
 	);
 }

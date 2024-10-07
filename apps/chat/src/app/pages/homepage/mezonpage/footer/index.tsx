@@ -3,8 +3,9 @@ import { getPlatform } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 interface FooterProps {
 	downloadUrl: string;
+	universalUrl: string;
 }
-const Footer = ({ downloadUrl }: FooterProps) => {
+const Footer = ({ downloadUrl, universalUrl }: FooterProps) => {
 	const platform = getPlatform();
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -152,7 +153,7 @@ const Footer = ({ downloadUrl }: FooterProps) => {
 												</a>
 												<a
 													className="cursor-pointer leading-[0px] block mt-[4px]"
-													href={downloadUrl}
+													href={universalUrl}
 													target="_blank"
 													rel="noreferrer"
 												>
