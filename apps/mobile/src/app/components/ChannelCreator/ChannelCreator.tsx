@@ -123,17 +123,17 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			title: t('fields.channelType.text.title'),
 			description: t('fields.channelType.text.description'),
 			value: ChannelType.CHANNEL_TYPE_TEXT,
-			icon: <Icons.VoiceNormalIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-		},
-		{
-			title: t('fields.channelType.voice.title'),
-			description: t('fields.channelType.voice.description'),
-			value: ChannelType.CHANNEL_TYPE_VOICE,
 			icon: <Icons.TextIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 		},
 		{
 			title: t('fields.channelType.voice.title'),
 			description: t('fields.channelType.voice.description'),
+			value: ChannelType.CHANNEL_TYPE_VOICE,
+			icon: <Icons.VoiceNormalIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+		},
+		{
+			title: t('fields.channelType.stream.title'),
+			description: t('fields.channelType.stream.description'),
 			value: ChannelType.CHANNEL_TYPE_STREAMING,
 			icon: <Icons.StreamIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 		}
@@ -157,7 +157,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 
 				<MezonOption title={t('fields.channelType.title')} data={channelTypeList} onChange={handleChannelTypeChange} value={channelType} />
 
-				{channelType !== ChannelType.CHANNEL_TYPE_VOICE && <MezonMenu menu={menuPrivate} />}
+				{channelType === ChannelType.CHANNEL_TYPE_TEXT && <MezonMenu menu={menuPrivate} />}
 			</ScrollView>
 		</View>
 	);
