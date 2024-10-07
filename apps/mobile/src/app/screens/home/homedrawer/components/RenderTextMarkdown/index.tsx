@@ -260,7 +260,7 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 				return (
 					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}>
 						<Text>
-							<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} />
+							<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} />{' '}
 						</Text>
 						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>
