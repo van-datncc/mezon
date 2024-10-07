@@ -135,8 +135,6 @@ export const updateEventManagement = createAsyncThunk(
 
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.updateEvent(mezon.session, event_id, body);
-			console.log(response);
-
 			if (response) {
 				thunkAPI.dispatch(fetchEventManagement({ clanId: body.clan_id || '', noCache: true }));
 			}

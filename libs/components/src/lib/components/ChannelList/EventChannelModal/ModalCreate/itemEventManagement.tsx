@@ -48,7 +48,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		openModelUpdate,
 		onEventUpdateId
 	} = props;
-	const { setChooseEvent, deleteEventManagement, updateEventManagement } = useEventManagement();
+	const { setChooseEvent, deleteEventManagement } = useEventManagement();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useSelector(selectChannelById(voiceChannel));
 	const userCreate = useSelector(selectMemberClanByUserId(event?.creator_id || ''));
