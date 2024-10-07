@@ -6,9 +6,12 @@ import {
 	RootState,
 	channelMembersActions,
 	channelMetaActions,
+	clansActions,
 	selectAllClans,
 	selectChannelById,
 	selectCurrentChannel,
+	selectLastChannelTimestamp,
+	selectMentionAndReplyUnreadByChanneld,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, TIME_OFFSET } from '@mezon/utils';
@@ -18,11 +21,11 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import NotificationSetting from '../../../components/NotificationSetting';
 import useStatusMuteChannel from '../../../hooks/useStatusMuteChannel';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import MezonBottomSheet from '../../../temp-ui/MezonBottomSheet';
 import ChannelMessagesWrapper from './ChannelMessagesWrapper';
 import { ChatBox } from './ChatBox';
 import PanelKeyboard from './PanelKeyboard';
@@ -31,13 +34,15 @@ import LicenseAgreement from './components/LicenseAgreement';
 import StreamingRoom from './components/StreamingRoom';
 import { style } from './styles';
 
-function useChannelSeen(channelId: string) {
+function useChannelSeen(channelId: string, clanId: string) {
 	const dispatch = useAppDispatch();
-	const currentChannel = useSelector(selectChannelById(channelId));
+	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
+	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(clanId ?? '', channelId ?? '', getLastSeenChannel ?? 0)).length;
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-	}, [channelId, currentChannel, dispatch]);
+		dispatch(clansActions.updateClanBadgeCount({ clanId: clanId ?? '', count: numberNotification * -1 }));
+	}, [channelId, clanId, dispatch, numberNotification]);
 }
 
 const HomeDefault = React.memo((props: any) => {
@@ -55,7 +60,7 @@ const HomeDefault = React.memo((props: any) => {
 	const panelKeyboardRef = useRef(null);
 	const prevChannelIdRef = useRef<string>();
 
-	useChannelSeen(currentChannel?.channel_id || '');
+	useChannelSeen(currentChannel?.channel_id || '', currentChannel?.clan_id || '');
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
@@ -63,6 +68,7 @@ const HomeDefault = React.memo((props: any) => {
 	}, []);
 
 	const isChannelStream = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_STREAMING, [currentChannel?.type]);
+	const isChannelApp = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_APP, [currentChannel?.type]);
 
 	useEffect(() => {
 		if (clansLoadingStatus === 'loaded' && !clans?.length) onOpenDrawer();
@@ -144,7 +150,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 				parentChannelLabel={parent?.channel_label || ''}
 			/>
-			{currentChannel && isFocusChannelView && !isChannelStream && (
+			{currentChannel && isFocusChannelView && !isChannelStream && !isChannelApp && (
 				<View style={styles.channelView}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
@@ -218,6 +224,10 @@ const HomeDefaultHeader = React.memo(
 
 			if (currentChannel?.channel_private !== ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 				return <Icons.StreamIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
+			}
+
+			if (currentChannel?.channel_private !== ChannelStatusEnum.isPrivate && currentChannel?.type === ChannelType.CHANNEL_TYPE_APP) {
+				return <Icons.AppChannelIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
 			}
 
 			return <Icons.TextIcon width={size.s_20} height={size.s_20} color={themeValue.textStrong} />;
