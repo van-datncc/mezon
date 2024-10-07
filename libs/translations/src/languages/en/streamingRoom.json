@@ -1,0 +1,18 @@
+{
+  "joinStreamingRoomBS": {
+    "voice": "Voice",
+    "noOne":"No one's here yet!",
+    "readyTalk": "When you are ready to talk, just hop in.",
+    "joinVoice": "Join Voice"
+  },
+  "selectAudioOutput": {
+    "title": "Select Audio Output",
+    "speaker": "Speaker",
+    "phone": "Phone"
+  },
+  "streamingRoom": {
+    "voice":"Voice",
+    "addPeople": "Add people to voice Chat",
+    "leftTheGroup": "Left the group known you are here!"
+  }
+}

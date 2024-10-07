@@ -31,7 +31,6 @@ import { ChatBox } from './ChatBox';
 import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
-import StreamingRoom from './components/StreamingRoom';
 import { style } from './styles';
 
 function useChannelSeen(channelId: string, clanId: string) {
@@ -67,7 +66,6 @@ const HomeDefault = React.memo((props: any) => {
 		}
 	}, []);
 
-	const isChannelStream = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_STREAMING, [currentChannel?.type]);
 	const isChannelApp = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_APP, [currentChannel?.type]);
 
 	useEffect(() => {
@@ -150,7 +148,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 				parentChannelLabel={parent?.channel_label || ''}
 			/>
-			{currentChannel && isFocusChannelView && !isChannelStream && !isChannelApp && (
+			{currentChannel && isFocusChannelView && !isChannelApp && (
 				<View style={styles.channelView}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
@@ -168,7 +166,6 @@ const HomeDefault = React.memo((props: any) => {
 					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
 				</View>
 			)}
-			{isChannelStream ? <StreamingRoom /> : null}
 
 			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
 				<NotificationSetting />
