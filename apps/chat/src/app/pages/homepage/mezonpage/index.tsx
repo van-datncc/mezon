@@ -22,15 +22,16 @@ function MezonPage() {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
 
+	const version = mezonPackage.version;
+
 	const downloadUrl: string = useMemo(() => {
-		const version = mezonPackage.version;
 		if (platform === 'MacOS') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.dmg`;
 		} else if (platform === 'Linux') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-linux-amd64.deb`;
 		}
 		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
-	}, [platform]);
+	}, [platform, version]);
 
 	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.dmg`;
 
