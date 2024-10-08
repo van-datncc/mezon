@@ -1,6 +1,15 @@
-import { Icons } from '@mezon/mobile-components';
+import {
+	getUpdateOrAddClanChannelCache,
+	Icons,
+	load,
+	remove,
+	save,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_PREVIOUS_CHANNEL
+} from '@mezon/mobile-components';
 import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
-import { useNavigation } from '@react-navigation/native';
+import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
@@ -84,7 +93,27 @@ export default function StreamingRoom() {
 	};
 
 	const handleEndCall = () => {
-		navigation.navigate(APP_SCREEN.HOME);
+		requestAnimationFrame(async () => {
+			const previousChannel = load(STORAGE_PREVIOUS_CHANNEL) || [];
+			navigation.navigate(APP_SCREEN.HOME);
+			navigation.dispatch(DrawerActions.openDrawer());
+			const { channel_id, clan_id } = previousChannel || {};
+			const dataSave = getUpdateOrAddClanChannelCache(clan_id, channel_id);
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			jumpToChannel(channel_id, clan_id);
+			remove(STORAGE_PREVIOUS_CHANNEL);
+		});
+	};
+
+	const jumpToChannel = async (channelId: string, clanId: string) => {
+		const store = await getStoreAsync();
+		store.dispatch(
+			channelsActions.joinChannel({
+				clanId,
+				channelId,
+				noFetchMembers: false
+			})
+		);
 	};
 
 	const handleVoice = () => {
