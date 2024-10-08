@@ -2,7 +2,9 @@ import {
 	searchMessagesActions,
 	selectAllMessageSearch,
 	selectCurrentChannelId,
+	selectCurrentClanId,
 	selectCurrentPage,
+	selectDmGroupCurrentId,
 	selectMessageSearchByChannelId,
 	selectTotalResultSearchMessage,
 	selectValueInputSearchMessage,
@@ -17,9 +19,12 @@ export function useSearchMessages() {
 	const searchMessages = useSelector(selectAllMessageSearch);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const currentPage = useSelector(selectCurrentPage);
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(currentChannelId as string));
-	const valueSearchMessage = useSelector(selectValueInputSearchMessage(currentChannelId ?? ''));
+	const currentChannelId = useSelector(selectCurrentChannelId) as string;
+	const currentDirectId = useSelector(selectDmGroupCurrentId) as string;
+	const currentClanId = useSelector(selectCurrentClanId);
+	const isClanView = currentClanId && currentClanId !== '0';
+	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(isClanView ? currentChannelId : currentDirectId));
+	const valueSearchMessage = useSelector(selectValueInputSearchMessage((isClanView ? currentChannelId : currentDirectId) ?? ''));
 
 	const fetchSearchMessages = useCallback(
 		async ({ filters, from, size, sorts }: ApiSearchMessageRequest) => {

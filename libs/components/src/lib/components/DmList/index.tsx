@@ -33,7 +33,7 @@ function DirectMessageList() {
 				</div>
 			</div>
 			<div
-				className={`flex-1 font-medium text-gray-300 pl-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+				className={`flex-1 font-medium text-gray-300 px-2 h-2/3 ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 			>
 				<div className="flex flex-col gap-1 text-[#AEAEAE] text-center relative">
 					<ListDMChannel listDM={dmGroupChatList} />
@@ -60,7 +60,7 @@ const CreateMessageGroupModal = memo(() => {
 		<div
 			ref={buttonPlusRef}
 			onClick={onClickOpenModal}
-			className="relative cursor-pointer flex flex-row justify-end ml-0 dark:hover:bg-bgSecondary hover:bg-bgLightMode rounded-full"
+			className="relative cursor-pointer flex flex-row justify-end ml-0 dark:hover:bg-bgSecondary hover:bg-bgLightMode rounded-full whitespace-nowrap"
 		>
 			<Tooltip content="Create DM" trigger="hover" animation="duration-500" style={appearanceTheme === 'light' ? 'light' : 'dark'}>
 				<Icons.Plus className="w-4 h-4" />

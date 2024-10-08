@@ -931,7 +931,7 @@ export const messagesSlice = createSlice({
 					state.loadingStatus = 'loaded';
 
 					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
-					if (!isNew || !channelId) return state;
+					if ((!isNew || !channelId) && !isClearMessage) return state;
 					const reversedMessages = action.payload.messages.reverse();
 
 					// remove all messages if clear message is true
@@ -950,7 +950,8 @@ export const messagesSlice = createSlice({
 						state,
 						channelId,
 						adapterPayload: reversedMessages,
-						direction
+						direction,
+						isClearMessage
 					});
 				}
 			)
@@ -1233,20 +1234,25 @@ const handleSetManyMessages = ({
 	state,
 	channelId,
 	adapterPayload,
-	direction
+	direction,
+	isClearMessage = false
 }: {
 	state: MessagesState;
 	channelId?: string;
 	adapterPayload: MessagesEntity[];
 	direction?: Direction_Mode;
+	isClearMessage?: boolean;
 }) => {
 	if (!channelId) return state;
 	if (!state.channelMessages[channelId])
 		state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
 			id: channelId
 		});
-
-	state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
+	if (isClearMessage) {
+		state.channelMessages[channelId] = channelMessagesAdapter.setAll(state.channelMessages[channelId], adapterPayload);
+	} else {
+		state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
+	}
 
 	state.channelMessages[channelId] = handleLimitMessage(state.channelMessages[channelId], 200, direction);
 
