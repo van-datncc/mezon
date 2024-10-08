@@ -124,7 +124,7 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
-			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId, noCache: true }));
+			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId }));
 
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ clanId: clanId, channelId, messageId }));
