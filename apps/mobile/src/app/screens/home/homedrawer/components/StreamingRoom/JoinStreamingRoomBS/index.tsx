@@ -1,16 +1,29 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { Icons } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	Icons,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_PREVIOUS_CHANNEL,
+	changeClan,
+	getUpdateOrAddClanChannelCache,
+	jumpToChannel,
+	save
+} from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
+import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { ChannelType } from 'mezon-js';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, Text, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { InviteToChannel } from '../../InviteToChannel';
 import { style } from './JoinStreamingRoomBS.styles';
 
-function JoinStreamingRoomBS(props, refRBSheet: React.MutableRefObject<BottomSheetModal>) {
+function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: React.MutableRefObject<BottomSheetModal>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const bottomSheetInviteRef = useRef(null);
@@ -18,17 +31,35 @@ function JoinStreamingRoomBS(props, refRBSheet: React.MutableRefObject<BottomShe
 	const navigation = useNavigation<any>();
 	const { dismiss } = useBottomSheetModal();
 	const { t } = useTranslation(['streamingRoom']);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const currentChannel = useSelector(selectCurrentChannel);
 
 	const handleMuteSpeaker = () => {
 		setIsMute(!isMute);
 	};
 
-	const handleJoinVoice = () => {
-		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-			screen: APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM
-		});
-		dismiss();
+	const handleJoinVoice = async () => {
+		if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+				screen: APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM
+			});
+			save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
+			const clanId = channel?.clan_id;
+			const channelId = channel?.channel_id;
+
+			if (currentClanId !== clanId) {
+				changeClan(clanId);
+			}
+			DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+				isFetchMemberChannelDM: true
+			});
+			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			await jumpToChannel(channelId, clanId);
+			dismiss();
+		}
 	};
+
 	return (
 		<Block width={'100%'} paddingVertical={size.s_10} paddingHorizontal={size.s_10}>
 			<Block flexDirection="row" justifyContent="space-between">
