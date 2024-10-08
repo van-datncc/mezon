@@ -118,7 +118,7 @@ export const joinChat = createAsyncThunk(
 
 export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
-	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = false }: fetchChannelMembersPayload, thunkAPI) => {
+	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = true }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
