@@ -147,9 +147,11 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
 				</div>
 			</div>
-			{(channelLabelInit !== channelLabel || appUrlInit !== appUrl || topicInit !== topic) && !checkValidate && !checkValidateUrl && (
-				<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
-			)}
+			{(channelLabelInit !== channelLabel || appUrlInit !== appUrl || topicInit !== topic) &&
+				!checkValidate &&
+				(!appUrl || !checkValidateUrl) && (
+					<ModalAskChangeChannel onReset={handleReset} onSave={handleSave} className="relative mt-8 bg-transparent pr-0" />
+				)}
 		</div>
 	);
 };

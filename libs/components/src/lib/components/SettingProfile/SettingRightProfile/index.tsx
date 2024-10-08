@@ -38,12 +38,14 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 					>
 						User Profile
 					</button>
-					<button
-						onClick={handleClanProfileClick}
-						className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.CLAN_SETTING ? 'border-[#155EEF]' : 'border-transparent dark:text-textThreadPrimary text-textSecondary800'}`}
-					>
-						Clan Profiles
-					</button>
+					{!isDM ? (
+						<button
+							onClick={handleClanProfileClick}
+							className={`pt-1 font-medium text-base tracking-wider border-b-2 ${activeType === EActiveType.CLAN_SETTING ? 'border-[#155EEF]' : 'border-transparent dark:text-textThreadPrimary text-textSecondary800'}`}
+						>
+							Clan Profiles
+						</button>
+					) : null}
 				</div>
 			</div>
 

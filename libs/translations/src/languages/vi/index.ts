@@ -36,6 +36,7 @@ import screen from './screen.json';
 import screenStack from './screenStack.json';
 import searchMessageChannel from './searchMessageChannel.json';
 import setting from './setting.json';
+import streamingRoom from './streamingRoom.json';
 import userEmptyClan from './userEmptyClan.json';
 import userProfile from './userProfile.json';
 
@@ -80,5 +81,6 @@ export default {
 	clanNotificationsSetting,
 	clanStickerSettings,
 	menuCustomDM,
-	linkMessageInvite
+	linkMessageInvite,
+	streamingRoom
 };

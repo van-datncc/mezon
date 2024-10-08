@@ -1,3 +1,4 @@
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
@@ -6,10 +7,12 @@ import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ActivityIndicator, Linking, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { MezonBottomSheet } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
+import JoinStreamingRoomBS from '../../StreamingRoom/JoinStreamingRoomBS';
 import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import ListChannelThread from '../ChannelListThread';
 import UserListVoiceChannel from '../ChannelListUserVoice';
@@ -36,6 +39,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const styles = style(themeValue);
 	const currentChanelId = useSelector(selectCurrentChannelId);
 	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
+	const bottomSheetChannelStreamingRef = useRef<BottomSheetModal>(null);
 
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
@@ -62,6 +66,10 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	}, []);
 
 	const handleRouteData = async (thread?: IChannel) => {
+		if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			bottomSheetChannelStreamingRef.current.present();
+			return;
+		}
 		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			if (props?.data?.status === StatusVoiceChannel.Active && props?.data?.meeting_code) {
 				const urlVoice = `${linkGoogleMeet}${props?.data?.meeting_code}`;
@@ -145,6 +153,11 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 
 			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />}
 			<UserListVoiceChannel channelId={props?.data?.channel_id} />
+			<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['50%']}>
+				<SafeAreaView>
+					<JoinStreamingRoomBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />
+				</SafeAreaView>
+			</MezonBottomSheet>
 		</View>
 	);
 });

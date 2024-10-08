@@ -4,7 +4,7 @@ import { selectEntiteschannelCategorySetting } from '../notificationSetting/noti
 
 export const CHANNELMETA_FEATURE_KEY = 'channelmeta';
 
-const enableMute = 0;
+export const enableMute = 0;
 
 export interface ChannelMetaEntity {
 	id: string; // Primary ID

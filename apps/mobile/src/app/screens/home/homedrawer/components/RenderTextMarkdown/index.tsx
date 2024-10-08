@@ -251,7 +251,7 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 				return (
 					<Text key={node.key} style={styles.voiceChannel} onPress={() => openUrl(`#${payload?.slice?.(7)}`, onLinkPress)}>
 						<Text>
-							<CustomIcon name="stream-video" size={size.s_14} color={Colors.textLink} />{' '}
+							<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} />{' '}
 						</Text>
 						<Text style={styles.textVoiceChannel}>{`${content}`}</Text>
 					</Text>

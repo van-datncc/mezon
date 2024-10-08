@@ -154,7 +154,11 @@ const Layout = memo((props: LayoutProps) => {
 										}
 									/>
 									<div className={`${sideBarIsOpen ? 'unset' : 'relative'} flex flex-col items-center justify-center w-full`}>
-										<Image className="w-full" src={`../../../assets/multiple-conversation-reply.png`} alt={'conversationReply'} />
+										<Image
+											className="w-full"
+											src={`../../../assets/multiple-conversation-reply.svg`}
+											alt={'conversation reply'}
+										/>
 									</div>
 								</AnimatedSection>
 							</div>
