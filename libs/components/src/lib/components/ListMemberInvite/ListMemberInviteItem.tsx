@@ -79,7 +79,7 @@ type ItemInviteDMProps = {
 const ItemInviteDM = (props: ItemInviteDMProps) => {
 	const { channelID = '', type = '', avatar = '', label = '', isInviteSent = false, userName = '', onHandle } = props;
 	return (
-		<div key={channelID} className="flex items-center justify-between h-14">
+		<div key={channelID} className="flex items-center justify-between h-fit group rounded-md dark:hover:bg-[#393c41] hover:bg-[#d1d2d4] p-1">
 			<AvatarImage
 				alt={userName}
 				userName={userName}
@@ -95,7 +95,7 @@ const ItemInviteDM = (props: ItemInviteDMProps) => {
 				className={
 					isInviteSent
 						? 'dark:text-[#9c9ea0] text-[#a1a8ef] rounded-[5px] py-[5px] px-[10px] cursor-not-allowed font-semibold'
-						: 'font-sans font-normal text-[14px] bg-white dark:bg-bgPrimary dark:hover:bg-green-700 hover:bg-green-700 text-textLightTheme hover:text-white dark:text-textDarkTheme border border-solid border-green-700 rounded-md py-[5px] px-[18px]'
+						: 'font-sans font-normal text-[14px] bg-white dark:bg-bgPrimary group-hover:bg-green-700 dark:hover:bg-[#1a6334] hover:bg-[#15562b] text-textLightTheme group-hover:text-white dark:text-textDarkTheme border border-solid border-green-700 rounded-sm py-[5px] px-[18px]'
 				}
 			>
 				{isInviteSent ? 'Sent' : 'Invite'}
