@@ -95,7 +95,7 @@ const ItemInviteDM = (props: ItemInviteDMProps) => {
 				className={
 					isInviteSent
 						? 'dark:text-[#9c9ea0] text-[#a1a8ef] rounded-[5px] py-[5px] px-[10px] cursor-not-allowed font-semibold'
-						: 'font-sans font-normal text-[14px] bg-white dark:bg-bgPrimary group-hover:bg-green-700 dark:hover:bg-[#1a6334] hover:bg-[#15562b] text-textLightTheme group-hover:text-white dark:text-textDarkTheme border border-solid border-green-700 rounded-sm py-[5px] px-[18px]'
+						: 'font-sans font-normal text-[14px] bg-white dark:bg-bgPrimary group-hover:bg-green-700 dark:hover:bg-green-900 hover:bg-green-900 text-textLightTheme group-hover:text-white dark:text-textDarkTheme border border-solid border-green-700 rounded-sm py-[5px] px-[18px]'
 				}
 			>
 				{isInviteSent ? 'Sent' : 'Invite'}
