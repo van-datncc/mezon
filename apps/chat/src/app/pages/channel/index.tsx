@@ -4,6 +4,7 @@ import {
 	channelMetaActions,
 	channelsActions,
 	clansActions,
+	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
@@ -17,7 +18,7 @@ import {
 import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useEffect, useMemo, useRef } from 'react';
+import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -27,15 +28,11 @@ function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
-
-	const numberNotification = useMemo(() => {
-		return currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
-	}, [currentChannel.count_mess_unread]);
-
+	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-	}, [channelId, currentChannel, dispatch, numberNotification]);
+	}, [channelId, currentChannel, dispatch]);
 
 	useEffect(() => {
 		if (!statusFetchChannel) return;
@@ -44,7 +41,15 @@ function useChannelSeen(channelId: string) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
+		if (!numberNotification && resetBadgeCount) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
+		}
 	}, [currentChannel.id, statusFetchChannel]);
+}
+
+function ChannelSeenListener({ channelId }: { channelId: string }) {
+	useChannelSeen(channelId);
+	return null;
 }
 
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
@@ -92,8 +97,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const appChannel = useSelector(selectAppChannelById(channelId));
-
-	useChannelSeen(currentChannel?.id || '');
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -161,7 +164,12 @@ export default function ChannelMain() {
 		return null;
 	}
 
-	return <ChannelMainContent channelId={currentChannel.id} />;
+	return (
+		<>
+			<ChannelMainContent channelId={currentChannel.id} />;
+			<ChannelSeenListener channelId={currentChannel?.id || ''} />
+		</>
+	);
 }
 
 const SearchMessageChannel = () => {

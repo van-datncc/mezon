@@ -86,7 +86,8 @@ export const APP_SCREEN = {
 		SEARCH_MESSAGE_CHANNEL: 'SEARCH_MESSAGE_CHANNEL',
 		CHANNEL_PERMISSION: 'CHANNEL_PERMISSION',
 		CHANGE_CATEGORY: 'CHANGE_CATEGORY',
-		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES'
+		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES',
+		STREAMING_ROOM: 'STREAMING_ROOM'
 	},
 
 	SETTINGS: {
@@ -138,7 +139,7 @@ type MenuThreadStackParamList = {
 	[APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity };
 };
 
-type MenuChannelStackParamList = {
+export type MenuChannelStackParamList = {
 	[APP_SCREEN.MENU_CHANNEL.SETTINGS]: {
 		channelId: string;
 	};
@@ -157,6 +158,7 @@ type MenuChannelStackParamList = {
 		id: string;
 		type?: number;
 	};
+	[APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM]: undefined;
 };
 
 type MenuClanStackParamList = {

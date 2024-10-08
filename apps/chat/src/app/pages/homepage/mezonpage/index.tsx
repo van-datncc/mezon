@@ -24,14 +24,14 @@ function MezonPage() {
 
 	const downloadUrl: string = useMemo(() => {
 		if (platform === 'MacOS') {
-			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.zip`;
+			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.dmg`;
 		} else if (platform === 'Linux') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-linux-amd64.deb`;
 		}
 		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
 	}, [platform]);
 
-	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.zip`;
+	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.dmg`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
@@ -130,28 +130,33 @@ function MezonPage() {
 							>
 								<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
 							</a>
-							{/* {platform === 'MacOS' ? ( */}
-							<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
-								<button onClick={toggleDropdown}>
-									<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />
-								</button>
+							{platform === 'MacOS' ? (
+								<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
+									<button onClick={toggleDropdown}>
+										<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />
+									</button>
 
-								{isOpen && (
-									<div className="absolute mt-[8px]">
-										<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
-											<Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" />
-										</a>
-										<a
-											className="cursor-pointer leading-[0px] block mt-[4px]"
-											href={universalUrl}
-											target="_blank"
-											rel="noreferrer"
-										>
-											<Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" />
-										</a>
-									</div>
-								)}
-							</div>
+									{isOpen && (
+										<div className="absolute mt-[8px] z-50">
+											<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
+												<Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" />
+											</a>
+											<a
+												className="cursor-pointer leading-[0px] block mt-[4px]"
+												href={universalUrl}
+												target="_blank"
+												rel="noreferrer"
+											>
+												<Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" />
+											</a>
+										</div>
+									)}
+								</div>
+							) : (
+								<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
+									<Icons.MicrosoftBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
+								</a>
+							)}
 						</div>
 					</div>
 				</div>

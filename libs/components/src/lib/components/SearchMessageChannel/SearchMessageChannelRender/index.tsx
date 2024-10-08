@@ -71,7 +71,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }
 				{groupedMessages.length > 0 ? (
 					<div
 						ref={messageContainerRef}
-						className="flex flex-col flex-1 h-full p-4 bg-bgLightSecondary dark:bg-bgSecondary overflow-y-auto overflow-x-hidden"
+						className="flex flex-col flex-1 h-full p-4 bg-bgLightSecondary dark:bg-bgSecondary max-h-[calc(100vh_-_120px)] overflow-y-auto overflow-x-hidden"
 					>
 						<div className="flex flex-col flex-1 gap-[20px]">
 							{groupedMessages.map((group, groupIndex) => (
@@ -83,7 +83,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }
 										{group.messages.map((searchMessage) => (
 											<div
 												key={searchMessage.message_id}
-												className="flex items-center px-[5px] pb-[12px] dark:bg-bgPrimary bg-white rounded-[6px] w-full"
+												className="flex items-center px-[5px] pb-[12px] dark:bg-bgPrimary bg-white rounded-[6px] w-full "
 											>
 												<MessageWithUser
 													allowDisplayShortProfile={false}
@@ -97,8 +97,8 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }
 								</div>
 							))}
 						</div>
-						<div className="mt-4 h-10">
-							{totalResult > 25 && (
+						{totalResult > 25 && (
+							<div className="mt-4 h-10">
 								<Pagination
 									className="flex justify-center"
 									currentPage={currentPage}
@@ -124,8 +124,8 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }
 										}
 									}}
 								/>
-							)}
-						</div>
+							</div>
+						)}
 					</div>
 				) : (
 					<EmptySearch />
