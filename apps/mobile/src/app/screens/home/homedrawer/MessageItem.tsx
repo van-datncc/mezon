@@ -1,13 +1,10 @@
 import {
 	ActionEmitEvent,
+	changeClan,
 	getUpdateOrAddClanChannelCache,
-	remove,
 	ReplyIcon,
 	ReplyMessageDeleted,
 	save,
-	setDefaultChannelLoader,
-	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_PREVIOUS_CHANNEL,
 	validLinkInviteRegex
@@ -37,7 +34,7 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { clansActions, selectCurrentChannel, selectCurrentClanId, setSelectedMessage } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClanId, setSelectedMessage } from '@mezon/store';
 import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -274,7 +271,7 @@ const MessageItem = React.memo(
 						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					}
 					if (currentClanId !== clanId) {
-						handleChangeClan(clanId);
+						changeClan(clanId);
 					}
 					DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
 						isFetchMemberChannelDM: true
@@ -285,21 +282,6 @@ const MessageItem = React.memo(
 				}
 			} catch (error) {
 				console.log(error);
-			}
-		}, []);
-
-		const handleChangeClan = useCallback(async (clanId: string) => {
-			const store = await getStoreAsync();
-			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-			save(STORAGE_CLAN_ID, clanId);
-			const promises = [];
-			promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
-			promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
-			promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
-			const results = await Promise.all(promises);
-			const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
-			if (channelResp) {
-				await setDefaultChannelLoader(channelResp.payload, clanId);
 			}
 		}, []);
 

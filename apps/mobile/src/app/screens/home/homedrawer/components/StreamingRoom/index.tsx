@@ -1,6 +1,9 @@
 import {
+	ActionEmitEvent,
+	changeClan,
 	getUpdateOrAddClanChannelCache,
 	Icons,
+	jumpToChannel,
 	load,
 	remove,
 	save,
@@ -8,12 +11,13 @@ import {
 	STORAGE_PREVIOUS_CHANNEL
 } from '@mezon/mobile-components';
 import { baseColor, Block, size, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
+import { selectCurrentClanId } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Animated, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Animated, DeviceEventEmitter, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { useSelector } from 'react-redux';
 import { InviteToChannel } from '..';
 import { MezonBottomSheet } from '../../../../../componentUI';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
@@ -35,6 +39,7 @@ export default function StreamingRoom() {
 	const bottomSheetInviteRef = useRef(null);
 	const bottomSheetSelectAudioRef = useRef(null);
 	const { t } = useTranslation(['streamingRoom']);
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	useEffect(() => {
 		showMenu();
@@ -98,22 +103,17 @@ export default function StreamingRoom() {
 			navigation.navigate(APP_SCREEN.HOME);
 			navigation.dispatch(DrawerActions.openDrawer());
 			const { channel_id, clan_id } = previousChannel || {};
+			if (currentClanId !== clan_id) {
+				changeClan(clan_id);
+			}
+			DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+				isFetchMemberChannelDM: true
+			});
 			const dataSave = getUpdateOrAddClanChannelCache(clan_id, channel_id);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			jumpToChannel(channel_id, clan_id);
 			remove(STORAGE_PREVIOUS_CHANNEL);
 		});
-	};
-
-	const jumpToChannel = async (channelId: string, clanId: string) => {
-		const store = await getStoreAsync();
-		store.dispatch(
-			channelsActions.joinChannel({
-				clanId,
-				channelId,
-				noFetchMembers: false
-			})
-		);
 	};
 
 	const handleVoice = () => {

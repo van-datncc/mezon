@@ -2,21 +2,19 @@ import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import {
 	ActionEmitEvent,
 	Icons,
-	STORAGE_CHANNEL_CURRENT_CACHE,
-	STORAGE_CLAN_ID,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_PREVIOUS_CHANNEL,
+	changeClan,
 	getUpdateOrAddClanChannelCache,
-	remove,
-	save,
-	setDefaultChannelLoader
+	jumpToChannel,
+	save
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { channelsActions, clansActions, getStoreAsync, selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
+import { selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -50,7 +48,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 			const channelId = channel?.channel_id;
 
 			if (currentClanId !== clanId) {
-				handleChangeClan(clanId);
+				changeClan(clanId);
 			}
 			DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
 				isFetchMemberChannelDM: true
@@ -62,31 +60,6 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 		}
 	};
 
-	const jumpToChannel = async (channelId: string, clanId: string) => {
-		const store = await getStoreAsync();
-		store.dispatch(
-			channelsActions.joinChannel({
-				clanId,
-				channelId,
-				noFetchMembers: false
-			})
-		);
-	};
-
-	const handleChangeClan = useCallback(async (clanId: string) => {
-		const store = await getStoreAsync();
-		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-		save(STORAGE_CLAN_ID, clanId);
-		const promises = [];
-		promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
-		promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
-		promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
-		const results = await Promise.all(promises);
-		const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
-		if (channelResp) {
-			await setDefaultChannelLoader(channelResp.payload, clanId);
-		}
-	}, []);
 	return (
 		<Block width={'100%'} paddingVertical={size.s_10} paddingHorizontal={size.s_10}>
 			<Block flexDirection="row" justifyContent="space-between">
