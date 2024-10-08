@@ -12,13 +12,14 @@ import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../
 import { memoizeAndTrack } from '../memoize';
 import { messagesActions } from '../messages/messages.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
+import { selectEntiteschannelCategorySetting } from '../notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { threadsActions } from '../threads/threads.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
-import { ChannelMetaEntity, channelMetaActions } from './channelmeta.slice';
+import { ChannelMetaEntity, channelMetaActions, enableMute } from './channelmeta.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -441,6 +442,10 @@ export const channelsSlice = createSlice({
 			});
 		},
 
+		setStatusChannelFetch: (state) => {
+			state.fetchChannelSuccess = false;
+		},
+
 		updateChannelPrivateSocket: (state, action: PayloadAction<ChannelUpdatedEvent>) => {
 			const payload = action.payload;
 			const entity = state.entities[payload.channel_id];
@@ -490,7 +495,6 @@ export const channelsSlice = createSlice({
 					}
 				});
 			}
-			state.fetchChannelSuccess = false;
 		}
 	},
 	extraReducers: (builder) => {
@@ -698,3 +702,14 @@ export const selectAppChannelById = (channelId: string) =>
 	});
 
 export const selectFetchChannelStatus = createSelector(getChannelsState, (state) => state.fetchChannelSuccess);
+
+export const selectAnyUnreadChannels = createSelector([getChannelsState, selectEntiteschannelCategorySetting], (state, settings) => {
+	for (let index = 0; index < state?.ids?.length; index++) {
+		const channel = state?.entities?.[state?.ids[index]];
+		if (settings?.[channel?.id]?.action === enableMute) continue;
+		if (channel.count_mess_unread && channel.count_mess_unread > 0) {
+			return true;
+		}
+	}
+	return false;
+});
