@@ -86,25 +86,6 @@ export function useMarkAsRead() {
 		[actionMarkAsRead, resetCountChannelBadge]
 	);
 
-	const handleClearBadge = useCallback(
-		async (channel: ChannelsEntity) => {
-			const body: ApiMarkAsReadRequest = {
-				clan_id: channel.clan_id,
-				category_id: channel.category_id,
-				channel_id: channel.channel_id
-			};
-
-			try {
-				const result = await actionMarkAsRead(body);
-
-				resetCountChannelBadge(channel);
-			} catch (error) {
-				console.error('Failed to mark as read:', error);
-			}
-		},
-		[actionMarkAsRead, resetCountChannelBadge]
-	);
-
 	const handleMarkAsReadCategory = useCallback(
 		async (category: ICategoryChannel) => {
 			const body: ApiMarkAsReadRequest = {
@@ -154,8 +135,7 @@ export function useMarkAsRead() {
 			handleMarkAsReadCategory,
 			statusMarkAsReadCategory,
 			handleMarkAsReadClan,
-			statusMarkAsReadClan,
-			handleClearBadge
+			statusMarkAsReadClan
 		}),
 		[
 			handleMarkAsReadChannel,
@@ -163,8 +143,7 @@ export function useMarkAsRead() {
 			handleMarkAsReadCategory,
 			statusMarkAsReadCategory,
 			handleMarkAsReadClan,
-			statusMarkAsReadClan,
-			handleClearBadge
+			statusMarkAsReadClan
 		]
 	);
 }
