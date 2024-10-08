@@ -1,8 +1,8 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import { STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
-import { load, save } from '../storage';
+import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '../../constant';
+import { load, remove, save } from '../storage';
 
 type ClanChannelPair = {
 	clanId: string;
@@ -107,4 +107,19 @@ export const cleanChannelData = (channels: any[]) => {
 			})
 		};
 	});
+};
+
+export const changeClan = async (clanId: string) => {
+	const store = await getStoreAsync();
+	await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+	save(STORAGE_CLAN_ID, clanId);
+	const promises = [];
+	promises.push(store.dispatch(clansActions.joinClan({ clanId: clanId })));
+	promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
+	promises.push(store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true })));
+	const results = await Promise.all(promises);
+	const channelResp = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
+	if (channelResp) {
+		await setDefaultChannelLoader(channelResp.payload, clanId);
+	}
 };
