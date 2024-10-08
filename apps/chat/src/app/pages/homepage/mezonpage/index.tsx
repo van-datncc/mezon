@@ -137,7 +137,7 @@ function MezonPage() {
 									</button>
 
 									{isOpen && (
-										<div className="absolute mt-[8px]">
+										<div className="absolute mt-[8px] z-50">
 											<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
 												<Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" />
 											</a>
