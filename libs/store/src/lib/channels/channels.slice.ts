@@ -124,7 +124,7 @@ export const joinChannel = createAsyncThunk(
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
 			thunkAPI.dispatch(notificationSettingActions.getNotificationSetting({ channelId }));
 			thunkAPI.dispatch(notifiReactMessageActions.getNotifiReactMessage({ channelId }));
-			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId, noCache: true }));
+			thunkAPI.dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: clanId ?? '', channelId: channelId }));
 
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ clanId: clanId, channelId, messageId }));
@@ -136,7 +136,7 @@ export const joinChannel = createAsyncThunk(
 				thunkAPI.dispatch(channelMembersActions.fetchChannelMembers({ clanId, channelId, channelType: ChannelType.CHANNEL_TYPE_TEXT }));
 			}
 			thunkAPI.dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: channelId }));
-			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId, noCache: true }));
+			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId }));
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			const parrentChannel = selectChannelById(channel?.parrent_id ?? '')(getChannelsRootState(thunkAPI));
 
