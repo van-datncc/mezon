@@ -25,7 +25,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 
 	const numberNotification = useMemo(() => {
 		return thread.count_mess_unread ? thread.count_mess_unread : 0;
-	}, [thread.count_mess_unread]);
+	}, [thread.channel_id, thread.count_mess_unread]);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const threadLinkRef = useRef<HTMLAnchorElement | null>(null);

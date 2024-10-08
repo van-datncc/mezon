@@ -64,6 +64,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	selectedChannelId?: string | null;
 	previousChannels: string[];
 	appChannelsList: Record<string, ApiChannelAppResponse>;
+	fetchChannelSuccess: boolean;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -323,12 +324,12 @@ export const fetchAppChannelCached = memoizeAndTrack(
 	}
 );
 
-type RequestType = {
+type fetchAppChannelsArgs = {
 	clanId: string;
 	noCache: boolean;
 };
 
-export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', async ({ clanId, noCache }: RequestType, thunkAPI) => {
+export const fetchAppChannels = createAsyncThunk('channels/fetchAppChannels', async ({ clanId, noCache }: fetchAppChannelsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	if (noCache) {
 		await fetchAppChannelCached.clear(mezon, clanId);
@@ -372,7 +373,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	modeResponsive: ModeResponsive.MODE_DM,
 	quantityNotifyChannels: {},
 	previousChannels: [],
-	appChannelsList: {}
+	appChannelsList: {},
+	fetchChannelSuccess: false
 });
 
 export const channelsSlice = createSlice({
@@ -432,6 +434,7 @@ export const channelsSlice = createSlice({
 				id: payload.channel_id,
 				changes: {
 					channel_label: payload.channel_label,
+					app_url: payload.app_url,
 					status: payload.status,
 					meeting_code: payload.meeting_code
 				}
@@ -487,6 +490,7 @@ export const channelsSlice = createSlice({
 					}
 				});
 			}
+			state.fetchChannelSuccess = false;
 		}
 	},
 	extraReducers: (builder) => {
@@ -496,6 +500,7 @@ export const channelsSlice = createSlice({
 			})
 			.addCase(fetchChannels.fulfilled, (state: ChannelsState, action: PayloadAction<ChannelsEntity[]>) => {
 				channelsAdapter.setAll(state, action.payload);
+				state.fetchChannelSuccess = true;
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchChannels.rejected, (state: ChannelsState, action) => {
@@ -691,3 +696,5 @@ export const selectAppChannelById = (channelId: string) =>
 	createSelector(getChannelsState, (state) => {
 		return state.appChannelsList[channelId];
 	});
+
+export const selectFetchChannelStatus = createSelector(getChannelsState, (state) => state.fetchChannelSuccess);

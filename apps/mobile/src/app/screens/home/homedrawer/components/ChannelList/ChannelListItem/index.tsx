@@ -49,6 +49,10 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		return currentChanelId === props?.data?.id;
 	}, [currentChanelId, props?.data?.id]);
 
+	const numberNotification = useMemo(() => {
+		return props?.data?.count_mess_unread ? props?.data?.count_mess_unread : 0;
+	}, [props?.data?.count_mess_unread]);
+
 	const dataThreads = useMemo(() => {
 		return !props?.data?.threads
 			? []
@@ -144,7 +148,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 					<ActivityIndicator color={themeValue.white} />
 				)}
 
-				{!!isUnRead && <ChannelBadgeUnread channelId={props.data?.channel_id} clanId={props.data?.clan_id} />}
+				{Number(numberNotification || 0) > 0 && <ChannelBadgeUnread countMessageUnread={Number(numberNotification || 0)} />}
 			</TouchableOpacity>
 
 			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />}

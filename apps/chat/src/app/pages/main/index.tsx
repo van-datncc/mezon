@@ -17,6 +17,7 @@ import {
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
+	selectChatStreamWidth,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
@@ -172,6 +173,7 @@ function MyApp() {
 	const currentDmIType = useSelector(selectDmGroupCurrentType);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
+	const chatStreamWidth = useSelector(selectChatStreamWidth);
 
 	useEffect(() => {
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
@@ -188,6 +190,10 @@ function MyApp() {
 	};
 	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannel?.id as string));
 	const allRolesInClan = useSelector(selectAllRoleIds);
+
+	const streamStyle = isShowChatStream
+		? { width: `calc(100vw - ${chatStreamWidth}px - 352px)`, right: `${chatStreamWidth + 8}px` }
+		: { width: closeMenu ? undefined : `calc(100vw - 344px)`, right: '0' };
 
 	return (
 		<div
@@ -267,7 +273,8 @@ function MyApp() {
 			<MainContent />
 
 			<div
-				className={`fixed h-[calc(100vh_-_60px)] ${isShowChatStream ? 'w-[calc(100vw_-_832px)] right-[488px]' : 'w-[calc(100vw_-_344px)] right-0'} bottom-0 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? ' flex justify-center items-center' : 'hidden pointer-events-none'}`}
+				className={`fixed h-[calc(100vh_-_60px)] bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
+				style={streamStyle}
 			>
 				<ChannelStream
 					key={currentStreamInfo?.streamId}
