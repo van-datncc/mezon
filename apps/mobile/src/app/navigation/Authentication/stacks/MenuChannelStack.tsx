@@ -64,7 +64,8 @@ export function MenuChannelStacks({}: any) {
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES} component={AdvancedPermissionOverrides} />
 			<Stack.Screen
 				options={{
-					headerShown: false
+					headerShown: false,
+					headerLeftLabelVisible: false
 				}}
 				name={APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM}
 				component={StreamingRoom}
