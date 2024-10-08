@@ -412,7 +412,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 	) : (
 		<div className="w-full h-full flex relative group" onMouseMove={handleMouseMoveOrClick} onClick={handleMouseMoveOrClick}>
 			<div className="flex flex-col justify-center gap-2 w-full bg-black">
-				<div className="relative min-h-40 items-center flex justify-center">
+				<div className={`relative min-h-40 h-full items-center flex justify-center ${memberJoin.length > 0 && showMembers ? 'mt-6' : ''}`}>
 					{hlsUrl ? (
 						<div
 							className={`transition-all duration-300 h-full max-sm:w-full w-${showMembers && !isShowChatStream ? '[70%]' : '[100%]'}`}
@@ -426,7 +426,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 					)}
 					{memberJoin.length > 0 && (
 						<div
-							className={`absolute z-50 opacity-0 transition-opacity duration-300 ${showMembers ? '-bottom-10' : `${isShowChatStream ? 'bottom-2' : 'bottom-20 max-[1700px]:bottom-2'}`} group-hover:opacity-100`}
+							className={`absolute z-50 opacity-0 transition-opacity duration-300 ${showMembers ? '-bottom-10' : `${isShowChatStream ? 'bottom-20' : 'bottom-20 max-[1700px]:bottom-2'}`} group-hover:opacity-100`}
 						>
 							<Tooltip
 								content={`${showMembers ? 'Hide Members' : 'Show Members'}`}
@@ -456,6 +456,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 						<UserListStreamChannel isShowChat={isShowChatStream} memberJoin={memberJoin}></UserListStreamChannel>
 					</div>
 				)}
+				{memberJoin.length > 0 && showMembers && <div className="h-20"></div>}
 			</div>
 			<div className="absolute z-50 bottom-4 left-1/2 transform -translate-x-1/2 translate-y-5 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
 				{showEndCallButton && (
