@@ -24,14 +24,14 @@ function MezonPage() {
 
 	const downloadUrl: string = useMemo(() => {
 		if (platform === 'MacOS') {
-			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.zip`;
+			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.dmg`;
 		} else if (platform === 'Linux') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-linux-amd64.deb`;
 		}
 		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
 	}, [platform]);
 
-	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.zip`;
+	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.dmg`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
