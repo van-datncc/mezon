@@ -42,7 +42,8 @@ export const fetchPermissionRoleChannelCached = memoizeAndTrack(
 		promise: true,
 		maxAge: 1000 * 60 * 3,
 		normalizer: (args) => {
-			return args[0].session?.username || '';
+			const username = args[0]?.session?.username || '';
+			return args[3] + args[2] + args[1] + username;
 		}
 	}
 );
