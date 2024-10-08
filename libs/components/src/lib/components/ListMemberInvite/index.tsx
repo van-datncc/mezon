@@ -18,6 +18,9 @@ const ListMemberInvite = (props: ModalParam) => {
 
 	const filteredListDMBySearch = useMemo(() => {
 		return listDMInvite?.filter((dmGroup) => {
+			if (dmGroup.usernames?.toLowerCase().includes(searchTerm.toLowerCase())) {
+				return dmGroup.usernames?.toLowerCase().includes(searchTerm.toLowerCase());
+			}
 			return dmGroup.channel_label?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
 	}, [listDMInvite, searchTerm]);
@@ -54,7 +57,7 @@ const ListMemberInvite = (props: ModalParam) => {
 				className={`py-[10px] pr-2 cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			>
 				{listDMInvite ? (
-					<div>
+					<div className="flex flex-col gap-3">
 						{filteredListDMBySearch?.map((dmGroup) => (
 							<ListMemberInviteItem
 								dmGroup={dmGroup}
@@ -66,7 +69,7 @@ const ListMemberInvite = (props: ModalParam) => {
 						))}
 					</div>
 				) : (
-					<div>
+					<div className="flex flex-col gap-3">
 						{filteredListUserBySearch?.map((user) => (
 							<ListMemberInviteItem user={user} key={user.id} url={props.url} onSend={handleSend} isSent={!!sendIds[user.id]} />
 						))}
