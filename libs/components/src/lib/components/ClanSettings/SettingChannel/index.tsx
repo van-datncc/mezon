@@ -1,15 +1,16 @@
 import { useCategory } from '@mezon/core';
-import { selectChannelMemberByUserIds, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { channelSettingActions, selectAllChannelSuggestion, selectCurrentClanId, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
-import { useMemo } from 'react';
+import { Avatar, Tooltip } from 'flowbite-react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 const ListChannelSetting = () => {
 	const { categorizedChannels } = useCategory();
 	const dispatch = useAppDispatch();
 	const selectClanId = useSelector(selectCurrentClanId);
-	const clanId = selectClanId == null || selectClanId === undefined ? '' : selectClanId;
+	const listChannel = useSelector(selectAllChannelSuggestion);
 
 	const memoizedCategorizedChannels = useMemo(() => {
 		return categorizedChannels.map((category: ICategoryChannel) => {
@@ -26,7 +27,28 @@ const ListChannelSetting = () => {
 			);
 		});
 	}, [categorizedChannels]);
-	return <div className="w-full flex flex-col gap-1">{memoizedCategorizedChannels}</div>;
+
+	useEffect(() => {
+		async function fetchListChannel() {
+			await dispatch(channelSettingActions.fetchChannelByUserId({ clanId: selectClanId as string }));
+		}
+		fetchListChannel();
+	}, []);
+	console.log('Lisst', listChannel);
+	return (
+		<div className="w-full flex flex-col gap-1">
+			<div className="w-full flex pl-12">
+				<span className="flex-1">Name</span>
+				<span className="flex-1">Members</span>
+				<span>Creator</span>
+			</div>
+			{listChannel.length > 0
+				? listChannel.map((channel, index) => (
+						<ItemInfor creatorId={'1809059413005176832'} label={'Hello Me'} privateChannel={1} isThread={false} key={index} />
+					))
+				: null}
+		</div>
+	);
 };
 
 interface ListChannelByCateProps {
@@ -86,26 +108,39 @@ const ItemInfor = ({
 	creatorId: string;
 	privateChannel: number;
 }) => {
-	const creatorChannel = useSelector((state) => selectChannelMemberByUserIds(state, creatorId as string));
+	const creatorChannel = useSelector(selectMemberClanByUserId(creatorId));
+	console.log('creatorChannel: ', creatorId);
+	// ${isThread ? 'after:content-[" "] after:w-4 after:h-16 after:rounded-l-md after:rounded-t-none after:border-l-2 after:border-b-2 after:bg-transparent after:border-channelTextLabel after:absolute after:bottom-8 after:-left-5 ' : ''}
 
 	return (
 		<div
-			className={`flex object-cover items-center py-3 px-3 gap-3 w-full relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0 
-    
-      ${isThread ? 'after:content-[" "] after:w-4 after:h-16 after:rounded-l-md after:rounded-t-none after:border-l-2 after:border-b-2 after:bg-transparent after:border-channelTextLabel after:absolute after:bottom-8 after:-left-5 ' : ''}
-    `}
+			className={`flex object-cover items-center py-3 px-3 gap-3 w-full relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0 `}
 		>
 			<div className="h-6 w-6">{isThread ? <Icons.ThreadIcon /> : privateChannel ? <Icons.HashtagLocked /> : <Icons.Hashtag />}</div>
 			<div className="flex-1">{label}</div>
-			<div className="h-8 w-8 rounded-full overflow-hidden flex object-cover">
-				<img
-					src={
-						creatorChannel[0]?.clan_avatar ||
-						creatorChannel[0]?.user?.avatar_url ||
-						'https://img.freepik.com/free-photo/digital-art-moon-tree-wallpaper_23-2150918811.jpg'
-					}
-				/>
+			<div className="flex-1 flex ">
+				<Avatar.Group className="flex gap-3 justify-end items-center">
+					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
+					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
+					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
+					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
+					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
+					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
+					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
+					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
+
+					<Avatar.Counter
+						total={50}
+						className="h-4 w-6 dark:text-bgLightPrimary text-bgPrimary ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
+					/>
+				</Avatar.Group>
 			</div>
+
+			<Tooltip content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel.user?.username}>
+				<div className="h-8 w-8 rounded-full overflow-hidden flex object-cover">
+					<img src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} />
+				</div>
+			</Tooltip>
 		</div>
 	);
 };
