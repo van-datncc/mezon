@@ -210,6 +210,7 @@ const MessageModalImage = () => {
 					/>
 					<div
 						className={`h-full w-12 absolute flex flex-col right-0 gap-2 justify-center ${scale === 1 ? 'opacity-100' : 'opacity-0 hover:opacity-100'}`}
+						onClick={(e) => e.stopPropagation()}
 					>
 						<div
 							className="rounded-full rotate-180 bg-bgTertiary cursor-pointer w-10 aspect-square flex items-center justify-center text-white"
