@@ -1,10 +1,11 @@
 import { Icons, LockIcon } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelUsersEntity } from '@mezon/store-mobile';
+import { ChannelUsersEntity, selectChannelById } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
 import style from './ChannelItem.styles';
 
 type ChannelItemProps = {
@@ -15,6 +16,8 @@ type ChannelItemProps = {
 export const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProps) => {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const { themeValue } = useTheme();
+	const parentChannel = useSelector(selectChannelById(channelData?.parrent_id || ''));
+	const parentLabel = useMemo(() => (parentChannel?.channel_label ? `(${parentChannel.channel_label})` : ''), [parentChannel]);
 	const styles = style(themeValue);
 	const handleOnPress = () => {
 		onPress && onPress(channelData);
@@ -36,7 +39,7 @@ export const ChannelItem = React.memo(({ channelData, onPress }: ChannelItemProp
 					)}
 					<Block>
 						<Block flexDirection="row" alignItems="center" gap={size.s_6} marginBottom={size.s_6}>
-							<Text style={styles.channelName}>{channelData?.channel_label}</Text>
+							<Text style={styles.channelName}>{`${channelData?.channel_label} ${parentLabel}`}</Text>
 						</Block>
 						{!!channelData?.clan_name && <Text style={styles.categoryChannel}>{channelData?.clan_name}</Text>}
 					</Block>

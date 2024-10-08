@@ -1,4 +1,4 @@
-import { version } from '@mezon/package-js';
+import mezonPackage from '@mezon/package-js';
 import { Icons } from '@mezon/ui';
 import { getPlatform } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -23,6 +23,7 @@ function MezonPage() {
 	};
 
 	const downloadUrl: string = useMemo(() => {
+		const version = mezonPackage.version;
 		if (platform === 'MacOS') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.dmg`;
 		} else if (platform === 'Linux') {
