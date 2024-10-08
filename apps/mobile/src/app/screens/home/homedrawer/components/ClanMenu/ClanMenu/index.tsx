@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { usePermissionChecker } from '@mezon/core';
+import { useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { categoriesActions, selectCurrentClan, selectIsShowEmptyCategory, useAppDispatch } from '@mezon/store-mobile';
@@ -33,6 +33,7 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const { dismiss } = useBottomSheetModal();
 	const dispatch = useAppDispatch();
+	const { handleMarkAsReadClan } = useMarkAsRead();
 
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const [showEmptyCategories, setShowEmptyCategories] = useState<boolean>(isShowEmptyCategory ?? true);
@@ -132,10 +133,19 @@ export default function ClanMenu({ inviteRef }: IServerMenuProps) {
 		}
 	];
 
+	const watchMenu: IMezonMenuItemProps[] = [
+		{
+			onPress: () => {
+				handleMarkAsReadClan();
+				dismiss();
+			},
+			title: t('menu.watchMenu.markAsRead')
+		}
+	];
 	const menu: IMezonMenuSectionProps[] = [
-		// {
-		// 	items: watchMenu,
-		// },
+		{
+			items: watchMenu
+		},
 		{
 			items: organizationMenu
 		},
