@@ -119,7 +119,7 @@ export const joinChat = createAsyncThunk(
 
 export const joinChannel = createAsyncThunk(
 	'channels/joinChannel',
-	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = false }: fetchChannelMembersPayload, thunkAPI) => {
+	async ({ clanId, channelId, noFetchMembers, messageId, isClearMessage = true }: fetchChannelMembersPayload, thunkAPI) => {
 		try {
 			thunkAPI.dispatch(channelsActions.setIdChannelSelected({ clanId, channelId }));
 			thunkAPI.dispatch(channelsActions.setCurrentChannelId(channelId));
@@ -130,7 +130,9 @@ export const joinChannel = createAsyncThunk(
 			if (messageId) {
 				thunkAPI.dispatch(messagesActions.jumpToMessage({ clanId: clanId, channelId, messageId }));
 			} else {
-				thunkAPI.dispatch(messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage }));
+				thunkAPI.dispatch(
+					messagesActions.fetchMessages({ clanId: clanId, channelId, isFetchingLatestMessages: true, isClearMessage, noCache: true })
+				);
 			}
 
 			if (!noFetchMembers) {
