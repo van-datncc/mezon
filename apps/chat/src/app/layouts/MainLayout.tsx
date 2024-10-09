@@ -48,7 +48,9 @@ const GlobalEventListener = () => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		const notificationCount = (allNotificationReplyMentionAllClan ?? 0) + totalUnreadMessages + quantityPendingRequest;
+		let notificationCountAllClan = 0;
+		notificationCountAllClan = allNotificationReplyMentionAllClan < 0 ? 0 : allNotificationReplyMentionAllClan;
+		const notificationCount = notificationCountAllClan + totalUnreadMessages + quantityPendingRequest;
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
 				electronBridge?.setBadgeCount(null);
