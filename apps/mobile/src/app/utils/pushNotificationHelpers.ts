@@ -223,7 +223,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 
 			// IS message DM
 			if (linkDirectMessageMatch) {
-				await store.dispatch(directActions.fetchDirectMessage({}));
+				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 				const messageId = linkDirectMessageMatch[1];
 				const clanIdCache = load(STORAGE_CLAN_ID);
 				store.dispatch(clansActions.joinClan({ clanId: '0' }));
