@@ -188,8 +188,8 @@ const MessageModalImage = () => {
 					<Icons.MenuClose className="text-white w-full" />
 				</div>
 			</div>
-			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col" onClick={closeModal}>
-				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative">
+			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col">
+				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative" onClick={closeModal}>
 					<img
 						src={urlImg}
 						alt={urlImg}
