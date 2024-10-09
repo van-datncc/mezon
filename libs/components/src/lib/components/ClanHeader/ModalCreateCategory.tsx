@@ -1,7 +1,11 @@
+import { checkDuplicateCategoryInClan, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { ValidateSpecialCharacters } from '@mezon/utils';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Modal } from 'flowbite-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce';
 
 type ModalCreateCategoryProps = {
 	openCreateCate: boolean;
@@ -11,18 +15,55 @@ type ModalCreateCategoryProps = {
 
 const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: ModalCreateCategoryProps) => {
 	const [nameCate, setNameCate] = useState('');
-	const [checkValidate, setCheckValidate] = useState(true);
+	const [checkCategoryName, setCheckCategoryName] = useState(true);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const dispatch = useAppDispatch();
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setNameCate(value);
-		const regex = ValidateSpecialCharacters();
-		if (regex.test(value) && value !== '') {
-			setCheckValidate(false);
-		} else {
-			setCheckValidate(true);
-		}
+	const messages = {
+		INVALID_NAME: `Please enter a valid category name (max 64 characters, only words, numbers, _ or -).`,
+		DUPLICATE_NAME: `The category  name already exists in the clan . Please enter another name.`
 	};
+	const [checkValidate, setCheckValidate] = useState(messages.INVALID_NAME);
+
+	const debouncedSetCategoryName = useDebouncedCallback(async (value: string) => {
+		const regex = ValidateSpecialCharacters();
+		if (regex.test(value)) {
+			await dispatch(
+				checkDuplicateCategoryInClan({
+					categoryName: value.trim(),
+					clanId: currentClanId ?? ''
+				})
+			)
+				.then(unwrapResult)
+				.then((result) => {
+					if (result) {
+						setCheckCategoryName(true);
+						setCheckValidate(messages.DUPLICATE_NAME);
+						return;
+					}
+					setCheckCategoryName(false);
+					setCheckValidate('');
+				});
+			return;
+		} else {
+			setCheckCategoryName(true);
+			setCheckValidate(messages.INVALID_NAME);
+		}
+	}, 300);
+
+	const handleInputChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			setNameCate(value);
+			if (value === '') {
+				setCheckCategoryName(true);
+			} else {
+				setCheckCategoryName(false);
+			}
+			debouncedSetCategoryName(value);
+		},
+		[debouncedSetCategoryName]
+	);
 
 	const handleCreateCate = () => {
 		onCreateCategory(nameCate);
@@ -58,11 +99,7 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 						value={nameCate}
 					/>
 				</div>
-				{checkValidate && (
-					<p className="text-[#e44141] text-xs italic font-thin">
-						Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).
-					</p>
-				)}
+				{checkValidate && <p className="text-[#e44141] text-xs italic font-thin">{checkValidate}</p>}
 				<div className="flex flex-row justify-between my-2 items-center">
 					<div className="flex flex-row items-center">
 						<Icons.LockIcon />
@@ -95,7 +132,7 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 				<button
 					className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
 					onClick={handleCreateCate}
-					disabled={checkValidate}
+					disabled={checkCategoryName}
 				>
 					Create Category
 				</button>

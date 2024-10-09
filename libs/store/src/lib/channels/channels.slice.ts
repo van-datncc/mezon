@@ -1,4 +1,4 @@
-import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput } from '@mezon/utils';
+import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput, TypeCheck } from '@mezon/utils';
 import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
@@ -170,7 +170,6 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.createChannelDesc(mezon.session, body);
-
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: body.clan_id as string, noCache: true }));
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
@@ -200,6 +199,25 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		return thunkAPI.rejectWithValue([]);
 	}
 });
+
+export const checkDuplicateChannelInCategory = createAsyncThunk(
+	'channels/checkDuplicateChannelInCategory',
+	async ({ channelName, categoryId }: { channelName: string; categoryId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(channelName, categoryId, TypeCheck.TYPECHANNEL);
+
+			if (isDuplicateName?.type === TypeCheck.TYPECHANNEL) {
+				return isDuplicateName.exist;
+			}
+			return;
+		} catch (error: any) {
+			Sentry.captureException(error);
+			const errmsg = await error.json();
+			return thunkAPI.rejectWithValue(errmsg.message);
+		}
+	}
+);
 
 export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (body: fetchChannelMembersPayload, thunkAPI) => {
 	try {
