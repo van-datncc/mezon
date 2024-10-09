@@ -47,10 +47,14 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 		if (isPlaying && videoElement) {
 			if (Hls.isSupported()) {
 				hls = new Hls({
-					lowLatencyMode: true,
-					enableWorker: true,
-					maxBufferLength: 30,
-					maxBufferSize: 60 * 1000 * 1000
+					enableWorker: true, // Improve performance and avoid lag/frame drops.
+					lowLatencyMode: true, // Enable Low-Latency HLS part playlist and segment loading.
+					liveSyncDurationCount: 2, // Start from the last few segments.
+					liveMaxLatencyDurationCount: 10, // Maximum delay allowed from edge of live.
+					maxBufferLength: 8, // Maximum buffer length in seconds.
+					maxMaxBufferLength: 10, // The max Maximum buffer length in seconds.
+					maxLiveSyncPlaybackRate: 1.2, // Catch up if the latency is large.
+					liveDurationInfinity: true // Override current Media Source duration to Infinity for a live broadcast.
 				});
 
 				hls.on(Hls.Events.ERROR, (event, data) => {
@@ -210,7 +214,7 @@ function HLSPlayer({ src }: MediaPlayerProps) {
 			onMouseMove={handleMouseMoveOrClick}
 			onClick={handleMouseMoveOrClick}
 		>
-			<video ref={videoRef} autoPlay playsInline controls={false} className="w-full h-full object-cover" />
+			<video ref={videoRef} autoPlay playsInline controls={false} className="w-full h-full object-contain" />
 
 			{isLoading && (
 				<div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex justify-center items-center text-white text-xl z-50">
@@ -355,7 +359,8 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
-		dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
+		const idStreamByMe = memberJoin?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
+		dispatch(usersStreamActions.remove(idStreamByMe || ''));
 		dispatch(appActions.setIsShowChatStream(false));
 		setShowMembers(true);
 	};
@@ -412,7 +417,7 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 	) : (
 		<div className="w-full h-full flex relative group" onMouseMove={handleMouseMoveOrClick} onClick={handleMouseMoveOrClick}>
 			<div className="flex flex-col justify-center gap-2 w-full bg-black">
-				<div className={`relative min-h-40 h-full items-center flex justify-center ${memberJoin.length > 0 && showMembers ? 'mt-6' : ''}`}>
+				<div className={`relative min-h-40 h-fit items-center flex justify-center ${memberJoin.length > 0 && showMembers ? 'mt-6' : ''}`}>
 					{hlsUrl ? (
 						<div
 							className={`transition-all duration-300 h-full max-sm:w-full w-${showMembers && !isShowChatStream ? '[70%]' : '[100%]'}`}
