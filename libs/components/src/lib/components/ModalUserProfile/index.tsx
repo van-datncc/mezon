@@ -8,7 +8,7 @@ import {
 	useSendInviteMessage,
 	useSettingFooter
 } from '@mezon/core';
-import { selectAllAccount, selectFriendStatus, selectMemberClanByUserId } from '@mezon/store';
+import { selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus, selectMemberClanByUserId } from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
@@ -78,6 +78,9 @@ const ModalUserProfile = ({
 	const userById = useSelector(selectMemberClanByUserId(userID ?? '')) as ChannelMembersEntity;
 	const date = new Date(userById?.user?.create_time as string | Date);
 	const { timeFormatted } = useFormatDate({ date });
+	const currentUserId = useSelector(selectCurrentUserId);
+	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
+	const displayCustomStatus = userID === currentUserId ? currentUserCustomStatus : userCustomStatus;
 
 	const [content, setContent] = useState<string>('');
 
@@ -159,7 +162,7 @@ const ModalUserProfile = ({
 				avatar={avatar || userById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
-				customStatus={userCustomStatus}
+				customStatus={displayCustomStatus}
 				isAnonymous={checkAnonymous}
 				userID={userID}
 				positionType={positionType}
