@@ -176,7 +176,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
 			<AnchorScroll ref={chatRef} anchorId={channelId}>
-				{isFetching && <ChannelMessages.Skeleton />}
+				{hasMoreTop && isFetching && <ChannelMessages.Skeleton />}
 				<div className="min-h-0 overflow-hidden">
 					{messages.map((messageId) => {
 						return (
