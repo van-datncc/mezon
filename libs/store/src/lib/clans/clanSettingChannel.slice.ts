@@ -26,7 +26,17 @@ export const initialSettingClanChannelState: SettingClanChannelState = channelSe
 
 export const fetchChannelByUserIdCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, clanId: string) => {
-		const response = await mezon.client.getChannelSettingInClan(mezon.session, clanId);
+		const response = await mezon.client.getChannelSettingInClan(
+			mezon.session,
+			clanId,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			100
+		);
 		return response;
 	},
 	{

@@ -1,147 +1,137 @@
-import { useCategory } from '@mezon/core';
 import { channelSettingActions, selectAllChannelSuggestion, selectCurrentClanId, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { Avatar, Tooltip } from 'flowbite-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 const ListChannelSetting = () => {
-	const { categorizedChannels } = useCategory();
 	const dispatch = useAppDispatch();
 	const selectClanId = useSelector(selectCurrentClanId);
 	const listChannel = useSelector(selectAllChannelSuggestion);
-
-	const memoizedCategorizedChannels = useMemo(() => {
-		return categorizedChannels.map((category: ICategoryChannel) => {
-			if (category.channels.length === 0) {
-				return null;
-			}
-			return (
-				<div className="flex flex-col w-full">
-					<div className="rounded-t w-fit px-2 py-2 dark:bg-bgSecondaryHover bg-bgLightModeThird text-channelActiveColor text-base shadow border-b-[1px] dark:border-bgTertiary uppercase font-semibold">
-						{category.category_name}
-					</div>
-					<ListChannelByCate key={category.id} category={category} channels={category.channels} />
-				</div>
-			);
-		});
-	}, [categorizedChannels]);
-
 	useEffect(() => {
 		async function fetchListChannel() {
 			await dispatch(channelSettingActions.fetchChannelByUserId({ clanId: selectClanId as string }));
 		}
 		fetchListChannel();
 	}, []);
-	console.log('Lisst', listChannel);
+	const parentRef = useRef(null);
+	const rowVirtualizer = useVirtualizer({
+		count: listChannel.length,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 56,
+		overscan: 5
+	});
 	return (
 		<div className="w-full flex flex-col gap-1">
-			<div className="w-full flex pl-12">
+			<div className="w-full flex pl-12 pr-4 justify-between items-center h-[48px] shadow border-b-[1px] dark:border-bgTertiary text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
 				<span className="flex-1">Name</span>
 				<span className="flex-1">Members</span>
 				<span>Creator</span>
 			</div>
-			{listChannel.length > 0
-				? listChannel.map((channel, index) => (
-						<ItemInfor creatorId={'1809059413005176832'} label={'Hello Me'} privateChannel={1} isThread={false} key={index} />
-					))
-				: null}
-		</div>
-	);
-};
-
-interface ListChannelByCateProps {
-	category: ICategoryChannel;
-	channels: ChannelThreads[];
-}
-
-const ListChannelByCate = ({ channels, category }: ListChannelByCateProps) => {
-	return (
-		<div className={`flex rounded-sm gap-2 dark:bg-bgSecondaryHover bg-bgLightModeThird`}>
-			<div className="space-y-0.5 text-contentTertiary flex-1">
-				{channels.map((channel: ChannelThreads) => {
-					return <ListThreadByChannel key={channel.id} channel={channel as ChannelThreads} />;
-				})}
+			<div className="h-[calc(100vh_-_136px)] overflow-y-auto  hide-scrollbar scroll-smooth" ref={parentRef}>
+				<div
+					style={{
+						height: `${rowVirtualizer.getTotalSize()}px`,
+						width: '100%',
+						position: 'relative'
+					}}
+				>
+					{rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
+						const channel = listChannel[virtualRow.index];
+						return (
+							<div
+								key={virtualRow.key}
+								style={{
+									position: 'absolute',
+									top: 0,
+									left: 0,
+									width: '100%',
+									height: `${virtualRow.size}px`,
+									transform: `translateY(${virtualRow.start}px)`
+								}}
+							>
+								<ItemInfor
+									creatorId={channel.creator_id as string}
+									label={channel.channel_label as string}
+									privateChannel={channel.channel_private as number}
+									isThread={channel.parent_id !== '0'}
+									key={channel.id}
+									userIds={channel.user_ids || []}
+								/>
+							</div>
+						);
+					})}
+				</div>
 			</div>
 		</div>
 	);
 };
 
-interface ListThreadByChannelProps {
-	channel: ChannelThreads;
-}
-
-const ListThreadByChannel = ({ channel }: ListThreadByChannelProps) => {
-	return (
-		<div className="flex overflow-hidden gap-1 flex-col dark:bg-bgSecondaryHover bg-bgLightModeThird rounded-lg dark:text-textDarkTheme text-textLightTheme">
-			<ItemInfor
-				creatorId={channel.creator_id as string}
-				label={channel.channel_label || ''}
-				privateChannel={channel.channel_private as number}
-			/>
-
-			{channel.threads?.length && channel.threads.length > 0 ? (
-				<div className="flex flex-col gap-1 pl-10">
-					{channel.threads.map((thread) => (
-						<ItemInfor
-							isThread={true}
-							creatorId={thread.category_id as string}
-							label={thread.channel_label || ''}
-							privateChannel={thread.channel_private as number}
-						/>
-					))}
-				</div>
-			) : null}
-		</div>
-	);
-};
+// };
 
 const ItemInfor = ({
 	isThread,
 	label,
 	creatorId,
-	privateChannel
+	privateChannel,
+	userIds
 }: {
 	isThread?: boolean;
 	label: string;
 	creatorId: string;
 	privateChannel: number;
+	userIds: string[];
 }) => {
 	const creatorChannel = useSelector(selectMemberClanByUserId(creatorId));
-	console.log('creatorChannel: ', creatorId);
-	// ${isThread ? 'after:content-[" "] after:w-4 after:h-16 after:rounded-l-md after:rounded-t-none after:border-l-2 after:border-b-2 after:bg-transparent after:border-channelTextLabel after:absolute after:bottom-8 after:-left-5 ' : ''}
 
 	return (
 		<div
 			className={`flex object-cover items-center py-3 px-3 gap-3 w-full relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0 `}
 		>
-			<div className="h-6 w-6">{isThread ? <Icons.ThreadIcon /> : privateChannel ? <Icons.HashtagLocked /> : <Icons.Hashtag />}</div>
+			<div className="h-6 w-6">
+				{isThread ? (
+					privateChannel ? (
+						<Icons.ThreadIconLocker />
+					) : (
+						<Icons.ThreadIcon />
+					)
+				) : privateChannel ? (
+					<Icons.HashtagLocked />
+				) : (
+					<Icons.Hashtag />
+				)}
+			</div>
 			<div className="flex-1">{label}</div>
 			<div className="flex-1 flex ">
-				<Avatar.Group className="flex gap-3 justify-end items-center">
-					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
-					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
-					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
-					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
-					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
-					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
-					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
-					<Avatar key={creatorId} img={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} rounded size="xs" />
-
-					<Avatar.Counter
-						total={50}
-						className="h-4 w-6 dark:text-bgLightPrimary text-bgPrimary ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
-					/>
-				</Avatar.Group>
+				{privateChannel ? (
+					<Avatar.Group className="flex gap-3 justify-end items-center">
+						{userIds.slice(0, 2).map((member) => (
+							<AvatarUser id={member} key={member} />
+						))}
+						{userIds.length > 1 && (
+							<Avatar.Counter
+								total={userIds.length - 1}
+								className="h-4 w-6 dark:text-bgLightPrimary text-bgPrimary ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
+							/>
+						)}
+					</Avatar.Group>
+				) : (
+					<p className="italic text-xs">(All Members)</p>
+				)}
 			</div>
 
-			<Tooltip content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel.user?.username}>
-				<div className="h-8 w-8 rounded-full overflow-hidden flex object-cover">
-					<img src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} />
+			<Tooltip content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel.user?.username} placement="left">
+				<div className="overflow-hidden flex w-12 items-center justify-center">
+					<img src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} className="w-8 h-8 object-cover rounded-full " />
 				</div>
 			</Tooltip>
 		</div>
 	);
 };
 export default ListChannelSetting;
+
+const AvatarUser = ({ id }: { id: string }) => {
+	const member = useSelector(selectMemberClanByUserId(id));
+	return <Avatar img={member?.clan_avatar || member?.user?.avatar_url} rounded size="xs" />;
+};
