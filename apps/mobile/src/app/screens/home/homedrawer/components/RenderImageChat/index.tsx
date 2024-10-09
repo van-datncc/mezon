@@ -1,6 +1,6 @@
-import { Block, Metrics, useTheme } from '@mezon/mobile-ui';
-import React from 'react';
-import { ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Block, Metrics, size, useTheme } from '@mezon/mobile-ui';
+import React, { useMemo } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { getAspectRatioSize, useImageResolution } from 'react-native-zoom-toolkit';
 import { style } from './styles';
@@ -8,7 +8,7 @@ import { style } from './styles';
 const widthMedia = Metrics.screenWidth - 150;
 const heightMedia = Metrics.screenHeight * 0.3;
 
-export const RenderImageChat = React.memo(({ image, index, disable, onPress, onLongPress }: any) => {
+export const RenderImageChat = React.memo(({ image, index, disable, onPress, onLongPress, images, remainingImagesCount }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { resolution } = useImageResolution({ uri: image.url });
@@ -19,7 +19,12 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 	});
 
 	const isUploading = !image?.url?.includes('http');
-
+	const photoSize = useMemo(() => {
+		return {
+			width: !imageSize?.height && !isUploading ? widthMedia : images?.length >= 2 ? widthMedia / 2 : imageSize.width * 0.8,
+			height: !imageSize?.height && !isUploading ? heightMedia : images?.length >= 2 ? heightMedia / 2 : imageSize.height * 0.8
+		};
+	}, [imageSize, images?.length, isUploading]);
 	if (!image.url) {
 		return null;
 	}
@@ -31,9 +36,10 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 				style={[
 					styles.imageMessageRender,
 					{
-						width: !imageSize?.height && !isUploading ? widthMedia : imageSize.width * 0.8,
-						height: !imageSize?.height && !isUploading ? heightMedia : imageSize.height * 0.8,
-						opacity: isUploading ? 0.5 : 1
+						width: photoSize?.width,
+						height: photoSize?.height,
+						opacity: isUploading ? 0.5 : 1,
+						marginVertical: !remainingImagesCount && images?.lenght === 1 ? size.s_6 : 0
 					}
 				]}
 				children={
@@ -47,8 +53,19 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 					uri: image?.url,
 					priority: FastImage.priority.high
 				}}
-				resizeMode={!imageSize?.height && !isUploading ? 'cover' : 'contain'}
+				resizeMode={!imageSize?.height && !isUploading ? 'cover' : images?.length >= 2 ? 'cover' : 'contain'}
 			/>
+			{!!remainingImagesCount && (
+				<View
+					style={{
+						...styles.overlay,
+						width: photoSize?.width,
+						height: photoSize?.height
+					}}
+				>
+					<Text style={styles.moreText}>+{remainingImagesCount}</Text>
+				</View>
+			)}
 		</TouchableOpacity>
 	);
 });
