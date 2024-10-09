@@ -38,31 +38,28 @@ const ListPinMessage = ({
 				<EmptyPinMess />
 			) : (
 				<div className="flex flex-col items-center justify-center space-y-2 py-2">
-					{listPinMessages
-						.slice()
-						.reverse()
-						.map((pinMessage) => {
-							// Parse content if it's a JSON string
-							let contentString = pinMessage.content;
-							if (typeof contentString === 'string') {
-								try {
-									const contentObject = JSON.parse(contentString);
-									contentString = contentObject.t;
-								} catch (e) {
-									console.error('Failed to parse content JSON:', e);
-								}
+					{listPinMessages.slice().map((pinMessage) => {
+						// Parse content if it's a JSON string
+						let contentString = pinMessage.content;
+						if (typeof contentString === 'string') {
+							try {
+								const contentObject = JSON.parse(contentString);
+								contentString = contentObject.t;
+							} catch (e) {
+								console.error('Failed to parse content JSON:', e);
 							}
+						}
 
-							return (
-								<ItemPinMessage
-									pinMessage={pinMessage}
-									contentString={contentString}
-									handleUnPinMessage={handleUnPinMessage}
-									key={pinMessage.id}
-									onClose={onClose}
-								/>
-							);
-						})}
+						return (
+							<ItemPinMessage
+								pinMessage={pinMessage}
+								contentString={contentString}
+								handleUnPinMessage={handleUnPinMessage}
+								key={pinMessage.id}
+								onClose={onClose}
+							/>
+						);
+					})}
 				</div>
 			)}
 		</div>
