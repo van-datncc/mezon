@@ -9,7 +9,7 @@ import { RenderVideoChat } from '../RenderVideoChat';
 
 interface IProps {
 	message: IMessageWithUser;
-	onLongPressImage: () => void;
+	onLongPressImage?: () => void;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 }
 const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
@@ -54,7 +54,7 @@ export const MessageAttachment = React.memo(({ message, onOpenImage, onLongPress
 				create_time: message.create_time
 			});
 		},
-		[message.create_time, message.sender_id, onOpenImage]
+		[message.create_time, message?.sender_id, onOpenImage]
 	);
 
 	const renderDocuments = () => {
