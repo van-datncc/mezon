@@ -164,6 +164,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 								}
 								trigger="click"
 								arrow={false}
+								placement="left-start"
 							>
 								<Tooltip content="Add Role">
 									<span className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base">
