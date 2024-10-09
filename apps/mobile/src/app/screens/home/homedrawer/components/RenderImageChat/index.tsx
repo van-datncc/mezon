@@ -21,8 +21,8 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 	const isUploading = !image?.url?.includes('http');
 	const photoSize = useMemo(() => {
 		return {
-			width: !imageSize?.height && !isUploading ? widthMedia : images?.length >= 2 ? imageSize.width * 0.6 : imageSize.width * 0.8,
-			height: !imageSize?.height && !isUploading ? heightMedia : images?.length >= 2 ? imageSize.height * 0.6 : imageSize.height * 0.8
+			width: !imageSize?.height && !isUploading ? widthMedia : images?.length >= 2 ? widthMedia / 2 : imageSize.width * 0.8,
+			height: !imageSize?.height && !isUploading ? heightMedia : images?.length >= 2 ? heightMedia / 2 : imageSize.height * 0.8
 		};
 	}, [imageSize, images?.length, isUploading]);
 	if (!image.url) {
@@ -53,7 +53,7 @@ export const RenderImageChat = React.memo(({ image, index, disable, onPress, onL
 					uri: image?.url,
 					priority: FastImage.priority.high
 				}}
-				resizeMode={!imageSize?.height && !isUploading ? 'cover' : 'contain'}
+				resizeMode={!imageSize?.height && !isUploading ? 'cover' : images?.length >= 2 ? 'cover' : 'contain'}
 			/>
 			{!!remainingImagesCount && (
 				<View
