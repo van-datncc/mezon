@@ -14,6 +14,7 @@ import {
 	selectDmGroupCurrent,
 	useAppDispatch
 } from '@mezon/store-mobile';
+import { TIME_OFFSET } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Image, Pressable, Text, View } from 'react-native';
@@ -28,15 +29,17 @@ function useChannelSeen(channelId: string) {
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
 	useEffect(() => {
-		if (lastMessage) {
-			if (mounted.current === channelId) {
-				return;
-			}
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
-			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+		if (mounted.current === channelId) {
+			return;
 		}
-	}, [channelId, dispatch, lastMessage]);
+		if (lastMessage) {
+			mounted.current = channelId;
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+			dispatch(directActions.setActiveDirect({ directId: channelId }));
+		}
+	}, [dispatch, channelId, lastMessage]);
 }
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {

@@ -1,16 +1,16 @@
-import { useAuth } from '@mezon/core';
 import { UserGroupIcon } from '@mezon/mobile-components';
 import { Block, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, selectDirectById, selectDirectsUnreadlist, useAppSelector } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import { style } from './styles';
 
-const UnreadDMBadgeItem = memo(({ dmId }: { dmId: string }) => {
+const UnreadDMBadgeItem = memo(({ dmId, numUnread }: { dmId: string; numUnread: number }) => {
+	const dm = useAppSelector((state) => selectDirectById(state, dmId)) || ({} as DirectEntity);
 	const navigation = useNavigation<any>();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -26,9 +26,9 @@ const UnreadDMBadgeItem = memo(({ dmId }: { dmId: string }) => {
 								<Text style={styles.textAvatar}>{dm?.channel_label?.charAt?.(0)}</Text>
 							</View>
 						)}
-						{dm?.count_mess_unread > 0 && (
+						{numUnread > 0 && (
 							<View style={styles.badge}>
-								<Text style={styles.badgeText}>{dm?.count_mess_unread || ''}</Text>
+								<Text style={styles.badgeText}>{numUnread || ''}</Text>
 							</View>
 						)}
 					</View>
@@ -37,9 +37,9 @@ const UnreadDMBadgeItem = memo(({ dmId }: { dmId: string }) => {
 				return (
 					<View style={styles.groupAvatar}>
 						<UserGroupIcon />
-						{dm?.count_mess_unread > 0 && (
+						{numUnread > 0 && (
 							<View style={styles.badge}>
-								<Text style={styles.badgeText}>{dm?.count_mess_unread}</Text>
+								<Text style={styles.badgeText}>{numUnread}</Text>
 							</View>
 						)}
 					</View>
@@ -48,8 +48,6 @@ const UnreadDMBadgeItem = memo(({ dmId }: { dmId: string }) => {
 				return <View />;
 		}
 	};
-
-	const dm = useAppSelector((state) => selectDirectById(state, dmId)) || ({} as DirectEntity);
 
 	const navigateToDirectMessageMDetail = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
@@ -66,27 +64,15 @@ const UnreadDMBadgeItem = memo(({ dmId }: { dmId: string }) => {
 });
 
 export const UnreadDMBadgeList = React.memo(() => {
-	const { userId } = useAuth();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const unReadDirectMessageList = useSelector(selectDirectsUnreadlist);
 
-	const filterUnreadDM = useCallback(
-		(dm: DirectEntity) => {
-			const { last_sent_message } = dm;
-			return last_sent_message?.sender_id !== userId;
-		},
-		[userId]
-	);
-	const unReadDM = useMemo(() => {
-		return unReadDirectMessageList.filter(filterUnreadDM);
-	}, [filterUnreadDM, unReadDirectMessageList]);
-
+	const unReadDM = useSelector(selectDirectsUnreadlist);
 	return (
 		<View style={[styles.container, !!unReadDM?.length && styles.containerBottom]}>
 			{!!unReadDM?.length &&
 				unReadDM?.map((dm: DirectEntity, index) => {
-					return <UnreadDMBadgeItem key={`${dm?.id}_${index}`} dmId={dm?.id} />;
+					return <UnreadDMBadgeItem key={`${dm?.id}_${index}`} dmId={dm?.id} numUnread={dm?.count_mess_unread || 0} />;
 				})}
 			{!!unReadDM?.length && <Block style={styles.lineBottom} />}
 		</View>

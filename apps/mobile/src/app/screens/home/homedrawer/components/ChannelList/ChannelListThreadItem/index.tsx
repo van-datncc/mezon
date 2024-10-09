@@ -43,6 +43,8 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 				) : (
 					<Block top={-size.s_20}>
 						<LongCornerIcon width={size.s_12} height={size.s_36} />
+						{/*hardcode virtual view to connect thread lines */}
+						<Block backgroundColor={'#535353'} width={1.5} height={size.s_6} position={'absolute'} top={-4} left={0} />
 					</Block>
 				)}
 				<TouchableOpacity
@@ -60,6 +62,7 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 							isUnReadChannel && styles.channelListItemTitleActive,
 							isActive && { backgroundColor: theme === 'light' ? themeValue.secondaryWeight : themeValue.secondaryLight }
 						]}
+						numberOfLines={1}
 					>
 						{thread?.channel_label}
 					</Text>
