@@ -1,10 +1,9 @@
 import { useAuth, useOnClickOutside } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannel, selectCurrentChannelId, selectDmGroupCurrentId, selectJumpPinMessageId } from '@mezon/store';
+import { MessagesEntity, selectCurrentChannel, selectJumpPinMessageId } from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_CHANNEL_LIST_BOX, WIDTH_CLAN_SIDE_BAR } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { useSelector } from 'react-redux';
 import ModalUserProfile from '../ModalUserProfile';
 import MessageAttachment from './MessageAttachment';
@@ -25,7 +24,6 @@ export type ReactedOutsideOptional = {
 
 export type MessageWithUserProps = {
 	message: MessagesEntity;
-	isMessNotifyMention?: boolean;
 	mode: number;
 	isMention?: boolean;
 	isEditing?: boolean;
@@ -40,7 +38,6 @@ export type MessageWithUserProps = {
 
 function MessageWithUser({
 	message,
-	isMessNotifyMention,
 	mode,
 	editor,
 	isMention,
@@ -52,59 +49,30 @@ function MessageWithUser({
 	isSearchMessage,
 	allowDisplayShortProfile
 }: Readonly<MessageWithUserProps>) {
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	const userLogin = useAuth();
+	const currentChannel = useSelector(selectCurrentChannel);
+	const panelRef = useRef<HTMLDivElement | null>(null);
 	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef } = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
-	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const [shortUserId, setShortUserId] = useState(senderId);
+	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
-	const handleOpenShortUser = useCallback(
-		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string) => {
-			if (checkAnonymous) {
-				return;
-			}
-			setShortUserId(userId);
-			const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
-			if (window.innerHeight - e.clientY > heightPanel) {
-				setPositionShortUser({
-					top: e.clientY,
-					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
-				});
-			} else {
-				setPositionShortUser({
-					top: window.innerHeight - heightPanel,
-					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
-				});
-			}
-			setIsShowPanelChannel(!isShowPanelChannel);
-		},
-		[message.message_id]
-	);
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
-	const userLogin = useAuth();
+	// Computed values
 	const isCombine = !message.isStartedMessageGroup;
 	const checkReplied = false;
 	const checkMessageTargetToMoved = false;
-	const currentDmId = useSelector(selectDmGroupCurrentId);
-	const currentChannel = useSelector(selectCurrentChannel);
-	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };
-
-	const currentDmOrChannelId = useMemo(
-		() => (mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannelId : currentDmId),
-		[currentChannelId, currentDmId, mode]
-	);
-	// Computed values
 	const attachments = message.attachments ?? [];
-	const mentions = message.mentions ?? [];
 	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
 	const isMeMessage = message.isMe;
 
 	const shouldNotRender = useMemo(() => {
+		const mentions = message?.mentions ?? [];
 		return hasFailedAttachment && !isMeMessage && Object.keys(message.content).length === 0 && mentions.length === 0;
-	}, [hasFailedAttachment, isMeMessage, message.content, mentions]);
+	}, [hasFailedAttachment, isMeMessage, message?.content, message?.mentions]);
 
 	const hasIncludeMention = useMemo(() => {
 		const userIdMention = userLogin.userProfile?.user?.id;
@@ -161,6 +129,30 @@ function MessageWithUser({
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
+
+	const handleOpenShortUser = useCallback(
+		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string) => {
+			if (checkAnonymous) {
+				return;
+			}
+			setShortUserId(userId);
+			const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
+			if (window.innerHeight - e.clientY > heightPanel) {
+				setPositionShortUser({
+					top: e.clientY,
+					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
+				});
+			} else {
+				setPositionShortUser({
+					top: window.innerHeight - heightPanel,
+					left: WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
+				});
+			}
+			setIsShowPanelChannel(!isShowPanelChannel);
+		},
+		[checkAnonymous, mode]
+	);
+
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -279,8 +271,36 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }
 };
 MessageWithUser.Skeleton = () => {
 	return (
-		<div className="flex py-0.5 min-w-min mx-3 h-15 mt-3 hover:bg-gray-950/[.07] overflow-x-hidden cursor-pointer flex-shrink-1">
-			<Skeleton circle={true} width={38} height={38} />
+		<div role="status" className="flex items-start space-x-4 p-4 animate-pulse">
+			{/* Avatar Skeleton with animation */}
+			<div className="w-10 h-10 bg-gray-500 rounded-full"></div>
+
+			{/* Message Content Skeleton with animation */}
+			<div className="flex-1 space-y-4 py-1">
+				{/* Username Skeleton */}
+				<div className="w-1/3 h-4 bg-gray-500 rounded-lg"></div>
+
+				{/* Text lines Skeleton */}
+				<div className="space-y-2">
+					<div className="w-full flex items-start space-x-2">
+						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
+						<div className="h-4 bg-gray-500 rounded-lg w-1/6"></div>
+						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
+						<div className="h-4 bg-gray-500 rounded-lg w-2/6"></div>
+					</div>
+					<div className="w-full flex items-start space-x-2">
+						<div className="h-4 bg-gray-500 rounded-lg w-1/6"></div>
+						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
+						<div className="h-4 bg-gray-500 rounded-lg w-1/6"></div>
+						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
+					</div>
+					<div className="w-5/6 flex items-start space-x-2">
+						<div className="h-4 bg-gray-600 rounded-lg w-3/6"></div>
+						<div className="h-4 bg-gray-600 rounded-lg w-2/6"></div>
+						<div className="h-4 bg-gray-500 rounded-lg w-1/6"></div>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 };

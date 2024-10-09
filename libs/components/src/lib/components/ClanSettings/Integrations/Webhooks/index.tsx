@@ -42,7 +42,7 @@ const Webhooks = ({ allWebhooks, currentChannel }: IWebhooksProps) => {
 	return (
 		<div className="pb-5">
 			<div className="dark:text-[#b5bac1] text-textLightTheme text-sm pt-5">
-				Webhooks are a simple way to post messages from other apps and websites into Discord using internet magic.
+				Webhooks are a simple way to post messages from other apps and websites into Mezon using internet magic.
 				<b className="font-semibold text-[#00a8fc] hover:underline cursor-pointer"> Learn more</b> or try{' '}
 				<b className="font-semibold text-[#00a8fc] hover:underline cursor-pointer">building one yourself.</b>
 			</div>

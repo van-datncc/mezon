@@ -86,7 +86,7 @@ const ClanLayout = () => {
 				</div>
 
 				{isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL && (
-					<div ref={chatStreamRef} className="flex flex-col flex-1 min-w-60 dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+					<div ref={chatStreamRef} className="flex flex-col flex-1 max-w-[480px] min-w-60 dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
 						<ChatStream currentChannel={currentChannel} />
 					</div>
 				)}

@@ -130,7 +130,8 @@ const MessageModalImage = () => {
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 	const [dragging, setDragging] = useState(false);
-	const handleMouseDown = (event: any) => {
+	const handleMouseDown = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+		event.stopPropagation();
 		setDragging(true);
 		setDragStart({
 			x: event.clientX - position.x,
@@ -147,7 +148,8 @@ const MessageModalImage = () => {
 		}
 	};
 
-	const handleMouseUp = () => {
+	const handleMouseUp = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+		event.stopPropagation();
 		setDragging(false);
 	};
 
@@ -186,7 +188,7 @@ const MessageModalImage = () => {
 					<Icons.MenuClose className="text-white w-full" />
 				</div>
 			</div>
-			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col">
+			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col" onClick={closeModal}>
 				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative">
 					<img
 						src={urlImg}
@@ -204,9 +206,11 @@ const MessageModalImage = () => {
 							rotate: `${rotate}deg`
 						}}
 						onContextMenu={handleContextMenu}
+						onClick={(e) => e.stopPropagation()}
 					/>
 					<div
 						className={`h-full w-12 absolute flex flex-col right-0 gap-2 justify-center ${scale === 1 ? 'opacity-100' : 'opacity-0 hover:opacity-100'}`}
+						onClick={(e) => e.stopPropagation()}
 					>
 						<div
 							className="rounded-full rotate-180 bg-bgTertiary cursor-pointer w-10 aspect-square flex items-center justify-center text-white"

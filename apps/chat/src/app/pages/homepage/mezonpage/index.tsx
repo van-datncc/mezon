@@ -1,4 +1,4 @@
-import { version } from '@mezon/package-js';
+import mezonPackage from '@mezon/package-js';
 import { Icons } from '@mezon/ui';
 import { getPlatform } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -22,6 +22,8 @@ function MezonPage() {
 		setSideBarIsOpen(!sideBarIsOpen);
 	};
 
+	const version = mezonPackage.version;
+
 	const downloadUrl: string = useMemo(() => {
 		if (platform === 'MacOS') {
 			return `https://cdn.mezon.vn/release/mezon-${version}-mac-arm64.dmg`;
@@ -29,7 +31,7 @@ function MezonPage() {
 			return `https://cdn.mezon.vn/release/mezon-${version}-linux-amd64.deb`;
 		}
 		return `https://cdn.mezon.vn/release/mezon-${version}-win-x64.exe`;
-	}, [platform]);
+	}, [platform, version]);
 
 	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.dmg`;
 
