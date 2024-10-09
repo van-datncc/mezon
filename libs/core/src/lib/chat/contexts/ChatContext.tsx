@@ -278,6 +278,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const isFriendPageView = location.pathname === '/chat/direct/friends';
 	const isDirectViewPage = location.pathname.includes('/chat/direct/message/');
 
+	const [isMinimized, setIsMinimized] = useState(false);
+
+	useEffect(() => {
+		window.electron.onWindowMinimized(() => {
+			setIsMinimized(true);
+			console.log('Window has been minimized');
+		});
+
+		return () => {
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			window.electron.removeListener('window-minimized', () => {});
+		};
+	}, []);
+
 	const onnotification = useCallback(
 		async (notification: Notification) => {
 			if (
