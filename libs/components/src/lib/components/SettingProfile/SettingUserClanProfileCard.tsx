@@ -1,5 +1,7 @@
-import { useAuth, useMemberCustomStatus } from '@mezon/core';
+import { useAuth } from '@mezon/core';
+import { selectAccountMetadata } from '@mezon/store';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import AvatarProfile from '../ModalUserProfile/AvatarProfile';
 import { getColorAverageFromURL } from './AverageColor';
 export type Profilesform = {
@@ -15,7 +17,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 	const { userProfile } = useAuth();
 	const { profiles, currentDisplayName } = props;
 	const checkUrl = profiles.urlImage === undefined || profiles.urlImage === '';
-	const { userCustomStatus } = useMemberCustomStatus(userProfile?.user?.id || '', props.isDM);
+	const userStatusProfile = useSelector(selectAccountMetadata)?.status || '';
 	const [color, setColor] = useState<string>('#323232');
 
 	useEffect(() => {
@@ -36,7 +38,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 				avatar={profiles.urlImage}
 				username={userProfile?.user?.username}
 				userToDisplay={true}
-				customStatus={userCustomStatus}
+				customStatus={userStatusProfile}
 				userID={userProfile?.user?.id}
 			/>
 			<div className="px-[16px]">

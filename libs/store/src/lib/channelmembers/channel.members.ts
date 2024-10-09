@@ -3,7 +3,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import * as Sentry from '@sentry/browser';
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
-import { selectAllAccount } from '../account/account.slice';
+import { accountActions, selectAllAccount } from '../account/account.slice';
 import { ChannelsEntity } from '../channels/channels.slice';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState, selectEntitesUserClans } from '../clanMembers/clan.members';
 import { DirectEntity, selectDirectById, selectDirectMessageEntities } from '../direct/direct.slice';
@@ -179,6 +179,8 @@ export const updateCustomStatus = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const response = await mezon.socketRef.current?.writeCustomStatus(clanId, customStatus);
+			thunkAPI.dispatch(accountActions.setCustomStatus(customStatus));
+			thunkAPI.dispatch(accountActions.getUserProfile({ noCache: true }));
 			if (response) {
 				return response;
 			}
