@@ -2,7 +2,7 @@ import { useAuth, useMemberCustomStatus, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	channelMembersActions,
-	selectAccountMetadata,
+	selectAccountCustomStatus,
 	selectAllAccount,
 	selectCurrentClanId,
 	selectShowModalCustomStatus,
@@ -38,7 +38,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const appearanceTheme = useSelector(selectTheme);
 	const userProfile = useSelector(selectAllAccount);
-	const userStatusProfile = useSelector(selectAccountMetadata)?.status;
+	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
 

@@ -154,7 +154,11 @@ const Layout = memo((props: LayoutProps) => {
 										}
 									/>
 									<div className={`${sideBarIsOpen ? 'unset' : 'relative'} flex flex-col items-center justify-center w-full`}>
-										<Image className="w-full" src={`../../../assets/multiple-conversation-reply.png`} alt={'conversationReply'} />
+										<Image
+											className="w-full"
+											src={`../../../assets/multiple-conversation-reply.svg`}
+											alt={'conversation reply'}
+										/>
 									</div>
 								</AnimatedSection>
 							</div>
@@ -169,16 +173,19 @@ const Layout = memo((props: LayoutProps) => {
 								>
 									<HeaderFeature content="Gaming & Entertainment" />
 									<div className="flex flex-col gap-[23px] max-md:gap-[12px] max-md:items-center">
-										{['Game Rooms & Channels', 'Developer-Driven Game Creation', 'Token-Driven Gaming Economy'].map((text) => (
-											<div
-												className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
-												style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
-											>
-												<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
-													{text}
-												</span>
-											</div>
-										))}
+										{['Game Rooms & Channels', 'Developer-Driven Game Creation', 'Token-Driven Gaming Economy'].map(
+											(text, index) => (
+												<div
+													key={index}
+													className="p-[16px] border border-[#4465FF4D] rounded-[8px] max-md:rounded-[6.67px] max-md:p-[13.33px] border-[0.83px] bg-[#0A052C] w-fit"
+													style={{ boxShadow: '0px 4px 24px 16px rgba(34, 17, 146, 0.4) inset' }}
+												>
+													<span className="font-normal text-[20px] leading-[28px] text-[#92B8FF] max-md:text-[16.67px] max-md:leading-[23.33px]">
+														{text}
+													</span>
+												</div>
+											)
+										)}
 									</div>
 									<Image
 										src={`../../../assets/cube.png`}

@@ -74,6 +74,7 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId }));
 		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId }));
 		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
+		thunkAPI.dispatch(channelsActions.setStatusChannelFetch());
 		thunkAPI.dispatch(
 			voiceActions.fetchVoiceChannelMembers({
 				clanId: clanId ?? '',
@@ -290,14 +291,15 @@ export const clansSlice = createSlice({
 		removeByClanID: (state, action: PayloadAction<string>) => {
 			clansAdapter.removeOne(state, action.payload);
 		},
-		updateClanBadgeCount: (state: ClansState, action: PayloadAction<{ clanId: string; count: number }>) => {
-			const { clanId, count } = action.payload;
+		updateClanBadgeCount: (state: ClansState, action: PayloadAction<{ clanId: string; count: number; isReset?: boolean }>) => {
+			const { clanId, count, isReset } = action.payload;
 			const entity = state.entities[clanId];
+
 			if (entity) {
 				clansAdapter.updateOne(state, {
 					id: clanId,
 					changes: {
-						badge_count: (entity.badge_count ?? 0) + count
+						badge_count: !isReset ? (entity.badge_count ?? 0) + count : 0
 					}
 				});
 			}

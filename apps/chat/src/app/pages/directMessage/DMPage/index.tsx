@@ -18,6 +18,7 @@ import {
 	useThreads
 } from '@mezon/core';
 import {
+	directActions,
 	directMetaActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
@@ -50,6 +51,7 @@ function useChannelSeen(channelId: string) {
 			const timestamp = Date.now() / 1000;
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+			dispatch(directActions.setActiveDirect({ directId: channelId }));
 		}
 	}, [dispatch, channelId, lastMessage]);
 }

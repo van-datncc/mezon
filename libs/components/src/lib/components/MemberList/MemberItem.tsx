@@ -1,5 +1,5 @@
 import { useAuth, useMemberCustomStatus } from '@mezon/core';
-import { ChannelMembersEntity, selectAccountMetadata } from '@mezon/store';
+import { ChannelMembersEntity, selectAccountCustomStatus } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,7 +19,7 @@ export type MemberItemProps = {
 function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name, isDM }: MemberItemProps) {
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '', isDM);
 	const { userProfile } = useAuth();
-	const currentUserCustomStatus = useSelector(selectAccountMetadata)?.status;
+	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 	const displayCustomStatus = user.user?.id === userProfile?.user?.id ? currentUserCustomStatus : userCustomStatus;
 
 	const isMe = useMemo(() => {
@@ -43,6 +43,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			positionType={positionType}
 			dataMemberCreate={dataMemberCreate}
 			hideLongName={true}
+			isDM={isDM}
 		/>
 	);
 }

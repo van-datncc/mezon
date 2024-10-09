@@ -122,6 +122,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			if (channel.status === StatusVoiceChannel.Active) {
 				dispatch(channelsActions.setCurrentVoiceChannelId(id));
 				dispatch(voiceActions.setStatusCall(true));
+				dispatch(videoStreamActions.stopStream());
 			}
 		};
 

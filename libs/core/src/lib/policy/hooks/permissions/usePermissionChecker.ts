@@ -68,7 +68,7 @@ function usePermissionChecker(permissions: string[], channelId?: string) {
 	}, [permissions, checkPermission]);
 
 	useEffect(() => {
-		if (currentClanId && channelId && !Object.keys(overriddenPermissions).length) {
+		if (currentClanId && currentClanId !== '0' && channelId && !Object.keys(overriddenPermissions).length) {
 			dispatch(overriddenPoliciesActions.fetchMaxChannelPermission({ clanId: currentClanId, channelId }));
 		}
 	}, [channelId, currentClanId, dispatch, overriddenPermissions]);

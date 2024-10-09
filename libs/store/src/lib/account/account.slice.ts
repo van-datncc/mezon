@@ -95,3 +95,5 @@ export const selectCurrentUserId = createSelector(getAccountState, (state: Accou
 export const selectAnonymousMode = createSelector(getAccountState, (state: AccountState) => state.anonymousMode);
 
 export const selectAccountMetadata = createSelector(getAccountState, (state: AccountState) => JSON.parse(state.userProfile?.user?.metadata || '{}'));
+
+export const selectAccountCustomStatus = createSelector(selectAccountMetadata, (metadata) => metadata?.status || '');

@@ -1,5 +1,5 @@
-import { useAuth } from '@mezon/core';
-import { selectCurrentStreamInfo, selectTheme, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
+import { useAuth, useMenu } from '@mezon/core';
+import { selectCloseMenu, selectCurrentStreamInfo, selectTheme, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -10,12 +10,20 @@ const StreamInfo = () => {
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const channelPath = `/chat/clans/${currentStreamInfo?.clanId}/channels/${currentStreamInfo?.streamId}`;
 	const appearanceTheme = useSelector(selectTheme);
+	const { setStatusMenu } = useMenu();
+	const closeMenu = useSelector(selectCloseMenu);
 
 	const handleLeaveChannel = async () => {
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
 		dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
+	};
+
+	const handleClick = () => {
+		if (closeMenu) {
+			setStatusMenu(false);
+		}
 	};
 
 	const streamAddress = `${currentStreamInfo?.streamName + ' / ' + currentStreamInfo?.clanName}`;
@@ -33,7 +41,7 @@ const StreamInfo = () => {
 						<Icons.NetworkStatus defaultSize="w-4 h-4 dark:text-channelTextLabel" />
 						<div className="text-green-700 font-bold text-base">Stream Connected</div>
 					</div>
-					<Link to={channelPath}>
+					<Link to={channelPath} onClick={handleClick}>
 						<div className="hover:underline font-medium dark:text-channelTextLabel text-colorTextLightMode text-xs dark:text-contentSecondary">
 							{streamAddress && streamAddress.length > 30 ? `${streamAddress.substring(0, 30)}...` : streamAddress}
 						</div>

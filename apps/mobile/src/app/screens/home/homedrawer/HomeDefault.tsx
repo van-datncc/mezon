@@ -6,12 +6,11 @@ import {
 	RootState,
 	channelMembersActions,
 	channelMetaActions,
+	channelsActions,
 	clansActions,
 	selectAllClans,
 	selectChannelById,
 	selectCurrentChannel,
-	selectLastChannelTimestamp,
-	selectMentionAndReplyUnreadByChanneld,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, TIME_OFFSET } from '@mezon/utils';
@@ -31,18 +30,26 @@ import { ChatBox } from './ChatBox';
 import PanelKeyboard from './PanelKeyboard';
 import { IModeKeyboardPicker } from './components';
 import LicenseAgreement from './components/LicenseAgreement';
-import StreamingRoom from './components/StreamingRoom';
 import { style } from './styles';
 
-function useChannelSeen(channelId: string, clanId: string) {
+function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
-	const getLastSeenChannel = useSelector(selectLastChannelTimestamp(channelId ?? ''));
-	const numberNotification = useSelector(selectMentionAndReplyUnreadByChanneld(clanId ?? '', channelId ?? '', getLastSeenChannel ?? 0)).length;
+	const currentChannel = useSelector(selectChannelById(channelId));
+	const numberNotification = useMemo(() => {
+		return currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
+	}, [currentChannel?.count_mess_unread]);
+
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		dispatch(clansActions.updateClanBadgeCount({ clanId: clanId ?? '', count: numberNotification * -1 }));
-	}, [channelId, clanId, dispatch, numberNotification]);
+	}, [channelId, currentChannel, dispatch, numberNotification]);
+
+	useEffect(() => {
+		if (numberNotification && numberNotification > 0) {
+			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
+		}
+	}, [channelId, currentChannel?.clan_id, dispatch, numberNotification]);
 }
 
 const HomeDefault = React.memo((props: any) => {
@@ -60,14 +67,13 @@ const HomeDefault = React.memo((props: any) => {
 	const panelKeyboardRef = useRef(null);
 	const prevChannelIdRef = useRef<string>();
 
-	useChannelSeen(currentChannel?.channel_id || '', currentChannel?.clan_id || '');
+	useChannelSeen(currentChannel?.channel_id || '');
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
 		}
 	}, []);
 
-	const isChannelStream = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_STREAMING, [currentChannel?.type]);
 	const isChannelApp = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_APP, [currentChannel?.type]);
 
 	useEffect(() => {
@@ -150,7 +156,7 @@ const HomeDefault = React.memo((props: any) => {
 				onOpenDrawer={onOpenDrawer}
 				parentChannelLabel={parent?.channel_label || ''}
 			/>
-			{currentChannel && isFocusChannelView && !isChannelStream && !isChannelApp && (
+			{currentChannel && isFocusChannelView && !isChannelApp && (
 				<View style={styles.channelView}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
@@ -168,7 +174,6 @@ const HomeDefault = React.memo((props: any) => {
 					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel.channel_id} currentClanId={currentChannel?.clan_id} />
 				</View>
 			)}
-			{isChannelStream ? <StreamingRoom /> : null}
 
 			<MezonBottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
 				<NotificationSetting />

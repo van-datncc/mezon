@@ -4,10 +4,12 @@ import {
 	channelMetaActions,
 	channelsActions,
 	clansActions,
+	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
+	selectFetchChannelStatus,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
 	selectStatusMenu,
@@ -16,7 +18,7 @@ import {
 import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useEffect, useMemo, useRef } from 'react';
+import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -25,21 +27,29 @@ import { ChannelTyping } from './ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
-	const numberNotification = useMemo(() => {
-		return currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
-	}, [currentChannel.count_mess_unread]);
-
+	const statusFetchChannel = useSelector(selectFetchChannelStatus);
+	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-	}, [channelId, currentChannel, dispatch, numberNotification]);
+	}, [channelId, currentChannel, dispatch]);
 
 	useEffect(() => {
+		if (!statusFetchChannel) return;
+		const numberNotification = currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
-	}, [numberNotification]);
+		if (!numberNotification && resetBadgeCount) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
+		}
+	}, [currentChannel.id, statusFetchChannel]);
+}
+
+function ChannelSeenListener({ channelId }: { channelId: string }) {
+	useChannelSeen(channelId);
+	return null;
 }
 
 const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
@@ -88,8 +98,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const appChannel = useSelector(selectAppChannelById(channelId));
 
-	useChannelSeen(currentChannel?.id || '');
-
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
@@ -122,7 +130,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 			>
 				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
 					<div
-						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && 'hidden'} z-10`}
+						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && 'hidden'} z-10`}
 					>
 						<div
 							className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
@@ -156,7 +164,12 @@ export default function ChannelMain() {
 		return null;
 	}
 
-	return <ChannelMainContent channelId={currentChannel.id} />;
+	return (
+		<>
+			<ChannelMainContent channelId={currentChannel.id} />;
+			<ChannelSeenListener channelId={currentChannel?.id || ''} />
+		</>
+	);
 }
 
 const SearchMessageChannel = () => {

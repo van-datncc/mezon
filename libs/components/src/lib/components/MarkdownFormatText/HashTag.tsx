@@ -1,5 +1,15 @@
 import { useAppNavigation, useAppParams, useMessageValue } from '@mezon/core';
-import { selectChannelById, selectCurrentChannel, selectHashtagDmById } from '@mezon/store';
+import {
+	appActions,
+	selectChannelById,
+	selectClanById,
+	selectCurrentChannel,
+	selectCurrentStreamInfo,
+	selectHashtagDmById,
+	selectStatusStream,
+	useAppDispatch,
+	videoStreamActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -14,6 +24,7 @@ type ChannelHashtagProps = {
 };
 
 const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble }: ChannelHashtagProps) => {
+	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const [openModal, setOpenModal] = useState(false);
 	const { clanId } = useAppParams();
@@ -22,6 +33,9 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const currentChannel = useSelector(selectCurrentChannel);
 	const hashtagDm = useSelector(selectHashtagDmById(channelHastagId.slice(2, -1)));
 	const hashtagChannel = useSelector(selectChannelById(channelHastagId.slice(2, -1)));
+	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const playStream = useSelector(selectStatusStream);
+	const clanById = useSelector(selectClanById(clanId || ''));
 	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
 		if (channelHastagId.startsWith('<#') && channelHastagId.endsWith('>')) {
 			return toChannelPage(channelHastagId.slice(2, -1), clanId || '');
@@ -54,7 +68,20 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 			window.open(urlVoice, '_blank', 'noreferrer');
 		}
-	}, [channel]);
+		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+			if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
+				dispatch(
+					videoStreamActions.startStream({
+						clanId: clanId || '',
+						clanName: clanById?.clan_name || '',
+						streamId: channel?.channel_id || '',
+						streamName: channel?.channel_label || ''
+					})
+				);
+				dispatch(appActions.setIsShowChatStream(false));
+			}
+		}
+	}, [channel, clanById, clanId, currentStreamInfo?.streamId, dispatch, playStream]);
 	const tokenClickAble = () => {
 		if (!isJumMessageEnabled || isTokenClickAble) {
 			handleClick();
