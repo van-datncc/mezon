@@ -1023,6 +1023,13 @@ export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 }
 
 export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEntity) {
+	if (a.isFirst && !b.isFirst) {
+		return -1;
+	}
+	if (!a.isFirst && b.isFirst) {
+		return 1;
+	}
+
 	if (a.create_time_seconds && b.create_time_seconds) {
 		return +a.create_time_seconds - +b.create_time_seconds;
 	}
