@@ -13,7 +13,7 @@ export const RenderVideoChat = React.memo(
 		const isUploading = !videoURL?.includes('http');
 
 		return (
-			<Block marginTop={size.s_10} opacity={isUploading || videoDimensions?.isLoading ? 0.5 : 1}>
+			<Block marginTop={size.s_10} marginBottom={size.s_6} opacity={isUploading || videoDimensions?.isLoading ? 0.5 : 1}>
 				<ExpoVideo
 					onError={(err) => {
 						console.log('load error', err);
