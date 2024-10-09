@@ -166,7 +166,7 @@ export default function ChannelMain() {
 
 	return (
 		<>
-			<ChannelMainContent channelId={currentChannel.id} />;
+			<ChannelMainContent channelId={currentChannel.id} />
 			<ChannelSeenListener channelId={currentChannel?.id || ''} />
 		</>
 	);
