@@ -10,6 +10,7 @@ import {
 	selectIdMessageToJump,
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
+	selectIsViewingOlderMessagesByChannelId,
 	selectLastMessageByChannelId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
@@ -39,6 +40,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const isJumpingToPresent = useSelector(selectIsJumpingToPresent(channelId));
+	const isViewOlderMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channelId));
 	const isMessageExist = useSelector(selectIsMessageIdExist(channelId, idMessageToJump));
 	const isFetching = useSelector(selectMessageIsLoading);
 	const hasMoreTop = useSelector(selectHasMoreMessageByChannelId(channelId));
@@ -164,18 +166,25 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 
 	// Handle scroll to bottom when user on the bottom and received new message
 	useEffect(() => {
-		if (userId === lastMessage?.sender_id) {
+		if (isViewOlderMessage) {
 			return;
 		}
+
+		if (userId === lastMessage?.sender_id) {
+			scrollToLastMessage({ behavior: 'instant' });
+			return;
+		}
+
 		const timeoutId = setTimeout(() => {
 			const bottomOffsetToScroll = 100;
 			const isNearBottom = getChatScrollBottomOffset() < bottomOffsetToScroll;
 			if (isNearBottom) {
-				scrollToLastMessage();
+				scrollToLastMessage({ behavior: 'instant' });
 			}
 		}, 100);
+
 		return () => timeoutId && clearTimeout(timeoutId);
-	}, [lastMessage, userId, scrollToLastMessage, getChatScrollBottomOffset]);
+	}, [lastMessage, userId, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
