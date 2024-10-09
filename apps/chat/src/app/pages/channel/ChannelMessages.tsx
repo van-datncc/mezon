@@ -90,23 +90,32 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 
 	const chatScrollRef = useChatScroll<HTMLDivElement>(chatRef, chatRefData, loadMoreMessage);
 
+	const getChatScrollBottomOffset = useCallback(() => {
+		const element = chatRef.current;
+		if (!element) {
+			return 0;
+		}
+		return Math.abs(element?.scrollHeight - element?.clientHeight - element?.scrollTop);
+	}, []);
+
 	const scrollToMessageById = useCallback(
 		(messageId: string, options: ScrollIntoViewOptions = { behavior: 'smooth' }) => {
 			return new Promise<void>((resolve) => {
+				const isAtBottom = getChatScrollBottomOffset() <= 1;
 				const messageElement = listMessageRefs.current[messageId];
 				if (messageElement) {
-					messageElement.scrollIntoView(options);
+					!isAtBottom && messageElement.scrollIntoView(options);
 					resolve();
 				} else {
 					// If message not rendered yet, wait a bit and try again
 					setTimeout(() => {
-						listMessageRefs.current[messageId]?.scrollIntoView(options);
+						!isAtBottom && listMessageRefs.current[messageId]?.scrollIntoView(options);
 						resolve();
 					}, 0);
 				}
 			});
 		},
-		[listMessageRefs]
+		[getChatScrollBottomOffset]
 	);
 
 	const scrollToLastMessage = useCallback(
@@ -159,19 +168,14 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 			return;
 		}
 		const timeoutId = setTimeout(() => {
-			const element = chatRef.current;
-			if (!element) {
-				return;
-			}
-
 			const bottomOffsetToScroll = 100;
-			const isNearBottom = element?.scrollHeight - element?.scrollTop - element?.clientHeight < bottomOffsetToScroll;
+			const isNearBottom = getChatScrollBottomOffset() < bottomOffsetToScroll;
 			if (isNearBottom) {
 				scrollToLastMessage();
 			}
 		}, 100);
 		return () => timeoutId && clearTimeout(timeoutId);
-	}, [lastMessage, userId, scrollToLastMessage]);
+	}, [lastMessage, userId, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
