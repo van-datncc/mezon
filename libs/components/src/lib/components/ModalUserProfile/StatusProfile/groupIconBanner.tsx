@@ -33,7 +33,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				<>
 					{checkAddFriend.friend && (
 						<div
-							className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit"
+							className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
 							onClick={(e) => {
 								handleDefault(e);
 								setOpenModal({ openOption: false, openFriend: !openModal.openFriend });
@@ -53,7 +53,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 					)}
 					{checkAddFriend.noFriend && (
 						<div
-							className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit"
+							className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
 							onClick={(e) => {
 								handleDefault(e);
 								if (user) {
@@ -148,7 +148,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 			)}
 
 			<div
-				className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit"
+				className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
 				onClick={(e) => {
 					handleDefault(e);
 					setOpenModal({ openFriend: false, openOption: !openModal.openOption });

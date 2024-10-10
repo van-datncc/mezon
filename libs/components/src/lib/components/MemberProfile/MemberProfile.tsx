@@ -304,16 +304,18 @@ export function MemberProfile({
 				<div className="flex flex-col items-start h-full">
 					<div
 						ref={subNameRef}
-						className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start ${isFooter ? 'ml-1' : ''} ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
+						className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start ${isFooter ? 'ml-[2px]' : ''} ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 					>
 						{!isHideStatus && (
 							<>
 								{customStatus && (isFooter || isListFriend) ? (
-									<span className={`text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1`}>
+									<span
+										className={`text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 leading-[13px]`}
+									>
 										{customStatus}
 									</span>
 								) : (
-									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode`}>
+									<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode leading-[18px]`}>
 										{!status ? 'Offline' : 'Online'}
 									</span>
 								)}
@@ -330,7 +332,7 @@ export function MemberProfile({
 								<p
 									className={`text-base font-medium nameMemberProfile
 				  ${isListFriend ? ' inline-flex justify-start' : ''}
-                  ${isFooter ? 'top-[-4px] leading-[26px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
+                  ${isFooter ? 'top-0 leading-[24px] max-w-[102px] overflow-x-hidden text-ellipsis' : ''}
                   ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
@@ -339,7 +341,7 @@ export function MemberProfile({
 									title={name}
 								>
 									<span
-										className={`one-line leading-none ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
+										className={`one-line ${hideLongName && 'truncate !block'} ${isOwnerClanOrGroup && 'max-w-[140px]'} ${isListFriend ? 'dark:text-white text-black' : ''}`}
 									>
 										{!isHiddenAvatarPanel && name}
 									</span>
