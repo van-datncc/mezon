@@ -15,9 +15,11 @@ import {
 	useDragAndDrop,
 	useGifsStickersEmoji,
 	useSearchMessages,
-	useThreads
+	useThreads,
+	useWindowFocusState
 } from '@mezon/core';
 import {
+	MessagesEntity,
 	directActions,
 	directMetaActions,
 	selectCloseMenu,
@@ -32,6 +34,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, memo, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -42,16 +45,29 @@ function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
+
+	const { isFocusDesktop } = useWindowFocusState();
+
+	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
+		const timestamp = Date.now() / 1000;
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+		dispatch(directActions.setActiveDirect({ directId: channelId }));
+	};
+
+	useEffect(() => {
+		if (lastMessage && isFocusDesktop === true && isElectron()) {
+			updateChannelSeenState(channelId, lastMessage);
+		}
+	}, [isFocusDesktop]);
+
 	useEffect(() => {
 		if (mounted.current === channelId) {
 			return;
 		}
 		if (lastMessage) {
 			mounted.current = channelId;
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			dispatch(directActions.setActiveDirect({ directId: channelId }));
+			updateChannelSeenState(channelId, lastMessage);
 		}
 	}, [dispatch, channelId, lastMessage]);
 }

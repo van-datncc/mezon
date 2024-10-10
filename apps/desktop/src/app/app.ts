@@ -82,8 +82,12 @@ export default class App {
 		App.mainWindow.setMenuBarVisibility(false);
 		App.mainWindow.center();
 
-		App.mainWindow.on('minimize', () => {
-			App.mainWindow.webContents.send('window-minimized', true);
+		App.mainWindow.on('blur', () => {
+			App.mainWindow.webContents.send('window-blurred', true);
+		});
+
+		App.mainWindow.on('focus', () => {
+			App.mainWindow.webContents.send('window-focused', true);
 		});
 
 		const gotTheLock = App.application.requestSingleInstanceLock();
@@ -115,7 +119,7 @@ export default class App {
 			return;
 		}
 
-		App.mainWindow.webContents.openDevTools();
+		// App.mainWindow.webContents.openDevTools();
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
 		}

@@ -8,7 +8,8 @@ export type MezonElectronAPI = {
 	getDeviceId: () => Promise<string>;
 	senderId: (senderId: string) => Promise<string>;
 	setBadgeCount: (badgeCount: number | null) => void;
-	onWindowMinimized: (callback: () => void) => void;
+	onWindowBlurred: (callback: () => void) => void;
+	onWindowFocused: (callback: () => void) => void;
 };
 declare global {
 	interface Window {

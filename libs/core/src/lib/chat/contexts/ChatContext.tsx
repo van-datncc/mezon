@@ -54,6 +54,7 @@ import {
 import { useMezon } from '@mezon/transport';
 import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
 import * as Sentry from '@sentry/browser';
+import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
 	ChannelCreatedEvent,
@@ -98,6 +99,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppParams } from '../../app/hooks/useAppParams';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useSeenMessagePool } from '../hooks/useSeenMessagePool';
+import { useWindowFocusState } from '../hooks/useWindowFocusState';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -125,6 +127,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const { isFocusDesktop } = useWindowFocusState();
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -227,12 +230,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const isClanView = currentClanId && currentClanId !== '0';
 				const isFriendPageView = window.location.pathname === '/chat/direct/friends';
 				const isNotCurrentDirect =
-					isFriendPageView || isClanView || !currentDirectId || (currentDirectId && !RegExp(currentDirectId).test(message?.channel_id));
+					isFriendPageView ||
+					isClanView ||
+					!currentDirectId ||
+					(currentDirectId && !RegExp(currentDirectId).test(message?.channel_id)) ||
+					(isElectron() && isFocusDesktop === false);
 				if (isNotCurrentDirect) {
 					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
 					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
 				}
+
 				if (mess.isMe) {
 					dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 				}
@@ -241,7 +249,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 		},
-		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId]
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, isFocusDesktop]
 	);
 
 	const onchannelpresence = useCallback(
@@ -280,26 +288,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const isFriendPageView = location.pathname === '/chat/direct/friends';
 	const isDirectViewPage = location.pathname.includes('/chat/direct/message/');
 
-	const [isMinimized, setIsMinimized] = useState(false);
-
-	useEffect(() => {
-		window.electron.onWindowMinimized(() => {
-			setIsMinimized(true);
-			console.log('Window has been minimized');
-		});
-
-		return () => {
-			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			window.electron.removeListener('window-minimized', () => {});
-		};
-	}, []);
-
 	const onnotification = useCallback(
 		async (notification: Notification) => {
 			if (
 				(currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') ||
 				isDirectViewPage ||
-				isFriendPageView
+				isFriendPageView ||
+				(isElectron() && isFocusDesktop === false)
 			) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
@@ -318,7 +313,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
-		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, location.pathname]
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, location.pathname, isFocusDesktop]
 	);
 
 	const onpinmessage = useCallback(
