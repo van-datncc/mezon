@@ -1,5 +1,13 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
-import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClanId, selectMessageByMessageId, useAppDispatch } from '@mezon/store';
+import {
+	PinMessageEntity,
+	messagesActions,
+	pinMessageActions,
+	selectCurrentClanId,
+	selectMessageByMessageId,
+	stickerSettingActions,
+	useAppDispatch
+} from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -48,6 +56,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	}, [pinMessage.content]);
 
 	const [openDeletePinMessage, closeDeletePinMessage] = useModal(() => {
+		dispatch(stickerSettingActions.openModalInChild());
 		return (
 			<ModalDeletePinMess
 				pinMessage={pinMessage}
