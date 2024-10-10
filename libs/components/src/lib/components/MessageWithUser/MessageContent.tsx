@@ -74,10 +74,11 @@ const MessageText = ({
 	}, [attachmentOnMessage, contentToMessage]);
 
 	const showEditted = useMemo(() => {
-		return message.hideEditted === false;
-	}, [message.hideEditted]);
+		return !message.hide_editted;
+	}, [message.hide_editted]);
 
 	return (
+		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{lines?.length > 0 ? (
 				<div className="flex w-full">
