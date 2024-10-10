@@ -61,16 +61,19 @@ const ChannelMessagesWrapper = React.memo(({ channelId, parentId, clanId, mode, 
 		};
 	}, []);
 
-	const onDeleteMessage = async (messageId) => {
-		const socket = socketRef.current;
-		dispatch(
-			messagesActions.remove({
-				channelId,
-				messageId
-			})
-		);
-		await socket.removeChatMessage(clanId || '', parentId || '', channelId, mode, isPublic, isParentPublic, messageId);
-	};
+	const onDeleteMessage = useCallback(
+		async (messageId: string) => {
+			const socket = socketRef.current;
+			dispatch(
+				messagesActions.remove({
+					channelId,
+					messageId
+				})
+			);
+			await socket.removeChatMessage(clanId || '', parentId || '', channelId, mode, isPublic, isParentPublic, messageId);
+		},
+		[channelId, clanId, dispatch, isParentPublic, isPublic, mode, parentId, socketRef]
+	);
 
 	const onConfirmAction = useCallback(
 		(payload: IConfirmActionPayload) => {
