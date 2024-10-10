@@ -1,5 +1,7 @@
 import { useDragAndDrop } from '@mezon/core';
 import { referencesActions, selectAttachmentByChannelId, useAppDispatch } from '@mezon/store';
+import { processFile } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { DragEvent } from 'react';
 import { useSelector } from 'react-redux';
 import DragAndDropUI from './DragAndDropUI';
@@ -41,15 +43,11 @@ function FileUploadByDnD({ currentId }: FileUploadByDnDOpt) {
 			setOverUploadingState(true);
 			return;
 		}
+		const updatedFiles = await Promise.all(filesArray.map(processFile<ApiMessageAttachment>));
 		dispatch(
 			referencesActions.setAtachmentAfterUpload({
 				channelId: currentId,
-				files: filesArray.map((file) => ({
-					filename: file.name,
-					filetype: file.type,
-					size: file.size,
-					url: URL.createObjectURL(file)
-				}))
+				files: updatedFiles
 			})
 		);
 	};

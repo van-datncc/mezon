@@ -2,7 +2,7 @@ import { useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core'
 import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { EOverriddenPermission, IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue } from '@mezon/utils';
+import { EOverriddenPermission, IMessageSendPayload, MIN_THRESHOLD_CHARS, MentionDataProps, ThreadValue, processFile } from '@mezon/utils';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { Fragment, ReactElement, memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -38,7 +38,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const { setOverUploadingState } = useDragAndDrop();
 
 	const onConvertToFiles = useCallback(
-		(content: string) => {
+		async (content: string) => {
 			if (content.length > MIN_THRESHOLD_CHARS) {
 				const fileContent = new Blob([content], { type: 'text/plain' });
 				const now = Date.now();
@@ -69,7 +69,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	);
 
 	const onPastedFiles = useCallback(
-		(event: React.ClipboardEvent<HTMLDivElement>) => {
+		async (event: React.ClipboardEvent<HTMLDivElement>) => {
 			const items = (event.clipboardData || (window as any).clipboardData).items;
 			const files: File[] = [];
 			if (items) {
@@ -87,15 +87,12 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 						setOverUploadingState(true);
 						return;
 					}
+					const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
+
 					dispatch(
 						referencesActions.setAtachmentAfterUpload({
 							channelId: currentChannelId,
-							files: files.map((file) => ({
-								filename: file.name,
-								filetype: file.type,
-								size: file.size,
-								url: URL.createObjectURL(file)
-							}))
+							files: updatedFiles
 						})
 					);
 				}
