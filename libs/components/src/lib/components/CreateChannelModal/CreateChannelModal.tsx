@@ -1,9 +1,10 @@
 import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
-import { RootState, channelsActions, createNewChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { RootState, channelsActions, createNewChannel, selectCurrentClanId, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { AlertTitleTextWarning, Icons } from '@mezon/ui';
+import { ValidateURL } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ChannelLableModal } from './ChannelLabel';
@@ -15,17 +16,19 @@ import { CreateChannelButton } from './CreateChannelButton';
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();
 	const InputRef = useRef<ChannelNameModalRef>(null);
-	const appUrlInputRef = useRef<ChannelNameModalRef>(null);
+	const appUrlInputRef = useRef<ChannelAppUrlModalRef>(null);
 	const [isInputError, setIsInputError] = useState<boolean>(true);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentCategory = useSelector((state: RootState) => state.channels.currentCategory);
 	const isOpenModal = useSelector((state: RootState) => state.channels.isOpenCreateNewChannel);
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
 	const [validate, setValidate] = useState(true);
-	const [channelName, setChannelName] = useState('');
+	const [validateUrl, setValidateUrl] = useState(true);
+	const [channelName, setChannelName] = useState<string>('');
 	const [appUrl, setAppUrl] = useState<string>('');
 	const [isErrorType, setIsErrorType] = useState<string>('');
 	const [isErrorName, setIsErrorName] = useState<string>('');
+	const [isErrorAppUrl, setIsErrorAppUrl] = useState<string>('');
 	const [isPrivate, setIsPrivate] = useState<number>(0);
 	const [channelType, setChannelType] = useState<number>(-1);
 	const navigate = useNavigate();
@@ -45,6 +48,16 @@ export const CreateNewChannelModal = () => {
 		}
 		if (channelName === '') {
 			setIsErrorName("Channel's name is required");
+			return;
+		}
+
+		if (isAppChannel && appUrl === '') {
+			setIsErrorAppUrl("Channel's app url is required");
+			return;
+		}
+
+		if (isAppChannel && !validateUrl) {
+			setIsErrorAppUrl('Please enter a valid channel app url');
 			return;
 		}
 
@@ -77,6 +90,7 @@ export const CreateNewChannelModal = () => {
 	const handleCloseModal = () => {
 		setIsErrorType('');
 		setIsErrorName('');
+		setIsErrorAppUrl('');
 		clearDataAfterCreateNew();
 		dispatch(channelsActions.openCreateNewModalChannel(false));
 	};
@@ -86,8 +100,17 @@ export const CreateNewChannelModal = () => {
 		setChannelName(value);
 	};
 
+	const handleAppUrlChannge = (value: string) => {
+		setIsErrorAppUrl('');
+		setAppUrl(value);
+	};
+
 	const checkValidate = (check: boolean) => {
 		setValidate(check);
+	};
+
+	const checkValidateUrl = (check: boolean) => {
+		setValidateUrl(check);
 	};
 
 	const onChangeChannelType = (value: number) => {
@@ -101,14 +124,22 @@ export const CreateNewChannelModal = () => {
 
 	const clearDataAfterCreateNew = () => {
 		setChannelName('');
+		setAppUrl('');
 		setChannelType(-1);
 		setIsPrivate(0);
 	};
 
 	const handleChangeValue = useCallback(() => {
-		const isValid = InputRef.current?.checkInput();
-		setIsInputError(isValid ?? false);
-	}, []);
+		const isValid = InputRef.current?.checkInput() ?? false;
+		const isAppUrlValid = appUrlInputRef.current?.checkInput() ?? false;
+
+		if (channelType === ChannelType.CHANNEL_TYPE_APP) {
+			const isInputError = isValid || isAppUrlValid;
+			setIsInputError(isInputError);
+		} else {
+			setIsInputError(isValid);
+		}
+	}, [channelType]);
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const handleClose = useCallback(() => {
@@ -116,9 +147,6 @@ export const CreateNewChannelModal = () => {
 	}, [isOpenModal]);
 	useEscapeKeyClose(modalRef, handleClose);
 
-	const handleChangeAppUrl = (value: string) => {
-		setAppUrl(value);
-	};
 	return (
 		isOpenModal && (
 			<div
@@ -188,16 +216,19 @@ export const CreateNewChannelModal = () => {
 								onHandleChangeValue={handleChangeValue}
 								placeholder={"Enter the channel's name"}
 								shouldValidate={true}
+								categoryId={currentCategory?.category_id}
 							/>
 							{channelType === ChannelType.CHANNEL_TYPE_APP && (
 								<div className={'mt-2 w-full'}>
-									<ChannelNameTextField
+									<ChannelAppUrlTextField
 										ref={appUrlInputRef}
-										onChange={handleChangeAppUrl}
-										type={channelType}
-										channelNameProps="What is app's URL?"
+										onChange={handleAppUrlChannge}
+										onCheckValidate={checkValidateUrl}
+										onHandleChangeValue={handleChangeValue}
+										channelAppUrlProps="What is app's URL?"
+										error={isErrorAppUrl}
 										placeholder={"Enter the app's URL"}
-										shouldValidate={false}
+										shouldValidate={true}
 									/>
 								</div>
 							)}
@@ -210,7 +241,87 @@ export const CreateNewChannelModal = () => {
 				</div>
 				{isErrorType !== '' && <AlertTitleTextWarning description={isErrorType} />}
 				{isErrorName !== '' && <AlertTitleTextWarning description={isErrorName} />}
+				{isAppChannel && isErrorAppUrl !== '' && <AlertTitleTextWarning description={isErrorAppUrl} />}
 			</div>
 		)
 	);
 };
+
+interface ChannelAppUrlModalProps {
+	channelAppUrlProps: string;
+	onChange: (value: string) => void;
+	onCheckValidate?: (check: boolean) => void;
+	onHandleChangeValue?: () => void;
+	error?: string;
+	placeholder: string;
+	shouldValidate: boolean;
+}
+
+type ChannelAppUrlModalRef = {
+	checkInput: () => boolean;
+};
+
+const ChannelAppUrlTextField = forwardRef<ChannelAppUrlModalRef, ChannelAppUrlModalProps>((props, ref) => {
+	const { channelAppUrlProps, onChange, onCheckValidate, onHandleChangeValue, error, placeholder, shouldValidate } = props;
+	const [checkValidate, setCheckValidate] = useState(true);
+	const [checkAppUrlChannel, setCheckAppUrlChannel] = useState(true);
+	const theme = useAppSelector(selectTheme);
+
+	const handleInputChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			onChange(value);
+			if (value === '') {
+				setCheckAppUrlChannel(true);
+			} else {
+				setCheckAppUrlChannel(false);
+			}
+
+			const regex = ValidateURL();
+			if (regex.test(value)) {
+				setCheckValidate(false);
+				if (onCheckValidate) {
+					onCheckValidate(true);
+				}
+			} else {
+				setCheckValidate(true);
+				if (onCheckValidate) {
+					onCheckValidate(false);
+				}
+			}
+		},
+		[onChange, setCheckValidate, onCheckValidate]
+	);
+	useImperativeHandle(ref, () => ({
+		checkInput: () => checkValidate || checkAppUrlChannel
+	}));
+
+	useEffect(() => {
+		if (onHandleChangeValue) {
+			onHandleChangeValue();
+		}
+	}, [checkValidate, checkAppUrlChannel, onHandleChangeValue]);
+
+	return (
+		<div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-2 flex mt-1">
+			<ChannelLableModal labelProp={channelAppUrlProps} />
+			<div className="ContentContainer self-stretch h-11 flex-col items-start flex">
+				<div
+					className={`InputContainer self-stretch h-11 px-4 py-3 dark:bg-neutral-950 bg-white rounded shadow border w-full ${error ? 'border border-red-500' : 'border-blue-600'}  justify-start items-center gap-2 inline-flex`}
+				>
+					<Icons.AppChannelIcon className="w-6 h-6" fill={theme} />
+					<div className="InputValue grow shrink basis-0 self-stretch justify-start items-center flex">
+						<input
+							className="Input grow shrink basis-0 h-10 outline-none dark:bg-neutral-950 bg-white dark:text-white text-black text-sm font-normal placeholder-[#AEAEAE]"
+							onChange={handleInputChange}
+							placeholder={placeholder}
+						/>
+					</div>
+				</div>
+			</div>
+			{shouldValidate && (checkValidate || checkAppUrlChannel) ? (
+				<p className="text-[#e44141] text-xs italic font-thin">Please enter a valid URL (e.g., https://example.com).</p>
+			) : null}
+		</div>
+	);
+});

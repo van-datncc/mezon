@@ -18,8 +18,7 @@ interface ISeachOptionPageProps {
 
 function SearchOptionPage({ searchText, onSelect, optionFilter }: ISeachOptionPageProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const userListData = UseMentionList(currentChannel?.id, currentChannel?.type);
-
+	const userListData = UseMentionList({ channelID: currentChannel?.id ?? '', channelMode: currentChannel?.type });
 	const userListDataSearchByMention = useMemo(
 		() =>
 			userListData?.map((user) => {

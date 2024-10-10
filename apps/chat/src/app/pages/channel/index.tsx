@@ -1,5 +1,5 @@
-import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
-import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
+import { FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
+import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads, useWindowFocusState } from '@mezon/core';
 import {
 	channelMetaActions,
 	channelsActions,
@@ -29,6 +29,7 @@ function useChannelSeen(channelId: string) {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
+	const { isFocusDesktop } = useWindowFocusState();
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
@@ -44,7 +45,7 @@ function useChannelSeen(channelId: string) {
 		if (!numberNotification && resetBadgeCount) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
-	}, [currentChannel.id, statusFetchChannel]);
+	}, [currentChannel.id, statusFetchChannel, isFocusDesktop]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {
@@ -89,7 +90,7 @@ type ChannelMainContentProps = {
 
 const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
-	const { draggingState, setDraggingState } = useDragAndDrop();
+	const { draggingState, setDraggingState, isOverUploading, setOverUploadingState } = useDragAndDrop();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const isSearchMessage = useSelector(selectIsSearchMessage(channelId));
 	const closeMenu = useSelector(selectCloseMenu);
@@ -123,6 +124,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	) : (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+			{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
 				id="mainChat"

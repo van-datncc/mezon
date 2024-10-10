@@ -5,7 +5,8 @@ export const style = (colors: Attributes) =>
 		imageMessageRender: {
 			borderRadius: verticalScale(5),
 			borderWidth: 0.5,
-			borderColor: Colors.borderPrimary
+			borderColor: Colors.borderPrimary,
+			marginBottom: size.s_6
 		},
 		wrapperTypingLabel: {
 			position: 'absolute',

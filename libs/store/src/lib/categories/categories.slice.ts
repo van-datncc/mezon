@@ -1,8 +1,9 @@
-import { ICategory, LoadingStatus, SortChannel } from '@mezon/utils';
+import { ICategory, LoadingStatus, SortChannel, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest, ApiUpdateCategoryOrderRequest } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
 /*
@@ -25,6 +26,7 @@ export interface CategoriesState extends EntityState<CategoriesEntity, string> {
 	sortChannelByCategoryId: Record<string, boolean>;
 	showEmptyCategory: boolean;
 	ctrlKSelectedChannelId?: string;
+	categoryExpandState: Record<string, Record<string, boolean>>;
 }
 
 export const categoriesAdapter = createEntityAdapter<CategoriesEntity>();
@@ -37,13 +39,29 @@ type updatCategoryPayload = {
 	clanId: string;
 	request: ApiUpdateCategoryDescRequest;
 };
+
+type FetchCategoriesPayload = {
+	categories: ICategory[];
+	clanId: string;
+};
+
+type SetCategoryExpandStatePayload = {
+	clanId: string;
+	categoryId: string;
+	expandState: boolean;
+};
+
 export const fetchCategories = createAsyncThunk('categories/fetchCategories', async ({ clanId }: fetchCategoriesPayload, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response = await mezon.client.listCategoryDescs(mezon.session, clanId);
 	if (!response.categorydesc) {
-		return [];
+		return { categories: [], clanId: clanId };
 	}
-	return response.categorydesc.map(mapCategoryToEntity);
+	const payload: FetchCategoriesPayload = {
+		categories: response.categorydesc.map(mapCategoryToEntity),
+		clanId: clanId
+	};
+	return payload;
 });
 
 export const createNewCategory = createAsyncThunk('categories/createCategories', async (body: ApiCreateCategoryDescRequest, thunkAPI) => {
@@ -60,6 +78,25 @@ export const createNewCategory = createAsyncThunk('categories/createCategories',
 		return thunkAPI.rejectWithValue([]);
 	}
 });
+
+export const checkDuplicateCategoryInClan = createAsyncThunk(
+	'categories/checkDuplicateCategoryInClan',
+	async ({ categoryName, clanId }: { categoryName: string; clanId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(categoryName, clanId, TypeCheck.TYPECATEGORY);
+			console.log('isDuplicateCategoryName', isDuplicateName);
+
+			if (isDuplicateName?.type === TypeCheck.TYPECATEGORY) {
+				return isDuplicateName.exist;
+			}
+			return;
+		} catch (error) {
+			Sentry.captureException(error);
+			return thunkAPI.rejectWithValue([]);
+		}
+	}
+);
 
 export const deleteCategory = createAsyncThunk(
 	'categories/deleteCategory',
@@ -120,7 +157,8 @@ export const initialCategoriesState: CategoriesState = categoriesAdapter.getInit
 	categories: [],
 	error: null,
 	sortChannelByCategoryId: {},
-	showEmptyCategory: false
+	showEmptyCategory: false,
+	categoryExpandState: {}
 });
 
 export const categoriesSlice = createSlice({
@@ -145,6 +183,10 @@ export const categoriesSlice = createSlice({
 		},
 		setCtrlKSelectedChannelId: (state, action: PayloadAction<string>) => {
 			state.ctrlKSelectedChannelId = action.payload;
+		},
+		setCategoryExpandState: (state, action: PayloadAction<SetCategoryExpandStatePayload>) => {
+			const { clanId, categoryId, expandState } = action.payload;
+			state.categoryExpandState[clanId][categoryId] = expandState;
 		}
 	},
 	extraReducers: (builder) => {
@@ -152,9 +194,19 @@ export const categoriesSlice = createSlice({
 			.addCase(fetchCategories.pending, (state: CategoriesState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchCategories.fulfilled, (state: CategoriesState, action: PayloadAction<ICategory[]>) => {
-				categoriesAdapter.setAll(state, action.payload);
+			.addCase(fetchCategories.fulfilled, (state: CategoriesState, action: PayloadAction<FetchCategoriesPayload>) => {
+				const { categories, clanId } = action.payload;
+				categoriesAdapter.setAll(state, categories);
 				state.loadingStatus = 'loaded';
+				if (!state.categoryExpandState[clanId]) {
+					state.categoryExpandState[clanId] = {};
+				}
+
+				categories.forEach((category) => {
+					if (state.categoryExpandState[clanId][category.id] === undefined) {
+						state.categoryExpandState[clanId][category.id] = true;
+					}
+				});
 			})
 			.addCase(fetchCategories.rejected, (state: CategoriesState, action) => {
 				state.loadingStatus = 'error';
@@ -257,3 +309,6 @@ export const selectCategoriesIds = createSelector(getCategoriesState, (entities)
 export const selectIsShowEmptyCategory = createSelector(getCategoriesState, (state) => state.showEmptyCategory);
 
 export const selectCtrlKSelectedChannelId = createSelector(getCategoriesState, (state) => state.ctrlKSelectedChannelId);
+
+export const selectCategoryExpandStateByCategoryId = (clanId: string, categoryId: string) =>
+	createSelector(getCategoriesState, (state) => state.categoryExpandState[clanId][categoryId]);

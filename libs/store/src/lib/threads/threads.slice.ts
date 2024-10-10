@@ -2,7 +2,6 @@ import { IMessageWithUser, IThread, LoadingStatus, TypeCheck } from '@mezon/util
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
-import { toast } from 'react-toastify';
 import { ensureSocket, getMezonCtx } from '../helpers';
 
 export const THREADS_FEATURE_KEY = 'threads';
@@ -75,11 +74,9 @@ export const checkDuplicateThread = createAsyncThunk(
 			if (isDuplicateName?.type === TypeCheck.TYPETHREAD) {
 				return isDuplicateName.exist;
 			}
-		} catch (error: any) {
+		} catch (error) {
 			Sentry.captureException(error);
-			const errmsg = await error.json();
-			toast.error(errmsg.message);
-			return thunkAPI.rejectWithValue(errmsg.message);
+			return thunkAPI.rejectWithValue([]);
 		}
 	}
 );

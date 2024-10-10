@@ -25,6 +25,7 @@ export { default as StreamInfo } from './components/StreamInfo';
 
 export { default as PreClass } from './components/MarkdownFormatText/PreClass';
 
+export { default as TooManyUpload } from './components/DragAndDrop/TooManyUpload';
 export { default as ChannelHashtag } from './components/MarkdownFormatText/HashTag';
 export { default as MentionUser } from './components/MarkdownFormatText/MentionUser';
 export { default as MemberList } from './components/MemberList';
@@ -78,6 +79,7 @@ export * from './components/ContextMenu';
 export * from './components/Firebase/firebase';
 
 export { AnchorScroll } from './components/AnchorScroll/AnchorScroll';
+export { default as ListChannelSetting } from './components/ClanSettings/SettingChannel/index';
 export { default as ModalDeleteMess } from './components/DeleteMessageModal/ModalDeleteMess';
 export { default as ModalRemoveMemberClan } from './components/MemberProfile/ModalRemoveMemberClan';
 export { default as useProcessMention } from './components/MessageBox/ReactionMentionInput/useProcessMention';
