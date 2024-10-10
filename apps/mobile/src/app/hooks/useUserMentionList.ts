@@ -1,45 +1,37 @@
 import { useChannelMembers } from '@mezon/core';
 import { ID_MENTION_HERE } from '@mezon/mobile-components';
 import { selectAllRolesClan } from '@mezon/store-mobile';
-import { ChannelMembersEntity, MentionDataProps } from '@mezon/utils';
+import { ChannelMembersEntity, EVERYONE_ROLE_ID, getNameForPrioritize, MentionDataProps } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiRole } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-
-function UseMentionList(channelID: string, channelMode?: number): MentionDataProps[] {
-	const { membersOfParent: members } = useChannelMembers({ channelId: channelID, mode: channelMode });
+interface UserMentionListProps {
+	channelID: string;
+	channelMode?: number;
+}
+function UseMentionList({ channelID, channelMode }: UserMentionListProps): MentionDataProps[] {
+	const { membersOfParent } = useChannelMembers({ channelId: channelID, mode: channelMode ?? 0 });
 	const rolesInClan = useSelector(selectAllRolesClan);
-	const { t } = useTranslation('clanRoles');
-
+	const filteredRoles = rolesInClan.filter((role) => role.id !== EVERYONE_ROLE_ID);
 	const newUserMentionList = useMemo(() => {
-		if (!members || members.length === 0) {
+		if (!membersOfParent || membersOfParent.length === 0) {
 			return [];
 		}
 
-		const userMentionRaw = members;
+		const userMentionRaw = membersOfParent;
 		const mentionList =
-			userMentionRaw?.map((item: ChannelMembersEntity) => {
-				return {
-					...item,
-					id: item?.user?.id ?? '',
-					display: item?.clan_nick || item?.user?.display_name || item?.user?.username || '',
-					avatarUrl: item?.user?.avatar_url ?? '',
-					username: item?.user?.username
-				};
-			}) ?? [];
-		const hardcodedUser = {
+			userMentionRaw?.map((item: ChannelMembersEntity) => ({
+				id: item?.id ?? '',
+				display: getNameForPrioritize(item.clan_nick ?? '', item.user?.display_name ?? '', item.user?.username ?? ''),
+				avatarUrl: item.clan_avatar ? item.clan_avatar : (item?.user?.avatar_url ?? ''),
+				username: item.user?.username
+			})) ?? [];
+		const hardcodedUser: MentionDataProps = {
 			id: ID_MENTION_HERE,
-			display: 'here',
+			display: '@here',
 			avatarUrl: '',
-			user: {
-				id: ID_MENTION_HERE,
-				display_name: 'here',
-				username: 'here',
-				avatarUrl: ''
-			},
-			username: t('notifyEveryone')
+			username: '@here'
 		};
 		const sortedMentionList = [...mentionList].sort((a, b) => {
 			const displayA = a.display?.toLowerCase() || '';
@@ -49,14 +41,12 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 			if (displayA > displayB) return 1;
 			return 0;
 		});
-
 		const roleMentions =
-			rolesInClan?.map((item: ApiRole) => ({
+			filteredRoles?.map((item: ApiRole) => ({
 				id: item.id ?? '',
 				display: item.title,
 				avatarUrl: '',
-				clanNick: item.title,
-				isRoleUser: true
+				clanNick: item.title
 			})) ?? [];
 
 		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
@@ -64,7 +54,7 @@ function UseMentionList(channelID: string, channelMode?: number): MentionDataPro
 		} else {
 			return [...sortedMentionList];
 		}
-	}, [members, rolesInClan, channelMode]);
+	}, [channelMode, filteredRoles, membersOfParent]);
 
 	return newUserMentionList;
 }
