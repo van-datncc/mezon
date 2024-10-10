@@ -1,5 +1,7 @@
-import { referencesActions, useAppDispatch } from '@mezon/store';
+import { useDragAndDrop } from '@mezon/core';
+import { referencesActions, selectAttachmentByChannelId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { useSelector } from 'react-redux';
 
 export type FileSelectionButtonProps = {
 	currentClanId: string;
@@ -9,10 +11,15 @@ export type FileSelectionButtonProps = {
 
 function FileSelectionButton({ currentClanId, currentChannelId, hasPermissionEdit }: FileSelectionButtonProps) {
 	const dispatch = useAppDispatch();
-
+	const uploadedAttachmentsInChannel = useSelector(selectAttachmentByChannelId(currentChannelId))?.files || [];
+	const { setOverUploadingState } = useDragAndDrop();
 	const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
 			const fileArr = Array.from(e.target.files);
+			if (fileArr.length + uploadedAttachmentsInChannel.length > 10) {
+				setOverUploadingState(true);
+				return;
+			}
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
