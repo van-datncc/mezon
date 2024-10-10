@@ -96,7 +96,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			messageId: string,
 			mentions: ApiMessageMention[],
 			attachments?: ApiMessageAttachment[],
-			hideEditted?: boolean
+			hide_editted?: boolean
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
@@ -116,7 +116,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 				content,
 				mentions,
 				attachments,
-				hideEditted
+				hide_editted
 			);
 		},
 		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]
