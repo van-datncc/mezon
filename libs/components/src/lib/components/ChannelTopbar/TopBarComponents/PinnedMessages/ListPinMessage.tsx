@@ -2,7 +2,7 @@ import { useAppParams } from '@mezon/core';
 import { PinMessageEntity, selectCurrentChannelId, selectPinMessageByChannelId } from '@mezon/store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { UnpinMessObject } from '.';
+import { UnpinMessageObject } from '.';
 import EmptyPinMess from './EmptyPinMess';
 import ItemPinMessage from './ItemPinMessage';
 
@@ -13,7 +13,7 @@ const ListPinMessage = ({
 	handleUnPinConfirm
 }: {
 	onClose?: () => void;
-	handleUnPinConfirm: (unpinValue: UnpinMessObject) => void;
+	handleUnPinConfirm: (unpinValue: UnpinMessageObject) => void;
 }) => {
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);

@@ -12,7 +12,7 @@ type PinnedMessagesProps = {
 	rootRef?: RefObject<HTMLElement>;
 };
 
-export type UnpinMessObject = {
+export type UnpinMessageObject = {
 	pinMessage: PinMessageEntity;
 	contentString: string;
 	attachments: ApiMessageAttachment[];
@@ -30,22 +30,22 @@ const PinnedMessages = ({ onClose, rootRef }: PinnedMessagesProps) => {
 		const channelId = directId || currentChannelId || '';
 		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: channelId || '', message_id: messageId }));
 	};
-	const [UnpinMess, setUnpinMess] = useState<UnpinMessObject | null>(null);
+	const [unpinMess, setUnpinMess] = useState<UnpinMessageObject | null>(null);
 	const modalDeleteRef = useRef(null);
 	const [openDeletePinMessage, closeDeletePinMessage] = useModal(() => {
 		return (
 			<ModalDeletePinMess
-				pinMessage={UnpinMess?.pinMessage as PinMessageEntity}
-				contentString={UnpinMess?.contentString}
-				handlePinMessage={() => handleUnPinMessage(UnpinMess?.pinMessage.message_id || '')}
+				pinMessage={unpinMess?.pinMessage as PinMessageEntity}
+				contentString={unpinMess?.contentString}
+				handlePinMessage={() => handleUnPinMessage(unpinMess?.pinMessage.message_id || '')}
 				closeModal={closeDeletePinMessage}
-				attachments={UnpinMess?.attachments as ApiMessageAttachment[]}
+				attachments={unpinMess?.attachments as ApiMessageAttachment[]}
 				modalref={modalDeleteRef}
 			/>
 		);
-	}, [UnpinMess]);
+	}, [unpinMess]);
 
-	const handleUnPinConfirm = (unpinValue: UnpinMessObject) => {
+	const handleUnPinConfirm = (unpinValue: UnpinMessageObject) => {
 		setUnpinMess({
 			pinMessage: unpinValue.pinMessage,
 			attachments: unpinValue.attachments,

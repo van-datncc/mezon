@@ -3,14 +3,14 @@ import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClan
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { UnpinMessObject } from '.';
+import { UnpinMessageObject } from '.';
 import { MemberProfile } from '../../../MemberProfile';
 import { MessageLine } from '../../../MessageWithUser/MessageLine';
 
 type ItemPinMessageProps = {
 	pinMessage: PinMessageEntity;
 	contentString: string | undefined;
-	handleUnPinMessage: (unpinValue: UnpinMessObject) => void;
+	handleUnPinMessage: (unpinValue: UnpinMessageObject) => void;
 	onClose: () => void;
 };
 
