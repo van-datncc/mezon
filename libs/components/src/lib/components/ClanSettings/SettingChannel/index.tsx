@@ -1,5 +1,6 @@
 import { channelSettingActions, selectAllChannelSuggestion, selectCurrentClanId, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { ChannelStatusEnum } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Avatar, Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef } from 'react';
@@ -24,7 +25,7 @@ const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListC
 	const parentRef = useRef(null);
 	const listChannelSetting = useMemo(() => {
 		return listChannel.filter((channel) => {
-			if (privateFilter && channel.channel_private !== 1) {
+			if (privateFilter && channel.channel_private !== ChannelStatusEnum.isPrivate) {
 				return false;
 			}
 			if (!channel.channel_label?.includes(searchFilter)) {
