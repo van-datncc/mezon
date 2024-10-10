@@ -237,7 +237,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						{channel.status === StatusVoiceChannel.No_Active && <Spinner aria-label="Loading spinner" />}
 					</span>
 				) : (
-					<Link to={channelPath} onClick={handleClick}>
+					<Link to={channelPath} onClick={handleClick} id={channelPath}>
 						<span ref={channelLinkRef} className={`${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}>
 							{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 							<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
