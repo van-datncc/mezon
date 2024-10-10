@@ -11,7 +11,6 @@ import Integrations from './Integrations';
 import { ItemObjProps, ItemSetting, listItemSetting } from './ItemObj';
 import NotificationSoundSetting from './NotificationSoundSetting';
 import CategoryOrderSetting from './OrderCategorySetting';
-import ListChannelSetting from './SettingChannel';
 import SettingEmoji from './SettingEmoji';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingSidebar from './SettingSidebar';
@@ -56,8 +55,6 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <SettingSticker parentRef={modalRef} />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
-			case ItemSetting.CHANNEL_SETTING:
-				return <ListChannelSetting />;
 		}
 	};
 	const dispatch = useAppDispatch();
