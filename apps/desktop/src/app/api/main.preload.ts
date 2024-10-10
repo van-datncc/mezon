@@ -17,5 +17,12 @@ contextBridge.exposeInMainWorld('electron', {
 	senderId: (senderId: string) => ipcRenderer.invoke(SENDER_ID, senderId),
 	setBadgeCount: (badgeCount: number) => {
 		ipcRenderer.send(SET_BADGE_COUNT, badgeCount);
+	},
+
+	onWindowBlurred: (callback: () => void) => {
+		ipcRenderer.on('window-blurred', callback);
+	},
+	onWindowFocused: (callback: () => void) => {
+		ipcRenderer.on('window-focused', callback);
 	}
 });
