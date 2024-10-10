@@ -3,6 +3,7 @@ import {
 	categoriesActions,
 	channelsActions,
 	defaultNotificationCategoryActions,
+	selectCategoryExpandStateByCategoryId,
 	selectCategoryIdSortChannel,
 	selectChannelMetaEntities,
 	selectCtrlKSelectedChannelId,
@@ -36,6 +37,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const categoryExpandState = useSelector(selectCategoryExpandStateByCategoryId(category.clan_id || '', category.id));
 	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
 		EPermission.administrator,
 		EPermission.manageClan,
@@ -85,7 +87,12 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	};
 
 	const handleToggleCategory = () => {
-		setIsShowAllCategoryChannels(!isShowAllCategoryChannels);
+		const payload = {
+			clanId: category.clan_id || '',
+			categoryId: category.id,
+			expandState: !categoryExpandState
+		};
+		dispatch(categoriesActions.setCategoryExpandState(payload));
 	};
 
 	const handleCloseCategorySetting = () => {
@@ -104,7 +111,12 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	};
 
 	const handleOpenCreateChannelModal = (category: ICategoryChannel) => {
-		setIsShowAllCategoryChannels(true);
+		const payload = {
+			clanId: category.clan_id || '',
+			categoryId: category.id,
+			expandState: true
+		};
+		dispatch(categoriesActions.setCategoryExpandState(payload));
 		openModalCreateNewChannel(category);
 	};
 
@@ -142,7 +154,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 						}}
 						className="dark:text-channelTextLabel text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold"
 					>
-						{isShowAllCategoryChannels ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
+						{categoryExpandState ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
 						<span className="one-line">{category.category_name}</span>
 					</button>
 					<button
@@ -188,7 +200,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 			<div className="mt-[5px] space-y-0.5 text-contentTertiary">
 				{category?.channels
 					?.filter((channel: IChannel) => {
-						return isShowAllCategoryChannels || isUnreadChannel(channel.id) || channel.id === ctrlKSelectedChannelId;
+						return categoryExpandState || isUnreadChannel(channel.id) || channel.id === ctrlKSelectedChannelId;
 					})
 					.map((channel: IChannel) => {
 						return (
@@ -198,7 +210,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 								key={channel.id}
 								channel={channel as ChannelThreads}
 								permissions={permissions}
-								isCollapsed={!isShowAllCategoryChannels}
+								isCollapsed={!categoryExpandState}
 							/>
 						);
 					})}
