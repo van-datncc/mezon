@@ -211,10 +211,9 @@ export const checkDuplicateChannelInCategory = createAsyncThunk(
 				return isDuplicateName.exist;
 			}
 			return;
-		} catch (error: any) {
+		} catch (error) {
 			Sentry.captureException(error);
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+			return thunkAPI.rejectWithValue([]);
 		}
 	}
 );
