@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 export function useDragAndDrop() {
 	const dispatch = useDispatch();
 	const draggingState = useSelector(selectDragAndDropState);
-	const overUploadingState = useSelector(selectOverLimitUploadState);
+	const isOverUploading = useSelector(selectOverLimitUploadState);
 	const setDraggingState = useCallback(
 		(status: boolean) => {
 			dispatch(dragAndDropAction.setDraggingState(status));
@@ -22,9 +22,9 @@ export function useDragAndDrop() {
 		() => ({
 			draggingState,
 			setDraggingState,
-			overUploadingState,
+			isOverUploading,
 			setOverUploadingState
 		}),
-		[draggingState, overUploadingState, setDraggingState, setOverUploadingState]
+		[draggingState, isOverUploading, setDraggingState, setOverUploadingState]
 	);
 }

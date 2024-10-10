@@ -53,12 +53,14 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				dispatch(
 					referencesActions.setAtachmentAfterUpload({
 						channelId: currentChannelId,
-						files: [file].map((file) => ({
-							filename: file.name,
-							filetype: file.type,
-							size: file.size,
-							url: URL.createObjectURL(file)
-						}))
+						files: [
+							{
+								filename: file.name,
+								filetype: file.type,
+								size: file.size,
+								url: URL.createObjectURL(file)
+							}
+						]
 					})
 				);
 			}

@@ -84,10 +84,8 @@ export const referencesSlice = createSlice({
 					files: files
 				};
 			} else {
-				if (files && files.length > 0) {
-					if (state.attachmentAfterUpload[channelId].files.length + files.length > 10) {
-						return;
-					}
+				// eslint-disable-next-line prettier/prettier
+				if (files && files.length > 0 && ( state.attachmentAfterUpload[channelId].files.length + files.length > 10 )) {
 					state.attachmentAfterUpload[channelId].files = [...state.attachmentAfterUpload[channelId].files, ...files];
 				}
 			}

@@ -89,7 +89,7 @@ type ChannelMainContentProps = {
 
 const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
-	const { draggingState, setDraggingState, overUploadingState, setOverUploadingState } = useDragAndDrop();
+	const { draggingState, setDraggingState, isOverUploading, setOverUploadingState } = useDragAndDrop();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const isSearchMessage = useSelector(selectIsSearchMessage(channelId));
 	const closeMenu = useSelector(selectCloseMenu);
@@ -123,7 +123,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	) : (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
-			{overUploadingState && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
+			{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
 				id="mainChat"
