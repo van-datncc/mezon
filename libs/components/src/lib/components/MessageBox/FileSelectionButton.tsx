@@ -1,6 +1,8 @@
 import { useDragAndDrop } from '@mezon/core';
 import { referencesActions, selectAttachmentByChannelId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { processFile } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
 
 export type FileSelectionButtonProps = {
@@ -20,21 +22,16 @@ function FileSelectionButton({ currentClanId, currentChannelId, hasPermissionEdi
 				setOverUploadingState(true);
 				return;
 			}
+			const updatedFiles = await Promise.all(fileArr.map(processFile<ApiMessageAttachment>));
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
-					files: fileArr.map((file) => ({
-						filename: file.name,
-						filetype: file.type,
-						size: file.size,
-						url: URL.createObjectURL(file)
-					}))
+					files: updatedFiles
 				})
 			);
-			e.target.value = ''; // Reset the input value after processing
+			e.target.value = '';
 		}
 	};
-
 	return (
 		<label className="pl-2 flex items-center h-11">
 			<input id="preview_img" type="file" onChange={handleChange} className="w-full hidden" multiple />
