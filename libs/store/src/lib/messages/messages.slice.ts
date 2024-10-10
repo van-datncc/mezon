@@ -22,7 +22,6 @@ import {
 	createSelector,
 	createSelectorCreator,
 	createSlice,
-	isAnyOf,
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
@@ -958,10 +957,6 @@ export const messagesSlice = createSlice({
 			.addCase(fetchMessages.rejected, (state: MessagesState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			})
-			.addMatcher(isAnyOf(sendMessage.fulfilled, sendMessage.rejected), (state, action) => {
-				const channelId = action?.meta?.arg?.channelId;
-				state.isJumpingToPresent[channelId] = true;
 			});
 	}
 });
@@ -1023,6 +1018,13 @@ export function orderMessageByDate(a: MessagesEntity, b: MessagesEntity) {
 }
 
 export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEntity) {
+	if (a.isFirst && !b.isFirst) {
+		return -1;
+	}
+	if (!a.isFirst && b.isFirst) {
+		return 1;
+	}
+
 	if (a.create_time_seconds && b.create_time_seconds) {
 		return +a.create_time_seconds - +b.create_time_seconds;
 	}

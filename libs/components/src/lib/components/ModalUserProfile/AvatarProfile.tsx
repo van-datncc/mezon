@@ -48,7 +48,7 @@ const AvatarProfile = ({ customStatus, avatar, username, isAnonymous, styleAvata
 					isAnonymous={isAnonymous}
 					classNameText="!text-5xl"
 				/>
-				<div className="absolute bottom-2 right-4">
+				<div className="absolute bottom-[0.4rem] right-[0.5rem]">
 					<StatusUser
 						isListDm={isListDm}
 						isMemberChannel={isMemberChannel}

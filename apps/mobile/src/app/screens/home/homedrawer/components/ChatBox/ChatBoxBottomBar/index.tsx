@@ -463,7 +463,14 @@ export const ChatBoxBottomBar = memo(
 				{triggers?.emoji?.keyword !== undefined && <EmojiSuggestion {...triggers.emoji} />}
 				<AttachmentPreview channelId={channelId} />
 
-				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
+				<Block
+					flexDirection="row"
+					justifyContent="space-between"
+					alignItems="center"
+					paddingBottom={size.s_20}
+					paddingTop={size.s_10}
+					paddingLeft={size.s_4}
+				>
 					<ChatMessageLeftArea
 						isShowAttachControl={isShowAttachControl}
 						setIsShowAttachControl={setIsShowAttachControl}

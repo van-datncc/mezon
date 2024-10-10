@@ -1,7 +1,7 @@
-import { Block, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useRef } from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import ChannelMessagesWrapper from '../../home/homedrawer/ChannelMessagesWrapper';
 import { ChatBox } from '../../home/homedrawer/ChatBox';
@@ -56,7 +56,6 @@ export const ChatMessageWrapper = memo(({ handleBack, directMessageId, isModeDM,
 					threadIcon: true
 				}}
 			/>
-			<Block height={Platform.OS === 'ios' ? 10 : 0} backgroundColor={themeValue.secondary} />
 			<PanelKeyboard
 				ref={panelKeyboardRef}
 				directMessageId={directMessageId || ''}
