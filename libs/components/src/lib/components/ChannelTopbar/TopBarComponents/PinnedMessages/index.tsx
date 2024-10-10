@@ -13,7 +13,17 @@ const PinnedMessages = ({ onClose, rootRef }: PinnedMessagesProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose, rootRef);
+	useOnClickOutside(
+		modalRef,
+		() => {
+			const modalConfirm = document.getElementById('delete_pin_mess');
+			if (modalConfirm) {
+				return;
+			}
+			onClose();
+		},
+		rootRef
+	);
 
 	return (
 		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999] animate-scale_up origin-top-right">

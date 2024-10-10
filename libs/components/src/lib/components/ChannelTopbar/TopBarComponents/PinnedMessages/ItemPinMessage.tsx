@@ -138,7 +138,7 @@ export const ListPinAttachment = ({ attachments }: { attachments: ApiMessageAtta
 	return (
 		<div className={`grid ${gridClass?.classGridParent} gap-1`}>
 			{attachments.map((attach) => {
-				return <img src={attach.url} className={`${gridClass?.classGridChild}`} />;
+				return <img src={attach.url} className={`${gridClass?.classGridChild}`} key={attach.url} />;
 			})}
 		</div>
 	);
