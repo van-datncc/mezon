@@ -68,7 +68,7 @@ export interface MessagesEntity extends IMessageWithUser {
 	channel_id: string;
 	isStartedMessageGroup?: boolean;
 	isStartedMessageOfTheDay?: boolean;
-	hideEditted?: boolean;
+	hide_editted?: boolean;
 }
 
 export interface UserTypingState {
@@ -533,7 +533,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			avatar: avatar,
 			isSending: true,
 			references: [],
-			isMe: true
+			isMe: true,
+			hide_editted: true
 		};
 		const fakeMess = mapMessageChannelToEntity(fakeMessage);
 
@@ -737,7 +738,7 @@ export const messagesSlice = createSlice({
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
-							hideEditted: action.payload.hide_editted,
+							hide_editted: action.payload.hide_editted,
 							update_time: action.payload.update_time
 						}
 					});
