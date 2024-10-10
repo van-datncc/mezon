@@ -2,10 +2,16 @@ import { channelSettingActions, selectAllChannelSuggestion, selectCurrentClanId,
 import { Icons } from '@mezon/ui';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Avatar, Tooltip } from 'flowbite-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
-const ListChannelSetting = () => {
+type ListChannelSettingProp = {
+	privateFilter?: boolean;
+	publicFilter?: boolean;
+	searchFilter: string;
+};
+
+const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListChannelSettingProp) => {
 	const dispatch = useAppDispatch();
 	const selectClanId = useSelector(selectCurrentClanId);
 	const listChannel = useSelector(selectAllChannelSuggestion);
@@ -16,20 +22,32 @@ const ListChannelSetting = () => {
 		fetchListChannel();
 	}, []);
 	const parentRef = useRef(null);
+	const listChannelSetting = useMemo(() => {
+		return listChannel.filter((channel) => {
+			if (privateFilter && channel.channel_private !== 1) {
+				return false;
+			}
+			if (!channel.channel_label?.includes(searchFilter)) {
+				return false;
+			}
+			return true;
+		});
+	}, [privateFilter, searchFilter, listChannel.length]);
+
 	const rowVirtualizer = useVirtualizer({
-		count: listChannel.length,
+		count: listChannelSetting.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 56,
 		overscan: 5
 	});
 	return (
-		<div className="w-full flex flex-col gap-1">
+		<div className="h-full w-full flex flex-col gap-1 flex-1">
 			<div className="w-full flex pl-12 pr-4 justify-between items-center h-[48px] shadow border-b-[1px] dark:border-bgTertiary text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
 				<span className="flex-1">Name</span>
 				<span className="flex-1">Members</span>
 				<span>Creator</span>
 			</div>
-			<div className="h-[calc(100vh_-_136px)] overflow-y-auto  hide-scrollbar scroll-smooth" ref={parentRef}>
+			<div className="h-full overflow-y-auto  hide-scrollbar scroll-smooth" ref={parentRef}>
 				<div
 					style={{
 						height: `${rowVirtualizer.getTotalSize()}px`,
@@ -38,7 +56,7 @@ const ListChannelSetting = () => {
 					}}
 				>
 					{rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
-						const channel = listChannel[virtualRow.index];
+						const channel = listChannelSetting[virtualRow.index];
 						return (
 							<div
 								key={virtualRow.key}
@@ -121,7 +139,7 @@ const ItemInfor = ({
 				)}
 			</div>
 
-			<Tooltip content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel.user?.username} placement="left">
+			<Tooltip content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username} placement="left">
 				<div className="overflow-hidden flex w-12 items-center justify-center">
 					<img src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} className="w-8 h-8 object-cover rounded-full " />
 				</div>
