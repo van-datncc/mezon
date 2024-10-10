@@ -1,5 +1,12 @@
 import { useAppParams } from '@mezon/core';
-import { PinMessageEntity, pinMessageActions, selectCurrentChannelId, selectPinMessageByChannelId, useAppDispatch } from '@mezon/store';
+import {
+	PinMessageEntity,
+	pinMessageActions,
+	selectCurrentChannelId,
+	selectPinMessageByChannelId,
+	stickerSettingActions,
+	useAppDispatch
+} from '@mezon/store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyPinMess from './EmptyPinMess';
@@ -28,6 +35,7 @@ const ListPinMessage = ({
 	const handleUnPinMessage = (messageId: string) => {
 		const channelId = directId || currentChannelId || '';
 		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: channelId || '', message_id: messageId }));
+		dispatch(stickerSettingActions.closeModalInChild());
 	};
 
 	const checkListPinMessages = useMemo(() => listPinMessages.length <= 0, [listPinMessages.length]);

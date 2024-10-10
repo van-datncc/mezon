@@ -55,6 +55,11 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 		return {};
 	}, [pinMessage.content]);
 
+	const handleCloseModalConfirm = () => {
+		dispatch(stickerSettingActions.closeModalInChild());
+		closeDeletePinMessage();
+	};
+
 	const [openDeletePinMessage, closeDeletePinMessage] = useModal(() => {
 		dispatch(stickerSettingActions.openModalInChild());
 		return (
@@ -62,7 +67,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 				pinMessage={pinMessage}
 				contentString={contentString}
 				handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')}
-				closeModal={closeDeletePinMessage}
+				closeModal={handleCloseModalConfirm}
 				attachments={message?.attachments ? message.attachments : []}
 			/>
 		);

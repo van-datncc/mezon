@@ -1,7 +1,7 @@
-import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
-import { hasGrandchildModal, selectTheme, stickerSettingActions } from '@mezon/store';
+import { useOnClickOutside } from '@mezon/core';
+import { hasGrandchildModal, selectTheme } from '@mezon/store';
 import { RefObject, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import ListPinMessage from './ListPinMessage';
 
 type PinnedMessagesProps = {
@@ -12,14 +12,11 @@ type PinnedMessagesProps = {
 const PinnedMessages = ({ onClose, rootRef }: PinnedMessagesProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const modalRef = useRef<HTMLDivElement>(null);
-	const dispatch = useDispatch();
 	const hasModalInChild = useSelector(hasGrandchildModal);
-	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(
 		modalRef,
 		() => {
 			if (hasModalInChild) {
-				dispatch(stickerSettingActions.closeModalInChild());
 				return;
 			}
 			onClose();
