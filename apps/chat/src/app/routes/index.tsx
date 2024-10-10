@@ -49,7 +49,7 @@ const DirectMessageIndex = loadable(() => import('../pages/directMessage/DMPage/
 const FriendsPage = loadable(() => import('../pages/directMessage/FriendsPage'));
 const ClanLayout = loadable(() => import('../layouts/ClanLayout'));
 const ChannelLayout = loadable(() => import('../layouts/ChannelLayout'));
-
+const ChannelSettingMain = loadable(() => import('../pages/setting/channelSetting'));
 // Components
 export const Routes = memo(() => {
 	const dispatch = useAppDispatch();
@@ -152,6 +152,10 @@ export const Routes = memo(() => {
 																			<MemberMain />
 																		</MemberProvider>
 																	)
+																},
+																{
+																	path: 'channel-setting',
+																	element: <ChannelSettingMain />
 																},
 																{
 																	path: 'channels',
