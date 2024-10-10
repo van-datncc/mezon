@@ -7,24 +7,21 @@ import { ChannelStreamMode } from 'mezon-js';
 import { FC, memo, useEffect, useMemo, useState } from 'react';
 import { FlatList, LayoutAnimation, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import UseMentionList from '../../hooks/useUserMentionList';
 import { EMessageActionType } from '../../screens/home/homedrawer/enums';
 import { IMessageActionNeedToResolve } from '../../screens/home/homedrawer/types';
 import SuggestItem from './SuggestItem';
 
 export interface MentionSuggestionsProps {
-	channelId: string;
 	keyword?: string;
 	onSelect: (user: MentionDataProps) => void;
 	messageActionNeedToResolve: IMessageActionNeedToResolve | null;
 	onAddMentionMessageAction?: (mentionData: MentionDataProps[]) => void;
 	mentionTextValue?: string;
-	channelMode?: number;
+	listMentions: MentionDataProps[];
 }
 
 const Suggestions: FC<MentionSuggestionsProps> = memo(
-	({ keyword, onSelect, channelId, messageActionNeedToResolve, onAddMentionMessageAction, mentionTextValue, channelMode }) => {
-		const listMentions = UseMentionList(channelId || '', channelMode);
+	({ keyword, onSelect, messageActionNeedToResolve, onAddMentionMessageAction, listMentions }) => {
 		const [listMentionData, setListMentionData] = useState([]);
 		useEffect(() => {
 			if (messageActionNeedToResolve?.type === EMessageActionType.Mention) {
