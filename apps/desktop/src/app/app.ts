@@ -82,6 +82,14 @@ export default class App {
 		App.mainWindow.setMenuBarVisibility(false);
 		App.mainWindow.center();
 
+		App.mainWindow.on('blur', () => {
+			App.mainWindow.webContents.send('window-blurred', true);
+		});
+
+		App.mainWindow.on('focus', () => {
+			App.mainWindow.webContents.send('window-focused', true);
+		});
+
 		const gotTheLock = App.application.requestSingleInstanceLock();
 		if (gotTheLock) {
 			App.application.on('second-instance', (e, argv) => {
