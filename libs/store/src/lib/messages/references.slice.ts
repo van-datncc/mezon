@@ -76,12 +76,18 @@ export const referencesSlice = createSlice({
 			}
 
 			if (!state.attachmentAfterUpload[channelId]) {
+				if (files && files.length > 10) {
+					return;
+				}
 				state.attachmentAfterUpload[channelId] = {
 					channelId: channelId,
 					files: files
 				};
 			} else {
 				if (files && files.length > 0) {
+					if (state.attachmentAfterUpload[channelId].files.length + files.length > 10) {
+						return;
+					}
 					state.attachmentAfterUpload[channelId].files = [...state.attachmentAfterUpload[channelId].files, ...files];
 				}
 			}

@@ -1,4 +1,4 @@
-import { FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
+import { FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
 import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads } from '@mezon/core';
 import {
 	channelMetaActions,
@@ -89,7 +89,7 @@ type ChannelMainContentProps = {
 
 const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
-	const { draggingState, setDraggingState } = useDragAndDrop();
+	const { draggingState, setDraggingState, overUploadingState, setOverUploadingState } = useDragAndDrop();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const isSearchMessage = useSelector(selectIsSearchMessage(channelId));
 	const closeMenu = useSelector(selectCloseMenu);
@@ -123,6 +123,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	) : (
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+			{overUploadingState && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
 				id="mainChat"

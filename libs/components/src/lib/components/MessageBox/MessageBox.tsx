@@ -1,4 +1,4 @@
-import { usePermissionChecker, useReference } from '@mezon/core';
+import { useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core';
 import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
@@ -35,25 +35,36 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], currentChannelId ?? '');
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 
-	const onConvertToFiles = useCallback((content: string) => {
-		if (content.length > MIN_THRESHOLD_CHARS) {
-			const fileContent = new Blob([content], { type: 'text/plain' });
-			const now = Date.now();
-			const filename = now + '.txt';
-			const file = new File([fileContent], filename, { type: 'text/plain' });
-			dispatch(
-				referencesActions.setAtachmentAfterUpload({
-					channelId: currentChannelId,
-					files: [file].map((file) => ({
-						filename: file.name,
-						filetype: file.type,
-						size: file.size,
-						url: URL.createObjectURL(file)
-					}))
-				})
-			);
-		}
-	}, []);
+	const { setOverUploadingState } = useDragAndDrop();
+
+	const onConvertToFiles = useCallback(
+		(content: string) => {
+			if (content.length > MIN_THRESHOLD_CHARS) {
+				const fileContent = new Blob([content], { type: 'text/plain' });
+				const now = Date.now();
+				const filename = now + '.txt';
+				const file = new File([fileContent], filename, { type: 'text/plain' });
+
+				if (attachmentFilteredByChannelId?.files?.length + 1 > 10) {
+					setOverUploadingState(true);
+					return;
+				}
+
+				dispatch(
+					referencesActions.setAtachmentAfterUpload({
+						channelId: currentChannelId,
+						files: [file].map((file) => ({
+							filename: file.name,
+							filetype: file.type,
+							size: file.size,
+							url: URL.createObjectURL(file)
+						}))
+					})
+				);
+			}
+		},
+		[attachmentFilteredByChannelId?.files?.length]
+	);
 
 	const onPastedFiles = useCallback(
 		(event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -70,6 +81,10 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				}
 
 				if (files.length > 0) {
+					if (files.length + attachmentFilteredByChannelId?.files?.length > 10) {
+						setOverUploadingState(true);
+						return;
+					}
 					dispatch(
 						referencesActions.setAtachmentAfterUpload({
 							channelId: currentChannelId,
@@ -84,7 +99,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				}
 			}
 		},
-		[clientRef, currentChannelId, currentClanId, sessionRef, props.mode]
+		[clientRef, currentChannelId, currentClanId, sessionRef, props.mode, attachmentFilteredByChannelId?.files?.length]
 	);
 
 	const closeMenu = useSelector(selectCloseMenu);
