@@ -8,7 +8,7 @@ export const style = (colors: Attributes) =>
 			gap: size.s_10,
 			marginBottom: size.s_10,
 			justifyContent: 'space-between',
-			alignItems: 'center',
+			alignItems: 'flex-start',
 			backgroundColor: colors.secondaryLight,
 			padding: Metrics.size.l,
 			borderRadius: size.s_10

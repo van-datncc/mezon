@@ -1,11 +1,13 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { PinMessageEntity } from '@mezon/store-mobile';
-import { IExtendedMessage } from '@mezon/utils';
+import { PinMessageEntity, selectMessageByMessageId } from '@mezon/store-mobile';
+import { IExtendedMessage, IMessageWithUser } from '@mezon/utils';
 import { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
-import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components';
+import { MessageAttachment } from '../../../screens/home/homedrawer/components/MessageAttachment';
+import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components/RenderTextMarkdown';
 import { style } from './PinMessageItem.styles';
 
 interface IPinMessageItemProps {
@@ -17,12 +19,14 @@ interface IPinMessageItemProps {
 const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessage }: IPinMessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const message = useSelector(selectMessageByMessageId(pinMessageItem?.message_id as string)) || {};
 	return (
 		<View style={styles.pinMessageItemWrapper}>
 			<MezonAvatar avatarUrl={pinMessageItem?.avatar} username={pinMessageItem?.username}></MezonAvatar>
 			<View style={styles.pinMessageItemBox}>
 				<Text style={styles.pinMessageItemName}>{pinMessageItem?.username}</Text>
 				<RenderTextMarkdownContent content={contentMessage} isEdited={false} />
+				<MessageAttachment message={message as IMessageWithUser} />
 			</View>
 			<View>
 				<TouchableOpacity

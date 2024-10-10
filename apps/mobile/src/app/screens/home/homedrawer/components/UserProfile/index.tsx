@@ -46,7 +46,10 @@ const UserProfile = React.memo(
 		const userById = useAppSelector(selectMemberClanByUserId(userId || user?.id));
 		const userStatus = useMemberStatus(userId || user?.id);
 		const rolesClan = useSelector(selectAllRolesClan);
-		const { color } = useMixImageColor(userById?.clan_avatar || userById?.user?.avatar_url || userProfile?.user?.avatar_url);
+		const messageAvatar = useMemo(() => {
+			return message?.clan_avatar || message?.avatar;
+		}, [message?.clan_avatar, message?.avatar]);
+		const { color } = useMixImageColor(messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url || userProfile?.user?.avatar_url);
 		const navigation = useNavigation<any>();
 		const { createDirectMessageWithUser } = useDirect();
 		const listDM = useSelector(selectDirectsOpenlist);
@@ -191,7 +194,7 @@ const UserProfile = React.memo(
 						<MezonAvatar
 							width={size.s_80}
 							height={size.s_80}
-							avatarUrl={userById?.clan_avatar || userById?.user?.avatar_url || user?.avatar_url}
+							avatarUrl={messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url || user?.avatar_url}
 							username={userById?.clan_nick || user?.display_name || userById?.user?.username}
 							userStatus={userStatus}
 							isBorderBoxImage={true}
