@@ -1,25 +1,20 @@
 import { useAppParams } from '@mezon/core';
-import {
-	PinMessageEntity,
-	pinMessageActions,
-	selectCurrentChannelId,
-	selectPinMessageByChannelId,
-	stickerSettingActions,
-	useAppDispatch
-} from '@mezon/store';
+import { PinMessageEntity, selectCurrentChannelId, selectPinMessageByChannelId } from '@mezon/store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { UnpinMessObject } from '.';
 import EmptyPinMess from './EmptyPinMess';
 import ItemPinMessage from './ItemPinMessage';
 
 const ListPinMessage = ({
 	onClose = () => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
-	}
+	},
+	handleUnPinConfirm
 }: {
 	onClose?: () => void;
+	handleUnPinConfirm: (unpinValue: UnpinMessObject) => void;
 }) => {
-	const dispatch = useAppDispatch();
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dmChannelId = useSelector(selectPinMessageByChannelId(directId));
@@ -31,12 +26,6 @@ const ListPinMessage = ({
 	} else if (clanChannelId) {
 		listPinMessages = clanChannelId;
 	}
-
-	const handleUnPinMessage = (messageId: string) => {
-		const channelId = directId || currentChannelId || '';
-		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: channelId || '', message_id: messageId }));
-		dispatch(stickerSettingActions.closeModalInChild());
-	};
 
 	const checkListPinMessages = useMemo(() => listPinMessages.length <= 0, [listPinMessages.length]);
 
@@ -62,7 +51,7 @@ const ListPinMessage = ({
 							<ItemPinMessage
 								pinMessage={pinMessage}
 								contentString={contentString}
-								handleUnPinMessage={handleUnPinMessage}
+								handleUnPinMessage={handleUnPinConfirm}
 								key={pinMessage.id}
 								onClose={onClose}
 							/>

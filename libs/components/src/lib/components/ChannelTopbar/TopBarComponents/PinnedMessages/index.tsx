@@ -1,7 +1,10 @@
-import { useOnClickOutside } from '@mezon/core';
-import { hasGrandchildModal, selectTheme } from '@mezon/store';
-import { RefObject, useRef } from 'react';
+import { useAppParams, useOnClickOutside } from '@mezon/core';
+import { PinMessageEntity, pinMessageActions, selectCurrentChannelId, selectTheme, useAppDispatch } from '@mezon/store';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
+import { RefObject, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { ModalDeletePinMess } from './DeletePinMessPopup';
 import ListPinMessage from './ListPinMessage';
 
 type PinnedMessagesProps = {
@@ -9,14 +12,52 @@ type PinnedMessagesProps = {
 	rootRef?: RefObject<HTMLElement>;
 };
 
+export type UnpinMessObject = {
+	pinMessage: PinMessageEntity;
+	contentString: string;
+	attachments: ApiMessageAttachment[];
+};
+
 const PinnedMessages = ({ onClose, rootRef }: PinnedMessagesProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const modalRef = useRef<HTMLDivElement>(null);
-	const hasModalInChild = useSelector(hasGrandchildModal);
+	const dispatch = useAppDispatch();
+
+	const { directId } = useAppParams();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+
+	const handleUnPinMessage = (messageId: string) => {
+		const channelId = directId || currentChannelId || '';
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: channelId || '', message_id: messageId }));
+	};
+	const [UnpinMess, setUnpinMess] = useState<UnpinMessObject | null>(null);
+	const modalDeleteRef = useRef(null);
+	const [openDeletePinMessage, closeDeletePinMessage] = useModal(() => {
+		return (
+			<ModalDeletePinMess
+				pinMessage={UnpinMess?.pinMessage as PinMessageEntity}
+				contentString={UnpinMess?.contentString}
+				handlePinMessage={() => handleUnPinMessage(UnpinMess?.pinMessage.message_id || '')}
+				closeModal={closeDeletePinMessage}
+				attachments={UnpinMess?.attachments as ApiMessageAttachment[]}
+				modalref={modalDeleteRef}
+			/>
+		);
+	}, [UnpinMess]);
+
+	const handleUnPinConfirm = (unpinValue: UnpinMessObject) => {
+		setUnpinMess({
+			pinMessage: unpinValue.pinMessage,
+			attachments: unpinValue.attachments,
+			contentString: unpinValue.contentString
+		});
+		openDeletePinMessage();
+	};
+
 	useOnClickOutside(
 		modalRef,
 		() => {
-			if (hasModalInChild) {
+			if (modalDeleteRef.current) {
 				return;
 			}
 			onClose();
@@ -35,7 +76,7 @@ const PinnedMessages = ({ onClose, rootRef }: PinnedMessagesProps) => {
 				<div
 					className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
 				>
-					<ListPinMessage onClose={onClose} />
+					<ListPinMessage onClose={onClose} handleUnPinConfirm={handleUnPinConfirm} />
 				</div>
 			</div>
 		</div>

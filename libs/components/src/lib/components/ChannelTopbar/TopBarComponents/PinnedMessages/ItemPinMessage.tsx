@@ -1,25 +1,16 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
-import {
-	PinMessageEntity,
-	messagesActions,
-	pinMessageActions,
-	selectCurrentClanId,
-	selectMessageByMessageId,
-	stickerSettingActions,
-	useAppDispatch
-} from '@mezon/store';
+import { PinMessageEntity, messagesActions, pinMessageActions, selectCurrentClanId, selectMessageByMessageId, useAppDispatch } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
-import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { UnpinMessObject } from '.';
 import { MemberProfile } from '../../../MemberProfile';
 import { MessageLine } from '../../../MessageWithUser/MessageLine';
-import { ModalDeletePinMess } from './DeletePinMessPopup';
 
 type ItemPinMessageProps = {
 	pinMessage: PinMessageEntity;
 	contentString: string | undefined;
-	handleUnPinMessage: (value: string) => void;
+	handleUnPinMessage: (unpinValue: UnpinMessObject) => void;
 	onClose: () => void;
 };
 
@@ -55,23 +46,13 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 		return {};
 	}, [pinMessage.content]);
 
-	const handleCloseModalConfirm = () => {
-		dispatch(stickerSettingActions.closeModalInChild());
-		closeDeletePinMessage();
+	const handleUnpinConfirm = () => {
+		handleUnPinMessage({
+			pinMessage: pinMessage,
+			contentString: contentString || '',
+			attachments: message?.attachments ? message?.attachments : []
+		});
 	};
-
-	const [openDeletePinMessage, closeDeletePinMessage] = useModal(() => {
-		dispatch(stickerSettingActions.openModalInChild());
-		return (
-			<ModalDeletePinMess
-				pinMessage={pinMessage}
-				contentString={contentString}
-				handlePinMessage={() => handleUnPinMessage(pinMessage.message_id || '')}
-				closeModal={handleCloseModalConfirm}
-				attachments={message?.attachments ? message.attachments : []}
-			/>
-		);
-	}, []);
 
 	return (
 		<div
@@ -108,7 +89,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 				</p>
 				<button
 					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 items-center justify-center text-[10px] px-3 py-2 flex"
-					onClick={openDeletePinMessage}
+					onClick={handleUnpinConfirm}
 				>
 					✕
 				</button>

@@ -11,13 +11,14 @@ type ModalDeletePinMessProps = {
 	closeModal: () => void;
 	handlePinMessage: () => void;
 	attachments: ApiMessageAttachment[];
+	modalref?: React.MutableRefObject<HTMLDivElement | null>;
 };
 export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
-	const { pinMessage, contentString, closeModal, handlePinMessage, attachments } = props;
+	const { pinMessage, contentString, closeModal, handlePinMessage, attachments, modalref } = props;
 	const userSender = useSelector(selectMemberClanByUserId(pinMessage.sender_id as string));
 	return (
 		<div
-			id="delete_pin_mess"
+			ref={modalref}
 			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 		>
 			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden max-w-[440px]">
