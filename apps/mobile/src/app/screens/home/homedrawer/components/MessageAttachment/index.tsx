@@ -1,3 +1,4 @@
+import { useTheme } from '@mezon/mobile-ui';
 import { IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -6,10 +7,11 @@ import { isImage, isVideo } from '../../../../../utils/helpers';
 import { RenderDocumentsChat } from '../RenderDocumentsChat';
 import { RenderImageChat } from '../RenderImageChat';
 import { RenderVideoChat } from '../RenderVideoChat';
+import { style } from './styles';
 
 interface IProps {
 	message: IMessageWithUser;
-	onLongPressImage: () => void;
+	onLongPressImage?: () => void;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 }
 const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
@@ -34,11 +36,14 @@ export const MessageAttachment = React.memo(({ message, onOpenImage, onLongPress
 	const attachments = useMemo(() => {
 		return message?.attachments || [];
 	}, [message?.attachments]);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
 
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
-
+	const visibleImages = images?.slice(0, 3) || [];
+	const remainingImagesCount = images?.length - 3 || 0;
 	useEffect(() => {
 		const { videos, images, documents } = classifyAttachments(attachments ?? []);
 		setVideos(videos);
@@ -54,7 +59,7 @@ export const MessageAttachment = React.memo(({ message, onOpenImage, onLongPress
 				create_time: message.create_time
 			});
 		},
-		[message.create_time, message.sender_id, onOpenImage]
+		[message.create_time, message?.sender_id, onOpenImage]
 	);
 
 	const renderDocuments = () => {
@@ -96,19 +101,34 @@ export const MessageAttachment = React.memo(({ message, onOpenImage, onLongPress
 	return (
 		<View>
 			{videos?.length > 0 && videos.map((video, index) => <RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} />)}
-			{images?.length > 0 &&
-				images.map((image, index) => {
-					const checkImage = notImplementForGifOrStickerSendFromPanel(image);
-					return (
+			<View style={styles.gridContainer}>
+				{visibleImages?.length > 0 &&
+					visibleImages?.map((image, index) => {
+						const checkImage = notImplementForGifOrStickerSendFromPanel(image);
+						return (
+							<RenderImageChat
+								disable={checkImage}
+								image={image}
+								images={images}
+								key={`${image?.url}_${index}`}
+								onPress={onPressImage}
+								onLongPress={onLongPressImage}
+							/>
+						);
+					})}
+				{remainingImagesCount > 0 && (
+					<View>
 						<RenderImageChat
-							disable={checkImage}
-							image={image}
-							key={`${image?.url}_${index}`}
+							images={images}
+							remainingImagesCount={remainingImagesCount}
+							image={images[3]}
 							onPress={onPressImage}
 							onLongPress={onLongPressImage}
 						/>
-					);
-				})}
+					</View>
+				)}
+			</View>
+
 			{documents?.length > 0 && renderDocuments()}
 		</View>
 	);

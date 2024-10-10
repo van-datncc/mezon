@@ -33,7 +33,7 @@ const ListAttachment = (props: ListAttachmentProps) => {
       });
       setScale(1);
     }
-  }, [setPosition, setScale, urlImg]);
+  }, [setPosition, setScale, currentIndexAtt,urlImg]);
 
   let previousDate: any;
 

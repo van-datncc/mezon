@@ -1,5 +1,13 @@
 import { useAuth, useMenu } from '@mezon/core';
-import { selectCloseMenu, selectCurrentStreamInfo, selectTheme, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
+import {
+	selectCloseMenu,
+	selectCurrentStreamInfo,
+	selectStreamMembersByChannelId,
+	selectTheme,
+	useAppDispatch,
+	usersStreamActions,
+	videoStreamActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -12,12 +20,14 @@ const StreamInfo = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
+	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 
 	const handleLeaveChannel = async () => {
 		if (currentStreamInfo) {
 			dispatch(videoStreamActions.stopStream());
 		}
-		dispatch(usersStreamActions.remove(userProfile?.user?.id || ''));
+		const idStreamByMe = streamChannelMember?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
+		dispatch(usersStreamActions.remove(idStreamByMe || ''));
 	};
 
 	const handleClick = () => {

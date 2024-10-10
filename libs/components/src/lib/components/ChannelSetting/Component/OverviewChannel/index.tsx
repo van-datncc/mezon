@@ -1,9 +1,11 @@
-import { channelsActions, selectAppChannelById, useAppDispatch } from '@mezon/store';
+import { channelsActions, checkDuplicateChannelInCategory, checkDuplicateThread, selectAppChannelById, useAppDispatch } from '@mezon/store';
 import { InputField, TextArea } from '@mezon/ui';
 import { IChannel, ValidateSpecialCharacters, ValidateURL } from '@mezon/utils';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce';
 import ModalAskChangeChannel from '../Modal/modalAskChangeChannel';
 
 export type OverviewChannelProps = {
@@ -16,18 +18,28 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [appUrlInit, setAppUrlInit] = useState(channelApp?.url || '');
 	const [appUrl, setAppUrl] = useState(appUrlInit);
 	const dispatch = useAppDispatch();
-	const [channelLabelInit, setChannelLabelInit] = useState(channel.channel_label);
+	const [channelLabelInit, setChannelLabelInit] = useState(channel.channel_label || '');
 	const [topicInit, setTopicInit] = useState('');
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [topic, setTopic] = useState(topicInit);
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
-	const [checkValidate, setCheckValidate] = useState(!ValidateSpecialCharacters().test(channelLabelInit || ''));
+	const [checkValidate, setCheckValidate] = useState('');
 	const [checkValidateUrl, setCheckValidateUrl] = useState(!ValidateURL().test(appUrlInit || ''));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
 	const isThread = channel.parrent_id !== '0';
 	const label = useMemo(() => {
 		return isThread ? 'thread' : 'channel';
 	}, [isThread]);
+
+	const parentLabel = useMemo(() => {
+		return isThread ? 'channel' : 'category';
+	}, [isThread]);
+
+	const messages = {
+		INVALID_NAME: `Please enter a valid ${label} name (max 64 characters, only words, numbers, _ or -).`,
+		DUPLICATE_NAME: `The ${label}  name already exists in the ${parentLabel} . Please enter another name.`,
+		INVALID_URL: `Please enter a valid URL (e.g., https://example.com).`
+	};
 
 	const handleChangeTextArea = useCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -37,18 +49,50 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		[topic, countCharacterTopic]
 	);
 
+	const debouncedSetChannelName = useDebouncedCallback(async (value: string) => {
+		if (channelLabelInit && value.trim() === channelLabelInit.trim()) {
+			setCheckValidate('');
+			return;
+		}
+
+		const regex = ValidateSpecialCharacters();
+		if (regex.test(value)) {
+			const checkDuplicate = async (checkFunction: any, payload: any) => {
+				await dispatch(checkFunction(payload))
+					.then(unwrapResult)
+					.then((result: any) => {
+						if (result) {
+							setCheckValidate(messages.DUPLICATE_NAME);
+							return;
+						}
+						setCheckValidate('');
+					});
+			};
+
+			if (isThread) {
+				await checkDuplicate(checkDuplicateThread, {
+					thread_name: value.trim(),
+					channel_id: channel.parrent_id ?? ''
+				});
+			} else {
+				await checkDuplicate(checkDuplicateChannelInCategory, {
+					channelName: value.trim(),
+					categoryId: channel.category_id ?? ''
+				});
+			}
+			return;
+		}
+
+		setCheckValidate(messages.INVALID_NAME);
+	}, 300);
+
 	const handleDisplayChannelLabel = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const value = e.target.value;
 			setChannelLabel(value);
-			const regex = ValidateSpecialCharacters();
-			if (regex.test(value) && value !== '') {
-				setCheckValidate(false);
-			} else {
-				setCheckValidate(true);
-			}
+			debouncedSetChannelName(value);
 		},
-		[channelLabel, checkValidate]
+		[debouncedSetChannelName]
 	);
 
 	const handleDisplayAppUrl = useCallback(
@@ -109,11 +153,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
 					maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 				/>
-				{checkValidate && (
-					<p className="text-[#e44141] text-xs italic font-thin">
-						Please enter a valid {label} name (max 64 characters, only words, numbers, _ or -).
-					</p>
-				)}
+				{checkValidate && <p className="text-[#e44141] text-xs italic font-thin">{checkValidate}</p>}
 
 				{channel.type === ChannelType.CHANNEL_TYPE_APP && (
 					<>
@@ -126,9 +166,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 							onChange={handleDisplayAppUrl}
 							className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
 						/>
-						{checkValidateUrl && (
-							<p className="text-[#e44141] text-xs italic font-thin">Please enter a valid URL (e.g., https://example.com).</p>
-						)}
+						{checkValidateUrl && <p className="text-[#e44141] text-xs italic font-thin">{messages.INVALID_URL}</p>}
 					</>
 				)}
 

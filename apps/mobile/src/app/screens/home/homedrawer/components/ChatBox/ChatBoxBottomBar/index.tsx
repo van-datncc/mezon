@@ -100,7 +100,7 @@ export const ChatBoxBottomBar = memo(
 		const [keyboardHeight, setKeyboardHeight] = useState<number>(Platform.OS === 'ios' ? 345 : 274);
 		const [isShowEmojiNativeIOS, setIsShowEmojiNativeIOS] = useState<boolean>(false);
 		const { sessionRef, clientRef } = useMezon();
-		const listMentions = UseMentionList(channelId || '', mode);
+		const listMentions = UseMentionList({ channelID: channelId || '', channelMode: mode });
 		const [textChange, setTextChange] = useState<string>('');
 		const listHashtagDm = useSelector(selectAllHashtagDm);
 		const listChannel = useSelector(selectAllChannels);
@@ -451,19 +451,24 @@ export const ChatBoxBottomBar = memo(
 			<Block paddingHorizontal={size.s_6} style={[isShowEmojiNativeIOS && { paddingBottom: size.s_50 }]}>
 				{triggers?.mention?.keyword !== undefined && (
 					<Suggestions
-						channelId={channelId}
 						{...triggers.mention}
 						messageActionNeedToResolve={messageActionNeedToResolve}
 						onAddMentionMessageAction={onAddMentionMessageAction}
-						mentionTextValue={mentionTextValue}
-						channelMode={mode}
+						listMentions={listMentions}
 					/>
 				)}
 				{triggers?.hashtag?.keyword !== undefined && <HashtagSuggestions directMessageId={channelId} mode={mode} {...triggers.hashtag} />}
 				{triggers?.emoji?.keyword !== undefined && <EmojiSuggestion {...triggers.emoji} />}
 				<AttachmentPreview channelId={channelId} />
 
-				<Block flexDirection="row" justifyContent="space-between" alignItems="center" paddingVertical={size.s_10}>
+				<Block
+					flexDirection="row"
+					justifyContent="space-between"
+					alignItems="center"
+					paddingBottom={size.s_20}
+					paddingTop={size.s_10}
+					paddingLeft={size.s_4}
+				>
 					<ChatMessageLeftArea
 						isShowAttachControl={isShowAttachControl}
 						setIsShowAttachControl={setIsShowAttachControl}

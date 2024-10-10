@@ -54,6 +54,13 @@ export const accountSlice = createSlice({
 		},
 		setAnonymousMode(state) {
 			state.anonymousMode = !state.anonymousMode;
+		},
+		setCustomStatus(state, action: PayloadAction<string>) {
+			if (state?.userProfile?.user) {
+				const userMetadata = JSON.parse(state.userProfile.user.metadata || '{}');
+				const updatedUserMetadata = { ...userMetadata, status: action.payload };
+				state.userProfile.user.metadata = JSON.stringify(updatedUserMetadata);
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -86,3 +93,7 @@ export const selectAllAccount = createSelector(getAccountState, (state: AccountS
 export const selectCurrentUserId = createSelector(getAccountState, (state: AccountState) => state?.userProfile?.user?.id || '');
 
 export const selectAnonymousMode = createSelector(getAccountState, (state: AccountState) => state.anonymousMode);
+
+export const selectAccountMetadata = createSelector(getAccountState, (state: AccountState) => JSON.parse(state.userProfile?.user?.metadata || '{}'));
+
+export const selectAccountCustomStatus = createSelector(selectAccountMetadata, (metadata) => metadata?.status || '');

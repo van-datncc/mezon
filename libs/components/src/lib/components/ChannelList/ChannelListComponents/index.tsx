@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useClans } from '@mezon/core';
+import { useAppNavigation, useAppParams, useClans, usePermissionChecker } from '@mezon/core';
 import {
 	EventManagementOnGogoing,
 	eventManagementActions,
@@ -8,13 +8,14 @@ import {
 	selectShowNumEvent
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { EPermission } from '@mezon/utils';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import EventModal from '../EventChannelModal';
 
 export const Events = () => {
-	const { toMembersPage } = useAppNavigation();
+	const { toMembersPage, toChannelSettingPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
 	const numberEventManagement = useSelector(selectNumberEvent);
 	const ongoingEvent = useSelector(selectOngoingEvent);
@@ -24,6 +25,9 @@ export const Events = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
 	const [showModal, setShowModal] = useState(false);
+
+	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
+
 	const closeModal = () => {
 		setShowModal(false);
 	};
@@ -38,6 +42,7 @@ export const Events = () => {
 		setOpenModalDetail(true);
 	};
 	const memberPath = toMembersPage(currentClanId || '');
+	const channelSettingPath = toChannelSettingPage(currentClanId || '');
 
 	return (
 		<>
@@ -77,6 +82,21 @@ export const Events = () => {
 					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Members</div>
 				</div>
 			</Link>
+			{checkAdminPermission ? (
+				<Link
+					to={channelSettingPath}
+					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${currentURL === channelSettingPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+				>
+					<div className="grow w-5 flex-row items-center gap-2 flex">
+						<div className="w-5 h-5 relative flex flex-row items-center">
+							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
+								<Icons.SettingProfile className="w-5 h-5 dark:text-channelTextLabel" />
+							</div>
+						</div>
+						<div className="w-full dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Channel Settings</div>
+					</div>
+				</Link>
+			) : null}
 			{showModal && (
 				<EventModal
 					onClose={closeModal}
