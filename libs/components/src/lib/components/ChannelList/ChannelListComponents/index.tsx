@@ -93,7 +93,7 @@ export const Events = () => {
 								<Icons.SettingProfile className="w-5 h-5 dark:text-channelTextLabel" />
 							</div>
 						</div>
-						<div className="w-full dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Channel Settings</div>
+						<div className="w-full dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Channels</div>
 					</div>
 				</Link>
 			) : null}
