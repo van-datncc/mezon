@@ -37,10 +37,12 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectCurrentStreamInfo,
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectMessageByMessageId,
 	selectModeResponsive,
+	selectStreamMembersByChannelId,
 	stickerSettingActions,
 	toastActions,
 	useAppDispatch,
@@ -121,6 +123,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const modeResponsive = useSelector(selectModeResponsive);
 	const channels = useAppSelector(selectChannelsByClanId(clanId as string));
 	const navigate = useNavigate();
+	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -161,15 +165,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onstreamingchanneljoined = useCallback(
 		(user: StreamingJoinedEvent) => {
-			if (user) {
-				dispatch(
-					usersStreamActions.add({
-						...user
-					})
-				);
+			const existingMember = streamChannelMember?.find((member) => member?.user_id === user?.user_id);
+			if (existingMember) {
+				dispatch(usersStreamActions.remove(existingMember?.id));
 			}
+			dispatch(usersStreamActions.add(user));
 		},
-		[dispatch]
+		[dispatch, streamChannelMember]
 	);
 
 	const onstreamingchannelleaved = useCallback(

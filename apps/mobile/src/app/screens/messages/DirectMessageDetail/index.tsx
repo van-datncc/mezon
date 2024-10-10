@@ -1,7 +1,6 @@
-import { useChatMessages, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
-import { directMetaActions } from '@mezon/store';
+import { useMemberStatus } from '@mezon/core';
+import { ActionEmitEvent, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelMembersActions,
@@ -11,33 +10,17 @@ import {
 	messagesActions,
 	selectCurrentChannel,
 	selectCurrentClanId,
-	selectDmGroupCurrent,
-	useAppDispatch
+	selectDmGroupCurrent
 } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { AppState, DeviceEventEmitter, Image, Pressable, Text, View } from 'react-native';
+import { AppState, DeviceEventEmitter } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChatMessageWrapper } from '../ChatMessageWrapper';
+import HeaderDirectMessage from './HeaderDirectMessage';
 import { style } from './styles';
-
-function useChannelSeen(channelId: string) {
-	const dispatch = useAppDispatch();
-	const { lastMessage } = useChatMessages({ channelId });
-	const mounted = useRef('');
-	useEffect(() => {
-		if (lastMessage) {
-			if (mounted.current === channelId) {
-				return;
-			}
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
-			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-		}
-	}, [channelId, dispatch, lastMessage]);
-}
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {
 	const { themeValue } = useTheme();
@@ -46,8 +29,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const from = route.params?.from;
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
-	useChannelSeen(directMessageId || '');
-
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isFetchMemberChannelDmRef = useRef(false);
@@ -77,9 +58,9 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const userStatus = useMemberStatus(isModeDM ? firstUserId : '');
 
-	const navigateToThreadDetail = () => {
+	const navigateToThreadDetail = useCallback(() => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
-	};
+	}, [currentDmGroup, navigation]);
 
 	const fetchMemberChannel = useCallback(async () => {
 		if (!currentChannel) {
@@ -191,41 +172,21 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			return;
 		}
 		navigation.goBack();
-	}, []);
+	}, [from, navigation]);
 
 	return (
 		<SafeAreaView edges={['top']} style={styles.dmMessageContainer}>
-			<View style={styles.headerWrapper}>
-				<Pressable onPress={() => handleBack()} style={styles.backButton}>
-					<Icons.ArrowLargeLeftIcon color={themeValue.text} height={size.s_20} width={size.s_20} />
-				</Pressable>
-				<Pressable style={styles.channelTitle} onPress={() => navigateToThreadDetail()}>
-					{isTypeDMGroup ? (
-						<View style={styles.groupAvatar}>
-							<Icons.GroupIcon width={18} height={18} />
-						</View>
-					) : (
-						<View style={styles.avatarWrapper}>
-							{dmAvatar ? (
-								<Image source={{ uri: dmAvatar || '' }} style={styles.friendAvatar} />
-							) : (
-								<View style={styles.wrapperTextAvatar}>
-									<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
-								</View>
-							)}
-							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
-						</View>
-					)}
-					<Text style={styles.titleText} numberOfLines={1}>
-						{dmLabel}
-					</Text>
-				</Pressable>
-				<View style={styles.actions}>
-					{/* TODO: update later */}
-					{/* <CallIcon />
-                    <VideoIcon /> */}
-				</View>
-			</View>
+			<HeaderDirectMessage
+				handleBack={handleBack}
+				navigateToThreadDetail={navigateToThreadDetail}
+				isTypeDMGroup={isTypeDMGroup}
+				dmAvatar={dmAvatar}
+				dmLabel={dmLabel}
+				userStatus={userStatus}
+				styles={styles}
+				themeValue={themeValue}
+				directMessageId={directMessageId}
+			/>
 			{directMessageId && (
 				<ChatMessageWrapper handleBack={handleBack} directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={currentClanId} />
 			)}

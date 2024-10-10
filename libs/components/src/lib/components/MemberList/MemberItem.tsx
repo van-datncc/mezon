@@ -1,7 +1,8 @@
 import { useAuth, useMemberCustomStatus } from '@mezon/core';
-import { ChannelMembersEntity } from '@mezon/store';
+import { ChannelMembersEntity, selectAccountCustomStatus } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import { MemberProfile } from '../MemberProfile';
 export type MemberItemProps = {
@@ -18,6 +19,8 @@ export type MemberItemProps = {
 function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name, isDM }: MemberItemProps) {
 	const userCustomStatus = useMemberCustomStatus(user.user?.id || '', isDM);
 	const { userProfile } = useAuth();
+	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
+	const displayCustomStatus = user.user?.id === userProfile?.user?.id ? currentUserCustomStatus : userCustomStatus;
 
 	const isMe = useMemo(() => {
 		return user?.user?.id === userProfile?.user?.id;
@@ -30,7 +33,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 			name={name || ''}
 			userNameAva={user?.user?.username}
 			status={isMe ? true : user.user?.online}
-			customStatus={userCustomStatus}
+			customStatus={displayCustomStatus}
 			isHideStatus={true}
 			isHideIconStatus={false}
 			textColor="[#AEAEAE]"

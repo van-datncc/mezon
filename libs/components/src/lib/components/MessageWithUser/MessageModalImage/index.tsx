@@ -180,6 +180,10 @@ const MessageModalImage = () => {
 		await handleSaveImage(urlImg);
 	};
 
+	const stopPropagation = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+		e.stopPropagation();
+	};
+
 	return (
 		<div className="justify-center items-center flex flex-col fixed z-50 inset-0 outline-none focus:outline-nonebg-black text-colorTextLightMode select-none">
 			<div className="flex justify-center items-center bg-[#2e2e2e] w-full h-[30px] relative">
@@ -188,12 +192,12 @@ const MessageModalImage = () => {
 					<Icons.MenuClose className="text-white w-full" />
 				</div>
 			</div>
-			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col" onClick={closeModal}>
-				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative">
+			<div className="flex w-full h-[calc(100vh_-_30px_-_56px)] bg-[#141414] max-[480px]:flex-col">
+				<div className="flex-1 flex justify-center items-center px-5 py-3 overflow-hidden h-full w-full relative" onClick={closeModal}>
 					<img
 						src={urlImg}
 						alt={urlImg}
-						className={`object-scale-down rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-full'}`}
+						className={`object-scale-down rounded-[10px] cursor-default ${rotate % 180 === 90 ? 'w-[calc(100vh_-_30px_-_56px)] h-auto' : 'h-auto'}`}
 						onDragStart={handleDrag}
 						onWheel={handleWheel}
 						onMouseUp={handleMouseUp}
@@ -206,11 +210,11 @@ const MessageModalImage = () => {
 							rotate: `${rotate}deg`
 						}}
 						onContextMenu={handleContextMenu}
-						onClick={(e) => e.stopPropagation()}
+						onClick={stopPropagation}
 					/>
 					<div
 						className={`h-full w-12 absolute flex flex-col right-0 gap-2 justify-center ${scale === 1 ? 'opacity-100' : 'opacity-0 hover:opacity-100'}`}
-						onClick={(e) => e.stopPropagation()}
+						onClick={stopPropagation}
 					>
 						<div
 							className="rounded-full rotate-180 bg-bgTertiary cursor-pointer w-10 aspect-square flex items-center justify-center text-white"

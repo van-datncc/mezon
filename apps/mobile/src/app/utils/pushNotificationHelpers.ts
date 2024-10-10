@@ -7,8 +7,8 @@ import {
 	save,
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
-import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
+import { appActions, channelsActions, clansActions, directActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
+import notifee, { EventType } from '@notifee/react-native';
 import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DrawerActions } from '@react-navigation/native';
@@ -171,6 +171,9 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 			const clanId = linkMatch[1];
 			const channelId = linkMatch[2];
+			if (clanId) {
+				await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
+			}
 			const clanIdCache = load(STORAGE_CLAN_ID);
 			const isDifferentClan = clanIdCache !== clanId;
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
@@ -220,6 +223,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 
 			// IS message DM
 			if (linkDirectMessageMatch) {
+				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 				const messageId = linkDirectMessageMatch[1];
 				const clanIdCache = load(STORAGE_CLAN_ID);
 				store.dispatch(clansActions.joinClan({ clanId: '0' }));
@@ -278,13 +282,13 @@ const processNotification = async ({ notification, navigation, time = 0 }) => {
 };
 
 export const setupNotificationListeners = async (navigation) => {
-	await notifee.createChannel({
-		id: 'default',
-		name: 'mezon',
-		importance: AndroidImportance.HIGH,
-		vibration: true,
-		vibrationPattern: [300, 500]
-	});
+	// await notifee.createChannel({
+	// 	id: 'default',
+	// 	name: 'mezon',
+	// 	importance: AndroidImportance.HIGH,
+	// 	vibration: true,
+	// 	vibrationPattern: [300, 500]
+	// });
 
 	messaging()
 		.getInitialNotification()

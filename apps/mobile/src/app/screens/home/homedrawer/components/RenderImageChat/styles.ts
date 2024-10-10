@@ -4,7 +4,6 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		imageMessageRender: {
 			borderRadius: verticalScale(5),
-			marginVertical: size.s_6,
 			borderWidth: 0.5,
 			borderColor: Colors.borderPrimary
 		},
@@ -20,5 +19,17 @@ export const style = (colors: Attributes) =>
 			paddingVertical: size.s_6,
 			fontSize: size.s_14,
 			color: colors.text
+		},
+		overlay: {
+			position: 'absolute',
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: 'rgba(0, 0, 0, 0.5)',
+			borderRadius: verticalScale(5)
+		},
+		moreText: {
+			color: colors.white,
+			fontSize: 20,
+			fontWeight: 'bold'
 		}
 	});
