@@ -9,6 +9,7 @@ import {
 import { useSeenMessagePool } from '@mezon/core';
 import {
 	selectChannelDraftMessage,
+	selectCurrentUserId,
 	selectIdMessageRefEdit,
 	selectLastSeenMessage,
 	selectMessageEntityById,
@@ -58,6 +59,9 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 		const { showMessageContextMenu } = useMessageContextMenu();
 		const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 		const messageRef = useRef<HTMLDivElement | null>(null);
+		const currentUserId = useSelector(selectCurrentUserId);
+
+		const isMyMessage = currentUserId && currentUserId === message?.sender_id;
 
 		const isEditing = useMemo(() => {
 			if (channelDraftMessage.message_id === messageId) {
@@ -130,7 +134,7 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 					</div>
 				)}
 
-				{lastSeen && <UnreadMessageBreak />}
+				{!isMyMessage && lastSeen && <UnreadMessageBreak />}
 			</>
 		);
 	}
