@@ -29,9 +29,9 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 			})) ?? [];
 		const hardcodedUser: MentionDataProps = {
 			id: ID_MENTION_HERE,
-			display: '@here',
+			display: 'here',
 			avatarUrl: '',
-			username: '@here'
+			username: 'here'
 		};
 		const sortedMentionList = [...mentionList].sort((a, b) => {
 			const displayA = a.display?.toLowerCase() || '';
