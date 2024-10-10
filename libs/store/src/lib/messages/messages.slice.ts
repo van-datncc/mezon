@@ -25,6 +25,7 @@ import {
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
@@ -1029,6 +1030,20 @@ export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEnti
 		return +a.create_time_seconds - +b.create_time_seconds;
 	}
 	return 0;
+}
+
+export function orderMessageByIDAscending(a: MessagesEntity, b: MessagesEntity) {
+	if (a.isFirst && !b.isFirst) {
+		return -1;
+	}
+	if (!a.isFirst && b.isFirst) {
+		return 1;
+	}
+
+	const aid = Snowflake.parse(a.id).timestamp;
+	const bid = Snowflake.parse(b.id).timestamp;
+
+	return +aid - +bid;
 }
 
 export const selectMessagesEntities = createSelector(getMessagesState, (messageState) => {
