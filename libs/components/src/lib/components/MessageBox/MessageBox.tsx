@@ -65,7 +65,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				);
 			}
 		},
-		[attachmentFilteredByChannelId?.files?.length]
+		[attachmentFilteredByChannelId?.files?.length, currentChannelId]
 	);
 
 	const onPastedFiles = useCallback(
