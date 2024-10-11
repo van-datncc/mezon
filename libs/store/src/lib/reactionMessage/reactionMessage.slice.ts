@@ -380,6 +380,5 @@ export const selectIsMessageHasReaction = (channelId: string, messageId: string)
 export const selectComputedReactionsByMessageId = (channelId: string, messageId: string) =>
 	createSelector(selectComputedMessageReactions, (computedMessageReactions) => {
 		const combinedId = `${channelId}_${messageId}`;
-		console.log(computedMessageReactions, 'computedMessageReactions');
 		return computedMessageReactions[combinedId] || [];
 	});
