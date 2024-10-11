@@ -312,8 +312,5 @@ export const selectCtrlKSelectedChannelId = createSelector(getCategoriesState, (
 
 export const selectCategoryExpandStateByCategoryId = (clanId: string, categoryId: string) =>
 	createSelector(getCategoriesState, (state) => {
-		if (state.categoryExpandState[clanId][categoryId] !== undefined) {
-			return state.categoryExpandState[clanId][categoryId];
-		}
-		return true;
+		return state.categoryExpandState?.[clanId]?.[categoryId] ?? true;
 	});
