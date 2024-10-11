@@ -114,7 +114,7 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 
 					 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 				>
-					{displayToken.display} ??? WHat
+					{displayToken.display}
 				</span>
 			)}
 			{displayToken?.type === MentionType.USER_EXIST && (
