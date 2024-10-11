@@ -14,6 +14,7 @@ import { Icons } from '@mezon/ui';
 import { IMessageWithUser, SubPanelName, findParentByClass, useMenuBuilder, useMenuBuilderPlugin } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
+import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -21,6 +22,14 @@ type ChannelMessageOptProps = {
 	message: IMessageWithUser;
 	handleContextMenu: (event: React.MouseEvent<HTMLElement>, props: any) => void;
 };
+
+enum EMessageOpt {
+	GIVE_A_COFFEE = 'giveacoffee',
+	REACT = 'react',
+	REPLY = 'reply',
+	THREAD = 'thread',
+	OPTION = 'option'
+}
 
 const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -36,19 +45,23 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 
 	return (
 		<div
-			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!message.isStartedMessageGroup ? '-top-4' : message.isStartedMessageOfTheDay ? 'top-6' : '-top-1'}  right-6 w-fit `}
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!message.isStartedMessageGroup ? '-top-4' : message.isStartedMessageOfTheDay ? 'top-6' : '-top-1'}  right-6 w-fit`}
 		>
 			<div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
 				<div className="w-fit h-full flex justify-between" ref={refOpt}>
-					{items.map((item, index) => (
-						<button
-							key={index}
-							onClick={(e) => (item?.handleItemClick ? item?.handleItemClick(e) : undefined)}
-							className={clx('h-full p-1 cursor-pointer popup-btn', item.classNames)}
-						>
-							{item.icon}
-						</button>
-					))}
+					{items
+						.filter((item) => {
+							return currentChannel?.type !== ChannelType.CHANNEL_TYPE_STREAMING || item.id !== EMessageOpt.THREAD;
+						})
+						.map((item, index) => (
+							<button
+								key={index}
+								onClick={(e) => (item?.handleItemClick ? item?.handleItemClick(e) : undefined)}
+								className={clx('h-full p-1 cursor-pointer popup-btn', item.classNames)}
+							>
+								{item.icon}
+							</button>
+						))}
 				</div>
 			</div>
 		</div>
