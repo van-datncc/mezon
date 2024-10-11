@@ -173,6 +173,16 @@ module.exports = {
           '100%':{
             transform:  'translateX(0px)'
           }
+        },
+        slide_in:{
+          '0%':{
+            transform: 'translateX(120px)',
+            opacity : 0.7
+          },
+          '100%':{
+            transform:  'translateX(0px)',
+            opacity : 1
+          }
         }
       },
       boxShadow: {
@@ -189,6 +199,7 @@ module.exports = {
       faded_input: 'faded_input 0.05s ease-in-out forwards',
       scale_up : 'scale_up 0.15s ease-in-out forwards',
       fly_in : 'fly_in 0.2s ease-in-out forwards',
+      slide_in: 'slide_in 0.5s ease-in-out forwards'
     },
     screens: {
       ssm: "430px",
