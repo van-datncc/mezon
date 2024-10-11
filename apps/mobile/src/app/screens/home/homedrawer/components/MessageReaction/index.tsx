@@ -22,7 +22,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 	const { reactionMessageDispatch } = useChatReaction({ isMobile: true });
 	const currentChannel = useSelector(selectCurrentChannel);
-	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
+	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.channel_id, message.id));
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 
