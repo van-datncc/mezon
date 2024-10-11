@@ -2,7 +2,7 @@ import { useEscapeKey } from '@mezon/core';
 import { appActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
-import ChannelLayout from '../../layouts/ChannelLayout';
+import ChannelMain from '../channel';
 
 type ChatStreamProps = {
 	readonly currentChannel?: Readonly<IChannel> | null;
@@ -40,7 +40,7 @@ const ChatStream = ({ currentChannel }: ChatStreamProps) => {
 	return (
 		<div className="flex flex-col h-full">
 			<ChatHeader currentChannel={currentChannel} />
-			<ChannelLayout />
+			<ChannelMain />
 		</div>
 	);
 };

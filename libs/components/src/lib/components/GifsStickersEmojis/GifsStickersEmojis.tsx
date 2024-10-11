@@ -60,7 +60,8 @@ export const GifStickerEmojiPopup = ({ emojiAction, mode, channelOrDirect }: Gif
 			(subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT && window.innerWidth <= 640) ||
 			(subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && window.innerWidth <= 640) ||
 			(emojiAction === EmojiPlaces.EMOJI_REACTION && window.innerWidth > 640) ||
-			(emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM && window.innerWidth > 640)
+			(emojiAction === EmojiPlaces.EMOJI_REACTION_BOTTOM && window.innerWidth > 640) ||
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 		);
 	};
 

@@ -1,9 +1,16 @@
 import { GifStickerEmojiPopup, MessageBox, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectAnonymousMode, selectDataReferences, selectIsViewingOlderMessagesByChannelId } from '@mezon/store';
+import {
+	referencesActions,
+	selectAnonymousMode,
+	selectCurrentChannel,
+	selectDataReferences,
+	selectIsViewingOlderMessagesByChannelId
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
 import classNames from 'classnames';
+import { ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -49,6 +56,8 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	}, [sendMessageTyping]);
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
+	const getCurrentChannel = useSelector(selectCurrentChannel);
+
 	useEffect(() => {
 		const isEmojiReactionPanel = subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM;
 
@@ -56,7 +65,9 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 
 		const isSmallScreen = window.innerWidth < 640;
 
-		const isActive = isOtherActivePanel || (isEmojiReactionPanel && isSmallScreen);
+		const isStreamChat = getCurrentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
+
+		const isActive = isOtherActivePanel || (isEmojiReactionPanel && isSmallScreen) || (isEmojiReactionPanel && isStreamChat);
 
 		setIsEmojiOnChat(isActive);
 	}, [subPanelActive]);
