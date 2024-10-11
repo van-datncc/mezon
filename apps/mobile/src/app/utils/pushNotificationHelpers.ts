@@ -173,62 +173,42 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const channelId = linkMatch?.[2];
 			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
 			const isExistChannel = respChannel.payload.find((channel: { channel_id: string }) => channel.channel_id === channelId);
-			const clanIdCache = load(STORAGE_CLAN_ID);
-			const isDifferentClan = clanIdCache !== clanId;
 			if (isExistChannel) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			}
 			save(STORAGE_CLAN_ID, clanId);
-			if (isDifferentClan) {
-				const joinAndChangeClan = async (store: any, clanId: string) => {
-					await Promise.all([
-						store.dispatch(clansActions.joinClan({ clanId: clanId })),
-						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
-						isExistChannel
-							? store.dispatch(
-									channelsActions.joinChannel({
-										clanId: clanId ?? '',
-										channelId: channelId,
-										noFetchMembers: false,
-										isClearMessage: true
-									})
-								)
-							: Promise.resolve()
-					]);
-				};
-				await joinAndChangeClan(store, clanId);
-				if (isExistChannel) {
-					store.dispatch(
-						messagesActions.fetchMessages({
-							channelId: channelId,
-							noCache: true,
-							isFetchingLatestMessages: true,
-							isClearMessage: true,
-							clanId: clanId ?? ''
-						})
-					);
-				} else {
-					await setDefaultChannelLoader(respChannel.payload, clanId);
-				}
+			const joinAndChangeClan = async (store: any, clanId: string) => {
+				await Promise.all([
+					store.dispatch(clansActions.joinClan({ clanId: clanId })),
+					store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
+					isExistChannel
+						? store.dispatch(
+								channelsActions.joinChannel({
+									clanId: clanId ?? '',
+									channelId: channelId,
+									noFetchMembers: false,
+									isClearMessage: true
+								})
+							)
+						: Promise.resolve()
+				]);
+			};
+			await joinAndChangeClan(store, clanId);
+			if (isExistChannel) {
+				store.dispatch(
+					messagesActions.fetchMessages({
+						channelId: channelId,
+						noCache: true,
+						isFetchingLatestMessages: true,
+						isClearMessage: true,
+						clanId: clanId ?? ''
+					})
+				);
 			} else {
-				if (isExistChannel) {
-					store.dispatch(
-						messagesActions.fetchMessages({
-							channelId: channelId,
-							noCache: true,
-							isFetchingLatestMessages: true,
-							isClearMessage: true,
-							clanId: clanId ?? ''
-						})
-					);
-					store.dispatch(
-						channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true })
-					);
-				} else {
-					await setDefaultChannelLoader(respChannel.payload, clanId);
-				}
+				await setDefaultChannelLoader(respChannel.payload, clanId);
 			}
+
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			setTimeout(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));

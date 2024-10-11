@@ -8,7 +8,8 @@ import LottieView from 'lottie-react-native';
 import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -110,7 +111,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 			) : (
 				<View style={styles.avatarWrapper}>
 					{directMessage?.channel_avatar?.[0] ? (
-						<Image source={{ uri: directMessage?.channel_avatar?.[0] }} style={styles.friendAvatar} />
+						<FastImage source={{ uri: directMessage?.channel_avatar?.[0] }} style={styles.friendAvatar} />
 					) : (
 						<View style={styles.wrapperTextAvatar}>
 							<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>
