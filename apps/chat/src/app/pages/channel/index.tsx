@@ -29,7 +29,7 @@ function useChannelSeen(channelId: string) {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
-	const { isFocusDesktop } = useWindowFocusState();
+	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
@@ -45,7 +45,7 @@ function useChannelSeen(channelId: string) {
 		if (!numberNotification && resetBadgeCount) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
-	}, [currentChannel.id, statusFetchChannel, isFocusDesktop]);
+	}, [currentChannel.id, statusFetchChannel, isFocusDesktop, isTabVisible]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {

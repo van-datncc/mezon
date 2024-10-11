@@ -248,6 +248,7 @@ export type IStreamInfo = {
 	clanName: string;
 	streamId: string;
 	streamName: string;
+	parentId: string;
 };
 
 export interface CategoryNameProps {

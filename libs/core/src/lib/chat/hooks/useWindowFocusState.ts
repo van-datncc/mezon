@@ -2,8 +2,17 @@ import { useEffect, useState } from 'react';
 
 export const useWindowFocusState = () => {
 	const [isFocusDesktop, setIsFocusDesktop] = useState(true);
+	const [isTabVisible, setIsTabVisible] = useState(true);
 
 	useEffect(() => {
+		const handleTabBrowserFocus = () => {
+			setIsTabVisible(true);
+		};
+
+		const handleTabBrowserBlur = () => {
+			setIsTabVisible(false);
+		};
+
 		if (window?.electron) {
 			const handleWindowFocused = () => {
 				setIsFocusDesktop(true);
@@ -21,7 +30,14 @@ export const useWindowFocusState = () => {
 				window.electron.removeListener('window-focused', handleWindowFocused);
 			};
 		}
+		window.addEventListener('focus', handleTabBrowserFocus);
+		window.addEventListener('blur', handleTabBrowserBlur);
+
+		return () => {
+			window.removeEventListener('focus', handleTabBrowserFocus);
+			window.removeEventListener('blur', handleTabBrowserBlur);
+		};
 	}, []);
 
-	return { isFocusDesktop };
+	return { isFocusDesktop, isTabVisible };
 };

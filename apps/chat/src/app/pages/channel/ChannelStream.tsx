@@ -273,24 +273,28 @@ export type UserListStreamChannelProps = {
 
 function UserListStreamChannel({ memberJoin = [], memberMax, isShowChat }: UserListStreamChannelProps) {
 	const [displayedMembers, setDisplayedMembers] = useState<IChannelMember[]>(memberJoin);
+	const [remainingCount, setRemainingCount] = useState(0);
 
 	const handleSizeWidth = useCallback(() => {
-		let membersToShow = [...memberJoin];
+		const membersToShow = [...memberJoin];
+		let maxMembers = memberMax ?? 7;
 
 		if (window.innerWidth < 1000) {
-			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 1 : 2));
+			maxMembers = isShowChat ? 1 : 2;
 		} else if (window.innerWidth < 1200) {
-			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 2 : 3));
+			maxMembers = isShowChat ? 2 : 3;
 		} else if (window.innerWidth < 1300) {
-			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 3 : 4));
+			maxMembers = isShowChat ? 3 : 4;
 		} else if (window.innerWidth < 1400) {
-			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 4 : 5));
+			maxMembers = isShowChat ? 4 : 5;
 		} else if (window.innerWidth < 1700) {
-			membersToShow = membersToShow.slice(0, memberMax ?? (isShowChat ? 5 : 6));
-		} else {
-			membersToShow = membersToShow.slice(0, memberMax ?? 7);
+			maxMembers = isShowChat ? 5 : 6;
 		}
-		setDisplayedMembers(membersToShow);
+
+		const extraMembers = membersToShow.length - maxMembers;
+
+		setDisplayedMembers(membersToShow.slice(0, maxMembers));
+		setRemainingCount(extraMembers > 0 ? extraMembers : 0);
 	}, [memberJoin, memberMax, isShowChat]);
 
 	useEffect(() => {
@@ -303,13 +307,16 @@ function UserListStreamChannel({ memberJoin = [], memberMax, isShowChat }: UserL
 	}, [handleSizeWidth]);
 
 	return (
-		<>
+		<div className="flex items-center gap-2">
 			{displayedMembers.map((item: IChannelMember) => (
 				<div key={item.id} className="flex items-center">
 					<UserItem user={item} />
 				</div>
 			))}
-		</>
+			{remainingCount > 0 && (
+				<div className="w-14 h-14 rounded-full bg-gray-300 text-black font-medium flex items-center justify-center">+{remainingCount}</div>
+			)}
+		</div>
 	);
 }
 
