@@ -46,7 +46,7 @@ function useChannelSeen(channelId: string) {
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
 
-	const { isFocusDesktop } = useWindowFocusState();
+	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
 		const timestamp = Date.now() / 1000;
@@ -56,10 +56,10 @@ function useChannelSeen(channelId: string) {
 	};
 
 	useEffect(() => {
-		if (lastMessage && isFocusDesktop === true && isElectron()) {
+		if ((lastMessage && isFocusDesktop === true && isElectron()) || (lastMessage && isTabVisible)) {
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [isFocusDesktop]);
+	}, [isFocusDesktop, isTabVisible]);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {

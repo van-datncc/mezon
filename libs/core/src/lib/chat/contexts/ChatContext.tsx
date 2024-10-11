@@ -127,7 +127,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const navigate = useNavigate();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
-	const { isFocusDesktop } = useWindowFocusState();
+	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
 	const clanIdActive = useMemo(() => {
 		if (clanId !== undefined || currentClanId) {
@@ -234,7 +234,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					isClanView ||
 					!currentDirectId ||
 					(currentDirectId && !RegExp(currentDirectId).test(message?.channel_id)) ||
-					(isElectron() && isFocusDesktop === false);
+					(isElectron() && isFocusDesktop === false) ||
+					isTabVisible === false;
 				if (isNotCurrentDirect) {
 					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
@@ -249,7 +250,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			}
 			dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 		},
-		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, isFocusDesktop]
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, isFocusDesktop, isTabVisible]
 	);
 
 	const onchannelpresence = useCallback(
@@ -294,7 +295,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				(currentChannel?.channel_id !== (notification as any).channel_id && (notification as any).clan_id !== '0') ||
 				isDirectViewPage ||
 				isFriendPageView ||
-				(isElectron() && isFocusDesktop === false)
+				(isElectron() && isFocusDesktop === false) ||
+				isTabVisible === false
 			) {
 				dispatch(notificationActions.add(mapNotificationToEntity(notification)));
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
@@ -313,7 +315,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
 		},
-		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, location.pathname, isFocusDesktop]
+		[userId, directId, currentDirectId, dispatch, channelId, currentChannelId, currentClanId, location.pathname, isFocusDesktop, isTabVisible]
 	);
 
 	const onpinmessage = useCallback(
