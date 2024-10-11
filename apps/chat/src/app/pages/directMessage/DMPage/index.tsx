@@ -46,7 +46,7 @@ function useChannelSeen(channelId: string) {
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
 
-	const { isFocusDesktop } = useWindowFocusState();
+	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
 		const timestamp = Date.now() / 1000;
@@ -56,10 +56,10 @@ function useChannelSeen(channelId: string) {
 	};
 
 	useEffect(() => {
-		if (lastMessage && isFocusDesktop === true && isElectron()) {
+		if ((lastMessage && isFocusDesktop === true && isElectron()) || (lastMessage && isTabVisible)) {
 			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [isFocusDesktop]);
+	}, [isFocusDesktop, isTabVisible]);
 
 	useEffect(() => {
 		if (mounted.current === channelId) {
@@ -190,7 +190,7 @@ const DirectMessage = () => {
 						)}
 						{subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && (
 							<div
-								className="fixed max-sm:hidden z-10"
+								className={`fixed z-50 max-sm:hidden duration-300 ease-in-out animate-fly_in`}
 								style={{
 									top: topPositionEmojiPanel,
 									bottom: distanceToBottom < HEIGHT_EMOJI_PANEL ? '0' : 'auto',

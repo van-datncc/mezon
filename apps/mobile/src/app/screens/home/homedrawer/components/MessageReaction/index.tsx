@@ -22,7 +22,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 	const { reactionMessageDispatch } = useChatReaction({ isMobile: true });
 	const currentChannel = useSelector(selectCurrentChannel);
-	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
+	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.channel_id, message.id));
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 
@@ -57,7 +57,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 
 	const removeEmoji = async (emojiData: EmojiDataOptionals) => {
 		const { id, emoji, senders, emojiId } = emojiData;
-		const countToRemove = senders.find((sender) => sender.sender_id === userId)?.count;
+		const countToRemove = senders?.find?.((sender) => sender.sender_id === userId)?.count;
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -104,7 +104,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	return (
 		<View style={[styles.reactionWrapper, allReactionDataOnOneMessage.length > 0 && styles.reactionSpace]}>
 			{allReactionDataOnOneMessage?.map((emojiItemData: EmojiDataOptionals, index) => {
-				const userSender = emojiItemData.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
+				const userSender = emojiItemData?.senders?.find?.((sender: SenderInfoOptionals) => sender.sender_id === userId);
 				const isMyReaction = userSender?.count && userSender.count > 0;
 
 				if (calculateTotalCount(emojiItemData.senders) === 0) {

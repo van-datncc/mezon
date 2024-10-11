@@ -206,7 +206,6 @@ const NavigationMain = () => {
 		const store = await getStoreAsync();
 		try {
 			const promises = [];
-			promises.push(store.dispatch(clansActions.fetchClans()));
 			promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser({ noCache: true })));
 			promises.push(store.dispatch(friendsActions.fetchListFriends({})));
 			promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
@@ -227,6 +226,7 @@ const NavigationMain = () => {
 				const currentClanIdCached = await load(STORAGE_CLAN_ID);
 				const clanId = currentClanId?.toString() !== '0' ? currentClanId : currentClanIdCached;
 				const promises = [];
+				promises.push(store.dispatch(clansActions.fetchClans()));
 				if (!isFromFCM) {
 					if (clanId) {
 						save(STORAGE_CLAN_ID, clanId);
