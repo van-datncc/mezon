@@ -311,4 +311,9 @@ export const selectIsShowEmptyCategory = createSelector(getCategoriesState, (sta
 export const selectCtrlKSelectedChannelId = createSelector(getCategoriesState, (state) => state.ctrlKSelectedChannelId);
 
 export const selectCategoryExpandStateByCategoryId = (clanId: string, categoryId: string) =>
-	createSelector(getCategoriesState, (state) => state.categoryExpandState[clanId][categoryId]);
+	createSelector(getCategoriesState, (state) => {
+		if (state.categoryExpandState[clanId][categoryId] !== undefined) {
+			return state.categoryExpandState[clanId][categoryId];
+		}
+		return true;
+	});
