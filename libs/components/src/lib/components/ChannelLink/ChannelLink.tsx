@@ -151,7 +151,8 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 							clanId: clanId || '',
 							clanName: clanById?.clan_name || '',
 							streamId: channel?.channel_id || '',
-							streamName: channel?.channel_label || ''
+							streamName: channel?.channel_label || '',
+							parentId: channel?.parrent_id || ''
 						})
 					);
 					dispatch(appActions.setIsShowChatStream(false));
@@ -193,7 +194,8 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						clanId: clanId || '',
 						clanName: clanById?.clan_name || '',
 						streamId: currentChannel?.channel_id || '',
-						streamName: currentChannel?.channel_label || ''
+						streamName: currentChannel?.channel_label || '',
+						parentId: currentChannel?.parrent_id || ''
 					})
 				);
 				dispatch(appActions.setIsShowChatStream(false));
@@ -237,7 +239,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						{channel.status === StatusVoiceChannel.No_Active && <Spinner aria-label="Loading spinner" />}
 					</span>
 				) : (
-					<Link to={channelPath} onClick={handleClick} id={channelPath}>
+					<Link to={channelPath} onClick={handleClick}>
 						<span ref={channelLinkRef} className={`${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}>
 							{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 							<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
