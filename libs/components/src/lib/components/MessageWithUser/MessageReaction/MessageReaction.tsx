@@ -17,8 +17,8 @@ type MessageReactionProps = {
 	mode: number;
 };
 
-function useMessageReaction(messageId: string) {
-	const computedReactions = useSelector(selectComputedReactionsByMessageId(messageId));
+function useMessageReaction(channelId: string, messageId: string) {
+	const computedReactions = useSelector(selectComputedReactionsByMessageId(channelId, messageId));
 
 	return computedReactions;
 }
@@ -29,8 +29,8 @@ const MessageReaction: React.FC<MessageReactionProps> = ({ message, mode }) => {
 	const reactionBottomState = useSelector(selectReactionBottomState);
 	const reactionBottomStateResponsive = useSelector(selectReactionBottomStateResponsive);
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
-	const messageReactions = useMessageReaction(message.id);
-	const checkHasEmoji = useSelector(selectIsMessageHasReaction(message.id));
+	const messageReactions = useMessageReaction(message.channel_id, message.id);
+	const checkHasEmoji = useSelector(selectIsMessageHasReaction(message.channel_id, message.id));
 
 	const isMessageMatched = message.id === idMessageRefReaction;
 

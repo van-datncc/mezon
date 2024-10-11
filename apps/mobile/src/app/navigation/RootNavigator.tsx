@@ -21,7 +21,7 @@ import {
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { NavigationContainer } from '@react-navigation/native';
-import React, { Suspense, lazy, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContext, ChatContextProvider } from '@mezon/core';
@@ -45,9 +45,8 @@ import { ChannelType } from 'mezon-js';
 import { AppState, DeviceEventEmitter, StatusBar } from 'react-native';
 import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
-import SplashScreen from '../components/SplashScreen';
 import { toastConfig } from '../configs/toastConfig';
-const MyStackComponent = lazy(() => import('./RootStack'));
+import RootStack from './RootStack';
 
 const NavigationMain = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
@@ -64,16 +63,24 @@ const NavigationMain = () => {
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		}, 500);
+		}, 800);
 		return () => {
 			clearTimeout(timer);
 		};
 	}, []);
 
 	useEffect(() => {
+		let timer: string | number | NodeJS.Timeout;
 		if (isLoggedIn) {
-			initAppLoading();
+			mainLoader();
+			timer = setTimeout(async () => {
+				initAppLoading();
+				// timeout 2000s to check app open from FCM or nomarly
+			}, 2000);
 		}
+		return () => {
+			clearTimeout(timer);
+		};
 	}, [isLoggedIn]);
 
 	useEffect(() => {
@@ -111,12 +118,12 @@ const NavigationMain = () => {
 				})
 			);
 		}
-	}, [currentChannelId]);
+	}, [currentChannelId, currentClanId]);
 
-	const initAppLoading = useCallback(async () => {
+	const initAppLoading = async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-		await mainLoader({ isFromFCM: isFromFCM?.toString() === 'true' });
-	}, []);
+		await mainLoaderTimeout({ isFromFCM: isFromFCM?.toString() === 'true' });
+	};
 
 	const handleAppStateChange = useCallback(
 		async (state: string) => {
@@ -195,16 +202,32 @@ const NavigationMain = () => {
 		}
 	}, []);
 
-	const mainLoader = useCallback(
+	const mainLoader = useCallback(async () => {
+		const store = await getStoreAsync();
+		try {
+			const promises = [];
+			promises.push(store.dispatch(clansActions.fetchClans()));
+			promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser({ noCache: true })));
+			promises.push(store.dispatch(friendsActions.fetchListFriends({})));
+			promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
+			promises.push(store.dispatch(directActions.fetchDirectMessage({})));
+			promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
+			await Promise.all(promises);
+			return null;
+		} catch (error) {
+			console.log('error mainLoader', error);
+			store.dispatch(appActions.setLoadingMainMobile(false));
+		}
+	}, []);
+
+	const mainLoaderTimeout = useCallback(
 		async ({ isFromFCM = false }) => {
 			const store = await getStoreAsync();
 			try {
 				const currentClanIdCached = await load(STORAGE_CLAN_ID);
 				const clanId = currentClanId?.toString() !== '0' ? currentClanId : currentClanIdCached;
 				const promises = [];
-
 				if (!isFromFCM) {
-					promises.push(store.dispatch(clansActions.fetchClans()));
 					if (clanId) {
 						save(STORAGE_CLAN_ID, clanId);
 						promises.push(store.dispatch(clansActions.joinClan({ clanId })));
@@ -212,12 +235,6 @@ const NavigationMain = () => {
 						promises.push(store.dispatch(channelsActions.fetchChannels({ clanId, noCache: true })));
 					}
 				}
-
-				promises.push(store.dispatch(listUsersByUserActions.fetchListUsersByUser({ noCache: true })));
-				promises.push(store.dispatch(friendsActions.fetchListFriends({})));
-				promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
-				promises.push(store.dispatch(directActions.fetchDirectMessage({})));
-				promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
 				const results = await Promise.all(promises);
 
 				if (!isFromFCM) {
@@ -231,8 +248,7 @@ const NavigationMain = () => {
 						}
 					}
 				}
-
-				store.dispatch(appActions.setLoadingMainMobile(false));
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				return null;
 			} catch (error) {
 				console.log('error mainLoader', error);
@@ -243,12 +259,10 @@ const NavigationMain = () => {
 	);
 
 	return (
-		<Suspense fallback={<SplashScreen />}>
-			<NavigationContainer>
-				<NetInfoComp />
-				{isReadyForUse && <MyStackComponent />}
-			</NavigationContainer>
-		</Suspense>
+		<NavigationContainer>
+			<NetInfoComp />
+			{isReadyForUse && <RootStack />}
+		</NavigationContainer>
 	);
 };
 

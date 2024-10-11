@@ -25,6 +25,7 @@ import {
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
@@ -67,7 +68,7 @@ export interface MessagesEntity extends IMessageWithUser {
 	channel_id: string;
 	isStartedMessageGroup?: boolean;
 	isStartedMessageOfTheDay?: boolean;
-	hideEditted?: boolean;
+	hide_editted?: boolean;
 }
 
 export interface UserTypingState {
@@ -532,7 +533,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			avatar: avatar,
 			isSending: true,
 			references: [],
-			isMe: true
+			isMe: true,
+			hide_editted: true
 		};
 		const fakeMess = mapMessageChannelToEntity(fakeMessage);
 
@@ -736,7 +738,7 @@ export const messagesSlice = createSlice({
 							content: action.payload.content,
 							mentions: action.payload.mentions,
 							attachments: action.payload.attachments,
-							hideEditted: action.payload.hide_editted,
+							hide_editted: action.payload.hide_editted,
 							update_time: action.payload.update_time
 						}
 					});
@@ -1029,6 +1031,20 @@ export function orderMessageByTimeMsAscending(a: MessagesEntity, b: MessagesEnti
 		return +a.create_time_seconds - +b.create_time_seconds;
 	}
 	return 0;
+}
+
+export function orderMessageByIDAscending(a: MessagesEntity, b: MessagesEntity) {
+	if (a.isFirst && !b.isFirst) {
+		return -1;
+	}
+	if (!a.isFirst && b.isFirst) {
+		return 1;
+	}
+
+	const aid = Snowflake.parse(a.id).timestamp;
+	const bid = Snowflake.parse(b.id).timestamp;
+
+	return +aid - +bid;
 }
 
 export const selectMessagesEntities = createSelector(getMessagesState, (messageState) => {
