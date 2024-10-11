@@ -31,6 +31,7 @@ export type UpdateBulkMessageReactionsArgs = {
 	messages: {
 		id: string;
 		reactions?: ApiMessageReaction[] | undefined;
+		channel_id?: string;
 	}[];
 };
 
@@ -163,9 +164,6 @@ export const reactionSlice = createSlice({
 	name: REACTION_FEATURE_KEY,
 	initialState: initialReactionState,
 	reducers: {
-		add: reactionAdapter.addOne,
-		remove: reactionAdapter.removeOne,
-
 		setEmojiHover(state, action) {
 			state.emojiHover = action.payload;
 		},
@@ -235,8 +233,9 @@ export const reactionSlice = createSlice({
 				// Do nothing when remove reaction and not found
 			}
 
-			if (action.payload.message_id) {
-				state.computedMessageReactions[action.payload.message_id] = combineMessageReactions(state, action.payload.message_id);
+			if (action.payload.message_id && action.payload.channel_id) {
+				const combinedId = `${action.payload.channel_id}_${action.payload.message_id}`;
+				state.computedMessageReactions[combinedId] = combineMessageReactions(state, combinedId);
 			}
 		},
 
@@ -256,10 +255,13 @@ export const reactionSlice = createSlice({
 				const reactions = (reactionsRaw || []).map((reaction) => {
 					const id = reaction.id || '';
 					const message_id = message.id;
-					return mapReactionToEntity({ ...reaction, id, message_id });
+					return mapReactionToEntity({ ...reaction, id, message_id, channel_id: message.channel_id });
 				});
 				reactionAdapter.upsertMany(state, reactions);
-				state.computedMessageReactions[message.id] = combineMessageReactions(state, message.id);
+				if (!reactions?.length) continue;
+
+				const combinedId = `${message.channel_id}_${message.id}`;
+				state.computedMessageReactions[combinedId] = combineMessageReactions(state, combinedId);
 			}
 		}
 	}
@@ -285,9 +287,10 @@ function saveRecentEmoji(emojiLastest: EmojiStorage) {
 	localStorage.setItem('recentEmojis', JSON.stringify(emojisRecentParse));
 }
 
-function combineMessageReactions(state: ReactionState, messageId: string): EmojiDataOptionals[] {
+function combineMessageReactions(state: ReactionState, combinedId: string): EmojiDataOptionals[] {
 	const reactionEntities = reactionAdapter.getSelectors().selectAll(state);
-	const reactions = reactionEntities.filter((reaction) => reaction.message_id === messageId);
+	const [channel_id, message_id] = combinedId.split('_');
+	const reactions = reactionEntities.filter((reaction) => reaction.message_id === message_id && reaction.channel_id === channel_id);
 
 	const dataCombined: Record<string, EmojiDataOptionals> = {};
 
@@ -305,7 +308,7 @@ function combineMessageReactions(state: ReactionState, messageId: string): Emoji
 				emoji,
 				senders: [],
 				action: false,
-				message_id: messageId,
+				message_id: message_id,
 				// TODO: TBD
 				id: '',
 				channel_id: ''
@@ -368,12 +371,14 @@ export const selectEmojiHover = createSelector(getReactionState, (state: Reactio
 
 export const selectComputedMessageReactions = createSelector(getReactionState, (state: ReactionState) => state.computedMessageReactions);
 
-export const selectIsMessageHasReaction = (messageId: string) =>
+export const selectIsMessageHasReaction = (channelId: string, messageId: string) =>
 	createSelector(selectComputedMessageReactions, (computedMessageReactions) => {
-		return computedMessageReactions[messageId] && computedMessageReactions[messageId].length > 0;
+		const combinedId = `${channelId}_${messageId}`;
+		return computedMessageReactions[combinedId] && computedMessageReactions[combinedId].length > 0;
 	});
 
-export const selectComputedReactionsByMessageId = (messageId: string) =>
+export const selectComputedReactionsByMessageId = (channelId: string, messageId: string) =>
 	createSelector(selectComputedMessageReactions, (computedMessageReactions) => {
-		return computedMessageReactions[messageId] || [];
+		const combinedId = `${channelId}_${messageId}`;
+		return computedMessageReactions[combinedId] || [];
 	});
