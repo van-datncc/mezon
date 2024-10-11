@@ -260,7 +260,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		return posShowMenu === SHOW_POSITION.IN_EMOJI;
 	}, [posShowMenu]);
 
-	const reactionStatus = useSelector(selectIsMessageHasReaction(messageId));
+	const reactionStatus = useSelector(selectIsMessageHasReaction(currentChannel?.id as string, messageId));
 	const enableViewReactionItem = useMemo(() => {
 		if (!checkPos) return false;
 		return reactionStatus;
