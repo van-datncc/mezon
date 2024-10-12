@@ -1,7 +1,6 @@
 import { useAuth, useChatReaction } from '@mezon/core';
 import {
 	reactionActions,
-	selectChannelById,
 	selectClanView,
 	selectCurrentChannel,
 	selectCurrentClanId,
@@ -29,7 +28,6 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 	const userId = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 
 	const removeEmojiSender = async (
 		id: string,
@@ -42,7 +40,6 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		await reactionMessageDispatch(
 			id,
 			mode,
-			currentChannel?.parrent_id || '',
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '',
 			message.channel_id ?? '',
 			messageId,
@@ -51,8 +48,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
-			currentChannel ? !currentChannel.channel_private : false,
-			parent ? !parent.channel_private : false
+			currentChannel ? !currentChannel.channel_private : false
 		);
 	};
 

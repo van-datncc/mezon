@@ -404,11 +404,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(
 						channelsActions.joinChat({
 							clanId: userAdds.clan_id,
-							parentId: userAdds.parent_id,
 							channelId: userAdds.channel_id,
 							channelType: userAdds.channel_type,
-							isPublic: userAdds.is_public,
-							isParentPublic: userAdds.is_parent_public
+							isPublic: userAdds.is_public
 						})
 					);
 				}
@@ -633,14 +631,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						last_seen_message: { timestamp_seconds: 0 },
 						last_sent_message: { timestamp_seconds: now }
 					};
+					const isPublic = channelCreated
+						? channelCreated.parrent_id !== '' && channelCreated.parrent_id !== '0'
+							? false
+							: !channelCreated.channel_private
+						: false;
 					dispatch(
 						channelsActions.joinChat({
 							clanId: channelCreated.clan_id,
-							parentId: channelCreated.parent_id,
 							channelId: channelCreated.channel_id,
 							channelType: channelCreated.channel_type,
-							isPublic: !channelCreated.channel_private,
-							isParentPublic: channelCreated.is_parent_public
+							isPublic: isPublic
 						})
 					);
 					dispatch(
@@ -765,23 +766,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						: currentActive.type === ChannelType.CHANNEL_TYPE_DM
 							? ChannelStreamMode.STREAM_MODE_DM
 							: 0;
-			const parentId = currentActive?.parrent_id;
 			const isPublic = !currentActive?.channel_private;
-			const isParentPublic = !parentChannelCoffee?.channel_private;
-
 			const payload = transformPayloadWriteSocket({
 				clanId: currentClanId as string,
-				parentId: parentId as string,
 				isPublicChannel: isPublic,
-				isPrivateParent: isParentPublic,
-				isClanView
+				isClanView: isClanView as boolean
 			});
 
 			dispatch(
 				reactionActions.writeMessageReaction({
 					id: '',
 					clanId: payload.clan_id as string,
-					parentId: payload.parent_id as string,
 					channelId: messageCoffee.channel_id ?? '',
 					mode: mode ?? 0,
 					messageId: messageIdCoffee ?? '',
@@ -790,8 +785,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					count: 1,
 					messageSenderId: messageCoffee?.sender_id ?? '',
 					actionDelete: false,
-					isPublic: payload.is_public,
-					isParentPulic: payload.is_parent_public
+					isPublic: payload.is_public
 				})
 			);
 		}

@@ -39,11 +39,9 @@ export const ChatMessageWrapper = memo(({ handleBack, directMessageId, isModeDM,
 				<View style={{ flex: 1 }}>
 					<ChannelMessagesWrapper
 						channelId={directMessageId}
-						parentId={''}
 						clanId={'0'}
 						mode={Number(isModeDM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
 						isPublic={false}
-						isParentPublic={false}
 						isDM={true}
 					/>
 				</View>

@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectComputedReactionsByMessageId, selectCurrentChannel } from '@mezon/store-mobile';
+import { selectComputedReactionsByMessageId, selectCurrentChannel } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -23,7 +23,6 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const { reactionMessageDispatch } = useChatReaction({ isMobile: true });
 	const currentChannel = useSelector(selectCurrentChannel);
 	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.channel_id, message.id));
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 
 	const userId = useMemo(() => userProfile?.user?.id, [userProfile?.user?.id]);
@@ -50,8 +49,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			1,
 			message_sender_id ?? '',
 			false,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
-			parent ? !parent.channel_private : false
+			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false
 		);
 	};
 
@@ -70,8 +68,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			countToRemove,
 			userId ?? '',
 			true,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
-			parent ? !parent.channel_private : false
+			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false
 		);
 	};
 

@@ -73,11 +73,9 @@ const ThreadBox = () => {
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
-								parentId: thread.parrent_id as string,
 								channelId: thread.channel_id as string,
 								channelType: thread.type as number,
-								isPublic: !thread.channel_private,
-								isParentPublic: currentChannel ? !currentChannel.channel_private : false
+								isPublic: false
 							})
 						);
 						await dispatch(
