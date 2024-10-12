@@ -2,7 +2,7 @@ import { useAppNavigation, useDirect, useEscapeKeyClose, useMemberCustomStatus, 
 import {
 	ChannelMembersEntity,
 	notificationActions,
-	selectCurrentClanId,
+	selectClanView,
 	selectCurrentUserId,
 	selectFriendStatus,
 	selectMembeGroupByUserId,
@@ -45,8 +45,7 @@ const UserProfileModalInner = ({ openModal, userId, directId, notify, onClose, i
 	const dispatch = useAppDispatch();
 	const userProfileRef = useRef<HTMLDivElement | null>(null);
 	const modeResponsive = useAppSelector(selectModeResponsive);
-	const currentClanId = useSelector(selectCurrentClanId);
-	const isClanView = currentClanId && currentClanId !== '0';
+	const isClanView = useSelector(selectClanView);
 	const clanUser = useSelector(selectMemberClanByUserId(userId as string));
 	const directUser = useSelector((state) => selectMembeGroupByUserId(state, directId, userId as string));
 	const userById = ((isClanView ? clanUser : directUser) || user) as ChannelMembersEntity;

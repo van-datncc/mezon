@@ -1,4 +1,4 @@
-import { channelMetaActions, messagesActions, selectChannelById, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { channelMetaActions, messagesActions, selectChannelById, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -12,7 +12,6 @@ export type UseThreadMessage = {
 
 export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 	const currentClanId = useSelector(selectCurrentClanId);
-	const parent = useSelector(selectCurrentChannel);
 	const thread = useSelector(selectChannelById(channelId));
 	const dispatch = useAppDispatch();
 
@@ -36,11 +35,9 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 
 			await socket.writeChatMessage(
 				currentClanId,
-				thread.parrent_id as string,
 				thread.channel_id as string,
 				mode,
-				thread ? !thread.channel_private : false,
-				parent ? !parent.channel_private : false,
+				false,
 				{ t: content.t },
 				mentions,
 				attachments,
@@ -50,7 +47,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			const timestamp = Date.now() / 1000;
 			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
-		[sessionRef, clientRef, socketRef, currentClanId, mode, parent, dispatch, channelId]
+		[sessionRef, clientRef, socketRef, currentClanId, mode, dispatch, channelId]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -58,15 +55,13 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			dispatch(
 				messagesActions.sendTypingUser({
 					clanId: currentClanId || '',
-					parentId: parent?.parrent_id || '',
 					channelId,
 					mode,
-					isPublic: thread ? !thread.channel_private : false,
-					isParentPublic: parent ? !parent.channel_private : false
+					isPublic: false
 				})
 			);
 		}
-	}, [channelId, dispatch, currentClanId, parent, mode, thread]);
+	}, [channelId, dispatch, currentClanId, mode]);
 
 	const editSendMessage = React.useCallback(
 		async (content: string, messageId: string) => {
@@ -80,18 +75,9 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			if (!client || !session || !socket || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.updateChatMessage(
-				currentClanId,
-				parent?.parrent_id || '',
-				channelId,
-				mode,
-				thread ? !thread.channel_private : false,
-				parent ? !parent.channel_private : false,
-				messageId,
-				editMessage
-			);
+			await socket.updateChatMessage(currentClanId, channelId, mode, thread ? !thread.channel_private : false, messageId, editMessage);
 		},
-		[sessionRef, clientRef, socketRef, currentClanId, parent, channelId, mode, thread]
+		[sessionRef, clientRef, socketRef, currentClanId, channelId, mode, thread]
 	);
 
 	return useMemo(

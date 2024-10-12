@@ -424,7 +424,6 @@ export const updateLastSeenMessage = createAsyncThunk(
 
 type SendMessagePayload = {
 	clanId: string;
-	parentId: string;
 	channelId: string;
 	content: IMessageSendPayload;
 	mentions?: Array<ApiMessageMention>;
@@ -435,7 +434,6 @@ type SendMessagePayload = {
 	mode: number;
 	senderId: string;
 	isPublic: boolean;
-	isParentPublic: boolean;
 	avatar?: string;
 	isMobile?: boolean;
 };
@@ -448,11 +446,9 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		references,
 		anonymous,
 		mentionEveryone,
-		parentId,
 		channelId,
 		mode,
 		isPublic,
-		isParentPublic,
 		clanId,
 		senderId,
 		avatar,
@@ -484,11 +480,9 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 
 			const res = await socket.writeChatMessage(
 				clanId,
-				parentId,
 				channelId,
 				mode,
 				isPublic,
-				isParentPublic,
 				content,
 				mentions,
 				uploadedFiles,
@@ -604,18 +598,16 @@ export const updateTypingUsers = createAsyncThunk(
 
 export type SendMessageArgs = {
 	clanId: string;
-	parentId: string;
 	channelId: string;
 	mode: number;
 	isPublic: boolean;
-	isParentPublic: boolean;
 };
 
 export const sendTypingUser = createAsyncThunk(
 	'messages/sendTypingUser',
-	async ({ clanId, parentId, channelId, mode, isPublic, isParentPublic }: SendMessageArgs, thunkAPI) => {
+	async ({ clanId, channelId, mode, isPublic }: SendMessageArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, parentId, channelId, mode, isPublic, isParentPublic);
+		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic);
 		return ack;
 	}
 );
@@ -1047,29 +1039,6 @@ export function orderMessageByIDAscending(a: MessagesEntity, b: MessagesEntity) 
 	return +aid - +bid;
 }
 
-// old function
-// export const selectMessagesEntities = createSelector(getMessagesState, (messageState) => {
-// 	let res: Record<string, MessagesEntity> = {};
-// 	Object.values(messageState.channelMessages || {}).forEach((item) => {
-// 		res = { ...res, ...item.entities };
-// 	});
-//
-// 	return res;
-// });
-
-export const selectMessagesEntities = (channelId?: string) =>
-	createSelector(getMessagesState, (messageState) => {
-		if (channelId) {
-			return messageState.channelMessages?.[channelId]?.entities;
-		}
-		let res: Record<string, MessagesEntity> = {};
-		Object.values(messageState.channelMessages || {}).forEach((item) => {
-			res = { ...res, ...item.entities };
-		});
-
-		return res;
-	});
-
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
 
 export const selectMessagesEntityById = createSelector(
@@ -1131,17 +1100,6 @@ export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
 		return param[channelId]?.lastLoadMessageId;
 	});
 
-// old function
-// export const selectMessageByMessageId = (messageId: string) =>
-// 	createSelector(selectMessagesEntities, (messageEntities) => {
-// 		return messageEntities[messageId];
-// 	});
-
-export const selectMessageByMessageIdAndChannelId = ({ messageId, channelId }: { messageId: string; channelId?: string }) =>
-	createSelector(selectMessagesEntities(channelId), (messageEntities) => {
-		return messageEntities?.[messageId];
-	});
-
 export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);
 
 // V2
@@ -1188,6 +1146,13 @@ export const selectMessageIdsByChannelId = createCachedSelector([getMessagesStat
 export const selectMessagesByChannel = createSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
 	return messagesState?.channelMessages?.[channelId];
 });
+
+export const selectMessageByMessageId = createSelector(
+	[selectMessagesByChannel, (_, __, messageId: string) => messageId],
+	(channelMessages, messageId) => {
+		return channelMessages?.entities?.[messageId];
+	}
+);
 
 export const selectLastMessageByChannelId = createSelector([selectMessagesByChannel], (channelMessages) => {
 	if (!channelMessages?.ids?.length) return null;

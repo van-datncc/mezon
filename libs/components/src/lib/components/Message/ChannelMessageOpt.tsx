@@ -45,7 +45,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 
 	return (
 		<div
-			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!message.isStartedMessageGroup ? '-top-4' : message.isStartedMessageOfTheDay ? 'top-6' : '-top-1'}  right-6 w-fit`}
+			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!message.isStartedMessageGroup ? '-top-8' : message.isStartedMessageOfTheDay ? 'top-6' : '-top-1'}  right-6 w-fit`}
 		>
 			<div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
 				<div className="w-fit h-full flex justify-between" ref={refOpt}>

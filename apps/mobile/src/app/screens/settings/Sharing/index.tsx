@@ -132,11 +132,9 @@ export const Sharing = ({ data, onClose }) => {
 		store.dispatch(
 			channelsActions.joinChat({
 				clanId: channelSelected?.clan_id,
-				parentId: '',
 				channelId: channelSelected?.channel_id,
 				channelType: channelSelected?.type,
-				isPublic: false,
-				isParentPublic: false
+				isPublic: false
 			})
 		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
@@ -163,11 +161,9 @@ export const Sharing = ({ data, onClose }) => {
 		store.dispatch(
 			channelsActions.joinChat({
 				clanId: channelSelected.clan_id,
-				parentId: channelSelected.parent_id,
 				channelId: channelSelected.channel_id,
 				channelType: channelSelected.type,
-				isPublic: !channelSelected?.channel_private,
-				isParentPublic: channelSelected ? !channelSelected.channel_private : false
+				isPublic: false
 			})
 		);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
