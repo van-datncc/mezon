@@ -52,8 +52,8 @@ function ApplicationsPage() {
 						</div>
 					</div>
 					<div className="text-[20px] dark:text-textSecondary mt-4">
-						Develop <span className="text-blue-600 hover:underline cursor-pointer">apps</span> to customize and extend Discord for
-						millions of users.
+						Develop <span className="text-blue-600 hover:underline cursor-pointer">apps</span> to customize and extend Mezon for millions
+						of users.
 					</div>
 				</div>
 				<AppPageBottom />
