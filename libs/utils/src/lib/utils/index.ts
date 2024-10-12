@@ -36,8 +36,9 @@ import {
 	SearchItemProps,
 	SenderInfoOptionals
 } from '../types';
-export { processFile } from './file';
-export { mergeRefs } from './mergeRefs';
+export * from './file';
+export * from './mergeRefs';
+export * from './transform';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);

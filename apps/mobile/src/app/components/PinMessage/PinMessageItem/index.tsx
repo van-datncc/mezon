@@ -1,10 +1,9 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { PinMessageEntity, selectMessageByMessageIdAndChannelId } from '@mezon/store-mobile';
+import { PinMessageEntity, selectMessageByMessageId, useAppSelector } from '@mezon/store-mobile';
 import { IExtendedMessage, IMessageWithUser } from '@mezon/utils';
 import { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { MessageAttachment } from '../../../screens/home/homedrawer/components/MessageAttachment';
 import { RenderTextMarkdownContent } from '../../../screens/home/homedrawer/components/RenderTextMarkdown';
@@ -19,10 +18,7 @@ interface IPinMessageItemProps {
 const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessage }: IPinMessageItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const message =
-		useSelector(
-			selectMessageByMessageIdAndChannelId({ messageId: pinMessageItem?.message_id as string, channelId: pinMessageItem?.channel_id })
-		) || {};
+	const message = useAppSelector((state) => selectMessageByMessageId(state, pinMessageItem?.channel_id, pinMessageItem?.message_id)) || {};
 	return (
 		<View style={styles.pinMessageItemWrapper}>
 			<MezonAvatar avatarUrl={pinMessageItem?.avatar} username={pinMessageItem?.username}></MezonAvatar>

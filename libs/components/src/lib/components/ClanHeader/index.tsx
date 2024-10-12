@@ -6,6 +6,7 @@ import {
 	selectCurrentClanId,
 	selectCurrentVoiceChannelId,
 	selectIsShowEmptyCategory,
+	settingClanStickerActions,
 	useAppDispatch
 } from '@mezon/store';
 import { EPermission } from '@mezon/utils';
@@ -139,6 +140,10 @@ function ClanHeader({ name, type, bannerImage }: ClanHeaderProps) {
 			closeAllModals();
 		}
 	}, [closeAllModals, params]);
+
+	useEffect(() => {
+		dispatch(settingClanStickerActions.closeModalInChild());
+	}, []);
 
 	return (
 		<>
