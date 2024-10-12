@@ -1,8 +1,8 @@
 import {
 	searchMessagesActions,
 	selectAllMessageSearch,
+	selectClanView,
 	selectCurrentChannelId,
-	selectCurrentClanId,
 	selectCurrentPage,
 	selectDmGroupCurrentId,
 	selectMessageSearchByChannelId,
@@ -21,8 +21,7 @@ export function useSearchMessages() {
 	const currentPage = useSelector(selectCurrentPage);
 	const currentChannelId = useSelector(selectCurrentChannelId) as string;
 	const currentDirectId = useSelector(selectDmGroupCurrentId) as string;
-	const currentClanId = useSelector(selectCurrentClanId);
-	const isClanView = currentClanId && currentClanId !== '0';
+	const isClanView = useSelector(selectClanView);
 	const messageSearchByChannelId = useSelector(selectMessageSearchByChannelId(isClanView ? currentChannelId : currentDirectId));
 	const valueSearchMessage = useSelector(selectValueInputSearchMessage((isClanView ? currentChannelId : currentDirectId) ?? ''));
 

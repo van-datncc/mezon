@@ -21,9 +21,9 @@ export function useMessageParser(message: IMessageWithUser) {
 	const contentUpdatedMention = addMention(content, mentions as any);
 
 	const lines = useMemo(() => {
-		const values = message.content?.t;
+		const values = message?.content?.t;
 		return values;
-	}, [message.content?.t]);
+	}, [message?.content?.t]);
 
 	const messageTime = useMemo(() => {
 		return convertTimeString(message?.create_time as string);

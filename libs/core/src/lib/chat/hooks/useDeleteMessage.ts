@@ -1,17 +1,8 @@
-import {
-	messagesActions,
-	selectChannelById,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectDirectById,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store';
+import { messagesActions, selectChannelById, selectClanView, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { ChannelStreamMode } from 'mezon-js';
+import { transformPayloadWriteSocket } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useAppParams } from '../../app/hooks/useAppParams';
 
 export type UseDeleteMessageOptions = {
 	channelId: string;
@@ -21,47 +12,42 @@ export type UseDeleteMessageOptions = {
 export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { directId } = useAppParams();
-	const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
-	const direct = useAppSelector((state) => selectDirectById(state, directId || (isDM && channelId) || ''));
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const isClanView = useSelector(selectClanView);
+	const { socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel);
 	const parent = useSelector(selectChannelById(channel?.parrent_id || ''));
 
 	const deleteSendMessage = React.useCallback(
 		async (messageId: string) => {
-			const session = sessionRef.current;
-			const client = clientRef.current;
 			const socket = socketRef.current;
-
-			if (!client || !session || !socket || (!channel && !direct)) {
-				throw new Error('Client is not initialized');
-			}
-			let channelIdDelete = channelId;
-			let clanId = currentClanId;
-			if (direct) {
-				channelIdDelete = direct.id || '';
-				clanId = '0';
-			}
+			if (!socket) return;
 
 			dispatch(
 				messagesActions.remove({
-					channelId: channelIdDelete,
+					channelId,
 					messageId
 				})
 			);
 
+			const payload = transformPayloadWriteSocket({
+				clanId: currentClanId as string,
+				parentId: parent?.id,
+				isPublicChannel: !channel?.channel_private,
+				isPrivateParent: parent && !parent.channel_private,
+				isClanView
+			});
+
 			await socket.removeChatMessage(
-				clanId || '',
-				channel?.parrent_id || '',
-				channelIdDelete,
+				payload.clan_id,
+				payload.parent_id,
+				channelId,
 				mode,
-				channel ? !channel.channel_private : false,
-				parent ? !parent.channel_private : false,
+				payload.is_public,
+				payload.is_parent_public,
 				messageId
 			);
 		},
-		[sessionRef, clientRef, socketRef, channel, direct, channelId, dispatch, currentClanId, mode]
+		[socketRef, channel, channelId, dispatch, currentClanId, mode, isClanView, parent]
 	);
 
 	return useMemo(

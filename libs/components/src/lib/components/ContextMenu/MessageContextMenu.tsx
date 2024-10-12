@@ -12,12 +12,13 @@ import {
 	referencesActions,
 	selectAllDirectMessages,
 	selectChannelById,
+	selectClanView,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
 	selectDmGroupCurrentId,
 	selectIsMessageHasReaction,
-	selectMessageByMessageIdAndChannelId,
+	selectMessageByMessageId,
 	selectMessageEntitiesByChannelId,
 	selectModeResponsive,
 	selectPinMessageByChannelId,
@@ -78,14 +79,14 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const messageParent = useSelector(selectChannelById(currentChannel?.parrent_id ?? ''));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
-	const message = useSelector(selectMessageByMessageIdAndChannelId({ messageId: messageId, channelId: currentChannel?.id }));
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+	const isClanView = useSelector(selectClanView);
+	const message = useAppSelector((state) => selectMessageByMessageId(state, isClanView ? currentChannel?.id : currentDmId, messageId));
 	const currentDm = useSelector(selectDmGroupCurrent(currentDmId || ''));
 	const modeResponsive = useSelector(selectModeResponsive);
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDm?.id) || '')
 	);
-	const currentMessage = useAppSelector(selectMessageByMessageIdAndChannelId({ messageId: messageId, channelId: currentChannel?.id }));
 	const convertedAllMessagesEntities = useMemo(() => (allMessagesEntities ? Object.values(allMessagesEntities) : []), [allMessagesEntities]);
 	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();
@@ -127,8 +128,8 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const [enableCopyImageItem, setEnableCopyImageItem] = useState<boolean>(false);
 	const [enableSaveImageItem, setEnableSaveImageItem] = useState<boolean>(false);
 	const [isOPenDeleteMessageModal, isCloseDeleteMessageModal] = useModal(() => {
-		return <ModalDeleteMess mess={currentMessage} closeModal={isCloseDeleteMessageModal} mode={mode} />;
-	}, [currentMessage]);
+		return <ModalDeleteMess mess={message} closeModal={isCloseDeleteMessageModal} mode={mode} />;
+	}, [message?.id]);
 
 	const [openPinMessageModal, closePinMessageModal] = useModal(() => {
 		return (
@@ -216,7 +217,6 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(setIsForwardAll(true));
 	}, [dispatch, dmGroupChatList?.length, message]);
 
-	const [openModalAddPin, setOpenModalAddPin] = useState(false);
 	const handlePinMessage = async () => {
 		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
