@@ -18,7 +18,6 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 		async (
 			id: string,
 			mode: number,
-			parentId: string,
 			clanId: string,
 			channelId: string,
 			messageId: string,
@@ -27,8 +26,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			count: number,
 			message_sender_id: string,
 			action_delete: boolean,
-			is_public: boolean,
-			is_parent_public: boolean
+			is_public: boolean
 		) => {
 			if (isMobile) {
 				const emojiLastest: EmojiStorage = {
@@ -43,17 +41,14 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 
 			const payload = transformPayloadWriteSocket({
 				clanId,
-				parentId,
 				isPublicChannel: is_public,
-				isPrivateParent: is_parent_public,
-				isClanView
+				isClanView: isClanView as boolean
 			});
 
 			return dispatch(
 				reactionActions.writeMessageReaction({
 					id,
 					clanId: payload.clan_id,
-					parentId: payload.parent_id,
 					channelId,
 					mode,
 					messageId,
@@ -62,8 +57,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					count,
 					messageSenderId: message_sender_id,
 					actionDelete: action_delete,
-					isPublic: payload.is_public,
-					isParentPulic: payload.is_parent_public
+					isPublic: payload.is_public
 				})
 			);
 		},

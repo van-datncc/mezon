@@ -424,7 +424,6 @@ export const updateLastSeenMessage = createAsyncThunk(
 
 type SendMessagePayload = {
 	clanId: string;
-	parentId: string;
 	channelId: string;
 	content: IMessageSendPayload;
 	mentions?: Array<ApiMessageMention>;
@@ -435,7 +434,6 @@ type SendMessagePayload = {
 	mode: number;
 	senderId: string;
 	isPublic: boolean;
-	isParentPublic: boolean;
 	avatar?: string;
 	isMobile?: boolean;
 };
@@ -448,11 +446,9 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		references,
 		anonymous,
 		mentionEveryone,
-		parentId,
 		channelId,
 		mode,
 		isPublic,
-		isParentPublic,
 		clanId,
 		senderId,
 		avatar,
@@ -484,11 +480,9 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 
 			const res = await socket.writeChatMessage(
 				clanId,
-				parentId,
 				channelId,
 				mode,
 				isPublic,
-				isParentPublic,
 				content,
 				mentions,
 				uploadedFiles,
@@ -604,18 +598,16 @@ export const updateTypingUsers = createAsyncThunk(
 
 export type SendMessageArgs = {
 	clanId: string;
-	parentId: string;
 	channelId: string;
 	mode: number;
 	isPublic: boolean;
-	isParentPublic: boolean;
 };
 
 export const sendTypingUser = createAsyncThunk(
 	'messages/sendTypingUser',
-	async ({ clanId, parentId, channelId, mode, isPublic, isParentPublic }: SendMessageArgs, thunkAPI) => {
+	async ({ clanId, channelId, mode, isPublic }: SendMessageArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, parentId, channelId, mode, isPublic, isParentPublic);
+		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic);
 		return ack;
 	}
 );

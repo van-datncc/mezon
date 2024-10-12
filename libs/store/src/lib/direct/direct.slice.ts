@@ -51,11 +51,9 @@ export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMe
 				await thunkAPI.dispatch(
 					channelsActions.joinChat({
 						clanId: '0',
-						parentId: '0',
 						channelId: response.channel_id as string,
 						channelType: response.type as number,
-						isPublic: false,
-						isParentPublic: false
+						isPublic: false
 					})
 				);
 			}
@@ -196,11 +194,9 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 			thunkAPI.dispatch(
 				channelsActions.joinChat({
 					clanId: '0',
-					parentId: '0',
 					channelId: directMessageId,
 					channelType: type ?? 0,
-					isPublic: false,
-					isParentPublic: false
+					isPublic: false
 				})
 			);
 		} catch (error) {
