@@ -1,8 +1,8 @@
-import { reactionActions, useAppDispatch } from '@mezon/store';
-import { EmojiStorage } from '@mezon/utils';
+import { reactionActions, selectClanView, useAppDispatch } from '@mezon/store';
+import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
@@ -12,6 +12,8 @@ interface ChatReactionProps {
 
 export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 	const dispatch = useAppDispatch();
+	const isClanView = useSelector(selectClanView);
+
 	const reactionMessageDispatch = useCallback(
 		async (
 			id: string,
@@ -39,11 +41,19 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 				saveRecentEmojiMobile(emojiLastest);
 			}
 
+			const payload = transformPayloadWriteSocket({
+				clanId,
+				parentId,
+				isPublicChannel: is_public,
+				isPrivateParent: is_parent_public,
+				isClanView
+			});
+
 			return dispatch(
 				reactionActions.writeMessageReaction({
 					id,
-					clanId: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? clanId : '',
-					parentId,
+					clanId: payload.clan_id,
+					parentId: payload.parent_id,
 					channelId,
 					mode,
 					messageId,
@@ -52,12 +62,12 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					count,
 					messageSenderId: message_sender_id,
 					actionDelete: action_delete,
-					isPublic: is_public,
-					isParentPulic: is_parent_public
+					isPublic: payload.is_public,
+					isParentPulic: payload.is_parent_public
 				})
 			);
 		},
-		[dispatch]
+		[dispatch, isMobile, isClanView]
 	);
 
 	return useMemo(

@@ -4,8 +4,9 @@ import {
 	messagesActions,
 	pinMessageActions,
 	selectCurrentClanId,
-	selectMessageByMessageIdAndChannelId,
-	useAppDispatch
+	selectMessageByMessageId,
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -41,11 +42,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			);
 		}
 	};
-
-	const message = useSelector(
-		selectMessageByMessageIdAndChannelId({ messageId: pinMessage.message_id as string, channelId: pinMessage?.channel_id })
-	);
-
+	const message = useAppSelector((state) => selectMessageByMessageId(state, pinMessage?.channel_id, pinMessage?.message_id as string));
 	const messageContentObject = useMemo(() => {
 		try {
 			return JSON.parse(pinMessage.content || '{}');

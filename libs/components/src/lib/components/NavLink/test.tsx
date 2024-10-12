@@ -12,26 +12,26 @@ useRouter.mockImplementation(() => ({
 
 describe('<NavLink />', () => {
 	it('should render correctly with children and link', () => {
-		render(<NavLink href="/some-link">Discord</NavLink>);
+		render(<NavLink href="/some-link">Mezon</NavLink>);
 
-		expect(screen.getByText(/discord/i)).toBeInTheDocument();
+		expect(screen.getByText(/mezon/i)).toBeInTheDocument();
 		expect(screen.getByRole('link')).toHaveAttribute('href', '/some-link');
 	});
 
 	it('should render with active styles if the prop is passed', () => {
 		render(
 			<NavLink href="/some-link" active>
-				Discord
+				Mezon
 			</NavLink>
 		);
 
-		expect(screen.getByText(/discord/i)).toHaveClass('rounded-2xl bg-brand text-white');
+		expect(screen.getByText(/mezon/i)).toHaveClass('rounded-2xl bg-brand text-white');
 	});
 
 	it('should render with active styles if the route is active', () => {
 		asPath = '/some-link';
-		render(<NavLink href="/some-link">Discord</NavLink>);
+		render(<NavLink href="/some-link">Mezon</NavLink>);
 
-		expect(screen.getByText(/discord/i)).toHaveClass('rounded-2xl bg-brand text-white');
+		expect(screen.getByText(/mezon/i)).toHaveClass('rounded-2xl bg-brand text-white');
 	});
 });

@@ -1,8 +1,8 @@
 import { useAppParams, useAuth, useChatReaction } from '@mezon/core';
-import { selectChannelById, selectCurrentChannel, selectDirectById, useAppSelector } from '@mezon/store';
+import { selectChannelById, selectClanView, selectCurrentChannel } from '@mezon/store';
 import { getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
 interface IReactionItem {
@@ -19,18 +19,9 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 	const getUrl = getSrcEmoji(emojiId);
 	const userId = useAuth();
 
-	const [channelID, setChannelID] = useState('');
-	const direct = useAppSelector((state) => selectDirectById(state, directId));
+	const isClanView = useSelector(selectClanView);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
-
-	useEffect(() => {
-		if (direct !== undefined) {
-			setChannelID(direct.id);
-		} else {
-			setChannelID(currentChannel?.id || '');
-		}
-	}, [currentChannel, direct, directId]);
 
 	const handleClickEmoji = useCallback(async () => {
 		await reactionMessageDispatch(
@@ -38,7 +29,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			activeMode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 			currentChannel?.parrent_id || '',
 			currentChannel?.clan_id || '',
-			channelID && channelID,
+			(isClanView ? currentChannel?.id : directId) || '',
 			messageId,
 			emojiId,
 			emojiShortCode,
@@ -48,7 +39,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			currentChannel ? !currentChannel.channel_private : false,
 			parent ? !parent.channel_private : false
 		);
-	}, [emojiId, emojiShortCode, activeMode, messageId, channelID, currentChannel]);
+	}, [emojiId, emojiShortCode, activeMode, messageId, currentChannel, directId, isClanView, parent, reactionMessageDispatch, userId]);
 
 	return (
 		<div
@@ -57,7 +48,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			dark:hover:bg-[#232428] dark:bg-[#1E1F22] 
 			bg-[#E3E5E8] hover:bg-[#EBEDEF] cursor-pointer"
 		>
-			<img src={getUrl} className="w-5 h-5"></img>
+			<img src={getUrl} className="w-5 h-5" alt="emoji" />
 		</div>
 	);
 };

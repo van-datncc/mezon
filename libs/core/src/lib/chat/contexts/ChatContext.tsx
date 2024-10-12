@@ -34,13 +34,14 @@ import {
 	rolesClanActions,
 	selectChannelById,
 	selectChannelsByClanId,
+	selectClanView,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectDirectById,
 	selectDmGroupCurrentId,
-	selectMessageByMessageIdAndChannelId,
+	selectMessageByMessageId,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	stickerSettingActions,
@@ -52,7 +53,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode, transformPayloadWriteSocket } from '@mezon/utils';
 import * as Sentry from '@sentry/browser';
 import isElectron from 'is-electron';
 import {
@@ -227,7 +228,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directMetaActions.updateDMSocket(message));
 
-				const isClanView = currentClanId && currentClanId !== '0';
 				const isFriendPageView = window.location.pathname === '/chat/direct/friends';
 				const isNotCurrentDirect =
 					isFriendPageView ||
@@ -748,10 +748,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const [messageIdCoffee, setMessageIdCoffee] = useState('');
 	const [channelIdCoffee, setChannelIdCoffee] = useState('');
-	const messageCoffee = useSelector(selectMessageByMessageIdAndChannelId({ messageId: messageIdCoffee ?? '', channelId: channelId }));
+	const messageCoffee = useAppSelector((state) => selectMessageByMessageId(state, channelId, messageIdCoffee));
 	const channelCoffee = useAppSelector(selectChannelById(channelIdCoffee));
 	const directCoffee = useAppSelector((state) => selectDirectById(state, channelIdCoffee));
 	const parentChannelCoffee = useAppSelector(selectChannelById(channelCoffee?.parrent_id ?? ''));
+	const isClanView = useSelector(selectClanView);
 
 	useEffect(() => {
 		const currentActive = channelCoffee ? channelCoffee : directCoffee;
@@ -766,13 +767,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							: 0;
 			const parentId = currentActive?.parrent_id;
 			const isPublic = !currentActive?.channel_private;
-			const isParentPublic = !currentActive?.channel_private;
+			const isParentPublic = !parentChannelCoffee?.channel_private;
+
+			const payload = transformPayloadWriteSocket({
+				clanId: currentClanId as string,
+				parentId: parentId as string,
+				isPublicChannel: isPublic,
+				isPrivateParent: isParentPublic,
+				isClanView
+			});
 
 			dispatch(
 				reactionActions.writeMessageReaction({
 					id: '',
-					clanId: currentActive?.clan_id ?? '0',
-					parentId: parentId ?? '0',
+					clanId: payload.clan_id as string,
+					parentId: payload.parent_id as string,
 					channelId: messageCoffee.channel_id ?? '',
 					mode: mode ?? 0,
 					messageId: messageIdCoffee ?? '',
@@ -781,8 +790,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					count: 1,
 					messageSenderId: messageCoffee?.sender_id ?? '',
 					actionDelete: false,
-					isPublic: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? isPublic : false,
-					isParentPulic: parentId === '0' || mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? false : isParentPublic
+					isPublic: payload.is_public,
+					isParentPulic: payload.is_parent_public
 				})
 			);
 		}
