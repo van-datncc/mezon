@@ -484,7 +484,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			currentChannel?.parrent_id || '',
 			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (message?.clan_id ?? currentClanId),
 			message.channel_id ?? '',
 			messageId ?? '',

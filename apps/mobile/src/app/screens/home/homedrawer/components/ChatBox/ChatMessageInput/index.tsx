@@ -39,7 +39,6 @@ interface IChatMessageInputProps {
 	markdownsOnMessage?: MutableRefObject<IMarkdownOnMessage[]>;
 	voiceLinkRoomOnMessage?: MutableRefObject<ILinkVoiceRoomOnMessage[]>;
 	isShowCreateThread?: boolean;
-	parentId?: string;
 	isPublic?: boolean;
 }
 
