@@ -285,14 +285,20 @@ export default class App {
 			{
 				label: 'View',
 				submenu: [
-					{ role: 'reload' },
-					{ role: 'forceReload' },
+					{
+						label: 'Reload',
+						accelerator: 'CmdOrCtrl+R',
+						click: () => {
+							App.mainWindow.webContents.send('reload-app');
+						}
+					},
 					{ type: 'separator' },
 					{ role: 'resetZoom' },
 					{ role: 'zoomIn' },
 					{ role: 'zoomOut' },
 					{ type: 'separator' },
-					{ role: 'togglefullscreen' }
+					{ role: 'togglefullscreen' },
+					{ role: 'toggleDevTools' }
 				]
 			},
 			// { role: 'windowMenu' }
