@@ -18,9 +18,11 @@ import ThreadModalContent from './ThreadModalContent';
 type ThreadItemProps = {
 	thread: ChannelsEntity;
 	setIsShowThread: () => void;
+	onClickToJoiningThread?: () => void;
+	isGroupPublic?: boolean;
 };
 
-const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
+const ThreadItem = ({ thread, setIsShowThread, onClickToJoiningThread, isGroupPublic = false }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 
@@ -74,7 +76,7 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 
 	return (
 		<div
-			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
+			onClick={isGroupPublic ? onClickToJoiningThread : () => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
 			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 			role="button"
 		>

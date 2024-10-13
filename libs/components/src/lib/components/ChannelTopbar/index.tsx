@@ -4,6 +4,7 @@ import {
 	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
+	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
@@ -17,6 +18,7 @@ import {
 	selectLastSeenPinMessageChannelById,
 	selectStatusMenu,
 	selectTheme,
+	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -132,7 +134,9 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 }
 
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
+	const dispatch = useAppDispatch();
 	const [isShowThread, setIsShowThread] = useState<boolean>(false);
+
 	const threadRef = useRef<HTMLDivElement | null>(null);
 
 	const handleShowThreads = () => {
@@ -142,6 +146,16 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	const handleClose = useCallback(() => {
 		setIsShowThread(false);
 	}, []);
+
+	// listThreadDescs(session: Session, channelId: string, limit?: number, state?: number, clanId?: string): Promise<ApiChannelDescList>;
+
+	const currentChannel = useSelector(selectCurrentChannel);
+	useEffect(() => {
+		if (isShowThread) {
+			const body = { channelId: currentChannel?.channel_id ?? '', clanId: currentChannel?.clan_id ?? '' };
+			dispatch(threadsActions.fetchThreads(body));
+		}
+	}, [isShowThread]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>

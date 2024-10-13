@@ -3,7 +3,7 @@ import { searchMessagesActions, selectCurrentChannel, selectTheme, threadsAction
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { RefObject, useRef } from 'react';
+import { RefObject, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -20,7 +20,15 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-	const { setIsShowCreateThread, threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
+	const {
+		setIsShowCreateThread,
+		threadChannel,
+		threadChannelOld,
+		threadChannelOnline,
+		publicThreadNotJoined,
+		threadWithRecentMessage,
+		threadWithOldMessage
+	} = useThreads();
 	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
 
@@ -42,6 +50,10 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(modalRef, onClose, rootRef);
+
+	const handleJoinToThread = useCallback(() => {
+		console.log('joining to thread');
+	}, []);
 
 	return (
 		<div
@@ -74,16 +86,31 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 				<div
 					className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 				>
-					{threadChannelOnline.length > 0 && (
-						<GroupThreads title={`${threadChannelOnline.length} joined threads`}>
-							{threadChannelOnline.map((thread) => (
+					{threadWithRecentMessage.length > 0 && (
+						<GroupThreads title={`${threadWithRecentMessage.length} joined threads`}>
+							{threadWithRecentMessage.map((thread) => (
 								<ThreadItem thread={thread} key={thread.id} setIsShowThread={onClose} />
 							))}
 						</GroupThreads>
 					)}
-					{threadChannelOld.length > 0 && (
-						<GroupThreads title="order threads">
-							{threadChannelOld.map((thread) => (
+
+					{publicThreadNotJoined.length > 0 && (
+						<GroupThreads title={`${publicThreadNotJoined.length} other active threads`}>
+							{publicThreadNotJoined.map((thread) => (
+								<ThreadItem
+									isGroupPublic={true}
+									onClickToJoiningThread={handleJoinToThread}
+									thread={thread}
+									key={thread.id}
+									setIsShowThread={onClose}
+								/>
+							))}
+						</GroupThreads>
+					)}
+
+					{threadWithOldMessage.length > 0 && (
+						<GroupThreads title={`${threadWithOldMessage.length} archived threads`}>
+							{threadWithOldMessage.map((thread) => (
 								<ThreadItem thread={thread} key={thread.id} setIsShowThread={onClose} />
 							))}
 						</GroupThreads>

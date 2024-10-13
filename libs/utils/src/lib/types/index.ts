@@ -142,6 +142,7 @@ export type IThread = {
 	channelId: string | undefined;
 	content: string | undefined;
 	date: string | undefined;
+	active: number;
 };
 
 export type IContextMenuItemAction = 'REST';
@@ -821,4 +822,10 @@ export enum TypeCheck {
 	TYPECATEGORY = 1,
 	TYPECHANNEL = 2,
 	TYPETHREAD = 3
+}
+
+export enum ThreadStatus {
+	PublicThreadNotJoined = 2, // Public thread not joined
+	JoinedWithRecentMessage = 1, // Joined and has a message within the last 3 days
+	JoinedWithOldMessage = 0 // Joined and has a message older than 3 days
 }

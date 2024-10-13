@@ -13,13 +13,13 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
-import { IMessageWithUser, isGreaterOneMonth } from '@mezon/utils';
+import { IMessageWithUser, ThreadStatus, isGreaterOneMonth } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useThreads() {
 	const dispatch = useAppDispatch();
-	const threads = useSelector(selectAllThreads);
+	// const threads = useSelector(selectAllThreads);
 	const channels = useSelector(selectAllChannels);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -30,6 +30,8 @@ export function useThreads() {
 	const isShowCreateThread = useSelector(selectIsShowCreateThread(currentChannelId as string));
 	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
 	const valueThread = useSelector(selectValueThread);
+
+	const getAllThreads = useSelector(selectAllThreads);
 
 	const setTurnOffThreadMessage = useCallback(() => {
 		setOpenThreadMessageState(false);
@@ -86,6 +88,22 @@ export function useThreads() {
 		);
 	}, [threadChannel]);
 
+	/// new update
+	const publicThreadNotJoined = useMemo(
+		() => getAllThreads.filter((thread) => thread?.active === ThreadStatus.PublicThreadNotJoined),
+		[threadChannel]
+	);
+
+	const threadWithRecentMessage = useMemo(
+		() => getAllThreads.filter((thread) => thread?.active === ThreadStatus.JoinedWithRecentMessage),
+		[threadChannel]
+	);
+
+	const threadWithOldMessage = useMemo(
+		() => getAllThreads.filter((thread) => thread?.active === ThreadStatus.JoinedWithOldMessage),
+		[threadChannel]
+	);
+
 	const threadCurrentChannel = useMemo(() => {
 		if (listThreadId && currentChannelId) {
 			return channels.find((channel) => channel.channel_id === listThreadId[currentChannelId]);
@@ -94,7 +112,11 @@ export function useThreads() {
 
 	return useMemo(
 		() => ({
-			threads,
+			getAllThreads,
+			publicThreadNotJoined,
+			threadWithRecentMessage,
+			threadWithOldMessage,
+			// threads,
 			threadChannel,
 			isShowCreateThread,
 			isPrivate,
@@ -112,6 +134,10 @@ export function useThreads() {
 			setTurnOffThreadMessage
 		}),
 		[
+			getAllThreads,
+			publicThreadNotJoined,
+			threadWithRecentMessage,
+			threadWithOldMessage,
 			isPrivate,
 			isShowCreateThread,
 			messageThreadError,
@@ -121,7 +147,7 @@ export function useThreads() {
 			threadChannelOld,
 			threadChannelOnline,
 			threadCurrentChannel,
-			threads,
+			// threads,
 			valueThread,
 			setNameValueThread,
 			setIsShowCreateThread,

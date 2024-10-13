@@ -1,8 +1,10 @@
 import { IMessageWithUser, IThread, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
+import memoizee from 'memoizee';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
 
 export const THREADS_FEATURE_KEY = 'threads';
 
@@ -46,13 +48,37 @@ export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
  * }, [dispatch]);
  * ```
  */
-export const fetchThreads = createAsyncThunk<ThreadsEntity[]>('threads/fetchStatus', async (_, thunkAPI) => {
-	/**
-	 * Replace this with your custom fetch call.
-	 * For example, `return myApi.getThreadss()`;
-	 * Right now we just return an empty array.
-	 */
-	return Promise.resolve([]);
+export interface FetchThreadsArgs {
+	channelId: string;
+	clanId: string;
+	noCache?: boolean;
+}
+
+const fetchThreadsCached = memoizee(
+	async (mezon: MezonValueContext, channelId: string, clanId: string) => {
+		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 50, undefined, clanId);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: LIST_THREADS_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[0].session.username;
+		}
+	}
+);
+
+export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ channelId, clanId, noCache }: FetchThreadsArgs, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	if (noCache) {
+		fetchThreadsCached.clear(mezon, channelId, clanId);
+	}
+	const response = await fetchThreadsCached(mezon, channelId, clanId);
+	if (!response.channeldesc) {
+		return [];
+	}
+
+	return response.channeldesc;
 });
 
 export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState({
@@ -134,7 +160,8 @@ export const threadsSlice = createSlice({
 			.addCase(fetchThreads.pending, (state: ThreadsState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<ThreadsEntity[]>) => {
+			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<any[]>) => {
+				console.log('action :', action.payload);
 				threadsAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
@@ -183,7 +210,7 @@ export const threadsReducer = threadsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const threadsActions = { ...threadsSlice.actions };
+export const threadsActions = { ...threadsSlice.actions, fetchThreads };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
