@@ -120,7 +120,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 			] satisfies IMezonMenuItemProps[],
 		[currentCategoryName]
 	);
-	// const navigation1 = useNavigation<any>();
 	const permissionMenu = useMemo(
 		() =>
 			[
