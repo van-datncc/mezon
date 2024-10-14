@@ -120,7 +120,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 			] satisfies IMezonMenuItemProps[],
 		[currentCategoryName]
 	);
-
 	const permissionMenu = useMemo(
 		() =>
 			[
@@ -171,7 +170,12 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					title: t('fields.channelWebhooks.webhook'),
 					expandable: true,
 					icon: <Icons.WebhookIcon color={themeValue.text} />,
-					isShow: isChannel
+					isShow: isChannel,
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
+							screen: APP_SCREEN.MENU_CLAN.INTEGRATIONS
+						});
+					}
 				}
 			] satisfies IMezonMenuItemProps[],
 		[]
