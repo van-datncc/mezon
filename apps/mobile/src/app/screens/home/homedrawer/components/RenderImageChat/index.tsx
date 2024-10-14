@@ -9,7 +9,10 @@ const widthMedia = Metrics.screenWidth - 150;
 const heightMedia = Metrics.screenHeight * 0.3;
 
 const RenderImageChat = React.memo(({ image, index, disable, onPress, onLongPress, isMultiple = false, remainingImagesCount }: any) => {
-	const imageSize = useMemo(() => getImageSize(image), [image.height, image?.url, image.width]);
+	const imageSize = useMemo(
+		() => getImageSize({ height: image?.height, width: image?.width, url: image?.url }),
+		[image?.height, image?.url, image?.width]
+	);
 
 	if (imageSize?.height && imageSize?.width) {
 		return (
@@ -39,8 +42,8 @@ const RenderImageChat = React.memo(({ image, index, disable, onPress, onLongPres
 	}
 });
 
-const getImageSize = (image: any) => {
-	const isImageCheckIn = image?.url?.includes('checkin.nccsoft');
+const getImageSize = ({ url, height, width }) => {
+	const isImageCheckIn = url?.includes('checkin.nccsoft');
 	if (isImageCheckIn) {
 		return {
 			height: heightMedia,
@@ -48,10 +51,10 @@ const getImageSize = (image: any) => {
 		};
 	}
 
-	if (image?.height && image?.width) {
+	if (height && width) {
 		return {
-			height: image.height,
-			width: image.width
+			height: height,
+			width: width
 		};
 	}
 	return {};
@@ -172,9 +175,11 @@ const RenderImageHaveSize = React.memo(
 
 const getPhotoSizeWithSize = (imageSize: any, isMultiple: boolean, isUploading: boolean) => {
 	return {
-		width: isUploading ? widthMedia : isMultiple ? widthMedia / 2 : Math.min(imageSize.width, widthMedia),
+		width: isUploading ? (isMultiple ? widthMedia / 2 : widthMedia) : isMultiple ? widthMedia / 2 : Math.min(imageSize.width, widthMedia),
 		height: isUploading
-			? heightMedia
+			? isMultiple
+				? heightMedia / 2
+				: heightMedia
 			: isMultiple
 				? heightMedia / 2
 				: (imageSize.height * Math.min(imageSize.width, widthMedia)) / imageSize.width

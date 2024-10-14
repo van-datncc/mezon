@@ -126,6 +126,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		mention: {
 			fontSize: size.medium,
+			fontWeight: '600',
 			color: colors.textLink,
 			backgroundColor: colors.midnightBlue,
 			lineHeight: size.s_20
