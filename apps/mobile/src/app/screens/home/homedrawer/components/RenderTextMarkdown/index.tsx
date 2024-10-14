@@ -91,8 +91,8 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.primary,
-			fontSize: size.small,
-			lineHeight: size.s_17
+			fontSize: size.medium,
+			lineHeight: size.s_20
 		},
 		fence: {
 			color: colors.text,
@@ -106,7 +106,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		link: {
 			color: colors.textLink,
 			textDecorationLine: 'none',
-			lineHeight: size.s_17
+			lineHeight: size.s_20
 		},
 		iconEmojiInMessage: {
 			width: size.s_20,
