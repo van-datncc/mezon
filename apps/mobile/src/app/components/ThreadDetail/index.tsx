@@ -1,9 +1,19 @@
 import { useThreads } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { threadsActions, useAppDispatch } from '@mezon/store-mobile';
-import React, { useCallback } from 'react';
+import {
+	ThreadsEntity,
+	selectActiveThreads,
+	selectCurrentChannel,
+	selectJoinedThreadsWithinLast30Days,
+	selectShowEmptyStatus,
+	selectThreadsOlderThan30Days,
+	threadsActions,
+	useAppDispatch
+} from '@mezon/store-mobile';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { APP_SCREEN, MenuThreadScreenProps } from '../../navigation/ScreenTypes';
 import EmptyThread from './EmptyThread';
 import GroupThread from './GroupThread';
@@ -16,17 +26,34 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { channelThreads } = route.params || {};
-	const { threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
 	const { t } = useTranslation(['createThread']);
 	const { setValueThread } = useThreads();
-	// const { setOpenThreadMessageState } = useReference();
 	const dispatch = useAppDispatch();
 	navigation.setOptions({
 		headerShown: true,
-		headerTitle: t('threads', { ns: 'createThread' }),
+		headerTitle: t('threads'),
 		headerTitleAlign: 'center',
 		headerRight: () => <ThreadAddButton onPress={handleNavigateCreateForm} />
 	});
+
+	const currentChannel = useSelector(selectCurrentChannel);
+	const isThread = useMemo(() => currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '', [currentChannel]);
+	useEffect(() => {
+		const fetchThreads = async () => {
+			const body = {
+				channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
+				clanId: currentChannel?.clan_id ?? ''
+			};
+			await dispatch(threadsActions.fetchThreads(body));
+		};
+
+		fetchThreads();
+	}, [currentChannel]);
+
+	const isEmpty = useSelector(selectShowEmptyStatus());
+	const getActiveThreads = useSelector(selectActiveThreads);
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days);
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days);
 
 	const handleNavigateCreateForm = useCallback(() => {
 		dispatch(threadsActions.setOpenThreadMessageState(false));
@@ -43,18 +70,43 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 		// TODO: MezonMenu??
 		<View style={styles.createChannelContainer}>
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: size.s_50, paddingTop: size.s_10 }}>
-				{threadChannelOnline?.length ? (
-					<GroupThread title={`${t('joinedThreads')} - ${threadChannelOnline?.length}`}>
-						{threadChannelOnline?.map((thread) => <ThreadItem thread={thread} key={thread.id} />)}
+				{getJoinedThreadsWithinLast30Days?.length > 0 && (
+					<GroupThread
+						title={
+							getJoinedThreadsWithinLast30Days?.length > 1
+								? `${getJoinedThreadsWithinLast30Days?.length} ${t('joinedThreads')}`
+								: `${getJoinedThreadsWithinLast30Days?.length} ${t('joinedThread')}`
+						}
+					>
+						{getJoinedThreadsWithinLast30Days?.map((thread: ThreadsEntity) => (
+							<ThreadItem thread={thread} key={`${thread.id}-joined-threads`} />
+						))}
 					</GroupThread>
-				) : null}
-				{threadChannelOld?.length ? (
-					<GroupThread title={t('otherThreads')}>
-						{threadChannelOld?.map((thread) => <ThreadItem thread={thread} key={thread.id} />)}
+				)}
+				{getActiveThreads?.length > 0 && (
+					<GroupThread
+						title={
+							getActiveThreads?.length > 1
+								? `${getActiveThreads?.length} ${t('otherActiveThreads')}`
+								: `${getActiveThreads?.length} ${t('otherActiveThread')}`
+						}
+					>
+						{getActiveThreads?.map((thread: ThreadsEntity) => <ThreadItem thread={thread} key={`${thread.id}-other-active-threads`} />)}
 					</GroupThread>
-				) : null}
+				)}
+				{getThreadsOlderThan30Days?.length > 0 && (
+					<GroupThread
+						title={
+							getThreadsOlderThan30Days?.length > 1
+								? `${getThreadsOlderThan30Days?.length} ${t('olderThreads')}`
+								: `${getThreadsOlderThan30Days?.length} ${t('olderThread')}`
+						}
+					>
+						{getThreadsOlderThan30Days?.map((thread: ThreadsEntity) => <ThreadItem thread={thread} key={`${thread.id}-older-threads`} />)}
+					</GroupThread>
+				)}
 			</ScrollView>
-			{threadChannel?.length === 0 && <EmptyThread onPress={handleNavigateCreateForm} />}
+			{isEmpty && <EmptyThread onPress={handleNavigateCreateForm} />}
 		</View>
 	);
 }
