@@ -6,7 +6,7 @@ import { ApiClanDesc } from 'mezon-js/api.gen';
 import { accountActions } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
 import { fetchListChannelsByUser } from '../channels/channelUser.slice';
-import { ChannelsEntity, channelsActions } from '../channels/channels.slice';
+import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
 import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
@@ -14,10 +14,8 @@ import { defaultNotificationCategoryActions } from '../notificationSetting/notif
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
-import { RootState } from '../store';
 import { channelsStreamActions } from '../stream/channelsStream.slice';
 import { usersStreamActions } from '../stream/usersStream.slice';
-import { threadsActions } from '../threads/threads.slice';
 import { voiceActions } from '../voice/voice.slice';
 
 export const CLANS_FEATURE_KEY = 'clans';
@@ -75,24 +73,7 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 		thunkAPI.dispatch(policiesActions.fetchPermission());
 		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId }));
 		thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId }));
-		await thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache: true })).unwrap();
-		const state = thunkAPI.getState() as RootState;
-		const currentChannelId = state.channels.currentChannelId;
-		if (currentChannelId && !state.channels.entities[currentChannelId]) {
-			const data = await thunkAPI
-				.dispatch(
-					threadsActions.fetchThread({
-						channelId: '0',
-						clanId,
-						threadId: currentChannelId,
-						noCache: true
-					})
-				)
-				.unwrap();
-			if (data?.length > 0) {
-				thunkAPI.dispatch(channelsActions.upsertOne(data[0] as ChannelsEntity));
-			}
-		}
+		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
 		thunkAPI.dispatch(channelsActions.setStatusChannelFetch());
 		thunkAPI.dispatch(
 			voiceActions.fetchVoiceChannelMembers({
