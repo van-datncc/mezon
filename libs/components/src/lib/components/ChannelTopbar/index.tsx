@@ -148,8 +148,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	}, []);
 
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = currentChannel?.parrent_id !== '0';
-
+	const isThread = currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '';
 	useEffect(() => {
 		const fetchThreads = async () => {
 			if (isShowThread) {

@@ -115,7 +115,12 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 							}
 						>
 							{getActiveThreads.map((thread: ThreadsEntity) => (
-								<ThreadItem thread={thread} key={`${thread.id}-other-active-threads`} setIsShowThread={onClose} />
+								<ThreadItem
+									isPublicThread={true}
+									thread={thread}
+									key={`${thread.id}-other-active-threads`}
+									setIsShowThread={onClose}
+								/>
 							))}
 						</GroupThreads>
 					)}
