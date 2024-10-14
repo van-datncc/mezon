@@ -75,7 +75,6 @@ export const updateReactionMessage = createAsyncThunk(
 export type WriteMessageReactionArgs = {
 	id: string;
 	clanId: string;
-	parentId: string;
 	channelId: string;
 	mode: number;
 	messageId: string;
@@ -85,27 +84,12 @@ export type WriteMessageReactionArgs = {
 	messageSenderId: string;
 	actionDelete: boolean;
 	isPublic: boolean;
-	isParentPulic: boolean;
 };
 
 export const writeMessageReaction = createAsyncThunk(
 	'messages/writeMessageReaction',
 	async (
-		{
-			id,
-			clanId,
-			parentId,
-			channelId,
-			mode,
-			messageId,
-			emoji_id,
-			emoji,
-			count,
-			messageSenderId,
-			actionDelete,
-			isPublic,
-			isParentPulic
-		}: WriteMessageReactionArgs,
+		{ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete, isPublic }: WriteMessageReactionArgs,
 		thunkAPI
 	) => {
 		try {
@@ -121,11 +105,9 @@ export const writeMessageReaction = createAsyncThunk(
 			await socket.writeMessageReaction(
 				id,
 				clanId,
-				parentId,
 				channelId,
 				mode,
 				isPublic,
-				isParentPulic,
 				messageId,
 				emoji_id,
 				emoji,

@@ -28,14 +28,12 @@ export function useSendForwardMessage() {
 				} else if (mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 					type = ChannelType.CHANNEL_TYPE_GROUP;
 				}
-				await socket.joinChat(clanid, '0', channel_id, type, isPublic, false);
+				await socket.joinChat(clanid, channel_id, type, isPublic);
 				await socket.writeChatMessage(
 					clanid,
-					'0',
 					channel_id,
 					mode,
 					isPublic,
-					false,
 					message.content,
 					message.mentions,
 					message.attachments,

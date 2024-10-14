@@ -3,9 +3,8 @@ import {
 	emojiSuggestionActions,
 	reactionActions,
 	referencesActions,
-	selectChannelById,
+	selectClanView,
 	selectCurrentChannel,
-	selectDirectById,
 	selectMessageByMessageId,
 	selectModeResponsive,
 	selectReactionPlaceActive,
@@ -28,8 +27,7 @@ export type EmojiCustomPanelOptions = {
 
 function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const dispatch = useDispatch();
-
-	const messageEmoji = useSelector(selectMessageByMessageId(props.messageEmojiId ?? ''));
+	const currentChannel = useSelector(selectCurrentChannel);
 	const { categoryEmoji, categoriesEmoji, emojis, setAddEmojiActionChatbox, addEmojiState, shiftPressedState } = useEmojiSuggestion();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -79,26 +77,17 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const [emojiHoverShortCode, setEmojiHoverShortCode] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const { setShiftPressed } = useEmojiSuggestion();
-	const currentChannel = useSelector(selectCurrentChannel);
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const { directId } = useAppParams();
-	const [channelID, setChannelID] = useState('');
-	const direct = useAppSelector((state) => selectDirectById(state, directId));
 
-	useEffect(() => {
-		if (direct !== undefined) {
-			setChannelID(direct.id);
-		} else {
-			setChannelID(currentChannel?.id || '');
-		}
-	}, [currentChannel, direct, directId]);
+	const isClanView = useSelector(selectClanView);
+	const channelID = isClanView ? currentChannel?.id : directId;
+	const messageEmoji = useAppSelector((state) => selectMessageByMessageId(state, channelID, props.messageEmojiId || ''));
 
 	const handleEmojiSelect = async (emojiId: string, emojiPicked: string) => {
 		if (subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM) {
 			await reactionMessageDispatch(
 				'',
 				props.mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-				currentChannel?.parrent_id || '',
 				currentChannel?.clan_id || '',
 				channelID ?? '',
 				props.messageEmojiId ?? '',
@@ -107,8 +96,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				1,
 				messageEmoji?.sender_id ?? '',
 				false,
-				currentChannel ? !currentChannel.channel_private : false,
-				parent ? !parent.channel_private : false
+				currentChannel ? !currentChannel.channel_private : false
 			);
 			setSubPanelActive(SubPanelName.NONE);
 			dispatch(referencesActions.setIdReferenceMessageReaction(''));

@@ -174,6 +174,16 @@ module.exports = {
             transform:  'translateX(0px)'
           }
         },
+        slide_in:{
+          '0%':{
+            transform: 'translateX(120px)',
+            opacity : 0.7
+          },
+          '100%':{
+            transform:  'translateX(0px)',
+            opacity : 1
+          }
+        },
         pulse: {
           '50%': {
             opacity: 0.5
@@ -194,6 +204,7 @@ module.exports = {
       faded_input: 'faded_input 0.05s ease-in-out forwards',
       scale_up : 'scale_up 0.15s ease-in-out forwards',
       fly_in : 'fly_in 0.2s ease-in-out forwards',
+      slide_in: 'slide_in 0.5s ease-in-out forwards',
       pulse: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite'
     },
     screens: {

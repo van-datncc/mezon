@@ -12,9 +12,8 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import ModalUnknowChannel from './ModalUnknowChannel';
 
 type ChannelHashtagProps = {
@@ -28,7 +27,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const { directId } = useAppParams();
 	const [openModal, setOpenModal] = useState(false);
 	const { clanId } = useAppParams();
-	const { toChannelPage } = useAppNavigation();
+	const { toChannelPage, navigate } = useAppNavigation();
 	const { currentChannelId } = useMessageValue();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const hashtagDm = useSelector(selectHashtagDmById(channelHastagId.slice(2, -1)));
@@ -36,12 +35,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const playStream = useSelector(selectStatusStream);
 	const clanById = useSelector(selectClanById(clanId || ''));
-	const getChannelPath = (channelHastagId: string, clanId: string): string | undefined => {
-		if (channelHastagId.startsWith('<#') && channelHastagId.endsWith('>')) {
-			return toChannelPage(channelHastagId.slice(2, -1), clanId || '');
-		}
-		return undefined;
-	};
+
 	const getChannelById = () => {
 		if (directId !== undefined) {
 			return hashtagDm;
@@ -51,58 +45,43 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 
 	const channel = getChannelById();
 
-	const [channelPath, setChannelPath] = useState(
-		getChannelPath(channelHastagId, directId !== undefined ? (channel?.clan_id ?? '') : (clanId ?? ''))
-	);
-
-	useEffect(() => {
-		if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			setChannelPath(getChannelPath('<#' + currentChannelId || '', directId !== undefined ? (channel?.clan_id ?? '') : (clanId ?? '') + '>'));
-		} else {
-			setChannelPath(getChannelPath(channelHastagId, directId !== undefined ? (channel?.clan_id ?? '') : (clanId ?? '')));
-		}
-	}, [currentChannelId, clanId, channelHastagId]);
-
 	const handleClick = useCallback(() => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
 			const urlVoice = `https://meet.google.com/${channel.meeting_code}`;
 			window.open(urlVoice, '_blank', 'noreferrer');
-		}
-		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-			if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
-				dispatch(
-					videoStreamActions.startStream({
-						clanId: clanId || '',
-						clanName: clanById?.clan_name || '',
-						streamId: channel?.channel_id || '',
-						streamName: channel?.channel_label || ''
-					})
-				);
-				dispatch(appActions.setIsShowChatStream(false));
+		} else {
+			if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
+					dispatch(
+						videoStreamActions.startStream({
+							clanId: clanId || '',
+							clanName: clanById?.clan_name || '',
+							streamId: channel?.channel_id || '',
+							streamName: channel?.channel_label || '',
+							parentId: channel?.parrent_id || ''
+						})
+					);
+					dispatch(appActions.setIsShowChatStream(false));
+				}
 			}
+			const channelUrl = toChannelPage(channel?.id, channel?.clan_id ?? '');
+			navigate(channelUrl, { state: { focusChannel: { id: channel?.id, parentId: channel?.parrent_id ?? '' } } });
 		}
-	}, [channel, clanById, clanId, currentStreamInfo?.streamId, dispatch, playStream]);
+	}, [channel, clanById, clanId, currentStreamInfo?.streamId, dispatch, navigate, playStream, toChannelPage]);
+
 	const tokenClickAble = () => {
 		if (!isJumMessageEnabled || isTokenClickAble) {
 			handleClick();
-			if (channelPath) {
-				setTimeout(() => {
-					const channelCallElement = document.getElementById(channelPath);
-					if (channelCallElement) {
-						channelCallElement.scrollIntoView({ behavior: 'smooth' });
-					}
-				}, 0);
-			}
 		}
 	};
+
 	return (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ||
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
 		(channelHastagId && directId)) &&
 		getChannelById() ? (
-		<Link
+		<div
 			onClick={tokenClickAble}
 			style={{ textDecoration: 'none' }}
-			to={!isJumMessageEnabled || isTokenClickAble ? (channelPath ?? '') : ''}
 			className={`font-medium px-0.1 rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${!isJumMessageEnabled ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer ' : `hover:none cursor-text`} `}
 		>
 			{channel.type === ChannelType.CHANNEL_TYPE_VOICE ? (
@@ -124,7 +103,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 				/>
 			) : null}
 			{channel.channel_label}
-		</Link>
+		</div>
 	) : (
 		<>
 			<span

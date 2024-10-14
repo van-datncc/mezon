@@ -1,12 +1,5 @@
 import { useAuth, useChatReaction } from '@mezon/core';
-import {
-	reactionActions,
-	selectChannelById,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectEmojiHover,
-	selectUserReactionPanelState
-} from '@mezon/store';
+import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -33,7 +26,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const userPanelRef = useRef<HTMLDivElement | null>(null);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 
 	async function reactOnExistEmoji(
 		id: string,
@@ -48,7 +40,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			currentChannel?.parrent_id || '',
 			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : currentClanId || '',
 			message.channel_id,
 			messageId ?? '',
@@ -57,8 +48,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			1,
 			message_sender_id ?? '',
 			false,
-			currentChannel ? !currentChannel.channel_private : false,
-			parent ? !parent.channel_private : false
+			currentChannel ? !currentChannel.channel_private : false
 		);
 	}
 

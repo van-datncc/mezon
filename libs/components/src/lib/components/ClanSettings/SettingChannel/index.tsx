@@ -9,9 +9,11 @@ import {
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, getAvatarForPrioritize } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Avatar, Tooltip } from 'flowbite-react';
-import { useEffect, useMemo, useRef } from 'react';
+import { Avatar, AvatarSizes, Tooltip } from 'flowbite-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import ChannelSettingInforItem from './InforChannelSetting';
 
 type ListChannelSettingProp = {
 	privateFilter?: boolean;
@@ -23,6 +25,7 @@ const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListC
 	const dispatch = useAppDispatch();
 	const selectClanId = useSelector(selectCurrentClanId);
 	const listChannel = useSelector(selectAllChannelSuggestion);
+	const [channelSettingId, setChannelSettingId] = useState('');
 	useEffect(() => {
 		async function fetchListChannel() {
 			await dispatch(channelSettingActions.fetchChannelByUserId({ clanId: selectClanId as string }));
@@ -48,12 +51,22 @@ const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListC
 		estimateSize: () => 56,
 		overscan: 5
 	});
+
+	const [openModalChannelSetting, closeModalChannelSetting] = useModal(() => {
+		return <ChannelSettingInforItem onClose={closeModalChannelSetting} channelId={channelSettingId} />;
+	}, [channelSettingId]);
+
+	const handleChooseChannelSetting = (id: string) => {
+		setChannelSettingId(id);
+		openModalChannelSetting();
+	};
+
 	return (
 		<div className="h-full w-full flex flex-col gap-1 flex-1">
-			<div className="w-full flex pl-12 pr-4 justify-between items-center h-[48px] shadow border-b-[1px] dark:border-bgTertiary text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
+			<div className="w-full flex pl-12 pr-16 justify-between items-center h-[48px] shadow border-b-[1px] dark:border-bgTertiary text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
 				<span className="flex-1">Name</span>
 				<span className="flex-1">Members</span>
-				<span>Creator</span>
+				<span className="pr-1">Creator</span>
 			</div>
 			<div className="h-full overflow-y-auto  hide-scrollbar scroll-smooth" ref={parentRef}>
 				<div
@@ -73,7 +86,7 @@ const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListC
 									top: 0,
 									left: 0,
 									width: '100%',
-									height: `${virtualRow.size}px`,
+									height: `${virtualRow.size + 20}px`,
 									transform: `translateY(${virtualRow.start}px)`
 								}}
 							>
@@ -84,6 +97,8 @@ const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListC
 									isThread={channel.parent_id !== '0'}
 									key={channel.id}
 									userIds={channel.user_ids || []}
+									onClick={handleChooseChannelSetting}
+									channelId={channel.id as string}
 								/>
 							</div>
 						);
@@ -101,68 +116,108 @@ const ItemInfor = ({
 	label,
 	creatorId,
 	privateChannel,
-	userIds
+	userIds,
+	onClick,
+	channelId
 }: {
 	isThread?: boolean;
 	label: string;
 	creatorId: string;
 	privateChannel: number;
 	userIds: string[];
+	onClick: (id: string) => void;
+	channelId: string;
 }) => {
 	const creatorChannel = useSelector(selectMemberClanByUserId(creatorId));
-
+	const handleChooseChannel = () => {
+		onClick(channelId);
+	};
+	const handleCopyChannelId = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		e.stopPropagation();
+		navigator.clipboard.writeText(channelId);
+	};
 	return (
 		<div
-			className={`flex object-cover items-center py-3 px-3 gap-3 w-full relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0 `}
+			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0 group`}
+			onClick={handleChooseChannel}
 		>
-			<div className="h-6 w-6">
-				{isThread ? (
-					privateChannel ? (
-						<Icons.ThreadIconLocker />
+			<div className="cursor-pointer px-3 py-2 flex items-center gap-3 w-full hover:bg-bgHover">
+				<div className="h-6 w-6">
+					{isThread ? (
+						privateChannel ? (
+							<Icons.ThreadIconLocker />
+						) : (
+							<Icons.ThreadIcon />
+						)
+					) : privateChannel ? (
+						<Icons.HashtagLocked />
 					) : (
-						<Icons.ThreadIcon />
-					)
-				) : privateChannel ? (
-					<Icons.HashtagLocked />
-				) : (
-					<Icons.Hashtag />
-				)}
-			</div>
-			<div className="flex-1">{label}</div>
-			<div className="flex-1 flex ">
-				{privateChannel ? (
-					<Avatar.Group className="flex gap-3 justify-end items-center">
-						{userIds.slice(0, 2).map((member) => (
-							<AvatarUser id={member} key={member} />
-						))}
-						{userIds.length > 1 && (
-							<Avatar.Counter
-								total={userIds.length - 1}
-								className="h-4 w-6 dark:text-bgLightPrimary text-bgPrimary ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
-							/>
-						)}
-					</Avatar.Group>
-				) : (
-					<p className="italic text-xs">(All Members)</p>
-				)}
-			</div>
-
-			<Tooltip content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username} placement="left">
-				<div className="overflow-hidden flex w-12 items-center justify-center">
-					<img src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url} className="w-8 h-8 object-cover rounded-full " />
+						<Icons.Hashtag />
+					)}
 				</div>
-			</Tooltip>
+				<div className="flex-1">{label}</div>
+				<div className="flex-1 flex ">
+					{privateChannel ? (
+						<Avatar.Group className="flex gap-3 justify-end items-center">
+							{userIds.slice(0, 2).map((member) => (
+								<AvatarUserShort id={member} key={member} hiddenTooltip={true} />
+							))}
+							{userIds.length > 3 && (
+								<Avatar.Counter
+									total={userIds.length - 1}
+									className="h-4 w-6 dark:text-bgLightPrimary text-bgPrimary ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
+								/>
+							)}
+						</Avatar.Group>
+					) : (
+						<p className="italic text-xs">(All Members)</p>
+					)}
+				</div>
+
+				<div className="overflow-hidden flex w-12 items-center justify-center">
+					{creatorChannel?.clan_avatar ||
+						(creatorChannel?.user?.avatar_url && (
+							<Tooltip
+								content={creatorChannel?.clan_nick || creatorChannel?.user?.display_name || creatorChannel?.user?.username}
+								placement="left"
+							>
+								<img
+									src={creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url}
+									className="w-8 h-8 object-cover rounded-full "
+								/>
+							</Tooltip>
+						))}
+				</div>
+
+				<Tooltip content={'Copy Channel Id'} placement="left">
+					<div
+						className=" overflow-hidden flex w-6 items-center justify-center rounded-full aspect-square hover:bg-bgHover"
+						onClick={handleCopyChannelId}
+					>
+						<Icons.CopyIcon />
+					</div>
+				</Tooltip>
+			</div>
 		</div>
 	);
 };
 export default ListChannelSetting;
-
-export const AvatarUser = ({ id }: { id: string }) => {
-	const userClan = useSelector(selectMemberClanByUserId(id));
+export const AvatarUserShort = ({ id, hiddenTooltip = false, size = 'xs' }: { id: string; hiddenTooltip?: boolean; size?: keyof AvatarSizes }) => {
+	const member = useSelector(selectMemberClanByUserId(id));
 	const voiceClan = useSelector(selectMemberClanByGoogleId(id ?? ''));
-	const clanAvatar = voiceClan?.clan_avatar || userClan?.clan_avatar;
-	const userAvatar = voiceClan?.user?.avatar_url || userClan?.user?.avatar_url;
+	const clanAvatar = voiceClan?.clan_avatar || member?.clan_avatar;
+	const userAvatar = voiceClan?.user?.avatar_url || member?.user?.avatar_url;
 	const avatarUrl = getAvatarForPrioritize(clanAvatar, userAvatar);
 
-	return <Avatar img={avatarUrl} rounded size="xs" />;
+	return (
+		<>
+			{hiddenTooltip ? (
+				<Avatar img={avatarUrl} rounded size={size} />
+			) : (
+				<Tooltip content={member?.clan_nick || member?.user?.display_name || member?.user?.username} hidden={hiddenTooltip} trigger="hover">
+					<Avatar img={avatarUrl} rounded size={size} />
+				</Tooltip>
+			)}
+		</>
+	);
 };

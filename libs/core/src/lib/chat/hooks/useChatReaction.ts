@@ -1,8 +1,8 @@
-import { reactionActions, useAppDispatch } from '@mezon/store';
-import { EmojiStorage } from '@mezon/utils';
+import { reactionActions, selectClanView, useAppDispatch } from '@mezon/store';
+import { EmojiStorage, transformPayloadWriteSocket } from '@mezon/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 export type UseMessageReactionOption = {
 	currentChannelId?: string | null | undefined;
 };
@@ -12,11 +12,12 @@ interface ChatReactionProps {
 
 export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 	const dispatch = useAppDispatch();
+	const isClanView = useSelector(selectClanView);
+
 	const reactionMessageDispatch = useCallback(
 		async (
 			id: string,
 			mode: number,
-			parentId: string,
 			clanId: string,
 			channelId: string,
 			messageId: string,
@@ -25,8 +26,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 			count: number,
 			message_sender_id: string,
 			action_delete: boolean,
-			is_public: boolean,
-			is_parent_public: boolean
+			is_public: boolean
 		) => {
 			if (isMobile) {
 				const emojiLastest: EmojiStorage = {
@@ -39,11 +39,16 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 				saveRecentEmojiMobile(emojiLastest);
 			}
 
+			const payload = transformPayloadWriteSocket({
+				clanId,
+				isPublicChannel: is_public,
+				isClanView: isClanView as boolean
+			});
+
 			return dispatch(
 				reactionActions.writeMessageReaction({
 					id,
-					clanId: mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? clanId : '',
-					parentId,
+					clanId: payload.clan_id,
 					channelId,
 					mode,
 					messageId,
@@ -52,12 +57,11 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					count,
 					messageSenderId: message_sender_id,
 					actionDelete: action_delete,
-					isPublic: is_public,
-					isParentPulic: is_parent_public
+					isPublic: payload.is_public
 				})
 			);
 		},
-		[dispatch]
+		[dispatch, isMobile, isClanView]
 	);
 
 	return useMemo(

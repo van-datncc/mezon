@@ -1,4 +1,4 @@
-import { useAuth, useMenu } from '@mezon/core';
+import { useAppNavigation, useAuth, useMenu } from '@mezon/core';
 import {
 	selectCloseMenu,
 	selectCurrentStreamInfo,
@@ -10,17 +10,16 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 
 const StreamInfo = () => {
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-	const channelPath = `/chat/clans/${currentStreamInfo?.clanId}/channels/${currentStreamInfo?.streamId}`;
 	const appearanceTheme = useSelector(selectTheme);
 	const { setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
+	const { toChannelPage, navigate } = useAppNavigation();
 
 	const handleLeaveChannel = async () => {
 		if (currentStreamInfo) {
@@ -34,12 +33,8 @@ const StreamInfo = () => {
 		if (closeMenu) {
 			setStatusMenu(false);
 		}
-		setTimeout(() => {
-			const channelCallElement = document.getElementById(channelPath);
-			if (channelCallElement) {
-				channelCallElement.scrollIntoView({ behavior: 'smooth' });
-			}
-		}, 0);
+		const channelUrl = toChannelPage(currentStreamInfo?.streamId ?? '', currentStreamInfo?.clanId ?? '');
+		navigate(channelUrl, { state: { focusChannel: { id: currentStreamInfo?.streamId, parentId: currentStreamInfo?.parentId ?? '' } } });
 	};
 
 	const streamAddress = `${currentStreamInfo?.streamName + ' / ' + currentStreamInfo?.clanName}`;
@@ -57,11 +52,11 @@ const StreamInfo = () => {
 						<Icons.NetworkStatus defaultSize="w-4 h-4 dark:text-channelTextLabel" />
 						<div className="text-green-700 font-bold text-base">Stream Connected</div>
 					</div>
-					<Link to={channelPath} onClick={handleClick}>
+					<button className="w-fit" onClick={handleClick}>
 						<div className="hover:underline font-medium dark:text-channelTextLabel text-colorTextLightMode text-xs dark:text-contentSecondary">
 							{streamAddress && streamAddress.length > 30 ? `${streamAddress.substring(0, 30)}...` : streamAddress}
 						</div>
-					</Link>
+					</button>
 				</div>
 				<button
 					className="opacity-80 dark:text-[#AEAEAE] text-black dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hover:rounded-md p-1"

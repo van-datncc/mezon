@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useChatReaction } from '@mezon/core';
 import { FaceIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectComputedReactionsByMessageId, selectCurrentChannel } from '@mezon/store-mobile';
+import { selectComputedReactionsByMessageId, selectCurrentChannel } from '@mezon/store-mobile';
 import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -22,8 +22,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 	const { reactionMessageDispatch } = useChatReaction({ isMobile: true });
 	const currentChannel = useSelector(selectCurrentChannel);
-	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.id));
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
+	const messageReactions = useSelector(selectComputedReactionsByMessageId(message.channel_id, message.id));
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 
 	const userId = useMemo(() => userProfile?.user?.id, [userProfile?.user?.id]);
@@ -41,7 +40,6 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			currentChannel?.parrent_id || '',
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.clan_id ?? '') : '',
 			message?.channel_id ?? '',
 			messageId ?? '',
@@ -50,18 +48,16 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			1,
 			message_sender_id ?? '',
 			false,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
-			parent ? !parent.channel_private : false
+			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false
 		);
 	};
 
 	const removeEmoji = async (emojiData: EmojiDataOptionals) => {
 		const { id, emoji, senders, emojiId } = emojiData;
-		const countToRemove = senders.find((sender) => sender.sender_id === userId)?.count;
+		const countToRemove = senders?.find?.((sender) => sender.sender_id === userId)?.count;
 		await reactionMessageDispatch(
 			id,
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			currentChannel?.parrent_id || '',
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentChannel?.clan_id ?? '') : '',
 			message?.channel_id ?? '',
 			message.id ?? '',
@@ -70,8 +66,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			countToRemove,
 			userId ?? '',
 			true,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false,
-			parent ? !parent.channel_private : false
+			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false
 		);
 	};
 
@@ -104,7 +99,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 	return (
 		<View style={[styles.reactionWrapper, allReactionDataOnOneMessage.length > 0 && styles.reactionSpace]}>
 			{allReactionDataOnOneMessage?.map((emojiItemData: EmojiDataOptionals, index) => {
-				const userSender = emojiItemData.senders.find((sender: SenderInfoOptionals) => sender.sender_id === userId);
+				const userSender = emojiItemData?.senders?.find?.((sender: SenderInfoOptionals) => sender.sender_id === userId);
 				const isMyReaction = userSender?.count && userSender.count > 0;
 
 				if (calculateTotalCount(emojiItemData.senders) === 0) {

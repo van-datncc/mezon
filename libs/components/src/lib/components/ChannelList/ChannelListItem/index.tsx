@@ -13,7 +13,7 @@ import {
 import { ChannelThreads } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChannelLink, ChannelLinkRef } from '../../ChannelLink';
-import { AvatarUser } from '../../ClanSettings/SettingChannel';
+import { AvatarUserShort } from '../../ClanSettings/SettingChannel';
 import ModalInvite from '../../ListMemberInvite/modalInvite';
 import ThreadListChannel, { ListThreadChannelRef } from '../../ThreadListChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';
@@ -104,7 +104,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 				{renderChannelLink()}
 				<Avatar.Group className="flex gap-3 justify-start items-center px-6">
 					{[...memberList].slice(0, 5).map((member) => (
-						<AvatarUser id={member.user_id} />
+						<AvatarUserShort id={member.user_id} />
 					))}
 					{memberList && memberList.length > 5 && (
 						<Avatar.Counter

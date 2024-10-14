@@ -1,10 +1,9 @@
-import { useAuth, useChatReaction, useEmojiSuggestion } from '@mezon/core';
+import { useAuth, useChatReaction } from '@mezon/core';
 import {
 	reactionActions,
-	selectChannelById,
+	selectClanView,
 	selectCurrentChannel,
 	selectCurrentClanId,
-	selectDirectById,
 	selectDmGroupCurrentId,
 	selectMembeGroupByUserId,
 	selectMemberClanByUserId,
@@ -13,7 +12,7 @@ import {
 import { Icons, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
@@ -26,21 +25,10 @@ type UserReactionPanelProps = {
 const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
 	const dispatch = useDispatch();
 	const { reactionMessageDispatch } = useChatReaction();
-	const { emojis } = useEmojiSuggestion();
 	const userId = useAuth();
-	const [channelLabel, setChannelLabel] = useState('');
 	const currentChannel = useSelector(selectCurrentChannel);
-	const direct = useAppSelector((state) => selectDirectById(state, message.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 
-	useEffect(() => {
-		if (direct != undefined) {
-			setChannelLabel('');
-		} else {
-			setChannelLabel(currentChannel?.channel_label || '');
-		}
-	}, [message]);
 	const removeEmojiSender = async (
 		id: string,
 		messageId: string,
@@ -52,7 +40,6 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		await reactionMessageDispatch(
 			id,
 			mode,
-			currentChannel?.parrent_id || '',
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (currentClanId ?? '') : '',
 			message.channel_id ?? '',
 			messageId,
@@ -61,8 +48,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
-			currentChannel ? !currentChannel.channel_private : false,
-			parent ? !parent.channel_private : false
+			currentChannel ? !currentChannel.channel_private : false
 		);
 	};
 
@@ -170,8 +156,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
 
-	const currentClanId = useSelector(selectCurrentClanId);
-	const isClanView = currentClanId && currentClanId !== '0';
+	const isClanView = useSelector(selectClanView);
 	const currentDMId = useSelector(selectDmGroupCurrentId);
 	const userClan = useSelector(selectMemberClanByUserId(sender.sender_id));
 	const userDirect = useAppSelector((state) => selectMembeGroupByUserId(state, currentDMId as string, sender.sender_id));
