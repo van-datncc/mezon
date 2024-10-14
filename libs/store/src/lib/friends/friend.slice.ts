@@ -22,13 +22,12 @@ interface IStatusSentMobile {
 	isSuccess: boolean;
 }
 
-export type StateFriendProps = {
-	noFriend: boolean;
-	myPendingFriend: boolean;
-	otherPendingFriend: boolean;
-	blockFriend: boolean;
-	friend: boolean;
-};
+export enum EStateFriend {
+	FRIEND = 0,
+	OTHER_PENDING = 1,
+	MY_PENDING = 2,
+	BLOCK = 3
+}
 
 export const mapFriendToEntity = (FriendRes: Friend) => {
 	return { ...FriendRes, id: FriendRes.user?.id || '' };
@@ -41,7 +40,9 @@ export interface FriendsState extends EntityState<FriendsEntity, string> {
 	statusSentMobile: IStatusSentMobile | null;
 }
 
-export const friendsAdapter = createEntityAdapter<FriendsEntity>();
+export const friendsAdapter = createEntityAdapter({
+	selectId: (friend: FriendsEntity) => friend.id || ''
+});
 
 export const fetchListFriendsCached = memoizeAndTrack(
 	(mezon: MezonValueContext, state: number, limit: number, cursor: string) =>
@@ -184,45 +185,14 @@ export const friendsActions = {
 	sendRequestBlockFriend
 };
 
-const { selectAll } = friendsAdapter.getSelectors();
+const { selectAll, selectById } = friendsAdapter.getSelectors();
 
 export const getFriendsState = (rootState: { [FRIEND_FEATURE_KEY]: FriendsState }): FriendsState => rootState[FRIEND_FEATURE_KEY];
 export const selectAllFriends = createSelector(getFriendsState, selectAll);
 export const selectStatusSentMobile = createSelector(getFriendsState, (state) => state.statusSentMobile);
 
 export const selectFriendStatus = (userID: string) =>
-	createSelector(selectAllFriends, (friends) => {
-		let status: StateFriendProps = {
-			noFriend: false,
-			otherPendingFriend: false,
-			myPendingFriend: false,
-			blockFriend: false,
-			friend: false
-		};
-
-		const friend = friends.find((friend) => friend.id === userID);
-
-		if (friend) {
-			switch (friend.state) {
-				case 0:
-					status.friend = true;
-					break;
-				case 1:
-					status.otherPendingFriend = true;
-					break;
-				case 2:
-					status.myPendingFriend = true;
-					break;
-				case 3:
-					status.blockFriend = true;
-					break;
-				default:
-					status.noFriend = true;
-					break;
-			}
-		} else {
-			status.noFriend = true;
-		}
-
-		return status;
+	createSelector(getFriendsState, (state) => {
+		const friend = selectById(state, userID);
+		return friend?.state;
 	});

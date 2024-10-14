@@ -8,7 +8,14 @@ import {
 	useSendInviteMessage,
 	useSettingFooter
 } from '@mezon/core';
-import { selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus, selectMemberClanByUserId } from '@mezon/store';
+import {
+	EStateFriend,
+	selectAccountCustomStatus,
+	selectAllAccount,
+	selectCurrentUserId,
+	selectFriendStatus,
+	selectMemberClanByUserId
+} from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
@@ -185,7 +192,7 @@ const ModalUserProfile = ({
 						</p>
 					</div>
 
-					{checkAddFriend.myPendingFriend && !showPopupLeft && <PendingFriend user={userById} />}
+					{checkAddFriend === EStateFriend.MY_PENDING && !showPopupLeft && <PendingFriend user={userById} />}
 
 					{mode !== 4 && mode !== 3 && !isFooterProfile && (
 						<UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me as string} />
