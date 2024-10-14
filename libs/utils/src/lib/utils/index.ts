@@ -36,8 +36,9 @@ import {
 	SearchItemProps,
 	SenderInfoOptionals
 } from '../types';
-export { processFile } from './file';
-export { mergeRefs } from './mergeRefs';
+export * from './file';
+export * from './mergeRefs';
+export * from './transform';
 
 export const convertTimeString = (dateString: string) => {
 	const codeTime = new Date(dateString);
@@ -741,6 +742,8 @@ export async function getMobileUploadedAttachments(payload: {
 				type: att?.filetype,
 				uri: att?.url,
 				size: att?.size,
+				height: att?.height,
+				width: att?.width,
 				fileData
 			};
 			return await handleUploadFileMobile(client, session, clanId, channelId, att?.filename || '', formattedFile);

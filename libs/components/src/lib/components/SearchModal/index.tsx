@@ -200,7 +200,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				const existsInPrevious = previous.some((item) => item?.id === listDirectSearch[i]?.idDM);
 				if (previousChannels.includes(itemDMId) && !existsInPrevious) {
 					previous.unshift(listDirectSearch[i]);
-					listDirectSearch.splice(i, 1);
+					// listDirectSearch.splice(i, 1);
 				}
 			}
 		}
@@ -232,7 +232,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					directActions.joinDirectMessage({
 						directMessageId: foundDirect.idDM ?? '',
 						channelName: '',
-						type: foundDirect?.type ?? ChannelType.CHANNEL_TYPE_DM
+						type: foundDirect?.type ?? ChannelType.CHANNEL_TYPE_DM,
+						noCache: true
 					})
 				);
 				if (result) {
@@ -251,9 +252,9 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	const handleSelectChannel = useCallback(
 		async (channel: SearchItemProps) => {
-			if (channel.id && channel.type === ChannelType.CHANNEL_TYPE_TEXT) {
-				dispatch(categoriesActions.setCtrlKSelectedChannelId(channel.id));
-				const channelUrl = toChannelPage(channel.id, channel.clanId ?? '');
+			if (channel.id && (channel.type === ChannelType.CHANNEL_TYPE_TEXT || channel.type === ChannelType.CHANNEL_TYPE_STREAMING)) {
+				dispatch(categoriesActions.setCtrlKSelectedChannelId(channel?.id ?? ''));
+				const channelUrl = toChannelPage(channel?.id ?? '', channel?.clanId ?? '');
 				navigate(channelUrl, { state: { focusChannel: { id: channel?.id, parentId: channel?.parrent_id ?? '' } } });
 			} else {
 				const urlVoice = `https://meet.google.com/${channel.meeting_code}`;

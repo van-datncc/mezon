@@ -1,8 +1,6 @@
 import {
 	messagesActions,
-	selectChannelById,
 	selectChannelMemberByUserIds,
-	selectCurrentChannel,
 	selectCurrentClanId,
 	selectTypingUserIdsByChannelId,
 	useAppDispatch,
@@ -38,20 +36,15 @@ export function useChatTypings({ channelId, mode, isPublic, isDM }: UseChatTypin
 	);
 
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannel = useSelector(selectCurrentChannel);
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
-
 	const dispatch = useAppDispatch();
 
 	const sendMessageTyping = React.useCallback(async () => {
 		dispatch(
 			messagesActions.sendTypingUser({
 				clanId: currentClanId || '',
-				parentId: currentChannel?.parrent_id || '',
 				channelId,
 				mode,
-				isPublic: isPublic,
-				isParentPublic: parent ? !parent.channel_private : false
+				isPublic: isPublic
 			})
 		);
 	}, [channelId, currentClanId, dispatch, isPublic, mode]);

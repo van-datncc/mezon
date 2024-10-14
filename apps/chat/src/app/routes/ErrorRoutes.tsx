@@ -7,10 +7,15 @@ const ErrorRoutes = () => {
 	console.error(error);
 
 	const handleClick = () => {
+		const authData = localStorage.getItem('persist:auth');
+		localStorage.clear();
+		if (authData) {
+			localStorage.setItem('persist:auth', authData);
+		}
 		if (isElectron()) {
-			window.location.replace('/');
+			window.location.href = window.location.pathname;
 		} else {
-			window.location.replace('/chat/direct/friends');
+			window.location.href = '/chat/direct/friends';
 		}
 	};
 

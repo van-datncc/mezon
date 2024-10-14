@@ -74,7 +74,7 @@ export const HeaderModal = memo((props: HeaderModalProps) => {
 		<div className="px-4 dark:text-contentTertiary text-colorTextLightMode">
 			<p className="text-base font-medium">An external application</p>
 			<h3 className="font-bold text-xl dark:text-white text-black">{name}</h3>
-			<p className="text-base">wants to access your Discord account</p>
+			<p className="text-base">wants to access your Mezon account</p>
 			<p className="text-sm">
 				Signed in as
 				<span className="dark:text-white text-black">&nbsp;{userName}</span>

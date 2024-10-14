@@ -50,7 +50,7 @@ export default function UserInfoDm({ user, currentChannel }: { user: ChannelMemb
 				<Text style={styles.desc}>{user?.user?.about_me}</Text> */}
 			</Block>
 			<Block>
-				<Text style={styles.title}>{t('userInfoDM.discordMemberSince')}</Text>
+				<Text style={styles.title}>{t('userInfoDM.mezonMemberSince')}</Text>
 				<Text style={styles.desc}>{formatDate(user?.user?.create_time)}</Text>
 			</Block>
 			<MezonMenu menu={menu} />

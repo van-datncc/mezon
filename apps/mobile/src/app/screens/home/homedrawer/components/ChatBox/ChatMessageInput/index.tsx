@@ -1,5 +1,5 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { messagesActions, selectChannelById, selectCurrentClanId } from '@mezon/store';
+import { messagesActions, selectCurrentClanId } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -39,7 +39,6 @@ interface IChatMessageInputProps {
 	markdownsOnMessage?: MutableRefObject<IMarkdownOnMessage[]>;
 	voiceLinkRoomOnMessage?: MutableRefObject<ILinkVoiceRoomOnMessage[]>;
 	isShowCreateThread?: boolean;
-	parentId?: string;
 	isPublic?: boolean;
 }
 
@@ -50,7 +49,6 @@ export const ChatMessageInput = memo(
 				textInputProps,
 				text,
 				isFocus,
-				isShowAttachControl,
 				channelId,
 				mode,
 				messageActionNeedToResolve,
@@ -68,8 +66,6 @@ export const ChatMessageInput = memo(
 				linksOnMessage,
 				markdownsOnMessage,
 				voiceLinkRoomOnMessage,
-				isShowCreateThread,
-				parentId,
 				isPublic
 			}: IChatMessageInputProps,
 			ref: MutableRefObject<TextInput>
@@ -80,7 +76,6 @@ export const ChatMessageInput = memo(
 			const dispatch = useAppDispatch();
 			const styles = style(themeValue);
 			const currentClanId = useSelector(selectCurrentClanId);
-			const parent = useSelector(selectChannelById(channelId || ''));
 			const isAvailableSending = useMemo(() => {
 				return text?.length > 0 && text?.trim()?.length > 0;
 			}, [text]);
@@ -99,14 +94,12 @@ export const ChatMessageInput = memo(
 				dispatch(
 					messagesActions.sendTypingUser({
 						clanId: currentClanId || '',
-						parentId: parentId,
 						channelId,
 						mode,
-						isPublic,
-						isParentPublic: parent ? !parent.channel_private : false
+						isPublic
 					})
 				);
-			}, [channelId, currentClanId, dispatch, isPublic, mode, parent, parentId]);
+			}, [channelId, currentClanId, dispatch, isPublic, mode]);
 
 			const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
@@ -115,11 +108,9 @@ export const ChatMessageInput = memo(
 					dispatch(
 						messagesActions.sendTypingUser({
 							clanId: '0',
-							parentId: parentId,
 							channelId: channelId,
 							mode: mode,
-							isPublic: false,
-							isParentPublic: parent ? !parent.channel_private : false
+							isPublic: false
 						})
 					)
 				]);

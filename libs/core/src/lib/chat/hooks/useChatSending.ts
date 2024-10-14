@@ -1,7 +1,6 @@
-import { messagesActions, selectAllAccount, selectAnonymousMode, selectChannelById, useAppDispatch } from '@mezon/store';
+import { messagesActions, selectAllAccount, selectAnonymousMode, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageSendPayload } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -18,23 +17,15 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 	}, [channelOrDirect?.clan_id]);
 
 	const isPublic = useMemo(() => {
+		if (channelOrDirect?.parrent_id !== '' && channelOrDirect?.parrent_id !== '0') {
+			return false;
+		}
 		return !channelOrDirect?.channel_private;
-	}, [channelOrDirect?.channel_private]);
+	}, [channelOrDirect]);
 
 	const channelIdOrDirectId = useMemo(() => {
 		return channelOrDirect?.channel_id;
 	}, [channelOrDirect?.channel_id]);
-
-	const parentId = useMemo(() => {
-		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
-			return channelOrDirect?.parrent_id;
-		}
-	}, [channelOrDirect?.parrent_id, mode]);
-	const parent = useSelector(selectChannelById(parentId || ''));
-
-	const isParentPublic = useMemo(() => {
-		return parent ? !parent.channel_private : false;
-	}, [parent?.channel_private]);
 
 	const userProfile = useSelector(selectAllAccount);
 	const currentUserId = userProfile?.user?.id || '';
@@ -53,12 +44,10 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 		) => {
 			await dispatch(
 				messagesActions.sendMessage({
-					parentId: parentId ?? '',
 					channelId: channelIdOrDirectId ?? '',
 					clanId: getClanId || '',
 					mode,
 					isPublic: isPublic,
-					isParentPublic: isParentPublic,
 					content,
 					mentions,
 					attachments,
@@ -79,11 +68,9 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			dispatch(
 				messagesActions.sendTypingUser({
 					clanId: getClanId || '',
-					parentId: parentId ?? '',
 					channelId: channelIdOrDirectId ?? '',
 					mode,
-					isPublic: isPublic,
-					isParentPublic: isParentPublic
+					isPublic: isPublic
 				})
 			);
 		}
@@ -107,11 +94,9 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 
 			await socket.updateChatMessage(
 				getClanId || '',
-				parentId || '',
 				channelIdOrDirectId ?? '',
 				mode,
 				isPublic,
-				isParentPublic,
 				messageId,
 				content,
 				mentions,

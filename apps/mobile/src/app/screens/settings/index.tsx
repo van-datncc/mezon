@@ -208,7 +208,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				// 	onPress: () => reserve(),
 				// 	expandable: true,
 				// 	title: t('appSettings.appIcon'),
-				// 	icon: <Icons.BrandDiscordIcon color={themeValue.textStrong} />,
+				// 	icon: <Icons.BrandMezonIcon color={themeValue.textStrong} />,
 				// },
 				// {
 				// 	onPress: () => reserve(),

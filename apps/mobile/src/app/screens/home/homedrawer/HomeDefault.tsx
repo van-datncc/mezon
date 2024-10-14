@@ -160,10 +160,8 @@ const HomeDefault = React.memo((props: any) => {
 				<View style={styles.channelView}>
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
-						parentId={currentChannel?.parrent_id}
 						clanId={currentChannel?.clan_id}
 						isPublic={currentChannel ? !currentChannel?.channel_private : false}
-						isParentPublic={parent ? !parent?.channel_private : false}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 					<ChatBox

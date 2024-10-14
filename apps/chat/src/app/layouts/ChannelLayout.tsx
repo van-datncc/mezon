@@ -35,7 +35,7 @@ const ChannelLayout = () => {
 	}
 
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible">
+		<div className="z-0 flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-visible">
 			{isChannelVoice ? (
 				<ChannelLayoutVoice channelLabel={currentChannel.channel_label} meetingCode={currentChannel.meeting_code} />
 			) : (
@@ -57,7 +57,7 @@ const ChannelLayout = () => {
 					)}
 					{subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && (
 						<div
-							className="fixed max-sm:hidden"
+							className={`fixed z-50 max-sm:hidden duration-300 ease-in-out animate-fly_in`}
 							style={{
 								top: topPositionEmojiPanel,
 								bottom: distanceToBottom < HEIGHT_EMOJI_PANEL ? '0' : 'auto',
