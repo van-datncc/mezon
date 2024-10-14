@@ -151,17 +151,15 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	const isThread = currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '';
 	useEffect(() => {
 		const fetchThreads = async () => {
-			if (isShowThread) {
-				const body = {
-					channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
-					clanId: currentChannel?.clan_id ?? ''
-				};
-				await dispatch(threadsActions.fetchThreads(body));
-			}
+			const body = {
+				channelId: isThread ? (currentChannel?.parrent_id ?? '') : (currentChannel?.channel_id ?? ''),
+				clanId: currentChannel?.clan_id ?? ''
+			};
+			await dispatch(threadsActions.fetchThreads(body));
 		};
 
 		fetchThreads();
-	}, [isShowThread]);
+	}, [currentChannel?.channel_id]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
