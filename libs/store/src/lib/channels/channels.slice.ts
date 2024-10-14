@@ -397,6 +397,7 @@ export const channelsSlice = createSlice({
 		removeAll: channelsAdapter.removeAll,
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
+		upsertOne: channelsAdapter.upsertOne,
 		removeByChannelID: (state, action: PayloadAction<string>) => {
 			channelsAdapter.removeOne(state, action.payload);
 		},
