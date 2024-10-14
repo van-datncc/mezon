@@ -130,10 +130,7 @@ const RenderImageHaveSize = React.memo(
 		const styles = style(themeValue);
 
 		const isUploading = !image?.url?.includes('http');
-		const photoSize = useMemo(
-			() => getPhotoSizeWithSize(imageSize, isMultiple, isUploading),
-			[imageSize.height, imageSize.width, isMultiple, isUploading]
-		);
+		const photoSize = useMemo(() => getPhotoSizeWithSize(imageSize, isMultiple, isUploading), [imageSize, isMultiple, isUploading]);
 
 		if (!image.url) {
 			return null;

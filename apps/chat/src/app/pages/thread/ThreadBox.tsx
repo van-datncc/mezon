@@ -58,6 +58,8 @@ const ThreadBox = () => {
 		[currentChannel, currentChannelId, currentClanId, dispatch]
 	);
 
+	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 	const handleSend = useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -70,6 +72,8 @@ const ThreadBox = () => {
 				if (value?.nameValueThread) {
 					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
+						// sleep for waiting server check exist after insert
+						await sleep(100);
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,

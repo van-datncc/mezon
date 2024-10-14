@@ -1,59 +1,66 @@
 <!doctype html>
 <html lang="en" class="dark">
-	<head>
-		<meta charset="utf-8" class="" />
-		<title>Mezon</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-		<link rel="manifest" href="assets/site.webmanifest" />
-		<meta
-			name="description"
-			content="Join Mezon to play games, chill with friends, and build your community. Create your own customized space to chat, play, and hang out with people from around the world."
-		/>
-		<meta property="og:locale" content="en_US" />
-		<meta property="og:title" content="Mezon - Your Clan & Your World" />
-		<meta
-			property="og:description"
-			content="Join Mezon to play games, chill with friends, and build your community. Create your own customized space to chat, play, and hang out with people from around the world."
-		/>
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content="https://mezon.ai" />
-		<meta property="og:image" itemprop="thumbnailUrl" content="https://mezon.ai/assets/preview.png" />
-		<meta property="og:image:alt" content="Mezon" />
-		<meta property="og:image:width" content="1200" />
-		<meta property="og:image:height" content="675" />
-		<meta name="twitter:card" content="summary" />
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:site" content="@mezon.ai" />
-		<meta name="twitter:creator" content="@mezon.ai" />
-		<meta name="twitter:url" content="https://mezon.ai" />
-		<meta name="twitter:title" content="Mezon - Your Clan & Your World" />
-		<meta
-			name="twitter:description"
-			content="Join Mezon to play games, chill with friends, and build your community. Create your own customized space to chat, play, and hang out with people from around the world."
-		/>
-		<meta name="twitter:image" content="https://mezon.ai/assets/preview.png" />
 
-		<style>
-			#splash-screen {
-				position: fixed;
-				width: 100%;
-				height: 100%;
-				background-color: #313337;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				z-index: 9999;
-				font-size: 14px;
-				color: white;
+<head>
+	<meta charset="utf-8" class="" />
+	<title>Mezon</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+	<link rel="manifest" href="assets/site.webmanifest" />
+	<meta name="description"
+		content="Join Mezon to play games, chill with friends, and build your community. Create your own customized space to chat, play, and hang out with people from around the world." />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:title" content="Mezon - Your Clan & Your World" />
+	<meta property="og:description"
+		content="Join Mezon to play games, chill with friends, and build your community. Create your own customized space to chat, play, and hang out with people from around the world." />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://mezon.ai" />
+	<meta property="og:image" itemprop="thumbnailUrl" content="https://mezon.ai/assets/preview.png" />
+	<meta property="og:image:alt" content="Mezon" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="675" />
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:site" content="@mezon.ai" />
+	<meta name="twitter:creator" content="@mezon.ai" />
+	<meta name="twitter:url" content="https://mezon.ai" />
+	<meta name="twitter:title" content="Mezon - Your Clan & Your World" />
+	<meta name="twitter:description"
+		content="Join Mezon to play games, chill with friends, and build your community. Create your own customized space to chat, play, and hang out with people from around the world." />
+	<meta name="twitter:image" content="https://mezon.ai/assets/preview.png" />
+
+	<style>
+		#splash-screen {
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			background-color: #313337;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			z-index: 9999;
+			font-size: 14px;
+			color: white;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="splash-screen">
+		<span>Loading ...</span>
+	</div>
+	<div id="root"></div>
+	<script>
+		const path = window.location.pathname;
+		window?.electron?.on('reload-app', () => {
+			const authData = localStorage.getItem('persist:auth');
+			localStorage.clear();
+			if (authData) {
+				localStorage.setItem('persist:auth', authData);
 			}
-		</style>
-	</head>
+			window.location.replace(path);
+		});
+	</script>
+</body>
 
-	<body>
-		<div id="splash-screen">
-			<span>Loading ...</span>
-		</div>
-		<div id="root"></div>
-	</body>
 </html>

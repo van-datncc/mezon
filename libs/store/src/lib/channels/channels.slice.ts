@@ -102,6 +102,7 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 	) {
 		return null;
 	}
+
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType, isPublic);
@@ -167,12 +168,13 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
+				const isPublic = response.parrent_id !== '' && response.parrent_id !== '0' ? false : !response.channel_private;
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
 						clanId: response.clan_id as string,
 						channelId: response.channel_id as string,
 						channelType: response.type as number,
-						isPublic: !body.channel_private
+						isPublic: isPublic
 					})
 				);
 			}
