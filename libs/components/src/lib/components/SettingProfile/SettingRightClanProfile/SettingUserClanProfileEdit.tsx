@@ -1,10 +1,12 @@
 import { useAuth, useClanProfileSetting } from '@mezon/core';
-import { selectUserClanProfileByClanID } from '@mezon/store';
+import { checkDuplicateClanNickName, selectUserClanProfileByClanID, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { InputField } from '@mezon/ui';
 import { fileTypeImage, resizeFileImage } from '@mezon/utils';
+import { unwrapResult } from '@reduxjs/toolkit';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce';
 import { ModalSettingSave } from '../../ClanSettings/SettingRoleManagement';
 import { ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
 import SettingRightClanCard from '../SettingUserClanProfileCard';
@@ -24,8 +26,10 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
+	const [checkValidate, setCheckValidate] = useState(false);
 
 	const { updateUserClanProfile } = useClanProfileSetting({ clanId });
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		setDraftProfile(userClansProfile);
@@ -77,9 +81,34 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 			}
 		);
 	};
+
+	const debouncedSetCategoryName = useDebouncedCallback(async (value: string) => {
+		if (value.trim() === userClansProfile?.nick_name || value.trim() == '') {
+			setCheckValidate(false);
+			return;
+		}
+
+		await dispatch(
+			checkDuplicateClanNickName({
+				clanNickName: value.trim(),
+				clanId: clanId ?? ''
+			})
+		)
+			.then(unwrapResult)
+			.then((result) => {
+				if (result) {
+					setCheckValidate(true);
+					return;
+				}
+				setCheckValidate(false);
+			});
+	}, 300);
+
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setDisplayName(e.target.value);
-		setFlagOption(e.target.value !== userClansProfile?.nick_name);
+		const value = e.target.value.trim();
+		setDisplayName(value);
+		setFlagOption(value !== userClansProfile?.nick_name);
+		debouncedSetCategoryName(value);
 	};
 
 	const handleRemoveButtonClick = () => {
@@ -101,7 +130,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 		setFlagOption(false);
 	};
 	const handleUpdateUser = async () => {
-		if (urlImage || displayName) {
+		if (!checkValidate && (urlImage || displayName)) {
 			await updateUserClanProfile(userClansProfile?.clan_id ?? '', displayName || '', urlImage || '');
 		}
 	};
@@ -130,6 +159,11 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 							value={displayName}
 							maxLength={32}
 						/>
+						{checkValidate && (
+							<p className="text-[#e44141] text-xs italic font-thin">
+								The nick name already exists in the clan. <br /> Please enter another nick name.
+							</p>
+						)}
 					</div>
 					<div className="mt-[20px]">
 						<p className="dark:text-[#CCCCCC] text-textLightTheme font-bold tracking-wide text-sm">AVATAR</p>
@@ -158,7 +192,8 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 					/>
 				</div>
 			</div>
-			<SettingUserClanProfileSave PropsSave={saveProfile} />
+
+			{!checkValidate && <SettingUserClanProfileSave PropsSave={saveProfile} />}
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 		</>

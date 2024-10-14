@@ -1,8 +1,9 @@
-import { IClanProfile, LoadingStatus } from '@mezon/utils';
+import { IClanProfile, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/browser';
 import { ApiUpdateClanProfileRequest } from 'mezon-js';
 import { ApiClanProfile } from 'mezon-js/api.gen';
-import { ensureClient, ensureSession, getMezonCtx } from '../helpers';
+import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 export const USER_CLAN_PROFILE_FEATURE_KEY = 'userClanProfile';
 
 export interface UserClanProfileEntity extends IClanProfile {
@@ -37,6 +38,24 @@ export const fetchUserClanProfile = createAsyncThunk('userclanProfile/userClanPr
 	const userClanProfileEntity = mapUserClanProfileToEntity(response);
 	return userClanProfileEntity;
 });
+
+export const checkDuplicateClanNickName = createAsyncThunk(
+	'userClanProfile/duplicateClanNickName',
+	async ({ clanNickName, clanId }: { clanNickName: string; clanId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(clanNickName, clanId, TypeCheck.TYPENICKNAME);
+
+			if (isDuplicateName?.type === TypeCheck.TYPENICKNAME) {
+				return isDuplicateName.exist;
+			}
+			return;
+		} catch (error) {
+			Sentry.captureException(error);
+			return thunkAPI.rejectWithValue([]);
+		}
+	}
+);
 
 type updateLinkUserClanProfile = {
 	username: string;
