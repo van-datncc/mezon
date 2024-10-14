@@ -178,7 +178,7 @@ export const CreateNewChannelModal = () => {
 							</div>
 							<div className="Frame407 self-stretch flex-col items-center gap-2 flex">
 								<ChannelLableModal labelProp="Choose channel's type:" />
-								<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex h-fit overflow-y-scroll max-xl:h-auto hide-scrollbar">
+								<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex sm:max-h-[200px] lg:h-fit lg:max-h-fit overflow-y-scroll max-xl:h-auto">
 									<ChannelTypeComponent type={ChannelType.CHANNEL_TYPE_TEXT} onChange={onChangeChannelType} error={isErrorType} />
 									<ChannelTypeComponent
 										disable={false}
