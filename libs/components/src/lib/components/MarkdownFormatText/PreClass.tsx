@@ -20,7 +20,7 @@ const PreClass = ({ children, isInPinMsg }: IPreClassProps) => {
 
 	return (
 		<pre
-			className={`pre bg-bgLightSecondary dark:bg-bgSecondary border border-[#E3E5E8] dark:border-[#1E1F22] ${isInPinMsg ? 'flex items-start' : ''}`}
+			className={`pre dark:text-white text-colorTextLightMode bg-bgLightSecondary dark:bg-bgSecondary border border-[#E3E5E8] dark:border-[#1E1F22] ${isInPinMsg ? 'flex items-start' : ''}`}
 		>
 			<CopyToClipboard text={children.props.children} onCopy={() => setCopied(true)}>
 				<button className="icon copy-icon">{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}</button>
