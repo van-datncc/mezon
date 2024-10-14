@@ -1,7 +1,18 @@
 import { ChatContext } from '@mezon/core';
-import { CloseIcon, debounce, getAttachmentUnique, PenIcon, save, SearchIcon, SendIcon, STORAGE_CLAN_ID } from '@mezon/mobile-components';
+import {
+	CloseIcon,
+	debounce,
+	getAttachmentUnique,
+	getUpdateOrAddClanChannelCache,
+	PenIcon,
+	save,
+	SearchIcon,
+	SendIcon,
+	STORAGE_CLAN_ID,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE
+} from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
-import { channelMetaActions, selectAllChannelsByUser, selectClansEntities } from '@mezon/store';
+import { channelMetaActions, clansActions, selectAllChannelsByUser, selectClansEntities } from '@mezon/store';
 import {
 	channelsActions,
 	directActions,
@@ -129,7 +140,7 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToDM = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
-		store.dispatch(
+		await store.dispatch(
 			channelsActions.joinChat({
 				clanId: channelSelected?.clan_id,
 				channelId: channelSelected?.channel_id,
@@ -141,10 +152,8 @@ export const Sharing = ({ data, onClose }) => {
 
 		await mezon.socketRef.current.writeChatMessage(
 			'0',
-			'0',
 			channelSelected.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
-			false,
 			false,
 			{
 				t: dataSend.text,
@@ -158,23 +167,36 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToGroup = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
-		store.dispatch(
+		const isPublic = channelSelected
+			? channelSelected.parrent_id !== '' && channelSelected.parrent_id !== '0'
+				? false
+				: !channelSelected.channel_private
+			: false;
+
+		requestAnimationFrame(async () => {
+			await store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
+			await store.dispatch(clansActions.changeCurrentClan({ clanId: channelSelected.clan_id, noCache: true }));
+			await store.dispatch(
+				channelsActions.joinChannel({ clanId: channelSelected.clan_id ?? '', channelId: channelSelected.channel_id, noFetchMembers: false })
+			);
+		});
+		const dataSave = getUpdateOrAddClanChannelCache(channelSelected.clan_id, channelSelected.channel_id);
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
+		await store.dispatch(
 			channelsActions.joinChat({
 				clanId: channelSelected.clan_id,
 				channelId: channelSelected.channel_id,
 				channelType: channelSelected.type,
-				isPublic: false
+				isPublic: isPublic
 			})
 		);
-		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 
 		await mezon.socketRef.current.writeChatMessage(
-			currentClan.id,
-			channelSelected.channel_id,
+			channelSelected.clan_id,
 			channelSelected.channel_id,
 			ChannelStreamMode.STREAM_MODE_CHANNEL,
-			!channelSelected.channel_private,
-			channelSelected?.parrent_id ? !channelSelected.channel_private : false,
+			isPublic,
 			{
 				t: dataSend.text,
 				lk: dataSend.links || []
