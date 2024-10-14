@@ -25,7 +25,9 @@ const PreClass = ({ children, isInPinMsg }: IPreClassProps) => {
 			<CopyToClipboard text={children.props.children} onCopy={() => setCopied(true)}>
 				<button className="icon copy-icon">{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}</button>
 			</CopyToClipboard>
-			<code className={`code ${isInPinMsg ? 'pin-msg-markdown' : ''}`}>{children.props.children?.toString()?.split('```')}</code>
+			<code className={`code ${isInPinMsg ? 'whitespace-pre-wrap block break-words' : ''}`}>
+				{children.props.children?.toString()?.split('```')}
+			</code>
 		</pre>
 	);
 };
