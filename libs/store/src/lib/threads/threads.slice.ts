@@ -51,12 +51,13 @@ export const threadsAdapter = createEntityAdapter({ selectId: (thread: ThreadsEn
 export interface FetchThreadsArgs {
 	channelId: string;
 	clanId: string;
+	threadId?: string;
 	noCache?: boolean;
 }
 
 const fetchThreadsCached = memoizee(
-	async (mezon: MezonValueContext, channelId: string, clanId: string) => {
-		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 50, undefined, clanId);
+	async (mezon: MezonValueContext, channelId: string, clanId: string, threadId?: string) => {
+		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 50, undefined, clanId, threadId);
 		return { ...response, time: Date.now() };
 	},
 	{
@@ -81,6 +82,20 @@ export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ ch
 		fetchThreadsCached.clear(mezon, channelId, clanId);
 	}
 	const response = await fetchThreadsCached(mezon, channelId, clanId);
+	if (!response.channeldesc) {
+		return [];
+	}
+
+	const threads = mapToThreadEntity(response.channeldesc);
+	return threads;
+});
+
+export const fetchThread = createAsyncThunk('threads/fetchThreads', async ({ channelId, clanId, threadId, noCache }: FetchThreadsArgs, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	if (noCache) {
+		fetchThreadsCached.clear(mezon, channelId, clanId, threadId);
+	}
+	const response = await fetchThreadsCached(mezon, channelId, clanId, threadId);
 	if (!response.channeldesc) {
 		return [];
 	}
@@ -231,7 +246,7 @@ export const threadsReducer = threadsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const threadsActions = { ...threadsSlice.actions, fetchThreads };
+export const threadsActions = { ...threadsSlice.actions, fetchThreads, fetchThread };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
