@@ -1,7 +1,5 @@
 import {
 	selectAllChannels,
-	selectAllThreads,
-	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectIsPrivate,
 	selectIsShowCreateThread,
@@ -13,15 +11,13 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
-import { IMessageWithUser, isGreaterOneMonth } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useThreads() {
 	const dispatch = useAppDispatch();
-	const threads = useSelector(selectAllThreads);
 	const channels = useSelector(selectAllChannels);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isPrivate = useSelector(selectIsPrivate);
 	const nameThreadError = useSelector(selectNameThreadError);
@@ -64,28 +60,6 @@ export function useThreads() {
 		[dispatch]
 	);
 
-	const threadChannel = useMemo(() => {
-		const threads = channels.filter((channel) => {
-			if (currentChannel && currentChannel.parrent_id !== '0') {
-				return channel.parrent_id === currentChannel.parrent_id;
-			}
-			if (currentChannel && currentChannel.parrent_id === '0') {
-				return channel.parrent_id === currentChannelId;
-			}
-		});
-		return threads;
-	}, [channels, currentChannel, currentChannelId]);
-
-	const threadChannelOld = useMemo(() => {
-		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp_seconds as number) > 30);
-	}, [threadChannel]);
-
-	const threadChannelOnline = useMemo(() => {
-		return threadChannel.filter(
-			(thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp_seconds as number) <= 30 || !thread.last_sent_message
-		);
-	}, [threadChannel]);
-
 	const threadCurrentChannel = useMemo(() => {
 		if (listThreadId && currentChannelId) {
 			return channels.find((channel) => channel.channel_id === listThreadId[currentChannelId]);
@@ -94,14 +68,10 @@ export function useThreads() {
 
 	return useMemo(
 		() => ({
-			threads,
-			threadChannel,
 			isShowCreateThread,
 			isPrivate,
 			nameThreadError,
 			messageThreadError,
-			threadChannelOld,
-			threadChannelOnline,
 			threadCurrentChannel,
 			nameValueThread,
 			valueThread,
@@ -117,11 +87,7 @@ export function useThreads() {
 			messageThreadError,
 			nameThreadError,
 			nameValueThread,
-			threadChannel,
-			threadChannelOld,
-			threadChannelOnline,
 			threadCurrentChannel,
-			threads,
 			valueThread,
 			setNameValueThread,
 			setIsShowCreateThread,
