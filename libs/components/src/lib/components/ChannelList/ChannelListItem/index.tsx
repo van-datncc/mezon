@@ -1,5 +1,5 @@
 import { Avatar } from 'flowbite-react';
-import React, { Fragment, memo, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { memo, Ref, useImperativeHandle, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 
@@ -23,7 +23,6 @@ type ChannelListItemProp = {
 	channel: ChannelThreads;
 	isActive: boolean;
 	permissions: IChannelLinkPermission;
-	isCollapsed: boolean;
 };
 
 export type ChannelListItemRef = {
@@ -32,23 +31,7 @@ export type ChannelListItemRef = {
 };
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props, ref) => {
-	const { channel, isActive, permissions, isCollapsed } = props;
-	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
-	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
-	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
-	const memberList = useMemo(() => {
-		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
-		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
-		return [];
-	}, [voiceChannelMembers, streamChannelMembers]);
-	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(channel.clan_id || '', channel.category_id || ''));
-	const unreadMessageCount = useMemo(() => channel.count_mess_unread || 0, [channel.count_mess_unread]);
-
-	const [openInviteModal, closeInviteModal] = useModal(() => <ModalInvite onClose={closeInviteModal} open={true} channelID={channel.id} />);
-
-	const handleOpenInvite = () => {
-		openInviteModal();
-	};
+	const { channel, isActive, permissions } = props;
 
 	const listThreadRef = useRef<ListThreadChannelRef | null>(null);
 	const channelLinkRef = useRef<ChannelLinkRef | null>(null);
@@ -61,6 +44,44 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 			listThreadRef.current?.scrollIntoThread(threadId, options);
 		}
 	}));
+
+	return (
+		<ChannelLinkContent
+			channel={channel}
+			listThreadRef={listThreadRef}
+			channelLinkRef={channelLinkRef}
+			isActive={isActive}
+			permissions={permissions}
+		/>
+	);
+});
+
+export default memo(ChannelListItem);
+
+type ChannelLinkContentProps = {
+	channel: ChannelThreads;
+	listThreadRef: Ref<ListThreadChannelRef>;
+	channelLinkRef: Ref<ChannelLinkRef>;
+	isActive: boolean;
+	permissions: IChannelLinkPermission;
+};
+
+const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listThreadRef, channelLinkRef, isActive, permissions }) => {
+	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
+	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(channel.id));
+	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(channel.id));
+	const channelMemberList = useMemo(() => {
+		if (channel.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
+		if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
+		return [];
+	}, [voiceChannelMembers, streamChannelMembers]);
+	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(channel.clan_id || '', channel.category_id || ''));
+	const unreadMessageCount = useMemo(() => channel.count_mess_unread || 0, [channel.count_mess_unread]);
+	const [openInviteModal, closeInviteModal] = useModal(() => <ModalInvite onClose={closeInviteModal} open={true} channelID={channel.id} />);
+
+	const handleOpenInvite = () => {
+		openInviteModal();
+	};
 
 	const renderChannelLink = () => {
 		return (
@@ -85,7 +106,7 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 			return (
 				<>
 					{renderChannelLink()}
-					{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} isCollapsed={isCollapsed} />}
+					{channel.threads && <ThreadListChannel ref={listThreadRef} threads={channel.threads} isCollapsed={!isCategoryExpanded} />}
 				</>
 			);
 		}
@@ -94,21 +115,21 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 			return (
 				<>
 					{renderChannelLink()}
-					<UserListVoiceChannel channelID={channel.channel_id ?? ''} channelType={channel?.type} memberList={memberList} />
+					<UserListVoiceChannel channelID={channel.channel_id ?? ''} channelType={channel?.type} memberList={channelMemberList} />
 				</>
 			);
 		}
 
-		return memberList.length > 0 ? (
+		return channelMemberList.length > 0 ? (
 			<>
 				{renderChannelLink()}
 				<Avatar.Group className="flex gap-3 justify-start items-center px-6">
-					{[...memberList].slice(0, 5).map((member) => (
+					{[...channelMemberList].slice(0, 5).map((member) => (
 						<AvatarUserShort id={member.user_id} />
 					))}
-					{memberList && memberList.length > 5 && (
+					{channelMemberList && channelMemberList.length > 5 && (
 						<Avatar.Counter
-							total={memberList?.length - 5 > 50 ? 50 : memberList?.length - 5}
+							total={channelMemberList?.length - 5 > 50 ? 50 : channelMemberList?.length - 5}
 							className="h-6 w-6 dark:text-bgLightPrimary text-bgPrimary ring-transparent dark:bg-bgTertiary bg-bgLightTertiary dark:hover:bg-bgTertiary hover:bg-bgLightTertiary"
 						/>
 					)}
@@ -117,7 +138,5 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 		) : null;
 	};
 
-	return <Fragment>{renderChannelContent()}</Fragment>;
-});
-
-export default memo(ChannelListItem);
+	return <>{renderChannelContent()}</>;
+};

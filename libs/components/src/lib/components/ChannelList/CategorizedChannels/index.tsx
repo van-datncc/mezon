@@ -200,27 +200,26 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 				</div>
 			)}
 			<div className="mt-[5px] space-y-0.5 text-contentTertiary">
-				{category?.channels
-					?.filter((channel: IChannel) => {
-						return (
-							categoryExpandState ||
-							isUnreadChannel(channel.id) ||
-							channel.id === ctrlKSelectedChannelId ||
-							channel.type === ChannelType.CHANNEL_TYPE_VOICE
-						);
-					})
-					.map((channel: IChannel) => {
-						return (
+				{category?.channels?.reduce<React.ReactNode[]>((acc, channel: IChannel) => {
+					const shouldRender =
+						categoryExpandState ||
+						isUnreadChannel(channel.id) ||
+						channel.id === ctrlKSelectedChannelId ||
+						channel.type === ChannelType.CHANNEL_TYPE_VOICE;
+
+					if (shouldRender) {
+						acc.push(
 							<ChannelListItem
 								ref={(component) => (channelRefs.current[channel.id] = component)}
 								isActive={currentChannelId === channel.id}
 								key={channel.id}
 								channel={channel as ChannelThreads}
 								permissions={permissions}
-								isCollapsed={!categoryExpandState}
 							/>
 						);
-					})}
+					}
+					return acc;
+				}, [])}
 			</div>
 		</div>
 	);
