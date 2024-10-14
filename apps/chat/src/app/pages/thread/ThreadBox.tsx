@@ -73,7 +73,7 @@ const ThreadBox = () => {
 					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
 						// sleep for waiting server check exist after insert
-						await sleep(100);
+						await sleep(10);
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
@@ -82,6 +82,7 @@ const ThreadBox = () => {
 								isPublic: false
 							})
 						);
+						await sendMessageThread(content, mentions, attachments, references, thread);
 						await dispatch(
 							messagesActions.fetchMessages({
 								clanId: currentClanId || '',
@@ -89,7 +90,6 @@ const ThreadBox = () => {
 								isFetchingLatestMessages: true
 							})
 						);
-						await sendMessageThread(content, mentions, attachments, references, thread);
 					}
 				} else {
 					await sendMessageThread(content, mentions, attachments, references, threadCurrentChannel);
