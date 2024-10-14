@@ -11,6 +11,7 @@ type MarkdownContentOpt = {
 	content?: string;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
+	isInPinMsg?: boolean;
 };
 
 const navigateToChannel = async (url: string, navigate: any) => {
@@ -24,7 +25,7 @@ const navigateToChannel = async (url: string, navigate: any) => {
 	}
 };
 
-export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble }) => {
+export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isInPinMsg }) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
@@ -59,7 +60,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 					children={content}
 					remarkPlugins={[remarkGfm]}
 					components={{
-						pre: PreClass,
+						pre: (props) => <PreClass {...props} isInPinMsg={isInPinMsg} />,
 						p: 'span',
 						a: (props) => (
 							<span
