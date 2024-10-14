@@ -620,7 +620,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
-			console.log(channelCreated);
 			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
