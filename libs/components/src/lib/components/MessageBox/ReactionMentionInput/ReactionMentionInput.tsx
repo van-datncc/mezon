@@ -10,9 +10,6 @@ import {
 	useThreads
 } from '@mezon/core';
 import {
-	ChannelsEntity,
-	channelMetaActions,
-	channelUsersActions,
 	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
@@ -47,22 +44,20 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
-	ChannelMembersEntity,
 	EmojiPlaces,
-	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	SubPanelName,
 	TITLE_MENTION_HERE,
+	ThreadStatus,
 	ThreadValue,
 	blankReferenceObj,
 	filterEmptyArrays,
 	focusToElement,
 	getRoleList,
 	searchMentionsHashtag,
-	threadError,
-	uniqueUsers
+	threadError
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -139,7 +134,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const currentClanId = useSelector(selectCurrentClanId);
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const { membersOfChild } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
+	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
@@ -239,37 +234,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	};
 
-	const addMemberToPrivateThread = useCallback(
-		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[], membersOfChild: ChannelMembersEntity[] | null) => {
-			if (!currentChannel?.channel_private) return;
-			const timestamp = Date.now() / 1000;
-
-			const userIds = uniqueUsers(mentions, membersOfChild);
-
-			const body = {
-				channelId: currentChannel?.channel_id as string,
-				channelType: currentChannel?.type,
-				userIds: userIds,
-				clanId: currentClanId || ''
-			};
-			if (userIds.length > 0) {
-				await dispatch(channelUsersActions.addChannelUsers(body));
-				dispatch(
-					channelMetaActions.updateBulkChannelMetadata([
-						{
-							id: currentChannel.channel_id ?? '',
-							lastSeenTimestamp: timestamp,
-							lastSentTimestamp: timestamp,
-							lastSeenPinMessage: '',
-							clanId: currentChannel.clan_id ?? ''
-						}
-					])
-				);
-			}
-		},
-		[dispatch]
-	);
-
 	const editorRef = useRef<HTMLInputElement | null>(null);
 	const openEditMessageState = useSelector(selectOpenEditMessageState);
 
@@ -326,7 +290,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
-			addMemberToPrivateThread(currentChannel, mentionList, membersOfChild);
+			addMemberToThread(currentChannel, mentionList);
+
+			if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
+				dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined }));
+				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
+			}
 
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
@@ -394,6 +363,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				})
 			);
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			request,
 			mentionData,
@@ -406,11 +376,10 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			setSubPanelActive,
 			isPrivate,
 			mentionEveryone,
-			addMemberToPrivateThread,
+			addMemberToThread,
 			currentChannel,
 			mentions,
 			usersClan,
-			membersOfChild,
 			currentChannelId,
 			valueThread?.content.t,
 			valueThread?.mentions,

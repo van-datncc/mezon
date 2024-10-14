@@ -61,21 +61,30 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		[attachmentData?.url, onContextMenu, setImageURL, setPositionShow]
 	);
 
+	const loaderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 	useEffect(() => {
-		const loaderTimeout = setTimeout(() => {
+		loaderTimeoutRef.current = setTimeout(() => {
 			if (!imageLoaded) {
 				setShowLoader(true);
 				fadeIn.current = true;
 			}
 		}, 500);
 
-		return () => clearTimeout(loaderTimeout);
+		return () => {
+			if (loaderTimeoutRef.current) {
+				clearTimeout(loaderTimeoutRef.current);
+			}
+		};
 	}, [imageLoaded]);
 
 	return (
-		<div className="my-1" style={{ width: 150 * ((attachmentData?.width || 1) / (attachmentData?.height || 1)), height: 150 }}>
+		<div
+			className="my-1"
+			style={{ width: attachmentData?.width ? 150 * ((attachmentData?.width || 1) / (attachmentData?.height || 1)) : 'auto', height: 150 }}
+		>
 			<div style={{ height: 1, width: 1, opacity: 0 }}>.</div>
-			{showLoader && (
+			{showLoader && !imageLoaded && (
 				<div
 					role="status"
 					className="image-loading max-w-sm rounded shadow animate-pulse"
@@ -114,6 +123,9 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					src={attachmentData.url}
 					alt={'message'}
 					onLoad={() => {
+						if (loaderTimeoutRef.current) {
+							clearTimeout(loaderTimeoutRef.current);
+						}
 						setImageLoaded(true);
 						setShowLoader(false);
 					}}

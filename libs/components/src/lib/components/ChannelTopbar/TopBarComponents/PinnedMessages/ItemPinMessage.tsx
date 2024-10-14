@@ -4,8 +4,9 @@ import {
 	messagesActions,
 	pinMessageActions,
 	selectCurrentClanId,
-	selectMessageByMessageIdAndChannelId,
-	useAppDispatch
+	selectMessageByMessageId,
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -41,11 +42,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			);
 		}
 	};
-
-	const message = useSelector(
-		selectMessageByMessageIdAndChannelId({ messageId: pinMessage.message_id as string, channelId: pinMessage?.channel_id })
-	);
-
+	const message = useAppSelector((state) => selectMessageByMessageId(state, pinMessage?.channel_id, pinMessage?.message_id as string));
 	const messageContentObject = useMemo(() => {
 		try {
 			return JSON.parse(pinMessage.content || '{}');
@@ -68,7 +65,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			key={pinMessage.id}
 			className="relative flex flex-row justify-between dark:hover:bg-bgSecondaryHover dark:bg-bgPrimary hover:bg-bgLightModeThird bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden border dark:border-bgTertiary border-gray-300 group/item-pinMess"
 		>
-			<div className="flex items-start gap-2">
+			<div className="flex items-start gap-2 w-full">
 				<MemberProfile
 					isHideUserName={true}
 					avatar={priorityAvatar ? priorityAvatar : pinMessage.avatar || ''}
@@ -77,14 +74,20 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 					isHideIconStatus={true}
 					textColor="#fff"
 				/>
-				<div className="flex flex-col gap-1 text-left">
+				<div className="flex flex-col gap-1 text-left w-[85%]">
 					<div>
 						<span className="font-medium dark:text-textDarkTheme text-textLightTheme">
 							{namePriority ? namePriority : pinMessage.username || ''}
 						</span>
 					</div>
 					<div className="leading-6">
-						<MessageLine isEditted={false} content={messageContentObject} isJumMessageEnabled={false} isTokenClickAble={false} />
+						<MessageLine
+							isInPinMsg={true}
+							isEditted={false}
+							content={messageContentObject}
+							isJumMessageEnabled={false}
+							isTokenClickAble={false}
+						/>
 					</div>
 					{message?.attachments?.length ? <ListPinAttachment attachments={message?.attachments} /> : <></>}
 				</div>

@@ -172,7 +172,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
 			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
-			const isExistChannel = respChannel.payload.find((channel: { channel_id: string }) => channel.channel_id === channelId);
+			const isExistChannel = respChannel?.payload?.find?.((channel: { channel_id: string }) => channel.channel_id === channelId);
 			if (isExistChannel) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);

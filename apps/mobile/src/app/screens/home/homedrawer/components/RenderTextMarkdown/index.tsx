@@ -126,6 +126,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		mention: {
 			fontSize: size.medium,
+			fontWeight: '600',
 			color: colors.textLink,
 			backgroundColor: colors.midnightBlue,
 			lineHeight: size.s_20
@@ -298,28 +299,23 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 	fence: (node, children, parent, styles, inheritedStyles = {}) => {
 		// we trim new lines off the end of code blocks because the parser sends an extra one.
 		let { content } = node;
-		const sourceInfo = node?.sourceInfo;
-		if (typeof node.content === 'string' && node.content.charAt(node.content.length - 1) === '\n') {
-			content = node.content.substring(0, node.content.length - 1);
+		if (typeof content === 'string' && content.endsWith('\n')) {
+			content = content.slice(0, -1);
 		}
+		const sourceInfo = node?.sourceInfo;
+		let displayContent = content;
 
-		//Note: Handle lost text when ```
 		if (sourceInfo) {
-			const textContent = sourceInfo?.split?.(' ');
+			const textContent = sourceInfo.split?.(' ');
 			if (textContent[textContent.length - 1].includes(EDITED_FLAG)) {
 				textContent.pop();
 			}
-			content = '```' + textContent.join(' ');
-			return (
-				<Text key={node.key} style={{ color: Colors.tertiary }}>
-					{content}
-				</Text>
-			);
+			displayContent = '```' + textContent.join(' ') + '\n' + content;
 		}
 
 		return (
 			<Text key={node.key} style={[inheritedStyles, styles.fence]}>
-				{content}
+				{displayContent}
 			</Text>
 		);
 	}

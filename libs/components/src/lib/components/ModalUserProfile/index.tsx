@@ -159,7 +159,7 @@ const ModalUserProfile = ({
 				)}
 			</div>
 			<AvatarProfile
-				avatar={avatar || userById?.user?.avatar_url}
+				avatar={avatar || userById?.clan_avatar || userById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={displayCustomStatus}
@@ -202,7 +202,7 @@ const ModalUserProfile = ({
 							<input
 								type="text"
 								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] "
-								placeholder={`Message @${message?.clan_nick || message?.display_name || userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}`}
+								placeholder={`Message @${userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}`}
 								value={content}
 								onKeyPress={(e) => {
 									if (e.key === 'Enter') {

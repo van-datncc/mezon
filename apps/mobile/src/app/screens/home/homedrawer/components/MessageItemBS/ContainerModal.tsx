@@ -2,15 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChatReaction, useChatSending, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import {
-	giveCoffeeActions,
-	messagesActions,
-	selectChannelById,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectDmGroupCurrent,
-	useAppDispatch
-} from '@mezon/store';
+import { giveCoffeeActions, messagesActions, selectCurrentChannel, selectCurrentClanId, selectDmGroupCurrent, useAppDispatch } from '@mezon/store';
 import {
 	MessagesEntity,
 	appActions,
@@ -56,7 +48,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const parent = useSelector(selectChannelById(currentChannel?.parrent_id || ''));
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
 
 	const { sendMessage } = useChatSending({
@@ -421,7 +412,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
-			isHideThread && EMessageActionType.ForwardMessage,
 			(!isShowForwardAll() || isHideThread) && EMessageActionType.ForwardAllMessages,
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
@@ -493,7 +483,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
-			currentChannel?.parrent_id || '',
 			mode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (message?.clan_id ?? currentClanId),
 			message.channel_id ?? '',
 			messageId ?? '',
@@ -502,8 +491,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			1,
 			senderId ?? '',
 			false,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel?.channel_private : false,
-			parent ? !parent.channel_private : false
+			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel?.channel_private : false
 		);
 		onClose();
 	};

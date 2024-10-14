@@ -1,6 +1,16 @@
-import { selectAllChannelMembers, selectChannelById, useAppSelector } from '@mezon/store';
+import {
+	channelMetaActions,
+	ChannelsEntity,
+	channelUsersActions,
+	selectAllChannelMembers,
+	selectChannelById,
+	ThreadsEntity,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
+import { IMentionOnMessage, uniqueUsers } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export type useChannelMembersOptions = {
@@ -13,11 +23,58 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 	const membersOfChild = useAppSelector((state) => (channelId ? selectAllChannelMembers(state, channelId as string) : null));
 	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel.parrent_id as string) : null));
 
+	const dispatch = useAppDispatch();
+
+	const updateChannelUsers = async (currentChannel: ChannelsEntity | null, userIds: string[], clanId: string) => {
+		const timestamp = Date.now() / 1000;
+
+		const body = {
+			channelId: currentChannel?.channel_id as string,
+			channelType: currentChannel?.type,
+			userIds: userIds,
+			clanId: clanId
+		};
+
+		await dispatch(channelUsersActions.addChannelUsers(body));
+		dispatch(
+			channelMetaActions.updateBulkChannelMetadata([
+				{
+					id: currentChannel?.channel_id ?? '',
+					lastSeenTimestamp: timestamp,
+					lastSentTimestamp: timestamp,
+					lastSeenPinMessage: '',
+					clanId: currentChannel?.clan_id ?? ''
+				}
+			])
+		);
+	};
+
+	const addMemberToThread = useCallback(
+		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[]) => {
+			if (currentChannel?.parrent_id === '0') return;
+			const userIds = uniqueUsers(mentions, membersOfChild);
+			if (userIds.length > 0) {
+				await updateChannelUsers(currentChannel, userIds, currentChannel?.clan_id as string);
+			}
+		},
+		[dispatch]
+	);
+
+	const joinningToThread = useCallback(
+		async (targetThread: ThreadsEntity | null, user: string[]) => {
+			if (targetThread?.parrent_id === '0') return;
+			await updateChannelUsers(targetThread as ChannelsEntity, user, targetThread?.clan_id as string);
+		},
+		[dispatch]
+	);
+
 	return useMemo(
 		() => ({
 			membersOfParent: mode === ChannelStreamMode.STREAM_MODE_CHANNEL && channel?.parrent_id !== '0' ? membersOfParent : membersOfChild,
-			membersOfChild
+			membersOfChild,
+			addMemberToThread,
+			joinningToThread
 		}),
-		[membersOfChild, membersOfParent, mode, channel?.parrent_id]
+		[membersOfChild, membersOfParent, mode, channel?.parrent_id, addMemberToThread, joinningToThread]
 	);
 }

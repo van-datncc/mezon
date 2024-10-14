@@ -107,6 +107,8 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		[currentChannel, currentChannel?.parrent_id, currentClanId, dispatch]
 	);
 
+	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 	const handleSendMessageThread = useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -119,14 +121,14 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 				if (value?.nameValueThread) {
 					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
+						// sleep for waiting server check exist after insert
+						await sleep(10);
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
-								parentId: thread.parrent_id as string,
 								channelId: thread.channel_id as string,
 								channelType: thread.type as number,
-								isPublic: !thread.channel_private,
-								isParentPublic: currentChannel ? !currentChannel.channel_private : false
+								isPublic: false
 							})
 						);
 						save(STORAGE_CLAN_ID, currentClanId);

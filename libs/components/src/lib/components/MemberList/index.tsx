@@ -1,3 +1,4 @@
+import { useAuth } from '@mezon/core';
 import { ChannelMembersEntity, ChannelsEntity, selectAllChannelMembers, selectCloseMenu, selectCurrentChannel, useAppSelector } from '@mezon/store';
 import { memo } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,9 +14,10 @@ function MemberList() {
 const MemberListContent = memo(({ currentChannel }: { currentChannel: ChannelsEntity | null }) => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const members = useAppSelector((state) => selectAllChannelMembers(state, currentChannel?.id as string));
+	const { userProfile } = useAuth();
 	const onlineMembers = (members as ChannelMembersEntity[])
 		.filter((item) => {
-			return item.user?.online;
+			return item.user?.online || item.user?.id === userProfile?.user?.id;
 		})
 		.sort((a, b) => {
 			const nameA = a.clan_nick?.toLowerCase() || a.user?.display_name?.toLowerCase() || a.user?.username?.toLowerCase() || '';
@@ -26,7 +28,7 @@ const MemberListContent = memo(({ currentChannel }: { currentChannel: ChannelsEn
 
 	const offlineMembers = (members as ChannelMembersEntity[])
 		.filter((item) => {
-			return !item.user?.online;
+			return !item.user?.online && item.user?.id !== userProfile?.user?.id;
 		})
 		.sort((a, b) => {
 			const nameA = a.clan_nick?.toLowerCase() || a.user?.display_name?.toLowerCase() || a.user?.username?.toLowerCase() || '';

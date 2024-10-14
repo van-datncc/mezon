@@ -24,6 +24,7 @@ jobs:
       - name: Build
         run: |
           echo "Build"
+          mv apps/chat/.env.prod apps/chat/.env
           yarn build:chat
       - name: Compress build artifact
         run: |
