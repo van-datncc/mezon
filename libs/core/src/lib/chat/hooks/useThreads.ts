@@ -1,17 +1,12 @@
 import {
-	selectActiveThreads,
 	selectAllChannels,
-	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectIsPrivate,
 	selectIsShowCreateThread,
-	selectJoinedThreadsWithinLast30Days,
 	selectListThreadId,
 	selectMessageThreadError,
 	selectNameThreadError,
 	selectNameValueThread,
-	selectShowEmptyStatus,
-	selectThreadsOlderThan30Days,
 	selectValueThread,
 	threadsActions,
 	useAppDispatch
@@ -23,7 +18,6 @@ import { useSelector } from 'react-redux';
 export function useThreads() {
 	const dispatch = useAppDispatch();
 	const channels = useSelector(selectAllChannels);
-	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isPrivate = useSelector(selectIsPrivate);
 	const nameThreadError = useSelector(selectNameThreadError);
@@ -32,20 +26,6 @@ export function useThreads() {
 	const isShowCreateThread = useSelector(selectIsShowCreateThread(currentChannelId as string));
 	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
 	const valueThread = useSelector(selectValueThread);
-
-	/// new update
-	const isEmpty = useSelector(selectShowEmptyStatus());
-
-	const getActiveThreads = useSelector(selectActiveThreads);
-	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days);
-	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days);
-
-	const handleUpdateActiveCodeThread = useCallback(
-		(channelId: string, activeCode: number) => {
-			dispatch(threadsActions.updateActiveCodeThread({ channelId, activeCode }));
-		},
-		[dispatch]
-	);
 
 	const setTurnOffThreadMessage = useCallback(() => {
 		setOpenThreadMessageState(false);
@@ -88,12 +68,6 @@ export function useThreads() {
 
 	return useMemo(
 		() => ({
-			handleUpdateActiveCodeThread,
-			isEmpty,
-			getActiveThreads,
-			getJoinedThreadsWithinLast30Days,
-			getThreadsOlderThan30Days,
-
 			isShowCreateThread,
 			isPrivate,
 			nameThreadError,
@@ -108,12 +82,6 @@ export function useThreads() {
 			setTurnOffThreadMessage
 		}),
 		[
-			handleUpdateActiveCodeThread,
-			isEmpty,
-			getActiveThreads,
-			getJoinedThreadsWithinLast30Days,
-			getThreadsOlderThan30Days,
-
 			isPrivate,
 			isShowCreateThread,
 			messageThreadError,

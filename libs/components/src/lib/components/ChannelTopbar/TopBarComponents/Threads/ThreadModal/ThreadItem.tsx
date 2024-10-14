@@ -1,14 +1,14 @@
 import { useAppNavigation } from '@mezon/core';
 import {
 	ChannelsEntity,
+	ThreadsEntity,
 	selectAllChannelMembers,
 	selectLastMessageIdByChannelId,
 	selectMemberClanByUserId,
 	selectMessageEntityById,
-	ThreadsEntity,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelMembersEntity, convertTimeMessage, IChannelMember } from '@mezon/utils';
+import { ChannelMembersEntity, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -19,11 +19,9 @@ import ThreadModalContent from './ThreadModalContent';
 type ThreadItemProps = {
 	thread: ThreadsEntity;
 	setIsShowThread: () => void;
-	onClickToJoiningThread?: () => void;
-	isGroupPublic?: boolean;
 };
 
-const ThreadItem = ({ thread, setIsShowThread, onClickToJoiningThread, isGroupPublic = false }: ThreadItemProps) => {
+const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 
@@ -77,7 +75,7 @@ const ThreadItem = ({ thread, setIsShowThread, onClickToJoiningThread, isGroupPu
 
 	return (
 		<div
-			onClick={isGroupPublic ? onClickToJoiningThread : () => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
+			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
 			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 			role="button"
 		>

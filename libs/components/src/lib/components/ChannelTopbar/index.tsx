@@ -25,7 +25,7 @@ import { Icons } from '@mezon/ui';
 import { EPermission, IChannel } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -148,9 +148,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	}, []);
 
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = useMemo(() => {
-		return currentChannel?.parrent_id !== '0';
-	}, [currentChannel?.channel_id]);
+	const isThread = currentChannel?.parrent_id !== '0';
 
 	useEffect(() => {
 		const fetchThreads = async () => {

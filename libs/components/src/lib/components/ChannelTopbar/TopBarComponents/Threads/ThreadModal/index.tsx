@@ -1,19 +1,20 @@
+import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import {
-	useAppNavigation,
-	useAuth,
-	useChannelMembers,
-	useEscapeKeyClose,
-	useOnClickOutside,
-	usePermissionChecker,
-	useReference,
-	useThreads
-} from '@mezon/core';
-import { ThreadsEntity, searchMessagesActions, selectCurrentChannel, selectTheme, threadsActions, useAppDispatch } from '@mezon/store';
+	ThreadsEntity,
+	searchMessagesActions,
+	selectActiveThreads,
+	selectCurrentChannel,
+	selectJoinedThreadsWithinLast30Days,
+	selectShowEmptyStatus,
+	selectTheme,
+	selectThreadsOlderThan30Days,
+	threadsActions,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EOverriddenPermission, ThreadStatus } from '@mezon/utils';
+import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { ChannelStreamMode } from 'mezon-js';
-import { RefObject, useCallback, useRef } from 'react';
+import { RefObject, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -30,21 +31,18 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-	const {
-		handleUpdateActiveCodeThread,
-		isEmpty,
-		getActiveThreads,
-		getJoinedThreadsWithinLast30Days,
-		getThreadsOlderThan30Days,
-		setIsShowCreateThread
-	} = useThreads();
+	const { setIsShowCreateThread } = useThreads();
 
 	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const { joinningToThread } = useChannelMembers({ channelId: currentChannel?.channel_id, mode: ChannelStreamMode.STREAM_MODE_CHANNEL });
-	const { userId } = useAuth();
+
 	const appearanceTheme = useSelector(selectTheme);
 	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
+
+	const isEmpty = useSelector(selectShowEmptyStatus());
+	const getActiveThreads = useSelector(selectActiveThreads);
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days);
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days);
 
 	const handleCreateThread = () => {
 		setOpenThreadMessageState(false);
@@ -61,14 +59,6 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(modalRef, onClose, rootRef);
-
-	const handleJoinToThread = useCallback(
-		(thread: ThreadsEntity) => {
-			joinningToThread(thread, [userId ?? '']);
-			handleUpdateActiveCodeThread(thread.channel_id ?? '', ThreadStatus.joined);
-		},
-		[joinningToThread, userId]
-	);
 
 	return (
 		<div
@@ -125,13 +115,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 							}
 						>
 							{getActiveThreads.map((thread: ThreadsEntity) => (
-								<ThreadItem
-									isGroupPublic={true}
-									onClickToJoiningThread={() => handleJoinToThread(thread)}
-									thread={thread}
-									key={`${thread.id}-other-active-threads`}
-									setIsShowThread={onClose}
-								/>
+								<ThreadItem thread={thread} key={`${thread.id}-other-active-threads`} setIsShowThread={onClose} />
 							))}
 						</GroupThreads>
 					)}
