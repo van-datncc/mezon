@@ -5,9 +5,10 @@ import {
 	selectLastMessageIdByChannelId,
 	selectMemberClanByUserId,
 	selectMessageEntityById,
+	ThreadsEntity,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelMembersEntity, IChannelMember, convertTimeMessage } from '@mezon/utils';
+import { ChannelMembersEntity, convertTimeMessage, IChannelMember } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,7 +17,7 @@ import { useMessageSender } from '../../../../MessageWithUser/useMessageSender';
 import ThreadModalContent from './ThreadModalContent';
 
 type ThreadItemProps = {
-	thread: ChannelsEntity;
+	thread: ThreadsEntity;
 	setIsShowThread: () => void;
 	onClickToJoiningThread?: () => void;
 	isGroupPublic?: boolean;
@@ -89,7 +90,7 @@ const ThreadItem = ({ thread, setIsShowThread, onClickToJoiningThread, isGroupPu
 							{user?.user?.display_name ?? username}:&nbsp;
 						</span>
 						<div className="overflow-hidden max-w-[140px]">
-							<ThreadModalContent message={message} thread={thread} />
+							<ThreadModalContent message={message} thread={thread as ChannelsEntity} />
 						</div>
 						<div className="overflow-x-hidden">
 							<p className="text-xs font-medium leading-4 ml-2">

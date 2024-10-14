@@ -1,25 +1,27 @@
 import {
+	selectActiveThreads,
 	selectAllChannels,
-	selectAllThreads,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectIsPrivate,
 	selectIsShowCreateThread,
+	selectJoinedThreadsWithinLast3Days,
 	selectListThreadId,
 	selectMessageThreadError,
 	selectNameThreadError,
 	selectNameValueThread,
+	selectShowEmptyStatus,
+	selectThreadsOlderThan30Days,
 	selectValueThread,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
-import { IMessageWithUser, ThreadStatus, isGreaterOneMonth } from '@mezon/utils';
+import { IMessageWithUser } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export function useThreads() {
 	const dispatch = useAppDispatch();
-	// const threads = useSelector(selectAllThreads);
 	const channels = useSelector(selectAllChannels);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -31,7 +33,19 @@ export function useThreads() {
 	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
 	const valueThread = useSelector(selectValueThread);
 
-	const getAllThreads = useSelector(selectAllThreads);
+	/// new update
+	const isEmpty = useSelector(selectShowEmptyStatus());
+
+	const getActiveThreads = useSelector(selectActiveThreads);
+	const getJoinedThreadsWithinLast3Days = useSelector(selectJoinedThreadsWithinLast3Days);
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days);
+
+	const handleUpdateActiveCodeThread = useCallback(
+		(channelId: string, activeCode: number) => {
+			dispatch(threadsActions.updateActiveCodeThread({ channelId, activeCode }));
+		},
+		[dispatch]
+	);
 
 	const setTurnOffThreadMessage = useCallback(() => {
 		setOpenThreadMessageState(false);
@@ -66,44 +80,6 @@ export function useThreads() {
 		[dispatch]
 	);
 
-	const threadChannel = useMemo(() => {
-		const threads = channels.filter((channel) => {
-			if (currentChannel && currentChannel.parrent_id !== '0') {
-				return channel.parrent_id === currentChannel.parrent_id;
-			}
-			if (currentChannel && currentChannel.parrent_id === '0') {
-				return channel.parrent_id === currentChannelId;
-			}
-		});
-		return threads;
-	}, [channels, currentChannel, currentChannelId]);
-
-	const threadChannelOld = useMemo(() => {
-		return threadChannel.filter((thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp_seconds as number) > 30);
-	}, [threadChannel]);
-
-	const threadChannelOnline = useMemo(() => {
-		return threadChannel.filter(
-			(thread) => isGreaterOneMonth(thread.last_sent_message?.timestamp_seconds as number) <= 30 || !thread.last_sent_message
-		);
-	}, [threadChannel]);
-
-	/// new update
-	const publicThreadNotJoined = useMemo(
-		() => getAllThreads.filter((thread) => thread?.active === ThreadStatus.PublicThreadNotJoined),
-		[threadChannel]
-	);
-
-	const threadWithRecentMessage = useMemo(
-		() => getAllThreads.filter((thread) => thread?.active === ThreadStatus.JoinedWithRecentMessage),
-		[threadChannel]
-	);
-
-	const threadWithOldMessage = useMemo(
-		() => getAllThreads.filter((thread) => thread?.active === ThreadStatus.JoinedWithOldMessage),
-		[threadChannel]
-	);
-
 	const threadCurrentChannel = useMemo(() => {
 		if (listThreadId && currentChannelId) {
 			return channels.find((channel) => channel.channel_id === listThreadId[currentChannelId]);
@@ -112,18 +88,16 @@ export function useThreads() {
 
 	return useMemo(
 		() => ({
-			getAllThreads,
-			publicThreadNotJoined,
-			threadWithRecentMessage,
-			threadWithOldMessage,
-			// threads,
-			threadChannel,
+			handleUpdateActiveCodeThread,
+			isEmpty,
+			getActiveThreads,
+			getJoinedThreadsWithinLast3Days,
+			getThreadsOlderThan30Days,
+
 			isShowCreateThread,
 			isPrivate,
 			nameThreadError,
 			messageThreadError,
-			threadChannelOld,
-			threadChannelOnline,
 			threadCurrentChannel,
 			nameValueThread,
 			valueThread,
@@ -134,20 +108,18 @@ export function useThreads() {
 			setTurnOffThreadMessage
 		}),
 		[
-			getAllThreads,
-			publicThreadNotJoined,
-			threadWithRecentMessage,
-			threadWithOldMessage,
+			handleUpdateActiveCodeThread,
+			isEmpty,
+			getActiveThreads,
+			getJoinedThreadsWithinLast3Days,
+			getThreadsOlderThan30Days,
+
 			isPrivate,
 			isShowCreateThread,
 			messageThreadError,
 			nameThreadError,
 			nameValueThread,
-			threadChannel,
-			threadChannelOld,
-			threadChannelOnline,
 			threadCurrentChannel,
-			// threads,
 			valueThread,
 			setNameValueThread,
 			setIsShowCreateThread,
