@@ -631,11 +631,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						last_seen_message: { timestamp_seconds: 0 },
 						last_sent_message: { timestamp_seconds: now }
 					};
+
 					const isPublic = channelCreated
 						? channelCreated.parrent_id !== '' && channelCreated.parrent_id !== '0'
 							? false
 							: !channelCreated.channel_private
 						: false;
+
 					dispatch(
 						channelsActions.joinChat({
 							clanId: channelCreated.clan_id,
