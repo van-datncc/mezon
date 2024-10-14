@@ -20,6 +20,7 @@ jobs:
 
       - name: Change prod environment
         run: |
+          rm -rf apps/chat/.env
           mv apps/chat/.env.prod apps/chat/.env
 
       - name: Release Desktop
