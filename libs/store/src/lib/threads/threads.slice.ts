@@ -57,7 +57,7 @@ export interface FetchThreadsArgs {
 
 const fetchThreadsCached = memoizee(
 	async (mezon: MezonValueContext, channelId: string, clanId: string, threadId?: string) => {
-		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 50, undefined, clanId, threadId);
+		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 50, 0, clanId, threadId);
 		return { ...response, time: Date.now() };
 	},
 	{

@@ -393,7 +393,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_DM || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 					dispatch(fetchDirectMessage({ noCache: true }));
 					dispatch(
-						fetchMessages({ clanId: userAdds.clan_id, channelId: userAdds?.channel_id, noCache: false, isFetchingLatestMessages: false })
+						fetchMessages({ clanId: userAdds.clan_id, channelId: userAdds?.channel_id, noCache: true, isFetchingLatestMessages: false })
 					);
 				}
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
