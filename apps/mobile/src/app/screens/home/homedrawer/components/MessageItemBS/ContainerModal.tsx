@@ -412,7 +412,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
-			isHideThread && EMessageActionType.ForwardMessage,
 			(!isShowForwardAll() || isHideThread) && EMessageActionType.ForwardAllMessages,
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
