@@ -34,7 +34,7 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
 				userIds: userIds,
-				clanId: channel.clan_id as string
+				clanId: channel?.clan_id as string
 			};
 			if (userIds.length > 0) {
 				await dispatch(channelUsersActions.addChannelUsers(body));
