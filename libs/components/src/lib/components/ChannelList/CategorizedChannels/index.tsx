@@ -13,6 +13,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -131,6 +132,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	};
 
 	const isUnreadChannel = (channelId: string) => {
+		console.log(allChannelMetaEntities[channelId], ' ', channelId);
 		return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
 	};
 
@@ -200,7 +202,12 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 			<div className="mt-[5px] space-y-0.5 text-contentTertiary">
 				{category?.channels
 					?.filter((channel: IChannel) => {
-						return categoryExpandState || isUnreadChannel(channel.id) || channel.id === ctrlKSelectedChannelId;
+						return (
+							categoryExpandState ||
+							isUnreadChannel(channel.id) ||
+							channel.id === ctrlKSelectedChannelId ||
+							channel.type === ChannelType.CHANNEL_TYPE_VOICE
+						);
 					})
 					.map((channel: IChannel) => {
 						return (

@@ -1,6 +1,13 @@
-import { channelSettingActions, selectAllChannelSuggestion, selectCurrentClanId, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
+import {
+	channelSettingActions,
+	selectAllChannelSuggestion,
+	selectCurrentClanId,
+	selectMemberClanByGoogleId,
+	selectMemberClanByUserId,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum } from '@mezon/utils';
+import { ChannelStatusEnum, getAvatarForPrioritize } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Avatar, Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef } from 'react';
@@ -150,7 +157,12 @@ const ItemInfor = ({
 };
 export default ListChannelSetting;
 
-const AvatarUser = ({ id }: { id: string }) => {
-	const member = useSelector(selectMemberClanByUserId(id));
-	return <Avatar img={member?.clan_avatar || member?.user?.avatar_url} rounded size="xs" />;
+export const AvatarUser = ({ id }: { id: string }) => {
+	const userClan = useSelector(selectMemberClanByUserId(id));
+	const voiceClan = useSelector(selectMemberClanByGoogleId(id ?? ''));
+	const clanAvatar = voiceClan?.clan_avatar || userClan?.clan_avatar;
+	const userAvatar = voiceClan?.user?.avatar_url || userClan?.user?.avatar_url;
+	const avatarUrl = getAvatarForPrioritize(clanAvatar, userAvatar);
+
+	return <Avatar img={avatarUrl} rounded size="xs" />;
 };
