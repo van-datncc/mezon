@@ -284,14 +284,15 @@ export const selectActiveThreads = createSelector([selectAllThreads], (threads) 
 	return threads.filter((thread) => thread.active === ThreadStatus.activePublic);
 });
 
-export const selectJoinedThreadsWithinLast3Days = createSelector([selectAllThreads], (threads) => {
-	const threeDaysInSeconds = 3 * 24 * 60 * 60;
+export const selectJoinedThreadsWithinLast30Days = createSelector([selectAllThreads], (threads) => {
+	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
 	const currentTime = Math.floor(Date.now() / 1000);
+
 	return threads.reduce((accumulator, thread) => {
 		if (
 			thread.active === ThreadStatus.joined &&
-			thread.update_time_seconds &&
-			currentTime - Number(thread.update_time_seconds) < threeDaysInSeconds
+			thread.last_sent_message?.timestamp_seconds &&
+			currentTime - Number(thread.last_sent_message.timestamp_seconds) < thirtyDaysInSeconds
 		) {
 			accumulator.push(thread);
 		}
@@ -303,7 +304,7 @@ export const selectThreadsOlderThan30Days = createSelector([selectAllThreads], (
 	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
 	const currentTime = Math.floor(Date.now() / 1000);
 	return threads.reduce((accumulator, thread) => {
-		if (thread.update_time_seconds && currentTime - Number(thread.update_time_seconds) > thirtyDaysInSeconds) {
+		if (thread.last_sent_message?.timestamp_seconds && currentTime - Number(thread.last_sent_message?.timestamp_seconds) > thirtyDaysInSeconds) {
 			accumulator.push(thread);
 		}
 		return accumulator;

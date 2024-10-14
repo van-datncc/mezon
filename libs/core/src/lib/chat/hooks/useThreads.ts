@@ -5,7 +5,7 @@ import {
 	selectCurrentChannelId,
 	selectIsPrivate,
 	selectIsShowCreateThread,
-	selectJoinedThreadsWithinLast3Days,
+	selectJoinedThreadsWithinLast30Days,
 	selectListThreadId,
 	selectMessageThreadError,
 	selectNameThreadError,
@@ -37,7 +37,7 @@ export function useThreads() {
 	const isEmpty = useSelector(selectShowEmptyStatus());
 
 	const getActiveThreads = useSelector(selectActiveThreads);
-	const getJoinedThreadsWithinLast3Days = useSelector(selectJoinedThreadsWithinLast3Days);
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days);
 	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days);
 
 	const handleUpdateActiveCodeThread = useCallback(
@@ -91,7 +91,7 @@ export function useThreads() {
 			handleUpdateActiveCodeThread,
 			isEmpty,
 			getActiveThreads,
-			getJoinedThreadsWithinLast3Days,
+			getJoinedThreadsWithinLast30Days,
 			getThreadsOlderThan30Days,
 
 			isShowCreateThread,
@@ -111,7 +111,7 @@ export function useThreads() {
 			handleUpdateActiveCodeThread,
 			isEmpty,
 			getActiveThreads,
-			getJoinedThreadsWithinLast3Days,
+			getJoinedThreadsWithinLast30Days,
 			getThreadsOlderThan30Days,
 
 			isPrivate,

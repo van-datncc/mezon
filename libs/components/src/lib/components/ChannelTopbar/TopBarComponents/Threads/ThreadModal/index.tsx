@@ -34,7 +34,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 		handleUpdateActiveCodeThread,
 		isEmpty,
 		getActiveThreads,
-		getJoinedThreadsWithinLast3Days,
+		getJoinedThreadsWithinLast30Days,
 		getThreadsOlderThan30Days,
 		setIsShowCreateThread
 	} = useThreads();
@@ -102,15 +102,15 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 					className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 				>
 					{/* Joined threads */}
-					{getJoinedThreadsWithinLast3Days.length > 0 && (
+					{getJoinedThreadsWithinLast30Days.length > 0 && (
 						<GroupThreads
 							title={
-								getJoinedThreadsWithinLast3Days.length > 1
-									? `${getJoinedThreadsWithinLast3Days.length} joined threads`
-									: `${getJoinedThreadsWithinLast3Days.length} joined thread`
+								getJoinedThreadsWithinLast30Days.length > 1
+									? `${getJoinedThreadsWithinLast30Days.length} joined threads`
+									: `${getJoinedThreadsWithinLast30Days.length} joined thread`
 							}
 						>
-							{getJoinedThreadsWithinLast3Days.map((thread: ThreadsEntity) => (
+							{getJoinedThreadsWithinLast30Days.map((thread: ThreadsEntity) => (
 								<ThreadItem thread={thread} key={`${thread.id}-joined-threads`} setIsShowThread={onClose} />
 							))}
 						</GroupThreads>
@@ -140,12 +140,12 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 						<GroupThreads
 							title={
 								getThreadsOlderThan30Days.length > 1
-									? `${getThreadsOlderThan30Days.length} order threads`
-									: `${getThreadsOlderThan30Days.length} order thread`
+									? `${getThreadsOlderThan30Days.length} older threads`
+									: `${getThreadsOlderThan30Days.length} older thread`
 							}
 						>
 							{getThreadsOlderThan30Days.map((thread: ThreadsEntity) => (
-								<ThreadItem thread={thread} key={`${thread.id}-order-threads`} setIsShowThread={onClose} />
+								<ThreadItem thread={thread} key={`${thread.id}-older-threads`} setIsShowThread={onClose} />
 							))}
 						</GroupThreads>
 					)}
