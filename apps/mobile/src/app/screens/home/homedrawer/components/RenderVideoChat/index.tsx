@@ -1,6 +1,6 @@
 import { Block, Colors, Metrics, size } from '@mezon/mobile-ui';
-import { Video as ExpoVideo, ResizeMode } from 'expo-av';
-import React, { useState } from 'react';
+import { Audio, Video as ExpoVideo, ResizeMode } from 'expo-av';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 
 const widthMedia = Metrics.screenWidth - 150;
@@ -8,7 +8,9 @@ const widthMedia = Metrics.screenWidth - 150;
 export const RenderVideoChat = React.memo(
 	({ videoURL }: { videoURL: string }) => {
 		const [videoDimensions, setVideoDimensions] = useState({ width: widthMedia + size.s_50, height: 160, isLoading: true });
-
+		useEffect(() => {
+			Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+		}, []);
 		if (!videoURL) return null;
 		const isUploading = !videoURL?.includes('http');
 
@@ -34,8 +36,8 @@ export const RenderVideoChat = React.memo(
 					removeClippedSubviews
 					shouldRasterizeIOS
 					style={{
-						width: videoDimensions.width,
-						height: videoDimensions.height,
+						width: Math.max(videoDimensions.width, Metrics.screenWidth - size.s_60 * 2),
+						height: Math.max(videoDimensions.height, size.s_100 * 2.5),
 						borderRadius: size.s_4,
 						overflow: 'hidden',
 						backgroundColor: Colors.borderDim
@@ -48,8 +50,8 @@ export const RenderVideoChat = React.memo(
 						left={0}
 						right={0}
 						bottom={15}
-						width={videoDimensions.width}
-						height={videoDimensions.height}
+						width={Math.max(videoDimensions.width, Metrics.screenWidth - size.s_60 * 2)}
+						height={Math.max(videoDimensions.height, size.s_100 * 2.5)}
 						alignItems="center"
 						justifyContent="center"
 					>

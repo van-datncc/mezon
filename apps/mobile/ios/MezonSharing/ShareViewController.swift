@@ -98,35 +98,65 @@ class ShareViewController: SLComposeServiceViewController {
    }
  }
 
- private func handleImages (content: NSExtensionItem, attachment: NSItemProvider, index: Int) {
-   attachment.loadItem(forTypeIdentifier: imageContentType, options: nil) { [weak self] data, error in
+    private func handleImages (content: NSExtensionItem, attachment: NSItemProvider, index: Int) {
 
-     if error == nil, let url = data as? URL, let this = self {
-       //  this.redirectToHostApp(type: .media)
-       // Always copy
-       let fileExtension = this.getExtension(from: url, type: .video)
-       let newName = UUID().uuidString
-       let newPath = FileManager.default
-         .containerURL(forSecurityApplicationGroupIdentifier: "group.\(this.hostAppBundleIdentifier)")!
-         .appendingPathComponent("\(newName).\(fileExtension)")
-       let copied = this.copyFile(at: url, to: newPath)
-       if(copied) {
-         this.sharedMedia.append(SharedMediaFile(path: newPath.absoluteString, thumbnail: nil, duration: nil, type: .image))
+
+       attachment.loadItem(forTypeIdentifier: imageContentType, options: nil) { [weak self] data, error in
+         
+         if error == nil, let this = self {
+
+     
+           var url: URL? = nil
+
+
+           if let dataURL = data as? URL { url = dataURL }
+           else if let imageData = data as? UIImage { url = this.saveScreenshot(imageData) }
+
+           let fileExtension = this.getExtension(from: url!, type: .image)
+           let newName = UUID().uuidString
+           let newPath = FileManager.default
+             .containerURL(forSecurityApplicationGroupIdentifier: "group.\(this.hostAppBundleIdentifier)")!
+             .appendingPathComponent("\(newName).\(fileExtension)")
+           let copied = this.copyFile(at: url!, to: newPath)
+
+           if(copied) {
+             this.sharedMedia.append(SharedMediaFile(path: newPath.absoluteString, thumbnail: nil, duration: nil, type: .image))
+           }
+           
+           // If this is the last item, save imagesData in userDefaults and redirect to host app
+           if index == (content.attachments?.count)! - 1 {
+             let userDefaults = UserDefaults(suiteName: "group.\(this.hostAppBundleIdentifier)")
+             userDefaults?.set(this.toData(data: this.sharedMedia), forKey: this.sharedKey)
+             userDefaults?.synchronize()
+             this.redirectToHostApp(type: .media)
+           }
+           
+         } else {
+           self?.dismissWithError()
+         }
        }
-
-       // If this is the last item, save imagesData in userDefaults and redirect to host app
-       if index == (content.attachments?.count)! - 1 {
-         let userDefaults = UserDefaults(suiteName: "group.\(this.hostAppBundleIdentifier)")
-         userDefaults?.set(this.toData(data: this.sharedMedia), forKey: this.sharedKey)
-         userDefaults?.synchronize()
-         this.redirectToHostApp(type: .media)
-       }
-
-     } else {
-       self?.dismissWithError()
      }
-   }
- }
+     
+
+      private func documentDirectoryPath () -> URL?  {
+        
+        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return path.first
+      }
+
+  private func saveScreenshot(_ image: UIImage) -> URL?
+      {
+        var screenshotURL: URL? = nil
+        if
+        let screenshotData = image.pngData(),
+        let screenshotPath = documentDirectoryPath()?.appendingPathComponent("Screenshot.png")
+        {
+       try? screenshotData.write(to: screenshotPath)
+       screenshotURL = screenshotPath
+        }
+        return screenshotURL
+    }
+
 
  private func handleVideos (content: NSExtensionItem, attachment: NSItemProvider, index: Int) {
    attachment.loadItem(forTypeIdentifier: videoContentType, options:nil) { [weak self] data, error in
