@@ -65,7 +65,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const [isShowPanelCategory, setIsShowPanelCategory] = useState<boolean>(false);
 	const [showModal, setShowModal] = useState(false);
 	const [isShowCategorySetting, setIsShowCategorySetting] = useState<boolean>(false);
-	const [isShowAllCategoryChannels, setIsShowAllCategoryChannels] = useState<boolean>(true);
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const { handleDeleteCategory } = useCategory();
 	const dispatch = useAppDispatch();
