@@ -79,7 +79,10 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	}, [imageLoaded]);
 
 	return (
-		<div className="my-1" style={{ width: 150 * ((attachmentData?.width || 1) / (attachmentData?.height || 1)), height: 150 }}>
+		<div
+			className="my-1"
+			style={{ width: attachmentData?.width ? 150 * ((attachmentData?.width || 1) / (attachmentData?.height || 1)) : 'auto', height: 150 }}
+		>
 			<div style={{ height: 1, width: 1, opacity: 0 }}>.</div>
 			{showLoader && !imageLoaded && (
 				<div
