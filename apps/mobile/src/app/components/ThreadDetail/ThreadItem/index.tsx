@@ -2,15 +2,15 @@ import { AngleRightIcon, getUpdateOrAddClanChannelCache, save, STORAGE_DATA_CLAN
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
-	ChannelsEntity,
 	getStoreAsync,
 	MessagesEntity,
 	selectLastMessageIdByChannelId,
 	selectMemberClanByUserId,
 	selectMessageEntityById,
+	ThreadsEntity,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { convertTimeMessage, IChannel, IChannelMember } from '@mezon/utils';
+import { convertTimeMessage, IChannelMember } from '@mezon/utils';
 import { DrawerActions, NavigationProp, useNavigation } from '@react-navigation/native';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -21,7 +21,7 @@ import { APP_SCREEN, AppStackParamList } from '../../../navigation/ScreenTypes';
 import { style } from './ThreadItem.style';
 
 interface IThreadItemProps {
-	thread: ChannelsEntity;
+	thread: ThreadsEntity;
 }
 const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const { themeValue } = useTheme();
@@ -35,7 +35,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 	const isTabletLandscape = useTabletLandscape();
 
 	const { username } = useMessageSender(user);
-	const handleNavigateThread = async (thread?: IChannel) => {
+	const handleNavigateThread = async (thread?: ThreadsEntity) => {
 		const clanId = thread?.clan_id;
 		const store = await getStoreAsync();
 		if (isTabletLandscape) {
