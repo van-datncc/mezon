@@ -17,6 +17,7 @@ import { notificationSettingActions } from '../notificationSetting/notificationS
 import { pinMessageActions } from '../pinMessages/pinMessage.slice';
 import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
+import { RootState } from '../store';
 import { threadsActions } from '../threads/threads.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
 import { ChannelMetaEntity, channelMetaActions, enableMute } from './channelmeta.slice';
@@ -310,6 +311,24 @@ export const fetchChannels = createAsyncThunk(
 			const lastChannelMessagesTruthy = lastChannelMessages.filter((message) => message);
 
 			thunkAPI.dispatch(messagesActions.setManyLastMessages(lastChannelMessagesTruthy as ApiChannelMessageHeaderWithChannel[]));
+		}
+
+		const state = thunkAPI.getState() as RootState;
+		const currentChannelId = state.channels?.currentChannelId;
+		// insert current private thread
+		if (currentChannelId && !response?.channeldesc?.some((item) => item.channel_id === currentChannelId)) {
+			const data = await thunkAPI
+				.dispatch(
+					threadsActions.fetchThread({
+						channelId: '0',
+						clanId,
+						threadId: currentChannelId
+					})
+				)
+				.unwrap();
+			if (data?.length > 0) {
+				response.channeldesc.push(data[0] as ChannelsEntity);
+			}
 		}
 
 		const channels = response.channeldesc.map((channel) => ({

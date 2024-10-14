@@ -229,7 +229,7 @@ function MessageWithUser({
 						message={message}
 						mode={mode}
 						positionType={''}
-						avatar={userClanAvatar}
+						avatar={shortUserId === senderId ? userClanAvatar : undefined}
 						name={userClanNickname || userDisplayName || username}
 						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
