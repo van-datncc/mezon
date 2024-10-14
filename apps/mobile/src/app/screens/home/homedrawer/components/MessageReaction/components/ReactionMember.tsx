@@ -42,8 +42,10 @@ export const ReactionMember = React.memo((props: IReactionMemberProps) => {
 					</View>
 				)}
 			</View>
-			<Text style={styles.memberName}>{reactionMember?.user?.display_name}</Text>
-			{reactionMember?.user?.username ? <Text style={styles.mentionText}>@{reactionMember?.user?.username}</Text> : null}
+			<Text style={styles.memberName}>{reactionMember?.user?.display_name || reactionMember?.user?.username}</Text>
+			{reactionMember?.user?.display_name || reactionMember?.user?.username ? (
+				<Text style={styles.mentionText}>@{reactionMember?.user?.display_name || reactionMember?.user?.username}</Text>
+			) : null}
 		</TouchableOpacity>
 	);
 });

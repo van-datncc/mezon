@@ -134,8 +134,8 @@ const MessageItem = React.memo(
 		const backgroundColor = React.useRef(new Animated.Value(0)).current;
 
 		const isMessageReplyDeleted = useMemo(() => {
-			return !messageReferences && message?.references && message?.references?.length;
-		}, [messageReferences, message.references]);
+			return message?.references?.length && !message.references?.[0]?.message_ref_id;
+		}, [message?.references]);
 
 		const isDM = useMemo(() => {
 			return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
