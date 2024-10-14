@@ -620,7 +620,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(
 		(channelCreated: ChannelCreatedEvent) => {
-			if (channelCreated && channelCreated.channel_private === 0) {
+			if (channelCreated && channelCreated.channel_private === 0 && (channelCreated.parrent_id === '' || channelCreated.parrent_id === '0')) {
 				dispatch(channelsActions.createChannelSocket(channelCreated));
 				dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 
@@ -632,12 +632,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						last_sent_message: { timestamp_seconds: now }
 					};
 
-					const isPublic = channelCreated
-						? channelCreated.parrent_id !== '' && channelCreated.parrent_id !== '0'
-							? false
-							: !channelCreated.channel_private
-						: false;
-
+					const isPublic = channelCreated.parrent_id !== '' && channelCreated.parrent_id !== '0' ? false : !channelCreated.channel_private;
 					dispatch(
 						channelsActions.joinChat({
 							clanId: channelCreated.clan_id,
