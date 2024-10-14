@@ -155,7 +155,7 @@ export const CreateNewChannelModal = () => {
 				className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 			>
 				<div
-					className={`z-60 w-full h-full sm:w-4/5 ${isAppChannel ? 'sm:max-h-[700px]' : 'sm:max-h-[570px]'}  md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative shadow-lg`}
+					className={`z-60 w-full h-full sm:w-4/5 ${isAppChannel ? 'sm:max-h-[730px]' : 'sm:max-h-[600px]'}  md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative shadow-lg`}
 				>
 					<div className="self-stretch md:h-96 flex-col justify-start items-start flex">
 						<div className="self-stretch md:h-96 px-5 pt-8 flex-col justify-start items-start gap-3 flex">
@@ -178,7 +178,7 @@ export const CreateNewChannelModal = () => {
 							</div>
 							<div className="Frame407 self-stretch flex-col items-center gap-2 flex">
 								<ChannelLableModal labelProp="Choose channel's type:" />
-								<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex max-h-[200px] overflow-y-scroll max-xl:h-auto hide-scrollbar">
+								<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex h-fit overflow-y-scroll max-xl:h-auto hide-scrollbar">
 									<ChannelTypeComponent type={ChannelType.CHANNEL_TYPE_TEXT} onChange={onChangeChannelType} error={isErrorType} />
 									<ChannelTypeComponent
 										disable={false}
