@@ -16,6 +16,7 @@ type MessageLineProps = {
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
 	isEditted: boolean;
+	isInPinMsg?: boolean;
 };
 
 const MessageLineComponent = ({
@@ -27,7 +28,8 @@ const MessageLineComponent = ({
 	isSearchMessage,
 	isTokenClickAble,
 	isHideLinkOneImage,
-	isEditted
+	isEditted,
+	isInPinMsg
 }: MessageLineProps) => {
 	const allChannels = useSelector(selectChannelsEntities);
 	const allChannelVoice = Object.values(allChannels).flat();
@@ -52,6 +54,7 @@ const MessageLineComponent = ({
 				allChannelVoice={allChannelVoice}
 				isSearchMessage={isSearchMessage}
 				isEditted={isEditted}
+				isInPinMsg={isInPinMsg}
 			/>
 		</div>
 	);
@@ -70,6 +73,7 @@ interface RenderContentProps {
 	isJumMessageEnabled: boolean;
 	parentWidth?: number;
 	isEditted: boolean;
+	isInPinMsg?: boolean;
 }
 
 interface ElementToken {
@@ -94,7 +98,8 @@ const RenderContent = memo(
 		isOnlyContainEmoji,
 		isTokenClickAble,
 		isHideLinkOneImage,
-		isEditted
+		isEditted,
+		isInPinMsg
 	}: RenderContentProps) => {
 		const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [] } = data;
 		const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
@@ -246,6 +251,7 @@ const RenderContent = memo(
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`markdown-${index}-${s}-${contentInElement}`}
 							content={content}
+							isInPinMsg={isInPinMsg}
 						/>
 					);
 				}

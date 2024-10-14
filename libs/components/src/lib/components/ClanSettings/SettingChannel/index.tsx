@@ -1,45 +1,24 @@
-import { channelSettingActions, selectAllChannelSuggestion, selectCurrentClanId, selectMemberClanByUserId, useAppDispatch } from '@mezon/store';
+import { selectMemberClanByGoogleId, selectMemberClanByUserId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum } from '@mezon/utils';
+import { getAvatarForPrioritize } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Avatar, AvatarSizes, Tooltip } from 'flowbite-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ApiChannelSettingItem } from 'mezon-js/api.gen';
+import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ChannelSettingInforItem from './InforChannelSetting';
 
 type ListChannelSettingProp = {
-	privateFilter?: boolean;
-	publicFilter?: boolean;
-	searchFilter: string;
+	listChannel: ApiChannelSettingItem[];
 };
 
-const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListChannelSettingProp) => {
-	const dispatch = useAppDispatch();
-	const selectClanId = useSelector(selectCurrentClanId);
-	const listChannel = useSelector(selectAllChannelSuggestion);
+const ListChannelSetting = ({ listChannel }: ListChannelSettingProp) => {
 	const [channelSettingId, setChannelSettingId] = useState('');
-	useEffect(() => {
-		async function fetchListChannel() {
-			await dispatch(channelSettingActions.fetchChannelByUserId({ clanId: selectClanId as string }));
-		}
-		fetchListChannel();
-	}, []);
 	const parentRef = useRef(null);
-	const listChannelSetting = useMemo(() => {
-		return listChannel.filter((channel) => {
-			if (privateFilter && channel.channel_private !== ChannelStatusEnum.isPrivate) {
-				return false;
-			}
-			if (!channel.channel_label?.includes(searchFilter)) {
-				return false;
-			}
-			return true;
-		});
-	}, [privateFilter, searchFilter, listChannel.length]);
 
 	const rowVirtualizer = useVirtualizer({
-		count: listChannelSetting.length,
+		count: listChannel.length,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 56,
 		overscan: 5
@@ -69,8 +48,8 @@ const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListC
 						position: 'relative'
 					}}
 				>
-					{rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
-						const channel = listChannelSetting[virtualRow.index];
+					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+						const channel = listChannel[virtualRow.index];
 						return (
 							<div
 								key={virtualRow.key}
@@ -85,11 +64,11 @@ const ListChannelSetting = ({ privateFilter, publicFilter, searchFilter }: ListC
 							>
 								<ItemInfor
 									creatorId={channel.creator_id as string}
-									label={channel.channel_label as string}
+									label={channel?.channel_label as string}
 									privateChannel={channel.channel_private as number}
-									isThread={channel.parent_id !== '0'}
+									isThread={channel?.parent_id !== '0'}
 									key={channel.id}
-									userIds={channel.user_ids || []}
+									userIds={channel?.user_ids || []}
 									onClick={handleChooseChannelSetting}
 									channelId={channel.id as string}
 								/>
@@ -197,13 +176,18 @@ const ItemInfor = ({
 export default ListChannelSetting;
 export const AvatarUserShort = ({ id, hiddenTooltip = false, size = 'xs' }: { id: string; hiddenTooltip?: boolean; size?: keyof AvatarSizes }) => {
 	const member = useSelector(selectMemberClanByUserId(id));
+	const voiceClan = useSelector(selectMemberClanByGoogleId(id ?? ''));
+	const clanAvatar = voiceClan?.clan_avatar || member?.clan_avatar;
+	const userAvatar = voiceClan?.user?.avatar_url || member?.user?.avatar_url;
+	const avatarUrl = getAvatarForPrioritize(clanAvatar, userAvatar);
+
 	return (
 		<>
 			{hiddenTooltip ? (
-				<Avatar img={member?.clan_avatar || member?.user?.avatar_url} rounded size={size} />
+				<Avatar img={avatarUrl} rounded size={size} />
 			) : (
-				<Tooltip content={member.clan_nick || member.user?.display_name || member.user?.username} hidden={hiddenTooltip} trigger="hover">
-					<Avatar img={member?.clan_avatar || member?.user?.avatar_url} rounded size={size} />
+				<Tooltip content={member?.clan_nick || member?.user?.display_name || member?.user?.username} hidden={hiddenTooltip} trigger="hover">
+					<Avatar img={avatarUrl} rounded size={size} />
 				</Tooltip>
 			)}
 		</>
