@@ -83,14 +83,21 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 	};
 
 	const debouncedSetCategoryName = useDebouncedCallback(async (value: string) => {
-		if (value.trim() === userClansProfile?.nick_name || value.trim() == '') {
+		if (value === userClansProfile?.nick_name) {
 			setCheckValidate(false);
+			setFlagOption(false);
+			return;
+		}
+
+		if (value == '') {
+			setCheckValidate(false);
+			setFlagOption(true);
 			return;
 		}
 
 		await dispatch(
 			checkDuplicateClanNickName({
-				clanNickName: value.trim(),
+				clanNickName: value,
 				clanId: clanId ?? ''
 			})
 		)
@@ -98,16 +105,17 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 			.then((result) => {
 				if (result) {
 					setCheckValidate(true);
+					setFlagOption(false);
 					return;
 				}
 				setCheckValidate(false);
+				setFlagOption(true);
 			});
 	}, 300);
 
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value.trim();
 		setDisplayName(value);
-		setFlagOption(value !== userClansProfile?.nick_name);
 		debouncedSetCategoryName(value);
 	};
 
