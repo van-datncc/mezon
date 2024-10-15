@@ -140,6 +140,7 @@ const ModalUserProfile = ({
 	const profileRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(rootRef || profileRef, onClose);
 	useOnClickOutside(rootRef || profileRef, onClose);
+	console.log('userById: ', userById, avatar);
 
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
@@ -159,7 +160,7 @@ const ModalUserProfile = ({
 				)}
 			</div>
 			<AvatarProfile
-				avatar={avatar || userById?.clan_avatar || userById?.user?.avatar_url}
+				avatar={avatar || userById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={displayCustomStatus}
@@ -181,7 +182,9 @@ const ModalUserProfile = ({
 									? userById?.user?.username
 									: checkAnonymous
 										? 'Anonymous'
-										: message?.username}
+										: userID === message?.sender_id
+											? message?.username
+											: message?.references?.[0].message_sender_username}
 						</p>
 					</div>
 
@@ -202,11 +205,16 @@ const ModalUserProfile = ({
 							<input
 								type="text"
 								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] "
-								placeholder={`Message @${userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}`}
+								placeholder={`Message @${userById?.clan_nick || userById?.user?.display_name || userById?.user?.username || userID === message?.sender_id ? message?.display_name || message?.username : message?.references?.[0].message_sender_display_name || message?.references?.[0].message_sender_username}`}
 								value={content}
 								onKeyPress={(e) => {
 									if (e.key === 'Enter') {
-										sendMessage(message?.sender_id || userById?.user?.id || '');
+										sendMessage(
+											userID ||
+												userById?.user?.id ||
+												(userID === message?.sender_id ? message?.sender_id : message?.references?.[0].message_sender_id) ||
+												''
+										);
 									}
 								}}
 								onChange={handleContent}

@@ -52,7 +52,18 @@ function MessageWithUser({
 	const userLogin = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
-	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef } = useMessageParser(message);
+	const {
+		senderId,
+		username,
+		userClanAvatar,
+		userClanNickname,
+		userDisplayName,
+		senderIdMessageRef,
+		avatarSender,
+		messageAvatarSenderRef,
+		messageDisplayNameSenderRef,
+		messageUsernameSenderRef
+	} = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const [shortUserId, setShortUserId] = useState(senderId);
@@ -152,7 +163,7 @@ function MessageWithUser({
 		},
 		[checkAnonymous, mode]
 	);
-
+	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -166,7 +177,10 @@ function MessageWithUser({
 									<MessageReply
 										message={message}
 										mode={mode}
-										onClick={(e) => handleOpenShortUser(e, senderIdMessageRef as string)}
+										onClick={(e) => {
+											handleOpenShortUser(e, senderIdMessageRef as string);
+											console.log('senderIdMessageRef: ', senderIdMessageRef);
+										}}
 									/>
 								)}
 								<div
@@ -229,9 +243,17 @@ function MessageWithUser({
 						message={message}
 						mode={mode}
 						positionType={''}
-						avatar={shortUserId === senderId ? userClanAvatar : undefined}
+						avatar={
+							isDM
+								? shortUserId === senderId
+									? avatarSender
+									: messageAvatarSenderRef
+								: shortUserId === senderId
+									? userClanAvatar || avatarSender
+									: undefined
+						}
 						name={userClanNickname || userDisplayName || username}
-						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL}
+						isDM={isDM}
 					/>
 				</div>
 			)}
