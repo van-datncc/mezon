@@ -20,7 +20,8 @@ jobs:
 
       - name: Change prod environment
         run: |
-          cp apps/chat/prod.env apps/chat/.env
+          rm -rf apps/chat/.env
+          mv apps/chat/.env.prod apps/chat/.env
 
       - name: Release Desktop
         run: |
