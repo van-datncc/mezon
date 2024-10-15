@@ -1,6 +1,8 @@
 import { useAppNavigation } from '@mezon/core';
 import {
 	ChannelsEntity,
+	ThreadsEntity,
+	channelsActions,
 	selectAllChannelMembers,
 	selectLastMessageIdByChannelId,
 	selectMemberClanByUserId,
@@ -10,20 +12,21 @@ import {
 import { ChannelMembersEntity, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useMessageSender } from '../../../../MessageWithUser/useMessageSender';
 import ThreadModalContent from './ThreadModalContent';
 
 type ThreadItemProps = {
-	thread: ChannelsEntity;
+	thread: ThreadsEntity;
 	setIsShowThread: () => void;
+	isPublicThread?: boolean;
 };
 
-const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
+const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-
+	const dispatch = useDispatch();
 	const threadMembers = useSelector((state) => selectAllChannelMembers(state, thread.channel_id));
 
 	const messageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, thread.channel_id as string));
@@ -68,6 +71,7 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 	}, [message, thread]);
 
 	const handleLinkThread = (channelId: string, clanId: string) => {
+		dispatch(channelsActions.upsertOne(thread as ChannelsEntity));
 		navigate(toChannelPage(channelId, clanId));
 		setIsShowThread();
 	};
@@ -87,7 +91,7 @@ const ThreadItem = ({ thread, setIsShowThread }: ThreadItemProps) => {
 							{user?.user?.display_name ?? username}:&nbsp;
 						</span>
 						<div className="overflow-hidden max-w-[140px]">
-							<ThreadModalContent message={message} thread={thread} />
+							<ThreadModalContent message={message} thread={thread as ChannelsEntity} />
 						</div>
 						<div className="overflow-x-hidden">
 							<p className="text-xs font-medium leading-4 ml-2">

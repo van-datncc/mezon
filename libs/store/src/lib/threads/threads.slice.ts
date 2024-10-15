@@ -1,8 +1,10 @@
-import { IMessageWithUser, IThread, LoadingStatus, TypeCheck } from '@mezon/utils';
+import { IMessageWithUser, IThread, LoadingStatus, ThreadStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
+import memoizee from 'memoizee';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
 
 export const THREADS_FEATURE_KEY = 'threads';
 
@@ -27,7 +29,7 @@ export interface ThreadsState extends EntityState<ThreadsEntity, string> {
 	currentThread?: ApiChannelDescription;
 }
 
-export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
+export const threadsAdapter = createEntityAdapter({ selectId: (thread: ThreadsEntity) => thread.id || '' });
 
 /**
  * Export an effect using createAsyncThunk from
@@ -46,13 +48,60 @@ export const threadsAdapter = createEntityAdapter<ThreadsEntity>();
  * }, [dispatch]);
  * ```
  */
-export const fetchThreads = createAsyncThunk<ThreadsEntity[]>('threads/fetchStatus', async (_, thunkAPI) => {
-	/**
-	 * Replace this with your custom fetch call.
-	 * For example, `return myApi.getThreadss()`;
-	 * Right now we just return an empty array.
-	 */
-	return Promise.resolve([]);
+export interface FetchThreadsArgs {
+	channelId: string;
+	clanId: string;
+	threadId?: string;
+	noCache?: boolean;
+}
+
+const fetchThreadsCached = memoizee(
+	async (mezon: MezonValueContext, channelId: string, clanId: string, threadId?: string) => {
+		const response = await mezon.client.listThreadDescs(mezon.session, channelId, 50, 0, clanId, threadId);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: LIST_THREADS_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[0].session.username;
+		}
+	}
+);
+
+const mapToThreadEntity = (threads: ApiChannelDescription[]) => {
+	return threads.map((thread) => ({
+		...thread,
+		id: thread.channel_id
+	}));
+};
+
+export const fetchThreads = createAsyncThunk('threads/fetchThreads', async ({ channelId, clanId, noCache }: FetchThreadsArgs, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	if (noCache) {
+		fetchThreadsCached.clear(mezon, channelId, clanId);
+	}
+	const response = await fetchThreadsCached(mezon, channelId, clanId);
+	if (!response.channeldesc) {
+		return [];
+	}
+
+	const threads = mapToThreadEntity(response.channeldesc);
+	return threads;
+});
+
+export const fetchThread = createAsyncThunk('threads/fetchThreads', async ({ channelId, clanId, threadId, noCache }: FetchThreadsArgs, thunkAPI) => {
+	const mezon = await ensureSession(getMezonCtx(thunkAPI));
+	if (noCache) {
+		fetchThreadsCached.clear(mezon, channelId, clanId, threadId);
+	}
+	const response = await fetchThreadsCached(mezon, channelId, clanId, threadId);
+	if (!response.channeldesc) {
+		return [];
+	}
+
+	const threads = mapToThreadEntity(response.channeldesc);
+	return threads;
 });
 
 export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState({
@@ -87,6 +136,8 @@ export const threadsSlice = createSlice({
 	reducers: {
 		add: threadsAdapter.addOne,
 		remove: threadsAdapter.removeOne,
+		update: threadsAdapter.updateOne,
+
 		setIsShowCreateThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; isShowCreateThread: boolean }>) => {
 			state.isShowCreateThread = {
 				...state.isShowCreateThread,
@@ -126,15 +177,27 @@ export const threadsSlice = createSlice({
 		},
 		setCurrentThread: (state, action: PayloadAction<ApiChannelDescription>) => {
 			state.currentThread = action.payload;
+		},
+
+		updateActiveCodeThread: (state: ThreadsState, action: PayloadAction<{ channelId: string; activeCode: number }>) => {
+			const { channelId, activeCode } = action.payload;
+			const entity = state.entities[channelId];
+			if (entity) {
+				threadsAdapter.updateOne(state, {
+					id: channelId,
+					changes: {
+						active: activeCode
+					}
+				});
+			}
 		}
-		// ...
 	},
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchThreads.pending, (state: ThreadsState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<ThreadsEntity[]>) => {
+			.addCase(fetchThreads.fulfilled, (state: ThreadsState, action: PayloadAction<any[]>) => {
 				threadsAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
@@ -183,7 +246,7 @@ export const threadsReducer = threadsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const threadsActions = { ...threadsSlice.actions };
+export const threadsActions = { ...threadsSlice.actions, fetchThreads, fetchThread };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -229,4 +292,41 @@ export const selectNameValueThread = (channelId: string) =>
 export const selectIsShowCreateThread = (channelId: string) =>
 	createSelector(getThreadsState, (state) => {
 		return state.isShowCreateThread?.[channelId] as boolean;
+	});
+// new update
+
+export const selectActiveThreads = createSelector([selectAllThreads], (threads) => {
+	return threads.filter((thread) => thread.active === ThreadStatus.activePublic);
+});
+
+export const selectJoinedThreadsWithinLast30Days = createSelector([selectAllThreads], (threads) => {
+	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
+	const currentTime = Math.floor(Date.now() / 1000);
+
+	return threads.reduce((accumulator, thread) => {
+		if (
+			thread.active === ThreadStatus.joined &&
+			thread.last_sent_message?.timestamp_seconds &&
+			currentTime - Number(thread.last_sent_message.timestamp_seconds) < thirtyDaysInSeconds
+		) {
+			accumulator.push(thread);
+		}
+		return accumulator;
+	}, [] as ThreadsEntity[]);
+});
+
+export const selectThreadsOlderThan30Days = createSelector([selectAllThreads], (threads) => {
+	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
+	const currentTime = Math.floor(Date.now() / 1000);
+	return threads.reduce((accumulator, thread) => {
+		if (thread.last_sent_message?.timestamp_seconds && currentTime - Number(thread.last_sent_message?.timestamp_seconds) > thirtyDaysInSeconds) {
+			accumulator.push(thread);
+		}
+		return accumulator;
+	}, [] as ThreadsEntity[]);
+});
+
+export const selectShowEmptyStatus = () =>
+	createSelector(selectAllThreads, (threads) => {
+		return threads.length === 0;
 	});

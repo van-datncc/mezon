@@ -4,6 +4,7 @@ import {
 	channelUsersActions,
 	selectAllChannelMembers,
 	selectChannelById,
+	ThreadsEntity,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -23,33 +24,46 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel.parrent_id as string) : null));
 
 	const dispatch = useAppDispatch();
+
+	const updateChannelUsers = async (currentChannel: ChannelsEntity | null, userIds: string[], clanId: string) => {
+		const timestamp = Date.now() / 1000;
+
+		const body = {
+			channelId: currentChannel?.channel_id as string,
+			channelType: currentChannel?.type,
+			userIds: userIds,
+			clanId: clanId
+		};
+
+		await dispatch(channelUsersActions.addChannelUsers(body));
+		dispatch(
+			channelMetaActions.updateBulkChannelMetadata([
+				{
+					id: currentChannel?.channel_id ?? '',
+					lastSeenTimestamp: timestamp,
+					lastSentTimestamp: timestamp,
+					lastSeenPinMessage: '',
+					clanId: currentChannel?.clan_id ?? ''
+				}
+			])
+		);
+	};
+
 	const addMemberToThread = useCallback(
 		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[]) => {
 			if (currentChannel?.parrent_id === '0') return;
-			const timestamp = Date.now() / 1000;
-
 			const userIds = uniqueUsers(mentions, membersOfChild);
-
-			const body = {
-				channelId: currentChannel?.channel_id as string,
-				channelType: currentChannel?.type,
-				userIds: userIds,
-				clanId: channel?.clan_id as string
-			};
 			if (userIds.length > 0) {
-				await dispatch(channelUsersActions.addChannelUsers(body));
-				dispatch(
-					channelMetaActions.updateBulkChannelMetadata([
-						{
-							id: currentChannel?.channel_id ?? '',
-							lastSeenTimestamp: timestamp,
-							lastSentTimestamp: timestamp,
-							lastSeenPinMessage: '',
-							clanId: currentChannel?.clan_id ?? ''
-						}
-					])
-				);
+				await updateChannelUsers(currentChannel, userIds, currentChannel?.clan_id as string);
 			}
+		},
+		[dispatch]
+	);
+
+	const joinningToThread = useCallback(
+		async (targetThread: ThreadsEntity | null, user: string[]) => {
+			if (targetThread?.parrent_id === '0') return;
+			await updateChannelUsers(targetThread as ChannelsEntity, user, targetThread?.clan_id as string);
 		},
 		[dispatch]
 	);
@@ -58,8 +72,9 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 		() => ({
 			membersOfParent: mode === ChannelStreamMode.STREAM_MODE_CHANNEL && channel?.parrent_id !== '0' ? membersOfParent : membersOfChild,
 			membersOfChild,
-			addMemberToThread
+			addMemberToThread,
+			joinningToThread
 		}),
-		[membersOfChild, membersOfParent, mode, channel?.parrent_id, addMemberToThread]
+		[membersOfChild, membersOfParent, mode, channel?.parrent_id, addMemberToThread, joinningToThread]
 	);
 }
