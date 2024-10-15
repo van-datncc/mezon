@@ -27,51 +27,6 @@ const ListChannelSetting = ({ listChannel }: ListChannelSettingProp) => {
 		openModalChannelSetting();
 	};
 
-	const RenderChannelAndThread = () => {
-		const components: JSX.Element[] = [];
-		for (const [key, listThread] of Object.entries(listChannel)) {
-			const channel = listChannelEntities[key];
-			components.push(
-				<>
-					<ItemInfor
-						creatorId={channel.creator_id as string}
-						label={channel?.channel_label as string}
-						privateChannel={channel.channel_private as number}
-						isThread={channel?.parent_id !== '0'}
-						key={channel.id}
-						userIds={channel?.user_ids || []}
-						onClick={handleChooseChannelSetting}
-						channelId={channel.id as string}
-						isVoice={channel.channel_type === ChannelType.CHANNEL_TYPE_VOICE}
-						message_count={channel.message_count || 0}
-					/>
-					<div className="flex flex-col pl-8">
-						{listThread.map((thread) => (
-							<ItemInfor
-								creatorId={thread.creator_id as string}
-								label={thread?.channel_label as string}
-								privateChannel={thread.channel_private as number}
-								isThread={thread?.parent_id !== '0'}
-								key={`${thread.id}_thread`}
-								userIds={thread?.user_ids || []}
-								onClick={handleChooseChannelSetting}
-								channelId={thread.id as string}
-								message_count={channel.message_count || 0}
-							/>
-						))}
-					</div>
-				</>
-			);
-		}
-		return (
-			<div className="flex flex-col">
-				{components.map((channelGroup, index) => (
-					<div key={`group_${index}`}>{channelGroup}</div>
-				))}
-			</div>
-		);
-	};
-
 	return (
 		<div className="h-full w-full flex flex-col gap-1 flex-1">
 			<div className="w-full flex pl-12 pr-12 justify-between items-center h-[48px] shadow border-b-[1px] dark:border-bgTertiary text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
@@ -81,13 +36,51 @@ const ListChannelSetting = ({ listChannel }: ListChannelSettingProp) => {
 				<span className="pr-1">Creator</span>
 			</div>
 			<div className="h-full overflow-y-auto  hide-scrollbar scroll-smooth pb-10" ref={parentRef}>
-				{RenderChannelAndThread()}
+				{Object.entries(listChannel).map(([key, value]) => (
+					<RenderChannelAndThread channelParrent={listChannelEntities[key]} listChannelGroup={value} key={`group_${key}`} />
+				))}
 			</div>
 		</div>
 	);
 };
 
-// };
+const RenderChannelAndThread = ({
+	listChannelGroup,
+	channelParrent
+}: {
+	listChannelGroup: ApiChannelSettingItem[];
+	channelParrent: ApiChannelSettingItem;
+}) => {
+	return (
+		<div className="flex flex-col">
+			<ItemInfor
+				creatorId={channelParrent.creator_id as string}
+				label={channelParrent?.channel_label as string}
+				privateChannel={channelParrent.channel_private as number}
+				isThread={channelParrent?.parent_id !== '0'}
+				key={channelParrent.id}
+				userIds={channelParrent?.user_ids || []}
+				channelId={channelParrent.id as string}
+				isVoice={channelParrent.channel_type === ChannelType.CHANNEL_TYPE_VOICE}
+				messageCount={channelParrent.message_count || 0}
+			/>
+			<div className="flex flex-col pl-8">
+				{listChannelGroup.map((thread) => (
+					<ItemInfor
+						creatorId={thread.creator_id as string}
+						label={thread?.channel_label as string}
+						privateChannel={thread.channel_private as number}
+						isThread={thread?.parent_id !== '0'}
+						key={`${thread.id}_thread`}
+						userIds={thread?.user_ids || []}
+						channelId={thread.id as string}
+						messageCount={thread.message_count || 0}
+					/>
+				))}
+			</div>
+		</div>
+	);
+};
 
 const ItemInfor = ({
 	isThread,
@@ -98,22 +91,20 @@ const ItemInfor = ({
 	onClick,
 	channelId,
 	isVoice,
-	message_count
+	messageCount
 }: {
 	isThread?: boolean;
 	label: string;
 	creatorId: string;
 	privateChannel: number;
 	userIds: string[];
-	onClick: (id: string) => void;
+	onClick?: (id: string) => void;
 	channelId: string;
 	isVoice?: boolean;
-	message_count?: number | string;
+	messageCount?: number | string;
 }) => {
 	const creatorChannel = useSelector(selectMemberClanByUserId(creatorId));
-	const handleChooseChannel = () => {
-		onClick(channelId);
-	};
+
 	const handleCopyChannelId = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		e.stopPropagation();
 		e.preventDefault();
@@ -162,7 +153,7 @@ const ItemInfor = ({
 						<p className={`italic text-xs ${isThread ? '-ml-8' : ''}`}>(All Members)</p>
 					)}
 				</div>
-				<div className={`flex-1 font-semibold ${isThread ? '-ml-8' : ''}`}>{message_count}</div>
+				<div className={`flex-1 font-semibold ${isThread ? '-ml-8' : ''}`}>{messageCount}</div>
 
 				<div className="overflow-hidden flex w-12 items-center justify-center">
 					{(creatorChannel?.clan_avatar || creatorChannel?.user?.avatar_url) && (

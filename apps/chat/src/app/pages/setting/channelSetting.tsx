@@ -25,23 +25,25 @@ const ChannelSetting = () => {
 		setSearchFilter(e.target.value);
 	};
 
-	const listChannelSetting = useMemo(() => {
-		const listFilter = listChannel.filter((channel) => {
-			if (privateFilter && channel.channel_private !== ChannelStatusEnum.isPrivate) {
-				return false;
-			}
-			if (threadFilter && channel.parent_id === '0') {
-				return false;
-			}
+	const filterChannel = (channel: ApiChannelSettingItem) => {
+		if (privateFilter && channel.channel_private !== ChannelStatusEnum.isPrivate) {
+			return false;
+		}
+		if (threadFilter && channel.parent_id === '0') {
+			return false;
+		}
+		if (!channel.channel_label?.includes(searchFilter)) {
+			return false;
+		}
+		return true;
+	};
 
-			if (!channel.channel_label?.includes(searchFilter)) {
-				return false;
-			}
-			return true;
-		});
-		setNumberChannel(listFilter.length);
+	const listChannelSetting = useMemo(() => {
 		const listChannelRecord: Record<string, ApiChannelSettingItem[]> = {};
-		listFilter.forEach((channel) => {
+		listChannel.forEach((channel) => {
+			if (!filterChannel(channel)) {
+				return;
+			}
 			if (listChannelRecord[channel.parent_id as string]) {
 				listChannelRecord[channel.parent_id as string].push(channel);
 				return;
@@ -62,6 +64,7 @@ const ChannelSetting = () => {
 		}
 		fetchListChannel();
 	}, []);
+
 	return (
 		<div className="p-8 h-[calc(100vh_-_56px)] flex flex-col">
 			<div className="p-2 flex items-center justify-between">
