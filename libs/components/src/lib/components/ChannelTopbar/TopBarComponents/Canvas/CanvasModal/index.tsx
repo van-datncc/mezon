@@ -1,4 +1,4 @@
-import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference } from '@mezon/core';
+import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	appActions,
 	selectCanvasIdsByChannelId,
@@ -13,7 +13,6 @@ import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { RefObject, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import GroupCanvas from './GroupCanvas';
 import SearchCanvas from './SearchCanvas';
 
@@ -24,10 +23,6 @@ type CanvasProps = {
 
 const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
-	const { toChannelPage } = useAppNavigation();
-	// const { setIsShowCreateThread, threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
-	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 
@@ -44,7 +39,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(modalRef, onClose, rootRef);
-	///
+
 	return (
 		<div
 			ref={modalRef}

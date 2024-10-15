@@ -50,12 +50,12 @@ const Canvas = () => {
 
 		const timer = setTimeout(() => {
 			callCreateEditCanvas();
-		}, 3000); // Đợi 3 giây
+		}, 3000);
 
 		setDebounceTimer(timer);
 
-		return () => clearTimeout(timer); // Dọn dẹp timer
-	}, [localTitle, content]); // Theo dõi cả localTitle và content
+		return () => clearTimeout(timer);
+	}, [localTitle, content]);
 
 	const handleInputChange = (e: { target: { value: any } }) => {
 		const newTitle = e.target.value;
