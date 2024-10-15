@@ -139,7 +139,6 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();
 	const [isShowCanvas, setIsShowCanvas] = useState<boolean>(false);
-	console.log(isShowCanvas, 'isShowCanvas')
 
 	const canvasRef = useRef<HTMLDivElement | null>(null);
 

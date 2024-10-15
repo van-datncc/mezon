@@ -42,4 +42,4 @@ export const selectTitle = createSelector(getCanvasState, (state) => state.title
 
 export const selectContent = createSelector(getCanvasState, (state) => state.content);
 
-export const selecIdCanvas = createSelector(getCanvasState, (state) => state.idCanvas);
+export const selectIdCanvas = createSelector(getCanvasState, (state) => state.idCanvas);

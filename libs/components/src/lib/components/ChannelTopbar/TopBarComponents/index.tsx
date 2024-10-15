@@ -1,9 +1,11 @@
 import { useAppNavigation, useMenu } from '@mezon/core';
 import {
 	appActions,
+	selectCanvasEntityById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
+	selectIdCanvas,
 	selectIsShowCanvas,
 	selectStatusMenu,
 	selectTheme,
@@ -32,6 +34,8 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const isActive = currentChannel?.channel_id === channel?.channel_id && !channelParent;
 	const theme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();
+	const idCanvas = useSelector(selectIdCanvas);
+	const canvasById = useSelector((state) => selectCanvasEntityById(state, currentChannel?.channel_id, idCanvas));
 
 	const handleRedirect = () => {
 		if (channelParent) {
@@ -88,7 +92,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 					<p
 						className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
 					>
-						{title ? title : 'Untitled'}
+						{canvasById?.title ? canvasById?.title : title ? title : 'Untitled'}
 					</p>
 				</div>
 			)}
