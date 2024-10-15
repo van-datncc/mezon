@@ -1384,9 +1384,16 @@ const computeIsViewingOlderMessagesByChannelId = (state: MessagesState, channelI
 		return false;
 	}
 
-	const isLastMessageExist = state.channelMessages[channelId]?.entities?.[lastMessageId];
+	const channelEntity = state.channelMessages[channelId]?.entities;
 
-	if (!isLastMessageExist) {
+	if (!channelEntity || typeof channelEntity !== 'object') {
+		return false;
+	}
+
+	const lengthChannelEntity = Object.keys(channelEntity || {}).length;
+	const isLastMessageExist = channelEntity?.[lastMessageId];
+
+	if (!isLastMessageExist && lengthChannelEntity >= LIMIT_MESSAGE * 4) {
 		return true;
 	}
 
