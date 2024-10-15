@@ -3,6 +3,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateClanProfileRequest } from 'mezon-js';
 import { ApiClanProfile } from 'mezon-js/api.gen';
+import { withError } from '../errors/helpers';
 import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 export const USER_CLAN_PROFILE_FEATURE_KEY = 'userClanProfile';
 
@@ -49,10 +50,11 @@ export const checkDuplicateClanNickName = createAsyncThunk(
 			if (isDuplicateName?.type === TypeCheck.TYPENICKNAME) {
 				return isDuplicateName.exist;
 			}
-			return;
+
+			return false;
 		} catch (error) {
 			Sentry.captureException(error);
-			return thunkAPI.rejectWithValue([]);
+			return thunkAPI.rejectWithValue(withError(false));
 		}
 	}
 );

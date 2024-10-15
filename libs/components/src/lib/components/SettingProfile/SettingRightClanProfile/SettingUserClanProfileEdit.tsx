@@ -89,28 +89,28 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 			return;
 		}
 
-		if (value == '') {
+		if (value === '') {
 			setCheckValidate(false);
 			setFlagOption(true);
 			return;
 		}
 
-		await dispatch(
-			checkDuplicateClanNickName({
-				clanNickName: value,
-				clanId: clanId ?? ''
-			})
-		)
-			.then(unwrapResult)
-			.then((result) => {
-				if (result) {
-					setCheckValidate(true);
-					setFlagOption(false);
-					return;
-				}
-				setCheckValidate(false);
-				setFlagOption(true);
-			});
+		const result = unwrapResult(
+			await dispatch(
+				checkDuplicateClanNickName({
+					clanNickName: value,
+					clanId: clanId ?? ''
+				})
+			)
+		);
+
+		if (result) {
+			setCheckValidate(true);
+			setFlagOption(false);
+		} else {
+			setCheckValidate(false);
+			setFlagOption(true);
+		}
 	}, 300);
 
 	const handleDisplayName = (e: React.ChangeEvent<HTMLInputElement>) => {
