@@ -117,7 +117,7 @@ export const canvasAPISlice = createSlice({
 		// ...
 		updateCanvas: (state: any, action: PayloadAction<any>) => {
 			const { channelId, results } = action.payload;
-			canvasAPIAdapter.updateOne(state, {
+			canvasAPIAdapter.updateOne(state.channelCanvas[channelId], {
 				id: results.payload.id,
 				changes: {
 					title: results.payload.title,
