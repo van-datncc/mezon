@@ -552,7 +552,7 @@ export const selectAllChannelMembers = createSelector(
 
 		if (!usersClanState?.ids?.length) return membersOfChannel;
 
-		const members = isPrivate === '1' || parentId !== '0' ? { ids: channelMembers } : usersClanState;
+		const members = isPrivate === '1' || (parentId !== '0' && parentId !== '') ? { ids: channelMembers } : usersClanState;
 
 		if (!members?.ids) return membersOfChannel;
 		const ids = members.ids || [];
@@ -574,16 +574,20 @@ export const selectAllChannelMemberIds = createSelector(
 		selectGrouplMembers,
 		(state, channelId: string) => {
 			const channel = state.channels?.entities[channelId];
-			const parentChannel = state.channels?.entities[channel?.parrent_id];
-			const isPrivate = channel?.channel_private || parentChannel?.channel_private || '';
+			const isPrivate = channel?.channel_private;
+			const parentId = channel?.parrent_id;
+
 			const isDm = state.direct?.currentDirectMessageId === channelId || '';
-			return `${channelId},${isPrivate},${isDm}`;
+			return `${channelId},${isPrivate},${isDm},${parentId}`;
 		}
 	],
 	(channelMembersState, usersClanState, directs, payload) => {
-		const [channelId, isPrivate, isDm] = payload.split(',');
+		const [channelId, isPrivate, isDm, parentId] = payload.split(',');
 		if (isDm) return directs.map((dm) => dm.id);
-		const memberIds = isPrivate ? channelMembersState.memberChannels[channelId]?.ids || [] : Object.keys(usersClanState.entities);
+		const memberIds =
+			isPrivate === '1' || (parentId !== '0' && parentId !== '')
+				? channelMembersState.memberChannels[channelId]?.ids || []
+				: Object.keys(usersClanState.entities);
 		return memberIds;
 	}
 );

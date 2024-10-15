@@ -290,7 +290,9 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
-			addMemberToThread(currentChannel, mentionList);
+			if (currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '') {
+				addMemberToThread(currentChannel, mentionList);
+			}
 
 			if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined }));
