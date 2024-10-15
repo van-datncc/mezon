@@ -1,7 +1,7 @@
 import { useAuth, useChatReaction } from '@mezon/core';
 import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectEmojiHover, selectUserReactionPanelState } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -48,7 +48,7 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			1,
 			message_sender_id ?? '',
 			false,
-			currentChannel ? !currentChannel.channel_private : false
+			isPublicChannel(currentChannel)
 		);
 	}
 
