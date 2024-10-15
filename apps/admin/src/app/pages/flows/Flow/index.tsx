@@ -287,6 +287,7 @@ const Flow = () => {
 					nodeName: node.nodeName,
 					measured: typeof node.measured === 'string' ? JSON.parse(node.measured) : node.measured,
 					position: typeof node.position === 'string' ? JSON.parse(node.position) : node.position,
+					dragHandle: '.custom-drag-handle',
 					data: {
 						label: node.nodeName,
 						id,
