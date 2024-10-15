@@ -2,7 +2,8 @@ import { IMessageWithUser, IThread, LoadingStatus, TypeCheck } from '@mezon/util
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
-import { ensureSocket, getMezonCtx } from '../helpers';
+import { fetchChannels } from '../channels/channels.slice';
+import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 
 export const THREADS_FEATURE_KEY = 'threads';
 
@@ -80,6 +81,19 @@ export const checkDuplicateThread = createAsyncThunk(
 		}
 	}
 );
+
+export const leaveThread = createAsyncThunk('thread/leavethread', async ({ clanId, threadId }: { clanId: string; threadId: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.leaveChannel(mezon.session, threadId);
+		if (response) {
+			thunkAPI.dispatch(fetchChannels({ clanId: clanId, noCache: true }));
+		}
+	} catch (error) {
+		Sentry.captureException(error);
+		return thunkAPI.rejectWithValue([]);
+	}
+});
 
 export const threadsSlice = createSlice({
 	name: THREADS_FEATURE_KEY,
@@ -183,7 +197,7 @@ export const threadsReducer = threadsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const threadsActions = { ...threadsSlice.actions };
+export const threadsActions = { ...threadsSlice.actions, leaveThread };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
