@@ -86,39 +86,63 @@ export type WriteMessageReactionArgs = {
 	isPublic: boolean;
 };
 
+const reactionQueue: Array<() => Promise<void>> = [];
+let isProcessingReactionQueue = false;
+
+async function processReactionQueue() {
+	if (isProcessingReactionQueue || reactionQueue.length === 0) return;
+	isProcessingReactionQueue = true;
+	while (reactionQueue.length > 0) {
+		const action = reactionQueue.shift();
+		if (action) {
+			try {
+				await action();
+			} catch (e) {
+				Sentry.captureException(e);
+			}
+		}
+	}
+	isProcessingReactionQueue = false;
+}
+
 export const writeMessageReaction = createAsyncThunk(
 	'messages/writeMessageReaction',
 	async (
 		{ id, clanId, channelId, mode, messageId, emoji_id, emoji, count, messageSenderId, actionDelete, isPublic }: WriteMessageReactionArgs,
 		thunkAPI
 	) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const session = mezon.sessionRef.current;
-			const client = mezon.clientRef.current;
-			const socket = mezon.socketRef.current;
+		const action = async () => {
+			try {
+				const mezon = await ensureSession(getMezonCtx(thunkAPI));
+				const session = mezon.sessionRef.current;
+				const client = mezon.clientRef.current;
+				const socket = mezon.socketRef.current;
 
-			if (!client || !session || !socket) {
-				throw new Error('Client is not initialized');
+				if (!client || !session || !socket) {
+					throw new Error('Client is not initialized');
+				}
+
+				await socket.writeMessageReaction(
+					id,
+					clanId,
+					channelId,
+					mode,
+					isPublic,
+					messageId,
+					emoji_id,
+					emoji,
+					count,
+					messageSenderId,
+					actionDelete
+				);
+			} catch (e) {
+				Sentry.captureException(e);
+				thunkAPI.rejectWithValue(e);
 			}
+		};
 
-			await socket.writeMessageReaction(
-				id,
-				clanId,
-				channelId,
-				mode,
-				isPublic,
-				messageId,
-				emoji_id,
-				emoji,
-				count,
-				messageSenderId,
-				actionDelete
-			);
-		} catch (e) {
-			Sentry.captureException(e);
-			return thunkAPI.rejectWithValue(e);
-		}
+		reactionQueue.push(action);
+		processReactionQueue();
 	}
 );
 
