@@ -1,11 +1,12 @@
 import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference } from '@mezon/core';
-import { appActions, selectCurrentChannel, selectTheme, useAppDispatch } from '@mezon/store';
+import { appActions, selectCanvasIdsByChannelId, selectCurrentChannel, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
 import { RefObject, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import GroupCanvas from './GroupCanvas';
 import SearchCanvas from './SearchCanvas';
 
 type CanvasProps = {
@@ -24,18 +25,11 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
     const appearanceTheme = useSelector(selectTheme);
     const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
 
+    const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? ''));
+
     const handleCreateCanvas = () => {
         dispatch(appActions.setIsShowCanvas(true));
         onClose();
-        // setOpenThreadMessageState(false);
-        // if (currentChannel && currentChannel?.parrent_id !== '0') {
-        //     navigate(toChannelPage(currentChannel.parrent_id as string, currentChannel.clan_id as string));
-        // }
-        // onClose();
-        // setIsShowCreateThread(true, currentChannel?.parrent_id !== '0' ? currentChannel?.parrent_id : currentChannel.channel_id);
-        // dispatch(threadsActions.setNameThreadError(''));
-        // dispatch(threadsActions.setMessageThreadError(''));
-        // dispatch(searchMessagesActions.setIsSearchMessage({ channelId: currentChannel?.channel_id as string, isSearchMessage: false }));
     };
 
     const modalRef = useRef<HTMLDivElement>(null);
@@ -73,21 +67,9 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
                 <div
                     className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
                 >
-                    {/* {threadChannelOnline.length > 0 && (
-                        <GroupCanvas title={`${threadChannelOnline.length} joined threads`}>
-                            {threadChannelOnline.map((thread) => (
-                                <CanvasItem thread={thread} key={thread.id} setIsShowThread={onClose} />
-                            ))}
-                        </GroupCanvas>
-                    )}
-                    {threadChannelOld.length > 0 && (
-                        <GroupCanvas title="order canvas">
-                            {threadChannelOld.map((thread) => (
-                                <CanvasItem thread={thread} key={thread.id} setIsShowThread={onClose} />
-                            ))}
-                        </GroupCanvas>
-                    )}
-                    {threadChannel.length === 0 && <EmptyCanvas onClick={handleCreateCanvas} />} */}
+                    {canvases.map((canvasId) => {
+                        return <GroupCanvas key={canvasId} canvasId={canvasId} channelId={currentChannel?.channel_id} />;
+                    })}
                 </div>
             </div>
         </div>

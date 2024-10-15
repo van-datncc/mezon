@@ -1,6 +1,7 @@
 import { useAppNavigation, useAppParams, usePermissionChecker, useThreads } from '@mezon/core';
 import {
 	appActions,
+	canvasAPIActions,
 	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
@@ -136,31 +137,55 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 }
 
 function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
-	const [isShowThread, setIsShowThread] = useState<boolean>(false);
-	const threadRef = useRef<HTMLDivElement | null>(null);
-	////
-	const handleShowThreads = () => {
-		setIsShowThread(!isShowThread);
+	const dispatch = useAppDispatch();
+	const [isShowCanvas, setIsShowCanvas] = useState<boolean>(false);
+	console.log(isShowCanvas, 'isShowCanvas')
+
+	const canvasRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowCanvas = () => {
+		setIsShowCanvas(!isShowCanvas);
 	};
 
 	const handleClose = useCallback(() => {
-		setIsShowThread(false);
+		setIsShowCanvas(false);
 	}, []);
+
+	const currentChannel = useSelector(selectCurrentChannel);
+
+	useEffect(() => {
+		if (currentChannel?.channel_id || isShowCanvas) {
+			const fetchCanvas = async () => {
+				const channelId = currentChannel?.channel_id ?? '';
+				const clanId = currentChannel?.clan_id ?? '';
+				console.log(channelId, 'channelId111111');
+
+				if (channelId && clanId) {
+					const body = {
+						channel_id: channelId,
+						clan_id: clanId
+					};
+					await dispatch(canvasAPIActions.getChannelCanvasList(body));
+				}
+			};
+			fetchCanvas();
+		}
+	}, [currentChannel?.channel_id, isShowCanvas]);
 	///
 	return (
-		<div className="relative leading-5 h-5" ref={threadRef}>
+		<div className="relative leading-5 h-5" ref={canvasRef}>
 			<Tooltip
-				className={`${isShowThread && 'hidden'}  flex justify-center items-center`}
+				className={`${isShowCanvas && 'hidden'}  flex justify-center items-center`}
 				content="Canvas"
 				trigger="hover"
 				animation="duration-500"
 				style={isLightMode ? 'light' : 'dark'}
 			>
-				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
-					<Icons.CanvasIcon isWhite={isShowThread} defaultSize="size-6" />
+				<button className="focus-visible:outline-none" onClick={handleShowCanvas} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.CanvasIcon isWhite={isShowCanvas} defaultSize="size-6" />
 				</button>
 			</Tooltip>
-			{isShowThread && <CanvasModal onClose={handleClose} rootRef={threadRef} />}
+			{isShowCanvas && <CanvasModal onClose={handleClose} rootRef={canvasRef} />}
 		</div>
 	);
 }

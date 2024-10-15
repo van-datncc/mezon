@@ -7,7 +7,6 @@ import {
 	ApiChannelMessageHeader,
 	ApiClanDesc,
 	ApiClanProfile,
-	ApiEditChannelCanvasRequest,
 	ApiEventManagement,
 	ApiInviteUserRes,
 	ApiMessageAttachment,
@@ -836,7 +835,10 @@ export enum ThreadStatus {
 	joined = 1
 }
 
-export type ICanvas = ApiEditChannelCanvasRequest & {
-	limit: number;
-	page: number;
+export type ICanvas = {
+	id?: string;
+	clan_id: string;
+	channel_id: string;
+	title?: string;
+	content?: string;
 };

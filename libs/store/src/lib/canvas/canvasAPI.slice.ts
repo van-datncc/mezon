@@ -12,36 +12,35 @@ export interface CanvasAPIEntity extends ICanvas {
 	id: string; // Primary ID
 }
 
-export interface CanvasAPIState extends EntityState<ApiEditChannelCanvasRequest, string> {
+export interface CanvasAPIState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	channelCanvas: Record<
+		string,
+		EntityState<CanvasAPIEntity, string> & {
+			id: string;
+		}
+	>;
 }
 
 export const canvasAPIAdapter = createEntityAdapter({
 	selectId: (canvas: ApiEditChannelCanvasRequest) => canvas.id || ''
 });
 
-// type EditCanvasPayload = {
-// 	id: string;
-// 	title: string;
-// 	content: string;
-// };
+const emptyObject = {};
 
-// type CreateEditPayload = {
-// 	clanId: string;
-// 	channelId: string;
-// 	noFetchMembers?: boolean;
-// 	messageId?: string;
-// 	isDmGroup?: boolean;
-// 	isClearMessage?: boolean;
-// };
+type getCanvasDetailPayload = {
+	id: string;
+	clan_id: string;
+	channel_id: string;
+};
 
-// type JoinChatPayload = {
-// 	clanId: string;
-// 	channelId: string;
-// 	channelType: number;
-// 	isPublic: boolean;
-// };
+type getCanvasListPayload = {
+	channel_id: string;
+	clan_id: string;
+	limit?: number;
+	page?: number;
+};
 
 export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', async (body: ApiEditChannelCanvasRequest, thunkAPI) => {
 	try {
@@ -56,50 +55,57 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 	}
 });
 
-// export const getChannelCanvasDetail = createAsyncThunk(
-// 	'canvas/getChannelCanvasDetail',
-// 	async ({ id, clan_id, channel_id, limit, page }: CanvasAPIEntity, thunkAPI) => {
-// 		try {
-// 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+export const getChannelCanvasDetail = createAsyncThunk(
+	'canvas/getChannelCanvasDetail',
+	async ({ id, clan_id, channel_id }: getCanvasDetailPayload, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-// 			const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limit, page);
+			const response = await mezon.client.getChannelCanvasDetail(mezon.session, id, clan_id, channel_id);
 
-// 			return response;
-// 		} catch (error: any) {
-// 			const errstream = await error.json();
-// 			return thunkAPI.rejectWithValue(errstream.message);
-// 		}
-// 	}
-// );
+			return response;
+		} catch (error: any) {
+			const errstream = await error.json();
+			return thunkAPI.rejectWithValue(errstream.message);
+		}
+	}
+);
 
-// export const getChannelCanvasList = createAsyncThunk(
-// 	'canvas/getChannelCanvasDetail',
-// 	async ({ id, clan_id, channel_id }: ApiEditChannelCanvasRequest, thunkAPI) => {
-// 		try {
-// 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+export const getChannelCanvasList = createAsyncThunk(
+	'canvas/getChannelCanvasList',
+	async ({ channel_id, clan_id, limit, page }: getCanvasListPayload, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			console.log(channel_id, 'channel_id');
+			const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limit, page);
 
-// 			const response = await mezon.client.getChannelCanvasDetail(mezon.session, id, clan_id, channel_id);
-
-// 			return response;
-// 		} catch (error: any) {
-// 			const errstream = await error.json();
-// 			return thunkAPI.rejectWithValue(errstream.message);
-// 		}
-// 	}
-// );
+			return response;
+		} catch (error: any) {
+			const errstream = await error.json();
+			return thunkAPI.rejectWithValue(errstream.message);
+		}
+	}
+);
 
 export const initialCanvasAPIState: CanvasAPIState = canvasAPIAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null
+	error: null,
+	channelCanvas: {}
 });
+
+const handleSetManyCanvas = ({ state, channelId, adapterPayload }: { state: any; channelId?: string; adapterPayload: CanvasAPIEntity[] }) => {
+	if (!channelId) return state;
+	if (!state.channelCanvas[channelId])
+		state.channelCanvas[channelId] = canvasAPIAdapter.getInitialState({
+			id: channelId
+		});
+	state.channelCanvas[channelId] = canvasAPIAdapter.setMany(state.channelCanvas[channelId], adapterPayload);
+};
 
 export const canvasAPISlice = createSlice({
 	name: CANVAS_API_FEATURE_KEY,
 	initialState: initialCanvasAPIState,
 	reducers: {
-		add: canvasAPIAdapter.addOne,
-		addMany: canvasAPIAdapter.addMany,
-		remove: canvasAPIAdapter.removeOne
 		// ...
 	},
 	extraReducers: (builder) => {
@@ -111,6 +117,35 @@ export const canvasAPISlice = createSlice({
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(createEditCanvas.rejected, (state: CanvasAPIState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+		builder
+			.addCase(getChannelCanvasList.pending, (state: CanvasAPIState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(getChannelCanvasList.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
+				state.loadingStatus = 'loaded';
+				const channelId = (action as any)?.meta?.arg?.channel_id;
+				const reversedCanvas = action.payload.channel_canvases;
+				handleSetManyCanvas({
+					state,
+					channelId,
+					adapterPayload: reversedCanvas
+				});
+			})
+			.addCase(getChannelCanvasList.rejected, (state: CanvasAPIState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+		builder
+			.addCase(getChannelCanvasDetail.pending, (state: CanvasAPIState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(getChannelCanvasDetail.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(getChannelCanvasDetail.rejected, (state: CanvasAPIState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -142,7 +177,9 @@ export const canvasAPIReducer = canvasAPISlice.reducer;
  */
 export const canvasAPIActions = {
 	...canvasAPISlice.actions,
-	createEditCanvas
+	createEditCanvas,
+	getChannelCanvasList,
+	getChannelCanvasDetail
 };
 
 /*
@@ -159,12 +196,26 @@ export const canvasAPIActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectById, selectEntities } = canvasAPIAdapter.getSelectors();
 
-export const getCanvasAPIState = (rootState: { [CANVAS_API_FEATURE_KEY]: CanvasAPIState }): CanvasAPIState => rootState[CANVAS_API_FEATURE_KEY];
+export const getCanvasApiState = (rootState: { [CANVAS_API_FEATURE_KEY]: CanvasAPIState }): CanvasAPIState => rootState[CANVAS_API_FEATURE_KEY];
 
-export const selectAllCanvas = createSelector(getCanvasAPIState, selectAll);
+export const getChannelIdCanvasAsSecondParam = (_: unknown, channelId: string) => channelId;
 
-export const selectCanvasEntities = createSelector(getCanvasAPIState, selectEntities);
+export const selectAllCanvas = createSelector(getCanvasApiState, (canvasState) => {
+	const res: CanvasAPIEntity[] = [];
+	Object.values(canvasState.channelCanvas || {}).forEach((item) => {
+		res.concat(Object.values(item?.entities || {}));
+	});
+	return res;
+});
 
-export const CanvasById = (Id: string) => createSelector(getCanvasAPIState, (state) => selectById(state, Id));
+export const selectCanvasIdsByChannelId = createSelector([getCanvasApiState, getChannelIdCanvasAsSecondParam], (state, channelId) => {
+	return state?.channelCanvas[channelId]?.ids || [];
+});
+
+export const selectCanvasEntityById = createSelector(
+	[getCanvasApiState, getChannelIdCanvasAsSecondParam, (_, __, messageId) => messageId],
+	(messagesState, channelId, canvasId) => {
+		return messagesState.channelCanvas[channelId]?.entities?.[canvasId] || emptyObject;
+	}
+);
