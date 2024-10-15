@@ -33,6 +33,7 @@ import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
 import { ChannelLabel } from './TopBarComponents';
+import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
@@ -105,6 +106,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
+								<CanvasButton isLightMode={appearanceTheme === 'light'} />
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -130,6 +132,36 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 				)}
 			</div>
 		</>
+	);
+}
+
+function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
+	const [isShowThread, setIsShowThread] = useState<boolean>(false);
+	const threadRef = useRef<HTMLDivElement | null>(null);
+	////
+	const handleShowThreads = () => {
+		setIsShowThread(!isShowThread);
+	};
+
+	const handleClose = useCallback(() => {
+		setIsShowThread(false);
+	}, []);
+	///
+	return (
+		<div className="relative leading-5 h-5" ref={threadRef}>
+			<Tooltip
+				className={`${isShowThread && 'hidden'}  flex justify-center items-center`}
+				content="Canvas"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
+				<button className="focus-visible:outline-none" onClick={handleShowThreads} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.CanvasIcon isWhite={isShowThread} defaultSize="size-6" />
+				</button>
+			</Tooltip>
+			{isShowThread && <CanvasModal onClose={handleClose} rootRef={threadRef} />}
+		</div>
 	);
 }
 

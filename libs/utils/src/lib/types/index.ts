@@ -7,6 +7,7 @@ import {
 	ApiChannelMessageHeader,
 	ApiClanDesc,
 	ApiClanProfile,
+	ApiEditChannelCanvasRequest,
 	ApiEventManagement,
 	ApiInviteUserRes,
 	ApiMessageAttachment,
@@ -834,3 +835,8 @@ export enum ThreadStatus {
 	activePublic = 2,
 	joined = 1
 }
+
+export type ICanvas = ApiEditChannelCanvasRequest & {
+	limit: number;
+	page: number;
+};
