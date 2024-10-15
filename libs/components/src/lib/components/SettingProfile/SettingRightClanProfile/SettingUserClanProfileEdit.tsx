@@ -201,7 +201,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 				</div>
 			</div>
 
-			{!checkValidate && <SettingUserClanProfileSave PropsSave={saveProfile} />}
+			<SettingUserClanProfileSave PropsSave={saveProfile} />
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
 		</>
