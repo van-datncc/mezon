@@ -31,7 +31,9 @@ export default function MezonClanAvatar({
 				<FastImage source={{ uri: image }} resizeMode="cover" style={styles.image} />
 			) : (
 				<View style={[styles.fakeBox, { backgroundColor: defaultColor || themeValue.colorAvatarDefault }]}>
-					<Image source={Images.ANONYMOUS_AVATAR} style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_50 }} />
+					{!noDefaultText ? (
+						<Image source={Images.ANONYMOUS_AVATAR} style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40 }} />
+					) : null}
 				</View>
 			)}
 		</Block>
