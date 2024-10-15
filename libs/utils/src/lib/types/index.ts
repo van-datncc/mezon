@@ -616,6 +616,7 @@ export type EmojiStorage = {
 	messageId: string;
 	senderId: string;
 	action: boolean;
+	channel_id?: string;
 };
 
 export enum Direction_Mode {

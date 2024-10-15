@@ -3,7 +3,7 @@ import { useChatReaction } from '@mezon/core';
 import { FaceIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { selectComputedReactionsByMessageId, selectCurrentChannel } from '@mezon/store-mobile';
-import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { EmojiDataOptionals, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -48,7 +48,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			1,
 			message_sender_id ?? '',
 			false,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false
+			isPublicChannel(currentChannel)
 		);
 	};
 
@@ -66,7 +66,7 @@ export const MessageAction = React.memo((props: IMessageReactionProps) => {
 			countToRemove,
 			userId ?? '',
 			true,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel.channel_private : false
+			isPublicChannel(currentChannel)
 		);
 	};
 

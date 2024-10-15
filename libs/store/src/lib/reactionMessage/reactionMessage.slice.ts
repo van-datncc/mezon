@@ -177,7 +177,8 @@ export const reactionSlice = createSlice({
 				emoji: reactionDataSocket.emoji ?? '',
 				messageId: reactionDataSocket.message_id ?? '',
 				senderId: reactionDataSocket.sender_id ?? '',
-				action: reactionDataSocket.action ?? false
+				action: reactionDataSocket.action ?? false,
+				channel_id: reactionDataSocket.channel_id
 			};
 
 			saveRecentEmoji(emojiLastest);
