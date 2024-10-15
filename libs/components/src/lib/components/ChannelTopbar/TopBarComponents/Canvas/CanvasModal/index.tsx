@@ -1,5 +1,5 @@
 import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference } from '@mezon/core';
-import { appActions, selectCanvasIdsByChannelId, selectCurrentChannel, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
+import { appActions, selectCanvasIdsByChannelId, selectCurrentChannel, selectCurrentClanId, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
@@ -21,6 +21,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
     // const { setIsShowCreateThread, threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
     const { setOpenThreadMessageState } = useReference();
     const currentChannel = useSelector(selectCurrentChannel);
+    const currentClanId = useSelector(selectCurrentClanId);
 
     const appearanceTheme = useSelector(selectTheme);
     const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
@@ -68,7 +69,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
                     className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
                 >
                     {canvases.map((canvasId) => {
-                        return <GroupCanvas key={canvasId} canvasId={canvasId} channelId={currentChannel?.channel_id} />;
+                        return <GroupCanvas key={canvasId} canvasId={canvasId} channelId={currentChannel?.channel_id} clanId={currentClanId || ''} />;
                     })}
                 </div>
             </div>

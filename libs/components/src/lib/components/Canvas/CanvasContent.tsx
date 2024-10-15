@@ -1,18 +1,23 @@
+import { canvasActions } from '@mezon/store';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 interface TextEntry {
     text: string;
     format: { [key: string]: unknown }; // Kiểu cho định dạng
 }
 
-function CanvasContent({ isLightMode }: { isLightMode: boolean }) {
+function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content: string }) {
     const [toolbarVisible, setToolbarVisible] = useState(false);
     const [texts, setTexts] = useState<TextEntry[]>([]);
     const quillRef = useRef<Quill | null>(null);
     const editorRef = useRef<HTMLDivElement | null>(null);
     const toolbarRef = useRef<HTMLDivElement | null>(null);
+    const dispatch = useDispatch();
+
+    console.log(content, 'content');
 
     useEffect(() => {
         // Khởi tạo Quill
@@ -94,15 +99,9 @@ function CanvasContent({ isLightMode }: { isLightMode: boolean }) {
     const getQuillContent = () => {
         if (quillRef.current) {
             const delta = quillRef.current.getContents(); // Lấy nội dung với định dạng Delta
-            const a = JSON.stringify(delta);
-            console.log(a, 'delta string')
-            const html = quillRef.current.root.innerHTML; // Lấy nội dung dưới dạng HTML
-            console.log(delta, 'delta'),
-                console.log(html, 'html')
-            return {
-                delta,
-                html,
-            };
+            const content = JSON.stringify(delta);
+            debugger
+            dispatch(canvasActions.setContent(content || ''));
         }
         return null;
     };
@@ -114,7 +113,7 @@ function CanvasContent({ isLightMode }: { isLightMode: boolean }) {
                 const response = await fetch('URL_API_CỦA_BẠN', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(content),
                 });

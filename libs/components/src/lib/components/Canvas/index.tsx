@@ -1,4 +1,4 @@
-import { canvasActions, createEditCanvas, selectContent, selectCurrentChannelId, selectCurrentClanId, selectTitle } from '@mezon/store';
+import { canvasActions, createEditCanvas, selecIdCanvas, selectCanvasEntityById, selectContent, selectCurrentChannelId, selectCurrentClanId, selectTitle } from '@mezon/store';
 import 'quill/dist/quill.snow.css';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,20 +8,25 @@ const Canvas = () => {
     const dispatch = useDispatch();
     const title = useSelector(selectTitle);
     const content = useSelector(selectContent);
+    const idCanvas = useSelector(selecIdCanvas);
     const currentChannelId = useSelector(selectCurrentChannelId);
     const currentClanId = useSelector(selectCurrentClanId);
     const [localTitle, setLocalTitle] = useState(title);
     const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+    const canvasById = useSelector((state) => selectCanvasEntityById(state, currentChannelId, idCanvas));
 
     const callCreateEditCanvas = async () => {
-        const body: any = {
-            channel_id: currentChannelId,
-            clan_id: currentClanId?.toString(),
-            content: content || 'aaaa',
-            id: null,
-            title: localTitle
-        };
-        await dispatch(createEditCanvas(body) as any);
+        if (currentChannelId && currentClanId) {
+            const body: any = {
+                channel_id: currentChannelId,
+                clan_id: currentClanId?.toString(),
+                content: content,
+                id: idCanvas || '',
+                title: localTitle
+            };
+            await dispatch(createEditCanvas(body) as any);
+        }
+
     };
 
     useEffect(() => {
@@ -52,12 +57,12 @@ const Canvas = () => {
         <div className="w-full h-[100vh_-_60px] overflow-auto">
             <textarea
                 placeholder="Your canvas title"
-                value={localTitle || ''}
+                value={canvasById?.title || localTitle || ''}
                 onChange={handleInputChange}
                 className="w-full h-auto px-4 py-2 bg-inherit focus:outline-none text-4xl resize-none overflow-hidden"
             />
             <div className="w-full">
-                <CanvasContent isLightMode={true} />
+                <CanvasContent isLightMode={true} content={canvasById?.content || ''} />
             </div>
         </div>
     );

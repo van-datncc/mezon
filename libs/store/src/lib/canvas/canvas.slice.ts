@@ -4,12 +4,14 @@ export const CANVAS_FEATURE_KEY = 'canvas';
 
 export interface CanvasState {
 	title: string;
-	content: any;
+	content: string;
+	idCanvas: string;
 }
 
 const initialState: CanvasState = {
 	title: '',
-	content: null
+	content: '',
+	idCanvas: ''
 };
 
 const canvasSlice = createSlice({
@@ -21,6 +23,9 @@ const canvasSlice = createSlice({
 		},
 		setContent: (state, action: PayloadAction<string>) => {
 			state.content = action.payload;
+		},
+		setIdCanvas: (state, action: PayloadAction<string>) => {
+			state.idCanvas = action.payload;
 		}
 	}
 });
@@ -36,3 +41,5 @@ export const getCanvasState = (rootState: { [CANVAS_FEATURE_KEY]: CanvasState })
 export const selectTitle = createSelector(getCanvasState, (state) => state.title);
 
 export const selectContent = createSelector(getCanvasState, (state) => state.content);
+
+export const selecIdCanvas = createSelector(getCanvasState, (state) => state.idCanvas);
