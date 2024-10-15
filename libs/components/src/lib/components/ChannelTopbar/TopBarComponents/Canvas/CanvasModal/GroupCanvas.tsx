@@ -11,7 +11,6 @@ type GroupCanvasProps = {
 const GroupCanvas = ({ canvasId, channelId, clanId, onClose }: GroupCanvasProps) => {
 	const canvas = useSelector((state) => selectCanvasEntityById(state, channelId, canvasId));
 	const dispatch = useAppDispatch();
-	console.log(canvas, 'canvas');
 
 	const handleOpenCanvas = async () => {
 		dispatch(appActions.setIsShowCanvas(true));

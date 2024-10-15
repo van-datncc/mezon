@@ -157,7 +157,6 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 			const fetchCanvas = async () => {
 				const channelId = currentChannel?.channel_id ?? '';
 				const clanId = currentChannel?.clan_id ?? '';
-				console.log(channelId, 'channelId111111');
 
 				if (channelId && clanId) {
 					const body = {

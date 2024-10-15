@@ -43,7 +43,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 		});
 		setQuill(quillRef.current);
 
-		console.log(content, 'content');
 		if (content) {
 			quillRef.current.setContents(JSON.parse(content));
 		}
@@ -59,7 +58,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 				setToolbarVisible(true);
 				// Get current formats and update activeFormats state
 				const formats = quillRef.current?.getFormat(range) || {};
-				console.log(formats, 'formats');
 				setActiveFormats({
 					bold: !!formats.bold,
 					italic: !!formats.italic,
@@ -120,7 +118,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 	}, []);
 
 	const handleContentChange = (content: Quill) => {
-		console.log(`content.getContents()`, content.getContents());
 		const data = JSON.stringify(content.getContents());
 		dispatch(canvasActions.setContent(data)); // Save content
 	};
@@ -187,7 +184,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 				borderRadius: '5px'
 			};
 		} else if (type === 'option') {
-			console.log(activeFormats, 'activeFormats');
 			const optionValue = value as string;
 			return {
 				backgroundColor: activeFormats.header === optionValue ? 'gray' : 'white'

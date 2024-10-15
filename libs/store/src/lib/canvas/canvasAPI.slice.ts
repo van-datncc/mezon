@@ -47,7 +47,7 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		const response = await mezon.client.editChannelCanvases(mezon.session, body);
-		console.log(response, 'response');
+
 		return response;
 	} catch (error: any) {
 		const errstream = await error.json();
@@ -116,7 +116,6 @@ export const canvasAPISlice = createSlice({
 	reducers: {
 		// ...
 		updateCanvas: (state: any, action: PayloadAction<any>) => {
-			// console.log(payload, 'payload');
 			const { channelId, results } = action.payload;
 			canvasAPIAdapter.updateOne(state, {
 				id: results.payload.id,
@@ -242,7 +241,6 @@ export const selectCanvasIdsByChannelId = createSelector([getCanvasApiState, get
 export const selectCanvasEntityById = createSelector(
 	[getCanvasApiState, getChannelIdCanvasAsSecondParam, (_, __, canvasId) => canvasId],
 	(messagesState, channelId, canvasId) => {
-		console.log(messagesState.channelCanvas[channelId]?.entities, 'messagesState.channelCanvas[channelId]?.entities');
 		return messagesState.channelCanvas[channelId]?.entities?.[canvasId];
 	}
 );

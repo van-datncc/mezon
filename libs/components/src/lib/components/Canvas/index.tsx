@@ -63,8 +63,6 @@ const Canvas = () => {
 		dispatch(canvasActions.setTitle(newTitle));
 	};
 
-	console.log(canvasById, 'tttttttttttttttttttttttttt');
-
 	return (
 		<div className="w-full h-[100vh_-_60px] overflow-auto">
 			<textarea

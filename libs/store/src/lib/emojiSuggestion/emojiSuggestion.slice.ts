@@ -155,7 +155,7 @@ export const emojiSuggestionSlice = createSlice({
 				state.emojiObjPicked[shortName] = id;
 			}
 		}
-	}, ///
+	},
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchEmoji.pending, (state: EmojiSuggestionState) => {
