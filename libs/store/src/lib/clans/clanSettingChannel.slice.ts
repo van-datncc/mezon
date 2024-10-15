@@ -43,7 +43,7 @@ export const fetchChannelByUserIdCached = memoizeAndTrack(
 		promise: true,
 		maxAge: CHANNEL_SETTING_CLAN_CACHE_TIME,
 		normalizer: (args) => {
-			return args[0]?.session?.username || '';
+			return args[0]?.session?.username || '' + args[1];
 		}
 	}
 );
@@ -58,7 +58,6 @@ export const fetchChannelByUserId = createAsyncThunk(
 			}
 
 			const response = await fetchChannelByUserIdCached(mezon, clanId);
-			console.log('Response :', response);
 			if (response) {
 				return response.channel_setting_list ?? [];
 			}
