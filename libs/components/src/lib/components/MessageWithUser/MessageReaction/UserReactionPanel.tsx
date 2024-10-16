@@ -10,7 +10,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons, NameComponent } from '@mezon/ui';
-import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { Fragment, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -48,7 +48,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
-			currentChannel ? !currentChannel.channel_private : false
+			isPublicChannel(currentChannel)
 		);
 	};
 

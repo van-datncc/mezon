@@ -22,6 +22,7 @@ export interface AppState {
 	isShowMemberList: boolean;
 	isShowChatStream: boolean;
 	chatStreamWidth: number;
+	isShowCanvas: boolean;
 	isShowMemberListDM: boolean;
 	isUseProfileDM: boolean;
 	initialPath?: string;
@@ -43,6 +44,7 @@ export const initialAppState: AppState = {
 	isShowMemberList: true,
 	isShowChatStream: false,
 	chatStreamWidth: 0,
+	isShowCanvas: true,
 	isShowMemberListDM: true,
 	isUseProfileDM: true,
 	initialPath: '/',
@@ -111,6 +113,9 @@ export const appSlice = createSlice({
 		},
 		setChatStreamWidth: (state, action) => {
 			state.chatStreamWidth = action.payload;
+		},
+		setIsShowCanvas: (state, action) => {
+			state.isShowCanvas = action.payload;
 		},
 		setInitialPath: (state, action) => {
 			state.initialPath = action.payload;
@@ -192,6 +197,8 @@ export const selectIsShowMemberList = createSelector(getAppState, (state: AppSta
 export const selectIsShowChatStream = createSelector(getAppState, (state: AppState) => state.isShowChatStream);
 
 export const selectChatStreamWidth = createSelector(getAppState, (state: AppState) => state.chatStreamWidth);
+
+export const selectIsShowCanvas = createSelector(getAppState, (state: AppState) => state.isShowCanvas);
 
 export const selectInitialPath = createCachedSelector(getAppState, (state: AppState) => state.initialPath);
 

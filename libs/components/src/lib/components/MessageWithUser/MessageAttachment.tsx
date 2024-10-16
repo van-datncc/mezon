@@ -1,4 +1,4 @@
-import { EMimeTypes, ETypeLinkMedia, IMessageWithUser, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { EMimeTypes, ETypeLinkMedia, IMessageWithUser, isMediaTypeNotSupported, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -18,6 +18,9 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 	const documents: ApiMessageAttachment[] = [];
 
 	attachments.forEach((attachment) => {
+		if (isMediaTypeNotSupported(attachment.filetype)) {
+			return documents.push(attachment);
+		}
 		if (
 			((attachment.filetype?.indexOf(EMimeTypes.mp4) !== -1 || attachment.filetype?.indexOf(EMimeTypes.mov) !== -1) &&
 				!attachment.url?.includes(EMimeTypes.tenor)) ||

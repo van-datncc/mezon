@@ -53,7 +53,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode, transformPayloadWriteSocket } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode, isPublicChannel, transformPayloadWriteSocket } from '@mezon/utils';
 import * as Sentry from '@sentry/browser';
 import isElectron from 'is-electron';
 import {
@@ -763,10 +763,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						: currentActive.type === ChannelType.CHANNEL_TYPE_DM
 							? ChannelStreamMode.STREAM_MODE_DM
 							: 0;
-			const isPublic = !currentActive?.channel_private;
 			const payload = transformPayloadWriteSocket({
 				clanId: currentClanId as string,
-				isPublicChannel: isPublic,
+				isPublicChannel: isPublicChannel(currentActive),
 				isClanView: isClanView as boolean
 			});
 

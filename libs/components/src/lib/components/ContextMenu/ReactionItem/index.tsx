@@ -1,6 +1,6 @@
 import { useAppParams, useAuth, useChatReaction } from '@mezon/core';
 import { selectClanView, selectCurrentChannel } from '@mezon/store';
-import { getSrcEmoji } from '@mezon/utils';
+import { getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -34,7 +34,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, active
 			1,
 			userId.userId ?? '',
 			false,
-			currentChannel ? !currentChannel.channel_private : false
+			isPublicChannel(currentChannel)
 		);
 	}, [emojiId, emojiShortCode, activeMode, messageId, currentChannel, directId, isClanView, reactionMessageDispatch, userId]);
 

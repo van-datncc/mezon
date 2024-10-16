@@ -59,7 +59,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(modalRef, onClose, rootRef);
-
+	///
 	return (
 		<div
 			ref={modalRef}

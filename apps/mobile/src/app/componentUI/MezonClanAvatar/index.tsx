@@ -1,6 +1,7 @@
-import { useTheme } from '@mezon/mobile-ui';
-import { StyleProp, Text, TextStyle, View } from 'react-native';
+import { Block, size, useTheme } from '@mezon/mobile-ui';
+import { Image, StyleProp, TextStyle, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import Images from '../../../assets/Images';
 import { style } from './styles';
 
 interface IMezonClanAvatarProps {
@@ -25,18 +26,16 @@ export default function MezonClanAvatar({
 	const styles = style(themeValue);
 
 	return (
-		<>
+		<Block>
 			{image ? (
 				<FastImage source={{ uri: image }} resizeMode="cover" style={styles.image} />
 			) : (
 				<View style={[styles.fakeBox, { backgroundColor: defaultColor || themeValue.colorAvatarDefault }]}>
 					{!noDefaultText ? (
-						<Text adjustsFontSizeToFit numberOfLines={1} style={[styles.altText, lightMode && styles.altTextLight, textStyle]}>
-							{alt?.charAt(0).toUpperCase()}
-						</Text>
+						<Image source={Images.ANONYMOUS_AVATAR} style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40 }} />
 					) : null}
 				</View>
 			)}
-		</>
+		</Block>
 	);
 }
