@@ -22,13 +22,13 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 		>
 			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden max-w-[440px]">
-				<div className="dark:text-white text-black">
+				<div className="dark:text-white text-black w-full">
 					<div className="p-4 pb-0">
 						<h3 className="font-semibold pb-4 text-xl">Unpin Message</h3>
 						<p>You sure you want to remove this pinned message?</p>
 					</div>
 					<div className="p-4 max-h-[60vh] overflow-y-auto hide-scrollbar">
-						<div className="flex items-start p-4 pr-6 shadow-md shadow-black rounded">
+						<div className="flex items-start p-4 pr-6 shadow-md dark:shadow-black rounded">
 							<MemberProfile
 								isHideUserName={true}
 								avatar={pinMessage.avatar || ''}
@@ -37,7 +37,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 								isHideIconStatus={true}
 								textColor="#fff"
 							/>
-							<div className="flex flex-col gap-1 text-left">
+							<div className="flex flex-col gap-1 text-left w-[90%]">
 								<div>
 									<span className="font-medium dark:text-textDarkTheme text-textLightTheme">
 										{userSender?.clan_nick ?? userSender?.user?.display_name ?? userSender?.user?.username}
@@ -49,6 +49,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 										isJumMessageEnabled={false}
 										isTokenClickAble={false}
 										content={JSON.parse(pinMessage.content || '{}')}
+										isInPinMsg={true}
 									/>
 								</span>
 								{attachments?.length ? <ListPinAttachment attachments={attachments} /> : <></>}

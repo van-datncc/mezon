@@ -26,6 +26,8 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { canvasReducer } from './canvas/canvas.slice';
+import { canvasAPIReducer } from './canvas/canvasAPI.slice';
 import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
@@ -78,7 +80,7 @@ const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
 		storage,
-		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile', 'isShowChatStream', 'chatStreamWidth']
+		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile', 'isShowChatStream', 'chatStreamWidth', 'isShowCanvas']
 	},
 	appReducer
 );
@@ -327,6 +329,8 @@ const reducer = {
 	usersstream: usersStreamReducer,
 	channelsstream: channelsStreamReducer,
 	videostream: persistedStreamReducer,
+	canvas: canvasReducer,
+	canvasapi: canvasAPIReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,

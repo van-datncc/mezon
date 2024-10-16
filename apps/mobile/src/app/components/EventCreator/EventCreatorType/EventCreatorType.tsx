@@ -54,7 +54,8 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 					textStyle: {
 						fontWeight: 'bold'
 					},
-					disabled: !voicesChannel?.length
+					disabled: !voicesChannel?.length,
+					icon: <Icons.VoiceNormalIcon color={themeValue.text} />
 				},
 				{
 					title: t('fields.channelType.somewhere.title'),
@@ -62,7 +63,8 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 					value: OptionEvent.OPTION_LOCATION,
 					textStyle: {
 						fontWeight: 'bold'
-					}
+					},
+					icon: <Icons.LocationIcon color={themeValue.text} />
 				}
 			] satisfies IMezonOptionData,
 		[]

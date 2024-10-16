@@ -50,6 +50,7 @@ import {
 	MentionDataProps,
 	SubPanelName,
 	TITLE_MENTION_HERE,
+	ThreadStatus,
 	ThreadValue,
 	blankReferenceObj,
 	filterEmptyArrays,
@@ -133,7 +134,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const currentClanId = useSelector(selectCurrentClanId);
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const { addMemberToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
+	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
@@ -290,6 +291,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				return;
 			}
 			addMemberToThread(currentChannel, mentionList);
+
+			if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
+				dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined }));
+				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
+			}
 
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(

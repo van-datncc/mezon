@@ -141,6 +141,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const handleClick = () => {
 			setTurnOffThreadMessage();
+			dispatch(appActions.setIsShowCanvas(false));
 			if (closeMenu) {
 				setStatusMenu(false);
 			}

@@ -1,5 +1,16 @@
 import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference, useThreads } from '@mezon/core';
-import { searchMessagesActions, selectCurrentChannel, selectTheme, threadsActions, useAppDispatch } from '@mezon/store';
+import {
+	ThreadsEntity,
+	searchMessagesActions,
+	selectActiveThreads,
+	selectCurrentChannel,
+	selectJoinedThreadsWithinLast30Days,
+	selectShowEmptyStatus,
+	selectTheme,
+	selectThreadsOlderThan30Days,
+	threadsActions,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
@@ -20,12 +31,18 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-	const { setIsShowCreateThread, threadChannel, threadChannelOld, threadChannelOnline } = useThreads();
+	const { setIsShowCreateThread } = useThreads();
+
 	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
 
 	const appearanceTheme = useSelector(selectTheme);
 	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
+
+	const isEmpty = useSelector(selectShowEmptyStatus());
+	const getActiveThreads = useSelector(selectActiveThreads);
+	const getJoinedThreadsWithinLast30Days = useSelector(selectJoinedThreadsWithinLast30Days);
+	const getThreadsOlderThan30Days = useSelector(selectThreadsOlderThan30Days);
 
 	const handleCreateThread = () => {
 		setOpenThreadMessageState(false);
@@ -42,7 +59,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 	useOnClickOutside(modalRef, onClose, rootRef);
-
+	///
 	return (
 		<div
 			ref={modalRef}
@@ -74,21 +91,55 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 				<div
 					className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 				>
-					{threadChannelOnline.length > 0 && (
-						<GroupThreads title={`${threadChannelOnline.length} joined threads`}>
-							{threadChannelOnline.map((thread) => (
-								<ThreadItem thread={thread} key={thread.id} setIsShowThread={onClose} />
+					{/* Joined threads */}
+					{getJoinedThreadsWithinLast30Days.length > 0 && (
+						<GroupThreads
+							title={
+								getJoinedThreadsWithinLast30Days.length > 1
+									? `${getJoinedThreadsWithinLast30Days.length} joined threads`
+									: `${getJoinedThreadsWithinLast30Days.length} joined thread`
+							}
+						>
+							{getJoinedThreadsWithinLast30Days.map((thread: ThreadsEntity) => (
+								<ThreadItem thread={thread} key={`${thread.id}-joined-threads`} setIsShowThread={onClose} />
 							))}
 						</GroupThreads>
 					)}
-					{threadChannelOld.length > 0 && (
-						<GroupThreads title="order threads">
-							{threadChannelOld.map((thread) => (
-								<ThreadItem thread={thread} key={thread.id} setIsShowThread={onClose} />
+					{/* Active threads */}
+					{getActiveThreads.length > 0 && (
+						<GroupThreads
+							title={
+								getActiveThreads.length > 1
+									? `${getActiveThreads.length} other active threads`
+									: `${getActiveThreads.length} other active thread`
+							}
+						>
+							{getActiveThreads.map((thread: ThreadsEntity) => (
+								<ThreadItem
+									isPublicThread={true}
+									thread={thread}
+									key={`${thread.id}-other-active-threads`}
+									setIsShowThread={onClose}
+								/>
 							))}
 						</GroupThreads>
 					)}
-					{threadChannel.length === 0 && <EmptyThread onClick={handleCreateThread} />}
+					{/* Order threads */}
+					{getThreadsOlderThan30Days.length > 0 && (
+						<GroupThreads
+							title={
+								getThreadsOlderThan30Days.length > 1
+									? `${getThreadsOlderThan30Days.length} older threads`
+									: `${getThreadsOlderThan30Days.length} older thread`
+							}
+						>
+							{getThreadsOlderThan30Days.map((thread: ThreadsEntity) => (
+								<ThreadItem thread={thread} key={`${thread.id}-older-threads`} setIsShowThread={onClose} />
+							))}
+						</GroupThreads>
+					)}
+
+					{isEmpty && <EmptyThread onClick={handleCreateThread} />}
 				</div>
 			</div>
 		</div>

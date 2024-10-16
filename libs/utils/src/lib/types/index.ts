@@ -136,12 +136,19 @@ export type IChannelMember = ClanUserListClanUser & {
 };
 
 export type IThread = {
-	name: string | undefined;
-	id: string | undefined;
-	clanId: string | undefined;
-	channelId: string | undefined;
-	content: string | undefined;
-	date: string | undefined;
+	id?: string | undefined;
+	/// new update
+	clan_id?: string | undefined;
+	parrent_id?: string | undefined;
+	channel_id?: string | undefined;
+	category_id?: string | undefined;
+	type?: number;
+	creator_id?: string | undefined;
+	channel_label?: string | undefined;
+	active?: number;
+	create_time_seconds?: number | string | undefined;
+	update_time_seconds?: number | string | undefined;
+	last_sent_message?: ApiChannelMessageHeader;
 };
 
 export type IContextMenuItemAction = 'REST';
@@ -609,6 +616,7 @@ export type EmojiStorage = {
 	messageId: string;
 	senderId: string;
 	action: boolean;
+	channel_id?: string;
 };
 
 export enum Direction_Mode {
@@ -822,3 +830,16 @@ export enum TypeCheck {
 	TYPECHANNEL = 2,
 	TYPETHREAD = 3
 }
+
+export enum ThreadStatus {
+	activePublic = 2,
+	joined = 1
+}
+
+export type ICanvas = {
+	id?: string;
+	clan_id: string;
+	channel_id: string;
+	title?: string;
+	content?: string;
+};

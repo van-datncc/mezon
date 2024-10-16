@@ -3,7 +3,7 @@ import { selectChannelById, selectCurrentClanId, selectEventById, selectVoiceCha
 import { ContenSubmitEventProps, OptionEvent, Tabs_Option } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getCurrentTimeRounded, handleTimeISO } from '../timeFomatEvent';
+import { formatTimeStringToHourFormat, formatToLocalDateString, getCurrentTimeRounded, handleTimeISO } from '../timeFomatEvent';
 import EventInfoModal from './eventInfoModal';
 import HeaderEventCreate from './headerEventCreate';
 import LocationModal from './locationModal';
@@ -26,16 +26,17 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const eventChannel = useSelector(selectChannelById(currentEvent ? currentEvent.channel_id || '' : ''));
 
 	const [contentSubmit, setContentSubmit] = useState<ContenSubmitEventProps>({
-		topic: '',
-		titleEvent: '',
-		timeStart: '00:00',
-		timeEnd: '00:00',
-		selectedDateStart: new Date(),
-		selectedDateEnd: new Date(),
-		voiceChannel: voicesChannel[0]?.id || '',
-		logo: '',
-		description: ''
+		topic: currentEvent ? currentEvent.title || '' : '',
+		titleEvent: currentEvent ? currentEvent.title || '' : '',
+		timeStart: currentEvent ? currentEvent.start_time || '00:00' : '00:00',
+		timeEnd: currentEvent ? currentEvent.end_time || '00:00' : '00:00',
+		selectedDateStart: currentEvent ? new Date(formatToLocalDateString(currentEvent.start_time || '')) : new Date(),
+		selectedDateEnd: currentEvent ? new Date(formatToLocalDateString(currentEvent.end_time || '')) : new Date(),
+		voiceChannel: currentEvent ? currentEvent.channel_id || '' : '',
+		logo: currentEvent ? currentEvent.logo || '' : '',
+		description: currentEvent ? currentEvent.description || '' : ''
 	});
+
 	const [buttonWork, setButtonWork] = useState(true);
 	const [option, setOption] = useState('');
 	const [errorOption, setErrorOption] = useState(false);
@@ -133,22 +134,6 @@ const ModalCreate = (props: ModalCreateProps) => {
 	};
 
 	useEffect(() => {
-		if (eventId !== '') {
-			setContentSubmit({
-				topic: currentEvent.title || '',
-				titleEvent: currentEvent.title || '',
-				timeStart: currentEvent.start_time || '00:00',
-				timeEnd: currentEvent.end_time || '00:00',
-				selectedDateStart: new Date(),
-				selectedDateEnd: new Date(),
-				voiceChannel: currentEvent.channel_id || '',
-				logo: currentEvent.logo || '',
-				description: currentEvent.description || ''
-			});
-		}
-	}, [eventId, currentEvent]);
-
-	useEffect(() => {
 		if (currentModal >= 1) {
 			setButtonWork(false);
 		} else {
@@ -171,8 +156,13 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const defaultTimeEnd = useMemo(() => getCurrentTimeRounded(true), []);
 
 	useEffect(() => {
-		setContentSubmit((prev) => ({ ...prev, timeStart: defaultTimeStart }));
-		setContentSubmit((prev) => ({ ...prev, timeEnd: defaultTimeEnd }));
+		if (eventId === '') {
+			setContentSubmit((prev) => ({ ...prev, timeStart: defaultTimeStart }));
+			setContentSubmit((prev) => ({ ...prev, timeEnd: defaultTimeEnd }));
+		} else {
+			setContentSubmit((prev) => ({ ...prev, timeStart: formatTimeStringToHourFormat(currentEvent.start_time || '') }));
+			setContentSubmit((prev) => ({ ...prev, timeEnd: formatTimeStringToHourFormat(currentEvent.end_time || '') }));
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -196,8 +186,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 					<EventInfoModal
 						contentSubmit={contentSubmit}
 						choiceLocation={choiceLocation}
-						timeStartDefault={defaultTimeStart}
-						timeEndDefault={defaultTimeEnd}
+						timeStartDefault={currentEvent ? formatTimeStringToHourFormat(currentEvent.start_time || '') : defaultTimeStart}
+						timeEndDefault={currentEvent ? formatTimeStringToHourFormat(currentEvent.end_time || '') : defaultTimeEnd}
 						setContentSubmit={setContentSubmit}
 						setErrorTime={(status: boolean) => setErrorTime(status)}
 					/>

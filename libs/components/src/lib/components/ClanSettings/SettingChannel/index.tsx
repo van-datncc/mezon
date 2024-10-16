@@ -1,5 +1,6 @@
-import { selectMemberClanByUserId } from '@mezon/store';
+import { selectMemberClanByGoogleId, selectMemberClanByUserId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { getAvatarForPrioritize } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Avatar, AvatarSizes, Tooltip } from 'flowbite-react';
 import { ApiChannelSettingItem } from 'mezon-js/api.gen';
@@ -175,13 +176,18 @@ const ItemInfor = ({
 export default ListChannelSetting;
 export const AvatarUserShort = ({ id, hiddenTooltip = false, size = 'xs' }: { id: string; hiddenTooltip?: boolean; size?: keyof AvatarSizes }) => {
 	const member = useSelector(selectMemberClanByUserId(id));
+	const voiceClan = useSelector(selectMemberClanByGoogleId(id ?? ''));
+	const clanAvatar = voiceClan?.clan_avatar || member?.clan_avatar;
+	const userAvatar = voiceClan?.user?.avatar_url || member?.user?.avatar_url;
+	const avatarUrl = getAvatarForPrioritize(clanAvatar, userAvatar);
+
 	return (
 		<>
 			{hiddenTooltip ? (
-				<Avatar img={member?.clan_avatar || member?.user?.avatar_url} rounded size={size} />
+				<Avatar img={avatarUrl} rounded size={size} />
 			) : (
-				<Tooltip content={member.clan_nick || member.user?.display_name || member.user?.username} hidden={hiddenTooltip} trigger="hover">
-					<Avatar img={member?.clan_avatar || member?.user?.avatar_url} rounded size={size} />
+				<Tooltip content={member?.clan_nick || member?.user?.display_name || member?.user?.username} hidden={hiddenTooltip} trigger="hover">
+					<Avatar img={avatarUrl} rounded size={size} />
 				</Tooltip>
 			)}
 		</>

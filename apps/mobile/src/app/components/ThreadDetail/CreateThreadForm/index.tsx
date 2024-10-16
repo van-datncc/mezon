@@ -122,7 +122,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
 						// sleep for waiting server check exist after insert
-						await sleep(100);
+						await sleep(10);
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,

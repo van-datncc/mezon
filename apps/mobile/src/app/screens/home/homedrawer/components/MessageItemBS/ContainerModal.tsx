@@ -13,7 +13,7 @@ import {
 	setIsForwardAll,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, getSrcEmoji } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -412,7 +412,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
-			isHideThread && EMessageActionType.ForwardMessage,
 			(!isShowForwardAll() || isHideThread) && EMessageActionType.ForwardAllMessages,
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
@@ -492,7 +491,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			1,
 			senderId ?? '',
 			false,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel?.channel_private : false
+			isPublicChannel(currentChannel)
 		);
 		onClose();
 	};
