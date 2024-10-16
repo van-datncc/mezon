@@ -223,6 +223,7 @@ const NavigationMain = () => {
 		async ({ isFromFCM = false }) => {
 			const store = await getStoreAsync();
 			try {
+				store.dispatch(appActions.setLoadingMainMobile(false));
 				const currentClanIdCached = await load(STORAGE_CLAN_ID);
 				const clanId = currentClanId?.toString() !== '0' ? currentClanId : currentClanIdCached;
 				const promises = [];

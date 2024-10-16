@@ -1,5 +1,5 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
-import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { Attributes, Colors, size, useTheme, verticalScale } from '@mezon/mobile-ui';
 import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
 import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
@@ -53,22 +53,28 @@ export const TYPE_MENTION = {
 export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean) =>
 	StyleSheet.create({
 		heading1: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(22)
 		},
 		heading2: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(20)
 		},
 		heading3: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(18)
 		},
 		heading4: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(17)
 		},
 		heading5: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(15)
 		},
 		heading6: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(16)
 		},
 		body: {
 			color: isUnReadChannel ? colors.white : colors.text,
@@ -483,6 +489,10 @@ export const RenderTextMarkdownContent = React.memo(
 			return formattedContent;
 		}, [elements, t, mode]);
 
+		const escapeDashes = (text: string): string => {
+			return text.replace(/-{1,10}/g, (match) => `\\${match}`);
+		};
+
 		const renderMarkdown = () => (
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -521,7 +531,7 @@ export const RenderTextMarkdownContent = React.memo(
 					}
 				}}
 			>
-				{formatBlockCode(contentRender?.trim(), isMessageReply)}
+				{escapeDashes(formatBlockCode(contentRender?.trim(), isMessageReply))}
 			</Markdown>
 		);
 

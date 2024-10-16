@@ -20,7 +20,7 @@ const ChannelListMessage = React.memo(
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 
-		const keyExtractor = useCallback((message) => message.id, []);
+		const keyExtractor = useCallback((message) => `${message?.id}_${message?.channel_id}`, []);
 
 		const ViewLoadMore = () => {
 			return (
@@ -48,8 +48,9 @@ const ChannelListMessage = React.memo(
 				renderItem={renderItem}
 				removeClippedSubviews={false}
 				keyExtractor={keyExtractor}
-				windowSize={20}
-				initialNumToRender={20}
+				initialNumToRender={5}
+				maxToRenderPerBatch={10}
+				windowSize={10}
 				onEndReached={
 					messages?.length && !isCannotLoadMore
 						? () => {

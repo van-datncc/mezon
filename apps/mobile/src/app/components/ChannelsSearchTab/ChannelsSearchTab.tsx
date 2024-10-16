@@ -69,7 +69,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 			if (isTabletLandscape) {
 				navigation.goBack();
 			} else {
-				navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+				navigation.goBack();
 				navigation.dispatch(DrawerActions.closeDrawer());
 			}
 			const channelId = channelData?.channel_id;
