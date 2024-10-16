@@ -164,6 +164,19 @@ function MessageWithUser({
 		[checkAnonymous, mode]
 	);
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
+	const avatar = useMemo(() => {
+		if (isDM && shortUserId === senderId) {
+			return avatarSender;
+		}
+
+		if (isDM) {
+			return messageAvatarSenderRef;
+		}
+
+		if (shortUserId === senderId) {
+			return userClanAvatar || avatarSender;
+		}
+	}, [userClanAvatar, avatarSender, shortUserId]);
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -177,10 +190,7 @@ function MessageWithUser({
 									<MessageReply
 										message={message}
 										mode={mode}
-										onClick={(e) => {
-											handleOpenShortUser(e, senderIdMessageRef as string);
-											console.log('senderIdMessageRef: ', senderIdMessageRef);
-										}}
+										onClick={(e) => handleOpenShortUser(e, senderIdMessageRef as string)}
 									/>
 								)}
 								<div
@@ -243,15 +253,7 @@ function MessageWithUser({
 						message={message}
 						mode={mode}
 						positionType={''}
-						avatar={
-							isDM
-								? shortUserId === senderId
-									? avatarSender
-									: messageAvatarSenderRef
-								: shortUserId === senderId
-									? userClanAvatar || avatarSender
-									: undefined
-						}
+						avatar={avatar}
 						name={userClanNickname || userDisplayName || username}
 						isDM={isDM}
 					/>
