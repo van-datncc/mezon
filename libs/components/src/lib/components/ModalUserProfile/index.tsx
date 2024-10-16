@@ -149,7 +149,7 @@ const ModalUserProfile = ({
 			return message?.display_name || message?.username;
 		}
 		return message?.references?.[0].message_sender_display_name || message?.references?.[0].message_sender_username;
-	}, []);
+	}, [userById, userID]);
 
 	const userNameShow = useMemo(() => {
 		if (isFooterProfile) {
@@ -165,7 +165,7 @@ const ModalUserProfile = ({
 			return message?.username;
 		}
 		return message?.references?.[0].message_sender_username;
-	}, []);
+	}, [userById, userID]);
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
