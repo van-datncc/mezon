@@ -21,7 +21,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 	const toolbarRef = useRef<HTMLDivElement | null>(null);
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
-
 	const [activeFormats, setActiveFormats] = useState<ActiveFormats>({
 		bold: false,
 		italic: false,
@@ -46,7 +45,6 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 		if (content) {
 			quillRef.current.setContents(JSON.parse(content));
 		}
-
 		// Handle content changes
 		quillRef.current.on('text-change', () => {
 			handleContentChange(quillRef.current!);
@@ -115,7 +113,7 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 			quillRef.current?.root.removeEventListener('keydown', handleKeyDown);
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, []);
+	}, [content]);
 
 	const handleContentChange = (content: Quill) => {
 		const data = JSON.stringify(content.getContents());

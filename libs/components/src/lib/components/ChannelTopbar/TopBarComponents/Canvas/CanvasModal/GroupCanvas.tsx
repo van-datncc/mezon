@@ -30,7 +30,7 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose }: GroupCanvasProps)
 	return (
 		<div className="cursor-pointer" onClick={handleOpenCanvas}>
 			<div className="mt-2 mb-2 h-6 text-xs font-semibold leading-6 uppercase dark:text-bgLightPrimary text-bgPrimary">
-				{canvas.title ? canvas.title : 'Untitled'}
+				{canvas.title ? (canvas.title.length > 30 ? `${canvas.title.substring(0, 30)}...` : canvas.title) : 'Untitled'}
 			</div>
 		</div>
 	);
