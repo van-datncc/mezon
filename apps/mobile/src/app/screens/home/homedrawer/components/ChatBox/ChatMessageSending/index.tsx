@@ -139,6 +139,13 @@ export const ChatMessageSending = memo(
 							};
 						}
 					});
+			await addMemberToThread(currentChannel, simplifiedMentionList);
+			if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
+				await dispatch(
+					threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined })
+				);
+				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
+			}
 			const payloadSendMessage: IMessageSendPayload = {
 				t: removeTags(valueInputRef?.current),
 				hg: hashtagsOnMessage?.current || [],
@@ -182,11 +189,7 @@ export const ChatMessageSending = memo(
 				})
 			);
 			clearInputAfterSendMessage();
-			addMemberToThread(currentChannel, simplifiedMentionList);
-			if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
-				dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined }));
-				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
-			}
+
 			const sendMessageAsync = async () => {
 				if ([EMessageActionType.CreateThread].includes(messageAction)) {
 					DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);
