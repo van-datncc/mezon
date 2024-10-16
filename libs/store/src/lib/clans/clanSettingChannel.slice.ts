@@ -61,7 +61,6 @@ export const fetchChannelByUserId = createAsyncThunk(
 			}
 
 			const response = await fetchChannelByUserIdCached(mezon, clanId);
-			console.log('response: ', response);
 			if (response) {
 				return response;
 			}
@@ -81,8 +80,8 @@ export const settingClanChannelSlice = createSlice({
 			.addCase(fetchChannelByUserId.fulfilled, (state: SettingClanChannelState, actions) => {
 				state.loadingStatus = 'loaded';
 				channelSettingAdapter.setAll(state, actions.payload.channel_setting_list || []);
-				state.channelCount = actions.payload.channel_count;
-				state.threadCount = actions.payload.thread_count;
+				state.channelCount = actions.payload?.channel_count || 0;
+				state.threadCount = actions.payload?.thread_count || 0;
 			})
 			.addCase(fetchChannelByUserId.pending, (state: SettingClanChannelState) => {
 				state.loadingStatus = 'loading';
