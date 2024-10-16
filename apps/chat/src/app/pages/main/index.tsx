@@ -197,12 +197,12 @@ function MyApp() {
 
 	return (
 		<div
-			className={`flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
+			className={`select-none flex h-screen min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
 			onClick={handleClick}
 		>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 			<div
-				className={`select-none fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
+				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
 				onClick={handleMenu}
 				id="menu"
 			>
