@@ -2,6 +2,7 @@ import { AngleRightIcon, getUpdateOrAddClanChannelCache, save, STORAGE_DATA_CLAN
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
+	ChannelsEntity,
 	getStoreAsync,
 	MessagesEntity,
 	selectLastMessageIdByChannelId,
@@ -46,6 +47,7 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 		}
 		const channelId = thread?.channel_id;
 		requestAnimationFrame(async () => {
+			await store.dispatch(channelsActions.upsertOne(thread as ChannelsEntity));
 			await store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 		});
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);

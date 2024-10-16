@@ -12,7 +12,7 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
-import { channelMetaActions, clansActions, selectAllChannelsByUser, selectClansEntities } from '@mezon/store';
+import { channelMetaActions, ChannelsEntity, clansActions, selectAllChannelsByUser, selectClansEntities } from '@mezon/store';
 import {
 	channelsActions,
 	directActions,
@@ -23,7 +23,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { ILinkOnMessage } from '@mezon/utils';
+import { checkIsThread, ILinkOnMessage } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -167,11 +167,7 @@ export const Sharing = ({ data, onClose }) => {
 
 	const sendToGroup = async (dataSend: { text: any; links: any[] }) => {
 		const store = await getStoreAsync();
-		const isPublic = channelSelected
-			? channelSelected.parrent_id !== '' && channelSelected.parrent_id !== '0'
-				? false
-				: !channelSelected.channel_private
-			: false;
+		const isPublic = channelSelected ? (checkIsThread(channelSelected as ChannelsEntity) ? false : !channelSelected.channel_private) : false;
 
 		requestAnimationFrame(async () => {
 			await store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));

@@ -1,8 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useChatSending } from '@mezon/core';
+import { useChannelMembers, useChatSending } from '@mezon/core';
 import { ActionEmitEvent, ID_MENTION_HERE, IRoleMention, Icons } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, selectAttachmentByChannelId, selectChannelById, selectDmGroupCurrent } from '@mezon/store';
+import {
+	emojiSuggestionActions,
+	selectAllAccount,
+	selectAttachmentByChannelId,
+	selectChannelById,
+	selectDmGroupCurrent,
+	threadsActions
+} from '@mezon/store';
 import {
 	ChannelsEntity,
 	channelMetaActions,
@@ -22,6 +29,7 @@ import {
 	IMarkdownOnMessage,
 	IMentionOnMessage,
 	IMessageSendPayload,
+	ThreadStatus,
 	filterEmptyArrays,
 	uniqueUsers
 } from '@mezon/utils';
@@ -74,6 +82,8 @@ export const ChatMessageSending = memo(
 		const currentChannel = useSelector(selectChannelById(channelId));
 		const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
 		const membersOfChild = useAppSelector((state) => (channelId ? selectAllChannelMembers(state, channelId as string) : null));
+		const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: channelId, mode: mode ?? 0 });
+		const userProfile = useSelector(selectAllAccount);
 
 		const { editSendMessage, sendMessage } = useChatSending({
 			mode,
@@ -129,6 +139,13 @@ export const ChatMessageSending = memo(
 							};
 						}
 					});
+			await addMemberToThread(currentChannel, simplifiedMentionList);
+			if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
+				await dispatch(
+					threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined })
+				);
+				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
+			}
 			const payloadSendMessage: IMessageSendPayload = {
 				t: removeTags(valueInputRef?.current),
 				hg: hashtagsOnMessage?.current || [],
@@ -172,6 +189,7 @@ export const ChatMessageSending = memo(
 				})
 			);
 			clearInputAfterSendMessage();
+
 			const sendMessageAsync = async () => {
 				if ([EMessageActionType.CreateThread].includes(messageAction)) {
 					DeviceEventEmitter.emit(ActionEmitEvent.SEND_MESSAGE, payloadThreadSendMessage);

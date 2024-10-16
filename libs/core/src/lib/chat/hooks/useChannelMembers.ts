@@ -53,7 +53,7 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 
 	const addMemberToThread = useCallback(
 		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[]) => {
-			if (currentChannel?.parrent_id === '0') return;
+			if (currentChannel?.parrent_id === '0' || currentChannel?.parrent_id === '') return;
 			const userIds = uniqueUsers(mentions, membersOfChild, rolesClan);
 			const existingUserIds = userIds.filter((userId) => membersOfParent?.some((member) => member.id === userId));
 			if (existingUserIds.length > 0) {
@@ -65,7 +65,7 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 
 	const joinningToThread = useCallback(
 		async (targetThread: ThreadsEntity | null, user: string[]) => {
-			if (targetThread?.parrent_id === '0') return;
+			if (targetThread?.parrent_id === '0' || targetThread?.parrent_id === '') return;
 			await updateChannelUsers(targetThread as ChannelsEntity, user, targetThread?.clan_id as string);
 		},
 		[dispatch]

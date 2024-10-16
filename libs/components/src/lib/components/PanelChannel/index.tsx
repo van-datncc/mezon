@@ -5,11 +5,14 @@ import {
 	channelsActions,
 	notificationSettingActions,
 	selectCategoryById,
+	selectChannelById,
 	selectCurrentChannelId,
 	selectCurrentClan,
+	selectCurrentUserId,
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectSelectedChannelNotificationSetting,
+	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
 import {
@@ -27,8 +30,10 @@ import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
+import ModalConfirm from '../ModalConfirm';
 import GroupPanels from './GroupPanels';
 import ItemPanel from './ItemPanel';
 
@@ -36,6 +41,7 @@ type PanelChannel = {
 	coords: Coords;
 	channel: IChannel;
 	onDeleteChannel: () => void;
+	selectedChannel?: string;
 	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	rootRef?: RefObject<HTMLElement>;
@@ -67,7 +73,16 @@ export const notificationTypesList = [
 	}
 ];
 
-const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, isUnread }: PanelChannel) => {
+const PanelChannel = ({
+	coords,
+	channel,
+	setOpenSetting,
+	setIsShowPanelChannel,
+	onDeleteChannel,
+	rootRef,
+	selectedChannel,
+	isUnread
+}: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -79,6 +94,8 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+	const currentChannel = useSelector(selectChannelById(selectedChannel || ''));
+	const currentUserId = useSelector(selectCurrentUserId);
 	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
 
 	const handleEditChannel = () => {
@@ -89,6 +106,22 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const handleDeleteChannel = () => {
 		onDeleteChannel();
 	};
+
+	const handleLeaveChannel = () => {
+		dispatch(threadsActions.leaveThread({ clanId: currentClan?.id || '', threadId: selectedChannel || '' }));
+	};
+	const modalConfirm = useRef(null);
+	const [openModelConfirm, closeModelConfirm] = useModal(() => (
+		<div ref={modalConfirm}>
+			<ModalConfirm
+				handleCancel={closeModelConfirm}
+				handleConfirm={handleLeaveChannel}
+				title="Leave Thread"
+				buttonName="Leave thread"
+				message={`You can't receive message from thread when leave this thread`}
+			/>
+		</div>
+	));
 
 	const handleScheduleMute = (duration: number) => {
 		if (duration !== Infinity) {
@@ -198,7 +231,15 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
-	useOnClickOutside(panelRef, handClosePannel, rootRef);
+	useOnClickOutside(
+		panelRef,
+		() => {
+			if (!modalConfirm.current) {
+				handClosePannel();
+			}
+		},
+		rootRef
+	);
 
 	const handleOpenCreateChannelModal = () => {
 		dispatch(channelsActions.setCurrentCategory(currentCategory));
@@ -352,6 +393,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 								<ItemPanel children="Nothing" type="radio" />
 							</Dropdown>
 						)}
+						{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={openModelConfirm} children="Leave Thread" danger />}
 					</GroupPanels>
 
 					{canManageThread && (

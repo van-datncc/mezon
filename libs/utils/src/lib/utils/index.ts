@@ -1,4 +1,4 @@
-import { RolesClanEntity } from '@mezon/store';
+import { ChannelsEntity } from '@mezon/store';
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
@@ -848,3 +848,7 @@ export function removeUndefinedAndEmpty(obj: Record<string, any[]>) {
 		Object.entries(obj).filter(([key, value]) => key !== 'undefined' && !(typeof value === 'object' && Object.keys(value).length === 0))
 	);
 }
+
+export const checkIsThread = (channel?: ChannelsEntity) => {
+	return channel?.parrent_id !== '0' && channel?.parrent_id !== '';
+};

@@ -41,13 +41,9 @@ export const EmojiMarkup: React.FC<EmojiMarkupOpt> = ({ emojiId, emojiSyntax, on
 	return (
 		<span onContextMenu={handleContextMenu} style={{ display: 'inline-block', height: onlyEmoji ? '50px' : 'auto' }}>
 			{srcEmoji ? (
-				isOne ? (
-					<Tooltip style={appearanceTheme === 'light' ? 'light' : 'dark'} content={emojiSyntax}>
-						{emojiElement}
-					</Tooltip>
-				) : (
-					emojiElement
-				)
+				<Tooltip style={appearanceTheme === 'light' ? 'light' : 'dark'} content={emojiSyntax}>
+					{emojiElement}
+				</Tooltip>
 			) : (
 				<PlainText text={emojiSyntax} />
 			)}
