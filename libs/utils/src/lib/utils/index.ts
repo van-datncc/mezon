@@ -1,4 +1,4 @@
-import { ChannelsEntity } from '@mezon/store';
+import { ChannelsEntity, RolesClanEntity } from '@mezon/store';
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
