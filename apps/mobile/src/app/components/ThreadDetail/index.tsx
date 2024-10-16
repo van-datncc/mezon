@@ -1,6 +1,7 @@
 import { useThreads } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
+	ChannelsEntity,
 	ThreadsEntity,
 	selectActiveThreads,
 	selectCurrentChannel,
@@ -10,7 +11,8 @@ import {
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { checkIsThread } from '@mezon/utils';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -37,7 +39,8 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	});
 
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = useMemo(() => currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '', [currentChannel]);
+	const isThread = checkIsThread(currentChannel as ChannelsEntity);
+
 	useEffect(() => {
 		const fetchThreads = async () => {
 			const body = {

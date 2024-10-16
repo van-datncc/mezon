@@ -10,6 +10,7 @@ import {
 	useThreads
 } from '@mezon/core';
 import {
+	ChannelsEntity,
 	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
@@ -53,6 +54,7 @@ import {
 	ThreadStatus,
 	ThreadValue,
 	blankReferenceObj,
+	checkIsThread,
 	filterEmptyArrays,
 	focusToElement,
 	getRoleList,
@@ -290,11 +292,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
-			if (currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '') {
+			if (checkIsThread(currentChannel as ChannelsEntity)) {
 				addMemberToThread(currentChannel, mentionList);
 			}
 
-			if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
+			if (checkIsThread(currentChannel as ChannelsEntity) && currentChannel?.active === ThreadStatus.activePublic) {
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined }));
 				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
 			}
