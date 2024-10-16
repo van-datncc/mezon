@@ -1,5 +1,14 @@
-import { ApiChannelMessageHeaderWithChannel, ICategory, IChannel, LoadingStatus, ModeResponsive, RequestInput, TypeCheck } from '@mezon/utils';
-import { EntityState, GetThunkAPI, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import {
+	ApiChannelMessageHeaderWithChannel,
+	checkIsThread,
+	ICategory,
+	IChannel,
+	LoadingStatus,
+	ModeResponsive,
+	RequestInput,
+	TypeCheck
+} from '@mezon/utils';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, GetThunkAPI, PayloadAction } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import { ApiUpdateChannelDescRequest, ChannelCreatedEvent, ChannelDeletedEvent, ChannelType, ChannelUpdatedEvent } from 'mezon-js';
 import { ApiChangeChannelPrivateRequest, ApiChannelDescription, ApiCreateChannelDescRequest, ApiMarkAsReadRequest } from 'mezon-js/api.gen';
@@ -8,7 +17,7 @@ import { fetchCategories } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
 import { directActions } from '../direct/direct.slice';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { messagesActions } from '../messages/messages.slice';
 import { notifiReactMessageActions } from '../notificationSetting/notificationReactMessage.slice';
@@ -19,8 +28,8 @@ import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice'
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { RootState } from '../store';
 import { threadsActions } from '../threads/threads.slice';
+import { channelMetaActions, ChannelMetaEntity, enableMute } from './channelmeta.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
-import { ChannelMetaEntity, channelMetaActions, enableMute } from './channelmeta.slice';
 
 const LIST_CHANNEL_CACHED_TIME = 1000 * 60 * 3;
 
@@ -140,7 +149,7 @@ export const joinChannel = createAsyncThunk(
 			const channel = selectChannelById(channelId)(getChannelsRootState(thunkAPI));
 			thunkAPI.dispatch(channelsActions.setModeResponsive(ModeResponsive.MODE_CLAN));
 
-			const isPublic = channel ? (channel.parrent_id !== '' && channel.parrent_id !== '0' ? false : !channel.channel_private) : false;
+			const isPublic = channel ? (checkIsThread(channel as ChannelsEntity) ? false : !channel.channel_private) : false;
 			if (channel) {
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
@@ -169,7 +178,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			thunkAPI.dispatch(fetchCategories({ clanId: body.clan_id as string }));
 			thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 			if (response.type !== ChannelType.CHANNEL_TYPE_VOICE && response.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
-				const isPublic = response.parrent_id !== '' && response.parrent_id !== '0' ? false : !response.channel_private;
+				const isPublic = checkIsThread(response as ChannelsEntity) ? false : !response.channel_private;
 				thunkAPI.dispatch(
 					channelsActions.joinChat({
 						clanId: response.clan_id as string,

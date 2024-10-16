@@ -1,6 +1,13 @@
-import { channelsActions, checkDuplicateChannelInCategory, checkDuplicateThread, selectAppChannelById, useAppDispatch } from '@mezon/store';
+import {
+	channelsActions,
+	ChannelsEntity,
+	checkDuplicateChannelInCategory,
+	checkDuplicateThread,
+	selectAppChannelById,
+	useAppDispatch
+} from '@mezon/store';
 import { InputField, TextArea } from '@mezon/ui';
-import { IChannel, ValidateSpecialCharacters, ValidateURL } from '@mezon/utils';
+import { checkIsThread, IChannel, ValidateSpecialCharacters, ValidateURL } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -26,7 +33,8 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [checkValidate, setCheckValidate] = useState('');
 	const [checkValidateUrl, setCheckValidateUrl] = useState(!ValidateURL().test(appUrlInit || ''));
 	const [countCharacterTopic, setCountCharacterTopic] = useState(1024);
-	const isThread = channel.parrent_id !== '0';
+	const isThread = checkIsThread(channel as ChannelsEntity);
+
 	const label = useMemo(() => {
 		return isThread ? 'thread' : 'channel';
 	}, [isThread]);
