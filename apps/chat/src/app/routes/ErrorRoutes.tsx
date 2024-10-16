@@ -21,6 +21,7 @@ const ErrorRoutes = () => {
 
 	return (
 		<div
+			id="error-crash"
 			style={{ backgroundImage: `url(assets/images/bg-boundary.svg)` }}
 			className="flex flex-col items-center justify-center min-h-screen bg-gray-500 text-gray-300 p-4 error-boundary"
 		>
