@@ -25,5 +25,5 @@ export const useEscapeKeyClose = (
 				element.removeEventListener('keydown', handleKeyDown);
 			}
 		};
-	}, [onClose]);
+	}, [onClose, options, ref]);
 };
