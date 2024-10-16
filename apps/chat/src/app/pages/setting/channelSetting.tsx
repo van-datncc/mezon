@@ -1,5 +1,12 @@
 import { ListChannelSetting } from '@mezon/components';
-import { channelSettingActions, selectAllChannelSuggestion, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import {
+	channelSettingActions,
+	selectAllChannelSuggestion,
+	selectCurrentClanId,
+	selectNumberChannelCount,
+	selectNumberThreadCount,
+	useAppDispatch
+} from '@mezon/store';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ApiChannelSettingItem } from 'mezon-js/api.gen';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
@@ -11,7 +18,9 @@ const ChannelSetting = () => {
 
 	const [searchFilter, setSearchFilter] = useState('');
 	const listChannel = useSelector(selectAllChannelSuggestion);
-	const [numberChannel, setNumberChannel] = useState(listChannel.length);
+	const countChannel = useSelector(selectNumberChannelCount);
+	const countThread = useSelector(selectNumberThreadCount);
+
 	const dispatch = useAppDispatch();
 	const selectClanId = useSelector(selectCurrentClanId);
 
@@ -77,7 +86,7 @@ const ChannelSetting = () => {
 						className="w-4 h-4 rounded-md border-channelTextLabel overflow-hidden"
 					/>
 					<label htmlFor="private_filter">
-						Only Private Channel <span className="font-semibold italic">({numberChannel})</span>
+						Only Private Channel <span className="font-semibold italic">({countChannel})</span>
 					</label>
 				</div>
 				<div className="flex items-center gap-2">
@@ -89,7 +98,7 @@ const ChannelSetting = () => {
 						className="w-4 h-4 rounded-md border-channelTextLabel overflow-hidden"
 					/>
 					<label htmlFor="thread_filter">
-						Only Thread <span className="font-semibold italic">({numberChannel})</span>
+						Only Thread <span className="font-semibold italic">({countThread})</span>
 					</label>
 				</div>
 				<div className="flex items-center gap-2">

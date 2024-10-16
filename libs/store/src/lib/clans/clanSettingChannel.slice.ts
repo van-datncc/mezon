@@ -12,6 +12,8 @@ const CHANNEL_SETTING_CLAN_CACHE_TIME = 1000 * 60 * 3;
 export interface SettingClanChannelState extends EntityState<ApiChannelSettingItem, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	channelCount: number;
+	threadCount: number;
 }
 
 export const channelSettingAdapter = createEntityAdapter({
@@ -21,7 +23,8 @@ export const channelSettingAdapter = createEntityAdapter({
 export const initialSettingClanChannelState: SettingClanChannelState = channelSettingAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	hasGrandchildModal: false
+	channelCount: 0,
+	threadCount: 0
 });
 
 export const fetchChannelByUserIdCached = memoizeAndTrack(
@@ -58,8 +61,9 @@ export const fetchChannelByUserId = createAsyncThunk(
 			}
 
 			const response = await fetchChannelByUserIdCached(mezon, clanId);
+			console.log('response: ', response);
 			if (response) {
-				return response.channel_setting_list ?? [];
+				return response;
 			}
 			throw new Error('Emoji list is undefined or null');
 		} catch (error) {
@@ -76,7 +80,9 @@ export const settingClanChannelSlice = createSlice({
 		builder
 			.addCase(fetchChannelByUserId.fulfilled, (state: SettingClanChannelState, actions) => {
 				state.loadingStatus = 'loaded';
-				channelSettingAdapter.setAll(state, actions.payload);
+				channelSettingAdapter.setAll(state, actions.payload.channel_setting_list || []);
+				state.channelCount = actions.payload.channel_count;
+				state.threadCount = actions.payload.thread_count;
 			})
 			.addCase(fetchChannelByUserId.pending, (state: SettingClanChannelState) => {
 				state.loadingStatus = 'loading';
@@ -100,3 +106,5 @@ export const selectAllChannelSuggestion = createSelector(getChannelSettingState,
 export const selectChannelSuggestionEntities = createSelector(getChannelSettingState, selectEntities);
 export const selectOneChannelInfor = (channelId: string) => createSelector(getChannelSettingState, (state) => selectById(state, channelId));
 export const settingChannelReducer = settingClanChannelSlice.reducer;
+export const selectNumberChannelCount = createSelector(getChannelSettingState, (state) => state.channelCount);
+export const selectNumberThreadCount = createSelector(getChannelSettingState, (state) => state.threadCount);
