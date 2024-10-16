@@ -393,13 +393,13 @@ const PanelChannel = ({
 								<ItemPanel children="Nothing" type="radio" />
 							</Dropdown>
 						)}
+						{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={openModelConfirm} children="Leave Thread" danger />}
 					</GroupPanels>
 
 					{canManageThread && (
 						<GroupPanels>
 							<ItemPanel onClick={handleEditChannel} children="Edit Thread" />
 							<ItemPanel children="Create Thread" />
-							{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={openModelConfirm} children="Leave Thread" danger />}
 							<ItemPanel onClick={handleDeleteChannel} children="Delete Thread" danger />
 						</GroupPanels>
 					)}

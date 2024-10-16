@@ -85,7 +85,7 @@ export const checkDuplicateThread = createAsyncThunk(
 export const leaveThread = createAsyncThunk('thread/leavethread', async ({ clanId, threadId }: { clanId: string; threadId: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.leaveChannel(mezon.session, threadId);
+		const response = await mezon.client.leaveThread(mezon.session, threadId);
 		if (response) {
 			thunkAPI.dispatch(fetchChannels({ clanId: clanId, noCache: true }));
 		}
