@@ -1,3 +1,4 @@
+import { ChannelsEntity } from '@mezon/store';
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
@@ -843,4 +844,7 @@ export const sortChannelsByLastActivity = (channels: IChannel[]): IChannel[] => 
 		const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
 		return timestampB - timestampA;
 	});
+};
+export const checkIsThread = (channel?: ChannelsEntity) => {
+	return channel?.parrent_id !== '0' && channel?.parrent_id !== '';
 };

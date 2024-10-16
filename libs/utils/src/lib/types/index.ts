@@ -828,7 +828,8 @@ export enum TypeCheck {
 	TYPECLAN = 0,
 	TYPECATEGORY = 1,
 	TYPECHANNEL = 2,
-	TYPETHREAD = 3
+	TYPETHREAD = 3,
+	TYPENICKNAME = 4
 }
 
 export enum ThreadStatus {

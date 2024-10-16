@@ -52,7 +52,18 @@ function MessageWithUser({
 	const userLogin = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
-	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef } = useMessageParser(message);
+	const {
+		senderId,
+		username,
+		userClanAvatar,
+		userClanNickname,
+		userDisplayName,
+		senderIdMessageRef,
+		avatarSender,
+		messageAvatarSenderRef,
+		messageDisplayNameSenderRef,
+		messageUsernameSenderRef
+	} = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const [shortUserId, setShortUserId] = useState(senderId);
@@ -152,7 +163,20 @@ function MessageWithUser({
 		},
 		[checkAnonymous, mode]
 	);
+	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
+	const avatar = useMemo(() => {
+		if (isDM && shortUserId === senderId) {
+			return avatarSender;
+		}
 
+		if (isDM) {
+			return messageAvatarSenderRef;
+		}
+
+		if (shortUserId === senderId) {
+			return userClanAvatar || avatarSender;
+		}
+	}, [userClanAvatar, avatarSender, shortUserId]);
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -229,9 +253,9 @@ function MessageWithUser({
 						message={message}
 						mode={mode}
 						positionType={''}
-						avatar={shortUserId === senderId ? userClanAvatar : undefined}
+						avatar={avatar}
 						name={userClanNickname || userDisplayName || username}
-						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL}
+						isDM={isDM}
 					/>
 				</div>
 			)}

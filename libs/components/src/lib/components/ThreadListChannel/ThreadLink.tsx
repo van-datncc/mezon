@@ -92,6 +92,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 
 			{isShowPanelChannel && (
 				<PanelChannel
+					selectedChannel={thread.id}
 					onDeleteChannel={handleDeleteChannel}
 					channel={thread}
 					coords={coords}

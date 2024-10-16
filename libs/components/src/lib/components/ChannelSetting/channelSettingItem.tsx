@@ -1,8 +1,9 @@
 import { useChannels, usePermissionChecker } from '@mezon/core';
+import { ChannelsEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission, IChannel } from '@mezon/utils';
+import { EPermission, IChannel, checkIsThread } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { EChannelSettingTab } from '.';
 import ModalConfirm from '../ModalConfirm';
 
@@ -21,9 +22,8 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	const [showModal, setShowModal] = useState(false);
 	const [hasManageChannelPermission] = usePermissionChecker([EPermission.manageChannel], channel.channel_id ?? '');
 	const canEditChannelPermissions = hasManageChannelPermission;
-	const isThread = useMemo(() => {
-		return channel.parrent_id !== '0';
-	}, [channel]);
+
+	const isThread = checkIsThread(channel as ChannelsEntity);
 
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);

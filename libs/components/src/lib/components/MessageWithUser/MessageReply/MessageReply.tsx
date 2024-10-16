@@ -51,6 +51,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 		senderIdMessageRef ?? ''
 	);
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_DM || mode == ChannelStreamMode.STREAM_MODE_GROUP;
+
 	return (
 		<div className="overflow-hidden " ref={markUpOnReplyParent}>
 			{message.references?.[0].message_ref_id ? (
@@ -62,7 +63,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
-								src={isDM ? messageSender?.user?.avatar_url : messageSender?.clan_avatar || messageSender?.user?.avatar_url}
+								src={isDM ? messageAvatarSenderRef : messageSender?.clan_avatar || messageSender?.user?.avatar_url}
 							/>
 						</div>
 
