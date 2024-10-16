@@ -5,7 +5,7 @@ import { channelsActions, getStoreAsync } from '@mezon/store-mobile';
 import { ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Linking, Platform, SafeAreaView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../../../../../componentUI';
@@ -60,7 +60,7 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 		};
 	}, []);
 
-	const handleRouteData = async (thread?: IChannel) => {
+	const handleRouteData = useCallback(async (thread?: IChannel) => {
 		if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 			bottomSheetChannelStreamingRef.current.present();
 			return;
@@ -88,14 +88,13 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		}
-	};
+	}, []);
 	const isVoiceOrStreaming = [ChannelType.CHANNEL_TYPE_VOICE, ChannelType.CHANNEL_TYPE_STREAMING].includes(props?.data?.type);
 	const shouldRender = !isVoiceOrStreaming || isCategoryExpanded || channelMemberList?.length;
 
 	return (
 		<View>
 			{shouldRender ? <ChannelItem onPress={handleRouteData} onLongPress={props?.onLongPress} data={props?.data} /> : null}
-
 			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />}
 			<UserListVoiceChannel channelId={props?.data?.channel_id} />
 			<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['50%']}>

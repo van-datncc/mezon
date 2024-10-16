@@ -103,7 +103,7 @@ const ChannelListSection = memo(
 					category={data}
 				/>
 
-				{data.channels?.map((item: IChannel, index: number) => {
+				{data?.channels?.map((item: IChannel, index: number) => {
 					const shouldRender = categoryExpandState || isUnreadChannel(item?.id) || item.type === ChannelType.CHANNEL_TYPE_VOICE;
 					if (shouldRender) {
 						return (

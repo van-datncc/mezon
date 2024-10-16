@@ -16,7 +16,7 @@ interface IChannelItemProps {
 	data: IChannel;
 }
 
-export default function ChannelItem({ onLongPress, onPress, data }: IChannelItemProps) {
+function ChannelItem({ onLongPress, onPress, data }: IChannelItemProps) {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, data?.id));
@@ -82,3 +82,4 @@ export default function ChannelItem({ onLongPress, onPress, data }: IChannelItem
 		</TouchableOpacity>
 	);
 }
+export default React.memo(ChannelItem);
