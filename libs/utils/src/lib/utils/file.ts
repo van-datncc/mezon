@@ -23,6 +23,9 @@ function processVideoFile<T>(file: File): Promise<T> {
 			URL.revokeObjectURL(video.src);
 		};
 		video.onerror = () => {
+			resolve({
+				...createFileMetadata(file)
+			} as T);
 			URL.revokeObjectURL(video.src);
 		};
 		video.src = URL.createObjectURL(file);
@@ -43,6 +46,9 @@ function processImageFile<T>(file: File): Promise<T> {
 				URL.revokeObjectURL(img.src);
 			};
 			img.onerror = () => {
+				resolve({
+					...createFileMetadata(file)
+				} as T);
 				URL.revokeObjectURL(img.src);
 			};
 			if (event.target?.result) {
@@ -63,4 +69,25 @@ export function processFile<T>(file: File): Promise<T> {
 	}
 
 	return processImageFile(file);
+}
+
+export function isMediaTypeNotSupported(mediaType?: string) {
+	if (!mediaType) return false;
+
+	const unsupportedMediaTypes = new Set([
+		'video/x-ms-wmv',
+		'video/wmv',
+		'video/avi',
+		'video/flv',
+		'video/mkv',
+		'video/rmvb',
+		'audio/wma',
+		'audio/ra',
+		'audio/atrac',
+		'image/tiff',
+		'image/bmp',
+		'image/psd'
+	]);
+
+	return unsupportedMediaTypes.has(mediaType);
 }

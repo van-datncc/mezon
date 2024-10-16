@@ -1,5 +1,17 @@
 import { useAppNavigation, useMenu } from '@mezon/core';
-import { selectChannelById, selectCloseMenu, selectCurrentChannel, selectStatusMenu, selectTheme } from '@mezon/store';
+import {
+	appActions,
+	selectCanvasEntityById,
+	selectChannelById,
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectIdCanvas,
+	selectIsShowCanvas,
+	selectStatusMenu,
+	selectTheme,
+	selectTitle,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -11,6 +23,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const { navigate, toChannelPage } = useAppNavigation();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
+	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isChannelVoice = type === ChannelType.CHANNEL_TYPE_VOICE;
 	const isChannelText = type === ChannelType.CHANNEL_TYPE_TEXT;
@@ -20,12 +33,19 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const isPrivate = channelParent ? channelParent?.channel_private : channel?.channel_private;
 	const isActive = currentChannel?.channel_id === channel?.channel_id && !channelParent;
 	const theme = useSelector(selectTheme);
+	const dispatch = useAppDispatch();
+	const idCanvas = useSelector(selectIdCanvas);
+	const canvasById = useSelector((state) => selectCanvasEntityById(state, currentChannel?.channel_id, idCanvas));
 
 	const handleRedirect = () => {
 		if (channelParent) {
 			navigate(toChannelPage(channelParent.id, channelParent?.clan_id ?? ''));
 		}
+		if (isShowCanvas) {
+			dispatch(appActions.setIsShowCanvas(false));
+		}
 	};
+	const title = useSelector(selectTitle);
 
 	return (
 		<div className={`flex flex-row items-center relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}>
@@ -50,7 +70,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 			>
 				{channelParent ? channelParent?.channel_label : channel?.channel_label}
 			</p>
-			{channelParent && channel && (
+			{channelParent && channel && !isShowCanvas && (
 				<div className="flex flex-row items-center gap-2">
 					<Icons.ArrowRight />
 					{channelParent && channel.channel_private === ChannelStatusEnum.isPrivate ? (
@@ -62,6 +82,17 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 						className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
 					>
 						{channel.channel_label}
+					</p>
+				</div>
+			)}
+			{isShowCanvas && (
+				<div className="flex flex-row items-center gap-2">
+					<Icons.ArrowRight />
+					<Icons.CanvasIcon defaultSize="w-6 h-6 min-w-6" />
+					<p
+						className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
+					>
+						{canvasById?.title ? canvasById?.title : title ? title : 'Untitled'}
 					</p>
 				</div>
 			)}

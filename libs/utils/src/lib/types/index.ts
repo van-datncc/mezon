@@ -835,3 +835,11 @@ export enum ThreadStatus {
 	activePublic = 2,
 	joined = 1
 }
+
+export type ICanvas = {
+	id?: string;
+	clan_id: string;
+	channel_id: string;
+	title?: string;
+	content?: string;
+};
