@@ -1,3 +1,4 @@
+import { RolesClanEntity } from '@mezon/store';
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
@@ -13,9 +14,10 @@ import {
 } from 'date-fns';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
+import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
-import { ID_MENTION_HERE, TIME_COMBINE } from '../constant';
+import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
 	EMarkdownType,
@@ -91,13 +93,24 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 		ref.current.focus();
 	}
 };
-export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null) => {
+export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null, rolesClan: RolesClanEntity[]) => {
+	const getListRoleId = mentions
+		.map((item) => item.role_id)
+		.filter((role_id): role_id is string => role_id !== undefined && role_id !== EVERYONE_ROLE_ID);
 	const getListId = mentions
 		.map((item) => item.user_id)
 		.filter((user_id): user_id is string => user_id !== undefined && user_id !== ID_MENTION_HERE);
-	const uniqueUserIds = Array.from(new Set(getListId));
+	const uniqueUserId1s = Array.from(new Set(getListId));
+	const filteredRolesClan = rolesClan.filter((role) => getListRoleId.includes(role.id));
+	const allRoleUsers = filteredRolesClan
+		.map((role) => role.role_user_list?.role_users)
+		.flat()
+		.filter((role): role is RoleUserListRoleUser => role !== undefined);
+	const uniqueUserId2s = Array.from(new Set(allRoleUsers.map((role) => role?.id).filter((id): id is string => id !== undefined)));
+	const combinedUniqueUserIds = Array.from(new Set([...uniqueUserId1s, ...uniqueUserId2s]));
+
 	const memUserIds = userChannels?.map((member) => member?.user?.id);
-	const userIdsNotInChannel = uniqueUserIds.filter((user_id) => !memUserIds?.includes(user_id));
+	const userIdsNotInChannel = combinedUniqueUserIds.filter((user_id) => !memUserIds?.includes(user_id));
 
 	return userIdsNotInChannel;
 };
