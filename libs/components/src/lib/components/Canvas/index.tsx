@@ -90,7 +90,7 @@ const Canvas = () => {
 				className="w-full px-4 py-2 mt-[25px] bg-inherit focus:outline-none text-[28px] resize-none leading-[34px] font-bold text-inherit"
 			/>
 			<div className="w-full">
-				<CanvasContent key={idCanvas} isLightMode={appearanceTheme === 'light'} content={content || ''} />
+				<CanvasContent key={idCanvas} idCanvas={idCanvas || ''} isLightMode={appearanceTheme === 'light'} content={content || ''} />
 			</div>
 		</div>
 	);

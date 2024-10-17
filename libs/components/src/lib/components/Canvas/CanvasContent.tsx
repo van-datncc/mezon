@@ -14,7 +14,7 @@ interface ActiveFormats {
 	header?: string;
 }
 
-function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content: string }) {
+function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolean; content: string; idCanvas: string }) {
 	const [toolbarVisible, setToolbarVisible] = useState(false);
 	const quillRef = useRef<Quill | null>(null);
 	const editorRef = useRef<HTMLDivElement | null>(null);
@@ -220,7 +220,7 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 	useEffect(() => {
 		quillRef?.current?.setContents(quillRef.current.getContents());
 		quillRef?.current?.formatText(0, quillRef.current.getLength(), { color: isLightMode ? 'rgb(51, 51, 51)' : 'white' });
-	}, [isLightMode, content]);
+	}, [isLightMode, idCanvas]);
 
 	return (
 		<div className="note-canvas" style={{ position: 'relative' }}>
