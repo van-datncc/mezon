@@ -170,7 +170,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					)}
 
 					{isShowCanvas && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-						<div className="w-full flex justify-center overflow-auto">
+						<div className="w-full flex justify-center overflow-y-scroll">
 							<Canvas />
 						</div>
 					)}

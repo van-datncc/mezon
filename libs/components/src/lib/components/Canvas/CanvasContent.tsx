@@ -32,6 +32,16 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 	});
 
 	useEffect(() => {
+		if (content && quillRef.current) {
+			const selection = quillRef.current.getSelection();
+			quillRef.current.setContents(JSON.parse(content));
+			if (selection) {
+				quillRef.current.setSelection(selection.index, selection.length);
+			}
+		}
+	}, [content]);
+
+	useEffect(() => {
 		// Initialize Quill
 		quillRef.current = new Quill('#editor', {
 			theme: 'snow',
@@ -42,12 +52,13 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 		});
 		setQuill(quillRef.current);
 
-		if (content) {
+		if (content && quillRef.current) {
 			quillRef.current.setContents(JSON.parse(content));
 		}
 		// Handle content changes
 		quillRef.current.on('text-change', () => {
-			handleContentChange(quillRef.current!);
+			const data = JSON.stringify(quillRef.current?.getContents());
+			handleContentChange(data);
 		});
 
 		// Handle selection changes
@@ -113,11 +124,10 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 			quillRef.current?.root.removeEventListener('keydown', handleKeyDown);
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, [content]);
+	}, []);
 
-	const handleContentChange = (content: Quill) => {
-		const data = JSON.stringify(content.getContents());
-		dispatch(canvasActions.setContent(data)); // Save content
+	const handleContentChange = (content: string) => {
+		dispatch(canvasActions.setContent(content));
 	};
 
 	// Function to toggle text formatting
