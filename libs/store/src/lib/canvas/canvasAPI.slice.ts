@@ -134,18 +134,7 @@ export const canvasAPISlice = createSlice({
 			.addCase(createEditCanvas.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
 				const { channel_id } = action.payload;
-				const existingCanvas = state.channelCanvas[channel_id]?.entities[action?.payload?.id];
-				if (existingCanvas) {
-					canvasAPIAdapter.updateOne(state.channelCanvas[channel_id], {
-						id: action.payload?.id,
-						changes: {
-							title: action.payload?.title,
-							content: action.payload?.content
-						}
-					});
-				} else {
-					canvasAPIAdapter.addOne(state.channelCanvas[channel_id], action?.payload);
-				}
+				canvasAPIAdapter.upsertOne(state.channelCanvas[channel_id], action.payload);
 			})
 			.addCase(createEditCanvas.rejected, (state: CanvasAPIState, action) => {
 				state.loadingStatus = 'error';
@@ -175,13 +164,6 @@ export const canvasAPISlice = createSlice({
 			})
 			.addCase(getChannelCanvasDetail.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
-				// canvasAPIAdapter.updateOne(state, {
-				// 	id: action.payload?.id ?? '',
-				// 	changes: {
-				// 		title: action.payload?.title,
-				// 		content: action.payload?.content
-				// 	}
-				// });
 			})
 			.addCase(getChannelCanvasDetail.rejected, (state: CanvasAPIState, action) => {
 				state.loadingStatus = 'error';
