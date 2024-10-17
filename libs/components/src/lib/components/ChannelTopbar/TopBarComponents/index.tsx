@@ -88,7 +88,7 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 					<p
 						className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
 					>
-						{title ? (title.length > 30 ? `${title.substring(0, 30)}...` : title) : 'Untitled'}
+						{title ? title : 'Untitled'}
 					</p>
 				</div>
 			)}

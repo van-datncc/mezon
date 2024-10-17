@@ -70,7 +70,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 					</div>
 				</div>
 				<div
-					className={`flex flex-col dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+					className={`flex flex-col gap-2 py-2 dark:bg-bgSecondary bg-bgLightSecondary px-[16px] min-h-full flex-1 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
 				>
 					{canvases?.map((canvasId) => {
 						return (

@@ -28,9 +28,13 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose }: GroupCanvasProps)
 	};
 
 	return (
-		<div className="cursor-pointer" onClick={handleOpenCanvas}>
-			<div className="mt-2 mb-2 h-6 text-xs font-semibold leading-6 uppercase dark:text-bgLightPrimary text-bgPrimary">
-				{canvas.title ? (canvas.title.length > 30 ? `${canvas.title.substring(0, 30)}...` : canvas.title) : 'Untitled'}
+		<div
+			className="p-4 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
+			onClick={handleOpenCanvas}
+			role="button"
+		>
+			<div className="h-6 text-xs one-line font-semibold leading-6 dark:text-bgLightPrimary text-bgPrimary">
+				{canvas.title ? canvas.title : 'Untitled'}
 			</div>
 		</div>
 	);
