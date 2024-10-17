@@ -192,6 +192,7 @@ export type IMessage = ChannelMessage & {
 	isCurrentChannel?: boolean;
 	isFirst?: boolean;
 	hide_editted?: boolean;
+	isErrorRetry?: boolean;
 };
 
 export type SearchMessage = ApiSearchMessageDocument & {

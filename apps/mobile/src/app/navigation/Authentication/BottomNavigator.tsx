@@ -55,7 +55,7 @@ const BottomNavigator = () => {
 					component={HomeScreen}
 					options={{
 						headerShown: false,
-						title: 'Servers',
+						title: 'Clans',
 						tabBarIcon: ({ color }) => (hiddenBottomTab ? <View /> : <HomeTab color={color} width={size.s_22} height={size.s_22} />)
 					}}
 				/>
