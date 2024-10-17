@@ -42,7 +42,7 @@ type PanelChannel = {
 	channel: IChannel;
 	onDeleteChannel: () => void;
 	selectedChannel?: string;
-	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
+	openSetting: () => void;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	rootRef?: RefObject<HTMLElement>;
 	isUnread?: boolean;
@@ -73,16 +73,7 @@ export const notificationTypesList = [
 	}
 ];
 
-const PanelChannel = ({
-	coords,
-	channel,
-	setOpenSetting,
-	setIsShowPanelChannel,
-	onDeleteChannel,
-	rootRef,
-	selectedChannel,
-	isUnread
-}: PanelChannel) => {
+const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, selectedChannel, isUnread }: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -96,10 +87,10 @@ const PanelChannel = ({
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentChannel = useSelector(selectChannelById(selectedChannel || ''));
 	const currentUserId = useSelector(selectCurrentUserId);
-	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
+	const currentCategory = useSelector(selectCategoryById(channel?.category_id || ''));
 
 	const handleEditChannel = () => {
-		setOpenSetting(true);
+		openSetting();
 		setIsShowPanelChannel(false);
 	};
 

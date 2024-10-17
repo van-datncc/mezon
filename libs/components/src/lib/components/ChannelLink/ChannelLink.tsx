@@ -208,6 +208,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			[channel.channel_id]
 		);
 
+		const handleOpenSetting = () => {
+			setOpenSetting(true);
+		};
 		return (
 			<div
 				onContextMenu={handleMouseClick}
@@ -330,7 +333,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						onDeleteChannel={handleOpenModalConfirm}
 						channel={channel}
 						coords={coords}
-						setOpenSetting={setOpenSetting}
+						openSetting={handleOpenSetting}
 						setIsShowPanelChannel={setIsShowPanelChannel}
 					/>
 				)}

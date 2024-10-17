@@ -28,8 +28,8 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 	const isClanView = useSelector(selectClanView);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const channel = useSelector(selectChannelById(currentChannelId ?? ''));
-	const membersOfChild = useAppSelector((state) => (channel.id ? selectAllChannelMembers(state, channel.id as string) : null));
-	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel.parrent_id as string) : null));
+	const membersOfChild = useAppSelector((state) => (channel?.id ? selectAllChannelMembers(state, channel?.id as string) : null));
+	const membersOfParent = useAppSelector((state) => (channel?.parrent_id ? selectAllChannelMembers(state, channel?.parrent_id as string) : null));
 	const updateChannelUsers = async (currentChannel: ChannelsEntity | null, userIds: string[], clanId: string) => {
 		const timestamp = Date.now() / 1000;
 
