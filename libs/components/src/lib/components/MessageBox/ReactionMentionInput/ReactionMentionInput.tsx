@@ -165,8 +165,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
-	const { request, setRequestInput } = useMessageValue();
-
+	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
 	const { mentions } = useMessageLine(request?.content);
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
