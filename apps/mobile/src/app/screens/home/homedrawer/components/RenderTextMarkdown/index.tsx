@@ -97,7 +97,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.primary,
-			fontSize: size.medium,
+			fontSize: size.small,
 			lineHeight: size.s_20
 		},
 		fence: {

@@ -1,22 +1,25 @@
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { isEqual } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { MessagesEntity } from '@mezon/store';
+import { FlashList } from '@shopify/flash-list';
 import React, { useCallback, useMemo } from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import { View } from 'react-native';
+import { Flow } from 'react-native-animated-spinkit';
 import { style } from './styles';
 
 interface IChannelListMessageProps {
-	flatListRef: React.RefObject<FlatList<MessagesEntity>>;
+	flatListRef: React.RefObject<FlashList<MessagesEntity>>;
 	messages: MessagesEntity[];
 	handleScroll: (event) => void;
 	renderItem: ({ item }: { item: MessagesEntity }) => React.ReactElement;
 	onLoadMore: (direction: ELoadMoreDirection) => void;
-	isLoadMore: boolean;
+	isLoadMoreTop: boolean;
+	isLoadMoreBottom: boolean;
 }
 
 const ChannelListMessage = React.memo(
-	({ flatListRef, messages, handleScroll, renderItem, onLoadMore, isLoadMore }: IChannelListMessageProps) => {
+	({ flatListRef, messages, handleScroll, renderItem, onLoadMore, isLoadMoreTop, isLoadMoreBottom }: IChannelListMessageProps) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 
@@ -25,7 +28,7 @@ const ChannelListMessage = React.memo(
 		const ViewLoadMore = () => {
 			return (
 				<View style={styles.loadMoreChannelMessage}>
-					<ActivityIndicator size="large" color={Colors.tertiary} />
+					<Flow size={size.s_30} color={Colors.tertiary} />
 				</View>
 			);
 		};
@@ -37,20 +40,23 @@ const ChannelListMessage = React.memo(
 		}, [messages]);
 
 		return (
-			<FlatList
+			<FlashList
 				ref={flatListRef}
 				inverted
-				showsVerticalScrollIndicator={false}
+				overrideProps={{ isInvertedVirtualizedList: true }}
+				// showsVerticalScrollIndicator={false}
 				data={messages || []}
 				onScroll={handleScroll}
 				keyboardShouldPersistTaps={'handled'}
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
 				removeClippedSubviews={false}
+				disableIntervalMomentum={true}
+				disableScrollViewPanResponder={true}
 				keyExtractor={keyExtractor}
-				initialNumToRender={5}
-				maxToRenderPerBatch={10}
-				windowSize={10}
+				// initialNumToRender={5}
+				// maxToRenderPerBatch={10}
+				// windowSize={10}
 				onEndReached={
 					messages?.length && !isCannotLoadMore
 						? () => {
@@ -59,19 +65,20 @@ const ChannelListMessage = React.memo(
 						: undefined
 				}
 				onEndReachedThreshold={0.5}
-				scrollEventThrottle={60}
+				scrollEventThrottle={16}
+				estimatedItemSize={220}
 				viewabilityConfig={{
 					itemVisiblePercentThreshold: 50,
 					minimumViewTime: 500
 				}}
-				// ListHeaderComponent={isLoadMore && hasMoreMessage ? <ViewLoadMore /> : null}
-				ListFooterComponent={isLoadMore && !isCannotLoadMore ? <ViewLoadMore /> : null}
+				contentInsetAdjustmentBehavior="automatic"
+				ListHeaderComponent={isLoadMoreBottom && !isCannotLoadMore ? <ViewLoadMore /> : null}
+				ListFooterComponent={isLoadMoreTop && !isCannotLoadMore ? <ViewLoadMore /> : null}
 			/>
 		);
 	},
 	(prev, curr) => {
-		return prev.isLoadMore === curr.isLoadMore && isEqual(prev.messages, curr.messages);
+		return prev.isLoadMoreTop === curr.isLoadMoreTop && isEqual(prev.messages, curr.messages) && prev.isLoadMoreBottom === curr.isLoadMoreBottom;
 	}
 );
-
 export default ChannelListMessage;
