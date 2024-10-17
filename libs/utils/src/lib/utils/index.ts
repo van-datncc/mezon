@@ -95,22 +95,40 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 	}
 };
 export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null, rolesClan: RolesClanEntity[]) => {
-	const getListId = mentions
-		.map((item) => item.user_id)
-		.filter((user_id): user_id is string => user_id !== undefined && user_id !== ID_MENTION_HERE);
-	const uniqueUserId1s = Array.from(new Set(getListId));
-	const filteredRolesClan = rolesClan.filter((role) =>
-		mentions.some((mention) => mention.role_id === role.id && mention.role_id !== EVERYONE_ROLE_ID)
+	const uniqueUserId1s = Array.from(
+		new Set(
+			mentions.reduce<string[]>((acc, mention) => {
+				if (mention.user_id && mention.user_id !== ID_MENTION_HERE) {
+					acc.push(mention.user_id);
+				}
+				return acc;
+			}, [])
+		)
 	);
-	const allRoleUsers = filteredRolesClan
-		.map((role) => role.role_user_list?.role_users)
-		.flat()
-		.filter((role): role is RoleUserListRoleUser => role !== undefined);
-	const uniqueUserId2s = Array.from(new Set(allRoleUsers.map((role) => role?.id).filter((id): id is string => id !== undefined)));
+
+	const allRoleUsers = rolesClan.reduce<RoleUserListRoleUser[]>((acc, role) => {
+		const isMentionedRole = mentions.some((mention) => mention.role_id === role.id && mention.role_id !== EVERYONE_ROLE_ID);
+		if (isMentionedRole && role.role_user_list?.role_users) {
+			acc.push(...role.role_user_list.role_users);
+		}
+		return acc;
+	}, []);
+
+	const uniqueUserId2s = Array.from(
+		new Set(
+			allRoleUsers.reduce<string[]>((acc, roleUser) => {
+				if (roleUser?.id) {
+					acc.push(roleUser.id);
+				}
+				return acc;
+			}, [])
+		)
+	);
+
 	const combinedUniqueUserIds = Array.from(new Set([...uniqueUserId1s, ...uniqueUserId2s]));
 
-	const memUserIds = userChannels?.map((member) => member?.user?.id);
-	const userIdsNotInChannel = combinedUniqueUserIds.filter((user_id) => !memUserIds?.includes(user_id));
+	const memUserIds = userChannels?.map((member) => member?.user?.id) || [];
+	const userIdsNotInChannel = combinedUniqueUserIds.filter((user_id) => !memUserIds.includes(user_id));
 
 	return userIdsNotInChannel;
 };
