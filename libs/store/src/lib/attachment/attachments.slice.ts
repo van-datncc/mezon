@@ -24,7 +24,10 @@ export interface AttachmentState extends EntityState<AttachmentEntity, string> {
 	currentAttachment: AttachmentEntity | null;
 }
 
-export const attachmentAdapter = createEntityAdapter<AttachmentEntity>();
+export const attachmentAdapter = createEntityAdapter({
+	selectId: (attachment: AttachmentEntity) => attachment.url as string
+	// sortComparer: (a :AttachmentEntity , b:AttachmentEntity) => Boolean(Date.parse(a.create_time as string) > Date.parse(b.create_time as string)),
+});
 
 type fetchChannelAttachmentsPayload = {
 	clanId: string;
@@ -82,7 +85,7 @@ export const attachmentSlice = createSlice({
 	initialState: initialAttachmentState,
 	reducers: {
 		add: attachmentAdapter.addOne,
-		addMany: attachmentAdapter.addMany,
+		addMany: attachmentAdapter.upsertMany,
 		remove: attachmentAdapter.removeOne,
 		setAttachment: (state, action) => {
 			state.attachment = action.payload;
@@ -101,6 +104,9 @@ export const attachmentSlice = createSlice({
 		},
 		removeCurrentAttachment: (state) => {
 			state.currentAttachment = null;
+		},
+		addAttachmentPhoto: (state, action: PayloadAction<AttachmentEntity[]>) => {
+			attachmentAdapter.setAll(state, [...action.payload, ...attachmentAdapter.getSelectors().selectAll(state)]);
 		}
 	},
 	extraReducers: (builder) => {

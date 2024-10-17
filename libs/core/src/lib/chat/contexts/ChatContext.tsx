@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+	AttachmentEntity,
 	appActions,
 	attachmentActions,
 	channelMembers,
@@ -226,14 +227,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
 
-			if (
-				mess.attachments?.length &&
-				mess.attachments.length > 0 &&
-				mess.attachments.some((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX))
-			) {
-				dispatch(
-					attachmentActions.fetchChannelAttachments({ clanId: mess.clan_id as string, channelId: mess.channel_id as string, noCache: true })
-				);
+			if (mess.attachments?.some((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX))) {
+				const attachmentList: AttachmentEntity[] = mess.attachments?.map((attachment) => {
+					const dateTime = new Date();
+
+					return {
+						...attachment,
+						id: attachment.url as string,
+						create_time: dateTime.toISOString()
+					};
+				});
+				dispatch(attachmentActions.addAttachmentPhoto(attachmentList));
 			}
 
 			dispatch(messagesActions.addNewMessage(mess));

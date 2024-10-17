@@ -1,4 +1,4 @@
-import { channelsActions } from '@mezon/store';
+import { attachmentActions, channelsActions } from '@mezon/store';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
 
@@ -12,6 +12,8 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 
 	dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, messageId: messageId || '' }));
 	dispatch(channelsActions.setPreviousChannels({ channelId: channelId }));
+	dispatch(attachmentActions.fetchChannelAttachments({ clanId: clanId ?? '', channelId }));
+
 	return null;
 };
 
