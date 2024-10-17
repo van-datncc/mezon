@@ -81,6 +81,7 @@ const DirectMessage = () => {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const isSearchMessage = useSelector(selectIsSearchMessage(directId || ''));
+	const dispatch = useAppDispatch();
 
 	useChannelSeen(directId || '');
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -91,7 +92,6 @@ const DirectMessage = () => {
 	}, [defaultChannelId, navigate]);
 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
-
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
@@ -106,6 +106,16 @@ const DirectMessage = () => {
 	const distanceToBottom = window.innerHeight - positionOfSmileButton.bottom;
 	const distanceToRight = window.innerWidth - positionOfSmileButton.right;
 	let topPositionEmojiPanel: string;
+
+	useEffect(() => {
+		dispatch(
+			directActions.joinDirectMessage({
+				directMessageId: currentDmGroup?.channel_id ?? '',
+				channelName: '',
+				type: Number(type)
+			})
+		);
+	}, [currentDmGroup.channel_id]);
 
 	if (distanceToBottom < HEIGHT_EMOJI_PANEL) {
 		topPositionEmojiPanel = 'auto';

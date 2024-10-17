@@ -46,29 +46,29 @@ function ChannelItem({ onLongPress, onPress, data }: IChannelItemProps) {
 
 				{data?.channel_private === ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.VoiceLockIcon
-						width={size.s_16}
-						height={size.s_16}
+						width={size.s_18}
+						height={size.s_18}
 						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
 					/>
 				)}
 				{data?.channel_private === ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-					<Icons.TextLockIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+					<Icons.TextLockIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 				)}
 				{data?.channel_private !== ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
 					<Icons.VoiceNormalIcon
-						width={size.s_16}
-						height={size.s_16}
+						width={size.s_18}
+						height={size.s_18}
 						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
 					/>
 				)}
 				{data?.channel_private !== ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-					<Icons.TextIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
+					<Icons.TextIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
 				)}
 				{data?.channel_private !== ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-					<Icons.StreamIcon height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
+					<Icons.StreamIcon height={size.s_18} width={size.s_18} color={themeValue.channelNormal} />
 				)}
 				{data?.channel_private !== ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_APP && (
-					<Icons.AppChannelIcon height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
+					<Icons.AppChannelIcon height={size.s_18} width={size.s_18} color={themeValue.channelNormal} />
 				)}
 				<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
 					{data?.channel_label}

@@ -4,6 +4,7 @@ import {
 	selectCategoryExpandStateByCategoryId,
 	selectCategoryIdSortChannel,
 	selectChannelMetaEntities,
+	selectCurrentChannel,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
@@ -32,6 +33,7 @@ const ChannelListSection = memo(
 		const dispatch = useAppDispatch();
 		const categoryExpandState = useSelector(selectCategoryExpandStateByCategoryId(data?.clan_id || '', data?.category_id));
 		const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
+		const currentChannel = useSelector(selectCurrentChannel);
 
 		const handleOnPressSortChannel = useCallback(() => {
 			dispatch(
@@ -104,7 +106,11 @@ const ChannelListSection = memo(
 				/>
 
 				{data?.channels?.map((item: IChannel, index: number) => {
-					const shouldRender = categoryExpandState || isUnreadChannel(item?.id) || item.type === ChannelType.CHANNEL_TYPE_VOICE;
+					const shouldRender =
+						categoryExpandState ||
+						isUnreadChannel(item?.id) ||
+						item.type === ChannelType.CHANNEL_TYPE_VOICE ||
+						item?.id === currentChannel?.channel_id;
 					if (shouldRender) {
 						return (
 							<View key={`${item?.id}`} onLayout={(event) => handlePositionChannel(item, event)}>

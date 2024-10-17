@@ -9,7 +9,7 @@ export const style = (colors: Attributes) =>
 
 		wrapperLogo: {
 			alignSelf: 'center',
-			marginHorizontal: size.s_15
+			marginHorizontal: size.s_12
 		},
 
 		badge: {

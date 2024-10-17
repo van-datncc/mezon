@@ -8,7 +8,8 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center'
 		},
 		listChannels: {
-			paddingVertical: size.s_14,
+			paddingTop: size.s_14,
+			paddingBottom: size.s_50,
 			backgroundColor: colors.secondary
 		}
 	});

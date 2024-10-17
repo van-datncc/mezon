@@ -341,7 +341,7 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.reactionBg,
 			borderLeftColor: Colors.textLink,
 			borderLeftWidth: 2,
-			paddingTop: size.s_2
+			paddingTop: size.s_4
 		},
 		highlightMessageReply: {
 			backgroundColor: Colors.bgMessageHighlight,

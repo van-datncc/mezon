@@ -518,6 +518,21 @@ input:-webkit-autofill:active {
 	}
 }
 
+.pre::-webkit-scrollbar {
+	height: 5px;
+}
+
+.pre::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.pre::-webkit-scrollbar-thumb {
+	background: transparent;
+}
+
+.pre::-webkit-scrollbar-thumb:hover {
+	background: #151515;
+}
 // thread-scroll
 .thread-scroll::-webkit-scrollbar {
 	width: 4px;
