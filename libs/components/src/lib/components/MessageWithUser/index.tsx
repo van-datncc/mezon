@@ -74,7 +74,10 @@ function MessageWithUser({
 
 	// Computed values
 	const isCombine = !message.isStartedMessageGroup;
-	const checkReplied = false;
+
+	const { userId } = useAuth();
+	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
+
 	const checkMessageTargetToMoved = false;
 	const attachments = message.attachments ?? [];
 	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
