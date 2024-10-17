@@ -48,7 +48,7 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 
 		const response = await mezon.client.editChannelCanvases(mezon.session, body);
 
-		return response;
+		return { ...response, channel_id: body.channel_id, title: body.title, content: body.content };
 	} catch (error: any) {
 		const errstream = await error.json();
 		return thunkAPI.rejectWithValue(errstream.message);
@@ -115,13 +115,13 @@ export const canvasAPISlice = createSlice({
 	initialState: initialCanvasAPIState,
 	reducers: {
 		// ...
-		updateCanvas: (state: any, action: PayloadAction<any>) => {
+		updateCanvas: (state, action: PayloadAction<any>) => {
 			const { channelId, results } = action.payload;
 			canvasAPIAdapter.updateOne(state.channelCanvas[channelId], {
-				id: results.payload.id,
+				id: results.payload?.id,
 				changes: {
-					title: results.payload.title,
-					content: results.payload.content
+					title: results.payload?.title,
+					content: results.payload?.content
 				}
 			});
 		}
@@ -133,6 +133,8 @@ export const canvasAPISlice = createSlice({
 			})
 			.addCase(createEditCanvas.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
+				const { channel_id } = action.payload;
+				canvasAPIAdapter.upsertOne(state.channelCanvas[channel_id], action.payload);
 			})
 			.addCase(createEditCanvas.rejected, (state: CanvasAPIState, action) => {
 				state.loadingStatus = 'error';
@@ -162,13 +164,6 @@ export const canvasAPISlice = createSlice({
 			})
 			.addCase(getChannelCanvasDetail.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
-				// canvasAPIAdapter.updateOne(state, {
-				// 	id: action.payload?.id ?? '',
-				// 	changes: {
-				// 		title: action.payload?.title,
-				// 		content: action.payload?.content
-				// 	}
-				// });
 			})
 			.addCase(getChannelCanvasDetail.rejected, (state: CanvasAPIState, action) => {
 				state.loadingStatus = 'error';
@@ -240,7 +235,7 @@ export const selectCanvasIdsByChannelId = createSelector([getCanvasApiState, get
 
 export const selectCanvasEntityById = createSelector(
 	[getCanvasApiState, getChannelIdCanvasAsSecondParam, (_, __, canvasId) => canvasId],
-	(messagesState, channelId, canvasId) => {
-		return messagesState.channelCanvas[channelId]?.entities?.[canvasId];
+	(canvasState, channelId, canvasId) => {
+		return canvasState.channelCanvas[channelId]?.entities?.[canvasId];
 	}
 );

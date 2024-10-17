@@ -2,6 +2,7 @@ import { useAppNavigation } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ThreadsEntity,
+	appActions,
 	channelsActions,
 	selectAllChannelMembers,
 	selectLastMessageIdByChannelId,
@@ -72,6 +73,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 
 	const handleLinkThread = (channelId: string, clanId: string) => {
 		dispatch(channelsActions.upsertOne(thread as ChannelsEntity));
+		dispatch(appActions.setIsShowCanvas(false));
 		navigate(toChannelPage(channelId, clanId));
 		setIsShowThread();
 	};

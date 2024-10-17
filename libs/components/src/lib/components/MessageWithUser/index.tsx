@@ -74,7 +74,10 @@ function MessageWithUser({
 
 	// Computed values
 	const isCombine = !message.isStartedMessageGroup;
-	const checkReplied = false;
+
+	const { userId } = useAuth();
+	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
+
 	const checkMessageTargetToMoved = false;
 	const attachments = message.attachments ?? [];
 	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
@@ -128,14 +131,14 @@ function MessageWithUser({
 		'flex h-15 flex-col w-auto px-3',
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
-		{ 'dark:bg-[#383B47]': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': checkMessageIncludeMention || checkJumpPinMessage },
+		{ 'dark:bg-[#383B47]': hasIncludeMention || checkMessageTargetToMoved },
+		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': checkMessageIncludeMention || checkJumpPinMessage || checkReplied },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
-		{ 'dark:bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
 		{ 'bg-[#403D38]': hasIncludeMention },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
