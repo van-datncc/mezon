@@ -29,7 +29,7 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose }: GroupCanvasProps)
 
 	return (
 		<div
-			className="p-4 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
+			className="p-4 cursor-pointer rounded-lg dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 			onClick={handleOpenCanvas}
 			role="button"
 		>

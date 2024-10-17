@@ -61,9 +61,9 @@ function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolea
 				if (op.attributes && op.attributes.background) {
 					delete op.attributes.background;
 				}
-				if (op.attributes && op.attributes.color) {
-					op.attributes.color = isLightMode ? 'black' : 'white';
-				}
+				// if (op.attributes && op.attributes.color) {
+				// 	op.attributes.color = isLightMode ? 'black' : 'white';
+				// }
 			});
 			return delta;
 		});
