@@ -85,3 +85,5 @@ export { default as ModalRemoveMemberClan } from './components/MemberProfile/Mod
 export { default as useProcessMention } from './components/MessageBox/ReactionMentionInput/useProcessMention';
 export { default as PanelMember } from './components/PanelMember';
 export * from './components/ThumbnailAttachmentRender';
+
+export { default as Canvas } from './components/Canvas';

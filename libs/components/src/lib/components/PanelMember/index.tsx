@@ -11,15 +11,7 @@ import {
 	usePermissionChecker,
 	useSettingFooter
 } from '@mezon/core';
-import {
-	directMetaActions,
-	selectAllRolesClan,
-	selectCurrentChannel,
-	selectCurrentClan,
-	selectDmGroupCurrent,
-	selectFriendStatus,
-	selectMemberClanByUserId
-} from '@mezon/store';
+import { EStateFriend, directMetaActions, selectCurrentChannel, selectCurrentClan, selectDmGroupCurrent, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity, EPermission, EUserSettings } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
@@ -52,20 +44,6 @@ const useClanOwnerChecker = (userId: string) => {
 		return currentClan?.creator_id === userId;
 	}, [currentClan, userId]);
 	return isClanOwner;
-};
-
-const useCheckRoleAdminMember = (userId: string) => {
-	const userById = useSelector(selectMemberClanByUserId(userId));
-	const rolesClan = useSelector(selectAllRolesClan);
-	const userRolesClan = useMemo(() => {
-		return userById?.role_id ? rolesClan.filter((role) => userById?.role_id?.includes(role.id)) : [];
-	}, [userById?.role_id, rolesClan]);
-	const hasAdminRole = useMemo(() => {
-		return userRolesClan.some((role) =>
-			role?.permission_list?.permissions?.some((permission) => permission.slug === 'administrator' && permission.active === 1)
-		);
-	}, [userRolesClan]);
-	return hasAdminRole;
 };
 
 const PanelMember = ({
@@ -266,7 +244,7 @@ const PanelMember = ({
 										<ItemPanelMember children="Clan 2" />
 										<ItemPanelMember children="Clan 3" />
 									</Dropdown>
-									{hasAddFriend.friend ? (
+									{hasAddFriend === EStateFriend.FRIEND ? (
 										<ItemPanelMember
 											children="Remove Friend"
 											onClick={() => {
@@ -308,7 +286,7 @@ const PanelMember = ({
 										<ItemPanelMember children="Clan 2" />
 										<ItemPanelMember children="Clan 3" />
 									</Dropdown>
-									{hasAddFriend.friend ? (
+									{hasAddFriend === EStateFriend.FRIEND ? (
 										<ItemPanelMember children="Remove Friend" onClick={() => deleteFriend(friendInfor.name, friendInfor.id)} />
 									) : (
 										<ItemPanelMember

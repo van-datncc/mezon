@@ -193,10 +193,6 @@ export const eventManagementSlice = createSlice({
 				}
 			});
 
-			if (action.payload.event_status === EEventStatus.ONGOING && state.ongoingEvent === null) {
-				state.ongoingEvent = action.payload;
-			}
-
 			if (action.payload.event_status === EEventStatus.COMPLETED && state.ongoingEvent?.event_id === action.payload.event_id) {
 				state.ongoingEvent = null;
 			}

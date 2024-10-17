@@ -616,6 +616,7 @@ export type EmojiStorage = {
 	messageId: string;
 	senderId: string;
 	action: boolean;
+	channel_id?: string;
 };
 
 export enum Direction_Mode {
@@ -827,10 +828,19 @@ export enum TypeCheck {
 	TYPECLAN = 0,
 	TYPECATEGORY = 1,
 	TYPECHANNEL = 2,
-	TYPETHREAD = 3
+	TYPETHREAD = 3,
+	TYPENICKNAME = 4
 }
 
 export enum ThreadStatus {
 	activePublic = 2,
 	joined = 1
 }
+
+export type ICanvas = {
+	id?: string;
+	clan_id: string;
+	channel_id: string;
+	title?: string;
+	content?: string;
+};

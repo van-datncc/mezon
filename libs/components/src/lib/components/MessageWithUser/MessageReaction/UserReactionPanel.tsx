@@ -1,16 +1,7 @@
-import { useAuth, useChatReaction } from '@mezon/core';
-import {
-	reactionActions,
-	selectClanView,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectDmGroupCurrentId,
-	selectMembeGroupByUserId,
-	selectMemberClanByUserId,
-	useAppSelector
-} from '@mezon/store';
+import { useAuth, useChatReaction, useUserById } from '@mezon/core';
+import { reactionActions, selectCurrentChannel, selectCurrentClanId } from '@mezon/store';
 import { Icons, NameComponent } from '@mezon/ui';
-import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji } from '@mezon/utils';
+import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { Fragment, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -48,7 +39,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 			countRemoved,
 			message_sender_id,
 			true,
-			currentChannel ? !currentChannel.channel_private : false
+			isPublicChannel(currentChannel)
 		);
 	};
 
@@ -156,11 +147,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 		hideSenderOnPanel(emojiShowPanel, sender.sender_id ?? '');
 	};
 
-	const isClanView = useSelector(selectClanView);
-	const currentDMId = useSelector(selectDmGroupCurrentId);
-	const userClan = useSelector(selectMemberClanByUserId(sender.sender_id));
-	const userDirect = useAppSelector((state) => selectMembeGroupByUserId(state, currentDMId as string, sender.sender_id));
-	const user = isClanView ? userClan : userDirect;
+	const user = useUserById(sender.sender_id);
 
 	return (
 		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">

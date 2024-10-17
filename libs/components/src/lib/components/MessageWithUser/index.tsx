@@ -52,7 +52,18 @@ function MessageWithUser({
 	const userLogin = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
-	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef } = useMessageParser(message);
+	const {
+		senderId,
+		username,
+		userClanAvatar,
+		userClanNickname,
+		userDisplayName,
+		senderIdMessageRef,
+		avatarSender,
+		messageAvatarSenderRef,
+		messageDisplayNameSenderRef,
+		messageUsernameSenderRef
+	} = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const [shortUserId, setShortUserId] = useState(senderId);
@@ -63,7 +74,10 @@ function MessageWithUser({
 
 	// Computed values
 	const isCombine = !message.isStartedMessageGroup;
-	const checkReplied = false;
+
+	const { userId } = useAuth();
+	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
+
 	const checkMessageTargetToMoved = false;
 	const attachments = message.attachments ?? [];
 	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
@@ -117,14 +131,14 @@ function MessageWithUser({
 		'flex h-15 flex-col w-auto px-3',
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
-		{ 'dark:bg-[#383B47]': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': checkMessageIncludeMention || checkJumpPinMessage },
+		{ 'dark:bg-[#383B47]': hasIncludeMention || checkMessageTargetToMoved },
+		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': checkMessageIncludeMention || checkJumpPinMessage || checkReplied },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
-		{ 'dark:bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
+		{ 'bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
 		{ 'bg-[#403D38]': hasIncludeMention },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
@@ -152,7 +166,20 @@ function MessageWithUser({
 		},
 		[checkAnonymous, mode]
 	);
+	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
+	const avatar = useMemo(() => {
+		if (isDM && shortUserId === senderId) {
+			return avatarSender;
+		}
 
+		if (isDM) {
+			return messageAvatarSenderRef;
+		}
+
+		if (shortUserId === senderId) {
+			return userClanAvatar || avatarSender;
+		}
+	}, [userClanAvatar, avatarSender, shortUserId]);
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -188,7 +215,7 @@ function MessageWithUser({
 											mode={mode}
 											onClick={(e) => handleOpenShortUser(e, senderId)}
 										/>
-										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
+										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat select-text">
 											<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 												{isEditing && editor}
 												{!isEditing && (
@@ -229,9 +256,9 @@ function MessageWithUser({
 						message={message}
 						mode={mode}
 						positionType={''}
-						avatar={shortUserId === senderId ? userClanAvatar : undefined}
+						avatar={avatar}
 						name={userClanNickname || userDisplayName || username}
-						isDM={mode === ChannelStreamMode.STREAM_MODE_CHANNEL}
+						isDM={isDM}
 					/>
 				</div>
 			)}

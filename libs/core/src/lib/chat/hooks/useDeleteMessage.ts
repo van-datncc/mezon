@@ -1,6 +1,6 @@
 import { messagesActions, selectClanView, selectCurrentChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { transformPayloadWriteSocket } from '@mezon/utils';
+import { isPublicChannel, transformPayloadWriteSocket } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -15,7 +15,6 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 	const isClanView = useSelector(selectClanView);
 	const { socketRef } = useMezon();
 	const channel = useSelector(selectCurrentChannel);
-
 	const deleteSendMessage = React.useCallback(
 		async (messageId: string) => {
 			const socket = socketRef.current;
@@ -30,7 +29,7 @@ export function useDeleteMessage({ channelId, mode }: UseDeleteMessageOptions) {
 
 			const payload = transformPayloadWriteSocket({
 				clanId: currentClanId as string,
-				isPublicChannel: !channel?.channel_private,
+				isPublicChannel: isPublicChannel(channel),
 				isClanView: isClanView as boolean
 			});
 

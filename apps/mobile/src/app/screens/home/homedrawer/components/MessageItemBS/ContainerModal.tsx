@@ -1,8 +1,16 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useChatReaction, useChatSending, usePermissionChecker } from '@mezon/core';
+import { useAuth, useChannelMembers, useChatReaction, useChatSending, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { giveCoffeeActions, messagesActions, selectCurrentChannel, selectCurrentClanId, selectDmGroupCurrent, useAppDispatch } from '@mezon/store';
+import {
+	giveCoffeeActions,
+	messagesActions,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectDmGroupCurrent,
+	threadsActions,
+	useAppDispatch
+} from '@mezon/store';
 import {
 	MessagesEntity,
 	appActions,
@@ -13,7 +21,7 @@ import {
 	setIsForwardAll,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, getSrcEmoji } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -68,6 +76,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	const messagePosition = useMemo(() => {
 		return convertedAllMessagesEntities?.findIndex((value: MessagesEntity) => value.id === message?.id);
 	}, [convertedAllMessagesEntities, message?.id]);
+	const { joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: mode ?? 0 });
 
 	const isShowForwardAll = () => {
 		if (messagePosition === -1) return false;
@@ -480,6 +489,11 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 	};
 
 	const handleReact = async (mode, messageId, emoji_id: string, emoji: string, senderId) => {
+		if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
+			await dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel?.channel_id ?? '', activeCode: ThreadStatus.joined }));
+			joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
+		}
+
 		await reactionMessageDispatch(
 			'',
 			mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -491,7 +505,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			1,
 			senderId ?? '',
 			false,
-			mode !== ChannelStreamMode?.STREAM_MODE_CHANNEL ? false : currentChannel ? !currentChannel?.channel_private : false
+			isPublicChannel(currentChannel)
 		);
 		onClose();
 	};

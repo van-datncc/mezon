@@ -59,7 +59,7 @@ export function useChatReaction({ isMobile = false }: ChatReactionProps = {}) {
 					actionDelete: action_delete,
 					isPublic: payload.is_public
 				})
-			);
+			).unwrap();
 		},
 		[dispatch, isMobile, isClanView]
 	);

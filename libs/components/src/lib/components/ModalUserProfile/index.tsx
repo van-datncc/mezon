@@ -6,9 +6,10 @@ import {
 	useMemberCustomStatus,
 	useOnClickOutside,
 	useSendInviteMessage,
-	useSettingFooter
+	useSettingFooter,
+	useUserById
 } from '@mezon/core';
-import { selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus, selectMemberClanByUserId } from '@mezon/store';
+import { EStateFriend, selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
@@ -75,7 +76,8 @@ const ModalUserProfile = ({
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
 	const userCustomStatus = useMemberCustomStatus(userID || '', isDM);
-	const userById = useSelector(selectMemberClanByUserId(userID ?? '')) as ChannelMembersEntity;
+	const userById = useUserById(userID);
+
 	const date = new Date(userById?.user?.create_time as string | Date);
 	const { timeFormatted } = useFormatDate({ date });
 	const currentUserId = useSelector(selectCurrentUserId);
@@ -141,10 +143,35 @@ const ModalUserProfile = ({
 	useEscapeKeyClose(rootRef || profileRef, onClose);
 	useOnClickOutside(rootRef || profileRef, onClose);
 
+	const placeholderUserName = useMemo(() => {
+		if (userById) {
+			return userById?.clan_nick || userById?.user?.display_name || userById?.user?.username;
+		}
+		if (userID === message?.sender_id) {
+			return message?.display_name || message?.username;
+		}
+		return message?.references?.[0].message_sender_display_name || message?.references?.[0].message_sender_username;
+	}, [userById, userID]);
+
+	const userNameShow = useMemo(() => {
+		if (isFooterProfile) {
+			return userProfile?.user?.username;
+		}
+		if (userById) {
+			return userById?.user?.username;
+		}
+		if (checkAnonymous) {
+			return 'Anonymous';
+		}
+		if (userID === message?.sender_id) {
+			return message?.username;
+		}
+		return message?.references?.[0].message_sender_username;
+	}, [userById, userID]);
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[105px]'} ${!color && 'dark:bg-bgAvatarDark bg-bgAvatarLight'} flex justify-end gap-x-2 p-2 `}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 `}
 				style={{ backgroundColor: color }}
 			>
 				{!checkUser && !checkAnonymous && (
@@ -152,14 +179,14 @@ const ModalUserProfile = ({
 						checkAddFriend={checkAddFriend}
 						openModal={openModal}
 						setOpenModal={setOpenModal}
-						user={userById}
+						user={userById as ChannelMembersEntity}
 						showPopupLeft={showPopupLeft}
 						kichUser={message?.user}
 					/>
 				)}
 			</div>
 			<AvatarProfile
-				avatar={avatar || userById?.clan_avatar || userById?.user?.avatar_url}
+				avatar={avatar || userById?.user?.avatar_url}
 				username={(isFooterProfile && userProfile?.user?.username) || message?.username || userById?.user?.username}
 				userToDisplay={isFooterProfile ? userProfile : userById}
 				customStatus={displayCustomStatus}
@@ -174,25 +201,17 @@ const ModalUserProfile = ({
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
 							{checkAnonymous ? 'Anonymous' : userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}
 						</p>
-						<p className="font-medium tracking-wide text-sm my-0">
-							{isFooterProfile
-								? userProfile?.user?.username
-								: userById
-									? userById?.user?.username
-									: checkAnonymous
-										? 'Anonymous'
-										: message?.username}
-						</p>
+						<p className="font-medium tracking-wide text-sm my-0">{userNameShow}</p>
 					</div>
 
-					{checkAddFriend.myPendingFriend && !showPopupLeft && <PendingFriend user={userById} />}
+					{checkAddFriend === EStateFriend.MY_PENDING && !showPopupLeft && <PendingFriend user={userById as ChannelMembersEntity} />}
 
 					{mode !== 4 && mode !== 3 && !isFooterProfile && (
 						<UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me as string} />
 					)}
 					{mode !== 4 && mode !== 3 && !isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
 					{isFooterProfile ? (
-						<StatusProfile userById={userById} isDM={isDM} />
+						<StatusProfile userById={userById as ChannelMembersEntity} isDM={isDM} />
 					) : (
 						mode !== 4 && mode !== 3 && !hiddenRole && userById && <RoleUserProfile userID={userID} />
 					)}
@@ -202,11 +221,17 @@ const ModalUserProfile = ({
 							<input
 								type="text"
 								className="w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] "
-								placeholder={`Message @${userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}`}
+								placeholder={`Message @${placeholderUserName}`}
 								value={content}
 								onKeyPress={(e) => {
 									if (e.key === 'Enter') {
-										sendMessage(message?.sender_id || userById?.user?.id || '');
+										if (userById) {
+											sendMessage(userById?.user?.id || '');
+											return;
+										}
+										sendMessage(
+											(userID === message?.sender_id ? message?.sender_id : message?.references?.[0].message_sender_id) || ''
+										);
 									}
 								}}
 								onChange={handleContent}
