@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
 	appActions,
+	attachmentActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
@@ -53,7 +54,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode, isPublicChannel, transformPayloadWriteSocket } from '@mezon/utils';
+import { EMOJI_GIVE_COFFEE, ETypeLinkMedia, ModeResponsive, NotificationCode, isPublicChannel, transformPayloadWriteSocket } from '@mezon/utils';
 import * as Sentry from '@sentry/browser';
 import isElectron from 'is-electron';
 import {
@@ -224,6 +225,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const idToCompare = !isMobile ? channelId : currentChannelId;
 				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
+
+			if (
+				mess.attachments?.length &&
+				mess.attachments.length > 0 &&
+				mess.attachments.some((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX))
+			) {
+				dispatch(attachmentActions.fetchChannelAttachments({ clanId: mess.clan_id as string, channelId: mess.channel_id as string }));
+			}
+
 			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directMetaActions.updateDMSocket(message));
