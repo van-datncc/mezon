@@ -10,12 +10,12 @@ import { ModeResponsive, RequestInput } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-export function useMessageValue(channelId?: string) {
+export function useMessageValue() {
 	const dispatch = useAppDispatch();
 	const mode = useSelector(selectModeResponsive);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
-	const request = useSelector(selectRequestByChannelId(mode === ModeResponsive.MODE_CLAN ? channelId || '' : currentDmGroupId || ''));
+	const request = useSelector(selectRequestByChannelId(mode === ModeResponsive.MODE_CLAN ? currentChannelId || '' : currentDmGroupId || ''));
 
 	const setRequestInput = useCallback(
 		(request: RequestInput, isThread?: boolean) => {
