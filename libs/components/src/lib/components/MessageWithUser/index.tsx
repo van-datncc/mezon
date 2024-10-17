@@ -67,7 +67,7 @@ function MessageWithUser({
 	} = useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
-	const [shortUserId, setShortUserId] = useState(senderId);
+	const [shortUserId, setShortUserId] = useState('');
 	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 
@@ -181,6 +181,7 @@ function MessageWithUser({
 			return userClanAvatar || avatarSender;
 		}
 	}, [userClanAvatar, avatarSender, shortUserId]);
+
 	return (
 		<>
 			{shouldShowDateDivider && <MessageDateDivider message={message} />}
@@ -241,7 +242,7 @@ function MessageWithUser({
 					</div>
 				</HoverStateWrapper>
 			)}
-			{isShowPanelChannel && senderId !== '0' && allowDisplayShortProfile && (
+			{isShowPanelChannel && senderId !== '0' && allowDisplayShortProfile && shortUserId && (
 				<div
 					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col  duration-300 ease-in-out animate-fly_in`}
 					style={{
