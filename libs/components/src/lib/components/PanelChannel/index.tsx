@@ -87,7 +87,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentChannel = useSelector(selectChannelById(selectedChannel || ''));
 	const currentUserId = useSelector(selectCurrentUserId);
-	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
+	const currentCategory = useSelector(selectCategoryById(channel?.category_id || ''));
 
 	const handleEditChannel = () => {
 		openSetting();

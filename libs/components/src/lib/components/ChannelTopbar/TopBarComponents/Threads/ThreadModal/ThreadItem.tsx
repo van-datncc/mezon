@@ -100,26 +100,6 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 		setIsShowPanelChannel((s) => !s);
 	};
 
-	const [openSettingThread, closeSettingThread] = useModal(() => {
-		return <SettingChannel onClose={closeSettingThread} channel={channelThread as IChannel} />;
-	}, [thread.id]);
-
-	const { handleConfirmDeleteChannel } = useChannels();
-	const handleDeleteChannel = () => {
-		handleConfirmDeleteChannel(thread.channel_id as string, thread.clan_id as string);
-		closeConfirmDelete();
-	};
-	const [openConfirmDelete, closeConfirmDelete] = useModal(() => {
-		return (
-			<ModalConfirm
-				handleCancel={closeConfirmDelete}
-				handleConfirm={handleDeleteChannel}
-				title="delete"
-				modalName={`${thread.channel_label}`}
-			/>
-		);
-	}, [thread.id]);
-	console.log(channelThread, thread.id);
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
@@ -163,18 +143,56 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 				</div>
 			</div>
 			{isShowPanelChannel && (
-				<PanelChannel
-					selectedChannel={thread.id}
-					onDeleteChannel={openConfirmDelete}
-					channel={channelThread as IChannel}
+				<PannelThreadItem
+					channelThread={channelThread as IChannel}
 					coords={coords}
-					openSetting={openSettingThread}
+					panelRef={panelRef}
 					setIsShowPanelChannel={setIsShowPanelChannel}
-					rootRef={panelRef}
 				/>
 			)}
 		</div>
 	);
 };
 
+const PannelThreadItem = ({
+	channelThread,
+	coords,
+	setIsShowPanelChannel,
+	panelRef
+}: {
+	panelRef: React.MutableRefObject<HTMLDivElement | null>;
+	channelThread: IChannel;
+	coords: Coords;
+	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+	const [openSettingThread, closeSettingThread] = useModal(() => {
+		return <SettingChannel onClose={closeSettingThread} channel={channelThread} />;
+	}, [channelThread?.id]);
+	const { handleConfirmDeleteChannel } = useChannels();
+	const handleDeleteChannel = () => {
+		handleConfirmDeleteChannel(channelThread?.channel_id as string, channelThread?.clan_id as string);
+		closeConfirmDelete();
+	};
+	const [openConfirmDelete, closeConfirmDelete] = useModal(() => {
+		return (
+			<ModalConfirm
+				handleCancel={closeConfirmDelete}
+				handleConfirm={handleDeleteChannel}
+				title="delete"
+				modalName={`${channelThread?.channel_label}`}
+			/>
+		);
+	}, [channelThread?.id]);
+	return (
+		<PanelChannel
+			selectedChannel={channelThread?.id}
+			onDeleteChannel={openConfirmDelete}
+			channel={channelThread as IChannel}
+			coords={coords}
+			openSetting={openSettingThread}
+			setIsShowPanelChannel={setIsShowPanelChannel}
+			rootRef={panelRef}
+		/>
+	);
+};
 export default ThreadItem;
