@@ -1,5 +1,6 @@
 import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
 import {
+	ChannelsEntity,
 	channelsActions,
 	selectChannelById,
 	selectChannelFirst,
@@ -8,6 +9,7 @@ import {
 	selectCurrentClanId,
 	useAppDispatch
 } from '@mezon/store';
+import { checkIsThread } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +29,9 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ onClose, onCloseModal,
 	const channelSecond = useSelector(selectChannelSecond);
 	let channelNavId = channelFirst.id;
 	const selectedChannel = useSelector(selectChannelById(channelId));
-	const isThread = selectedChannel.parrent_id !== '0';
+
+	const isThread = checkIsThread(selectedChannel as ChannelsEntity);
+
 	const { toChannelPage } = useAppNavigation();
 	const navigate = useNavigate();
 

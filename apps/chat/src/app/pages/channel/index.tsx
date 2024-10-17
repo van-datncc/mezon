@@ -1,4 +1,4 @@
-import { FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
+import { Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
 import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads, useWindowFocusState } from '@mezon/core';
 import {
 	channelMetaActions,
@@ -11,6 +11,7 @@ import {
 	selectCurrentChannel,
 	selectFetchChannelStatus,
 	selectIsSearchMessage,
+	selectIsShowCanvas,
 	selectIsShowMemberList,
 	selectStatusMenu,
 	useAppDispatch
@@ -96,6 +97,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
+	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const appChannel = useSelector(selectAppChannelById(channelId));
 
@@ -113,9 +115,21 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [isShowMemberList, setIsShowCreateThread]);
 
+	useEffect(() => {
+		if (appChannel?.url) {
+			const handleMessage = (event: MessageEvent) => {
+				if (event.origin === appChannel?.url) {
+					// implement logic here
+				}
+			};
+			window.addEventListener('message', handleMessage);
+			return () => window.removeEventListener('message', handleMessage);
+		}
+	}, [appChannel?.url]);
+
 	return currentChannel.type === ChannelType.CHANNEL_TYPE_APP ? (
 		appChannel?.url ? (
-			<iframe src={appChannel?.url} className={'w-full h-full'}></iframe>
+			<iframe title={appChannel?.url} src={appChannel?.url} className={'w-full h-full'}></iframe>
 		) : (
 			<div className={'w-full h-full flex items-center justify-center'}>
 				<Loading />
@@ -131,18 +145,20 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				onDragEnter={handleDragEnter}
 			>
 				<div className={`flex flex-row ${closeMenu ? 'h-heightWithoutTopBarMobile' : 'h-heightWithoutTopBar'}`}>
-					<div
-						className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && 'hidden'} z-10`}
-					>
+					{!isShowCanvas && (
 						<div
-							className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
-							ref={messagesContainerRef}
+							className={`flex flex-col flex-1 min-w-60 ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && 'hidden'} z-10`}
 						>
-							<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+							<div
+								className={`relative dark:bg-bgPrimary max-w-widthMessageViewChat bg-bgLightPrimary ${closeMenu ? 'h-heightMessageViewChatMobile' : 'h-heightMessageViewChat'}`}
+								ref={messagesContainerRef}
+							>
+								<ChannelMedia currentChannel={currentChannel} key={currentChannel?.channel_id} />
+							</div>
+							<ChannelMainContentText channelId={currentChannel?.id as string} />
 						</div>
-						<ChannelMainContentText channelId={currentChannel?.id as string} />
-					</div>
-					{isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+					)}
+					{!isShowCanvas && isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
 						<div
 							onContextMenu={(event) => event.preventDefault()}
 							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
@@ -150,6 +166,12 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						>
 							<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
 							<MemberList />
+						</div>
+					)}
+
+					{isShowCanvas && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+						<div className="w-full">
+							<Canvas />
 						</div>
 					)}
 					{isSearchMessage && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}

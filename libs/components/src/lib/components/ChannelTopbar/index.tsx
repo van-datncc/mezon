@@ -1,6 +1,8 @@
 import { useAppNavigation, useAppParams, usePermissionChecker, useThreads } from '@mezon/core';
 import {
+	ChannelsEntity,
 	appActions,
+	canvasAPIActions,
 	notificationActions,
 	searchMessagesActions,
 	selectCloseMenu,
@@ -22,7 +24,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission, IChannel } from '@mezon/utils';
+import { EPermission, IChannel, checkIsThread } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -33,6 +35,7 @@ import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
 import { ChannelLabel } from './TopBarComponents';
+import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
@@ -105,6 +108,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
+								<CanvasButton isLightMode={appearanceTheme === 'light'} />
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -133,6 +137,58 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 	);
 }
 
+function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
+	const dispatch = useAppDispatch();
+	const [isShowCanvas, setIsShowCanvas] = useState<boolean>(false);
+
+	const canvasRef = useRef<HTMLDivElement | null>(null);
+
+	const handleShowCanvas = () => {
+		setIsShowCanvas(!isShowCanvas);
+	};
+
+	const handleClose = useCallback(() => {
+		setIsShowCanvas(false);
+	}, []);
+
+	const currentChannel = useSelector(selectCurrentChannel);
+
+	useEffect(() => {
+		if (currentChannel?.channel_id || isShowCanvas) {
+			const fetchCanvas = async () => {
+				const channelId = currentChannel?.channel_id ?? '';
+				const clanId = currentChannel?.clan_id ?? '';
+
+				if (channelId && clanId) {
+					const body = {
+						channel_id: channelId,
+						clan_id: clanId
+					};
+					await dispatch(canvasAPIActions.getChannelCanvasList(body));
+				}
+			};
+			fetchCanvas();
+		}
+	}, [currentChannel?.channel_id, isShowCanvas]);
+	///
+	return (
+		<div className="relative leading-5 h-5" ref={canvasRef}>
+			<Tooltip
+				className={`${isShowCanvas && 'hidden'}  flex justify-center items-center`}
+				content="Canvas"
+				trigger="hover"
+				animation="duration-500"
+				style={isLightMode ? 'light' : 'dark'}
+			>
+				<button className="focus-visible:outline-none" onClick={handleShowCanvas} onContextMenu={(e) => e.preventDefault()}>
+					<Icons.CanvasIcon isWhite={isShowCanvas} defaultSize="size-6" />
+				</button>
+			</Tooltip>
+			{isShowCanvas && <CanvasModal onClose={handleClose} rootRef={canvasRef} />}
+		</div>
+	);
+}
+
 function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();
 	const [isShowThread, setIsShowThread] = useState<boolean>(false);
@@ -148,7 +204,8 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	}, []);
 
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '';
+	const isThread = checkIsThread(currentChannel as ChannelsEntity);
+
 	useEffect(() => {
 		if (currentChannel?.channel_id || isShowThread) {
 			const fetchThreads = async () => {
