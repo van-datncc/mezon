@@ -43,6 +43,11 @@ import { ChannelTyping } from '../../channel/ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		dispatch(directActions.setDmGroupCurrentId(channelId));
+	}, [channelId]);
+
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
 
