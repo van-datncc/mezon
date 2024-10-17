@@ -149,6 +149,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
@@ -164,7 +165,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
 
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
-	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
+	const { request, setRequestInput } = useMessageValue();
 
 	const { mentions } = useMessageLine(request?.content);
 	const [valueHighlight, setValueHightlight] = useState<string>('');
