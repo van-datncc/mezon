@@ -51,6 +51,8 @@ const GlobalEventListener = () => {
 		let notificationCountAllClan = 0;
 		notificationCountAllClan = allNotificationReplyMentionAllClan < 0 ? 0 : allNotificationReplyMentionAllClan;
 		const notificationCount = notificationCountAllClan + totalUnreadMessages + quantityPendingRequest;
+		const displayCountBrowser = notificationCount > 99 ? '99+' : notificationCount.toString();
+
 		if (isElectron()) {
 			if (hasUnreadChannel && !notificationCount) {
 				electronBridge?.setBadgeCount(null);
@@ -58,7 +60,7 @@ const GlobalEventListener = () => {
 			}
 			electronBridge?.setBadgeCount(notificationCount);
 		} else {
-			document.title = notificationCount > 0 ? `(${notificationCount}) Mezon` : 'Mezon';
+			document.title = notificationCount > 0 ? `(${displayCountBrowser}) Mezon` : 'Mezon';
 		}
 	}, [allNotificationReplyMentionAllClan, totalUnreadMessages, quantityPendingRequest, hasUnreadChannel]);
 

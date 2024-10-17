@@ -1,9 +1,10 @@
-import { IMessageWithUser, IThread, LoadingStatus, ThreadStatus, TypeCheck } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { IMessageWithUser, IThread, LoadingStatus, sortChannelsByLastActivity, ThreadStatus, TypeCheck } from '@mezon/utils';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import memoizee from 'memoizee';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { fetchChannels } from '../channels/channels.slice';
+import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
 
 export const THREADS_FEATURE_KEY = 'threads';
@@ -130,6 +131,19 @@ export const checkDuplicateThread = createAsyncThunk(
 	}
 );
 
+export const leaveThread = createAsyncThunk('thread/leavethread', async ({ clanId, threadId }: { clanId: string; threadId: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.leaveThread(mezon.session, threadId);
+		if (response) {
+			thunkAPI.dispatch(fetchChannels({ clanId: clanId, noCache: true }));
+		}
+	} catch (error) {
+		Sentry.captureException(error);
+		return thunkAPI.rejectWithValue([]);
+	}
+});
+
 export const threadsSlice = createSlice({
 	name: THREADS_FEATURE_KEY,
 	initialState: initialThreadsState,
@@ -246,7 +260,7 @@ export const threadsReducer = threadsSlice.reducer;
  *
  * See: https://react-redux.js.org/next/api/hooks#usedispatch
  */
-export const threadsActions = { ...threadsSlice.actions, fetchThreads, fetchThread };
+export const threadsActions = { ...threadsSlice.actions, fetchThreads, fetchThread, leaveThread };
 
 /*
  * Export selectors to query state. For use with the `useSelector` hook.
@@ -296,14 +310,15 @@ export const selectIsShowCreateThread = (channelId: string) =>
 // new update
 
 export const selectActiveThreads = createSelector([selectAllThreads], (threads) => {
-	return threads.filter((thread) => thread.active === ThreadStatus.activePublic);
+	const result = threads.filter((thread) => thread.active === ThreadStatus.activePublic);
+	const sortByLsentMess = sortChannelsByLastActivity(result as any);
+	return sortByLsentMess;
 });
 
 export const selectJoinedThreadsWithinLast30Days = createSelector([selectAllThreads], (threads) => {
 	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
 	const currentTime = Math.floor(Date.now() / 1000);
-
-	return threads.reduce((accumulator, thread) => {
+	const result = threads.reduce((accumulator, thread) => {
 		if (
 			thread.active === ThreadStatus.joined &&
 			thread.last_sent_message?.timestamp_seconds &&
@@ -313,17 +328,22 @@ export const selectJoinedThreadsWithinLast30Days = createSelector([selectAllThre
 		}
 		return accumulator;
 	}, [] as ThreadsEntity[]);
+	const sortByLsentMess = sortChannelsByLastActivity(result as any);
+	return sortByLsentMess;
 });
 
 export const selectThreadsOlderThan30Days = createSelector([selectAllThreads], (threads) => {
 	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
 	const currentTime = Math.floor(Date.now() / 1000);
-	return threads.reduce((accumulator, thread) => {
+	const result = threads.reduce((accumulator, thread) => {
 		if (thread.last_sent_message?.timestamp_seconds && currentTime - Number(thread.last_sent_message?.timestamp_seconds) > thirtyDaysInSeconds) {
 			accumulator.push(thread);
 		}
 		return accumulator;
 	}, [] as ThreadsEntity[]);
+	const sortByLsentMess = sortChannelsByLastActivity(result as any);
+
+	return sortByLsentMess;
 });
 
 export const selectShowEmptyStatus = () =>

@@ -2,7 +2,7 @@ import { useCheckVoiceStatus } from '@mezon/core';
 import { Icons, ThreadIcon, ThreadIconLocker } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store';
-import { ChannelStatusEnum, getSrcEmoji } from '@mezon/utils';
+import { ChannelStatusEnum, checkIsThread, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,9 @@ const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaul
 	const { isChannelPrivate, isChannelText, isThread, isChannelVoice, isChannelStream, isChannelApp } = useMemo(() => {
 		const isChannelPrivate = channel?.channel_private === ChannelStatusEnum.isPrivate;
 		const isChannelText = channel?.type === ChannelType.CHANNEL_TYPE_TEXT;
-		const isThread = channel?.parrent_id !== '0';
+
+		const isThread = checkIsThread(channel as ChannelsEntity);
+
 		const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 		const isChannelStream = channel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 		const isChannelApp = channel?.type === ChannelType.CHANNEL_TYPE_APP;

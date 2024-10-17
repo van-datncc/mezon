@@ -5,7 +5,6 @@ import { ApiUpdateClanDescRequest, ChannelType } from 'mezon-js';
 import { ApiClanDesc } from 'mezon-js/api.gen';
 import { accountActions } from '../account/account.slice';
 import { categoriesActions } from '../categories/categories.slice';
-import { fetchListChannelsByUser } from '../channels/channelUser.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
@@ -100,7 +99,6 @@ export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', as
 		if (!response.clandesc) {
 			return [];
 		}
-		thunkAPI.dispatch(fetchListChannelsByUser({ noCache: true }));
 		const clans = response.clandesc.map(mapClanToEntity);
 		const meta = clans.map((clan) => extractClanMeta(clan));
 		thunkAPI.dispatch(clansActions.updateBulkClanMetadata(meta));

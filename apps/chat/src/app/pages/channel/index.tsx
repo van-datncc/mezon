@@ -115,9 +115,21 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		}
 	}, [isShowMemberList, setIsShowCreateThread]);
 
+	useEffect(() => {
+		if (appChannel?.url) {
+			const handleMessage = (event: MessageEvent) => {
+				if (event.origin === appChannel?.url) {
+					// implement logic here
+				}
+			};
+			window.addEventListener('message', handleMessage);
+			return () => window.removeEventListener('message', handleMessage);
+		}
+	}, [appChannel?.url]);
+
 	return currentChannel.type === ChannelType.CHANNEL_TYPE_APP ? (
 		appChannel?.url ? (
-			<iframe src={appChannel?.url} className={'w-full h-full'}></iframe>
+			<iframe title={appChannel?.url} src={appChannel?.url} className={'w-full h-full'}></iframe>
 		) : (
 			<div className={'w-full h-full flex items-center justify-center'}>
 				<Loading />

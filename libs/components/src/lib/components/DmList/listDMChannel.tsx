@@ -51,7 +51,7 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 					type: type
 				})
 			);
-			dispatch(directActions.setDmGroupCurrentId(DMid));
+
 			if (result) {
 				navigate(`/chat/direct/message/${DMid}/${type}`);
 			}

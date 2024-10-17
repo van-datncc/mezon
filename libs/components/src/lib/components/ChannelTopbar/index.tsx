@@ -1,5 +1,6 @@
 import { useAppNavigation, useAppParams, usePermissionChecker, useThreads } from '@mezon/core';
 import {
+	ChannelsEntity,
 	appActions,
 	canvasAPIActions,
 	notificationActions,
@@ -23,7 +24,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission, IChannel } from '@mezon/utils';
+import { EPermission, IChannel, checkIsThread } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -203,7 +204,8 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	}, []);
 
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '';
+	const isThread = checkIsThread(currentChannel as ChannelsEntity);
+
 	useEffect(() => {
 		if (currentChannel?.channel_id || isShowThread) {
 			const fetchThreads = async () => {
