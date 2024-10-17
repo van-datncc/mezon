@@ -170,7 +170,7 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 			fetchCanvas();
 		}
 	}, [currentChannel?.channel_id]);
-	///
+
 	return (
 		<div className="relative leading-5 h-5" ref={canvasRef}>
 			<Tooltip

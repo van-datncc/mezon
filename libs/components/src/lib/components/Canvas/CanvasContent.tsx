@@ -59,11 +59,9 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 		quillRef.current.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
 			delta.ops.forEach((op) => {
 				if (op.attributes && op.attributes.background) {
-					console.log(isLightMode, 'isLightMode');
 					delete op.attributes.background;
 				}
 				if (op.attributes && op.attributes.color) {
-					console.log(isLightMode, 'isLightMode');
 					op.attributes.color = isLightMode ? 'black' : 'white';
 				}
 			});
@@ -220,13 +218,9 @@ function CanvasContent({ isLightMode, content }: { isLightMode: boolean; content
 	};
 
 	useEffect(() => {
-		const editor = document.querySelector('.ql-editor');
-		if (editor) {
-			(editor as HTMLElement).style.setProperty('--placeholder-color', placeholderColor);
-		}
 		quillRef?.current?.setContents(quillRef.current.getContents());
 		quillRef?.current?.formatText(0, quillRef.current.getLength(), { color: isLightMode ? 'rgb(51, 51, 51)' : 'white' });
-	}, [isLightMode, placeholderColor]);
+	}, [isLightMode, content]);
 
 	return (
 		<div className="note-canvas" style={{ position: 'relative' }}>
