@@ -21,7 +21,7 @@ function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolea
 	const toolbarRef = useRef<HTMLDivElement | null>(null);
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
-	const placeholderColor = isLightMode ? '#f8f8f2' : '#ffffff';
+	const placeholderColor = isLightMode ? 'rgba(0,0,0,0.6)' : '#ffffff';
 
 	const [activeFormats, setActiveFormats] = useState<ActiveFormats>({
 		bold: false,
