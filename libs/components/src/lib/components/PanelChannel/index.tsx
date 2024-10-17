@@ -42,7 +42,7 @@ type PanelChannel = {
 	channel: IChannel;
 	onDeleteChannel: () => void;
 	selectedChannel?: string;
-	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
+	openSetting: () => void;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
 	rootRef?: RefObject<HTMLElement>;
 	isUnread?: boolean;
@@ -73,16 +73,7 @@ export const notificationTypesList = [
 	}
 ];
 
-const PanelChannel = ({
-	coords,
-	channel,
-	setOpenSetting,
-	setIsShowPanelChannel,
-	onDeleteChannel,
-	rootRef,
-	selectedChannel,
-	isUnread
-}: PanelChannel) => {
+const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, selectedChannel, isUnread }: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -99,7 +90,7 @@ const PanelChannel = ({
 	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
 
 	const handleEditChannel = () => {
-		setOpenSetting(true);
+		openSetting();
 		setIsShowPanelChannel(false);
 	};
 
@@ -122,7 +113,7 @@ const PanelChannel = ({
 			/>
 		</div>
 	));
-
+	console.log('Here');
 	const handleScheduleMute = (duration: number) => {
 		if (duration !== Infinity) {
 			const now = new Date();
@@ -183,6 +174,7 @@ const PanelChannel = ({
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
+			console.log('Here');
 			setPositionTop(true);
 		}
 	}, [coords.distanceToBottom]);

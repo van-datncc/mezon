@@ -1,20 +1,26 @@
-import { useAppNavigation } from '@mezon/core';
+import { useAppNavigation, useChannels } from '@mezon/core';
 import {
 	ChannelsEntity,
 	ThreadsEntity,
 	channelsActions,
 	selectAllChannelMembers,
+	selectChannelById,
 	selectLastMessageIdByChannelId,
 	selectMemberClanByUserId,
 	selectMessageEntityById,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelMembersEntity, IChannelMember, convertTimeMessage } from '@mezon/utils';
+import { ChannelMembersEntity, IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Coords } from '../../../../ChannelLink';
+import SettingChannel from '../../../../ChannelSetting';
 import { useMessageSender } from '../../../../MessageWithUser/useMessageSender';
+import ModalConfirm from '../../../../ModalConfirm';
+import PanelChannel from '../../../../PanelChannel';
 import ThreadModalContent from './ThreadModalContent';
 
 type ThreadItemProps = {
@@ -28,7 +34,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 	const { toChannelPage } = useAppNavigation();
 	const dispatch = useDispatch();
 	const threadMembers = useSelector((state) => selectAllChannelMembers(state, thread.channel_id));
-
+	const channelThread = useSelector(selectChannelById(thread.id));
 	const messageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, thread.channel_id as string));
 	const message = useAppSelector((state) =>
 		selectMessageEntityById(state, thread.channel_id as string, messageId || thread?.last_sent_message?.id)
@@ -76,11 +82,51 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 		setIsShowThread();
 	};
 
+	const [coords, setCoords] = useState<Coords>({
+		mouseX: 0,
+		mouseY: 0,
+		distanceToBottom: 0
+	});
+
+	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
+
+	const handlePannelThread = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const mouseX = event.clientX;
+		const mouseY = event.clientY;
+		const windowHeight = window.innerHeight;
+		const distanceToBottom = windowHeight - event.clientY;
+		setCoords({ mouseX, mouseY, distanceToBottom });
+		setIsShowPanelChannel((s) => !s);
+	};
+
+	const [openSettingThread, closeSettingThread] = useModal(() => {
+		return <SettingChannel onClose={closeSettingThread} channel={channelThread as IChannel} />;
+	}, [thread.id]);
+
+	const { handleConfirmDeleteChannel } = useChannels();
+	const handleDeleteChannel = () => {
+		handleConfirmDeleteChannel(thread.channel_id as string, thread.clan_id as string);
+		closeConfirmDelete();
+	};
+	const [openConfirmDelete, closeConfirmDelete] = useModal(() => {
+		return (
+			<ModalConfirm
+				handleCancel={closeConfirmDelete}
+				handleConfirm={handleDeleteChannel}
+				title="delete"
+				modalName={`${thread.channel_label}`}
+			/>
+		);
+	}, [thread.id]);
+	console.log(channelThread, thread.id);
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
-			className="p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
+			className="relative overflow-y-hidden p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 			role="button"
+			ref={panelRef}
+			onContextMenu={handlePannelThread}
 		>
 			<div className="flex flex-row justify-between items-center">
 				<div className="flex flex-col gap-1">
@@ -116,6 +162,17 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 					)}
 				</div>
 			</div>
+			{isShowPanelChannel && (
+				<PanelChannel
+					selectedChannel={thread.id}
+					onDeleteChannel={openConfirmDelete}
+					channel={channelThread as IChannel}
+					coords={coords}
+					openSetting={openSettingThread}
+					setIsShowPanelChannel={setIsShowPanelChannel}
+					rootRef={panelRef}
+				/>
+			)}
 		</div>
 	);
 };
