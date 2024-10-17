@@ -16,17 +16,19 @@ export function UserMentionList({ channelID, channelMode }: UserMentionListProps
 	const { membersOfParent } = useChannelMembers({ channelId: channelID, mode: channelMode ?? 0 });
 	const channel = useSelector(selectChannelById(channelID));
 	const channelparrent = useSelector(selectChannelById(channel?.parrent_id || ''));
-	const RolesChannel = useSelector(selectRolesByChannelId(channel?.parrent_id));
+	const rolesChannel = useSelector(selectRolesByChannelId(channel?.parrent_id));
 	const rolesInClan = useSelector(selectAllRolesClan);
 	const rolesToUse = useMemo(() => {
 		if (channel?.parrent_id !== '0' && channelparrent?.channel_private === 1) {
-			return RolesChannel;
+			return rolesChannel;
 		} else {
 			return rolesInClan;
 		}
-	}, [channel?.parrent_id, channelparrent?.channel_private, RolesChannel, rolesInClan]);
+	}, [channel?.parrent_id, channelparrent?.channel_private, rolesChannel, rolesInClan]);
 
-	const filteredRoles = rolesToUse.filter((role) => role.id !== EVERYONE_ROLE_ID);
+	const filteredRoles = useMemo(() => {
+		return rolesToUse.filter((role) => role.id !== EVERYONE_ROLE_ID);
+	}, [rolesToUse]);
 	const newUserMentionList = useMemo(() => {
 		if (!membersOfParent || membersOfParent.length === 0) {
 			return [];
