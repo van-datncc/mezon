@@ -85,7 +85,7 @@ export const attachmentSlice = createSlice({
 	initialState: initialAttachmentState,
 	reducers: {
 		add: attachmentAdapter.addOne,
-		addMany: attachmentAdapter.upsertMany,
+		addMany: attachmentAdapter.addMany,
 		remove: attachmentAdapter.removeOne,
 		setAttachment: (state, action) => {
 			state.attachment = action.payload;
@@ -115,7 +115,7 @@ export const attachmentSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchChannelAttachments.fulfilled, (state: AttachmentState, action: PayloadAction<any>) => {
-				attachmentAdapter.setAll(state, action.payload);
+				attachmentAdapter.setMany(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchChannelAttachments.rejected, (state: AttachmentState, action) => {

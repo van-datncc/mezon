@@ -42,6 +42,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 		if ((currentClanId && currentChannelId) || currentDmGroupId) {
 			const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 			const channelId = (currentDmGroupId as string) || (currentChannelId as string);
+			dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
 		}
 
 		dispatch(attachmentActions.setMessageId(messageId));
