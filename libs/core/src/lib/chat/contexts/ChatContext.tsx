@@ -231,7 +231,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				mess.attachments.length > 0 &&
 				mess.attachments.some((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX))
 			) {
-				dispatch(attachmentActions.fetchChannelAttachments({ clanId: mess.clan_id as string, channelId: mess.channel_id as string }));
+				dispatch(
+					attachmentActions.fetchChannelAttachments({ clanId: mess.clan_id as string, channelId: mess.channel_id as string, noCache: true })
+				);
 			}
 
 			dispatch(messagesActions.addNewMessage(mess));

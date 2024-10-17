@@ -29,6 +29,7 @@ export const attachmentAdapter = createEntityAdapter<AttachmentEntity>();
 type fetchChannelAttachmentsPayload = {
 	clanId: string;
 	channelId: string;
+	noCache?: boolean;
 };
 
 const CHANNEL_ATTACHMENTS_CACHED_TIME = 1000 * 60 * 3;
@@ -49,8 +50,12 @@ export const mapChannelAttachmentsToEntity = (attachmentRes: ApiChannelAttachmen
 
 export const fetchChannelAttachments = createAsyncThunk(
 	'attachment/fetchChannelAttachments',
-	async ({ clanId, channelId }: fetchChannelAttachmentsPayload, thunkAPI) => {
+	async ({ clanId, channelId, noCache }: fetchChannelAttachmentsPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchChannelAttachmentsCached.clear();
+		}
+
 		const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
 
 		if (!response.attachments) {
