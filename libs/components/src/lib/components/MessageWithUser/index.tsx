@@ -1,5 +1,5 @@
 import { useAuth, useOnClickOutside } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannel, selectJumpPinMessageId } from '@mezon/store';
+import { MessagesEntity, selectCurrentChannel, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_CHANNEL_LIST_BOX, WIDTH_CLAN_SIDE_BAR } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -52,6 +52,7 @@ function MessageWithUser({
 	const userLogin = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
+	const user = useAppSelector(selectMemberClanByUserId(userLogin.userProfile?.user?.id || ''));
 	const {
 		senderId,
 		username,
@@ -96,8 +97,9 @@ function MessageWithUser({
 			includesHere = message.content.t?.includes('@here');
 		}
 		const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
-		return includesHere || includesUser;
-	}, [message.content?.t, userLogin.userProfile?.user?.id, message.mentions]);
+		const includesRole = mentionOnMessage?.some((item) => user?.role_id?.includes(item?.role_id as string));
+		return includesHere || includesUser || includesRole;
+	}, [message.content?.t, userLogin.userProfile?.user?.id, message.mentions, user]);
 
 	const checkReferences = message.references?.length !== 0;
 	const shouldShowDateDivider = useMemo(() => {
@@ -138,8 +140,8 @@ function MessageWithUser({
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
-		{ 'bg-blue-500': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'bg-[#403D38]': hasIncludeMention },
+		{ 'bg-blue-500': checkReplied || checkMessageTargetToMoved },
+		{ 'dark:bg-[#FFDB88] bg-[#FFDB88]': hasIncludeMention },
 		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
