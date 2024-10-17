@@ -14,6 +14,7 @@ import {
 	selectIsShowCanvas,
 	selectIsShowMemberList,
 	selectStatusMenu,
+	selectTheme,
 	useAppDispatch
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
@@ -100,6 +101,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isShowCanvas = useSelector(selectIsShowCanvas);
 	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
 	const appChannel = useSelector(selectAppChannelById(channelId));
+	const appearanceTheme = useSelector(selectTheme);
 
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -170,7 +172,9 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					)}
 
 					{isShowCanvas && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-						<div className="w-full">
+						<div
+							className={`w-full flex justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+						>
 							<Canvas />
 						</div>
 					)}
