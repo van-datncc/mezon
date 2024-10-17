@@ -21,7 +21,7 @@ function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolea
 	const toolbarRef = useRef<HTMLDivElement | null>(null);
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
-	const placeholderColor = isLightMode ? 'rgb(83 83 83 / 1' : '#ffffff';
+	const placeholderColor = isLightMode ? '#f8f8f2' : '#ffffff';
 
 	const [activeFormats, setActiveFormats] = useState<ActiveFormats>({
 		bold: false,
@@ -401,6 +401,7 @@ function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolea
 
 				.ql-snow .ql-editor code {
 					background-color: #23241f;
+					color: ${placeholderColor} !important;
 				}
         `}
 			</style>
