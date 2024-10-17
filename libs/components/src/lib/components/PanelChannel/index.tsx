@@ -113,7 +113,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 			/>
 		</div>
 	));
-	console.log('Here');
+
 	const handleScheduleMute = (duration: number) => {
 		if (duration !== Infinity) {
 			const now = new Date();
@@ -174,7 +174,6 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
-			console.log('Here');
 			setPositionTop(true);
 		}
 	}, [coords.distanceToBottom]);
