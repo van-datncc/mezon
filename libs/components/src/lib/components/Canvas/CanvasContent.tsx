@@ -401,8 +401,11 @@ function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolea
 
 				.ql-snow .ql-editor code {
 					background-color: #23241f;
-					color: ${placeholderColor} !important;
+					color: #f0f0f0 !important;
 				}
+					span, strong {
+						color: ${placeholderColor} !important;
+					}
         `}
 			</style>
 		</div>
