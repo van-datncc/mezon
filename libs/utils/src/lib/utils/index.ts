@@ -24,6 +24,7 @@ import {
 	EMimeTypes,
 	ETokenMessage,
 	EmojiDataOptionals,
+	IChannel,
 	IEmojiOnMessage,
 	IExtendedMessage,
 	IHashtagOnMessage,
@@ -94,14 +95,13 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 	}
 };
 export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null, rolesClan: RolesClanEntity[]) => {
-	const getListRoleId = mentions
-		.map((item) => item.role_id)
-		.filter((role_id): role_id is string => role_id !== undefined && role_id !== EVERYONE_ROLE_ID);
 	const getListId = mentions
 		.map((item) => item.user_id)
 		.filter((user_id): user_id is string => user_id !== undefined && user_id !== ID_MENTION_HERE);
 	const uniqueUserId1s = Array.from(new Set(getListId));
-	const filteredRolesClan = rolesClan.filter((role) => getListRoleId.includes(role.id));
+	const filteredRolesClan = rolesClan.filter((role) =>
+		mentions.some((mention) => mention.role_id === role.id && mention.role_id !== EVERYONE_ROLE_ID)
+	);
 	const allRoleUsers = filteredRolesClan
 		.map((role) => role.role_user_list?.role_users)
 		.flat()
@@ -849,6 +849,13 @@ export function removeUndefinedAndEmpty(obj: Record<string, any[]>) {
 	);
 }
 
+export const sortChannelsByLastActivity = (channels: IChannel[]): IChannel[] => {
+	return channels.sort((a, b) => {
+		const timestampA = a.last_sent_message?.timestamp_seconds || a.create_time_seconds || 0;
+		const timestampB = b.last_sent_message?.timestamp_seconds || b.create_time_seconds || 0;
+		return timestampB - timestampA;
+	});
+};
 export const checkIsThread = (channel?: ChannelsEntity) => {
 	return channel?.parrent_id !== '0' && channel?.parrent_id !== '';
 };

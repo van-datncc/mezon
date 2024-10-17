@@ -50,7 +50,7 @@ const UserProfileModalInner = ({ openModal, userId, directId, notify, onClose, i
 	const directUser = useSelector((state) => selectMembeGroupByUserId(state, directId, userId as string));
 	const userById = ((isClanView ? clanUser : directUser) || user) as ChannelMembersEntity;
 
-	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || ''));
+	const checkAddFriend = useSelector(selectFriendStatus(userById?.user?.id || userId || ''));
 	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [openGroupIconBanner, setGroupIconBanner] = useState<OpenModalProps>(initOpenModal);
 	const [activeTab, setActiveTab] = useState<string>(typeTab.ABOUT_ME);
@@ -176,7 +176,7 @@ const UserProfileModalInner = ({ openModal, userId, directId, notify, onClose, i
 								{isOPenEditOption && (
 									<div
 										ref={panelRef}
-										className={`absolute left-[calc(100%_+_10px)] top-[38px] dark:bg-bgSearchHover bg-gray-100 rounded-sm shadow w-[165px] p-2 z-[1] mr-2 w-fit shadow-lg outline-none`}
+										className={`absolute left-[calc(100%_+_10px)] top-[38px] dark:bg-bgSearchHover bg-gray-100 rounded-sm p-2 z-[1] mr-2 w-fit shadow-lg outline-none`}
 									>
 										{modeResponsive === ModeResponsive.MODE_CLAN && (
 											<ItemPanel children="Edit Clan Profile" onClick={handleOpenClanProfileSetting} />

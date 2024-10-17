@@ -212,7 +212,7 @@ function MessageWithUser({
 											mode={mode}
 											onClick={(e) => handleOpenShortUser(e, senderId)}
 										/>
-										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat">
+										<div className="justify-start items-center  inline-flex w-full h-full pt-[2px] textChat select-text">
 											<div className={messageContentClass} style={{ wordBreak: 'break-word' }}>
 												{isEditing && editor}
 												{!isEditing && (
