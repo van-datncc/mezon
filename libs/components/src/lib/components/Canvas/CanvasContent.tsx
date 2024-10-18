@@ -14,7 +14,14 @@ interface ActiveFormats {
 	header?: string;
 }
 
-function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolean; content: string; idCanvas: string }) {
+type CanvasContentProps = {
+	isLightMode: boolean;
+	content: string;
+	idCanvas: string;
+	isEditCanvas: boolean;
+};
+
+function CanvasContent({ isLightMode, content, idCanvas, isEditCanvas }: CanvasContentProps) {
 	const [toolbarVisible, setToolbarVisible] = useState(false);
 	const quillRef = useRef<Quill | null>(null);
 	const editorRef = useRef<HTMLDivElement | null>(null);
@@ -73,8 +80,12 @@ function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolea
 		}
 
 		quillRef.current.on('text-change', () => {
-			const data = JSON.stringify(quillRef.current?.getContents());
-			handleContentChange(data);
+			if (isEditCanvas) {
+				const data = JSON.stringify(quillRef.current?.getContents());
+				handleContentChange(data);
+			} else {
+				quillRef.current?.disable();
+			}
 		});
 
 		const handleSelectionChange = (range: any) => {
@@ -134,14 +145,14 @@ function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolea
 			quillRef.current?.root.removeEventListener('keydown', handleKeyDown);
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, []);
+	}, [isEditCanvas]);
 
 	const handleContentChange = (content: string) => {
 		dispatch(canvasActions.setContent(content));
 	};
 
 	const formatText = (format: keyof ActiveFormats) => {
-		if (quillRef.current) {
+		if (quillRef.current && isEditCanvas) {
 			const currentFormat = quillRef.current.getFormat();
 			const isActive = !!currentFormat[format];
 			quillRef.current.format(format, !isActive);
@@ -155,7 +166,7 @@ function CanvasContent({ isLightMode, content, idCanvas }: { isLightMode: boolea
 
 	const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const value = e.target.value;
-		if (quill) {
+		if (quill && isEditCanvas) {
 			if (value === 'h1') {
 				quill.format('header', 1);
 			} else if (value === 'h2') {

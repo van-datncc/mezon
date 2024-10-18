@@ -4,6 +4,7 @@ import {
 	channelMetaActions,
 	channelsActions,
 	clansActions,
+	gifsStickerEmojiActions,
 	selectAnyUnreadChannels,
 	selectAppChannelById,
 	selectChannelById,
@@ -18,7 +19,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { EOverriddenPermission, TIME_OFFSET } from '@mezon/utils';
+import { EOverriddenPermission, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -35,6 +36,7 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch]);
 
 	useEffect(() => {
