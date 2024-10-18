@@ -106,6 +106,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
+		if (isShowCanvas) return;
 		if (e.dataTransfer?.types.includes('Files')) {
 			setDraggingState(true);
 		}
@@ -139,7 +140,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		)
 	) : (
 		<>
-			{draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
+			{!isShowCanvas && draggingState && <FileUploadByDnD currentId={currentChannel?.channel_id ?? ''} />}
 			{isOverUploading && <TooManyUpload togglePopup={() => setOverUploadingState(false)} />}
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] overflow-hidden z-10"
@@ -201,6 +202,6 @@ export default function ChannelMain() {
 }
 
 const SearchMessageChannel = () => {
-	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
-	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
+	const { totalResult, currentPage, searchMessages } = useSearchMessages();
+	return <SearchMessageChannelRender searchMessages={searchMessages} currentPage={currentPage} totalResult={totalResult} />;
 };

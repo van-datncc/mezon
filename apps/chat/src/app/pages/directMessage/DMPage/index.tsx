@@ -115,7 +115,7 @@ const DirectMessage = () => {
 				type: Number(type)
 			})
 		);
-	}, [currentDmGroup.channel_id]);
+	}, [currentDmGroup?.channel_id]);
 
 	if (distanceToBottom < HEIGHT_EMOJI_PANEL) {
 		topPositionEmojiPanel = 'auto';
@@ -151,7 +151,7 @@ const DirectMessage = () => {
 
 	return (
 		<>
-			{draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
+			{draggingState && <FileUploadByDnD currentId={currentDmGroup?.channel_id ?? ''} />}
 			<div
 				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent

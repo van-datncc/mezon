@@ -64,9 +64,9 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 		<div
 			ref={modalRef}
 			tabIndex={-1}
-			className="absolute top-8 right-0 rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-[99999999] animate-scale_up origin-top-right"
+			className="absolute top-8 right-0 rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-30 origin-top-right"
 		>
-			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] max-h-[80vh] lg:w-[540px]  shadow-sm overflow-hidden">
+			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] lg:w-[540px] shadow-sm max-h-[calc(100vh_-_180px)] overflow-hidden">
 				<div className="dark:bg-bgTertiary bg-bgLightTertiary flex flex-row items-center justify-between p-[16px] h-12">
 					<div className="flex flex-row items-center border-r-[1px] dark:border-r-[#6A6A6A] border-r-[#E1E1E1] pr-[16px] gap-4">
 						<Icons.ThreadIcon />
