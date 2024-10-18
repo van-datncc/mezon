@@ -16,6 +16,7 @@ export interface DMMetaEntity {
 	last_sent_message?: ApiChannelMessageHeader;
 	last_seen_message?: ApiChannelMessageHeader;
 	active?: number;
+	is_mute?: boolean;
 }
 
 const dmMetaAdapter = createEntityAdapter<DMMetaEntity>();
@@ -36,7 +37,8 @@ function extractDMMeta(channel: DirectEntity): DMMetaEntity {
 		lastSentTimestamp: lastSentTimestamp,
 		count_mess_unread: Number(channel.count_mess_unread || 0),
 		active: channel.active,
-		channel_label: channel.channel_label
+		channel_label: channel.channel_label,
+		is_mute: channel.is_mute
 	};
 }
 
@@ -146,7 +148,9 @@ export const selectIsUnreadDMById = (channelId: string) =>
 	});
 
 export const selectDirectsUnreadlist = createSelector(selectAllDMMeta, (state) => {
-	return state.filter((item) => item.count_mess_unread);
+	return state.filter((item) => {
+		return item.count_mess_unread && item.is_mute !== true;
+	});
 });
 
 export const selectTotalUnreadDM = createSelector(selectDirectsUnreadlist, (listUnreadDM) => {
