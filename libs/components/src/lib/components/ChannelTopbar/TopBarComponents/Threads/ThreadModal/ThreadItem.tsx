@@ -13,6 +13,7 @@ import {
 } from '@mezon/store';
 import { ChannelMembersEntity, IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
 import { Avatar } from 'flowbite-react';
+import { ChannelType } from 'mezon-js';
 import { useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,9 +29,10 @@ type ThreadItemProps = {
 	thread: ThreadsEntity;
 	setIsShowThread: () => void;
 	isPublicThread?: boolean;
+	isHasContext?: boolean;
 };
 
-const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadItemProps) => {
+const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasContext = true }: ThreadItemProps) => {
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
 	const dispatch = useDispatch();
@@ -94,6 +96,9 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 
 	const handlePannelThread = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		if (!isHasContext) {
+			return;
+		}
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
 		const windowHeight = window.innerHeight;
@@ -146,7 +151,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false }: ThreadI
 			</div>
 			{isShowPanelChannel && (
 				<PannelThreadItem
-					channelThread={channelThread as IChannel}
+					channelThread={{ ...channelThread, type: ChannelType.CHANNEL_TYPE_THREAD }}
 					coords={coords}
 					panelRef={panelRef}
 					setIsShowPanelChannel={setIsShowPanelChannel}
@@ -186,15 +191,17 @@ const PannelThreadItem = ({
 		);
 	}, [channelThread?.id]);
 	return (
-		<PanelChannel
-			selectedChannel={channelThread?.id}
-			onDeleteChannel={openConfirmDelete}
-			channel={channelThread as IChannel}
-			coords={coords}
-			openSetting={openSettingThread}
-			setIsShowPanelChannel={setIsShowPanelChannel}
-			rootRef={panelRef}
-		/>
+		<div onClick={(e) => e.stopPropagation()}>
+			<PanelChannel
+				selectedChannel={channelThread?.id}
+				onDeleteChannel={openConfirmDelete}
+				channel={channelThread as IChannel}
+				coords={coords}
+				openSetting={openSettingThread}
+				setIsShowPanelChannel={setIsShowPanelChannel}
+				rootRef={panelRef}
+			/>
+		</div>
 	);
 };
 export default ThreadItem;
