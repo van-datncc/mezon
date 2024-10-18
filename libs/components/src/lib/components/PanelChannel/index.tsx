@@ -3,6 +3,7 @@ import {
 	SetMuteNotificationPayload,
 	SetNotificationPayload,
 	channelsActions,
+	hasGrandchildModal,
 	notificationSettingActions,
 	selectCategoryById,
 	selectChannelById,
@@ -12,6 +13,7 @@ import {
 	selectDefaultNotificationCategory,
 	selectDefaultNotificationClan,
 	selectSelectedChannelNotificationSetting,
+	stickerSettingActions,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -88,6 +90,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	const currentChannel = useSelector(selectChannelById(selectedChannel || ''));
 	const currentUserId = useSelector(selectCurrentUserId);
 	const currentCategory = useSelector(selectCategoryById(channel?.category_id || ''));
+	const hasModalInChild = useSelector(hasGrandchildModal);
 
 	const handleEditChannel = () => {
 		openSetting();
@@ -100,19 +103,29 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 
 	const handleLeaveChannel = () => {
 		dispatch(threadsActions.leaveThread({ clanId: currentClan?.id || '', threadId: selectedChannel || '' }));
+		handleCloseModalConfirm();
 	};
-	const modalConfirm = useRef(null);
+
 	const [openModelConfirm, closeModelConfirm] = useModal(() => (
-		<div ref={modalConfirm}>
-			<ModalConfirm
-				handleCancel={closeModelConfirm}
-				handleConfirm={handleLeaveChannel}
-				title="Leave Thread"
-				buttonName="Leave thread"
-				message={`You can't receive message from thread when leave this thread`}
-			/>
-		</div>
+		<ModalConfirm
+			handleCancel={handleCloseModalConfirm}
+			handleConfirm={handleLeaveChannel}
+			title="Leave Thread"
+			buttonName="Leave thread"
+			message={`You can't receive message from thread when leave this thread`}
+		/>
 	));
+
+	const handleOpenModalConfirm = () => {
+		dispatch(stickerSettingActions.openModalInChild());
+		openModelConfirm();
+	};
+
+	const handleCloseModalConfirm = () => {
+		dispatch(stickerSettingActions.closeModalInChild());
+		closeModelConfirm();
+		handClosePannel();
+	};
 
 	const handleScheduleMute = (duration: number) => {
 		if (duration !== Infinity) {
@@ -233,7 +246,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	useOnClickOutside(
 		panelRef,
 		() => {
-			if (!modalConfirm.current) {
+			if (!hasModalInChild) {
 				handClosePannel();
 			}
 		},
@@ -418,7 +431,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 								))}
 							</Dropdown>
 						)}
-						{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={openModelConfirm} children="Leave Thread" danger />}
+						{currentChannel.creator_id !== currentUserId && <ItemPanel onClick={handleOpenModalConfirm} children="Leave Thread" danger />}
 					</GroupPanels>
 
 					{canManageThread && (
