@@ -65,7 +65,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			key={pinMessage.id}
 			className="relative flex flex-row justify-between dark:bg-bgPrimary bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-pointer rounded overflow-hidden border dark:border-bgTertiary border-gray-300 group/item-pinMess"
 		>
-			<div className="flex items-start gap-2 w-full">
+			<div className="flex items-start gap-2 w-full enableSelectText">
 				<MemberProfile
 					isHideUserName={true}
 					avatar={priorityAvatar ? priorityAvatar : pinMessage.avatar || ''}
