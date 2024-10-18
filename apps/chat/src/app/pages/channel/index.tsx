@@ -202,6 +202,6 @@ export default function ChannelMain() {
 }
 
 const SearchMessageChannel = () => {
-	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
-	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
+	const { totalResult, currentPage, searchMessages } = useSearchMessages();
+	return <SearchMessageChannelRender searchMessages={searchMessages} currentPage={currentPage} totalResult={totalResult} />;
 };
