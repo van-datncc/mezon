@@ -6,6 +6,7 @@ import {
 	pinMessageActions,
 	selectAllChannelMemberIds,
 	selectAllRoleIds,
+	selectDataReferences,
 	selectHasMoreBottomByChannelId,
 	selectHasMoreMessageByChannelId,
 	selectIdMessageToJump,
@@ -54,6 +55,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	const allRolesInClan = useSelector(selectAllRoleIds);
 	const jumpPinMessageId = useSelector(selectJumpPinMessageId);
 	const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
+	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
 	const dispatch = useAppDispatch();
 
 	const chatRefData = useMemo(() => {
@@ -130,6 +132,12 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		},
 		[lastMessage?.id, scrollToMessageById]
 	);
+
+	useEffect(() => {
+		if (dataReferences && lastMessage?.id === dataReferences?.message_ref_id) {
+			scrollToLastMessage({ behavior: 'instant' });
+		}
+	}, [dataReferences, lastMessage, scrollToLastMessage]);
 
 	// Jump to message when user is jumping to message from pin message
 	useEffect(() => {
