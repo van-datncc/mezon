@@ -115,7 +115,7 @@ export const attachmentSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchChannelAttachments.fulfilled, (state: AttachmentState, action: PayloadAction<any>) => {
-				attachmentAdapter.setMany(state, action.payload);
+				attachmentAdapter.setAll(state, action.payload);
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchChannelAttachments.rejected, (state: AttachmentState, action) => {
@@ -187,3 +187,5 @@ export const selectMessageIdAttachment = createSelector(getAttachmentState, (sta
 
 export const selectAttachmentPhoto = () =>
 	createSelector(selectAllAttachment, (attachments) => (attachments || []).filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)));
+
+export const selectLoadedStatus = createSelector(getAttachmentState, (state: AttachmentState) => state.loadingStatus);
