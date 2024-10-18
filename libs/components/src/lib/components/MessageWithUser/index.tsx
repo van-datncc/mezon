@@ -1,5 +1,12 @@
 import { useAuth, useOnClickOutside } from '@mezon/core';
-import { MessagesEntity, selectCurrentChannel, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
+import {
+	MessagesEntity,
+	selectCurrentChannel,
+	selectDataReferences,
+	selectJumpPinMessageId,
+	selectMemberClanByUserId,
+	useAppSelector
+} from '@mezon/store';
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, WIDTH_CHANNEL_LIST_BOX, WIDTH_CLAN_SIDE_BAR } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -70,6 +77,7 @@ function MessageWithUser({
 	const [shortUserId, setShortUserId] = useState('');
 	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };
 	const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
+	const dataReferences = useSelector(selectDataReferences(message?.channel_id ?? ''));
 
 	useOnClickOutside(panelRef, () => setIsShowPanelChannel(false));
 
@@ -78,6 +86,7 @@ function MessageWithUser({
 
 	const { userId } = useAuth();
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
+	const messageReplyHighlight = dataReferences?.message_ref_id && dataReferences?.message_ref_id === message?.id;
 
 	const checkMessageTargetToMoved = false;
 	const attachments = message.attachments ?? [];
@@ -134,14 +143,22 @@ function MessageWithUser({
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
 		{ 'dark:bg-[#383B47]': hasIncludeMention || checkMessageTargetToMoved },
-		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': checkMessageIncludeMention || checkJumpPinMessage || checkReplied },
-		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
+		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': (checkMessageIncludeMention || checkJumpPinMessage || checkReplied) && !messageReplyHighlight },
+		{
+			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
+				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
+		},
+		{ 'bg-bgMessageReplyHighline': messageReplyHighlight }
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
+		{ 'bg-blue-500': messageReplyHighlight },
 		{ 'bg-bgMentionReply': hasIncludeMention || checkReplied || checkMessageTargetToMoved },
-		{ 'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved }
+		{
+			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
+				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
+		}
 	);
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
 
