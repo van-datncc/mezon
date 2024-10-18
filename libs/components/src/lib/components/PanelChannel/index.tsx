@@ -303,7 +303,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
 
-						{channel.type === typeChannel.text && (
+						{channel?.type === typeChannel.text && (
 							<Dropdown
 								trigger="hover"
 								dismissOnClick={false}

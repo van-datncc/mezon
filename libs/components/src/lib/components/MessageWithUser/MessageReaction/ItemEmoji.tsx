@@ -215,6 +215,10 @@ type ItemDetailProps = {
 };
 const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 	({ onMouse, onLeave, userSenderCount, onClickReactExist, getUrlItem, totalCount }, ref) => {
+		const mumberformatter = Intl.NumberFormat('en-US', {
+			notation: 'compact',
+			compactDisplay: 'short'
+		});
 		return (
 			<div className="flex flex-row gap-1">
 				<div
@@ -230,7 +234,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 						<img src={getUrlItem} className="w-4 h-4" alt="Item Icon" />
 					</span>
 					<div className=" text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
-						<p>{totalCount}</p>
+						<p>{mumberformatter.format(totalCount)}</p>
 					</div>
 				</div>
 			</div>
