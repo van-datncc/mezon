@@ -62,18 +62,8 @@ function MessageWithUser({
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const user = useAppSelector(selectMemberClanByUserId(userLogin.userProfile?.user?.id || ''));
-	const {
-		senderId,
-		username,
-		userClanAvatar,
-		userClanNickname,
-		userDisplayName,
-		senderIdMessageRef,
-		avatarSender,
-		messageAvatarSenderRef,
-		messageDisplayNameSenderRef,
-		messageUsernameSenderRef
-	} = useMessageParser(message);
+	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef, avatarSender, messageAvatarSenderRef } =
+		useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const [shortUserId, setShortUserId] = useState('');

@@ -3,7 +3,7 @@ import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectEmoji
 import { Icons } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
 
@@ -213,12 +213,15 @@ type ItemDetailProps = {
 	getUrlItem: string;
 	totalCount: number;
 };
+
 const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 	({ onMouse, onLeave, userSenderCount, onClickReactExist, getUrlItem, totalCount }, ref) => {
-		const mumberformatter = Intl.NumberFormat('en-US', {
-			notation: 'compact',
-			compactDisplay: 'short'
-		});
+		const strCount = useMemo(() => {
+			const s = ['', 'K', 'M', 'G', 'T', 'P'];
+			const e = Math.floor(Math.log(totalCount) / Math.log(1000));
+			return totalCount / Math.pow(1000, e) + ' ' + s[e];
+		}, [totalCount]);
+
 		return (
 			<div className="flex flex-row gap-1">
 				<div
@@ -234,7 +237,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 						<img src={getUrlItem} className="w-4 h-4" alt="Item Icon" />
 					</span>
 					<div className=" text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
-						<p>{mumberformatter.format(totalCount)}</p>
+						<p>{strCount}</p>
 					</div>
 				</div>
 			</div>
