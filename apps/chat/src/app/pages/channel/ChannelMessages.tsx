@@ -134,10 +134,10 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	);
 
 	useEffect(() => {
-		if (dataReferences && lastMessage?.id === dataReferences?.message_ref_id) {
+		if (dataReferences && getChatScrollBottomOffset() <= 51) {
 			scrollToLastMessage({ behavior: 'instant' });
 		}
-	}, [dataReferences, lastMessage, scrollToLastMessage]);
+	}, [dataReferences, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	// Jump to message when user is jumping to message from pin message
 	useEffect(() => {
