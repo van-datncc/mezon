@@ -25,9 +25,11 @@ export type ChannelMessageBoxProps = {
 
 export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMessageBoxProps>) {
 	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(channel?.channel_id ?? ''));
+
 	const channelId = useMemo(() => {
-		return channel.channel_id;
-	}, [channel.channel_id]);
+		return channel?.channel_id;
+	}, [channel?.channel_id]);
+
 	const dispatch = useDispatch();
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: channel, mode });
 	const { subPanelActive } = useGifsStickersEmoji();
