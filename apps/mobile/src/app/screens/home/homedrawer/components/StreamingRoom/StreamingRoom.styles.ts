@@ -1,4 +1,4 @@
-import { Attributes, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 import { transparent } from 'tailwindcss/colors';
 
@@ -9,7 +9,9 @@ export const style = (colors: Attributes) =>
 			height: '100%',
 			width: '100%'
 		},
-		userStreamingRoomContainer: {},
+		userStreamingRoomContainer: {
+			backgroundColor: baseColor.black
+		},
 		menuHeader: {
 			width: '100%',
 			backgroundColor: transparent,

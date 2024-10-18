@@ -8,6 +8,8 @@ import Video from 'react-native-video';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
 
+import { ActivityIndicator, Text } from 'react-native';
+
 export function StreamingScreen({
 	streamID,
 	onFullScreenVideo,
@@ -22,6 +24,8 @@ export function StreamingScreen({
 	const styles = style(themeValue);
 	const videoRef = useRef(null);
 	const [isFullScreen, setIsFullScreen] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(false);
 
 	const handleFullScreen = () => {
 		setIsFullScreen(!isFullScreen);
@@ -35,22 +39,48 @@ export function StreamingScreen({
 		}
 	};
 
+	const handleVideoLoadStart = () => {
+		setLoading(true);
+		setError(false);
+	};
+
+	const handleVideoLoad = () => {
+		setLoading(false);
+	};
+
+	const handleVideoError = (err: any) => {
+		setLoading(false);
+		setError(true);
+	};
+
 	return (
 		<View style={styles.container}>
-			<Video
-				controls={false}
-				ref={videoRef}
-				source={{
-					uri: channelStream?.streaming_url
-				}}
-				resizeMode={isFullScreen ? 'cover' : 'contain'}
-				style={isFullScreen ? styles.fullScreenVideo : styles.video}
-				onError={(err) => {
-					console.log('Video error', err);
-				}}
-			/>
+			{loading && !error && (
+				<View style={styles.loadingOverlay}>
+					<ActivityIndicator size="large" color="white" />
+				</View>
+			)}
 
-			{(isAnimationComplete || isFullScreen) && (
+			{error ? (
+				<View style={styles.errorContainer}>
+					<Text style={styles.errorText}>No streaming available</Text>
+				</View>
+			) : (
+				<Video
+					controls={false}
+					ref={videoRef}
+					source={{
+						uri: channelStream?.streaming_url
+					}}
+					resizeMode={isFullScreen ? 'cover' : 'contain'}
+					style={isFullScreen ? styles.fullScreenVideo : styles.video}
+					onLoadStart={handleVideoLoadStart}
+					onLoad={handleVideoLoad}
+					onError={handleVideoError}
+				/>
+			)}
+
+			{(isAnimationComplete || isFullScreen) && !error && (
 				<TouchableOpacity style={styles.fullScreenButton} onPress={handleFullScreen}>
 					<Ionicons name={isFullScreen ? 'contract-outline' : 'expand-outline'} size={24} color="white" />
 				</TouchableOpacity>
@@ -59,4 +89,4 @@ export function StreamingScreen({
 	);
 }
 
-export const MemoizedStreamingScreen = memo(StreamingScreen);
+export const StreamingScreenComponent = memo(StreamingScreen);

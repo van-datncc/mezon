@@ -1,4 +1,4 @@
-import { Attributes } from '@mezon/mobile-ui';
+import { Attributes, baseColor, size } from '@mezon/mobile-ui';
 import { Dimensions, StyleSheet } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
@@ -15,10 +15,31 @@ export const style = (colors: Attributes) =>
 		},
 		fullScreenButton: {
 			position: 'absolute',
-			top: 10,
-			right: 10,
-			padding: 10,
-			backgroundColor: 'rgba(0, 0, 0, 0.5)',
-			borderRadius: 50
+			bottom: size.s_10,
+			right: size.s_10,
+			padding: size.s_10,
+			backgroundColor: 'rgba(0,0,0,0.5)',
+			borderRadius: 25
+		},
+		loadingOverlay: {
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			right: 0,
+			bottom: 0,
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: 'rgba(0,0,0,0.7)'
+		},
+		errorContainer: {
+			justifyContent: 'center',
+			alignItems: 'center',
+			width: '100%',
+			height: 250,
+			backgroundColor: baseColor.black
+		},
+		errorText: {
+			color: colors.white,
+			fontSize: 16
 		}
 	});

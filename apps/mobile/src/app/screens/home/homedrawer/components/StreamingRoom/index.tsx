@@ -25,7 +25,7 @@ import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { InviteToChannel } from '../InviteToChannel';
 import SelectAudio from './SelectAudio';
 import { style } from './StreamingRoom.styles';
-import { MemoizedStreamingScreen } from './StreamingScreen';
+import { StreamingScreenComponent } from './StreamingScreen';
 import UserStreamingRoom from './UserStreamingRoom';
 
 function StreamingRoom({
@@ -145,14 +145,13 @@ function StreamingRoom({
 							height: isAnimationComplete ? (isFullScreen ? '100%' : '60%') : '100%'
 						}}
 					>
-						<MemoizedStreamingScreen
+						<StreamingScreenComponent
 							streamID={currentStreamInfo?.streamId}
 							isAnimationComplete={isAnimationComplete}
 							onFullScreenVideo={handelFullScreenVideo}
 						/>
-
-						{!isFullScreen && isAnimationComplete && <UserStreamingRoom streamChannelMember={streamChannelMember} />}
 					</Block>
+					{!isFullScreen && isAnimationComplete && <UserStreamingRoom streamChannelMember={streamChannelMember} />}
 					{!isFullScreen && isAnimationComplete && (
 						<Block style={[styles.menuFooter]}>
 							<Block borderRadius={size.s_40} backgroundColor={themeValue.secondary}>
@@ -179,12 +178,12 @@ function StreamingRoom({
 										{isMute ? <Icons.SpeakerMuteIcon /> : <Icons.SpeakerUnMuteIcon />}
 									</TouchableOpacity>
 
-									<TouchableOpacity style={styles.menuIcon}>
+									{/* <TouchableOpacity style={styles.menuIcon}>
 										<Icons.ChatIcon />
-									</TouchableOpacity>
-									<TouchableOpacity style={styles.menuIcon}>
+									</TouchableOpacity> */}
+									{/* <TouchableOpacity style={styles.menuIcon}>
 										<Icons.AppActivitiesIcon />
-									</TouchableOpacity>
+									</TouchableOpacity> */}
 									<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
 										<Icons.PhoneCallIcon />
 									</TouchableOpacity>
