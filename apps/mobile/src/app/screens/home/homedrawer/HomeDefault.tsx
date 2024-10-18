@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
+import { ActionEmitEvent, ENotificationActive, EOpenSearchChannelFrom, Icons, STORAGE_AGREED_POLICY, load, save } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -14,11 +14,12 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, TIME_OFFSET } from '@mezon/utils';
+import { useDrawerStatus } from '@react-navigation/drawer';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import NotificationSetting from '../../../components/NotificationSetting';
@@ -73,6 +74,12 @@ const HomeDefault = React.memo((props: any) => {
 			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
 		}
 	}, []);
+
+	const isOpenDrawer = useDrawerStatus() === 'open';
+
+	useEffect(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.OPEN_CLOSE_DRAWER, { isOpenDrawer: isOpenDrawer });
+	}, [isOpenDrawer]);
 
 	const isChannelApp = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_APP, [currentChannel?.type]);
 

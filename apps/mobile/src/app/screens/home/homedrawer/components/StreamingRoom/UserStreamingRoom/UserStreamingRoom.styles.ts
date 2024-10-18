@@ -10,8 +10,8 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-around'
 		},
 		userContainer: {
-			width: '45%',
-			height: 150,
+			width: '100%',
+			height: '100%',
 			margin: 5,
 			justifyContent: 'center',
 			alignItems: 'center',

@@ -10,16 +10,15 @@ import {
 	save
 } from '@mezon/mobile-components';
 import { Block, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel, selectCurrentClanId } from '@mezon/store-mobile';
+import { appActions, selectClanById, useAppDispatch, videoStreamActions } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClanId, selectCurrentStreamInfo, selectStatusStream } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
-import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { InviteToChannel } from '../../InviteToChannel';
 import { style } from './JoinStreamingRoomBS.styles';
 
@@ -28,36 +27,52 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 	const styles = style(themeValue);
 	const bottomSheetInviteRef = useRef(null);
 	const [isMute, setIsMute] = useState<boolean>(true);
-	const navigation = useNavigation<any>();
 	const { dismiss } = useBottomSheetModal();
 	const { t } = useTranslation(['streamingRoom']);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannel = useSelector(selectCurrentChannel);
+	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
+	const playStream = useSelector(selectStatusStream);
+	const dispatch = useAppDispatch();
+	const clanById = useSelector(selectClanById(channel?.clan_id || ''));
 
 	const handleMuteSpeaker = () => {
 		setIsMute(!isMute);
 	};
 
 	const handleJoinVoice = async () => {
-		if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-			navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-				screen: APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM
-			});
-			save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
-			const clanId = channel?.clan_id;
-			const channelId = channel?.channel_id;
+		requestAnimationFrame(async () => {
+			if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
+				dispatch(appActions.setHiddenBottomTabMobile(true));
+				if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
+					dispatch(
+						videoStreamActions.startStream({
+							clanId: channel?.clan_id || '',
+							clanName: clanById?.clan_name || '',
+							streamId: channel?.channel_id || '',
+							streamName: channel?.channel_label || '',
+							parentId: channel?.parrent_id || ''
+						})
+					);
+					dispatch(appActions.setIsShowChatStream(false));
+				}
 
-			if (currentClanId !== clanId) {
-				changeClan(clanId);
+				save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
+				const clanId = channel?.clan_id;
+				const channelId = channel?.channel_id;
+
+				if (currentClanId !== clanId) {
+					changeClan(clanId);
+				}
+				DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+					isFetchMemberChannelDM: true
+				});
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+				await jumpToChannel(channelId, clanId);
+				dismiss();
 			}
-			DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
-				isFetchMemberChannelDM: true
-			});
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-			await jumpToChannel(channelId, clanId);
-			dismiss();
-		}
+		});
 	};
 
 	return (

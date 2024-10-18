@@ -1,0 +1,98 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
+import { useAppDispatch } from '@mezon/store';
+import { appActions } from '@mezon/store-mobile';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, DeviceEventEmitter, Dimensions, PanResponder, TouchableOpacity } from 'react-native';
+import StreamingRoom from '../StreamingRoom';
+import { style } from './styles';
+const { width, height } = Dimensions.get('window');
+
+export const StreamingPopup = () => {
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const pan = useRef(new Animated.ValueXY()).current;
+	const [isFullScreen, setIsFullScreen] = useState(true);
+	const [windowSize, setWindowSize] = useState(new Animated.ValueXY({ x: 100, y: 100 }));
+	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
+	const dispatch = useAppDispatch();
+	const navigation = useNavigation();
+	const [isOpenDrawer, setIsOpenDrawer] = useState(true);
+
+	console.log('navigation: ', navigation.getState());
+
+	useEffect(() => {
+		const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.OPEN_CLOSE_DRAWER, ({ isOpenDrawer }) => {
+			setIsOpenDrawer(isOpenDrawer);
+		});
+		return () => {
+			showSKlListener.remove();
+		};
+	}, []);
+
+	const panResponder = useRef(
+		PanResponder.create({
+			onMoveShouldSetPanResponder: () => true,
+			onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], { useNativeDriver: false }),
+			onPanResponderRelease: () => {}
+		})
+	).current;
+
+	useEffect(() => {
+		if (isFullScreen) {
+			Animated.timing(windowSize, {
+				toValue: { x: width, y: height }, // Kích thước full màn hình
+				duration: 100,
+				useNativeDriver: false
+			}).start();
+		}
+	}, []);
+
+	const handleResizeStreamRoom = useCallback((isFullScreen: boolean) => {
+		if (isFullScreen) {
+			Animated.spring(pan, {
+				toValue: { x: 0, y: 0 },
+				useNativeDriver: false
+			}).start(() => {
+				Animated.timing(windowSize, {
+					toValue: { x: width, y: height },
+					duration: 100,
+					useNativeDriver: false
+				}).start(() => {
+					setIsAnimationComplete(true);
+				});
+			});
+			dispatch(appActions.setHiddenBottomTabMobile(true));
+		} else {
+			Animated.timing(windowSize, {
+				toValue: { x: 100, y: 100 },
+				duration: 100,
+				useNativeDriver: false
+			}).start(() => {
+				setIsAnimationComplete(false);
+			});
+			isOpenDrawer && dispatch(appActions.setHiddenBottomTabMobile(false));
+		}
+		setIsFullScreen(isFullScreen);
+	}, []);
+
+	return (
+		<Animated.View
+			style={[
+				styles.animatedView,
+				{
+					width: windowSize.x,
+					height: windowSize.y,
+					transform: [{ translateX: pan.x }, { translateY: pan.y }],
+					position: 'absolute'
+				}
+			]}
+			{...(!isFullScreen ? panResponder.panHandlers : {})}
+		>
+			<TouchableOpacity activeOpacity={isFullScreen ? 1 : 0.5} onPress={() => !isFullScreen && handleResizeStreamRoom(true)}>
+				<StreamingRoom isAnimationComplete={isAnimationComplete} onPressMinimizeRoom={handleResizeStreamRoom} />
+			</TouchableOpacity>
+		</Animated.View>
+	);
+};
