@@ -107,6 +107,9 @@ export const attachmentSlice = createSlice({
 		},
 		addAttachmentPhoto: (state, action: PayloadAction<AttachmentEntity[]>) => {
 			attachmentAdapter.setAll(state, [...action.payload, ...attachmentAdapter.getSelectors().selectAll(state)]);
+		},
+		removeLoadedStatusCached: (state) => {
+			state.loadingStatus = 'not loaded';
 		}
 	},
 	extraReducers: (builder) => {

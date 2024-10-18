@@ -1,5 +1,14 @@
 import { useAppParams, useMenu } from '@mezon/core';
-import { channelsActions, directActions, directMetaActions, selectCloseMenu, selectStatusStream, selectTheme, useAppDispatch } from '@mezon/store';
+import {
+	attachmentActions,
+	channelsActions,
+	directActions,
+	directMetaActions,
+	selectCloseMenu,
+	selectStatusStream,
+	selectTheme,
+	useAppDispatch
+} from '@mezon/store';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -53,6 +62,7 @@ const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
 			);
 
 			if (result) {
+				dispatch(attachmentActions.removeLoadedStatusCached());
 				navigate(`/chat/direct/message/${DMid}/${type}`);
 			}
 
