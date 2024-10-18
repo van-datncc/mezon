@@ -8,8 +8,10 @@ import {
 	selectCurrentClan,
 	selectCurrentStreamInfo,
 	selectStatusStream,
+	selectThreadNotJoin,
 	threadsActions,
 	useAppDispatch,
+	useAppSelector,
 	videoStreamActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -35,12 +37,14 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const playStream = useSelector(selectStatusStream);
 	const clanById = useSelector(selectCurrentClan);
 
-	const channel = useTagById(tagId);
+	let channel = useTagById(tagId);
+	const thread = useAppSelector((state) => selectThreadNotJoin(state, tagId));
+	if (thread) channel = thread;
 	const [loading, setLoading] = useState(!channel);
 
 	useEffect(() => {
 		const fetchThreads = async () => {
-			if (!(isClanView && clanById?.id && !channel)) return;
+			if (!(isClanView && clanById?.id && !channel && !thread)) return;
 			setLoading(true);
 			const threads = await dispatch(
 				threadsActions.fetchThread({
@@ -51,6 +55,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			).unwrap();
 
 			if (threads?.length) {
+				dispatch(channelsActions.addThreadUserNotJoin(threads[0] as ChannelsEntity));
 				dispatch(channelsActions.upsertOne(threads[0] as ChannelsEntity));
 			}
 			setLoading(false);
