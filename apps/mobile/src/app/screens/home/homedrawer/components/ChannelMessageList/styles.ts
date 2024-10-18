@@ -10,6 +10,6 @@ export const style = (colors: Attributes) =>
 		listChannels: {
 			paddingTop: size.s_14,
 			paddingBottom: size.s_50,
-			backgroundColor: colors.secondary
+			backgroundColor: colors.primary
 		}
 	});

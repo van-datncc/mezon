@@ -44,7 +44,9 @@ const Notifications = () => {
 	const [notificationsFilter, setNotificationsFilter] = useState<NotificationEntity[]>([]);
 
 	useEffect(() => {
-		initLoader();
+		if (currentClanId && currentClanId !== '0') {
+			initLoader();
+		}
 	}, [currentClanId]);
 
 	useEffect(() => {
