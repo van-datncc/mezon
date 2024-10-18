@@ -1,6 +1,7 @@
 import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import {
 	ThreadsEntity,
+	hasGrandchildModal,
 	searchMessagesActions,
 	selectActiveThreads,
 	selectCurrentChannel,
@@ -35,7 +36,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);
-
+	const hasChildModal = useSelector(hasGrandchildModal);
 	const appearanceTheme = useSelector(selectTheme);
 	const [canManageThread] = usePermissionChecker([EOverriddenPermission.manageThread], currentChannel?.id ?? '');
 
@@ -58,7 +59,15 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose, rootRef);
+	useOnClickOutside(
+		modalRef,
+		() => {
+			if (!hasChildModal) {
+				onClose();
+			}
+		},
+		rootRef
+	);
 	///
 	return (
 		<div
@@ -120,6 +129,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 									thread={thread}
 									key={`${thread.id}-other-active-threads`}
 									setIsShowThread={onClose}
+									isHasContext={false}
 								/>
 							))}
 						</GroupThreads>
@@ -134,7 +144,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 							}
 						>
 							{getThreadsOlderThan30Days.map((thread: ThreadsEntity) => (
-								<ThreadItem thread={thread} key={`${thread.id}-older-threads`} setIsShowThread={onClose} />
+								<ThreadItem thread={thread} key={`${thread.id}-older-threads`} setIsShowThread={onClose} isHasContext={false} />
 							))}
 						</GroupThreads>
 					)}

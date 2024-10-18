@@ -1,4 +1,4 @@
-import { ICanvas, LoadingStatus } from '@mezon/utils';
+import { CanvasUpdate, ICanvas, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEditChannelCanvasRequest } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx } from '../helpers';
@@ -95,9 +95,9 @@ const handleSetManyCanvas = ({
 	channelId,
 	adapterPayload
 }: {
-	state: CanvasAPIState; // Đảm bảo kiểu state là CanvasAPIState
+	state: CanvasAPIState;
 	channelId?: string;
-	adapterPayload: CanvasAPIEntity[]; // Đảm bảo adapterPayload là mảng CanvasAPIEntity
+	adapterPayload: CanvasAPIEntity[];
 }) => {
 	if (!channelId) return;
 	if (!state.channelCanvas[channelId]) {
@@ -105,9 +105,9 @@ const handleSetManyCanvas = ({
 			id: channelId
 		});
 	}
-	// Sử dụng setMany đúng cách
+
 	const updatedChannelCanvas = canvasAPIAdapter.setMany(state.channelCanvas[channelId], adapterPayload);
-	state.channelCanvas[channelId] = updatedChannelCanvas; // Cập nhật lại state
+	state.channelCanvas[channelId] = updatedChannelCanvas;
 };
 
 export const canvasAPISlice = createSlice({
@@ -115,13 +115,15 @@ export const canvasAPISlice = createSlice({
 	initialState: initialCanvasAPIState,
 	reducers: {
 		// ...
-		updateCanvas: (state, action: PayloadAction<any>) => {
-			const { channelId, results } = action.payload;
+		updateCanvas: (state, action: PayloadAction<{ channelId: string; dataUpdate: CanvasUpdate }>) => {
+			const { channelId, dataUpdate } = action.payload;
+			const { id, title, content, creator_id } = dataUpdate;
 			canvasAPIAdapter.updateOne(state.channelCanvas[channelId], {
-				id: results.payload?.id,
+				id: id,
 				changes: {
-					title: results.payload?.title,
-					content: results.payload?.content
+					title: title,
+					content: content,
+					creator_id: creator_id
 				}
 			});
 		}

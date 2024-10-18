@@ -1,11 +1,9 @@
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, selectIsUnreadChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import { StatusVoiceChannel } from '../ChannelListItem';
 import { style } from '../ChannelListItem/styles';
@@ -14,17 +12,13 @@ interface IChannelItemProps {
 	onPress: () => void;
 	onLongPress: () => void;
 	data: IChannel;
+	isUnRead?: boolean;
+	isActive?: boolean;
 }
 
-function ChannelItem({ onLongPress, onPress, data }: IChannelItemProps) {
+function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChannelItemProps) {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
-	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, data?.id));
-	const currentChanelId = useSelector(selectCurrentChannelId);
-
-	const isActive = useMemo(() => {
-		return currentChanelId === data?.id;
-	}, [currentChanelId, data?.id]);
 
 	const numberNotification = useMemo(() => {
 		return data?.count_mess_unread ? data?.count_mess_unread : 0;
