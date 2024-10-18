@@ -38,6 +38,7 @@ type PanelChannel = {
 	onDeleteChannel: () => void;
 	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
+	channelId?: string;
 	rootRef?: RefObject<HTMLElement>;
 	isUnread?: boolean;
 };
@@ -67,7 +68,7 @@ export const notificationTypesList = [
 	}
 ];
 
-const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, isUnread }: PanelChannel) => {
+const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel, channelId, rootRef, isUnread }: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -80,6 +81,10 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
+
+	const maskFavoriteChannel = () => {
+		dispatch(channelsActions.addFavoriteChannel({ channel_id: channelId, clan_id: currentClan?.id }));
+	};
 
 	const handleEditChannel = () => {
 		setOpenSetting(true);
@@ -229,6 +234,7 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 			<GroupPanels>
 				<ItemPanel children="Invite People" />
 				<ItemPanel children="Copy link" />
+				<ItemPanel children="Mask Favorite" />
 			</GroupPanels>
 			{channel.type === typeChannel.voice && (
 				<GroupPanels>

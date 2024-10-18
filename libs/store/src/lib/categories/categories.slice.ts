@@ -27,6 +27,7 @@ export interface CategoriesState extends EntityState<CategoriesEntity, string> {
 	showEmptyCategory: boolean;
 	ctrlKSelectedChannelId?: string;
 	categoryExpandState: Record<string, Record<string, boolean>>;
+	channelFavorites: Record<string, string[]>;
 }
 
 export const categoriesAdapter = createEntityAdapter<CategoriesEntity>();
@@ -158,7 +159,8 @@ export const initialCategoriesState: CategoriesState = categoriesAdapter.getInit
 	error: null,
 	sortChannelByCategoryId: {},
 	showEmptyCategory: false,
-	categoryExpandState: {}
+	categoryExpandState: {},
+	channelFavorites: {}
 });
 
 export const categoriesSlice = createSlice({
