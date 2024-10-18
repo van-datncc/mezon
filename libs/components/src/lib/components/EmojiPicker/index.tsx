@@ -37,7 +37,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const modeResponsive = useAppSelector(selectModeResponsive);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
-		const lowerCaseSearchTerm = searchTerm.toLowerCase();
+		const lowerCaseSearchTerm = searchTerm.trim().toLowerCase();
 		return emojis.filter((emoji) => emoji?.shortname?.toLowerCase().includes(lowerCaseSearchTerm));
 	};
 
