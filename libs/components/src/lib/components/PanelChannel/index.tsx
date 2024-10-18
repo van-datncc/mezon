@@ -4,6 +4,7 @@ import {
 	SetNotificationPayload,
 	channelsActions,
 	notificationSettingActions,
+	selectAllChannelsFavorite,
 	selectCategoryById,
 	selectCurrentChannelId,
 	selectCurrentClan,
@@ -38,7 +39,6 @@ type PanelChannel = {
 	onDeleteChannel: () => void;
 	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
 	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
-	channelId?: string;
 	rootRef?: RefObject<HTMLElement>;
 	isUnread?: boolean;
 };
@@ -68,7 +68,7 @@ export const notificationTypesList = [
 	}
 ];
 
-const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel, channelId, rootRef, isUnread }: PanelChannel) => {
+const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, isUnread }: PanelChannel) => {
 	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -81,9 +81,28 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentCategory = useSelector(selectCategoryById(channel.category_id || ''));
+	const favoriteChannel = useSelector(selectAllChannelsFavorite);
+	const [isFavorite, setIsFavorite] = useState<boolean>(false);
+
+	useEffect(() => {
+		console.log(favoriteChannel);
+		console.log('Render pannel');
+		if (favoriteChannel && favoriteChannel.length > 0) {
+			const isFav = favoriteChannel.some((channelId) => channelId === channel.id);
+			console.log(isFav);
+
+			setIsFavorite(isFav);
+		}
+	}, [favoriteChannel, channel.id]);
 
 	const maskFavoriteChannel = () => {
-		dispatch(channelsActions.addFavoriteChannel({ channel_id: channelId, clan_id: currentClan?.id }));
+		dispatch(channelsActions.addFavoriteChannel({ channel_id: channel.id, clan_id: currentClan?.id }));
+		setIsShowPanelChannel(false);
+	};
+
+	const removeFavoriteChannel = () => {
+		dispatch(channelsActions.removeFavoriteChannel({ channelId: channel.id, clanId: currentClan?.id || '' }));
+		setIsShowPanelChannel(false);
 	};
 
 	const handleEditChannel = () => {
@@ -234,7 +253,6 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 			<GroupPanels>
 				<ItemPanel children="Invite People" />
 				<ItemPanel children="Copy link" />
-				<ItemPanel children="Mask Favorite" />
 			</GroupPanels>
 			{channel.type === typeChannel.voice && (
 				<GroupPanels>
@@ -303,6 +321,11 @@ const PanelChannel = ({ coords, channel, setOpenSetting, setIsShowPanelChannel, 
 									/>
 								))}
 							</Dropdown>
+						)}
+						{isFavorite ? (
+							<ItemPanel children="Unmask Favorite" onClick={removeFavoriteChannel} />
+						) : (
+							<ItemPanel children="Mask Favorite" onClick={maskFavoriteChannel} />
 						)}
 					</GroupPanels>
 

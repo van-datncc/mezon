@@ -284,7 +284,7 @@ export const updateChannelPrivate = createAsyncThunk('channels/updateChannelPriv
 export const fetchListFavoriteChannelCache = memoizeAndTrack(
 	async (mezon: MezonValueContext, clanId: string) => {
 		const response = await mezon.client.getListFavoriteChannel(mezon.session, clanId);
-		return { ...response, time: Date.now() };
+		return response;
 	},
 	{
 		promise: true,
@@ -665,7 +665,11 @@ export const channelsSlice = createSlice({
 			})
 			.addCase(fetchListFavoriteChannel.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
-				state.favoriteChannels = action.payload;
+				if (action.payload) {
+					state.favoriteChannels = action.payload.channel_ids;
+				} else {
+					state.favoriteChannels = [];
+				}
 				state.fetchChannelSuccess = true;
 			})
 			.addCase(fetchListFavoriteChannel.rejected, (state, action) => {
@@ -673,6 +677,9 @@ export const channelsSlice = createSlice({
 				state.error = action.error.message;
 			})
 			.addCase(addFavoriteChannel.fulfilled, (state, action) => {
+				if (!state.favoriteChannels) {
+					state.favoriteChannels = [];
+				}
 				state.favoriteChannels.push(action.payload?.channel_id || '');
 			})
 			.addCase(removeFavoriteChannel.fulfilled, (state, action) => {
@@ -818,6 +825,8 @@ export const selectIdChannelSelectedByClanId = (clanId: string) =>
 	});
 
 export const selectAllIdChannelSelected = createSelector(getChannelsState, (state) => state.idChannelSelected);
+
+export const selectAllChannelsFavorite = createSelector(getChannelsState, (state) => state.favoriteChannels);
 
 export const selectPreviousChannels = createSelector(getChannelsState, (state) => state.previousChannels);
 
