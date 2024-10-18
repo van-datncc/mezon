@@ -44,7 +44,7 @@ if (Platform.OS === 'android') {
 	if (UIManager.setLayoutAnimationEnabledExperimental) {
 		UIManager.setLayoutAnimationEnabledExperimental(true);
 	}
-};
+}
 
 const ChannelMessages = React.memo(
 	({ channelId, clanId, mode, onOpenImage, onMessageAction, setIsOnlyEmojiPicker, isDM, isPublic }: ChannelMessagesProps) => {
@@ -147,9 +147,9 @@ const ChannelMessages = React.memo(
 				await dispatch(messagesActions.loadMoreMessage({ clanId, channelId, direction: Direction_Mode.BEFORE_TIMESTAMP, fromMobile: true }));
 				isLoadMore.current[direction] = false;
 				setTriggerRender(false);
-				if (messages?.length >= LIMIT_MESSAGE * 4) {
-					scrollChannelMessageToIndex(LIMIT_MESSAGE * 3);
-				}
+				// if (messages?.length >= LIMIT_MESSAGE * 4) {
+				// 	scrollChannelMessageToIndex(LIMIT_MESSAGE * 3);
+				// }
 
 				return true;
 			},

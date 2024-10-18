@@ -28,13 +28,15 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 	const { clanAvatar } = useGetPriorityNameFromUserClan(messageReferences.message_sender_id);
 
 	const handleJumpToMessage = (messageId: string) => {
-		dispatch(
-			messagesActions.jumpToMessage({
-				clanId: clanId || '',
-				messageId: messageId,
-				channelId: channelId
-			})
-		);
+		requestAnimationFrame(async () => {
+			dispatch(
+				messagesActions.jumpToMessage({
+					clanId: clanId || '',
+					messageId: messageId,
+					channelId: channelId
+				})
+			);
+		});
 	};
 
 	const onPressAvatar = () => {
