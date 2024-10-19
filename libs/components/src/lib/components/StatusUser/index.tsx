@@ -59,7 +59,7 @@ const StatusUser = memo((props: StatusUserProps) => {
 			{isTyping && checkTypingUser ? (
 				<Icons.IconLoadingTyping bgFill="bg-colorSuccess" />
 			) : status ? (
-				<Icons.OnlineStatus defaultSize={sizeStatusIcon} />
+				<Icons.IconMobileDevice defaultSize={'w-3 h-3'} />
 			) : (
 				<Icons.OfflineStatus defaultSize={sizeStatusIcon} />
 			)}
