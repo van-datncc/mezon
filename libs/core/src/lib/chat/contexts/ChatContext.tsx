@@ -48,6 +48,7 @@ import {
 	toastActions,
 	useAppDispatch,
 	useAppSelector,
+	userChannelsActions,
 	usersClanActions,
 	usersStreamActions,
 	voiceActions
@@ -429,7 +430,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						}));
 					dispatch(usersClanActions.upsertMany(members));
 				}
-
 				dispatch(
 					channelMembersActions.fetchChannelMembers({
 						clanId: userAdds.clan_id || '',
@@ -438,6 +438,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelType: userAdds.channel_type
 					})
 				);
+				dispatch(userChannelsActions.fetchUserChannels({ channelId: userAdds.channel_id, noCache: true }));
+
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 					dispatch(fetchDirectMessage({ noCache: true }));
 					dispatch(fetchListFriends({ noCache: true }));
