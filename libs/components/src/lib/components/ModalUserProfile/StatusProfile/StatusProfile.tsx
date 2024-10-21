@@ -48,7 +48,14 @@ export const StatusProfile = () => {
 				placement="right-start"
 				className="bg-[#232428] border-none ml-2 py-[6px] px-[8px] w-[200px]"
 			>
-				<MemberProfile name={''} status={true} avatar={''} isHideStatus={false} numberCharacterCollapse={15} classParent="memberProfile" />
+				<MemberProfile
+					name={''}
+					status={{ status: true, isMobile: false }}
+					avatar={''}
+					isHideStatus={false}
+					numberCharacterCollapse={15}
+					classParent="memberProfile"
+				/>
 				<ItemStatus children="Manage Accounts" />
 			</Dropdown>
 		</>
