@@ -88,21 +88,21 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		code_block: {
 			color: colors.text,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondaryLight,
 			paddingVertical: 1,
-			borderColor: colors.text,
+			borderColor: colors.secondary,
 			borderRadius: 5,
 			lineHeight: size.s_20
 		},
 		code_inline: {
 			color: colors.text,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondaryLight,
 			fontSize: size.small,
 			lineHeight: size.s_20
 		},
 		fence: {
 			color: colors.text,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondaryLight,
 			paddingVertical: 5,
 			borderColor: colors.borderHighlight,
 			borderRadius: 5,

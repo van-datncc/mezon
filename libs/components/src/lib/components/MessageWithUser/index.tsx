@@ -62,18 +62,8 @@ function MessageWithUser({
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const user = useAppSelector(selectMemberClanByUserId(userLogin.userProfile?.user?.id || ''));
-	const {
-		senderId,
-		username,
-		userClanAvatar,
-		userClanNickname,
-		userDisplayName,
-		senderIdMessageRef,
-		avatarSender,
-		messageAvatarSenderRef,
-		messageDisplayNameSenderRef,
-		messageUsernameSenderRef
-	} = useMessageParser(message);
+	const { senderId, username, userClanAvatar, userClanNickname, userDisplayName, senderIdMessageRef, avatarSender, messageAvatarSenderRef } =
+		useMessageParser(message);
 	const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
 	const [shortUserId, setShortUserId] = useState('');
@@ -88,7 +78,7 @@ function MessageWithUser({
 
 	const { userId } = useAuth();
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
-	const messageReplyHighlight = dataReferences?.message_ref_id && dataReferences?.message_ref_id === message?.id;
+	const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === message?.id) || false;
 	const idMessageToJump = useSelector(selectIdMessageToJump);
 	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, message?.channel_id ?? ''));
 
@@ -147,7 +137,10 @@ function MessageWithUser({
 		{ 'mt-0': isMention },
 		{ 'pt-[2px]': !isCombine },
 		{ 'dark:bg-[#383B47]': hasIncludeMention || checkMessageTargetToMoved || checkJumpPinMessage },
-		{ 'dark:bg-[#403D38] bg-[#EAB3081A]': (checkMessageIncludeMention || checkReplied) && !messageReplyHighlight && !checkJumpPinMessage },
+		{
+			'dark:bg-[#403D38] bg-[#EAB3081A]':
+				(checkMessageIncludeMention || checkReplied) && !messageReplyHighlight && !checkJumpPinMessage && !checkMessageTargetToMoved
+		},
 		{
 			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
 				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
@@ -157,7 +150,7 @@ function MessageWithUser({
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
-		{ 'bg-blue-500': messageReplyHighlight || checkMessageTargetToMoved },
+		{ 'bg-blue-500': messageReplyHighlight },
 		{ 'bg-bgMentionReply': hasIncludeMention || checkReplied },
 		{
 			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':

@@ -23,7 +23,7 @@ const ChannelListMessage = React.memo(
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 
-		const keyExtractor = useCallback((message) => `${message?.id}_${message?.channel_id}`, []);
+		const keyExtractor = useCallback((message) => `${message?.id}_${message?.channel_id}_item_msg`, []);
 
 		const ViewLoadMore = () => {
 			return (
@@ -51,6 +51,7 @@ const ChannelListMessage = React.memo(
 				contentContainerStyle={styles.listChannels}
 				renderItem={renderItem}
 				removeClippedSubviews={false}
+				decelerationRate={'fast'}
 				disableIntervalMomentum={true}
 				disableScrollViewPanResponder={true}
 				keyExtractor={keyExtractor}
@@ -68,12 +69,20 @@ const ChannelListMessage = React.memo(
 				scrollEventThrottle={16}
 				estimatedItemSize={220}
 				viewabilityConfig={{
-					itemVisiblePercentThreshold: 50,
-					minimumViewTime: 500
+					minimumViewTime: 0,
+					viewAreaCoveragePercentThreshold: 0,
+					itemVisiblePercentThreshold: 0,
+					waitForInteraction: false
 				}}
 				contentInsetAdjustmentBehavior="automatic"
 				ListHeaderComponent={isLoadMoreBottom && !isCannotLoadMore ? <ViewLoadMore /> : null}
 				ListFooterComponent={isLoadMoreTop && !isCannotLoadMore ? <ViewLoadMore /> : null}
+				// onScrollToIndexFailed={(info) => {
+				// 	const wait = new Promise((resolve) => setTimeout(resolve, 300));
+				// 	wait.then(() => {
+				// 		flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+				// 	});
+				// }}
 			/>
 		);
 	},

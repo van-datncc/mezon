@@ -112,7 +112,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			setValueDisplay(newPlainTextValue);
 			const filter: SearchFilter[] = [];
 			// TODO: check logic below code
-			if (mentions.length === 0) {
+			if (value) {
 				filter.push({
 					field_name: 'content',
 					field_value: value
@@ -189,7 +189,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			dispatch(
 				searchMessagesActions.setValueInputSearch({
 					channelId,
-					value: hasKeySearch(value ?? '') ? value : valueInputSearch + value
+					value: !valueInputSearch ? value : valueInputSearch + value
 				})
 			);
 			searchRef.current?.focus();

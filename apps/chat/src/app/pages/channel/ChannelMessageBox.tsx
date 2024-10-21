@@ -111,12 +111,13 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 						<ChannelJumpToPresent clanId={clanId || ''} channelId={channelId ?? ''} className="pb-[10px]" />
 					</div>
 				)}
-				{dataReferences.message_ref_id && (
-					<div className="relative z-1 pb-[4px]">
-						<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
-					</div>
-				)}
 			</div>
+
+			{dataReferences.message_ref_id && (
+				<div className="relative z-1 pb-[4px]">
+					<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
+				</div>
+			)}
 
 			<MessageBox
 				listMentions={UserMentionList({ channelID: channelId ?? '', channelMode: mode })}
