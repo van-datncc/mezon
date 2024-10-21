@@ -27,7 +27,7 @@ const Canvas = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 	const { userProfile } = useAuth();
-	const isEditAndDelCanvas = Boolean(canvasById?.creator_id === userProfile?.user?.id || !idCanvas);
+	const isEditAndDelCanvas = Boolean(canvasById?.creator_id === userProfile?.user?.id || !canvasById?.creator_id);
 
 	useEffect(() => {
 		if (textAreaRef.current) {
