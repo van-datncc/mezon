@@ -1,7 +1,14 @@
-import { ETypeMEntion, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, IRoleMention } from '@mezon/utils';
+import { ChannelMembersEntity, RolesClanEntity } from '@mezon/store';
+import { ETypeMEntion, IEmojiOnMessage, IHashtagOnMessage, IMentionOnMessage, getRoleList, uniqueUsers } from '@mezon/utils';
 import { MentionItem } from 'react-mentions';
 
-const useProcessMention = (mentionsRaw: MentionItem[], roleList: IRoleMention[]) => {
+const useProcessMention = (
+	mentionsRaw: MentionItem[],
+	roles: RolesClanEntity[],
+	membersOfChild: ChannelMembersEntity[],
+	membersOfParent: ChannelMembersEntity[]
+) => {
+	const roleList = getRoleList(roles);
 	const mentions: IMentionOnMessage[] = [];
 	const hashtags: IHashtagOnMessage[] = [];
 	const emojis: IEmojiOnMessage[] = [];
@@ -39,7 +46,11 @@ const useProcessMention = (mentionsRaw: MentionItem[], roleList: IRoleMention[])
 			});
 		}
 	});
+	const userIds = uniqueUsers(mentions, membersOfChild, roles);
+	const usersNotExistingInThread = userIds.filter((userId) => membersOfParent?.some((member) => member.id === userId));
+
 	return {
+		usersNotExistingInThread,
 		mentionList: mentions,
 		hashtagList: hashtags,
 		emojiList: emojis
