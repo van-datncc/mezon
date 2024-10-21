@@ -521,13 +521,13 @@ export const selectMemberStatusById = createSelector(
 		const userClan = usersClanState.entities[userId];
 		const userGroup = directs?.[currentDirectMessageId];
 		if (userClan) {
-			return userClan.user?.online;
+			return { status: userClan.user?.online, isMobile: userClan.user?.is_mobile };
 		}
 		const index = userGroup?.user_id?.findIndex((item) => item === userId) ?? -1;
 		if (index === -1) {
-			return false;
+			return { status: false, isMobile: false };
 		}
-		return userGroup?.is_online?.[index] || false;
+		return { status: userGroup?.is_online?.[index] || false, isMobile: false };
 	}
 );
 
