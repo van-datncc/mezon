@@ -246,7 +246,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						create_time: dateTime.toISOString()
 					};
 				});
-				dispatch(attachmentActions.addAttachmentPhoto(attachmentList));
+				dispatch(attachmentActions.addMany(attachmentList));
 			}
 
 			dispatch(messagesActions.addNewMessage(mess));
