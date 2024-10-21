@@ -1,6 +1,7 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
 	appActions,
+	attachmentActions,
 	channelsActions,
 	notificationSettingActions,
 	selectClanById,
@@ -198,6 +199,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						parentId: currentChannel?.parrent_id || ''
 					})
 				);
+				dispatch(attachmentActions.removeLoadedStatusCached());
 				dispatch(appActions.setIsShowChatStream(false));
 			}
 			dispatch(appActions.setIsShowCanvas(false));
