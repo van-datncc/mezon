@@ -33,11 +33,11 @@ import {
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	STORAGE_KEY_TEMPORARY_ATTACHMENT,
+	jumpToChannel,
 	load,
 	remove,
 	save,
-	setCurrentClanLoader,
-	setDefaultChannelLoader
+	setCurrentClanLoader
 } from '@mezon/mobile-components';
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
@@ -237,11 +237,9 @@ const NavigationMain = () => {
 					}
 				}
 				const results = await Promise.all(promises);
-
 				if (!isFromFCM) {
-					const respChannel = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
-					if (respChannel && clanId) {
-						await setDefaultChannelLoader(respChannel.payload, clanId);
+					if (currentChannelId && clanId) {
+						await jumpToChannel(currentChannelId, clanId);
 					} else {
 						const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
 						if (clanResp && !clanId) {

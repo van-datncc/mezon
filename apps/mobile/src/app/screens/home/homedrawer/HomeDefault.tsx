@@ -13,7 +13,7 @@ import {
 	selectCurrentChannel,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelStatusEnum, TIME_OFFSET } from '@mezon/utils';
+import { ChannelStatusEnum, TIME_OFFSET, isPublicChannel } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -161,7 +161,7 @@ const HomeDefault = React.memo((props: any) => {
 					<ChannelMessagesWrapper
 						channelId={currentChannel?.channel_id}
 						clanId={currentChannel?.clan_id}
-						isPublic={currentChannel ? !currentChannel?.channel_private : false}
+						isPublic={isPublicChannel(currentChannel)}
 						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
 					/>
 					<ChatBox
