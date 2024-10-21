@@ -19,15 +19,6 @@ export const addChannelUsers = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			const body = {
-				clanId: clanId,
-				channelId: channelId,
-				noCache: true,
-				channelType: channelType ?? 0,
-				repace: true
-			};
-			thunkAPI.dispatch(channelMembersActions.fetchChannelMembers(body));
-			thunkAPI.dispatch(userChannelsActions.fetchUserChannels({ channelId: channelId, noCache: true }));
 			return response;
 		} catch (error: any) {
 			const errmsg = await error.json();

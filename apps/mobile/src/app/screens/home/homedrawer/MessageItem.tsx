@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
 	ActionEmitEvent,
 	changeClan,
@@ -116,8 +117,8 @@ const MessageItem = React.memo(
 			if (typeof message.content?.t == 'string') {
 				includesHere = message.content.t?.includes('@here');
 			}
-			const includesUser = mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
-			const checkReplied = message?.references && message?.references[0]?.message_sender_id === userProfile?.user?.id;
+			const includesUser = !!userIdMention && mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
+			const checkReplied = !!userIdMention && message?.references && message?.references[0]?.message_sender_id === userProfile?.user?.id;
 			return includesHere || includesUser || checkReplied;
 		}, [userProfile?.user?.id, message?.mentions, message?.content?.t, message?.references]);
 

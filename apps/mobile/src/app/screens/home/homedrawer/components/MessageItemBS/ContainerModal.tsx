@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChannelMembers, useChatReaction, useChatSending, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
@@ -220,6 +221,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				messageId: message.id
 			})
 		);
+		onClose();
 		await sendMessage(
 			message.content,
 			message.mentions,
@@ -229,7 +231,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			message?.isMentionEveryone || false,
 			true
 		);
-		onClose();
 	};
 
 	const handleActionMention = () => {
