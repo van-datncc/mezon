@@ -30,7 +30,7 @@ export const attachmentAdapter = createEntityAdapter({
 		if (a.create_time && b.create_time) {
 			return Date.parse(b.create_time) - Date.parse(a.create_time);
 		}
-		return b.create_time ? -1 : 1;
+		return 0;
 	}
 });
 
