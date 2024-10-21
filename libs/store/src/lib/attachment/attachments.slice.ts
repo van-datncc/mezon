@@ -24,11 +24,15 @@ export interface AttachmentState extends EntityState<AttachmentEntity, string> {
 	currentAttachment: AttachmentEntity | null;
 }
 
-export const attachmentAdapter = createEntityAdapter<AttachmentEntity>();
+export const attachmentAdapter = createEntityAdapter({
+	selectId: (attachment: AttachmentEntity) => attachment.url as string
+	// sortComparer: (a :AttachmentEntity , b:AttachmentEntity) => Boolean(Date.parse(a.create_time as string) > Date.parse(b.create_time as string)),
+});
 
 type fetchChannelAttachmentsPayload = {
 	clanId: string;
 	channelId: string;
+	noCache?: boolean;
 };
 
 const CHANNEL_ATTACHMENTS_CACHED_TIME = 1000 * 60 * 3;
@@ -49,8 +53,12 @@ export const mapChannelAttachmentsToEntity = (attachmentRes: ApiChannelAttachmen
 
 export const fetchChannelAttachments = createAsyncThunk(
 	'attachment/fetchChannelAttachments',
-	async ({ clanId, channelId }: fetchChannelAttachmentsPayload, thunkAPI) => {
+	async ({ clanId, channelId, noCache }: fetchChannelAttachmentsPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchChannelAttachmentsCached.clear();
+		}
+
 		const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
 
 		if (!response.attachments) {
@@ -96,6 +104,12 @@ export const attachmentSlice = createSlice({
 		},
 		removeCurrentAttachment: (state) => {
 			state.currentAttachment = null;
+		},
+		addAttachmentPhoto: (state, action: PayloadAction<AttachmentEntity[]>) => {
+			attachmentAdapter.setAll(state, [...action.payload, ...attachmentAdapter.getSelectors().selectAll(state)]);
+		},
+		removeLoadedStatusCached: (state) => {
+			state.loadingStatus = 'not loaded';
 		}
 	},
 	extraReducers: (builder) => {
@@ -176,3 +190,5 @@ export const selectMessageIdAttachment = createSelector(getAttachmentState, (sta
 
 export const selectAttachmentPhoto = () =>
 	createSelector(selectAllAttachment, (attachments) => (attachments || []).filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)));
+
+export const selectLoadedStatus = createSelector(getAttachmentState, (state: AttachmentState) => state.loadingStatus);
