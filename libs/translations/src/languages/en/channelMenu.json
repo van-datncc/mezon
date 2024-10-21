@@ -55,5 +55,10 @@
             "content": "Are you sure you want to delete this channel?",
             "confirmText": "Yes"
         }
+    },
+    "modalConFirmLeaveThread": {
+      "title": "Leave Thread",
+      "yesButton": "Leave Thread",
+      "textConfirm": "Are you sure you want to Leave Thread ? You can't receive message from thread when leave this thread"
     }
 }
