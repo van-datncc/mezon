@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChannelMembers, useChatReaction, useChatSending, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
