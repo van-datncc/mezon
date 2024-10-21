@@ -29,23 +29,21 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 	return (
 		<div className="flex justify-between">
 			<div className="flex flex-row items-center gap-2">
-				<div>
-					{itemUnread?.clan_logo || notification?.content?.clan_logo ? (
-						<img
-							src={itemUnread?.clan_logo || notification?.content?.clan_logo}
-							className="w-[45px] h-[45px] rounded-xl"
-							alt={itemUnread?.clan_logo || notification?.content?.clan_logo}
-						/>
-					) : (
-						<div>
-							{clan?.clan_name && (
-								<div className="w-[45px] h-[45px] bg-bgDisable flex justify-center items-center text-contentSecondary text-[20px] rounded-xl">
-									{clan?.clan_name.charAt(0).toUpperCase()}
-								</div>
-							)}
-						</div>
-					)}
-				</div>
+				{itemUnread?.clan_logo || notification?.content?.clan_logo ? (
+					<img
+						src={itemUnread?.clan_logo || notification?.content?.clan_logo}
+						className="w-[45px] h-[45px] rounded-xl"
+						alt={itemUnread?.clan_logo || notification?.content?.clan_logo}
+					/>
+				) : (
+					<>
+						{clan?.clan_name && (
+							<div className="w-[45px] h-[45px] bg-bgDisable flex justify-center items-center text-contentSecondary text-[20px] rounded-xl">
+								{clan?.clan_name.charAt(0).toUpperCase()}
+							</div>
+						)}
+					</>
+				)}
 
 				<div className="flex flex-col gap-1">
 					<div className="font-bold text-[16px] cursor-pointer flex gap-x-1">
@@ -57,7 +55,7 @@ const NotificationChannelHeader = ({ itemUnread, isUnreadTab, clan_id, notificat
 				</div>
 			</div>
 
-			<div className="flex flex-row items-center gap-3">
+			<div className="flex flex-row items-center gap-3 relative">
 				{isUnreadTab ? (
 					<>
 						<Tooltip
