@@ -225,7 +225,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 						const newSession = await clientRef?.current?.sessionRefresh(
 							new Session(session.token, session.refresh_token, session.created)
 						);
-						const recsession = await socket.connect(newSession || session, true, '0', DefaultSocket.DefaultConnectTimeoutMs, signal);
+						const recsession = await socket.connect(newSession || session, true, isFromMobile ? '1' : '0', DefaultSocket.DefaultConnectTimeoutMs, signal);
 						await socket.joinClanChat(clanId);
 						socketRef.current = socket;
 						sessionRef.current = recsession;
