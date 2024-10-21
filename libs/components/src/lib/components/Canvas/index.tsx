@@ -27,7 +27,7 @@ const Canvas = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 	const { userProfile } = useAuth();
-	const isEditCanvas = canvasById?.creator_id === userProfile?.user?.id;
+	const isEditAndDelCanvas = Boolean(canvasById?.creator_id === userProfile?.user?.id || !idCanvas);
 
 	useEffect(() => {
 		if (textAreaRef.current) {
@@ -77,7 +77,7 @@ const Canvas = () => {
 	}, [canvasById]);
 
 	const handleInputChange = (e: { target: { value: any } }) => {
-		if (isEditCanvas) {
+		if (isEditAndDelCanvas) {
 			const newTitle = e.target.value;
 			dispatch(canvasActions.setTitle(newTitle));
 		}
@@ -92,7 +92,7 @@ const Canvas = () => {
 				style={{ color: appearanceTheme === 'light' ? 'rgb(51, 51, 51)' : 'white' }}
 				onChange={handleInputChange}
 				rows={1}
-				disabled={!isEditCanvas}
+				disabled={!isEditAndDelCanvas}
 				className="w-full px-4 py-2 mt-[25px] bg-inherit focus:outline-none text-[28px] resize-none leading-[34px] font-bold text-inherit"
 			/>
 			<div className="w-full">
@@ -101,7 +101,7 @@ const Canvas = () => {
 					idCanvas={idCanvas || ''}
 					isLightMode={appearanceTheme === 'light'}
 					content={content || ''}
-					isEditCanvas={isEditCanvas}
+					isEditAndDelCanvas={isEditAndDelCanvas}
 				/>
 			</div>
 		</div>
