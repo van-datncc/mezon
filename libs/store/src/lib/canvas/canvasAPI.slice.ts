@@ -136,6 +136,12 @@ export const canvasAPISlice = createSlice({
 			.addCase(createEditCanvas.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
 				const { channel_id } = action.payload;
+				if (!channel_id) return;
+				if (!state.channelCanvas[channel_id]) {
+					state.channelCanvas[channel_id] = canvasAPIAdapter.getInitialState({
+						id: channel_id
+					});
+				}
 				canvasAPIAdapter.upsertOne(state.channelCanvas[channel_id], action.payload);
 			})
 			.addCase(createEditCanvas.rejected, (state: CanvasAPIState, action) => {
