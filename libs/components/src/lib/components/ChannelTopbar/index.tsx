@@ -1,9 +1,11 @@
 import { useAppNavigation, useAppParams, usePermissionChecker, useThreads } from '@mezon/core';
 import {
+	ChannelsEntity,
 	appActions,
 	canvasAPIActions,
 	notificationActions,
 	searchMessagesActions,
+	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
@@ -23,7 +25,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission, IChannel } from '@mezon/utils';
+import { EPermission, IChannel, checkIsThread } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -96,6 +98,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 	const { toMembersPage } = useAppNavigation();
 	const { currentURL } = useAppParams();
 	const memberPath = toMembersPage(currentClanId || '');
+	const channelParent = useSelector(selectChannelById(channel?.parrent_id ? (channel.parrent_id as string) : ''));
 
 	return (
 		<>
@@ -107,7 +110,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								<CanvasButton isLightMode={appearanceTheme === 'light'} />
+								{!channelParent && memberPath !== currentURL && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -168,8 +171,8 @@ function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 			};
 			fetchCanvas();
 		}
-	}, [currentChannel?.channel_id, isShowCanvas]);
-	///
+	}, [currentChannel?.channel_id]);
+
 	return (
 		<div className="relative leading-5 h-5" ref={canvasRef}>
 			<Tooltip
@@ -203,7 +206,8 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	}, []);
 
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isThread = currentChannel?.parrent_id !== '0' && currentChannel?.parrent_id !== '';
+	const isThread = checkIsThread(currentChannel as ChannelsEntity);
+
 	useEffect(() => {
 		if (currentChannel?.channel_id || isShowThread) {
 			const fetchThreads = async () => {

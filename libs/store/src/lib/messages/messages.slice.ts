@@ -339,7 +339,7 @@ export const loadMoreMessage = createAsyncThunk(
 				);
 			}
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 			return thunkAPI.rejectWithValue([]);
 		}
 	}
@@ -382,7 +382,7 @@ export const jumpToMessage = createAsyncThunk(
 			}
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump(messageId));
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 			return thunkAPI.rejectWithValue([]);
 		}
 	}
@@ -585,11 +585,13 @@ export const updateTypingUsers = createAsyncThunk(
 		// set user typing to true
 		thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
 
-		if (typingTimeouts[userId]) {
-			clearTimeout(typingTimeouts[userId]);
+		const typingKey = channelId + userId;
+
+		if (typingTimeouts[typingKey]) {
+			clearTimeout(typingTimeouts[typingKey]);
 		}
 
-		typingTimeouts[userId] = setTimeout(() => {
+		typingTimeouts[typingKey] = setTimeout(() => {
 			thunkAPI.dispatch(messagesActions.recheckTypingUsers({ channelId, userId }));
 			delete typingTimeouts[userId];
 		}, TYPING_TIMEOUT + 100);

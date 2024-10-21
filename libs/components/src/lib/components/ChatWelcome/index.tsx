@@ -1,5 +1,6 @@
 import { useAppParams, useFriends } from '@mezon/core';
 import {
+	EStateFriend,
 	selectCurrentChannel,
 	selectDirectById,
 	selectFriendStatus,
@@ -10,7 +11,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { memo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
@@ -35,30 +36,37 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const isDm = mode === ChannelStreamMode.STREAM_MODE_DM;
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;
 	const isChatStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
-
+	const [loading, setLoading] = useState(false);
+	useEffect(() => {
+		setLoading(true);
+	}, []);
 	return (
 		<div className="space-y-2 px-4 mb-0 mt-[50px] flex-1 flex flex-col justify-end">
-			{isChannel &&
-				(isChannelThread ? (
-					<WelcomeChannelThread name={name} classNameSubtext={classNameSubtext} userName={user?.user?.username} />
-				) : (
-					<WelComeChannel
-						name={name}
-						classNameSubtext={classNameSubtext}
-						showName={showName}
-						channelPrivate={Boolean(selectedChannel?.channel_private)}
-						isChatStream={isChatStream}
-					/>
-				))}
-			{(isDm || isDmGroup) && (
-				<WelComeDm
-					name={name || `${selectedChannel?.creator_name}'s Groups`}
-					userName={userName}
-					avatar={avatarDM}
-					classNameSubtext={classNameSubtext}
-					showName={showName}
-					isDmGroup={isDmGroup}
-				/>
+			{loading && (
+				<>
+					{isChannel &&
+						(isChannelThread ? (
+							<WelcomeChannelThread name={name} classNameSubtext={classNameSubtext} userName={user?.user?.username} />
+						) : (
+							<WelComeChannel
+								name={name}
+								classNameSubtext={classNameSubtext}
+								showName={showName}
+								channelPrivate={Boolean(selectedChannel?.channel_private)}
+								isChatStream={isChatStream}
+							/>
+						))}
+					{(isDm || isDmGroup) && (
+						<WelComeDm
+							name={name || `${selectedChannel?.creator_name}'s Groups`}
+							userName={userName}
+							avatar={avatarDM}
+							classNameSubtext={classNameSubtext}
+							showName={showName}
+							isDmGroup={isDmGroup}
+						/>
+					)}
+				</>
 			)}
 		</div>
 	);
@@ -135,6 +143,9 @@ type WelComeDmProps = {
 
 const WelComeDm = (props: WelComeDmProps) => {
 	const { name = '', userName = '', avatar = '', classNameSubtext, showName, isDmGroup } = props;
+	const userID = useSelector(selectUserIdCurrentDm);
+	const checkAddFriend = useSelector(selectFriendStatus(userID[0] || ''));
+
 	return (
 		<>
 			<AvatarImage
@@ -160,74 +171,72 @@ const WelComeDm = (props: WelComeDmProps) => {
 					)}
 				</p>
 			</div>
-			{!isDmGroup && <StatusFriend userName={userName} />}
+			{!isDmGroup && <StatusFriend userName={userName} checkAddFriend={checkAddFriend} userID={userID[0]} />}
 		</>
 	);
 };
 
 type StatusFriendProps = {
 	userName?: string;
+	checkAddFriend?: number;
+	userID: string;
 };
 
 const StatusFriend = memo((props: StatusFriendProps) => {
-	const { userName = '' } = props;
-	const userID = useSelector(selectUserIdCurrentDm);
-	const checkAddFriend = useSelector(selectFriendStatus(userID[0] || ''));
+	const { userName = '', checkAddFriend, userID } = props;
 	const { acceptFriend, deleteFriend, addFriend } = useFriends();
+
+	const title = useMemo(() => {
+		switch (checkAddFriend) {
+			case EStateFriend.MY_PENDING:
+				return ['Accept', 'Ignore'];
+			case EStateFriend.OTHER_PENDING:
+				return ['Friend Request Sent'];
+			case EStateFriend.FRIEND:
+				return ['Remove Friend'];
+			default:
+				return ['Add Friend'];
+		}
+	}, [checkAddFriend]);
+
+	const handleOnClickButtonFriend = (index: number) => {
+		console.log('checkAddFriend: ', checkAddFriend);
+		switch (checkAddFriend) {
+			case EStateFriend.MY_PENDING:
+				if (index === 0) {
+					acceptFriend(userName, userID);
+					break;
+				}
+				deleteFriend(userName, userID);
+				break;
+			case EStateFriend.OTHER_PENDING:
+				// return "Friend Request Sent"
+				break;
+			case EStateFriend.FRIEND:
+				deleteFriend(userName, userID);
+				break;
+			default:
+				addFriend({
+					ids: [userID],
+					usernames: [userName]
+				});
+		}
+	};
 	return (
 		<div className="flex gap-x-2 items-center text-sm">
-			{checkAddFriend.myPendingFriend && (
-				<>
-					<p className="dark:text-contentTertiary text-colorTextLightMode">Sent you a friend request:</p>
-					<button
-						className="rounded bg-bgSelectItem px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
-						onClick={() => {
-							acceptFriend(userName, userID[0]);
-						}}
-					>
-						Accept
-					</button>
-					<button
-						className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
-						onClick={() => {
-							deleteFriend(userName, userID[0]);
-						}}
-					>
-						Ignore
-					</button>
-				</>
+			{checkAddFriend === EStateFriend.MY_PENDING && (
+				<p className="dark:text-contentTertiary text-colorTextLightMode">Sent you a friend request:</p>
 			)}
-			{checkAddFriend.friend && (
+			{title.map((button, index) => (
 				<button
-					className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
-					onClick={() => {
-						deleteFriend(userName, userID[0]);
-					}}
+					className={`rounded  px-4 py-0.5 hover:bg-opacity-85 font-medium text-white ${checkAddFriend === EStateFriend.OTHER_PENDING ? 'cursor-not-allowed' : ''} ${checkAddFriend === EStateFriend.FRIEND ? 'bg-bgModifierHover' : 'bg-bgSelectItem'}`}
+					onClick={() => handleOnClickButtonFriend(index)}
+					key={button}
 				>
-					Remove Friend
+					{button}
 				</button>
-			)}
-			{checkAddFriend.otherPendingFriend && (
-				<button
-					className="rounded bg-bgSelectItem opacity-50 cursor-not-allowed px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
-					onClick={() => console.log(1)}
-				>
-					Friend Request Sent
-				</button>
-			)}
-			{checkAddFriend.noFriend && (
-				<button
-					className="rounded bg-bgSelectItem px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
-					onClick={() => {
-						addFriend({
-							ids: userID,
-							usernames: [userName]
-						});
-					}}
-				>
-					Add Friend
-				</button>
-			)}
+			))}
+
 			<button className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white">Block</button>
 		</div>
 	);

@@ -10,6 +10,7 @@ import {
 	useThreads
 } from '@mezon/core';
 import {
+	ChannelsEntity,
 	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
@@ -53,6 +54,7 @@ import {
 	ThreadStatus,
 	ThreadValue,
 	blankReferenceObj,
+	checkIsThread,
 	filterEmptyArrays,
 	focusToElement,
 	getRoleList,
@@ -147,6 +149,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
@@ -163,7 +166,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
-
 	const { mentions } = useMessageLine(request?.content);
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
@@ -172,7 +174,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		if (query.length === 0) return;
 		const seenIds = new Set();
 		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.filter((emoji) => emoji.shortname && emoji.shortname.toLowerCase().indexOf(query.toLowerCase()) > -1)
 			.filter((emoji) => {
 				if (emoji.id && !seenIds.has(emoji.id)) {
 					seenIds.add(emoji.id);
@@ -290,9 +292,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
-			addMemberToThread(currentChannel, mentionList);
+			if (checkIsThread(currentChannel as ChannelsEntity)) {
+				addMemberToThread(currentChannel, mentionList);
+			}
 
-			if (currentChannel?.parrent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
+			if (checkIsThread(currentChannel as ChannelsEntity) && currentChannel?.active === ThreadStatus.activePublic) {
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: currentChannel.channel_id ?? '', activeCode: ThreadStatus.joined }));
 				joinningToThread(currentChannel, [userProfile?.user?.id ?? '']);
 			}

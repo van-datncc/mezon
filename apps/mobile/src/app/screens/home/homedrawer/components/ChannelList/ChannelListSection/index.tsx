@@ -1,7 +1,7 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import { categoriesActions, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store-mobile';
+import { categoriesActions, selectCategoryExpandStateByCategoryId, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel } from '@mezon/utils';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ChannelsPositionRef } from '../../../ChannelList';
@@ -17,12 +17,13 @@ interface IChannelListSectionProps {
 	channelsPositionRef: ChannelsPositionRef;
 	onPressCollapse: (isCollapse: boolean) => void;
 }
+
 const ChannelListSection = memo(
 	({ data, onLongPressCategory, onLongPressChannel, onLongPressThread, channelsPositionRef, onPressCollapse }: IChannelListSectionProps) => {
 		const styles = style(useTheme().themeValue);
-		const [isCollapsed, setIsCollapsed] = useState(false);
 		const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 		const dispatch = useAppDispatch();
+		const categoryExpandState = useSelector(selectCategoryExpandStateByCategoryId(data?.clan_id || '', data?.category_id));
 
 		const handleOnPressSortChannel = useCallback(() => {
 			dispatch(
@@ -33,10 +34,18 @@ const ChannelListSection = memo(
 			);
 		}, [categoryIdSortChannel, dispatch]);
 
-		const toggleCollapse = useCallback(() => {
-			setIsCollapsed(!isCollapsed);
-			onPressCollapse(!isCollapsed);
-		}, [isCollapsed, setIsCollapsed]);
+		const toggleCollapse = useCallback(
+			(category: ICategoryChannel) => {
+				const payload = {
+					clanId: category.clan_id || '',
+					categoryId: category.id,
+					expandState: !categoryExpandState
+				};
+				dispatch(categoriesActions.setCategoryExpandState(payload));
+				onPressCollapse(categoryExpandState);
+			},
+			[dispatch, onPressCollapse, categoryExpandState]
+		);
 
 		const onLongPressHeader = useCallback(() => {
 			onLongPressCategory(data);
@@ -79,25 +88,24 @@ const ChannelListSection = memo(
 					onPress={toggleCollapse}
 					onLongPress={onLongPressHeader}
 					onPressSortChannel={handleOnPressSortChannel}
-					isCollapsed={isCollapsed}
+					isCollapsed={categoryExpandState}
+					category={data}
 				/>
 
-				<View style={{ display: isCollapsed ? 'none' : 'flex' }}>
-					{data.channels?.map((item: IChannel, index: number) => {
-						return (
-							<View key={`${item?.id}`} onLayout={(event) => handlePositionChannel(item, event)}>
-								<ChannelListItem
-									data={item}
-									key={`${item.id}_channel_item` + index}
-									onLongPress={() => {
-										onLongPressChannel(item);
-									}}
-									onLongPressThread={onLongPressThread}
-								/>
-							</View>
-						);
-					})}
-				</View>
+				{data?.channels?.map((item: IChannel, index: number) => {
+					return (
+						<View key={`${item?.id}`} onLayout={(event) => handlePositionChannel(item, event)}>
+							<ChannelListItem
+								data={item}
+								key={`${item.id}_channel_item` + index}
+								onLongPress={() => {
+									onLongPressChannel(item);
+								}}
+								onLongPressThread={onLongPressThread}
+							/>
+						</View>
+					);
+				})}
 			</View>
 		);
 	}

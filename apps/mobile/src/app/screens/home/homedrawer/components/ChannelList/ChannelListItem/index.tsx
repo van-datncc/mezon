@@ -1,22 +1,26 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { Icons, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
-import { channelsActions, getStoreAsync, selectCurrentChannelId } from '@mezon/store-mobile';
-import { ChannelStatusEnum, ChannelThreads, IChannel } from '@mezon/utils';
+import { STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
+import {
+	selectCategoryExpandStateByCategoryId,
+	selectCurrentChannelId,
+	selectIsUnreadChannelById,
+	selectStreamMembersByChannelId,
+	selectVoiceChannelMembersByChannelId
+} from '@mezon/store';
+import { channelsActions, getStoreAsync, useAppSelector } from '@mezon/store-mobile';
+import { ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { ActivityIndicator, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Linking, Platform, SafeAreaView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../../../../../componentUI';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { linkGoogleMeet } from '../../../../../../utils/helpers';
 import JoinStreamingRoomBS from '../../StreamingRoom/JoinStreamingRoomBS';
-import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
+import ChannelItem from '../ChannelItem';
 import ListChannelThread from '../ChannelListThread';
 import UserListVoiceChannel from '../ChannelListUserVoice';
-import { style } from './styles';
 
 interface IChannelListItemProps {
 	data: any;
@@ -35,23 +39,22 @@ export enum IThreadActiveType {
 }
 
 export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
-	const { themeValue, theme } = useTheme();
-	const styles = style(themeValue);
-	const currentChanelId = useSelector(selectCurrentChannelId);
-	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
 	const bottomSheetChannelStreamingRef = useRef<BottomSheetModal>(null);
+	const voiceChannelMembers = useSelector(selectVoiceChannelMembersByChannelId(props?.data?.id));
+	const streamChannelMembers = useSelector(selectStreamMembersByChannelId(props?.data?.id));
+	const isUnRead = useAppSelector((state) => selectIsUnreadChannelById(state, props?.data?.id));
+	const currentChanelId = useSelector(selectCurrentChannelId);
+
+	const channelMemberList = useMemo(() => {
+		if (props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE) return voiceChannelMembers;
+		if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) return streamChannelMembers;
+		return [];
+	}, [voiceChannelMembers, streamChannelMembers, props?.data?.type]);
+	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(props?.data?.clan_id || '', props?.data?.category_id || ''));
 
 	const timeoutRef = useRef<any>();
 	const navigation = useNavigation();
 	const isTabletLandscape = useTabletLandscape();
-
-	const isActive = useMemo(() => {
-		return currentChanelId === props?.data?.id;
-	}, [currentChanelId, props?.data?.id]);
-
-	const numberNotification = useMemo(() => {
-		return props?.data?.count_mess_unread ? props?.data?.count_mess_unread : 0;
-	}, [props?.data?.count_mess_unread]);
 
 	const dataThreads = useMemo(() => {
 		return !props?.data?.threads
@@ -59,13 +62,17 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			: props?.data?.threads.filter((thread: { active: IThreadActiveType }) => thread?.active === IThreadActiveType.Active);
 	}, [props?.data?.threads]);
 
+	const isActive = useMemo(() => {
+		return currentChanelId === props?.data?.id;
+	}, [currentChanelId, props?.data?.id]);
+
 	useEffect(() => {
 		return () => {
 			timeoutRef.current && clearTimeout(timeoutRef.current);
 		};
 	}, []);
 
-	const handleRouteData = async (thread?: IChannel) => {
+	const handleRouteData = useCallback(async (thread?: IChannel) => {
 		if (props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 			bottomSheetChannelStreamingRef.current.present();
 			return;
@@ -93,66 +100,15 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 			);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		}
-	};
+	}, []);
+
+	if (!isCategoryExpanded && !isUnRead && !channelMemberList?.length && !isActive) return;
 
 	return (
 		<View>
-			<TouchableOpacity
-				activeOpacity={1}
-				onPress={() => handleRouteData()}
-				onLongPress={props.onLongPress}
-				style={[
-					styles.channelListLink,
-					isActive && styles.channelListItemActive,
-					isActive && { backgroundColor: theme === 'light' ? themeValue.secondaryWeight : themeValue.secondaryLight }
-				]}
-			>
-				<View style={[styles.channelListItem]}>
-					{isUnRead && <View style={styles.dotIsNew} />}
-
-					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceLockIcon
-							width={size.s_16}
-							height={size.s_16}
-							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
-						/>
-					)}
-					{props?.data?.channel_private === ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextLockIcon
-							width={size.s_16}
-							height={size.s_16}
-							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
-						/>
-					)}
-					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-						<Icons.VoiceNormalIcon
-							width={size.s_16}
-							height={size.s_16}
-							color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
-						/>
-					)}
-					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-						<Icons.TextIcon width={size.s_16} height={size.s_16} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
-					)}
-					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-						<Icons.StreamIcon height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
-					)}
-					{props?.data?.channel_private !== ChannelStatusEnum.isPrivate && props?.data?.type === ChannelType.CHANNEL_TYPE_APP && (
-						<Icons.AppChannelIcon height={size.s_16} width={size.s_16} color={themeValue.channelNormal} />
-					)}
-					<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
-						{props.data.channel_label}
-					</Text>
-				</View>
-				{props?.data?.type === ChannelType.CHANNEL_TYPE_VOICE && props?.data?.status === StatusVoiceChannel.No_Active && (
-					<ActivityIndicator color={themeValue.white} />
-				)}
-
-				{Number(numberNotification || 0) > 0 && <ChannelBadgeUnread countMessageUnread={Number(numberNotification || 0)} />}
-			</TouchableOpacity>
-
+			<ChannelItem onPress={handleRouteData} onLongPress={props?.onLongPress} data={props?.data} isUnRead={isUnRead} isActive={isActive} />
 			{!!dataThreads?.length && <ListChannelThread threads={dataThreads} onPress={handleRouteData} onLongPress={props?.onLongPressThread} />}
-			<UserListVoiceChannel channelId={props?.data?.channel_id} />
+			<UserListVoiceChannel channelId={props?.data?.channel_id} isCategoryExpanded={isCategoryExpanded} />
 			<MezonBottomSheet ref={bottomSheetChannelStreamingRef} snapPoints={['50%']}>
 				<SafeAreaView>
 					<JoinStreamingRoomBS channel={props?.data} ref={bottomSheetChannelStreamingRef} />

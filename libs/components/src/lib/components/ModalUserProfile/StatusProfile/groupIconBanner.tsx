@@ -1,14 +1,15 @@
 import { useFriends } from '@mezon/core';
-import { ChannelMembersEntity, selectCurrentUserId, selectTheme, StateFriendProps, useAppSelector } from '@mezon/store';
+import { ChannelMembersEntity, EStateFriend, selectCurrentUserId, selectTheme, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IUser } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { OpenModalProps } from '..';
 import { PopupFriend, PopupOption } from './PopupShortUser';
 
 type GroupIconBannerProps = {
-	checkAddFriend: StateFriendProps;
+	checkAddFriend?: number;
 	openModal: OpenModalProps;
 	user: ChannelMembersEntity | null;
 	showPopupLeft?: boolean;
@@ -27,123 +28,104 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 		event.stopPropagation();
 	};
 
+	const buttonFriendProps = useMemo(() => {
+		switch (checkAddFriend) {
+			case EStateFriend.FRIEND:
+				return [
+					{
+						title: 'Friend',
+						icon: <Icons.IconFriend className="iconWhiteImportant size-4" />
+					}
+				];
+			case EStateFriend.OTHER_PENDING:
+				return [
+					{
+						title: 'Pending',
+						icon: <Icons.IconFriend className="iconWhiteImportant size-4" />
+					}
+				];
+			case EStateFriend.MY_PENDING:
+				return [
+					{
+						title: 'Accept',
+						icon: <Icons.IConAcceptFriend className="iconWhiteImportant size-4" />
+					},
+					{
+						title: 'Ignore',
+						icon: <Icons.IConIgnoreFriend className="iconWhiteImportant size-4" />
+					}
+				];
+			default:
+				return [
+					{
+						title: 'Add friend',
+						icon: <Icons.AddPerson className="iconWhiteImportant size-4" />
+					}
+				];
+		}
+	}, [checkAddFriend]);
+
+	const handleOnClickButtonFriend = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
+		switch (checkAddFriend) {
+			case EStateFriend.FRIEND:
+				handleDefault(e);
+				setOpenModal({ openOption: false, openFriend: !openModal.openFriend });
+				break;
+			case EStateFriend.OTHER_PENDING:
+				handleDefault(e);
+				break;
+			case EStateFriend.MY_PENDING:
+				handleDefault(e);
+				if (user) {
+					if (index === 0) {
+						acceptFriend(user.user?.username || '', user.user?.id || '');
+						break;
+					}
+					deleteFriend(user.user?.username || '', user.user?.id || '');
+				}
+				break;
+			default: {
+				handleDefault(e);
+				if (user) {
+					addFriend({
+						usernames: [user.user?.username || ''],
+						ids: []
+					});
+				} else {
+					if (kichUser) {
+						addFriend({
+							usernames: [kichUser.username],
+							ids: []
+						});
+					}
+				}
+			}
+		}
+	};
 	return (
 		<>
 			{!isSelf && (
 				<>
-					{checkAddFriend.friend && (
+					{buttonFriendProps.map((button, index) => (
 						<div
-							className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
-							onClick={(e) => {
-								handleDefault(e);
-								setOpenModal({ openOption: false, openFriend: !openModal.openFriend });
-							}}
+							className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
+							onClick={(e) => handleOnClickButtonFriend(e, index)}
+							key={button.title}
 						>
 							<Tooltip
-								content="Friend"
+								content={button.title}
 								trigger="hover"
 								animation="duration-500"
 								style={appearanceTheme === 'light' ? 'light' : 'dark'}
 								className="whitespace-nowrap"
 							>
-								<Icons.IconFriend className="iconWhiteImportant size-4" />
+								{button.icon}
 							</Tooltip>
-							{openModal.openFriend && <PopupFriend user={user} showPopupLeft={showPopupLeft} />}
+							{openModal.openFriend && checkAddFriend === EStateFriend.FRIEND && (
+								<PopupFriend user={user} showPopupLeft={showPopupLeft} />
+							)}
 						</div>
-					)}
-					{checkAddFriend.noFriend && (
-						<div
-							className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
-							onClick={(e) => {
-								handleDefault(e);
-								if (user) {
-									addFriend({
-										usernames: [user.user?.username || ''],
-										ids: []
-									});
-								} else {
-									if (kichUser) {
-										addFriend({
-											usernames: [kichUser.username],
-											ids: []
-										});
-									}
-								}
-							}}
-						>
-							<Tooltip
-								content="Add friend"
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-								className="whitespace-nowrap"
-							>
-								<Icons.AddPerson className="iconWhiteImportant size-4" />
-							</Tooltip>
-						</div>
-					)}
-
-					{checkAddFriend.myPendingFriend && showPopupLeft && (
-						<>
-							<div
-								className="p-2 rounded-full bg-[#4e5058] relative h-fit"
-								onClick={(e) => {
-									handleDefault(e);
-									if (user) {
-										acceptFriend(user.user?.username || '', user.user?.id || '');
-									}
-								}}
-							>
-								<Tooltip
-									content="Accept"
-									trigger="hover"
-									animation="duration-500"
-									style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									className="whitespace-nowrap"
-								>
-									<Icons.IConAcceptFriend className="iconWhiteImportant size-4" />
-								</Tooltip>
-							</div>
-							<div
-								className="p-2 rounded-full bg-[#4e5058] relative h-fit"
-								onClick={(e) => {
-									handleDefault(e);
-									if (user) {
-										deleteFriend(user.user?.username || '', user.user?.id || '');
-									}
-								}}
-							>
-								<Tooltip
-									content="Ignore"
-									trigger="hover"
-									animation="duration-500"
-									style={appearanceTheme === 'light' ? 'light' : 'dark'}
-									className="whitespace-nowrap"
-								>
-									<Icons.IConIgnoreFriend className="iconWhiteImportant size-4" />
-								</Tooltip>
-							</div>
-						</>
-					)}
-
-					{checkAddFriend.otherPendingFriend && (
-						<div
-							className="p-2 rounded-full bg-[#4e5058] relative h-fit"
-							onClick={(e) => {
-								handleDefault(e);
-							}}
-						>
-							<Tooltip
-								content="Pending"
-								trigger="hover"
-								animation="duration-500"
-								style={appearanceTheme === 'light' ? 'light' : 'dark'}
-								className="whitespace-nowrap"
-							>
-								<Icons.PendingFriend className="iconWhiteImportant size-4" />
-							</Tooltip>
-						</div>
-					)}
+					))}
 				</>
 			)}
 
