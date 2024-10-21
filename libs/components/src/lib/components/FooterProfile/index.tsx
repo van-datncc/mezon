@@ -88,7 +88,7 @@ function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: F
 					<div className="pointer-events-none">
 						<MemberProfile
 							name={name}
-							status={isMe ? true : status}
+							status={{ status: isMe ? true : status, isMobile: false }}
 							avatar={avatar}
 							isHideStatus={false}
 							classParent="memberProfile"

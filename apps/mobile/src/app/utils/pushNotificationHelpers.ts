@@ -293,7 +293,6 @@ export const setupNotificationListeners = async (navigation) => {
 			if (remoteMessage) {
 				const store = await getStoreAsync();
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-				store.dispatch(appActions.setLoadingMainMobile(true));
 				store.dispatch(appActions.setIsFromFCMMobile(true));
 				if (remoteMessage?.notification?.title) {
 					processNotification({

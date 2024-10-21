@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Block, Colors, Metrics, size } from '@mezon/mobile-ui';
 import { Audio, Video as ExpoVideo, InterruptionModeIOS, ResizeMode } from 'expo-av';
 import React, { useEffect, useRef, useState } from 'react';

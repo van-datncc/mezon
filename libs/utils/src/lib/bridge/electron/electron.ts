@@ -8,7 +8,7 @@ import {
 	START_NOTIFICATION_SERVICE,
 	TRIGGER_SHORTCUT
 } from './constants';
-import { ElectronBridgeHandler, IElectronBridge, MezonElectronAPI } from './types';
+import { ElectronBridgeHandler, IElectronBridge, MezonElectronAPI, MezonNotificationOptions } from './types';
 
 export class ElectronBridge implements IElectronBridge {
 	private readonly bridge: MezonElectronAPI = window.electron;
@@ -35,16 +35,11 @@ export class ElectronBridge implements IElectronBridge {
 		}
 		this.shortcutHandler = shortcutHandler;
 		this.setupSenderId();
-		this.setupPushReceiver();
 		this.setupShortCut();
 		this.hasListeners = true;
 	}
 
 	public removeAllListeners() {
-		this.bridge.removeListener(NOTIFICATION_SERVICE_STARTED, this.notificationServiceStartedHandler);
-		this.bridge.removeListener(NOTIFICATION_RECEIVED, this.notificationReceivedHandler);
-		this.bridge.removeListener(NOTIFICATION_SERVICE_ERROR, this.notificationErrorhandler);
-		this.bridge.removeListener(FCM_TOKEN_UPDATED, this.tokenUpdatedHandler);
 		this.bridge.removeListener(TRIGGER_SHORTCUT, this.triggerShortcut);
 		this.hasListeners = false;
 	}
@@ -53,12 +48,33 @@ export class ElectronBridge implements IElectronBridge {
 		this.bridge.setBadgeCount(badgeCount);
 	}
 
+	public pushNotification(title: string, options: MezonNotificationOptions) {
+		const notification = new Notification(title, options);
+		notification.onclick = () => {
+			const link = options.data?.link;
+			if (!link) {
+				return;
+			}
+			const notificationUrl = new URL(link);
+			const currentPath = window.location.pathname;
+			const path = notificationUrl.pathname;
+			const isSubPath = currentPath.endsWith(path);
+
+			if (path) {
+				this.bridge?.send(NAVIGATE_TO_URL, path, isSubPath);
+			}
+		};
+	}
+
 	private setupSenderId() {
 		this.bridge.senderId(SENDER_ID).then((senderId: string) => {
 			this.bridge.send(START_NOTIFICATION_SERVICE, senderId);
 		});
 	}
 
+	/**
+	 * @deprecated use ws instead
+	 */
 	private setupPushReceiver() {
 		this.bridge.on(NOTIFICATION_SERVICE_STARTED, this.listenerHandlers[NOTIFICATION_SERVICE_STARTED]);
 		this.bridge.on(NOTIFICATION_RECEIVED, this.listenerHandlers[NOTIFICATION_RECEIVED]);
@@ -84,35 +100,17 @@ export class ElectronBridge implements IElectronBridge {
 
 	private notificationReceivedHandler = (
 		_: unknown,
-		serverNotificationPayload: { notification: { body: any; title: string; image: string }; data: { link: string | URL } }
+		serverNotificationPayload: { notification: { body: string; title: string; image: string }; data: { link: string } }
 	) => {
 		if (serverNotificationPayload.notification.body) {
-			const notification = new Notification(serverNotificationPayload.notification.title, {
-				body: serverNotificationPayload.notification.body,
-				icon: serverNotificationPayload.notification.image,
-				data: {
-					link: serverNotificationPayload.data.link
-				}
-			});
-
-			notification.onclick = () => {
-				const notificationUrl = new URL(serverNotificationPayload.data.link);
-				const currentPath = window.location.pathname;
-				const path = notificationUrl.pathname;
-				const isSubPath = currentPath.endsWith(path);
-
-				if (path) {
-					this.bridge?.send(NAVIGATE_TO_URL, path, isSubPath);
-				}
-			};
-		} else {
-			console.log('do something with the key/value pairs in the data', serverNotificationPayload.data);
+			const { body, image, title } = serverNotificationPayload.notification;
+			const link = serverNotificationPayload.data?.link;
+			this.pushNotification(title, { body, icon: image, data: { link } });
 		}
 	};
 
-	private tokenUpdatedHandler = (_: unknown, token: string) => {
-		console.log(token);
-	};
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	private tokenUpdatedHandler = (_: unknown, token: string) => {};
 
 	private triggerShortcut = (_: unknown, name: string) => {
 		if (this.shortcutHandler) {

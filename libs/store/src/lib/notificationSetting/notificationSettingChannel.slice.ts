@@ -2,6 +2,7 @@ import { INotificationSetting, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiNotificationUserChannel } from 'mezon-js/api.gen';
 import { channelsActions } from '../channels/channels.slice';
+import { directActions } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { defaultNotificationCategoryActions } from './notificationSettingCategory.slice';
@@ -120,8 +121,12 @@ export const setMuteNotificationSetting = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id, noCache: true }));
-		thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		if (clan_id !== '0' && clan_id !== '') {
+			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: clan_id, noCache: true }));
+			thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '' }));
+		} else {
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+		}
 		thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', isCurrentChannel: is_current_channel, noCache: true }));
 		return response;
 	}
