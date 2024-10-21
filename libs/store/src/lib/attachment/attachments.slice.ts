@@ -25,8 +25,13 @@ export interface AttachmentState extends EntityState<AttachmentEntity, string> {
 }
 
 export const attachmentAdapter = createEntityAdapter({
-	selectId: (attachment: AttachmentEntity) => attachment.url as string
-	// sortComparer: (a :AttachmentEntity , b:AttachmentEntity) => Boolean(Date.parse(a.create_time as string) > Date.parse(b.create_time as string)),
+	selectId: (attachment: AttachmentEntity) => attachment.url as string,
+	sortComparer: (a: AttachmentEntity, b: AttachmentEntity) => {
+		if (a.create_time && b.create_time) {
+			return Date.parse(b.create_time) - Date.parse(a.create_time);
+		}
+		return b.create_time ? -1 : 1;
+	}
 });
 
 type fetchChannelAttachmentsPayload = {
