@@ -30,11 +30,6 @@
 						"glob": "apps/admin/src/assets/favicon.ico",
 						"input": "./",
 						"output": "./"
-					},
-					{
-						"glob": "apps/admin/src/assets/firebase-messaging-sw.js",
-						"input": "./",
-						"output": "./"
 					}
 				],
         "styles": ["apps/admin/src/styles.scss"],
