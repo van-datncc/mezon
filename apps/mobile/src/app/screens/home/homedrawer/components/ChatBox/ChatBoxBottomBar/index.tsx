@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,

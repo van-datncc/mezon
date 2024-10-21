@@ -1,5 +1,12 @@
 import { useChannelMembersActions } from '@mezon/core';
-import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import {
+	ChannelMembersEntity,
+	notificationSettingActions,
+	selectAllAccount,
+	selectCurrentClan,
+	selectCurrentClanId,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	HEIGHT_PANEL_PROFILE,
@@ -92,10 +99,10 @@ export function MemberProfile({
 	const currentClan = useSelector(selectCurrentClan);
 	const userProfile = useSelector(selectAllAccount);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
-
+	const dispatch = useAppDispatch();
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
-	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		// stop open popup default of web
 		window.oncontextmenu = (e) => {
 			e.preventDefault();
@@ -132,6 +139,11 @@ export function MemberProfile({
 			if (modalState.current.pannelMember) {
 				closeModal(ModalType.PannelMember);
 			} else {
+				await dispatch(
+					notificationSettingActions.getNotificationSetting({
+						channelId: directMessageValue?.dmID || ''
+					})
+				);
 				resetModalState();
 				openPanelMember();
 			}

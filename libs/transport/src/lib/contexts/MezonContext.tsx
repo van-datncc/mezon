@@ -73,7 +73,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return session;
 			}
 
-			const session2 = await socketRef.current.connect(session, true);
+			const session2 = await socketRef.current.connect(session, true, '0');
 			sessionRef.current = session2;
 
 			return session;
@@ -96,7 +96,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return session;
 			}
 
-			const session2 = await socketRef.current.connect(session, true);
+			const session2 = await socketRef.current.connect(session, true, '0');
 			sessionRef.current = session2;
 
 			return session;
@@ -119,7 +119,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return session;
 			}
 
-			const session2 = await socketRef.current.connect(session, true);
+			const session2 = await socketRef.current.connect(session, true, '0');
 			sessionRef.current = session2;
 
 			return session;
@@ -130,7 +130,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	const logOutMezon = useCallback(async () => {
 		if (socketRef.current) {
 			socketRef.current.ondisconnect = () => {
-				console.log('loged out');
+				//console.log('loged out');
 			};
 			await socketRef.current.disconnect(false);
 			socketRef.current = null;
@@ -171,7 +171,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return newSession;
 			}
 
-			const session2 = await socketRef.current.connect(newSession, true);
+			const session2 = await socketRef.current.connect(newSession, true, '0');
 			sessionRef.current = session2;
 			return newSession;
 		},
@@ -225,7 +225,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 						const newSession = await clientRef?.current?.sessionRefresh(
 							new Session(session.token, session.refresh_token, session.created)
 						);
-						const recsession = await socket.connect(newSession || session, true, DefaultSocket.DefaultConnectTimeoutMs, signal);
+						const recsession = await socket.connect(newSession || session, true, '0', DefaultSocket.DefaultConnectTimeoutMs, signal);
 						await socket.joinClanChat(clanId);
 						socketRef.current = socket;
 						sessionRef.current = recsession;
