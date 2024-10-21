@@ -149,48 +149,51 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		};
 	}, [directMessageId, directMessageLoader]);
 
+	const handleAppStateChange = useCallback(
+		async (state: string) => {
+			if (state === 'active') {
+				try {
+					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
+					const store = await getStoreAsync();
+					handleReconnect('DM detail reconnect attempt');
+					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+					store.dispatch(
+						channelsActions.joinChat({
+							clanId: '0',
+							channelId: directMessageId,
+							channelType: dmType ?? 0,
+							isPublic: false
+						})
+					);
+					store.dispatch(
+						messagesActions.fetchMessages({
+							channelId: directMessageId,
+							noCache: true,
+							isFetchingLatestMessages: true,
+							isClearMessage: true,
+							clanId: '0'
+						})
+					);
+					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+				} catch (error) {
+					const store = await getStoreAsync();
+					store.dispatch(appActions.setIsFromFCMMobile(false));
+					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+				}
+			}
+		},
+		[directMessageId, dmType, handleReconnect]
+	);
+
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
 		return () => {
 			appStateSubscription.remove();
 		};
-	}, [directMessageId, directMessageId, dmType]);
-
-	const handleAppStateChange = async (state: string) => {
-		if (state === 'active') {
-			try {
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
-				const store = await getStoreAsync();
-				handleReconnect('DM detail reconnect attempt');
-				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-				store.dispatch(
-					channelsActions.joinChat({
-						clanId: '0',
-						channelId: directMessageId,
-						channelType: dmType ?? 0,
-						isPublic: false
-					})
-				);
-				store.dispatch(
-					messagesActions.fetchMessages({
-						channelId: directMessageId,
-						noCache: true,
-						isFetchingLatestMessages: true,
-						isClearMessage: true,
-						clanId: '0'
-					})
-				);
-				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
-			} catch (error) {
-				const store = await getStoreAsync();
-				store.dispatch(appActions.setIsFromFCMMobile(false));
-				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
-			}
-		}
-	};
+	}, [directMessageId, dmType, currentClanId, handleAppStateChange]);
 
 	const handleBack = useCallback(() => {
 		if (APP_SCREEN.MESSAGES.NEW_GROUP === from) {
