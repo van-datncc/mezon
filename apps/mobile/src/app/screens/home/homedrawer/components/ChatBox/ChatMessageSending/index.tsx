@@ -243,7 +243,7 @@ export const ChatMessageSending = memo(
 			membersOfChild: ChannelMembersEntity[] | null
 		) => {
 			const timestamp = Date.now() / 1000;
-			const userIds = uniqueUsers(mentions, membersOfChild);
+			const userIds = uniqueUsers(mentions, membersOfChild, rolesInClan);
 			const body = {
 				channelId: currentChannel?.channel_id as string,
 				channelType: currentChannel?.type,
