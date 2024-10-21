@@ -15,7 +15,6 @@ import {
 	channelsActions,
 	getStoreAsync,
 	notificationSettingActions,
-	selectAllChannels,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
 	selectCurrentUserId,
@@ -59,7 +58,6 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	}, []);
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
 	const currentUserId = useSelector(selectCurrentUserId);
-	const channelsClan = useSelector(selectAllChannels);
 
 	const isChannelUnmute = useMemo(() => {
 		return (
@@ -308,12 +306,13 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 
 	const handleConfirmLeaveThread = useCallback(async () => {
 		await dispatch(threadsActions.leaveThread({ clanId: currentClan?.id || '', threadId: channel?.id || '' }));
-		handleJoinFirstChannel();
+		dismiss();
+		handleJoinChannel();
 	}, []);
 
-	const handleJoinFirstChannel = async () => {
-		const channelId = channelsClan[0]?.channel_id || '';
-		const clanId = channelsClan[0]?.clan_id || '';
+	const handleJoinChannel = async () => {
+		const channelId = channel?.parrent_id || '';
+		const clanId = channel?.clan_id || '';
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		const store = await getStoreAsync();
 		requestAnimationFrame(async () => {
