@@ -1,3 +1,4 @@
+import { useAuth } from '@mezon/core';
 import {
 	canvasActions,
 	createEditCanvas,
@@ -25,6 +26,8 @@ const Canvas = () => {
 	const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+	const { userProfile } = useAuth();
+	const isEditCanvas = canvasById?.creator_id === userProfile?.user?.id;
 
 	useEffect(() => {
 		if (textAreaRef.current) {
@@ -74,8 +77,10 @@ const Canvas = () => {
 	}, [canvasById]);
 
 	const handleInputChange = (e: { target: { value: any } }) => {
-		const newTitle = e.target.value;
-		dispatch(canvasActions.setTitle(newTitle));
+		if (isEditCanvas) {
+			const newTitle = e.target.value;
+			dispatch(canvasActions.setTitle(newTitle));
+		}
 	};
 
 	return (
@@ -87,10 +92,17 @@ const Canvas = () => {
 				style={{ color: appearanceTheme === 'light' ? 'rgb(51, 51, 51)' : 'white' }}
 				onChange={handleInputChange}
 				rows={1}
+				disabled={!isEditCanvas}
 				className="w-full px-4 py-2 mt-[25px] bg-inherit focus:outline-none text-[28px] resize-none leading-[34px] font-bold text-inherit"
 			/>
 			<div className="w-full">
-				<CanvasContent key={idCanvas} idCanvas={idCanvas || ''} isLightMode={appearanceTheme === 'light'} content={content || ''} />
+				<CanvasContent
+					key={idCanvas}
+					idCanvas={idCanvas || ''}
+					isLightMode={appearanceTheme === 'light'}
+					content={content || ''}
+					isEditCanvas={isEditCanvas}
+				/>
 			</div>
 		</div>
 	);

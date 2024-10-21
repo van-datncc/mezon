@@ -23,7 +23,8 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose }: GroupCanvasProps)
 				clan_id: clanId
 			};
 			const results = await dispatch(canvasAPIActions.getChannelCanvasDetail(body));
-			dispatch(canvasAPIActions.updateCanvas({ channelId, results }));
+			const dataUpdate = results?.payload;
+			dispatch(canvasAPIActions.updateCanvas({ channelId, dataUpdate }));
 		}
 	};
 

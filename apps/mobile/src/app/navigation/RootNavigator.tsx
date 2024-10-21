@@ -3,13 +3,13 @@ import {
 	accountActions,
 	appActions,
 	authActions,
-	channelsActions,
 	clansActions,
 	directActions,
 	emojiSuggestionActions,
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	listChannelsByUserActions,
 	listUsersByUserActions,
 	messagesActions,
 	selectCurrentChannelId,
@@ -33,11 +33,11 @@ import {
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	STORAGE_KEY_TEMPORARY_ATTACHMENT,
+	jumpToChannel,
 	load,
 	remove,
 	save,
-	setCurrentClanLoader,
-	setDefaultChannelLoader
+	setCurrentClanLoader
 } from '@mezon/mobile-components';
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
@@ -211,6 +211,7 @@ const NavigationMain = () => {
 			promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 			promises.push(store.dispatch(directActions.fetchDirectMessage({})));
 			promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
+			promises.push(store.dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
 			await Promise.all(promises);
 			return null;
 		} catch (error) {
@@ -223,6 +224,7 @@ const NavigationMain = () => {
 		async ({ isFromFCM = false }) => {
 			const store = await getStoreAsync();
 			try {
+				store.dispatch(appActions.setLoadingMainMobile(false));
 				const currentClanIdCached = await load(STORAGE_CLAN_ID);
 				const clanId = currentClanId?.toString() !== '0' ? currentClanId : currentClanIdCached;
 				const promises = [];
@@ -232,15 +234,12 @@ const NavigationMain = () => {
 						save(STORAGE_CLAN_ID, clanId);
 						promises.push(store.dispatch(clansActions.joinClan({ clanId })));
 						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId, noCache: true })));
-						promises.push(store.dispatch(channelsActions.fetchChannels({ clanId, noCache: true })));
 					}
 				}
 				const results = await Promise.all(promises);
-
 				if (!isFromFCM) {
-					const respChannel = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
-					if (respChannel && clanId) {
-						await setDefaultChannelLoader(respChannel.payload, clanId);
+					if (currentChannelId && clanId) {
+						await jumpToChannel(currentChannelId, clanId);
 					} else {
 						const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
 						if (clanResp && !clanId) {

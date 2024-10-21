@@ -1,9 +1,10 @@
-import { useMemberStatus } from '@mezon/core';
+import { ChatContext, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
 	channelMembersActions,
+	channelsActions,
 	clansActions,
 	directActions,
 	getStoreAsync,
@@ -13,8 +14,8 @@ import {
 	selectDmGroupCurrent
 } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { AppState, DeviceEventEmitter } from 'react-native';
+import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import { AppState, DeviceEventEmitter, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -23,7 +24,7 @@ import HeaderDirectMessage from './HeaderDirectMessage';
 import { style } from './styles';
 
 export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const directMessageId = route.params?.directMessageId as string;
 
@@ -32,6 +33,8 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isFetchMemberChannelDmRef = useRef(false);
+	const { handleReconnect } = useContext(ChatContext);
+
 	const isModeDM = useMemo(() => {
 		return currentDmGroup?.user_id?.length === 1;
 	}, [currentDmGroup?.user_id?.length]);
@@ -98,6 +101,21 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 	}, [currentChannel?.clan_id, directMessageId, dmType]);
 
 	useEffect(() => {
+		const focusedListener = navigation.addListener('focus', () => {
+			StatusBar.setBackgroundColor(themeValue.primary);
+			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
+		});
+		const blurListener = navigation.addListener('blur', () => {
+			StatusBar.setBackgroundColor(themeValue.secondary);
+			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
+		});
+		return () => {
+			focusedListener();
+			blurListener();
+		};
+	}, [navigation, themeBasic, themeValue.primary, themeValue.secondary]);
+
+	useEffect(() => {
 		const onMentionHashtagDM = DeviceEventEmitter.addListener(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, ({ isFetchMemberChannelDM }) => {
 			isFetchMemberChannelDmRef.current = isFetchMemberChannelDM;
 		});
@@ -137,14 +155,23 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		return () => {
 			appStateSubscription.remove();
 		};
-	}, [directMessageId, directMessageId]);
+	}, [directMessageId, directMessageId, dmType]);
 
 	const handleAppStateChange = async (state: string) => {
 		if (state === 'active') {
 			try {
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
 				const store = await getStoreAsync();
+				handleReconnect('DM detail reconnect attempt');
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+				store.dispatch(
+					channelsActions.joinChat({
+						clanId: '0',
+						channelId: directMessageId,
+						channelType: dmType ?? 0,
+						isPublic: false
+					})
+				);
 				store.dispatch(
 					messagesActions.fetchMessages({
 						channelId: directMessageId,
@@ -157,7 +184,6 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} catch (error) {
-				console.log('error messageLoaderBackground', error);
 				const store = await getStoreAsync();
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);

@@ -77,6 +77,7 @@ export interface ChannelsState extends EntityState<ChannelsEntity, string> {
 	previousChannels: string[];
 	appChannelsList: Record<string, ApiChannelAppResponse>;
 	fetchChannelSuccess: boolean;
+	threadsNotJoinedByUser: EntityState<ChannelsEntity, string>;
 }
 
 export const channelsAdapter = createEntityAdapter<ChannelsEntity>();
@@ -342,6 +343,14 @@ export const fetchChannels = createAsyncThunk(
 			}
 		}
 
+		// Add threads that the user has not joined to the response
+
+		const unjoinedThreads = state.channels.threadsNotJoinedByUser;
+		if (unjoinedThreads.ids?.length) {
+			const unjoinedThreadEntities = unjoinedThreads.ids.map((id) => unjoinedThreads.entities[id]);
+			response.channeldesc = [...response.channeldesc, ...unjoinedThreadEntities];
+		}
+
 		const channels = response.channeldesc.map((channel) => ({
 			...mapChannelToEntity(channel),
 			last_seen_message: channel.last_seen_message ? channel.last_seen_message : { timestamp_seconds: 0 }
@@ -416,7 +425,8 @@ export const initialChannelsState: ChannelsState = channelsAdapter.getInitialSta
 	quantityNotifyChannels: {},
 	previousChannels: [],
 	appChannelsList: {},
-	fetchChannelSuccess: false
+	fetchChannelSuccess: false,
+	threadsNotJoinedByUser: channelsAdapter.getInitialState()
 });
 
 export const channelsSlice = createSlice({
@@ -428,6 +438,9 @@ export const channelsSlice = createSlice({
 		remove: channelsAdapter.removeOne,
 		update: channelsAdapter.updateOne,
 		upsertOne: channelsAdapter.upsertOne,
+		addThreadUserNotJoin: (state: ChannelsState, action: PayloadAction<ChannelsEntity>) => {
+			channelsAdapter.upsertOne(state.threadsNotJoinedByUser, action.payload);
+		},
 		removeByChannelID: (state, action: PayloadAction<string>) => {
 			channelsAdapter.removeOne(state, action.payload);
 		},
@@ -756,4 +769,8 @@ export const selectAnyUnreadChannels = createSelector([getChannelsState, selectE
 		}
 	}
 	return false;
+});
+
+export const selectThreadNotJoin = createSelector([getChannelsState, (state, id: string) => id], (state, id: string) => {
+	return state.threadsNotJoinedByUser.entities[id];
 });

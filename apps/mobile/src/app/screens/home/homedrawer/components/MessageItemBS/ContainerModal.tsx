@@ -220,6 +220,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				messageId: message.id
 			})
 		);
+		onClose();
 		await sendMessage(
 			message.content,
 			message.mentions,
@@ -229,7 +230,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			message?.isMentionEveryone || false,
 			true
 		);
-		onClose();
 	};
 
 	const handleActionMention = () => {
@@ -629,14 +629,5 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		}
 	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
 
-	return (
-		<View
-			style={[
-				styles.bottomSheetWrapper,
-				{ backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }
-			]}
-		>
-			{content}
-		</View>
-	);
+	return <View style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>{content}</View>;
 });
