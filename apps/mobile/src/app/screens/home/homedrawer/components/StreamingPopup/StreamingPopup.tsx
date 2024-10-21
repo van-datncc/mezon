@@ -2,7 +2,6 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch } from '@mezon/store';
 import { appActions } from '@mezon/store-mobile';
-import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, DeviceEventEmitter, Dimensions, PanResponder, TouchableOpacity } from 'react-native';
 import StreamingRoom from '../StreamingRoom';
@@ -17,10 +16,7 @@ export const StreamingPopup = () => {
 	const [windowSize, setWindowSize] = useState(new Animated.ValueXY({ x: 100, y: 100 }));
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 	const dispatch = useAppDispatch();
-	const navigation = useNavigation();
 	const [isOpenDrawer, setIsOpenDrawer] = useState(true);
-
-	console.log('navigation: ', navigation.getState());
 
 	useEffect(() => {
 		const showSKlListener = DeviceEventEmitter.addListener(ActionEmitEvent.OPEN_CLOSE_DRAWER, ({ isOpenDrawer }) => {
@@ -42,7 +38,7 @@ export const StreamingPopup = () => {
 	useEffect(() => {
 		if (isFullScreen) {
 			Animated.timing(windowSize, {
-				toValue: { x: width, y: height }, // Kích thước full màn hình
+				toValue: { x: width, y: height },
 				duration: 100,
 				useNativeDriver: false
 			}).start();

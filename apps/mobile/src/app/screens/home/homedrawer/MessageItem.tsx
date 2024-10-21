@@ -6,7 +6,6 @@ import {
 	ReplyMessageDeleted,
 	save,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	STORAGE_PREVIOUS_CHANNEL,
 	validLinkInviteRegex
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
@@ -263,10 +262,8 @@ const MessageItem = React.memo(
 					await Linking.openURL(urlVoice);
 				} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
 					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
-						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-							screen: APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM
-						});
-						save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
+						// update mention hashtag stream
+						// save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
 					} else {
 						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					}

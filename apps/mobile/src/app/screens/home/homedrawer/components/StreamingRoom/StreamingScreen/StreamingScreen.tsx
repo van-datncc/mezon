@@ -8,6 +8,7 @@ import Video from 'react-native-video';
 import { useSelector } from 'react-redux';
 import { style } from './styles';
 
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Text } from 'react-native';
 
 export function StreamingScreen({
@@ -26,6 +27,7 @@ export function StreamingScreen({
 	const [isFullScreen, setIsFullScreen] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
+	const { t } = useTranslation(['streamingRoom']);
 
 	const handleFullScreen = () => {
 		setIsFullScreen(!isFullScreen);
@@ -63,7 +65,7 @@ export function StreamingScreen({
 
 			{error ? (
 				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>No streaming available</Text>
+					<Text style={styles.errorText}>{t('noStreaming')}</Text>
 				</View>
 			) : (
 				<Video

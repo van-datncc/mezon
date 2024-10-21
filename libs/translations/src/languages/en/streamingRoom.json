@@ -14,5 +14,6 @@
     "voice":"Voice",
     "addPeople": "Add people to voice Chat",
     "leftTheGroup": "Left the group known you are here!"
-  }
+  },
+  "noStreaming": "No streaming available"
 }

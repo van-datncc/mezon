@@ -15,12 +15,12 @@ import { baseColor, Block, Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentStreamInfo, selectStreamMembersByChannelId, useAppDispatch, usersStreamActions, videoStreamActions } from '@mezon/store';
 import { selectCurrentClanId } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { MezonBottomSheet } from 'apps/mobile/src/app/componentUI';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, SafeAreaView, Text, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
+import { MezonBottomSheet } from '../../../../../componentUI';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { InviteToChannel } from '../InviteToChannel';
 import SelectAudio from './SelectAudio';
@@ -67,8 +67,6 @@ function StreamingRoom({
 	};
 
 	const handleEndCall = useCallback(() => {
-		console.log('handleEndCall');
-
 		requestAnimationFrame(async () => {
 			handleLeaveChannel();
 			const previousChannel = load(STORAGE_PREVIOUS_CHANNEL) || [];

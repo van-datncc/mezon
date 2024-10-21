@@ -1,6 +1,5 @@
 import { Attributes, baseColor, size } from '@mezon/mobile-ui';
-import { Dimensions, StyleSheet } from 'react-native';
-const { width, height } = Dimensions.get('window');
+import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
@@ -40,6 +39,7 @@ export const style = (colors: Attributes) =>
 		},
 		errorText: {
 			color: colors.white,
-			fontSize: 16
+			fontSize: size.regular,
+			fontWeight: '600'
 		}
 	});
