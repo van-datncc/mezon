@@ -1,7 +1,14 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
 import { Attributes, Colors, size, useTheme, verticalScale } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
-import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
+import {
+	ChannelsEntity,
+	selectAllChannelMembers,
+	selectAllUserClans,
+	selectChannelsEntities,
+	selectCurrentChannelId,
+	selectHashtagDmEntities,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';

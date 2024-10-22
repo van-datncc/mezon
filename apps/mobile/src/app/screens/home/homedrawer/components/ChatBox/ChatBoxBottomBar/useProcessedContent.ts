@@ -1,4 +1,4 @@
-import { selectEmojiObjSuggestion } from '@mezon/store';
+import { selectEmojiObjSuggestion } from '@mezon/store-mobile';
 import { EMarkdownType, IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';

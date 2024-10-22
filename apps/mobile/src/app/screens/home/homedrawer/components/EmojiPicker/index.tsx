@@ -3,8 +3,14 @@ import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { Icons, debounce } from '@mezon/mobile-components';
 import { Block, Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId, settingClanStickerActions } from '@mezon/store';
-import { getStoreAsync, gifsActions, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
+import {
+	getStoreAsync,
+	gifsActions,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectDmGroupCurrent,
+	settingClanStickerActions
+} from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
