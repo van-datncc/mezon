@@ -1,8 +1,9 @@
 import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { isEqual } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { MessagesEntity } from '@mezon/store';
+import { MessagesEntity } from '@mezon/store-mobile';
 import { FlashList } from '@shopify/flash-list';
+import debounce from 'lodash.debounce';
 import React, { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
@@ -39,6 +40,12 @@ const ChannelListMessage = React.memo(
 			return lastMessage?.sender_id === '0' && !lastMessage?.content?.t && lastMessage?.username === 'system';
 		}, [messages]);
 
+		const handleEndReached = debounce(() => {
+			if (messages?.length && !isCannotLoadMore) {
+				onLoadMore(ELoadMoreDirection.top);
+			}
+		}, 300);
+
 		return (
 			<FlashList
 				ref={flatListRef}
@@ -56,13 +63,7 @@ const ChannelListMessage = React.memo(
 				// initialNumToRender={5}
 				// maxToRenderPerBatch={10}
 				// windowSize={10}
-				onEndReached={
-					messages?.length && !isCannotLoadMore
-						? () => {
-								onLoadMore(ELoadMoreDirection.top);
-							}
-						: undefined
-				}
+				onEndReached={handleEndReached}
 				onEndReachedThreshold={0.5}
 				scrollEventThrottle={16}
 				estimatedItemSize={220}

@@ -1,8 +1,7 @@
 import { useChatTypings } from '@mezon/core';
 import { convertTimestampToTimeAgo, Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadDMById } from '@mezon/store';
-import { directActions, DirectEntity, selectDmGroupCurrentId, useAppDispatch } from '@mezon/store-mobile';
+import { directActions, DirectEntity, selectDmGroupCurrentId, selectIsUnreadDMById, useAppDispatch } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import { ChannelType } from 'mezon-js';

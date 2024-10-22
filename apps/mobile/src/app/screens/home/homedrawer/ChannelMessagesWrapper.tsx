@@ -1,6 +1,5 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { attachmentActions, AttachmentEntity } from '@mezon/store';
-import { messagesActions, useAppDispatch } from '@mezon/store-mobile';
+import { attachmentActions, AttachmentEntity, messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';

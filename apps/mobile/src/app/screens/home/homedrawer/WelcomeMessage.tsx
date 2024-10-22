@@ -6,13 +6,13 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	EStateFriend,
 	friendsActions,
+	getStoreAsync,
 	selectChannelById,
 	selectDmGroupCurrent,
 	selectFriendStatus,
 	selectMemberClanByUserId,
 	useAppSelector
-} from '@mezon/store';
-import { getStoreAsync } from '@mezon/store-mobile';
+} from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';

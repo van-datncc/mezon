@@ -1,7 +1,6 @@
 import { Icons, PlayIcon } from '@mezon/mobile-components';
 import { baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
-import { referencesActions, selectAttachmentByChannelId } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { referencesActions, selectAttachmentByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import React, { useMemo } from 'react';
 import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
