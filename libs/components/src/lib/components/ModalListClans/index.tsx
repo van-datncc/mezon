@@ -1,4 +1,4 @@
-import { selectBadgeCountByClanId } from '@mezon/store';
+import { attachmentActions, selectBadgeCountByClanId, useAppDispatch } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan } from '@mezon/utils';
 import { useSelector } from 'react-redux';
@@ -15,9 +15,13 @@ export type SidebarClanItemProps = {
 const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItemProps) => {
 	const currentClanPath = pathname.split('/channels')[0];
 	const isSameClan = currentClanPath === linkClan;
+	const dispatch = useAppDispatch();
+
 	const handleClick = (e: React.MouseEvent) => {
 		if (isSameClan) {
 			e.preventDefault();
+		} else {
+			dispatch(attachmentActions.removeLoadedStatusCached());
 		}
 	};
 

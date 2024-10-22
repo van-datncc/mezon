@@ -103,7 +103,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 						<Tooltip
 							content={
 								<div className={'flex flex-col items-start gap-1'}>
-									{userRolesClan.slice(6, -1).map((userRole, index) => (
+									{userRolesClan.slice(6, userRolesClan.length).map((userRole, index) => (
 										<RoleClanItem
 											key={`${userRole.id}_role`}
 											appearanceTheme={appearanceTheme}
