@@ -31,11 +31,6 @@
 						"glob": "apps/chat/src/assets/favicon.ico",
 						"input": "./",
 						"output": "./"
-					},
-					{
-						"glob": "apps/chat/src/assets/firebase-messaging-sw.js",
-						"input": "./",
-						"output": "./"
 					}
 				],
 				"styles": ["apps/chat/src/styles.scss"],

@@ -79,7 +79,7 @@ export const Sharing = ({ data, onClose }) => {
 
 	useEffect(() => {
 		handleReconnect('Initial reconnect attempt');
-	}, []);
+	}, [handleReconnect]);
 
 	useEffect(() => {
 		if (searchText) {

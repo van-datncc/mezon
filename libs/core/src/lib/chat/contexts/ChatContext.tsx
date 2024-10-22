@@ -246,7 +246,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						create_time: dateTime.toISOString()
 					};
 				});
-				dispatch(attachmentActions.addAttachmentPhoto(attachmentList));
+				dispatch(attachmentActions.addMany(attachmentList));
 			}
 
 			dispatch(messagesActions.addNewMessage(mess));
@@ -449,7 +449,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								display_name: user.display_name,
 								metadata: user.custom_status,
 								username: user.username,
-								create_time: new Date(user.create_time_second * 1000).toISOString()
+								create_time: new Date(user.create_time_second * 1000).toISOString(),
+								online: user.online
 							}
 						}));
 					dispatch(usersClanActions.upsertMany(members));

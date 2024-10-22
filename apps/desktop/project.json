@@ -119,11 +119,6 @@
             "output": "./"
           },
           {
-            "glob": "apps/chat/src/assets/firebase-messaging-sw.js",
-            "input": "./",
-            "output": "./"
-          },
-          {
             "glob": "apps/desktop/index.html",
             "input": "./",
             "output": "./"
