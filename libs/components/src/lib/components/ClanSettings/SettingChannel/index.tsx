@@ -2,7 +2,7 @@ import { selectChannelSuggestionEntities, selectMemberClanByGoogleId, selectMemb
 import { Icons } from '@mezon/ui';
 import { getAvatarForPrioritize } from '@mezon/utils';
 import { formatDistance } from 'date-fns';
-import { Avatar, AvatarSizes, Tooltip } from 'flowbite-react';
+import { Avatar, AvatarSizes, Dropdown, Pagination, Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
@@ -11,10 +11,15 @@ import { useSelector } from 'react-redux';
 import ChannelSettingInforItem from './InforChannelSetting';
 
 type ListChannelSettingProp = {
-	listChannel: Record<string, ApiChannelSettingItem[]>;
+	listChannel: ApiChannelSettingItem[];
+	currentPage: number;
+	pageSize: number;
+	onPageChange: (page: number) => void;
+	handleChangePageSize: (pageSize: number) => void;
+	countChannel: number;
 };
 
-const ListChannelSetting = ({ listChannel }: ListChannelSettingProp) => {
+const ListChannelSetting = ({ listChannel, currentPage, pageSize, onPageChange, handleChangePageSize, countChannel }: ListChannelSettingProp) => {
 	const [channelSettingId, setChannelSettingId] = useState('');
 	const parentRef = useRef(null);
 	const listChannelEntities = useSelector(selectChannelSuggestionEntities);
@@ -39,20 +44,55 @@ const ListChannelSetting = ({ listChannel }: ListChannelSettingProp) => {
 			</div>
 			<div className="h-full overflow-y-auto  hide-scrollbar scroll-smooth pb-10" ref={parentRef}>
 				{Object.entries(listChannel).map(([key, value]) => (
-					<RenderChannelAndThread channelParrent={listChannelEntities[key]} listChannelGroup={value} key={`group_${key}`} />
+					<RenderChannelAndThread channelParrent={listChannelEntities[key]} key={`group_${key}`} />
 				))}
+
+				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-[1px] dark:border-borderDivider border-buttonLightTertiary mt-0">
+					<div className={'flex flex-row items-center'}>
+						Show
+						<Dropdown
+							value={pageSize}
+							renderTrigger={() => (
+								<div
+									className={
+										'flex flex-row items-center justify-center text-center dark:bg-slate-800 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode border-[1px] dark:border-borderDivider border-buttonLightTertiary rounded mx-1 px-3 w-12'
+									}
+								>
+									<span className="mr-1">{pageSize}</span>
+									<Icons.ArrowDown />
+								</div>
+							)}
+							label={''}
+						>
+							<Dropdown.Item
+								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+								onClick={() => handleChangePageSize(10)}
+							>
+								10
+							</Dropdown.Item>
+							<Dropdown.Item
+								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+								onClick={() => handleChangePageSize(50)}
+							>
+								50
+							</Dropdown.Item>
+							<Dropdown.Item
+								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+								onClick={() => handleChangePageSize(100)}
+							>
+								100
+							</Dropdown.Item>
+						</Dropdown>
+						channel of {countChannel}
+					</div>
+					<Pagination currentPage={currentPage} totalPages={Math.ceil(countChannel / pageSize)} onPageChange={onPageChange} />
+				</div>
 			</div>
 		</div>
 	);
 };
 
-const RenderChannelAndThread = ({
-	listChannelGroup,
-	channelParrent
-}: {
-	listChannelGroup: ApiChannelSettingItem[];
-	channelParrent: ApiChannelSettingItem;
-}) => {
+const RenderChannelAndThread = ({ channelParrent }: { channelParrent: ApiChannelSettingItem }) => {
 	return (
 		<div className="flex flex-col">
 			<ItemInfor
@@ -67,8 +107,7 @@ const RenderChannelAndThread = ({
 				messageCount={channelParrent.message_count || 0}
 				lastMessage={channelParrent.last_sent_message}
 			/>
-			<div className="flex flex-col pl-8">
-				{listChannelGroup.map((thread) => (
+			{/* <div className="flex flex-col pl-8">
 					<ItemInfor
 						creatorId={thread.creator_id as string}
 						label={thread?.channel_label as string}
@@ -80,8 +119,7 @@ const RenderChannelAndThread = ({
 						messageCount={thread.message_count || 0}
 						lastMessage={channelParrent.last_sent_message}
 					/>
-				))}
-			</div>
+			</div> */}
 		</div>
 	);
 };

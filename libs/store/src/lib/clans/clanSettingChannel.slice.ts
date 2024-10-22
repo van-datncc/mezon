@@ -27,18 +27,19 @@ export const initialSettingClanChannelState: SettingClanChannelState = channelSe
 	threadCount: 0
 });
 
-export const fetchChannelByUserIdCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, clanId: string) => {
+export const fetchChannelSettingInClanCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, clanId: string, page: number, limit: number) => {
 		const response = await mezon.client.getChannelSettingInClan(
 			mezon.session,
 			clanId,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			100
+			'0', // parent_id
+			undefined, // category_id
+			undefined, // private_channel
+			undefined, // active
+			undefined, // status
+			undefined, // type
+			limit, // limit
+			page // page
 		);
 		return response;
 	},
@@ -51,16 +52,16 @@ export const fetchChannelByUserIdCached = memoizeAndTrack(
 	}
 );
 
-export const fetchChannelByUserId = createAsyncThunk(
+export const fetchChannelSettingInClan = createAsyncThunk(
 	'channelSetting/fetchClanChannelSetting',
-	async ({ noCache = false, clanId }: { noCache?: boolean; clanId: string }, thunkAPI) => {
+	async ({ noCache = false, clanId, page, limit }: { noCache?: boolean; clanId: string; page: number; limit: number }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
-				fetchChannelByUserIdCached.clear(mezon, clanId);
+				fetchChannelSettingInClanCached.clear(mezon, clanId, page, limit);
 			}
 
-			const response = await fetchChannelByUserIdCached(mezon, clanId);
+			const response = await fetchChannelSettingInClanCached(mezon, clanId, page, limit);
 			if (response) {
 				return response;
 			}
@@ -77,16 +78,16 @@ export const settingClanChannelSlice = createSlice({
 	reducers: {},
 	extraReducers(builder) {
 		builder
-			.addCase(fetchChannelByUserId.fulfilled, (state: SettingClanChannelState, actions) => {
+			.addCase(fetchChannelSettingInClan.fulfilled, (state: SettingClanChannelState, actions) => {
 				state.loadingStatus = 'loaded';
 				channelSettingAdapter.setAll(state, actions.payload.channel_setting_list || []);
 				state.channelCount = actions.payload?.channel_count || 0;
 				state.threadCount = actions.payload?.thread_count || 0;
 			})
-			.addCase(fetchChannelByUserId.pending, (state: SettingClanChannelState) => {
+			.addCase(fetchChannelSettingInClan.pending, (state: SettingClanChannelState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchChannelByUserId.rejected, (state: SettingClanChannelState, action) => {
+			.addCase(fetchChannelSettingInClan.rejected, (state: SettingClanChannelState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -95,7 +96,7 @@ export const settingClanChannelSlice = createSlice({
 
 export const channelSettingActions = {
 	...settingClanChannelSlice.actions,
-	fetchChannelByUserId
+	fetchChannelSettingInClan
 };
 
 export const getChannelSettingState = (rootState: { [SETTING_CLAN_CHANNEL]: SettingClanChannelState }): SettingClanChannelState =>
