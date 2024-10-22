@@ -3,11 +3,12 @@ import { selectAllChannelsFavorite, selectChannelById, selectCurrentClan, select
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, ICategoryChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import CategorizedChannels from './CategorizedChannels';
 import { Events } from './ChannelListComponents';
+import { ChannelListItemRef } from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
@@ -18,12 +19,13 @@ function ChannelList() {
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 	const channelFavorites = useSelector(selectAllChannelsFavorite);
 	const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
+	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
 	const memoizedCategorizedChannels = useMemo(() => {
 		return categorizedChannels.map((category: ICategoryChannel) => {
 			if (!isShowEmptyCategory && category.channels.length === 0) {
 				return null;
 			}
-			return <CategorizedChannels key={category.id} category={category} />;
+			return <CategorizedChannels key={category.id} category={category} channelRefs={channelRefs} />;
 		});
 	}, [categorizedChannels, isShowEmptyCategory]);
 	const handleExpandFavoriteChannel = () => {
@@ -58,7 +60,11 @@ function ChannelList() {
 					</div>
 					{isExpandFavorite ? (
 						<div className="px-4">
-							{channelFavorites ? channelFavorites.map((item, index) => <FavoriteChannel key={index} channelId={item} />) : ''}
+							{channelFavorites
+								? channelFavorites.map((id, index) => (
+										<FavoriteChannel key={index} channelId={id} channelRef={channelRefs.current[id]} />
+									))
+								: ''}
 						</div>
 					) : null}
 				</div>
@@ -70,18 +76,17 @@ function ChannelList() {
 
 type FavoriteChannelProps = {
 	channelId: string;
+	channelRef: ChannelListItemRef | null;
 };
 
-const FavoriteChannel = ({ channelId }: FavoriteChannelProps) => {
+const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 	const channel = useSelector(selectChannelById(channelId));
 	const theme = useSelector(selectTheme);
 	const { navigate, toChannelPage } = useAppNavigation();
 	const handleJumpChannel = (id: string, clanId: string) => {
-		const elementChannel = document.getElementById(id);
-		elementChannel?.scrollIntoView({
-			behavior: 'auto',
-			block: 'center'
-		});
+		if (channelRef) {
+			channelRef.scrollIntoChannel();
+		}
 		navigate(toChannelPage(id, clanId));
 	};
 
