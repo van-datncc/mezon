@@ -1,7 +1,7 @@
 export const searchFieldName: Record<string, string> = {
 	from: 'username',
 	mentions: 'username',
-	has: 'attachment',
+	has: 'has',
 	before: 'create_time',
 	in: 'channel_label',
 	pinned: '',
@@ -9,9 +9,9 @@ export const searchFieldName: Record<string, string> = {
 };
 
 export const searchOptions = [
-	{ title: 'from:', content: 'user', value: 'username' }
-	// { title: 'mentions:', content: 'user', value: 'username' },
-	// { title: 'has:', content: 'link, embed or file', value: 'attachment' },
+	{ title: 'from:', content: 'user', value: 'username' },
+	{ title: 'mentions:', content: 'user', value: 'mentions' },
+	{ title: 'has:', content: 'link, embed or file', value: 'has' }
 	// { title: 'before:', content: 'specific data', value: 'username' },
 	// { title: 'during:', content: 'specific data', value: 'username' },
 	// { title: 'after:', content: 'specific data', value: 'username' },

@@ -24,6 +24,7 @@ import SelectGroup from './SelectGroup';
 import darkMentionsInputStyle from './StyleSearchMessagesDark';
 import lightMentionsInputStyle from './StyleSearchMessagesLight';
 
+import { ApiSearchMessageRequest } from 'mezon-js/api.gen';
 import { UserMentionList } from '../UserMentionList';
 import SelectItemUser from './SelectItemUser';
 import { hasKeySearch, searchFieldName } from './constant';
@@ -31,6 +32,12 @@ import { hasKeySearch, searchFieldName } from './constant';
 type SearchMessageChannelProps = {
 	mode?: ChannelStreamMode;
 };
+
+const HAS_OPTIONS = [
+	{ id: 'video', display: 'video' },
+	{ id: 'link', display: 'link' },
+	{ id: 'image', display: 'image' }
+];
 
 const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const dispatch = useAppDispatch();
@@ -71,7 +78,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const [isShowSearchMessageModal, setIsShowSearchMessageModal] = useState(false);
 	const [isShowSearchOptions, setIsShowSearchOptions] = useState('');
 	const [valueDisplay, setValueDisplay] = useState<string>('');
-	const [search, setSearch] = useState<any | undefined>();
+	const [search, setSearch] = useState<any | undefined | ApiSearchMessageRequest>();
 	const [isShowMemberListBefore, setIsShowMemberListBefore] = useState<boolean>(false);
 	const [isShowMemberListDMBefore, setIsShowMemberListDMBefore] = useState<boolean>(false);
 	const [isUseProfileDMBefore, setIsUseProfileDMBefore] = useState<boolean>(false);
@@ -108,16 +115,23 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const handleChange: OnChangeHandlerFunc = useCallback(
 		(event, newValue, newPlainTextValue, mentions) => {
 			const value = event.target.value;
+			const words = value.split(' ');
+			const cleanedWords = words.filter((word) => {
+				return !(word.startsWith('@[') && word.includes('](') && word.endsWith(')'));
+			});
+
+			const cleanedValue = cleanedWords.join(' ').trim();
 			dispatch(searchMessagesActions.setValueInputSearch({ channelId, value }));
 			setValueDisplay(newPlainTextValue);
 			const filter: SearchFilter[] = [];
 			// TODO: check logic below code
-			if (value) {
+			if (cleanedValue) {
 				filter.push({
 					field_name: 'content',
-					field_value: value
+					field_value: cleanedValue
 				});
 			}
+
 			for (const mention of mentions) {
 				const convertMention = mention.display.split(':');
 				filter.push({ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] });
@@ -283,6 +297,19 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 						);
 					}}
 				>
+					<Mention
+						appendSpaceOnAdd={true}
+						data={HAS_OPTIONS}
+						trigger="has:"
+						displayTransform={(id, display) => {
+							return `has:${display}`;
+						}}
+						renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => (
+							<SelectItemUser search={search} isFocused={focused} title="has: " content={suggestion.display} />
+						)}
+						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+					/>
+
 					<Mention
 						appendSpaceOnAdd={true}
 						data={handleSearchUserMention}
