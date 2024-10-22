@@ -12,6 +12,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
+import { UserStatus } from '../../components/UserStatus';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { DmListItemLastMessage } from './DMListItemLastMessage';
@@ -127,7 +128,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 							/>
 						</View>
 					) : (
-						<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+						<UserStatus status={{ status: directMessage.is_online?.some(Boolean), isMobile: false }} />
 					)}
 				</View>
 			)}
