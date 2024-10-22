@@ -29,9 +29,8 @@ const UserVoiceItem = React.memo(({ userVoice, isCategoryExpanded, index, totalM
 			return (
 				<Block
 					left={-size.s_4 * index}
-					top={-1}
-					width={size.s_24}
-					height={size.s_24}
+					width={size.s_20}
+					height={size.s_20}
 					borderRadius={size.s_20}
 					backgroundColor={themeValue.primary}
 					borderWidth={1}

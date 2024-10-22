@@ -1,7 +1,6 @@
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { directMetaActions } from '@mezon/store';
 import {
 	appActions,
 	channelMembersActions,
