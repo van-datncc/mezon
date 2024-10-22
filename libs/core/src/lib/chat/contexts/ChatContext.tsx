@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+	AttachmentEntity,
 	appActions,
+	attachmentActions,
 	channelMembers,
 	channelMembersActions,
 	channelMetaActions,
@@ -48,12 +50,21 @@ import {
 	toastActions,
 	useAppDispatch,
 	useAppSelector,
+	userChannelsActions,
 	usersClanActions,
 	usersStreamActions,
 	voiceActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { EMOJI_GIVE_COFFEE, ModeResponsive, NotificationCode, isPublicChannel, transformPayloadWriteSocket } from '@mezon/utils';
+import {
+	EMOJI_GIVE_COFFEE,
+	ETypeLinkMedia,
+	ModeResponsive,
+	NotificationCode,
+	isPublicChannel,
+	sleep,
+	transformPayloadWriteSocket
+} from '@mezon/utils';
 import * as Sentry from '@sentry/browser';
 import isElectron from 'is-electron';
 import {
@@ -224,6 +235,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const idToCompare = !isMobile ? channelId : currentChannelId;
 				mess.isCurrentChannel = message.channel_id === idToCompare;
 			}
+
+			if (mess.attachments?.some((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX))) {
+				const attachmentList: AttachmentEntity[] = mess.attachments?.map((attachment) => {
+					const dateTime = new Date();
+
+					return {
+						...attachment,
+						id: attachment.url as string,
+						create_time: dateTime.toISOString()
+					};
+				});
+				dispatch(attachmentActions.addMany(attachmentList));
+			}
+
 			dispatch(messagesActions.addNewMessage(mess));
 			if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 				dispatch(directMetaActions.updateDMSocket(message));
@@ -387,7 +412,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onuserchanneladded = useCallback(
-		(userAdds: UserChannelAddedEvent) => {
+		async (userAdds: UserChannelAddedEvent) => {
 			const user = userAdds.users.find((user: any) => user.user_id === userId);
 			if (user) {
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_DM || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
@@ -424,12 +449,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								display_name: user.display_name,
 								metadata: user.custom_status,
 								username: user.username,
-								create_time: new Date(user.create_time_second * 1000).toISOString()
+								create_time: new Date(user.create_time_second * 1000).toISOString(),
+								online: user.online
 							}
 						}));
 					dispatch(usersClanActions.upsertMany(members));
 				}
-
+				await sleep(500);
 				dispatch(
 					channelMembersActions.fetchChannelMembers({
 						clanId: userAdds.clan_id || '',
@@ -438,6 +464,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						channelType: userAdds.channel_type
 					})
 				);
+				dispatch(userChannelsActions.fetchUserChannels({ channelId: userAdds.channel_id, noCache: true }));
+
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP || userAdds.channel_type === ChannelType.CHANNEL_TYPE_GROUP) {
 					dispatch(fetchDirectMessage({ noCache: true }));
 					dispatch(fetchListFriends({ noCache: true }));

@@ -166,7 +166,6 @@ export const joinChannel = createAsyncThunk(
 
 			return channel;
 		} catch (error) {
-			console.log(error);
 			return thunkAPI.rejectWithValue([]);
 		}
 	}

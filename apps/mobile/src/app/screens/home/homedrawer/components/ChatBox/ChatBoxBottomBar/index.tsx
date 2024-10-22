@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
 	ActionEmitEvent,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
@@ -19,7 +20,7 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, typeConverts } from '@mezon/utils';
+import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps, isPublicChannel, typeConverts } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 // eslint-disable-next-line
 import { IFile } from 'apps/mobile/src/app/componentUI';
@@ -502,7 +503,7 @@ export const ChatBoxBottomBar = memo(
 						markdownsOnMessage={markdownList}
 						voiceLinkRoomOnMessage={voiceLinkRoomList}
 						isShowCreateThread={isShowCreateThread}
-						isPublic={currentChannel ? !currentChannel?.channel_private : false}
+						isPublic={isPublicChannel(currentChannel)}
 					/>
 				</Block>
 			</Block>
