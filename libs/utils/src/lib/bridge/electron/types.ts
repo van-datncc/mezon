@@ -22,3 +22,7 @@ export interface IElectronBridge {
 	removeAllListeners: () => void;
 	setBadgeCount: (badgeCount: number | null) => void;
 }
+
+export interface MezonNotificationOptions extends NotificationOptions {
+	data: { link: string };
+}

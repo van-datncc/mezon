@@ -1,5 +1,5 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store';
+import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
 import { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';

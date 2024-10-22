@@ -32,7 +32,7 @@ import ModalRemoveMemberClan from './ModalRemoveMemberClan';
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
-	status?: boolean;
+	status?: { status?: boolean; isMobile?: boolean };
 	customStatus?: string;
 	isHideStatus?: boolean;
 	isHideIconStatus?: boolean;

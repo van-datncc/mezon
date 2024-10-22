@@ -1,3 +1,4 @@
+import { useMemberStatus } from '@mezon/core';
 import { OwnerIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity } from '@mezon/utils';
@@ -38,6 +39,7 @@ export function MemberProfile({
 	const userInfo: any = useMemo(() => {
 		return user?.user || user;
 	}, [user]);
+	const userStatus = useMemberStatus(userInfo?.id || '');
 
 	const currentChannel = useContext(threadDetailContext);
 	const name = useMemo(() => {
@@ -48,7 +50,7 @@ export function MemberProfile({
 	return (
 		<View style={{ ...styles.container, opacity: isOffline ? 0.5 : 1 }}>
 			{/* Avatar */}
-			<MezonAvatar avatarUrl={userInfo?.avatar_url} username={userInfo?.username} userStatus={status} />
+			<MezonAvatar avatarUrl={userInfo?.avatar_url} username={userInfo?.username} userStatus={userStatus} />
 
 			{/* Name */}
 			<View style={{ ...styles.nameContainer, borderBottomWidth: 1 }}>

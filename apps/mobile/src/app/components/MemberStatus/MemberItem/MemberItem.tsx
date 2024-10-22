@@ -27,7 +27,7 @@ export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThrea
 		>
 			<MemberProfile
 				user={user}
-				status={userStatus}
+				status={userStatus.status}
 				numCharCollapse={30}
 				isHideIconStatus={userStatus ? false : true}
 				isOffline={isOffline}

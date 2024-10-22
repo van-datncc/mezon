@@ -42,7 +42,6 @@ export const checkNotificationPermission = async () => {
 		authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL
 	) {
 		// Permission is granted
-		console.log('Notification permission granted.');
 	}
 };
 
@@ -110,7 +109,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			}
 		});
 	} catch (err) {
-		console.log('err', err);
+		/* empty */
 	}
 };
 
@@ -129,7 +128,7 @@ export const handleFCMToken = async () => {
 			try {
 				return fcmtoken;
 			} catch (error) {
-				console.log('Error setting fcmtoken to user');
+				/* empty */
 			}
 		}
 	}
@@ -234,7 +233,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				if (time && Number(clanIdCache || 0) !== 0) {
 					const joinChangeFetchAndSetLoader = async (store: any, clanIdCache: string) => {
 						const [respCurrentClan, respChannel] = await Promise.all([
-							store.dispatch(clansActions.changeCurrentClan({ clanId: clanIdCache, noCache: true, isNotSetCurrentClanId: true })),
+							store.dispatch(clansActions.changeCurrentClan({ clanId: clanIdCache, noCache: true })),
 							store.dispatch(channelsActions.fetchChannels({ clanId: clanIdCache, noCache: true }))
 						]);
 
@@ -289,11 +288,9 @@ export const setupNotificationListeners = async (navigation) => {
 	messaging()
 		.getInitialNotification()
 		.then(async (remoteMessage) => {
-			console.log('Notification caused app to open from quit state:');
 			if (remoteMessage) {
 				const store = await getStoreAsync();
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-				store.dispatch(appActions.setLoadingMainMobile(true));
 				store.dispatch(appActions.setIsFromFCMMobile(true));
 				if (remoteMessage?.notification?.title) {
 					processNotification({
@@ -313,23 +310,17 @@ export const setupNotificationListeners = async (navigation) => {
 		});
 	});
 
-	messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-		console.log('Message handled in the background!', remoteMessage);
-	});
+	messaging().setBackgroundMessageHandler(async (remoteMessage) => {});
 
 	return notifee.onForegroundEvent(({ type, detail }) => {
 		switch (type) {
 			case EventType.DISMISSED:
-				console.log('User dismissed notification', detail.notification);
-
 				break;
 			case EventType.PRESS:
 				processNotification({
 					notification: detail.notification,
 					navigation
 				});
-				console.log('User pressed notification', detail.notification);
-
 				break;
 		}
 	});

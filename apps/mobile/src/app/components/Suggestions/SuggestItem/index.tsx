@@ -1,7 +1,7 @@
 import { useCheckVoiceStatus } from '@mezon/core';
 import { Icons, ThreadIcon, ThreadIconLocker } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity } from '@mezon/store';
+import { ChannelsEntity } from '@mezon/store-mobile';
 import { ChannelStatusEnum, checkIsThread, getSrcEmoji } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';

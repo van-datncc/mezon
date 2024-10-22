@@ -35,7 +35,7 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { selectCurrentChannel, selectCurrentClanId, setSelectedMessage } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClanId, setSelectedMessage } from '@mezon/store-mobile';
 import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -190,8 +190,8 @@ const MessageItem = React.memo(
 				setShowHighlightReply(true);
 				timeoutRef.current = setTimeout(() => {
 					setShowHighlightReply(false);
-					dispatch(messagesActions.setIdMessageToJump(null));
-				}, 3000);
+					dispatch(messagesActions.setIdMessageToJump(''));
+				}, 2000);
 			} else {
 				setShowHighlightReply(false);
 				timeoutRef.current && clearTimeout(timeoutRef.current);
@@ -371,8 +371,8 @@ const MessageItem = React.memo(
 					style={[
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
-						// hasIncludeMention && styles.highlightMessageMention,
-						(showHighlightReply || hasIncludeMention) && styles.highlightMessageReply
+						hasIncludeMention && styles.highlightMessageReply,
+						showHighlightReply && styles.highlightMessageMention
 					]}
 				>
 					{!!messageReferences && !!messageReferences?.message_ref_id && (

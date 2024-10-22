@@ -19,7 +19,7 @@ export const style = (colors: Attributes) =>
 			borderColor: colors.reactionBorder
 		},
 		otherReaction: {
-			backgroundColor: colors.primary
+			backgroundColor: colors.secondary
 		},
 		reactItem: {
 			flexDirection: 'row',

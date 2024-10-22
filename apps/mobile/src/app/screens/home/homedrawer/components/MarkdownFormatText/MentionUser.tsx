@@ -1,4 +1,4 @@
-import { ChannelMembersEntity, UsersClanEntity } from '@mezon/store';
+import { ChannelMembersEntity, UsersClanEntity } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js/client';
 
 type IMentionUser = {
