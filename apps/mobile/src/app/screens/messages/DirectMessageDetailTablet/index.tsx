@@ -1,7 +1,6 @@
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { directMetaActions } from '@mezon/store';
 import {
 	appActions,
 	channelMembersActions,
@@ -20,6 +19,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
+import { UserStatus } from '../../../components/UserStatus';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChatMessageWrapper } from '../ChatMessageWrapper';
 import { style } from './styles';
@@ -172,7 +172,6 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} catch (error) {
-				console.log('error messageLoaderBackground', error);
 				const store = await getStoreAsync();
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -198,7 +197,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 									<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
 								</View>
 							)}
-							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+							<UserStatus status={userStatus} />
 						</View>
 					)}
 					<Text style={styles.titleText} numberOfLines={1}>

@@ -1,10 +1,11 @@
 import { useChatMessages } from '@mezon/core';
-import { Icons } from '@mezon/mobile-components';
+import { Icons, IUserStatus } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import { directActions, directMetaActions, useAppDispatch } from '@mezon/store-mobile';
 import { TIME_OFFSET } from '@mezon/utils';
 import React, { useEffect, useRef } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import { UserStatus } from '../../../components/UserStatus';
 
 interface HeaderProps {
 	handleBack: () => void;
@@ -12,7 +13,7 @@ interface HeaderProps {
 	isTypeDMGroup: boolean;
 	dmAvatar: string | null;
 	dmLabel: string;
-	userStatus: boolean;
+	userStatus: IUserStatus;
 	styles: any;
 	themeValue: any;
 	directMessageId: string;
@@ -68,7 +69,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({
 								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
 							</View>
 						)}
-						<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+						<UserStatus status={userStatus} />
 					</View>
 				)}
 				<Text style={styles.titleText} numberOfLines={1}>

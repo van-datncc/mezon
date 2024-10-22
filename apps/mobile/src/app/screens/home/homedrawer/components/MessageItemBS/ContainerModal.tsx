@@ -4,22 +4,20 @@ import { useAuth, useChannelMembers, useChatReaction, useChatSending, usePermiss
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
+	MessagesEntity,
+	appActions,
 	giveCoffeeActions,
 	messagesActions,
 	selectCurrentChannel,
+	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
-	threadsActions,
-	useAppDispatch
-} from '@mezon/store';
-import {
-	MessagesEntity,
-	appActions,
-	selectCurrentChannelId,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
 	selectPinMessageByChannelId,
 	setIsForwardAll,
+	threadsActions,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
 import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, getSrcEmoji, isPublicChannel } from '@mezon/utils';

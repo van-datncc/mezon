@@ -1,6 +1,6 @@
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, referencesActions } from '@mezon/store';
+import { appActions, referencesActions } from '@mezon/store-mobile';
 import { createUploadFilePath, useMezon } from '@mezon/transport';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';

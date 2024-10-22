@@ -1,8 +1,7 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { messagesActions } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { messagesActions, useAppDispatch } from '@mezon/store-mobile';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
