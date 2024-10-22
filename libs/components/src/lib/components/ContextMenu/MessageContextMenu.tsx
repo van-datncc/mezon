@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useAppParams, useAuth, usePermissionChecker, useReference, useThreads } from '@mezon/core';
 import {
 	MessagesEntity,
+	createEditCanvas,
 	directActions,
 	gifsStickerEmojiActions,
 	giveCoffeeActions,
@@ -14,6 +15,7 @@ import {
 	selectClanView,
 	selectCurrentChannel,
 	selectCurrentClanId,
+	selectDefaultCanvasByChannelId,
 	selectDmGroupCurrent,
 	selectDmGroupCurrentId,
 	selectIsMessageHasReaction,
@@ -59,6 +61,10 @@ type MessageContextMenuProps = {
 	activeMode: number | undefined;
 };
 
+interface JsonObject {
+	ops: Array<{ insert: string; attributes?: { list: string } }>;
+}
+
 const useIsOwnerGroupDM = () => {
 	const { userProfile } = useAuth();
 	const { directId } = useAppParams();
@@ -85,12 +91,14 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (modeResponsive === ModeResponsive.MODE_CLAN ? currentChannel?.channel_id : currentDm?.id) || '')
 	);
+	const defaultCanvas = useAppSelector((state) => selectDefaultCanvasByChannelId(state, currentChannel?.channel_id ?? ''));
 	const convertedAllMessagesEntities = useMemo(() => (allMessagesEntities ? Object.values(allMessagesEntities) : []), [allMessagesEntities]);
 	const messagePosition = convertedAllMessagesEntities.findIndex((message: MessagesEntity) => message.id === messageId);
 	const dispatch = useAppDispatch();
 	const { userId } = useAuth();
 	const { posShowMenu, imageSrc } = useMessageContextMenu();
 	const isOwnerGroupDM = useIsOwnerGroupDM();
+
 	const isMyMessage = useMemo(() => {
 		return message?.sender_id === userId;
 	}, [message?.sender_id, userId]);
@@ -140,6 +148,51 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			/>
 		);
 	}, [message]);
+
+	const handleAddToNote = useCallback(() => {
+		if (!message || !currentChannel || !currentClanId) return;
+
+		const createCanvasBody = (content?: string, id?: string) => ({
+			channel_id: currentChannel.channel_id,
+			clan_id: currentClanId.toString(),
+			content,
+			is_default: true,
+			...(id && { id }),
+			title: defaultCanvas?.title || 'Note'
+		});
+
+		const updateJsonWithInsert = (jsonObject: JsonObject, newInsert: string) => {
+			jsonObject.ops.push({ insert: newInsert });
+			jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
+			return jsonObject;
+		};
+
+		const isContentExists = (jsonObject: JsonObject, newInsert: string) => {
+			return jsonObject.ops.some((op) => op.insert === newInsert);
+		};
+
+		let formattedString;
+
+		if (!defaultCanvas) {
+			formattedString = JSON.stringify({
+				ops: [{ insert: message.content.t }, { attributes: { list: 'ordered' }, insert: '\n' }]
+			});
+		} else {
+			if (defaultCanvas.content) {
+				const jsonObject = JSON.parse(defaultCanvas.content as string);
+				const newInsert = message.content.t;
+				if (newInsert) {
+					if (!isContentExists(jsonObject, newInsert)) {
+						const updatedJsonObject = updateJsonWithInsert(jsonObject, newInsert);
+						formattedString = JSON.stringify(updatedJsonObject);
+					} else {
+						return;
+					}
+				}
+			}
+		}
+		dispatch(createEditCanvas(createCanvasBody(formattedString, defaultCanvas?.id)));
+	}, [dispatch, message, currentChannel, currentClanId, defaultCanvas]);
 
 	const appearanceTheme = useSelector(selectTheme);
 
@@ -416,6 +469,10 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 		builder.when(pinMessageStatus === false, (builder) => {
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
+		});
+
+		builder.when(userId === currentChannel?.creator_id, (builder) => {
+			builder.addMenuItem('addNote', 'Add to Note', handleAddToNote, <Icons.CanvasIcon defaultSize="w-4 h-4" />);
 		});
 
 		builder.when(checkPos && canSendMessage, (builder) => {

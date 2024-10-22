@@ -27,9 +27,7 @@ export const canvasAPIAdapter = createEntityAdapter({
 	selectId: (canvas: CanvasAPIEntity) => canvas.id || ''
 });
 
-const emptyObject = {};
-
-type getCanvasDetailPayload = {
+type fetchCanvasPayload = {
 	id: string;
 	clan_id: string;
 	channel_id: string;
@@ -48,7 +46,7 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 
 		const response = await mezon.client.editChannelCanvases(mezon.session, body);
 
-		return { ...response, channel_id: body.channel_id, title: body.title, content: body.content };
+		return { ...response, channel_id: body.channel_id, title: body.title, content: body.content, is_default: body.is_default };
 	} catch (error: any) {
 		const errstream = await error.json();
 		return thunkAPI.rejectWithValue(errstream.message);
@@ -57,7 +55,7 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 
 export const getChannelCanvasDetail = createAsyncThunk(
 	'canvas/getChannelCanvasDetail',
-	async ({ id, clan_id, channel_id }: getCanvasDetailPayload, thunkAPI) => {
+	async ({ id, clan_id, channel_id }: fetchCanvasPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.getChannelCanvasDetail(mezon.session, id, clan_id, channel_id);
@@ -83,6 +81,18 @@ export const getChannelCanvasList = createAsyncThunk(
 		}
 	}
 );
+
+export const deleteCanvas = createAsyncThunk('canvas/deleteCanvas', async ({ id, channel_id, clan_id }: fetchCanvasPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+		const response = await mezon.client.deleteChannelCanvas(mezon.session, id, clan_id, channel_id);
+		return response;
+	} catch (error: any) {
+		const errstream = await error.json();
+		return thunkAPI.rejectWithValue(errstream.message);
+	}
+});
 
 export const initialCanvasAPIState: CanvasAPIState = canvasAPIAdapter.getInitialState({
 	loadingStatus: 'not loaded',
@@ -126,6 +136,12 @@ export const canvasAPISlice = createSlice({
 					creator_id: creator_id
 				}
 			});
+		},
+		removeOneCanvas: (state, action: PayloadAction<{ channelId: string; canvasId: string }>) => {
+			const { channelId, canvasId } = action.payload;
+			if (state.channelCanvas[channelId]) {
+				canvasAPIAdapter.removeOne(state.channelCanvas[channelId], canvasId);
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -207,7 +223,8 @@ export const canvasAPIActions = {
 	...canvasAPISlice.actions,
 	createEditCanvas,
 	getChannelCanvasList,
-	getChannelCanvasDetail
+	getChannelCanvasDetail,
+	deleteCanvas
 };
 
 /*
@@ -247,3 +264,21 @@ export const selectCanvasEntityById = createSelector(
 		return canvasState.channelCanvas[channelId]?.entities?.[canvasId];
 	}
 );
+
+export const selectDefaultCanvasByChannelId = createSelector([getCanvasApiState, getChannelIdCanvasAsSecondParam], (canvasState, channelId) => {
+	const entities = canvasState.channelCanvas[channelId]?.entities;
+	const ids = canvasState.channelCanvas[channelId]?.ids;
+	if (!entities || !ids) return null;
+
+	let defaultCanvas = null;
+
+	for (let i = 0; i < ids.length; i++) {
+		const id = ids[i];
+		if (entities[id]?.is_default === true) {
+			defaultCanvas = entities[id];
+			break;
+		}
+	}
+
+	return defaultCanvas || null;
+});

@@ -1,9 +1,12 @@
-import { useAppNavigation, useMenu } from '@mezon/core';
+import { useAppNavigation, useAuth, useEscapeKeyClose, useMenu, useOnClickOutside } from '@mezon/core';
 import {
 	appActions,
+	selectCanvasEntityById,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
+	selectCurrentClanId,
+	selectIdCanvas,
 	selectIsShowCanvas,
 	selectStatusMenu,
 	selectTheme,
@@ -11,9 +14,12 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, IChannel, ThreadNameProps } from '@mezon/utils';
+import { ChannelStatusEnum, IChannel, MouseButton, ThreadNameProps } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
+import { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Coords } from '../../ChannelLink';
+import PanelCanvas from '../../PanelCanvas';
 
 export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined }) => {
 	const type = Number(channel?.type);
@@ -31,6 +37,18 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const isPrivate = channelParent ? channelParent?.channel_private : channel?.channel_private;
 	const isActive = currentChannel?.channel_id === channel?.channel_id && !channelParent;
 	const theme = useSelector(selectTheme);
+	const currentClanId = useSelector(selectCurrentClanId);
+	const currentCanvasId = useSelector(selectIdCanvas);
+	const canvasById = useSelector((state) => selectCanvasEntityById(state, currentChannel?.channel_id, currentCanvasId));
+	const { userProfile } = useAuth();
+	const isDisableDelCanvas = Boolean(canvasById?.creator_id !== userProfile?.user?.id && currentChannel?.creator_id !== userProfile?.user?.id);
+	const panelRef = useRef<HTMLDivElement | null>(null);
+	const [coords, setCoords] = useState<Coords>({
+		mouseX: 0,
+		mouseY: 0,
+		distanceToBottom: 0
+	});
+	const [isShowPanelCanvas, setIsShowPanelCanvas] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 
 	const handleRedirect = () => {
@@ -43,8 +61,30 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	};
 	const title = useSelector(selectTitle);
 
+	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const mouseX = event.clientX;
+		const mouseY = event.clientY;
+		const windowHeight = window.innerHeight;
+
+		if (event.button === MouseButton.RIGHT) {
+			const distanceToBottom = windowHeight - event.clientY;
+			setCoords({ mouseX, mouseY, distanceToBottom });
+			setIsShowPanelCanvas(!isShowPanelCanvas);
+		}
+	};
+	const handClosePannel = useCallback(() => {
+		setIsShowPanelCanvas(false);
+	}, []);
+
+	useEscapeKeyClose(panelRef, handClosePannel);
+	useOnClickOutside(panelRef, handClosePannel);
+
 	return (
-		<div className={`flex flex-row items-center relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}>
+		<div
+			onMouseDown={handleMouseClick}
+			ref={panelRef}
+			className={`flex flex-row items-center relative ${closeMenu && !statusMenu ? 'ml-[25px]' : ''}`}
+		>
 			<div className="absolute flex text-zinc-400 gap-2 text-lg pb-0">
 				{closeMenu && !statusMenu && (
 					<div className="flex items-end" onClick={() => setStatusMenu(true)} role="button">
@@ -82,14 +122,24 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 				</div>
 			)}
 			{isShowCanvas && (
-				<div className="flex flex-row items-center gap-2">
-					<Icons.ArrowRight />
-					<Icons.CanvasIcon defaultSize="w-6 h-6 min-w-6" />
-					<p
-						className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
-					>
-						{title ? title : 'Untitled'}
-					</p>
+				<div role={'button'}>
+					<div className="flex flex-row items-center gap-2">
+						<Icons.ArrowRight />
+						<Icons.CanvasIcon defaultSize="w-6 h-6 min-w-6" />
+						<p
+							className={`mt-[2px] text-base font-semibold cursor-default one-line ${currentChannel?.channel_id === channel?.channel_id ? 'dark:text-white text-colorTextLightMode' : 'dark:colorTextLightMode text-colorTextLightMode'}`}
+						>
+							{title ? title : 'Untitled'}
+						</p>
+					</div>
+					{isShowPanelCanvas && !isDisableDelCanvas && (
+						<PanelCanvas
+							coords={coords}
+							channelId={currentChannel?.channel_id}
+							clanId={currentClanId || ''}
+							canvasId={currentCanvasId || ''}
+						/>
+					)}
 				</div>
 			)}
 		</div>

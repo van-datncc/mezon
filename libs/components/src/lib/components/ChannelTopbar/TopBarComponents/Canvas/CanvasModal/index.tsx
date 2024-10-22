@@ -80,6 +80,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 								canvasId={canvasId}
 								channelId={currentChannel?.channel_id}
 								clanId={currentClanId || ''}
+								creatorIdChannel={currentChannel?.creator_id}
 							/>
 						);
 					})}
