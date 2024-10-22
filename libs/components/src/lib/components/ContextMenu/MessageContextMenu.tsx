@@ -472,7 +472,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		});
 
 		builder.when(userId === currentChannel?.creator_id, (builder) => {
-			builder.addMenuItem('addNote', 'Add to Note', handleAddToNote, <Icons.CanvasIcon defaultSize="w-4 h-4" />);
+			builder.addMenuItem('addNote', 'Add To Note', handleAddToNote, <Icons.CanvasIcon defaultSize="w-4 h-4" />);
 		});
 
 		builder.when(checkPos && canSendMessage, (builder) => {
