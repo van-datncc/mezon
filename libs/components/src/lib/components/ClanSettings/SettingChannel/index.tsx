@@ -156,7 +156,7 @@ const ItemInfor = ({
 			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0 group text-textPrimaryLight dark:text-textPrimary`}
 			onContextMenu={handleCopyChannelId}
 		>
-			<div className="cursor-pointer px-3 py-2 pr-12 flex gap-3 items-center w-full dark:hover:bg-bgHover hover:bg-bgLightSearchHover">
+			<div className="cursor-pointer px-3 py-2 pr-12 flex gap-3 items-center w-full dark:hover:bg-bgHover hover:bg-white">
 				<div className="h-6 w-6">
 					{!isVoice && (
 						<>
