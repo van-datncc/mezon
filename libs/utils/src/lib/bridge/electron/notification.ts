@@ -7,6 +7,7 @@ export interface IMessageExtras {
 export interface NotificationData {
 	id: number;
 	appid: number;
+	channel_id: string;
 	message: string;
 	title: string;
 	priority: number;
@@ -22,6 +23,7 @@ export class MezonNotificationService {
 	private maxReconnectAttempts = 5;
 	private reconnectInterval = 1000; // Start with 1 second
 	public static instance: MezonNotificationService;
+	private currentChannelId: string | undefined;
 
 	private constructor() {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -51,6 +53,9 @@ export class MezonNotificationService {
 				const msg = JSON.parse(data.data) as NotificationData;
 				const { title, message, image } = msg ?? {};
 				const { link } = msg?.extras ?? {};
+				if (msg?.channel_id && msg?.channel_id === this.currentChannelId) {
+					return;
+				}
 				electronBridge.pushNotification(title, {
 					body: message,
 					icon: image ?? '',
@@ -79,6 +84,10 @@ export class MezonNotificationService {
 
 	public close = () => {
 		this.ws?.close(1000, 'WebSocketStore#close');
+	};
+
+	public setCurrentChannelId = (channelId: string) => {
+		this.currentChannelId = channelId;
 	};
 
 	private reconnect = (token: string) => {

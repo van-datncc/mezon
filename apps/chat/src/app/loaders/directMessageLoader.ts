@@ -1,4 +1,5 @@
 import { channelsActions, directActions } from '@mezon/store';
+import { notificationService } from '@mezon/utils';
 import { CustomLoaderFunction } from './appLoader';
 
 export const directMessageLoader: CustomLoaderFunction = async ({ params, dispatch }) => {
@@ -15,6 +16,7 @@ export const directMessageLoader: CustomLoaderFunction = async ({ params, dispat
 		})
 	);
 	dispatch(channelsActions.setPreviousChannels({ channelId: directId }));
+	notificationService.setCurrentChannelId(directId);
 
 	return null;
 };
