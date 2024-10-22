@@ -68,7 +68,6 @@ import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
-import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
@@ -152,7 +151,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
-	const { mentions } = useMessageLine(request?.content);
+	// const { mentions } = useMessageLine(request?.content);
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
 	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
 	const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = useProcessMention(
@@ -381,7 +380,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			mentionEveryone,
 			addMemberToThread,
 			currentChannel,
-			mentions,
+			// mentions,
 			usersClan,
 			currentChannelId,
 			valueThread?.content.t,
