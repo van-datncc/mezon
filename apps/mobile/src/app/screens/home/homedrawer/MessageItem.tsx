@@ -372,7 +372,7 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageReply,
-						showHighlightReply && styles.highlightMessageMention,
+						showHighlightReply && styles.highlightMessageMention
 					]}
 				>
 					{!!messageReferences && !!messageReferences?.message_ref_id && (
