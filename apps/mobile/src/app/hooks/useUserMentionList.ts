@@ -61,7 +61,8 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 				id: item.id ?? '',
 				display: item.title,
 				avatarUrl: '',
-				clanNick: item.title
+				clanNick: item.title,
+				isRoleUser: true
 			})) ?? [];
 
 		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {

@@ -137,7 +137,7 @@ const ItemInfor = ({
 				onClick={closeModalAllMember}
 			>
 				<div
-					className="w-450 max-h-[80vh] min-h-250 bg-bgTertiary rounded-lg flex flex-col gap-2 p-4 overflow-y-auto hide-scrollbar"
+					className="w-450 max-h-[80vh] min-h-250 dark:bg-bgTertiary bg-bgLightMode rounded-lg flex flex-col gap-2 p-4 overflow-y-auto hide-scrollbar"
 					onClick={(e) => e.stopPropagation()}
 				>
 					<div className="font-semibold pb-3 text-channelActiveLightColor dark:text-channelTextareaLight">List Member</div>
@@ -156,7 +156,7 @@ const ItemInfor = ({
 			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px] before:bg-borderDivider before:absolute before:top-0 before:left-0 group text-textPrimaryLight dark:text-textPrimary`}
 			onContextMenu={handleCopyChannelId}
 		>
-			<div className="cursor-pointer px-3 py-2 pr-12 flex gap-3 items-center w-full hover:bg-bgHover">
+			<div className="cursor-pointer px-3 py-2 pr-12 flex gap-3 items-center w-full dark:hover:bg-bgHover hover:bg-white">
 				<div className="h-6 w-6">
 					{!isVoice && (
 						<>
@@ -251,7 +251,7 @@ export const AvatarUserShort = ({
 				</Tooltip>
 			)}
 			{showName ? (
-				<div className="text-channelActiveColor dark:text-channelTextareaLight">
+				<div className="text-textLightTheme dark:text-channelTextareaLight">
 					{member?.clan_nick || member?.user?.display_name || member?.user?.username}
 				</div>
 			) : null}

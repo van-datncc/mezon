@@ -116,7 +116,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 		} else if (type === 'sticker') {
 			handleSend({ t: '' }, [], [{ url: data, height: 40, width: 40, filetype: 'image/gif' }], []);
 		} else {
-			console.log('handleSelected data', data);
+			/* empty */
 		}
 
 		onDone && type !== 'emoji' && onDone();

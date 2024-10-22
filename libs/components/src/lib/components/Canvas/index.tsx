@@ -38,11 +38,12 @@ const Canvas = () => {
 
 	const callCreateEditCanvas = async () => {
 		if (currentChannelId && currentClanId) {
-			const body: any = {
+			const body = {
 				channel_id: currentChannelId,
 				clan_id: currentClanId?.toString(),
 				content: content,
-				id: idCanvas || null,
+				...(idCanvas && { id: idCanvas }),
+				...(canvasById?.is_default && { is_default: true }),
 				title: title
 			};
 			const response = await dispatch(createEditCanvas(body) as any);
