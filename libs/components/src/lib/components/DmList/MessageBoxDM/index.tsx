@@ -1,9 +1,18 @@
 import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
-import { RootState, referencesActions, selectDataReferences } from '@mezon/store';
+import {
+	RootState,
+	messagesActions,
+	referencesActions,
+	selectDataReferences,
+	selectIsViewingOlderMessagesByChannelId,
+	useAppDispatch
+} from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
+import classNames from 'classnames';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { GifStickerEmojiPopup } from '../../GifsStickersEmojis';
 import { MessageBox } from '../../MessageBox';
@@ -20,13 +29,15 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 		return direct?.channel_id ?? '';
 	}, [direct?.channel_id]);
 
+	const isViewingOldMessage = useSelector(selectIsViewingOlderMessagesByChannelId(direct?.channel_id ?? ''));
+
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: direct, mode: mode });
 	// TODO: move selector to store
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const { subPanelActive } = useGifsStickersEmoji();
 	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const dataReferences = useSelector(selectDataReferences(directParamId ?? ''));
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	const chatboxRef = useRef<HTMLDivElement | null>(null);
 
@@ -74,6 +85,12 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 	}, [dataReferences.message_ref_id]);
 
 	useEscapeKey(handleCloseReplyMessageBox, { preventEvent: !dataReferences.message_ref_id });
+
+	const handleJumpToPresent = useCallback(() => {
+		dispatch(messagesActions.fetchMessages({ clanId: '0', channelId: directParamId, isFetchingLatestMessages: true, noCache: true }));
+		dispatch(messagesActions.setIdMessageToJump(null));
+	}, [directParamId]);
+
 	return (
 		<div className="mx-2 relative " role="button" ref={chatboxRef}>
 			{isEmojiOnChat && (
@@ -89,6 +106,28 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 					<GifStickerEmojiPopup channelOrDirect={direct} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
+			<div className="absolute bottom-[calc(100%-10px)] left-0 right-0">
+				{isViewingOldMessage && (
+					<div
+						className={classNames(
+							'relative z-0 px-2 py-1 text-sm bg-[#6d6f78] dark:bg-bgDarkAccent font-semibold rounded-md',
+							dataReferences.message_ref_id ? 'top-[8px]' : ''
+						)}
+					>
+						<div
+							className={classNames('w-full h-full opacity-95 cursor-pointer text-white flex items-center justify-between pb-[10px]')}
+							onClick={handleJumpToPresent}
+						>
+							<div>You're viewing older messages</div>
+							<div className="flex items-center gap-1">
+								Jump to present
+								<Icons.JumpToPresentArrow className="w-4 h-4 text-white" />
+							</div>
+						</div>
+					</div>
+				)}
+			</div>
+
 			{dataReferences.message_ref_id && <ReplyMessageBox channelId={directParamId ?? ''} dataReferences={dataReferences} />}
 			<MessageBox
 				onSend={handleSend}

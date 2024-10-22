@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { directMessageValueProps } from '../DmList/DMListItem';
 
 type StatusUserProps = {
-	status?: boolean;
+	status?: { status?: boolean; isMobile?: boolean };
 	isMemberDMGroup: boolean;
 	isMemberChannel: boolean;
 	isListDm: boolean;
@@ -58,8 +58,10 @@ const StatusUser = memo((props: StatusUserProps) => {
 		>
 			{isTyping && checkTypingUser ? (
 				<Icons.IconLoadingTyping bgFill="bg-colorSuccess" />
-			) : status ? (
+			) : status?.isMobile ? (
 				<Icons.IconMobileDevice defaultSize={'w-3 h-3'} />
+			) : status?.status ? (
+				<Icons.OnlineStatus defaultSize={sizeStatusIcon} />
 			) : (
 				<Icons.OfflineStatus defaultSize={sizeStatusIcon} />
 			)}

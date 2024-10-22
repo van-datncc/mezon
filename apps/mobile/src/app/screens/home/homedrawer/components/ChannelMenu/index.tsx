@@ -17,6 +17,7 @@ import {
 	notificationSettingActions,
 	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
+	selectCurrentUserId,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -42,7 +43,8 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	// const { setOpenThreadMessageState } = useReference();
-	const [isShowModalConfirm, setIsShowModalConfirm] = useState(false);
+	const [isShowModalDeleteChannel, setIsShowModalDeleteChannel] = useState(false);
+	const [isShowModalLeaveThread, setIsShowModalLeaveThread] = useState(false);
 	const currentClan = useSelector(selectCurrentClan);
 	const dispatch = useAppDispatch();
 	const [isCanManageThread, isCanManageChannel] = usePermissionChecker(
@@ -55,6 +57,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
 	}, []);
 	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const currentUserId = useSelector(selectCurrentUserId);
 
 	const isChannelUnmute = useMemo(() => {
 		return (
@@ -193,7 +196,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 			title: t('menu.organizationMenu.deleteChannel'),
 			icon: <Icons.CloseSmallBoldIcon color={Colors.textRed} />,
 			onPress: () => {
-				setIsShowModalConfirm(true);
+				setIsShowModalDeleteChannel(true);
 			},
 			textStyle: {
 				color: Colors.textRed
@@ -203,15 +206,17 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	];
 
 	const manageThreadMenu: IMezonMenuItemProps[] = [
-		// {
-		// 	title: t('menu.manageThreadMenu.leaveThread'),
-		// 	icon: <Icons.LeaveGroup color={Colors.textRed} />,
-		// 	onPress: () => reserve(),
-		// 	textStyle: {
-		// 		color: Colors.textRed
-		// 	},
-		// 	isShow: isCanManageThread
-		// },
+		{
+			title: t('menu.manageThreadMenu.leaveThread'),
+			icon: <Icons.LeaveGroup color={Colors.textRed} />,
+			onPress: () => {
+				setIsShowModalLeaveThread(true);
+			},
+			textStyle: {
+				color: Colors.textRed
+			},
+			isShow: channel?.creator_id !== currentUserId
+		},
 		// {
 		// 	title: t('menu.manageThreadMenu.closeThread'),
 		// 	icon: <Icons.CloseSmallBoldIcon color={themeValue.textStrong} />,
@@ -294,9 +299,26 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 
 	const handleConfirmDeleteChannel = async () => {
 		await dispatch(channelsActions.deleteChannel({ channelId: channel?.channel_id || '', clanId: channel?.clan_id || '' }));
-		setIsShowModalConfirm(false);
+		setIsShowModalDeleteChannel(false);
 		dismiss();
 		handleFocusDefaultChannel();
+	};
+
+	const handleConfirmLeaveThread = useCallback(async () => {
+		await dispatch(threadsActions.leaveThread({ clanId: currentClan?.id || '', threadId: channel?.id || '' }));
+		dismiss();
+		handleJoinChannel();
+	}, []);
+
+	const handleJoinChannel = async () => {
+		const channelId = channel?.parrent_id || '';
+		const clanId = channel?.clan_id || '';
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		const store = await getStoreAsync();
+		requestAnimationFrame(async () => {
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		});
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 	};
 
 	return (
@@ -313,8 +335,18 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 			</View>
 
 			<MezonConfirm
-				visible={isShowModalConfirm}
-				onVisibleChange={setIsShowModalConfirm}
+				visible={isShowModalLeaveThread}
+				onVisibleChange={setIsShowModalLeaveThread}
+				onConfirm={handleConfirmLeaveThread}
+				title={t('modalConFirmLeaveThread.title')}
+				confirmText={t('modalConFirmLeaveThread.yesButton')}
+				content={t('modalConFirmLeaveThread.textConfirm')}
+				hasBackdrop={true}
+			/>
+
+			<MezonConfirm
+				visible={isShowModalDeleteChannel}
+				onVisibleChange={setIsShowModalDeleteChannel}
 				onConfirm={handleConfirmDeleteChannel}
 				title={
 					isChannel
