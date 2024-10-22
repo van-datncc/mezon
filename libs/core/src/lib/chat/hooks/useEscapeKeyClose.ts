@@ -9,7 +9,9 @@ export const useEscapeKeyClose = (ref: RefObject<HTMLElement> | undefined, onClo
 				onClose();
 			}
 		};
-
+		if (document.activeElement !== element && !element?.contains(document.activeElement)) {
+			element.focus();
+		}
 		document.addEventListener('keydown', handleKeyDown);
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown);

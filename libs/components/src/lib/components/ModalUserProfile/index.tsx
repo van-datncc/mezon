@@ -12,7 +12,7 @@ import {
 import { EStateFriend, selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
+import { RefObject, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
 import AvatarProfile from './AvatarProfile';
@@ -255,4 +255,4 @@ const ModalUserProfile = ({
 	);
 };
 
-export default ModalUserProfile;
+export default memo(ModalUserProfile);
