@@ -4,7 +4,6 @@ import clx from 'classnames';
 import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
 import { useSelector } from 'react-redux';
-import remarkGfm from 'remark-gfm';
 import { PreClass } from '../../components';
 
 type MarkdownContentOpt = {
@@ -12,17 +11,6 @@ type MarkdownContentOpt = {
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
 	isInPinMsg?: boolean;
-};
-
-const navigateToChannel = async (url: string, navigate: any) => {
-	const regex = /\/invite\/(\d+)/;
-	const match = url.match(regex);
-	if (match) {
-		const [_, inviteId] = match;
-		if (inviteId) {
-			navigate('/invite/' + inviteId);
-		}
-	}
 };
 
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isInPinMsg }) => {
@@ -58,7 +46,6 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 			<div className={`lineText contents dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
 				<Markdown
 					children={content}
-					remarkPlugins={[remarkGfm]}
 					components={{
 						pre: (props) => <PreClass {...props} isInPinMsg={isInPinMsg} />,
 						p: 'span',
