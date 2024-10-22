@@ -2,7 +2,7 @@ import { IMessageLine } from '@mezon/utils';
 import { useMemo } from 'react';
 
 export function useMessageLine(line: string): IMessageLine {
-	const combinedRegex = /(?<!`)((?<=\s|^)(@)\S+(?=\s|$)|<#[^>`\s]+>|:[a-zA-Z0-9_]*:)(?!`)/g;
+	const combinedRegex = /./g;
 	const emojiRegex = /^:\w+:$/;
 	const extensionsRegex = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
 
