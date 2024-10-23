@@ -52,21 +52,18 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		);
 	}
 
-	const handleOpenShortUser = useCallback((emoji: any) => {
+	const handleOpenShortUser = useCallback((emoji: EmojiDataOptionals) => {
 		if (emoji && emojiItemRef.current) {
 			emojiHover.current = emoji;
-			const data = emojiItemRef.current.getBoundingClientRect();
-			if (window.innerHeight - emojiItemRef.current.getBoundingClientRect()?.y > 300) {
-				positionShortUser.current = {
-					top: emojiItemRef.current.getBoundingClientRect()?.y + 24,
-					left: data.left
-				};
-			} else {
-				positionShortUser.current = {
-					top: window.innerHeight - 300,
-					left: data.left
-				};
-			}
+			const { y, left } = emojiItemRef.current.getBoundingClientRect();
+			const elementHeight = ((emojiHover.current?.senders.length || 1) + 1) * 48 + 40;
+			const offset = 24;
+
+			positionShortUser.current = {
+				top: window.innerHeight - y > elementHeight ? y + offset : y + offset - elementHeight,
+				left: left
+			};
+
 			openProfileItem();
 		}
 	}, []);
@@ -112,13 +109,9 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 
-	const modalState = useRef({
-		profileItem: false
-	});
-
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		return (
-			emojiHover && (
+			emojiHover?.current && (
 				<div
 					onMouseEnter={() => {
 						timeoutLeave.current && clearTimeout(timeoutLeave.current);
@@ -126,14 +119,14 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 					onMouseLeave={() => {
 						closeProfileItem();
 					}}
-					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col`}
+					className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 rounded-lg flex flex-col`}
 					style={{
 						top: `${positionShortUser.current?.top}px`,
 						left: `${positionShortUser.current?.left}px`
 					}}
 				>
 					<div className="text-sm text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400">
-						<UserReactionPanel message={message} emojiShowPanel={emojiHover.current!} mode={mode} />
+						<UserReactionPanel message={message} emojiShowPanel={emojiHover.current} mode={mode} />
 					</div>
 				</div>
 			)

@@ -3,7 +3,7 @@ import { messagesActions, selectClanView, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageWithUser } from '@mezon/utils';
 
-import { useCallback, useRef } from 'react';
+import { memo, useCallback, useRef } from 'react';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 import { useSelector } from 'react-redux';
@@ -111,4 +111,4 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 	);
 };
 
-export default MessageReply;
+export default memo(MessageReply, (prev, cur) => prev.message?.id === cur.message?.id);

@@ -2,6 +2,7 @@ import { useShowName } from '@mezon/core';
 import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { IMessageWithUser, convertTimeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
+import { memo } from 'react';
 import usePendingNames from './usePendingNames';
 
 type IMessageHeadProps = {
@@ -12,7 +13,7 @@ type IMessageHeadProps = {
 
 const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 	const messageTime = convertTimeString(message?.create_time as string);
-	const userClan = useAppSelector((state) => selectMemberClanByUserId2(state, message.sender_id));
+	const userClan = useAppSelector((state) => selectMemberClanByUserId2(state, message?.sender_id));
 	const usernameSender = userClan?.user?.username;
 	const clanNick = userClan?.clan_nick;
 	const displayName = userClan?.user?.display_name;
@@ -31,7 +32,7 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 		clanNick ? clanNick : (pendingClannick ?? ''),
 		pendingDisplayName ?? '',
 		pendingUserName ?? '',
-		message.sender_id ?? ''
+		message?.sender_id ?? ''
 	);
 
 	return (
@@ -51,4 +52,4 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 	);
 };
 
-export default MessageHead;
+export default memo(MessageHead, (prev, cur) => prev.message?.id === cur.message?.id);

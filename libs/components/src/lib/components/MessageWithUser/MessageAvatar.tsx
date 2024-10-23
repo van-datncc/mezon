@@ -1,6 +1,7 @@
 import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
+import { memo } from 'react';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import usePendingNames from './usePendingNames';
 
@@ -50,4 +51,4 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 	);
 };
 
-export default MessageAvatar;
+export default memo(MessageAvatar, (prev, cur) => prev.message?.id === cur.message?.id);
