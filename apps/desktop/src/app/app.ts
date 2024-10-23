@@ -8,7 +8,6 @@ import { rendererAppName, rendererAppPort } from './constants';
 import tray from '../Tray';
 import { TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
-import { setupPushReceiver } from './services/push-receiver';
 
 const isQuitting = false;
 
@@ -45,7 +44,6 @@ export default class App {
 			App.loadMainWindow();
 			App.setupMenu();
 			App.setupBadge();
-			App.setupPushReceiver();
 			tray.init(isQuitting);
 		}
 	}
@@ -205,13 +203,6 @@ export default class App {
 		App.application.on('window-all-closed', App.onWindowAllClosed);
 		App.application.on('ready', App.onReady);
 		App.application.on('activate', App.onActivate);
-	}
-
-	/**
-	 * setup receive notification from FCM
-	 */
-	private static setupPushReceiver() {
-		return setupPushReceiver(App.mainWindow.webContents);
 	}
 
 	/**

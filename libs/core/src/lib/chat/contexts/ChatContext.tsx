@@ -264,7 +264,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (isNotCurrentDirect) {
 					dispatch(directActions.openDirectMessage({ channelId: message.channel_id, clanId: message.clan_id || '' }));
 					dispatch(directMetaActions.setDirectLastSentTimestamp({ channelId: message.channel_id, timestamp }));
-					dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id }));
+					if (
+						((Array.isArray(message.mentions) && message.mentions.length === 0) ||
+							message.mentions?.some((listUser) => listUser.user_id !== userId)) &&
+						message.references?.at(0)?.message_sender_id !== userId
+					) {
+						dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id, isMention: false }));
+					}
 				}
 
 				if (mess.isMe) {
@@ -327,6 +333,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (notification.code === NotificationCode.USER_MENTIONED || notification.code === NotificationCode.USER_REPLIED) {
 					dispatch(clansActions.updateClanBadgeCount({ clanId: (notification as any).clan_id, count: 1 }));
 					dispatch(channelsActions.updateChannelBadgeCount({ channelId: (notification as any).channel_id ?? '', count: 1 }));
+					dispatch(directMetaActions.setCountMessUnread({ channelId: (notification as any).channel_id ?? '', isMention: true }));
 				}
 			}
 

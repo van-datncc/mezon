@@ -90,14 +90,14 @@ const ChannelSetting = () => {
 
 	return (
 		<div className="p-8 h-[calc(100vh_-_56px)] flex flex-col">
-			<div className="p-2 flex items-center justify-between">
+			<div className="p-2 flex items-center justify-between text-textLightTheme dark:text-textDarkTheme">
 				<div className="flex items-center gap-2">
 					<input
 						type="checkbox"
 						id="private_filter"
 						defaultChecked={privateFilter}
 						onChange={handleFilterPrivateChannel}
-						className="w-4 h-4 rounded-md border-channelTextLabel overflow-hidden"
+						className="w-4 h-4 rounded-md dark:border-channelTextLabel border overflow-hidden"
 					/>
 					<label htmlFor="private_filter">
 						Only Private <span className="font-semibold italic">({countChannel})</span>
@@ -109,7 +109,7 @@ const ChannelSetting = () => {
 						id="thread_filter"
 						defaultChecked={threadFilter}
 						onChange={handleFilterThread}
-						className="w-4 h-4 rounded-md border-channelTextLabel overflow-hidden"
+						className="w-4 h-4 rounded-md dark:border-channelTextLabel border overflow-hidden"
 					/>
 					<label htmlFor="thread_filter">
 						Only Thread <span className="font-semibold italic">({countThread})</span>

@@ -1,5 +1,7 @@
-import { LoadingStatus } from '@mezon/utils';
+import { isPublicChannel, LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import isElectron from 'is-electron';
+import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
@@ -73,7 +75,10 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI)
 	const currentChannelId = state.channels?.currentChannelId;
 	const currentDirectId = state.direct?.currentDirectMessageId;
 	const currentClanId = state.clans?.currentClanId;
-	const path = window.location.pathname;
+	const path = isElectron() ? window.location.hash : window.location.pathname;
+	const currentChannel = state.channels?.entities?.[currentChannelId as string];
+	const currentDirect = state.direct?.entities?.[currentDirectId as string];
+	const channelType = isClanView ? currentChannel?.type : currentDirect?.type;
 
 	let channelId = null;
 	let clanId = null;
@@ -92,6 +97,18 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI)
 
 	if (isClanView && currentClanId) {
 		thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
+	}
+
+	if (!currentChannel?.id || !isPublicChannel(currentChannel) || !isClanView) {
+		channelType &&
+			thunkAPI.dispatch(
+				channelsActions.joinChat({
+					clanId: clanId as string,
+					channelId: channelId as string,
+					channelType: channelType,
+					isPublic: false
+				})
+			);
 	}
 });
 
