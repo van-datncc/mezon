@@ -203,6 +203,7 @@ const RenderContent = memo(
 				if (element.kindOf === ETokenMessage.LINKS && !isHideLinkOneImage) {
 					formattedContent.push(
 						<MarkdownContent
+							isLink={true}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`link-${index}-${s}-${contentInElement}`}
@@ -225,6 +226,7 @@ const RenderContent = memo(
 							)
 						: formattedContent.push(
 								<MarkdownContent
+									isLink={true}
 									isTokenClickAble={isTokenClickAble}
 									isJumMessageEnabled={isJumMessageEnabled}
 									key={`voicelink-${index}-${s}-${contentInElement}`}
@@ -247,11 +249,13 @@ const RenderContent = memo(
 					}
 					formattedContent.push(
 						<MarkdownContent
+							isMarkDown={true}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`markdown-${index}-${s}-${contentInElement}`}
 							content={content}
 							isInPinMsg={isInPinMsg}
+							typeOfMarkdown={element.type}
 						/>
 					);
 				}
