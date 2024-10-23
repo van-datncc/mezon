@@ -127,7 +127,10 @@ export const attachmentSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchChannelAttachments.fulfilled, (state: AttachmentState, action) => {
-				if (action.payload.length > 0 && !state.listAttachmentsByChannel[action.payload[0].channelId as string]) {
+				if (
+					action.payload.length > 0 &&
+					Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, action.payload[0].channelId as string)
+				) {
 					attachmentAdapter.setAll(state, action.payload);
 					state.listAttachmentsByChannel[action.payload[0].channelId as string] = action.payload;
 				}
@@ -206,9 +209,12 @@ export const selectAttachmentPhoto = () =>
 export const selectLoadedStatus = createSelector(getAttachmentState, (state: AttachmentState) => state.loadingStatus);
 
 export const selectAllListAttachmentByChannel = (channelId: string) =>
-	createSelector(getAttachmentState, (state) =>
-		(state.listAttachmentsByChannel[channelId] || []).filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX))
-	);
+	createSelector(getAttachmentState, (state) => {
+		if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {
+			return [];
+		}
+		return state.listAttachmentsByChannel[channelId].filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX));
+	});
 
 export const checkListAttachmentExist = (channelId: string) =>
 	createSelector(getAttachmentState, (state) => Boolean(state.listAttachmentsByChannel[channelId]));
