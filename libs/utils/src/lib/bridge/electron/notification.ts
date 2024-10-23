@@ -16,14 +16,22 @@ export interface NotificationData {
 	extras?: IMessageExtras;
 }
 
+const DEFAULT_MAX_RECONNECT_ATTEMPTS = 10;
+const DEFAULT_RECONNECT_INTERVAL = 1000; // 1s
+const DEFAULT_MAX_RECONNECT_INTERVAL = 32000; // 32s (after 5 reconnect attempts)
+const PING_TIMEOUT = 90000; // 90 seconds
+
 export class MezonNotificationService {
 	private wsActive = false;
 	private ws: WebSocket | null = null;
 	private reconnectAttempts = 0;
-	private maxReconnectAttempts = 5;
-	private reconnectInterval = 1000; // Start with 1 second
+	private maxReconnectAttempts = DEFAULT_MAX_RECONNECT_ATTEMPTS;
+	private reconnectInterval = DEFAULT_RECONNECT_INTERVAL;
+	private maxReconnectInterval = DEFAULT_MAX_RECONNECT_INTERVAL;
+
 	public static instance: MezonNotificationService;
 	private currentChannelId: string | undefined;
+	private pingTimeout: NodeJS.Timeout | null = null;
 
 	private constructor() {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -41,14 +49,21 @@ export class MezonNotificationService {
 			return;
 		}
 
-		this.wsActive = true;
+		this.close();
 
 		const wsUrl = process.env.NX_CHAT_APP_NOTIFICATION_WS_URL;
 		const ws = new WebSocket(`${wsUrl}/stream?token=${token}`);
 
+		ws.onopen = (_event) => {
+			this.wsActive = true;
+			this.restReconnectParam();
+			this.startPingMonitoring(token);
+		};
+
 		ws.onmessage = (data: MessageEvent<string>) => {
 			if (data.data === 'ping') {
 				this.handlePong();
+				this.startPingMonitoring(token);
 			} else {
 				const msg = JSON.parse(data.data) as NotificationData;
 				const { title, message, image } = msg ?? {};
@@ -98,8 +113,23 @@ export class MezonNotificationService {
 			}, this.reconnectInterval);
 
 			// Exponentially increase the interval for the next reconnection attempt
-			this.reconnectInterval = this.reconnectInterval * 2;
+			if (this.reconnectInterval < this.maxReconnectInterval) {
+				this.reconnectInterval = this.reconnectInterval * 2;
+			}
 		}
+	};
+
+	private restReconnectParam = () => {
+		this.reconnectAttempts = 0;
+		this.reconnectInterval = DEFAULT_RECONNECT_INTERVAL;
+	};
+
+	public startPingMonitoring = (token: string) => {
+		this.pingTimeout && clearTimeout(this.pingTimeout);
+		this.pingTimeout = setTimeout(() => {
+			this.wsActive = false;
+			this.reconnect(token);
+		}, PING_TIMEOUT);
 	};
 
 	private handlePong = () => {
