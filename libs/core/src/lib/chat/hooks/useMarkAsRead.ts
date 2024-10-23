@@ -43,14 +43,14 @@ export function useMarkAsRead() {
 			dispatch(
 				clansActions.updateClanBadgeCount({
 					clanId: channel?.clan_id ?? '',
-					count: (channel.count_mess_unread ?? 0) * -1
+					count: (channel?.count_mess_unread ?? 0) * -1
 				})
 			);
 
 			dispatch(
 				channelsActions.updateChannelBadgeCount({
 					channelId: channel?.channel_id ?? '',
-					count: (channel.count_mess_unread ?? 0) * -1
+					count: (channel?.count_mess_unread ?? 0) * -1
 				})
 			);
 		},
@@ -131,6 +131,7 @@ export function useMarkAsRead() {
 
 	return useMemo(
 		() => ({
+			resetCountChannelBadge,
 			handleMarkAsReadChannel,
 			statusMarkAsReadChannel,
 			handleMarkAsReadCategory,
@@ -139,6 +140,7 @@ export function useMarkAsRead() {
 			statusMarkAsReadClan
 		}),
 		[
+			resetCountChannelBadge,
 			handleMarkAsReadChannel,
 			statusMarkAsReadChannel,
 			handleMarkAsReadCategory,

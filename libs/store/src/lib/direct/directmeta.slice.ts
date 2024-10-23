@@ -85,11 +85,11 @@ export const directMetaSlice = createSlice({
 		setCountMessUnread: (state, action: PayloadAction<{ channelId: string; isMention: boolean }>) => {
 			const { channelId, isMention } = action.payload;
 			const entity = state.entities[channelId];
-			if (entity.is_mute !== true || isMention === true) {
+			if (entity?.is_mute !== true || isMention === true) {
 				directMetaAdapter.updateOne(state, {
 					id: channelId,
 					changes: {
-						count_mess_unread: (entity.count_mess_unread || 0) + 1
+						count_mess_unread: (entity?.count_mess_unread || 0) + 1
 					}
 				});
 			}
@@ -149,10 +149,10 @@ export const selectIsUnreadDMById = (channelId: string) =>
 
 export const selectDirectsUnreadlist = createSelector(selectAllDMMeta, (state) => {
 	return state.filter((item) => {
-		return item.count_mess_unread;
+		return item?.count_mess_unread;
 	});
 });
 
 export const selectTotalUnreadDM = createSelector(selectDirectsUnreadlist, (listUnreadDM) => {
-	return listUnreadDM.reduce((total, count) => total + (count.count_mess_unread ?? 0), 0);
+	return listUnreadDM.reduce((total, count) => total + (count?.count_mess_unread ?? 0), 0);
 });
