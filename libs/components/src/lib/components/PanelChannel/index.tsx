@@ -376,9 +376,9 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 							</Dropdown>
 						)}
 						{isFavorite ? (
-							<ItemPanel children="Unmask Favorite" onClick={removeFavoriteChannel} />
+							<ItemPanel children="Unmark Favorite" onClick={removeFavoriteChannel} />
 						) : (
-							<ItemPanel children="Mask Favorite" onClick={maskFavoriteChannel} />
+							<ItemPanel children="Mark Favorite" onClick={maskFavoriteChannel} />
 						)}
 					</GroupPanels>
 

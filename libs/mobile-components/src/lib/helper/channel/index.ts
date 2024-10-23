@@ -84,7 +84,7 @@ export const jumpToChannel = async (channelId: string, clanId: string) => {
 		// if (!channelsCache?.includes(channelId)) {
 		// 	save(STORAGE_CHANNEL_CURRENT_CACHE, [...channelsCache, channelId]);
 		// }
-		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false, isClearMessage: true }));
 	}
 };
 
