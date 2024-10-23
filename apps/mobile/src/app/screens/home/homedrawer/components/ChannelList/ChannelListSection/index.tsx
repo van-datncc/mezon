@@ -76,7 +76,8 @@ const ChannelListSection = memo(
 			channelsPositionRef.current = {
 				...channelsPositionRef.current,
 				[`${item.id}`]: {
-					height: heightChannel
+					height: heightChannel,
+					cateId: item?.category_id
 				}
 			};
 		};
