@@ -41,7 +41,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 		setLoading(true);
 	}, []);
 	return (
-		<div className="space-y-2 px-4 mb-0 mt-[50px] flex-1 flex flex-col justify-end">
+		<div className="space-y-2 px-4 mb-0  flex-1 flex flex-col justify-end">
 			{loading && (
 				<>
 					{isChannel &&

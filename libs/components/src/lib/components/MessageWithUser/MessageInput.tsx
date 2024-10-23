@@ -85,18 +85,16 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
 	const processedContentDraft: IMessageSendPayload = useMemo(() => {
 		return {
-			t: channelDraftMessage.draftContent?.t,
-			hg: channelDraftMessage.draftContent?.hg,
-			ej: channelDraftMessage.draftContent?.ej,
-			lk: channelDraftMessage.draftContent?.lk,
-			mk: channelDraftMessage.draftContent?.mk,
-			vk: channelDraftMessage.draftContent?.vk
+			t: channelDraftMessage?.draftContent?.t,
+			hg: channelDraftMessage?.draftContent?.hg,
+			ej: channelDraftMessage?.draftContent?.ej,
+			lk: channelDraftMessage?.draftContent?.lk,
+			mk: channelDraftMessage?.draftContent?.mk,
+			vk: channelDraftMessage?.draftContent?.vk
 		};
-	}, [channelDraftMessage.draftContent, messageId]);
+	}, [channelDraftMessage?.draftContent, messageId]);
 
-	const processedMentionDraft: ApiMessageMention[] = useMemo(() => {
-		return channelDraftMessage.draftMention;
-	}, [channelDraftMessage.draftMention, messageId]);
+	const processedMentionDraft: ApiMessageMention[] = channelDraftMessage?.draftMention;
 
 	const addMentionToContent = useMemo(
 		() => addMention(processedContentDraft, processedMentionDraft),
@@ -118,9 +116,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	useEscapeKey(handleCancelEdit);
 
-	const draftContent = useMemo(() => {
-		return channelDraftMessage.draftContent?.t;
-	}, [channelDraftMessage.draftContent?.t]);
+	const draftContent = channelDraftMessage?.draftContent?.t;
 
 	const originalContent = useMemo(() => {
 		return message.content?.t;
@@ -232,7 +228,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
-					rows={channelDraftMessage.draftContent?.t?.split('\n').length}
+					rows={channelDraftMessage?.draftContent?.t?.split('\n').length}
 					forceSuggestionsAboveCursor={true}
 					style={appearanceTheme === ThemeApp.Light ? lightMentionsInputStyle : darkMentionsInputStyle}
 					customSuggestionsContainer={(children: React.ReactNode) => {

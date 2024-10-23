@@ -21,6 +21,7 @@ import { useSelector } from 'react-redux';
 type ChannelMessageOptProps = {
 	message: IMessageWithUser;
 	handleContextMenu: (event: React.MouseEvent<HTMLElement>, props: any) => void;
+	isCombine: boolean;
 };
 
 enum EMessageOpt {
@@ -31,7 +32,7 @@ enum EMessageOpt {
 	OPTION = 'option'
 }
 
-const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProps) => {
+const ChannelMessageOpt = ({ message, handleContextMenu, isCombine }: ChannelMessageOptProps) => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const refOpt = useRef<HTMLDivElement>(null);
 	const checkHiddenIconThread = !currentChannel || Snowflake.isValid(currentChannel.parrent_id ?? '');
@@ -44,9 +45,7 @@ const ChannelMessageOpt = ({ message, handleContextMenu }: ChannelMessageOptProp
 	const items = useMenuBuilder([giveACoffeeMenu, reactMenu, replyMenu, editMenu, threadMenu, optionMenu]);
 
 	return (
-		<div
-			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!message.isStartedMessageGroup ? '-top-8' : message.isStartedMessageOfTheDay ? 'top-6' : '-top-1'}  right-6 w-fit`}
-		>
+		<div className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? 'top-6' : '-top-8'}  right-6 w-fit`}>
 			<div className="flex justify-between dark:bg-bgPrimary bg-bgLightMode border border-bgSecondary rounded">
 				<div className="w-fit h-full flex justify-between" ref={refOpt}>
 					{items
