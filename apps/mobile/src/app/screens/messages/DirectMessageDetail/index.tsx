@@ -15,7 +15,7 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { AppState, DeviceEventEmitter, StatusBar } from 'react-native';
+import { AppState, DeviceEventEmitter, Platform, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -102,11 +102,15 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	useEffect(() => {
 		const focusedListener = navigation.addListener('focus', () => {
-			StatusBar.setBackgroundColor(themeValue.primary);
+			if (Platform.OS === 'android') {
+				StatusBar.setBackgroundColor(themeValue.primary);
+			}
 			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
 		});
 		const blurListener = navigation.addListener('blur', () => {
-			StatusBar.setBackgroundColor(themeValue.secondary);
+			if (Platform.OS === 'android') {
+				StatusBar.setBackgroundColor(themeValue.secondary);
+			}
 			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
 		});
 		return () => {

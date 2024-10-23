@@ -1,7 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { ETokenMessage, IExtendedMessage, getSrcEmoji } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { style } from './styles';
 
@@ -17,14 +17,13 @@ type IEmojiMarkup = {
 	emojiid: string;
 };
 
-export const DmListItemLastMessage = React.memo((props: { content: IExtendedMessage }) => {
+const EMOJI_KEY = '[ICON_EMOJI]';
+export const DmListItemLastMessage = React.memo((props: { content: IExtendedMessage; fontSize?: number }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t, ej = [] } = props.content || {};
 	const emojis = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
 	const elements: ElementToken[] = [...emojis].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
-	const splitEmojisRegex = /([^)\s]*\))/g;
-	const emojiUrlRegex = /\((.*?)\)/;
 
 	const EmojiMarkup = ({ shortname, emojiid }: IEmojiMarkup) => {
 		const srcEmoji = getSrcEmoji(emojiid);
@@ -32,7 +31,7 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 		if (!srcEmoji) {
 			return shortname;
 		}
-		return `[${shortname}](${srcEmoji})`;
+		return `${EMOJI_KEY}${srcEmoji}${EMOJI_KEY}`;
 	};
 
 	const formatEmojiInText = useMemo(() => {
@@ -57,22 +56,37 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 	}, [elements, t]);
 
 	const convertTextToEmoji = () => {
-		const parts = formatEmojiInText.split(splitEmojisRegex);
-		return parts.map((item) => {
-			if (splitEmojisRegex.test(item)) {
-				const url = item.match(emojiUrlRegex);
-				return (
-					<FastImage
-						style={styles.emoji}
-						source={{
-							uri: url?.[1]
-						}}
-					/>
-				);
+		const parts = [];
+		let startIndex = 0;
+		let endIndex = formatEmojiInText.indexOf(EMOJI_KEY, startIndex);
+
+		while (endIndex !== -1) {
+			const textPart = formatEmojiInText.slice(startIndex, endIndex);
+			if (textPart) {
+				parts.push(<Text style={[styles.message, props?.fontSize && { fontSize: props?.fontSize }]}>{textPart}</Text>);
 			}
-			return <Text style={styles.message}>{item}</Text>;
-		});
+
+			startIndex = endIndex + EMOJI_KEY.length;
+			endIndex = formatEmojiInText.indexOf(EMOJI_KEY, startIndex);
+
+			if (endIndex !== -1) {
+				const emojiUrl = formatEmojiInText.slice(startIndex, endIndex);
+				parts.push(<FastImage style={styles.emoji} source={{ uri: emojiUrl }} />);
+				startIndex = endIndex + EMOJI_KEY.length;
+				endIndex = formatEmojiInText.indexOf(EMOJI_KEY, startIndex);
+			}
+		}
+
+		if (startIndex < formatEmojiInText.length) {
+			parts.push(<Text style={[styles.message, props?.fontSize && { fontSize: props?.fontSize }]}>{formatEmojiInText.slice(startIndex)}</Text>);
+		}
+
+		return parts;
 	};
 
-	return <View style={styles.dmMessageContainer}>{convertTextToEmoji()}</View>;
+	return (
+		<Text style={[styles.dmMessageContainer, props?.fontSize && { fontSize: props?.fontSize }]} numberOfLines={1}>
+			{convertTextToEmoji()}
+		</Text>
+	);
 });
