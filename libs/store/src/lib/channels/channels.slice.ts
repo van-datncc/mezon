@@ -415,7 +415,7 @@ export const fetchChannels = createAsyncThunk(
 		// Add threads that the user has not joined to the response
 
 		const unjoinedThreads = state.channels.threadsNotJoinedByUser;
-		if (unjoinedThreads.ids?.length) {
+		if (unjoinedThreads?.ids?.length) {
 			const unjoinedThreadEntities = unjoinedThreads.ids.map((id) => unjoinedThreads.entities[id]);
 			response.channeldesc = [...response.channeldesc, ...unjoinedThreadEntities];
 		}

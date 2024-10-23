@@ -15,13 +15,16 @@ import {
 	selectIsViewingOlderMessagesByChannelId,
 	selectJumpPinMessageId,
 	selectLastMessageByChannelId,
+	selectLastMessageIdByChannelId,
 	selectMessageIdsByChannelId,
 	selectMessageIsLoading,
 	selectMessageNotified,
+	selectUnreadMessageIdByChannelId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { Direction_Mode } from '@mezon/utils';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -56,6 +59,8 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	const jumpPinMessageId = useSelector(selectJumpPinMessageId);
 	const isPinMessageExist = useSelector(selectIsMessageIdExist(channelId, jumpPinMessageId));
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
+	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, channelId as string));
+	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
 	const dispatch = useAppDispatch();
 
 	const chatRefData = useMemo(() => {
@@ -217,26 +222,58 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		return () => timeoutId && clearTimeout(timeoutId);
 	}, [lastMessage, userId, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
+	const refItem = useCallback((component: MessageRef | null) => {
+		listMessageRefs.current[component?.messageId as string] = component;
+	}, []);
+
+	const rowVirtualizer = useVirtualizer({
+		count: messages.length,
+		getScrollElement: () => chatRef.current,
+		estimateSize: () => 50,
+		overscan: 5
+	});
+
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>
 			<AnchorScroll ref={chatRef} anchorId={channelId}>
-				{hasMoreTop && isFetching && <ChannelMessages.Skeleton />}
-				<div className="min-h-0 overflow-hidden">
-					{messages.map((messageId) => {
+				<div
+					style={{
+						height: `${rowVirtualizer.getTotalSize()}px`,
+						width: '100%',
+						position: 'relative'
+					}}
+				>
+					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
 						return (
-							<MemorizedChannelMessage
-								ref={(component) => {
-									listMessageRefs.current[messageId] = component;
+							<div
+								key={virtualRow.index}
+								style={{
+									position: 'absolute',
+									top: 0,
+									left: 0,
+									width: '100%',
+									height: `${virtualRow.size}px`,
+									transform: `translateY(${virtualRow.start}px)`
 								}}
-								avatarDM={avatarDM}
-								userName={userName}
-								key={messageId}
-								messageId={messageId}
-								channelId={channelId}
-								isHighlight={messageId === idMessageNotified}
-								mode={mode}
-								channelLabel={channelLabel ?? ''}
-							/>
+							>
+								<div key={virtualRow.key} data-index={virtualRow.index} ref={rowVirtualizer.measureElement}>
+									<MemorizedChannelMessage
+										ref={refItem}
+										avatarDM={avatarDM}
+										userName={userName}
+										key={messages[virtualRow.index]}
+										messageId={messages[virtualRow.index]}
+										previousMessageId={messages[virtualRow.index - 1]}
+										channelId={channelId}
+										isHighlight={messages[virtualRow.index] === idMessageNotified}
+										mode={mode}
+										channelLabel={channelLabel ?? ''}
+										isLastSeen={Boolean(
+											messages[virtualRow.index] === lastMessageUnreadId && messages[virtualRow.index] !== lastMessageId
+										)}
+									/>
+								</div>
+							</div>
 						);
 					})}
 				</div>
