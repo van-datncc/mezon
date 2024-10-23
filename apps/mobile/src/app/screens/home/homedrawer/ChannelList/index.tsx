@@ -12,9 +12,8 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import { MezonBottomSheet } from '../../../../componentUI';
@@ -30,6 +29,7 @@ import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
+import ButtonNewUnread from './ButtonNewUnread';
 import { style } from './styles';
 export type ChannelsPositionRef = {
 	current: {
@@ -64,17 +64,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const selectCategoryOffsets = useSelector(selectCategoryChannelOffsets);
 	const [isCollapseCategory, setIsCollapseCategory] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { t } = useTranslation('channelMenu');
-
-	const findFirstChannelWithBadgeCount = (listCategory = []) =>
-		listCategory
-			.flatMap((category) => category?.channels ?? [])
-			.flatMap((channel) => [channel, ...(channel?.threads ?? [])])
-			.find((item) => item?.badgeCount > 0) || null;
-
-	const firstChannelBadgeCount = useMemo(() => {
-		return findFirstChannelWithBadgeCount(categorizedChannels);
-	}, [categorizedChannels]);
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -191,16 +180,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					<Block height={80} />
 				</ScrollView>
 
-				{!!firstChannelBadgeCount && (
-					<TouchableOpacity
-						onPress={() => {
-							handleScrollToChannel(firstChannelBadgeCount?.channel_id);
-						}}
-						style={styles.buttonBadgeCount}
-					>
-						<Text style={styles.buttonBadgeCountText}>{t('btnBadgeCount')}</Text>
-					</TouchableOpacity>
-				)}
+				<ButtonNewUnread handleScrollToChannel={handleScrollToChannel} />
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>

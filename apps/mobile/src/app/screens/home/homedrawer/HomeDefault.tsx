@@ -8,7 +8,6 @@ import {
 	channelMetaActions,
 	channelsActions,
 	clansActions,
-	gifsStickerEmojiActions,
 	selectAllClans,
 	selectAnyUnreadChannels,
 	selectChannelById,
@@ -16,7 +15,7 @@ import {
 	selectFetchChannelStatus,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ChannelStatusEnum, SubPanelName, TIME_OFFSET, isPublicChannel } from '@mezon/utils';
+import { ChannelStatusEnum, TIME_OFFSET, isPublicChannel } from '@mezon/utils';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -43,7 +42,6 @@ function useChannelSeen(channelId: string) {
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch]);
 
 	useEffect(() => {
