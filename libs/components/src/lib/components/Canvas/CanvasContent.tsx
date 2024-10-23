@@ -79,13 +79,19 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 			quillRef.current.setContents(JSON.parse(content));
 		}
 
+		if (!isEditAndDelCanvas) {
+			quillRef.current.enable(false);
+			quillRef.current.root.style.pointerEvents = 'auto';
+			quillRef.current.root.style.userSelect = 'text';
+		} else {
+			quillRef.current.enable(true);
+			quillRef.current.root.style.pointerEvents = 'auto';
+			quillRef.current.root.style.userSelect = 'none';
+		}
+
 		quillRef.current.on('text-change', () => {
-			if (isEditAndDelCanvas) {
-				const data = JSON.stringify(quillRef.current?.getContents());
-				handleContentChange(data);
-			} else {
-				quillRef.current?.disable();
-			}
+			const data = JSON.stringify(quillRef.current?.getContents());
+			handleContentChange(data);
 		});
 
 		const handleSelectionChange = (range: any) => {
@@ -152,10 +158,12 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 	};
 
 	const formatText = (format: keyof ActiveFormats) => {
-		if (quillRef.current && isEditAndDelCanvas) {
+		if (quillRef.current) {
 			const currentFormat = quillRef.current.getFormat();
 			const isActive = !!currentFormat[format];
-			quillRef.current.format(format, !isActive);
+			if (isEditAndDelCanvas) {
+				quillRef.current.format(format, !isActive);
+			}
 
 			setActiveFormats((prev) => ({
 				...prev,
@@ -235,7 +243,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 
 	return (
 		<div className="note-canvas" style={{ position: 'relative' }}>
-			{toolbarVisible && (
+			{toolbarVisible && isEditAndDelCanvas && (
 				<div
 					ref={toolbarRef}
 					id="toolbar"
