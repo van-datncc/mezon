@@ -203,7 +203,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 					onClick={onClickReactExist}
 				>
 					<span className="absolute left-[5px]">
-						<img src={getUrlItem} className="w-4 h-4" alt="Item Icon" />
+						<img src={getUrlItem} className="w-4 h-4 object-scale-down" alt="Item Icon" />
 					</span>
 					<div className=" text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
 						<p>{strCount}</p>
