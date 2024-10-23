@@ -129,7 +129,7 @@ export const attachmentSlice = createSlice({
 			.addCase(fetchChannelAttachments.fulfilled, (state: AttachmentState, action) => {
 				if (
 					action.payload.length > 0 &&
-					Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, action.payload[0].channelId as string)
+					!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, action.payload[0].channelId as string)
 				) {
 					attachmentAdapter.setAll(state, action.payload);
 					state.listAttachmentsByChannel[action.payload[0].channelId as string] = action.payload;
