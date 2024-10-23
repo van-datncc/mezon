@@ -367,6 +367,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			request,
+			hashtagList,
+			emojiList,
+			linkList,
+			markdownList,
+			voiceLinkRoomList,
 			mentionData,
 			nameValueThread,
 			props,
