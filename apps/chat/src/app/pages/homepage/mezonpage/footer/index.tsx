@@ -180,14 +180,14 @@ const Footer = ({ downloadUrl, universalUrl }: FooterProps) => {
 				<div className="w-10/12 px-[32px] max-md:px-[16px] flex items-center gap-[32px] justify-between max-lg:gap-[24px] max-lg:w-full max-lg:flex-col-reverse max-lg:items-start">
 					<div className="text-[16px] leading-[24px] font-normal text-[#7C92AF]">© 2024 Mezon. All rights reserved.</div>
 					<div className="flex items-center gap-[24px]">
-						<a href="#" target="_blank" rel="noreferrer">
+						<a href="https://www.linkedin.com/company/nccplus-vietnam" target="_blank" rel="noreferrer">
 							<Image src={`assets/instagram.svg`} alt={'linkedIn'} />
 						</a>
-						<a href="#" target="_blank" rel="noreferrer">
+						<a href="https://www.facebook.com/profile.php?id=61558081847939" target="_blank" rel="noreferrer">
 							<Image src={`assets/facebook.svg`} alt={'facebook'} />
 						</a>
-						<a href="#" target="_blank" rel="noreferrer">
-							<Image src={`assets/twitter.svg`} alt={'twitter'} />
+						<a href="https://github.com/nccasia/mezon-fe" target="_blank" rel="noreferrer">
+							<Image src={`assets/twitter.svg`} alt={'github'} />
 						</a>
 					</div>
 				</div>
