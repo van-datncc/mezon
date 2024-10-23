@@ -80,7 +80,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 			<div className="p-2 border-[1px] border-gray-300 rounded-md">
 				<button
 					onClick={handleOpenModal}
-					className="flex rounded-full items-center justify-center border-[1px] border-gray-300 bg-gray-200 hover:bg-gray-300 w-full h-[40px] shadow-md active:bg-gray-200 transition-all"
+					className="flex rounded-full items-center justify-center border-[1px] border-gray-300 bg-gray-200 hover:bg-gray-300 dark:bg-gray-500 dark:hover:bg-gray-400 w-full h-[40px] shadow-md active:bg-gray-200 transition-all"
 				>
 					<span className="w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded-full text-[20px] mr-2">
 						+
@@ -91,7 +91,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 					<div>
 						<span>&#123;</span>
 					</div>
-					<div className="pl-1">
+					<div className="pl-1 overflow-hidden">
 						{options.length > 0 ? (
 							options.map((option, index) => (
 								<div>
@@ -100,7 +100,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 								</div>
 							))
 						) : (
-							<div className="">// No {label}</div>
+							<div className="">/ / No {label}</div>
 						)}
 					</div>
 					<div>
@@ -111,7 +111,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 			<Modal dismissible show={open} onClose={handleClose}>
 				<div className="p-4">
 					<div className="header text-center">
-						<span className="font-medium text-[20px]">{props.placeholder}</span>
+						<span className="dark:text-white font-medium text-[20px]">{props.placeholder}</span>
 					</div>
 					<div className="body my-4">
 						<div className="form">
@@ -120,21 +120,21 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 									<div key={index} className="form-item flex items-center gap-[40px]">
 										<div className="flex-1 grid grid-cols-2 gap-4">
 											<div className="flex items-center gap-2">
-												<label className="block w-70px text-sm">Key</label>
+												<label className="dark:text-white block w-70px text-sm">Key</label>
 												<input
 													value={option.key}
 													onChange={(e) => handleChangeInput(e, 'key', index)}
 													type="text"
-													className="flex-1 my-1 block w-full px-3 py-1 rounded-md border-[1px] focus:border-[1px] bg-transparent focus-visible:outline-none focus-visible:border-[1px] focus-visible:border-gray-400"
+													className="dark:text-white flex-1 my-1 block w-full px-3 py-1 rounded-md border-[1px] focus:border-[1px] bg-transparent focus-visible:outline-none focus-visible:border-[1px] focus-visible:border-gray-400"
 												/>
 											</div>
 											<div className="flex items-center gap-2">
-												<label className="block w-70px text-sm">Value</label>
+												<label className="dark:text-white block w-70px text-sm">Value</label>
 												<input
 													value={option.value}
 													onChange={(e) => handleChangeInput(e, 'value', index)}
 													type="text"
-													className="flex-1 my-1 block w-full px-3 py-1 rounded-md border-[1px] focus:border-[1px] bg-transparent focus-visible:outline-none focus-visible:border-[1px] focus-visible:border-gray-400"
+													className="dark:text-white flex-1 my-1 block w-full px-3 py-1 rounded-md border-[1px] focus:border-[1px] bg-transparent focus-visible:outline-none focus-visible:border-[1px] focus-visible:border-gray-400"
 												/>
 											</div>
 										</div>
@@ -147,7 +147,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 									</div>
 								))
 							) : (
-								<div className="text-center">No {label}</div>
+								<div className="text-center dark:text-white">No {label}</div>
 							)}
 						</div>
 					</div>
@@ -155,7 +155,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 						<div>
 							<button
 								onClick={handleAddOptions}
-								className="text-primary font-semibold text-sm px-4 py-1 shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 border-[1px] border-primary text-[16px] leading-6 rounded"
+								className="text-primary dark:text-white font-semibold text-sm px-4 py-1 shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 border-[1px] border-primary text-[16px] leading-6 rounded"
 							>
 								Add Option
 							</button>

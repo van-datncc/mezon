@@ -27,7 +27,10 @@ const NodeTypes = [
 					type: 'string',
 					uniforms: { component: CustomTextField, label: 'Command Name', name: 'commandName', placeholder: 'Enter command input' }
 				},
-				options: { type: 'string', uniforms: { component: CustomTagsField, label: 'Options', name: 'options', placeholder: 'Enter options' } }
+				options: {
+					type: 'string',
+					uniforms: { component: CustomTagsField, label: 'Options', name: 'options', placeholder: 'Enter more options' }
+				}
 			},
 			required: ['commandName']
 		},
