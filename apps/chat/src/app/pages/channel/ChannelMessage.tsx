@@ -11,12 +11,10 @@ import {
 	selectChannelDraftMessage,
 	selectCurrentUserId,
 	selectIdMessageRefEdit,
-	selectLastSeenMessage,
 	selectMessageEntityById,
 	selectOpenEditMessageState,
 	useAppSelector
 } from '@mezon/store';
-import { IMessageWithUser } from '@mezon/utils';
 import React, {
 	ForwardRefExoticComponent,
 	PropsWithoutRef,
@@ -30,20 +28,22 @@ import React, {
 	useRef
 } from 'react';
 import { useSelector } from 'react-redux';
-import MessageInput from './MessageInput';
 
 export type MessageProps = {
 	channelId: string;
 	messageId: string;
+	previousMessageId: string;
 	mode: number;
 	isHighlight?: boolean;
 	channelLabel: string;
 	avatarDM?: string;
 	userName?: string;
+	isLastSeen?: boolean;
 };
 
 export type MessageRef = {
 	scrollIntoView: (options?: ScrollIntoViewOptions) => void;
+	messageId: string;
 };
 
 type ChannelMessageComponent = ForwardRefExoticComponent<PropsWithoutRef<MessageProps> & RefAttributes<MessageRef>> & {
@@ -51,8 +51,9 @@ type ChannelMessageComponent = ForwardRefExoticComponent<PropsWithoutRef<Message
 };
 
 export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageRef, MessageProps>(
-	({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName }: Readonly<MessageProps>, ref) => {
+	({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName, isLastSeen, previousMessageId }: Readonly<MessageProps>, ref) => {
 		const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
+		const previousMessage = useSelector((state) => selectMessageEntityById(state, channelId, previousMessageId));
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const openEditMessageState = useSelector(selectOpenEditMessageState);
 		const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
@@ -63,15 +64,18 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 
 		const isMyMessage = currentUserId && currentUserId === message?.sender_id;
 
-		const isEditing = useMemo(() => {
-			if (channelDraftMessage.message_id === messageId) {
-				return openEditMessageState;
-			} else {
-				return openEditMessageState && idMessageRefEdit === messageId;
-			}
-		}, [openEditMessageState, idMessageRefEdit, channelDraftMessage.message_id, messageId]);
+		const isEditing =
+			channelDraftMessage?.message_id === messageId ? openEditMessageState : openEditMessageState && idMessageRefEdit === messageId;
 
-		const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
+		const isSameUser = message?.user?.id === previousMessage?.user?.id;
+		const isTimeGreaterThan60Minutes = useMemo(() => {
+			if (message?.create_time && previousMessage?.create_time) {
+				return Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 60 * 60 * 1000;
+			}
+			return false;
+		}, [message?.create_time, previousMessage?.create_time]);
+
+		const isCombine = isSameUser && isTimeGreaterThan60Minutes;
 
 		const handleContextMenu = useCallback(
 			(event: React.MouseEvent<HTMLElement>, props?: Partial<MessageContextMenuProps>) => {
@@ -80,68 +84,52 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 			[showMessageContextMenu, messageId, mode]
 		);
 
-		const mess = useMemo(() => {
+		const mess = (() => {
 			if (typeof message.content === 'object' && typeof (message.content as Record<string, unknown>).id === 'string') {
 				return message.content;
 			}
 			return message;
-		}, [message]);
-
-		const editor = useMemo(() => {
-			return (
-				<MessageInput
-					messageId={messageId}
-					channelId={channelId}
-					mode={mode}
-					channelLabel={channelLabel}
-					message={mess as IMessageWithUser}
-				/>
-			);
-		}, [messageId, channelId, mode, channelLabel, mess]);
-
+		})();
 		const popup = useMemo(() => {
-			return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} />;
-		}, [message, handleContextMenu]);
+			return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} isCombine={isCombine} />;
+		}, [message, handleContextMenu, isCombine]);
 
 		useImperativeHandle(
 			ref,
 			() => ({
-				scrollIntoView: (options?: ScrollIntoViewOptions) => messageRef.current?.scrollIntoView(options)
+				scrollIntoView: (options?: ScrollIntoViewOptions) => messageRef.current?.scrollIntoView(options),
+				messageId: messageId
 			}),
 			[messageRef]
 		);
 
 		useEffect(() => {
 			markMessageAsSeen(message);
-		}, [markMessageAsSeen, message]);
+		}, [messageId]);
 
 		return (
 			<>
 				{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
-				{!mess.isFirst && (
+				{!message.isFirst && (
 					<div ref={messageRef} className="fullBoxText relative group">
 						<MessageWithUser
 							allowDisplayShortProfile={true}
-							message={mess as IMessageWithUser}
+							message={mess}
 							mode={mode}
 							isEditing={isEditing}
 							isHighlight={isHighlight}
 							popup={popup}
-							editor={editor}
 							onContextMenu={handleContextMenu}
+							isCombine={isCombine}
 						/>
 					</div>
 				)}
 
-				{!isMyMessage && lastSeen && <UnreadMessageBreak />}
+				{!isMyMessage && isLastSeen && <UnreadMessageBreak />}
 			</>
 		);
 	}
 );
-
-ChannelMessage.Skeleton = function () {
-	return <MessageWithUser.Skeleton />;
-};
 
 export const MemorizedChannelMessage = memo(ChannelMessage);

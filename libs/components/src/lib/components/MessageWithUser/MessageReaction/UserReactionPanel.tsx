@@ -43,7 +43,7 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 		);
 	};
 
-	const [senderList, setSenderList] = useState<SenderInfoOptionals[]>(emojiShowPanel.senders);
+	const [senderList, setSenderList] = useState<SenderInfoOptionals[]>(emojiShowPanel?.senders);
 	const hideSenderOnPanel = useCallback((emojiData: EmojiDataOptionals, senderId: string) => {
 		const newEmojiData = { ...emojiData };
 		if (newEmojiData.senders) {

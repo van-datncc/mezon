@@ -67,13 +67,13 @@ const ChannelListMessage = React.memo(
 				onEndReachedThreshold={0.5}
 				scrollEventThrottle={16}
 				estimatedItemSize={220}
-				viewabilityConfig={{
-					minimumViewTime: 0,
-					viewAreaCoveragePercentThreshold: 0,
-					itemVisiblePercentThreshold: 0,
-					waitForInteraction: false
-				}}
-				contentInsetAdjustmentBehavior="automatic"
+				// viewabilityConfig={{
+				// 	minimumViewTime: 0,
+				// 	viewAreaCoveragePercentThreshold: 0,
+				// 	itemVisiblePercentThreshold: 0,
+				// 	waitForInteraction: false
+				// }}
+				// contentInsetAdjustmentBehavior="automatic"
 				ListHeaderComponent={isLoadMoreBottom && !isCannotLoadMore ? <ViewLoadMore /> : null}
 				ListFooterComponent={isLoadMoreTop && !isCannotLoadMore ? <ViewLoadMore /> : null}
 				// onScrollToIndexFailed={(info) => {

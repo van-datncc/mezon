@@ -1,6 +1,4 @@
-import { useSearchMessages } from '@mezon/core';
-import { HighlightMatch } from '@mezon/ui';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 type PlainTextOpt = {
 	text: string;
@@ -8,11 +6,6 @@ type PlainTextOpt = {
 };
 
 export const PlainText: React.FC<PlainTextOpt> = ({ text, isSearchMessage }) => {
-	const { valueSearchMessage } = useSearchMessages();
-	const valueSearchMessageSplitted = useMemo(() => {
-		return valueSearchMessage?.trim()?.split(' ') || [];
-	}, [valueSearchMessage]);
-
-	return <span>{isSearchMessage ? HighlightMatch(text, valueSearchMessageSplitted) : text}</span>;
+	return <span>{text}</span>;
 };
 export default PlainText;

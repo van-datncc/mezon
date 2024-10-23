@@ -1,7 +1,5 @@
-import { ETypeLinkMedia, IExtendedMessage, IMessageWithUser, isValidEmojiData } from '@mezon/utils';
-import { useMemo } from 'react';
+import { addMention, ETypeLinkMedia, IExtendedMessage, IMessageWithUser, isValidEmojiData } from '@mezon/utils';
 import { MessageLine } from './MessageLine';
-import { useMessageParser } from './useMessageParser';
 
 type IMessageContentProps = {
 	message: IMessageWithUser;
@@ -15,19 +13,19 @@ type IMessageContentProps = {
 };
 
 const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps) => {
-	const { lines, contentUpdatedMention } = useMessageParser(message);
+	const lines = message?.content?.t;
+	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
 
-	const isOnlyContainEmoji = useMemo(() => {
-		return isValidEmojiData(contentUpdatedMention);
-	}, [contentUpdatedMention]);
+	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
 
-	const lineValue = useMemo(() => {
+	const lineValue = (() => {
 		if (lines === undefined && typeof message.content === 'string') {
 			return JSON.parse(message.content).t;
 		} else {
 			return lines;
 		}
-	}, [lines, message.content]);
+	})();
+
 	return (
 		<MessageText
 			isOnlyContainEmoji={isOnlyContainEmoji}
@@ -57,26 +55,16 @@ const MessageText = ({
 	isSearchMessage?: boolean;
 	isOnlyContainEmoji?: boolean;
 }) => {
-	const attachmentOnMessage = useMemo(() => {
-		return message.attachments;
-	}, [message.attachments]);
+	const attachmentOnMessage = message.attachments;
 
-	const contentToMessage = useMemo(() => {
-		return message.content?.t;
-	}, [message]);
+	const contentToMessage = message.content?.t;
 
-	const checkOneLinkImage = useMemo(() => {
-		return (
-			attachmentOnMessage?.length === 1 &&
-			attachmentOnMessage[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
-			attachmentOnMessage[0].url === contentToMessage?.trim()
-		);
-	}, [attachmentOnMessage, contentToMessage]);
+	const checkOneLinkImage =
+		attachmentOnMessage?.length === 1 &&
+		attachmentOnMessage[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
+		attachmentOnMessage[0].url === contentToMessage?.trim();
 
-	const showEditted = useMemo(() => {
-		return !message.hide_editted;
-	}, [message.hide_editted]);
-
+	const showEditted = !message.hide_editted;
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>

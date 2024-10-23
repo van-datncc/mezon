@@ -246,7 +246,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						create_time: dateTime.toISOString()
 					};
 				});
-				dispatch(attachmentActions.addMany(attachmentList));
+				dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
 			}
 
 			dispatch(messagesActions.addNewMessage(mess));
@@ -431,6 +431,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
 					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+					dispatch(
+						channelMembersActions.fetchChannelMembers({
+							clanId: userAdds.clan_id || '',
+							channelId: userAdds.channel_id,
+							noCache: true,
+							channelType: userAdds.channel_type
+						})
+					);
 				}
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(

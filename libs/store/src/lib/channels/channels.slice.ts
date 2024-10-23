@@ -131,6 +131,8 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 		return null;
 	}
 
+	if (!channelId) return null;
+
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType, isPublic);
@@ -415,7 +417,7 @@ export const fetchChannels = createAsyncThunk(
 		// Add threads that the user has not joined to the response
 
 		const unjoinedThreads = state.channels.threadsNotJoinedByUser;
-		if (unjoinedThreads.ids?.length) {
+		if (unjoinedThreads?.ids?.length) {
 			const unjoinedThreadEntities = unjoinedThreads.ids.map((id) => unjoinedThreads.entities[id]);
 			response.channeldesc = [...response.channeldesc, ...unjoinedThreadEntities];
 		}

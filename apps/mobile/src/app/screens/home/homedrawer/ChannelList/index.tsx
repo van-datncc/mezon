@@ -22,9 +22,8 @@ import {
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { DeviceEventEmitter, Linking, ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import { EventViewer } from '../../../../components/Event';
@@ -43,6 +42,7 @@ import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
 import { ChannelListContext } from '../Reusables';
+import ButtonNewUnread from './ButtonNewUnread';
 import { style } from './styles';
 export type ChannelsPositionRef = {
 	current: {
@@ -77,17 +77,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const selectCategoryOffsets = useSelector(selectCategoryChannelOffsets);
 	const [isScrollChannelActive, setIsScrollChannelActive] = useState(true);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const { t } = useTranslation('channelMenu');
-
-	const findFirstChannelWithBadgeCount = (listCategory = []) =>
-		listCategory
-			.flatMap((category) => category?.channels ?? [])
-			.flatMap((channel) => [channel, ...(channel?.threads ?? [])])
-			.find((item) => item?.badgeCount > 0) || null;
-
-	const firstChannelBadgeCount = useMemo(() => {
-		return findFirstChannelWithBadgeCount(categorizedChannels);
-	}, [categorizedChannels]);
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -237,16 +226,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					<Block height={80} />
 				</ScrollView>
 
-				{!!firstChannelBadgeCount && (
-					<TouchableOpacity
-						onPress={() => {
-							handleScrollToChannel(firstChannelBadgeCount?.channel_id);
-						}}
-						style={styles.buttonBadgeCount}
-					>
-						<Text style={styles.buttonBadgeCountText}>{t('btnBadgeCount')}</Text>
-					</TouchableOpacity>
-				)}
+				<ButtonNewUnread handleScrollToChannel={handleScrollToChannel} />
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>

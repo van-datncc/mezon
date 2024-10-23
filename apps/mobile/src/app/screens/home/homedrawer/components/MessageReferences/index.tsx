@@ -1,4 +1,3 @@
-import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { AttachmentImageIcon, ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { messagesActions, useAppDispatch } from '@mezon/store-mobile';
@@ -6,8 +5,9 @@ import { ApiMessageRef } from 'mezon-js/api.gen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { MezonAvatar } from '../../../../../componentUI';
-import { RenderTextMarkdownContent } from '../RenderTextMarkdown';
+import { DmListItemLastMessage } from '../../../../messages/DMListItemLastMessage';
 import { style } from './styles';
 
 interface IProps {
@@ -24,7 +24,6 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('message');
-	const { clanAvatar } = useGetPriorityNameFromUserClan(messageReferences.message_sender_id);
 
 	const handleJumpToMessage = (messageId: string) => {
 		requestAnimationFrame(async () => {
@@ -51,7 +50,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 			</View>
 			<View style={styles.repliedMessageWrapper}>
 				<MezonAvatar
-					avatarUrl={clanAvatar || messageReferences?.mesages_sender_avatar}
+					avatarUrl={messageReferences?.mesages_sender_avatar || ''}
 					username={messageReferences?.message_sender_username}
 					height={size.s_20}
 					width={size.s_20}
@@ -62,6 +61,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 							messageReferences?.message_sender_display_name ||
 							messageReferences?.message_sender_username ||
 							'Anonymous'}
+						<FastImage />
 					</Text>
 					{messageReferences?.has_attachment ? (
 						<>
@@ -69,16 +69,7 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 							<AttachmentImageIcon width={size.s_12} height={size.s_12} color={Colors.textGray} />
 						</>
 					) : (
-						<RenderTextMarkdownContent
-							content={{
-								...(messageReferences.content ? JSON.parse(messageReferences?.content) : {})
-							}}
-							isEdited={false}
-							translate={t}
-							isMessageReply
-							isNumberOfLine
-							mode={mode}
-						/>
+						<DmListItemLastMessage content={JSON.parse(messageReferences?.content || '{}')} fontSize={size.small} />
 					)}
 				</View>
 			</View>

@@ -172,6 +172,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const channelId = linkMatch?.[2];
 			const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: clanId, noCache: true }));
 			const isExistChannel = respChannel?.payload?.find?.((channel: { channel_id: string }) => channel.channel_id === channelId);
+			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (isExistChannel) {
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
@@ -194,21 +195,9 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				]);
 			};
 			await joinAndChangeClan(store, clanId);
-			if (isExistChannel) {
-				store.dispatch(
-					messagesActions.fetchMessages({
-						channelId: channelId,
-						noCache: true,
-						isFetchingLatestMessages: true,
-						isClearMessage: true,
-						clanId: clanId ?? ''
-					})
-				);
-			} else {
+			if (!isExistChannel) {
 				await setDefaultChannelLoader(respChannel.payload, clanId);
 			}
-
-			store.dispatch(appActions.setLoadingMainMobile(false));
 			setTimeout(() => {
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);

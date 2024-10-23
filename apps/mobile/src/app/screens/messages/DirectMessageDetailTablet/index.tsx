@@ -2,10 +2,12 @@ import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
+	MessagesEntity,
 	appActions,
 	channelMembersActions,
 	clansActions,
 	directActions,
+	directMetaActions,
 	getStoreAsync,
 	messagesActions,
 	selectCurrentChannel,
@@ -13,6 +15,7 @@ import {
 	selectDmGroupCurrent,
 	useAppDispatch
 } from '@mezon/store-mobile';
+import { TIME_OFFSET } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -28,16 +31,32 @@ function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
+
+	const updateChannelSeenState = useCallback(
+		(channelId: string, lastMessage: MessagesEntity) => {
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+			dispatch(directActions.setActiveDirect({ directId: channelId }));
+		},
+		[dispatch]
+	);
+
 	useEffect(() => {
 		if (lastMessage) {
-			if (mounted.current === channelId) {
-				return;
-			}
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
-			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [channelId, dispatch, lastMessage]);
+	}, [channelId, lastMessage, updateChannelSeenState]);
+
+	useEffect(() => {
+		if (mounted.current === channelId) {
+			return;
+		}
+		if (lastMessage) {
+			mounted.current = channelId;
+			updateChannelSeenState(channelId, lastMessage);
+		}
+	}, [dispatch, channelId, lastMessage, updateChannelSeenState]);
 }
 
 export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId?: string }) => {
