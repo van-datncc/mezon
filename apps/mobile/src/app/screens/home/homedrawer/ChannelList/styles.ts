@@ -1,5 +1,5 @@
 import { IS_TABLET } from '@mezon/mobile-components';
-import { Attributes, Colors, Metrics, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes, isTablet: boolean) =>
@@ -62,5 +62,15 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 		titleEvent: {
 			fontSize: size.s_14,
 			color: colors.textStrong
+		},
+		buttonBadgeCountText: { textAlign: 'center', fontSize: size.medium, fontWeight: '600', color: colors.white, textTransform: 'uppercase' },
+		buttonBadgeCount: {
+			backgroundColor: baseColor.redStrong,
+			position: 'absolute',
+			borderRadius: size.s_20,
+			paddingHorizontal: size.s_6,
+			padding: size.s_4,
+			bottom: 10,
+			left: '30%'
 		}
 	});
