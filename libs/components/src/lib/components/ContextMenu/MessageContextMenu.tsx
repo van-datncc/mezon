@@ -61,9 +61,12 @@ type MessageContextMenuProps = {
 	activeMode: number | undefined;
 };
 
-interface JsonObject {
-	ops: Array<{ insert: string; attributes?: { list: string } }>;
-}
+type JsonObject = {
+	ops: Array<{
+		insert: string | { image: string };
+		attributes?: { list: string };
+	}>;
+};
 
 const useIsOwnerGroupDM = () => {
 	const { userProfile } = useAuth();
@@ -161,36 +164,64 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			title: defaultCanvas?.title || 'Note'
 		});
 
+		const insertImageToJson = (jsonObject: JsonObject, imageUrl?: string) => {
+			if (!imageUrl) return;
+			const imageInsert = { insert: { image: imageUrl } };
+			jsonObject.ops.push(imageInsert);
+			jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
+		};
+
 		const updateJsonWithInsert = (jsonObject: JsonObject, newInsert: string) => {
 			jsonObject.ops.push({ insert: newInsert });
 			jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
-			return jsonObject;
 		};
 
 		const isContentExists = (jsonObject: JsonObject, newInsert: string) => {
 			return jsonObject.ops.some((op) => op.insert === newInsert);
 		};
 
+		const isImageExists = (jsonObject: JsonObject, imageUrl?: string) => {
+			return jsonObject.ops.some((op) => {
+				return typeof op.insert === 'object' && op.insert !== null && op.insert.image === imageUrl;
+			});
+		};
+
 		let formattedString;
 
-		if (!defaultCanvas) {
-			formattedString = JSON.stringify({
-				ops: [{ insert: message.content.t }, { attributes: { list: 'ordered' }, insert: '\n' }]
-			});
+		if (!defaultCanvas || (defaultCanvas && !defaultCanvas.content)) {
+			const messageContent = message.content.t;
+			const jsonObject: JsonObject = { ops: [] };
+			if (message.attachments?.length) {
+				const newImageUrl = message.attachments[0].url;
+				insertImageToJson(jsonObject, newImageUrl);
+			}
+			if (messageContent) {
+				jsonObject.ops.push({ insert: messageContent });
+				jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
+			}
+			formattedString = JSON.stringify(jsonObject);
 		} else {
-			if (defaultCanvas.content) {
-				const jsonObject = JSON.parse(defaultCanvas.content as string);
+			const jsonObject: JsonObject = JSON.parse(defaultCanvas.content as string);
+
+			if (message.attachments?.length) {
+				const newImageUrl = message.attachments[0].url;
+				if (!isImageExists(jsonObject, newImageUrl)) {
+					insertImageToJson(jsonObject, newImageUrl);
+				} else {
+					return;
+				}
+			} else {
 				const newInsert = message.content.t;
-				if (newInsert) {
-					if (!isContentExists(jsonObject, newInsert)) {
-						const updatedJsonObject = updateJsonWithInsert(jsonObject, newInsert);
-						formattedString = JSON.stringify(updatedJsonObject);
-					} else {
-						return;
-					}
+				if (newInsert && !isContentExists(jsonObject, newInsert)) {
+					updateJsonWithInsert(jsonObject, newInsert);
+				} else {
+					return;
 				}
 			}
+
+			formattedString = JSON.stringify(jsonObject);
 		}
+
 		dispatch(createEditCanvas(createCanvasBody(formattedString, defaultCanvas?.id)));
 	}, [dispatch, message, currentChannel, currentClanId, defaultCanvas]);
 
@@ -471,9 +502,14 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
-		builder.when(userId === currentChannel?.creator_id, (builder) => {
-			builder.addMenuItem('addNote', 'Add To Note', handleAddToNote, <Icons.CanvasIcon defaultSize="w-4 h-4" />);
-		});
+		builder.when(
+			userId === currentChannel?.creator_id &&
+				activeMode !== ChannelStreamMode.STREAM_MODE_DM &&
+				activeMode !== ChannelStreamMode.STREAM_MODE_GROUP,
+			(builder) => {
+				builder.addMenuItem('addNote', 'Add To Note', handleAddToNote, <Icons.CanvasIcon defaultSize="w-4 h-4" />);
+			}
+		);
 
 		builder.when(checkPos && canSendMessage, (builder) => {
 			builder.addMenuItem(
