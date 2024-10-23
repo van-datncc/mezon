@@ -19,7 +19,7 @@ export interface NotificationData {
 const DEFAULT_MAX_RECONNECT_ATTEMPTS = 10;
 const DEFAULT_RECONNECT_INTERVAL = 1000; // 1s
 const DEFAULT_MAX_RECONNECT_INTERVAL = 32000; // 32s (after 5 reconnect attempts)
-const PING_TIMEOUT = 90000; // 90 seconds
+const PING_TIMEOUT = 60000; // 60 seconds
 
 export class MezonNotificationService {
 	private wsActive = false;
