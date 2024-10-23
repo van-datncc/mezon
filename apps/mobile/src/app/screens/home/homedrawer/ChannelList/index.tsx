@@ -116,7 +116,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
 			const position = (positionChannel?.height || 0) + (categoryOffset || 0);
 
-			if (!isCollapseCategory) {
+			if (position && !isCollapseCategory) {
 				flashListRef?.current?.scrollTo({
 					x: 0,
 					y: position - size.s_150,
