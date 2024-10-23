@@ -197,7 +197,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	return (
 		<View style={styles.wrapper}>
 			{getNotificationChannelSelected?.active === ENotificationActive.ON ||
-			getNotificationChannelSelected.id === ENotificationChannelId.Default ? (
+			getNotificationChannelSelected?.id === ENotificationChannelId.Default ? (
 				<MezonMenu menu={menu} />
 			) : (
 				<View style={styles.optionsBox}>

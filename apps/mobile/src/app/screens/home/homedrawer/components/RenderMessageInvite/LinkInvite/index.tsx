@@ -9,12 +9,11 @@ import {
 	setDefaultChannelLoader
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, channelsActions, clansActions, getStoreAsync, inviteActions, useAppDispatch } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, getStoreAsync } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
-import { MezonAvatar } from '../../../../../../componentUI';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { style } from '../RenderMessageInvite.styles';
 
@@ -23,35 +22,13 @@ export const extractInviteIdFromUrl = (url: string): string | null => {
 	return match ? match[1] : null;
 };
 
-interface IResInvite {
-	id: string;
-	channel_id?: string;
-	channel_label?: string;
-	clan_id?: string;
-	clan_name?: string;
-	user_joined?: boolean;
-	expiry_time?: string;
-}
 function LinkInvite({ content, part }: { content: string; part: string }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { inviteUser } = useInvite();
 	const navigation = useNavigation<any>();
 	const inviteID = useMemo(() => extractInviteIdFromUrl(content), [content]);
-	const dispatch = useAppDispatch();
-	const [clanInvite, setClanInvite] = useState(null);
 	const { t } = useTranslation('linkMessageInvite');
-
-	useEffect(() => {
-		if (inviteID) {
-			dispatch(inviteActions.getLinkInvite({ inviteId: inviteID }))
-				.then((res) => {
-					const payloadInvite = res?.payload as IResInvite;
-					if (payloadInvite) setClanInvite(payloadInvite);
-				})
-				.catch((error) => {});
-		}
-	}, [dispatch, inviteID]);
 
 	const handleJoinClanInvite = async () => {
 		const store = await getStoreAsync();
@@ -86,12 +63,6 @@ function LinkInvite({ content, part }: { content: string; part: string }) {
 			<Text style={styles.textLink}>{part}</Text>
 			<View style={styles.boxLink}>
 				<Text style={styles.title}>{t('title')}</Text>
-				<View style={styles.container}>
-					<MezonAvatar username={clanInvite?.clan_name} avatarUrl={clanInvite?.clan_avatar}></MezonAvatar>
-					<View>
-						<Text style={styles.clanName}>{clanInvite?.clan_name}</Text>
-					</View>
-				</View>
 				<TouchableOpacity style={styles.inviteClanBtn} onPress={handleJoinClanInvite}>
 					<Text style={styles.inviteClanBtnText}>{t('join')}</Text>
 				</TouchableOpacity>

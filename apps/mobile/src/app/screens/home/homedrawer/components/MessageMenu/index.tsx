@@ -34,10 +34,10 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 
 	const isGroup = useMemo(() => {
 		return Number(messageInfo?.type) === ChannelType.CHANNEL_TYPE_GROUP;
-	}, [messageInfo?.channel_avatar]);
+	}, [messageInfo?.type]);
 
 	const lastOne = useMemo(() => {
-		return !messageInfo?.user_id.length;
+		return !messageInfo?.user_id?.length;
 	}, [messageInfo?.user_id]);
 
 	const leaveGroupMenu: IMezonMenuItemProps[] = [
@@ -146,7 +146,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 					<Text style={styles.serverName} numberOfLines={2}>
 						{messageInfo?.channel_label || messageInfo?.usernames}
 					</Text>
-					{isGroup && <Text style={styles.memberText}>{messageInfo?.user_id.length + 1} members</Text>}
+					{isGroup && <Text style={styles.memberText}>{messageInfo?.user_id?.length + 1} members</Text>}
 				</View>
 			</View>
 

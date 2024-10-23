@@ -431,6 +431,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
 					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
+					dispatch(
+						channelMembersActions.fetchChannelMembers({
+							clanId: userAdds.clan_id || '',
+							channelId: userAdds.channel_id,
+							noCache: true,
+							channelType: userAdds.channel_type
+						})
+					);
 				}
 				if (userAdds.channel_type !== ChannelType.CHANNEL_TYPE_VOICE) {
 					dispatch(

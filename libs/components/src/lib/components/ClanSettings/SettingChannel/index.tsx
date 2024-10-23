@@ -1,8 +1,14 @@
-import { selectChannelSuggestionEntities, selectMemberClanByGoogleId, selectMemberClanByUserId } from '@mezon/store';
+import {
+	channelSettingActions,
+	selectChannelSuggestionEntities,
+	selectMemberClanByGoogleId,
+	selectMemberClanByUserId,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { getAvatarForPrioritize } from '@mezon/utils';
 import { formatDistance } from 'date-fns';
-import { Avatar, AvatarSizes, Tooltip } from 'flowbite-react';
+import { Avatar, AvatarSizes, Dropdown, Pagination, Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
 import { useRef, useState } from 'react';
@@ -11,13 +17,35 @@ import { useSelector } from 'react-redux';
 import ChannelSettingInforItem from './InforChannelSetting';
 
 type ListChannelSettingProp = {
-	listChannel: Record<string, ApiChannelSettingItem[]>;
+	listChannel: ApiChannelSettingItem[];
+	clanId: string;
+	countChannel?: number;
 };
 
-const ListChannelSetting = ({ listChannel }: ListChannelSettingProp) => {
+const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSettingProp) => {
 	const [channelSettingId, setChannelSettingId] = useState('');
 	const parentRef = useRef(null);
+	const dispatch = useAppDispatch();
 	const listChannelEntities = useSelector(selectChannelSuggestionEntities);
+	// const selectClanId = useSelector(selectCurrentClanId);
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
+
+	const onPageChange = async (page: number) => {
+		setCurrentPage(page);
+		if (currentPage * pageSize > listChannel.length && countChannel && listChannel.length < countChannel) {
+			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId, page, limit: pageSize, noCache: true }));
+		}
+	};
+
+	const handleChangePageSize = async (pageSize: number) => {
+		setPageSize(pageSize);
+		setCurrentPage(1);
+		if (listChannel.length < pageSize) {
+			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId, limit: pageSize, noCache: true }));
+		}
+	};
 
 	const [openModalChannelSetting, closeModalChannelSetting] = useModal(() => {
 		return <ChannelSettingInforItem onClose={closeModalChannelSetting} channelId={channelSettingId} />;
@@ -38,27 +66,61 @@ const ListChannelSetting = ({ listChannel }: ListChannelSettingProp) => {
 				<span className="pr-1">Creator</span>
 			</div>
 			<div className="h-full overflow-y-auto  hide-scrollbar scroll-smooth pb-10" ref={parentRef}>
-				{Object.entries(listChannel).map(([key, value]) => (
-					<RenderChannelAndThread channelParrent={listChannelEntities[key]} listChannelGroup={value} key={`group_${key}`} />
+				{listChannel.slice(pageSize * (currentPage - 1), pageSize * (currentPage - 1) + pageSize).map((channel) => (
+					<RenderChannelAndThread channelParrent={channel} key={`group_${channel.id}`} />
 				))}
+				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-[1px] dark:border-borderDivider border-buttonLightTertiary mt-0">
+					<div className={'flex flex-row items-center'}>
+						Show
+						<Dropdown
+							value={pageSize}
+							renderTrigger={() => (
+								<div
+									className={
+										'flex flex-row items-center justify-center text-center dark:bg-slate-800 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode border-[1px] dark:border-borderDivider border-buttonLightTertiary rounded mx-1 px-3 w-12'
+									}
+								>
+									<span className="mr-1">{pageSize}</span>
+									<Icons.ArrowDown />
+								</div>
+							)}
+							label={''}
+						>
+							<Dropdown.Item
+								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+								onClick={() => handleChangePageSize(10)}
+							>
+								10
+							</Dropdown.Item>
+							<Dropdown.Item
+								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+								onClick={() => handleChangePageSize(20)}
+							>
+								20
+							</Dropdown.Item>
+							<Dropdown.Item
+								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
+								onClick={() => handleChangePageSize(30)}
+							>
+								30
+							</Dropdown.Item>
+						</Dropdown>
+						channel of {countChannel}
+					</div>
+					<Pagination currentPage={currentPage} totalPages={Math.ceil((countChannel || 0) / pageSize)} onPageChange={onPageChange} />
+				</div>
 			</div>
 		</div>
 	);
 };
 
-const RenderChannelAndThread = ({
-	listChannelGroup,
-	channelParrent
-}: {
-	listChannelGroup: ApiChannelSettingItem[];
-	channelParrent: ApiChannelSettingItem;
-}) => {
+const RenderChannelAndThread = ({ channelParrent }: { channelParrent: ApiChannelSettingItem }) => {
 	return (
 		<div className="flex flex-col">
 			<ItemInfor
-				creatorId={channelParrent.creator_id as string}
+				creatorId={channelParrent?.creator_id as string}
 				label={channelParrent?.channel_label as string}
-				privateChannel={channelParrent.channel_private as number}
+				privateChannel={channelParrent?.channel_private as number}
 				isThread={channelParrent?.parent_id !== '0'}
 				key={channelParrent.id}
 				userIds={channelParrent?.user_ids || []}
@@ -67,8 +129,7 @@ const RenderChannelAndThread = ({
 				messageCount={channelParrent.message_count || 0}
 				lastMessage={channelParrent.last_sent_message}
 			/>
-			<div className="flex flex-col pl-8">
-				{listChannelGroup.map((thread) => (
+			{/* <div className="flex flex-col pl-8">
 					<ItemInfor
 						creatorId={thread.creator_id as string}
 						label={thread?.channel_label as string}
@@ -80,8 +141,7 @@ const RenderChannelAndThread = ({
 						messageCount={thread.message_count || 0}
 						lastMessage={channelParrent.last_sent_message}
 					/>
-				))}
-			</div>
+			</div> */}
 		</div>
 	);
 };

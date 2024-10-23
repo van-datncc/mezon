@@ -9,11 +9,11 @@ import {
 } from '@mezon/store';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ApiChannelSettingItem } from 'mezon-js/api.gen';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const ChannelSetting = () => {
-	const [privateFilter, setPrivateFilter] = useState(true);
+	const [privateFilter, setPrivateFilter] = useState(false);
 	const [threadFilter, setThreadFilter] = useState(false);
 
 	const [searchFilter, setSearchFilter] = useState('');
@@ -47,29 +47,29 @@ const ChannelSetting = () => {
 		return true;
 	};
 
-	const listChannelSetting = useMemo(() => {
-		const listChannelRecord: Record<string, ApiChannelSettingItem[]> = {};
-		listChannel.forEach((channel) => {
-			if (!filterChannel(channel)) {
-				return;
-			}
-			if (listChannelRecord[channel.parent_id as string]) {
-				listChannelRecord[channel.parent_id as string].push(channel);
-				return;
-			}
-			if (channel.parent_id === '0') {
-				listChannelRecord[channel.id as string] = [];
-			} else {
-				listChannelRecord[channel.parent_id as string] = [channel];
-			}
-		});
+	// const listChannelSetting = useMemo(() => {
+	// 	const listChannelRecord: Record<string, ApiChannelSettingItem[]> = {};
+	// 	listChannel.forEach((channel) => {
+	// 		if (!filterChannel(channel)) {
+	// 			return;
+	// 		}
+	// 		if (listChannelRecord[channel.parent_id as string]) {
+	// 			listChannelRecord[channel.parent_id as string].push(channel);
+	// 			return;
+	// 		}
+	// 		if (channel.parent_id === '0') {
+	// 			listChannelRecord[channel.id as string] = [];
+	// 		} else {
+	// 			listChannelRecord[channel.parent_id as string] = [channel];
+	// 		}
+	// 	});
 
-		return listChannelRecord;
-	}, [privateFilter, searchFilter, listChannel.length, threadFilter]);
+	// 	return listChannelRecord;
+	// }, [privateFilter, searchFilter, listChannel.length, threadFilter, currentPage, pageSize]);
 
 	useEffect(() => {
 		async function fetchListChannel() {
-			await dispatch(channelSettingActions.fetchChannelByUserId({ clanId: selectClanId as string }));
+			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId: selectClanId as string }));
 		}
 		fetchListChannel();
 	}, []);
@@ -111,7 +111,7 @@ const ChannelSetting = () => {
 					/>
 				</div>
 			</div>
-			<ListChannelSetting listChannel={listChannelSetting} />
+			<ListChannelSetting listChannel={listChannel} clanId={selectClanId as string} countChannel={countChannel} />
 		</div>
 	);
 };
