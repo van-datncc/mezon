@@ -1,3 +1,4 @@
+import { useAuth } from '@mezon/core';
 import {
 	canvasActions,
 	createEditCanvas,
@@ -25,6 +26,8 @@ const Canvas = () => {
 	const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+	const { userProfile } = useAuth();
+	const isEditAndDelCanvas = Boolean(canvasById?.creator_id === userProfile?.user?.id || !canvasById?.creator_id);
 
 	useEffect(() => {
 		if (textAreaRef.current) {
@@ -35,11 +38,12 @@ const Canvas = () => {
 
 	const callCreateEditCanvas = async () => {
 		if (currentChannelId && currentClanId) {
-			const body: any = {
+			const body = {
 				channel_id: currentChannelId,
 				clan_id: currentClanId?.toString(),
 				content: content,
-				id: idCanvas || null,
+				...(idCanvas && { id: idCanvas }),
+				...(canvasById?.is_default && { is_default: true }),
 				title: title
 			};
 			const response = await dispatch(createEditCanvas(body) as any);
@@ -74,8 +78,10 @@ const Canvas = () => {
 	}, [canvasById]);
 
 	const handleInputChange = (e: { target: { value: any } }) => {
-		const newTitle = e.target.value;
-		dispatch(canvasActions.setTitle(newTitle));
+		if (isEditAndDelCanvas) {
+			const newTitle = e.target.value;
+			dispatch(canvasActions.setTitle(newTitle));
+		}
 	};
 
 	return (
@@ -87,10 +93,17 @@ const Canvas = () => {
 				style={{ color: appearanceTheme === 'light' ? 'rgb(51, 51, 51)' : 'white' }}
 				onChange={handleInputChange}
 				rows={1}
+				disabled={!isEditAndDelCanvas}
 				className="w-full px-4 py-2 mt-[25px] bg-inherit focus:outline-none text-[28px] resize-none leading-[34px] font-bold text-inherit"
 			/>
 			<div className="w-full">
-				<CanvasContent key={idCanvas} idCanvas={idCanvas || ''} isLightMode={appearanceTheme === 'light'} content={content || ''} />
+				<CanvasContent
+					key={idCanvas}
+					idCanvas={idCanvas || ''}
+					isLightMode={appearanceTheme === 'light'}
+					content={content || ''}
+					isEditAndDelCanvas={isEditAndDelCanvas}
+				/>
 			</div>
 		</div>
 	);

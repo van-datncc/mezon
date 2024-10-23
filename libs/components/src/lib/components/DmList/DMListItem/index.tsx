@@ -63,7 +63,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				avatar={isTypeDMGroup ? 'assets/images/avatar-group.png' : (directMessage?.channel_avatar?.at(0) ?? '')}
 				name={(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
 				userNameAva={directMessage?.usernames}
-				status={directMessage.is_online?.some(Boolean)}
+				status={{ status: directMessage.is_online?.some(Boolean), isMobile: false }}
 				isHideStatus={true}
 				isHideIconStatus={false}
 				key={directMessage.channel_id}
@@ -73,6 +73,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				positionType={MemberProfileType.DM_LIST}
 				countMember={(directMessage?.user_id?.length || 0) + 1}
 				user={directMessage as ChannelMembersEntity}
+				isMute={directMessage.is_mute}
 			/>
 			<button
 				className={`group-hover/itemListDm:opacity-100 opacity-0 absolute right-2 text-gray-500 hover:text-red-500 ${isTypeDMGroup ? 'top-[22px]' : 'top-[18px]'}`}

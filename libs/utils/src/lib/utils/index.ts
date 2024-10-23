@@ -1,4 +1,3 @@
-import { ChannelsEntity, RolesClanEntity } from '@mezon/store';
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
@@ -34,6 +33,7 @@ import {
 	IMentionOnMessage,
 	IMessageSendPayload,
 	IMessageWithUser,
+	IRolesClan,
 	MentionDataProps,
 	NotificationEntity,
 	SearchItemProps,
@@ -94,7 +94,12 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 		ref.current.focus();
 	}
 };
-export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null, rolesClan: RolesClanEntity[]) => {
+export const uniqueUsers = (
+	mentions: IMentionOnMessage[],
+	userChannels: ChannelMembersEntity[] | null,
+	rolesClan: IRolesClan[],
+	refereceSenderId: string[]
+) => {
 	const uniqueUserId1s = Array.from(
 		new Set(
 			mentions.reduce<string[]>((acc, mention) => {
@@ -125,7 +130,7 @@ export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: Channel
 		)
 	);
 
-	const combinedUniqueUserIds = Array.from(new Set([...uniqueUserId1s, ...uniqueUserId2s]));
+	const combinedUniqueUserIds = Array.from(new Set([...uniqueUserId1s, ...uniqueUserId2s, ...refereceSenderId]));
 
 	const memUserIds = userChannels?.map((member) => member?.user?.id) || [];
 	const userIdsNotInChannel = combinedUniqueUserIds.filter((user_id) => !memUserIds.includes(user_id));
@@ -874,6 +879,6 @@ export const sortChannelsByLastActivity = (channels: IChannel[]): IChannel[] => 
 		return timestampB - timestampA;
 	});
 };
-export const checkIsThread = (channel?: ChannelsEntity) => {
+export const checkIsThread = (channel?: IChannel) => {
 	return channel?.parrent_id !== '0' && channel?.parrent_id !== '';
 };

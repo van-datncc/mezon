@@ -1,4 +1,4 @@
-import { useMenu } from '@mezon/core';
+import { useAppParams, useMenu } from '@mezon/core';
 import {
 	DirectEntity,
 	appActions,
@@ -6,6 +6,7 @@ import {
 	selectDmGroupCurrent,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
+	selectPinMessageByChannelId,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -67,7 +68,7 @@ function DmTopbar({ dmGroupId }: ChannelTopbarProps) {
 								: (currentDmGroup?.channel_avatar?.at(0) ?? '')
 						}
 						name={currentDmGroup?.usernames || `${currentDmGroup?.creator_name}'s Group`}
-						status={currentDmGroup?.is_online?.some(Boolean)}
+						status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
 						isHideStatus={true}
 						isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
 						key={currentDmGroup?.channel_id}
@@ -185,8 +186,11 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 		setIsShowPinMessage(false);
 	}, []);
 
+	const { directId } = useAppParams();
+	const pinMsgs = useSelector(selectPinMessageByChannelId(directId));
+
 	return (
-		<div className="relative leading-5 h-5" ref={threadRef}>
+		<div className="relative leading-5 size-6" ref={threadRef}>
 			<Tooltip
 				className={`${isShowPinMessage && 'hidden'} w-[142px]`}
 				content="Pinned Messages"
@@ -197,6 +201,9 @@ function PinButton({ isLightMode }: { isLightMode: boolean }) {
 				<button className="focus-visible:outline-none" onClick={handleShowPinMessage} onContextMenu={(e) => e.preventDefault()}>
 					<Icons.PinRight isWhite={isShowPinMessage} />
 				</button>
+				{pinMsgs?.length > 0 && (
+					<span className="w-[10px] h-[10px] rounded-full bg-[#DA373C] absolute bottom-0 right-[3px] border-[1px] border-solid dark:border-bgPrimary border-white"></span>
+				)}
 			</Tooltip>
 			{isShowPinMessage && <PinnedMessages onClose={handleClose} rootRef={threadRef} />}
 		</div>

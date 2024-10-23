@@ -89,8 +89,8 @@ export const Events = () => {
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
 						<div className="w-5 h-5 relative flex flex-row items-center">
-							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-								<Icons.SettingProfile className="w-5 h-5 dark:text-channelTextLabel" />
+							<div className="w-5 h-5">
+								<Icons.SettingProfile className="w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode" />
 							</div>
 						</div>
 						<div className="w-full dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Channels</div>

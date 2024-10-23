@@ -29,12 +29,11 @@ export const registFcmDeviceToken = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await registFcmDeviceTokenCached(mezon, tokenId, deviceId, platform || '');
 			if (!response) {
-				return thunkAPI.rejectWithValue([]);
+				return thunkAPI.rejectWithValue(null);
 			}
 			return response;
-		} catch (error: any) {
-			const errmsg = await error.json();
-			return thunkAPI.rejectWithValue(errmsg.message);
+		} catch {
+			return null;
 		}
 	}
 );

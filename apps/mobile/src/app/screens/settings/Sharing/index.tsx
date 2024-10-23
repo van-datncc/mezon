@@ -12,11 +12,15 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
-import { channelMetaActions, ChannelsEntity, clansActions, selectAllChannelsByUser, selectClansEntities } from '@mezon/store';
 import {
+	channelMetaActions,
 	channelsActions,
+	ChannelsEntity,
+	clansActions,
 	directActions,
 	getStoreAsync,
+	selectAllChannelsByUser,
+	selectClansEntities,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectDirectsOpenlist,
@@ -79,7 +83,7 @@ export const Sharing = ({ data, onClose }) => {
 
 	useEffect(() => {
 		handleReconnect('Initial reconnect attempt');
-	}, []);
+	}, [handleReconnect]);
 
 	useEffect(() => {
 		if (searchText) {

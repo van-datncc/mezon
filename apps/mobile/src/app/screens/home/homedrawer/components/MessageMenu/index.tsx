@@ -1,8 +1,16 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectCurrentUserId, useAppSelector } from '@mezon/store';
-import { DirectEntity, deleteChannel, directActions, fetchDirectMessage, removeMemberChannel, useAppDispatch } from '@mezon/store-mobile';
+import {
+	DirectEntity,
+	deleteChannel,
+	directActions,
+	fetchDirectMessage,
+	removeMemberChannel,
+	selectCurrentUserId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

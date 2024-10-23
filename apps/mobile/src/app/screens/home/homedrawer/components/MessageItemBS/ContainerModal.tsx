@@ -1,24 +1,23 @@
+/* eslint-disable no-console */
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useChannelMembers, useChatReaction, useChatSending, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent, CopyIcon, Icons } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
+	MessagesEntity,
+	appActions,
 	giveCoffeeActions,
 	messagesActions,
 	selectCurrentChannel,
+	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
-	threadsActions,
-	useAppDispatch
-} from '@mezon/store';
-import {
-	MessagesEntity,
-	appActions,
-	selectCurrentChannelId,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
 	selectPinMessageByChannelId,
 	setIsForwardAll,
+	threadsActions,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
 import { EMOJI_GIVE_COFFEE, EOverriddenPermission, EPermission, ThreadStatus, getSrcEmoji, isPublicChannel } from '@mezon/utils';
@@ -220,6 +219,7 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 				messageId: message.id
 			})
 		);
+		onClose();
 		await sendMessage(
 			message.content,
 			message.mentions,
@@ -229,7 +229,6 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 			message?.isMentionEveryone || false,
 			true
 		);
-		onClose();
 	};
 
 	const handleActionMention = () => {
@@ -629,14 +628,5 @@ export const ContainerModal = React.memo((props: IReplyBottomSheet) => {
 		}
 	}, [type, isShowEmojiPicker, isOnlyEmojiPicker]);
 
-	return (
-		<View
-			style={[
-				styles.bottomSheetWrapper,
-				{ backgroundColor: isShowEmojiPicker || isOnlyEmojiPicker ? themeValue.secondary : themeValue.primary }
-			]}
-		>
-			{content}
-		</View>
-	);
+	return <View style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>{content}</View>;
 });

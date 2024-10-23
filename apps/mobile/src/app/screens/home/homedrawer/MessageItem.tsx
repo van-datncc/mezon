@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
 	ActionEmitEvent,
 	changeClan,
@@ -34,7 +35,7 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { selectCurrentChannel, selectCurrentClanId, setSelectedMessage } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClanId, setSelectedMessage } from '@mezon/store-mobile';
 import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -61,7 +62,6 @@ export type MessageItemProps = {
 	channelId?: string;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
-	jumpToRepliedMessage?: (messageId: string) => void;
 	currentClanId?: string;
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
@@ -77,7 +77,6 @@ const MessageItem = React.memo(
 			mode,
 			onOpenImage,
 			isNumberOfLine,
-			jumpToRepliedMessage,
 			onMessageAction,
 			setIsOnlyEmojiPicker,
 			showUserInformation = false,
@@ -112,8 +111,17 @@ const MessageItem = React.memo(
 		}, [message?.sender_id, message?.username]);
 
 		const hasIncludeMention = useMemo(() => {
-			return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
-		}, [message?.content?.t, userProfile]);
+			const userIdMention = userProfile?.user?.id;
+			const mentionOnMessage = message.mentions;
+			let includesHere = false;
+			if (typeof message.content?.t == 'string') {
+				includesHere = message.content.t?.includes('@here');
+			}
+			const includesUser = !!userIdMention && mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
+			const checkReplied = !!userIdMention && message?.references && message?.references[0]?.message_sender_id === userProfile?.user?.id;
+			return includesHere || includesUser || checkReplied;
+		}, [userProfile?.user?.id, message?.mentions, message?.content?.t, message?.references]);
+
 		const messageReferences = useMemo(() => {
 			return message?.references?.[0] as ApiMessageRef;
 		}, [message?.references]);
@@ -161,8 +169,6 @@ const MessageItem = React.memo(
 		}, [message.content]);
 
 		const isEdited = useMemo(() => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			if (message?.update_time && !message.isError && !message.isErrorRetry) {
 				const updateDate = new Date(message?.update_time);
 				const createDate = new Date(message?.create_time);
@@ -184,8 +190,8 @@ const MessageItem = React.memo(
 				setShowHighlightReply(true);
 				timeoutRef.current = setTimeout(() => {
 					setShowHighlightReply(false);
-					dispatch(messagesActions.setIdMessageToJump(null));
-				}, 3000);
+					dispatch(messagesActions.setIdMessageToJump(''));
+				}, 2000);
 			} else {
 				setShowHighlightReply(false);
 				timeoutRef.current && clearTimeout(timeoutRef.current);
@@ -193,7 +199,7 @@ const MessageItem = React.memo(
 			return () => {
 				timeoutRef.current && clearTimeout(timeoutRef.current);
 			};
-		}, [idMessageToJump]);
+		}, [dispatch, idMessageToJump, message?.id]);
 
 		const onLongPressImage = useCallback(() => {
 			if (preventAction) return;
@@ -365,8 +371,8 @@ const MessageItem = React.memo(
 					style={[
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
-						hasIncludeMention && styles.highlightMessageMention,
-						showHighlightReply && styles.highlightMessageReply
+						hasIncludeMention && styles.highlightMessageReply,
+						showHighlightReply && styles.highlightMessageMention
 					]}
 				>
 					{!!messageReferences && !!messageReferences?.message_ref_id && (
@@ -374,7 +380,8 @@ const MessageItem = React.memo(
 							messageReferences={messageReferences}
 							preventAction={preventAction}
 							isMessageReply={true}
-							jumpToRepliedMessage={jumpToRepliedMessage}
+							channelId={message.channel_id}
+							clanId={message.clan_id}
 							mode={mode}
 						/>
 					)}
@@ -420,8 +427,6 @@ const MessageItem = React.memo(
 								createTime={message?.create_time}
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-							{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-							{/*@ts-expect-error*/}
 							<Block opacity={message.isError || (message.isSending && !hasInternet) || message?.isErrorRetry ? 0.6 : 1}>
 								{isInviteLink ? (
 									<RenderMessageInvite content={contentMessage} />

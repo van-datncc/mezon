@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { selectBadgeCountByClanId, selectCurrentClanId } from '@mezon/store';
+import { selectBadgeCountByClanId, selectCurrentClanId } from '@mezon/store-mobile';
 import { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -36,7 +36,7 @@ export const ClanIcon = memo((props: IClanIconProps) => {
 
 			{badgeCountClan > 0 && (
 				<View style={styles.badge}>
-					<Text style={styles.badgeText}>{badgeCountClan}</Text>
+					<Text style={styles.badgeText}>{badgeCountClan > 99 ? `+99` : badgeCountClan}</Text>
 				</View>
 			)}
 			{!!isActive && <View style={styles.lineActiveClan} />}

@@ -11,16 +11,30 @@ import {
 	usePermissionChecker,
 	useSettingFooter
 } from '@mezon/core';
-import { EStateFriend, directMetaActions, selectCurrentChannel, selectCurrentClan, selectDmGroupCurrent, selectFriendStatus } from '@mezon/store';
-import { ChannelMembersEntity, EPermission, EUserSettings } from '@mezon/utils';
+import {
+	EStateFriend,
+	SetMuteNotificationPayload,
+	SetNotificationPayload,
+	directMetaActions,
+	notificationSettingActions,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectDmGroupCurrent,
+	selectFriendStatus,
+	selectSelectedChannelNotificationSetting,
+	useAppDispatch
+} from '@mezon/store';
+import { ChannelMembersEntity, EPermission, EUserSettings, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
+import { format } from 'date-fns';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
+import ItemPanel from '../PanelChannel/ItemPanel';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
 import PanelGroupDM from './PanelGroupDm';
@@ -58,7 +72,7 @@ const PanelMember = ({
 	dataMemberCreate,
 	onOpenProfile
 }: PanelMemberProps) => {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -67,7 +81,9 @@ const PanelMember = ({
 	const [hasClanOwnerPermission, hasAdminPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.administrator]);
 	const memberIsClanOwner = useClanOwnerChecker(member?.user?.id ?? '');
 	const { directId } = useAppParams();
-
+	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
+	const [nameChildren, setNameChildren] = useState('');
+	const [mutedUntil, setmutedUntil] = useState('');
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
@@ -105,7 +121,7 @@ const PanelMember = ({
 	const { toDmGroupPageFromMainApp } = useAppNavigation();
 	const navigate = useNavigate();
 	const { createDirectMessageWithUser } = useDirect();
-	const { setRequestInput, request } = useMessageValue();
+	const { setRequestInput, request } = useMessageValue(currentChannel?.channel_id);
 	const displayMentionName = useMemo(() => {
 		if (member?.clan_nick) return member.clan_nick;
 		return member?.user?.display_name ?? member?.user?.username;
@@ -162,6 +178,74 @@ const PanelMember = ({
 		},
 		[dispatch]
 	);
+
+	useEffect(() => {
+		if (getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0') {
+			setNameChildren(`Mute @${name}`);
+
+			setmutedUntil('');
+		} else {
+			setNameChildren(`UnMute @${name}`);
+
+			if (getNotificationChannelSelected?.time_mute) {
+				const timeMute = new Date(getNotificationChannelSelected.time_mute);
+				const currentTime = new Date();
+				if (timeMute > currentTime) {
+					const timeDifference = timeMute.getTime() - currentTime.getTime();
+					const formattedDate = format(timeMute, 'dd/MM, HH:mm');
+					setmutedUntil(`Muted until ${formattedDate}`);
+
+					setTimeout(() => {
+						const body = {
+							channel_id: directMessageValue?.dmID || '',
+							notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
+							clan_id: '',
+							active: 1,
+							is_current_channel: directMessageValue?.dmID === directId
+						};
+						dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+					}, timeDifference);
+				}
+			}
+		}
+	}, [getNotificationChannelSelected]);
+
+	const muteOrUnMuteChannel = (active: number) => {
+		const body = {
+			channel_id: directMessageValue?.dmID || '',
+			notification_type: 0,
+			clan_id: '',
+			active: active,
+			is_current_channel: directMessageValue?.dmID === directId
+		};
+		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+	};
+
+	const handleScheduleMute = (duration: number) => {
+		if (duration !== Infinity) {
+			const now = new Date();
+			const unmuteTime = new Date(now.getTime() + duration);
+			const unmuteTimeISO = unmuteTime.toISOString();
+
+			const body: SetNotificationPayload = {
+				channel_id: directMessageValue?.dmID || '',
+				notification_type: 0,
+				clan_id: '',
+				time_mute: unmuteTimeISO,
+				is_current_channel: directMessageValue?.dmID === directId
+			};
+			dispatch(notificationSettingActions.setNotificationSetting(body));
+		} else {
+			const body: SetMuteNotificationPayload = {
+				channel_id: directMessageValue?.dmID || '',
+				notification_type: 0,
+				clan_id: '',
+				active: 0,
+				is_current_channel: directMessageValue?.dmID === directId
+			};
+			dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+		}
+	};
 
 	return (
 		<div
@@ -299,9 +383,32 @@ const PanelMember = ({
 							)}
 						</>
 					)}
+
 					{directMessageValue && (
 						<GroupPanelMember>
-							<ItemPanelMember children={`Mute @${name}`} />
+							{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
+								<Dropdown
+									trigger="hover"
+									dismissOnClick={false}
+									renderTrigger={() => (
+										<div>
+											<ItemPanel children={nameChildren} dropdown="change here" onClick={() => muteOrUnMuteChannel(0)} />
+										</div>
+									)}
+									label=""
+									placement="right-start"
+									className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+								>
+									<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
+									<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
+									<ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(FOR_3_HOURS)} />
+									<ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(FOR_8_HOURS)} />
+									<ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(FOR_24_HOURS)} />
+									<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
+								</Dropdown>
+							) : (
+								<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
+							)}
 						</GroupPanelMember>
 					)}
 					{!isSelf && (hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner)) && (

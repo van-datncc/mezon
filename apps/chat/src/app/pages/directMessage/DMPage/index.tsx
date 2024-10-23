@@ -22,6 +22,7 @@ import {
 	MessagesEntity,
 	directActions,
 	directMetaActions,
+	gifsStickerEmojiActions,
 	selectCloseMenu,
 	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
@@ -36,7 +37,7 @@ import {
 import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, memo, useEffect, useMemo, useRef } from 'react';
+import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
@@ -54,6 +55,10 @@ function useChannelSeen(channelId: string) {
 		dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 		dispatch(directActions.setActiveDirect({ directId: channelId }));
 	};
+
+	useEffect(() => {
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+	}, [channelId]);
 
 	useEffect(() => {
 		if ((lastMessage && isFocusDesktop === true && isElectron()) || (lastMessage && isTabVisible)) {
@@ -115,7 +120,7 @@ const DirectMessage = () => {
 				type: Number(type)
 			})
 		);
-	}, [currentDmGroup.channel_id]);
+	}, [currentDmGroup?.channel_id]);
 
 	if (distanceToBottom < HEIGHT_EMOJI_PANEL) {
 		topPositionEmojiPanel = 'auto';
@@ -148,10 +153,12 @@ const DirectMessage = () => {
 	}, [messagesContainerRef.current?.getBoundingClientRect()]);
 
 	const isDmChannel = useMemo(() => currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM, [currentDmGroup?.type]);
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	const handleClose = useCallback(() => {}, []);
 
 	return (
 		<>
-			{draggingState && <FileUploadByDnD currentId={currentDmGroup.channel_id ?? ''} />}
+			{draggingState && <FileUploadByDnD currentId={currentDmGroup?.channel_id ?? ''} />}
 			<div
 				className={` flex flex-col
 			 flex-1 shrink min-w-0 bg-transparent
@@ -259,8 +266,7 @@ const DirectMessage = () => {
 							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-widthDmProfile'}`}
 						>
 							<ModalUserProfile
-								// eslint-disable-next-line @typescript-eslint/no-empty-function
-								onClose={() => {}}
+								onClose={handleClose}
 								userID={Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id}
 								classWrapper="w-full"
 								classBanner="h-[120px]"
