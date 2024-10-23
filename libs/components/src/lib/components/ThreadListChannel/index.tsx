@@ -54,7 +54,7 @@ const ThreadListChannel = React.forwardRef<ListThreadChannelRef, ThreadListChann
 
 	const isShowThread = (thread: IChannel) => {
 		const threadId = thread.id;
-		return allChannelMetaEntities[threadId].lastSeenTimestamp < allChannelMetaEntities[threadId].lastSentTimestamp;
+		return allChannelMetaEntities[threadId]?.lastSeenTimestamp < allChannelMetaEntities[threadId]?.lastSentTimestamp;
 	};
 
 	const filteredThreads = threads.filter((thread) => {
