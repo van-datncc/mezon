@@ -3,7 +3,7 @@ import { appActions } from '@mezon/store-mobile';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
-import { Keyboard, StatusBar, View } from 'react-native';
+import { Keyboard, Platform, StatusBar, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
@@ -21,11 +21,15 @@ const HomeScreen = React.memo((props: any) => {
 
 	useEffect(() => {
 		const focusedListener = navigation.addListener('focus', () => {
-			StatusBar.setBackgroundColor(themeValue.primary);
+			if (Platform.OS === 'android') {
+				StatusBar.setBackgroundColor(themeValue.primary);
+			}
 			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
 		});
 		const blurListener = navigation.addListener('blur', () => {
-			StatusBar.setBackgroundColor(themeValue.secondary);
+			if (Platform.OS === 'android') {
+				StatusBar.setBackgroundColor(themeValue.secondary);
+			}
 			StatusBar.setBarStyle(themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content');
 		});
 		return () => {
