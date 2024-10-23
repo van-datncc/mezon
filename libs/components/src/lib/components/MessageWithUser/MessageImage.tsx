@@ -1,5 +1,12 @@
 import { useAppParams, useAttachments } from '@mezon/core';
-import { attachmentActions, selectCurrentChannelId, selectCurrentClanId, selectLoadedStatus, useAppDispatch } from '@mezon/store';
+import {
+	attachmentActions,
+	checkListAttachmentExist,
+	selectCurrentChannelId,
+	selectCurrentClanId,
+	selectLoadedStatus,
+	useAppDispatch
+} from '@mezon/store';
 import { SHOW_POSITION, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -25,6 +32,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const [showLoader, setShowLoader] = useState(false);
 	const fadeIn = useRef(false);
 	const loadedImageCached = useSelector(selectLoadedStatus);
+	const checkListAttachment = useSelector(checkListAttachmentExist(currentChannelId as string));
 
 	const handleClick = (url: string) => {
 		if (checkImage) return;
@@ -40,7 +48,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 			})
 		);
 
-		if (((currentClanId && currentChannelId) || currentDmGroupId) && loadedImageCached !== 'loaded') {
+		if (((currentClanId && currentChannelId) || currentDmGroupId) && loadedImageCached !== 'loaded' && !checkListAttachment) {
 			const clanId = currentDmGroupId ? '0' : (currentClanId as string);
 			const channelId = (currentDmGroupId as string) || (currentChannelId as string);
 			dispatch(attachmentActions.fetchChannelAttachments({ clanId, channelId }));
