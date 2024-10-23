@@ -6,7 +6,8 @@ const useProcessMention = (
 	mentionsRaw: MentionItem[],
 	roles: RolesClanEntity[],
 	membersOfChild: ChannelMembersEntity[],
-	membersOfParent: ChannelMembersEntity[]
+	membersOfParent: ChannelMembersEntity[],
+	refereceSenderId?: string
 ) => {
 	const roleList = getRoleList(roles);
 	const mentions: IMentionOnMessage[] = [];
@@ -46,7 +47,7 @@ const useProcessMention = (
 			});
 		}
 	});
-	const userIds = uniqueUsers(mentions, membersOfChild, roles);
+	const userIds = uniqueUsers(mentions, membersOfChild, roles, [refereceSenderId || '']);
 	const usersNotExistingInThread = userIds.filter((userId) => membersOfParent?.some((member) => member.id === userId));
 
 	return {

@@ -131,6 +131,8 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 		return null;
 	}
 
+	if (!channelId) return null;
+
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType, isPublic);

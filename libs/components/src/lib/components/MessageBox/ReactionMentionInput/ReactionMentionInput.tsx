@@ -150,6 +150,12 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
+	const currentDmOrChannelId = useMemo(
+		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
+		[currentChannel?.channel_id, currentDmId, props.mode]
+	);
+	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
+
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
 	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
@@ -157,15 +163,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		request?.mentionRaw,
 		rolesClan,
 		membersOfChild as ChannelMembersEntity[],
-		membersOfParent as ChannelMembersEntity[]
+		membersOfParent as ChannelMembersEntity[],
+		dataReferences?.message_sender_id || ''
 	);
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
 
-	const currentDmOrChannelId = useMemo(
-		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
-		[currentChannel?.channel_id, currentDmId, props.mode]
-	);
-	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
@@ -367,6 +369,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			request,
+			hashtagList,
+			emojiList,
+			linkList,
+			markdownList,
+			voiceLinkRoomList,
 			mentionData,
 			nameValueThread,
 			props,

@@ -59,7 +59,7 @@ function ChannelList() {
 						<span className="one-line">Favorite channel</span>
 					</div>
 					{isExpandFavorite ? (
-						<div className="px-4">
+						<div className="w-[94%] mx-auto">
 							{channelFavorites
 								? channelFavorites.map((id, index) => (
 										<FavoriteChannel key={index} channelId={id} channelRef={channelRefs.current[id]} />
@@ -95,7 +95,7 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 			{channel ? (
 				<div
 					onClick={() => handleJumpChannel(channel.channel_id || '', channel.clan_id || '')}
-					className="flex gap-2 items-center mt-2 hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
+					className="flex gap-2 rounded-md w-full px-2 py-1 mt-1 items-center hover:dark:bg-bgModifierHover hover:bg-bgModifierHoverLight"
 				>
 					<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
 						{channel.channel_private === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_VOICE && (
