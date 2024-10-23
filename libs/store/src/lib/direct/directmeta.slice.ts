@@ -85,11 +85,11 @@ export const directMetaSlice = createSlice({
 		setCountMessUnread: (state, action: PayloadAction<{ channelId: string; isMention: boolean }>) => {
 			const { channelId, isMention } = action.payload;
 			const entity = state.entities[channelId];
-			if (entity.is_mute !== true || isMention === true) {
+			if (entity?.is_mute !== true || isMention === true) {
 				directMetaAdapter.updateOne(state, {
 					id: channelId,
 					changes: {
-						count_mess_unread: (entity.count_mess_unread || 0) + 1
+						count_mess_unread: (entity?.count_mess_unread || 0) + 1
 					}
 				});
 			}
