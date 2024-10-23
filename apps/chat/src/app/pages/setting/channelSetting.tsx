@@ -21,18 +21,6 @@ const ChannelSetting = () => {
 	const countChannel = useSelector(selectNumberChannelCount);
 	const countThread = useSelector(selectNumberThreadCount);
 
-	const [currentPage, setCurrentPage] = useState(1);
-	const [pageSize, setPageSize] = useState(10);
-
-	const onPageChange = (page: number) => {
-		setCurrentPage(page);
-	};
-
-	const handleChangePageSize = (pageSize: number) => {
-		setPageSize(pageSize);
-		setCurrentPage(1);
-	};
-
 	const dispatch = useAppDispatch();
 	const selectClanId = useSelector(selectCurrentClanId);
 
@@ -81,12 +69,10 @@ const ChannelSetting = () => {
 
 	useEffect(() => {
 		async function fetchListChannel() {
-			await dispatch(
-				channelSettingActions.fetchChannelSettingInClan({ clanId: selectClanId as string, page: currentPage, limit: pageSize, noCache: true })
-			);
+			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId: selectClanId as string }));
 		}
 		fetchListChannel();
-	}, [currentPage, pageSize]);
+	}, []);
 
 	return (
 		<div className="p-8 h-[calc(100vh_-_56px)] flex flex-col">
@@ -125,14 +111,7 @@ const ChannelSetting = () => {
 					/>
 				</div>
 			</div>
-			<ListChannelSetting
-				listChannel={listChannel}
-				currentPage={currentPage}
-				pageSize={pageSize}
-				onPageChange={onPageChange}
-				handleChangePageSize={handleChangePageSize}
-				countChannel={countChannel}
-			/>
+			<ListChannelSetting listChannel={listChannel} clanId={selectClanId as string} countChannel={countChannel} />
 		</div>
 	);
 };

@@ -54,11 +54,11 @@ export const fetchChannelSettingInClanCached = memoizeAndTrack(
 
 export const fetchChannelSettingInClan = createAsyncThunk(
 	'channelSetting/fetchClanChannelSetting',
-	async ({ noCache = false, clanId, page, limit }: { noCache?: boolean; clanId: string; page: number; limit: number }, thunkAPI) => {
+	async ({ noCache = false, clanId, page = 1, limit = 10 }: { noCache?: boolean; clanId: string; page?: number; limit?: number }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
-				fetchChannelSettingInClanCached.clear(mezon, clanId, page, limit);
+				fetchChannelSettingInClanCached.clear();
 			}
 
 			const response = await fetchChannelSettingInClanCached(mezon, clanId, page, limit);
@@ -80,7 +80,7 @@ export const settingClanChannelSlice = createSlice({
 		builder
 			.addCase(fetchChannelSettingInClan.fulfilled, (state: SettingClanChannelState, actions) => {
 				state.loadingStatus = 'loaded';
-				channelSettingAdapter.setAll(state, actions.payload.channel_setting_list || []);
+				channelSettingAdapter.setMany(state, actions.payload.channel_setting_list || []);
 				state.channelCount = actions.payload?.channel_count || 0;
 				state.threadCount = actions.payload?.thread_count || 0;
 			})
