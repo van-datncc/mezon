@@ -1,11 +1,10 @@
 import { useAppNavigation } from '@mezon/core';
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { EMarkdownType } from '@mezon/utils';
-import clx from 'classnames';
-import { memo, useCallback } from 'react';
-import Markdown from 'react-markdown';
+import { memo, useCallback, useEffect, useState } from 'react';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
-import { PreClass } from '../../components';
 
 type MarkdownContentOpt = {
 	content?: string;
@@ -46,49 +45,68 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 		[isJumMessageEnabled, isTokenClickAble]
 	);
 
-	const classes = clx(
-		'prose-code:text-sm inline prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',
-		{
-			lightMode: appearanceTheme === 'light'
-		}
-	);
+	const isLightMode = appearanceTheme === 'light';
+
 	return (
-		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
-			<div className={`lineText contents dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
-				{isLink && (
-					// eslint-disable-next-line jsx-a11y/anchor-is-valid
-					<a
-						onClick={() => onClickLink(content ?? '')}
-						rel="noopener noreferrer"
-						style={{
-							color: 'rgb(59,130,246)',
-							cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
-							wordBreak: 'break-word',
-							textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline'
-						}}
-						className="tagLink"
-					>
-						{content}
-					</a>
-				)}
-				{isMarkDown && typeOfMarkdown === EMarkdownType.SINGLE && (
-					<Markdown
-						children={content}
-						components={{
-							p: 'span'
-						}}
-					/>
-				)}
-				{isMarkDown && typeOfMarkdown === EMarkdownType.TRIPLE && (
-					<Markdown
-						children={content}
-						components={{
-							pre: (props) => <PreClass {...props} isInPinMsg={isInPinMsg} />
-						}}
-					/>
-				)}
-			</div>
-		</article>
+		<div className={`contents dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+			{isLink && (
+				// eslint-disable-next-line jsx-a11y/anchor-is-valid
+				<a
+					onClick={() => onClickLink(content ?? '')}
+					rel="noopener noreferrer"
+					style={{
+						color: 'rgb(59,130,246)',
+						cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
+						wordBreak: 'break-word',
+						textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline'
+					}}
+					className="tagLink"
+				>
+					{content}
+				</a>
+			)}
+			{isMarkDown && typeOfMarkdown === EMarkdownType.SINGLE && <SingleMarkdown content={content ?? ''} isLightMode={isLightMode} />}
+			{isMarkDown && typeOfMarkdown === EMarkdownType.TRIPLE && (
+				<TripleMarkdown content={content ?? ''} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
+			)}
+		</div>
 	);
 };
 export default memo(MarkdownContent);
+
+type PartMarkdownOpt = {
+	content?: string;
+	isLightMode?: boolean;
+	isInPinMsg?: boolean;
+};
+
+const SingleMarkdown: React.FC<PartMarkdownOpt> = ({ content, isLightMode }) => {
+	return (
+		<span className={`prose ${isLightMode ? 'single-markdown-light-mode' : 'single-markdown'} `}>
+			<code>{content?.split('`')}</code>
+		</span>
+	);
+};
+
+const TripleMarkdown: React.FC<PartMarkdownOpt> = ({ content, isLightMode, isInPinMsg }) => {
+	const [copied, setCopied] = useState(false);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setCopied(false);
+		}, 5000);
+
+		return () => clearTimeout(timer);
+	}, [copied]);
+
+	return (
+		<div className={`triple-markdown ${isInPinMsg ? 'pinned-msg' : ''}`}>
+			<pre className={`pre ${isInPinMsg ? 'flex items-start' : ''}`}>
+				<CopyToClipboard text={content ?? ''} onCopy={() => setCopied(true)}>
+					<button className="icon copy-icon">{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}</button>
+				</CopyToClipboard>
+				<code className={`code ${isInPinMsg ? 'whitespace-pre-wrap block break-words' : ''}`}>{content?.toString()?.split('```')}</code>
+			</pre>
+		</div>
+	);
+};
