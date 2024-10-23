@@ -12,8 +12,9 @@ import {
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationSetting from '../../../../../../../mobile/src/app/components/NotificationSetting';
 import { MezonBottomSheet } from '../../../../componentUI';
@@ -52,7 +53,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const bottomSheetInviteRef = useRef(null);
 	const bottomSheetNotifySettingRef = useRef<BottomSheetModal>(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
-	const previousPositionRef = useRef(null);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
@@ -64,6 +64,17 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const selectCategoryOffsets = useSelector(selectCategoryChannelOffsets);
 	const [isCollapseCategory, setIsCollapseCategory] = useState(false);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const { t } = useTranslation('channelMenu');
+
+	const findFirstChannelWithBadgeCount = (listCategory = []) =>
+		listCategory
+			.flatMap((category) => category?.channels ?? [])
+			.flatMap((channel) => [channel, ...(channel?.threads ?? [])])
+			.find((item) => item?.badgeCount > 0) || null;
+
+	const firstChannelBadgeCount = useMemo(() => {
+		return findFirstChannelWithBadgeCount(categorizedChannels);
+	}, [categorizedChannels]);
 
 	const handlePress = useCallback(() => {
 		bottomSheetMenuRef.current?.present();
@@ -98,21 +109,27 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const handleCollapseCategory = useCallback((isCollapse: boolean) => {
 		setIsCollapseCategory(true);
 	}, []);
-	useEffect(() => {
-		const positionChannel = channelsPositionRef?.current?.[currentChannel?.id];
-		const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
-		const position = (positionChannel?.height || 0) + (categoryOffset || 0);
-		const previousPosition = previousPositionRef?.current;
 
-		if (Math.abs(position - previousPosition) > 100 && !isCollapseCategory) {
-			flashListRef?.current?.scrollTo({
-				x: 0,
-				y: position - size.s_150,
-				animated: true
-			});
-			previousPositionRef.current = position;
-		}
-	}, [selectCategoryOffsets, currentChannel, isCollapseCategory, currentClanId]);
+	const handleScrollToChannel = useCallback(
+		(currentChannelId: string) => {
+			const positionChannel = channelsPositionRef?.current?.[currentChannelId];
+			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
+			const position = (positionChannel?.height || 0) + (categoryOffset || 0);
+
+			if (position && !isCollapseCategory) {
+				flashListRef?.current?.scrollTo({
+					x: 0,
+					y: position - size.s_150,
+					animated: true
+				});
+			}
+		},
+		[selectCategoryOffsets, currentChannel?.category_id, isCollapseCategory]
+	);
+
+	useEffect(() => {
+		handleScrollToChannel(currentChannel?.id);
+	}, [selectCategoryOffsets, currentChannel, isCollapseCategory, currentClanId, handleScrollToChannel]);
 
 	useEffect(() => {
 		setIsCollapseCategory(false);
@@ -173,6 +190,17 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 						})}
 					<Block height={80} />
 				</ScrollView>
+
+				{!!firstChannelBadgeCount && (
+					<TouchableOpacity
+						onPress={() => {
+							handleScrollToChannel(firstChannelBadgeCount?.channel_id);
+						}}
+						style={styles.buttonBadgeCount}
+					>
+						<Text style={styles.buttonBadgeCountText}>{t('btnBadgeCount')}</Text>
+					</TouchableOpacity>
+				)}
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
