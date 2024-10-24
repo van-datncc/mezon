@@ -112,9 +112,6 @@ export const attachmentSlice = createSlice({
 		removeCurrentAttachment: (state) => {
 			state.currentAttachment = null;
 		},
-		removeLoadedStatusCached: (state) => {
-			state.loadingStatus = 'not loaded';
-		},
 		addAttachments: (state, action: PayloadAction<{ listAttachments: AttachmentEntity[]; channelId: string }>) => {
 			const currentChannelId = action?.payload?.channelId;
 			if (state.listAttachmentsByChannel[currentChannelId]) {
@@ -206,8 +203,6 @@ export const selectMessageIdAttachment = createSelector(getAttachmentState, (sta
 
 export const selectAttachmentPhoto = () =>
 	createSelector(selectAllAttachment, (attachments) => (attachments || []).filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)));
-
-export const selectLoadedStatus = createSelector(getAttachmentState, (state: AttachmentState) => state.loadingStatus);
 
 export const selectAllListAttachmentByChannel = (channelId: string) =>
 	createSelector(getAttachmentState, (state) => {

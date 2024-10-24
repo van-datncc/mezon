@@ -1,7 +1,6 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
 	appActions,
-	attachmentActions,
 	channelsActions,
 	notificationSettingActions,
 	selectClanById,
@@ -160,7 +159,6 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 				}
 			} else {
 				dispatch(channelsActions.setCurrentChannelId(channel.id));
-				dispatch(attachmentActions.removeLoadedStatusCached());
 			}
 		};
 
