@@ -20,7 +20,7 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Linking, ScrollView, View } from 'react-native';
@@ -194,6 +194,9 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				await Linking.openURL(urlVoice);
 			}
 		} else {
+			if (!isTabletLandscape) {
+				navigation.dispatch(DrawerActions.closeDrawer());
+			}
 			const channelId = channel?.channel_id || '';
 			const clanId = channel?.clan_id || '';
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
