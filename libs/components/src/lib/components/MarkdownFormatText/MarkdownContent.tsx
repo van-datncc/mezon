@@ -1,7 +1,7 @@
 import { useAppNavigation } from '@mezon/core';
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EMarkdownType } from '@mezon/utils';
+import { EBacktickType } from '@mezon/utils';
 import { memo, useCallback, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
@@ -12,8 +12,8 @@ type MarkdownContentOpt = {
 	isTokenClickAble: boolean;
 	isInPinMsg?: boolean;
 	isLink?: boolean;
-	isMarkDown?: boolean;
-	typeOfMarkdown?: EMarkdownType;
+	isBacktick?: boolean;
+	typeOfBacktick?: EBacktickType;
 };
 
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
@@ -22,8 +22,8 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	isTokenClickAble,
 	isInPinMsg,
 	isLink,
-	isMarkDown,
-	typeOfMarkdown
+	isBacktick,
+	typeOfBacktick
 }) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
@@ -66,11 +66,11 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 					{content}
 				</a>
 			)}
-			{isMarkDown && typeOfMarkdown === EMarkdownType.SINGLE ? (
+			{isBacktick && typeOfBacktick === EBacktickType.SINGLE ? (
 				<SingleBacktick content={content?.split('`').filter(Boolean)} isInPinMsg={isInPinMsg} isLightMode={isLightMode} />
-			) : isMarkDown && typeOfMarkdown === EMarkdownType.TRIPLE && !posInReply ? (
+			) : isBacktick && typeOfBacktick === EBacktickType.TRIPLE && !posInReply ? (
 				<TripleBackticks content={content ?? ''} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
-			) : typeOfMarkdown === EMarkdownType.TRIPLE && posInReply ? (
+			) : typeOfBacktick === EBacktickType.TRIPLE && posInReply ? (
 				<SingleBacktick content={content?.split('`').filter(Boolean)} isLightMode={isLightMode} />
 			) : null}
 		</div>
