@@ -116,9 +116,12 @@ export const attachmentSlice = createSlice({
 			state.loadingStatus = 'not loaded';
 		},
 		addAttachments: (state, action: PayloadAction<{ listAttachments: AttachmentEntity[]; channelId: string }>) => {
-			action.payload.listAttachments.map((attachment) => {
-				state.listAttachmentsByChannel[action.payload.channelId].unshift(attachment);
-			});
+			const currentChannelId = action?.payload?.channelId;
+			if (state.listAttachmentsByChannel[currentChannelId]) {
+				action?.payload?.listAttachments.map((attachment) => {
+					state.listAttachmentsByChannel[currentChannelId].unshift(attachment);
+				});
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -127,12 +130,10 @@ export const attachmentSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchChannelAttachments.fulfilled, (state: AttachmentState, action) => {
-				if (
-					action.payload.length > 0 &&
-					!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, action.payload[0].channelId as string)
-				) {
+				const currentChannelId = action.payload[0].channelId as string;
+				if (action.payload.length > 0 && !Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, currentChannelId)) {
 					attachmentAdapter.setAll(state, action.payload);
-					state.listAttachmentsByChannel[action.payload[0].channelId as string] = action.payload;
+					state.listAttachmentsByChannel[currentChannelId] = action.payload;
 				}
 				state.loadingStatus = 'loaded';
 			})

@@ -32,7 +32,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 	const [showLoader, setShowLoader] = useState(false);
 	const fadeIn = useRef(false);
 	const loadedImageCached = useSelector(selectLoadedStatus);
-	const checkListAttachment = useSelector(checkListAttachmentExist(currentChannelId as string));
+	const checkListAttachment = useSelector(checkListAttachmentExist((currentDmGroupId || currentChannelId) as string));
 
 	const handleClick = (url: string) => {
 		if (checkImage) return;
