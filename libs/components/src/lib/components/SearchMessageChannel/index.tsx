@@ -117,7 +117,8 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			const value = event.target.value;
 			const words = value.split(' ');
 			const cleanedWords = words.filter((word) => {
-				return !(word.startsWith('@[') && word.includes('](') && word.endsWith(')'));
+				const validStart = word.startsWith('from:') || word.includes('mention') || word.startsWith('has:');
+				return !validStart;
 			});
 
 			const cleanedValue = cleanedWords.join(' ').trim();
@@ -134,7 +135,10 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 
 			for (const mention of mentions) {
 				const convertMention = mention.display.split(':');
-				filter.push({ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] });
+				filter.push({
+					field_name: searchFieldName[convertMention[0]],
+					field_value: convertMention[0] === 'mentions' ? `"user_id":"${mention.id}"` : convertMention[1]
+				});
 			}
 			setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
 		},
@@ -298,6 +302,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					}}
 				>
 					<Mention
+						markup="has:[__display__](__id__)"
 						appendSpaceOnAdd={true}
 						data={HAS_OPTIONS}
 						trigger="has:"
@@ -305,12 +310,13 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 							return `has:${display}`;
 						}}
 						renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => (
-							<SelectItemUser search={search} isFocused={focused} title="has: " content={suggestion.display} />
+							<SelectItemUser search={search} isFocused={focused} title="has: " content={suggestion.display} key={suggestion.id} />
 						)}
 						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 					/>
 
 					<Mention
+						markup="from:[__display__](__id__)"
 						appendSpaceOnAdd={true}
 						data={handleSearchUserMention}
 						trigger="from:"
@@ -325,6 +331,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 									title="from: "
 									content={suggestion.display}
 									onClick={() => setIsShowSearchOptions('')}
+									// key={suggestion.display}
 								/>
 							);
 						}}
@@ -332,10 +339,12 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					/>
 
 					<Mention
+						markup='"mention":\"user_id\":\"__display__\"(__id__)'
+						// markup={'mention:[__display__](__id__)'}
 						appendSpaceOnAdd={true}
 						data={userListDataSearchByMention}
 						trigger="mentions:"
-						displayTransform={(id: any, display: any) => {
+						displayTransform={(id: string, display: string) => {
 							return `mentions:${display}`;
 						}}
 						renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => {
@@ -346,6 +355,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 									title="mentions: "
 									content={suggestion.display}
 									onClick={() => setIsShowSearchOptions('')}
+									// key={suggestion.display}
 								/>
 							);
 						}}
