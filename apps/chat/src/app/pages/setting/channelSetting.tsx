@@ -69,7 +69,7 @@ const ChannelSetting = () => {
 
 	useEffect(() => {
 		async function fetchListChannel() {
-			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId: selectClanId as string }));
+			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId: selectClanId as string, parentId: '0' }));
 		}
 		fetchListChannel();
 	}, []);

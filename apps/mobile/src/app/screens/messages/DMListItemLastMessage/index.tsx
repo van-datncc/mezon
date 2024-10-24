@@ -18,7 +18,7 @@ type IEmojiMarkup = {
 };
 
 const EMOJI_KEY = '[ICON_EMOJI]';
-export const DmListItemLastMessage = React.memo((props: { content: IExtendedMessage; fontSize?: number }) => {
+export const DmListItemLastMessage = React.memo((props: { content: IExtendedMessage; styleText?: any }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t, ej = [] } = props.content || {};
@@ -63,7 +63,7 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 		while (endIndex !== -1) {
 			const textPart = formatEmojiInText.slice(startIndex, endIndex);
 			if (textPart) {
-				parts.push(<Text style={[styles.message, props?.fontSize && { fontSize: props?.fontSize }]}>{textPart}</Text>);
+				parts.push(<Text style={[styles.message, props?.styleText && props?.styleText]}>{textPart}</Text>);
 			}
 
 			startIndex = endIndex + EMOJI_KEY.length;
@@ -78,14 +78,14 @@ export const DmListItemLastMessage = React.memo((props: { content: IExtendedMess
 		}
 
 		if (startIndex < formatEmojiInText.length) {
-			parts.push(<Text style={[styles.message, props?.fontSize && { fontSize: props?.fontSize }]}>{formatEmojiInText.slice(startIndex)}</Text>);
+			parts.push(<Text style={[styles.message, props?.styleText && props?.styleText]}>{formatEmojiInText.slice(startIndex)}</Text>);
 		}
 
 		return parts;
 	};
 
 	return (
-		<Text style={[styles.dmMessageContainer, props?.fontSize && { fontSize: props?.fontSize }]} numberOfLines={1}>
+		<Text style={[styles.dmMessageContainer, props?.styleText && props?.styleText]} numberOfLines={1}>
 			{convertTextToEmoji()}
 		</Text>
 	);

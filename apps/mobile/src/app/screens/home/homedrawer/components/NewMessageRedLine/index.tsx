@@ -1,9 +1,8 @@
 import { Block, Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { selectLastSeenMessage } from '@mezon/store-mobile';
+import { selectUnreadMessageIdByChannelId, useAppSelector } from '@mezon/store';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
-import { useSelector } from 'react-redux';
 
 interface INewMessageRedLineProps {
 	messageId: string;
@@ -17,10 +16,10 @@ export const NewMessageRedLine = memo((props: INewMessageRedLineProps) => {
 	const { channelId = '', messageId = '', isEdited = false, isSending = false, isMe = false } = props;
 	const { themeValue } = useTheme();
 	const { t } = useTranslation('message');
-	const lastSeen = useSelector(selectLastSeenMessage(channelId, messageId));
+	const lastMessageUnreadId = useAppSelector((state) => selectUnreadMessageIdByChannelId(state, channelId as string));
 	const isUnread = useMemo(() => {
-		return lastSeen && !isEdited && !isSending && !isMe;
-	}, [lastSeen, isEdited, isSending, isMe]);
+		return lastMessageUnreadId === messageId && !isEdited && !isSending && !isMe;
+	}, [lastMessageUnreadId, messageId, isEdited, isSending, isMe]);
 
 	return (
 		<Block alignItems="center">

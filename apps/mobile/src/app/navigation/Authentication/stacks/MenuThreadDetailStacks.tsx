@@ -6,7 +6,8 @@ import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm'
 import MenuThreadDetail from '../../../components/ThreadDetail/MenuThreadDetail';
 import { APP_SCREEN } from '../../ScreenTypes';
 
-export const MenuThreadDetailStacks = () => {
+// eslint-disable-next-line no-empty-pattern
+export const MenuThreadDetailStacks = ({}: any) => {
 	const { themeValue } = useTheme();
 	const Stack = createStackNavigator();
 	return (
