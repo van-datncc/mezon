@@ -7,7 +7,8 @@
         "inviteMenu": {
             "title": "",
             "invite": "Invite",
-            "favorite": "Favorite",
+            "markFavorite": "Mark Favorite",
+            "unMarkFavorite": "UnMark Favorite",
             "copyLink": "Copy Link"
         },
         "notification": {
@@ -61,5 +62,6 @@
       "yesButton": "Leave Thread",
       "textConfirm": "Are you sure you want to Leave Thread ? You can't receive message from thread when leave this thread"
     },
-    "btnBadgeCount": "New"
+    "btnBadgeCount": "New",
+    "favoriteChannel":"FAVORITE CHANNEL"
 }

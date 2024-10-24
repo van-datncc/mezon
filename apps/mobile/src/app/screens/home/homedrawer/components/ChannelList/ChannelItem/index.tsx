@@ -1,12 +1,12 @@
-import { Icons } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
-import { ChannelStatusEnum, IChannel } from '@mezon/utils';
+import { useTheme } from '@mezon/mobile-ui';
+import { IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { ChannelBadgeUnread } from '../ChannelBadgeUnread';
 import { StatusVoiceChannel } from '../ChannelListItem';
 import { style } from '../ChannelListItem/styles';
+import { ChannelStatusIcon } from '../ChannelStatusIcon';
 
 interface IChannelItemProps {
 	onPress: () => void;
@@ -38,32 +38,7 @@ function ChannelItem({ onLongPress, onPress, data, isUnRead, isActive }: IChanne
 			<View style={[styles.channelListItem]}>
 				{isUnRead && <View style={styles.dotIsNew} />}
 
-				{data?.channel_private === ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-					<Icons.VoiceLockIcon
-						width={size.s_18}
-						height={size.s_18}
-						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
-					/>
-				)}
-				{data?.channel_private === ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-					<Icons.TextLockIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
-				)}
-				{data?.channel_private !== ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_VOICE && (
-					<Icons.VoiceNormalIcon
-						width={size.s_18}
-						height={size.s_18}
-						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
-					/>
-				)}
-				{data?.channel_private !== ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_TEXT && (
-					<Icons.TextIcon width={size.s_18} height={size.s_18} color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal} />
-				)}
-				{data?.channel_private !== ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-					<Icons.StreamIcon height={size.s_18} width={size.s_18} color={themeValue.channelNormal} />
-				)}
-				{data?.channel_private !== ChannelStatusEnum.isPrivate && data?.type === ChannelType.CHANNEL_TYPE_APP && (
-					<Icons.AppChannelIcon height={size.s_18} width={size.s_18} color={themeValue.channelNormal} />
-				)}
+				<ChannelStatusIcon channel={data} isUnRead={isUnRead} />
 				<Text style={[styles.channelListItemTitle, isUnRead && styles.channelListItemTitleActive]} numberOfLines={1}>
 					{data?.channel_label}
 				</Text>
