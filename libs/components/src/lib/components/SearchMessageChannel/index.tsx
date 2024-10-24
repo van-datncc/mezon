@@ -117,11 +117,12 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			const value = event.target.value;
 			const words = value.split(' ');
 			const cleanedWords = words.filter((word) => {
-				const isMentionStart = word.startsWith('from:') || word.startsWith('mention:') || word.startsWith('has:');
+				const mentionPrefixes = ['from:', 'mention:', 'has:'];
+				const isMentionStart = mentionPrefixes.some((prefix) => word.startsWith(prefix));
 				return !isMentionStart;
 			});
-
 			const cleanedValue = cleanedWords.join(' ').trim();
+
 			dispatch(searchMessagesActions.setValueInputSearch({ channelId, value }));
 			setValueDisplay(newPlainTextValue);
 			const filter: SearchFilter[] = [];
