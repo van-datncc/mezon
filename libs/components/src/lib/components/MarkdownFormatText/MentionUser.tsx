@@ -3,6 +3,7 @@ import { selectChannelMemberByUserIds, selectCurrentChannel, selectCurrentChanne
 import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { RefObject, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalUserProfile from '../ModalUserProfile';
 
@@ -82,28 +83,31 @@ const MentionUser = ({ tagUserName, mode, isJumMessageEnabled, isTokenClickAble,
 				});
 			}
 			setIsShowPanelChannel(!showProfileUser);
+			openProfileItem();
 		},
 		[tagRoleId]
 	);
 
 	const handleClickOutside = useCallback(() => {
-		setIsShowPanelChannel(false);
+		closeProfileItem();
 	}, []);
+
+	const [openProfileItem, closeProfileItem] = useModal(() => {
+		return (
+			<UserProfilePopup
+				rootRef={mentionRef}
+				userID={tagUserId ?? ''}
+				channelId={channelId ?? ''}
+				mode={mode}
+				isDm={isDM}
+				positionShortUser={positionShortUser}
+				onClose={handleClickOutside}
+			/>
+		);
+	}, [positionShortUser]);
 
 	return (
 		<span ref={mentionRef}>
-			{showProfileUser && (
-				<UserProfilePopup
-					rootRef={mentionRef}
-					userID={tagUserId ?? ''}
-					channelId={channelId ?? ''}
-					mode={mode}
-					isDm={isDM}
-					positionShortUser={positionShortUser}
-					onClose={handleClickOutside}
-				/>
-			)}
-
 			{displayToken?.type === MentionType.ROLE_EXIST && (
 				<span className="font-medium px-[0.1rem] rounded-sm bg-[#E3F1E4] hover:bg-[#B1E0C7] text-[#0EB08C] dark:bg-[#3D4C43] dark:hover:bg-[#2D6457]">{`${displayToken.display}`}</span>
 			)}
