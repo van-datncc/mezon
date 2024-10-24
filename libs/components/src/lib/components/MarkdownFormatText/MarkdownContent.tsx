@@ -67,18 +67,18 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 				</a>
 			)}
 			{isMarkDown && typeOfMarkdown === EMarkdownType.SINGLE ? (
-				<SingleMarkdown content={content?.split('`').filter(Boolean)} isInPinMsg={isInPinMsg} isLightMode={isLightMode} />
+				<SingleBacktick content={content?.split('`').filter(Boolean)} isInPinMsg={isInPinMsg} isLightMode={isLightMode} />
 			) : isMarkDown && typeOfMarkdown === EMarkdownType.TRIPLE && !posInReply ? (
-				<TripleMarkdown content={content ?? ''} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
+				<TripleBackticks content={content ?? ''} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
 			) : typeOfMarkdown === EMarkdownType.TRIPLE && posInReply ? (
-				<SingleMarkdown content={content?.split('`').filter(Boolean)} isLightMode={isLightMode} />
+				<SingleBacktick content={content?.split('`').filter(Boolean)} isLightMode={isLightMode} />
 			) : null}
 		</div>
 	);
 };
 export default memo(MarkdownContent);
 
-type PartMarkdownOpt = {
+type BacktickOpt = {
 	content?: any;
 	isLightMode?: boolean;
 	isInPinMsg?: boolean;
@@ -86,7 +86,7 @@ type PartMarkdownOpt = {
 	posInNotification?: boolean;
 };
 
-const SingleMarkdown: React.FC<PartMarkdownOpt> = ({ content, isLightMode, posInNotification, isInPinMsg }) => {
+const SingleBacktick: React.FC<BacktickOpt> = ({ content, isLightMode, posInNotification, isInPinMsg }) => {
 	return (
 		<span className={`prose ${isLightMode ? 'single-markdown-light-mode' : 'single-markdown'} `}>
 			<code
@@ -98,7 +98,7 @@ const SingleMarkdown: React.FC<PartMarkdownOpt> = ({ content, isLightMode, posIn
 	);
 };
 
-const TripleMarkdown: React.FC<PartMarkdownOpt> = ({ content, isLightMode, isInPinMsg }) => {
+const TripleBackticks: React.FC<BacktickOpt> = ({ content, isLightMode, isInPinMsg }) => {
 	const [copied, setCopied] = useState(false);
 
 	useEffect(() => {
