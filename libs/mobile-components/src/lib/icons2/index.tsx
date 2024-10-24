@@ -1789,3 +1789,12 @@ export function IconMobileDevice({ width = 32, height = 32, color = '#16A34A', .
 		</Svg>
 	);
 }
+
+export const FavoriteFilledIcon = ({ width = 30, height = 30, color = 'white', ...props }: SvgProps) => (
+	<Svg width={width} height={height} viewBox="0 0 32 32" fill="none" {...props}>
+		<Path
+			d="M16.667 23.467l4.8 2.933a1.333 1.333 0 002-1.467l-1.334-5.466a1.333 1.333 0 01.4-1.334L26.8 14.4A1.333 1.333 0 0026 12l-5.6-.533a1.16 1.16 0 01-1.067-.8l-2.133-5.2a1.4 1.4 0 00-2.533 0L12.533 10.8a1.334 1.334 0 01-1.066.8l-5.6.4a1.413 1.413 0 00-.8 2.4l4.266 3.733a1.214 1.214 0 01.4 1.334L8.4 24.933a1.333 1.333 0 002 1.467l4.8-2.933a1.44 1.44 0 011.467 0z"
+			fill="#B5BAC1"
+		/>
+	</Svg>
+);

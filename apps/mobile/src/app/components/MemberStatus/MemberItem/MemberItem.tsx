@@ -15,7 +15,7 @@ interface IProps {
 }
 
 export function MemberItem({ user, isOffline, onPress, currentChannel, isDMThread }: IProps) {
-	const userStatus = useMemberStatus(user?.user?.id || '');
+	const userStatus = useMemberStatus(user?.id || '');
 	const currentClan = useSelector(selectCurrentClan);
 	const clanProfile = useSelector(selectUserClanProfileByClanID(currentClan?.clan_id as string, user?.user?.id as string));
 	return (
