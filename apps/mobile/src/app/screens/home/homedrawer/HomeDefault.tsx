@@ -46,7 +46,7 @@ function useChannelSeen(channelId: string) {
 
 	useEffect(() => {
 		if (!statusFetchChannel) return;
-		const numberNotification = currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
+		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
@@ -54,7 +54,7 @@ function useChannelSeen(channelId: string) {
 		if (!numberNotification && resetBadgeCount) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
-	}, [channelId, currentChannel?.clan_id, currentChannel.count_mess_unread, currentChannel.id, dispatch, resetBadgeCount, statusFetchChannel]);
+	}, [channelId, currentChannel?.clan_id, currentChannel?.count_mess_unread, currentChannel?.id, dispatch, resetBadgeCount, statusFetchChannel]);
 }
 
 const HomeDefault = React.memo((props: any) => {
