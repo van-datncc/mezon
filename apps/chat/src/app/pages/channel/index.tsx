@@ -1,5 +1,5 @@
 import { Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
-import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads, useWindowFocusState } from '@mezon/core';
+import { useDragAndDrop, useMarkAsRead, usePermissionChecker, useSearchMessages, useThreads, useWindowFocusState } from '@mezon/core';
 import {
 	channelMetaActions,
 	channelsActions,
@@ -14,6 +14,7 @@ import {
 	selectIsSearchMessage,
 	selectIsShowCanvas,
 	selectIsShowMemberList,
+	selectPreviousChannels,
 	selectStatusMenu,
 	selectTheme,
 	useAppDispatch
@@ -41,7 +42,7 @@ function useChannelSeen(channelId: string) {
 
 	useEffect(() => {
 		if (!statusFetchChannel) return;
-		const numberNotification = currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
+		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
@@ -50,6 +51,12 @@ function useChannelSeen(channelId: string) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
 	}, [currentChannel.id, statusFetchChannel, isFocusDesktop, isTabVisible]);
+	const previousChannelId = useSelector(selectPreviousChannels)[1];
+	const previousChannel = useSelector(selectChannelById(previousChannelId));
+	const { resetCountChannelBadge } = useMarkAsRead();
+	useEffect(() => {
+		resetCountChannelBadge(previousChannel);
+	}, [previousChannelId]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {
