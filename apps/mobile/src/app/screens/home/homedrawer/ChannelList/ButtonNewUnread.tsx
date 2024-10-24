@@ -18,7 +18,7 @@ const ButtonNewUnread = React.memo(({ handleScrollToChannel }: ButtonNewUnreadPr
 	const currentClanId = useSelector(selectCurrentClanId);
 	const channelsInClan = useSelector(selectChannelsByClanId(currentClanId ?? ''));
 
-	const findFirstChannelWithBadgeCount = (channels = []) => channels.find((item) => item?.count_mess_unread > 0) || null;
+	const findFirstChannelWithBadgeCount = (channels = []) => channels?.find((item) => item?.count_mess_unread > 0) || null;
 
 	const firstChannelBadgeCount = useMemo(() => {
 		return findFirstChannelWithBadgeCount(channelsInClan);

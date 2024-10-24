@@ -1,17 +1,15 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlist } from '@mezon/store-mobile';
-import { sortChannelsByLastActivity } from '@mezon/utils';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { DirectEntity, RootState, directActions, getStoreAsync, selectAllClans, selectDirectsOpenlistOrder } from '@mezon/store-mobile';
+import { FlashList } from '@shopify/flash-list';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppState, FlatList, Pressable, Text, TextInput, View } from 'react-native';
+import { AppState, Pressable, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { MezonBottomSheet } from '../../componentUI';
-import { SeparatorWithSpace } from '../../components/Common';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { normalizeString } from '../../utils/helpers';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
 import { DmListItem } from './DmListItem';
@@ -21,8 +19,7 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [searchText, setSearchText] = useState<string>('');
-	const directsOpenList = useSelector(selectDirectsOpenlist);
-	const dmGroupChatList = sortChannelsByLastActivity(directsOpenList);
+	const dmGroupChatList = useSelector(selectDirectsOpenlistOrder);
 	const { t } = useTranslation(['dmMessage', 'common']);
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
@@ -47,10 +44,6 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 			}
 		}
 	};
-
-	const filteredDataDM = useMemo(() => {
-		return dmGroupChatList?.filter?.((dm) => normalizeString(dm.channel_label || dm.usernames)?.includes(normalizeString(searchText)));
-	}, [dmGroupChatList, searchText]);
 
 	const navigateToAddFriendScreen = () => {
 		navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.ADD_FRIEND });
@@ -100,22 +93,19 @@ const MessagesScreen = ({ navigation }: { navigation: any }) => {
 					</Pressable>
 				)}
 			</View>
-			{clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ? (
+			{clansLoadingStatus === 'loaded' && !clans?.length && !dmGroupChatList?.length ? (
 				<UserEmptyMessage
 					onPress={() => {
 						navigateToAddFriendScreen();
 					}}
 				/>
 			) : (
-				<FlatList
-					data={filteredDataDM}
-					style={styles.dmMessageListContainer}
+				<FlashList
+					data={dmGroupChatList}
 					showsVerticalScrollIndicator={false}
-					keyExtractor={(dm) => dm.id.toString()}
-					ItemSeparatorComponent={SeparatorWithSpace}
-					renderItem={({ item }) => (
-						<DmListItem directMessage={item} navigation={navigation} key={item.id} onLongPress={() => handleLongPress(item)} />
-					)}
+					keyExtractor={(dm) => dm + 'DM_MSG_ITEM'}
+					estimatedItemSize={size.s_60}
+					renderItem={({ item }) => <DmListItem id={item} navigation={navigation} key={item} onLongPress={handleLongPress} />}
 				/>
 			)}
 

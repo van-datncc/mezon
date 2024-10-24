@@ -59,12 +59,8 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 		},
 
 		addFriendText: {
-			fontSize: isTablet ? size.medium : size.label,
+			fontSize: isTablet ? size.small : size.medium,
 			color: colors.textStrong
-		},
-
-		dmMessageListContainer: {
-			marginTop: size.s_18
 		},
 
 		searchMessage: {
@@ -115,10 +111,11 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: size.s_8,
+			marginTop: size.s_10,
 			marginHorizontal: size.s_10,
 			paddingHorizontal: size.s_8,
 			paddingVertical: size.s_6,
-			borderRadius: size.s_10
+			borderRadius: size.s_10,
 		},
 		friendAvatar: {
 			width: size.s_40,
