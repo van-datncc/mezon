@@ -417,6 +417,7 @@ input:-webkit-autofill:active {
 			line-height: 1.6rem;
 			display: inline-block; /* Ensure the span behaves inline */
 			code {
+				color: #dfdfe0;
 				border: 1px solid #1e1f22 !important;
 				background-color: #2b2d31;
 				border-radius: 6px;
@@ -436,33 +437,19 @@ input:-webkit-autofill:active {
 		}
 
 		&.triple-markdown {
-			.pre {
+			pre {
 				position: relative;
 				margin: 0;
 				white-space: break-spaces;
 				padding-right: 26px;
 				min-width: 70%;
-				max-width: 90%;
-
-				.copy-icon {
-					position: absolute;
-					top: 4px;
-					right: 4px;
-					background: none;
-					border: none;
-					cursor: pointer;
-
-					svg {
-						width: 16px;
-						height: 16px;
-					}
-				}
-
-				.code {
+				max-width: 100%;
+				padding: 6px;
+				border: 1px solid #1e1f22 !important;
+				background-color: #2b2d31;
+				code {
 					font-size: 14px;
-					font-family: Consolas, monospace;
-					background-color: #2b2d31;
-					border: 1px solid #1e1f22;
+					font-family: Consolas;
 					border-radius: 6px;
 					padding: 3px 6px;
 					color: #fff;
@@ -472,7 +459,60 @@ input:-webkit-autofill:active {
 				}
 			}
 		}
+
+		&.triple-markdown-lightMode {
+			pre {
+				position: relative;
+				margin: 0;
+				white-space: break-spaces;
+				padding-right: 26px;
+				min-width: 70%;
+				max-width: 100%;
+				padding: 6px;
+				border: 1px solid #e3e5e8 !important;
+				background-color: #f2f3f5;
+
+				code {
+					font-size: 14px;
+					font-family: Consolas;
+					border-radius: 6px;
+					padding: 3px 6px;
+					color: #535353;
+					display: inline-block;
+					white-space: pre-wrap;
+					word-wrap: break-word;
+				}
+			}
+		}
 	}
+}
+
+.pin-msg {
+	border: 1px solid #1e1f22 !important;
+	background-color: #2b2d31;
+	color: #fff;
+	padding: 2px;
+	border-radius: 6px;
+	margin-top: 0;
+}
+
+.pin-msg:before,
+.pin-msg:after {
+	content: '';
+}
+
+.pin-msg-modeLight {
+	border: 1px solid #e3e5e8 !important;
+	background-color: #f2f3f5;
+	color: #535353;
+	padding: 2px;
+	border-radius: 6px;
+	margin-top: 0;
+}
+
+.pin-msg-modeLight:before,
+.pin-msg-modeLight:after {
+	content: '';
 }
 
 // css video

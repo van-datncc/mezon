@@ -29,7 +29,6 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
 	const origin = process.env.NX_CHAT_APP_REDIRECT_URI + '/invite/';
-
 	const onClickLink = useCallback(
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
@@ -46,9 +45,11 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	);
 
 	const isLightMode = appearanceTheme === 'light';
+	const posInNotification = !isJumMessageEnabled && !isTokenClickAble;
+	const posInReply = isJumMessageEnabled && !isTokenClickAble;
 
 	return (
-		<div className={`contents dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+		<div className={` dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
 			{isLink && (
 				// eslint-disable-next-line jsx-a11y/anchor-is-valid
 				<a
@@ -65,25 +66,34 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 					{content}
 				</a>
 			)}
-			{isMarkDown && typeOfMarkdown === EMarkdownType.SINGLE && <SingleMarkdown content={content ?? ''} isLightMode={isLightMode} />}
-			{isMarkDown && typeOfMarkdown === EMarkdownType.TRIPLE && (
+			{isMarkDown && typeOfMarkdown === EMarkdownType.SINGLE ? (
+				<SingleMarkdown content={content?.split('`').filter(Boolean)} isInPinMsg={isInPinMsg} isLightMode={isLightMode} />
+			) : isMarkDown && typeOfMarkdown === EMarkdownType.TRIPLE && !posInReply ? (
 				<TripleMarkdown content={content ?? ''} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
-			)}
+			) : typeOfMarkdown === EMarkdownType.TRIPLE && posInReply ? (
+				<SingleMarkdown content={content?.split('`').filter(Boolean)} isLightMode={isLightMode} />
+			) : null}
 		</div>
 	);
 };
 export default memo(MarkdownContent);
 
 type PartMarkdownOpt = {
-	content?: string;
+	content?: any;
 	isLightMode?: boolean;
 	isInPinMsg?: boolean;
+	isJumMessageEnabled?: boolean;
+	posInNotification?: boolean;
 };
 
-const SingleMarkdown: React.FC<PartMarkdownOpt> = ({ content, isLightMode }) => {
+const SingleMarkdown: React.FC<PartMarkdownOpt> = ({ content, isLightMode, posInNotification, isInPinMsg }) => {
 	return (
 		<span className={`prose ${isLightMode ? 'single-markdown-light-mode' : 'single-markdown'} `}>
-			<code>{content?.split('`')}</code>
+			<code
+				className={`${isInPinMsg && isLightMode ? 'whitespace-pre-wrap block break-words pin-msg-modeLight' : isInPinMsg && !isLightMode ? 'whitespace-pre-wrap block break-words pin-msg' : null}`}
+			>
+				{content}
+			</code>
 		</span>
 	);
 };
@@ -99,13 +109,19 @@ const TripleMarkdown: React.FC<PartMarkdownOpt> = ({ content, isLightMode, isInP
 		return () => clearTimeout(timer);
 	}, [copied]);
 
+	const splitContent = content?.split('```').filter(Boolean);
+
 	return (
-		<div className={`triple-markdown ${isInPinMsg ? 'pinned-msg' : ''}`}>
-			<pre className={`pre ${isInPinMsg ? 'flex items-start' : ''}`}>
+		<div className={`prose ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
+			<pre className={`relative p-2 ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
 				<CopyToClipboard text={content ?? ''} onCopy={() => setCopied(true)}>
-					<button className="icon copy-icon">{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}</button>
+					<button className={`absolute right-3 top-3 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
+						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
+					</button>
 				</CopyToClipboard>
-				<code className={`code ${isInPinMsg ? 'whitespace-pre-wrap block break-words' : ''}`}>{content?.toString()?.split('```')}</code>
+				{splitContent?.map((block: string) => (
+					<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words' : ''}`}>{block.trim()}</code>
+				))}
 			</pre>
 		</div>
 	);
