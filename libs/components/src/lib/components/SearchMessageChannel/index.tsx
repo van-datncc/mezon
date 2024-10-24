@@ -108,14 +108,22 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const handleChange: OnChangeHandlerFunc = useCallback(
 		(event, newValue, newPlainTextValue, mentions) => {
 			const value = event.target.value;
+			const words = value.split(' ');
+			const cleanedWords = words.filter((word) => {
+				const mentionPrefixes = ['from:'];
+				const isMentionStart = mentionPrefixes.some((prefix) => word.startsWith(prefix));
+				return !isMentionStart;
+			});
+			const cleanedValue = cleanedWords.join(' ').trim();
+
 			dispatch(searchMessagesActions.setValueInputSearch({ channelId, value }));
 			setValueDisplay(newPlainTextValue);
 			const filter: SearchFilter[] = [];
 			// TODO: check logic below code
-			if (value) {
+			if (cleanedValue) {
 				filter.push({
 					field_name: 'content',
-					field_value: value
+					field_value: cleanedValue
 				});
 			}
 			for (const mention of mentions) {
@@ -284,6 +292,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					}}
 				>
 					<Mention
+						markup="from:[__display__](__id__)"
 						appendSpaceOnAdd={true}
 						data={handleSearchUserMention}
 						trigger="from:"
@@ -305,6 +314,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					/>
 
 					<Mention
+						markup="mention:[__display__](__id__)"
 						appendSpaceOnAdd={true}
 						data={userListDataSearchByMention}
 						trigger="mentions:"
