@@ -57,7 +57,7 @@ const ChannelLayout = () => {
 					)}
 					{subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM && (
 						<div
-							className={`fixed z-50 max-sm:hidden duration-300 ease-in-out animate-fly_in`}
+							className={`fixed z-50 max-sm:hidden duration-300 ease-in-out animate-fly_in max-[460px]:!left-24 `}
 							style={{
 								top: topPositionEmojiPanel,
 								bottom: distanceToBottom < HEIGHT_EMOJI_PANEL ? '0' : 'auto',
