@@ -297,7 +297,7 @@ export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirec
 
 export const selectListDMUnread = createSelector(selectAllDirectMessages, getDirectState, (directMessages, state) => {
 	return directMessages.filter((dm) => {
-		return state.statusDMChannelUnread[dm.channel_id ?? ''] && dm.count_mess_unread && dm.count_mess_unread > 0;
+		return state.statusDMChannelUnread[dm.channel_id ?? ''] && dm?.count_mess_unread && dm?.count_mess_unread > 0;
 	});
 });
 export const selectListStatusDM = createSelector(getDirectState, (state) => state.statusDMChannelUnread);

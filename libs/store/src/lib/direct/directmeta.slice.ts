@@ -149,10 +149,10 @@ export const selectIsUnreadDMById = (channelId: string) =>
 
 export const selectDirectsUnreadlist = createSelector(selectAllDMMeta, (state) => {
 	return state.filter((item) => {
-		return item.count_mess_unread;
+		return item?.count_mess_unread;
 	});
 });
 
 export const selectTotalUnreadDM = createSelector(selectDirectsUnreadlist, (listUnreadDM) => {
-	return listUnreadDM.reduce((total, count) => total + (count.count_mess_unread ?? 0), 0);
+	return listUnreadDM.reduce((total, count) => total + (count?.count_mess_unread ?? 0), 0);
 });

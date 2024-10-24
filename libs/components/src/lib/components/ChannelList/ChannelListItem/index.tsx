@@ -76,7 +76,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 		return [];
 	}, [voiceChannelMembers, streamChannelMembers]);
 	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(channel.clan_id || '', channel.category_id || ''));
-	const unreadMessageCount = useMemo(() => channel.count_mess_unread || 0, [channel.count_mess_unread]);
+	const unreadMessageCount = useMemo(() => channel?.count_mess_unread || 0, [channel?.count_mess_unread]);
 	const [openInviteModal, closeInviteModal] = useModal(() => <ModalInvite onClose={closeInviteModal} open={true} channelID={channel.id} />);
 
 	const handleOpenInvite = () => {

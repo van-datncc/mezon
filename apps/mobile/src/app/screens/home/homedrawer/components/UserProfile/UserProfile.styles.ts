@@ -118,5 +118,6 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			fontSize: size.h7,
 			fontWeight: 'bold'
-		}
+		},
+		statusUser: { right: size.s_8, bottom: size.s_4 }
 	});

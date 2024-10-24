@@ -1,6 +1,6 @@
+import { restoreLocalStorage } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import isElectron from 'is-electron';
-import { restoreLocalStorage } from 'libs/store/src/lib/helpers';
 import { useRouteError } from 'react-router-dom';
 
 const ErrorRoutes = () => {

@@ -82,8 +82,7 @@
           "x-scheme-handler/mezonapp"
         ],
         "desktop": {
-          "exec": "mezonapp %U",
-          "startupWMClass": "@mezon/desktop"
+          "exec": "mezonapp %U"
         },
         "appId": "mezon.ai",
         "publish": [

@@ -33,11 +33,13 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 					label=""
 					trigger={undefined}
 					renderTrigger={() => (
-						<ItemStatus
-							disabled={true}
-							children={`Token: ${Number(tokenInWallet) + Number(getTokenSocket)}`}
-							startIcon={<Icons.Check />}
-						/>
+						<div>
+							<ItemStatus
+								disabled={true}
+								children={`Token: ${Number(tokenInWallet) + Number(getTokenSocket)}`}
+								startIcon={<Icons.Check />}
+							/>
+						</div>
 					)}
 				/>
 				<Dropdown
