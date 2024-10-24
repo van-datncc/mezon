@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAuth } from '@mezon/core';
@@ -56,9 +56,23 @@ export const Authentication = () => {
 	const currentChannelRef = useRef(currentClan);
 	useCheckUpdatedVersion();
 
+	const loadFRMConfig = useCallback(async () => {
+		try {
+			const [fcmtoken, appInfo] = await Promise.all([handleFCMToken(), getAppInfo()]);
+			if (fcmtoken) {
+				const { app_platform: platform } = appInfo;
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-expect-error
+				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: userProfile?.user?.username, platform }));
+			}
+		} catch (error) {
+			console.error('Error loading FCM config:', error);
+		}
+	}, [dispatch, userProfile?.user?.username]);
+
 	useEffect(() => {
-		if (userProfile?.email) loadFRMConfig();
-	}, [userProfile?.email]);
+		if (userProfile?.user?.username) loadFRMConfig();
+	}, [loadFRMConfig, userProfile?.user?.username]);
 
 	useEffect(() => {
 		setupNotificationListeners(navigation);
@@ -115,26 +129,12 @@ export const Authentication = () => {
 					setFileShared(files);
 				},
 				(error: any) => {
-					console.log('Error receiving files:', error);
+					/* empty */
 				},
 				'mezon.mobile.sharing'
 			);
 		} catch (error) {
-			console.log('Error while receiving files:', error);
-		}
-	};
-
-	const loadFRMConfig = async () => {
-		try {
-			const [fcmtoken, appInfo] = await Promise.all([handleFCMToken(), getAppInfo()]);
-			if (fcmtoken) {
-				const { app_device_id: deviceId, app_platform: platform } = appInfo;
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
-				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId, platform }));
-			}
-		} catch (error) {
-			console.error('Error loading FCM config:', error);
+			/* empty */
 		}
 	};
 
