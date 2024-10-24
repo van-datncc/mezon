@@ -13,7 +13,7 @@ export const UserStatus = React.memo(({ status, customStyles }: IUserStatusProps
 			backgroundColor={themeValue.tertiary}
 			padding={size.s_2}
 			borderRadius={size.s_10}
-			{...customStyles}
+			{...(customStyles && customStyles)}
 		>
 			{status?.isMobile ? (
 				<Icons.IconMobileDevice width={size.s_16} height={size.s_16} />
