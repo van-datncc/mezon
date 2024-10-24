@@ -331,7 +331,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 									title="from: "
 									content={suggestion.display}
 									onClick={() => setIsShowSearchOptions('')}
-									// key={suggestion.display}
+									key={suggestion.id}
 								/>
 							);
 						}}
@@ -355,7 +355,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 									title="mentions: "
 									content={suggestion.display}
 									onClick={() => setIsShowSearchOptions('')}
-									// key={suggestion.display}
+									key={suggestion.id}
 								/>
 							);
 						}}
