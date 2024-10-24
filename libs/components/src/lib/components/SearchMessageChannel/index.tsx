@@ -117,8 +117,8 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			const value = event.target.value;
 			const words = value.split(' ');
 			const cleanedWords = words.filter((word) => {
-				const validStart = word.startsWith('from:') || word.includes('mention') || word.startsWith('has:');
-				return !validStart;
+				const isMentionStart = word.startsWith('from:') || word.startsWith('mention:') || word.startsWith('has:');
+				return !isMentionStart;
 			});
 
 			const cleanedValue = cleanedWords.join(' ').trim();
