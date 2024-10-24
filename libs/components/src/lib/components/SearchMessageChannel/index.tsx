@@ -339,8 +339,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					/>
 
 					<Mention
-						markup='"mention":\"user_id\":\"__display__\"(__id__)'
-						// markup={'mention:[__display__](__id__)'}
+						markup="mention:[__display__](__id__)"
 						appendSpaceOnAdd={true}
 						data={userListDataSearchByMention}
 						trigger="mentions:"
