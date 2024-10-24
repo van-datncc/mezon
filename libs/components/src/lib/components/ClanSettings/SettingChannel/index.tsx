@@ -12,7 +12,7 @@ import { formatDistance } from 'date-fns';
 import { Avatar, AvatarSizes, Dropdown, Pagination, Tooltip } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AnchorScroll } from '../../AnchorScroll/AnchorScroll';
@@ -138,7 +138,6 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize 
 				parentId: channelParrent.id as string,
 				page: currentPage,
 				limit: pageSize,
-				noCache: true,
 				isFetchingThread: true
 			})
 		);
@@ -151,6 +150,10 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize 
 		setShowThreadsList(!showThreadsList);
 	};
 
+	const isVoiceChannel = useMemo(() => {
+		return channelParrent.channel_type === ChannelType.CHANNEL_TYPE_VOICE;
+	}, [channelParrent.channel_type]);
+
 	return (
 		<div className="flex flex-col">
 			<div className="relative" onClick={handleFetchThreads}>
@@ -162,16 +165,18 @@ const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize 
 					key={channelParrent.id}
 					userIds={channelParrent?.user_ids || []}
 					channelId={channelParrent.id as string}
-					isVoice={channelParrent.channel_type === ChannelType.CHANNEL_TYPE_VOICE}
+					isVoice={isVoiceChannel}
 					messageCount={channelParrent.message_count || 0}
 					lastMessage={channelParrent.last_sent_message}
 				/>
-				<div
-					onClick={toggleThreadsList}
-					className={`absolute top-4 right-2 cursor-pointer transition duration-100 ease-in-out ${showThreadsList ? '' : '-rotate-90'}`}
-				>
-					<Icons.ArrowDown defaultSize="h-6 w-6 dark:text-[#b5bac1] text-black" />
-				</div>
+				{!isVoiceChannel && (
+					<div
+						onClick={toggleThreadsList}
+						className={`absolute top-4 right-2 cursor-pointer transition duration-100 ease-in-out ${showThreadsList ? '' : '-rotate-90'}`}
+					>
+						<Icons.ArrowDown defaultSize="h-6 w-6 dark:text-[#b5bac1] text-black" />
+					</div>
+				)}
 			</div>
 			{showThreadsList && (
 				<div className="flex flex-col pl-8">
