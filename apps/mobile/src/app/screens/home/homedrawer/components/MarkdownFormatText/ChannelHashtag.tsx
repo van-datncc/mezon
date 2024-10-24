@@ -1,4 +1,4 @@
-import { ChannelsEntity } from '@mezon/store';
+import { ChannelsEntity } from '@mezon/store-mobile';
 import { ChannelStreamMode, ChannelType, HashtagDm } from 'mezon-js';
 
 type IChannelHashtag = {

@@ -1,5 +1,5 @@
 import { size } from '@mezon/mobile-ui';
-import { selectVoiceChannelMembersByChannelId } from '@mezon/store';
+import { selectVoiceChannelMembersByChannelId } from '@mezon/store-mobile';
 import React, { memo } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';

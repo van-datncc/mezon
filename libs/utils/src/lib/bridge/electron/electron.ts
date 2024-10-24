@@ -1,13 +1,4 @@
-import {
-	FCM_TOKEN_UPDATED,
-	NAVIGATE_TO_URL,
-	NOTIFICATION_RECEIVED,
-	NOTIFICATION_SERVICE_ERROR,
-	NOTIFICATION_SERVICE_STARTED,
-	SENDER_ID,
-	START_NOTIFICATION_SERVICE,
-	TRIGGER_SHORTCUT
-} from './constants';
+import { NAVIGATE_TO_URL, SENDER_ID, START_NOTIFICATION_SERVICE, TRIGGER_SHORTCUT } from './constants';
 import { ElectronBridgeHandler, IElectronBridge, MezonElectronAPI, MezonNotificationOptions } from './types';
 
 export class ElectronBridge implements IElectronBridge {
@@ -72,45 +63,9 @@ export class ElectronBridge implements IElectronBridge {
 		});
 	}
 
-	/**
-	 * @deprecated use ws instead
-	 */
-	private setupPushReceiver() {
-		this.bridge.on(NOTIFICATION_SERVICE_STARTED, this.listenerHandlers[NOTIFICATION_SERVICE_STARTED]);
-		this.bridge.on(NOTIFICATION_RECEIVED, this.listenerHandlers[NOTIFICATION_RECEIVED]);
-		this.bridge.on(NOTIFICATION_SERVICE_ERROR, this.listenerHandlers[NOTIFICATION_SERVICE_ERROR]);
-		this.bridge.on(FCM_TOKEN_UPDATED, this.listenerHandlers[FCM_TOKEN_UPDATED]);
-	}
-
 	private setupShortCut() {
 		this.bridge.on(TRIGGER_SHORTCUT, this.listenerHandlers[TRIGGER_SHORTCUT]);
 	}
-
-	private notificationServiceStartedHandler = (_: unknown, token: string) => {
-		localStorage.setItem('fcmToken', token);
-		this.bridge.getDeviceId().then((deviceId) => {
-			const fcmTokenObject = { token, deviceId };
-			localStorage.setItem('fcmTokenObject', JSON.stringify(fcmTokenObject));
-		});
-	};
-
-	private notificationErrorhandler = (error: string) => {
-		console.error('notification error', error);
-	};
-
-	private notificationReceivedHandler = (
-		_: unknown,
-		serverNotificationPayload: { notification: { body: string; title: string; image: string }; data: { link: string } }
-	) => {
-		if (serverNotificationPayload.notification.body) {
-			const { body, image, title } = serverNotificationPayload.notification;
-			const link = serverNotificationPayload.data?.link;
-			this.pushNotification(title, { body, icon: image, data: { link } });
-		}
-	};
-
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	private tokenUpdatedHandler = (_: unknown, token: string) => {};
 
 	private triggerShortcut = (_: unknown, name: string) => {
 		if (this.shortcutHandler) {
@@ -119,10 +74,6 @@ export class ElectronBridge implements IElectronBridge {
 	};
 
 	private readonly listenerHandlers: Record<string, ElectronBridgeHandler> = {
-		[NOTIFICATION_SERVICE_STARTED]: this.notificationServiceStartedHandler,
-		[NOTIFICATION_RECEIVED]: this.notificationReceivedHandler,
-		[NOTIFICATION_SERVICE_ERROR]: this.notificationErrorhandler,
-		[FCM_TOKEN_UPDATED]: this.tokenUpdatedHandler,
 		[TRIGGER_SHORTCUT]: this.triggerShortcut
 	};
 }

@@ -1,7 +1,9 @@
+import { channelMembersActions } from '@mezon/store';
 import { IMessageWithUser, IThread, LoadingStatus, sortChannelsByLastActivity, ThreadStatus, TypeCheck } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import memoizee from 'memoizee';
+import { ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { fetchChannels } from '../channels/channels.slice';
 import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
@@ -136,6 +138,14 @@ export const leaveThread = createAsyncThunk('thread/leavethread', async ({ clanI
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.leaveThread(mezon.session, threadId);
 		if (response) {
+			thunkAPI.dispatch(
+				channelMembersActions.fetchChannelMembers({
+					clanId: clanId || '',
+					channelId: threadId,
+					noCache: true,
+					channelType: ChannelType.CHANNEL_TYPE_TEXT
+				})
+			);
 			thunkAPI.dispatch(fetchChannels({ clanId: clanId, noCache: true }));
 		}
 	} catch (error) {

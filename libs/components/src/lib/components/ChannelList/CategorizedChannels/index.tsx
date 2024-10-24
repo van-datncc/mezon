@@ -25,6 +25,7 @@ import ChannelListItem, { ChannelListItemRef } from '../ChannelListItem';
 
 type CategorizedChannelsProps = {
 	category: ICategoryChannel;
+	channelRefs: React.RefObject<Record<string, ChannelListItemRef | null>>;
 };
 
 export interface IChannelLinkPermission {
@@ -34,7 +35,7 @@ export interface IChannelLinkPermission {
 	isClanOwner: boolean;
 }
 
-const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) => {
+const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, channelRefs }) => {
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
@@ -69,7 +70,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	const { handleDeleteCategory } = useCategory();
 	const dispatch = useAppDispatch();
 	const location = useLocation();
-	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasChannelManagePermission || hasClanPermission;
 	const ctrlKSelectedChannelId = useSelector(selectCtrlKSelectedChannelId);
 
@@ -137,9 +137,9 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 	useEffect(() => {
 		const focusChannel = location.state?.focusChannel ?? {};
 		const { id, parentId } = focusChannel as { id: string; parentId: string };
-		if (id && parentId && parentId !== '0') {
+		if (id && parentId && parentId !== '0' && channelRefs.current) {
 			channelRefs.current[parentId]?.scrollIntoThread(id);
-		} else if (id) {
+		} else if (id && channelRefs.current) {
 			channelRefs.current[id]?.scrollIntoChannel();
 		}
 	}, [location]);
@@ -208,7 +208,7 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category }) =
 					if (shouldRender) {
 						acc.push(
 							<ChannelListItem
-								ref={(component) => (channelRefs.current[channel.id] = component)}
+								ref={(component) => channelRefs.current && (channelRefs.current[channel.id] = component)}
 								isActive={currentChannelId === channel.id}
 								key={channel.id}
 								channel={channel as ChannelThreads}

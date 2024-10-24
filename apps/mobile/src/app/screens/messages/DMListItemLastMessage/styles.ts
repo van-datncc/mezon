@@ -5,16 +5,14 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		dmMessageContainer: {
 			flex: 1,
-			height: size.s_17,
-			flexDirection: 'row',
-			alignItems: 'flex-end'
+			flexDirection: 'row'
 		},
 		message: {
 			fontSize: size.small,
 			color: colors.text
 		},
 		emoji: {
-			height: size.s_17,
-			width: size.s_17
+			height: size.s_14,
+			width: size.s_14
 		}
 	});

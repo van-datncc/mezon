@@ -12,6 +12,7 @@ import {
 import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
 import {
 	accountActions,
+	attachmentActions,
 	clansActions,
 	getIsShowPopupForward,
 	selectAllChannelMemberIds,
@@ -211,7 +212,10 @@ function MyApp() {
 						<SidebarTooltip titleTooltip="Direct Message">
 							<NavLink
 								to={currentDmId ? `/chat/direct/message/${currentDmId}/${currentDmIType}` : '/chat/direct/friends'}
-								onClick={() => setModeResponsive(ModeResponsive.MODE_DM)}
+								onClick={() => {
+									setModeResponsive(ModeResponsive.MODE_DM);
+									dispatch(attachmentActions.removeLoadedStatusCached());
+								}}
 							>
 								<NavLinkComponent active={pathName?.includes('direct')}>
 									<div>

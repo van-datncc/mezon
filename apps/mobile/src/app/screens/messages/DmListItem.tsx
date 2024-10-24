@@ -1,8 +1,7 @@
 import { useChatTypings } from '@mezon/core';
 import { convertTimestampToTimeAgo, Icons, PaperclipIcon } from '@mezon/mobile-components';
 import { Colors, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadDMById } from '@mezon/store';
-import { directActions, DirectEntity, selectDmGroupCurrentId, useAppDispatch } from '@mezon/store-mobile';
+import { directActions, DirectEntity, selectDmGroupCurrentId, selectIsUnreadDMById, useAppDispatch } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import { ChannelType } from 'mezon-js';
@@ -12,6 +11,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
+import { UserStatus } from '../../components/UserStatus';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { DmListItemLastMessage } from './DMListItemLastMessage';
@@ -127,7 +127,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 							/>
 						</View>
 					) : (
-						<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+						<UserStatus status={{ status: directMessage.is_online?.some(Boolean), isMobile: false }} />
 					)}
 				</View>
 			)}

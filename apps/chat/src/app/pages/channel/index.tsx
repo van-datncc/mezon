@@ -163,7 +163,14 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							<ChannelMainContentText channelId={currentChannel?.id as string} />
 						</div>
 					)}
-					{!isShowCanvas && isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+					{isShowCanvas && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+						<div
+							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+						>
+							<Canvas />
+						</div>
+					)}
+					{isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
 						<div
 							onContextMenu={(event) => event.preventDefault()}
 							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
@@ -174,13 +181,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						</div>
 					)}
 
-					{isShowCanvas && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-						<div
-							className={`w-full flex justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-						>
-							<Canvas />
-						</div>
-					)}
 					{isSearchMessage && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}
 				</div>
 			</div>

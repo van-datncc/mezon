@@ -3,8 +3,14 @@ import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { Icons, debounce } from '@mezon/mobile-components';
 import { Block, Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId, settingClanStickerActions } from '@mezon/store';
-import { getStoreAsync, gifsActions, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
+import {
+	getStoreAsync,
+	gifsActions,
+	selectCurrentChannel,
+	selectCurrentClanId,
+	selectDmGroupCurrent,
+	settingClanStickerActions
+} from '@mezon/store-mobile';
 import { IMessageSendPayload } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -110,7 +116,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '' }: IProps) {
 		} else if (type === 'sticker') {
 			handleSend({ t: '' }, [], [{ url: data, height: 40, width: 40, filetype: 'image/gif' }], []);
 		} else {
-			console.log('handleSelected data', data);
+			/* empty */
 		}
 
 		onDone && type !== 'emoji' && onDone();

@@ -1,10 +1,10 @@
 import { useAppNavigation } from '@mezon/core';
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
+import { EMarkdownType } from '@mezon/utils';
 import clx from 'classnames';
 import { memo, useCallback } from 'react';
 import Markdown from 'react-markdown';
 import { useSelector } from 'react-redux';
-import remarkGfm from 'remark-gfm';
 import { PreClass } from '../../components';
 
 type MarkdownContentOpt = {
@@ -12,20 +12,20 @@ type MarkdownContentOpt = {
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
 	isInPinMsg?: boolean;
+	isLink?: boolean;
+	isMarkDown?: boolean;
+	typeOfMarkdown?: EMarkdownType;
 };
 
-const navigateToChannel = async (url: string, navigate: any) => {
-	const regex = /\/invite\/(\d+)/;
-	const match = url.match(regex);
-	if (match) {
-		const [_, inviteId] = match;
-		if (inviteId) {
-			navigate('/invite/' + inviteId);
-		}
-	}
-};
-
-export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isInPinMsg }) => {
+export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
+	content,
+	isJumMessageEnabled,
+	isTokenClickAble,
+	isInPinMsg,
+	isLink,
+	isMarkDown,
+	typeOfMarkdown
+}) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
@@ -52,33 +52,41 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 			lightMode: appearanceTheme === 'light'
 		}
 	);
-
 	return (
 		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
 			<div className={`lineText contents dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
-				<Markdown
-					children={content}
-					remarkPlugins={[remarkGfm]}
-					components={{
-						pre: (props) => <PreClass {...props} isInPinMsg={isInPinMsg} />,
-						p: 'span',
-						a: (props) => (
-							<span
-								onClick={() => onClickLink(props.href ?? '')}
-								rel="noopener noreferrer"
-								style={{
-									color: 'rgb(59,130,246)',
-									cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
-									wordBreak: 'break-word',
-									textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline'
-								}}
-								className="tagLink"
-							>
-								{props.children}
-							</span>
-						)
-					}}
-				/>
+				{isLink && (
+					// eslint-disable-next-line jsx-a11y/anchor-is-valid
+					<a
+						onClick={() => onClickLink(content ?? '')}
+						rel="noopener noreferrer"
+						style={{
+							color: 'rgb(59,130,246)',
+							cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
+							wordBreak: 'break-word',
+							textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline'
+						}}
+						className="tagLink"
+					>
+						{content}
+					</a>
+				)}
+				{isMarkDown && typeOfMarkdown === EMarkdownType.SINGLE && (
+					<Markdown
+						children={content}
+						components={{
+							p: 'span'
+						}}
+					/>
+				)}
+				{isMarkDown && typeOfMarkdown === EMarkdownType.TRIPLE && (
+					<Markdown
+						children={content}
+						components={{
+							pre: (props) => <PreClass {...props} isInPinMsg={isInPinMsg} />
+						}}
+					/>
+				)}
 			</div>
 		</article>
 	);

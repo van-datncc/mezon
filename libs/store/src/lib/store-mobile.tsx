@@ -26,11 +26,14 @@ import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
+import { canvasReducer } from './canvas/canvas.slice';
+import { canvasAPIReducer } from './canvas/canvasAPI.slice';
 import { userChannelsReducer } from './channelmembers/AllUsersChannelByAddChannel.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
 import { hashtagDmReducer } from './channels/hashtagDm.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
+import { settingChannelReducer } from './clans/clanSettingChannel.slice';
 import { directMetaReducer } from './direct/directmeta.slice';
 import { dragAndDropReducer } from './dragAndDrop/dragAndDrop.slice';
 import { errorListenerMiddleware } from './errors/errors.listener';
@@ -77,7 +80,7 @@ const persistedAppReducer = persistReducer(
 	{
 		key: 'apps',
 		storage,
-		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile']
+		blacklist: ['loadingMainMobile', 'isFromFcmMobile', 'hasInternetMobile', 'isShowChatStream', 'chatStreamWidth', 'isShowCanvas']
 	},
 	appReducer
 );
@@ -110,8 +113,7 @@ const persistedMessageReducer = persistReducer(
 	{
 		key: 'messages',
 		storage,
-		blacklist: ['typingUsers', 'isSending'],
-		transforms: [transformJumpingError]
+		blacklist: ['typingUsers', 'isSending']
 	},
 	messagesReducer
 );
@@ -261,7 +263,8 @@ const persistedChannelMetaReducer = persistReducer(
 const persistedsettingClanStickerReducer = persistReducer(
 	{
 		key: 'settingSticker',
-		storage
+		storage,
+		blacklist: ['hasGrandchildModal']
 	},
 	settingStickerReducer
 );
@@ -272,6 +275,22 @@ const persisteduserChannelsReducer = persistReducer(
 		storage
 	},
 	userChannelsReducer
+);
+
+const persistedStreamReducer = persistReducer(
+	{
+		key: 'stream',
+		storage
+	},
+	videoStreamReducer
+);
+
+const persistPoliciesReducer = persistReducer(
+	{
+		key: 'policiesReducer',
+		storage
+	},
+	policiesReducer
 );
 
 const reducer = {
@@ -295,7 +314,7 @@ const reducer = {
 	rolesclan: persistedRolesClanReducer,
 	eventmanagement: persistedEventMngtReducer,
 	usersClan: usersClanReducer,
-	[POLICIES_FEATURE_KEY]: policiesReducer,
+	[POLICIES_FEATURE_KEY]: persistPoliciesReducer,
 	userClanProfile: userClanProfileReducer,
 	friends: friendsReducer,
 	direct: directReducer,
@@ -317,7 +336,9 @@ const reducer = {
 	voice: voiceReducer,
 	usersstream: usersStreamReducer,
 	channelsstream: channelsStreamReducer,
-	videostream: videoStreamReducer,
+	videostream: persistedStreamReducer,
+	canvas: canvasReducer,
+	canvasapi: canvasAPIReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
@@ -329,7 +350,8 @@ const reducer = {
 	integrationWebhook: integrationWebhookReducer,
 	adminApplication: adminApplicationReducer,
 	systemMessages: systemMessageReducer,
-	giveCoffee: giveCoffeeReducer
+	giveCoffee: giveCoffeeReducer,
+	settingClanChannel: settingChannelReducer
 };
 
 let storeInstance = configureStore({

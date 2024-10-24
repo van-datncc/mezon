@@ -1,6 +1,6 @@
 import { useGetPriorityNameFromUserClan, useJumpToMessage } from '@mezon/core';
 import { messagesActions, notificationActions } from '@mezon/store';
-import { IMessageWithUser, INotification } from '@mezon/utils';
+import { IMentionOnMessage, IMessageWithUser, INotification, addMention } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -9,7 +9,6 @@ import MessageAttachment from '../MessageWithUser/MessageAttachment';
 import MessageHead from '../MessageWithUser/MessageHead';
 import { MessageLine } from '../MessageWithUser/MessageLine';
 import MessageReply from '../MessageWithUser/MessageReply/MessageReply';
-import { useMessageParser } from '../MessageWithUser/useMessageParser';
 export type NotifyMentionProps = {
 	readonly notify: INotification;
 	readonly isUnreadTab?: boolean;
@@ -85,7 +84,7 @@ interface IMentionTabContent {
 }
 
 function MentionTabContent({ message }: IMentionTabContent) {
-	const { username, contentUpdatedMention } = useMessageParser(message);
+	const contentUpdatedMention = addMention(message?.content, message?.mentions as IMentionOnMessage[]);
 	const { priorityAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
 	const checkMessageHasReply = useMemo(() => {
 		return message.references && message.references?.length > 0;
@@ -103,12 +102,12 @@ function MentionTabContent({ message }: IMentionTabContent) {
 				<AvatarImage
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"
-					userName={username}
+					userName={message?.username}
 					src={priorityAvatar ? priorityAvatar : message.avatar}
 				/>
 
 				<div className="h-full">
-					<MessageHead message={message} isCombine={true} isShowFull={true} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+					<MessageHead message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 					<MessageLine isEditted={false} content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} />
 					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
 				</div>

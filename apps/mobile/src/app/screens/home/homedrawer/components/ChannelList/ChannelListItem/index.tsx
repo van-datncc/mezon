@@ -1,13 +1,15 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import {
+	channelsActions,
+	getStoreAsync,
 	selectCategoryExpandStateByCategoryId,
 	selectCurrentChannelId,
 	selectIsUnreadChannelById,
 	selectStreamMembersByChannelId,
-	selectVoiceChannelMembersByChannelId
-} from '@mezon/store';
-import { channelsActions, getStoreAsync, useAppSelector } from '@mezon/store-mobile';
+	selectVoiceChannelMembersByChannelId,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';

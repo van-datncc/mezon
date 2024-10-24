@@ -29,6 +29,7 @@ import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
 import ChannelMenu from '../components/ChannelMenu';
 import ClanMenu from '../components/ClanMenu/ClanMenu';
+import ButtonNewUnread from './ButtonNewUnread';
 import { style } from './styles';
 export type ChannelsPositionRef = {
 	current: {
@@ -52,7 +53,6 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const bottomSheetInviteRef = useRef(null);
 	const bottomSheetNotifySettingRef = useRef<BottomSheetModal>(null);
 	const [isUnknownChannel, setIsUnKnownChannel] = useState<boolean>(false);
-	const previousPositionRef = useRef(null);
 
 	const [currentPressedCategory, setCurrentPressedCategory] = useState<ICategoryChannel>(null);
 	const [currentPressedChannel, setCurrentPressedChannel] = useState<ChannelThreads | null>(null);
@@ -98,21 +98,27 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	const handleCollapseCategory = useCallback((isCollapse: boolean) => {
 		setIsCollapseCategory(true);
 	}, []);
-	useEffect(() => {
-		const positionChannel = channelsPositionRef?.current?.[currentChannel?.id];
-		const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
-		const position = (positionChannel?.height || 0) + (categoryOffset || 0);
-		const previousPosition = previousPositionRef?.current;
 
-		if (Math.abs(position - previousPosition) > 100 && !isCollapseCategory) {
-			flashListRef?.current?.scrollTo({
-				x: 0,
-				y: position - size.s_150,
-				animated: true
-			});
-			previousPositionRef.current = position;
-		}
-	}, [selectCategoryOffsets, currentChannel, isCollapseCategory, currentClanId]);
+	const handleScrollToChannel = useCallback(
+		(currentChannelId: string) => {
+			const positionChannel = channelsPositionRef?.current?.[currentChannelId];
+			const categoryOffset = selectCategoryOffsets?.[positionChannel?.cateId || currentChannel?.category_id];
+			const position = (positionChannel?.height || 0) + (categoryOffset || 0);
+
+			if (position && !isCollapseCategory) {
+				flashListRef?.current?.scrollTo({
+					x: 0,
+					y: position - size.s_150,
+					animated: true
+				});
+			}
+		},
+		[selectCategoryOffsets, currentChannel?.category_id, isCollapseCategory]
+	);
+
+	useEffect(() => {
+		handleScrollToChannel(currentChannel?.id);
+	}, [selectCategoryOffsets, currentChannel, isCollapseCategory, currentClanId, handleScrollToChannel]);
 
 	useEffect(() => {
 		setIsCollapseCategory(false);
@@ -173,6 +179,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 						})}
 					<Block height={80} />
 				</ScrollView>
+
+				<ButtonNewUnread handleScrollToChannel={handleScrollToChannel} />
 			</View>
 
 			<MezonBottomSheet ref={bottomSheetMenuRef}>
