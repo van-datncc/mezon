@@ -2,7 +2,7 @@ import { Icons, IUserStatusProps, OfflineStatus, OnlineStatus } from '@mezon/mob
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
 
-export const UserStatus = React.memo(({ status }: IUserStatusProps) => {
+export const UserStatus = React.memo(({ status, customStyles }: IUserStatusProps) => {
 	const { themeValue } = useTheme();
 
 	return (
@@ -13,6 +13,7 @@ export const UserStatus = React.memo(({ status }: IUserStatusProps) => {
 			backgroundColor={themeValue.tertiary}
 			padding={size.s_2}
 			borderRadius={size.s_10}
+			{...(customStyles && customStyles)}
 		>
 			{status?.isMobile ? (
 				<Icons.IconMobileDevice width={size.s_16} height={size.s_16} />

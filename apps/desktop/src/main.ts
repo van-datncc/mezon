@@ -1,9 +1,8 @@
 import { BrowserWindow, Notification, app, dialog, ipcMain } from 'electron';
 import log from 'electron-log/main';
 import { UpdateInfo, autoUpdater } from 'electron-updater';
-import { machineId } from 'node-machine-id';
 import App from './app/app';
-import { GET_DEVICE_ID, NAVIGATE_TO_URL, SENDER_ID } from './app/events/constants';
+import { NAVIGATE_TO_URL, SENDER_ID } from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
 import { environment } from './environments/environment';
@@ -33,10 +32,6 @@ export default class Main {
 
 ipcMain.handle(SENDER_ID, () => {
 	return environment.senderId;
-});
-
-ipcMain.handle(GET_DEVICE_ID, async () => {
-	return await machineId();
 });
 
 ipcMain.on(NAVIGATE_TO_URL, async (event, path, isSubPath) => {
