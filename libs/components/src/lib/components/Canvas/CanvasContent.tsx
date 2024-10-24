@@ -258,6 +258,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 				toolbarRef.current &&
 				!toolbarRef.current.contains(event.target as Node)
 			) {
+				setIsOpen(false);
 				setToolbarVisible(false);
 				setActiveFormats({
 					bold: false,
