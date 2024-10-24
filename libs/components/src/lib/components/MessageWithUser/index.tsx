@@ -51,6 +51,7 @@ export type MessageWithUserProps = {
 	isSearchMessage?: boolean;
 	allowDisplayShortProfile: boolean;
 	isCombine?: boolean;
+	showDivider?: boolean;
 	channelLabel?: string;
 };
 
@@ -67,6 +68,7 @@ function MessageWithUser({
 	isSearchMessage,
 	allowDisplayShortProfile,
 	isCombine,
+	showDivider,
 	channelLabel
 }: Readonly<MessageWithUserProps>) {
 	const userLogin = useAuth();
@@ -218,7 +220,7 @@ function MessageWithUser({
 
 	return (
 		<>
-			{!isCombine && <MessageDateDivider message={message} />}
+			{showDivider && <MessageDateDivider message={message} />}
 			{!shouldNotRender && (
 				<HoverStateWrapper popup={popup}>
 					<div className={containerClass} onContextMenu={onContextMenu} id={`msg-${message.id}`}>

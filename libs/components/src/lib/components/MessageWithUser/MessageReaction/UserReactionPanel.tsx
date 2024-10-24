@@ -1,10 +1,10 @@
 import { useAuth, useChatReaction, useUserById } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectCurrentClanId } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClanId } from '@mezon/store';
 import { Icons, NameComponent } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { Fragment, useCallback, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 type UserReactionPanelProps = {
@@ -14,7 +14,6 @@ type UserReactionPanelProps = {
 };
 
 const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelProps) => {
-	const dispatch = useDispatch();
 	const { reactionMessageDispatch } = useChatReaction();
 	const userId = useAuth();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -54,17 +53,12 @@ const UserReactionPanel = ({ emojiShowPanel, mode, message }: UserReactionPanelP
 	}, []);
 
 	const count = calculateTotalCount(senderList);
-	const onLeavePanel = () => {
-		dispatch(reactionActions.setEmojiHover(null));
-		dispatch(reactionActions.setUserReactionPanelState(false));
-	};
 
 	return (
 		<>
 			{count > 0 && (
 				<div className="flex flex-col justify-center ">
 					<div
-						onMouseLeave={onLeavePanel}
 						onClick={(e) => e.stopPropagation()}
 						className={`z-50   w-[18rem]
 						dark:bg-[#28272b] bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] shadow-md

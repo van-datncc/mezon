@@ -1,10 +1,11 @@
 import { useAppParams, useAttachments } from '@mezon/core';
 import {
 	attachmentActions,
+	selectAllListAttachmentByChannel,
 	selectAttachment,
-	selectAttachmentPhoto,
 	selectCurrentAttachmentShowImage,
 	selectCurrentChannel,
+	selectCurrentChannelId,
 	selectDmGroupCurrent,
 	selectMemberClanByUserId,
 	selectMessageIdAttachment,
@@ -21,11 +22,13 @@ import ListAttachment from './listAttachment';
 export const MAX_SCALE_IMAGE = 5;
 
 const MessageModalImage = () => {
+	const { directId } = useAppParams();
 	const [scale, setScale] = useState(1);
 	const [rotate, setRotate] = useState(0);
 
 	const [showList, setShowList] = useState(true);
-	const attachments = useSelector(selectAttachmentPhoto());
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const attachments = useSelector(selectAllListAttachmentByChannel((directId ?? currentChannelId) as string));
 	const { setOpenModalAttachment } = useAttachments();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 	const attachment = useSelector(selectAttachment);
@@ -152,8 +155,6 @@ const MessageModalImage = () => {
 		event.stopPropagation();
 		setDragging(false);
 	};
-
-	const { directId } = useAppParams();
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDM = useSelector(selectDmGroupCurrent(directId as string));

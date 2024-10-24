@@ -246,7 +246,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						create_time: dateTime.toISOString()
 					};
 				});
-				dispatch(attachmentActions.addMany(attachmentList));
+				dispatch(attachmentActions.addAttachments({ listAttachments: attachmentList, channelId: message.channel_id }));
 			}
 
 			dispatch(messagesActions.addNewMessage(mess));

@@ -112,7 +112,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	}, []);
 
 	const scrollToMessageById = useCallback(
-		(messageId: string, options: ScrollIntoViewOptions = { behavior: 'smooth' }) => {
+		(messageId: string, options: ScrollIntoViewOptions = { behavior: 'instant' }) => {
 			return new Promise<void>((resolve) => {
 				const isAtBottom = getChatScrollBottomOffset() <= 1;
 				const messageElement = listMessageRefs.current[messageId];
@@ -132,7 +132,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	);
 
 	const scrollToLastMessage = useCallback(
-		(options: ScrollIntoViewOptions = { behavior: 'smooth' }) => {
+		(options: ScrollIntoViewOptions = { behavior: 'instant' }) => {
 			return scrollToMessageById(lastMessage?.id ?? '', options);
 		},
 		[lastMessage?.id, scrollToMessageById]
@@ -149,7 +149,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		if (jumpPinMessageId && isPinMessageExist) {
 			const messageRef = listMessageRefs.current[jumpPinMessageId];
 			if (messageRef) {
-				messageRef?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				messageRef?.scrollIntoView({ behavior: 'instant', block: 'center' });
 				const timeoutId = setTimeout(() => {
 					dispatch(pinMessageActions.setJumpPinMessageId(null));
 				}, 1000);
@@ -164,7 +164,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		if (idMessageToJump && isMessageExist) {
 			const messageRef = listMessageRefs.current[idMessageToJump];
 			if (messageRef) {
-				messageRef?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				messageRef?.scrollIntoView({ behavior: 'instant', block: 'center' });
 				const timeoutId = setTimeout(() => {
 					dispatch(messagesActions.setIdMessageToJump(null));
 				}, 1000);

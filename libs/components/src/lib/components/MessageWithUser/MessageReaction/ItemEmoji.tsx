@@ -1,9 +1,9 @@
 import { useAuth, useChatReaction } from '@mezon/core';
-import { reactionActions, selectCurrentChannel, selectCurrentClanId, selectUserReactionPanelState } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiDataOptionals, IMessageWithUser, SenderInfoOptionals, calculateTotalCount, getSrcEmoji, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import UserReactionPanel from './UserReactionPanel';
@@ -18,7 +18,6 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 	const dispatch = useDispatch();
 	const userId = useAuth();
 	const { reactionMessageDispatch } = useChatReaction();
-	const userReactionPanelState = useSelector(selectUserReactionPanelState);
 	const emojiHover = useRef<EmojiDataOptionals | null>(null);
 	const getUrlItem = getSrcEmoji(emoji.emojiId || '');
 	const count = calculateTotalCount(emoji.senders);
@@ -56,11 +55,13 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 		if (emoji && emojiItemRef.current) {
 			emojiHover.current = emoji;
 			const { y, left } = emojiItemRef.current.getBoundingClientRect();
-			const elementHeight = ((emojiHover.current?.senders.length || 1) + 1) * 48 + 40;
+			let elementHeight = ((emojiHover.current?.senders.length || 1) + 1) * 48 + 40;
+			const maxHeight = 205;
+			elementHeight = elementHeight > maxHeight ? maxHeight : elementHeight;
 			const offset = 24;
 
 			positionShortUser.current = {
-				top: window.innerHeight - y > elementHeight ? y + offset : y + offset - elementHeight,
+				top: window.innerHeight - y - 70 > elementHeight ? y + offset : y - offset - elementHeight,
 				left: left
 			};
 
@@ -72,42 +73,17 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 
 	const onHoverEnter = useCallback(
 		async (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-			await dispatch(reactionActions.setEmojiHover(emoji));
-			await dispatch(reactionActions.setUserReactionPanelState(true));
 			if (timeoutEnter.current) {
 				clearTimeout(timeoutEnter.current);
 			}
 			timeoutEnter.current = setTimeout(() => {
 				handleOpenShortUser(emoji);
 			}, 300);
+
+			return () => timeoutEnter.current && clearTimeout(timeoutEnter.current);
 		},
-		[dispatch, emoji, handleOpenShortUser]
+		[emoji, handleOpenShortUser]
 	);
-
-	const resetState = useCallback(() => {
-		dispatch(reactionActions.setEmojiHover(null));
-		dispatch(reactionActions.setUserReactionPanelState(false));
-	}, [dispatch]);
-
-	const timeoutLeave = useRef<NodeJS.Timeout | null>(null);
-
-	const onHoverLeave = useCallback(() => {
-		if (timeoutLeave.current) {
-			clearTimeout(timeoutLeave.current);
-		}
-		timeoutLeave.current = setTimeout(() => {
-			resetState();
-			closeProfileItem();
-		}, 300);
-	}, [resetState]);
-
-	useEffect(() => {
-		if (!userReactionPanelState) {
-			resetState();
-		}
-	}, [userReactionPanelState, resetState]);
-
-	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		return (
@@ -132,6 +108,20 @@ function ItemEmoji({ emoji, mode, message }: EmojiItemProps) {
 			)
 		);
 	}, [message, emojiHover]);
+
+	const timeoutLeave = useRef<NodeJS.Timeout | null>(null);
+
+	const onHoverLeave = useCallback(() => {
+		if (timeoutLeave.current) {
+			clearTimeout(timeoutLeave.current);
+		}
+		timeoutLeave.current = setTimeout(() => {
+			closeProfileItem();
+		}, 300);
+		return () => timeoutLeave.current && clearTimeout(timeoutLeave.current);
+	}, [closeProfileItem]);
+
+	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 
 	return (
 		<ItemDetail
@@ -203,7 +193,7 @@ const ItemDetail = forwardRef<HTMLDivElement, ItemDetailProps>(
 					onClick={onClickReactExist}
 				>
 					<span className="absolute left-[5px]">
-						<img src={getUrlItem} className="w-4 h-4" alt="Item Icon" />
+						<img src={getUrlItem} className="w-4 h-4 object-scale-down" alt="Item Icon" />
 					</span>
 					<div className=" text-[13px] top-[2px] ml-5 absolute justify-center text-center cursor-pointer dark:text-white text-black">
 						<p>{strCount}</p>
@@ -223,10 +213,7 @@ type ArrowItemProps = {
 
 function ArrowItem({ arrow, isRightLimit, emojiCross, isLeftLimit }: ArrowItemProps) {
 	const dispatch = useDispatch();
-	const onHover = () => {
-		dispatch(reactionActions.setEmojiHover(emojiCross));
-		dispatch(reactionActions.setUserReactionPanelState(true));
-	};
+	const onHover = () => {};
 	return (
 		<div
 			onMouseEnter={onHover}
