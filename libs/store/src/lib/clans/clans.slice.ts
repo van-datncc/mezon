@@ -300,6 +300,9 @@ export const clansSlice = createSlice({
 					}
 				});
 			}
+		},
+		refreshStatus(state) {
+			state.loadingStatus = 'not loaded';
 		}
 	},
 	extraReducers: (builder) => {
@@ -423,5 +426,5 @@ export const selectBadgeCountAllClan = createSelector(selectAllClans, (clan) => 
 export const selectBadgeCountByClanId = (clanId: string) =>
 	createSelector(getClansState, (state) => {
 		const clan = state.entities[clanId];
-		return clan.badge_count;
+		return clan?.badge_count;
 	});

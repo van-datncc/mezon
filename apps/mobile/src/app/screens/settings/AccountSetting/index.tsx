@@ -62,8 +62,6 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 	const handleSettingOption = (type: EAccountSettingType) => {
 		switch (type) {
 			case EAccountSettingType.UserName:
-				showUpdating();
-				break;
 			case EAccountSettingType.DisplayName:
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.PROFILE });
 				break;
