@@ -38,6 +38,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
 	const placeholderColor = isLightMode ? 'rgba(0,0,0,0.6)' : '#ffffff';
+	const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
 
 	const [activeOption, setActiveOption] = useState('paragraph');
 
@@ -163,6 +164,33 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 		const handleSelectionChange = (range: any) => {
 			if (range && range.length > 0) {
 				setToolbarVisible(true);
+				requestAnimationFrame(() => {
+					const bounds = quillRef.current?.getBounds(range.index, range.length);
+					let newTop = 0;
+					let newLeft = 0;
+
+					if (bounds) {
+						if (toolbarRef.current) {
+							const toolbarHeight = toolbarRef.current.offsetHeight || 40;
+							newTop = bounds.top + window.scrollY - toolbarHeight - 10;
+							newLeft = bounds.left + window.scrollX;
+						}
+					} else {
+						const editorBounds = editorRef.current?.getBoundingClientRect();
+						if (editorBounds) {
+							const toolbarHeight = toolbarRef.current?.offsetHeight || 40;
+							newTop = editorBounds.top + window.scrollY - toolbarHeight - 10;
+							newLeft = editorBounds.left + window.scrollX;
+						}
+					}
+
+					setToolbarPosition((prevPosition) => {
+						if (prevPosition.top !== newTop || prevPosition.left !== newLeft) {
+							return { top: newTop, left: newLeft };
+						}
+						return prevPosition;
+					});
+				});
 				const formats = quillRef.current?.getFormat(range) || {};
 				setActiveOption(
 					(formats?.header as string) || (formats?.list as string) || (formats?.blockquote === true ? 'blockquote' : 'paragraph')
@@ -222,7 +250,12 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 		};
 
 		const handleClickOutside = (event: MouseEvent) => {
-			if (editorRef.current && !editorRef.current.contains(event.target as Node) && !toolbarRef.current) {
+			if (
+				editorRef.current &&
+				!editorRef.current.contains(event.target as Node) &&
+				toolbarRef.current &&
+				!toolbarRef.current.contains(event.target as Node)
+			) {
 				setToolbarVisible(false);
 				setActiveFormats({
 					bold: false,
@@ -241,6 +274,10 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 					blockquote: false,
 					image: ''
 				});
+
+				if (quillRef.current) {
+					quillRef.current.setSelection(0, 0);
+				}
 			}
 		};
 
@@ -379,8 +416,8 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 					className="toolbar"
 					style={{
 						position: 'absolute',
-						top: '-30px',
-						left: '0',
+						top: `${toolbarPosition.top}px`,
+						left: `${toolbarPosition.left}px`,
 						padding: '5px',
 						display: 'flex',
 						alignItems: 'center',
