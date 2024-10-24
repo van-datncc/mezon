@@ -200,7 +200,6 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 	}, [checkAddFriend]);
 
 	const handleOnClickButtonFriend = (index: number) => {
-		console.log('checkAddFriend: ', checkAddFriend);
 		switch (checkAddFriend) {
 			case EStateFriend.MY_PENDING:
 				if (index === 0) {

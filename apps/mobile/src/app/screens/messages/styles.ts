@@ -115,7 +115,7 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			marginHorizontal: size.s_10,
 			paddingHorizontal: size.s_8,
 			paddingVertical: size.s_6,
-			borderRadius: size.s_10,
+			borderRadius: size.s_10
 		},
 		friendAvatar: {
 			width: size.s_40,
