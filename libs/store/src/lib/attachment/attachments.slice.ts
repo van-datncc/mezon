@@ -48,7 +48,7 @@ const fetchChannelAttachmentsCached = memoizeAndTrack(
 		promise: true,
 		maxAge: CHANNEL_ATTACHMENTS_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[0].session.username;
+			return args[2] + args[1] + args[0].session.username;
 		}
 	}
 );
@@ -116,9 +116,11 @@ export const attachmentSlice = createSlice({
 			state.loadingStatus = 'not loaded';
 		},
 		addAttachments: (state, action: PayloadAction<{ listAttachments: AttachmentEntity[]; channelId: string }>) => {
-			action.payload.listAttachments.map((attachment) => {
-				state.listAttachmentsByChannel[action.payload.channelId].unshift(attachment);
-			});
+			if (state.listAttachmentsByChannel[action.payload.channelId]) {
+				action.payload.listAttachments.map((attachment) => {
+					state.listAttachmentsByChannel[action.payload.channelId].unshift(attachment);
+				});
+			}
 		}
 	},
 	extraReducers: (builder) => {
