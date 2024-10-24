@@ -44,6 +44,8 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 
 	const [isOpen, setIsOpen] = useState(false);
 	const selectRef = useRef<HTMLDivElement>(null);
+	const DEFAULT_TOOLBAR_OFFSET_HEIGHT = 40;
+	const TOOLBAR_POSITION_OFFSET_TOP = 10;
 
 	const options = [
 		{
@@ -171,15 +173,15 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 
 					if (bounds) {
 						if (toolbarRef.current) {
-							const toolbarHeight = toolbarRef.current.offsetHeight || 40;
-							newTop = bounds.top + window.scrollY - toolbarHeight - 10;
+							const toolbarHeight = toolbarRef.current.offsetHeight || DEFAULT_TOOLBAR_OFFSET_HEIGHT;
+							newTop = bounds.top + window.scrollY - toolbarHeight - TOOLBAR_POSITION_OFFSET_TOP;
 							newLeft = bounds.left + window.scrollX;
 						}
 					} else {
 						const editorBounds = editorRef.current?.getBoundingClientRect();
 						if (editorBounds) {
-							const toolbarHeight = toolbarRef.current?.offsetHeight || 40;
-							newTop = editorBounds.top + window.scrollY - toolbarHeight - 10;
+							const toolbarHeight = toolbarRef.current?.offsetHeight || DEFAULT_TOOLBAR_OFFSET_HEIGHT;
+							newTop = editorBounds.top + window.scrollY - toolbarHeight - TOOLBAR_POSITION_OFFSET_TOP;
 							newLeft = editorBounds.left + window.scrollX;
 						}
 					}
