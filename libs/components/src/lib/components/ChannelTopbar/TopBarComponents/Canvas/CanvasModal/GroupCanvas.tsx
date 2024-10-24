@@ -15,7 +15,9 @@ const GroupCanvas = ({ canvasId, channelId, clanId, onClose, creatorIdChannel }:
 	const currentIdCanvas = useSelector(selectIdCanvas);
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
-	const isDisableDelCanvas = Boolean(canvas.creator_id !== userProfile?.user?.id && creatorIdChannel !== userProfile?.user?.id);
+	const isDisableDelCanvas = Boolean(
+		canvas.creator_id && canvas.creator_id !== userProfile?.user?.id && creatorIdChannel !== userProfile?.user?.id
+	);
 
 	const handleOpenCanvas = async () => {
 		dispatch(appActions.setIsShowCanvas(true));
