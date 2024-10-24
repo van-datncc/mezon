@@ -1,3 +1,4 @@
+import { useMemberStatus } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectMemberClanByUserId } from '@mezon/store-mobile';
 import { Text, View } from 'react-native';
@@ -13,6 +14,7 @@ const Avatar = ({ id, index }: { id: string; index: number }) => {
 	const user = useSelector(selectMemberClanByUserId(id || ''));
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const userStatus = useMemberStatus(id || '');
 
 	return (
 		<View style={styles.item}>
@@ -22,7 +24,7 @@ const Avatar = ({ id, index }: { id: string; index: number }) => {
 				width={40}
 				avatarUrl={user?.user?.avatar_url}
 				username={user?.user?.username}
-				userStatus={user?.user?.online}
+				userStatus={userStatus}
 			/>
 			<Text style={styles.text}>{user?.user?.display_name}</Text>
 		</View>
