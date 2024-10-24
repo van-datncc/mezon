@@ -32,9 +32,9 @@ function DirectUnread({ directMessage }: DirectMessUnreadProp) {
 						className="min-w-12 min-h-12 max-w-12 max-h-12"
 						src={direct.type === ChannelType.CHANNEL_TYPE_DM ? direct?.channel_avatar?.at(0) : 'assets/images/avatar-group.png'}
 					/>
-					{directMessage.count_mess_unread && (
+					{directMessage?.count_mess_unread && (
 						<div className="absolute border-[4px] dark:border-bgPrimary border-white w-[24px] h-[24px] rounded-full bg-colorDanger text-[#fff] font-bold text-[11px] flex items-center justify-center top-7 right-[-6px]">
-							{directMessage.count_mess_unread >= 100 ? '99+' : directMessage.count_mess_unread}
+							{directMessage?.count_mess_unread >= 100 ? '99+' : directMessage?.count_mess_unread}
 						</div>
 					)}
 				</div>

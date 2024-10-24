@@ -14,6 +14,7 @@ export interface SettingClanChannelState extends EntityState<ApiChannelSettingIt
 	error?: string | null;
 	channelCount: number;
 	threadCount: number;
+	threadsByChannel: Record<string, ApiChannelSettingItem[]>;
 }
 
 export const channelSettingAdapter = createEntityAdapter({
@@ -24,15 +25,16 @@ export const initialSettingClanChannelState: SettingClanChannelState = channelSe
 	loadingStatus: 'not loaded',
 	error: null,
 	channelCount: 0,
-	threadCount: 0
+	threadCount: 0,
+	threadsByChannel: {}
 });
 
 export const fetchChannelSettingInClanCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, clanId: string, page: number, limit: number) => {
+	async (mezon: MezonValueContext, clanId: string, parentId: string, page: number, limit: number) => {
 		const response = await mezon.client.getChannelSettingInClan(
 			mezon.session,
 			clanId,
-			'0', // parent_id
+			parentId, // parent_id
 			undefined, // category_id
 			undefined, // private_channel
 			undefined, // active
@@ -47,23 +49,36 @@ export const fetchChannelSettingInClanCached = memoizeAndTrack(
 		promise: true,
 		maxAge: CHANNEL_SETTING_CLAN_CACHE_TIME,
 		normalizer: (args) => {
-			return args[0]?.session?.username || '' + args[1];
+			return args[1] + args[2] + args[0]?.session?.username || '';
 		}
 	}
 );
 
+interface IFetchChannelSetting {
+	noCache?: boolean;
+	clanId: string;
+	parentId: string;
+	page?: number;
+	limit?: number;
+	isFetchingThread?: boolean;
+}
+
 export const fetchChannelSettingInClan = createAsyncThunk(
 	'channelSetting/fetchClanChannelSetting',
-	async ({ noCache = false, clanId, page = 1, limit = 10 }: { noCache?: boolean; clanId: string; page?: number; limit?: number }, thunkAPI) => {
+	async ({ noCache = false, clanId, parentId, page = 1, limit = 10, isFetchingThread }: IFetchChannelSetting, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
 				fetchChannelSettingInClanCached.clear();
 			}
 
-			const response = await fetchChannelSettingInClanCached(mezon, clanId, page, limit);
+			const response = await fetchChannelSettingInClanCached(mezon, clanId, parentId, page, limit);
 			if (response) {
-				return response;
+				return {
+					parentId: parentId,
+					response: response,
+					isFetchingThread: isFetchingThread
+				};
 			}
 			throw new Error('Emoji list is undefined or null');
 		} catch (error) {
@@ -80,9 +95,13 @@ export const settingClanChannelSlice = createSlice({
 		builder
 			.addCase(fetchChannelSettingInClan.fulfilled, (state: SettingClanChannelState, actions) => {
 				state.loadingStatus = 'loaded';
-				channelSettingAdapter.setMany(state, actions.payload.channel_setting_list || []);
-				state.channelCount = actions.payload?.channel_count || 0;
-				state.threadCount = actions.payload?.thread_count || 0;
+				if (actions.payload.isFetchingThread) {
+					state.threadsByChannel[actions.payload.parentId] = actions.payload.response.channel_setting_list || [];
+				} else {
+					channelSettingAdapter.setAll(state, actions.payload.response.channel_setting_list || []);
+					state.channelCount = actions.payload?.response.channel_count || 0;
+					state.threadCount = actions.payload?.response.thread_count || 0;
+				}
 			})
 			.addCase(fetchChannelSettingInClan.pending, (state: SettingClanChannelState) => {
 				state.loadingStatus = 'loading';
@@ -105,6 +124,7 @@ const { selectAll, selectEntities, selectById } = channelSettingAdapter.getSelec
 export const selectAllChannelSuggestion = createSelector(getChannelSettingState, selectAll);
 export const selectChannelSuggestionEntities = createSelector(getChannelSettingState, selectEntities);
 export const selectOneChannelInfor = (channelId: string) => createSelector(getChannelSettingState, (state) => selectById(state, channelId));
+export const selectThreadsListByParentId = (parentId: string) => createSelector(getChannelSettingState, (state) => state.threadsByChannel[parentId]);
 export const settingChannelReducer = settingClanChannelSlice.reducer;
 export const selectNumberChannelCount = createSelector(getChannelSettingState, (state) => state.channelCount);
 export const selectNumberThreadCount = createSelector(getChannelSettingState, (state) => state.threadCount);

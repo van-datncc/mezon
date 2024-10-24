@@ -20,12 +20,15 @@ export const ChatMessageWrapper = memo(({ handleBack, directMessageId, isModeDM,
 	const styles = style(themeValue);
 	const panelKeyboardRef = useRef(null);
 
-	const onHandlerStateChange = useCallback((event: { nativeEvent: { translationX: any; velocityX: any } }) => {
-		const { translationX, velocityX } = event.nativeEvent;
-		if (translationX > 50 && velocityX > 300) {
-			handleBack?.();
-		}
-	}, []);
+	const onHandlerStateChange = useCallback(
+		(event: { nativeEvent: { translationX: any; velocityX: any } }) => {
+			const { translationX, velocityX } = event.nativeEvent;
+			if (translationX > 50 && velocityX > 300) {
+				handleBack?.();
+			}
+		},
+		[handleBack]
+	);
 
 	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
 		if (panelKeyboardRef?.current) {

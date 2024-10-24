@@ -31,6 +31,8 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		store.dispatch(messagesActions.removeAll());
 		store.dispatch(clansActions.setCurrentClanId(''));
 		store.dispatch(clansActions.removeAll());
+		store.dispatch(clansActions.refreshStatus());
+
 		await remove(STORAGE_DATA_CLAN_CHANNEL_CACHE);
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		await remove(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
@@ -45,7 +47,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			[
 				{
 					text: 'Cancel',
-					onPress: () => console.log('Cancel Pressed'),
+					onPress: () => {},
 					style: 'cancel'
 				},
 				{ text: 'Yes', onPress: () => logout() }

@@ -339,10 +339,7 @@ export const style = (colors: Attributes) =>
 			marginTop: size.s_10
 		},
 		highlightMessageMention: {
-			backgroundColor: colors.reactionBg,
-			borderLeftColor: Colors.textLink,
-			borderLeftWidth: 2,
-			paddingTop: size.s_4
+			backgroundColor: colors.reactionBg
 		},
 		highlightMessageReply: {
 			backgroundColor: Colors.bgMessageHighlight,

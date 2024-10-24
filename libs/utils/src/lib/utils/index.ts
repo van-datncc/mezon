@@ -19,7 +19,7 @@ import Resizer from 'react-image-file-resizer';
 import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
-	EMarkdownType,
+	EBacktickType,
 	EMimeTypes,
 	ETokenMessage,
 	EmojiDataOptionals,
@@ -589,7 +589,7 @@ export const processText = (inputString: string) => {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
-					markdowns.push({ type: EMarkdownType.TRIPLE, s: startindex, e: endindex });
+					markdowns.push({ type: EBacktickType.TRIPLE, s: startindex, e: endindex });
 				}
 			}
 		} else if (inputString[i] === singleBacktick) {
@@ -605,7 +605,7 @@ export const processText = (inputString: string) => {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
-					markdowns.push({ type: EMarkdownType.SINGLE, s: startindex, e: endindex });
+					markdowns.push({ type: EBacktickType.SINGLE, s: startindex, e: endindex });
 				}
 				i++;
 			}
