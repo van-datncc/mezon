@@ -14,11 +14,12 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, TIME_OFFSET, isPublicChannel } from '@mezon/utils';
+import { useDrawerStatus } from '@react-navigation/drawer';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonBottomSheet from '../../../componentUI/MezonBottomSheet';
 import NotificationSetting from '../../../components/NotificationSetting';
@@ -61,6 +62,7 @@ const HomeDefault = React.memo((props: any) => {
 	const [isFocusChannelView, setIsFocusChannelView] = useState(false);
 	const [isShowLicenseAgreement, setIsShowLicenseAgreement] = useState<boolean>(false);
 	const navigation = useNavigation<any>();
+
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
 	const dispatch = useAppDispatch();
@@ -91,6 +93,21 @@ const HomeDefault = React.memo((props: any) => {
 			bottomSheetRef.current?.present();
 		}, 200);
 	};
+	const drawerStatus = useDrawerStatus();
+
+	useEffect(() => {
+		const backAction = () => {
+			if (drawerStatus === 'closed') {
+				navigation.dispatch(DrawerActions.openDrawer());
+				return true;
+			}
+			return false;
+		};
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+		return () => {
+			backHandler.remove();
+		};
+	}, [drawerStatus, navigation]);
 
 	useFocusEffect(
 		useCallback(() => {
