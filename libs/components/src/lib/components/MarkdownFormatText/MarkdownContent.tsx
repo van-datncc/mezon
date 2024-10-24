@@ -49,7 +49,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const posInReply = isJumMessageEnabled && !isTokenClickAble;
 
 	return (
-		<div className={` dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+		<div className={`inline dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
 			{isLink && (
 				// eslint-disable-next-line jsx-a11y/anchor-is-valid
 				<a
