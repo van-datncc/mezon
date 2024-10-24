@@ -190,7 +190,7 @@ The application data flow is managed by some packages:
 ![Data Flow for voice](./docs/voice.svg)
 
 -   in voice context, we add room voice creat function createVoiceConnection.
--   When someone join to voice rôm, voicecontext will send to chat server and trigger onVoiceJoined (notify all) in mezon-js.
+-   when someone join to voice room, voicecontext will send to chat server and trigger onVoiceJoined (notify all) in mezon-js.
 -   we create a slice in FE to manage state when onVoiceJoined trigger and update number of joined participate in channel.
 
 ## Layouting
