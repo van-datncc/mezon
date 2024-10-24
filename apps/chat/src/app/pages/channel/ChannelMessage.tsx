@@ -15,6 +15,7 @@ import {
 	selectOpenEditMessageState,
 	useAppSelector
 } from '@mezon/store';
+import { isSameDay } from 'date-fns';
 import React, {
 	ForwardRefExoticComponent,
 	PropsWithoutRef,
@@ -75,6 +76,13 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 			return false;
 		}, [message?.create_time, previousMessage?.create_time]);
 
+		const isDifferentDay = useMemo(() => {
+			if (message?.create_time && previousMessage?.create_time) {
+				return !isSameDay(new Date(message.create_time), new Date(previousMessage.create_time));
+			}
+			return false;
+		}, [message?.create_time, previousMessage?.create_time]);
+
 		const isCombine = isSameUser && isTimeGreaterThan60Minutes;
 
 		const handleContextMenu = useCallback(
@@ -112,7 +120,7 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 				{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
 				{!message.isFirst && (
-					<div ref={messageRef} className="fullBoxText relative group">
+					<div ref={messageRef} className={`fullBoxText relative group ${!isCombine ? 'pt-3' : ''}`}>
 						<MessageWithUser
 							allowDisplayShortProfile={true}
 							message={mess}
@@ -122,6 +130,7 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 							popup={popup}
 							onContextMenu={handleContextMenu}
 							isCombine={isCombine}
+							showDivider={isDifferentDay}
 						/>
 					</div>
 				)}
