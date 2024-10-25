@@ -14,12 +14,11 @@ interface IProps {
 	messageReferences?: ApiMessageRef;
 	preventAction: boolean;
 	isMessageReply?: boolean;
-	mode?: number;
 	channelId?: string;
 	clanId?: string;
 }
 
-export const MessageReferences = React.memo(({ messageReferences, preventAction, mode, channelId, clanId }: IProps) => {
+export const MessageReferences = React.memo(({ messageReferences, preventAction, channelId, clanId }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
