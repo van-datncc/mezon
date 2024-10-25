@@ -8,11 +8,12 @@ type AnchorScrollProps = {
 	children: ReactNode;
 	anchorId?: string | number;
 	className?: classNames.ArgumentArray;
+	classNameChild?: classNames.ArgumentArray;
 };
 
 type AnchorScrollRef = HTMLDivElement;
 
-export const AnchorScroll = React.forwardRef<AnchorScrollRef, AnchorScrollProps>(({ children, anchorId, className }, ref) => {
+export const AnchorScroll = React.forwardRef<AnchorScrollRef, AnchorScrollProps>(({ children, anchorId, className, classNameChild }, ref) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const contentRef = useRef<HTMLDivElement | null>(null);
@@ -104,7 +105,7 @@ export const AnchorScroll = React.forwardRef<AnchorScrollRef, AnchorScrollProps>
 					className
 				])}
 			>
-				<div ref={contentRef} className={classNames(['min-h-[100%]', 'flex flex-col justify-end'])}>
+				<div ref={contentRef} className={classNames(['min-h-[100%]', 'flex flex-col justify-end', classNameChild])}>
 					{children}
 				</div>
 			</div>
