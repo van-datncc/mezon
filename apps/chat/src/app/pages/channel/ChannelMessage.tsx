@@ -30,6 +30,8 @@ export type MessageProps = {
 	userName?: string;
 	isLastSeen?: boolean;
 	index: number;
+	checkMessageTargetToMoved?: boolean;
+	messageReplyHighlight?: boolean;
 };
 
 export type MessageRef = {
@@ -43,7 +45,19 @@ type ChannelMessageComponent = ForwardRefExoticComponent<PropsWithoutRef<Message
 };
 
 export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageRef, MessageProps>(
-	({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName, isLastSeen, previousMessageId, index }: Readonly<MessageProps>) => {
+	({
+		messageId,
+		channelId,
+		mode,
+		channelLabel,
+		isHighlight,
+		avatarDM,
+		userName,
+		isLastSeen,
+		previousMessageId,
+		checkMessageTargetToMoved,
+		messageReplyHighlight
+	}: Readonly<MessageProps>) => {
 		const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 		const previousMessage = useSelector((state) => selectMessageEntityById(state, channelId, previousMessageId));
 		const { markMessageAsSeen } = useSeenMessagePool();
@@ -114,6 +128,8 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 							onContextMenu={handleContextMenu}
 							isCombine={isCombine}
 							showDivider={isDifferentDay}
+							checkMessageTargetToMoved={checkMessageTargetToMoved}
+							messageReplyHighlight={messageReplyHighlight}
 						/>
 					</div>
 				)}
