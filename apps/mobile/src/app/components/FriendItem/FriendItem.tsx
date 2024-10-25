@@ -5,6 +5,7 @@ import { FriendsEntity } from '@mezon/store-mobile';
 import React, { useMemo } from 'react';
 import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
+import { UserStatus } from '../UserStatus';
 import { style } from './styles';
 
 export enum EFriendItemAction {
@@ -73,7 +74,7 @@ export const FriendItem = React.memo(
 							</Text>
 						</View>
 					)}
-					{!isPendingFriendRequest ? <View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} /> : null}
+					{!isPendingFriendRequest ? <UserStatus status={userStatus} /> : null}
 				</View>
 				<View style={styles.fill}>
 					<View style={styles.friendItemContent}>

@@ -15,7 +15,6 @@ import {
 	useDragAndDrop,
 	useGifsStickersEmoji,
 	useSearchMessages,
-	useThreads,
 	useWindowFocusState
 } from '@mezon/core';
 import {
@@ -24,9 +23,11 @@ import {
 	directMetaActions,
 	gifsStickerEmojiActions,
 	selectCloseMenu,
+	selectCurrentChannelId,
 	selectDefaultChannelIdByClanId,
 	selectDmGroupCurrent,
 	selectIsSearchMessage,
+	selectIsShowCreateThread,
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectPositionEmojiButtonSmile,
@@ -37,7 +38,7 @@ import {
 import { EmojiPlaces, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, memo, useEffect, useMemo, useRef } from 'react';
+import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
@@ -101,7 +102,8 @@ const DirectMessage = () => {
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	const { isShowCreateThread } = useThreads();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannelId as string));
 	const { isShowMemberList, setIsShowMemberList } = useApp();
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 
@@ -153,6 +155,8 @@ const DirectMessage = () => {
 	}, [messagesContainerRef.current?.getBoundingClientRect()]);
 
 	const isDmChannel = useMemo(() => currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM, [currentDmGroup?.type]);
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	const handleClose = useCallback(() => {}, []);
 
 	return (
 		<>
@@ -264,8 +268,7 @@ const DirectMessage = () => {
 							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-widthDmProfile'}`}
 						>
 							<ModalUserProfile
-								// eslint-disable-next-line @typescript-eslint/no-empty-function
-								onClose={() => {}}
+								onClose={handleClose}
 								userID={Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id}
 								classWrapper="w-full"
 								classBanner="h-[120px]"

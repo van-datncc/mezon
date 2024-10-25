@@ -1,5 +1,6 @@
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import isElectron from 'is-electron';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
@@ -73,7 +74,7 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async (_, thunkAPI)
 	const currentChannelId = state.channels?.currentChannelId;
 	const currentDirectId = state.direct?.currentDirectMessageId;
 	const currentClanId = state.clans?.currentClanId;
-	const path = window.location.pathname;
+	const path = isElectron() ? window.location.hash : window.location.pathname;
 
 	let channelId = null;
 	let clanId = null;

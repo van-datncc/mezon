@@ -1,8 +1,16 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { Icons } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectCurrentUserId, useAppSelector } from '@mezon/store';
-import { DirectEntity, deleteChannel, directActions, fetchDirectMessage, removeMemberChannel, useAppDispatch } from '@mezon/store-mobile';
+import {
+	DirectEntity,
+	deleteChannel,
+	directActions,
+	fetchDirectMessage,
+	removeMemberChannel,
+	selectCurrentUserId,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,10 +34,10 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 
 	const isGroup = useMemo(() => {
 		return Number(messageInfo?.type) === ChannelType.CHANNEL_TYPE_GROUP;
-	}, [messageInfo?.channel_avatar]);
+	}, [messageInfo?.type]);
 
 	const lastOne = useMemo(() => {
-		return !messageInfo?.user_id.length;
+		return !messageInfo?.user_id?.length;
 	}, [messageInfo?.user_id]);
 
 	const leaveGroupMenu: IMezonMenuItemProps[] = [
@@ -138,7 +146,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 					<Text style={styles.serverName} numberOfLines={2}>
 						{messageInfo?.channel_label || messageInfo?.usernames}
 					</Text>
-					{isGroup && <Text style={styles.memberText}>{messageInfo?.user_id.length + 1} members</Text>}
+					{isGroup && <Text style={styles.memberText}>{messageInfo?.user_id?.length + 1} members</Text>}
 				</View>
 			</View>
 

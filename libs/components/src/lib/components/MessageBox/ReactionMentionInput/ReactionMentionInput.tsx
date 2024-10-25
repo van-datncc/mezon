@@ -1,6 +1,5 @@
 import {
 	useChannelMembers,
-	useChannels,
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -16,6 +15,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
+	selectAllChannels,
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectAllUserClans,
@@ -39,6 +39,7 @@ import {
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
+	selectThreadCurrentChannel,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -68,7 +69,6 @@ import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
-import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
@@ -123,9 +123,8 @@ export type MentionReactInputProps = {
 };
 
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
-	const { channels } = useChannels();
+	const channels = useSelector(selectAllChannels);
 	const rolesClan = useSelector(selectAllRolesClan);
-
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const dispatch = useAppDispatch();
@@ -135,7 +134,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
+	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
+	const { messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
 	const { emojis } = useEmojiSuggestion();
@@ -151,23 +151,24 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
+	const currentDmOrChannelId = useMemo(
+		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
+		[currentChannel?.channel_id, currentDmId, props.mode]
+	);
+	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
+
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
-	const { mentions } = useMessageLine(request?.content);
 	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
 	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
 	const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = useProcessMention(
 		request?.mentionRaw,
 		rolesClan,
 		membersOfChild as ChannelMembersEntity[],
-		membersOfParent as ChannelMembersEntity[]
+		membersOfParent as ChannelMembersEntity[],
+		dataReferences?.message_sender_id || ''
 	);
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
 
-	const currentDmOrChannelId = useMemo(
-		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
-		[currentChannel?.channel_id, currentDmId, props.mode]
-	);
-	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
@@ -369,6 +370,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			request,
+			hashtagList,
+			emojiList,
+			linkList,
+			markdownList,
+			voiceLinkRoomList,
 			mentionData,
 			nameValueThread,
 			props,
@@ -381,7 +387,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			mentionEveryone,
 			addMemberToThread,
 			currentChannel,
-			mentions,
 			usersClan,
 			currentChannelId,
 			valueThread?.content.t,

@@ -1,7 +1,7 @@
-import { useThreads } from '@mezon/core';
-import { threadsActions, useAppDispatch } from '@mezon/store';
+import { selectNameThreadError, threadsActions, useAppDispatch } from '@mezon/store';
 import { ValidateSpecialCharacters, threadError } from '@mezon/utils';
 import { KeyboardEvent, useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 interface ThreadNameTextFieldProps {
 	label?: string;
@@ -15,7 +15,7 @@ interface ThreadNameTextFieldProps {
 
 const ThreadNameTextField = ({ label, error, placeholder, value, className, onChange, onKeyDown }: ThreadNameTextFieldProps) => {
 	const dispatch = useAppDispatch();
-	const { nameThreadError } = useThreads();
+	const nameThreadError = useSelector(selectNameThreadError);
 	const [checkValidate, setCheckValidate] = useState(false);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

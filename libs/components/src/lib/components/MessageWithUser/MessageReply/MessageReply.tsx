@@ -8,7 +8,6 @@ import { AvatarImage } from '../../AvatarImage/AvatarImage';
 
 import { useSelector } from 'react-redux';
 import { MessageLine } from '../MessageLine';
-import { useMessageParser } from '../useMessageParser';
 type MessageReplyProps = {
 	message: IMessageWithUser;
 	mode?: number;
@@ -17,16 +16,10 @@ type MessageReplyProps = {
 
 // TODO: refactor component for message lines
 const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) => {
-	const {
-		senderIdMessageRef,
-		messageContentRef,
-		messageUsernameSenderRef,
-		messageAvatarSenderRef,
-		messageClanNicknameSenderRef,
-		messageDisplayNameSenderRef,
-		messageIdRef,
-		hasAttachmentInMessageRef
-	} = useMessageParser(message);
+	const senderIdMessageRef = message?.references?.[0]?.message_sender_id as string;
+	const messageIdRef = message?.references?.[0]?.message_ref_id;
+	const hasAttachmentInMessageRef = message?.references?.[0]?.has_attachment;
+	const messageUsernameSenderRef = message?.references?.[0]?.message_sender_username ?? '';
 	const messageSender = useUserById(senderIdMessageRef);
 
 	const dispatch = useAppDispatch();
@@ -44,8 +37,8 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 	const markUpOnReplyParent = useRef<HTMLDivElement | null>(null);
 
 	const nameShowed = useShowName(
-		messageClanNicknameSenderRef ?? '',
-		messageDisplayNameSenderRef ?? '',
+		message?.references?.[0]?.message_sender_clan_nick ?? '',
+		message?.references?.[0]?.message_sender_display_name ?? '',
 		messageUsernameSenderRef ?? '',
 		senderIdMessageRef ?? ''
 	);
@@ -63,7 +56,11 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								className="w-5 h-5"
 								alt="user avatar"
 								userName={messageUsernameSenderRef}
-								src={!isClanView ? messageAvatarSenderRef : messageSender?.clan_avatar || messageSender?.user?.avatar_url}
+								src={
+									!isClanView
+										? (message?.references?.[0]?.mesages_sender_avatar ?? '')
+										: messageSender?.clan_avatar || messageSender?.user?.avatar_url
+								}
 							/>
 						</div>
 
@@ -72,7 +69,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 								onClick={onClick}
 								className=" text-[#84ADFF] font-bold hover:underline cursor-pointer tracking-wide whitespace-nowrap"
 							>
-								{!isClanView ? messageDisplayNameSenderRef || messageUsernameSenderRef : nameShowed}
+								{!isClanView ? message?.references?.[0]?.message_sender_display_name || messageUsernameSenderRef : nameShowed}
 							</span>
 							{hasAttachmentInMessageRef ? (
 								<div className=" flex flex-row items-center">
@@ -92,7 +89,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 										isTokenClickAble={false}
 										isJumMessageEnabled={true}
 										onClickToMessage={getIdMessageToJump}
-										content={messageContentRef}
+										content={JSON.parse(message?.references?.[0]?.content ?? '{}')}
 									/>
 								</div>
 							)}
@@ -114,4 +111,4 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode }) =
 	);
 };
 
-export default memo(MessageReply);
+export default memo(MessageReply, (prev, cur) => prev.message?.id === cur.message?.id);

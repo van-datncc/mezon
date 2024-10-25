@@ -25,7 +25,8 @@ import { SetupMembers } from '../../../screens/serverRoles/SetupMembers';
 import { SetupPermissions } from '../../../screens/serverRoles/SetupPermissions';
 import { APP_SCREEN } from '../../ScreenTypes';
 
-export const MenuClanStacks = () => {
+// eslint-disable-next-line no-empty-pattern
+export const MenuClanStacks = ({}: any) => {
 	const { themeValue } = useTheme();
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['screenStack']);

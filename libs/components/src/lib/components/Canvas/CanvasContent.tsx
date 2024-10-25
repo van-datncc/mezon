@@ -1,7 +1,8 @@
 import { canvasActions } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 interface ActiveFormats {
@@ -10,8 +11,16 @@ interface ActiveFormats {
 	underline: boolean;
 	strike: boolean;
 	'code-block': boolean;
-	link: boolean;
-	header?: string;
+	link: string;
+	h1: boolean;
+	h2: boolean;
+	h3: boolean;
+	paragraph: boolean;
+	check: boolean;
+	ordered: boolean;
+	bullet: boolean;
+	blockquote: boolean;
+	image: string;
 }
 
 type CanvasContentProps = {
@@ -29,6 +38,30 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
 	const placeholderColor = isLightMode ? 'rgba(0,0,0,0.6)' : '#ffffff';
+	const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+
+	const [activeOption, setActiveOption] = useState('paragraph');
+
+	const [isOpen, setIsOpen] = useState(false);
+	const selectRef = useRef<HTMLDivElement>(null);
+	const DEFAULT_TOOLBAR_OFFSET_HEIGHT = 40;
+	const TOOLBAR_POSITION_OFFSET_TOP = 10;
+
+	const options = [
+		{
+			value: 'paragraph',
+			label: 'Paragraph',
+			text: 'paragraph',
+			icon: <Icons.ParagraphIcon />
+		},
+		{ value: '1', label: 'Big Heading', text: 'h1', icon: <Icons.H1Icon /> },
+		{ value: '2', label: 'Medium Heading', text: 'h2', icon: <Icons.H2Icon /> },
+		{ value: '3', label: 'Small Heading', text: 'h3', icon: <Icons.H3Icon /> },
+		{ value: 'check', label: 'Checked list', text: 'check', icon: <Icons.CheckListIcon /> },
+		{ value: 'ordered', label: 'Ordered list', text: 'ordered', icon: <Icons.OrderedListIcon /> },
+		{ value: 'bullet', label: 'Bulleted list', text: 'bullet', icon: <Icons.BulletListIcon /> },
+		{ value: 'blockquote', label: 'Blockquote', text: 'blockquote', icon: <Icons.BlockquoteIcon /> }
+	];
 
 	const [activeFormats, setActiveFormats] = useState<ActiveFormats>({
 		bold: false,
@@ -36,8 +69,16 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 		underline: false,
 		strike: false,
 		'code-block': false,
-		link: false,
-		header: 'paragraph'
+		link: '',
+		h1: false,
+		h2: false,
+		h3: false,
+		paragraph: true,
+		check: false,
+		ordered: false,
+		bullet: false,
+		blockquote: false,
+		image: ''
 	});
 
 	useEffect(() => {
@@ -54,7 +95,6 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 		quillRef.current = new Quill('#editor', {
 			theme: 'snow',
 			modules: {
-				toolbar: false,
 				clipboard: {
 					matchVisual: false
 				}
@@ -79,26 +119,108 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 			quillRef.current.setContents(JSON.parse(content));
 		}
 
+		if (!isEditAndDelCanvas) {
+			quillRef.current.enable(false);
+			quillRef.current.root.style.pointerEvents = 'auto';
+			quillRef.current.root.style.userSelect = 'text';
+		} else {
+			quillRef.current.enable(true);
+			quillRef.current.root.style.pointerEvents = 'auto';
+			quillRef.current.root.style.userSelect = 'none';
+		}
+
 		quillRef.current.on('text-change', () => {
-			if (isEditAndDelCanvas) {
-				const data = JSON.stringify(quillRef.current?.getContents());
-				handleContentChange(data);
-			} else {
-				quillRef.current?.disable();
+			const data = JSON.stringify(quillRef.current?.getContents());
+			handleContentChange(data);
+			const selection = quillRef.current?.getSelection();
+			if (selection) {
+				const formats = quillRef.current?.getFormat(selection.index, selection.length);
+				setActiveFormats({
+					bold: !!formats?.bold,
+					italic: !!formats?.italic,
+					underline: !!formats?.underline,
+					strike: !!formats?.strike,
+					'code-block': formats?.['code-block'] === 'plain',
+					link: (formats?.link as string) || '',
+					h1: formats?.header === 1,
+					h2: formats?.header === 2,
+					h3: formats?.header === 3,
+					paragraph: !(
+						formats?.header === 1 ||
+						formats?.header === 2 ||
+						formats?.header === 3 ||
+						formats?.list === 'check' ||
+						formats?.list === 'ordered' ||
+						formats?.list === 'ordered' ||
+						!!formats?.blockquote
+					),
+					check: formats?.list === 'check',
+					ordered: formats?.list === 'ordered',
+					bullet: formats?.list === 'bullet',
+					blockquote: !!formats?.blockquote,
+					image: (formats?.image as string) || ''
+				});
 			}
 		});
 
 		const handleSelectionChange = (range: any) => {
 			if (range && range.length > 0) {
 				setToolbarVisible(true);
+				requestAnimationFrame(() => {
+					const bounds = quillRef.current?.getBounds(range.index, range.length);
+					let newTop = 0;
+					let newLeft = 0;
+
+					if (bounds) {
+						if (toolbarRef.current) {
+							const toolbarHeight = toolbarRef.current.offsetHeight || DEFAULT_TOOLBAR_OFFSET_HEIGHT;
+							newTop = bounds.top + window.scrollY - toolbarHeight - TOOLBAR_POSITION_OFFSET_TOP;
+							newLeft = bounds.left + window.scrollX;
+						}
+					} else {
+						const editorBounds = editorRef.current?.getBoundingClientRect();
+						if (editorBounds) {
+							const toolbarHeight = toolbarRef.current?.offsetHeight || DEFAULT_TOOLBAR_OFFSET_HEIGHT;
+							newTop = editorBounds.top + window.scrollY - toolbarHeight - TOOLBAR_POSITION_OFFSET_TOP;
+							newLeft = editorBounds.left + window.scrollX;
+						}
+					}
+
+					setToolbarPosition((prevPosition) => {
+						if (prevPosition.top !== newTop || prevPosition.left !== newLeft) {
+							return { top: newTop, left: newLeft };
+						}
+						return prevPosition;
+					});
+				});
 				const formats = quillRef.current?.getFormat(range) || {};
+				setActiveOption(
+					(formats?.header as string) || (formats?.list as string) || (formats?.blockquote === true ? 'blockquote' : 'paragraph')
+				);
 				setActiveFormats({
 					bold: !!formats.bold,
 					italic: !!formats.italic,
 					underline: !!formats.underline,
 					strike: !!formats.strike,
-					'code-block': !!formats['code-block'],
-					link: !!formats.link
+					'code-block': formats?.['code-block'] === 'plain',
+					link: formats?.link as string,
+					h1: formats?.header === 1,
+					h2: formats?.header === 2,
+					h3: formats?.header === 3,
+					paragraph: !(
+						formats?.header === 1 ||
+						formats?.header === 2 ||
+						formats?.header === 3 ||
+						formats?.list === 'check' ||
+						formats?.list === 'ordered' ||
+						formats?.list === 'bullet' ||
+						!!formats?.blockquote
+					),
+					check: formats?.list === 'check',
+					ordered: formats?.list === 'ordered',
+					bullet: formats?.list === 'bullet',
+					blockquote: !!formats?.blockquote,
+					image: (formats?.image as string) || ''
 				});
 			} else {
 				setToolbarVisible(false);
@@ -108,8 +230,16 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 					underline: false,
 					strike: false,
 					'code-block': false,
-					link: false,
-					header: 'paragraph'
+					link: '',
+					h1: false,
+					h2: false,
+					h3: false,
+					paragraph: false,
+					check: false,
+					ordered: false,
+					bullet: false,
+					blockquote: false,
+					image: ''
 				});
 			}
 		};
@@ -122,7 +252,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 		};
 
 		const handleClickOutside = (event: MouseEvent) => {
-			if (editorRef.current && !editorRef.current.contains(event.target as Node) && !toolbarRef.current) {
+			if (
+				editorRef.current &&
+				!editorRef.current.contains(event.target as Node) &&
+				toolbarRef.current &&
+				!toolbarRef.current.contains(event.target as Node)
+			) {
+				setIsOpen(false);
 				setToolbarVisible(false);
 				setActiveFormats({
 					bold: false,
@@ -130,9 +266,21 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 					underline: false,
 					strike: false,
 					'code-block': false,
-					link: false,
-					header: 'paragraph'
+					link: '',
+					h1: false,
+					h2: false,
+					h3: false,
+					paragraph: false,
+					check: false,
+					ordered: false,
+					bullet: false,
+					blockquote: false,
+					image: ''
 				});
+
+				if (quillRef.current) {
+					quillRef.current.setSelection(0, 0);
+				}
 			}
 		};
 
@@ -152,77 +300,93 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 	};
 
 	const formatText = (format: keyof ActiveFormats) => {
-		if (quillRef.current && isEditAndDelCanvas) {
-			const currentFormat = quillRef.current.getFormat();
+		if (quillRef.current) {
+			const currentSelection = quillRef?.current?.getSelection();
+			const currentFormat = quillRef?.current?.getFormat(currentSelection?.index, currentSelection?.length);
 			const isActive = !!currentFormat[format];
-			quillRef.current.format(format, !isActive);
-
-			setActiveFormats((prev) => ({
-				...prev,
-				[format]: !isActive
-			}));
+			if (isEditAndDelCanvas) {
+				if (format === 'link') {
+					quillRef.current.format(format, quillRef?.current.getText(currentSelection?.index, currentSelection?.length));
+					setActiveFormats((prev: any) => ({
+						...prev,
+						[format]: quillRef?.current?.getText(currentSelection?.index, currentSelection?.length)
+					}));
+				} else {
+					quillRef.current.format(format, !isActive);
+					setActiveFormats((prev) => ({
+						...prev,
+						[format]: !isActive
+					}));
+				}
+			}
 		}
 	};
 
-	const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		const value = e.target.value;
+	const handleSelectChange = (value: string) => {
 		if (quill && isEditAndDelCanvas) {
-			if (value === 'h1') {
+			if (value === '1') {
 				quill.format('header', 1);
-			} else if (value === 'h2') {
+			} else if (value === '2') {
 				quill.format('header', 2);
-			} else if (value === 'h3') {
+			} else if (value === '3') {
 				quill.format('header', 3);
 			} else if (value === 'paragraph') {
-				quill.format('header', false);
-			} else if (value === 'check-list') {
+				quill.format('header', true);
+			} else if (value === 'check') {
 				quill.format('list', 'check');
-			} else if (value === 'order-list') {
+			} else if (value === 'ordered') {
 				quill.format('list', 'ordered');
-			} else if (value === 'bullet-list') {
+			} else if (value === 'bullet') {
 				quill.format('list', 'bullet');
-			} else if (value === 'code-block') {
-				quill.format('code-block', true);
-			} else if (value === 'block-quote') {
+			} else if (value === 'blockquote') {
 				quill.format('blockquote', true);
 			}
-			setActiveFormats((prevFormats) => {
-				const updatedFormats = {
-					...prevFormats,
-					header: value
-				};
-				return updatedFormats;
-			});
+			if (value === '1' || value === '2' || value === '3' || value === 'paragraph') {
+				setActiveFormats((prevFormats) => {
+					const updatedFormats = {
+						...prevFormats,
+						header: value
+					};
+					return updatedFormats;
+				});
+			} else if (value === 'check' || value === 'ordered' || value === 'bullet') {
+				setActiveFormats((prevFormats) => {
+					const updatedFormats = {
+						...prevFormats,
+						list: value
+					};
+					return updatedFormats;
+				});
+			} else {
+				setActiveFormats((prevFormats) => {
+					const updatedFormats = {
+						...prevFormats,
+						[value]: value
+					};
+					return updatedFormats;
+				});
+			}
+			setIsOpen(false);
 		}
 	};
 
 	const getStyle = (type: 'button' | 'option', value: string | keyof ActiveFormats) => {
+		const format = value as keyof ActiveFormats;
 		if (type === 'button') {
-			const format = value as keyof ActiveFormats;
-			// active ? black : !light ? black : white
-
 			return {
 				padding: '5px',
 				fontWeight: format === 'bold' ? 600 : 'normal',
 				fontStyle: format === 'italic' ? 'italic' : 'normal',
 				textDecoration: format === 'underline' ? 'underline' : format === 'strike' ? 'line-through' : 'none',
 				backgroundColor: activeFormats[format] ? (isLightMode ? '#d3d3d3' : '#555') : 'transparent',
-				color:
-					activeFormats[format] && isLightMode ? 'rgb(51, 51, 51)' : !activeFormats[format] && !isLightMode ? 'rgb(51, 51, 51)' : 'white',
+				color: 'white',
 				border: 'none',
 				cursor: 'pointer',
 				borderRadius: '5px'
 			};
 		} else if (type === 'option') {
-			const optionValue = value as string;
 			return {
-				backgroundColor: activeFormats.header === optionValue ? (isLightMode ? '#d3d3d3' : '#555') : 'transparent',
-				color:
-					activeFormats.header === optionValue && isLightMode
-						? 'rgb(51, 51, 51)'
-						: !(activeFormats.header === optionValue) && !isLightMode
-							? 'rgb(51, 51, 51)'
-							: 'white'
+				color: activeFormats[format] ? '#048dba' : 'white'
 			};
 		}
 		return {};
@@ -233,102 +397,101 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 		quillRef?.current?.formatText(0, quillRef.current.getLength(), { color: isLightMode ? 'rgb(51, 51, 51)' : 'white' });
 	}, [isLightMode, idCanvas]);
 
+	useEffect(() => {
+		const handleClickOutside = (event: { target: any }) => {
+			if (selectRef.current && !selectRef?.current?.contains(event.target)) {
+				setIsOpen(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, []);
+
 	return (
 		<div className="note-canvas" style={{ position: 'relative' }}>
-			{toolbarVisible && (
+			{toolbarVisible && isEditAndDelCanvas && (
 				<div
 					ref={toolbarRef}
 					id="toolbar"
 					className="toolbar"
 					style={{
 						position: 'absolute',
-						top: '-30px',
-						left: '0',
-						padding: '0 10px',
+						top: `${toolbarPosition.top}px`,
+						left: `${toolbarPosition.left}px`,
+						padding: '5px',
 						display: 'flex',
 						alignItems: 'center',
 						gap: '4px',
-						background: isLightMode ? '#333' : '#f0f0f0',
-						color: isLightMode ? 'white' : 'rgb(51, 51, 51)',
+						background: '#333',
+						color: 'white',
 						borderRadius: '5px',
 						zIndex: 99,
-						boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+						boxShadow: '0 0 0 1px #e8e8e840,0 1px 3px #00000014'
 					}}
 				>
-					{/* Header Selection */}
-					<select
-						className="header-select"
-						style={{
-							padding: '5px',
-							borderRadius: '3px',
-							border: 'none',
-							background: isLightMode ? '#333' : '#f0f0f0',
-							color: isLightMode ? 'white' : 'rgb(51, 51, 51)'
-						}}
-						value={activeFormats.header || 'paragraph'}
-						onChange={handleSelectChange}
-						defaultValue="paragraph"
-					>
-						<option value="paragraph" style={getStyle('option', 'paragraph')}>
-							<svg data-5iu="true" data-qa="paragraph" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
-								<path
-									fill="currentColor"
-									fill-rule="evenodd"
-									d="M7.25 3.007C5.42 3.109 4 4.335 4 6.25s1.42 3.14 3.25 3.243zm0 7.988C4.75 10.886 2.5 9.152 2.5 6.25c0-2.999 2.402-4.75 5-4.75h9.25a.75.75 0 0 1 0 1.5h-3v14.75a.75.75 0 0 1-1.5 0V3h-3.5v14.75a.75.75 0 0 1-1.5 0z"
-									clip-rule="evenodd"
-								></path>
-							</svg>{' '}
-							Paragraph
-						</option>
-						<option value="h1" style={getStyle('option', 'h1')}>
-							<svg
-								data-5iu="true"
-								data-qa="heading-1"
-								aria-hidden="true"
-								viewBox="0 0 20 20"
-								className="is-inline"
-								style={{ width: '1em', height: '1em' }}
-							>
-								<path
-									fill="currentColor"
-									fill-rule="evenodd"
-									d="M3 3.25a.75.75 0 0 0-1.5 0v13.5a.75.75 0 0 0 1.5 0v-6h6.2v6a.75.75 0 0 0 1.5 0V3.25a.75.75 0 0 0-1.5 0v6H3zM17.45 8.5a.75.75 0 0 0-1.191-.607l-2.75 2a.75.75 0 1 0 .882 1.214l1.559-1.134v6.777a.75.75 0 0 0 1.5 0z"
-									clip-rule="evenodd"
-								></path>
-							</svg>{' '}
-							H1 Big Heading
-						</option>
-						<option value="h2" style={getStyle('option', 'h2')}>
-							H2 Medium heading
-						</option>
-						<option value="h3" style={getStyle('option', 'h3')}>
-							H3 Small heading
-						</option>
-						<hr></hr>
-						<option value="check-list" style={getStyle('option', 'check-list')}>
-							Checked list
-						</option>
-						<option value="order-list" style={getStyle('option', 'order-list')}>
-							Ordered list
-						</option>
-						<option value="bullet-list" style={getStyle('option', 'bullet-list')}>
-							Bulleted list
-						</option>
-						<hr></hr>
-						<option value="code-block" style={getStyle('option', 'code-block')}>
-							Code block
-						</option>
-						<option value="block-quote" style={getStyle('option', 'block-quote')}>
-							Blockquote
-						</option>
-					</select>
-
+					<div className="relative pl-[5px] cursor-pointer" ref={selectRef}>
+						<div className="flex items-center" onClick={() => setIsOpen(!isOpen)}>
+							{options.find((option) => option.value === String(activeOption))?.icon || <Icons.ParagraphIcon />}
+							<Icons.ChevronDownIcon />
+						</div>
+						<div>
+							{isOpen && (
+								<ul
+									style={{ boxShadow: '0 0 0 1px #e8e8e840,0 1px 3px #00000014' }}
+									className="absolute left-0 bg-[#313338] pt-[12px] pr-[0] pb-[12px] pl-[0] rounded-[6px] min-w-[200px] max-w-[calc(100vh - 62px)] overflow-y-auto"
+								>
+									{options.map((option) => (
+										<React.Fragment key={option.value}>
+											<li
+												key={option.value}
+												onClick={() => handleSelectChange(option.value)}
+												style={getStyle('option', `${option.text}`)}
+												value={option.value}
+												className="min-h-[28px] cursor-pointer pt-[0] pr-[24px] pb-[0] pl-[10px] flex items-center"
+											>
+												{String(activeOption) === option.value ||
+												(option.value === 'blockquote' && activeFormats['blockquote']) ? (
+													<span className="mr-[5px] w-[10px]">
+														<Icons.CheckedIcon color="#048dba" />
+													</span>
+												) : (
+													<span className="mr-[5px] w-[10px]"></span>
+												)}
+												{option.icon && (
+													<span className="mr-[20px]">
+														{React.cloneElement(option.icon, {
+															color:
+																(String(activeOption) === option.value ||
+																	(option.value === 'blockquote' && activeFormats['blockquote'])) &&
+																'#048dba'
+														})}
+													</span>
+												)}
+												{option.label}
+											</li>
+											{option.value === '3' && <hr className="border-gray-400 my-2" />}
+										</React.Fragment>
+									))}
+								</ul>
+							)}
+						</div>
+					</div>
 					<span
 						className={`separator ${isLightMode ? 'bg-white' : 'bg-[#8080808f]'}`}
 						style={{ height: '20px', width: '1px', margin: '0 4px' }}
 					></span>
 
-					<button type="button" onClick={() => formatText('bold')} style={getStyle('button', 'bold')} title="Bold">
+					<button
+						className="disabled:opacity-50 disabled:cursor-auto"
+						type="button"
+						onClick={() => formatText('bold')}
+						style={getStyle('button', 'bold')}
+						title="Bold"
+						disabled={activeFormats['code-block']}
+					>
 						<svg data-5iu="true" data-qa="bold" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
@@ -339,7 +502,14 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 						</svg>
 					</button>
 
-					<button type="button" onClick={() => formatText('italic')} style={getStyle('button', 'italic')} title="Italic">
+					<button
+						className="disabled:opacity-50 disabled:cursor-auto"
+						type="button"
+						onClick={() => formatText('italic')}
+						style={getStyle('button', 'italic')}
+						title="Italic"
+						disabled={activeFormats['code-block']}
+					>
 						<svg data-5iu="true" data-qa="italic" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
@@ -350,7 +520,14 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 						</svg>
 					</button>
 
-					<button type="button" onClick={() => formatText('strike')} style={getStyle('button', 'strike')} title="Strikethrough">
+					<button
+						className="disabled:opacity-50 disabled:cursor-auto"
+						type="button"
+						onClick={() => formatText('strike')}
+						style={getStyle('button', 'strike')}
+						title="Strikethrough"
+						disabled={activeFormats['code-block']}
+					>
 						<svg data-5iu="true" data-qa="strikethrough" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
@@ -380,7 +557,14 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 						className={`separator ${isLightMode ? 'bg-white' : 'bg-[#8080808f]'}`}
 						style={{ height: '20px', width: '1px', margin: '0 4px' }}
 					></span>
-					<button type="button" onClick={() => formatText('link')} style={getStyle('button', 'link')} title="Link">
+					<button
+						className="ql-link disabled:opacity-50 disabled:cursor-auto"
+						type="button"
+						onClick={() => formatText('link')}
+						style={getStyle('button', 'link')}
+						title="Link"
+						disabled={activeFormats['code-block']}
+					>
 						<svg data-5iu="true" data-qa="link" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }}>
 							<path
 								fill="currentColor"
@@ -417,6 +601,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 					span, strong {
 						color: ${placeholderColor} !important;
 					}
+					.ql-toolbar {
+						display: none;
+					} 
+					.ql-tooltip {
+						left: 0 !important;
+					}
+					
         `}
 			</style>
 		</div>

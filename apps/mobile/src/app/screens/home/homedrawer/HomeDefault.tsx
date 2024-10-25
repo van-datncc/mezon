@@ -9,8 +9,10 @@ import {
 	channelsActions,
 	clansActions,
 	selectAllClans,
+	selectAnyUnreadChannels,
 	selectChannelById,
 	selectCurrentChannel,
+	selectFetchChannelStatus,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, TIME_OFFSET, isPublicChannel } from '@mezon/utils';
@@ -36,21 +38,24 @@ import { style } from './styles';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
-	const numberNotification = useMemo(() => {
-		return currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
-	}, [currentChannel?.count_mess_unread]);
-
+	const statusFetchChannel = useSelector(selectFetchChannelStatus);
+	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-	}, [channelId, currentChannel, dispatch, numberNotification]);
+	}, [channelId, currentChannel, dispatch]);
 
 	useEffect(() => {
+		if (!statusFetchChannel) return;
+		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
-	}, [channelId, currentChannel?.clan_id, dispatch, numberNotification]);
+		if (!numberNotification && resetBadgeCount) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
+		}
+	}, [channelId, currentChannel?.clan_id, currentChannel?.count_mess_unread, currentChannel?.id, dispatch, resetBadgeCount, statusFetchChannel]);
 }
 
 const HomeDefault = React.memo((props: any) => {
@@ -78,9 +83,15 @@ const HomeDefault = React.memo((props: any) => {
 
 	const isChannelApp = useMemo(() => currentChannel?.type === ChannelType?.CHANNEL_TYPE_APP, [currentChannel?.type]);
 
+	const onOpenDrawer = useCallback(() => {
+		onShowKeyboardBottomSheet(false, 0, 'text');
+		navigation.dispatch(DrawerActions.openDrawer());
+		Keyboard.dismiss();
+	}, [navigation, onShowKeyboardBottomSheet]);
+
 	useEffect(() => {
 		if (clansLoadingStatus === 'loaded' && !clans?.length) onOpenDrawer();
-	}, [clans, clansLoadingStatus]);
+	}, [clans, clansLoadingStatus, onOpenDrawer]);
 
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const snapPoints = useMemo(() => ['50%'], []);
@@ -109,6 +120,19 @@ const HomeDefault = React.memo((props: any) => {
 		};
 	}, [drawerStatus, navigation]);
 
+	const fetchMemberChannel = useCallback(async () => {
+		if (!currentChannel) {
+			return;
+		}
+		await dispatch(
+			channelMembersActions.fetchChannelMembers({
+				clanId: currentChannel?.clan_id || '',
+				channelId: currentChannel?.channel_id || '',
+				channelType: currentChannel?.type
+			})
+		);
+	}, [currentChannel, dispatch]);
+
 	useFocusEffect(
 		useCallback(() => {
 			setIsFocusChannelView(true);
@@ -131,25 +155,6 @@ const HomeDefault = React.memo((props: any) => {
 			clearTimeout(timeout);
 		};
 	}, []);
-
-	const fetchMemberChannel = async () => {
-		if (!currentChannel) {
-			return;
-		}
-		await dispatch(
-			channelMembersActions.fetchChannelMembers({
-				clanId: currentChannel?.clan_id || '',
-				channelId: currentChannel?.channel_id || '',
-				channelType: currentChannel?.type
-			})
-		);
-	};
-
-	const onOpenDrawer = () => {
-		onShowKeyboardBottomSheet(false, 0, 'text');
-		navigation.dispatch(DrawerActions.openDrawer());
-		Keyboard.dismiss();
-	};
 
 	const checkShowLicenseAgreement = async () => {
 		const isAgreed = await load(STORAGE_AGREED_POLICY);

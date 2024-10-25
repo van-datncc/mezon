@@ -1,5 +1,5 @@
 import { Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
-import { useDragAndDrop, usePermissionChecker, useSearchMessages, useThreads, useWindowFocusState } from '@mezon/core';
+import { useDragAndDrop, usePermissionChecker, useResetCountChannelBadge, useSearchMessages, useWindowFocusState } from '@mezon/core';
 import {
 	channelMetaActions,
 	channelsActions,
@@ -13,15 +13,18 @@ import {
 	selectFetchChannelStatus,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
+	selectIsShowCreateThread,
 	selectIsShowMemberList,
+	selectPreviousChannels,
 	selectStatusMenu,
 	selectTheme,
+	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
 import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useEffect, useRef } from 'react';
+import { DragEvent, useCallback, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -33,6 +36,8 @@ function useChannelSeen(channelId: string) {
 	const statusFetchChannel = useSelector(selectFetchChannelStatus);
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	const { isFocusDesktop, isTabVisible } = useWindowFocusState();
+	const resetCountChannelBadge = useResetCountChannelBadge();
+
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
@@ -41,7 +46,7 @@ function useChannelSeen(channelId: string) {
 
 	useEffect(() => {
 		if (!statusFetchChannel) return;
-		const numberNotification = currentChannel.count_mess_unread ? currentChannel.count_mess_unread : 0;
+		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
 		if (numberNotification && numberNotification > 0) {
 			dispatch(channelsActions.updateChannelBadgeCount({ channelId: channelId, count: numberNotification * -1 }));
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
@@ -50,6 +55,11 @@ function useChannelSeen(channelId: string) {
 			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
 		}
 	}, [currentChannel.id, statusFetchChannel, isFocusDesktop, isTabVisible]);
+	const previousChannelId = useSelector(selectPreviousChannels)[1];
+	const previousChannel = useSelector(selectChannelById(previousChannelId));
+	useEffect(() => {
+		resetCountChannelBadge(previousChannel);
+	}, [previousChannelId]);
 }
 
 function ChannelSeenListener({ channelId }: { channelId: string }) {
@@ -93,6 +103,7 @@ type ChannelMainContentProps = {
 };
 
 const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
+	const dispatch = useAppDispatch();
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const { draggingState, setDraggingState, isOverUploading, setOverUploadingState } = useDragAndDrop();
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -101,7 +112,13 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const statusMenu = useSelector(selectStatusMenu);
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const isShowCanvas = useSelector(selectIsShowCanvas);
-	const { isShowCreateThread, setIsShowCreateThread } = useThreads();
+	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannel?.id));
+	const setIsShowCreateThread = useCallback(
+		(isShowCreateThread: boolean) => {
+			dispatch(threadsActions.setIsShowCreateThread({ channelId: currentChannel?.id, isShowCreateThread }));
+		},
+		[currentChannel?.id, dispatch]
+	);
 	const appChannel = useSelector(selectAppChannelById(channelId));
 	const appearanceTheme = useSelector(selectTheme);
 
@@ -163,7 +180,14 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 							<ChannelMainContentText channelId={currentChannel?.id as string} />
 						</div>
 					)}
-					{!isShowCanvas && isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+					{isShowCanvas && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
+						<div
+							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+						>
+							<Canvas />
+						</div>
+					)}
+					{isShowMemberList && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
 						<div
 							onContextMenu={(event) => event.preventDefault()}
 							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
@@ -174,13 +198,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 						</div>
 					)}
 
-					{isShowCanvas && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && (
-						<div
-							className={`w-full flex justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-						>
-							<Canvas />
-						</div>
-					)}
 					{isSearchMessage && currentChannel.type !== ChannelType.CHANNEL_TYPE_STREAMING && <SearchMessageChannel />}
 				</div>
 			</div>

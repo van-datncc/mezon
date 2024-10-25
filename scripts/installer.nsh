@@ -1,5 +1,4 @@
 !macro customInit
-  # Define registry key for the old version (adjust based on your app’s name)
   ReadRegStr $R0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\c837c073-4372-582d-8049-41f9c372ead4" "QuietUninstallString"
 
   # Check if the uninstall string exists (i.e., the previous version is installed)

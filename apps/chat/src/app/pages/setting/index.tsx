@@ -3,7 +3,7 @@ import { useEscapeKeyClose, useSettingFooter } from '@mezon/core';
 import { selectIsShowSettingFooter } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUserSettings } from '@mezon/utils';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 interface settingProps {
@@ -71,4 +71,4 @@ const Setting = ({ isDM }: settingProps) => {
 	);
 };
 
-export default Setting;
+export default memo(Setting);

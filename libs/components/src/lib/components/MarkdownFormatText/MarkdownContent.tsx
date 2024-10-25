@@ -1,36 +1,34 @@
 import { useAppNavigation } from '@mezon/core';
 import { inviteActions, selectTheme, useAppDispatch } from '@mezon/store';
-import clx from 'classnames';
-import { memo, useCallback } from 'react';
-import Markdown from 'react-markdown';
+import { Icons } from '@mezon/ui';
+import { EBacktickType } from '@mezon/utils';
+import { memo, useCallback, useEffect, useState } from 'react';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
-import remarkGfm from 'remark-gfm';
-import { PreClass } from '../../components';
 
 type MarkdownContentOpt = {
 	content?: string;
 	isJumMessageEnabled: boolean;
 	isTokenClickAble: boolean;
 	isInPinMsg?: boolean;
+	isLink?: boolean;
+	isBacktick?: boolean;
+	typeOfBacktick?: EBacktickType;
 };
 
-const navigateToChannel = async (url: string, navigate: any) => {
-	const regex = /\/invite\/(\d+)/;
-	const match = url.match(regex);
-	if (match) {
-		const [_, inviteId] = match;
-		if (inviteId) {
-			navigate('/invite/' + inviteId);
-		}
-	}
-};
-
-export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMessageEnabled, isTokenClickAble, isInPinMsg }) => {
+export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
+	content,
+	isJumMessageEnabled,
+	isTokenClickAble,
+	isInPinMsg,
+	isLink,
+	isBacktick,
+	typeOfBacktick
+}) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { navigate } = useAppNavigation();
 	const dispatch = useAppDispatch();
 	const origin = process.env.NX_CHAT_APP_REDIRECT_URI + '/invite/';
-
 	const onClickLink = useCallback(
 		(url: string) => {
 			if (!isJumMessageEnabled || isTokenClickAble) {
@@ -46,41 +44,85 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({ content, isJumMe
 		[isJumMessageEnabled, isTokenClickAble]
 	);
 
-	const classes = clx(
-		'prose-code:text-sm inline prose-hr:my-0 prose-headings:my-0 prose-h1-2xl whitespace-pre-wrap prose   prose-blockquote:my-0 leading-[0] ',
-		{
-			lightMode: appearanceTheme === 'light'
-		}
-	);
+	const isLightMode = appearanceTheme === 'light';
+	const posInNotification = !isJumMessageEnabled && !isTokenClickAble;
+	const posInReply = isJumMessageEnabled && !isTokenClickAble;
 
 	return (
-		<article style={{ letterSpacing: '-0.01rem' }} className={classes}>
-			<div className={`lineText contents dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
-				<Markdown
-					children={content}
-					remarkPlugins={[remarkGfm]}
-					components={{
-						pre: (props) => <PreClass {...props} isInPinMsg={isInPinMsg} />,
-						p: 'span',
-						a: (props) => (
-							<span
-								onClick={() => onClickLink(props.href ?? '')}
-								rel="noopener noreferrer"
-								style={{
-									color: 'rgb(59,130,246)',
-									cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
-									wordBreak: 'break-word',
-									textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline'
-								}}
-								className="tagLink"
-							>
-								{props.children}
-							</span>
-						)
+		<div className={`inline dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+			{isLink && (
+				// eslint-disable-next-line jsx-a11y/anchor-is-valid
+				<a
+					onClick={() => onClickLink(content ?? '')}
+					rel="noopener noreferrer"
+					style={{
+						color: 'rgb(59,130,246)',
+						cursor: isJumMessageEnabled || !isTokenClickAble ? 'text' : 'pointer',
+						wordBreak: 'break-word',
+						textDecoration: isJumMessageEnabled || !isTokenClickAble ? 'none' : 'underline'
 					}}
-				/>
-			</div>
-		</article>
+					className="tagLink"
+				>
+					{content}
+				</a>
+			)}
+			{isBacktick && typeOfBacktick === EBacktickType.SINGLE ? (
+				<SingleBacktick content={content?.split('`').filter(Boolean)} isInPinMsg={isInPinMsg} isLightMode={isLightMode} />
+			) : isBacktick && typeOfBacktick === EBacktickType.TRIPLE && !posInReply ? (
+				<TripleBackticks content={content ?? ''} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
+			) : typeOfBacktick === EBacktickType.TRIPLE && posInReply ? (
+				<SingleBacktick content={content?.split('`').filter(Boolean)} isLightMode={isLightMode} />
+			) : null}
+		</div>
 	);
 };
 export default memo(MarkdownContent);
+
+type BacktickOpt = {
+	content?: any;
+	isLightMode?: boolean;
+	isInPinMsg?: boolean;
+	isJumMessageEnabled?: boolean;
+	posInNotification?: boolean;
+};
+
+const SingleBacktick: React.FC<BacktickOpt> = ({ content, isLightMode, posInNotification, isInPinMsg }) => {
+	return (
+		<span className={`prose ${isLightMode ? 'single-markdown-light-mode' : 'single-markdown'} `}>
+			<code
+				className={`${isInPinMsg && isLightMode ? 'whitespace-pre-wrap block break-words pin-msg-modeLight' : isInPinMsg && !isLightMode ? 'whitespace-pre-wrap block break-words pin-msg' : null}`}
+			>
+				{content}
+			</code>
+		</span>
+	);
+};
+
+const TripleBackticks: React.FC<BacktickOpt> = ({ content, isLightMode, isInPinMsg }) => {
+	const [copied, setCopied] = useState(false);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setCopied(false);
+		}, 5000);
+
+		return () => clearTimeout(timer);
+	}, [copied]);
+
+	const splitContent = content?.split('```').filter(Boolean);
+
+	return (
+		<div className={`prose ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
+			<pre className={`relative p-2 ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
+				<CopyToClipboard text={content ?? ''} onCopy={() => setCopied(true)}>
+					<button className={`absolute right-3 top-3 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
+						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
+					</button>
+				</CopyToClipboard>
+				{splitContent?.map((block: string) => (
+					<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words' : ''}`}>{block.trim()}</code>
+				))}
+			</pre>
+		</div>
+	);
+};

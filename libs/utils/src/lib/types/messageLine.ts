@@ -5,7 +5,7 @@ export interface IStartEndIndex {
 	e?: number | undefined;
 }
 
-export enum EMarkdownType {
+export enum EBacktickType {
 	TRIPLE = 't',
 	SINGLE = 's'
 }
@@ -23,7 +23,7 @@ export interface IEmoji {
 }
 
 export interface IMarkdown {
-	type?: EMarkdownType;
+	type?: EBacktickType;
 }
 
 export interface IMentionOnMessage extends IMention, IStartEndIndex {}

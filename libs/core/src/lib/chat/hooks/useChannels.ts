@@ -1,6 +1,4 @@
-import { ChannelsEntity, channelsActions, selectAllChannels, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
-import { ChannelThreads } from '@mezon/utils';
-import React from 'react';
+import { channelsActions, selectAllChannels, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useAppNavigation } from '../../app/hooks/useAppNavigation';
 
@@ -10,18 +8,6 @@ export function useChannels() {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const dispatch = useAppDispatch();
-
-	const channelFilter = React.useMemo(() => channels.filter((channel) => channel.parrent_id === '0' || channel.parrent_id === ''), [channels]);
-	const listChannels = React.useMemo(() => {
-		const channelThread = channelFilter.map((channel) => {
-			const thread = channels.filter((thread) => channel && channel?.channel_id === thread.parrent_id) as ChannelsEntity[];
-			return {
-				...channel,
-				threads: thread
-			};
-		});
-		return channelThread as ChannelThreads[];
-	}, [channelFilter, channels]);
 
 	const handleConfirmDeleteChannel = async (channelId: string, clanId: string) => {
 		await dispatch(channelsActions.deleteChannel({ channelId, clanId: clanId as string }));
@@ -49,8 +35,6 @@ export function useChannels() {
 	};
 
 	return {
-		channels,
-		listChannels,
 		navigateAfterDeleteChannel,
 		handleConfirmDeleteChannel
 	};

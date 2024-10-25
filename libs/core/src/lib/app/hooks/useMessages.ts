@@ -1,4 +1,3 @@
-import { reactionActions } from '@mezon/store';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -34,8 +33,6 @@ export const useMessages = ({ messages, chatRef, channelId, hasMoreMessage, load
 
 	useEffect(() => {
 		const handleWheel = async (event: WheelEvent) => {
-			dispatch(reactionActions.setUserReactionPanelState(false));
-			dispatch(reactionActions.setEmojiHover(null));
 			const currentChatRef = chatRef.current;
 			if (!currentChatRef || isFetching) return;
 

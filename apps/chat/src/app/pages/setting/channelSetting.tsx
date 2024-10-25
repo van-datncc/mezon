@@ -9,11 +9,11 @@ import {
 } from '@mezon/store';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ApiChannelSettingItem } from 'mezon-js/api.gen';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const ChannelSetting = () => {
-	const [privateFilter, setPrivateFilter] = useState(true);
+	const [privateFilter, setPrivateFilter] = useState(false);
 	const [threadFilter, setThreadFilter] = useState(false);
 
 	const [searchFilter, setSearchFilter] = useState('');
@@ -47,43 +47,43 @@ const ChannelSetting = () => {
 		return true;
 	};
 
-	const listChannelSetting = useMemo(() => {
-		const listChannelRecord: Record<string, ApiChannelSettingItem[]> = {};
-		listChannel.forEach((channel) => {
-			if (!filterChannel(channel)) {
-				return;
-			}
-			if (listChannelRecord[channel.parent_id as string]) {
-				listChannelRecord[channel.parent_id as string].push(channel);
-				return;
-			}
-			if (channel.parent_id === '0') {
-				listChannelRecord[channel.id as string] = [];
-			} else {
-				listChannelRecord[channel.parent_id as string] = [channel];
-			}
-		});
+	// const listChannelSetting = useMemo(() => {
+	// 	const listChannelRecord: Record<string, ApiChannelSettingItem[]> = {};
+	// 	listChannel.forEach((channel) => {
+	// 		if (!filterChannel(channel)) {
+	// 			return;
+	// 		}
+	// 		if (listChannelRecord[channel.parent_id as string]) {
+	// 			listChannelRecord[channel.parent_id as string].push(channel);
+	// 			return;
+	// 		}
+	// 		if (channel.parent_id === '0') {
+	// 			listChannelRecord[channel.id as string] = [];
+	// 		} else {
+	// 			listChannelRecord[channel.parent_id as string] = [channel];
+	// 		}
+	// 	});
 
-		return listChannelRecord;
-	}, [privateFilter, searchFilter, listChannel.length, threadFilter]);
+	// 	return listChannelRecord;
+	// }, [privateFilter, searchFilter, listChannel.length, threadFilter, currentPage, pageSize]);
 
 	useEffect(() => {
 		async function fetchListChannel() {
-			await dispatch(channelSettingActions.fetchChannelByUserId({ clanId: selectClanId as string }));
+			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId: selectClanId as string, parentId: '0' }));
 		}
 		fetchListChannel();
 	}, []);
 
 	return (
 		<div className="p-8 h-[calc(100vh_-_56px)] flex flex-col">
-			<div className="p-2 flex items-center justify-between">
+			<div className="p-2 flex items-center justify-between text-textLightTheme dark:text-textDarkTheme">
 				<div className="flex items-center gap-2">
 					<input
 						type="checkbox"
 						id="private_filter"
 						defaultChecked={privateFilter}
 						onChange={handleFilterPrivateChannel}
-						className="w-4 h-4 rounded-md border-channelTextLabel overflow-hidden"
+						className="w-4 h-4 rounded-md dark:border-channelTextLabel border overflow-hidden"
 					/>
 					<label htmlFor="private_filter">
 						Only Private <span className="font-semibold italic">({countChannel})</span>
@@ -95,7 +95,7 @@ const ChannelSetting = () => {
 						id="thread_filter"
 						defaultChecked={threadFilter}
 						onChange={handleFilterThread}
-						className="w-4 h-4 rounded-md border-channelTextLabel overflow-hidden"
+						className="w-4 h-4 rounded-md dark:border-channelTextLabel border overflow-hidden"
 					/>
 					<label htmlFor="thread_filter">
 						Only Thread <span className="font-semibold italic">({countThread})</span>
@@ -111,7 +111,7 @@ const ChannelSetting = () => {
 					/>
 				</div>
 			</div>
-			<ListChannelSetting listChannel={listChannelSetting} />
+			<ListChannelSetting listChannel={listChannel} clanId={selectClanId as string} countChannel={countChannel} />
 		</div>
 	);
 };

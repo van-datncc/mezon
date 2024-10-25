@@ -1,9 +1,8 @@
 import { selectTheme } from '@mezon/store';
 import { mergeRefs } from '@mezon/utils';
 import classNames from 'classnames';
-import React, { ReactNode, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { ReactNode, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useHeightObserverRef } from './useHeightObserver';
 
 type AnchorScrollProps = {
 	children: ReactNode;
@@ -17,75 +16,78 @@ export const AnchorScroll = React.forwardRef<AnchorScrollRef, AnchorScrollProps>
 	const appearanceTheme = useSelector(selectTheme);
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const contentRef = useRef<HTMLDivElement | null>(null);
-	const heightObserverRef = useHeightObserverRef();
 
-	const scrollToBottomIfNeed = useCallback(() => {
-		const element = containerRef.current;
-		if (!element) {
-			return;
-		}
-		const isAtBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 1;
-		if (!isAtBottom) {
-			return;
-		}
-		element.scrollTo(0, Number.MAX_SAFE_INTEGER);
-	}, [containerRef]);
+	// comment for now bro, if it's not okay I will rollback: cc @dat.nguyenquoc
 
-	/**
-	 * before each browser repaint,
-	 * we need to scroll to bottom if need,
-	 * then we need to observe scroll content height
-	 * to detect scroll content height change
-	 */
-	useLayoutEffect(() => {
-		if (!containerRef.current || !contentRef.current) {
-			return;
-		}
-		scrollToBottomIfNeed();
-	}, [anchorId, containerRef, contentRef, scrollToBottomIfNeed]);
+	// const heightObserverRef = useHeightObserverRef();
 
-	useEffect(() => {
-		if (!containerRef.current || !contentRef.current || !heightObserverRef.current) {
-			return;
-		}
-		const { observer, setListener } = heightObserverRef.current;
-		observer.observe(containerRef.current);
-		observer.observe(contentRef.current);
-		const disconnectResizeObserver = () => observer?.disconnect();
-		setListener('onResize', () => {
-			containerRef.current?.scrollTo(0, Number.MAX_SAFE_INTEGER);
-		});
+	// const scrollToBottomIfNeed = useCallback(() => {
+	// 	const element = containerRef.current;
+	// 	if (!element) {
+	// 		return;
+	// 	}
+	// 	const isAtBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 1;
+	// 	if (!isAtBottom) {
+	// 		return;
+	// 	}
+	// 	element.scrollTo(0, Number.MAX_SAFE_INTEGER);
+	// }, [containerRef]);
 
-		let stableTimeoutId: NodeJS.Timeout | null = null;
-		setListener('onStable', () => {
-			const scrollContainer = containerRef.current;
-			const contentElement = contentRef.current;
-			if (!scrollContainer || !contentElement) {
-				return;
-			}
-			const containerHeight = scrollContainer.getBoundingClientRect().height;
-			const contentHeight = contentElement?.getBoundingClientRect().height;
-			// The content’s initial height matches the container’s height,
-			// so handling stable disconnections during this initial phase is incorrect.
-			if (containerHeight === contentHeight) {
-				return;
-			}
-			stableTimeoutId && clearTimeout(stableTimeoutId);
-			stableTimeoutId = setTimeout(() => {
-				disconnectResizeObserver();
-			}, 500);
-		});
+	// /**
+	//  * before each browser repaint,
+	//  * we need to scroll to bottom if need,
+	//  * then we need to observe scroll content height
+	//  * to detect scroll content height change
+	//  */
+	// useLayoutEffect(() => {
+	// 	if (!containerRef.current || !contentRef.current) {
+	// 		return;
+	// 	}
+	// 	scrollToBottomIfNeed();
+	// }, [anchorId, containerRef, contentRef, scrollToBottomIfNeed]);
 
-		containerRef.current.addEventListener('wheel', disconnectResizeObserver, { passive: true, once: true });
+	// useEffect(() => {
+	// 	if (!containerRef.current || !contentRef.current || !heightObserverRef.current) {
+	// 		return;
+	// 	}
+	// 	const { observer, setListener } = heightObserverRef.current;
+	// 	observer.observe(containerRef.current);
+	// 	observer.observe(contentRef.current);
+	// 	const disconnectResizeObserver = () => observer?.disconnect();
+	// 	setListener('onResize', () => {
+	// 		containerRef.current?.scrollTo(0, Number.MAX_SAFE_INTEGER);
+	// 	});
 
-		const cleanUp = () => {
-			stableTimeoutId && clearTimeout(stableTimeoutId);
-			containerRef?.current?.removeEventListener('wheel', disconnectResizeObserver);
-			observer.disconnect();
-		};
+	// 	let stableTimeoutId: NodeJS.Timeout | null = null;
+	// 	setListener('onStable', () => {
+	// 		const scrollContainer = containerRef.current;
+	// 		const contentElement = contentRef.current;
+	// 		if (!scrollContainer || !contentElement) {
+	// 			return;
+	// 		}
+	// 		const containerHeight = scrollContainer.getBoundingClientRect().height;
+	// 		const contentHeight = contentElement?.getBoundingClientRect().height;
+	// 		// The content’s initial height matches the container’s height,
+	// 		// so handling stable disconnections during this initial phase is incorrect.
+	// 		if (containerHeight === contentHeight) {
+	// 			return;
+	// 		}
+	// 		stableTimeoutId && clearTimeout(stableTimeoutId);
+	// 		stableTimeoutId = setTimeout(() => {
+	// 			disconnectResizeObserver();
+	// 		}, 500);
+	// 	});
 
-		return () => cleanUp();
-	}, [anchorId, containerRef, contentRef, heightObserverRef]);
+	// 	containerRef.current.addEventListener('wheel', disconnectResizeObserver, { passive: true, once: true });
+
+	// 	const cleanUp = () => {
+	// 		stableTimeoutId && clearTimeout(stableTimeoutId);
+	// 		containerRef?.current?.removeEventListener('wheel', disconnectResizeObserver);
+	// 		observer.disconnect();
+	// 	};
+
+	// 	return () => cleanUp();
+	// }, [anchorId, containerRef, contentRef, heightObserverRef]);
 
 	return (
 		<div className={classNames(['w-full h-full', '[&_*]:overflow-anchor-none', 'relative'])}>

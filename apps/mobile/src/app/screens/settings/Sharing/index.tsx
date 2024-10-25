@@ -12,11 +12,15 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
-import { channelMetaActions, ChannelsEntity, clansActions, selectAllChannelsByUser, selectClansEntities } from '@mezon/store';
 import {
+	channelMetaActions,
 	channelsActions,
+	ChannelsEntity,
+	clansActions,
 	directActions,
 	getStoreAsync,
+	selectAllChannelsByUser,
+	selectClansEntities,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectDirectsOpenlist,
@@ -249,30 +253,39 @@ export const Sharing = ({ data, onClose }) => {
 		onClose();
 	};
 
+	const getSizeImage = async (media: any) => {
+		try {
+			const fileInfo = await RNFS.stat(media.filePath || media?.contentUri);
+			return fileInfo?.size || 0;
+		} catch (e) {
+			return 0;
+		}
+	};
 	const convertFileFormat = async () => {
-		const fileFormats = await Promise.all(
-			dataMedia.map(async (media) => {
-				const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
-				setAttachmentUpload((prev) => [
-					...prev,
-					{ url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }
-				]);
-				const fileData = await RNFS.readFile(media.contentUri || media?.filePath, 'base64');
+		try {
+			const fileFormats = await Promise.all(
+				dataMedia.map(async (media) => {
+					const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
+					setAttachmentUpload((prev) => [
+						...prev,
+						{ url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }
+					]);
+					const fileSize = await getSizeImage(media);
+					const fileData = await RNFS.readFile(media.filePath || media?.contentUri, 'base64');
 
-				return {
-					uri: media.contentUri || media?.filePath,
-					name: media?.fileName || media?.contentUri || media?.filePath,
-					type: media?.mimeType,
-					fileData
-				};
-			})
-		);
-		handleFiles(fileFormats);
-		// setAttachmentData({
-		// 	url: filePath,
-		// 	filename: image?.filename || image?.uri,
-		// 	filetype: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
-		// });
+					return {
+						uri: media.contentUri || media?.filePath,
+						name: media?.fileName || media?.contentUri || media?.filePath,
+						type: media?.mimeType,
+						size: fileSize,
+						fileData
+					};
+				})
+			);
+			handleFiles(fileFormats);
+		} catch (e) {
+			console.error(e);
+		}
 	};
 
 	const handleFiles = async (files: any) => {

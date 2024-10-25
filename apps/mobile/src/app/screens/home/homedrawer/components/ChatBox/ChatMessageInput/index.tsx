@@ -1,6 +1,5 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
-import { messagesActions, selectCurrentClanId } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { messagesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { IEmojiOnMessage, IHashtagOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage, IMentionOnMessage } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { Dispatch, MutableRefObject, SetStateAction, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';

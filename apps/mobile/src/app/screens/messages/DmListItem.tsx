@@ -1,30 +1,27 @@
-import { useChatTypings } from '@mezon/core';
 import { convertTimestampToTimeAgo, Icons, PaperclipIcon } from '@mezon/mobile-components';
-import { Colors, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { selectIsUnreadDMById } from '@mezon/store';
-import { directActions, DirectEntity, selectDmGroupCurrentId, useAppDispatch } from '@mezon/store-mobile';
+import { Colors, useTheme } from '@mezon/mobile-ui';
+import { useAppSelector } from '@mezon/store';
+import { directActions, selectDirectById, selectDmGroupCurrentId, selectIsUnreadDMById, useAppDispatch } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
-import LottieView from 'lottie-react-native';
 import { ChannelType } from 'mezon-js';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
-import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { DmListItemLastMessage } from './DMListItemLastMessage';
 import { style } from './styles';
+import { TypingDmItem } from './TypingDmItem';
 
-export const DmListItem = React.memo((props: { directMessage: DirectEntity; navigation: any; onLongPress; onPress? }) => {
-	const { themeValue, theme } = useTheme();
+export const DmListItem = React.memo((props: { id: string; navigation: any; onLongPress; onPress? }) => {
+	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { directMessage, navigation, onLongPress, onPress } = props;
-	const { typingUsers } = useChatTypings({ channelId: directMessage?.channel_id, mode: directMessage?.type, isPublic: false, isDM: true });
+	const { id, navigation, onLongPress, onPress } = props;
+	const directMessage = useAppSelector((state) => selectDirectById(state, id));
 	const isUnReadChannel = useSelector(selectIsUnreadDMById(directMessage?.id));
 	const { t } = useTranslation('message');
-	const userStatus = directMessage?.is_online?.some(Boolean);
 	const isTabletLandscape = useTabletLandscape();
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const dispatch = useAppDispatch();
@@ -59,26 +56,35 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 		if (!content) return null;
 		const text = typeof content === 'string' ? JSON.parse(content)?.t : JSON.parse(JSON.stringify(content))?.t;
 		const lastMessageSender = otherMemberList?.find?.((it) => it.userId === directMessage?.last_sent_message?.sender_id);
-		const isUnread = Boolean(lastMessageSender) && isUnReadChannel;
 
 		if (!text) {
 			return (
-				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnread ? themeValue.white : themeValue.text }]} numberOfLines={1}>
-					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
-					{': '}
-					{'attachment '}
-					<PaperclipIcon width={13} height={13} color={Colors.textGray} />
-				</Text>
+				<View style={styles.contentMessage}>
+					<Text
+						style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}
+						numberOfLines={1}
+					>
+						{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
+						{': '}
+						{'attachment '}
+						<PaperclipIcon width={13} height={13} color={Colors.textGray} />
+					</Text>
+				</View>
 			);
 		}
 
 		return (
 			<View style={styles.contentMessage}>
-				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnread ? themeValue.white : themeValue.text }]}>
+				<Text style={[styles.defaultText, styles.lastMessage, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}>
 					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
 					{': '}
 				</Text>
-				{!!content && <DmListItemLastMessage content={typeof content === 'object' ? content : JSON.parse(content || '{}')} />}
+				{!!content && (
+					<DmListItemLastMessage
+						content={typeof content === 'object' ? content : JSON.parse(content || '{}')}
+						styleText={{ color: isUnReadChannel ? themeValue.white : themeValue.textNormal }}
+					/>
+				)}
 			</View>
 		);
 	};
@@ -102,7 +108,7 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 				}
 			]}
 			onPress={redirectToMessageDetail}
-			onLongPress={onLongPress}
+			onLongPress={() => onLongPress(directMessage)}
 		>
 			{isTypeDMGroup ? (
 				<View style={styles.groupAvatar}>
@@ -117,27 +123,23 @@ export const DmListItem = React.memo((props: { directMessage: DirectEntity; navi
 							<Text style={styles.textAvatar}>{(directMessage?.channel_label || directMessage?.usernames)?.charAt?.(0)}</Text>
 						</View>
 					)}
-					{typingUsers?.length > 0 ? (
-						<View style={[styles.statusTyping, userStatus ? styles.online : styles.offline]}>
-							<LottieView
-								source={theme === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}
-								autoPlay
-								loop
-								style={styles.lottie}
-							/>
-						</View>
-					) : (
-						<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
-					)}
+					<TypingDmItem directMessage={directMessage} />
 				</View>
 			)}
 
 			<View style={{ flex: 1 }}>
 				<View style={styles.messageContent}>
-					<Text numberOfLines={1} style={[styles.defaultText, styles.channelLabel]}>
+					<Text
+						numberOfLines={1}
+						style={[styles.defaultText, styles.channelLabel, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}
+					>
 						{(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
 					</Text>
-					{lastMessageTime ? <Text style={[styles.defaultText, styles.dateTime]}>{lastMessageTime}</Text> : null}
+					{lastMessageTime ? (
+						<Text style={[styles.defaultText, styles.dateTime, { color: isUnReadChannel ? themeValue.white : themeValue.textNormal }]}>
+							{lastMessageTime}
+						</Text>
+					) : null}
 				</View>
 
 				{getLastMessageContent(directMessage?.last_sent_message?.content)}

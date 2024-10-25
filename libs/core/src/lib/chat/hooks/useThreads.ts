@@ -1,9 +1,7 @@
 import {
-	selectAllChannels,
 	selectCurrentChannelId,
 	selectIsPrivate,
 	selectIsShowCreateThread,
-	selectListThreadId,
 	selectMessageThreadError,
 	selectNameThreadError,
 	selectNameValueThread,
@@ -17,13 +15,11 @@ import { useSelector } from 'react-redux';
 
 export function useThreads() {
 	const dispatch = useAppDispatch();
-	const channels = useSelector(selectAllChannels);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const isPrivate = useSelector(selectIsPrivate);
 	const nameThreadError = useSelector(selectNameThreadError);
 	const messageThreadError = useSelector(selectMessageThreadError);
-	const listThreadId = useSelector(selectListThreadId);
-	const isShowCreateThread = useSelector(selectIsShowCreateThread(currentChannelId as string));
+	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannelId as string));
 	const nameValueThread = useSelector(selectNameValueThread(currentChannelId as string));
 	const valueThread = useSelector(selectValueThread);
 
@@ -59,20 +55,12 @@ export function useThreads() {
 		},
 		[dispatch]
 	);
-
-	const threadCurrentChannel = useMemo(() => {
-		if (listThreadId && currentChannelId) {
-			return channels.find((channel) => channel.channel_id === listThreadId[currentChannelId]);
-		}
-	}, [channels, currentChannelId, listThreadId]);
-
 	return useMemo(
 		() => ({
 			isShowCreateThread,
 			isPrivate,
 			nameThreadError,
 			messageThreadError,
-			threadCurrentChannel,
 			nameValueThread,
 			valueThread,
 			setIsShowCreateThread,
@@ -87,7 +75,6 @@ export function useThreads() {
 			messageThreadError,
 			nameThreadError,
 			nameValueThread,
-			threadCurrentChannel,
 			valueThread,
 			setNameValueThread,
 			setIsShowCreateThread,

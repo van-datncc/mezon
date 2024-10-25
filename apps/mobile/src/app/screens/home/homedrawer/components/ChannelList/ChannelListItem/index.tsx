@@ -1,13 +1,15 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
 import {
+	channelsActions,
+	getStoreAsync,
 	selectCategoryExpandStateByCategoryId,
 	selectCurrentChannelId,
 	selectIsUnreadChannelById,
 	selectStreamMembersByChannelId,
-	selectVoiceChannelMembersByChannelId
-} from '@mezon/store';
-import { channelsActions, getStoreAsync, useAppSelector } from '@mezon/store-mobile';
+	selectVoiceChannelMembersByChannelId,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { ChannelThreads, IChannel } from '@mezon/utils';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -59,7 +61,10 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const dataThreads = useMemo(() => {
 		return !props?.data?.threads
 			? []
-			: props?.data?.threads.filter((thread: { active: IThreadActiveType }) => thread?.active === IThreadActiveType.Active);
+			: props?.data?.threads.filter(
+					(thread: { active: IThreadActiveType; count_mess_unread: number }) =>
+						thread?.active === IThreadActiveType.Active && !thread?.count_mess_unread
+				);
 	}, [props?.data?.threads]);
 
 	const isActive = useMemo(() => {

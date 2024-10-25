@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, useClans, usePermissionChecker } from '@mezon/core';
+import { useClans, usePermissionChecker } from '@mezon/core';
 import {
 	EventManagementOnGogoing,
 	eventManagementActions,
@@ -9,14 +9,12 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import EventModal from '../EventChannelModal';
 
-export const Events = () => {
-	const { toMembersPage, toChannelSettingPage } = useAppNavigation();
-	const { currentURL } = useAppParams();
+export const Events = memo(({ isMemberPath, isSettingPath }: { isMemberPath: boolean; isSettingPath: boolean }) => {
 	const numberEventManagement = useSelector(selectNumberEvent);
 	const ongoingEvent = useSelector(selectOngoingEvent);
 	const [openModalDetail, setOpenModalDetail] = useState(false);
@@ -41,8 +39,9 @@ export const Events = () => {
 		setShowModal(true);
 		setOpenModalDetail(true);
 	};
-	const memberPath = toMembersPage(currentClanId || '');
-	const channelSettingPath = toChannelSettingPage(currentClanId || '');
+
+	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
+	const channelSettingPath = `/chat/clans/${currentClanId}/channel-setting`;
 
 	return (
 		<>
@@ -71,7 +70,7 @@ export const Events = () => {
 			</div>
 			<Link
 				to={memberPath}
-				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${currentURL === memberPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isMemberPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
 			>
 				<div className="grow w-5 flex-row items-center gap-2 flex">
 					<div className="w-5 h-5 relative flex flex-row items-center">
@@ -85,12 +84,12 @@ export const Events = () => {
 			{checkAdminPermission ? (
 				<Link
 					to={channelSettingPath}
-					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${currentURL === channelSettingPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isSettingPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
 						<div className="w-5 h-5 relative flex flex-row items-center">
-							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-								<Icons.SettingProfile className="w-5 h-5 dark:text-channelTextLabel" />
+							<div className="w-5 h-5">
+								<Icons.SettingProfile className="w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode" />
 							</div>
 						</div>
 						<div className="w-full dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Channels</div>
@@ -107,7 +106,7 @@ export const Events = () => {
 			)}
 		</>
 	);
-};
+});
 
 const EventNotification = ({ event, handleOpenDetail }: { event: EventManagementOnGogoing; handleOpenDetail: () => void }) => {
 	const dispatch = useDispatch();
