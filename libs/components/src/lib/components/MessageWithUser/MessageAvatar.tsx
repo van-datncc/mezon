@@ -51,4 +51,4 @@ const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
 	);
 };
 
-export default memo(MessageAvatar, (prev, cur) => prev.message?.id === cur.message?.id);
+export default memo(MessageAvatar, (prev, cur) => prev.message?.sender_id === cur.message?.sender_id);
