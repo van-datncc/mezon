@@ -1,41 +1,42 @@
 import { ChannelList, ChannelTopbar, ClanHeader, FooterProfile, StreamInfo } from '@mezon/components';
-import { useApp, useAppNavigation, useAppParams, useThreads } from '@mezon/core';
+import { useApp } from '@mezon/core';
 import {
+	ChannelsEntity,
+	ClansEntity,
 	appActions,
 	selectAllAccount,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClan,
+	selectCurrentStreamInfo,
 	selectIsShowChatStream,
+	selectIsShowCreateThread,
 	selectStatusMenu,
 	selectStatusStream,
-	useAppDispatch
+	useAppDispatch,
+	videoStreamActions,
+	voiceActions
 } from '@mezon/store';
+import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { Outlet, useLoaderData } from 'react-router-dom';
-import { ClanLoaderData } from '../loaders/clanLoader';
+import { Outlet } from 'react-router-dom';
 import ChatStream from '../pages/chatStream';
 import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
 
-const ClanLayout = () => {
+const ClanEffects: React.FC<{
+	chatStreamRef: React.RefObject<HTMLDivElement>;
+	currentChannel: ChannelsEntity | null;
+	currentClan: ClansEntity | null;
+	isShowChatStream: boolean;
+	isShowCreateThread: boolean;
+}> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread }) => {
+	// move code thanh.levan
 	const dispatch = useAppDispatch();
-	const { clanId } = useLoaderData() as ClanLoaderData;
-	const currentClan = useSelector(selectCurrentClan);
-	const userProfile = useSelector(selectAllAccount);
-	const closeMenu = useSelector(selectCloseMenu);
-	const statusMenu = useSelector(selectStatusMenu);
-	const streamPlay = useSelector(selectStatusStream);
-	const isShowChatStream = useSelector(selectIsShowChatStream);
-	const { toMembersPage } = useAppNavigation();
-	const { currentURL } = useAppParams();
-	const memberPath = toMembersPage(currentClan?.clan_id || '');
-	const { isShowCreateThread } = useThreads();
 	const { setIsShowMemberList } = useApp();
-	const currentChannel = useSelector(selectCurrentChannel);
-	const chatStreamRef = useRef<HTMLDivElement | null>(null);
+	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 
 	useEffect(() => {
 		const updateChatStreamWidth = () => {
@@ -50,13 +51,57 @@ const ClanLayout = () => {
 		return () => {
 			window.removeEventListener('resize', updateChatStreamWidth);
 		};
-	}, [dispatch, isShowChatStream]);
+	}, [isShowChatStream]);
+
+	useEffect(() => {
+		if (
+			currentClan &&
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING &&
+			currentStreamInfo?.clanId !== currentClan.id &&
+			currentStreamInfo?.streamId !== currentChannel.channel_id
+		) {
+			dispatch(
+				videoStreamActions.startStream({
+					clanId: currentClan.id || '',
+					clanName: currentClan.clan_name || '',
+					streamId: currentChannel.channel_id || '',
+					streamName: currentChannel.channel_label || '',
+					parentId: currentChannel.parrent_id || ''
+				})
+			);
+			dispatch(appActions.setIsShowChatStream(false));
+		}
+		dispatch(appActions.setIsShowCanvas(false));
+	}, [currentStreamInfo, currentClan, currentChannel]);
 
 	useEffect(() => {
 		if (isShowCreateThread) {
 			setIsShowMemberList(false);
 		}
 	}, [isShowCreateThread]);
+
+	const checkTypeChannel = currentChannel?.type === ChannelType.CHANNEL_TYPE_VOICE;
+	useEffect(() => {
+		if (checkTypeChannel) {
+			dispatch(voiceActions.setStatusCall(checkTypeChannel));
+		}
+	}, [currentChannel?.type]);
+
+	return null;
+};
+
+const ClanLayout = () => {
+	const currentClan = useSelector(selectCurrentClan);
+	const userProfile = useSelector(selectAllAccount);
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
+	const streamPlay = useSelector(selectStatusStream);
+	const isShowChatStream = useSelector(selectIsShowChatStream);
+	const currentURL = isElectron() ? window.location.hash : window.location.pathname;
+	const memberPath = `/chat/clans/${currentClan?.clan_id}/member-safety`;
+	const currentChannel = useSelector(selectCurrentChannel);
+	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannel?.id as string));
+	const chatStreamRef = useRef<HTMLDivElement | null>(null);
 
 	return (
 		<>
@@ -71,7 +116,6 @@ const ClanLayout = () => {
 					status={userProfile?.user?.online}
 					avatar={userProfile?.user?.avatar_url || ''}
 					userId={userProfile?.user?.id || ''}
-					channelCurrent={currentChannel}
 					isDM={false}
 				/>
 			</div>
@@ -97,6 +141,14 @@ const ClanLayout = () => {
 				</div>
 			)}
 			<Setting isDM={false} />
+
+			<ClanEffects
+				currentChannel={currentChannel}
+				currentClan={currentClan}
+				chatStreamRef={chatStreamRef}
+				isShowChatStream={isShowChatStream}
+				isShowCreateThread={isShowCreateThread}
+			/>
 		</>
 	);
 };

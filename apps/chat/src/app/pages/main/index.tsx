@@ -9,15 +9,17 @@ import {
 	SidebarClanItem,
 	SidebarTooltip
 } from '@mezon/components';
-import { useAppNavigation, useAppParams, useAuth, useFriends, useMenu, useMessageValue, useReference } from '@mezon/core';
+import { useAppParams, useAuth, useFriends, useMenu, useReference } from '@mezon/core';
 import {
 	accountActions,
+	channelsActions,
 	clansActions,
 	getIsShowPopupForward,
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
 	selectChatStreamWidth,
+	selectClanView,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
@@ -39,10 +41,10 @@ import {
 import { Image } from '@mezon/ui';
 import { IClan, ModeResponsive, Platform, TIME_OF_SHOWING_FIRST_POPUP, getPlatform } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import ChannelStream from '../channel/ChannelStream';
 import { MainContent } from './MainContent';
 import PopupQuickMess from './PopupQuickMess';
@@ -50,17 +52,10 @@ import DirectUnread from './directUnreads';
 
 function MyApp() {
 	const elementHTML = document.documentElement;
-	const clans = useSelector(selectAllClans);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const pathName = useLocation().pathname;
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
 	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} open={true} />);
-
-	const listUnreadDM = useSelector(selectDirectsUnreadlist);
-	const { quantityPendingRequest } = useFriends();
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
-
-	const { setCloseMenu, setStatusMenu } = useMenu();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
@@ -73,56 +68,8 @@ function MyApp() {
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const channelStream = useSelector(selectStreamChannelByChannelId(currentStreamInfo?.streamId || ''));
 
-	const { toMembersPage } = useAppNavigation();
 	const { currentURL, directId } = useAppParams();
-	const memberPath = toMembersPage(currentClanId || '');
-
-	useEffect(() => {
-		const handleSizeWidth = () => {
-			if (window.innerWidth < 480) {
-				setCloseMenu(true);
-			} else {
-				setCloseMenu(false);
-			}
-		};
-
-		handleSizeWidth();
-
-		if (closeMenu) {
-			setStatusMenu(false);
-		}
-
-		const handleResize = () => {
-			handleSizeWidth();
-		};
-
-		window.addEventListener('resize', handleResize);
-
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
-	}, []);
-
-	const handleMenu = (event: any) => {
-		const elementClick = event.target;
-		const wrapElement = document.querySelector('#menu');
-		if (!closeMenu) {
-			return;
-		}
-		if (elementClick.classList.contains('clan')) {
-			if (elementClick.classList.contains('choose')) {
-				setStatusMenu(false);
-				elementClick.classList.remove('choose');
-			} else {
-				setStatusMenu(true);
-				const elementOld = wrapElement?.querySelector('.choose');
-				if (elementOld) {
-					elementOld.classList.remove('choose');
-				}
-				elementClick.classList.add('choose');
-			}
-		}
-	};
+	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent) => {
@@ -162,15 +109,12 @@ function MyApp() {
 		}
 	}, [appearanceTheme]);
 
-	const { setModeResponsive } = useMessageValue();
 	const { setOpenOptionMessageState } = useReference();
 
 	const handleClick = useCallback(() => {
 		setOpenOptionMessageState(false);
 	}, []);
 
-	const currentDmId = useSelector(selectDmGroupCurrentId);
-	const currentDmIType = useSelector(selectDmGroupCurrentType);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 	const chatStreamWidth = useSelector(selectChatStreamWidth);
@@ -185,9 +129,7 @@ function MyApp() {
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 
 	const dispatch = useAppDispatch();
-	const handleClickToJoinClan = () => {
-		dispatch(clansActions.joinClan({ clanId: '0' }));
-	};
+
 	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannel?.id as string));
 	const allRolesInClan = useSelector(selectAllRoleIds);
 
@@ -201,9 +143,114 @@ function MyApp() {
 			onClick={handleClick}
 		>
 			{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
+			<SidebarMenu openCreateClanModal={openCreateClanModal} />
+			<MainContent />
+			{currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
+				<div
+					className={`fixed h-[calc(100vh_-_60px)] bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
+					style={streamStyle}
+				>
+					<ChannelStream
+						key={currentStreamInfo?.streamId}
+						hlsUrl={channelStream?.streaming_url}
+						memberJoin={streamChannelMember}
+						channelName={currentChannel?.channel_label}
+						currentStreamInfo={currentStreamInfo}
+					/>
+				</div>
+			)}
+
+			{openModalAttachment && (
+				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
+					<MessageModalImage />
+				</MessageContextMenuProvider>
+			)}
+			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
+			{isShowPopupQuickMess && <PopupQuickMess />}
+		</div>
+	);
+}
+
+export default MyApp;
+
+type ShowModal = () => void;
+
+const SidebarMenu = memo(
+	({ openCreateClanModal }: { openCreateClanModal: ShowModal }) => {
+		const dispatch = useAppDispatch();
+		const clans = useSelector(selectAllClans);
+		const listUnreadDM = useSelector(selectDirectsUnreadlist);
+		const isClanView = useSelector(selectClanView);
+		const appearanceTheme = useSelector(selectTheme);
+		const { quantityPendingRequest } = useFriends();
+		const currentDmId = useSelector(selectDmGroupCurrentId);
+		const currentDmIType = useSelector(selectDmGroupCurrentType);
+		const currentClanId = useSelector(selectCurrentClanId);
+		const closeMenu = useSelector(selectCloseMenu);
+		const statusMenu = useSelector(selectStatusMenu);
+		const setModeResponsive = useCallback(
+			(value: string) => {
+				dispatch(channelsActions.setModeResponsive(value));
+			},
+			[dispatch]
+		);
+		const { setCloseMenu, setStatusMenu } = useMenu();
+
+		const handleClickToJoinClan = () => {
+			dispatch(clansActions.joinClan({ clanId: '0' }));
+		};
+
+		useEffect(() => {
+			const handleSizeWidth = () => {
+				if (window.innerWidth < 480) {
+					setCloseMenu(true);
+				} else {
+					setCloseMenu(false);
+				}
+			};
+
+			handleSizeWidth();
+
+			if (closeMenu) {
+				setStatusMenu(false);
+			}
+
+			const handleResize = () => {
+				handleSizeWidth();
+			};
+
+			window.addEventListener('resize', handleResize);
+
+			return () => {
+				window.removeEventListener('resize', handleResize);
+			};
+		}, []);
+
+		const handleMenu = (event: MouseEvent) => {
+			const elementClick = event.target as HTMLDivElement;
+			const wrapElement = document.querySelector('#menu');
+			if (!closeMenu) {
+				return;
+			}
+			if (elementClick.classList.contains('clan')) {
+				if (elementClick.classList.contains('choose')) {
+					setStatusMenu(false);
+					elementClick.classList.remove('choose');
+				} else {
+					setStatusMenu(true);
+					const elementOld = wrapElement?.querySelector('.choose');
+					if (elementOld) {
+						elementOld.classList.remove('choose');
+					}
+					elementClick.classList.add('choose');
+				}
+			}
+		};
+
+		return (
 			<div
 				className={`fixed z-10 left-0 top-0 w-[72px] dark:bg-bgTertiary bg-bgLightTertiary duration-100 ${closeMenu ? (statusMenu ? '' : 'hidden') : ''}`}
-				onClick={handleMenu}
+				onClick={() => handleMenu}
 				id="menu"
 			>
 				<div className="top-0 left-0 right-0 flex flex-col h-screen items-center py-4 px-3 overflow-y-auto hide-scrollbar ">
@@ -215,7 +262,7 @@ function MyApp() {
 									setModeResponsive(ModeResponsive.MODE_DM);
 								}}
 							>
-								<NavLinkComponent active={pathName?.includes('direct')}>
+								<NavLinkComponent active={!isClanView}>
 									<div>
 										<Image
 											src={`assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`}
@@ -249,8 +296,7 @@ function MyApp() {
 									<SidebarClanItem
 										linkClan={`/chat/clans/${clan.id}`}
 										option={clan}
-										active={!pathName?.includes('direct') && currentClanId === clan.clan_id}
-										pathname={pathName}
+										active={isClanView && currentClanId === clan.clan_id}
 									/>
 								</SidebarTooltip>
 							);
@@ -272,29 +318,7 @@ function MyApp() {
 					</div>
 				</div>
 			</div>
-			<MainContent />
-
-			<div
-				className={`fixed h-[calc(100vh_-_60px)] bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
-				style={streamStyle}
-			>
-				<ChannelStream
-					key={currentStreamInfo?.streamId}
-					hlsUrl={channelStream?.streaming_url}
-					memberJoin={streamChannelMember}
-					channelName={currentChannel?.channel_label}
-					currentStreamInfo={currentStreamInfo}
-				/>
-			</div>
-			{openModalAttachment && (
-				<MessageContextMenuProvider allRolesInClan={allRolesInClan} allUserIdsInChannel={allUserIdsInChannel}>
-					<MessageModalImage />
-				</MessageContextMenuProvider>
-			)}
-			{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
-			{isShowPopupQuickMess && <PopupQuickMess />}
-		</div>
-	);
-}
-
-export default MyApp;
+		);
+	},
+	() => true
+);

@@ -3,20 +3,17 @@ import {
 	ChannelsEntity,
 	channelMembersActions,
 	selectAccountCustomStatus,
-	selectAllAccount,
 	selectCurrentClanId,
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
 	selectTheme,
 	useAppDispatch,
-	userClanProfileActions,
-	voiceActions
+	userClanProfileActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
-import { ChannelType } from 'mezon-js';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
@@ -31,24 +28,15 @@ export type FooterProfileProps = {
 	isDM: boolean;
 };
 
-function FooterProfile({ name, status, avatar, userId, channelCurrent, isDM }: FooterProfileProps) {
+function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const appearanceTheme = useSelector(selectTheme);
-	const userProfile = useSelector(selectAllAccount);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const userCustomStatus = useMemberCustomStatus(userId || '', isDM);
 	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
-
-	const checkTypeChannel = channelCurrent?.type === ChannelType.CHANNEL_TYPE_VOICE;
-
-	useEffect(() => {
-		if (checkTypeChannel) {
-			dispatch(voiceActions.setStatusCall(checkTypeChannel));
-		}
-	}, [channelCurrent?.type]);
 
 	const handleClickFooterProfile = () => {
 		dispatch(userClanProfileActions.setShowModalFooterProfile(!showModalFooterProfile));

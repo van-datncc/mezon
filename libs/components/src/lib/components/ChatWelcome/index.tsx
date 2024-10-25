@@ -11,7 +11,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { ChannelIsNotThread } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
@@ -36,13 +36,9 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const isDm = mode === ChannelStreamMode.STREAM_MODE_DM;
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;
 	const isChatStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
-	const [loading, setLoading] = useState(false);
-	useEffect(() => {
-		setLoading(true);
-	}, []);
 	return (
 		<div className="space-y-2 px-4 mb-0  flex-1 flex flex-col justify-end">
-			{loading && (
+			{
 				<>
 					{isChannel &&
 						(isChannelThread ? (
@@ -67,7 +63,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 						/>
 					)}
 				</>
-			)}
+			}
 		</div>
 	);
 }

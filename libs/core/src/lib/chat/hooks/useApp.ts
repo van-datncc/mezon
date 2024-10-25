@@ -8,7 +8,6 @@ export function useApp() {
 	// TODO: separate theme into a separate hook
 	const appearanceTheme = useSelector(selectTheme);
 	const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)');
-	const elementHTML = document.documentElement;
 
 	const setAppearanceTheme = useCallback(
 		(value: string) => {
@@ -30,10 +29,10 @@ export function useApp() {
 				setAppearanceTheme('dark');
 				break;
 			case 'dark':
-				elementHTML.classList.add('dark');
+				document.documentElement.classList.add('dark');
 				break;
 			case 'light':
-				elementHTML.classList.remove('dark');
+				document.documentElement.classList.remove('dark');
 				break;
 			default:
 				break;
@@ -45,9 +44,8 @@ export function useApp() {
 			isShowMemberList,
 			setIsShowMemberList,
 			setAppearanceTheme,
-			systemIsDark,
-			elementHTML
+			systemIsDark
 		}),
-		[isShowMemberList, setIsShowMemberList, setAppearanceTheme, systemIsDark, elementHTML]
+		[isShowMemberList, setIsShowMemberList, setAppearanceTheme, systemIsDark]
 	);
 }

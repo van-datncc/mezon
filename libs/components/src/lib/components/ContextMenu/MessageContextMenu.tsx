@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { useAppParams, useAuth, usePermissionChecker, useReference, useThreads } from '@mezon/core';
+import { useAppParams, useAuth, usePermissionChecker, useReference } from '@mezon/core';
 import {
 	MessagesEntity,
 	createEditCanvas,
@@ -36,6 +36,7 @@ import {
 	ContextMenuItem,
 	EOverriddenPermission,
 	EPermission,
+	IMessageWithUser,
 	MenuBuilder,
 	ModeResponsive,
 	SHOW_POSITION,
@@ -316,7 +317,19 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
 	}, [dispatch, message?.channel_id, message?.id]);
 
-	const { setIsShowCreateThread, setValueThread } = useThreads();
+	const setIsShowCreateThread = useCallback(
+		(isShowCreateThread: boolean, channelId?: string) => {
+			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannel?.id as string), isShowCreateThread }));
+		},
+		[currentChannel?.id, dispatch]
+	);
+
+	const setValueThread = useCallback(
+		(value: IMessageWithUser | null) => {
+			dispatch(threadsActions.setValueThread(value));
+		},
+		[dispatch]
+	);
 
 	const handleCreateThread = useCallback(() => {
 		setIsShowCreateThread(true);

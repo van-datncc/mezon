@@ -1,6 +1,13 @@
 import { GifStickerEmojiPopup } from '@mezon/components';
-import { useApp, useGifsStickersEmoji, useThreads } from '@mezon/core';
-import { selectCloseMenu, selectCurrentChannel, selectPositionEmojiButtonSmile, selectReactionTopState, selectStatusMenu } from '@mezon/store';
+import { useApp, useGifsStickersEmoji } from '@mezon/core';
+import {
+	selectCloseMenu,
+	selectCurrentChannel,
+	selectIsShowCreateThread,
+	selectPositionEmojiButtonSmile,
+	selectReactionTopState,
+	selectStatusMenu
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EmojiPlaces, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -16,7 +23,7 @@ const ChannelLayout = () => {
 	const { subPanelActive } = useGifsStickersEmoji();
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	const { isShowCreateThread } = useThreads();
+	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannel?.id as string));
 	const { isShowMemberList } = useApp();
 	const positionOfSmileButton = useSelector(selectPositionEmojiButtonSmile);
 

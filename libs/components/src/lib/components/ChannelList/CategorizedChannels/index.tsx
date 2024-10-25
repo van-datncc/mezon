@@ -14,7 +14,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { ChannelThreads, EPermission, ICategory, ICategoryChannel, IChannel, MouseButton } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { CategorySetting } from '../../CategorySetting';
@@ -38,7 +38,6 @@ export interface IChannelLinkPermission {
 const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, channelRefs }) => {
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const categoryExpandState = useSelector(selectCategoryExpandStateByCategoryId(category.clan_id || '', category.id));
 	const [hasAdminPermission, hasClanPermission, hasChannelManagePermission] = usePermissionChecker([
 		EPermission.administrator,
@@ -46,7 +45,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 		EPermission.manageChannel
 	]);
 	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
-	const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
 	const permissions = useMemo(
 		() => ({
 			hasAdminPermission,
@@ -71,7 +69,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 	const dispatch = useAppDispatch();
 	const location = useLocation();
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasChannelManagePermission || hasClanPermission;
-	const ctrlKSelectedChannelId = useSelector(selectCtrlKSelectedChannelId);
 
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
@@ -128,10 +125,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 	const confirmDeleteCategory = async () => {
 		handleDeleteCategory({ category });
 		setShowModal(false);
-	};
-
-	const isUnreadChannel = (channelId: string) => {
-		return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
 	};
 
 	useEffect(() => {
@@ -197,29 +190,60 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 					{isShowCategorySetting && <CategorySetting onClose={handleCloseCategorySetting} category={category} />}
 				</div>
 			)}
-			<div className="mt-[5px] space-y-0.5 text-contentTertiary">
-				{category?.channels?.reduce<React.ReactNode[]>((acc, channel: IChannel) => {
-					const shouldRender =
-						categoryExpandState ||
-						isUnreadChannel(channel.id) ||
-						channel.id === ctrlKSelectedChannelId ||
-						channel.type === ChannelType.CHANNEL_TYPE_VOICE;
-
-					if (shouldRender) {
-						acc.push(
-							<ChannelListItem
-								ref={(component) => channelRefs.current && (channelRefs.current[channel.id] = component)}
-								isActive={currentChannelId === channel.id}
-								key={channel.id}
-								channel={channel as ChannelThreads}
-								permissions={permissions}
-							/>
-						);
-					}
-					return acc;
-				}, [])}
-			</div>
+			<ChannelList
+				channels={category?.channels || []}
+				categoryExpandState={categoryExpandState}
+				channelRefs={channelRefs}
+				permissions={permissions}
+			/>
 		</div>
 	);
 };
-export default CategorizedChannels;
+export default memo(CategorizedChannels);
+
+type ChannelListProps = {
+	channels: IChannel[];
+	categoryExpandState: boolean;
+	channelRefs: React.RefObject<Record<string, ChannelListItemRef | null>>;
+	permissions: IChannelLinkPermission;
+};
+
+const ChannelList: React.FC<ChannelListProps> = ({ channels, categoryExpandState, channelRefs, permissions }) => {
+	const ctrlKSelectedChannelId = useSelector(selectCtrlKSelectedChannelId);
+	const currentChannelId = useSelector(selectCurrentChannelId);
+
+	const refItem = useCallback((component: ChannelListItemRef | null) => {
+		channelRefs.current && (channelRefs.current[component?.channelId as string] = component);
+	}, []);
+
+	const allChannelMetaEntities = useSelector(selectChannelMetaEntities);
+
+	const isUnreadChannel = (channelId: string) => {
+		return allChannelMetaEntities[channelId]?.lastSeenTimestamp < allChannelMetaEntities[channelId]?.lastSentTimestamp;
+	};
+
+	return (
+		<div className="mt-[5px] space-y-0.5 text-contentTertiary">
+			{channels.reduce<React.ReactNode[]>((acc, channel) => {
+				const shouldRender =
+					categoryExpandState ||
+					isUnreadChannel(channel.id) ||
+					channel.id === ctrlKSelectedChannelId ||
+					channel.type === ChannelType.CHANNEL_TYPE_VOICE;
+
+				if (shouldRender) {
+					acc.push(
+						<ChannelListItem
+							ref={refItem}
+							isActive={currentChannelId === channel.id}
+							key={channel.id}
+							channel={channel as ChannelThreads}
+							permissions={permissions}
+						/>
+					);
+				}
+				return acc;
+			}, [])}
+		</div>
+	);
+};

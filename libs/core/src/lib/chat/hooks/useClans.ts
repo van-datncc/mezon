@@ -2,10 +2,8 @@ import {
 	ClansEntity,
 	clansActions,
 	selectAllClans,
-	selectAllUserClans,
 	selectCurrentClan,
 	selectCurrentClanId,
-	selectShowNumEvent,
 	useAppDispatch,
 	userClanProfileActions
 } from '@mezon/store';
@@ -18,8 +16,6 @@ export function useClans() {
 	const clans = useSelector(selectAllClans);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
-	const usersClan = useSelector(selectAllUserClans);
-	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
 
 	const setClanShowNumEvent = React.useCallback(
 		async (status: boolean) => {
@@ -83,19 +79,11 @@ export function useClans() {
 		[dispatch]
 	);
 
-	const avatarClans = usersClan.map((user) => user.user?.avatar_url).slice(0, 5);
-
-	const remainingMember = usersClan.map((user) => user.user).slice(5);
-
 	return useMemo(
 		() => ({
 			clans,
 			currentClanId,
 			currentClan,
-			usersClan,
-			avatarClans,
-			remainingMember,
-			showNumEvent,
 			setClanShowNumEvent,
 			getUserClanProfile,
 			updateUserClanProfile,
@@ -103,20 +91,6 @@ export function useClans() {
 			updateClan,
 			deleteClan
 		}),
-		[
-			clans,
-			currentClanId,
-			currentClan,
-			usersClan,
-			avatarClans,
-			remainingMember,
-			showNumEvent,
-			setClanShowNumEvent,
-			getUserClanProfile,
-			updateUserClanProfile,
-			createClans,
-			updateClan,
-			deleteClan
-		]
+		[clans, currentClanId, currentClan, setClanShowNumEvent, getUserClanProfile, updateUserClanProfile, createClans, updateClan, deleteClan]
 	);
 }

@@ -1,13 +1,8 @@
 import { useChannels, useMenu } from '@mezon/core';
 import {
-	appActions,
 	channelsActions,
 	notificationSettingActions,
-	selectClanById,
 	selectCloseMenu,
-	selectCurrentChannel,
-	selectCurrentStreamInfo,
-	selectStatusStream,
 	selectTheme,
 	threadsActions,
 	useAppDispatch,
@@ -18,7 +13,8 @@ import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { Spinner } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useImperativeHandle, useRef } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IChannelLinkPermission } from '../ChannelList/CategorizedChannels';
@@ -65,14 +61,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		ref
 	) => {
 		const { hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner } = permissions;
-
 		const dispatch = useAppDispatch();
-		const clanById = useSelector(selectClanById(clanId || ''));
-		const [openSetting, setOpenSetting] = useState(false);
-		const [showModal, setShowModal] = useState(false);
-		const [isShowPanelChannel, setIsShowPanelChannel] = useState<boolean>(false);
 		const channelLinkRef = useRef<HTMLAnchorElement | null>(null);
-		const [coords, setCoords] = useState<Coords>({
+		const coords = useRef<Coords>({
 			mouseX: 0,
 			mouseY: 0,
 			distanceToBottom: 0
@@ -80,12 +71,9 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const theme = useSelector(selectTheme);
 
 		const handleOpenCreate = () => {
-			setOpenSetting(true);
-			setIsShowPanelChannel(false);
+			openSettingModal();
+			closeProfileItem();
 		};
-		const currentChannel = useSelector(selectCurrentChannel);
-		const currentStreamInfo = useSelector(selectCurrentStreamInfo);
-		const playStream = useSelector(selectStatusStream);
 
 		const channelPath = `/chat/clans/${clanId}/channels/${channel.id}`;
 		const state = isActive ? 'active' : channel?.unread ? 'inactiveUnread' : 'inactiveRead';
@@ -98,7 +86,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 
 		const handleCreateLinkInvite = () => {
 			createInviteLink(clanId ?? '', channel.channel_id ?? '');
-			setIsShowPanelChannel(false);
+			closeProfileItem();
 		};
 
 		const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -114,8 +102,8 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			);
 
 			const distanceToBottom = windowHeight - event.clientY;
-			setCoords({ mouseX, mouseY, distanceToBottom });
-			setIsShowPanelChannel((s) => !s);
+			coords.current = { mouseX, mouseY, distanceToBottom };
+			openProfileItem();
 		};
 
 		const handleVoiceChannel = (id: string) => {
@@ -127,8 +115,8 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		};
 
 		const handleOpenModalConfirm = () => {
-			setShowModal(true);
-			setIsShowPanelChannel(false);
+			openDeleteModal();
+			closeProfileItem();
 		};
 
 		const { setStatusMenu } = useMenu();
@@ -144,20 +132,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 			if (closeMenu) {
 				setStatusMenu(false);
 			}
-			if (channel.type === ChannelType.CHANNEL_TYPE_STREAMING) {
-				if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
-					dispatch(
-						videoStreamActions.startStream({
-							clanId: clanId || '',
-							clanName: clanById?.clan_name || '',
-							streamId: channel?.channel_id || '',
-							streamName: channel?.channel_label || '',
-							parentId: channel?.parrent_id || ''
-						})
-					);
-					dispatch(appActions.setIsShowChatStream(false));
-				}
-			} else {
+			if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 				dispatch(channelsActions.setCurrentChannelId(channel.id));
 			}
 		};
@@ -173,43 +148,10 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		);
 		const isShowSettingChannel = isClanOwner || hasAdminPermission || hasClanPermission || hasChannelManagePermission;
 
-		const { handleConfirmDeleteChannel } = useChannels();
-
-		const handleCloseModalShow = () => {
-			setShowModal(false);
-		};
-
-		const handleDeleteChannel = () => {
-			handleConfirmDeleteChannel(channel.channel_id as string, clanId as string);
-			handleCloseModalShow();
-		};
-		useEffect(() => {
-			if (
-				currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING &&
-				currentStreamInfo?.clanId !== clanId &&
-				currentStreamInfo?.streamId !== currentChannel.channel_id
-			) {
-				dispatch(
-					videoStreamActions.startStream({
-						clanId: clanId || '',
-						clanName: clanById?.clan_name || '',
-						streamId: currentChannel?.channel_id || '',
-						streamName: currentChannel?.channel_label || '',
-						parentId: currentChannel?.parrent_id || ''
-					})
-				);
-				dispatch(appActions.setIsShowChatStream(false));
-			}
-			dispatch(appActions.setIsShowCanvas(false));
-		}, [clanById?.clan_name, clanId, currentChannel, currentChannel?.type, currentStreamInfo?.clanId, currentStreamInfo?.streamId, dispatch]);
-
-		const notVoiceOrAppOrStreamChannel = useMemo(
-			() =>
-				channel.type !== ChannelType.CHANNEL_TYPE_VOICE &&
-				channel.type !== ChannelType.CHANNEL_TYPE_APP &&
-				channel.type !== ChannelType.CHANNEL_TYPE_STREAMING,
-			[channel.channel_id]
-		);
+		const notVoiceOrAppOrStreamChannel =
+			channel.type !== ChannelType.CHANNEL_TYPE_VOICE &&
+			channel.type !== ChannelType.CHANNEL_TYPE_APP &&
+			channel.type !== ChannelType.CHANNEL_TYPE_STREAMING;
 
 		const activeChannelChannelText = isActive && notVoiceOrAppOrStreamChannel;
 		const notMuteAndUnread = !channel?.is_mute && isUnReadChannel && notVoiceOrAppOrStreamChannel && !isActive;
@@ -218,9 +160,34 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 		const hightLightTextChannel = activeChannelChannelText || notMuteAndUnread || notMuteAndHasCountNoti;
 		const highLightVoiceChannel = isActive && !notVoiceOrAppOrStreamChannel;
 
-		const handleOpenSetting = () => {
-			setOpenSetting(true);
-		};
+		const [openProfileItem, closeProfileItem] = useModal(() => {
+			return (
+				<PanelChannel
+					isUnread={isUnReadChannel}
+					onDeleteChannel={handleOpenModalConfirm}
+					channel={channel}
+					coords={coords.current}
+					openSetting={openSettingModal}
+					setIsShowPanelChannel={closeProfileItem}
+				/>
+			);
+		}, []);
+
+		const [openDeleteModal, closeDeleteModal] = useModal(() => {
+			return (
+				<ModalConfirmComponent
+					handleCancel={closeDeleteModal}
+					channelId={channel.channel_id as string}
+					clanId={clanId as string}
+					modalName={`${channel.channel_label}`}
+				/>
+			);
+		}, []);
+
+		const [openSettingModal, closeSettingModal] = useModal(() => {
+			return <SettingChannel onClose={closeSettingModal} channel={channel} />;
+		}, []);
+
 		return (
 			<div
 				onContextMenu={handleMouseClick}
@@ -254,7 +221,7 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						{channel.status === StatusVoiceChannel.No_Active && <Spinner aria-label="Loading spinner" />}
 					</span>
 				) : (
-					<Link to={channelPath} onClick={handleClick}>
+					<Link to={channelPath} onClick={handleClick} className="channel-link">
 						<span ref={channelLinkRef} className={`${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}>
 							{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 							<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
@@ -329,37 +296,27 @@ const ChannelLinkComponent = React.forwardRef<ChannelLinkRef, ChannelLinkProps>(
 						)}
 					</>
 				)}
-
-				{openSetting && (
-					<SettingChannel
-						onClose={() => {
-							setOpenSetting(false);
-						}}
-						channel={channel}
-					/>
-				)}
-				{isShowPanelChannel && (
-					<PanelChannel
-						isUnread={isUnReadChannel}
-						onDeleteChannel={handleOpenModalConfirm}
-						channel={channel}
-						coords={coords}
-						openSetting={handleOpenSetting}
-						setIsShowPanelChannel={setIsShowPanelChannel}
-					/>
-				)}
-
-				{showModal && (
-					<ModalConfirm
-						handleCancel={handleCloseModalShow}
-						handleConfirm={handleDeleteChannel}
-						title="delete"
-						modalName={`${channel.channel_label}`}
-					/>
-				)}
 			</div>
 		);
 	}
 );
 
 export const ChannelLink = memo(ChannelLinkComponent);
+
+type ModalConfirmComponentProps = {
+	handleCancel: () => void;
+	channelId: string;
+	clanId: string;
+	modalName: string;
+};
+
+const ModalConfirmComponent: React.FC<ModalConfirmComponentProps> = ({ handleCancel, channelId, clanId, modalName }) => {
+	const { handleConfirmDeleteChannel } = useChannels();
+
+	const handleDeleteChannel = () => {
+		handleConfirmDeleteChannel(channelId, clanId);
+		handleCancel();
+	};
+
+	return <ModalConfirm handleCancel={handleCancel} handleConfirm={handleDeleteChannel} title="delete" modalName={modalName} />;
+};

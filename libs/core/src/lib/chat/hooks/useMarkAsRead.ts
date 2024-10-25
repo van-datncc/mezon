@@ -193,3 +193,37 @@ function getThreadWithBadgeCount(channel: ChannelThreads) {
 
 	return getThreadsWithBadge;
 }
+
+export function useResetCountChannelBadge() {
+	const dispatch = useAppDispatch();
+
+	const resetCountChannelBadge = useCallback(
+		(channel: ChannelsEntity) => {
+			if (!channel) return;
+			const timestamp = Date.now() / 1000;
+			dispatch(
+				channelMetaActions.setChannelLastSeenTimestamp({
+					channelId: channel?.channel_id ?? '',
+					timestamp: timestamp + TIME_OFFSET
+				})
+			);
+
+			dispatch(
+				clansActions.updateClanBadgeCount({
+					clanId: channel?.clan_id ?? '',
+					count: (channel?.count_mess_unread ?? 0) * -1
+				})
+			);
+
+			dispatch(
+				channelsActions.updateChannelBadgeCount({
+					channelId: channel?.channel_id ?? '',
+					count: (channel?.count_mess_unread ?? 0) * -1
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	return resetCountChannelBadge;
+}
