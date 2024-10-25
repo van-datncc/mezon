@@ -219,6 +219,10 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 					}}
 				>
 					{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+						const messageId = messages[virtualRow.index];
+						const checkMessageTargetToMoved = idMessageToJump === messageId && messageId !== lastMessageId;
+						const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
+
 						return (
 							<div
 								key={virtualRow.index}
@@ -236,16 +240,16 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 										index={virtualRow.index}
 										avatarDM={avatarDM}
 										userName={userName}
-										key={messages[virtualRow.index]}
-										messageId={messages[virtualRow.index]}
+										key={messageId}
+										messageId={messageId}
 										previousMessageId={messages[virtualRow.index - 1]}
 										channelId={channelId}
-										isHighlight={messages[virtualRow.index] === idMessageNotified}
+										isHighlight={messageId === idMessageNotified}
 										mode={mode}
 										channelLabel={channelLabel ?? ''}
-										isLastSeen={Boolean(
-											messages[virtualRow.index] === lastMessageUnreadId && messages[virtualRow.index] !== lastMessageId
-										)}
+										isLastSeen={Boolean(messageId === lastMessageUnreadId && messageId !== lastMessageId)}
+										checkMessageTargetToMoved={checkMessageTargetToMoved}
+										messageReplyHighlight={messageReplyHighlight}
 									/>
 								</div>
 							</div>
