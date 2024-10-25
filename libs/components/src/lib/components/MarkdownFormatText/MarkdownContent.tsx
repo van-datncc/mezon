@@ -88,7 +88,7 @@ type BacktickOpt = {
 
 const SingleBacktick: React.FC<BacktickOpt> = ({ content, isLightMode, posInNotification, isInPinMsg }) => {
 	return (
-		<span className={`prose ${isLightMode ? 'single-markdown-light-mode' : 'single-markdown'} `}>
+		<span className={`prose-backtick ${isLightMode ? 'single-markdown-light-mode' : 'single-markdown'} `}>
 			<code
 				className={`${isInPinMsg && isLightMode ? 'whitespace-pre-wrap block break-words pin-msg-modeLight' : isInPinMsg && !isLightMode ? 'whitespace-pre-wrap block break-words pin-msg' : null}`}
 			>
@@ -112,8 +112,8 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ content, isLightMode, isInPinM
 	const splitContent = content?.split('```').filter(Boolean);
 
 	return (
-		<div className={`prose ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
-			<pre className={`relative p-2 ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
+		<div className={`prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
+			<pre className={`relative p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
 				<CopyToClipboard text={content ?? ''} onCopy={() => setCopied(true)}>
 					<button className={`absolute right-3 top-3 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
 						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}

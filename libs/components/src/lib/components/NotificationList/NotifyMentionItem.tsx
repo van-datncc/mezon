@@ -106,7 +106,7 @@ function MentionTabContent({ message }: IMentionTabContent) {
 					src={priorityAvatar ? priorityAvatar : message.avatar}
 				/>
 
-				<div className="h-full">
+				<div className="h-full w-full">
 					<MessageHead message={message} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
 					<MessageLine isEditted={false} content={contentUpdatedMention} isTokenClickAble={false} isJumMessageEnabled={false} />
 					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
