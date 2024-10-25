@@ -140,7 +140,7 @@ type MenuThreadStackParamList = {
 		channelThreads: ChannelThreads;
 	};
 	[APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL]: { channelThreads: ChannelThreads };
-	[APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity };
+	[APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity; isCurrentChannel: boolean };
 };
 
 export type MenuChannelStackParamList = {
