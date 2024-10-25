@@ -91,7 +91,6 @@ import {
 	StickerCreateEvent,
 	StickerDeleteEvent,
 	StickerUpdateEvent,
-	StreamPresenceEvent,
 	StreamingEndedEvent,
 	StreamingJoinedEvent,
 	StreamingLeavedEvent,
@@ -291,27 +290,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch]
 	);
 
-	const onstreampresence = useCallback(
-		(channelStreamPresence: StreamPresenceEvent) => {
-			if (channelStreamPresence.joins.length > 0) {
-				const onlineStatus = channelStreamPresence.joins.map((join) => {
-					return { userId: join.user_id, status: true };
+	const onstatuspresence = useCallback(
+		(statusPresence: StatusPresenceEvent) => {
+			if (statusPresence.joins.length > 0) {
+				const onlineStatus = statusPresence.joins.map((join) => {
+					return { userId: join.user_id, online: true, isMobile: false };
 				});
 				dispatch(usersClanActions.setManyStatusUser(onlineStatus));
 			}
-			if (channelStreamPresence.leaves.length > 0) {
-				const offlineStatus = channelStreamPresence.leaves.map((leave) => {
-					return { userId: leave.user_id, status: false };
+			if (statusPresence.leaves.length > 0) {
+				const offlineStatus = statusPresence.leaves.map((leave) => {
+					return { userId: leave.user_id, online: false, isMobile: false };
 				});
 				dispatch(usersClanActions.setManyStatusUser(offlineStatus));
 			}
-		},
-		[dispatch]
-	);
-
-	const onstatuspresence = useCallback(
-		(statusPresence: StatusPresenceEvent) => {
-			dispatch(channelMembersActions.updateStatusUser(statusPresence));
 		},
 		[dispatch]
 	);
@@ -913,8 +905,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onchannelmessage = onchannelmessage;
 
 			socket.onchannelpresence = onchannelpresence;
-
-			socket.onstreampresence = onstreampresence;
 
 			socket.ondisconnect = ondisconnect;
 
