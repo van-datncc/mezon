@@ -1,4 +1,4 @@
-import { useSearchMessages, useThreads } from '@mezon/core';
+import { useSearchMessages } from '@mezon/core';
 import {
 	appActions,
 	searchMessagesActions,
@@ -11,6 +11,7 @@ import {
 	selectIsUseProfileDM,
 	selectTheme,
 	selectValueInputSearchMessage,
+	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -35,7 +36,13 @@ type SearchMessageChannelProps = {
 const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const dispatch = useAppDispatch();
 	const { fetchSearchMessages, currentPage } = useSearchMessages();
-	const { setIsShowCreateThread } = useThreads();
+
+	const setIsShowCreateThread = useCallback(
+		(isShowCreateThread: boolean, channelId?: string) => {
+			channelId && dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId, isShowCreateThread }));
+		},
+		[dispatch]
+	);
 
 	const isActive = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);

@@ -1,13 +1,37 @@
-import { useMessageValue, useThreads } from '@mezon/core';
+import { useMessageValue } from '@mezon/core';
+import { selectCurrentChannelId, threadsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
+import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 
 type ThreadHeaderProps = {
 	threadCurrentChannel?: ApiChannelDescription | null;
 };
 
 const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
-	const { setNameValueThread, setIsShowCreateThread, setTurnOffThreadMessage } = useThreads();
+	const dispatch = useAppDispatch();
+	const currentChannelId = useSelector(selectCurrentChannelId);
+
+	const setNameValueThread = useCallback(
+		(nameValue: string) => {
+			dispatch(threadsActions.setNameValueThread({ channelId: currentChannelId as string, nameValue }));
+		},
+		[currentChannelId, dispatch]
+	);
+
+	const setIsShowCreateThread = useCallback(
+		(isShowCreateThread: boolean, channelId?: string) => {
+			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread }));
+		},
+		[currentChannelId, dispatch]
+	);
+
+	const setTurnOffThreadMessage = useCallback(() => {
+		dispatch(threadsActions.setOpenThreadMessageState(false));
+		dispatch(threadsActions.setValueThread(null));
+	}, [dispatch]);
+
 	const { setRequestInput, request } = useMessageValue();
 
 	const handleCloseModal = () => {
