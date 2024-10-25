@@ -1,20 +1,65 @@
-import { categoriesActions, selectAllCategories, selectCategoryIdSortChannel, useAppDispatch } from '@mezon/store';
+import { categoriesActions, selectAllCategories, selectCategoryIdSortChannel, selectChannelThreads, useAppDispatch } from '@mezon/store';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
-import React, { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useAppNavigation } from '../../app/hooks/useAppNavigation';
-import { useChannels } from './useChannels';
 
 export function useCategory() {
-	const { listChannels } = useChannels();
-	const categories = useSelector(selectAllCategories);
-	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const { toChannelPage, toMembersPage } = useAppNavigation();
+	const categorizedChannels = useCategorizedChannels();
+	const handleDeleteCategory = useCallback(
+		async ({ category }: { category: ICategoryChannel }) => {
+			const toChannelPage = (channelId: string, clanId: string) => {
+				if (channelId) return `/chat/clans/${clanId}/channels/${channelId}`;
+				return `/chat/clans/${clanId}`;
+			};
+			const toMembersPage = (clanId: string) => {
+				return `/chat/clans/${clanId}/member-safety`;
+			};
+			await dispatch(categoriesActions.deleteCategory({ clanId: category.clan_id as string, categoryId: category.id as string }));
+			const targetIndex = categorizedChannels.findIndex((obj) => obj.category_id === category.id);
 
-	const categorizedChannels = React.useMemo(() => {
+			let channelNavId = '';
+			if (targetIndex !== -1) {
+				if (targetIndex === 0) {
+					channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
+					if (!channelNavId) {
+						const clanPath = toMembersPage(category.clan_id ?? '');
+						navigate(clanPath);
+						return;
+					}
+				} else if (targetIndex === categorizedChannels.length - 1) {
+					channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+				} else {
+					channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
+				}
+			}
+
+			if (channelNavId && category.clan_id) {
+				const channelPath = toChannelPage(channelNavId ?? '', category.clan_id ?? '');
+				navigate(channelPath);
+				return;
+			}
+		},
+		[categorizedChannels]
+	);
+
+	return useMemo(
+		() => ({
+			categorizedChannels,
+			handleDeleteCategory
+		}),
+		[categorizedChannels, handleDeleteCategory]
+	);
+}
+
+export function useCategorizedChannels() {
+	const listChannels = useSelector(selectChannelThreads);
+	const categories = useSelector(selectAllCategories);
+	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
+
+	const categorizedChannels = useMemo(() => {
 		const results = categories.map((category) => {
 			const categoryChannels = listChannels.filter((channel) => channel && channel?.category_id === category.id) as IChannel[];
 
@@ -36,38 +81,5 @@ export function useCategory() {
 		return results as ICategoryChannel[];
 	}, [categories, listChannels, categoryIdSortChannel]);
 
-	const handleDeleteCategory = async ({ category }: { category: ICategoryChannel }) => {
-		await dispatch(categoriesActions.deleteCategory({ clanId: category.clan_id as string, categoryId: category.id as string }));
-		const targetIndex = categorizedChannels.findIndex((obj) => obj.category_id === category.id);
-
-		let channelNavId = '';
-		if (targetIndex !== -1) {
-			if (targetIndex === 0) {
-				channelNavId = categorizedChannels[targetIndex + 1]?.channels[0]?.id;
-				if (!channelNavId) {
-					const clanPath = toMembersPage(category.clan_id ?? '');
-					navigate(clanPath);
-					return;
-				}
-			} else if (targetIndex === categorizedChannels.length - 1) {
-				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
-			} else {
-				channelNavId = categorizedChannels[targetIndex - 1]?.channels[0]?.id;
-			}
-		}
-
-		if (channelNavId && category.clan_id) {
-			const channelPath = toChannelPage(channelNavId ?? '', category.clan_id ?? '');
-			navigate(channelPath);
-			return;
-		}
-	};
-
-	return useMemo(
-		() => ({
-			categorizedChannels,
-			handleDeleteCategory
-		}),
-		[categorizedChannels, handleDeleteCategory]
-	);
+	return categorizedChannels;
 }

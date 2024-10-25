@@ -1,4 +1,4 @@
-import { useAuth, useThreads } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import {
 	gifsStickerEmojiActions,
 	giveCoffeeActions,
@@ -204,7 +204,27 @@ function useReactMenuBuilder(message: IMessageWithUser) {
 function useThreadMenuBuilder(message: IMessageWithUser, isThread: boolean) {
 	const [thread, setThread] = useState(false);
 	const dispatch = useAppDispatch();
-	const { setIsShowCreateThread, setOpenThreadMessageState, setValueThread } = useThreads();
+
+	const setIsShowCreateThread = useCallback(
+		(isShowCreateThread: boolean) => {
+			dispatch(threadsActions.setIsShowCreateThread({ channelId: message.channel_id as string, isShowCreateThread }));
+		},
+		[message.channel_id, dispatch]
+	);
+
+	const setOpenThreadMessageState = useCallback(
+		(value: boolean) => {
+			dispatch(threadsActions.setOpenThreadMessageState(value));
+		},
+		[dispatch]
+	);
+
+	const setValueThread = useCallback(
+		(value: IMessageWithUser | null) => {
+			dispatch(threadsActions.setValueThread(value));
+		},
+		[dispatch]
+	);
 
 	const handleItemClick = useCallback(() => {
 		setThread(!thread);

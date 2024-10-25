@@ -1,5 +1,6 @@
 import {
 	ApiChannelMessageHeaderWithChannel,
+	ChannelThreads,
 	checkIsThread,
 	ICategory,
 	IChannel,
@@ -34,7 +35,7 @@ import { overriddenPoliciesActions } from '../policies/overriddenPolicies.slice'
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import { RootState } from '../store';
-import { threadsActions } from '../threads/threads.slice';
+import { selectListThreadId, threadsActions } from '../threads/threads.slice';
 import { channelMetaActions, ChannelMetaEntity, enableMute } from './channelmeta.slice';
 import { fetchListChannelsByUser } from './channelUser.slice';
 
@@ -64,7 +65,7 @@ export const mapChannelToEntity = (channelRes: ApiChannelDescription) => {
 		...channelRes,
 		id: channelRes.channel_id || '',
 		status: channelRes.meeting_code ? 1 : 0,
-		badgeCount: channelRes.count_mess_unread ? channelRes.count_mess_unread : 0
+		count_mess_unread: channelRes.count_mess_unread ? channelRes.count_mess_unread : 0
 	};
 };
 
@@ -615,12 +616,15 @@ export const channelsSlice = createSlice({
 			const { channelId, count, isReset = false } = action.payload;
 			const entity = state.entities[channelId];
 			if (entity) {
-				channelsAdapter.updateOne(state, {
-					id: channelId,
-					changes: {
-						count_mess_unread: isReset ? 0 : (entity.count_mess_unread ?? 0) + count
-					}
-				});
+				const newCountMessUnread = isReset ? 0 : (entity.count_mess_unread ?? 0) + count;
+				if (entity.count_mess_unread !== newCountMessUnread) {
+					channelsAdapter.updateOne(state, {
+						id: channelId,
+						changes: {
+							count_mess_unread: newCountMessUnread
+						}
+					});
+				}
 			}
 		}
 	},
@@ -877,4 +881,26 @@ export const selectAnyUnreadChannels = createSelector([getChannelsState, selectE
 
 export const selectThreadNotJoin = createSelector([getChannelsState, (state, id: string) => id], (state, id: string) => {
 	return state.threadsNotJoinedByUser.entities[id];
+});
+
+export const selectThreadCurrentChannel = createSelector(
+	[selectChannelsEntities, selectCurrentChannelId, selectListThreadId],
+	(channels, currentChannelId, listThreadId) => {
+		if (listThreadId && currentChannelId && listThreadId[currentChannelId]) {
+			return channels[listThreadId[currentChannelId]];
+		}
+		return undefined;
+	}
+);
+
+export const selectChannelThreads = createSelector([selectAllChannels], (channels) => {
+	const channelFilter = channels.filter((channel) => channel.parrent_id === '0' || channel.parrent_id === '');
+	const channelThread = channelFilter.map((channel) => {
+		const thread = channels.filter((thread) => channel && channel?.channel_id === thread.parrent_id) as ChannelsEntity[];
+		return {
+			...channel,
+			threads: thread
+		};
+	});
+	return channelThread as ChannelThreads[];
 });

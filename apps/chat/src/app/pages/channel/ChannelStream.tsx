@@ -2,6 +2,8 @@ import { AvatarImage } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import {
 	appActions,
+	selectCurrentChannel,
+	selectCurrentClan,
 	selectIsShowChatStream,
 	selectMemberClanByGoogleId,
 	selectMemberClanByUserId,
@@ -16,6 +18,7 @@ import { Icons } from '@mezon/ui';
 import { IChannelMember, IStreamInfo, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import Hls from 'hls.js';
+import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -361,6 +364,26 @@ export default function ChannelStream({ hlsUrl, memberJoin, currentStreamInfo, c
 	const [showMembersButton, setShowMembersButton] = useState(true);
 	const hideButtonsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
+
+	const channel = useSelector(selectCurrentChannel);
+	const currentClan = useSelector(selectCurrentClan);
+
+	useEffect(() => {
+		if (!channel || !currentClan || !currentStreamInfo) return;
+		if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) return;
+		if (currentStreamInfo.streamId !== channel.id || (!streamPlay && currentStreamInfo?.streamId === channel.id)) {
+			dispatch(
+				videoStreamActions.startStream({
+					clanId: currentClan.id || '',
+					clanName: currentClan.clan_name || '',
+					streamId: channel.channel_id || '',
+					streamName: channel.channel_label || '',
+					parentId: channel.parrent_id || ''
+				})
+			);
+			dispatch(appActions.setIsShowChatStream(false));
+		}
+	}, [channel, currentStreamInfo, currentClan]);
 
 	const handleLeaveChannel = async () => {
 		if (currentStreamInfo) {

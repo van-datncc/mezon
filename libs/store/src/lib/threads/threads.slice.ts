@@ -1,10 +1,10 @@
-import { channelMembersActions } from '@mezon/store';
 import { IMessageWithUser, IThread, LoadingStatus, sortChannelsByLastActivity, ThreadStatus, TypeCheck } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
 import memoizee from 'memoizee';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
+import { channelMembersActions } from '../channelmembers/channel.members';
 import { fetchChannels } from '../channels/channels.slice';
 import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 const LIST_THREADS_CACHED_TIME = 1000 * 60 * 3;
@@ -313,10 +313,9 @@ export const selectNameValueThread = (channelId: string) =>
 		return state.nameValueThread?.[channelId] as string;
 	});
 
-export const selectIsShowCreateThread = (channelId: string) =>
-	createSelector(getThreadsState, (state) => {
-		return state.isShowCreateThread?.[channelId] as boolean;
-	});
+export const selectIsShowCreateThread = createSelector([getThreadsState, (_, channelId: string) => channelId], (state, channelId) => {
+	return !!state.isShowCreateThread?.[channelId];
+});
 // new update
 
 export const selectActiveThreads = createSelector([selectAllThreads], (threads) => {

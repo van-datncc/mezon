@@ -1,6 +1,14 @@
 import { CustomModalMentions, ModalDeleteMess, SuggestItem, UserMentionList, useProcessMention } from '@mezon/components';
-import { useChannelMembers, useChannels, useEditMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { ChannelMembersEntity, selectAllHashtagDm, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
+import { useChannelMembers, useEditMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
+import {
+	ChannelMembersEntity,
+	selectAllChannels,
+	selectAllHashtagDm,
+	selectAllRolesClan,
+	selectChannelDraftMessage,
+	selectTheme,
+	useAppSelector
+} from '@mezon/store';
 import {
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -59,8 +67,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	};
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
-
-	const { channels } = useChannels();
+	const channels = useSelector(selectAllChannels);
 
 	const listChannelsMention = useMemo(() => {
 		if (mode !== ChannelStreamMode.STREAM_MODE_GROUP && mode !== ChannelStreamMode.STREAM_MODE_DM) {

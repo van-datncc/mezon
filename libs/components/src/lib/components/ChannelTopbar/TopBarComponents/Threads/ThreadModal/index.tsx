@@ -1,4 +1,4 @@
-import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference, useThreads } from '@mezon/core';
+import { useAppNavigation, useEscapeKeyClose, useOnClickOutside, usePermissionChecker, useReference } from '@mezon/core';
 import {
 	ThreadsEntity,
 	hasGrandchildModal,
@@ -15,7 +15,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { EOverriddenPermission } from '@mezon/utils';
 import { Button } from 'flowbite-react';
-import { RefObject, useRef } from 'react';
+import { RefObject, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import EmptyThread from './EmptyThread';
@@ -32,7 +32,12 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { toChannelPage } = useAppNavigation();
-	const { setIsShowCreateThread } = useThreads();
+	const setIsShowCreateThread = useCallback(
+		(isShowCreateThread: boolean, channelId?: string) => {
+			channelId && dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId, isShowCreateThread }));
+		},
+		[dispatch]
+	);
 
 	const { setOpenThreadMessageState } = useReference();
 	const currentChannel = useSelector(selectCurrentChannel);

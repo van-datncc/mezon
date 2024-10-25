@@ -1,9 +1,10 @@
-import { useAppNavigation, useCategory } from '@mezon/core';
-import { selectAllChannelsFavorite, selectChannelById, selectCurrentClan, selectIsShowEmptyCategory, selectTheme } from '@mezon/store';
+import { useAppNavigation, useCategorizedChannels, usePathMatch } from '@mezon/core';
+import { selectAllChannelsFavorite, selectChannelById, selectCurrentClan, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, ICategoryChannel } from '@mezon/utils';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChannelType } from 'mezon-js';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
 import CategorizedChannels from './CategorizedChannels';
@@ -13,24 +14,12 @@ export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
-	const { categorizedChannels } = useCategory();
 	const appearanceTheme = useSelector(selectTheme);
 	const currentClan = useSelector(selectCurrentClan);
-	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
-	const channelFavorites = useSelector(selectAllChannelsFavorite);
-	const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
-	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
-	const memoizedCategorizedChannels = useMemo(() => {
-		return categorizedChannels.map((category: ICategoryChannel) => {
-			if (!isShowEmptyCategory && category.channels.length === 0) {
-				return null;
-			}
-			return <CategorizedChannels key={category.id} category={category} channelRefs={channelRefs} />;
-		});
-	}, [categorizedChannels, isShowEmptyCategory]);
-	const handleExpandFavoriteChannel = () => {
-		setIsExpandFavorite(!isExpandFavorite);
-	};
+	const memberPath = `/chat/clans/${currentClan?.id}/member-safety`;
+	const channelSettingPath = `/chat/clans/${currentClan?.id}/channel-setting`;
+
+	const { isMemberPath, isSettingPath } = usePathMatch({ isMemberPath: memberPath, isSettingPath: channelSettingPath });
 
 	return (
 		<div
@@ -46,34 +35,134 @@ function ChannelList() {
 				</div>
 			)}
 			<div className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
-				<Events />
+				<Events isMemberPath={isMemberPath} isSettingPath={isSettingPath} />
 			</div>
 			<hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
 			<div className={`overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide`}>
-				<div>
-					<div
-						className="dark:text-channelTextLabel text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold px-2"
-						onClick={handleExpandFavoriteChannel}
-					>
-						{isExpandFavorite ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
-						<span className="one-line">Favorite channel</span>
-					</div>
-					{isExpandFavorite ? (
-						<div className="w-[94%] mx-auto">
-							{channelFavorites
-								? channelFavorites.map((id, index) => (
-										<FavoriteChannel key={index} channelId={id} channelRef={channelRefs.current[id]} />
-									))
-								: ''}
-						</div>
-					) : null}
-				</div>
-				{memoizedCategorizedChannels}
+				<RowVirtualizerDynamic hasBanner={!!currentClan?.banner} appearanceTheme={appearanceTheme} />
 			</div>
 		</div>
 	);
 }
 
+const RowVirtualizerDynamic = memo(({ hasBanner, appearanceTheme }: { hasBanner: boolean; appearanceTheme: string }) => {
+	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
+	const categorizedChannels = useCategorizedChannels();
+	const data = useMemo(() => [{ type: 'favorites' }, ...categorizedChannels], [categorizedChannels]) as ICategoryChannel[];
+	const parentRef = useRef<HTMLDivElement>(null);
+	const count = data.length;
+	const bannerHeight = 136;
+	const outsideHeight = 234 + (hasBanner ? bannerHeight : 0);
+	console.log(outsideHeight, 'outsideHeight');
+	const [height, setHeight] = useState(window.innerHeight - outsideHeight);
+	const virtualizer = useVirtualizer({
+		count,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 45
+	});
+
+	const items = virtualizer.getVirtualItems();
+
+	useEffect(() => {
+		const handleResize = () => setHeight(window.innerHeight - outsideHeight);
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, [outsideHeight]);
+
+	const channelFavorites = useSelector(selectAllChannelsFavorite);
+	const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
+
+	const handleExpandFavoriteChannel = () => {
+		setIsExpandFavorite(!isExpandFavorite);
+	};
+
+	return (
+		<div
+			ref={parentRef}
+			style={{
+				height: height,
+				overflowY: 'auto',
+				contain: 'strict'
+			}}
+			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+		>
+			<div
+				style={{
+					height: virtualizer.getTotalSize(),
+					width: '100%',
+					position: 'relative'
+				}}
+			>
+				<div
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						width: '100%',
+						transform: `translateY(${items[0]?.start ?? 0}px)`
+					}}
+				>
+					{items.map((virtualRow) => {
+						const item = data[virtualRow.index];
+						if (virtualRow.index === 0) {
+							return (
+								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+									<FavoriteChannelsSection
+										isExpandFavorite={isExpandFavorite}
+										handleExpandFavoriteChannel={handleExpandFavoriteChannel}
+										channelFavorites={channelFavorites}
+										channelRefs={channelRefs}
+									/>
+								</div>
+							);
+						} else {
+							return (
+								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+									<div style={{ padding: '10px 0' }}>
+										<div>
+											<CategorizedChannels key={item.id} category={item} channelRefs={channelRefs} />
+										</div>
+									</div>
+								</div>
+							);
+						}
+					})}
+				</div>
+			</div>
+		</div>
+	);
+});
+
+const FavoriteChannelsSection = ({
+	isExpandFavorite,
+	handleExpandFavoriteChannel,
+	channelFavorites,
+	channelRefs
+}: {
+	isExpandFavorite: boolean;
+	handleExpandFavoriteChannel: () => void;
+	channelFavorites: string[];
+	channelRefs: React.RefObject<Record<string, ChannelListItemRef | null>>;
+}) => (
+	<div>
+		<div
+			className="dark:text-channelTextLabel text-colorTextLightMode flex items-center px-0.5 w-full font-title tracking-wide dark:hover:text-gray-100 hover:text-black uppercase text-sm font-semibold px-2"
+			onClick={handleExpandFavoriteChannel}
+		>
+			{isExpandFavorite ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
+			<span className="one-line">Favorite channel</span>
+		</div>
+		{isExpandFavorite ? (
+			<div className="w-[94%] mx-auto">
+				{channelFavorites
+					? channelFavorites.map((id, index) => (
+							<FavoriteChannel key={index} channelId={id} channelRef={channelRefs?.current?.[id] || null} />
+						))
+					: ''}
+			</div>
+		) : null}
+	</div>
+);
 type FavoriteChannelProps = {
 	channelId: string;
 	channelRef: ChannelListItemRef | null;
@@ -121,4 +210,4 @@ const FavoriteChannel = ({ channelId, channelRef }: FavoriteChannelProps) => {
 		</div>
 	);
 };
-export default memo(ChannelList);
+export default memo(ChannelList, () => true);

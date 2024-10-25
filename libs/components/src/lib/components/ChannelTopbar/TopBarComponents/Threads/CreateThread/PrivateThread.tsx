@@ -1,6 +1,6 @@
-import { useThreads } from '@mezon/core';
-import { threadsActions, useAppDispatch } from '@mezon/store';
+import { selectIsPrivate, threadsActions, useAppDispatch } from '@mezon/store';
 import { Checkbox, Label } from 'flowbite-react';
+import { useSelector } from 'react-redux';
 
 type PrivateThreadProps = {
 	label?: string;
@@ -9,7 +9,7 @@ type PrivateThreadProps = {
 
 const PrivateThread = ({ label, title }: PrivateThreadProps) => {
 	const dispatch = useAppDispatch();
-	const { isPrivate } = useThreads();
+	const isPrivate = useSelector(selectIsPrivate);
 
 	const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.checked ? 1 : 0;

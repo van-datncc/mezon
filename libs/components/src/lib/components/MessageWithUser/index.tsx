@@ -47,7 +47,7 @@ export type MessageWithUserProps = {
 	isHighlight?: boolean;
 	editor?: JSX.Element;
 	onContextMenu?: (event: React.MouseEvent<HTMLParagraphElement>) => void;
-	popup?: JSX.Element;
+	popup?: () => ReactNode;
 	isSearchMessage?: boolean;
 	allowDisplayShortProfile: boolean;
 	isCombine?: boolean;
@@ -307,7 +307,7 @@ function MessageDateDivider({ message }: { message: MessagesEntity }) {
 
 interface HoverStateWrapperProps {
 	children: ReactNode;
-	popup?: ReactNode;
+	popup?: () => ReactNode;
 }
 
 const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }) => {
@@ -319,7 +319,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }
 	return (
 		<div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
 			{children}
-			{isHover && popup}
+			{isHover && popup && popup()}
 		</div>
 	);
 };
