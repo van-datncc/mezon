@@ -49,15 +49,18 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSe
 		}
 	};
 
-	const handleChangePageSize = async (pageSize: number) => {
-		setPageSize(pageSize);
+	const handleChangePageSize = async (pageSizeChange: number) => {
+		if (pageSizeChange === pageSize) {
+			return;
+		}
+		setPageSize(pageSizeChange);
 		setCurrentPage(1);
-		if (listChannel.length < pageSize) {
+		if (listChannel.length < pageSizeChange) {
 			await dispatch(
 				channelSettingActions.fetchChannelSettingInClan({
 					clanId,
 					parentId: '0',
-					limit: pageSize,
+					limit: pageSizeChange,
 					typeFetch: ETypeFetchChannelSetting.MORE_CHANNEL
 				})
 			);
