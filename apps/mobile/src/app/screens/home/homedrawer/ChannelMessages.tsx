@@ -96,6 +96,12 @@ const ChannelMessages = React.memo(
 		}, []);
 
 		useEffect(() => {
+			if (flatListRef?.current && channelId) {
+				flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
+			}
+		}, [channelId]);
+
+		useEffect(() => {
 			if (idMessageToJump && isMessageExist) {
 				const indexToJump = messages?.findIndex?.((message: { id: string }) => message.id === idMessageToJump);
 				if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
