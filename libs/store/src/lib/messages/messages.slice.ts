@@ -436,6 +436,7 @@ type SendMessagePayload = {
 	isPublic: boolean;
 	avatar?: string;
 	isMobile?: boolean;
+	username?: string;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
@@ -452,7 +453,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		clanId,
 		senderId,
 		avatar,
-		isMobile = false
+		isMobile = false,
+		username
 	} = payload;
 	const id = Date.now().toString();
 
@@ -523,7 +525,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			attachments,
 			create_time: new Date().toISOString(),
 			sender_id: senderId,
-			username: '',
+			username: username || '',
 			avatar: avatar,
 			isSending: true,
 			references: [],

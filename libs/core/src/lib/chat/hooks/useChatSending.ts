@@ -56,7 +56,8 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 					mentionEveryone,
 					senderId: currentUserId,
 					avatar: userProfile?.user?.avatar_url,
-					isMobile
+					isMobile,
+					username: userProfile?.user?.display_name
 				})
 			);
 		},
