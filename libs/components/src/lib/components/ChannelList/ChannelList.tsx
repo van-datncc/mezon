@@ -53,7 +53,6 @@ const RowVirtualizerDynamic = memo(({ hasBanner, appearanceTheme }: { hasBanner:
 	const count = data.length;
 	const bannerHeight = 136;
 	const outsideHeight = 234 + (hasBanner ? bannerHeight : 0);
-	console.log(outsideHeight, 'outsideHeight');
 	const [height, setHeight] = useState(window.innerHeight - outsideHeight);
 	const virtualizer = useVirtualizer({
 		count,
