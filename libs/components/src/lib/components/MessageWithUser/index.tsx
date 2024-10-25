@@ -1,13 +1,5 @@
 import { useAuth } from '@mezon/core';
-import {
-	MessagesEntity,
-	selectDataReferences,
-	selectIdMessageToJump,
-	selectJumpPinMessageId,
-	selectLastMessageIdByChannelId,
-	selectMemberClanByUserId,
-	useAppSelector
-} from '@mezon/store';
+import { MessagesEntity, selectJumpPinMessageId, selectMemberClanByUserId, useAppSelector } from '@mezon/store';
 import {
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
@@ -53,12 +45,13 @@ export type MessageWithUserProps = {
 	isCombine?: boolean;
 	showDivider?: boolean;
 	channelLabel?: string;
+	checkMessageTargetToMoved?: boolean;
+	messageReplyHighlight?: boolean;
 };
 
 function MessageWithUser({
 	message,
 	mode,
-	editor,
 	isMention,
 	onContextMenu,
 	isEditing,
@@ -66,10 +59,11 @@ function MessageWithUser({
 	popup,
 	isShowFull,
 	isSearchMessage,
-	allowDisplayShortProfile,
 	isCombine,
 	showDivider,
-	channelLabel
+	channelLabel,
+	checkMessageTargetToMoved,
+	messageReplyHighlight
 }: Readonly<MessageWithUserProps>) {
 	const userLogin = useAuth();
 	const userId = userLogin?.userId;
@@ -77,7 +71,6 @@ function MessageWithUser({
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 	const shortUserId = useRef('');
 	const checkAnonymous = message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
-	const dataReferences = useSelector(selectDataReferences(message?.channel_id ?? ''));
 
 	const modalState = useRef({
 		profileItem: false
@@ -86,11 +79,7 @@ function MessageWithUser({
 	// Computed values
 
 	const checkReplied = message?.references && message?.references[0]?.message_sender_id === userId;
-	const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === message?.id) || false;
-	const idMessageToJump = useSelector(selectIdMessageToJump);
-	const lastMessageId = useAppSelector((state) => selectLastMessageIdByChannelId(state, message?.channel_id ?? ''));
 
-	const checkMessageTargetToMoved = idMessageToJump === message.id && message.id !== lastMessageId;
 	const attachments = message.attachments ?? [];
 	const hasFailedAttachment = attachments.length === 1 && attachments[0].filename === 'failAttachment' && attachments[0].filetype === 'unknown';
 	const isMeMessage = message.isMe;

@@ -52,4 +52,4 @@ const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
 	);
 };
 
-export default memo(MessageHead, (prev, cur) => prev.message?.id === cur.message?.id);
+export default memo(MessageHead, (prev, cur) => prev.message?.id === cur.message?.id && prev.message?.sender_id === cur.message?.sender_id);

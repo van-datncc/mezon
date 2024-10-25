@@ -53,14 +53,6 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				</button>
 				<br />
 				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-					Family Center
-				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-					Family Center
-				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Authorized Apps
 				</button>
 				<br />
@@ -70,10 +62,6 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				<br />
 				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 					Connections
-				</button>
-				<br />
-				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-					Clips
 				</button>
 				<br />
 				<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
