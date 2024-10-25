@@ -345,3 +345,5 @@ See: https://github.com/electron/electron/issues/3331
 -   3, Open Chrome and navigate to `chrome://inspect`
 -   4, Click on `Configure...` and add `localhost:8315` to the list
 -   5, Click on `inspect` to open the DevTools
+
+# Auto Update
