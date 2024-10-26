@@ -1,21 +1,27 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { Icons } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { ENotificationActive, ENotificationChannelId, Icons, UserMinus } from '@mezon/mobile-components';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
 	deleteChannel,
 	directActions,
 	fetchDirectMessage,
+	notificationSettingActions,
 	removeMemberChannel,
+	selectCurrentClan,
 	selectCurrentUserId,
+	selectSelectedChannelNotificationSetting,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import { memo, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonConfirm, MezonMenu, reserve } from '../../../../../componentUI';
+import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { style } from './styles';
 
 interface IServerMenuProps {
@@ -29,6 +35,19 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 	const [isVisibleLeaveGroupModal, setIsVisibleLeaveGroupModal] = useState<boolean>(false);
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
+	const navigation = useNavigation<any>();
+	const currentClan = useSelector(selectCurrentClan);
+	useEffect(() => {
+		dispatch(notificationSettingActions.getNotificationSetting({ channelId: messageInfo?.channel_id }));
+	}, []);
+
+	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
+
+	const isDmUnmute = useMemo(() => {
+		return (
+			getNotificationChannelSelected?.active === ENotificationActive.ON || getNotificationChannelSelected?.id === ENotificationChannelId.Default
+		);
+	}, [getNotificationChannelSelected]);
 
 	const { dismiss } = useBottomSheetModal();
 
@@ -55,7 +74,8 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		{
 			onPress: () => reserve(),
 			title: t('menu.profile'),
-			isShow: !isGroup
+			isShow: !isGroup,
+			icon: <Icons.UserBoxIcon color={baseColor.gray} />
 		},
 		{
 			onPress: async () => {
@@ -63,33 +83,61 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 				dismiss();
 			},
 			title: t('menu.closeDm'),
-			isShow: !isGroup
+			isShow: !isGroup,
+			icon: <UserMinus color={baseColor.gray} />
 		}
 	];
 
 	const markAsReadMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
-			title: t('menu.markAsRead')
+			title: t('menu.markAsRead'),
+			icon: <Icons.EyeIcon color={baseColor.gray} />
 		}
 	];
 
 	const favoriteMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => reserve(),
-			title: t('menu.favorite')
+			title: t('menu.favorite'),
+			icon: <Icons.FavoriteFilledIcon color={baseColor.gray} />
 		}
 	];
 
+	const muteOrUnMuteChannel = (active: ENotificationActive) => {
+		const body = {
+			channel_id: messageInfo?.channel_id || '',
+			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
+			clan_id: currentClan?.clan_id || '',
+			active
+		};
+		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+	};
+
 	const optionsMenu: IMezonMenuItemProps[] = [
 		{
-			onPress: () => reserve(),
-			title: t('menu.muteConversation')
-		},
-		{
-			onPress: () => reserve(),
-			title: t('menu.notificationSettings')
+			title: isDmUnmute ? t('menu.muteConversation') : t('menu.unMuteConversation'),
+			onPress: () => {
+				if (!isDmUnmute) {
+					muteOrUnMuteChannel(ENotificationActive.ON);
+				} else {
+					navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
+						screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL,
+						params: { currentChannel: messageInfo, isCurrentChannel: false }
+					});
+				}
+				dismiss();
+			},
+			icon: isDmUnmute ? (
+				<Icons.BellSlashIcon color={themeValue.textStrong} />
+			) : (
+				<Icons.BellIcon width={22} height={22} color={themeValue.text} />
+			)
 		}
+		// {
+		// 	onPress: () => reserve(),
+		// 	title: t('menu.notificationSettings')
+		// }
 	];
 
 	const menu: IMezonMenuSectionProps[] = [

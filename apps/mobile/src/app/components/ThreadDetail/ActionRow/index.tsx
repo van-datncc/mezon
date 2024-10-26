@@ -63,7 +63,7 @@ export const ActionRow = React.memo(() => {
 			action: () => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
 					screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL,
-					params: { currentChannel }
+					params: { currentChannel, isCurrentChannel: true }
 				});
 			},
 			isShow: true,
