@@ -1,6 +1,6 @@
 import {
+	ETypeFetchChannelSetting,
 	channelSettingActions,
-	selectChannelSuggestionEntities,
 	selectMemberClanByGoogleId,
 	selectMemberClanByUserId,
 	selectThreadsListByParentId,
@@ -28,7 +28,7 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSe
 	const [channelSettingId, setChannelSettingId] = useState('');
 	const parentRef = useRef(null);
 	const dispatch = useAppDispatch();
-	const listChannelEntities = useSelector(selectChannelSuggestionEntities);
+
 	// const selectClanId = useSelector(selectCurrentClanId);
 
 	const [currentPage, setCurrentPage] = useState(1);
@@ -36,16 +36,34 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSe
 
 	const onPageChange = async (page: number) => {
 		setCurrentPage(page);
-		if (currentPage * pageSize > listChannel.length && countChannel && listChannel.length < countChannel) {
-			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId, parentId: '0', page, limit: pageSize, noCache: true }));
+		if (page * pageSize > listChannel.length && countChannel && listChannel.length < countChannel) {
+			await dispatch(
+				channelSettingActions.fetchChannelSettingInClan({
+					clanId,
+					parentId: '0',
+					page,
+					limit: pageSize,
+					typeFetch: ETypeFetchChannelSetting.MORE_CHANNEL
+				})
+			);
 		}
 	};
 
-	const handleChangePageSize = async (pageSize: number) => {
-		setPageSize(pageSize);
+	const handleChangePageSize = async (pageSizeChange: number) => {
+		if (pageSizeChange === pageSize) {
+			return;
+		}
+		setPageSize(pageSizeChange);
 		setCurrentPage(1);
-		if (listChannel.length < pageSize) {
-			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId, parentId: '0', limit: pageSize, noCache: true }));
+		if (listChannel.length < pageSizeChange) {
+			await dispatch(
+				channelSettingActions.fetchChannelSettingInClan({
+					clanId,
+					parentId: '0',
+					limit: pageSizeChange,
+					typeFetch: ETypeFetchChannelSetting.MORE_CHANNEL
+				})
+			);
 		}
 	};
 
@@ -67,7 +85,7 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel }: ListChannelSe
 				<span className="flex-1">Last Sent</span>
 				<span className="pr-1">Creator</span>
 			</div>
-			<AnchorScroll anchorId={clanId} ref={parentRef}>
+			<AnchorScroll anchorId={clanId} ref={parentRef} className={['hide-scrollbar']} classNameChild={['!justify-start']}>
 				{listChannel.slice(pageSize * (currentPage - 1), pageSize * (currentPage - 1) + pageSize).map((channel) => (
 					<RenderChannelAndThread
 						channelParrent={channel}
@@ -131,19 +149,22 @@ interface IRenderChannelAndThread {
 
 const RenderChannelAndThread = ({ channelParrent, clanId, currentPage, pageSize }: IRenderChannelAndThread) => {
 	const dispatch = useAppDispatch();
+	const threadsList = useSelector(selectThreadsListByParentId(channelParrent.id as string));
+
 	const handleFetchThreads = () => {
-		dispatch(
-			channelSettingActions.fetchChannelSettingInClan({
-				clanId,
-				parentId: channelParrent.id as string,
-				page: currentPage,
-				limit: pageSize,
-				isFetchingThread: true
-			})
-		);
+		if (!threadsList) {
+			dispatch(
+				channelSettingActions.fetchChannelSettingInClan({
+					clanId,
+					parentId: channelParrent.id as string,
+					page: currentPage,
+					limit: pageSize,
+					typeFetch: ETypeFetchChannelSetting.FETCH_THREAD
+				})
+			);
+		}
 	};
 
-	const threadsList = useSelector(selectThreadsListByParentId(channelParrent.id as string));
 	const [showThreadsList, setShowThreadsList] = useState(false);
 
 	const toggleThreadsList = () => {
