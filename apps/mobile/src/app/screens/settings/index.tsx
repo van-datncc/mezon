@@ -118,7 +118,11 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				// 	icon: <Icons.FriendIcon color={themeValue.textStrong} />,
 				// },
 				{
-					onPress: () => reserve(),
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+							screen: APP_SCREEN.SETTINGS.QR_SCANNER
+						});
+					},
 					expandable: true,
 					title: t('accountSettings.QRScan'),
 					icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />
