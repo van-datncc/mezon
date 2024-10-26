@@ -120,7 +120,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 						{mezonJoinTime ? mezonJoinTime + ' ago' : '-'}
 					</span>
 				</div>
-				<div className="flex-1 p-1 text-center">
+				<div className="flex-2 p-1 text-center">
 					<span className={'inline-flex items-center'}>
 						{userRolesClan?.length ? (
 							<>
@@ -175,7 +175,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 						)}
 					</span>
 				</div>
-				<div className="flex-3 p-1 text-center">
+				<div className="flex-1 p-1 text-center">
 					<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">Signals</span>
 				</div>
 			</div>
