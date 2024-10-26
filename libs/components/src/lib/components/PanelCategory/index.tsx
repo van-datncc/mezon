@@ -33,7 +33,7 @@ interface IPanelCategoryProps {
 	coords: Coords;
 	category?: ICategoryChannel;
 	onDeleteCategory?: () => void;
-	setIsShowPanelChannel: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsShowPanelChannel: () => void;
 	setOpenSetting: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -59,7 +59,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 
 	const handleOpenSetting = () => {
 		setOpenSetting(true);
-		setIsShowPanelChannel(false);
+		setIsShowPanelChannel();
 	};
 
 	const handleChangeSettingType = (notificationType: number) => {
@@ -128,7 +128,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 	}, [defaultCategoryNotificationSetting]);
 
 	const handClosePannel = useCallback(() => {
-		setIsShowPanelChannel(false);
+		setIsShowPanelChannel();
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
@@ -137,7 +137,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({ coords, category, onDele
 	const { handleMarkAsReadCategory, statusMarkAsReadCategory } = useMarkAsRead();
 	useEffect(() => {
 		if (statusMarkAsReadCategory === 'success' || statusMarkAsReadCategory === 'error') {
-			setIsShowPanelChannel(false);
+			setIsShowPanelChannel();
 		}
 	}, [statusMarkAsReadCategory]);
 

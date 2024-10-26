@@ -29,6 +29,12 @@ export const initialSettingClanChannelState: SettingClanChannelState = channelSe
 	threadsByChannel: {}
 });
 
+export enum ETypeFetchChannelSetting {
+	FETCH_CHANNEL = 'FETCH_CHANNEL',
+	MORE_CHANNEL = 'MORE_CHANNEL',
+	FETCH_THREAD = 'FETCH_THREAD'
+}
+
 export const fetchChannelSettingInClanCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, clanId: string, parentId: string, page: number, limit: number) => {
 		const response = await mezon.client.getChannelSettingInClan(
@@ -49,7 +55,7 @@ export const fetchChannelSettingInClanCached = memoizeAndTrack(
 		promise: true,
 		maxAge: CHANNEL_SETTING_CLAN_CACHE_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[0]?.session?.username || '';
+			return args[4] + args[3] + args[1] + args[2] + args[0]?.session?.username || '';
 		}
 	}
 );
@@ -60,12 +66,12 @@ interface IFetchChannelSetting {
 	parentId: string;
 	page?: number;
 	limit?: number;
-	isFetchingThread?: boolean;
+	typeFetch: ETypeFetchChannelSetting;
 }
 
 export const fetchChannelSettingInClan = createAsyncThunk(
 	'channelSetting/fetchClanChannelSetting',
-	async ({ noCache = false, clanId, parentId, page = 1, limit = 10, isFetchingThread }: IFetchChannelSetting, thunkAPI) => {
+	async ({ noCache = false, clanId, parentId, page = 1, limit = 10, typeFetch }: IFetchChannelSetting, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
@@ -77,7 +83,7 @@ export const fetchChannelSettingInClan = createAsyncThunk(
 				return {
 					parentId: parentId,
 					response: response,
-					isFetchingThread: isFetchingThread
+					typeFetch
 				};
 			}
 			throw new Error('Emoji list is undefined or null');
@@ -95,13 +101,21 @@ export const settingClanChannelSlice = createSlice({
 		builder
 			.addCase(fetchChannelSettingInClan.fulfilled, (state: SettingClanChannelState, actions) => {
 				state.loadingStatus = 'loaded';
-				if (actions.payload.isFetchingThread) {
-					state.threadsByChannel[actions.payload.parentId] = actions.payload.response.channel_setting_list || [];
-				} else {
-					channelSettingAdapter.setAll(state, actions.payload.response.channel_setting_list || []);
-					state.channelCount = actions.payload?.response.channel_count || 0;
-					state.threadCount = actions.payload?.response.thread_count || 0;
+				switch (actions.payload.typeFetch) {
+					case ETypeFetchChannelSetting.FETCH_CHANNEL:
+						channelSettingAdapter.setAll(state, actions.payload.response.channel_setting_list || []);
+						break;
+					case ETypeFetchChannelSetting.MORE_CHANNEL:
+						channelSettingAdapter.setMany(state, actions.payload.response.channel_setting_list || []);
+						break;
+					case ETypeFetchChannelSetting.FETCH_THREAD:
+						state.threadsByChannel[actions.payload.parentId] = actions.payload.response.channel_setting_list || [];
+						break;
+					default:
+						channelSettingAdapter.setAll(state, actions.payload.response.channel_setting_list || []);
 				}
+				state.channelCount = actions.payload.response.channel_count || 0;
+				state.threadCount = actions.payload.response.thread_count || 0;
 			})
 			.addCase(fetchChannelSettingInClan.pending, (state: SettingClanChannelState) => {
 				state.loadingStatus = 'loading';

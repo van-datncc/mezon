@@ -116,12 +116,13 @@ export const fetchChannelMembersPresence = createAsyncThunk(
 		if (channelPresence.joins.length > 0) {
 			const joinUser = channelPresence.joins[0];
 			const userId = joinUser.user_id;
+			const isMobile = joinUser.is_mobile;
 			const channelId = channelPresence.channel_id;
 			const state = thunkAPI.getState() as ChannelMemberRootState;
 			const existingMember = state[CHANNEL_MEMBERS_FEATURE_KEY].memberChannels[channelId]?.ids?.findIndex((item) => item === userId);
 			if (!existingMember) {
 				thunkAPI.dispatch(channelMembersActions.addNewMember(channelPresence));
-				thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: true }));
+				thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: true, isMobile: isMobile }));
 				thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: joinUser.status ?? '' }));
 			}
 		}
@@ -132,14 +133,16 @@ export const updateStatusUser = createAsyncThunk('channelMembers/fetchUserStatus
 	if (statusPresence?.leaves?.length) {
 		for (const leave of statusPresence.leaves) {
 			const userId = leave.user_id;
-			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: false }));
+			const isMobile = leave.is_mobile;
+			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: false, isMobile: isMobile }));
 			thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: leave.status }));
 		}
 	}
 	if (statusPresence?.joins?.length) {
 		for (const join of statusPresence.joins) {
 			const userId = join.user_id;
-			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, status: true }));
+			const isMobile = join.is_mobile;
+			thunkAPI.dispatch(channelMembersActions.setStatusUser({ userId, online: true, isMobile: isMobile }));
 			thunkAPI.dispatch(channelMembersActions.setCustomStatusUser({ userId, customStatus: join.status }));
 		}
 	}
@@ -204,7 +207,8 @@ export const initialChannelMembersState: ChannelMembersState = channelMembersAda
 
 export type StatusUserArgs = {
 	userId: string;
-	status: boolean;
+	online: boolean;
+	isMobile: boolean;
 };
 
 export type CustomStatusUserArgs = {
@@ -239,7 +243,7 @@ export const channelMembers = createSlice({
 			state.followingUserIds = action.payload;
 		},
 		setStatusUser: (state, action: PayloadAction<StatusUserArgs>) => {
-			state.onlineStatusUser[action.payload.userId] = action.payload.status;
+			state.onlineStatusUser[action.payload.userId] = action.payload.online;
 		},
 
 		setCustomStatusUser: (state, action: PayloadAction<CustomStatusUserArgs>) => {
