@@ -629,7 +629,7 @@ export type SetUserTypingArgs = {
 
 const channelMessagesAdapter = createEntityAdapter({
 	selectId: (message: MessagesEntity) => message.id,
-	sortComparer: orderMessageByTimeMsAscending
+	sortComparer: orderMessageByIDAscending //orderMessageByTimeMsAscending
 });
 
 export const initialMessagesState: MessagesState = {
