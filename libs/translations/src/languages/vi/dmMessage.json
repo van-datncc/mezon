@@ -10,6 +10,7 @@
         "markAsRead": "Đánh dấu đã đọc",
         "favorite": "Yêu thích",
         "muteConversation": "Tắt thông báo",
+        "unMuteConversation": "Bật thông báo",
         "notificationSettings": "Cài đặt thông báo"
     },
     "confirm": {

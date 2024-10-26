@@ -17,9 +17,9 @@ import {
 	getStoreAsync,
 	notificationSettingActions,
 	selectAllChannelsFavorite,
-	selectCurrentChannelNotificatonSelected,
 	selectCurrentClan,
 	selectCurrentUserId,
+	selectSelectedChannelNotificationSetting,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -58,7 +58,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
 	}, []);
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const currentUserId = useSelector(selectCurrentUserId);
 
 	const isChannelUnmute = useMemo(() => {
@@ -161,15 +161,15 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 				} else {
 					navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
 						screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL,
-						params: { currentChannel: channel }
+						params: { currentChannel: channel, isCurrentChannel: false }
 					});
 				}
 				dismiss();
 			},
 			icon: isChannelUnmute ? (
-				<Icons.BellIcon width={22} height={22} color={themeValue.text} />
-			) : (
 				<Icons.BellSlashIcon color={themeValue.textStrong} />
+			) : (
+				<Icons.BellIcon width={22} height={22} color={themeValue.text} />
 			)
 		},
 		{

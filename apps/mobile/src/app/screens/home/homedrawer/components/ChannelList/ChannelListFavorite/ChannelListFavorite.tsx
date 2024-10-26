@@ -19,6 +19,7 @@ export const ChannelListFavorite = React.memo(
 			onPressCollapse();
 			setIsCollapse(!isCollapse);
 		};
+		if (!channelFavorites?.length) return;
 		return (
 			<Block width={'100%'} paddingHorizontal={size.s_8} paddingVertical={size.s_10}>
 				<TouchableOpacity onPress={handleCollapse} style={styles.categoryItem}>
