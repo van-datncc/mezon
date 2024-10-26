@@ -10,6 +10,7 @@
         "markAsRead": "Mark As Read",
         "favorite": "Favorite",
         "muteConversation": "Mute Conversation",
+        "unMuteConversation": "UnMute Conversation",
         "notificationSettings": "Notification Settings"
     },
     "confirm": {
