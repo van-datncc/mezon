@@ -1,4 +1,4 @@
-import { useChannels, useSendForwardMessage } from '@mezon/core';
+import { useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, Icons, UserGroupIcon } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -6,6 +6,7 @@ import {
 	MessagesEntity,
 	getIsFowardAll,
 	getSelectedMessage,
+	selectChannelThreads,
 	selectCurrentChannelId,
 	selectDirectsOpenlist,
 	selectDmGroupCurrentId,
@@ -45,7 +46,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 	const [selectedForwardObjects, setSelectedForwardObjects] = useState<IForwardIObject[]>([]);
 
 	const dmGroupChatList = useSelector(selectDirectsOpenlist);
-	const { listChannels } = useChannels();
+	const listChannels = useSelector(selectChannelThreads);
 
 	const { sendForwardMessage } = useSendForwardMessage();
 	const { t } = useTranslation('message');
@@ -289,7 +290,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 	return (
 		<Modal isVisible={show} hasBackdrop={false} style={{ margin: 0, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_16 }}>
 			<SafeAreaView style={{ flex: 1 }}>
-				<Block flex={1} marginTop={size.s_24}>
+				<Block flex={1} marginTop={size.s_34}>
 					<Block flexDirection="row" justifyContent="center" marginBottom={size.s_18}>
 						<Block position="absolute" left={0}>
 							<TouchableOpacity onPress={() => onClose()}>
@@ -306,7 +307,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 						onTextChange={setSearchText}
 						value={searchText}
 						prefixIcon={<Icons.MagnifyingIcon color={themeValue.text} height={20} width={20} />}
-						inputWrapperStyle={{ backgroundColor: themeValue.primary }}
+						inputWrapperStyle={{ backgroundColor: themeValue.primary, paddingHorizontal: size.s_6 }}
 					/>
 
 					<Block flex={1}>
