@@ -25,7 +25,6 @@ import {
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
-import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
@@ -1037,10 +1036,10 @@ export function orderMessageByIDAscending(a: MessagesEntity, b: MessagesEntity) 
 		return 1;
 	}
 
-	const aid = Snowflake.parse(a.id).timestamp;
-	const bid = Snowflake.parse(b.id).timestamp;
+	const aid = BigInt(a.id);
+	const bid = BigInt(b.id);
 
-	return +aid - +bid;
+	return Number(aid - bid);
 }
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
