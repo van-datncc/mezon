@@ -138,31 +138,28 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		}
 	}, [dataReferences, lastMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
-	// Jump to message when user is jumping to message from pin message
-	useEffect(() => {
-		if (jumpPinMessageId && isPinMessageExist && !rowVirtualizer.isScrolling) {
-			const index = messages.findIndex((item) => item === jumpPinMessageId);
-			if (index >= 0) {
-				rowVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' });
-				setTimeout(() => {
-					dispatch(pinMessageActions.setJumpPinMessageId(null));
-				}, 1000);
-			}
-		}
-	}, [dispatch, jumpPinMessageId, isPinMessageExist]);
+	// Jump to ,message from pin and reply, notification...
 
-	// Jump to message when user is jumping to message
 	useEffect(() => {
-		if (idMessageToJump && isMessageExist && !rowVirtualizer.isScrolling) {
-			const index = messages.findIndex((item) => item === idMessageToJump);
+		const handleScrollToIndex = (messageId: string) => {
+			const index = messages.findIndex((item) => item === messageId);
 			if (index >= 0) {
 				rowVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' });
-				setTimeout(() => {
-					dispatch(messagesActions.setIdMessageToJump(null));
-				}, 1000);
 			}
+		};
+
+		if (jumpPinMessageId && isPinMessageExist) {
+			handleScrollToIndex(jumpPinMessageId);
+			setTimeout(() => {
+				dispatch(pinMessageActions.setJumpPinMessageId(null));
+			}, 1000);
+		} else if (idMessageToJump && isMessageExist && jumpPinMessageId === null) {
+			handleScrollToIndex(idMessageToJump);
+			setTimeout(() => {
+				dispatch(messagesActions.setIdMessageToJump(null));
+			}, 1000);
 		}
-	}, [dispatch, idMessageToJump, isMessageExist]);
+	}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist, messages]);
 
 	// Jump to present when user is jumping to present
 	useEffect(() => {
