@@ -3,8 +3,8 @@ import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useSettingFooter } from '@mezon/core';
-import { electronBridge } from '@mezon/utils';
+import { useActivities, useSettingFooter } from '@mezon/core';
+import { ACTIVE_WINDOW, TRIGGER_SHORTCUT, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -23,10 +23,16 @@ const mezon: CreateMezonClientOptions = {
 const AppInitializer = () => {
 	const isLogin = useSelector(selectIsLogin);
 	const { setIsShowSettingFooterStatus } = useSettingFooter();
+	const { setUserActivity } = useActivities();
 	if (isElectron()) {
 		if (isLogin) {
-			electronBridge?.initListeners(() => {
-				setIsShowSettingFooterStatus(true);
+			electronBridge?.initListeners({
+				[TRIGGER_SHORTCUT]: () => {
+					setIsShowSettingFooterStatus(true);
+				},
+				[ACTIVE_WINDOW]: (activitiesInfo) => {
+					setUserActivity(activitiesInfo);
+				}
 			});
 		} else {
 			electronBridge?.removeAllListeners();
