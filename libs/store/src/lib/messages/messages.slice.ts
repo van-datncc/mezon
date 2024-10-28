@@ -339,7 +339,7 @@ export const loadMoreMessage = createAsyncThunk(
 				);
 			}
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 			return thunkAPI.rejectWithValue([]);
 		}
 	}
@@ -382,7 +382,7 @@ export const jumpToMessage = createAsyncThunk(
 			}
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump(messageId));
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 			return thunkAPI.rejectWithValue([]);
 		}
 	}
@@ -436,6 +436,7 @@ type SendMessagePayload = {
 	isPublic: boolean;
 	avatar?: string;
 	isMobile?: boolean;
+	username?: string;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
@@ -452,9 +453,9 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		clanId,
 		senderId,
 		avatar,
-		isMobile = false
+		isMobile = false,
+		username
 	} = payload;
-	const id = Date.now().toString();
 
 	async function doSend() {
 		try {
@@ -512,6 +513,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		}
 	}
 
+	const id = Snowflake.generate();
 	async function fakeItUntilYouMakeIt() {
 		const fakeMessage: ChannelMessage = {
 			id,
@@ -523,7 +525,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			attachments,
 			create_time: new Date().toISOString(),
 			sender_id: senderId,
-			username: '',
+			username: username || '',
 			avatar: avatar,
 			isSending: true,
 			references: [],
@@ -585,11 +587,13 @@ export const updateTypingUsers = createAsyncThunk(
 		// set user typing to true
 		thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
 
-		if (typingTimeouts[userId]) {
-			clearTimeout(typingTimeouts[userId]);
+		const typingKey = channelId + userId;
+
+		if (typingTimeouts[typingKey]) {
+			clearTimeout(typingTimeouts[typingKey]);
 		}
 
-		typingTimeouts[userId] = setTimeout(() => {
+		typingTimeouts[typingKey] = setTimeout(() => {
 			thunkAPI.dispatch(messagesActions.recheckTypingUsers({ channelId, userId }));
 			delete typingTimeouts[userId];
 		}, TYPING_TIMEOUT + 100);
@@ -625,7 +629,7 @@ export type SetUserTypingArgs = {
 
 const channelMessagesAdapter = createEntityAdapter({
 	selectId: (message: MessagesEntity) => message.id,
-	sortComparer: orderMessageByTimeMsAscending
+	sortComparer: orderMessageByIDAscending //orderMessageByTimeMsAscending
 });
 
 export const initialMessagesState: MessagesState = {
@@ -688,7 +692,7 @@ export const messagesSlice = createSlice({
 			const channelEntity = state.channelMessages[channelId];
 			switch (code) {
 				case 0: {
-					state.channelMessages[channelId] = handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
+					handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 
 					// update last message
 					state.lastMessageByChannel[channelId] = action.payload;
@@ -925,7 +929,7 @@ export const messagesSlice = createSlice({
 
 					const isNew = channelId && action.payload.messages.some(({ id }) => !state.channelMessages?.[channelId]?.entities?.[id]);
 					if ((!isNew || !channelId) && !isClearMessage) return state;
-					const reversedMessages = action.payload.messages.reverse();
+					// const reversedMessages = action.payload.messages.reverse();
 
 					// remove all messages if clear message is true
 					if (isClearMessage) {
@@ -942,7 +946,7 @@ export const messagesSlice = createSlice({
 					handleSetManyMessages({
 						state,
 						channelId,
-						adapterPayload: reversedMessages,
+						adapterPayload: action.payload.messages,
 						direction,
 						isClearMessage
 					});
@@ -1033,10 +1037,10 @@ export function orderMessageByIDAscending(a: MessagesEntity, b: MessagesEntity) 
 		return 1;
 	}
 
-	const aid = Snowflake.parse(a.id).timestamp;
-	const bid = Snowflake.parse(b.id).timestamp;
+	const aid = BigInt(a.id);
+	const bid = BigInt(b.id);
 
-	return +aid - +bid;
+	return Number(aid - bid);
 }
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);
@@ -1050,10 +1054,12 @@ export const selectMessagesEntityById = createSelector(
 
 export const selectUnreadMessageEntries = createSelector(getMessagesState, (state) => state.unreadMessagesEntries);
 
-export const selectUnreadMessageIdByChannelId = (channelId?: string | null) =>
-	createSelector(getMessagesState, selectUnreadMessageEntries, (state, lastMessagesEntries) => {
+export const selectUnreadMessageIdByChannelId = createSelector(
+	[selectUnreadMessageEntries, (state, channelId) => channelId],
+	(lastMessagesEntries, channelId) => {
 		return lastMessagesEntries?.[channelId ?? ''];
-	});
+	}
+);
 
 export const selectTypingUsers = createSelector(getMessagesState, (state) => state.typingUsers);
 
@@ -1176,7 +1182,7 @@ export const selectLassSendMessageEntityBySenderId = createCachedSelector(
 );
 
 export const selectChannelDraftMessage = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
-	return messagesState.channelDraftMessage[channelId] || emptyObject;
+	return messagesState.channelDraftMessage[channelId];
 });
 
 export const selectFirstMessageId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
@@ -1201,14 +1207,6 @@ export const selectLatestMessageId = createCachedSelector([getMessagesState, get
 export const selectLastMessageIdByChannelId = createSelector(selectMessageIdsByChannelId, (ids) => {
 	return ids.at(-1);
 });
-
-export const selectLastSeenMessage = (channelId: string, messageId: string) =>
-	createSelector(
-		[(state) => selectLastMessageIdByChannelId(state, channelId), selectUnreadMessageIdByChannelId(channelId)],
-		(lastMessageId, unreadMessageId) => {
-			return Boolean(messageId === unreadMessageId && messageId !== lastMessageId);
-		}
-	);
 
 export const selectIsViewingOlderMessagesByChannelId = (channelId: string) =>
 	createSelector(getMessagesState, (state) => {
@@ -1262,9 +1260,9 @@ const handleSetManyMessages = ({
 	// update is viewing older messages
 	state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
 
-	const channelEntity = state.channelMessages[channelId];
+	// const channelEntity = state.channelMessages[channelId];
 	// const startSlicePosition = isFetchingLatestMessages ? channelEntity.ids.length - adapterPayload.length : 0;
-	handleUpdateIsCombineMessage(channelEntity, channelEntity.ids);
+	// handleUpdateIsCombineMessage(channelEntity, channelEntity.ids);
 };
 
 const handleUpdateIsCombineMessage = (
@@ -1344,15 +1342,15 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: MessagesState; channelId: string; adapterPayload: MessagesEntity }) => {
 	const messageId = adapterPayload.id;
 	state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
-	const channelEntity = state.channelMessages[channelId];
-	const index = channelEntity.ids.indexOf(messageId);
-	if (index === -1) return channelEntity;
+	// const channelEntity = state.channelMessages[channelId];
+	// const index = channelEntity.ids.indexOf(messageId);
+	// if (index === -1) return channelEntity;
 
-	const startIndex = Math.max(index - 1, 0);
+	// const startIndex = Math.max(index - 1, 0);
 
-	const itemCount = channelEntity.ids.length;
+	// const itemCount = channelEntity.ids.length;
 
-	return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), itemCount > 2 ? false : true);
+	// return handleUpdateIsCombineMessage(channelEntity, channelEntity.ids.slice(startIndex, startIndex + 3), itemCount > 2 ? false : true);
 };
 
 const handleLimitMessage = (

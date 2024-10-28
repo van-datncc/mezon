@@ -1,37 +1,39 @@
-import { useGetPriorityNameFromUserClan, useShowName } from '@mezon/core';
-import { IMessageWithUser } from '@mezon/utils';
+import { useShowName } from '@mezon/core';
+import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
+import { IMessageWithUser, convertTimeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo } from 'react';
-import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
 
 type IMessageHeadProps = {
 	message: IMessageWithUser;
-	isCombine: boolean;
-	isShowFull?: boolean;
 	mode?: number;
 	onClick?: (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => void;
 };
 
-const MessageHead = ({ message, isCombine, isShowFull, mode, onClick }: IMessageHeadProps) => {
-	const { messageTime } = useMessageParser(message);
-	const { userClanNickname, userDisplayName, username, senderId } = useMessageParser(message);
-	const { clanNick, displayName, usernameSender } = useGetPriorityNameFromUserClan(message.sender_id);
+const MessageHead = ({ message, mode, onClick }: IMessageHeadProps) => {
+	const messageTime = convertTimeString(message?.create_time as string);
+	const userClan = useAppSelector((state) => selectMemberClanByUserId2(state, message?.sender_id));
+	const usernameSender = userClan?.user?.username;
+	const clanNick = userClan?.clan_nick;
+	const displayName = userClan?.user?.display_name;
+
 	const { pendingClannick, pendingDisplayName, pendingUserName } = usePendingNames(
 		message,
 		clanNick ?? '',
 		displayName ?? '',
 		usernameSender ?? '',
-		userClanNickname ?? '',
-		userDisplayName ?? '',
-		username ?? ''
+		message.clan_nick ?? '',
+		message?.display_name ?? '',
+		message?.username ?? ''
 	);
 
-	const nameShowed = useShowName(clanNick ? clanNick : (pendingClannick ?? ''), pendingDisplayName ?? '', pendingUserName ?? '', senderId ?? '');
-
-	if (isCombine && message.references?.length === 0 && !isShowFull) {
-		return <></>;
-	}
+	const nameShowed = useShowName(
+		clanNick ? clanNick : (pendingClannick ?? ''),
+		pendingDisplayName ?? '',
+		pendingUserName ?? '',
+		message?.sender_id ?? ''
+	);
 
 	return (
 		<div className="relative group">
@@ -42,7 +44,7 @@ const MessageHead = ({ message, isCombine, isShowFull, mode, onClick }: IMessage
 					role="button"
 					style={{ letterSpacing: '-0.01rem' }}
 				>
-					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? nameShowed : userDisplayName ? userDisplayName : username}
+					{mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? nameShowed : message?.display_name ? message?.display_name : message?.username}
 				</div>
 				<div className=" dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">{messageTime}</div>
 			</div>
@@ -50,4 +52,4 @@ const MessageHead = ({ message, isCombine, isShowFull, mode, onClick }: IMessage
 	);
 };
 
-export default memo(MessageHead);
+export default memo(MessageHead, (prev, cur) => prev.message?.id === cur.message?.id && prev.message?.sender_id === cur.message?.sender_id);

@@ -26,6 +26,7 @@ export interface CategoriesState extends EntityState<CategoriesEntity, string> {
 	sortChannelByCategoryId: Record<string, boolean>;
 	showEmptyCategory: boolean;
 	ctrlKSelectedChannelId?: string;
+	ctrlKFocusChannel?: { id: string; parentId: string } | null;
 	categoryExpandState: Record<string, Record<string, boolean>>;
 }
 
@@ -85,7 +86,6 @@ export const checkDuplicateCategoryInClan = createAsyncThunk(
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(categoryName, clanId, TypeCheck.TYPECATEGORY);
-			console.log('isDuplicateCategoryName', isDuplicateName);
 
 			if (isDuplicateName?.type === TypeCheck.TYPECATEGORY) {
 				return isDuplicateName.exist;
@@ -136,7 +136,6 @@ export const deleteCategoriesOrder = createAsyncThunk('categories/deleteCategori
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteCategoryOrder(mezon.session, clanId);
 		thunkAPI.dispatch(fetchCategories({ clanId: clanId }));
-		console.log(response);
 	} catch (error) {
 		return thunkAPI.rejectWithValue([]);
 	}
@@ -183,6 +182,9 @@ export const categoriesSlice = createSlice({
 		},
 		setCtrlKSelectedChannelId: (state, action: PayloadAction<string>) => {
 			state.ctrlKSelectedChannelId = action.payload;
+		},
+		setCtrlKFocusChannel: (state, action: PayloadAction<{ id: string; parentId: string } | null>) => {
+			state.ctrlKFocusChannel = action.payload;
 		},
 		setCategoryExpandState: (state, action: PayloadAction<SetCategoryExpandStatePayload>) => {
 			const { clanId, categoryId, expandState } = action.payload;
@@ -309,6 +311,8 @@ export const selectCategoriesIds = createSelector(getCategoriesState, (entities)
 export const selectIsShowEmptyCategory = createSelector(getCategoriesState, (state) => state.showEmptyCategory);
 
 export const selectCtrlKSelectedChannelId = createSelector(getCategoriesState, (state) => state.ctrlKSelectedChannelId);
+
+export const selectCtrlKFocusChannel = createSelector(getCategoriesState, (state) => state.ctrlKFocusChannel);
 
 export const selectCategoryExpandStateByCategoryId = (clanId: string, categoryId: string) =>
 	createSelector(getCategoriesState, (state) => {

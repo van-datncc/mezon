@@ -1,4 +1,4 @@
-import { useSearchMessages, useThreads } from '@mezon/core';
+import { useSearchMessages } from '@mezon/core';
 import {
 	appActions,
 	searchMessagesActions,
@@ -11,6 +11,7 @@ import {
 	selectIsUseProfileDM,
 	selectTheme,
 	selectValueInputSearchMessage,
+	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -35,7 +36,13 @@ type SearchMessageChannelProps = {
 const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const dispatch = useAppDispatch();
 	const { fetchSearchMessages, currentPage } = useSearchMessages();
-	const { setIsShowCreateThread } = useThreads();
+
+	const setIsShowCreateThread = useCallback(
+		(isShowCreateThread: boolean, channelId?: string) => {
+			channelId && dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId, isShowCreateThread }));
+		},
+		[dispatch]
+	);
 
 	const isActive = useSelector(selectIsShowMemberList);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
@@ -108,26 +115,27 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	const handleChange: OnChangeHandlerFunc = useCallback(
 		(event, newValue, newPlainTextValue, mentions) => {
 			const value = event.target.value;
+			const words = value.split(' ');
+			const cleanedWords = words.filter((word) => {
+				const mentionPrefixes = ['from:'];
+				const isMentionStart = mentionPrefixes.some((prefix) => word.startsWith(prefix));
+				return !isMentionStart;
+			});
+			const cleanedValue = cleanedWords.join(' ').trim();
+
 			dispatch(searchMessagesActions.setValueInputSearch({ channelId, value }));
 			setValueDisplay(newPlainTextValue);
 			const filter: SearchFilter[] = [];
 			// TODO: check logic below code
-			if (mentions.length === 0) {
-				filter.push(
-					{
-						field_name: 'content',
-						field_value: value
-					},
-					{ field_name: 'channel_id', field_value: channelId },
-					{ field_name: 'clan_id', field_value: currentClanId as string }
-				);
+			if (cleanedValue) {
+				filter.push({
+					field_name: 'content',
+					field_value: cleanedValue
+				});
 			}
 			for (const mention of mentions) {
 				const convertMention = mention.display.split(':');
-				filter.push(
-					{ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] },
-					{ field_name: 'channel_id', field_value: channelId }
-				);
+				filter.push({ field_name: searchFieldName[convertMention[0]], field_value: convertMention[1] });
 			}
 			setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
 		},
@@ -160,7 +168,13 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 				if (isShowMemberListDM) dispatch(appActions.setIsShowMemberListDM(!isShowMemberListDM));
 				if (isUseProfileDM) dispatch(appActions.setIsUseProfileDM(!isUseProfileDM));
 				if (search) {
-					fetchSearchMessages(search);
+					const requestFilter = [
+						...(search.filters || []),
+						{ field_name: 'channel_id', field_value: channelId },
+						{ field_name: 'clan_id', field_value: currentClanId as string }
+					];
+					const requestBody = { ...search, filters: requestFilter };
+					fetchSearchMessages(requestBody);
 				}
 			}
 
@@ -190,7 +204,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			dispatch(
 				searchMessagesActions.setValueInputSearch({
 					channelId,
-					value: hasKeySearch(value ?? '') ? value : valueInputSearch + value
+					value: !valueInputSearch ? value : valueInputSearch + value
 				})
 			);
 			searchRef.current?.focus();
@@ -285,6 +299,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					}}
 				>
 					<Mention
+						markup="from:[__display__](__id__)"
 						appendSpaceOnAdd={true}
 						data={handleSearchUserMention}
 						trigger="from:"
@@ -306,6 +321,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					/>
 
 					<Mention
+						markup="mention:[__display__](__id__)"
 						appendSpaceOnAdd={true}
 						data={userListDataSearchByMention}
 						trigger="mentions:"

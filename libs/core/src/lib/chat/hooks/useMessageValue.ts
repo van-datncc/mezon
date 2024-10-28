@@ -16,7 +16,6 @@ export function useMessageValue(channelId?: string) {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const request = useSelector(selectRequestByChannelId(mode === ModeResponsive.MODE_CLAN ? channelId || '' : currentDmGroupId || ''));
-
 	const setRequestInput = useCallback(
 		(request: RequestInput, isThread?: boolean) => {
 			if (mode === ModeResponsive.MODE_CLAN) {
@@ -38,22 +37,11 @@ export function useMessageValue(channelId?: string) {
 		[currentChannelId, currentDmGroupId, mode, dispatch]
 	);
 
-	const setModeResponsive = useCallback(
-		(value: string) => {
-			dispatch(channelsActions.setModeResponsive(value));
-		},
-		[dispatch]
-	);
-
 	return useMemo(
 		() => ({
-			currentChannelId,
-			mode,
-			currentDmGroupId,
 			request,
-			setRequestInput,
-			setModeResponsive
+			setRequestInput
 		}),
-		[setRequestInput, setModeResponsive, request, currentDmGroupId, mode, currentChannelId]
+		[setRequestInput, request]
 	);
 }

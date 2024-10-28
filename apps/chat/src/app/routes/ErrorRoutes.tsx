@@ -1,3 +1,4 @@
+import { restoreLocalStorage } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import isElectron from 'is-electron';
 import { useRouteError } from 'react-router-dom';
@@ -7,11 +8,8 @@ const ErrorRoutes = () => {
 	console.error(error);
 
 	const handleClick = () => {
-		const authData = localStorage.getItem('persist:auth');
-		localStorage.clear();
-		if (authData) {
-			localStorage.setItem('persist:auth', authData);
-		}
+		restoreLocalStorage(['persist:auth', 'persist:apps', 'persist:categories']);
+
 		if (isElectron()) {
 			window.location.href = window.location.pathname;
 		} else {

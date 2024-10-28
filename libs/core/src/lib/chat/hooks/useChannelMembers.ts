@@ -8,7 +8,6 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { IMentionOnMessage, uniqueUsers } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -50,19 +49,14 @@ export function useChannelMembers({ channelId, mode }: useChannelMembersOptions)
 	};
 
 	const addMemberToThread = useCallback(
-		async (currentChannel: ChannelsEntity | null, mentions: IMentionOnMessage[]) => {
-			if (currentChannel?.parrent_id === '0' || currentChannel?.parrent_id === '') return;
-			const userIds = uniqueUsers(mentions, membersOfChild);
-			if (userIds.length > 0) {
-				await updateChannelUsers(currentChannel, userIds, currentChannel?.clan_id as string);
-			}
+		async (currentChannel: ChannelsEntity | null, notExistingUserIds: string[]) => {
+			await updateChannelUsers(currentChannel, notExistingUserIds, currentChannel?.clan_id as string);
 		},
-		[dispatch]
+		[dispatch, membersOfChild]
 	);
 
 	const joinningToThread = useCallback(
 		async (targetThread: ThreadsEntity | null, user: string[]) => {
-			if (targetThread?.parrent_id === '0' || targetThread?.parrent_id === '') return;
 			await updateChannelUsers(targetThread as ChannelsEntity, user, targetThread?.clan_id as string);
 		},
 		[dispatch]

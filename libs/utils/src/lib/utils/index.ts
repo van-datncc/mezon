@@ -1,4 +1,3 @@
-import { ChannelsEntity } from '@mezon/store';
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
 import {
 	differenceInDays,
@@ -14,12 +13,13 @@ import {
 } from 'date-fns';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
+import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
-import { ID_MENTION_HERE, TIME_COMBINE } from '../constant';
+import { EVERYONE_ROLE_ID, ID_MENTION_HERE, TIME_COMBINE } from '../constant';
 import {
 	ChannelMembersEntity,
-	EMarkdownType,
+	EBacktickType,
 	EMimeTypes,
 	ETokenMessage,
 	EmojiDataOptionals,
@@ -33,6 +33,7 @@ import {
 	IMentionOnMessage,
 	IMessageSendPayload,
 	IMessageWithUser,
+	IRolesClan,
 	MentionDataProps,
 	NotificationEntity,
 	SearchItemProps,
@@ -93,13 +94,46 @@ export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement 
 		ref.current.focus();
 	}
 };
-export const uniqueUsers = (mentions: IMentionOnMessage[], userChannels: ChannelMembersEntity[] | null) => {
-	const getListId = mentions
-		.map((item) => item.user_id)
-		.filter((user_id): user_id is string => user_id !== undefined && user_id !== ID_MENTION_HERE);
-	const uniqueUserIds = Array.from(new Set(getListId));
-	const memUserIds = userChannels?.map((member) => member?.user?.id);
-	const userIdsNotInChannel = uniqueUserIds.filter((user_id) => !memUserIds?.includes(user_id));
+export const uniqueUsers = (
+	mentions: IMentionOnMessage[],
+	userChannels: ChannelMembersEntity[] | null,
+	rolesClan: IRolesClan[],
+	refereceSenderId: string[]
+) => {
+	const uniqueUserId1s = Array.from(
+		new Set(
+			mentions.reduce<string[]>((acc, mention) => {
+				if (mention.user_id && mention.user_id !== ID_MENTION_HERE) {
+					acc.push(mention.user_id);
+				}
+				return acc;
+			}, [])
+		)
+	);
+
+	const allRoleUsers = rolesClan.reduce<RoleUserListRoleUser[]>((acc, role) => {
+		const isMentionedRole = mentions.some((mention) => mention.role_id === role.id && mention.role_id !== EVERYONE_ROLE_ID);
+		if (isMentionedRole && role.role_user_list?.role_users) {
+			acc.push(...role.role_user_list.role_users);
+		}
+		return acc;
+	}, []);
+
+	const uniqueUserId2s = Array.from(
+		new Set(
+			allRoleUsers.reduce<string[]>((acc, roleUser) => {
+				if (roleUser?.id) {
+					acc.push(roleUser.id);
+				}
+				return acc;
+			}, [])
+		)
+	);
+
+	const combinedUniqueUserIds = Array.from(new Set([...uniqueUserId1s, ...uniqueUserId2s, ...refereceSenderId]));
+
+	const memUserIds = userChannels?.map((member) => member?.user?.id) || [];
+	const userIdsNotInChannel = combinedUniqueUserIds.filter((user_id) => !memUserIds.includes(user_id));
 
 	return userIdsNotInChannel;
 };
@@ -555,7 +589,7 @@ export const processText = (inputString: string) => {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
-					markdowns.push({ type: EMarkdownType.TRIPLE, s: startindex, e: endindex });
+					markdowns.push({ type: EBacktickType.TRIPLE, s: startindex, e: endindex });
 				}
 			}
 		} else if (inputString[i] === singleBacktick) {
@@ -571,7 +605,7 @@ export const processText = (inputString: string) => {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
-					markdowns.push({ type: EMarkdownType.SINGLE, s: startindex, e: endindex });
+					markdowns.push({ type: EBacktickType.SINGLE, s: startindex, e: endindex });
 				}
 				i++;
 			}
@@ -845,6 +879,6 @@ export const sortChannelsByLastActivity = (channels: IChannel[]): IChannel[] => 
 		return timestampB - timestampA;
 	});
 };
-export const checkIsThread = (channel?: ChannelsEntity) => {
+export const checkIsThread = (channel?: IChannel) => {
 	return channel?.parrent_id !== '0' && channel?.parrent_id !== '';
 };

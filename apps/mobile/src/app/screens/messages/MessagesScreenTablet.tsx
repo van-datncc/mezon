@@ -8,21 +8,18 @@ import {
 	directActions,
 	getStoreAsync,
 	selectAllClans,
-	selectDirectsOpenlist,
+	selectDirectsOpenlistOrder,
 	selectDmGroupCurrentId,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { sortChannelsByLastActivity } from '@mezon/utils';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppState, FlatList, Pressable, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import { MezonBottomSheet } from '../../componentUI';
-import { SeparatorWithSpace } from '../../components/Common';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
-import { normalizeString } from '../../utils/helpers';
 import { FriendsTablet } from '../friend/FriendsTablet';
 import ServerList from '../home/homedrawer/ServerList';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
@@ -36,8 +33,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 	const isTabletLandscape = useTabletLandscape();
 	const styles = style(themeValue, isTabletLandscape);
 	const [searchText, setSearchText] = useState<string>('');
-	const directsOpenList = useSelector(selectDirectsOpenlist);
-	const dmGroupChatList = sortChannelsByLastActivity(directsOpenList);
+	const dmGroupChatList = useSelector(selectDirectsOpenlistOrder);
 	const { t } = useTranslation(['dmMessage', 'common']);
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const clans = useSelector(selectAllClans);
@@ -62,14 +58,10 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 				const store = await getStoreAsync();
 				await store.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 			} catch (error) {
-				console.log('error messageLoaderBackground', error);
+				console.error('error messageLoaderBackground', error);
 			}
 		}
 	};
-
-	const filteredDataDM = useMemo(() => {
-		return dmGroupChatList?.filter?.((dm) => normalizeString(dm.channel_label || dm.usernames)?.includes(normalizeString(searchText)));
-	}, [dmGroupChatList, searchText]);
 
 	const navigateToAddFriendScreen = () => {
 		navigation.navigate(APP_SCREEN.FRIENDS.STACK, { screen: APP_SCREEN.FRIENDS.ADD_FRIEND });
@@ -108,7 +100,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 				<View style={styles.headerWrapper}>
 					<Text style={styles.headerTitle}>{t('dmMessage:title')}</Text>
 					<Pressable style={styles.addFriendWrapper} onPress={() => navigateToAddFriendScreen()}>
-						<Icons.UserPlusIcon height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+						<Icons.UserPlusIcon height={size.s_16} width={size.s_16} color={themeValue.textStrong} />
 						<Text style={styles.addFriendText}>{t('dmMessage:addFriend')}</Text>
 					</Pressable>
 				</View>
@@ -137,7 +129,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 					<Text style={styles.headerTitle}>{t('dmMessage:friends')}</Text>
 				</Pressable>
 
-				{clansLoadingStatus === 'loaded' && !clans?.length && !filteredDataDM?.length ? (
+				{clansLoadingStatus === 'loaded' && !clans?.length && !dmGroupChatList?.length ? (
 					<UserEmptyMessage
 						onPress={() => {
 							navigateToAddFriendScreen();
@@ -145,14 +137,10 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 					/>
 				) : (
 					<FlatList
-						data={filteredDataDM}
-						style={styles.dmMessageListContainer}
+						data={dmGroupChatList}
 						showsVerticalScrollIndicator={false}
-						keyExtractor={(dm) => dm.id.toString()}
-						ItemSeparatorComponent={SeparatorWithSpace}
-						renderItem={({ item }) => (
-							<DmListItem directMessage={item} navigation={navigation} key={item.id} onLongPress={() => handleLongPress(item)} />
-						)}
+						keyExtractor={(dm) => dm + 'DM_MSG_ITEM'}
+						renderItem={({ item }) => <DmListItem id={item} navigation={navigation} key={item} onLongPress={handleLongPress} />}
 					/>
 				)}
 

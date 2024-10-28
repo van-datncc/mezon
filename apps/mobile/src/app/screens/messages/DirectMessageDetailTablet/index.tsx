@@ -1,12 +1,13 @@
 import { useChatMessages, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, Icons, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { directMetaActions } from '@mezon/store';
 import {
+	MessagesEntity,
 	appActions,
 	channelMembersActions,
 	clansActions,
 	directActions,
+	directMetaActions,
 	getStoreAsync,
 	messagesActions,
 	selectCurrentChannel,
@@ -14,12 +15,14 @@ import {
 	selectDmGroupCurrent,
 	useAppDispatch
 } from '@mezon/store-mobile';
+import { TIME_OFFSET } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AppState, DeviceEventEmitter, Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
+import { UserStatus } from '../../../components/UserStatus';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { ChatMessageWrapper } from '../ChatMessageWrapper';
 import { style } from './styles';
@@ -28,16 +31,32 @@ function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const { lastMessage } = useChatMessages({ channelId });
 	const mounted = useRef('');
+
+	const updateChannelSeenState = useCallback(
+		(channelId: string, lastMessage: MessagesEntity) => {
+			const timestamp = Date.now() / 1000;
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
+			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+			dispatch(directActions.setActiveDirect({ directId: channelId }));
+		},
+		[dispatch]
+	);
+
 	useEffect(() => {
 		if (lastMessage) {
-			if (mounted.current === channelId) {
-				return;
-			}
-			const timestamp = Date.now() / 1000;
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId, timestamp: timestamp }));
-			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
+			updateChannelSeenState(channelId, lastMessage);
 		}
-	}, [channelId, dispatch, lastMessage]);
+	}, [channelId, lastMessage, updateChannelSeenState]);
+
+	useEffect(() => {
+		if (mounted.current === channelId) {
+			return;
+		}
+		if (lastMessage) {
+			mounted.current = channelId;
+			updateChannelSeenState(channelId, lastMessage);
+		}
+	}, [dispatch, channelId, lastMessage, updateChannelSeenState]);
 }
 
 export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId?: string }) => {
@@ -172,7 +191,6 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			} catch (error) {
-				console.log('error messageLoaderBackground', error);
 				const store = await getStoreAsync();
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -198,7 +216,7 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 									<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
 								</View>
 							)}
-							<View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />
+							<UserStatus status={userStatus} />
 						</View>
 					)}
 					<Text style={styles.titleText} numberOfLines={1}>

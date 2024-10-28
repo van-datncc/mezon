@@ -1,14 +1,11 @@
 import { IMessageWithUser } from '@mezon/utils';
-import { useMemo } from 'react';
 
 const usePendingName = (isMe: boolean | undefined, messageUsername: string | undefined, nameFromMemList: string, nameFromMessage: string) => {
-	return useMemo(() => {
-		if (isMe && !messageUsername) {
-			return nameFromMemList;
-		} else {
-			return nameFromMessage;
-		}
-	}, [isMe, messageUsername, nameFromMemList, nameFromMessage]);
+	if (isMe && !messageUsername) {
+		return nameFromMemList;
+	} else {
+		return nameFromMessage;
+	}
 };
 
 const usePendingNames = (

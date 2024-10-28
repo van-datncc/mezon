@@ -1,6 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChannelsEntity, selectChannelsEntities } from '@mezon/store';
-import { EMarkdownType, ETokenMessage, IExtendedMessage, convertMarkdown } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, IExtendedMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -84,7 +84,7 @@ interface ElementToken {
 	role_id?: string;
 	channelid?: string;
 	emojiid?: string;
-	type?: EMarkdownType;
+	type?: EBacktickType;
 }
 
 const RenderContent = memo(
@@ -203,6 +203,7 @@ const RenderContent = memo(
 				if (element.kindOf === ETokenMessage.LINKS && !isHideLinkOneImage) {
 					formattedContent.push(
 						<MarkdownContent
+							isLink={true}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`link-${index}-${s}-${contentInElement}`}
@@ -225,6 +226,7 @@ const RenderContent = memo(
 							)
 						: formattedContent.push(
 								<MarkdownContent
+									isLink={true}
 									isTokenClickAble={isTokenClickAble}
 									isJumMessageEnabled={isJumMessageEnabled}
 									key={`voicelink-${index}-${s}-${contentInElement}`}
@@ -239,7 +241,7 @@ const RenderContent = memo(
 					if (isJumMessageEnabled) {
 						content = content.replace(/\n/g, '');
 
-						if (element.type === EMarkdownType.TRIPLE) {
+						if (element.type === EBacktickType.TRIPLE) {
 							content = content.replace(/```/g, '`');
 						}
 					} else {
@@ -247,11 +249,13 @@ const RenderContent = memo(
 					}
 					formattedContent.push(
 						<MarkdownContent
+							isBacktick={true}
 							isTokenClickAble={isTokenClickAble}
 							isJumMessageEnabled={isJumMessageEnabled}
 							key={`markdown-${index}-${s}-${contentInElement}`}
 							content={content}
 							isInPinMsg={isInPinMsg}
+							typeOfBacktick={element.type}
 						/>
 					);
 				}

@@ -64,7 +64,7 @@
         "include": "scripts/installer.nsh",
         "packElevateHelper": false,
         "runAfterFinish": true,
-        "createDesktopShortcut": false,
+        "createDesktopShortcut": "always",
         "deleteAppDataOnUninstall": false
       },
       "msi": {
@@ -114,11 +114,6 @@
           },
           {
             "glob": "apps/chat/src/assets/favicon.ico",
-            "input": "./",
-            "output": "./"
-          },
-          {
-            "glob": "apps/chat/src/assets/firebase-messaging-sw.js",
             "input": "./",
             "output": "./"
           },

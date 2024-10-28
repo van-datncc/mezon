@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
 	ActionEmitEvent,
 	changeClan,
@@ -6,6 +7,7 @@ import {
 	ReplyMessageDeleted,
 	save,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	STORAGE_PREVIOUS_CHANNEL,
 	validLinkInviteRegex
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
@@ -19,7 +21,6 @@ import {
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectHasInternetMobile,
-	selectIdMessageToJump,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
@@ -33,7 +34,7 @@ import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { useSeenMessagePool } from 'libs/core/src/lib/chat/hooks/useSeenMessagePool';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { selectCurrentChannel, selectCurrentClanId, setSelectedMessage } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentClanId, setSelectedMessage } from '@mezon/store-mobile';
 import { ETypeLinkMedia, isValidEmojiData } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -60,7 +61,6 @@ export type MessageItemProps = {
 	channelId?: string;
 	onOpenImage?: (image: ApiMessageAttachment) => void;
 	isNumberOfLine?: boolean;
-	jumpToRepliedMessage?: (messageId: string) => void;
 	currentClanId?: string;
 	onMessageAction?: (payload: IMessageActionPayload) => void;
 	setIsOnlyEmojiPicker?: (value: boolean) => void;
@@ -76,7 +76,6 @@ const MessageItem = React.memo(
 			mode,
 			onOpenImage,
 			isNumberOfLine,
-			jumpToRepliedMessage,
 			onMessageAction,
 			setIsOnlyEmojiPicker,
 			showUserInformation = false,
@@ -99,7 +98,6 @@ const MessageItem = React.memo(
 
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const userProfile = useSelector(selectAllAccount);
-		const idMessageToJump = useSelector(selectIdMessageToJump);
 		const usersClan = useSelector(selectAllUserClans);
 		const rolesInClan = useSelector(selectAllRolesClan);
 		const timeoutRef = useRef<NodeJS.Timeout>(null);
@@ -111,8 +109,17 @@ const MessageItem = React.memo(
 		}, [message?.sender_id, message?.username]);
 
 		const hasIncludeMention = useMemo(() => {
-			return message?.content?.t?.includes?.('@here') || message?.content?.t?.includes?.(`@${userProfile?.user?.username}`);
-		}, [message?.content?.t, userProfile]);
+			const userIdMention = userProfile?.user?.id;
+			const mentionOnMessage = message.mentions;
+			let includesHere = false;
+			if (typeof message.content?.t == 'string') {
+				includesHere = message.content.t?.includes('@here');
+			}
+			const includesUser = !!userIdMention && mentionOnMessage?.some((mention) => mention.user_id === userIdMention);
+			const checkReplied = !!userIdMention && message?.references && message?.references[0]?.message_sender_id === userProfile?.user?.id;
+			return includesHere || includesUser || checkReplied;
+		}, [userProfile?.user?.id, message?.mentions, message?.content?.t, message?.references]);
+
 		const messageReferences = useMemo(() => {
 			return message?.references?.[0] as ApiMessageRef;
 		}, [message?.references]);
@@ -160,8 +167,6 @@ const MessageItem = React.memo(
 		}, [message.content]);
 
 		const isEdited = useMemo(() => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			if (message?.update_time && !message.isError && !message.isErrorRetry) {
 				const updateDate = new Date(message?.update_time);
 				const createDate = new Date(message?.create_time);
@@ -170,29 +175,33 @@ const MessageItem = React.memo(
 				return true;
 			}
 			return false;
-		}, [message?.update_time, message.hide_editted, message?.content?.t, message?.create_time]);
+		}, [message?.update_time, message.isError, message.isErrorRetry, message.hide_editted, message?.content?.t, message?.create_time]);
+
+		useEffect(() => {
+			const event = DeviceEventEmitter.addListener(ActionEmitEvent.MESSAGE_ID_TO_JUMP, (msgId: string) => {
+				if (msgId === message?.id) {
+					setShowHighlightReply(true);
+					timeoutRef.current = setTimeout(() => {
+						setShowHighlightReply(false);
+						dispatch(messagesActions.setIdMessageToJump(''));
+					}, 2000);
+				} else {
+					setShowHighlightReply(false);
+					timeoutRef.current && clearTimeout(timeoutRef.current);
+				}
+			});
+
+			return () => {
+				event.remove();
+				timeoutRef.current && clearTimeout(timeoutRef.current);
+			};
+		}, [dispatch, message?.id]);
 
 		useEffect(() => {
 			if (props?.messageId) {
 				markMessageAsSeen(message);
 			}
 		}, [markMessageAsSeen, message, props.messageId]);
-
-		useEffect(() => {
-			if (idMessageToJump === message?.id) {
-				setShowHighlightReply(true);
-				timeoutRef.current = setTimeout(() => {
-					setShowHighlightReply(false);
-					dispatch(messagesActions.setIdMessageToJump(null));
-				}, 3000);
-			} else {
-				setShowHighlightReply(false);
-				timeoutRef.current && clearTimeout(timeoutRef.current);
-			}
-			return () => {
-				timeoutRef.current && clearTimeout(timeoutRef.current);
-			};
-		}, [idMessageToJump]);
 
 		const onLongPressImage = useCallback(() => {
 			if (preventAction) return;
@@ -239,8 +248,6 @@ const MessageItem = React.memo(
 
 		const jumpToChannel = async (channelId: string, clanId: string, channelCateId: string) => {
 			const store = await getStoreAsync();
-			// TODO: do we need to jump to message here?
-			store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId, clanId }));
 			store.dispatch(
 				channelsActions.joinChannel({
 					clanId,
@@ -250,37 +257,42 @@ const MessageItem = React.memo(
 			);
 		};
 
-		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
-			try {
-				const type = channel?.type;
-				const channelId = channel?.channel_id;
-				const channelCateId = channel?.category_id;
-				const clanId = channel?.clan_id;
+		const onChannelMention = useCallback(
+			async (channel: ChannelsEntity) => {
+				try {
+					const type = channel?.type;
+					const channelId = channel?.channel_id;
+					const channelCateId = channel?.category_id;
+					const clanId = channel?.clan_id;
 
-				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
-					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
-					await Linking.openURL(urlVoice);
-				} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
-					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
-						// update mention hashtag stream
-						// save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
-					} else {
-						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+					if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
+						const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
+						await Linking.openURL(urlVoice);
+					} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
+						if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
+							navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+								screen: APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM
+							});
+							save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
+						} else {
+							navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+						}
+						if (currentClanId !== clanId) {
+							changeClan(clanId);
+						}
+						DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+							isFetchMemberChannelDM: true
+						});
+						const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+						save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+						await jumpToChannel(channelId, clanId, channelCateId);
 					}
-					if (currentClanId !== clanId) {
-						changeClan(clanId);
-					}
-					DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
-						isFetchMemberChannelDM: true
-					});
-					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-					await jumpToChannel(channelId, clanId, channelCateId);
+				} catch (error) {
+					console.log(error);
 				}
-			} catch (error) {
-				console.log(error);
-			}
-		}, []);
+			},
+			[currentChannel, currentClanId, navigation]
+		);
 
 		const senderDisplayName = useMemo(() => {
 			if (isDM) {
@@ -362,8 +374,8 @@ const MessageItem = React.memo(
 					style={[
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
-						hasIncludeMention && styles.highlightMessageMention,
-						showHighlightReply && styles.highlightMessageReply
+						hasIncludeMention && styles.highlightMessageReply,
+						showHighlightReply && styles.highlightMessageMention
 					]}
 				>
 					{!!messageReferences && !!messageReferences?.message_ref_id && (
@@ -371,8 +383,8 @@ const MessageItem = React.memo(
 							messageReferences={messageReferences}
 							preventAction={preventAction}
 							isMessageReply={true}
-							jumpToRepliedMessage={jumpToRepliedMessage}
-							mode={mode}
+							channelId={message.channel_id}
+							clanId={message.clan_id}
 						/>
 					)}
 					{isMessageReplyDeleted ? (
@@ -417,8 +429,6 @@ const MessageItem = React.memo(
 								createTime={message?.create_time}
 							/>
 							<MessageAttachment message={message} onOpenImage={onOpenImage} onLongPressImage={onLongPressImage} />
-							{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-							{/*@ts-expect-error*/}
 							<Block opacity={message.isError || (message.isSending && !hasInternet) || message?.isErrorRetry ? 0.6 : 1}>
 								{isInviteLink ? (
 									<RenderMessageInvite content={contentMessage} />

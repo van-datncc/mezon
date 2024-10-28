@@ -1,5 +1,5 @@
-import { selectEmojiObjSuggestion } from '@mezon/store';
-import { EMarkdownType, IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
+import { selectEmojiObjSuggestion } from '@mezon/store-mobile';
+import { EBacktickType, IEmojiOnMessage, ILinkOnMessage, ILinkVoiceRoomOnMessage, IMarkdownOnMessage } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -98,7 +98,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				i += tripleBacktick.length;
 				const endindex = i;
 				if (markdown.trim().length > 0) {
-					markdowns.push({ type: EMarkdownType.TRIPLE, s: startindex, e: endindex });
+					markdowns.push({ type: EBacktickType.TRIPLE, s: startindex, e: endindex });
 				}
 			}
 		} else if (inputString[i] === singleBacktick) {
@@ -114,7 +114,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 				const endindex = i + 1;
 				const nextChar = inputString[endindex];
 				if (!markdown.includes('``') && markdown.trim().length > 0 && nextChar !== singleBacktick) {
-					markdowns.push({ type: EMarkdownType.SINGLE, s: startindex, e: endindex });
+					markdowns.push({ type: EBacktickType.SINGLE, s: startindex, e: endindex });
 				}
 				i++;
 			}

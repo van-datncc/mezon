@@ -27,6 +27,7 @@ export * from './lib/chat/hooks/useClanProfileSetting';
 export * from './lib/chat/hooks/useClans';
 export * from './lib/chat/hooks/useClickUpToEdit';
 export * from './lib/chat/hooks/useDMInvite';
+export * from './lib/chat/hooks/useUserById';
 
 export * from './lib/chat/hooks/useDeleteMessage';
 export * from './lib/chat/hooks/useDirect';
@@ -51,6 +52,7 @@ export * from './lib/chat/hooks/useMessageValue';
 export * from './lib/chat/hooks/useMyRole';
 export * from './lib/chat/hooks/useNotify';
 export * from './lib/chat/hooks/useOnClickOutSide';
+export * from './lib/chat/hooks/usePathMatch';
 export * from './lib/chat/hooks/useReference';
 export * from './lib/chat/hooks/useRole';
 export * from './lib/chat/hooks/useSearchMessages';

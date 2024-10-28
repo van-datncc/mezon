@@ -8,6 +8,7 @@ import AppearanceSetting from '../../../screens/settings/AppearanceSetting';
 import AppThemeSetting from '../../../screens/settings/AppearanceSetting/AppTheme';
 import { LanguageSetting } from '../../../screens/settings/LanguageSetting';
 import { ProfileSetting } from '../../../screens/settings/ProfileSetting';
+import { QRScanner } from '../../../screens/settings/QRScanner';
 import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
 
@@ -99,6 +100,14 @@ export const SettingStacks = ({}: any) => {
 			<Stack.Screen
 				name={APP_SCREEN.SETTINGS.SHARING}
 				component={Sharing}
+				options={{
+					headerShown: false
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.SETTINGS.QR_SCANNER}
+				component={QRScanner}
 				options={{
 					headerShown: false
 				}}

@@ -1,6 +1,8 @@
+import { IUserStatus } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import { View } from 'react-native';
+import { View, ViewStyle } from 'react-native';
+import { UserStatus } from '../../components/UserStatus';
 import MezonClanAvatar from '../MezonClanAvatar';
 import { style } from './styles';
 
@@ -9,17 +11,28 @@ interface IMezonAvatarProps {
 	username: string;
 	width?: number;
 	height?: number;
-	userStatus?: boolean;
+	userStatus?: IUserStatus;
 	isBorderBoxImage?: boolean;
 	stacks?: {
 		avatarUrl: string;
 		username: string;
 	}[];
 	isShow?: boolean;
+	statusUserStyles?: ViewStyle;
 }
 const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 	const { themeValue } = useTheme();
-	const { avatarUrl, username, width = size.s_40, height = size.s_40, userStatus, isBorderBoxImage, stacks, isShow = true } = props;
+	const {
+		avatarUrl,
+		username,
+		width = size.s_40,
+		height = size.s_40,
+		userStatus,
+		isBorderBoxImage,
+		stacks,
+		isShow = true,
+		statusUserStyles
+	} = props;
 	const styles = style(themeValue, height, width, stacks?.length);
 
 	if (!isShow) return <View style={{ height, width }}></View>;
@@ -44,7 +57,7 @@ const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 				<MezonClanAvatar alt={username} image={avatarUrl} lightMode />
 			</View>
 
-			{!!userStatus && <View style={[styles.statusCircle, userStatus ? styles.online : styles.offline]} />}
+			{!!userStatus && <UserStatus status={userStatus} customStyles={statusUserStyles} />}
 		</View>
 	);
 });

@@ -99,6 +99,7 @@ export const APP_SCREEN = {
 		LANGUAGE: 'ROUTES.SETTINGS.LANGUAGE',
 		PROFILE: 'ROUTES.SETTINGS.PROFILE',
 		SHARING: 'ROUTES.SETTINGS.SHARING',
+		QR_SCANNER: 'ROUTES.SETTINGS.QR_SCANNER',
 		APPEARANCE: 'ROUTES.SETTINGS.APPEARANCE',
 		APP_THEME: 'ROUTES.SETTINGS.APP_THEME',
 		ACCOUNT: 'ROUTES.SETTINGS.ACCOUNT',
@@ -139,7 +140,7 @@ type MenuThreadStackParamList = {
 		channelThreads: ChannelThreads;
 	};
 	[APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL]: { channelThreads: ChannelThreads };
-	[APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity };
+	[APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL]: { currentChannel: IChannel | DirectEntity; isCurrentChannel: boolean };
 };
 
 export type MenuChannelStackParamList = {

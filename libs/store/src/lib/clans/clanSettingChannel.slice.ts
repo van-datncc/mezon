@@ -14,6 +14,7 @@ export interface SettingClanChannelState extends EntityState<ApiChannelSettingIt
 	error?: string | null;
 	channelCount: number;
 	threadCount: number;
+	threadsByChannel: Record<string, ApiChannelSettingItem[]>;
 }
 
 export const channelSettingAdapter = createEntityAdapter({
@@ -24,21 +25,29 @@ export const initialSettingClanChannelState: SettingClanChannelState = channelSe
 	loadingStatus: 'not loaded',
 	error: null,
 	channelCount: 0,
-	threadCount: 0
+	threadCount: 0,
+	threadsByChannel: {}
 });
 
-export const fetchChannelByUserIdCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, clanId: string) => {
+export enum ETypeFetchChannelSetting {
+	FETCH_CHANNEL = 'FETCH_CHANNEL',
+	MORE_CHANNEL = 'MORE_CHANNEL',
+	FETCH_THREAD = 'FETCH_THREAD'
+}
+
+export const fetchChannelSettingInClanCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, clanId: string, parentId: string, page: number, limit: number) => {
 		const response = await mezon.client.getChannelSettingInClan(
 			mezon.session,
 			clanId,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			100
+			parentId, // parent_id
+			undefined, // category_id
+			undefined, // private_channel
+			undefined, // active
+			undefined, // status
+			undefined, // type
+			limit, // limit
+			page // page
 		);
 		return response;
 	},
@@ -46,23 +55,36 @@ export const fetchChannelByUserIdCached = memoizeAndTrack(
 		promise: true,
 		maxAge: CHANNEL_SETTING_CLAN_CACHE_TIME,
 		normalizer: (args) => {
-			return args[0]?.session?.username || '' + args[1];
+			return args[4] + args[3] + args[1] + args[2] + args[0]?.session?.username || '';
 		}
 	}
 );
 
-export const fetchChannelByUserId = createAsyncThunk(
+interface IFetchChannelSetting {
+	noCache?: boolean;
+	clanId: string;
+	parentId: string;
+	page?: number;
+	limit?: number;
+	typeFetch: ETypeFetchChannelSetting;
+}
+
+export const fetchChannelSettingInClan = createAsyncThunk(
 	'channelSetting/fetchClanChannelSetting',
-	async ({ noCache = false, clanId }: { noCache?: boolean; clanId: string }, thunkAPI) => {
+	async ({ noCache = false, clanId, parentId, page = 1, limit = 10, typeFetch }: IFetchChannelSetting, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
-				fetchChannelByUserIdCached.clear(mezon, clanId);
+				fetchChannelSettingInClanCached.clear();
 			}
 
-			const response = await fetchChannelByUserIdCached(mezon, clanId);
+			const response = await fetchChannelSettingInClanCached(mezon, clanId, parentId, page, limit);
 			if (response) {
-				return response;
+				return {
+					parentId: parentId,
+					response: response,
+					typeFetch
+				};
 			}
 			throw new Error('Emoji list is undefined or null');
 		} catch (error) {
@@ -77,16 +99,28 @@ export const settingClanChannelSlice = createSlice({
 	reducers: {},
 	extraReducers(builder) {
 		builder
-			.addCase(fetchChannelByUserId.fulfilled, (state: SettingClanChannelState, actions) => {
+			.addCase(fetchChannelSettingInClan.fulfilled, (state: SettingClanChannelState, actions) => {
 				state.loadingStatus = 'loaded';
-				channelSettingAdapter.setAll(state, actions.payload.channel_setting_list || []);
-				state.channelCount = actions.payload?.channel_count || 0;
-				state.threadCount = actions.payload?.thread_count || 0;
+				switch (actions.payload.typeFetch) {
+					case ETypeFetchChannelSetting.FETCH_CHANNEL:
+						channelSettingAdapter.setAll(state, actions.payload.response.channel_setting_list || []);
+						break;
+					case ETypeFetchChannelSetting.MORE_CHANNEL:
+						channelSettingAdapter.setMany(state, actions.payload.response.channel_setting_list || []);
+						break;
+					case ETypeFetchChannelSetting.FETCH_THREAD:
+						state.threadsByChannel[actions.payload.parentId] = actions.payload.response.channel_setting_list || [];
+						break;
+					default:
+						channelSettingAdapter.setAll(state, actions.payload.response.channel_setting_list || []);
+				}
+				state.channelCount = actions.payload.response.channel_count || 0;
+				state.threadCount = actions.payload.response.thread_count || 0;
 			})
-			.addCase(fetchChannelByUserId.pending, (state: SettingClanChannelState) => {
+			.addCase(fetchChannelSettingInClan.pending, (state: SettingClanChannelState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchChannelByUserId.rejected, (state: SettingClanChannelState, action) => {
+			.addCase(fetchChannelSettingInClan.rejected, (state: SettingClanChannelState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
@@ -95,7 +129,7 @@ export const settingClanChannelSlice = createSlice({
 
 export const channelSettingActions = {
 	...settingClanChannelSlice.actions,
-	fetchChannelByUserId
+	fetchChannelSettingInClan
 };
 
 export const getChannelSettingState = (rootState: { [SETTING_CLAN_CHANNEL]: SettingClanChannelState }): SettingClanChannelState =>
@@ -104,6 +138,7 @@ const { selectAll, selectEntities, selectById } = channelSettingAdapter.getSelec
 export const selectAllChannelSuggestion = createSelector(getChannelSettingState, selectAll);
 export const selectChannelSuggestionEntities = createSelector(getChannelSettingState, selectEntities);
 export const selectOneChannelInfor = (channelId: string) => createSelector(getChannelSettingState, (state) => selectById(state, channelId));
+export const selectThreadsListByParentId = (parentId: string) => createSelector(getChannelSettingState, (state) => state.threadsByChannel[parentId]);
 export const settingChannelReducer = settingClanChannelSlice.reducer;
 export const selectNumberChannelCount = createSelector(getChannelSettingState, (state) => state.channelCount);
 export const selectNumberThreadCount = createSelector(getChannelSettingState, (state) => state.threadCount);

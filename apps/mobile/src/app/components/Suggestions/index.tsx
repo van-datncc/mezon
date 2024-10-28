@@ -1,7 +1,6 @@
 import { debounce } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion } from '@mezon/store';
-import { selectAllHashtagDm, useAppDispatch } from '@mezon/store-mobile';
+import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion, selectAllHashtagDm, useAppDispatch } from '@mezon/store-mobile';
 import { MentionDataProps, compareObjects, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { FC, memo, useEffect, useMemo, useState } from 'react';

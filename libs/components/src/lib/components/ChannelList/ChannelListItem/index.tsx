@@ -28,6 +28,7 @@ type ChannelListItemProp = {
 export type ChannelListItemRef = {
 	scrollIntoChannel: (options?: ScrollIntoViewOptions) => void;
 	scrollIntoThread: (threadId: string, options?: ScrollIntoViewOptions) => void;
+	channelId: string;
 };
 
 const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListItemProp>((props, ref) => {
@@ -42,7 +43,8 @@ const ChannelListItem = React.forwardRef<ChannelListItemRef | null, ChannelListI
 		},
 		scrollIntoThread: (threadId: string, options: ScrollIntoViewOptions = { block: 'center' }) => {
 			listThreadRef.current?.scrollIntoThread(threadId, options);
-		}
+		},
+		channelId: channel?.id
 	}));
 
 	return (
@@ -76,7 +78,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, listTh
 		return [];
 	}, [voiceChannelMembers, streamChannelMembers]);
 	const isCategoryExpanded = useSelector(selectCategoryExpandStateByCategoryId(channel.clan_id || '', channel.category_id || ''));
-	const unreadMessageCount = useMemo(() => channel.count_mess_unread || 0, [channel.count_mess_unread]);
+	const unreadMessageCount = channel?.count_mess_unread || 0;
 	const [openInviteModal, closeInviteModal] = useModal(() => <ModalInvite onClose={closeInviteModal} open={true} channelID={channel.id} />);
 
 	const handleOpenInvite = () => {

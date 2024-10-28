@@ -1,22 +1,49 @@
+/* eslint-disable no-console */
 import { Block, Colors, Metrics, size } from '@mezon/mobile-ui';
-import { Audio, Video as ExpoVideo, ResizeMode } from 'expo-av';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { Audio, Video as ExpoVideo, InterruptionModeIOS, ResizeMode } from 'expo-av';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Platform } from 'react-native';
 
 const widthMedia = Metrics.screenWidth - 150;
 
 export const RenderVideoChat = React.memo(
 	({ videoURL }: { videoURL: string }) => {
+		const videoRef = useRef<ExpoVideo>();
 		const [videoDimensions, setVideoDimensions] = useState({ width: widthMedia + size.s_50, height: 160, isLoading: true });
+
 		useEffect(() => {
-			Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+			let timeout;
+			Audio.setAudioModeAsync({
+				interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+				playsInSilentModeIOS: true,
+				allowsRecordingIOS: false,
+				staysActiveInBackground: false
+			})
+				.then(() => {
+					if (Platform.OS === 'ios') {
+						videoRef?.current?.playAsync();
+						videoRef?.current?.setVolumeAsync(0);
+						timeout = setTimeout(() => {
+							videoRef?.current?.setVolumeAsync(1);
+							videoRef?.current?.pauseAsync();
+						}, 500);
+						return;
+					}
+				})
+				.catch((err) => console.log('Set active err', err));
+
+			return () => {
+				timeout && clearTimeout(timeout);
+			};
 		}, []);
+
 		if (!videoURL) return null;
 		const isUploading = !videoURL?.includes('http');
 
 		return (
 			<Block marginTop={size.s_10} marginBottom={size.s_6} opacity={isUploading || videoDimensions?.isLoading ? 0.5 : 1}>
 				<ExpoVideo
+					ref={videoRef}
 					onError={(err) => {
 						console.log('load error', err);
 					}}
@@ -33,6 +60,7 @@ export const RenderVideoChat = React.memo(
 					useNativeControls
 					resizeMode={ResizeMode.CONTAIN}
 					rate={1.0}
+					shouldPlay={false}
 					removeClippedSubviews
 					shouldRasterizeIOS
 					style={{

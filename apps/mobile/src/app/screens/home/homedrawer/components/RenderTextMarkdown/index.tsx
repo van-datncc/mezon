@@ -1,7 +1,14 @@
 import { codeBlockRegex, codeBlockRegexGlobal, markdownDefaultUrlRegex, splitBlockCodeRegex, urlRegex } from '@mezon/mobile-components';
-import { Attributes, Colors, size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannelId, useAppSelector } from '@mezon/store';
-import { ChannelsEntity, selectAllChannelMembers, selectAllUserClans, selectChannelsEntities, selectHashtagDmEntities } from '@mezon/store-mobile';
+import { Attributes, Colors, size, useTheme, verticalScale } from '@mezon/mobile-ui';
+import {
+	ChannelsEntity,
+	selectAllChannelMembers,
+	selectAllUserClans,
+	selectChannelsEntities,
+	selectCurrentChannelId,
+	selectHashtagDmEntities,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { ETokenMessage, IExtendedMessage } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import React, { useMemo } from 'react';
@@ -53,22 +60,28 @@ export const TYPE_MENTION = {
 export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean) =>
 	StyleSheet.create({
 		heading1: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(22)
 		},
 		heading2: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(20)
 		},
 		heading3: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(18)
 		},
 		heading4: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(17)
 		},
 		heading5: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(15)
 		},
 		heading6: {
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			fontSize: verticalScale(16)
 		},
 		body: {
 			color: isUnReadChannel ? colors.white : colors.text,
@@ -82,21 +95,21 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		code_block: {
 			color: colors.text,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondaryLight,
 			paddingVertical: 1,
-			borderColor: colors.text,
+			borderColor: colors.secondary,
 			borderRadius: 5,
 			lineHeight: size.s_20
 		},
 		code_inline: {
 			color: colors.text,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondaryLight,
 			fontSize: size.small,
-			lineHeight: size.s_17
+			lineHeight: size.s_20
 		},
 		fence: {
 			color: colors.text,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondaryLight,
 			paddingVertical: 5,
 			borderColor: colors.borderHighlight,
 			borderRadius: 5,
@@ -106,7 +119,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		link: {
 			color: colors.textLink,
 			textDecorationLine: 'none',
-			lineHeight: size.s_17
+			lineHeight: size.s_20
 		},
 		iconEmojiInMessage: {
 			width: size.s_20,
@@ -483,6 +496,10 @@ export const RenderTextMarkdownContent = React.memo(
 			return formattedContent;
 		}, [elements, t, mode]);
 
+		const escapeDashes = (text: string): string => {
+			return text.replace(/-{1,10}/g, (match) => `\\${match}`);
+		};
+
 		const renderMarkdown = () => (
 			<Markdown
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -521,7 +538,7 @@ export const RenderTextMarkdownContent = React.memo(
 					}
 				}}
 			>
-				{formatBlockCode(contentRender?.trim(), isMessageReply)}
+				{escapeDashes(formatBlockCode(contentRender?.trim(), isMessageReply))}
 			</Markdown>
 		);
 

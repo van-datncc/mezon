@@ -1,5 +1,7 @@
+import { memo } from 'react';
 import { Outlet } from 'react-router-dom';
 
-export function MainContent() {
-	return <Outlet />;
-}
+export const MainContent = memo(
+	() => <Outlet />,
+	() => true
+);

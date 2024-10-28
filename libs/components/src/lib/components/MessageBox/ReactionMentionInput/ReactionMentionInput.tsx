@@ -1,6 +1,5 @@
 import {
 	useChannelMembers,
-	useChannels,
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -16,6 +15,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
+	selectAllChannels,
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectAllUserClans,
@@ -24,7 +24,6 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectCurrentClanId,
 	selectDataReferences,
 	selectDmGroupCurrentId,
 	selectIdMessageRefEdit,
@@ -40,11 +39,13 @@ import {
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
+	selectThreadCurrentChannel,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
+	ChannelMembersEntity,
 	EmojiPlaces,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
@@ -57,7 +58,6 @@ import {
 	checkIsThread,
 	filterEmptyArrays,
 	focusToElement,
-	getRoleList,
 	searchMentionsHashtag,
 	threadError
 } from '@mezon/utils';
@@ -69,7 +69,6 @@ import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
 import PrivateThread from '../../ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
-import { useMessageLine } from '../../MessageWithUser/useMessageLine';
 import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
 import ChannelMessageThread from './ChannelMessageThread';
 import CustomModalMentions from './CustomModalMentions';
@@ -124,20 +123,19 @@ export type MentionReactInputProps = {
 };
 
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
-	const rolesInClan = useSelector(selectAllRolesClan);
-	const roleList = getRoleList(rolesInClan);
-	const { channels } = useChannels();
+	const channels = useSelector(selectAllChannels);
+	const rolesClan = useSelector(selectAllRolesClan);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const dispatch = useAppDispatch();
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { setSubPanelActive } = useGifsStickersEmoji();
 	const commonChannelDms = useSelector(selectAllHashtagDm);
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
-	const currentClanId = useSelector(selectCurrentClanId);
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
-	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
+	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
+	const { messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
 	const { emojis } = useEmojiSuggestion();
@@ -149,6 +147,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
+
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
@@ -158,15 +157,23 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	);
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
+	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
+	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
+	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
+	const { mentionList, hashtagList, emojiList, usersNotExistingInThread } = useProcessMention(
+		request?.mentionRaw,
+		rolesClan,
+		membersOfChild as ChannelMembersEntity[],
+		membersOfParent as ChannelMembersEntity[],
+		dataReferences?.message_sender_id || ''
+	);
+	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
+
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const isSearchMessage = useSelector(selectIsSearchMessage(currentDmOrChannelId || ''));
 	const lastMessageByUserId = useSelector((state) => selectLassSendMessageEntityBySenderId(state, currentDmOrChannelId, userProfile?.user?.id));
-
 	const { setOpenThreadMessageState, checkAttachment } = useReference(currentDmOrChannelId || '');
-	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
-
-	const { mentions } = useMessageLine(request?.content);
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
 
@@ -174,7 +181,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		if (query.length === 0) return;
 		const seenIds = new Set();
 		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
+			.filter((emoji) => emoji.shortname && emoji.shortname.toLowerCase().indexOf(query.toLowerCase()) > -1)
 			.filter((emoji) => {
 				if (emoji.id && !seenIds.has(emoji.id)) {
 					seenIds.add(emoji.id);
@@ -192,7 +199,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const isShowPopupQuickMess = useSelector(selectIsShowPopupQuickMess);
 	const onKeyDown = async (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): Promise<void> => {
 		const { key, ctrlKey, shiftKey, metaKey } = event;
-		const isEnterKey = key === 'Enter';
 		const isComposing = event.nativeEvent.isComposing;
 
 		if ((ctrlKey || metaKey) && (key === 'z' || key === 'Z')) {
@@ -242,12 +248,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 
-	const { linkList, markdownList, voiceLinkRoomList } = useProcessedContent(request?.content);
-
-	const { mentionList, hashtagList, emojiList } = useProcessMention(request?.mentionRaw, roleList);
-
-	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
-
 	const attachmentData = useMemo(() => {
 		if (attachmentFilteredByChannelId === null) {
 			return [];
@@ -292,8 +292,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				dispatch(threadsActions.setNameThreadError(threadError.name));
 				return;
 			}
-			if (checkIsThread(currentChannel as ChannelsEntity)) {
-				addMemberToThread(currentChannel, mentionList);
+			if (checkIsThread(currentChannel as ChannelsEntity) && usersNotExistingInThread.length > 0) {
+				addMemberToThread(currentChannel, usersNotExistingInThread);
 			}
 
 			if (checkIsThread(currentChannel as ChannelsEntity) && currentChannel?.active === ThreadStatus.activePublic) {
@@ -370,6 +370,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			request,
+			hashtagList,
+			emojiList,
+			linkList,
+			markdownList,
+			voiceLinkRoomList,
 			mentionData,
 			nameValueThread,
 			props,
@@ -382,7 +387,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			mentionEveryone,
 			addMemberToThread,
 			currentChannel,
-			mentions,
 			usersClan,
 			currentChannelId,
 			valueThread?.content.t,

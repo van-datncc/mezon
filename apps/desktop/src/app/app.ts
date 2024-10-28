@@ -2,13 +2,11 @@ import { app, BrowserWindow, Menu, MenuItemConstructorOptions, screen, shell } f
 import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import { format } from 'url';
-import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
 import { TRIGGER_SHORTCUT } from './events/constants';
 import { initBadge } from './services/badge';
-import { setupPushReceiver } from './services/push-receiver';
 
 const isQuitting = false;
 
@@ -20,10 +18,7 @@ export default class App {
 	static BrowserWindow: typeof Electron.BrowserWindow;
 
 	public static isDevelopmentMode() {
-		const isEnvironmentSet: boolean = 'ELECTRON_IS_DEV' in process.env;
-		const getFromEnvironment: boolean = parseInt(process.env.ELECTRON_IS_DEV, 10) === 1;
-
-		return isEnvironmentSet ? getFromEnvironment : !environment.production;
+		return !app.isPackaged;
 	}
 
 	private static onWindowAllClosed() {
@@ -41,11 +36,13 @@ export default class App {
 	private static onReady() {
 		autoUpdater.checkForUpdates();
 		if (rendererAppName) {
+			App.application.setLoginItemSettings({
+				openAtLogin: true
+			});
 			App.initMainWindow();
 			App.loadMainWindow();
 			App.setupMenu();
 			App.setupBadge();
-			App.setupPushReceiver();
 			tray.init(isQuitting);
 		}
 	}
@@ -148,6 +145,9 @@ export default class App {
 		});
 		// handle all external redirects in a new browser window
 		App.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+			if (App.isDevelopmentMode()) {
+				return { action: 'allow' };
+			}
 			shell.openExternal(url);
 			return { action: 'deny' };
 		});
@@ -205,13 +205,6 @@ export default class App {
 		App.application.on('window-all-closed', App.onWindowAllClosed);
 		App.application.on('ready', App.onReady);
 		App.application.on('activate', App.onActivate);
-	}
-
-	/**
-	 * setup receive notification from FCM
-	 */
-	private static setupPushReceiver() {
-		return setupPushReceiver(App.mainWindow.webContents);
 	}
 
 	/**

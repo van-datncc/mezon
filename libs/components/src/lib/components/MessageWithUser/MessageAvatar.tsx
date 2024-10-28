@@ -1,23 +1,21 @@
-import { useGetPriorityNameFromUserClan } from '@mezon/core';
+import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store';
 import { IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
-import { useMessageParser } from './useMessageParser';
 import usePendingNames from './usePendingNames';
 
 type IMessageAvatarProps = {
 	message: IMessageWithUser;
-	isCombine: boolean;
 	isEditing?: boolean;
-	isShowFull?: boolean;
 	mode?: number;
 	onClick?: (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => void;
 };
 
-const MessageAvatar = ({ message, isCombine, isShowFull, mode, onClick }: IMessageAvatarProps) => {
-	const { senderId, username, avatarSender, userClanAvatar } = useMessageParser(message);
-	const { clanAvatar, generalAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
+const MessageAvatar = ({ message, mode, onClick }: IMessageAvatarProps) => {
+	const userClan = useAppSelector((state) => selectMemberClanByUserId2(state, message.sender_id));
+	const clanAvatar = userClan?.clan_avatar;
+	const generalAvatar = userClan?.user?.avatar_url;
 	const { pendingUserAvatar, pendingClanAvatar } = usePendingNames(
 		message,
 		undefined,
@@ -26,23 +24,11 @@ const MessageAvatar = ({ message, isCombine, isShowFull, mode, onClick }: IMessa
 		undefined,
 		undefined,
 		undefined,
-		avatarSender,
+		message?.avatar,
 		generalAvatar,
 		clanAvatar,
-		userClanAvatar
+		message?.clan_avatar
 	);
-
-	const { messageHour } = useMessageParser(message);
-
-	const isAnonymous = useMemo(() => senderId === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID, [senderId]);
-
-	if (message.references?.length === 0 && isCombine && !isShowFull) {
-		return (
-			<div className="w-10 flex items-center justify-center min-w-10">
-				<div className="hidden group-hover:text-zinc-400 group-hover:text-[10px] group-hover:block cursor-default">{messageHour}</div>
-			</div>
-		);
-	}
 
 	return (
 		<AvatarImage
@@ -50,19 +36,19 @@ const MessageAvatar = ({ message, isCombine, isShowFull, mode, onClick }: IMessa
 				e.preventDefault();
 				e.stopPropagation();
 			}}
-			alt={username ?? ''}
-			userName={username}
+			alt={message.username ?? ''}
+			userName={message.username}
 			data-popover-target="popover-content"
 			src={
 				(mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? clanAvatar || pendingClanAvatar || pendingUserAvatar : pendingUserAvatar) ||
-				avatarSender
+				message?.avatar
 			}
 			className="min-w-10 min-h-10"
 			classNameText="font-semibold"
-			isAnonymous={isAnonymous}
+			isAnonymous={message.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID}
 			onClick={onClick}
 		/>
 	);
 };
 
-export default memo(MessageAvatar);
+export default memo(MessageAvatar, (prev, cur) => prev.message?.sender_id === cur.message?.sender_id);

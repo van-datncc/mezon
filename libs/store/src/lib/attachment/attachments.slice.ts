@@ -22,13 +22,23 @@ export interface AttachmentState extends EntityState<AttachmentEntity, string> {
 	mode: ChannelStreamMode | undefined;
 	messageId: string;
 	currentAttachment: AttachmentEntity | null;
+	listAttachmentsByChannel: Record<string, AttachmentEntity[]>;
 }
 
-export const attachmentAdapter = createEntityAdapter<AttachmentEntity>();
+export const attachmentAdapter = createEntityAdapter({
+	selectId: (attachment: AttachmentEntity) => attachment.url as string,
+	sortComparer: (a: AttachmentEntity, b: AttachmentEntity) => {
+		if (a.create_time && b.create_time) {
+			return Date.parse(b.create_time) - Date.parse(a.create_time);
+		}
+		return 0;
+	}
+});
 
 type fetchChannelAttachmentsPayload = {
 	clanId: string;
 	channelId: string;
+	noCache?: boolean;
 };
 
 const CHANNEL_ATTACHMENTS_CACHED_TIME = 1000 * 60 * 3;
@@ -49,8 +59,12 @@ export const mapChannelAttachmentsToEntity = (attachmentRes: ApiChannelAttachmen
 
 export const fetchChannelAttachments = createAsyncThunk(
 	'attachment/fetchChannelAttachments',
-	async ({ clanId, channelId }: fetchChannelAttachmentsPayload, thunkAPI) => {
+	async ({ clanId, channelId, noCache }: fetchChannelAttachmentsPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchChannelAttachmentsCached.clear();
+		}
+
 		const response = await fetchChannelAttachmentsCached(mezon, channelId, clanId);
 
 		if (!response.attachments) {
@@ -69,7 +83,8 @@ export const initialAttachmentState: AttachmentState = attachmentAdapter.getInit
 	openModalAttachment: false,
 	mode: undefined,
 	messageId: '',
-	currentAttachment: null
+	currentAttachment: null,
+	listAttachmentsByChannel: {}
 });
 
 export const attachmentSlice = createSlice({
@@ -96,6 +111,14 @@ export const attachmentSlice = createSlice({
 		},
 		removeCurrentAttachment: (state) => {
 			state.currentAttachment = null;
+		},
+		addAttachments: (state, action: PayloadAction<{ listAttachments: AttachmentEntity[]; channelId: string }>) => {
+			const currentChannelId = action?.payload?.channelId;
+			if (state.listAttachmentsByChannel[currentChannelId]) {
+				action?.payload?.listAttachments.map((attachment) => {
+					state.listAttachmentsByChannel[currentChannelId].unshift(attachment);
+				});
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -103,8 +126,12 @@ export const attachmentSlice = createSlice({
 			.addCase(fetchChannelAttachments.pending, (state: AttachmentState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchChannelAttachments.fulfilled, (state: AttachmentState, action: PayloadAction<any>) => {
-				attachmentAdapter.setAll(state, action.payload);
+			.addCase(fetchChannelAttachments.fulfilled, (state: AttachmentState, action) => {
+				const currentChannelId = action.payload[0].channelId as string;
+				if (action.payload.length > 0 && !Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, currentChannelId)) {
+					attachmentAdapter.setAll(state, action.payload);
+					state.listAttachmentsByChannel[currentChannelId] = action.payload;
+				}
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchChannelAttachments.rejected, (state: AttachmentState, action) => {
@@ -176,3 +203,14 @@ export const selectMessageIdAttachment = createSelector(getAttachmentState, (sta
 
 export const selectAttachmentPhoto = () =>
 	createSelector(selectAllAttachment, (attachments) => (attachments || []).filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)));
+
+export const selectAllListAttachmentByChannel = (channelId: string) =>
+	createSelector(getAttachmentState, (state) => {
+		if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {
+			return [];
+		}
+		return state.listAttachmentsByChannel[channelId].filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX));
+	});
+
+export const checkListAttachmentExist = (channelId: string) =>
+	createSelector(getAttachmentState, (state) => Boolean(state.listAttachmentsByChannel[channelId]));

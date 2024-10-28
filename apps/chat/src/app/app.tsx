@@ -9,18 +9,9 @@ import isElectron from 'is-electron';
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import 'react-toastify/dist/ReactToastify.css';
-import WebFont from 'webfontloader';
 import './app.module.scss';
 import { preloadedState } from './mock/state';
 import { Routes } from './routes';
-
-if (typeof window !== 'undefined') {
-	WebFont.load({
-		google: {
-			families: ['gg sans']
-		}
-	});
-}
 
 const mezon: CreateMezonClientOptions = {
 	host: process.env.NX_CHAT_APP_API_HOST as string,

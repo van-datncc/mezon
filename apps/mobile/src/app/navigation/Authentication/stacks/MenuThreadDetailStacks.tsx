@@ -1,12 +1,13 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { CardStyleInterpolators, createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
+import { createStackNavigator, TransitionSpecs } from '@react-navigation/stack';
 import MuteThreadDetailModal from '../../../components/MuteThreadDetailModal';
 import CreateThreadModal from '../../../components/ThreadDetail';
 import CreateThreadForm from '../../../components/ThreadDetail/CreateThreadForm';
 import MenuThreadDetail from '../../../components/ThreadDetail/MenuThreadDetail';
 import { APP_SCREEN } from '../../ScreenTypes';
 
-export const MenuThreadDetailStacks = () => {
+// eslint-disable-next-line no-empty-pattern
+export const MenuThreadDetailStacks = ({}: any) => {
 	const { themeValue } = useTheme();
 	const Stack = createStackNavigator();
 	return (
@@ -28,8 +29,7 @@ export const MenuThreadDetailStacks = () => {
 				headerStyle: {
 					backgroundColor: themeValue.secondary
 				},
-				cardStyle: { backgroundColor: 'transparent' },
-				cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS
+				cardStyle: { backgroundColor: 'transparent' }
 			}}
 		>
 			<Stack.Screen

@@ -1,6 +1,14 @@
 import { CustomModalMentions, ModalDeleteMess, SuggestItem, UserMentionList, useProcessMention } from '@mezon/components';
-import { useChannels, useEditMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { selectAllHashtagDm, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
+import { useChannelMembers, useEditMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
+import {
+	ChannelMembersEntity,
+	selectAllChannels,
+	selectAllHashtagDm,
+	selectAllRolesClan,
+	selectChannelDraftMessage,
+	selectTheme,
+	useAppSelector
+} from '@mezon/store';
 import {
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -9,7 +17,6 @@ import {
 	addMention,
 	createFormattedString,
 	filterEmptyArrays,
-	getRoleList,
 	processText,
 	searchMentionsHashtag
 } from '@mezon/utils';
@@ -47,6 +54,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
 	const mentionListData = UserMentionList({ channelID: channelId, channelMode: mode });
+	const rolesClan = useSelector(selectAllRolesClan);
+	const { membersOfChild, membersOfParent } = useChannelMembers({ channelId: channelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (query.length === 0) return;
@@ -58,8 +67,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	};
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
-
-	const { channels } = useChannels();
+	const channels = useSelector(selectAllChannels);
 
 	const listChannelsMention = useMemo(() => {
 		if (mode !== ChannelStreamMode.STREAM_MODE_GROUP && mode !== ChannelStreamMode.STREAM_MODE_DM) {
@@ -82,22 +90,18 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [openEditMessageState, message.id, idMessageRefEdit]);
 
 	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-	const rolesInClan = useSelector(selectAllRolesClan);
-	const roleList = getRoleList(rolesInClan);
 	const processedContentDraft: IMessageSendPayload = useMemo(() => {
 		return {
-			t: channelDraftMessage.draftContent?.t,
-			hg: channelDraftMessage.draftContent?.hg,
-			ej: channelDraftMessage.draftContent?.ej,
-			lk: channelDraftMessage.draftContent?.lk,
-			mk: channelDraftMessage.draftContent?.mk,
-			vk: channelDraftMessage.draftContent?.vk
+			t: channelDraftMessage?.draftContent?.t,
+			hg: channelDraftMessage?.draftContent?.hg,
+			ej: channelDraftMessage?.draftContent?.ej,
+			lk: channelDraftMessage?.draftContent?.lk,
+			mk: channelDraftMessage?.draftContent?.mk,
+			vk: channelDraftMessage?.draftContent?.vk
 		};
-	}, [channelDraftMessage.draftContent, messageId]);
+	}, [channelDraftMessage?.draftContent, messageId]);
 
-	const processedMentionDraft: ApiMessageMention[] = useMemo(() => {
-		return channelDraftMessage.draftMention;
-	}, [channelDraftMessage.draftMention, messageId]);
+	const processedMentionDraft: ApiMessageMention[] = channelDraftMessage?.draftMention;
 
 	const addMentionToContent = useMemo(
 		() => addMention(processedContentDraft, processedMentionDraft),
@@ -119,9 +123,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	useEscapeKey(handleCancelEdit);
 
-	const draftContent = useMemo(() => {
-		return channelDraftMessage.draftContent?.t;
-	}, [channelDraftMessage.draftContent?.t]);
+	const draftContent = channelDraftMessage?.draftContent?.t;
 
 	const originalContent = useMemo(() => {
 		return message.content?.t;
@@ -163,8 +165,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 	const handleChange: OnChangeHandlerFunc = (event, newValue, newPlainTextValue, mentions) => {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const { mentionList, hashtagList, emojiList } = useProcessMention(mentions, roleList);
-
+		const { mentionList, hashtagList, emojiList } = useProcessMention(
+			mentions,
+			rolesClan,
+			membersOfChild as ChannelMembersEntity[],
+			membersOfParent as ChannelMembersEntity[]
+		);
 		const { links, markdowns, voiceRooms } = processText(newPlainTextValue);
 		setChannelDraftMessage(
 			channelId,
@@ -229,7 +235,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
-					rows={channelDraftMessage.draftContent?.t?.split('\n').length}
+					rows={channelDraftMessage?.draftContent?.t?.split('\n').length}
 					forceSuggestionsAboveCursor={true}
 					style={appearanceTheme === ThemeApp.Light ? lightMentionsInputStyle : darkMentionsInputStyle}
 					customSuggestionsContainer={(children: React.ReactNode) => {

@@ -1,5 +1,12 @@
 import { useChannelMembersActions } from '@mezon/core';
-import { ChannelMembersEntity, selectAllAccount, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import {
+	ChannelMembersEntity,
+	notificationSettingActions,
+	selectAllAccount,
+	selectCurrentClan,
+	selectCurrentClanId,
+	useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	HEIGHT_PANEL_PROFILE,
@@ -25,7 +32,7 @@ import ModalRemoveMemberClan from './ModalRemoveMemberClan';
 export type MemberProfileProps = {
 	avatar: string;
 	name: string;
-	status?: boolean;
+	status?: { status?: boolean; isMobile?: boolean };
 	customStatus?: string;
 	isHideStatus?: boolean;
 	isHideIconStatus?: boolean;
@@ -47,6 +54,7 @@ export type MemberProfileProps = {
 	userNameAva?: string;
 	hideLongName?: boolean;
 	isDM?: boolean;
+	isMute?: boolean;
 };
 
 export enum ModalType {
@@ -79,7 +87,8 @@ export function MemberProfile({
 	isHiddenAvatarPanel,
 	userNameAva,
 	hideLongName,
-	isDM
+	isDM,
+	isMute
 }: MemberProfileProps) {
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
@@ -87,17 +96,15 @@ export function MemberProfile({
 		distanceToBottom: 0
 	});
 	const [openModalRemoveMember, setOpenModalRemoveMember] = useState<boolean>(false);
-	const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean>(false);
-
 	const { removeMemberClan } = useChannelMembersActions();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentClan = useSelector(selectCurrentClan);
 	const userProfile = useSelector(selectAllAccount);
 	const [positionShortUser, setPositionShortUser] = useState<{ top: number; left: number } | null>(null);
-
+	const dispatch = useAppDispatch();
 	const panelRef = useRef<HTMLDivElement | null>(null);
 
-	const handleMouseClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		// stop open popup default of web
 		window.oncontextmenu = (e) => {
 			e.preventDefault();
@@ -134,6 +141,11 @@ export function MemberProfile({
 			if (modalState.current.pannelMember) {
 				closeModal(ModalType.PannelMember);
 			} else {
+				await dispatch(
+					notificationSettingActions.getNotificationSetting({
+						channelId: directMessageValue?.dmID || ''
+					})
+				);
 				resetModalState();
 				openPanelMember();
 			}
@@ -236,7 +248,6 @@ export function MemberProfile({
 		modalState.current.userProfile = true;
 		return (
 			<UserProfileModalInner
-				openModal={isOpenProfileModal}
 				userId={user?.user?.id || user?.user_id?.[0]}
 				directId={(user as any)?.channel_id || user?.channelId}
 				onClose={() => closeModal(ModalType.UserProfile)}
@@ -338,7 +349,7 @@ export function MemberProfile({
                   ${isMemberChannel || positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
                   ${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
-                  ${isUnReadDirect ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}
+                  ${isUnReadDirect && !isMute ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}
 							    `}
 									title={name}
 								>

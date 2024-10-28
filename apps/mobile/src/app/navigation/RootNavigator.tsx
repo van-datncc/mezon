@@ -1,15 +1,16 @@
+/* eslint-disable no-console */
 import {
 	MezonStoreProvider,
 	accountActions,
 	appActions,
 	authActions,
-	channelsActions,
 	clansActions,
 	directActions,
 	emojiSuggestionActions,
 	friendsActions,
 	getStoreAsync,
 	initStore,
+	listChannelsByUserActions,
 	listUsersByUserActions,
 	messagesActions,
 	selectCurrentChannelId,
@@ -33,11 +34,11 @@ import {
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	STORAGE_KEY_TEMPORARY_ATTACHMENT,
+	jumpToChannel,
 	load,
 	remove,
 	save,
-	setCurrentClanLoader,
-	setDefaultChannelLoader
+	setCurrentClanLoader
 } from '@mezon/mobile-components';
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
@@ -84,21 +85,6 @@ const NavigationMain = () => {
 	}, [isLoggedIn]);
 
 	useEffect(() => {
-		// Trigger when app is in background back to active
-		let timeout: string | number | NodeJS.Timeout;
-		const appStateSubscription = AppState.addEventListener('change', (state) => {
-			if (isLoggedIn)
-				timeout = setTimeout(async () => {
-					await handleAppStateChange(state);
-				}, 200);
-		});
-		return () => {
-			appStateSubscription.remove();
-			timeout && clearTimeout(timeout);
-		};
-	}, [currentChannelId, isFromFcmMobile, isLoggedIn, currentClanId]);
-
-	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
 			refreshMessageInitApp();
 			authLoader();
@@ -124,22 +110,6 @@ const NavigationMain = () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		await mainLoaderTimeout({ isFromFCM: isFromFCM?.toString() === 'true' });
 	};
-
-	const handleAppStateChange = useCallback(
-		async (state: string) => {
-			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
-			// Note: if currentClanId === 0 is current DM
-			if (state === 'active' && currentClanId !== '0') {
-				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
-				if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
-					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
-				} else {
-					await messageLoaderBackground();
-				}
-			}
-		},
-		[isFromFcmMobile, currentChannelId, currentClanId]
-	);
 
 	const messageLoaderBackground = useCallback(async () => {
 		try {
@@ -178,11 +148,40 @@ const NavigationMain = () => {
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
 			return null;
 		} catch (error) {
-			// alert('error messageLoaderBackground' + error.message);
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
-			console.log('error messageLoaderBackground', error);
 		}
-	}, [currentChannelId, currentClanId]);
+	}, [currentChannelId, currentClanId, handleReconnect]);
+
+	const handleAppStateChange = useCallback(
+		async (state: string) => {
+			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+			// Note: if currentClanId === 0 is current DM
+			if (state === 'active' && currentClanId !== '0') {
+				DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: false });
+				if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
+					DeviceEventEmitter.emit(ActionEmitEvent.SHOW_SKELETON_CHANNEL_MESSAGE, { isShow: true });
+				} else {
+					await messageLoaderBackground();
+				}
+			}
+		},
+		[currentClanId, isFromFcmMobile, messageLoaderBackground]
+	);
+
+	useEffect(() => {
+		// Trigger when app is in background back to active
+		let timeout: string | number | NodeJS.Timeout;
+		const appStateSubscription = AppState.addEventListener('change', (state) => {
+			if (isLoggedIn)
+				timeout = setTimeout(async () => {
+					await handleAppStateChange(state);
+				}, 200);
+		});
+		return () => {
+			appStateSubscription.remove();
+			timeout && clearTimeout(timeout);
+		};
+	}, [currentChannelId, isFromFcmMobile, isLoggedIn, currentClanId, handleAppStateChange]);
 
 	const authLoader = useCallback(async () => {
 		const store = await getStoreAsync();
@@ -211,6 +210,7 @@ const NavigationMain = () => {
 			promises.push(store.dispatch(clansActions.joinClan({ clanId: '0' })));
 			promises.push(store.dispatch(directActions.fetchDirectMessage({})));
 			promises.push(store.dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
+			promises.push(store.dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
 			await Promise.all(promises);
 			return null;
 		} catch (error) {
@@ -223,6 +223,7 @@ const NavigationMain = () => {
 		async ({ isFromFCM = false }) => {
 			const store = await getStoreAsync();
 			try {
+				store.dispatch(appActions.setLoadingMainMobile(false));
 				const currentClanIdCached = await load(STORAGE_CLAN_ID);
 				const clanId = currentClanId?.toString() !== '0' ? currentClanId : currentClanIdCached;
 				const promises = [];
@@ -232,15 +233,12 @@ const NavigationMain = () => {
 						save(STORAGE_CLAN_ID, clanId);
 						promises.push(store.dispatch(clansActions.joinClan({ clanId })));
 						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId, noCache: true })));
-						promises.push(store.dispatch(channelsActions.fetchChannels({ clanId, noCache: true })));
 					}
 				}
 				const results = await Promise.all(promises);
-
 				if (!isFromFCM) {
-					const respChannel = results.find((result) => result.type === 'channels/fetchChannels/fulfilled');
-					if (respChannel && clanId) {
-						await setDefaultChannelLoader(respChannel.payload, clanId);
+					if (currentChannelId && clanId) {
+						await jumpToChannel(currentChannelId, clanId);
 					} else {
 						const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
 						if (clanResp && !clanId) {

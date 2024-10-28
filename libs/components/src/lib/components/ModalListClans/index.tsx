@@ -2,27 +2,23 @@ import { selectBadgeCountByClanId } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan } from '@mezon/utils';
 import { useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import NavLinkComponent from '../NavLink';
 
 export type SidebarClanItemProps = {
 	option: IClan;
 	linkClan: string;
 	active?: boolean;
-	pathname: string;
 };
 
-const SidebarClanItem = ({ option, linkClan, active, pathname }: SidebarClanItemProps) => {
-	const currentClanPath = pathname.split('/channels')[0];
-	const isSameClan = currentClanPath === linkClan;
-	const handleClick = (e: React.MouseEvent) => {
-		if (isSameClan) {
-			e.preventDefault();
+const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => {
+	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
+	const location = useLocation();
+	const handleClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+		if (location.pathname.includes(linkClan)) {
+			event.preventDefault();
 		}
 	};
-
-	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
-
 	return (
 		<div className="relative">
 			<NavLink to={linkClan} onClick={handleClick}>
