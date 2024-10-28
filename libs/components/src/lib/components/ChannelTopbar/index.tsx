@@ -220,8 +220,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 				if (channelId && clanId) {
 					const body = {
 						channelId,
-						clanId,
-						noCache: true
+						clanId
 					};
 					await dispatch(threadsActions.fetchThreads(body));
 				}

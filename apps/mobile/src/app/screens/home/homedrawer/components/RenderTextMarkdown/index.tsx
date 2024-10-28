@@ -209,13 +209,14 @@ export type IMarkdownProps = {
 	isOnlyContainEmoji?: boolean;
 	isUnReadChannel?: boolean;
 	isLastMessage?: boolean;
+	onLongPress?: () => void;
 };
 
 /**
  * custom render if you need
  * react-native-markdown-display/src/lib/renderRules.js to see more
  */
-export const renderRulesCustom = (isOnlyContainEmoji) => ({
+export const renderRulesCustom = (isOnlyContainEmoji, onLongPress) => ({
 	heading1: (node, children, parent, styles) => {
 		return (
 			<View key={node.key} style={styles._VIEW_SAFE_heading1}>
@@ -296,7 +297,12 @@ export const renderRulesCustom = (isOnlyContainEmoji) => ({
 			);
 		}
 		return (
-			<Text key={node.key} style={[styles.link]} onPress={() => openUrl(node.attributes.href, onLinkPress)}>
+			<Text
+				key={node.key}
+				style={[styles.link]}
+				onPress={() => openUrl(node.attributes.href, onLinkPress)}
+				onLongPress={onLongPress && onLongPress}
+			>
 				{children}
 			</Text>
 		);
@@ -398,7 +404,8 @@ export const RenderTextMarkdownContent = React.memo(
 		isOpenLink = true,
 		isOnlyContainEmoji,
 		isUnReadChannel = false,
-		isLastMessage = false
+		isLastMessage = false,
+		onLongPress
 	}: IMarkdownProps) => {
 		let customStyle = {};
 		const { themeValue } = useTheme();
@@ -507,7 +514,7 @@ export const RenderTextMarkdownContent = React.memo(
 					...(themeValue ? (markdownStyles(themeValue, isUnReadChannel, isLastMessage) as StyleSheet.NamedStyles<any>) : {}),
 					...customStyle
 				}}
-				rules={renderRulesCustom(isOnlyContainEmoji)}
+				rules={renderRulesCustom(isOnlyContainEmoji, onLongPress)}
 				onLinkPress={(url) => {
 					if (isOpenLink) {
 						if (url.startsWith(TYPE_MENTION.userRoleMention)) {

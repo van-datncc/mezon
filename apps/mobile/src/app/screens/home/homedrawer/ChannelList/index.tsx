@@ -146,7 +146,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 	}, [selectCategoryOffsets, currentChannel, isScrollChannelActive, currentClanId, handleScrollToChannel]);
 
 	useEffect(() => {
-		if (currentClanId) {
+		if (currentClanId && currentClanId?.toString() !== '0') {
 			dispatch(channelsActions.fetchListFavoriteChannel({ clanId: currentClanId }));
 		}
 		setIsScrollChannelActive(true);

@@ -125,6 +125,7 @@ dependencies {
     implementation("com.facebook.react:flipper-integration")
     // If your app supports Android versions before Ice Cream Sandwich (API level 14)
     implementation 'com.facebook.fresco:animated-base-support:1.3.0'
+    implementation 'com.google.mlkit:barcode-scanning:17.2.0'
 
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:3.1.3'
@@ -141,6 +142,11 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+project.ext.react = [
+    enableHermes: true  // Enable Hermes
+]
+
 project.ext.vectoricons = [
     iconFontNames: [ 'MaterialIcons.ttf', 'EvilIcons.ttf',"Entypo.ttf" ,'Feather.ttf'] // Specify font files
 ]

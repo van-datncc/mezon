@@ -335,6 +335,17 @@ const MessageItem = React.memo(
 			}
 		};
 
+		const handleLongPressMessage = useCallback(() => {
+			if (preventAction) return;
+			setIsOnlyEmojiPicker(false);
+			onMessageAction({
+				type: EMessageBSToShow.MessageAction,
+				senderDisplayName,
+				message
+			});
+			dispatch(setSelectedMessage(message));
+		}, [message, preventAction, senderDisplayName]);
+
 		// Message welcome
 		if (message?.sender_id === '0' && !message?.content?.t && message?.username === 'system') {
 			return <WelcomeMessage channelId={props.channelId} />;
@@ -343,16 +354,16 @@ const MessageItem = React.memo(
 		const handlePressIn = () => {
 			Animated.timing(backgroundColor, {
 				toValue: 1,
-				duration: 500,
-				useNativeDriver: false
+				duration: 200,
+				useNativeDriver: true
 			}).start();
 		};
 
 		const handlePressOut = () => {
 			Animated.timing(backgroundColor, {
 				toValue: 0,
-				duration: 500,
-				useNativeDriver: false
+				duration: 200,
+				useNativeDriver: true
 			}).start();
 		};
 
@@ -406,21 +417,13 @@ const MessageItem = React.memo(
 							username={usernameMessage}
 							isShow={!isCombine || !!message?.references?.length || showUserInformation}
 						/>
+
 						<Pressable
 							style={[styles.rowMessageBox]}
 							delayLongPress={300}
 							onPressIn={handlePressIn}
 							onPressOut={handlePressOut}
-							onLongPress={() => {
-								if (preventAction) return;
-								setIsOnlyEmojiPicker(false);
-								onMessageAction({
-									type: EMessageBSToShow.MessageAction,
-									senderDisplayName,
-									message
-								});
-								dispatch(setSelectedMessage(message));
-							}}
+							onLongPress={handleLongPressMessage}
 						>
 							<InfoUserMessage
 								onPress={onPressInfoUser}
@@ -448,6 +451,7 @@ const MessageItem = React.memo(
 										mode={mode}
 										directMessageId={channelId}
 										isOnlyContainEmoji={isOnlyContainEmoji}
+										onLongPress={handleLongPressMessage}
 									/>
 								)}
 							</Block>
