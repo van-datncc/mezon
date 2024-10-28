@@ -269,7 +269,7 @@ export const fetchMessages = createAsyncThunk(
 
 		if (isFetchingLatestMessages) {
 			thunkAPI.dispatch(messagesActions.setIsJumpingToPresent({ channelId, status: true }));
-			// thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
+			thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 		}
 
 		return {
