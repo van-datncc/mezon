@@ -70,7 +70,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				setShowLoader(true);
 				fadeIn.current = true;
 			}
-		}, 500);
+		}, 5000);
 
 		return () => {
 			if (loaderTimeoutRef.current) {
@@ -84,9 +84,15 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 			<div style={{ height: 1, width: 1, opacity: 0 }}>.</div>
 			{showLoader && !imageLoaded && (
 				<div role="status" className="image-loading max-w-md rounded shadow animate-pulse">
-					<div className="flex items-center justify-center bg-gray-300 rounded " style={{ height: '100%' }}>
+					<div
+						className={`flex items-center justify-center bg-gray-300 rounded ${attachmentData.height ? 'max-w-4xl max-h-[480px]' : 'h-[150px]'}`}
+						style={{
+							width: attachmentData.width ?? 'auto',
+							height: attachmentData.height ?? 150
+						}}
+					>
 						<svg
-							className="w-10 h-10 text-gray-200"
+							className={`w-10 h-10 text-gray-200 object-scale-down`}
 							aria-hidden="true"
 							xmlns="http://www.w3.org/2000/svg"
 							fill="currentColor"
@@ -103,7 +109,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 					<div style={{ width: 1, opacity: 0 }}>.</div>
 					<img
 						onContextMenu={handleContextMenu}
-						className={`max-w-4xl max-h-[480px] object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
+						className={`${attachmentData.height ? 'max-w-4xl max-h-[480px]' : 'h-[150px]'} object-left-top rounded cursor-default ${fadeIn.current ? 'fade-in' : ''}`}
 						src={attachmentData.url}
 						alt={'message'}
 						onClick={() => handleClick(attachmentData.url || '')}
