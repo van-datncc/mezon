@@ -125,6 +125,6 @@ export const styles = StyleSheet.create({
 	},
 	iconLogin: {
 		width: size.s_50 * 2,
-		height: size.s_50 * 2,
+		height: size.s_50 * 2
 	}
 });

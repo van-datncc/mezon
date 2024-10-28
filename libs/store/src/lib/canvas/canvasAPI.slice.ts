@@ -1,9 +1,11 @@
 import { CanvasUpdate, ICanvas, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEditChannelCanvasRequest } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const CANVAS_API_FEATURE_KEY = 'canvasapi';
+const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
 
 /*
  * Update these interfaces according to your requirements.
@@ -38,7 +40,23 @@ type getCanvasListPayload = {
 	clan_id: string;
 	limit?: number;
 	page?: number;
+	noCache?: boolean;
 };
+
+export const fetchCanvasCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, channel_id: string, clan_id: string, limit?: number, page?: number) => {
+		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limit, page);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: FETCH_MESSAGES_CACHED_TIME,
+		normalizer: (args) => {
+			// set default value
+			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
+		}
+	}
+);
 
 export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', async (body: ApiEditChannelCanvasRequest, thunkAPI) => {
 	try {
@@ -69,11 +87,14 @@ export const getChannelCanvasDetail = createAsyncThunk(
 
 export const getChannelCanvasList = createAsyncThunk(
 	'canvas/getChannelCanvasList',
-	async ({ channel_id, clan_id, limit, page }: getCanvasListPayload, thunkAPI) => {
+	async ({ channel_id, clan_id, limit, page, noCache }: getCanvasListPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-			const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limit, page);
+			if (noCache) {
+				fetchCanvasCached.clear(mezon, channel_id, clan_id, limit, page);
+			}
+			const response = await fetchCanvasCached(mezon, channel_id, clan_id, limit, page);
 			return response;
 		} catch (error: any) {
 			const errstream = await error.json();

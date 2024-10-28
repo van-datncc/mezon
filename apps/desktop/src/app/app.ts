@@ -2,7 +2,6 @@ import { app, BrowserWindow, Menu, MenuItemConstructorOptions, screen, shell } f
 import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
 import { format } from 'url';
-import { environment } from '../environments/environment';
 import { rendererAppName, rendererAppPort } from './constants';
 
 import tray from '../Tray';
@@ -19,10 +18,7 @@ export default class App {
 	static BrowserWindow: typeof Electron.BrowserWindow;
 
 	public static isDevelopmentMode() {
-		const isEnvironmentSet: boolean = 'ELECTRON_IS_DEV' in process.env;
-		const getFromEnvironment: boolean = parseInt(process.env.ELECTRON_IS_DEV, 10) === 1;
-
-		return isEnvironmentSet ? getFromEnvironment : !environment.production;
+		return !app.isPackaged;
 	}
 
 	private static onWindowAllClosed() {
@@ -40,6 +36,9 @@ export default class App {
 	private static onReady() {
 		autoUpdater.checkForUpdates();
 		if (rendererAppName) {
+			App.application.setLoginItemSettings({
+				openAtLogin: true
+			});
 			App.initMainWindow();
 			App.loadMainWindow();
 			App.setupMenu();
@@ -146,6 +145,9 @@ export default class App {
 		});
 		// handle all external redirects in a new browser window
 		App.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+			if (App.isDevelopmentMode()) {
+				return { action: 'allow' };
+			}
 			shell.openExternal(url);
 			return { action: 'deny' };
 		});
