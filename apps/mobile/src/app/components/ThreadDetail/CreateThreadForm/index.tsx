@@ -19,6 +19,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectOpenThreadMessageState,
+	selectThreadCurrentChannel,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { IChannel, IMessageSendPayload, ThreadValue } from '@mezon/utils';
@@ -54,7 +55,8 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 
 	const formikRef = useRef(null);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
-	const { valueThread, threadCurrentChannel } = useThreads();
+	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
+	const { valueThread } = useThreads();
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		mode: ChannelStreamMode.STREAM_MODE_THREAD
