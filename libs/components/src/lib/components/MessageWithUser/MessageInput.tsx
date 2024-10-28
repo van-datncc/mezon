@@ -1,6 +1,13 @@
-import { CustomModalMentions, ModalDeleteMess, SuggestItem, UserMentionList, useProcessMention } from '@mezon/components';
-import { useChannelMembers, useChannels, useEditMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
-import { ChannelMembersEntity, selectAllHashtagDm, selectAllRolesClan, selectChannelDraftMessage, selectTheme, useAppSelector } from '@mezon/store';
+import { useChannelMembers, useEditMessage, useEmojiSuggestion, useEscapeKey } from '@mezon/core';
+import {
+	ChannelMembersEntity,
+	selectAllChannels,
+	selectAllHashtagDm,
+	selectAllRolesClan,
+	selectChannelDraftMessage,
+	selectTheme,
+	useAppSelector
+} from '@mezon/store';
 import {
 	IMessageSendPayload,
 	IMessageWithUser,
@@ -17,6 +24,11 @@ import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
+import ModalDeleteMess from '../../components/DeleteMessageModal/ModalDeleteMess';
+import CustomModalMentions from '../../components/MessageBox/ReactionMentionInput/CustomModalMentions';
+import SuggestItem from '../../components/MessageBox/ReactionMentionInput/SuggestItem';
+import useProcessMention from '../../components/MessageBox/ReactionMentionInput/useProcessMention';
+import { UserMentionList } from '../../components/UserMentionList';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
@@ -59,8 +71,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	};
 
 	const [openModalDelMess, setOpenModalDelMess] = useState(false);
-
-	const { channels } = useChannels();
+	const channels = useSelector(selectAllChannels);
 
 	const listChannelsMention = useMemo(() => {
 		if (mode !== ChannelStreamMode.STREAM_MODE_GROUP && mode !== ChannelStreamMode.STREAM_MODE_DM) {

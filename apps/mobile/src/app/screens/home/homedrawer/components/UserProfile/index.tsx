@@ -197,6 +197,7 @@ const UserProfile = React.memo(
 							username={userById?.clan_nick || user?.display_name || userById?.user?.username}
 							userStatus={userStatus}
 							isBorderBoxImage={true}
+							statusUserStyles={styles.statusUser}
 						/>
 					</View>
 				</View>

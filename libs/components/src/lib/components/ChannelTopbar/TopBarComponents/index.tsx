@@ -41,7 +41,9 @@ export const ChannelLabel = ({ channel }: { channel: IChannel | null | undefined
 	const currentCanvasId = useSelector(selectIdCanvas);
 	const canvasById = useSelector((state) => selectCanvasEntityById(state, currentChannel?.channel_id, currentCanvasId));
 	const { userProfile } = useAuth();
-	const isDisableDelCanvas = Boolean(canvasById?.creator_id !== userProfile?.user?.id && currentChannel?.creator_id !== userProfile?.user?.id);
+	const isDisableDelCanvas = Boolean(
+		canvasById?.creator_id && canvasById?.creator_id !== userProfile?.user?.id && currentChannel?.creator_id !== userProfile?.user?.id
+	);
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,

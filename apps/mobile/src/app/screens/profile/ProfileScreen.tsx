@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth, useFriends, useMemberCustomStatus } from '@mezon/core';
+import { useAuth, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { CheckIcon, Icons } from '@mezon/mobile-components';
 import { Block, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity, channelMembersActions, selectCurrentClanId, selectUpdateToken, useAppDispatch } from '@mezon/store-mobile';
@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { MezonAvatar, MezonButton } from '../../componentUI';
 import { AddStatusUserModal } from '../../components/AddStatusUserModal';
 import { CustomStatusUser } from '../../components/CustomStatusUser';
+import { UserStatus } from '../../components/UserStatus';
 import { useMixImageColor } from '../../hooks/useMixImageColor';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -33,6 +34,8 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 	const getTokenSocket = useSelector(selectUpdateToken(user?.userId ?? ''));
+	const userStatus = useMemberStatus(user?.userId || '');
+
 	const tokenInWallet = useMemo(() => {
 		return user?.userProfile?.wallet ? JSON.parse(user?.userProfile?.wallet)?.value : 0;
 	}, [user?.userProfile?.wallet]);
@@ -102,7 +105,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
 						</Block>
 					)}
-					<View style={styles.dotOnline} />
+					<UserStatus status={userStatus} customStyles={styles.dotStatusUser} />
 				</TouchableOpacity>
 			</View>
 

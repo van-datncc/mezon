@@ -21,7 +21,6 @@ import {
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectHasInternetMobile,
-	selectIdMessageToJump,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
@@ -99,7 +98,6 @@ const MessageItem = React.memo(
 
 		const { markMessageAsSeen } = useSeenMessagePool();
 		const userProfile = useSelector(selectAllAccount);
-		const idMessageToJump = useSelector(selectIdMessageToJump);
 		const usersClan = useSelector(selectAllUserClans);
 		const rolesInClan = useSelector(selectAllRolesClan);
 		const timeoutRef = useRef<NodeJS.Timeout>(null);
@@ -177,29 +175,33 @@ const MessageItem = React.memo(
 				return true;
 			}
 			return false;
-		}, [message?.update_time, message.hide_editted, message?.content?.t, message?.create_time]);
+		}, [message?.update_time, message.isError, message.isErrorRetry, message.hide_editted, message?.content?.t, message?.create_time]);
+
+		useEffect(() => {
+			const event = DeviceEventEmitter.addListener(ActionEmitEvent.MESSAGE_ID_TO_JUMP, (msgId: string) => {
+				if (msgId === message?.id) {
+					setShowHighlightReply(true);
+					timeoutRef.current = setTimeout(() => {
+						setShowHighlightReply(false);
+						dispatch(messagesActions.setIdMessageToJump(''));
+					}, 2000);
+				} else {
+					setShowHighlightReply(false);
+					timeoutRef.current && clearTimeout(timeoutRef.current);
+				}
+			});
+
+			return () => {
+				event.remove();
+				timeoutRef.current && clearTimeout(timeoutRef.current);
+			};
+		}, [dispatch, message?.id]);
 
 		useEffect(() => {
 			if (props?.messageId) {
 				markMessageAsSeen(message);
 			}
 		}, [markMessageAsSeen, message, props.messageId]);
-
-		useEffect(() => {
-			if (idMessageToJump === message?.id) {
-				setShowHighlightReply(true);
-				timeoutRef.current = setTimeout(() => {
-					setShowHighlightReply(false);
-					dispatch(messagesActions.setIdMessageToJump(''));
-				}, 2000);
-			} else {
-				setShowHighlightReply(false);
-				timeoutRef.current && clearTimeout(timeoutRef.current);
-			}
-			return () => {
-				timeoutRef.current && clearTimeout(timeoutRef.current);
-			};
-		}, [dispatch, idMessageToJump, message?.id]);
 
 		const onLongPressImage = useCallback(() => {
 			if (preventAction) return;
@@ -246,8 +248,6 @@ const MessageItem = React.memo(
 
 		const jumpToChannel = async (channelId: string, clanId: string, channelCateId: string) => {
 			const store = await getStoreAsync();
-			// TODO: do we need to jump to message here?
-			store.dispatch(messagesActions.jumpToMessage({ messageId: '', channelId, clanId }));
 			store.dispatch(
 				channelsActions.joinChannel({
 					clanId,
@@ -257,39 +257,42 @@ const MessageItem = React.memo(
 			);
 		};
 
-		const onChannelMention = useCallback(async (channel: ChannelsEntity) => {
-			try {
-				const type = channel?.type;
-				const channelId = channel?.channel_id;
-				const channelCateId = channel?.category_id;
-				const clanId = channel?.clan_id;
+		const onChannelMention = useCallback(
+			async (channel: ChannelsEntity) => {
+				try {
+					const type = channel?.type;
+					const channelId = channel?.channel_id;
+					const channelCateId = channel?.category_id;
+					const clanId = channel?.clan_id;
 
-				if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
-					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
-					await Linking.openURL(urlVoice);
-				} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
-					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
-						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-							screen: APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM
+					if (type === ChannelType.CHANNEL_TYPE_VOICE && channel?.meeting_code) {
+						const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
+						await Linking.openURL(urlVoice);
+					} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
+						if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
+							navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+								screen: APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM
+							});
+							save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
+						} else {
+							navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+						}
+						if (currentClanId !== clanId) {
+							changeClan(clanId);
+						}
+						DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
+							isFetchMemberChannelDM: true
 						});
-						save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
-					} else {
-						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+						const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+						save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+						await jumpToChannel(channelId, clanId, channelCateId);
 					}
-					if (currentClanId !== clanId) {
-						changeClan(clanId);
-					}
-					DeviceEventEmitter.emit(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, {
-						isFetchMemberChannelDM: true
-					});
-					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-					await jumpToChannel(channelId, clanId, channelCateId);
+				} catch (error) {
+					console.log(error);
 				}
-			} catch (error) {
-				console.log(error);
-			}
-		}, []);
+			},
+			[currentChannel, currentClanId, navigation]
+		);
 
 		const senderDisplayName = useMemo(() => {
 			if (isDM) {
@@ -382,7 +385,6 @@ const MessageItem = React.memo(
 							isMessageReply={true}
 							channelId={message.channel_id}
 							clanId={message.clan_id}
-							mode={mode}
 						/>
 					)}
 					{isMessageReplyDeleted ? (

@@ -37,22 +37,11 @@ export function useMessageValue(channelId?: string) {
 		[currentChannelId, currentDmGroupId, mode, dispatch]
 	);
 
-	const setModeResponsive = useCallback(
-		(value: string) => {
-			dispatch(channelsActions.setModeResponsive(value));
-		},
-		[dispatch]
-	);
-
 	return useMemo(
 		() => ({
-			currentChannelId,
-			mode,
-			currentDmGroupId,
 			request,
-			setRequestInput,
-			setModeResponsive
+			setRequestInput
 		}),
-		[setRequestInput, setModeResponsive, request, currentDmGroupId, mode, currentChannelId]
+		[setRequestInput, request]
 	);
 }

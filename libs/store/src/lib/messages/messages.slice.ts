@@ -436,6 +436,7 @@ type SendMessagePayload = {
 	isPublic: boolean;
 	avatar?: string;
 	isMobile?: boolean;
+	username?: string;
 };
 
 export const sendMessage = createAsyncThunk('messages/sendMessage', async (payload: SendMessagePayload, thunkAPI) => {
@@ -452,9 +453,9 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		clanId,
 		senderId,
 		avatar,
-		isMobile = false
+		isMobile = false,
+		username
 	} = payload;
-	const id = Date.now().toString();
 
 	async function doSend() {
 		try {
@@ -512,6 +513,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		}
 	}
 
+	const id = Snowflake.generate();
 	async function fakeItUntilYouMakeIt() {
 		const fakeMessage: ChannelMessage = {
 			id,
@@ -523,7 +525,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			attachments,
 			create_time: new Date().toISOString(),
 			sender_id: senderId,
-			username: '',
+			username: username || '',
 			avatar: avatar,
 			isSending: true,
 			references: [],
@@ -627,7 +629,7 @@ export type SetUserTypingArgs = {
 
 const channelMessagesAdapter = createEntityAdapter({
 	selectId: (message: MessagesEntity) => message.id,
-	sortComparer: orderMessageByTimeMsAscending
+	sortComparer: orderMessageByIDAscending //orderMessageByTimeMsAscending
 });
 
 export const initialMessagesState: MessagesState = {
@@ -1035,10 +1037,10 @@ export function orderMessageByIDAscending(a: MessagesEntity, b: MessagesEntity) 
 		return 1;
 	}
 
-	const aid = Snowflake.parse(a.id).timestamp;
-	const bid = Snowflake.parse(b.id).timestamp;
+	const aid = BigInt(a.id);
+	const bid = BigInt(b.id);
 
-	return +aid - +bid;
+	return Number(aid - bid);
 }
 
 export const selectOpenOptionMessageState = createSelector(getMessagesState, (state: MessagesState) => state.openOptionMessageState);

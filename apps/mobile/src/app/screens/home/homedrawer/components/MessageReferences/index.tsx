@@ -14,12 +14,11 @@ interface IProps {
 	messageReferences?: ApiMessageRef;
 	preventAction: boolean;
 	isMessageReply?: boolean;
-	mode?: number;
 	channelId?: string;
 	clanId?: string;
 }
 
-export const MessageReferences = React.memo(({ messageReferences, preventAction, mode, channelId, clanId }: IProps) => {
+export const MessageReferences = React.memo(({ messageReferences, preventAction, channelId, clanId }: IProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
@@ -64,12 +63,17 @@ export const MessageReferences = React.memo(({ messageReferences, preventAction,
 						<FastImage />
 					</Text>
 					{messageReferences?.has_attachment ? (
-						<>
-							<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')}</Text>
+						<Text>
+							<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')} </Text>
 							<AttachmentImageIcon width={size.s_12} height={size.s_12} color={Colors.textGray} />
-						</>
+						</Text>
 					) : (
-						<DmListItemLastMessage content={JSON.parse(messageReferences?.content || '{}')} fontSize={size.small} />
+						<DmListItemLastMessage
+							content={JSON.parse(messageReferences?.content || '{}')}
+							styleText={{
+								fontSize: size.small
+							}}
+						/>
 					)}
 				</View>
 			</View>

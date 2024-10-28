@@ -16,18 +16,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { isSameDay } from 'date-fns';
-import React, {
-	ForwardRefExoticComponent,
-	PropsWithoutRef,
-	ReactNode,
-	RefAttributes,
-	memo,
-	useCallback,
-	useEffect,
-	useImperativeHandle,
-	useMemo,
-	useRef
-} from 'react';
+import React, { ForwardRefExoticComponent, PropsWithoutRef, ReactNode, RefAttributes, memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 export type MessageProps = {
@@ -40,11 +29,15 @@ export type MessageProps = {
 	avatarDM?: string;
 	userName?: string;
 	isLastSeen?: boolean;
+	index: number;
+	checkMessageTargetToMoved?: boolean;
+	messageReplyHighlight?: boolean;
 };
 
 export type MessageRef = {
 	scrollIntoView: (options?: ScrollIntoViewOptions) => void;
 	messageId: string;
+	index: number;
 };
 
 type ChannelMessageComponent = ForwardRefExoticComponent<PropsWithoutRef<MessageProps> & RefAttributes<MessageRef>> & {
@@ -52,7 +45,19 @@ type ChannelMessageComponent = ForwardRefExoticComponent<PropsWithoutRef<Message
 };
 
 export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageRef, MessageProps>(
-	({ messageId, channelId, mode, channelLabel, isHighlight, avatarDM, userName, isLastSeen, previousMessageId }: Readonly<MessageProps>, ref) => {
+	({
+		messageId,
+		channelId,
+		mode,
+		channelLabel,
+		isHighlight,
+		avatarDM,
+		userName,
+		isLastSeen,
+		previousMessageId,
+		checkMessageTargetToMoved,
+		messageReplyHighlight
+	}: Readonly<MessageProps>) => {
 		const message = useSelector((state) => selectMessageEntityById(state, channelId, messageId));
 		const previousMessage = useSelector((state) => selectMessageEntityById(state, channelId, previousMessageId));
 		const { markMessageAsSeen } = useSeenMessagePool();
@@ -98,18 +103,10 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 			}
 			return message;
 		})();
-		const popup = useMemo(() => {
+
+		const popup = useCallback(() => {
 			return <ChannelMessageOpt message={message} handleContextMenu={handleContextMenu} isCombine={isCombine} />;
 		}, [message, handleContextMenu, isCombine]);
-
-		useImperativeHandle(
-			ref,
-			() => ({
-				scrollIntoView: (options?: ScrollIntoViewOptions) => messageRef.current?.scrollIntoView(options),
-				messageId: messageId
-			}),
-			[messageRef]
-		);
 
 		useEffect(() => {
 			markMessageAsSeen(message);
@@ -131,6 +128,8 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 							onContextMenu={handleContextMenu}
 							isCombine={isCombine}
 							showDivider={isDifferentDay}
+							checkMessageTargetToMoved={checkMessageTargetToMoved}
+							messageReplyHighlight={messageReplyHighlight}
 						/>
 					</div>
 				)}

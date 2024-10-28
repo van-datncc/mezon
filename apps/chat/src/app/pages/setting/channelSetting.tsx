@@ -1,5 +1,6 @@
 import { ListChannelSetting } from '@mezon/components';
 import {
+	ETypeFetchChannelSetting,
 	channelSettingActions,
 	selectAllChannelSuggestion,
 	selectCurrentClanId,
@@ -69,7 +70,13 @@ const ChannelSetting = () => {
 
 	useEffect(() => {
 		async function fetchListChannel() {
-			await dispatch(channelSettingActions.fetchChannelSettingInClan({ clanId: selectClanId as string }));
+			await dispatch(
+				channelSettingActions.fetchChannelSettingInClan({
+					clanId: selectClanId as string,
+					parentId: '0',
+					typeFetch: ETypeFetchChannelSetting.FETCH_CHANNEL
+				})
+			);
 		}
 		fetchListChannel();
 	}, []);

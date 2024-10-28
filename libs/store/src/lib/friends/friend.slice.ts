@@ -70,7 +70,7 @@ export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', asy
 		return [];
 	}
 	const onlineStatus = response.friends.map((friend) => {
-		return { userId: friend.user?.id ?? '', status: friend.user?.online ?? false };
+		return { userId: friend.user?.id ?? '', online: friend.user?.online ?? false, isMobile: friend.user?.is_mobile ?? false };
 	});
 	const listFriends = response.friends.map(mapFriendToEntity);
 	thunkAPI.dispatch(usersClanActions.setManyStatusUser(onlineStatus));
@@ -105,9 +105,6 @@ export const sendRequestAddFriend = createAsyncThunk('friends/requestFriends', a
 				);
 				thunkAPI.dispatch(friendsActions.fetchListFriends({ noCache: true }));
 			}
-		})
-		.catch((e) => {
-			console.log('error');
 		});
 });
 

@@ -1,4 +1,4 @@
-import { useAuth, useChannels, useSendForwardMessage } from '@mezon/core';
+import { useAuth, useSendForwardMessage } from '@mezon/core';
 import {
 	DirectEntity,
 	MessagesEntity,
@@ -9,6 +9,7 @@ import {
 	selectAllChannelMembers,
 	selectAllDirectMessages,
 	selectAllUserClans,
+	selectChannelThreads,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectDmGroupCurrentId,
@@ -50,7 +51,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
-	const { listChannels } = useChannels();
+	const listChannels = useSelector(selectChannelThreads);
 	const isLoading = useSelector((state: RootState) => state.channels.loadingStatus);
 	const listGroup = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_GROUP);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
@@ -90,7 +91,6 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		if (existingIndex !== -1) {
 			setSelectedObjectIdSends((prevItems) => [...prevItems.slice(0, existingIndex), ...prevItems.slice(existingIndex + 1)]);
 		} else {
-			console.log('ispulic', isPublic);
 			setSelectedObjectIdSends((prevItems) => [...prevItems, { id, type, clanId, channelLabel, isPublic }]);
 		}
 	};
@@ -114,7 +114,6 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 		}
 
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
-			console.log('--', selectedObjectIdSend.type);
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				for (const message of combineMessages) {
 					sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, message);

@@ -81,16 +81,9 @@ export const style = (colors: Attributes) =>
 			fontWeight: 'bold'
 		},
 
-		dotOnline: {
-			position: 'absolute',
-			width: size.s_20,
-			height: size.s_20,
-			borderRadius: size.s_50,
-			backgroundColor: baseColor.green,
-			bottom: size.s_2,
-			right: size.s_2,
-			borderWidth: 3,
-			borderColor: colors.secondary
+		dotStatusUser: {
+			right: size.s_6,
+			bottom: size.s_2
 		},
 
 		contentContainer: {

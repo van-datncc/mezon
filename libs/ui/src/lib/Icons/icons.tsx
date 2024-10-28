@@ -5310,3 +5310,195 @@ export function IconMobileDevice({ defaultFill = '#16A34A', defaultSize = 'w-5 h
 		</svg>
 	);
 }
+
+export function ParagraphIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg data-315="true" data-qa="paragraph" aria-hidden="true" viewBox="0 0 20 20" className="is-inline" width="1em" height="1em" {...props}>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M7.25 3.007C5.42 3.109 4 4.335 4 6.25s1.42 3.14 3.25 3.243zm0 7.988C4.75 10.886 2.5 9.152 2.5 6.25c0-2.999 2.402-4.75 5-4.75h9.25a.75.75 0 0 1 0 1.5h-3v14.75a.75.75 0 0 1-1.5 0V3h-3.5v14.75a.75.75 0 0 1-1.5 0z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+
+export function CheckedIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			data-315="true"
+			data-qa="menu_item_checkmark"
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			className="is-inline"
+			style={{ width: '1em', height: '1em', fontSize: '10px' }}
+			{...props}
+		>
+			<path
+				fill={props.color}
+				fill-rule="evenodd"
+				d="M17.234 3.677a.75.75 0 0 1 .089 1.057l-9.72 11.5a.75.75 0 0 1-1.19-.058L2.633 10.7a.75.75 0 0 1 1.234-.852l3.223 4.669 9.087-10.751a.75.75 0 0 1 1.057-.089"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+
+export function H1Icon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			data-315="true"
+			data-qa="heading-1"
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			className="is-inline"
+			style={{ width: '1em', height: '1em' }}
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M3 3.25a.75.75 0 0 0-1.5 0v13.5a.75.75 0 0 0 1.5 0v-6h6.2v6a.75.75 0 0 0 1.5 0V3.25a.75.75 0 0 0-1.5 0v6H3zM17.45 8.5a.75.75 0 0 0-1.191-.607l-2.75 2a.75.75 0 1 0 .882 1.214l1.559-1.134v6.777a.75.75 0 0 0 1.5 0z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+export function H2Icon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			data-315="true"
+			data-qa="heading-2"
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			className="is-inline"
+			style={{ width: '1em', height: '1em' }}
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M2.25 2.5a.75.75 0 0 1 .75.75v6h6.2v-6a.75.75 0 0 1 1.5 0v13.5a.75.75 0 0 1-1.5 0v-6H3v6a.75.75 0 0 1-1.5 0V3.25a.75.75 0 0 1 .75-.75M14.952 16a59 59 0 0 1 1.49-1.526c.33-.33.613-.613.84-.86.345-.373.629-.73.815-1.15.192-.431.255-.87.255-1.372 0-.954-.347-1.726-.913-2.264a3.1 3.1 0 0 0-1.976-.824c-.696-.035-1.425.154-1.995.6-.59.462-.968 1.17-.968 2.053a.75.75 0 0 0 1.5 0c0-.421.165-.693.393-.871.245-.193.604-.303.996-.284.388.02.755.165 1.016.414.25.237.447.607.447 1.176 0 .37-.046.583-.126.763-.085.193-.237.407-.546.742-.207.224-.456.473-.77.787l-.545.547a59 59 0 0 0-2.176 2.32.748.748 0 0 0 .204 1.159c.106.057.228.09.357.09h4.352a.75.75 0 0 0 0-1.5z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+export function H3Icon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			data-315="true"
+			data-qa="heading-3"
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			className="is-inline"
+			style={{ width: '1em', height: '1em' }}
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M2.25 2.5a.75.75 0 0 1 .75.75v6h6.2v-6a.75.75 0 0 1 1.5 0v13.5a.75.75 0 0 1-1.5 0v-6H3v6a.75.75 0 0 1-1.5 0V3.25a.75.75 0 0 1 .75-.75m13.166 13.435c.848-.084 1.484-.636 1.484-1.526 0-.714-.259-1.143-.59-1.374-.342-.24-.895-.36-1.649-.174a.75.75 0 0 1-.73-1.249L15.929 9.5H12.95a.75.75 0 0 1 0-1.5h4.719a.75.75 0 0 1 .545 1.265l-1.994 2.11c.342.086.663.23.951.43.806.565 1.229 1.5 1.229 2.604 0 1.837-1.41 2.876-2.834 3.019-1.424.142-3.044-.576-3.628-2.327a.75.75 0 1 1 1.423-.475c.326.976 1.207 1.394 2.055 1.31"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+
+export function CheckListIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			data-315="true"
+			data-qa="checkbox"
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			className="is-inline"
+			style={{ width: '1em', height: '1em' }}
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M3 4.5A1.5 1.5 0 0 1 4.5 3h11A1.5 1.5 0 0 1 17 4.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 15.5zm1.5-3a3 3 0 0 0-3 3v11a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3v-11a3 3 0 0 0-3-3zm9.33 6.225a.75.75 0 0 0-1.16-.95l-3.885 4.748-1.428-1.964a.75.75 0 0 0-1.214.882l2 2.75a.75.75 0 0 0 1.187.034z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+
+export function OrderedListIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			data-315="true"
+			data-qa="numbered-list"
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			className="is-inline"
+			style={{ width: '1em', height: '1em' }}
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M3.792 2.094A.5.5 0 0 1 4 2.5V6h1a.5.5 0 1 1 0 1H2a.5.5 0 1 1 0-1h1V3.194l-.842.28a.5.5 0 0 1-.316-.948l1.5-.5a.5.5 0 0 1 .45.068M7.75 3.5a.75.75 0 0 0 0 1.5h10a.75.75 0 0 0 0-1.5zM7 10.75a.75.75 0 0 1 .75-.75h10a.75.75 0 0 1 0 1.5h-10a.75.75 0 0 1-.75-.75m0 6.5a.75.75 0 0 1 .75-.75h10a.75.75 0 0 1 0 1.5h-10a.75.75 0 0 1-.75-.75m-4.293-3.36a1 1 0 0 1 .793-.39c.49 0 .75.38.75.75 0 .064-.033.194-.173.409a5 5 0 0 1-.594.711c-.256.267-.552.548-.87.848l-.088.084a42 42 0 0 0-.879.845A.5.5 0 0 0 2 18h3a.5.5 0 0 0 0-1H3.242l.058-.055c.316-.298.629-.595.904-.882a6 6 0 0 0 .711-.859c.18-.277.335-.604.335-.954 0-.787-.582-1.75-1.75-1.75a2 2 0 0 0-1.81 1.147.5.5 0 1 0 .905.427 1 1 0 0 1 .112-.184"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+
+export function BulletListIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			data-315="true"
+			data-qa="bulleted-list"
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			className="is-inline"
+			style={{ width: '1em', height: '1em' }}
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M4 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a.75.75 0 0 1 .75-.75h10a.75.75 0 0 1 0 1.5h-10A.75.75 0 0 1 7 3m.75 6.25a.75.75 0 0 0 0 1.5h10a.75.75 0 0 0 0-1.5zm0 7a.75.75 0 0 0 0 1.5h10a.75.75 0 0 0 0-1.5zM3 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+
+export function BlockquoteIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			data-315="true"
+			data-qa="quote"
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			className="is-inline"
+			style={{ width: '1em', height: '1em' }}
+			{...props}
+		>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M3.5 2.75a.75.75 0 0 0-1.5 0v14.5a.75.75 0 0 0 1.5 0zM6.75 3a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5zM6 10.25a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1-.75-.75m.75 5.25a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}
+
+export function ChevronDownIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg data-315="true" data-qa="caret-down" aria-hidden="true" viewBox="0 0 20 20" style={{ width: '1em', height: '1em' }} {...props}>
+			<path
+				fill="currentColor"
+				fill-rule="evenodd"
+				d="M5.72 7.47a.75.75 0 0 1 1.06 0L10 10.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-3.75 3.75a.75.75 0 0 1-1.06 0L5.72 8.53a.75.75 0 0 1 0-1.06"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+	);
+}

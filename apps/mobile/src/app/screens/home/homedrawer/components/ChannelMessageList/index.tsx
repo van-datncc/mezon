@@ -2,15 +2,13 @@ import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { isEqual } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { MessagesEntity } from '@mezon/store-mobile';
-import { FlashList } from '@shopify/flash-list';
-import debounce from 'lodash.debounce';
 import React, { useCallback, useMemo } from 'react';
-import { View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { style } from './styles';
 
 interface IChannelListMessageProps {
-	flatListRef: React.RefObject<FlashList<MessagesEntity>>;
+	flatListRef: React.RefObject<FlatList<MessagesEntity>>;
 	messages: MessagesEntity[];
 	handleScroll: (event) => void;
 	renderItem: ({ item }: { item: MessagesEntity }) => React.ReactElement;
@@ -40,17 +38,17 @@ const ChannelListMessage = React.memo(
 			return lastMessage?.sender_id === '0' && !lastMessage?.content?.t && lastMessage?.username === 'system';
 		}, [messages]);
 
-		const handleEndReached = debounce(() => {
+		const handleEndReached = () => {
 			if (messages?.length && !isCannotLoadMore) {
 				onLoadMore(ELoadMoreDirection.top);
 			}
-		}, 300);
+		};
 
 		return (
-			<FlashList
+			<FlatList
 				ref={flatListRef}
 				inverted
-				overrideProps={{ isInvertedVirtualizedList: true }}
+				// overrideProps={{ isInvertedVirtualizedList: true }}
 				// showsVerticalScrollIndicator={false}
 				data={messages || []}
 				onScroll={handleScroll}
@@ -60,13 +58,13 @@ const ChannelListMessage = React.memo(
 				removeClippedSubviews={false}
 				decelerationRate={'fast'}
 				keyExtractor={keyExtractor}
-				// initialNumToRender={5}
-				// maxToRenderPerBatch={10}
-				// windowSize={10}
+				initialNumToRender={15}
+				maxToRenderPerBatch={25}
+				windowSize={50}
 				onEndReached={handleEndReached}
-				onEndReachedThreshold={0.5}
+				onEndReachedThreshold={0.1}
 				scrollEventThrottle={16}
-				estimatedItemSize={220}
+				// estimatedItemSize={220}
 				// viewabilityConfig={{
 				// 	minimumViewTime: 0,
 				// 	viewAreaCoveragePercentThreshold: 0,
@@ -76,12 +74,12 @@ const ChannelListMessage = React.memo(
 				// contentInsetAdjustmentBehavior="automatic"
 				ListHeaderComponent={isLoadMoreBottom && !isCannotLoadMore ? <ViewLoadMore /> : null}
 				ListFooterComponent={isLoadMoreTop && !isCannotLoadMore ? <ViewLoadMore /> : null}
-				// onScrollToIndexFailed={(info) => {
-				// 	const wait = new Promise((resolve) => setTimeout(resolve, 300));
-				// 	wait.then(() => {
-				// 		flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
-				// 	});
-				// }}
+				onScrollToIndexFailed={(info) => {
+					const wait = new Promise((resolve) => setTimeout(resolve, 300));
+					wait.then(() => {
+						flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+					});
+				}}
 			/>
 		);
 	},

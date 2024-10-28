@@ -1,6 +1,5 @@
 import {
 	useChannelMembers,
-	useChannels,
 	useClickUpToEdit,
 	useEmojiSuggestion,
 	useGifsStickersEmoji,
@@ -16,6 +15,7 @@ import {
 	reactionActions,
 	referencesActions,
 	selectAllAccount,
+	selectAllChannels,
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectAllUserClans,
@@ -39,6 +39,7 @@ import {
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
+	selectThreadCurrentChannel,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store';
@@ -122,9 +123,8 @@ export type MentionReactInputProps = {
 };
 
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
-	const { channels } = useChannels();
+	const channels = useSelector(selectAllChannels);
 	const rolesClan = useSelector(selectAllRolesClan);
-
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const { addMemberToThread, joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: props.mode ?? 0 });
 	const dispatch = useAppDispatch();
@@ -134,7 +134,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const [mentionEveryone, setMentionEveryone] = useState(false);
-	const { threadCurrentChannel, messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
+	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
+	const { messageThreadError, isPrivate, nameValueThread, valueThread, isShowCreateThread } = useThreads();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const usersClan = useSelector(selectAllUserClans);
 	const { emojis } = useEmojiSuggestion();

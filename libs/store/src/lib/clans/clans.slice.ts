@@ -291,15 +291,21 @@ export const clansSlice = createSlice({
 		updateClanBadgeCount: (state: ClansState, action: PayloadAction<{ clanId: string; count: number; isReset?: boolean }>) => {
 			const { clanId, count, isReset } = action.payload;
 			const entity = state.entities[clanId];
-
 			if (entity) {
-				clansAdapter.updateOne(state, {
-					id: clanId,
-					changes: {
-						badge_count: !isReset ? (entity.badge_count ?? 0) + count : 0
-					}
-				});
+				const newBadgeCount = !isReset ? (entity.badge_count ?? 0) + count : 0;
+				if (!entity.badge_count && newBadgeCount === 0) return;
+				if (entity.badge_count !== newBadgeCount) {
+					clansAdapter.updateOne(state, {
+						id: clanId,
+						changes: {
+							badge_count: newBadgeCount
+						}
+					});
+				}
 			}
+		},
+		refreshStatus(state) {
+			state.loadingStatus = 'not loaded';
 		}
 	},
 	extraReducers: (builder) => {
@@ -396,7 +402,7 @@ export const getClansState = (rootState: { [CLANS_FEATURE_KEY]: ClansState }): C
 export const selectAllClans = createSelector(getClansState, selectAll);
 export const selectCurrentClanId = createSelector(getClansState, (state) => state.currentClanId);
 
-export const selectClanView = createSelector(selectCurrentClanId, (currentClanId) => currentClanId && currentClanId !== '0');
+export const selectClanView = createSelector(selectCurrentClanId, (currentClanId) => !!(currentClanId && currentClanId !== '0'));
 
 export const selectClansEntities = createSelector(getClansState, selectEntities);
 
@@ -423,5 +429,5 @@ export const selectBadgeCountAllClan = createSelector(selectAllClans, (clan) => 
 export const selectBadgeCountByClanId = (clanId: string) =>
 	createSelector(getClansState, (state) => {
 		const clan = state.entities[clanId];
-		return clan.badge_count;
+		return clan?.badge_count;
 	});

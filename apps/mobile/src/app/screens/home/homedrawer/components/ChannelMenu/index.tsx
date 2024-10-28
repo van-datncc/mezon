@@ -1,6 +1,7 @@
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useCategory, useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import {
+	ActionEmitEvent,
 	ENotificationActive,
 	ENotificationChannelId,
 	Icons,
@@ -15,9 +16,10 @@ import {
 	channelsActions,
 	getStoreAsync,
 	notificationSettingActions,
-	selectCurrentChannelNotificatonSelected,
+	selectAllChannelsFavorite,
 	selectCurrentClan,
 	selectCurrentUserId,
+	selectSelectedChannelNotificationSetting,
 	threadsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -25,7 +27,7 @@ import { ChannelThreads, EOverriddenPermission, EPermission } from '@mezon/utils
 import { useNavigation } from '@react-navigation/native';
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { DeviceEventEmitter, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, AppStackScreenProps } from '../../../../../../app/navigation/ScreenTypes';
 import { IMezonMenuItemProps, IMezonMenuSectionProps, MezonClanAvatar, MezonConfirm, MezonMenu, reserve } from '../../../../../componentUI';
@@ -56,7 +58,7 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
 	}, []);
-	const getNotificationChannelSelected = useSelector(selectCurrentChannelNotificatonSelected);
+	const getNotificationChannelSelected = useSelector(selectSelectedChannelNotificationSetting);
 	const currentUserId = useSelector(selectCurrentUserId);
 
 	const isChannelUnmute = useMemo(() => {
@@ -67,6 +69,13 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 	const isChannel = useMemo(() => {
 		return Array.isArray(channel?.threads);
 	}, [channel?.threads]);
+	const favoriteChannel = useSelector(selectAllChannelsFavorite);
+	const isFavorite = useMemo(() => {
+		if (favoriteChannel && favoriteChannel?.length > 0) {
+			return favoriteChannel?.some((channelId) => channelId === channel?.id);
+		}
+		return false;
+	}, [favoriteChannel, channel?.id]);
 
 	const { dismiss } = useBottomSheetModal();
 
@@ -94,6 +103,15 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 				dismiss();
 			},
 			icon: <Icons.GroupPlusIcon color={themeValue.textStrong} />
+		},
+		{
+			title: isFavorite ? t('menu.inviteMenu.unMarkFavorite') : t('menu.inviteMenu.markFavorite'),
+			onPress: () => {
+				DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, { isActiveScroll: false });
+				isFavorite ? removeFavoriteChannel() : markFavoriteChannel();
+				dismiss();
+			},
+			icon: <Icons.FavoriteFilledIcon color={themeValue.textStrong} />
 		}
 		//TODO: update later
 		// {
@@ -113,6 +131,14 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 		// 	icon: <Icons.LinkIcon color={themeValue.textStrong} />,
 		// },
 	];
+
+	const markFavoriteChannel = () => {
+		dispatch(channelsActions.addFavoriteChannel({ channel_id: channel?.id, clan_id: currentClan?.id }));
+	};
+
+	const removeFavoriteChannel = () => {
+		dispatch(channelsActions.removeFavoriteChannel({ channelId: channel?.id, clanId: currentClan?.id || '' }));
+	};
 
 	const muteOrUnMuteChannel = (active: ENotificationActive) => {
 		const body = {
@@ -135,15 +161,15 @@ export default function ChannelMenu({ channel, inviteRef, notifySettingRef }: IC
 				} else {
 					navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
 						screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL,
-						params: { currentChannel: channel }
+						params: { currentChannel: channel, isCurrentChannel: false }
 					});
 				}
 				dismiss();
 			},
 			icon: isChannelUnmute ? (
-				<Icons.BellIcon width={22} height={22} color={themeValue.text} />
-			) : (
 				<Icons.BellSlashIcon color={themeValue.textStrong} />
+			) : (
+				<Icons.BellIcon width={22} height={22} color={themeValue.text} />
 			)
 		},
 		{

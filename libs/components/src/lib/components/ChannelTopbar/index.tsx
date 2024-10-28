@@ -1,4 +1,4 @@
-import { useAppNavigation, useAppParams, usePermissionChecker, useThreads } from '@mezon/core';
+import { useAppNavigation, usePathMatch } from '@mezon/core';
 import {
 	ChannelsEntity,
 	appActions,
@@ -25,13 +25,12 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission, IChannel, checkIsThread } from '@mezon/utils';
+import { IChannel, checkIsThread } from '@mezon/utils';
 import { Tooltip } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import ModalInvite from '../ListMemberInvite/modalInvite';
 import NotificationList from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
@@ -45,23 +44,30 @@ export type ChannelTopbarProps = {
 	readonly channel?: Readonly<IChannel> | null;
 	isChannelVoice?: boolean;
 	mode?: ChannelStreamMode;
+	isMemberPath?: boolean;
 };
 
 const ChannelTopbar = memo(({ channel, mode }: ChannelTopbarProps) => {
 	const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_VOICE;
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-
+	const currentClanId = useSelector(selectCurrentClanId);
+	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
+	const { isMemberPath } = usePathMatch({ isMemberPath: memberPath });
 	return (
 		<div
-			className={`z-30 flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
+			className={`max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
-			{isChannelVoice ? <TopBarChannelVoice channel={channel} /> : <TopBarChannelText channel={channel} mode={mode} />}
+			{isChannelVoice ? (
+				<TopBarChannelVoice channel={channel} />
+			) : (
+				<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} />
+			)}
 		</div>
 	);
 });
 
-function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
+const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(
 		() => <ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />,
 		[channel?.channel_id]
@@ -85,21 +91,18 @@ function TopBarChannelVoice({ channel }: ChannelTopbarProps) {
 			</div>
 		</>
 	);
-}
+});
 
-function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps) {
-	const { setTurnOffThreadMessage } = useThreads();
+const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath }: ChannelTopbarProps) => {
+	const dispatch = useAppDispatch();
+	const setTurnOffThreadMessage = useCallback(() => {
+		dispatch(threadsActions.setOpenThreadMessageState(false));
+		dispatch(threadsActions.setValueThread(null));
+	}, [dispatch]);
+
 	const appearanceTheme = useSelector(selectTheme);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
-	const currentClanId = useSelector(selectCurrentClanId);
-	const hasChannelManagePermission = usePermissionChecker([EPermission.manageChannel]);
-	const isShowSettingChannel = hasChannelManagePermission;
-	const param = useParams();
-	const { toMembersPage } = useAppNavigation();
-	const { currentURL } = useAppParams();
-	const memberPath = toMembersPage(currentClanId || '');
 	const channelParent = useSelector(selectChannelById(channel?.parrent_id ? (channel.parrent_id as string) : ''));
-
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex">
@@ -110,7 +113,7 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 					<div className="justify-end items-center gap-2 flex">
 						<div className="hidden sbm:flex">
 							<div className="relative justify-start items-center gap-[15px] flex mr-4">
-								{!channelParent && memberPath !== currentURL && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
+								{!channelParent && !isMemberPath && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
 								<ThreadButton isLightMode={appearanceTheme === 'light'} />
 								<MuteButton isLightMode={appearanceTheme === 'light'} />
 								<PinButton isLightMode={appearanceTheme === 'light'} />
@@ -132,12 +135,12 @@ function TopBarChannelText({ channel, isChannelVoice, mode }: ChannelTopbarProps
 						</div>
 					</div>
 				) : (
-					!isShowChatStream && memberPath !== currentURL && <ChatButton isLightMode={appearanceTheme === 'light'} />
+					!isShowChatStream && !isMemberPath && <ChatButton isLightMode={appearanceTheme === 'light'} />
 				)}
 			</div>
 		</>
 	);
-}
+});
 
 function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
 	const dispatch = useAppDispatch();

@@ -61,7 +61,10 @@ export const ChannelListItem = React.memo((props: IChannelListItemProps) => {
 	const dataThreads = useMemo(() => {
 		return !props?.data?.threads
 			? []
-			: props?.data?.threads.filter((thread: { active: IThreadActiveType }) => thread?.active === IThreadActiveType.Active);
+			: props?.data?.threads.filter(
+					(thread: { active: IThreadActiveType; count_mess_unread: number }) =>
+						thread?.active === IThreadActiveType.Active && !thread?.count_mess_unread
+				);
 	}, [props?.data?.threads]);
 
 	const isActive = useMemo(() => {

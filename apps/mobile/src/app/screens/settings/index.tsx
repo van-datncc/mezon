@@ -31,6 +31,8 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		store.dispatch(messagesActions.removeAll());
 		store.dispatch(clansActions.setCurrentClanId(''));
 		store.dispatch(clansActions.removeAll());
+		store.dispatch(clansActions.refreshStatus());
+
 		await remove(STORAGE_DATA_CLAN_CHANNEL_CACHE);
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		await remove(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
@@ -45,7 +47,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 			[
 				{
 					text: 'Cancel',
-					onPress: () => console.log('Cancel Pressed'),
+					onPress: () => {},
 					style: 'cancel'
 				},
 				{ text: 'Yes', onPress: () => logout() }
@@ -116,7 +118,11 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 				// 	icon: <Icons.FriendIcon color={themeValue.textStrong} />,
 				// },
 				{
-					onPress: () => reserve(),
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
+							screen: APP_SCREEN.SETTINGS.QR_SCANNER
+						});
+					},
 					expandable: true,
 					title: t('accountSettings.QRScan'),
 					icon: <Icons.QRCodeCameraIcon color={themeValue.textStrong} width={size.s_24} height={size.s_24} />
