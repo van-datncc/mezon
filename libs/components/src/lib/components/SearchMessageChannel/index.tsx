@@ -144,8 +144,8 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			for (const mention of mentions) {
 				const convertMention = mention.display.split(':');
 				filter.push({
-					field_name: searchFieldName[convertMention[0]],
-					field_value: convertMention[0] === 'mentions' ? `"user_id":"${mention.id}"` : convertMention[1]
+					field_name: searchFieldName?.[convertMention[0]],
+					field_value: convertMention?.[0] === 'mentions' ? `"user_id":"${mention.id}"` : convertMention?.[1]
 				});
 			}
 			setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
