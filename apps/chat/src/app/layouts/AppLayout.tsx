@@ -38,10 +38,14 @@ const AppLayout = () => {
 				deviceId: 'bar',
 				platform: 'desktop'
 			})
-		).then((response): void => {
-			const token = (response?.payload as { token: string })?.token;
-			notificationService.connect(token);
-		});
+		)
+			.then((response): void => {
+				const token = (response?.payload as { token: string })?.token;
+				notificationService.connect(token);
+			})
+			.catch((error) => {
+				console.error(error);
+			});
 	}, [isLogin]);
 
 	return (
