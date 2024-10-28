@@ -1,11 +1,13 @@
 import { Icons, Image } from '@mezon/ui';
 import { getPlatform } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
+import { DropdownButton } from '..';
 interface FooterProps {
 	downloadUrl: string;
 	universalUrl: string;
+	portableUrl: string;
 }
-const Footer = ({ downloadUrl, universalUrl }: FooterProps) => {
+const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 	const platform = getPlatform();
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -167,9 +169,21 @@ const Footer = ({ downloadUrl, universalUrl }: FooterProps) => {
 										<Image src={`assets/linux.svg`} alt={'linux'} className="max-w-[135px]" />
 									</a>
 								) : (
-									<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
-										<Image src={`assets/microsoft.svg`} alt={'microsoft'} className="max-w-[135px]" />
-									</a>
+									<DropdownButton
+										icon={
+											<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+												<Icons.MicrosoftDropdown className="max-w-full h-[40px] w-fit" />
+											</a>
+										}
+										downloadLinks={[
+											{
+												url: portableUrl,
+												icon: <Icons.MicrosoftWinPortable className="max-w-full h-[40px] max-md:w-fit" />
+											}
+										]}
+										dropdownRef={dropdownRef}
+										downloadUrl={downloadUrl}
+									/>
 								)}
 							</div>
 						</div>
