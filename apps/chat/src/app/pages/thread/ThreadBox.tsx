@@ -30,7 +30,7 @@ const ThreadBox = () => {
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
 	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
-		mode: ChannelStreamMode.STREAM_MODE_CHANNEL
+		mode: ChannelStreamMode.STREAM_MODE_THREAD
 	});
 
 	const createThread = useCallback(
@@ -47,7 +47,7 @@ const ThreadBox = () => {
 				channel_private: value.isPrivate,
 				parrent_id: currentChannelId as string,
 				category_id: currentChannel?.category_id,
-				type: ChannelType.CHANNEL_TYPE_TEXT,
+				type: ChannelType.CHANNEL_TYPE_THREAD,
 				lastSeenTimestamp: timestamp,
 				lastSentTimestamp: timestamp
 			};
