@@ -117,7 +117,10 @@ export const ChannelMessage: ChannelMessageComponent = React.forwardRef<MessageR
 				{message.isFirst && <ChatWelcome key={messageId} name={channelLabel} avatarDM={avatarDM} userName={userName} mode={mode} />}
 
 				{!message.isFirst && (
-					<div ref={messageRef} className={`fullBoxText relative group ${!isCombine ? 'pt-3' : 'pt-1'}`}>
+					<div
+						ref={messageRef}
+						className={`fullBoxText relative group ${!isCombine ? 'pt-3' : ''} ${mess.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
+					>
 						<MessageWithUser
 							allowDisplayShortProfile={true}
 							message={mess}
