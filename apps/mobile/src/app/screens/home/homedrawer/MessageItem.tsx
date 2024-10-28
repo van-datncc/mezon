@@ -343,16 +343,16 @@ const MessageItem = React.memo(
 		const handlePressIn = () => {
 			Animated.timing(backgroundColor, {
 				toValue: 1,
-				duration: 500,
-				useNativeDriver: false
+				duration: 200,
+				useNativeDriver: true
 			}).start();
 		};
 
 		const handlePressOut = () => {
 			Animated.timing(backgroundColor, {
 				toValue: 0,
-				duration: 500,
-				useNativeDriver: false
+				duration: 200,
+				useNativeDriver: true
 			}).start();
 		};
 
