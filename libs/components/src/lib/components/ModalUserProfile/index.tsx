@@ -12,6 +12,7 @@ import {
 import { EStateFriend, selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus } from '@mezon/store';
 import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
+import { ApiUserActivity } from 'mezon-js/api.gen';
 import { RefObject, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -44,6 +45,7 @@ type ModalUserProfileProps = {
 	userStatusProfile?: string;
 	onClose: () => void;
 	rootRef?: RefObject<HTMLElement>;
+	activityByUserId?: ApiUserActivity;
 };
 
 export type OpenModalProps = {
@@ -53,7 +55,8 @@ export type OpenModalProps = {
 
 enum ETileDetail {
 	AboutMe = 'About me',
-	MemberSince = 'Member Since'
+	MemberSince = 'Member Since',
+	Actitity = 'Activity'
 }
 
 const ModalUserProfile = ({
@@ -70,7 +73,8 @@ const ModalUserProfile = ({
 	positionType,
 	isDM,
 	onClose,
-	rootRef
+	rootRef,
+	activityByUserId
 }: ModalUserProfileProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const { createDirectMessageWithUser } = useDirect();
@@ -83,6 +87,8 @@ const ModalUserProfile = ({
 	const currentUserId = useSelector(selectCurrentUserId);
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 	const displayCustomStatus = userID === currentUserId ? currentUserCustomStatus : userCustomStatus;
+
+	const activity = activityByUserId?.activity_name + ' - ' + activityByUserId?.activity_description;
 
 	const [content, setContent] = useState<string>('');
 
@@ -194,6 +200,7 @@ const ModalUserProfile = ({
 				userID={userID}
 				positionType={positionType}
 				isFooterProfile={isFooterProfile}
+				activityByUserId={activityByUserId}
 			/>
 			<div className="px-[16px]">
 				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
@@ -210,6 +217,9 @@ const ModalUserProfile = ({
 						<UserDescription title={ETileDetail.AboutMe} detail={userById?.user?.about_me as string} />
 					)}
 					{mode !== 4 && mode !== 3 && !isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
+
+					{activityByUserId && <UserDescription title={ETileDetail.Actitity} detail={activity} />}
+
 					{isFooterProfile ? (
 						<StatusProfile userById={userById as ChannelMembersEntity} isDM={isDM} />
 					) : (

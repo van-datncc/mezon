@@ -1,4 +1,4 @@
-import { NAVIGATE_TO_URL, SENDER_ID, START_NOTIFICATION_SERVICE, TRIGGER_SHORTCUT } from './constants';
+import { ACTIVE_WINDOW, NAVIGATE_TO_URL, SENDER_ID, START_NOTIFICATION_SERVICE, TRIGGER_SHORTCUT } from './constants';
 import { ElectronBridgeHandler, IElectronBridge, MezonElectronAPI, MezonNotificationOptions } from './types';
 
 export class ElectronBridge implements IElectronBridge {
@@ -14,19 +14,20 @@ export class ElectronBridge implements IElectronBridge {
 	}
 
 	private hasListeners = false;
-	private shortcutHandler?: () => void;
+	private handlers?: Record<string, ElectronBridgeHandler>;
 
 	private constructor() {
 		// private constructor to prevent instantiation
 	}
 
-	public initListeners(shortcutHandler: () => void) {
+	public initListeners(handlers: Record<string, ElectronBridgeHandler>) {
 		if (this.hasListeners) {
 			return;
 		}
-		this.shortcutHandler = shortcutHandler;
+		this.handlers = handlers;
 		this.setupSenderId();
 		this.setupShortCut();
+		this.setActiveWindow();
 		this.hasListeners = true;
 	}
 
@@ -37,6 +38,10 @@ export class ElectronBridge implements IElectronBridge {
 
 	public setBadgeCount(badgeCount: number | null) {
 		this.bridge.setBadgeCount(badgeCount);
+	}
+
+	public setActiveWindow() {
+		this.bridge.on(ACTIVE_WINDOW, this.listenerHandlers[ACTIVE_WINDOW]);
 	}
 
 	public pushNotification(title: string, options: MezonNotificationOptions) {
@@ -68,13 +73,20 @@ export class ElectronBridge implements IElectronBridge {
 	}
 
 	private triggerShortcut = (_: unknown, name: string) => {
-		if (this.shortcutHandler) {
-			this.shortcutHandler();
+		if (this.handlers?.[TRIGGER_SHORTCUT]) {
+			this.handlers?.[TRIGGER_SHORTCUT]();
+		}
+	};
+
+	private triggerActiveWindow = (_: unknown, name: string) => {
+		if (this.handlers?.[ACTIVE_WINDOW]) {
+			this.handlers?.[ACTIVE_WINDOW](name);
 		}
 	};
 
 	private readonly listenerHandlers: Record<string, ElectronBridgeHandler> = {
-		[TRIGGER_SHORTCUT]: this.triggerShortcut
+		[TRIGGER_SHORTCUT]: this.triggerShortcut,
+		[ACTIVE_WINDOW]: this.triggerActiveWindow
 	};
 }
 

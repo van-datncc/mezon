@@ -855,3 +855,25 @@ export type CanvasUpdate = {
 	id: string;
 	title: string;
 };
+
+export type IActivity = {
+	activity_description?: string;
+	activity_name?: string;
+	activity_type?: number;
+	application_id?: string;
+	end_time?: string;
+	start_time?: string;
+	status?: number;
+	user_id?: string;
+	id: string;
+};
+
+export enum EActivities {
+	CODE = 'Code',
+	SPOTIFY = 'Spotify'
+}
+
+export interface ActivitiesInfo {
+	appName: string;
+	windowTitle: string;
+}

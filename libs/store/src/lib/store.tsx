@@ -24,6 +24,7 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
+import { activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
 import { canvasReducer } from './canvas/canvas.slice';
@@ -331,6 +332,7 @@ const reducer = {
 	videostream: persistedStreamReducer,
 	canvas: canvasReducer,
 	canvasapi: canvasAPIReducer,
+	activitiesapi: activitiesAPIReducer,
 	references: referencesReducer,
 	reaction: reactionReducer,
 	suggestionEmoji: persistedEmojiSuggestionReducer,
