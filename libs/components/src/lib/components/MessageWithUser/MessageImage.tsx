@@ -92,7 +92,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 						}}
 					>
 						<svg
-							className={`w-10 h-10 text-gray-200 object-scale-down`}
+							className="w-10 h-10 text-gray-200"
 							aria-hidden="true"
 							xmlns="http://www.w3.org/2000/svg"
 							fill="currentColor"
