@@ -40,6 +40,9 @@ export default class App {
 	private static onReady() {
 		autoUpdater.checkForUpdates();
 		if (rendererAppName) {
+			App.application.setLoginItemSettings({
+				openAtLogin: true
+			});
 			App.initMainWindow();
 			App.loadMainWindow();
 			App.setupMenu();
