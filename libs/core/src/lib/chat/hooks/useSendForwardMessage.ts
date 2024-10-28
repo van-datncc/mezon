@@ -17,6 +17,7 @@ export function useSendForwardMessage() {
 			const socket = socketRef.current;
 
 			if (!client || !session || !socket || !channel_id) {
+				// eslint-disable-next-line no-console
 				console.log(client, session, socket, channel_id);
 				throw new Error('Client is not initialized');
 			}
@@ -27,6 +28,8 @@ export function useSendForwardMessage() {
 					type = ChannelType.CHANNEL_TYPE_DM;
 				} else if (mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 					type = ChannelType.CHANNEL_TYPE_GROUP;
+				} else if (mode === ChannelStreamMode.STREAM_MODE_THREAD) {
+					type = ChannelType.CHANNEL_TYPE_THREAD;
 				}
 				await socket.joinChat(clanid, channel_id, type, isPublic);
 				await socket.writeChatMessage(

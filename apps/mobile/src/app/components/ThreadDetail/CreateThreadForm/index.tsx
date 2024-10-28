@@ -57,7 +57,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	const { valueThread, threadCurrentChannel } = useThreads();
 	const { sendMessageThread } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
-		mode: ChannelStreamMode.STREAM_MODE_CHANNEL
+		mode: ChannelStreamMode.STREAM_MODE_THREAD
 	});
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
@@ -90,7 +90,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 				channel_private: value.isPrivate,
 				parrent_id: (channelThreads ? channelThreads?.id : currentChannelId) || '',
 				category_id: currentChannel?.category_id,
-				type: ChannelType.CHANNEL_TYPE_TEXT
+				type: ChannelType.CHANNEL_TYPE_THREAD
 			};
 			try {
 				const newThreadResponse = await dispatch(createNewChannel(body));
