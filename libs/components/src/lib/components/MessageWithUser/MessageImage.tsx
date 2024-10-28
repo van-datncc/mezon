@@ -70,7 +70,7 @@ const MessageImage = memo(({ attachmentData, onContextMenu, mode, messageId }: M
 				setShowLoader(true);
 				fadeIn.current = true;
 			}
-		}, 5000);
+		}, 500);
 
 		return () => {
 			if (loaderTimeoutRef.current) {
