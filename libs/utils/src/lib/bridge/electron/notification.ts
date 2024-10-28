@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { electronBridge } from './electron';
 
 export interface IMessageExtras {
@@ -32,9 +33,18 @@ export class MezonNotificationService {
 	public static instance: MezonNotificationService;
 	private currentChannelId: string | undefined;
 	private pingTimeout: NodeJS.Timeout | null = null;
+	private isFocusOnApp = false;
 
 	private constructor() {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		if (isElectron()) {
+			window.electron.onWindowFocused(() => {
+				this.isFocusOnApp = true;
+			});
+			window.electron.onWindowBlurred(() => {
+				this.isFocusOnApp = false;
+			});
+		}
 	}
 
 	public static getInstance() {
@@ -68,7 +78,7 @@ export class MezonNotificationService {
 				const msg = JSON.parse(data.data) as NotificationData;
 				const { title, message, image } = msg ?? {};
 				const { link } = msg?.extras ?? {};
-				if (msg?.channel_id && msg?.channel_id === this.currentChannelId) {
+				if (msg?.channel_id && msg?.channel_id === this.currentChannelId && this.isFocusOnApp) {
 					return;
 				}
 				electronBridge.pushNotification(title, {
