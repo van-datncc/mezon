@@ -444,6 +444,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		}
 	}, [checkElementIsImage, isClickedEmoji, isClickedSticker]);
 
+	/* eslint-disable no-console */
 	const items = useMemo<ContextMenuItem[]>(() => {
 		const builder = new MenuBuilder();
 
@@ -696,6 +697,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		handleForwardAllMessage,
 		urlImage
 	]);
+	/* eslint-disable no-console */
 
 	return <DynamicContextMenu menuId={id} items={items} messageId={messageId} mode={activeMode} />;
 }

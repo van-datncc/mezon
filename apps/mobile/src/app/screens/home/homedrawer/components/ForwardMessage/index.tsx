@@ -169,7 +169,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 				}
 			});
 		} catch (error) {
-			console.log('Forward all messages log => error', error);
+			console.error('Forward all messages log => error', error);
 		}
 		onClose && onClose();
 	};
@@ -201,7 +201,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 				}
 			});
 		} catch (error) {
-			console.log('error', error);
+			console.error('error', error);
 		}
 		onClose && onClose();
 	};
