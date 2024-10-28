@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, Icons, UserGroupIcon } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
