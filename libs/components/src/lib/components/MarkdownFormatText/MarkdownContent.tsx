@@ -112,8 +112,8 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ content, isLightMode, isInPinM
 	const splitContent = content?.split('```').filter(Boolean);
 
 	return (
-		<div className={`prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
-			<pre className={`relative p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
+		<div className={`relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
+			<pre className={`pre p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
 				<CopyToClipboard text={content ?? ''} onCopy={() => setCopied(true)}>
 					<button className={`absolute right-3 top-3 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
 						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}

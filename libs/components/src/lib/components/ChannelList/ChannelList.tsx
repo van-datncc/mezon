@@ -33,7 +33,7 @@ function ChannelList() {
 					{currentClan?.banner && <img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />}
 				</div>
 			)}
-			<div className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
+			<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
 				<Events isMemberPath={isMemberPath} isSettingPath={isSettingPath} />
 			</div>
 			<hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
@@ -47,26 +47,38 @@ function ChannelList() {
 const RowVirtualizerDynamic = memo(({ hasBanner, appearanceTheme }: { hasBanner: boolean; appearanceTheme: string }) => {
 	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
 	const categorizedChannels = useCategorizedChannels();
-	const data = useMemo(() => [{ type: 'favorites' }, ...categorizedChannels], [categorizedChannels]) as ICategoryChannel[];
+	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
+
+	const data = useMemo(
+		() => [{ type: 'favorites' }, ...categorizedChannels.filter((item) => !isShowEmptyCategory && item.channels.length !== 0)],
+		[categorizedChannels, isShowEmptyCategory]
+	) as ICategoryChannel[];
+
 	const parentRef = useRef<HTMLDivElement>(null);
 	const count = data.length;
-	const bannerHeight = 136;
-	const outsideHeight = 234 + (hasBanner ? bannerHeight : 0);
-	const [height, setHeight] = useState(window.innerHeight - outsideHeight);
 	const virtualizer = useVirtualizer({
 		count,
 		getScrollElement: () => parentRef.current,
 		estimateSize: () => 45
 	});
-	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
 
 	const items = virtualizer.getVirtualItems();
 
+	const [height, setHeight] = useState(0);
+	const clanTopbarEle = 60;
 	useEffect(() => {
-		const handleResize = () => setHeight(window.innerHeight - outsideHeight);
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
-	}, [outsideHeight]);
+		const calculateHeight = () => {
+			const clanFooterEle = document.getElementById('clan-footer');
+			const channelListTopELe = document.getElementById('channel-list-top');
+			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + (channelListTopELe?.clientHeight || 0) + 25;
+			const bannerHeight = 136;
+			const outsideHeight = totalHeight + (hasBanner ? bannerHeight : 0);
+			setHeight(window.innerHeight - outsideHeight);
+		};
+		calculateHeight();
+		window.addEventListener('resize', calculateHeight);
+		return () => window.removeEventListener('resize', calculateHeight);
+	}, [hasBanner, data]);
 
 	const channelFavorites = useSelector(selectAllChannelsFavorite);
 	const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
@@ -114,8 +126,6 @@ const RowVirtualizerDynamic = memo(({ hasBanner, appearanceTheme }: { hasBanner:
 									/>
 								</div>
 							);
-						} else if (!isShowEmptyCategory && item.channels.length === 0) {
-							return null;
 						} else {
 							return (
 								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>

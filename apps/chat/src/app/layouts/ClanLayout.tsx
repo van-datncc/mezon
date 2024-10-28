@@ -110,14 +110,16 @@ const ClanLayout = () => {
 			>
 				<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 				<ChannelList />
-				{streamPlay && <StreamInfo />}
-				<FooterProfile
-					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
-					status={userProfile?.user?.online}
-					avatar={userProfile?.user?.avatar_url || ''}
-					userId={userProfile?.user?.id || ''}
-					isDM={false}
-				/>
+				<div id="clan-footer">
+					{streamPlay && <StreamInfo />}
+					<FooterProfile
+						name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
+						status={userProfile?.user?.online}
+						avatar={userProfile?.user?.avatar_url || ''}
+						userId={userProfile?.user?.id || ''}
+						isDM={false}
+					/>
+				</div>
 			</div>
 			<div
 				className={`flex flex-1 shrink min-w-0 gap-2 ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'dark:bg-bgTertiary bg-bgLightTertiary' : ''}`}

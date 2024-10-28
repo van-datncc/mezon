@@ -64,7 +64,7 @@
         "include": "scripts/installer.nsh",
         "packElevateHelper": false,
         "runAfterFinish": true,
-        "createDesktopShortcut": false,
+        "createDesktopShortcut": "always",
         "deleteAppDataOnUninstall": false
       },
       "msi": {

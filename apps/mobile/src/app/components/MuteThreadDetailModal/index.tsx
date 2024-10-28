@@ -24,6 +24,7 @@ import { style } from './MuteThreadDetailModal.styles';
 type RootStackParamList = {
 	MuteThreadDetail: {
 		currentChannel: IChannel | DirectEntity;
+		isCurrentChannel: boolean;
 	};
 };
 
@@ -88,7 +89,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	const [timeMuted, setTimeMuted] = useState('');
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const [isChannel, setIsChannel] = useState<boolean>();
-	const { currentChannel } = route?.params || {};
+	const { currentChannel, isCurrentChannel } = route?.params || {};
 	const isDMThread = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
@@ -177,17 +178,19 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 
 			const body = {
 				channel_id: currentChannel?.channel_id || '',
-				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-				clan_id: currentClanId || '',
-				time_mute: unmuteTimeISO
+				notification_type: isDMThread ? 0 : getNotificationChannelSelected?.notification_setting_type || 0,
+				clan_id: isDMThread ? '' : currentClanId || '',
+				time_mute: unmuteTimeISO,
+				...(isCurrentChannel && { is_current_channel: false })
 			};
 			dispatch(notificationSettingActions.setNotificationSetting(body));
 		} else {
 			const body = {
 				channel_id: currentChannel?.channel_id || '',
-				notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
-				clan_id: currentClanId || '',
-				active: ENotificationActive.OFF
+				notification_type: isDMThread ? 0 : getNotificationChannelSelected?.notification_setting_type || 0,
+				clan_id: isDMThread ? '' : currentClanId || '',
+				active: ENotificationActive.OFF,
+				...(isCurrentChannel && { is_current_channel: false })
 			};
 			dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 		}

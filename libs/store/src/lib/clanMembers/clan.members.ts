@@ -72,7 +72,8 @@ export const UsersClanSlice = createSlice({
 								...member,
 								user: {
 									...member.user,
-									online: memberUpdate?.status
+									online: memberUpdate?.online,
+									is_mobile: memberUpdate?.isMobile
 								}
 							}
 						};
