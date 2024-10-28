@@ -136,11 +136,11 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 		<div className={`relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
 			<pre className={`pre p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
 				<CopyToClipboard text={`\`\`\`${contentBacktick.trim()}\`\`\``} onCopy={() => setCopied(true)}>
-					<button className={`absolute right-3 top-3 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
+					<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
 						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 					</button>
 				</CopyToClipboard>
-				<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words' : ''}`}>{contentBacktick.trim()}</code>
+				<code className={`${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick.trim()}</code>
 			</pre>
 		</div>
 	);
