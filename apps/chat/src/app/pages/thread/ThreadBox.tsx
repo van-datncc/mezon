@@ -126,7 +126,10 @@ const ThreadBox = () => {
 				<MentionReactInput
 					onSend={handleSend}
 					onTyping={handleTypingDebounced}
-					listMentions={UserMentionList({ channelID: threadCurrentChannel?.channel_id as string })}
+					listMentions={UserMentionList({
+						channelID: currentChannel?.channel_id as string,
+						channelMode: ChannelStreamMode.STREAM_MODE_CHANNEL
+					})}
 					isThread
 				/>
 			</div>
