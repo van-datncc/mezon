@@ -132,6 +132,16 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 						message
 					);
 				}
+			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				for (const message of combineMessages) {
+					sendForwardMessage(
+						selectedObjectIdSend.clanId || '',
+						selectedObjectIdSend.id,
+						ChannelStreamMode.STREAM_MODE_THREAD,
+						currentChannel ? !currentChannel.channel_private : false,
+						message
+					);
+				}
 			}
 		}
 
@@ -149,6 +159,14 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					selectedObjectIdSend.clanId || '',
 					selectedObjectIdSend.id,
 					ChannelStreamMode.STREAM_MODE_CHANNEL,
+					selectedObjectIdSend.isPublic,
+					selectedMessage
+				);
+			} else if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				sendForwardMessage(
+					selectedObjectIdSend.clanId || '',
+					selectedObjectIdSend.id,
+					ChannelStreamMode.STREAM_MODE_THREAD,
 					selectedObjectIdSend.isPublic,
 					selectedMessage
 				);

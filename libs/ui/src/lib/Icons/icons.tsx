@@ -5548,7 +5548,7 @@ export function MicrosoftDropdown(props: React.HTMLAttributes<SVGElement>) {
 				d="M69.0516 21.7491V36.403H66.5045V24.9246H66.4715L61.9232 36.403H60.2361L55.572 24.9246H55.539V36.403H53.1904V21.7491H56.8291L61.0466 32.6155H61.1127L65.5618 21.7491H69.0516Z"
 				fill="white"
 			/>
-			<path d="M164.953 25L158.953 19L152.953 25" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+			<path d="M164.953 25L158.953 19L152.953 25" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 		</svg>
 	);
 }
