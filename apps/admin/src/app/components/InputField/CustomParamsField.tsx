@@ -80,7 +80,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 			<div className="p-2 border-[1px] border-gray-300 rounded-md">
 				<button
 					onClick={handleOpenModal}
-					className="flex rounded-full items-center justify-center border-[1px] border-gray-300 bg-gray-200 hover:bg-gray-300 dark:bg-gray-500 dark:hover:bg-gray-400 w-full h-[40px] shadow-md active:bg-gray-200 transition-all"
+					className="flex rounded-full items-center justify-center border-[1px] border-gray-300 hover:bg-gray-100 dark:bg-gray-500 dark:hover:bg-gray-400 w-full h-[40px] shadow-md active:bg-gray-200 transition-all"
 				>
 					<span className="w-[30px] h-[30px] flex items-center justify-center border-[1px] border-gray-300 rounded-full text-[20px] mr-2">
 						+
@@ -94,7 +94,7 @@ function CustomParamsField({ onChange, value, label, errorMessage, showInlineErr
 					<div className="pl-1 overflow-hidden">
 						{options.length > 0 ? (
 							options.map((option, index) => (
-								<div>
+								<div key={index}>
 									<span>"{option.key}"</span>
 									<span>: "{option.value}"</span>,
 								</div>

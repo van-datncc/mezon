@@ -9,10 +9,21 @@ type CustomFormFieldProps = HTMLFieldProps<string, HTMLDivElement> & {
 	label?: string;
 };
 
-function CodeEditorField({ onChange, value, label, errorMessage, showInlineError, fieldType, changed, ...props }: CustomFormFieldProps) {
+function CodeEditorField({
+	onChange,
+	value,
+	label,
+	errorMessage,
+	showInlineError,
+	fieldType,
+	changed,
+	hidden = false,
+	...props
+}: CustomFormFieldProps) {
 	const highlight = (code: string) => Prism.highlight(code, Prism.languages.javascript, 'javascript');
+	console.log(hidden);
 	return (
-		<div className="ImageField mt-2">
+		<div className={`ImageField mt-2 ${hidden && 'hidden'}`}>
 			{label && <label className="block text-sm">{label}</label>}
 			<Editor
 				// {...props}
@@ -24,7 +35,7 @@ function CodeEditorField({ onChange, value, label, errorMessage, showInlineError
 				padding={10}
 				autoCapitalize="off"
 				style={{
-					minHeight: '150px'
+					minHeight: '100px'
 				}}
 			/>
 		</div>

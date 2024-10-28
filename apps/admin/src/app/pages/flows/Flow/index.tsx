@@ -145,7 +145,7 @@ const Flow = () => {
 				}
 				return {
 					parameterKey: key,
-					parameterValue: value.trim()
+					parameterValue: value?.trim()
 				};
 			});
 			const newNode: INode = {

@@ -18,7 +18,7 @@ const NodeTypes = [
 				.required('Command Name is required')
 				.test('starts-with-asterisk', 'Command Name must start with an asterisk (*)', (value) => !!value && value.startsWith('*'))
 				.test('not-have-space', 'Command Name must not have space', (value) => !!value && !value?.trim()?.includes(' ')),
-			options: yup.array().nullable()
+			query: yup.array().nullable()
 		}),
 		bridgeSchema: {
 			type: 'object',
@@ -27,9 +27,9 @@ const NodeTypes = [
 					type: 'string',
 					uniforms: { component: CustomTextField, label: 'Command Name', name: 'commandName', placeholder: 'Enter command input' }
 				},
-				options: {
+				query: {
 					type: 'string',
-					uniforms: { component: CustomTagsField, label: 'Options', name: 'options', placeholder: 'Enter more options' }
+					uniforms: { component: CustomTagsField, label: 'Query key', name: 'options', placeholder: 'Enter more options' }
 				}
 			},
 			required: ['commandName']
@@ -103,7 +103,9 @@ const NodeTypes = [
 		schema: yup.object().shape({
 			url: yup.string().required('Url is required'),
 			method: yup.string().required('Method is required').oneOf(['GET', 'POST'], 'Method must be either GET or POST'),
-			defaultOptions: yup.object().nullable()
+			defaultOptions: yup.object().nullable(),
+			headers: yup.object().nullable(),
+			body: yup.string().nullable()
 		}),
 		bridgeSchema: {
 			type: 'object',
@@ -124,7 +126,25 @@ const NodeTypes = [
 				},
 				defaultOptions: {
 					type: 'object',
-					uniforms: { component: CustomParamsField, label: 'Default Options', placeholder: 'Add default options', name: 'defaultOptions' }
+					uniforms: {
+						component: CustomParamsField,
+						label: 'Default Query Options',
+						placeholder: 'Add default options',
+						name: 'defaultOptions'
+					}
+				},
+				headers: {
+					type: 'object',
+					uniforms: { component: CustomParamsField, label: 'Headers', placeholder: 'Add Header Options', name: 'headers' }
+				},
+				body: {
+					type: 'string',
+					uniforms: {
+						component: CodeEditorField,
+						label: 'Body of post method',
+						name: 'body'
+						// hidden: (context: any) => context?.method === 'GET'
+					}
 				}
 			},
 			required: []
@@ -167,4 +187,3 @@ const NodeTypes = [
 	}
 ];
 export default NodeTypes;
-// AIzaSyBWtaAws4vSpYdPs-_jOKky7sbzB5Zox2E
