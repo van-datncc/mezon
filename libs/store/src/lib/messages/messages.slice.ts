@@ -25,6 +25,7 @@ import {
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { ChannelMessage } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { channelMetaActions } from '../channels/channelmeta.slice';
@@ -455,7 +456,6 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		isMobile = false,
 		username
 	} = payload;
-	const id = Date.now().toString();
 
 	async function doSend() {
 		try {
@@ -513,6 +513,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		}
 	}
 
+	const id = Snowflake.generate();
 	async function fakeItUntilYouMakeIt() {
 		const fakeMessage: ChannelMessage = {
 			id,
