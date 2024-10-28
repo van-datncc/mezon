@@ -139,7 +139,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 	}, [dataReferences, lastMessage, scrollToLastMessage, getChatScrollBottomOffset]);
 
 	// Jump to ,message from pin and reply, notification...
-
+	const timerRef = useRef<number | null>(null);
 	useEffect(() => {
 		const handleScrollToIndex = (messageId: string) => {
 			const index = messages.findIndex((item) => item === messageId);
@@ -150,15 +150,22 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 
 		if (jumpPinMessageId && isPinMessageExist) {
 			handleScrollToIndex(jumpPinMessageId);
-			setTimeout(() => {
+			timerRef.current = window.setTimeout(() => {
 				dispatch(pinMessageActions.setJumpPinMessageId(null));
 			}, 1000);
 		} else if (idMessageToJump && isMessageExist && jumpPinMessageId === null) {
 			handleScrollToIndex(idMessageToJump);
-			setTimeout(() => {
+			timerRef.current = window.setTimeout(() => {
 				dispatch(messagesActions.setIdMessageToJump(null));
 			}, 1000);
 		}
+
+		return () => {
+			if (timerRef.current) {
+				clearTimeout(timerRef.current);
+				timerRef.current = null;
+			}
+		};
 	}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist, messages]);
 
 	// Jump to present when user is jumping to present
