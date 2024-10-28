@@ -105,9 +105,11 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 	return (
 		<span
 			className={
-				!posInPinOrNotification ? `${isLightMode ? 'prose-backtick single-markdown-light-mode' : 'prose-backtick single-markdown'}` : ''
+				!posInPinOrNotification
+					? `${isLightMode ? 'prose-backtick single-markdown-light-mode ' : 'prose-backtick single-markdown'}`
+					: 'w-full'
 			}
-			style={{ display: posInPinOrNotification ? 'block' : 'inline', padding: 2, margin: 0 }}
+			style={{ display: posInPinOrNotification ? '' : 'inline', padding: 2, margin: 0 }}
 		>
 			<code
 				className={`${
