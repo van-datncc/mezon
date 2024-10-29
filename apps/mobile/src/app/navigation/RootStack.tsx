@@ -1,7 +1,6 @@
 import { selectIsLogin } from '@mezon/store-mobile';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect } from 'react';
-import BootSplash from 'react-native-bootsplash';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { Authentication } from './Authentication';
 import { APP_SCREEN } from './ScreenTypes';
@@ -12,12 +11,6 @@ const Root = createStackNavigator();
 const RootStack = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 
-	useEffect(() => {
-		const timer = setTimeout(async () => {
-			await BootSplash.hide({ fade: true });
-		}, 10);
-		return () => clearTimeout(timer);
-	}, []);
 	return (
 		<Root.Navigator screenOptions={{ headerShown: false }}>
 			{isLoggedIn ? (

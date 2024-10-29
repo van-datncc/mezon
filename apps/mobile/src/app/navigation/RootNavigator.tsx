@@ -26,7 +26,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useSelector } from 'react-redux';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContext, ChatContextProvider } from '@mezon/core';
-import { IWithError } from '@mezon/utils';
+import { IWithError, sleep } from '@mezon/utils';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
 	ActionEmitEvent,
@@ -43,7 +43,8 @@ import {
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
 import { ChannelType } from 'mezon-js';
-import { AppState, DeviceEventEmitter, StatusBar } from 'react-native';
+import { AppState, DeviceEventEmitter, InteractionManager, StatusBar } from 'react-native';
+import BootSplash from 'react-native-bootsplash';
 import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
 import { toastConfig } from '../configs/toastConfig';
@@ -64,7 +65,9 @@ const NavigationMain = () => {
 			await notifee.cancelAllNotifications();
 			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		}, 800);
+			await sleep(100);
+			await BootSplash.hide({ fade: true });
+		}, 200);
 		return () => {
 			clearTimeout(timer);
 		};
@@ -73,11 +76,12 @@ const NavigationMain = () => {
 	useEffect(() => {
 		let timer: string | number | NodeJS.Timeout;
 		if (isLoggedIn) {
-			mainLoader();
 			timer = setTimeout(async () => {
-				initAppLoading();
+				InteractionManager.runAfterInteractions(() => {
+					initAppLoading();
+				});
 				// timeout 2000s to check app open from FCM or nomarly
-			}, 2000);
+			}, 3000);
 		}
 		return () => {
 			clearTimeout(timer);
@@ -108,6 +112,7 @@ const NavigationMain = () => {
 
 	const initAppLoading = async () => {
 		const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
+		await mainLoader();
 		await mainLoaderTimeout({ isFromFCM: isFromFCM?.toString() === 'true' });
 	};
 

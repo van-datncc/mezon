@@ -1,3 +1,4 @@
+import { size } from '@mezon/mobile-ui';
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 interface ButtonProps {
@@ -27,20 +28,20 @@ export default Button;
 
 const styles = StyleSheet.create({
 	button: {
-		borderRadius: 8,
-		marginHorizontal: 20,
+		borderRadius: size.s_8,
+		marginHorizontal: size.s_20,
 		justifyContent: 'center',
 		alignItems: 'center',
-		marginTop: 20,
-		height: 50
+		marginTop: size.s_20,
+		height: size.s_50
 	},
 	signinButtonText: {
-		fontSize: 18,
-		lineHeight: 18 * 1.4,
+		fontSize: size.s_18,
+		lineHeight: size.s_22,
 		color: '#FFFFFF'
 	},
 	wrapperLoading: {
 		flexDirection: 'row',
-		gap: 8
+		gap: size.s_8
 	}
 });

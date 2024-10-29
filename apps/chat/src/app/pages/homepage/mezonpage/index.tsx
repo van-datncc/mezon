@@ -1,6 +1,6 @@
 import mezonPackage from '@mezon/package-js';
 import { Icons, Image } from '@mezon/ui';
-import { getPlatform } from '@mezon/utils';
+import { Platform, getPlatform } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Footer from './footer';
 import HeaderMezon from './header';
@@ -15,7 +15,6 @@ function MezonPage() {
 	const homeRef = useRef<HTMLDivElement>(null);
 	const isVisible = useIntersectionObserver(homeRef, { threshold: 0.1 });
 
-	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const toggleSideBar = () => {
@@ -34,6 +33,7 @@ function MezonPage() {
 	}, [platform, version]);
 
 	const universalUrl = `https://cdn.mezon.vn/release/mezon-${version}-mac-universal.dmg`;
+	const portableUrl = `https://cdn.mezon.vn/release/mezon-${version}-win-portable-x64.zip`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
@@ -65,23 +65,6 @@ function MezonPage() {
 			top: sectionTop
 		});
 	};
-
-	const toggleDropdown = () => {
-		setIsOpen(!isOpen);
-	};
-
-	const handleClickOutside = (event: MouseEvent) => {
-		if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-			setIsOpen(false);
-		}
-	};
-
-	useEffect(() => {
-		document.addEventListener('mousedown', handleClickOutside);
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
-	}, []);
 
 	useEffect(() => {
 		updateBackgroundImage();
@@ -133,35 +116,35 @@ function MezonPage() {
 								<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
 							</a>
 							{platform === 'MacOS' ? (
-								<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
-									<button onClick={toggleDropdown}>
-										<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />
-									</button>
-
-									{isOpen && (
-										<div className="absolute mt-[8px] z-50">
-											<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
-												<Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" />
-											</a>
-											<a
-												className="cursor-pointer leading-[0px] block mt-[4px]"
-												href={universalUrl}
-												target="_blank"
-												rel="noreferrer"
-											>
-												<Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" />
-											</a>
-										</div>
-									)}
-								</div>
+								<DropdownButton
+									icon={<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />}
+									downloadLinks={[
+										{ url: downloadUrl, icon: <Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" /> },
+										{ url: universalUrl, icon: <Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" /> }
+									]}
+									dropdownRef={dropdownRef}
+									platform={Platform.MACOS}
+								/>
 							) : platform === 'Linux' ? (
 								<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
 									<Image src={`assets/linux.svg`} alt={'linux'} className="max-w-full max-md:h-[32px] max-md:w-full" />
 								</a>
 							) : (
-								<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
-									<Icons.MicrosoftBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
-								</a>
+								<DropdownButton
+									icon={
+										<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
+											<Icons.MicrosoftDropdown className="max-w-full max-md:h-[32px] max-md:w-full" />
+										</a>
+									}
+									downloadLinks={[
+										{
+											url: portableUrl,
+											icon: <Icons.MicrosoftWinPortable className="max-w-full max-md:h-[32px] max-md:w-full" />
+										}
+									]}
+									dropdownRef={dropdownRef}
+									downloadUrl={downloadUrl}
+								/>
 							)}
 						</div>
 					</div>
@@ -175,9 +158,66 @@ function MezonPage() {
 			</div>
 
 			<Layout sideBarIsOpen={sideBarIsOpen} />
-			<Footer downloadUrl={downloadUrl} universalUrl={universalUrl}></Footer>
+			<Footer downloadUrl={downloadUrl} universalUrl={universalUrl} portableUrl={portableUrl}></Footer>
 		</div>
 	);
 }
 
 export default MezonPage;
+
+interface DownloadLink {
+	url: string;
+	icon: JSX.Element;
+}
+
+interface DropdownButtonProps {
+	icon: JSX.Element;
+	downloadLinks: DownloadLink[];
+	dropdownRef: React.RefObject<HTMLDivElement>;
+	downloadUrl?: string;
+	platform?: Platform;
+}
+
+export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, downloadLinks, dropdownRef, downloadUrl }) => {
+	const [isOpen, setIsOpen] = useState(false);
+
+	const toggleDropdown = () => {
+		if (platform === Platform.MACOS) {
+			setIsOpen((prev) => !prev);
+		}
+	};
+
+	const toggleDropdownWindow = () => {
+		setIsOpen((prev) => !prev);
+	};
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				setIsOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, [dropdownRef]);
+
+	return (
+		<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
+			<button className="relative" onClick={toggleDropdown}>
+				{icon}
+				<div className="absolute top-2.5 right-2.5 max-md:top-0 max-md:right-0">
+					<Icons.ChevronDownIcon onClick={toggleDropdownWindow} style={{ width: 26, height: 26, color: 'transparent' }} />
+				</div>
+			</button>
+			{isOpen && (
+				<div className="absolute mt-[8px] z-50 flex flex-col gap-1">
+					{downloadLinks.map((link, index) => (
+						<a key={index} className="cursor-pointer block" href={link.url} target="_blank" rel="noreferrer">
+							{link.icon}
+						</a>
+					))}
+				</div>
+			)}
+		</div>
+	);
+};

@@ -1,6 +1,8 @@
 import * as yup from 'yup';
 import CodeEditorField from '../../../components/InputField/CodeEditorField';
+import CustomParamsField from '../../../components/InputField/CustomParamsField';
 import CustomSelectField from '../../../components/InputField/CustomSelectField';
+import CustomTagsField from '../../../components/InputField/CustomTagsField';
 import CustomTextField from '../../../components/InputField/CustomTextField';
 import MultiImageUploadField from '../../../components/MultiImageUploadField';
 
@@ -15,11 +17,20 @@ const NodeTypes = [
 				.string()
 				.required('Command Name is required')
 				.test('starts-with-asterisk', 'Command Name must start with an asterisk (*)', (value) => !!value && value.startsWith('*'))
+				.test('not-have-space', 'Command Name must not have space', (value) => !!value && !value?.trim()?.includes(' ')),
+			options: yup.array().nullable()
 		}),
 		bridgeSchema: {
 			type: 'object',
 			properties: {
-				commandName: { type: 'string', uniforms: { component: CustomTextField, label: 'Command Name', name: 'commandName' } }
+				commandName: {
+					type: 'string',
+					uniforms: { component: CustomTextField, label: 'Command Name', name: 'commandName', placeholder: 'Enter command input' }
+				},
+				options: {
+					type: 'string',
+					uniforms: { component: CustomTagsField, label: 'Options', name: 'options', placeholder: 'Enter more options' }
+				}
 			},
 			required: ['commandName']
 		},
@@ -28,7 +39,8 @@ const NodeTypes = [
 			target: []
 		},
 		initialValue: {
-			commandName: '*'
+			commandName: '*',
+			options: []
 		}
 	},
 	{
@@ -41,7 +53,10 @@ const NodeTypes = [
 		bridgeSchema: {
 			type: 'object',
 			properties: {
-				message: { type: 'string', uniforms: { component: CustomTextField, label: 'Message', name: 'message' } },
+				message: {
+					type: 'string',
+					uniforms: { component: CustomTextField, label: 'Message', name: 'message', placeholder: 'Enter message' }
+				},
 				image: { type: 'string', uniforms: { component: MultiImageUploadField, label: 'Uploaded Image', name: 'image' } }
 			},
 			required: []
@@ -65,7 +80,10 @@ const NodeTypes = [
 		bridgeSchema: {
 			type: 'object',
 			properties: {
-				message: { type: 'string', uniforms: { component: CustomTextField, label: 'Message', name: 'message' } },
+				message: {
+					type: 'string',
+					uniforms: { component: CustomTextField, label: 'Message', name: 'message', placeholder: 'Enter message' }
+				},
 				image: { type: 'string', uniforms: { component: MultiImageUploadField, label: 'Uploaded Image', name: 'image' } }
 			},
 			required: []
@@ -84,7 +102,10 @@ const NodeTypes = [
 		label: 'API Loader',
 		schema: yup.object().shape({
 			url: yup.string().required('Url is required'),
-			method: yup.string().required('Method is required').oneOf(['GET', 'POST'], 'Method must be either GET or POST')
+			method: yup.string().required('Method is required').oneOf(['GET', 'POST'], 'Method must be either GET or POST'),
+			defaultOptions: yup.object().nullable(),
+			headers: yup.object().nullable(),
+			body: yup.string().nullable()
 		}),
 		bridgeSchema: {
 			type: 'object',
@@ -101,6 +122,27 @@ const NodeTypes = [
 							{ label: 'GET', value: 'GET' },
 							{ label: 'POST', value: 'POST' }
 						]
+					}
+				},
+				defaultOptions: {
+					type: 'object',
+					uniforms: {
+						component: CustomParamsField,
+						label: 'Default Query Options',
+						placeholder: 'Add default options',
+						name: 'defaultOptions'
+					}
+				},
+				headers: {
+					type: 'object',
+					uniforms: { component: CustomParamsField, label: 'Headers', placeholder: 'Add Header Options', name: 'headers' }
+				},
+				body: {
+					type: 'string',
+					uniforms: {
+						component: CodeEditorField,
+						label: 'Body of post method',
+						name: 'body'
 					}
 				}
 			},
@@ -128,7 +170,10 @@ const NodeTypes = [
 			properties: {
 				functionName: { type: 'string', uniforms: { component: CustomTextField, label: 'Function Name', name: 'functionName' } },
 				variable: { type: 'string', uniforms: { component: CustomTextField, label: 'Variable', name: 'variable' } },
-				functionBody: { type: 'string', uniforms: { component: CodeEditorField, label: 'Function Body', name: 'functionBody' } }
+				functionBody: {
+					type: 'string',
+					uniforms: { component: CodeEditorField, label: 'Function Body', name: 'functionBody' }
+				}
 			},
 			required: []
 		},

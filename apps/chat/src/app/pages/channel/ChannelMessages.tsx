@@ -117,23 +117,45 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		}
 	});
 
+	const lastMsgTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 	useEffect(() => {
 		if (messages.length && lastMessage && cacheLastChannelId.current !== lastMessage?.channel_id) {
-			setTimeout(() => {
+			if (lastMsgTimeoutRef.current) {
+				clearTimeout(lastMsgTimeoutRef.current);
+				lastMsgTimeoutRef.current = null;
+			}
+			lastMsgTimeoutRef.current = setTimeout(() => {
 				cacheLastChannelId.current = lastMessage?.channel_id as string;
-			}, 0);
+			}, 100);
 		}
-	}, [lastMessage]);
+
+		return () => {
+			if (lastMsgTimeoutRef.current) {
+				clearTimeout(lastMsgTimeoutRef.current);
+				lastMsgTimeoutRef.current = null;
+			}
+		};
+	}, [messages, lastMessage]);
+
+	const rowVirtualizer = useVirtualizer({
+		count: messages.length,
+		getScrollElement: () => chatRef.current,
+		estimateSize: () => 50,
+		overscan: 5
+	});
 
 	const scrollToLastMessage = useCallback(() => {
 		return new Promise((rs) => {
-			messages.length - 1 >= 0 && rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'start', behavior: 'auto' });
+			const index = messages.length - 1;
+
+			index >= 0 && rowVirtualizer.scrollToIndex(index, { align: 'start', behavior: 'auto' });
 			rs(true);
 		});
-	}, [lastMessage?.id]);
+	}, [messages, rowVirtualizer]);
 
 	useEffect(() => {
-		if (dataReferences && getChatScrollBottomOffset() <= 51) {
+		if (dataReferences && getChatScrollBottomOffset() <= 61) {
 			scrollToLastMessage();
 		}
 	}, [dataReferences, lastMessage, scrollToLastMessage, getChatScrollBottomOffset]);
@@ -147,6 +169,11 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 				rowVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' });
 			}
 		};
+
+		if (timerRef.current) {
+			clearTimeout(timerRef.current);
+			timerRef.current = null;
+		}
 
 		if (jumpPinMessageId && isPinMessageExist) {
 			handleScrollToIndex(jumpPinMessageId);
@@ -166,7 +193,7 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 				timerRef.current = null;
 			}
 		};
-	}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist, messages]);
+	}, [dispatch, jumpPinMessageId, isPinMessageExist, idMessageToJump, isMessageExist, messages, rowVirtualizer]);
 
 	// Jump to present when user is jumping to present
 	useEffect(() => {
@@ -182,18 +209,6 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		chatScrollRef.updateLoadMoreCb(loadMoreMessage);
 	}, [loadMoreMessage, chatScrollRef]);
 
-	// TODO: move this to another place
-	useEffect(() => {
-		// Update last message of channel when component unmount
-		return () => {
-			dispatch(
-				messagesActions.UpdateChannelLastMessage({
-					channelId
-				})
-			);
-		};
-	}, [channelId, dispatch]);
-
 	// Handle scroll to bottom when user on the bottom and received new message
 	useEffect(() => {
 		if (isViewOlderMessage) {
@@ -204,13 +219,6 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 			return;
 		}
 	}, [lastMessage, userId, isViewOlderMessage, scrollToLastMessage, getChatScrollBottomOffset]);
-
-	const rowVirtualizer = useVirtualizer({
-		count: messages.length,
-		getScrollElement: () => chatRef.current,
-		estimateSize: () => 50,
-		overscan: 5
-	});
 
 	return (
 		<MessageContextMenuProvider allUserIdsInChannel={allUserIdsInChannel} allRolesInClan={allRolesInClan}>

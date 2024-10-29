@@ -2,13 +2,19 @@ import { Icons } from '@mezon/ui';
 import { Handle, Position } from '@xyflow/react';
 import { changeOpenModalNodeDetail, changeSelectedNode, copyNode, deleteNode } from '../../../../stores/flow/flow.action';
 
-import React, { useContext, useRef } from 'react';
+import React, { Children, ReactElement, useContext, useRef } from 'react';
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema';
 import { AutoForm } from 'uniforms-semantic';
 import * as yup from 'yup';
 
+import { Context, UnknownObject, useForm } from 'uniforms';
 import { FlowContext } from '../../../../context/FlowContext';
 import { ISelectedNode } from '../../../../stores/flow/flow.interface';
+
+type DisplayIfProps<Model extends UnknownObject> = {
+	children: ReactElement;
+	condition: (context: Context<Model>) => boolean;
+};
 
 interface IAnchor {
 	id: string;
@@ -110,6 +116,11 @@ const CustomNode = React.forwardRef(({ data, schema, bridgeSchema, anchors, labe
 		flowDispatch(changeOpenModalNodeDetail(true));
 		e.stopPropagation();
 	};
+
+	function DisplayIf<Model extends UnknownObject>({ children, condition }: DisplayIfProps<Model>) {
+		const uniforms = useForm<Model>();
+		return condition(uniforms) ? Children.only(children) : null;
+	}
 
 	return (
 		<div className="w-[250px] border-2 rounded-lg bg-slate-50 dark:bg-gray-600 relative group hover:border-blue-300">

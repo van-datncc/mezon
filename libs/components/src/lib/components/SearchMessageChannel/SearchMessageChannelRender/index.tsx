@@ -1,8 +1,9 @@
-import { SearchMessageEntity, searchMessagesActions, useAppDispatch } from '@mezon/store';
+import { SearchMessageEntity, searchMessagesActions, selectChannelById, useAppDispatch } from '@mezon/store';
 import { IMessageWithUser, SIZE_PAGE_SEARCH } from '@mezon/utils';
 import { Pagination } from 'flowbite-react';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import MessageWithUser from '../../MessageWithUser';
 import EmptySearch from './EmptySearch';
 
@@ -10,6 +11,7 @@ type searchMessagesProps = {
 	searchMessages: SearchMessageEntity[];
 	currentPage: number;
 	totalResult: number;
+	channelId: string;
 };
 
 type GroupedMessages = {
@@ -17,12 +19,14 @@ type GroupedMessages = {
 	messages: SearchMessageEntity[];
 }[];
 
-const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }: searchMessagesProps) => {
+const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, channelId }: searchMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const messageContainerRef = useRef<HTMLDivElement>(null);
 	const onPageChange = (page: number) => {
 		dispatch(searchMessagesActions.setCurrentPage(page));
 	};
+
+	const searchChannel = useSelector(selectChannelById(channelId));
 
 	const groupedMessages: GroupedMessages = [];
 	let currentGroup: SearchMessageEntity[] = [];
@@ -88,7 +92,11 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult }
 												<MessageWithUser
 													allowDisplayShortProfile={false}
 													message={searchMessage as IMessageWithUser}
-													mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+													mode={
+														searchChannel?.type === ChannelType.CHANNEL_TYPE_THREAD
+															? ChannelStreamMode.STREAM_MODE_THREAD
+															: ChannelStreamMode.STREAM_MODE_CHANNEL
+													}
 													isSearchMessage={true}
 												/>
 											</div>

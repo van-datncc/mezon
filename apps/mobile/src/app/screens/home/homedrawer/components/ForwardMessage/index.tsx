@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useSendForwardMessage } from '@mezon/core';
 import { CheckIcon, Icons, UserGroupIcon } from '@mezon/mobile-components';
 import { Block, Colors, Text, size, useTheme } from '@mezon/mobile-ui';
@@ -169,7 +170,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 				}
 			});
 		} catch (error) {
-			console.log('Forward all messages log => error', error);
+			console.error('Forward all messages log => error', error);
 		}
 		onClose && onClose();
 	};
@@ -201,7 +202,7 @@ const ForwardMessageModal = ({ show, message, onClose, isPublic }: ForwardMessag
 				}
 			});
 		} catch (error) {
-			console.log('error', error);
+			console.error('error', error);
 		}
 		onClose && onClose();
 	};

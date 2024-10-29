@@ -10,7 +10,7 @@ import {
 } from '@mezon/utils';
 import classNames from 'classnames';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { ReactNode, memo, useCallback, useRef, useState } from 'react';
+import React, { ReactNode, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ModalUserProfile from '../ModalUserProfile';
@@ -104,7 +104,7 @@ function MessageWithUser({
 	const checkJumpPinMessage = jumpPinMessageId === message.id;
 
 	const containerClass = classNames('relative', 'message-container', {
-		'is-sending': message.isSending,
+		// 'is-sending': message.isSending,
 		'is-error': message.isError,
 		'bg-[#383B47]': isHighlight
 	});
@@ -118,21 +118,20 @@ function MessageWithUser({
 			'dark:bg-[#403D38] bg-[#EAB3081A]':
 				(checkMessageIncludeMention || checkReplied) && !messageReplyHighlight && !checkJumpPinMessage && !checkMessageTargetToMoved
 		},
-		{
-			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
-				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
-		},
+		// {
+		// 	'dark:group-hover:bg-bgPrimary1 ': !hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
+		// },
 		{ 'bg-bgMessageReplyHighline': messageReplyHighlight }
 	);
 
 	const childDivClass = classNames(
 		'absolute w-0.5 h-full left-0',
 		{ 'bg-blue-500': messageReplyHighlight },
-		{ 'bg-bgMentionReply': hasIncludeMention || checkReplied },
-		{
-			'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
-				!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
-		}
+		{ 'bg-bgMentionReply': hasIncludeMention || checkReplied }
+		// {
+		// 	'dark:group-hover:bg-bgPrimary1 group-hover:bg-[#EAB3081A]':
+		// 		!hasIncludeMention && !checkReplied && !checkMessageTargetToMoved && !messageReplyHighlight
+		// }
 	);
 
 	const messageContentClass = classNames('flex flex-col whitespace-pre-wrap text-base w-full cursor-text');
@@ -145,7 +144,10 @@ function MessageWithUser({
 			return;
 		}
 		shortUserId.current = userId;
-		const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
+		const heightPanel =
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
+				? HEIGHT_PANEL_PROFILE
+				: HEIGHT_PANEL_PROFILE_DM;
 		if (window.innerHeight - e.clientY > heightPanel) {
 			positionShortUser.current = {
 				top: e.clientY,
@@ -261,7 +263,7 @@ function MessageWithUser({
 													<MessageContent
 														message={message}
 														isCombine={isCombine}
-														isSending={message.isSending}
+														// isSending={message.isSending}
 														isError={message.isError}
 														mode={mode}
 														isSearchMessage={isSearchMessage}
@@ -298,12 +300,49 @@ interface HoverStateWrapperProps {
 	children: ReactNode;
 	popup?: () => ReactNode;
 }
-
 const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({ children, popup }) => {
 	const [isHover, setIsHover] = useState(false);
+	const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
+	const isScrolling = useRef(false);
 
-	const handleMouseEnter = () => setIsHover(true);
-	const handleMouseLeave = () => setIsHover(false);
+	const handleMouseEnter = () => {
+		if (isScrolling.current) return;
+
+		if (hoverTimeout.current) {
+			clearTimeout(hoverTimeout.current);
+		}
+		hoverTimeout.current = setTimeout(() => {
+			setIsHover(true);
+		}, 100);
+	};
+
+	const handleMouseLeave = () => {
+		if (hoverTimeout.current) {
+			clearTimeout(hoverTimeout.current);
+		}
+		hoverTimeout.current = setTimeout(() => {
+			setIsHover(false);
+		}, 100);
+	};
+
+	useEffect(() => {
+		const handleScroll = () => {
+			isScrolling.current = true;
+			if (hoverTimeout.current) {
+				clearTimeout(hoverTimeout.current);
+			}
+			setIsHover(false);
+			setTimeout(() => {
+				isScrolling.current = false;
+			}, 100);
+		};
+
+		window.addEventListener('scroll', handleScroll, true);
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll, true);
+		};
+	}, []);
 
 	return (
 		<div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>

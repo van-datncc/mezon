@@ -42,6 +42,7 @@ function useChannelSeen(channelId: string) {
 	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 	useEffect(() => {
 		const timestamp = Date.now() / 1000;
+		DeviceEventEmitter.emit(ActionEmitEvent.CHANNEL_ID_ACTIVE, channelId);
 		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
 	}, [channelId, currentChannel, dispatch]);
 

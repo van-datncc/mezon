@@ -18,7 +18,7 @@ declare global {
 }
 
 export interface IElectronBridge {
-	initListeners: (callback: ElectronBridgeHandler) => void;
+	initListeners: (handlers: Record<string, ElectronBridgeHandler>) => void;
 	removeAllListeners: () => void;
 	setBadgeCount: (badgeCount: number | null) => void;
 }

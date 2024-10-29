@@ -24,7 +24,7 @@ import {
 import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useCallback, useEffect, useRef } from 'react';
+import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -71,10 +71,34 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
+	const mode = currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 
-	if (!canSendMessage) {
+	const [canSendMessageDelayed, setCanSendMessageDelayed] = useState(true);
+
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
+	useEffect(() => {
+		if (timerRef.current) {
+			clearTimeout(timerRef.current);
+			timerRef.current = null;
+		}
+
+		timerRef.current = setTimeout(() => {
+			setCanSendMessageDelayed(canSendMessage);
+		}, 500);
+
+		return () => {
+			if (timerRef.current) {
+				clearTimeout(timerRef.current);
+			}
+		};
+	}, [canSendMessage]);
+
+	if (!canSendMessageDelayed) {
 		return (
-			<div className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line">
+			<div
+				style={{ height: 44 }}
+				className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line"
+			>
 				You do not have permission to send messages in this channel.
 			</div>
 		);
@@ -83,16 +107,12 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
 			{currentChannel ? (
-				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />
 			) : (
 				<ChannelMessageBox.Skeleton />
 			)}
 			{currentChannel && (
-				<ChannelTyping
-					channelId={currentChannel?.id}
-					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					isPublic={currentChannel ? !currentChannel.channel_private : false}
-				/>
+				<ChannelTyping channelId={currentChannel?.id} mode={mode} isPublic={currentChannel ? !currentChannel.channel_private : false} />
 			)}
 		</div>
 	);
@@ -214,7 +234,7 @@ export default function ChannelMain() {
 
 	return (
 		<>
-			<ChannelMainContent channelId={currentChannel.id} />
+			<ChannelMainContent channelId={currentChannel?.id} />
 			<ChannelSeenListener channelId={currentChannel?.id || ''} />
 		</>
 	);
@@ -222,5 +242,14 @@ export default function ChannelMain() {
 
 const SearchMessageChannel = () => {
 	const { totalResult, currentPage, searchMessages } = useSearchMessages();
-	return <SearchMessageChannelRender searchMessages={searchMessages} currentPage={currentPage} totalResult={totalResult} />;
+	const currentChannel = useSelector(selectCurrentChannel);
+
+	return (
+		<SearchMessageChannelRender
+			searchMessages={searchMessages}
+			currentPage={currentPage}
+			totalResult={totalResult}
+			channelId={currentChannel?.id || ''}
+		/>
+	);
 };
