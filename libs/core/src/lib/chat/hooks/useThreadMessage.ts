@@ -36,9 +36,9 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 	const membersOfChild = useAppSelector((state) => (thread?.channel_id ? selectAllChannelMembers(state, thread?.channel_id as string) : null));
 	const rolesClan = useSelector(selectAllRolesClan);
 
-	const mapToMemberIds = membersOfChild?.map((item) => {
-		return item.id;
-	});
+	const mapToMemberIds = useMemo(() => {
+		return membersOfChild?.map((item) => item.id);
+	}, [membersOfChild]);
 
 	const sendMessageThread = React.useCallback(
 		async (
