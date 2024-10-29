@@ -1,12 +1,22 @@
-import { Attributes, Metrics } from '@mezon/mobile-ui';
+import { IS_TABLET } from '@mezon/mobile-components';
+import { Attributes, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 	StyleSheet.create({
 		container: {
-			flex: 1,
 			backgroundColor: colors.primary,
-			justifyContent: 'center'
+			justifyContent: 'center',
+			width: isTabletLandscape ? '50%' : IS_TABLET ? '80%' : '100%',
+			height: isTabletLandscape ? '90%' : IS_TABLET ? '70%' : '100%',
+			borderRadius: IS_TABLET ? size.s_20 : 0,
+			paddingHorizontal: IS_TABLET ? size.s_10 : 0
+		},
+		gradient: {
+			width: '100%',
+			height: '100%',
+			justifyContent: 'center',
+			alignItems: 'center'
 		},
 		headerContainer: {
 			alignItems: 'center',
@@ -14,13 +24,14 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: Metrics.size.xl
 		},
 		headerTitle: {
-			fontSize: 38,
+			fontSize: isTabletLandscape ? size.s_40 : size.s_34,
 			textAlign: 'center',
+			fontWeight: 'bold',
 			color: colors.textStrong
 		},
 		headerContent: {
-			fontSize: 16,
-			lineHeight: 20 * 1.4,
+			fontSize: size.s_16,
+			lineHeight: size.s_20,
 			textAlign: 'center',
 			color: colors.text
 		},
