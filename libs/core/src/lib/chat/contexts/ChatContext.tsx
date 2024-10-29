@@ -420,7 +420,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						fetchMessages({ clanId: userAdds.clan_id, channelId: userAdds?.channel_id, noCache: true, isFetchingLatestMessages: false })
 					);
 				}
-				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT) {
+				if (userAdds.channel_type === ChannelType.CHANNEL_TYPE_TEXT || userAdds.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
 					dispatch(channelsActions.fetchChannels({ clanId: userAdds.clan_id, noCache: true }));
 					dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true }));
 					dispatch(
