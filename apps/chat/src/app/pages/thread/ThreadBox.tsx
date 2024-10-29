@@ -17,7 +17,7 @@ import {
 import { IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useThrottledCallback } from 'use-debounce';
@@ -39,9 +39,9 @@ const ThreadBox = () => {
 		mode: ChannelStreamMode.STREAM_MODE_THREAD
 	});
 
-	const mapToMemberIds = membersOfParent?.map((item) => {
-		return item.id;
-	});
+	const mapToMemberIds = useMemo(() => {
+		return membersOfParent?.map((item) => item.id);
+	}, [membersOfParent]);
 
 	const createThread = useCallback(
 		async (value: ThreadValue) => {
