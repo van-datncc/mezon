@@ -87,7 +87,7 @@ export const StreamingPopup = () => {
 			]}
 			{...(!isFullScreen ? panResponder.panHandlers : {})}
 		>
-			<TouchableOpacity activeOpacity={isFullScreen ? 1 : 0.5} onPress={() => !isFullScreen && handleResizeStreamRoom(true)}>
+			<TouchableOpacity activeOpacity={1} onPress={() => !isFullScreen && handleResizeStreamRoom(true)}>
 				<StreamingRoom isAnimationComplete={isAnimationComplete} onPressMinimizeRoom={handleResizeStreamRoom} />
 			</TouchableOpacity>
 		</Animated.View>

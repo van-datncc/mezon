@@ -6,7 +6,7 @@ import { MezonAvatar } from '../../../../../../../componentUI';
 
 function UserItem(user) {
 	const userStream = useAppSelector(selectMemberClanByUserId(user?.user?.user_id ?? ''));
-	return <MezonAvatar width={size.s_60} height={size.s_60} username={userStream?.user?.username} avatarUrl={userStream?.user?.avatar_url} />;
+	return <MezonAvatar width={size.s_50} height={size.s_50} username={userStream?.user?.username} avatarUrl={userStream?.user?.avatar_url} />;
 }
 
 export default React.memo(UserItem);

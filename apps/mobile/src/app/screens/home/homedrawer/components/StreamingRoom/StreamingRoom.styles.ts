@@ -26,7 +26,9 @@ export const style = (colors: Attributes) =>
 			bottom: 20,
 			width: '100%',
 			padding: size.s_20,
-			gap: size.s_10
+			gap: size.s_10,
+			alignItems: 'center',
+			justifyContent: 'center'
 		},
 		textMenuItem: {
 			fontSize: 16,

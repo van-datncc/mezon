@@ -144,8 +144,8 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 						justifyContent="center"
 						alignItems="center"
 						position="relative"
-						width={size.s_30}
-						height={size.s_30}
+						width={size.s_60}
+						height={size.s_60}
 						backgroundColor={'transparent'}
 						borderRadius={size.s_30}
 					></Block>
