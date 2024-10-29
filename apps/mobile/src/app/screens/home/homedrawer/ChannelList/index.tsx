@@ -96,12 +96,15 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		setCurrentPressedCategory(category);
 	}, []);
 
-	const handleLongPressChannel = useCallback((channel: ChannelThreads) => {
-		bottomSheetChannelMenuRef.current?.present();
-		setCurrentPressedChannel(channel);
-		setIsUnKnownChannel(!channel?.channel_id);
-		dispatch(channelsActions.setSelectedChannelId(channel?.channel_id));
-	}, []);
+	const handleLongPressChannel = useCallback(
+		(channel: ChannelThreads) => {
+			bottomSheetChannelMenuRef.current?.present();
+			setCurrentPressedChannel(channel);
+			setIsUnKnownChannel(!channel?.channel_id);
+			dispatch(channelsActions.setSelectedChannelId(channel?.channel_id));
+		},
+		[dispatch]
+	);
 
 	const handleLongPressThread = useCallback((channel: ChannelThreads) => {
 		bottomSheetChannelMenuRef.current?.present();
@@ -143,7 +146,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 
 	useEffect(() => {
 		handleScrollToChannel(currentChannel?.id);
-	}, [selectCategoryOffsets, currentChannel, isScrollChannelActive, currentClanId, handleScrollToChannel]);
+	}, [currentChannel?.id, handleScrollToChannel]);
 
 	useEffect(() => {
 		if (currentClanId && currentClanId?.toString() !== '0') {
@@ -152,10 +155,16 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 		setIsScrollChannelActive(true);
 	}, [currentClanId, dispatch]);
 
-	const handleLayout = useCallback((event, item) => {
-		const { y } = event?.nativeEvent?.layout || {};
-		if (item) dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: y }));
-	}, []);
+	const handleLayout = useCallback(
+		(event, item) => {
+			if (item) {
+				const { y } = event?.nativeEvent?.layout || {};
+				if (selectCategoryOffsets?.[item?.category_id]) return;
+				dispatch(appActions.setCategoryChannelOffsets({ [item?.category_id]: Math.round(y) }));
+			}
+		},
+		[selectCategoryOffsets, dispatch]
+	);
 
 	const renderItemChannelList = useCallback(
 		({ item }) => {
@@ -172,7 +181,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				</View>
 			);
 		},
-		[handleLongPressCategory, handleLongPressChannel, handleLongPressThread, handleLayout, handleCollapseCategory]
+		[handleLongPressCategory, handleLongPressChannel, handleLongPressThread, handleCollapseCategory, handleLayout]
 	);
 
 	const handlePressEventCreate = useCallback(() => {
@@ -185,30 +194,35 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				}
 			}
 		});
-	}, []);
+	}, [navigation]);
 
-	const handleScrollToChannelFavorite = useCallback(async (channel?: ChannelsEntity) => {
-		handleScrollToChannel(channel?.channel_id);
-		if (currentChannel?.channel_id === channel?.channel_id) return;
-		if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
-			if (channel?.status === StatusVoiceChannel.Active && channel?.meeting_code) {
-				const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
-				await Linking.openURL(urlVoice);
-			}
-		} else {
-			if (!isTabletLandscape) {
+	const handleScrollToChannelFavorite = useCallback(
+		async (channel?: ChannelsEntity) => {
+			if (currentChannel?.channel_id === channel?.channel_id) {
 				navigation.dispatch(DrawerActions.closeDrawer());
+				return;
 			}
-			const channelId = channel?.channel_id || '';
-			const clanId = channel?.clan_id || '';
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			const store = await getStoreAsync();
-			requestAnimationFrame(async () => {
-				store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-			});
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-		}
-	}, []);
+			if (channel?.type === ChannelType.CHANNEL_TYPE_VOICE) {
+				if (channel?.status === StatusVoiceChannel.Active && channel?.meeting_code) {
+					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
+					await Linking.openURL(urlVoice);
+				}
+			} else {
+				if (!isTabletLandscape) {
+					navigation.dispatch(DrawerActions.closeDrawer());
+				}
+				const channelId = channel?.channel_id || '';
+				const clanId = channel?.clan_id || '';
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				const store = await getStoreAsync();
+				requestAnimationFrame(async () => {
+					store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+				});
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			}
+		},
+		[currentChannel?.channel_id, isTabletLandscape, navigation]
+	);
 
 	return (
 		<ChannelListContext.Provider value={{ navigation: navigation }}>
@@ -218,6 +232,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					showsVerticalScrollIndicator={false}
 					ref={flashListRef}
 					scrollEventThrottle={16}
+					removeClippedSubviews={false}
+					decelerationRate={'fast'}
 					bounces={false}
 				>
 					<ChannelListBackground onPress={handlePress} />

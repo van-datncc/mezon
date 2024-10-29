@@ -124,7 +124,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 					const thread = (await createThread(value)) as ApiChannelDescription;
 					if (thread) {
 						// sleep for waiting server check exist after insert
-						await sleep(10);
+						await sleep(100);
 						await dispatch(
 							channelsActions.joinChat({
 								clanId: currentClanId as string,
@@ -172,7 +172,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		const store = await getStoreAsync();
 		navigation.navigate(APP_SCREEN.HOME);
 		const channelId = thread?.channel_id;
-		const clanId = thread?.clan_id;
+		const clanId = thread?.clan_id || currentClanId;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
