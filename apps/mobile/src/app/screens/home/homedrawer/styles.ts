@@ -725,5 +725,11 @@ export const style = (colors: Attributes) =>
 		buttonText: {
 			fontSize: size.s_14,
 			color: Colors.white
+		},
+		containerDrawerEmpty: {
+			flex: 1,
+			flexDirection: 'row',
+			justifyContent: 'center',
+			alignItems: 'center'
 		}
 	});

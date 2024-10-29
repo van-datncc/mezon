@@ -148,7 +148,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 					field_value: convertMention?.[0] === 'mentions' ? `"user_id":"${mention.id}"` : convertMention?.[1]
 				});
 			}
-			setSearch({ ...search, filters: filter, from: 1, size: SIZE_PAGE_SEARCH });
+			setSearch({ ...search, filters: filter });
 		},
 		[channelId, currentClanId, search]
 	);
@@ -184,7 +184,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 						{ field_name: 'channel_id', field_value: channelId },
 						{ field_name: 'clan_id', field_value: currentClanId as string }
 					];
-					const requestBody = { ...search, filters: requestFilter };
+					const requestBody = { ...search, filters: requestFilter, from: 1, size: SIZE_PAGE_SEARCH };
 					fetchSearchMessages(requestBody);
 				}
 			}
@@ -225,7 +225,13 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 
 	useEffect(() => {
 		if (search) {
-			fetchSearchMessages({ ...search, from: currentPage });
+			const requestFilter = [
+				...(search.filters || []),
+				{ field_name: 'channel_id', field_value: channelId },
+				{ field_name: 'clan_id', field_value: currentClanId as string }
+			];
+			const requestBody = { ...search, filters: requestFilter, from: currentPage, size: SIZE_PAGE_SEARCH };
+			fetchSearchMessages(requestBody);
 		}
 	}, [currentPage]);
 

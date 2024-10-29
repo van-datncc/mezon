@@ -4,7 +4,8 @@ import { DirectEntity, selectDirectById, selectDirectsUnreadlist, useAppSelector
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { memo } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import { style } from './styles';
@@ -20,7 +21,7 @@ const UnreadDMBadgeItem = memo(({ dmId, numUnread }: { dmId: string; numUnread: 
 				return (
 					<View style={styles.avatarWrapper}>
 						{dm?.channel_avatar?.[0] ? (
-							<Image source={{ uri: dm?.channel_avatar?.[0] }} resizeMode="cover" style={styles.groupAvatar} />
+							<FastImage source={{ uri: dm?.channel_avatar?.[0] }} resizeMode="cover" style={styles.groupAvatar} />
 						) : (
 							<View style={styles.wrapperTextAvatar}>
 								<Text style={styles.textAvatar}>{dm?.channel_label?.charAt?.(0)}</Text>

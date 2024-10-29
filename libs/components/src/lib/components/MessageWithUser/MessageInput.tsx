@@ -194,7 +194,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		if (newPlainTextValue.endsWith('@')) {
 			setTitleMention('Members');
 		} else if (newPlainTextValue.endsWith('#')) {
-			setTitleMention('Text channels');
+			setTitleMention('Channel List');
 		} else if (newPlainTextValue.endsWith(':')) {
 			setTitleMention('Emoji matching');
 		}
