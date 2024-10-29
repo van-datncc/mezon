@@ -306,7 +306,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [dispatch, dmGroupChatList?.length, message]);
 
 	const handlePinMessage = async () => {
-		dispatch(pinMessageActions.setChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
+		dispatch(pinMessageActions.setChannelPinMessage({ clan_id: currentClanId ?? '', channel_id: message?.channel_id, message_id: message?.id }));
 		dispatch(
 			pinMessageActions.joinPinMessage({
 				clanId: activeMode !== ChannelStreamMode.STREAM_MODE_CHANNEL ? '' : (currentClanId ?? ''),
