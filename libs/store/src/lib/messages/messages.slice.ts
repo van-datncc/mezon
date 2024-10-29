@@ -11,7 +11,8 @@ import {
 	checkContinuousMessagesByCreateTimeMs,
 	checkSameDayByCreateTime,
 	getMobileUploadedAttachments,
-	getWebUploadedAttachments
+	getWebUploadedAttachments,
+	sleep
 } from '@mezon/utils';
 import {
 	EntityState,
@@ -32,6 +33,7 @@ import { channelMetaActions } from '../channels/channelmeta.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { reactionActions } from '../reactionMessage/reactionMessage.slice';
+import { RootState } from '../store';
 import { seenMessagePool } from './SeenMessagePool';
 
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 3;
@@ -182,8 +184,16 @@ export const fetchMessages = createAsyncThunk(
 			fetchMessagesCached.clear(mezon, clanId, channelId, messageId, direction);
 		}
 
+		const state = thunkAPI.getState() as RootState;
+		const channelHasMessages = state.messages?.channelMessages?.[channelId];
+		const startTime = Date.now();
 		const response = await fetchMessagesCached(mezon, clanId, channelId, messageId, direction);
+		const elapsedTime = Date.now() - startTime;
 
+		const remainingTime = 300 - elapsedTime;
+		if (!channelHasMessages && remainingTime > 0) {
+			await sleep(remainingTime);
+		}
 		if (!response.messages) {
 			return {
 				messages: []

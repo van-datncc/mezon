@@ -10,7 +10,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { EmojiPlaces, IMessageSendPayload, SubPanelName, ThreadValue, blankReferenceObj } from '@mezon/utils';
 import classNames from 'classnames';
-import { ChannelType } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -84,6 +84,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	}, [dataReferences.message_ref_id]);
 
 	useEscapeKey(handleCloseReplyMessageBox, { preventEvent: !dataReferences.message_ref_id });
+
 	return (
 		<div className="mx-4 relative" role="button" ref={chatboxRef}>
 			{isEmojiOnChat && (
@@ -99,7 +100,6 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					<GifStickerEmojiPopup channelOrDirect={channel} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
 				</div>
 			)}
-
 			<div className="absolute bottom-[calc(100%-10px)] left-0 right-0">
 				{isViewingOldMessage && (
 					<div
@@ -112,15 +112,16 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 					</div>
 				)}
 			</div>
-
 			{dataReferences.message_ref_id && (
 				<div className="relative z-1 pb-[4px]">
 					<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
 				</div>
 			)}
-
 			<MessageBox
-				listMentions={UserMentionList({ channelID: channelId ?? '', channelMode: mode })}
+				listMentions={UserMentionList({
+					channelID: mode === ChannelStreamMode.STREAM_MODE_THREAD ? (channel.parrent_id ?? '') : (channelId ?? ''),
+					channelMode: ChannelStreamMode.STREAM_MODE_CHANNEL
+				})}
 				onSend={handleSend}
 				onTyping={handleTypingDebounced}
 				currentChannelId={channelId}

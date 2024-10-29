@@ -24,7 +24,7 @@ import {
 import { Loading } from '@mezon/ui';
 import { EOverriddenPermission, SubPanelName, TIME_OFFSET } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, useCallback, useEffect, useRef } from 'react';
+import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
@@ -73,7 +73,27 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 	const mode = currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 
-	if (!canSendMessage) {
+	const [canSendMessageDelayed, setCanSendMessageDelayed] = useState(true);
+
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
+	useEffect(() => {
+		if (timerRef.current) {
+			clearTimeout(timerRef.current);
+			timerRef.current = null;
+		}
+
+		timerRef.current = setTimeout(() => {
+			setCanSendMessageDelayed(canSendMessage);
+		}, 500);
+
+		return () => {
+			if (timerRef.current) {
+				clearTimeout(timerRef.current);
+			}
+		};
+	}, [canSendMessage]);
+
+	if (!canSendMessageDelayed) {
 		return (
 			<div
 				style={{ height: 44 }}
