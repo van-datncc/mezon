@@ -214,7 +214,7 @@ export default function ChannelMain() {
 
 	return (
 		<>
-			<ChannelMainContent channelId={currentChannel.id} />
+			<ChannelMainContent channelId={currentChannel?.id} />
 			<ChannelSeenListener channelId={currentChannel?.id || ''} />
 		</>
 	);
@@ -222,5 +222,14 @@ export default function ChannelMain() {
 
 const SearchMessageChannel = () => {
 	const { totalResult, currentPage, searchMessages } = useSearchMessages();
-	return <SearchMessageChannelRender searchMessages={searchMessages} currentPage={currentPage} totalResult={totalResult} />;
+	const currentChannel = useSelector(selectCurrentChannel);
+
+	return (
+		<SearchMessageChannelRender
+			searchMessages={searchMessages}
+			currentPage={currentPage}
+			totalResult={totalResult}
+			channelId={currentChannel?.id || ''}
+		/>
+	);
 };
