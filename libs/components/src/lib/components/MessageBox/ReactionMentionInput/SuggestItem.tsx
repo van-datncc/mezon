@@ -63,7 +63,7 @@ const SuggestItem = ({
 			}
 		}
 
-		if (type === ChannelType.CHANNEL_TYPE_TEXT && parrent_id !== '0') {
+		if (type === ChannelType.CHANNEL_TYPE_THREAD) {
 			if (!channel_private || channel_private === 0) {
 				return <Icons.ThreadIcon defaultSize="w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode" />;
 			}
@@ -133,10 +133,10 @@ const SuggestItem = ({
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}
 			</div>
 			<span className={`text-[10px] font-semibold text-[#A1A1AA] one-line ${subTextStyle}`}>
-				{channel?.parrent_id === '0' ? (
-					<>{HighlightMatchBold(subText ?? '', valueHightLight ?? '')}</>
-				) : (
+				{channel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
 					<RenderChannelLabelForThread channel_id={channel?.parrent_id as string} />
+				) : (
+					<>{HighlightMatchBold(subText ?? '', valueHightLight ?? '')}</>
 				)}
 			</span>
 		</div>
