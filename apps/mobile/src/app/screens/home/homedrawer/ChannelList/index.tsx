@@ -181,7 +181,7 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 				</View>
 			);
 		},
-		[handleLongPressCategory, handleLongPressChannel, handleLongPressThread, handleCollapseCategory, currentChannel?.channel_id, handleLayout]
+		[handleLongPressCategory, handleLongPressChannel, handleLongPressThread, handleCollapseCategory, handleLayout]
 	);
 
 	const handlePressEventCreate = useCallback(() => {
@@ -232,6 +232,8 @@ const ChannelList = React.memo(({ categorizedChannels }: { categorizedChannels: 
 					showsVerticalScrollIndicator={false}
 					ref={flashListRef}
 					scrollEventThrottle={16}
+					removeClippedSubviews={false}
+					decelerationRate={'fast'}
 					bounces={false}
 				>
 					<ChannelListBackground onPress={handlePress} />

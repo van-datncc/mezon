@@ -32,7 +32,7 @@ const ChannelListSection = memo(
 					categoryId: data?.category_id
 				})
 			);
-		}, [categoryIdSortChannel, dispatch]);
+		}, [categoryIdSortChannel, data?.category_id, dispatch]);
 
 		const toggleCollapse = useCallback(
 			(category: ICategoryChannel) => {
