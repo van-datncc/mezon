@@ -16,6 +16,7 @@ export const ChannelMedia = ({ currentChannel }: ChannelMediaProps) => {
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL;
 		return (
 			<ChannelMessages
+				key={currentChannel.id}
 				clanId={currentChannel?.clan_id || ''}
 				channelId={currentChannel?.id}
 				channelLabel={currentChannel.channel_label}

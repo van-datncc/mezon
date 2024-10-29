@@ -2,7 +2,6 @@ import { useEventManagement, useOnClickOutside, usePermissionChecker } from '@me
 import { EventManagementEntity, selectChannelById, selectChannelFirst, selectMemberClanByUserId, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EEventStatus, EPermission, OptionEvent } from '@mezon/utils';
-import { Tooltip } from 'flowbite-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -148,20 +147,21 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 						</p>
 					</div>
 					{event?.creator_id && (
-						<Tooltip
-							content={`Created by ${userCreate?.user?.username}`}
-							trigger="hover"
-							animation="duration-500"
-							style={appearanceTheme === 'light' ? 'light' : 'dark'}
-						>
-							<AvatarImage
-								alt={userCreate?.user?.username || ''}
-								userName={userCreate?.user?.username}
-								className="min-w-6 min-h-6 max-w-6 max-h-6"
-								src={userCreate?.user?.avatar_url}
-								classNameText="text-[9px] pt-[3px]"
-							/>
-						</Tooltip>
+						// <Tooltip
+						// 	content={`Created by ${userCreate?.user?.username}`}
+						// 	trigger="hover"
+						// 	animation="duration-500"
+						// 	style={appearanceTheme === 'light' ? 'light' : 'dark'}
+						// >
+						// TODO: check error loop resize
+						// </Tooltip>
+						<AvatarImage
+							alt={userCreate?.user?.username || ''}
+							userName={userCreate?.user?.username}
+							className="min-w-6 min-h-6 max-w-6 max-h-6"
+							src={userCreate?.user?.avatar_url}
+							classNameText="text-[9px] pt-[3px]"
+						/>
 					)}
 				</div>
 				<div className="flex justify-between gap-4">
