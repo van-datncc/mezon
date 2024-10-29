@@ -34,7 +34,6 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 	});
 
 	const membersOfChild = useAppSelector((state) => (thread?.channel_id ? selectAllChannelMembers(state, thread?.channel_id as string) : null));
-	const membersOfParent = useAppSelector((state) => (thread?.parrent_id ? selectAllChannelMembers(state, thread?.parrent_id as string) : null));
 	const rolesClan = useSelector(selectAllRolesClan);
 
 	const mapToMemberIds = membersOfChild?.map((item) => {
@@ -114,11 +113,10 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 
 	return useMemo(
 		() => ({
-			membersOfParent,
 			sendMessageThread,
 			sendMessageTyping,
 			editSendMessage
 		}),
-		[sendMessageThread, sendMessageTyping, editSendMessage, membersOfParent]
+		[sendMessageThread, sendMessageTyping, editSendMessage]
 	);
 }

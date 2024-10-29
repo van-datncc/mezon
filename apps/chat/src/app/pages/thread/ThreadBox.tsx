@@ -6,11 +6,13 @@ import {
 	checkDuplicateThread,
 	createNewChannel,
 	messagesActions,
+	selectAllChannelMembers,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectThreadCurrentChannel,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -28,7 +30,11 @@ const ThreadBox = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
-	const { sendMessageThread, sendMessageTyping, membersOfParent } = useThreadMessage({
+
+	const membersOfParent = useAppSelector((state) =>
+		threadCurrentChannel?.parrent_id ? selectAllChannelMembers(state, threadCurrentChannel?.parrent_id as string) : null
+	);
+	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		mode: ChannelStreamMode.STREAM_MODE_THREAD
 	});
