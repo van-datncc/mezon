@@ -1,4 +1,6 @@
 import { accountActions, authActions, selectAllAccount, useAppDispatch } from '@mezon/store';
+import { Session } from 'mezon-js';
+import { ApiLoginIDResponse } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -46,15 +48,32 @@ export function useAuth() {
 		[dispatch]
 	);
 
+	const qRCode = useCallback(async () => {
+		const action = await dispatch(authActions.createQRLogin());
+		const loginQR = action.payload as ApiLoginIDResponse;
+		return loginQR;
+	}, [dispatch]);
+
+	const checkLoginRequest = useCallback(
+		async (loginId: string) => {
+			const action = await dispatch(authActions.checkLoginRequest({ loginId: loginId || '' }));
+			const session = action.payload as Session;
+			return session;
+		},
+		[dispatch]
+	);
+
 	return useMemo(
 		() => ({
 			userProfile,
 			userId,
 			loginEmail,
 			loginByGoogle,
+			qRCode,
+			checkLoginRequest,
 			loginByApple,
 			fetchUserProfile
 		}),
-		[userProfile, userId, loginEmail, loginByGoogle, loginByApple, fetchUserProfile]
+		[userProfile, userId, loginEmail, loginByGoogle, qRCode, loginByApple, fetchUserProfile]
 	);
 }
