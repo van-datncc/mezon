@@ -10,6 +10,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { memo, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import EventModal from '../EventChannelModal';
@@ -22,26 +23,36 @@ export const Events = memo(({ isMemberPath, isSettingPath }: { isMemberPath: boo
 	const { setClanShowNumEvent } = useClans();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showNumEvent = useSelector(selectShowNumEvent(currentClanId || ''));
-	const [showModal, setShowModal] = useState(false);
 
 	const [checkAdminPermission] = usePermissionChecker([EPermission.administrator]);
 
 	const closeModal = () => {
-		setShowModal(false);
+		closeEventModal();
 	};
 
 	const openModal = () => {
-		setShowModal(true);
+		openEventModal();
 		setClanShowNumEvent(false);
 	};
 
 	const handleOpenDetail = () => {
-		setShowModal(true);
+		openEventModal();
 		setOpenModalDetail(true);
 	};
 
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 	const channelSettingPath = `/chat/clans/${currentClanId}/channel-setting`;
+
+	const [openEventModal, closeEventModal] = useModal(() => {
+		return (
+			<EventModal
+				onClose={closeModal}
+				numberEventManagement={numberEventManagement}
+				openModalDetail={openModalDetail}
+				setOpenModalDetail={setOpenModalDetail}
+			/>
+		);
+	}, []);
 
 	return (
 		<>
@@ -96,14 +107,6 @@ export const Events = memo(({ isMemberPath, isSettingPath }: { isMemberPath: boo
 					</div>
 				</Link>
 			) : null}
-			{showModal && (
-				<EventModal
-					onClose={closeModal}
-					numberEventManagement={numberEventManagement}
-					openModalDetail={openModalDetail}
-					setOpenModalDetail={setOpenModalDetail}
-				/>
-			)}
 		</>
 	);
 });

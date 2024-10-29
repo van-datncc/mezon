@@ -119,6 +119,7 @@ const ThreadBox = () => {
 						<ChannelMessages
 							isThreadBox={true}
 							userIdsFromThreadBox={mapToMemberIds}
+							key={threadCurrentChannel.channel_id}
 							clanId={currentClanId || ''}
 							channelId={threadCurrentChannel.channel_id as string}
 							channelLabel={threadCurrentChannel.channel_label}

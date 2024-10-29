@@ -31,7 +31,7 @@ function ChatWelCome({ name, userName, avatarDM, mode }: ChatWelComeProp) {
 	const classNameSubtext = 'dark:text-zinc-400 text-colorTextLightMode text-sm';
 	const showName = <span className="font-medium">{name || userName}</span>;
 
-	const isChannel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL;
+	const isChannel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD;
 	const isChannelThread = selectedChannel?.parrent_id !== ChannelIsNotThread.TRUE;
 	const isDm = mode === ChannelStreamMode.STREAM_MODE_DM;
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;

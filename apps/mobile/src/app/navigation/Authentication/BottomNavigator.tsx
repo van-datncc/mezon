@@ -4,7 +4,7 @@ import { selectHiddenBottomTabMobile } from '@mezon/store-mobile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigationState } from '@react-navigation/native';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, LayoutAnimation, View } from 'react-native';
+import { Animated, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -32,7 +32,6 @@ const BottomNavigator = () => {
 	}, [routesNavigation]);
 
 	useEffect(() => {
-		LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types['easeInEaseOut'], LayoutAnimation.Properties['opacity']));
 		Animated.timing(tabBarTranslateY, {
 			toValue: hiddenBottomTab ? 80 : 0,
 			duration: 200,

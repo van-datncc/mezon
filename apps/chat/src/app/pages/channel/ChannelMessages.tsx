@@ -129,12 +129,25 @@ function ChannelMessages({
 		}
 	});
 
+	const lastMsgTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 	useEffect(() => {
 		if (messages.length && lastMessage && cacheLastChannelId.current !== lastMessage?.channel_id) {
-			setTimeout(() => {
+			if (lastMsgTimeoutRef.current) {
+				clearTimeout(lastMsgTimeoutRef.current);
+				lastMsgTimeoutRef.current = null;
+			}
+			lastMsgTimeoutRef.current = setTimeout(() => {
 				cacheLastChannelId.current = lastMessage?.channel_id as string;
 			}, 100);
 		}
+
+		return () => {
+			if (lastMsgTimeoutRef.current) {
+				clearTimeout(lastMsgTimeoutRef.current);
+				lastMsgTimeoutRef.current = null;
+			}
+		};
 	}, [messages, lastMessage]);
 
 	const rowVirtualizer = useVirtualizer({
@@ -168,6 +181,11 @@ function ChannelMessages({
 				rowVirtualizer.scrollToIndex(index, { align: 'center', behavior: 'auto' });
 			}
 		};
+
+		if (timerRef.current) {
+			clearTimeout(timerRef.current);
+			timerRef.current = null;
+		}
 
 		if (jumpPinMessageId && isPinMessageExist) {
 			handleScrollToIndex(jumpPinMessageId);

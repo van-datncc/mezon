@@ -18,7 +18,7 @@ const NodeTypes = [
 				.required('Command Name is required')
 				.test('starts-with-asterisk', 'Command Name must start with an asterisk (*)', (value) => !!value && value.startsWith('*'))
 				.test('not-have-space', 'Command Name must not have space', (value) => !!value && !value?.trim()?.includes(' ')),
-			query: yup.array().nullable()
+			options: yup.array().nullable()
 		}),
 		bridgeSchema: {
 			type: 'object',
@@ -27,9 +27,9 @@ const NodeTypes = [
 					type: 'string',
 					uniforms: { component: CustomTextField, label: 'Command Name', name: 'commandName', placeholder: 'Enter command input' }
 				},
-				query: {
+				options: {
 					type: 'string',
-					uniforms: { component: CustomTagsField, label: 'Query key', name: 'options', placeholder: 'Enter more options' }
+					uniforms: { component: CustomTagsField, label: 'Options', name: 'options', placeholder: 'Enter more options' }
 				}
 			},
 			required: ['commandName']
@@ -143,7 +143,6 @@ const NodeTypes = [
 						component: CodeEditorField,
 						label: 'Body of post method',
 						name: 'body'
-						// hidden: (context: any) => context?.method === 'GET'
 					}
 				}
 			},
@@ -171,7 +170,10 @@ const NodeTypes = [
 			properties: {
 				functionName: { type: 'string', uniforms: { component: CustomTextField, label: 'Function Name', name: 'functionName' } },
 				variable: { type: 'string', uniforms: { component: CustomTextField, label: 'Variable', name: 'variable' } },
-				functionBody: { type: 'string', uniforms: { component: CodeEditorField, label: 'Function Body', name: 'functionBody' } }
+				functionBody: {
+					type: 'string',
+					uniforms: { component: CodeEditorField, label: 'Function Body', name: 'functionBody' }
+				}
 			},
 			required: []
 		},
