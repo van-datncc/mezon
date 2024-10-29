@@ -140,12 +140,12 @@ const Flow = () => {
 		nodes.forEach((node) => {
 			const parameters = Object.keys(formData[node.id] ?? {}).map((key) => {
 				let value = formData[node.id][key];
-				if (typeof value !== 'string') {
+				if (typeof value !== 'string' && value !== null) {
 					value = JSON.stringify(value);
 				}
 				return {
 					parameterKey: key,
-					parameterValue: value?.trim()
+					parameterValue: value?.trim() ?? null
 				};
 			});
 			const newNode: INode = {
@@ -268,7 +268,7 @@ const Flow = () => {
 			} = {};
 			const listNode = flowDetail.nodes?.map((node: INode) => {
 				const params: {
-					[key: string]: string | null;
+					[key: string]: string;
 				} = {};
 				node?.parameters?.forEach((param: IParameter) => {
 					let value = param.parameterValue;

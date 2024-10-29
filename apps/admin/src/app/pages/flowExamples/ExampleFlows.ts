@@ -291,7 +291,7 @@ const ExampleFlow: IExampleFlow[] = [
 						{
 							nodeId: 'f59ae940-4b23-4f26-aeb2-de4022c9b8e5',
 							parameterKey: 'body',
-							parameterValue: null,
+							parameterValue: '',
 							id: '0d71287a-11a5-4098-b16e-d382666858c1'
 						},
 						{

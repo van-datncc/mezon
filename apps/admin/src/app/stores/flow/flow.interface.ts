@@ -64,7 +64,7 @@ export interface IFlowDataRequest {
 
 export interface IParameter {
 	parameterKey: string;
-	parameterValue: string | null;
+	parameterValue: string;
 	id?: string;
 	nodeId?: string;
 }
