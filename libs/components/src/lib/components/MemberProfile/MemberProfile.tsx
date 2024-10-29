@@ -10,7 +10,7 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
-	EActivities,
+	ActivitiesName,
 	HEIGHT_PANEL_PROFILE,
 	HEIGHT_PANEL_PROFILE_DM,
 	MemberProfileType,
@@ -106,9 +106,11 @@ export function MemberProfile({
 	const dispatch = useAppDispatch();
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const activityByUserId = useSelector(selectActivityByUserId(user?.user?.id || ''));
+
 	const activityNames: { [key: string]: string } = {
-		[EActivities.CODE]: 'Visual Studio Code',
-		[EActivities.SPOTIFY]: 'Listening to Spotify'
+		[ActivitiesName.CODE]: 'Visual Studio Code',
+		[ActivitiesName.SPOTIFY]: 'Listening to Spotify',
+		[ActivitiesName.LOL]: 'Riot Client'
 	};
 
 	const activityStatus = customStatus || activityNames[activityByUserId?.activity_name as string];
@@ -233,7 +235,7 @@ export function MemberProfile({
 				/>
 			</div>
 		);
-	}, [positionShortUser]);
+	}, [positionShortUser, activityByUserId]);
 
 	const [openPanelMember, closePanelMember] = useModal(() => {
 		if (isHiddenAvatarPanel) return;

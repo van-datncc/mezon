@@ -868,12 +868,20 @@ export type IActivity = {
 	id: string;
 };
 
-export enum EActivities {
-	CODE = 'Code',
-	SPOTIFY = 'Spotify'
-}
-
 export interface ActivitiesInfo {
 	appName: string;
 	windowTitle: string;
+	startTime: string;
+}
+
+export enum ActivitiesType {
+	VISUAL_STUDIO_CODE = 1,
+	SPOTIFY = 2,
+	LOL = 3
+}
+
+export enum ActivitiesName {
+	CODE = 'Code',
+	SPOTIFY = 'Spotify',
+	LOL = 'Riot Client'
 }
