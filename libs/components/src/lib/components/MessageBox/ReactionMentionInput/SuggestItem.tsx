@@ -38,6 +38,10 @@ const SuggestItem = ({
 	channel
 }: SuggestItemProps) => {
 	const allChannels = useSelector(selectAllChannels);
+	const getChannel = allChannels.find((channel) => {
+		return channel.channel_id === channelId;
+	});
+
 	const { directId } = useParams();
 	const commonChannels = useSelector(selectAllHashtagDm);
 	const theme = useSelector(selectTheme);
@@ -133,8 +137,8 @@ const SuggestItem = ({
 				{checkVoiceStatus && <i className="text-[15px] font-thin dark:text-text-zinc-400 text-colorDanger ">(busy)</i>}
 			</div>
 			<span className={`text-[10px] font-semibold text-[#A1A1AA] one-line ${subTextStyle}`}>
-				{channel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
-					<RenderChannelLabelForThread channel_id={channel?.parrent_id as string} />
+				{getChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
+					<RenderChannelLabelForThread channel_id={getChannel?.parrent_id as string} />
 				) : (
 					<>{HighlightMatchBold(subText ?? '', valueHightLight ?? '')}</>
 				)}
