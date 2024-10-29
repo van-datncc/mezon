@@ -3,13 +3,14 @@ import {
 	ChannelsEntity,
 	messagesActions,
 	selectAllChannelMembers,
+	selectAllRolesClan,
 	selectChannelById,
 	selectCurrentClanId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { IMessageSendPayload } from '@mezon/utils';
+import { IMessageSendPayload, uniqueUsers } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
@@ -34,6 +35,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 
 	const membersOfChild = useAppSelector((state) => (thread?.channel_id ? selectAllChannelMembers(state, thread?.channel_id as string) : null));
 	const membersOfParent = useAppSelector((state) => (thread?.parrent_id ? selectAllChannelMembers(state, thread?.parrent_id as string) : null));
+	const rolesClan = useSelector(selectAllRolesClan);
 
 	const mapToMemberIds = membersOfChild?.map((item) => {
 		return item.id;
@@ -65,8 +67,9 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 				attachments,
 				references
 			);
-			const userIdNeedToAdd = getUniqueIds(mentions);
-			const usersNotExistingInThread = userIdNeedToAdd.filter((userId) => !mapToMemberIds?.includes(userId as string));
+
+			const userIds = uniqueUsers(mentions as ApiMessageMention[], membersOfChild, rolesClan, []);
+			const usersNotExistingInThread = userIds.filter((userId) => !mapToMemberIds?.includes(userId as string));
 
 			if (usersNotExistingInThread.length > 0) {
 				addMemberToThread(thread as ChannelsEntity, usersNotExistingInThread as string[]);
@@ -75,6 +78,7 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 			const timestamp = Date.now() / 1000;
 			dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[sessionRef, clientRef, socketRef, currentClanId, mode, dispatch, channelId]
 	);
 
@@ -107,19 +111,6 @@ export function useThreadMessage({ channelId, mode }: UseThreadMessage) {
 		},
 		[sessionRef, clientRef, socketRef, currentClanId, channelId, mode, thread]
 	);
-
-	function getUniqueIds(data: any) {
-		const uniqueIds = new Set();
-		data.forEach((item: any) => {
-			if (item.user_id) {
-				uniqueIds.add(item.user_id);
-			}
-			if (item.role_id) {
-				uniqueIds.add(item.role_id);
-			}
-		});
-		return Array.from(uniqueIds);
-	}
 
 	return useMemo(
 		() => ({
