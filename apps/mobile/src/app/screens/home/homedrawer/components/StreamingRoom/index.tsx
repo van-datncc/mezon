@@ -17,13 +17,15 @@ import { selectCurrentClanId } from '@mezon/store-mobile';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, SafeAreaView, Text, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, SafeAreaView, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
 import { MezonBottomSheet } from '../../../../../componentUI';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
+import { IModeKeyboardPicker } from '../BottomKeyboardPicker';
 import { InviteToChannel } from '../InviteToChannel';
-import SelectAudio from './SelectAudio';
+import { ChatBoxStreamComponent } from './ChatBoxStream';
+import FooterChatBoxStream from './ChatBoxStream/FooterChatBoxStream';
 import { style } from './StreamingRoom.styles';
 import { StreamingScreenComponent } from './StreamingScreen';
 import UserStreamingRoom from './UserStreamingRoom';
@@ -38,25 +40,16 @@ function StreamingRoom({
 	const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [isMute, setIsMute] = useState<boolean>(false);
-	const [isVideoCall, setIsVideoCall] = useState<boolean>(false);
 	const navigation = useNavigation<any>();
 	const bottomSheetInviteRef = useRef(null);
-	const bottomSheetSelectAudioRef = useRef(null);
+	const bottomSheetChatRef = useRef(null);
+	const panelKeyboardRef = useRef(null);
 	const { t } = useTranslation(['streamingRoom']);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const streamChannelMember = useSelector(selectStreamMembersByChannelId(currentStreamInfo?.streamId || ''));
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
-
-	const handleMuteOrUnMute = () => {
-		setIsMute(!isMute);
-	};
-
-	const handleVideoCall = () => {
-		setIsVideoCall(!isVideoCall);
-	};
 
 	const handleLeaveChannel = async () => {
 		if (currentStreamInfo) {
@@ -86,15 +79,21 @@ function StreamingRoom({
 		});
 	}, []);
 
-	const handleVoice = () => {
-		bottomSheetSelectAudioRef.current.present();
-	};
 	const handleAddPeopleToVoice = () => {
 		bottomSheetInviteRef.current.present();
 	};
 	const handelFullScreenVideo = useCallback(() => {
 		setIsFullScreen(!isFullScreen);
 	}, [isFullScreen]);
+	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+		if (panelKeyboardRef?.current) {
+			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
+		}
+	}, []);
+
+	const handleShowChat = () => {
+		bottomSheetChatRef.current.present();
+	};
 
 	return (
 		<SafeAreaView>
@@ -119,16 +118,8 @@ function StreamingRoom({
 								>
 									<Icons.ChevronSmallDownIcon />
 								</TouchableOpacity>
-
-								<TouchableOpacity style={styles.btnVoice}>
-									<Text style={styles.textMenuItem}>{t('streamingRoom.voice')}</Text>
-									<Icons.ChevronSmallRightIcon />
-								</TouchableOpacity>
 							</Block>
 							<Block flexDirection="row" alignItems="center" gap={size.s_20}>
-								<TouchableOpacity onPress={handleVoice} style={styles.buttonCircle}>
-									<Icons.VoiceNormalIcon />
-								</TouchableOpacity>
 								<TouchableOpacity onPress={handleAddPeopleToVoice} style={styles.buttonCircle}>
 									<Icons.UserPlusIcon />
 								</TouchableOpacity>
@@ -169,19 +160,10 @@ function StreamingRoom({
 									paddingHorizontal={size.s_14}
 									paddingBottom={size.s_14}
 								>
-									<TouchableOpacity onPress={handleVideoCall} style={styles.menuIcon}>
-										{isVideoCall ? <Icons.VideoIcon /> : <Icons.VideoSlashIcon />}
-									</TouchableOpacity>
-									<TouchableOpacity onPress={handleMuteOrUnMute} style={styles.menuIcon}>
-										{isMute ? <Icons.SpeakerMuteIcon /> : <Icons.SpeakerUnMuteIcon />}
+									<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
+										<Icons.ChatIcon />
 									</TouchableOpacity>
 
-									{/* <TouchableOpacity style={styles.menuIcon}>
-										<Icons.ChatIcon />
-									</TouchableOpacity> */}
-									{/* <TouchableOpacity style={styles.menuIcon}>
-										<Icons.AppActivitiesIcon />
-									</TouchableOpacity> */}
 									<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
 										<Icons.PhoneCallIcon />
 									</TouchableOpacity>
@@ -191,8 +173,15 @@ function StreamingRoom({
 					)}
 				</Block>
 				<InviteToChannel isUnknownChannel={false} ref={bottomSheetInviteRef} />
-				<MezonBottomSheet snapPoints={['40%']} ref={bottomSheetSelectAudioRef}>
-					<SelectAudio />
+
+				<MezonBottomSheet
+					footer={<FooterChatBoxStream onShowKeyboardBottomSheet={onShowKeyboardBottomSheet} />}
+					title={t('chat')}
+					titleSize={'md'}
+					snapPoints={['100%']}
+					ref={bottomSheetChatRef}
+				>
+					<ChatBoxStreamComponent ref={panelKeyboardRef} />
 				</MezonBottomSheet>
 			</LinearGradient>
 		</SafeAreaView>

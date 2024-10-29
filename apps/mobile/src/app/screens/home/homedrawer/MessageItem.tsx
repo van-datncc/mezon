@@ -7,11 +7,11 @@ import {
 	ReplyMessageDeleted,
 	save,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	STORAGE_PREVIOUS_CHANNEL,
 	validLinkInviteRegex
 } from '@mezon/mobile-components';
 import { Block, Colors, Text, useTheme } from '@mezon/mobile-ui';
 import {
+	appActions,
 	channelsActions,
 	ChannelsEntity,
 	getStoreAsync,
@@ -21,7 +21,9 @@ import {
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectHasInternetMobile,
-	useAppDispatch
+	selectStatusStream,
+	useAppDispatch,
+	videoStreamActions
 } from '@mezon/store-mobile';
 import { ApiMessageAttachment, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -102,6 +104,7 @@ const MessageItem = React.memo(
 		const rolesInClan = useSelector(selectAllRolesClan);
 		const timeoutRef = useRef<NodeJS.Timeout>(null);
 		const hasInternet = useSelector(selectHasInternetMobile);
+		const playStream = useSelector(selectStatusStream);
 
 		const checkAnonymous = useMemo(() => message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [message?.sender_id]);
 		const checkSystem = useMemo(() => {
@@ -269,11 +272,17 @@ const MessageItem = React.memo(
 						const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 						await Linking.openURL(urlVoice);
 					} else if ([ChannelType.CHANNEL_TYPE_TEXT, ChannelType.CHANNEL_TYPE_STREAMING].includes(type)) {
-						if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
-							navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-								screen: APP_SCREEN.MENU_CHANNEL.STREAMING_ROOM
-							});
-							save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
+						if (type === ChannelType.CHANNEL_TYPE_STREAMING && !playStream) {
+							dispatch(appActions.setHiddenBottomTabMobile(true));
+							dispatch(
+								videoStreamActions.startStream({
+									clanId: channel?.clan_id || '',
+									clanName: channel?.clan_name || '',
+									streamId: channel?.channel_id || '',
+									streamName: channel?.channel_label || '',
+									parentId: channel?.parrent_id || ''
+								})
+							);
 						} else {
 							navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 						}

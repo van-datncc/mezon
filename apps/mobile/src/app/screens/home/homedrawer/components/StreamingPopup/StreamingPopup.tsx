@@ -3,7 +3,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch } from '@mezon/store';
 import { appActions } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, DeviceEventEmitter, Dimensions, PanResponder, TouchableOpacity } from 'react-native';
+import { Animated, DeviceEventEmitter, Dimensions, Keyboard, PanResponder, TouchableOpacity } from 'react-native';
 import StreamingRoom from '../StreamingRoom';
 import { style } from './styles';
 const { width, height } = Dimensions.get('window');
@@ -71,6 +71,7 @@ export const StreamingPopup = () => {
 			isOpenDrawer && dispatch(appActions.setHiddenBottomTabMobile(false));
 		}
 		setIsFullScreen(isFullScreen);
+		Keyboard.dismiss();
 	}, []);
 
 	return (

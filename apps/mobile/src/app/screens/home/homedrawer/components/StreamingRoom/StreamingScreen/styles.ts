@@ -39,7 +39,7 @@ export const style = (colors: Attributes) =>
 		},
 		errorText: {
 			color: colors.white,
-			fontSize: size.regular,
+			fontSize: size.s_20,
 			fontWeight: '600'
 		}
 	});

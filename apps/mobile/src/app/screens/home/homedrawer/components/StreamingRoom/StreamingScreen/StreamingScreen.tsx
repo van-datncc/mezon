@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@mezon/mobile-ui';
+import { Block, useTheme } from '@mezon/mobile-ui';
 import { selectStreamChannelByChannelId } from '@mezon/store-mobile';
-import { memo, default as React, useRef, useState } from 'react';
+import { default as React, memo, useRef, useState } from 'react';
 import { StatusBar, TouchableOpacity, View } from 'react-native';
 import Orientation from 'react-native-orientation-locker';
 import Video from 'react-native-video';
@@ -57,32 +57,40 @@ export function StreamingScreen({
 
 	return (
 		<View style={styles.container}>
-			{loading && !error && (
-				<View style={styles.loadingOverlay}>
-					<ActivityIndicator size="large" color="white" />
-				</View>
-			)}
+			{channelStream?.streaming_url ? (
+				<View>
+					{loading && !error && (
+						<View style={styles.loadingOverlay}>
+							<ActivityIndicator size="large" color="white" />
+						</View>
+					)}
 
-			{error ? (
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{t('noStreaming')}</Text>
+					{error ? (
+						<Block width={'100%'} height={'100%'} justifyContent="center" alignItems="center">
+							<Text style={styles.errorText}>{t('noStreaming')}</Text>
+						</Block>
+					) : (
+						<Video
+							controls={false}
+							ref={videoRef}
+							source={{
+								uri: channelStream?.streaming_url
+							}}
+							resizeMode={isFullScreen ? 'cover' : 'contain'}
+							style={isFullScreen ? styles.fullScreenVideo : styles.video}
+							onLoadStart={handleVideoLoadStart}
+							onLoad={handleVideoLoad}
+							onError={handleVideoError}
+						/>
+					)}
 				</View>
 			) : (
-				<Video
-					controls={false}
-					ref={videoRef}
-					source={{
-						uri: channelStream?.streaming_url
-					}}
-					resizeMode={isFullScreen ? 'cover' : 'contain'}
-					style={isFullScreen ? styles.fullScreenVideo : styles.video}
-					onLoadStart={handleVideoLoadStart}
-					onLoad={handleVideoLoad}
-					onError={handleVideoError}
-				/>
+				<Block width={'100%'} height={'100%'} justifyContent="center" alignItems="center">
+					<Text style={styles.errorText}>{t('noDisplay')}</Text>
+				</Block>
 			)}
 
-			{(isAnimationComplete || isFullScreen) && !error && (
+			{(isAnimationComplete || isFullScreen) && !error && channelStream?.streaming_url && (
 				<TouchableOpacity style={styles.fullScreenButton} onPress={handleFullScreen}>
 					<Ionicons name={isFullScreen ? 'contract-outline' : 'expand-outline'} size={24} color="white" />
 				</TouchableOpacity>

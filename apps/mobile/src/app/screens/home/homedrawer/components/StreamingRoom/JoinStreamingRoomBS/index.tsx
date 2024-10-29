@@ -14,19 +14,22 @@ import { appActions, selectClanById, useAppDispatch, videoStreamActions } from '
 import { selectCurrentChannel, selectCurrentClanId, selectCurrentStreamInfo, selectStatusStream } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
+import { MezonBottomSheet } from '../../../../../../componentUI';
+import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import { InviteToChannel } from '../../InviteToChannel';
+import { ChatBoxStreamComponent } from '../ChatBoxStream';
+import FooterChatBoxStream from '../ChatBoxStream/FooterChatBoxStream';
 import { style } from './JoinStreamingRoomBS.styles';
 
 function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: React.MutableRefObject<BottomSheetModal>) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const bottomSheetInviteRef = useRef(null);
-	const [isMute, setIsMute] = useState<boolean>(true);
 	const { dismiss } = useBottomSheetModal();
 	const { t } = useTranslation(['streamingRoom']);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -35,16 +38,14 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 	const playStream = useSelector(selectStatusStream);
 	const dispatch = useAppDispatch();
 	const clanById = useSelector(selectClanById(channel?.clan_id || ''));
-
-	const handleMuteSpeaker = () => {
-		setIsMute(!isMute);
-	};
+	const bottomSheetChatRef = useRef(null);
+	const panelKeyboardRef = useRef(null);
 
 	const handleJoinVoice = async () => {
 		requestAnimationFrame(async () => {
 			if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING) {
 				dispatch(appActions.setHiddenBottomTabMobile(true));
-				if (currentStreamInfo?.streamId !== channel.id || (!playStream && currentStreamInfo?.streamId === channel.id)) {
+				if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
 					dispatch(
 						videoStreamActions.startStream({
 							clanId: channel?.clan_id || '',
@@ -54,7 +55,6 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 							parentId: channel?.parrent_id || ''
 						})
 					);
-					dispatch(appActions.setIsShowChatStream(false));
 				}
 
 				save(STORAGE_PREVIOUS_CHANNEL, currentChannel);
@@ -73,6 +73,16 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 				dismiss();
 			}
 		});
+	};
+
+	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, height: number, type?: IModeKeyboardPicker) => {
+		if (panelKeyboardRef?.current) {
+			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, height, type);
+		}
+	}, []);
+
+	const handleShowChat = () => {
+		bottomSheetChatRef.current.present();
 	};
 
 	return (
@@ -114,7 +124,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 				>
 					<Icons.VoiceNormalIcon width={size.s_36} height={size.s_36} />
 				</LinearGradient>
-				<Text style={styles.text}>{t('joinStreamingRoomBS.voice')}</Text>
+				<Text style={styles.text}>{t('joinStreamingRoomBS.stream')}</Text>
 				<Text style={styles.textDisable}>{t('joinStreamingRoomBS.noOne')}</Text>
 				<Text style={styles.textDisable}>{t('joinStreamingRoomBS.readyTalk')}</Text>
 			</Block>
@@ -130,7 +140,21 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 					paddingHorizontal={size.s_20}
 					paddingBottom={size.s_20}
 				>
-					<TouchableOpacity onPress={handleMuteSpeaker}>
+					<Block
+						justifyContent="center"
+						alignItems="center"
+						position="relative"
+						width={size.s_30}
+						height={size.s_30}
+						backgroundColor={'transparent'}
+						borderRadius={size.s_30}
+					></Block>
+					<Block flexDirection="column" flex={1}>
+						<TouchableOpacity style={styles.btnJoinVoice} onPress={handleJoinVoice}>
+							<Text style={styles.textBtnJoinVoice}>{t('joinStreamingRoomBS.joinStream')}</Text>
+						</TouchableOpacity>
+					</Block>
+					<TouchableOpacity onPress={handleShowChat}>
 						<Block
 							justifyContent="center"
 							alignItems="center"
@@ -140,28 +164,20 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }, refRBSheet: Rea
 							backgroundColor={themeValue.badgeHighlight}
 							borderRadius={size.s_30}
 						>
-							{isMute ? <Icons.SpeakerMuteIcon /> : <Icons.SpeakerUnMuteIcon />}
+							<Icons.ChatIcon />
 						</Block>
 					</TouchableOpacity>
-					<Block flexDirection="column" flex={1}>
-						<TouchableOpacity style={styles.btnJoinVoice} onPress={handleJoinVoice}>
-							<Text style={styles.textBtnJoinVoice}>{t('joinStreamingRoomBS.joinVoice')}</Text>
-						</TouchableOpacity>
-					</Block>
-					<Block
-						justifyContent="center"
-						alignItems="center"
-						position="relative"
-						width={size.s_60}
-						height={size.s_60}
-						backgroundColor={themeValue.badgeHighlight}
-						borderRadius={size.s_30}
-					>
-						<Icons.ChatIcon />
-					</Block>
 				</Block>
 			</Block>
-
+			<MezonBottomSheet
+				footer={<FooterChatBoxStream onShowKeyboardBottomSheet={onShowKeyboardBottomSheet} />}
+				title={t('chat')}
+				titleSize={'md'}
+				snapPoints={['100%']}
+				ref={bottomSheetChatRef}
+			>
+				<ChatBoxStreamComponent ref={panelKeyboardRef} />
+			</MezonBottomSheet>
 			<InviteToChannel isUnknownChannel={false} ref={bottomSheetInviteRef} />
 		</Block>
 	);

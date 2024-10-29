@@ -130,10 +130,12 @@ export const uniqueUsers = (
 		)
 	);
 
-	const combinedUniqueUserIds = Array.from(new Set([...uniqueUserId1s, ...uniqueUserId2s, ...refereceSenderId]));
+	const combinedUniqueUserIds = Array.from(
+		new Set([...(uniqueUserId1s || []), ...(uniqueUserId2s || []), ...(refereceSenderId ? [refereceSenderId] : [])])
+	);
 
 	const memUserIds = userChannels?.map((member) => member?.user?.id) || [];
-	const userIdsNotInChannel = combinedUniqueUserIds.filter((user_id) => !memUserIds.includes(user_id));
+	const userIdsNotInChannel = combinedUniqueUserIds.filter((user_id) => Array.isArray(memUserIds) && !memUserIds.includes(user_id as string));
 
 	return userIdsNotInChannel;
 };
