@@ -31,7 +31,10 @@ export const createActivity = createAsyncThunk('activity/createActiviy', async (
 
 		const response = await mezon.client.createActiviy(mezon.session, body);
 
-		return response;
+		return {
+			...response,
+			id: response.user_id
+		};
 	} catch (error: any) {
 		const errstream = await error.json();
 		return thunkAPI.rejectWithValue(errstream.message);
