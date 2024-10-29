@@ -268,12 +268,12 @@ const Flow = () => {
 			} = {};
 			const listNode = flowDetail.nodes?.map((node: INode) => {
 				const params: {
-					[key: string]: string;
+					[key: string]: string | null;
 				} = {};
 				node?.parameters?.forEach((param: IParameter) => {
 					let value = param.parameterValue;
 					try {
-						value = JSON.parse(param.parameterValue);
+						value = JSON.parse(param.parameterValue ?? '');
 					} catch {
 						value = param.parameterValue;
 					}
