@@ -294,6 +294,8 @@ export const selectAllThreads = createSelector(getThreadsState, selectAll);
 
 export const selectThreadsEntities = createSelector(getThreadsState, selectEntities);
 
+export const selectThreadById = createSelector([selectThreadsEntities, (state, threadId: string) => threadId], (state, threadId) => state[threadId]);
+
 export const selectIsPrivate = createSelector(getThreadsState, (state) => state.isPrivate);
 
 export const selectNameThreadError = createSelector(getThreadsState, (state) => state.nameThreadError);

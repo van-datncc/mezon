@@ -23,9 +23,9 @@ function getErrorFromRejectedWithValue(action: any) {
 
 	if (typeof action.payload === 'string') {
 		message = action.payload;
-	} else if (typeof action.payload === 'object' && action.payload.message) {
+	} else if (typeof action.payload === 'object' && action.payload != null && action.payload.message) {
 		message = action.payload.message;
-	} else if (typeof action.payload === 'object' && action.payload.error) {
+	} else if (typeof action.payload === 'object' && action.payload != null && action.payload.error) {
 		if (typeof action.payload.error === 'string') {
 			message = action.payload.error;
 		} else if (typeof action.payload.error === 'object' && action.payload.error.message) {

@@ -176,6 +176,7 @@ const DirectMessage = () => {
 						<div className="overflow-y-auto bg-[#1E1E1E] h-heightMessageViewChatDM flex-shrink " ref={messagesContainerRef}>
 							{
 								<ChannelMessages
+									key={directId}
 									clanId="0"
 									channelId={directId ?? ''}
 									channelLabel={currentDmGroup?.channel_label}

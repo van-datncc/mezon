@@ -407,7 +407,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		if (Number(type) === ChannelType.CHANNEL_TYPE_GROUP) {
 			return isOwnerGroupDM;
 		}
-		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) {
+		if (activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL || activeMode === ChannelStreamMode.STREAM_MODE_THREAD) {
 			return canDeleteMessage;
 		}
 	}, [activeMode, type, canDeleteMessage, isMyMessage, checkPos, isOwnerGroupDM]);
