@@ -113,6 +113,7 @@ const ThreadBox = () => {
 				{threadCurrentChannel && (
 					<div className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChatThread h-heightMessageViewChatThread">
 						<ChannelMessages
+							key={threadCurrentChannel.channel_id}
 							clanId={currentClanId || ''}
 							channelId={threadCurrentChannel.channel_id as string}
 							channelLabel={threadCurrentChannel.channel_label}

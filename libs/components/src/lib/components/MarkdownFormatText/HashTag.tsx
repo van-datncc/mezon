@@ -3,21 +3,19 @@ import {
 	ChannelsEntity,
 	appActions,
 	categoriesActions,
-	channelsActions,
 	selectClanView,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentStreamInfo,
 	selectStatusStream,
-	selectThreadNotJoin,
-	threadsActions,
+	selectThreadById,
 	useAppDispatch,
 	useAppSelector,
 	videoStreamActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalUnknowChannel from './ModalUnknowChannel';
 
@@ -39,35 +37,8 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 	const clanById = useSelector(selectCurrentClan);
 
 	let channel = useTagById(tagId);
-	const thread = useAppSelector((state) => selectThreadNotJoin(state, tagId));
-	if (thread) channel = thread;
-	const [loading, setLoading] = useState(!channel);
-
-	useEffect(() => {
-		const fetchThreads = async () => {
-			if (!(isClanView && clanById?.id && !channel && !thread)) return;
-			setLoading(true);
-			try {
-				const threads = await dispatch(
-					threadsActions.fetchThread({
-						channelId: '0',
-						clanId: clanById?.id,
-						threadId: tagId
-					})
-				).unwrap();
-
-				if (threads?.length) {
-					dispatch(channelsActions.addThreadUserNotJoin(threads[0] as ChannelsEntity));
-					dispatch(channelsActions.upsertOne(threads[0] as ChannelsEntity));
-				}
-			} catch (error) {
-				console.error(error);
-			}
-
-			setLoading(false);
-		};
-		fetchThreads();
-	}, []);
+	const thread = useAppSelector((state) => selectThreadById(state, tagId));
+	if (thread) channel = thread as ChannelsEntity;
 
 	const handleClick = useCallback(() => {
 		if (!channel) return;
@@ -101,9 +72,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 		}
 	};
 
-	return loading ? (
-		<span></span>
-	) : channel ? (
+	return channel ? (
 		(currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT ||
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
 			(channelHastagId && !isClanView)) &&
