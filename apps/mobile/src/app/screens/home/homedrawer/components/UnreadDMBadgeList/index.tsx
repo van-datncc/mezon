@@ -8,6 +8,7 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import { style } from './styles';
+import FastImage from "react-native-fast-image";
 
 const UnreadDMBadgeItem = memo(({ dmId, numUnread }: { dmId: string; numUnread: number }) => {
 	const dm = useAppSelector((state) => selectDirectById(state, dmId)) || ({} as DirectEntity);
@@ -20,7 +21,7 @@ const UnreadDMBadgeItem = memo(({ dmId, numUnread }: { dmId: string; numUnread: 
 				return (
 					<View style={styles.avatarWrapper}>
 						{dm?.channel_avatar?.[0] ? (
-							<Image source={{ uri: dm?.channel_avatar?.[0] }} resizeMode="cover" style={styles.groupAvatar} />
+							<FastImage source={{ uri: dm?.channel_avatar?.[0] }} resizeMode="cover" style={styles.groupAvatar} />
 						) : (
 							<View style={styles.wrapperTextAvatar}>
 								<Text style={styles.textAvatar}>{dm?.channel_label?.charAt?.(0)}</Text>
