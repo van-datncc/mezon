@@ -108,7 +108,12 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 	}, [message?.sender_id, userId]);
 	const mode = useMemo(() => {
 		if (modeResponsive === ModeResponsive.MODE_CLAN) {
-			return ChannelStreamMode.STREAM_MODE_CHANNEL;
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_TEXT) {
+				return ChannelStreamMode.STREAM_MODE_CHANNEL;
+			}
+			if (currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				return ChannelStreamMode.STREAM_MODE_THREAD;
+			}
 		}
 
 		if (currentDm?.type === ChannelType.CHANNEL_TYPE_DM) {
@@ -116,7 +121,7 @@ function MessageContextMenu({ id, elementTarget, messageId, activeMode }: Messag
 		}
 
 		return ChannelStreamMode.STREAM_MODE_GROUP;
-	}, [modeResponsive, currentDm?.type]);
+	}, [modeResponsive, currentDm?.type, currentChannel?.type]);
 
 	const checkMessageHasText = useMemo(() => {
 		return message?.content.t !== '';

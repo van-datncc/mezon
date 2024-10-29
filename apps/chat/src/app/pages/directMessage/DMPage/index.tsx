@@ -289,7 +289,15 @@ const DirectMessage = () => {
 
 const SearchMessageChannel = () => {
 	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
-	return <SearchMessageChannelRender searchMessages={messageSearchByChannelId} currentPage={currentPage} totalResult={totalResult} />;
+	const currentChannelId = useSelector(selectCurrentChannelId);
+	return (
+		<SearchMessageChannelRender
+			searchMessages={messageSearchByChannelId}
+			currentPage={currentPage}
+			totalResult={totalResult}
+			channelId={currentChannelId || ''}
+		/>
+	);
 };
 
 export default memo(DirectMessage);

@@ -144,7 +144,10 @@ function MessageWithUser({
 			return;
 		}
 		shortUserId.current = userId;
-		const heightPanel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? HEIGHT_PANEL_PROFILE : HEIGHT_PANEL_PROFILE_DM;
+		const heightPanel =
+			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
+				? HEIGHT_PANEL_PROFILE
+				: HEIGHT_PANEL_PROFILE_DM;
 		if (window.innerHeight - e.clientY > heightPanel) {
 			positionShortUser.current = {
 				top: e.clientY,

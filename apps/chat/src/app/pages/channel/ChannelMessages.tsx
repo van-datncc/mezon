@@ -191,18 +191,6 @@ function ChannelMessages({ clanId, channelId, channelLabel, avatarDM, userName, 
 		chatScrollRef.updateLoadMoreCb(loadMoreMessage);
 	}, [loadMoreMessage, chatScrollRef]);
 
-	// TODO: move this to another place
-	// useEffect(() => {
-	// 	// Update last message of channel when component unmount
-	// 	return () => {
-	// 		dispatch(
-	// 			messagesActions.UpdateChannelLastMessage({
-	// 				channelId
-	// 			})
-	// 		);
-	// 	};
-	// }, [channelId, dispatch]);
-
 	// Handle scroll to bottom when user on the bottom and received new message
 	useEffect(() => {
 		if (isViewOlderMessage) {
