@@ -5573,3 +5573,60 @@ export function MicrosoftWinPortable(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+
+export const RiotGame: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			id="Layer_1"
+			data-name="Layer 1"
+			viewBox="0 0 32 32"
+			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
+		>
+			<circle cx="16" cy="16" r="16" fill="#f1f5f1"></circle>
+			<polygon
+				points="16.42 8 6.75 12.47 9.16 21.64 11 21.41 10.49 15.65 11.1 15.38 12.13 21.27 15.27 20.89 14.71 14.53 15.3 14.27 16.45 20.75 19.62 20.36 19.01 13.38 19.61 13.12 20.86 20.2 24 19.82 24 9.89 16.42 8"
+				fill="#050505"
+			></polygon>
+			<polygon points="16.65 21.9 16.81 22.8 24 24 24 21 16.66 21.9 16.65 21.9" fill="#050505"></polygon>
+		</svg>
+	);
+};
+
+export const Spotify: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			enable-background="new 0 0 40 40"
+			viewBox="0 0 40 40"
+			id="spotify"
+			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
+		>
+			<switch>
+				<g>
+					<g>
+						<circle cx="20" cy="20" r="16" fill="#1ed35a"></circle>
+						<path d="M31 18.5c-.2 0-.4 0-.7-.1-3.3-1.6-6.8-2.5-10.5-2.8-3.2-.2-6.4.1-9.5.9-.8.2-1.6-.3-1.8-1.1-.2-.8.3-1.6 1.1-1.8 3.4-.9 7-1.3 10.5-1 4 .3 7.9 1.3 11.5 3.1.7.4 1.1 1.3.7 2C32.1 18.2 31.6 18.5 31 18.5zM28.9 23c-.2 0-.4 0-.5-.1-2.6-1.4-5.5-2.3-8.5-2.6-2.8-.3-5.8 0-8.5.9-.6.2-1.2-.2-1.4-.7-.2-.6.2-1.2.7-1.4 3-.9 6.2-1.2 9.3-.9 3.3.3 6.5 1.3 9.3 2.8.5.3.7 1 .4 1.5C29.7 22.8 29.3 23 28.9 23zM26.7 27.5c-.2 0-.3 0-.4-.1-1.1-.8-2.4-1.4-3.7-1.9-4.3-1.5-8.4-.8-11 0-.4.1-.9-.1-1-.5-.1-.4.1-.9.5-1 2.9-.9 7.3-1.7 12.1 0 1.4.5 2.8 1.2 4 2 .4.2.5.7.2 1.1C27.2 27.4 27 27.5 26.7 27.5z"></path>
+					</g>
+				</g>
+			</switch>
+		</svg>
+	);
+};
+
+export const VisualStudioCode: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			id="visual-studio-code"
+			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
+		>
+			<path
+				fill="#1677C7"
+				d="m2.419 13.939 3.434-2.589L12 17l3-1.456V4.456L12 3 5.853 8.65 2.418 6.062 1 6.889 4.385 10 1 13.111l1.419.828zM12 6.717v6.566L7.644 10 12 6.717z"
+			></path>
+			<path fill="#1677C7" d="M18 19.484 0 17.939v.561L18 24l6-2.5v-19L18 0z"></path>
+		</svg>
+	);
+};

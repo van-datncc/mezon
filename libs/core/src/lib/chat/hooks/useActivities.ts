@@ -1,20 +1,11 @@
 import { acitvitiesActions, useAppDispatch } from '@mezon/store';
-import { ActivitiesInfo } from '@mezon/utils';
+import { ActivitiesInfo, ActivitiesName, ActivitiesType } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 
-export enum ActivitiesName {
-	CODE = 'Code',
-	SPOTIFY = 'Spotify'
-}
-
-export enum ActititiesType {
-	CODE = 0,
-	SPOTIFY = 1
-}
-
-const testToActivityTypeMap: Record<ActivitiesName, ActititiesType> = {
-	[ActivitiesName.CODE]: ActititiesType.CODE,
-	[ActivitiesName.SPOTIFY]: ActititiesType.SPOTIFY
+const testToActivityTypeMap: Record<ActivitiesName, ActivitiesType> = {
+	[ActivitiesName.CODE]: ActivitiesType.VISUAL_STUDIO_CODE,
+	[ActivitiesName.SPOTIFY]: ActivitiesType.SPOTIFY,
+	[ActivitiesName.LOL]: ActivitiesType.LOL
 };
 
 export function useActivities() {
@@ -26,6 +17,7 @@ export function useActivities() {
 				activity_name: info.appName,
 				activity_type: testToActivityTypeMap[info.appName as ActivitiesName],
 				application_id: '0',
+				start_time: info.startTime,
 				status: 1
 			};
 			dispatch(acitvitiesActions.createActivity(body));
