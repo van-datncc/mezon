@@ -71,10 +71,14 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	const currentChannel = useSelector(selectChannelById(channelId));
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
+	const mode = currentChannel.type === ChannelType.CHANNEL_TYPE_TEXT ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
 
 	if (!canSendMessage) {
 		return (
-			<div className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line">
+			<div
+				style={{ height: 44 }}
+				className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line"
+			>
 				You do not have permission to send messages in this channel.
 			</div>
 		);
@@ -83,16 +87,12 @@ const ChannelMainContentText = ({ channelId }: ChannelMainContentProps) => {
 	return (
 		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
 			{currentChannel ? (
-				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
+				<ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />
 			) : (
 				<ChannelMessageBox.Skeleton />
 			)}
 			{currentChannel && (
-				<ChannelTyping
-					channelId={currentChannel?.id}
-					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					isPublic={currentChannel ? !currentChannel.channel_private : false}
-				/>
+				<ChannelTyping channelId={currentChannel?.id} mode={mode} isPublic={currentChannel ? !currentChannel.channel_private : false} />
 			)}
 		</div>
 	);

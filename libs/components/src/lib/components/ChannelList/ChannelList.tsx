@@ -1,5 +1,13 @@
 import { useAppNavigation, useCategorizedChannels, usePathMatch } from '@mezon/core';
-import { selectAllChannelsFavorite, selectChannelById, selectCurrentClan, selectIsShowEmptyCategory, selectTheme } from '@mezon/store';
+import {
+	ClansEntity,
+	selectAllChannelsFavorite,
+	selectChannelById,
+	selectCurrentClan,
+	selectIsShowEmptyCategory,
+	selectStatusStream,
+	selectTheme
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ChannelStatusEnum, ICategoryChannel } from '@mezon/utils';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -15,11 +23,6 @@ export type CategoriesState = Record<string, boolean>;
 
 function ChannelList() {
 	const appearanceTheme = useSelector(selectTheme);
-	const currentClan = useSelector(selectCurrentClan);
-	const memberPath = `/chat/clans/${currentClan?.id}/member-safety`;
-	const channelSettingPath = `/chat/clans/${currentClan?.id}/channel-setting`;
-
-	const { isMemberPath, isSettingPath } = usePathMatch({ isMemberPath: memberPath, isSettingPath: channelSettingPath });
 	return (
 		<div
 			onContextMenu={(event) => event.preventDefault()}
@@ -28,29 +31,45 @@ function ChannelList() {
 			role="button"
 		>
 			{<CreateNewChannelModal />}
-			{currentClan?.banner && (
-				<div className="h-[136px]">
-					{currentClan?.banner && <img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />}
-				</div>
-			)}
-			<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
-				<Events isMemberPath={isMemberPath} isSettingPath={isSettingPath} />
-			</div>
 			<hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
 			<div className={`overflow-y-scroll flex-1 pt-3 space-y-[21px]  text-gray-300 scrollbar-hide`}>
-				<RowVirtualizerDynamic hasBanner={!!currentClan?.banner} appearanceTheme={appearanceTheme} />
+				<RowVirtualizerDynamic appearanceTheme={appearanceTheme} />
 			</div>
 		</div>
 	);
 }
 
-const RowVirtualizerDynamic = memo(({ hasBanner, appearanceTheme }: { hasBanner: boolean; appearanceTheme: string }) => {
+const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity | null }) => {
+	const memberPath = `/chat/clans/${currentClan?.id}/member-safety`;
+	const channelSettingPath = `/chat/clans/${currentClan?.id}/channel-setting`;
+	const { isMemberPath, isSettingPath } = usePathMatch({ isMemberPath: memberPath, isSettingPath: channelSettingPath });
+	return (
+		<>
+			{currentClan?.banner && (
+				<div className="h-[136px]">
+					<img src={currentClan?.banner} alt="imageCover" className="h-full w-full object-cover" />
+				</div>
+			)}
+			<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
+				<Events isMemberPath={isMemberPath} isSettingPath={isSettingPath} />
+			</div>
+		</>
+	);
+});
+
+const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
 	const channelRefs = useRef<Record<string, ChannelListItemRef | null>>({});
 	const categorizedChannels = useCategorizedChannels();
+	const currentClan = useSelector(selectCurrentClan);
 	const isShowEmptyCategory = useSelector(selectIsShowEmptyCategory);
+	const streamPlay = useSelector(selectStatusStream);
 
 	const data = useMemo(
-		() => [{ type: 'favorites' }, ...categorizedChannels.filter((item) => !isShowEmptyCategory && item.channels.length !== 0)],
+		() => [
+			{ type: 'bannerAndEvents' },
+			{ type: 'favorites' },
+			...(isShowEmptyCategory ? categorizedChannels : categorizedChannels.filter((item) => item.channels.length !== 0))
+		],
 		[categorizedChannels, isShowEmptyCategory]
 	) as ICategoryChannel[];
 
@@ -69,16 +88,14 @@ const RowVirtualizerDynamic = memo(({ hasBanner, appearanceTheme }: { hasBanner:
 	useEffect(() => {
 		const calculateHeight = () => {
 			const clanFooterEle = document.getElementById('clan-footer');
-			const channelListTopELe = document.getElementById('channel-list-top');
-			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + (channelListTopELe?.clientHeight || 0) + 25;
-			const bannerHeight = 136;
-			const outsideHeight = totalHeight + (hasBanner ? bannerHeight : 0);
+			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 25;
+			const outsideHeight = totalHeight;
 			setHeight(window.innerHeight - outsideHeight);
 		};
 		calculateHeight();
 		window.addEventListener('resize', calculateHeight);
 		return () => window.removeEventListener('resize', calculateHeight);
-	}, [hasBanner, data]);
+	}, [data, streamPlay]);
 
 	const channelFavorites = useSelector(selectAllChannelsFavorite);
 	const [isExpandFavorite, setIsExpandFavorite] = useState<boolean>(true);
@@ -116,6 +133,12 @@ const RowVirtualizerDynamic = memo(({ hasBanner, appearanceTheme }: { hasBanner:
 					{items.map((virtualRow) => {
 						const item = data[virtualRow.index];
 						if (virtualRow.index === 0) {
+							return (
+								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+									<ChannelBannerAndEvents currentClan={currentClan} />
+								</div>
+							);
+						} else if (virtualRow.index === 1) {
 							return (
 								<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
 									<FavoriteChannelsSection
