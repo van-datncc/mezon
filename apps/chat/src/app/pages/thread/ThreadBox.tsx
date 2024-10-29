@@ -28,9 +28,13 @@ const ThreadBox = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
-	const { sendMessageThread, sendMessageTyping } = useThreadMessage({
+	const { sendMessageThread, sendMessageTyping, membersOfParent } = useThreadMessage({
 		channelId: threadCurrentChannel?.id as string,
 		mode: ChannelStreamMode.STREAM_MODE_THREAD
+	});
+
+	const mapToMemberIds = membersOfParent?.map((item) => {
+		return item.id;
 	});
 
 	const createThread = useCallback(
@@ -113,6 +117,8 @@ const ThreadBox = () => {
 				{threadCurrentChannel && (
 					<div className="overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden max-h-heightMessageViewChatThread h-heightMessageViewChatThread">
 						<ChannelMessages
+							isThreadBox={true}
+							userIdsFromThreadBox={mapToMemberIds}
 							clanId={currentClanId || ''}
 							channelId={threadCurrentChannel.channel_id as string}
 							channelLabel={threadCurrentChannel.channel_label}
