@@ -13,7 +13,7 @@ const ChannelMessageThread = (props: ChannelMessageThreadProps) => {
 			<MessageWithUser
 				allowDisplayShortProfile={true}
 				message={message}
-				mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+				mode={ChannelStreamMode.STREAM_MODE_THREAD}
 				isMention={true}
 				isShowFull={true}
 			/>
