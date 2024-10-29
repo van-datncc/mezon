@@ -1,9 +1,11 @@
 import { IPinMessage, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
-import { ApiPinMessageRequest } from 'mezon-js/api.gen';
+import { ChannelMessage } from 'mezon-js';
+import { ApiMessageMention, ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
+import { mapMessageChannelToEntity, messagesActions } from '../messages/messages.slice';
 
 export const PIN_MESSAGE_FEATURE_KEY = 'pinmessages';
 
@@ -65,14 +67,16 @@ export const fetchChannelPinMessages = createAsyncThunk(
 	}
 );
 type SetChannelPinMessagesPayload = {
+	clan_id?: string;
 	channel_id: string;
 	message_id: string;
 };
 export const setChannelPinMessage = createAsyncThunk(
 	'pinmessage/setChannelPinMessage',
-	async ({ channel_id, message_id }: SetChannelPinMessagesPayload, thunkAPI) => {
+	async ({ clan_id, channel_id, message_id }: SetChannelPinMessagesPayload, thunkAPI) => {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const body = {
+			clan_id: clan_id,
 			channel_id: channel_id,
 			message_id: message_id
 		};
@@ -80,6 +84,31 @@ export const setChannelPinMessage = createAsyncThunk(
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
+
+		const content = JSON.parse(response.content ?? '');
+		const originalMentions = JSON.parse(response.mention ?? '') as ApiMessageMention[];
+		const mentions = originalMentions.map((item) => ({
+			user_id: item.user_id,
+			e: item.e
+		}));
+		const reference = JSON.parse(response.referece ?? '');
+
+		const messageSystem: ChannelMessage = {
+			id: response.id ?? '',
+			channel_id: channel_id,
+			channel_label: '',
+			code: 0,
+			content: content ?? '',
+			create_time: response.timestamp_seconds ? new Date(response.timestamp_seconds * 1000).toISOString() : '',
+			mentions: mentions ?? [],
+			references: reference ?? [],
+			sender_id: '0',
+			username: 'System'
+		};
+		const mess = mapMessageChannelToEntity(messageSystem);
+		mess.isMe = true;
+		mess.hide_editted = true;
+		thunkAPI.dispatch(messagesActions.addNewMessage(mess));
 		thunkAPI.dispatch(fetchChannelPinMessages({ channelId: channel_id, noCache: true }));
 		return response;
 	}
