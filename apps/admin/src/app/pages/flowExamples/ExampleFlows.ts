@@ -350,14 +350,14 @@ const ExampleFlow: IExampleFlow[] = [
 	},
 	{
 		id: 'example-flow-4',
-		flowName: 'Api loader with mothod post',
-		description: 'This is an example about api loader with mothod post',
+		flowName: 'Api loader with method post',
+		description: 'This is an example about api loader with method post',
 		status: 'active',
 		flowDetail: {
 			id: '89c19669-073a-40c7-b55a-0a07c4458510',
 			userId: 'a08a1932-10cc-479c-8c1c-7b14cde57fd2',
-			flowName: 'Api loader with mothod post',
-			description: 'This is an example about api loader with mothod post',
+			flowName: 'Api loader with method post',
+			description: 'This is an example about api loader with method post',
 			connections: [
 				{
 					id: 'e85f114b-33c9-4728-a671-0dcd3394cabb',
