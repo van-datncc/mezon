@@ -36,6 +36,34 @@ export interface IChannelLinkPermission {
 	isClanOwner: boolean;
 }
 
+interface DeleteCategoryModalProps {
+	category: { category_name: string; id: string; channels?: IChannel[] };
+	closeDeleteModal: () => void;
+}
+
+const DeleteCategoryModal: React.FC<DeleteCategoryModalProps> = ({ category, closeDeleteModal }) => {
+	const { handleDeleteCategory } = useCategory();
+
+	const confirmDeleteCategory = async () => {
+		await handleDeleteCategory({
+			category: { ...category, channels: category.channels || [] }
+		});
+		closeDeleteModal();
+	};
+
+	return (
+		<ModalConfirm
+			handleCancel={closeDeleteModal}
+			modalName={category.category_name || ''}
+			handleConfirm={confirmDeleteCategory}
+			title="delete"
+			buttonName="Delete category"
+			message="This cannot be undone"
+			customModalName="Category"
+		/>
+	);
+};
+
 const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, channelRefs }) => {
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
@@ -65,14 +93,9 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 
 	const [openDeleteCategoryModal, closeDeleteModal] = useModal(() => {
 		return (
-			<ModalConfirm
-				handleCancel={closeDeleteModal}
-				modalName={category.category_name || ''}
-				handleConfirm={confirmDeleteCategory}
-				title="delete"
-				buttonName="Delete category"
-				message="This cannot be undone"
-				customModalName="Category"
+			<DeleteCategoryModal
+				category={{ ...category, category_name: category.category_name || 'Default Name' }}
+				closeDeleteModal={closeDeleteModal}
 			/>
 		);
 	});
@@ -81,7 +104,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 	const categoryIdSortChannel = useSelector(selectCategoryIdSortChannel);
 	const ctrlKFocusChannel = useSelector(selectCtrlKFocusChannel);
 
-	const { handleDeleteCategory } = useCategory();
 	const dispatch = useAppDispatch();
 	const isShowCreateChannel = isClanOwner || hasAdminPermission || hasChannelManagePermission || hasClanPermission;
 
@@ -142,11 +164,6 @@ const CategorizedChannels: React.FC<CategorizedChannelsProps> = ({ category, cha
 		};
 		dispatch(categoriesActions.setCategoryExpandState(payload));
 		openModalCreateNewChannel(category);
-	};
-
-	const confirmDeleteCategory = async () => {
-		await handleDeleteCategory({ category });
-		closeDeleteModal();
 	};
 
 	useEffect(() => {

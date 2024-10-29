@@ -47,18 +47,23 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 		const fetchThreads = async () => {
 			if (!(isClanView && clanById?.id && !channel && !thread)) return;
 			setLoading(true);
-			const threads = await dispatch(
-				threadsActions.fetchThread({
-					channelId: '0',
-					clanId: clanById?.id,
-					threadId: tagId
-				})
-			).unwrap();
+			try {
+				const threads = await dispatch(
+					threadsActions.fetchThread({
+						channelId: '0',
+						clanId: clanById?.id,
+						threadId: tagId
+					})
+				).unwrap();
 
-			if (threads?.length) {
-				dispatch(channelsActions.addThreadUserNotJoin(threads[0] as ChannelsEntity));
-				dispatch(channelsActions.upsertOne(threads[0] as ChannelsEntity));
+				if (threads?.length) {
+					dispatch(channelsActions.addThreadUserNotJoin(threads[0] as ChannelsEntity));
+					dispatch(channelsActions.upsertOne(threads[0] as ChannelsEntity));
+				}
+			} catch (error) {
+				console.error(error);
 			}
+
 			setLoading(false);
 		};
 		fetchThreads();

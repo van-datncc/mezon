@@ -1057,7 +1057,7 @@ export const selectUnreadMessageEntries = createSelector(getMessagesState, (stat
 export const selectUnreadMessageIdByChannelId = createSelector(
 	[selectUnreadMessageEntries, (state, channelId) => channelId],
 	(lastMessagesEntries, channelId) => {
-		return lastMessagesEntries?.[channelId ?? ''];
+		return lastMessagesEntries?.[channelId];
 	}
 );
 
