@@ -672,16 +672,18 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 						return `#${display}`;
 					}}
 					style={mentionStyle}
-					renderSuggestion={(suggestion) => (
-						<SuggestItem
-							valueHightLight={valueHighlight}
-							display={suggestion?.display}
-							symbol="#"
-							subText={(suggestion as ChannelsMentionProps).subText}
-							channelId={suggestion.id}
-							emojiId=""
-						/>
-					)}
+					renderSuggestion={(suggestion) =>
+						suggestion?.id && suggestion?.display ? (
+							<SuggestItem
+								valueHightLight={valueHighlight}
+								display={suggestion.display}
+								symbol="#"
+								subText={(suggestion as ChannelsMentionProps).subText}
+								channelId={suggestion.id}
+								emojiId=""
+							/>
+						) : null
+					}
 					className="dark:bg-[#3B416B] bg-bgLightModeButton"
 				/>
 				<Mention

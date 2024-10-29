@@ -4,11 +4,11 @@ import { DirectEntity, selectDirectById, selectDirectsUnreadlist, useAppSelector
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import React, { memo } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../../../../../app/navigation/ScreenTypes';
 import { style } from './styles';
-import FastImage from "react-native-fast-image";
 
 const UnreadDMBadgeItem = memo(({ dmId, numUnread }: { dmId: string; numUnread: number }) => {
 	const dm = useAppSelector((state) => selectDirectById(state, dmId)) || ({} as DirectEntity);
