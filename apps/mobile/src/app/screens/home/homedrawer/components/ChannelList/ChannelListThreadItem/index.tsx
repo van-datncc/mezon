@@ -1,7 +1,7 @@
 import { Block, size, useTheme } from '@mezon/mobile-ui';
 import { selectIsUnreadChannelById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelThreads } from '@mezon/utils';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import LongCornerIcon from '../../../../../../../assets/svg/long-corner.svg';
 import ShortCornerIcon from '../../../../../../../assets/svg/short-corner.svg';
@@ -15,7 +15,7 @@ interface IChannelListThreadItemProps {
 	isFirstThread?: boolean;
 }
 
-export default function ChannelListThreadItem({ onPress, onLongPress, thread, isActive, isFirstThread }: IChannelListThreadItemProps) {
+const ChannelListThreadItem = memo(({ onPress, onLongPress, thread, isActive, isFirstThread }: IChannelListThreadItemProps) => {
 	const { themeValue, theme } = useTheme();
 	const styles = style(themeValue);
 
@@ -76,4 +76,5 @@ export default function ChannelListThreadItem({ onPress, onLongPress, thread, is
 			)}
 		</View>
 	);
-}
+});
+export default ChannelListThreadItem;

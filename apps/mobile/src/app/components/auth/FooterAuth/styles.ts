@@ -12,12 +12,12 @@ export const style = (colors: Attributes) =>
 		},
 		accountText: {
 			fontSize: Fonts.size.h7,
-			lineHeight: 13 * 1.4,
+			lineHeight: Fonts.size.h7,
 			color: colors.text
 		},
 		signupText: {
 			fontSize: Fonts.size.h7,
-			lineHeight: 13 * 1.4,
+			lineHeight: Fonts.size.h7,
 			color: baseColor.blurple,
 			marginLeft: Metrics.size.s
 		}
