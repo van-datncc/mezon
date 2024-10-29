@@ -1,4 +1,11 @@
-import { ChannelsEntity, selectAllChannels, selectAllHashtagDm, selectChannelById, selectNumberMemberVoiceChannel, selectTheme } from '@mezon/store';
+import {
+	ChannelsEntity,
+	selectAllChannelsByUser,
+	selectAllHashtagDm,
+	selectChannelById,
+	selectNumberMemberVoiceChannel,
+	selectTheme
+} from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { SearchItemProps, getSrcEmoji } from '@mezon/utils';
 import { ChannelType, HashtagDm } from 'mezon-js';
@@ -37,7 +44,7 @@ const SuggestItem = ({
 	isHightLight = true,
 	channel
 }: SuggestItemProps) => {
-	const allChannels = useSelector(selectAllChannels);
+	const allChannels = useSelector(selectAllChannelsByUser);
 	const { directId } = useParams();
 	const commonChannels = useSelector(selectAllHashtagDm);
 	const theme = useSelector(selectTheme);
