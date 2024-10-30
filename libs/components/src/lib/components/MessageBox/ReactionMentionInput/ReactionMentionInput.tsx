@@ -10,6 +10,7 @@ import {
 } from '@mezon/core';
 import {
 	ChannelsEntity,
+	RolesClanEntity,
 	emojiSuggestionActions,
 	messagesActions,
 	reactionActions,
@@ -47,6 +48,7 @@ import { Icons } from '@mezon/ui';
 import {
 	ChannelMembersEntity,
 	EmojiPlaces,
+	IMentionOnMessage,
 	IMessageSendPayload,
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
@@ -64,7 +66,7 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { KeyboardEvent, ReactElement, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Mention, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput, OnChangeHandlerFunc } from 'react-mentions';
 import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import { ThreadNameTextField } from '../../../components';
@@ -151,10 +153,11 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 
-	const currentDmOrChannelId = useMemo(
-		() => (props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currentChannel?.channel_id : currentDmId),
-		[currentChannel?.channel_id, currentDmId, props.mode]
-	);
+	const currentDmOrChannelId =
+		props.mode === ChannelStreamMode.STREAM_MODE_CHANNEL || props.mode === ChannelStreamMode.STREAM_MODE_THREAD
+			? currentChannel?.channel_id
+			: currentDmId;
+
 	const dataReferences = useSelector(selectDataReferences(currentDmOrChannelId ?? ''));
 
 	const { request, setRequestInput } = useMessageValue(props.isThread ? currentChannelId + String(props.isThread) : (currentChannelId as string));
@@ -167,6 +170,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		membersOfParent as ChannelMembersEntity[],
 		dataReferences?.message_sender_id || ''
 	);
+
 	const attachmentFilteredByChannelId = useSelector(selectAttachmentByChannelId(props.currentChannelId ?? ''));
 
 	const userProfile = useSelector(selectAllAccount);
@@ -256,6 +260,8 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		}
 	}, [attachmentFilteredByChannelId?.files]);
 
+	const [mentionOnFile, setMentionOnFile] = useState<IMentionOnMessage[]>([]);
+
 	const handleSend = useCallback(
 		(anonymousMessage?: boolean) => {
 			const payload = {
@@ -266,7 +272,6 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				mk: markdownList,
 				vk: voiceLinkRoomList
 			};
-
 			if ((!request?.valueTextInput && !checkAttachment) || ((request?.valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
@@ -304,7 +309,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			if (dataReferences.message_ref_id !== '') {
 				props.onSend(
 					filterEmptyArrays(payload),
-					mentionList,
+					mentionOnFile.length > 0 ? mentionOnFile : mentionList,
 					attachmentData,
 					[dataReferences],
 					{ nameValueThread: nameValueThread, isPrivate },
@@ -337,7 +342,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 				} else {
 					props.onSend(
 						filterEmptyArrays(payload),
-						mentionList,
+						mentionOnFile.length > 0 ? mentionOnFile : mentionList,
 						attachmentData,
 						undefined,
 						{ nameValueThread: nameValueThread, isPrivate },
@@ -366,6 +371,7 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 					files: []
 				})
 			);
+			setMentionOnFile([]);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -437,10 +443,22 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 		if (typeof props.onTyping === 'function') {
 			props.onTyping();
 		}
+		const onlyMention = filterMentionsWithAtSign(mentions);
+		const displayString = getDisplayMention(onlyMention);
 
 		if (props.handleConvertToFile !== undefined && newValue.length > MIN_THRESHOLD_CHARS) {
 			props.handleConvertToFile(newValue);
-			setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
+
+			if (onlyMention.length > 0) {
+				const mentionConverted = convertMentionOnfile(rolesClan, displayString, onlyMention as MentionItem[]);
+				setMentionOnFile(mentionConverted);
+				setRequestInput(
+					{ ...request, valueTextInput: formatMentionsToString(onlyMention), content: getDisplayMention(onlyMention) },
+					props.isThread
+				);
+			} else {
+				setRequestInput({ ...request, valueTextInput: '', content: '' }, props.isThread);
+			}
 		}
 
 		if (newPlainTextValue.endsWith('@')) {
@@ -566,6 +584,18 @@ export const MentionReactInput = memo((props: MentionReactInputProps): ReactElem
 			);
 		}
 	}, [currentChannel, isSearchMessage, isShowCreateThread, isShowDMUserProfile, isShowMemberList, isShowMemberListDM, props.mode]);
+
+	function formatMentionsToString(array: MentionDataProps[]) {
+		const mentionStrings = array.map((item) => `@[${item?.display?.replace('@', '')}](${item.id})`);
+		return mentionStrings.join(' ');
+	}
+	function getDisplayMention(array: MentionDataProps[]) {
+		const mentionStrings = array.map((item) => `${item?.display}`);
+		return mentionStrings.join(' ');
+	}
+	function filterMentionsWithAtSign(array: MentionDataProps[]) {
+		return array.filter((item: MentionDataProps) => item?.display?.startsWith('@'));
+	}
 
 	return (
 		<div className="relative">
@@ -744,4 +774,34 @@ const useEnterPressTracker = () => {
 	}, [enterCount, handleOpenPopupQuickMess]);
 
 	return { trackEnterPress };
+};
+
+const convertMentionOnfile = (roles: RolesClanEntity[], contentString: string, ment: MentionItem[]): IMentionOnMessage[] => {
+	const roleIds = roles.map((role) => role.id);
+	const mentions: IMentionOnMessage[] = [];
+
+	ment.forEach((mention) => {
+		const { id, display } = mention;
+		let startIndex = 0;
+
+		while ((startIndex = contentString.indexOf(display, startIndex)) !== -1) {
+			const s = startIndex;
+			const e = startIndex + display.length;
+			const isRole = roleIds.includes(id);
+
+			const exists = mentions.some((m) => m.s === s && m.e === e && ((isRole && m.role_id === id) || (!isRole && m.user_id === id)));
+
+			if (!exists) {
+				if (isRole) {
+					mentions.push({ role_id: id, s, e });
+				} else {
+					mentions.push({ user_id: id, s, e });
+				}
+			}
+
+			startIndex = e;
+		}
+	});
+
+	return mentions;
 };
