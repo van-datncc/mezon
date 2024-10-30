@@ -42,7 +42,10 @@ const App = () => {
 	const [isShowUpdateModal, setIsShowUpdateModal] = React.useState<boolean>(false);
 
 	useEffect(() => {
-		checkForUpdate();
+		const timer = setTimeout(() => {
+			checkForUpdate();
+		}, 2000);
+		return () => clearTimeout(timer);
 	}, []);
 
 	const checkForUpdate = async () => {
